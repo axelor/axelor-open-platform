@@ -42,57 +42,55 @@ export function useSelector() {
       context,
     });
 
-    if (tab === null) return;
-
-    const Handler = () => {
-      const { data, dataStore } = usePopupOptions();
-      if (data && dataStore) {
-        return <Operations state={data} dataStore={dataStore} />;
-      }
-      return null;
-    };
-
-    const Operations = ({
-      state,
-      dataStore,
-    }: {
-      state: GridState;
-      dataStore: DataStore;
-    }) => {
-      const onSelectionChange = useCallback(
-        (index: number, records: DataRecord[]) => {
-          if (index === 0 && multiple) return;
-          onSelect?.(records);
-          close();
-        },
-        []
-      );
-
-      useEffect(() => {
-        const index = state.selectedCell?.[1] ?? 0;
-        const records =
-          state.selectedRows?.map((index) => state.rows[index].record) ?? [];
-        if (records.length) {
-          onSelectionChange(index, records);
-        }
-      }, [
-        onSelectionChange,
-        state.rows,
-        state.selectedCell,
-        state.selectedRows,
-      ]);
-
-      return null;
-    };
+    if (!tab) return;
 
     const close = await showPopup({
       tab,
       open: true,
       onClose: () => {},
       header: () => <Header />,
-      handler: () => <Handler />,
+      handler: () => (
+        <Handler
+          close={() => close()}
+          multiple={multiple}
+          onSelect={onSelect}
+        />
+      ),
     });
   }, []);
+}
+
+function Handler({
+  multiple,
+  close,
+  onSelect,
+}: {
+  multiple?: boolean;
+  close: () => void;
+  onSelect?: (records: DataRecord[]) => void;
+}) {
+  const { data } = usePopupOptions();
+
+  const onSelectionChange = useCallback(
+    (index: number, records: DataRecord[]) => {
+      if (index === 0 && multiple) return;
+      onSelect?.(records);
+      close();
+    },
+    [close, multiple, onSelect]
+  );
+
+  useEffect(() => {
+    const state = data as GridState;
+    const index = state?.selectedCell?.[1] ?? 0;
+    const records =
+      state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
+    if (records.length) {
+      onSelectionChange(index, records);
+    }
+  }, [data, onSelectionChange]);
+
+  return null;
 }
 
 function Header() {
