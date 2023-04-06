@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
@@ -10,8 +10,13 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
+import { useSetPopupOptions } from "@/view-containers/view-popup";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewRoute, useViewSwitch } from "@/view-containers/views/scope";
+import {
+  useViewRoute,
+  useViewSwitch,
+  useViewTab,
+} from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import {
@@ -91,9 +96,8 @@ function FormContainer({
       async (get) => {
         let rec = get(formAtom).record;
         let res = await dataStore.save(rec);
-        if (res.id) {
-          doEdit(doRead(res.id));
-        }
+        if (res.id) res = await doRead(res.id);
+        doEdit(res);
         return res;
       },
       [dataStore, doEdit, doRead, formAtom]
@@ -144,75 +148,93 @@ function FormContainer({
 
   const pagination = usePagination(dataStore, record, doEdit);
 
+  const setPopupOptions = useSetPopupOptions();
+
+  const { popup, popupOptions } = useViewTab();
+
+  const showToolbar = popupOptions?.showToolbar !== false;
+
+  useEffect(() => {
+    if (popup) {
+      setPopupOptions({
+        onSave,
+        onEdit: doEdit,
+        onRead: doRead,
+      });
+    }
+  }, [doEdit, doRead, onSave, popup, setPopupOptions]);
+
   return (
     <div className={styles.formViewContainer}>
-      <ViewToolBar
-        meta={meta}
-        actions={[
-          {
-            key: "new",
-            text: i18n.get("New"),
-            iconProps: {
-              icon: "add",
-            },
-            onClick: onNew,
-          },
-          {
-            key: "save",
-            text: i18n.get("Save"),
-            iconProps: {
-              icon: "save",
-            },
-            onClick: onSave,
-          },
-          {
-            key: "more",
-            iconOnly: true,
-            iconProps: {
-              icon: "arrow_drop_down",
-            },
-            items: [
-              {
-                key: "refresh",
-                text: i18n.get("Refresh"),
-                onClick: onRefresh,
+      {showToolbar && (
+        <ViewToolBar
+          meta={meta}
+          actions={[
+            {
+              key: "new",
+              text: i18n.get("New"),
+              iconProps: {
+                icon: "add",
               },
-              {
-                key: "delete",
-                text: i18n.get("Delete"),
-                iconProps: {
-                  icon: "delete",
+              onClick: onNew,
+            },
+            {
+              key: "save",
+              text: i18n.get("Save"),
+              iconProps: {
+                icon: "save",
+              },
+              onClick: onSave,
+            },
+            {
+              key: "more",
+              iconOnly: true,
+              iconProps: {
+                icon: "arrow_drop_down",
+              },
+              items: [
+                {
+                  key: "refresh",
+                  text: i18n.get("Refresh"),
+                  onClick: onRefresh,
                 },
-                onClick: onDelete,
-              },
-              {
-                key: "copy",
-                text: i18n.get("Duplicate"),
-                onClick: onCopy,
-              },
-              {
-                key: "s1",
-                divider: true,
-              },
-              {
-                key: "archive",
-                text: i18n.get("Archive"),
-                onClick: onArchive,
-              },
-              {
-                key: "s2",
-                divider: true,
-              },
-              {
-                key: "audit",
-                text: i18n.get("Last modified..."),
-                onClick: onAudit,
-              },
-            ],
-          },
-        ]}
-        pagination={pagination}
-      />
+                {
+                  key: "delete",
+                  text: i18n.get("Delete"),
+                  iconProps: {
+                    icon: "delete",
+                  },
+                  onClick: onDelete,
+                },
+                {
+                  key: "copy",
+                  text: i18n.get("Duplicate"),
+                  onClick: onCopy,
+                },
+                {
+                  key: "s1",
+                  divider: true,
+                },
+                {
+                  key: "archive",
+                  text: i18n.get("Archive"),
+                  onClick: onArchive,
+                },
+                {
+                  key: "s2",
+                  divider: true,
+                },
+                {
+                  key: "audit",
+                  text: i18n.get("Last modified..."),
+                  onClick: onAudit,
+                },
+              ],
+            },
+          ]}
+          pagination={pagination}
+        />
+      )}
       <div className={styles.formViewScroller}>
         <FormComponent
           className={styles.formView}

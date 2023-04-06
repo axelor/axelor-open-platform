@@ -3,14 +3,17 @@ import { createScope, molecule, useMolecule } from "jotai-molecules";
 
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
 
 export type PopupOptions = {
   data?: any;
   dataStore?: DataStore;
-  onNew?: () => void;
-  onSave?: () => void;
+  onNew?: () => Promise<void>;
+  onRead?: (id: string | number) => Promise<DataRecord>;
+  onEdit?: (record: DataRecord | null) => Promise<void>;
+  onSave?: () => Promise<DataRecord>;
   onSearch?: (options?: SearchOptions) => Promise<SearchResult>;
-  onRefresh?: () => void;
+  onRefresh?: () => Promise<void>;
 };
 
 export const PopupScope = createScope<PopupOptions>({});
