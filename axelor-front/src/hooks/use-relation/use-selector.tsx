@@ -12,7 +12,7 @@ import { showPopup, usePopupOptions } from "@/view-containers/view-popup";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
 
-export type SelectorProps = {
+export type SelectorOptions = {
   model: string;
   title: string;
   multiple?: boolean;
@@ -23,9 +23,9 @@ export type SelectorProps = {
 };
 
 export function useSelector() {
-  return useCallback(async function showSelector(props: SelectorProps) {
+  return useCallback(async function showSelector(options: SelectorOptions) {
     const { title, model, viewName, multiple, domain, context, onSelect } =
-      props;
+      options;
     const tab = await initTab({
       name: uniqueId("$selector"),
       title,
