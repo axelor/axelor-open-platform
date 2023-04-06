@@ -2,29 +2,26 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { memo, useMemo } from "react";
 
-import { Box, Fade } from "@axelor/ui";
-
-import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
-import { findView } from "@/services/client/meta-cache";
 import { filters as fetchFilters } from "@/services/client/meta";
+import { findView } from "@/services/client/meta-cache";
 import { SearchFilter, SearchFilters } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
+import { Loader } from "@/components/loader/loader";
+import { Box, Fade } from "@axelor/ui";
 import { ViewScope } from "./scope";
 
-function useViewComp(viewType: string) {
-  return useAsync(async () => {
-    const type = toKebabCase(viewType);
-    const name = toCamelCase(type);
-    const { [name]: Comp } = await import(`../../views/${type}/index.ts`);
-    return Comp as React.ElementType;
-  }, [viewType]);
+async function loadComp(viewType: string) {
+  const type = toKebabCase(viewType);
+  const name = toCamelCase(type);
+  const { [name]: Comp } = await import(`../../views/${type}/index.ts`);
+  return Comp as React.ElementType;
 }
 
-function useViewSchema({
+async function loadView({
   name,
   type,
   model,
@@ -33,10 +30,9 @@ function useViewSchema({
   name?: string;
   model?: string;
 }) {
-  return useAsync(
-    async () => findView({ type, name, model }),
-    [type, name, model]
-  );
+  const meta = await findView({ type, name, model });
+  const Comp = await loadComp(type);
+  return { meta, type, Comp };
 }
 
 function ViewContainer({
@@ -51,16 +47,16 @@ function ViewContainer({
   domains?: SearchFilter[];
 }) {
   const { model } = tab.action;
+  const { state, data } = useAsync(
+    async () => loadView({ model, ...view }),
+    [model, view]
+  );
 
-  const viewSchema = useViewSchema({ model, ...view });
-  const viewComp = useViewComp(view.type);
-
-  if (viewSchema.state === "loading" || viewComp.state === "loading") {
+  if (state === "loading" || data?.type !== view.type) {
     return <Loader />;
   }
 
-  const meta = viewSchema.data;
-  const Comp = viewComp.data;
+  const { meta, Comp } = data;
 
   if (Comp) {
     return (
