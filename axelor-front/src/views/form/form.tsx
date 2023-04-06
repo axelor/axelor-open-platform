@@ -1,12 +1,14 @@
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useContainerQuery } from "@/hooks/use-container-query";
+import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewRoute, useViewSwitch } from "@/view-containers/views/scope";
@@ -20,148 +22,123 @@ import {
 } from "./builder";
 import { fallbackWidgetAtom } from "./builder/atoms";
 
-import { DataStore } from "@/services/client/data-store";
 import styles from "./form.module.scss";
 
-export function Form({ meta, dataStore }: ViewProps<FormView>) {
+const fetchRecord = async (
+  meta: ViewData<FormView>,
+  dataStore: DataStore,
+  id?: string | number
+) => {
+  if (id && +id > 0) {
+    const fields = Object.keys(meta.fields ?? {});
+    const related = meta.related;
+    return dataStore.read(+id, { fields, related });
+  }
+  return {};
+};
+
+export function Form(props: ViewProps<FormView>) {
+  const { meta, dataStore } = props;
   const { id } = useViewRoute("form");
+  const { data: record = {} } = useAsync(
+    () => fetchRecord(meta, dataStore, id),
+    [id, meta, dataStore]
+  );
 
-  const fetchRecord = useCallback(async (): Promise<DataRecord> => {
-    if (id) {
-      const fields = Object.keys(meta.fields ?? {});
-      const related = meta.related;
-      return dataStore.read(+id, {
-        fields,
-        related,
-      });
-    }
-    return {};
-  }, [dataStore, id, meta.fields, meta.related]);
+  return <FormContainer {...props} record={record} />;
+}
 
-  const { data: record = {} } = useAsync(fetchRecord, [id, meta, dataStore]);
-
+function FormContainer({
+  meta,
+  dataStore,
+  record,
+}: ViewProps<FormView> & { record: DataRecord }) {
   const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
     meta,
     record
   );
 
-  const editRef = useRef<DataRecord | null>(null);
-
   const switchTo = useViewSwitch();
+
+  const doRead = useCallback(
+    async (id: number | string) => {
+      return await fetchRecord(meta, dataStore, id);
+    },
+    [dataStore, meta]
+  );
 
   const doEdit = useAtomCallback(
     useCallback(
       async (get, set, record: DataRecord | null) => {
-        const lastId = id;
-        const nextId = String(record?.id ?? "");
-
-        editRef.current = record;
-
-        if (nextId !== lastId) {
-          switchTo({
-            mode: "edit",
-            id: nextId,
-          });
-        }
-
+        const id = String(record?.id ?? "");
+        switchTo({ mode: "edit", id });
         set(formAtom, (prev) => ({
           ...prev,
           states: {},
           record: record ?? {},
         }));
       },
-      [formAtom, id, switchTo]
+      [formAtom, switchTo]
     )
   );
 
-  useEffect(() => {
-    if (id) return;
-    doEdit(editRef.current);
-  }, [doEdit, id]);
-
-  const onNew = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        doEdit(null);
-      },
-      [doEdit]
-    )
-  );
+  const onNew = useCallback(async () => {
+    doEdit(null);
+  }, [doEdit]);
 
   const onSave = useAtomCallback(
     useCallback(
-      async (get, set) => {
-        const rec = get(formAtom).record;
-        const res = await dataStore.save(rec);
-        doEdit(res);
-      },
-      [dataStore, doEdit, formAtom]
-    )
-  );
-
-  const onRefresh = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        const rec = await fetchRecord();
-        await doEdit(rec);
-      },
-      [doEdit, fetchRecord]
-    )
-  );
-
-  const onDelete = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        if (record.id) {
-          const confirmed = await dialogs.confirm({
-            content: i18n.get(
-              "Do you really want to delete the selected record?"
-            ),
-          });
-          if (confirmed) {
-            const id = record.id!;
-            const version = record.version!;
-            await dataStore.delete({ id, version });
-            switchTo({ mode: "list" });
-          }
+      async (get) => {
+        let rec = get(formAtom).record;
+        let res = await dataStore.save(rec);
+        if (res.id) {
+          doEdit(doRead(res.id));
         }
+        return res;
       },
-      [dataStore, record.id, record.version, switchTo]
+      [dataStore, doEdit, doRead, formAtom]
     )
   );
 
-  const onCopy = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        if (record.id) {
-          const rec = await dataStore.copy(record.id);
-          doEdit(rec);
-        }
-      },
-      [dataStore, doEdit, record.id]
-    )
-  );
+  const onRefresh = useCallback(async () => {
+    const rec = await doRead(record.id ?? "");
+    await doEdit(rec);
+  }, [doEdit, doRead, record.id]);
 
-  const onArchive = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        if (record.id) {
-          const confirmed = await dialogs.confirm({
-            content: i18n.get(
-              "Do you really want to archive the selected record?"
-            ),
-          });
-          if (confirmed) {
-            const id = record.id!;
-            const version = record.version!;
-            await dataStore.save({ id, version, archived: true });
-            switchTo({ mode: "list" });
-          }
-        }
-      },
-      [dataStore, record.id, record.version, switchTo]
-    )
-  );
+  const onDelete = useCallback(async () => {
+    if (record.id) {
+      const confirmed = await dialogs.confirm({
+        content: i18n.get("Do you really want to delete the selected record?"),
+      });
+      if (confirmed) {
+        const id = record.id!;
+        const version = record.version!;
+        await dataStore.delete({ id, version });
+        switchTo({ mode: "list" });
+      }
+    }
+  }, [dataStore, record.id, record.version, switchTo]);
+
+  const onCopy = useCallback(async () => {
+    if (record.id) {
+      const rec = await dataStore.copy(record.id);
+      doEdit(rec);
+    }
+  }, [dataStore, doEdit, record.id]);
+
+  const onArchive = useCallback(async () => {
+    if (record.id) {
+      const confirmed = await dialogs.confirm({
+        content: i18n.get("Do you really want to archive the selected record?"),
+      });
+      if (confirmed) {
+        const id = record.id!;
+        const version = record.version!;
+        await dataStore.save({ id, version, archived: true });
+        switchTo({ mode: "list" });
+      }
+    }
+  }, [dataStore, record.id, record.version, switchTo]);
 
   const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
 
