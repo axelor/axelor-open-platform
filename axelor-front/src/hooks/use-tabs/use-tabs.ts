@@ -108,6 +108,42 @@ export type Tab = {
   readonly action: ActionView;
 
   /**
+   * Whether this tab is a popup view.
+   *
+   */
+  readonly popup?: boolean;
+
+  /**
+   * Options for the popup views.
+   *
+   */
+  readonly popupOptions?: {
+    /**
+     * Whether the popup should be displayed in fullscreen mode.
+     *
+     */
+    fullScreen?: boolean;
+
+    /**
+     * Whether to show the toolbar.
+     *
+     */
+    showToolbar?: boolean;
+
+    /**
+     * Whether to show the edit icon in grid popup.
+     *
+     */
+    showEditIcon?: boolean;
+
+    /**
+     * Whether to allow multiple row selection in grid popup.
+     *
+     */
+    multiSelect?: boolean;
+  };
+
+  /**
    * The volatile state of the tab
    *
    */
@@ -234,11 +270,21 @@ export async function initTab(
       }
     );
 
+    const popup = Boolean(actionView.params?.popup);
+    const popupOptions = {
+      fullScreen: Boolean(actionView.params?.["popup-maximized"]),
+      showToolbar: actionView.params?.["show-toolbar"] !== false,
+      showEditIcon: actionView.params?.["_popup-edit-icon"] !== false,
+      multiSelect: actionView.params?.["_popup-multi-select"] !== false,
+    };
+
     const tab: Tab = {
       id,
       title,
       action: actionView,
       state: state,
+      popup,
+      popupOptions,
     };
 
     return tab;
@@ -276,12 +322,11 @@ const openTabAtom = atom(
     }
 
     const tab = await initTab(view, route);
-    const popup = Boolean(tab?.action?.params?.popup);
 
     if (tab) {
       set(tabsAtom, (state) => {
         const { active, tabs, popups } = state;
-        const newState = popup
+        const newState = tab.popup
           ? { active, tabs, popups: [...popups, tab] }
           : { active: tab.id, tabs: [...tabs, tab], popups };
         return newState;
