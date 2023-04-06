@@ -1,11 +1,12 @@
 import { WidgetProps } from "../../builder";
-import { useAtomValue } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DataSource } from "./utils";
 import { focusAtom } from "jotai-optics";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
+import { useViewAction } from "@/view-containers/views/scope";
 
 function getMessages(
   id: number,
@@ -35,21 +36,21 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
     limit: 4,
     total: 0,
   });
+  const { name } = useViewAction();
+  const { model, modelId: recordId } = schema;
   const { offset, limit } = pagination;
-  const recordId = useAtomValue(
+  const setEmpty = useSetAtom(
     useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
+      () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
       [formAtom]
     )
   );
   const fields = useAtomValue(
     useMemo(() => focusAtom(formAtom, (o) => o.prop("fields")), [formAtom])
   );
-  const model = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom])
-  );
-  const msgFolder = "";
-  const hasMessages = true;
+  const isMessageBox = model === "com.axelor.mail.db.MailMessage";
+  const folder = isMessageBox ? name.split(".").pop() : "";
+  const hasMessages = isMessageBox || (recordId ?? 0) > 0;
 
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
@@ -59,7 +60,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         data,
         pageInfo: { totalRecords, hasNextPage },
       } = await getMessages(recordId as number, model, {
-        folder: msgFolder,
+        folder,
         ...options,
       });
       if (parent) {
@@ -87,7 +88,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }));
       }
     },
-    [hasMessages, recordId, model, msgFolder]
+    [hasMessages, recordId, model, folder]
   );
 
   const postComment = useCallback(
@@ -208,11 +209,18 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
     fetchAll({ ...pagination, offset: 0 });
   }, [fetchAll]);
 
+  const { total } = pagination;
+  useEffect(() => {
+    if (isMessageBox) {
+      setEmpty(total === 0);
+    }
+  }, [isMessageBox, total, setEmpty]);
+  
   return (
     <MessageBox
       fields={fields}
       data={messages}
-      isMail={false}
+      isMail={isMessageBox}
       onFetch={fetchAll}
       onComment={postComment}
       onCommentRemove={removeComment}
