@@ -14,7 +14,7 @@ export type FormatOptions = {
 
 export type Formatter = (value: any, opts?: FormatOptions) => string;
 
-function getTimeFormat(opts: FormatOptions = {}) {
+export function getTimeFormat(opts: FormatOptions = {}) {
   let props = opts?.props;
   let format = "HH:mm";
   if (props?.seconds) {
@@ -23,7 +23,7 @@ function getTimeFormat(opts: FormatOptions = {}) {
   return format;
 }
 
-function getDateTimeFormat(opts: FormatOptions = {}) {
+export function getDateTimeFormat(opts: FormatOptions = {}) {
   const dateFormat = l10n.getDateFormat();
   return dateFormat + " " + getTimeFormat(opts);
 }
