@@ -5,12 +5,13 @@ import {
   useAtomValue,
   useSetAtom,
 } from "jotai";
-import { selectAtom } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNil, omitBy } from "lodash";
 
-import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView, SavedFilter } from "@/services/client/meta.types";
+import { useCallback } from "react";
+import { useRoute } from "../use-route";
 
 /**
  * The route state of a specific view type.
@@ -355,13 +356,6 @@ const closeTabAtom = atom(null, async (get, set, view: ActionView | string) => {
       tabs: newTabs,
       popups,
     });
-
-    // if it was a last tab
-    if (newTabs.length === 0) {
-      navigate("/");
-    }
-
-    return;
   }
 
   const popup = popups.find((x) => x.id === name);
@@ -384,9 +378,18 @@ const closeTabAtom = atom(null, async (get, set, view: ActionView | string) => {
 export function useTabs() {
   const { tabs: items, popups } = useAtomValue(tabsAtom);
   const active = useAtomValue(activeAtom) ?? null;
+  const { navigate } = useRoute();
 
   const open: OpenTab = useSetAtom(openTabAtom);
-  const close: CloseTab = useSetAtom(closeTabAtom);
+  const close: CloseTab = useAtomCallback(
+    useCallback(
+      (get, set, view) => {
+        set(closeTabAtom, view);
+        get(tabsAtom).tabs.length === 0 && navigate("/");
+      },
+      [navigate]
+    )
+  );
 
   return {
     active,

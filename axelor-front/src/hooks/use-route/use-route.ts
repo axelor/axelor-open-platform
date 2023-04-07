@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   createSearchParams,
   generatePath,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
-import { navigate } from "@/routes";
-
 export function useRoute() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const refs = useRef({ location });
+  const refs = useRef({ location, navigate });
 
   const redirect = useCallback(
     (
@@ -21,7 +21,7 @@ export function useRoute() {
       let search = createSearchParams(query).toString();
       const current = refs.current.location;
       if (current.pathname !== pathname || current.search !== search) {
-        navigate({
+        refs.current.navigate({
           pathname,
           search,
         });
@@ -31,11 +31,8 @@ export function useRoute() {
   );
 
   useEffect(() => {
-    refs.current = { location };
-  }, [location]);
+    refs.current = { location, navigate };
+  }, [location, navigate]);
 
-  return {
-    location,
-    redirect,
-  };
+  return useMemo(() => ({ ...refs.current, redirect }), [redirect]);
 }

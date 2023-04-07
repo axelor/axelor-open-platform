@@ -1,14 +1,16 @@
 import { useSession } from "@/hooks/use-session";
-import { navigate } from "@/routes";
 import { Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+import { useRoute } from "@/hooks/use-route";
 import { useSidebar } from "../nav-drawer/hook";
+
+import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import styles from "./nav-header.module.scss";
 
 function FarItems() {
   const { data, logout } = useSession();
+  const { navigate } = useRoute();
   return (
     <CommandBar
       items={[

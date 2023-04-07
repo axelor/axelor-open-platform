@@ -61,8 +61,6 @@ const router = createHashRouter([
   },
 ]);
 
-export const navigate = router.navigate;
-
 export function Routes() {
   return <RouterProvider router={router} />;
 }
