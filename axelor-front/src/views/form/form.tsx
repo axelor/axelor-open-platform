@@ -10,7 +10,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import { useSetPopupOptions } from "@/view-containers/view-popup";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewRoute,
@@ -27,6 +27,7 @@ import {
 } from "./builder";
 import { fallbackWidgetAtom } from "./builder/atoms";
 
+import { useSetAtom } from "jotai";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -154,21 +155,21 @@ function FormContainer({
 
   const pagination = usePagination(dataStore, record, doEdit);
 
-  const setPopupOptions = useSetPopupOptions();
-
   const { popup, popupOptions } = useViewTab();
+  const popupHandlerAtom = usePopupHandlerAtom();
+  const setPopupHandlers = useSetAtom(popupHandlerAtom);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
   useEffect(() => {
     if (popup) {
-      setPopupOptions({
+      setPopupHandlers({
         onSave,
         onEdit: doEdit,
         onRead: doRead,
       });
     }
-  }, [doEdit, doRead, onSave, popup, setPopupOptions]);
+  }, [doEdit, doRead, onSave, popup, setPopupHandlers]);
 
   return (
     <div className={styles.formViewContainer}>

@@ -7,8 +7,10 @@ import { GridState } from "@axelor/ui/grid";
 import { PageText } from "@/components/page-text";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { showPopup, usePopupOptions } from "@/view-containers/view-popup";
+import { showPopup } from "@/view-containers/view-popup";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
+import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
 
@@ -69,7 +71,8 @@ function Handler({
   close: () => void;
   onSelect?: (records: DataRecord[]) => void;
 }) {
-  const { data } = usePopupOptions();
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
 
   const onSelectionChange = useCallback(
     (index: number, records: DataRecord[]) => {
@@ -81,22 +84,23 @@ function Handler({
   );
 
   useEffect(() => {
-    const state = data as GridState;
+    const state = handler.data as GridState;
     const index = state?.selectedCell?.[1] ?? 0;
     const records =
       state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
     if (records.length) {
       onSelectionChange(index, records);
     }
-  }, [data, onSelectionChange]);
+  }, [handler, onSelectionChange]);
 
   return null;
 }
 
 function Header() {
-  const { dataStore } = usePopupOptions();
-  if (dataStore) {
-    return <SelectorHeader dataStore={dataStore} />;
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+  if (handler.dataStore) {
+    return <SelectorHeader dataStore={handler.dataStore} />;
   }
   return null;
 }

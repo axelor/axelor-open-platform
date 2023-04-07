@@ -1,13 +1,15 @@
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
+import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import AdvanceSearch from "@/view-containers/advance-search";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewProps,
@@ -20,8 +22,6 @@ import { ViewProps } from "../types";
 import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
 
-import { PageText } from "@/components/page-text";
-import { useSetPopupOptions } from "@/view-containers/view-popup";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -136,15 +136,18 @@ export function Grid(props: ViewProps<GridView>) {
   );
 
   const { popup, popupOptions } = useViewTab();
-  const setPopupOptions = useSetPopupOptions();
+  const popupHandlerAtom = usePopupHandlerAtom();
+  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+
   useEffect(() => {
-    if (!popup) return;
-    setPopupOptions({
-      data: state,
-      dataStore: dataStore,
-      onSearch,
-    });
-  }, [state, onSearch, setPopupOptions, popup, dataStore]);
+    if (popup) {
+      setPopupHandlers({
+        data: state,
+        dataStore: dataStore,
+        onSearch,
+      });
+    }
+  }, [state, onSearch, popup, dataStore, setPopupHandlers]);
 
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;

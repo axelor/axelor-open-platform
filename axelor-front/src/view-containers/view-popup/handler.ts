@@ -1,11 +1,10 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
-
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
+import { atom } from "jotai";
+import { createScope, molecule, useMolecule } from "jotai-molecules";
 
-export type PopupOptions = {
+export type PopupHandler = {
   data?: any;
   dataStore?: DataStore;
   onNew?: () => Promise<void>;
@@ -16,19 +15,12 @@ export type PopupOptions = {
   onRefresh?: () => Promise<void>;
 };
 
-export const PopupScope = createScope<PopupOptions>({});
+export const PopupScope = createScope<PopupHandler>({});
 
 const popupMolecule = molecule((getMol, getScope) => {
-  const initialView = getScope(PopupScope);
-  return atom(initialView);
+  return atom(getScope(PopupScope));
 });
 
-export function useSetPopupOptions() {
-  const viewAtom = useMolecule(popupMolecule);
-  return useSetAtom(viewAtom);
-}
-
-export function usePopupOptions() {
-  const viewAtom = useMolecule(popupMolecule);
-  return useAtomValue(viewAtom);
+export function usePopupHandlerAtom() {
+  return useMolecule(popupMolecule);
 }

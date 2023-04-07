@@ -1,3 +1,4 @@
+import { useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import { useCallback } from "react";
 
@@ -5,7 +6,8 @@ import { Box, Button } from "@axelor/ui";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { showPopup, usePopupOptions } from "@/view-containers/view-popup";
+import { showPopup } from "@/view-containers/view-popup";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { useAsyncEffect } from "../use-async-effect";
 import { initTab } from "../use-tabs";
@@ -49,13 +51,18 @@ export function useEditor() {
 }
 
 function Handler({ record }: { record?: DataRecord | null }) {
-  const { onRead, onEdit } = usePopupOptions();
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+
+  const { onEdit, onRead } = handler;
+
   useAsyncEffect(async () => {
     if (!onRead || !onEdit) return;
     let rec = record ?? {};
     if (rec.id && +rec.id > 0) rec = await onRead(rec.id);
     onEdit(rec);
-  }, [onEdit, onRead, record]);
+  }, [record]);
+
   return null;
 }
 
@@ -66,19 +73,21 @@ function Footer({
   onClose: () => void;
   onSelect?: (record: DataRecord) => void;
 }) {
-  const { onSave } = usePopupOptions();
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
 
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
 
   const handleConfirm = useCallback(async () => {
+    const { onSave } = handler;
     if (onSave) {
       const rec = await onSave();
       onSelect?.(rec);
     }
     onClose();
-  }, [onClose, onSave, onSelect]);
+  }, [handler, onClose, onSelect]);
 
   return (
     <Box d="flex" g={2}>

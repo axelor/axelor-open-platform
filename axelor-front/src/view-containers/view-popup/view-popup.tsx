@@ -5,7 +5,7 @@ import { DialogButton, ModalDialog } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 
 import { Views } from "../views";
-import { PopupScope } from "./scope";
+import { PopupScope } from "./handler";
 
 import styles from "./view-popup.module.scss";
 
