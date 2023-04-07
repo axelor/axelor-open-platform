@@ -45,6 +45,9 @@ function processFields(fields: Property[] | Record<string, Property>) {
 }
 
 function processSelection(field: Schema) {
+  if (field.selectionList && !field.widget) {
+    field.widget = 'selection';
+  }
   _.each(field.selectionList, (item) => {
     if (_.isString(item.data)) {
       item.data = JSON.parse(item.data);

@@ -1,0 +1,23 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 1.75rem;
+}
+
+.tag-text {
+  display: inline-block;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.tag-remove {
+  cursor: pointer;
+  line-height: 0;
+  margin-right: -0.25rem;
+  [dir="rtl"] & {
+    margin-right: unset;
+    margin-left: -0.25rem;
+  }
+}
