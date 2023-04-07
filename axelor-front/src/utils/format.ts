@@ -1,8 +1,7 @@
-import moment from "dayjs";
 import _ from "lodash";
 
 import { DataContext } from "@/services/client/data.types";
-import { l10n } from "@/services/client/l10n";
+import { l10n, moment } from "@/services/client/l10n";
 import { Field, JsonField } from "@/services/client/meta.types";
 
 import { toKebabCase } from "./names";

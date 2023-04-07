@@ -1,4 +1,4 @@
-import moment from "dayjs";
+import { moment } from "@/services/client/l10n";
 import { toKebabCase } from "@/utils/names";
 
 function getNextOf(mm, timeUnit) {

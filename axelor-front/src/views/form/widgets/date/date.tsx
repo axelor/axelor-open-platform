@@ -1,4 +1,3 @@
-import moment from "dayjs";
 import { Box, useClassNames } from "@axelor/ui";
 import { useAtom } from "jotai";
 import {
@@ -19,10 +18,8 @@ import { Picker } from "./picker";
 import { i18n } from "@/services/client/i18n";
 import { DateInput } from "./date-input";
 import { TimeInput } from "./time-input";
-import { l10n } from "@/services/client/l10n";
+import { l10n, moment } from "@/services/client/l10n";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-moment.extend(customParseFormat);
 
 function focusInput(inputEl?: HTMLElement) {
   let input = inputEl && inputEl.querySelector("input,textarea");
@@ -95,7 +92,7 @@ export function Date({ schema, readonly, valueAtom }: FieldProps<string>) {
       if (changed) {
         const value = e?.target?.value || null;
         setValue(
-          value && moment(value).isValid()
+          value && moment(value, format).isValid()
             ? moment(value, format).format(valueFormat)
             : null,
           true
@@ -137,7 +134,7 @@ export function Date({ schema, readonly, valueAtom }: FieldProps<string>) {
     (value: Date | null, event: SyntheticEvent) => {
       const callOnChange = event.type === "click" ? true : false;
       setValue(
-        value && moment(value, format).isValid()
+        value && moment(value).isValid()
           ? moment(value).format(valueFormat)
           : null,
         callOnChange
@@ -147,7 +144,7 @@ export function Date({ schema, readonly, valueAtom }: FieldProps<string>) {
     [valueFormat, setValue]
   );
 
-  const momentValue = value ? moment(value, format) : null;
+  const momentValue = value ? moment(value) : null;
   return (
     <FieldContainer readonly={readonly}>
       <label htmlFor={uid}>{title}</label>

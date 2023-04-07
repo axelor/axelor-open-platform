@@ -1,4 +1,3 @@
-import moment from "dayjs";
 import { get } from "lodash";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -6,6 +5,7 @@ import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 import { ActionOptions } from "@/view-containers/action";
+import { moment } from "@/services/client/l10n";
 
 export type EvalContextOptions = {
   valid?: (name?: string) => boolean;

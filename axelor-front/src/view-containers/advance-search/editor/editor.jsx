@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import moment from "dayjs";
+import { useCallback, useEffect, useMemo } from "react";
 import produce from "immer";
 import { Input, Divider, Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -12,6 +11,7 @@ import {
   SimpleButton,
   RelationalWidget,
 } from "./components";
+import { moment } from "@/services/client/l10n";
 import Criteria from "./criteria";
 import styles from "./editor.module.css";
 

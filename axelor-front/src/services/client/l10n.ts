@@ -1,7 +1,13 @@
+import dayjs from "dayjs";
 import dayjsLocale from "dayjs/locale.json";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 import { toKebabCase } from "@/utils/names";
 import { session } from "./session";
+
+dayjs.extend(customParseFormat);
+dayjs.extend(relativeTime);
 
 const DATE_FORMAT = "DD/MM/YYYY";
 const SUPPORTED_LOCALE = dayjsLocale.reduce((prev, item) => ({
@@ -82,6 +88,8 @@ function findLocale() {
     navigator.language;
   return lang ?? "en";
 }
+
+export const moment = dayjs;
 
 export module l10n {
   export function getLocale() {

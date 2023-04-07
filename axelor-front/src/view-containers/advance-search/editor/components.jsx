@@ -1,11 +1,11 @@
 import React, { useRef } from "react";
 import clsx from "clsx";
-import moment from "dayjs";
 import { Box, Select as AxSelect, Button, Input } from "@axelor/ui";
 import { ReactComponent as CaretDownFillIcon } from "bootstrap-icons/icons/caret-down-fill.svg";
 import { toKebabCase } from "@/utils/names";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
+import { moment } from "@/services/client/l10n";
 import styles from "./components.module.css";
 
 function TextField(props) {
