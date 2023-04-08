@@ -12,19 +12,14 @@ const getURL = (
   mode: string | null = null,
   id: string | null = null
 ) => {
-  if (!action || action.startsWith("$")) {
-    return null;
-  }
+  if (!action || action.startsWith("$")) return null;
 
-  if (mode === "list") {
-    id = id || "1";
-  }
+  if (mode === "list") id = id || "1";
 
-  return generatePath("/ds/:action/:mode?/:id?", {
-    action,
-    mode,
-    id,
-  });
+  if (!mode) return generatePath("/ds/:action", { action });
+  if (!id) return generatePath("/ds/:action/:mode", { action, mode });
+
+  return generatePath("/ds/:action/:mode/:id", { action, mode, id });
 };
 
 const activeTabAtom = atom<Tab | null>(null);
