@@ -13,6 +13,7 @@ import { FormView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  useViewProps,
   useViewRoute,
   useViewSwitch,
   useViewTab,
@@ -25,9 +26,10 @@ import {
   FormWidget,
   useFormHandlers,
 } from "./builder";
-import { fallbackWidgetAtom } from "./builder/atoms";
+import { createWidgetAtom } from "./builder/atoms";
 
-import { useSetAtom } from "jotai";
+import { useRoute } from "@/hooks/use-route";
+import { useAtomValue, useSetAtom } from "jotai";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -45,24 +47,46 @@ const fetchRecord = async (
 
 export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
-  const { id } = useViewRoute("form");
+
+  const { id } = useViewRoute();
+  const [viewProps = {}] = useViewProps();
+
+  const { action } = useViewTab();
+
+  const readonly = action.params?.forceReadonly ?? viewProps.readonly;
+  const recordId = id ?? action.context?._showRecord;
+
   const { data: record = {} } = useAsync(
-    () => fetchRecord(meta, dataStore, id),
-    [id, meta, dataStore]
+    () => fetchRecord(meta, dataStore, recordId),
+    [recordId, meta, dataStore]
   );
 
-  return <FormContainer {...props} record={record} />;
+  return <FormContainer {...props} record={record} readonly={readonly} />;
 }
 
 function FormContainer({
   meta,
   dataStore,
   record,
-}: ViewProps<FormView> & { record: DataRecord }) {
+  ...props
+}: ViewProps<FormView> & { record: DataRecord; readonly?: boolean }) {
+  const { view: schema } = meta;
+
   const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
     meta,
     record
   );
+
+  const widgetAtom = useMemo(
+    () => createWidgetAtom({ schema, formAtom }),
+    [formAtom, schema]
+  );
+
+  const { attrs } = useAtomValue(widgetAtom);
+  const setAttrs = useSetAtom(widgetAtom);
+  const { navigate } = useRoute();
+
+  const readonly = attrs.readonly ?? props.readonly;
 
   const switchTo = useViewSwitch();
 
@@ -75,9 +99,14 @@ function FormContainer({
 
   const doEdit = useAtomCallback(
     useCallback(
-      async (get, set, record: DataRecord | null) => {
+      async (
+        get,
+        set,
+        record: DataRecord | null,
+        options?: { readonly?: boolean }
+      ) => {
         const id = String(record?.id ?? "");
-        switchTo({ mode: "edit", id });
+        switchTo("form", { route: { id }, props: options });
         set(formAtom, (prev) => ({
           ...prev,
           states: {},
@@ -89,8 +118,21 @@ function FormContainer({
   );
 
   const onNew = useCallback(async () => {
-    doEdit(null);
+    doEdit(null, {
+      readonly: false,
+    });
   }, [doEdit]);
+
+  const onEdit = useCallback(async () => {
+    setAttrs((prev) => ({
+      ...prev,
+      attrs: { ...prev.attrs, readonly: false },
+    }));
+  }, [setAttrs]);
+
+  const onBack = useCallback(async () => {
+    navigate(-1);
+  }, [navigate]);
 
   const onSave = useAtomCallback(
     useCallback(
@@ -125,7 +167,7 @@ function FormContainer({
         const id = record.id!;
         const version = record.version!;
         await dataStore.delete({ id, version });
-        switchTo({ mode: "list" });
+        switchTo("grid");
       }
     }
   }, [dataStore, record.id, record.version, switchTo]);
@@ -146,7 +188,7 @@ function FormContainer({
         const id = record.id!;
         const version = record.version!;
         await dataStore.save({ id, version, archived: true });
-        switchTo({ mode: "list" });
+        switchTo("grid");
       }
     }
   }, [dataStore, record.id, record.version, switchTo]);
@@ -186,12 +228,30 @@ function FormContainer({
               onClick: onNew,
             },
             {
+              key: "edit",
+              text: i18n.get("Edit"),
+              iconProps: {
+                icon: "edit",
+              },
+              onClick: onEdit,
+              hidden: !readonly,
+            },
+            {
               key: "save",
               text: i18n.get("Save"),
               iconProps: {
                 icon: "save",
               },
               onClick: onSave,
+              hidden: readonly,
+            },
+            {
+              key: "back",
+              text: i18n.get("Back"),
+              iconProps: {
+                icon: "arrow_back",
+              },
+              onClick: onBack,
             },
             {
               key: "more",
@@ -245,6 +305,7 @@ function FormContainer({
       <div className={styles.formViewScroller}>
         <FormComponent
           className={styles.formView}
+          readonly={readonly}
           schema={meta.view}
           fields={meta.fields!}
           record={record}
@@ -252,7 +313,7 @@ function FormContainer({
           actionHandler={actionHandler}
           actionExecutor={actionExecutor}
           layout={Layout}
-          widgetAtom={fallbackWidgetAtom}
+          widgetAtom={widgetAtom}
         />
       </div>
     </div>
@@ -304,7 +365,7 @@ function usePagination(
   };
 }
 
-const Layout: FormLayout = ({ schema, formAtom, className }) => {
+const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const isSmall = useContainerQuery(ref, "width < 768px");
 
@@ -342,13 +403,23 @@ const Layout: FormLayout = ({ schema, formAtom, className }) => {
     >
       <div className={styles.main}>
         {mainItems.map((item) => (
-          <FormWidget key={item.uid} schema={item} formAtom={formAtom} />
+          <FormWidget
+            key={item.uid}
+            schema={item}
+            formAtom={formAtom}
+            readonly={readonly}
+          />
         ))}
       </div>
       {sideItems.length > 0 && (
         <div className={styles.side}>
           {side.map((item) => (
-            <FormWidget key={item.uid} schema={item} formAtom={formAtom} />
+            <FormWidget
+              key={item.uid}
+              schema={item}
+              formAtom={formAtom}
+              readonly={readonly}
+            />
           ))}
         </div>
       )}

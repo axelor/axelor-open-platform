@@ -1,4 +1,6 @@
+import uniq from "lodash/uniq";
 import { useCallback, useMemo } from "react";
+
 import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
@@ -7,16 +9,17 @@ import {
   GridRow,
   GridRowProps,
 } from "@axelor/ui/grid";
-import { Field, JsonField, GridView } from "@/services/client/meta.types";
-import { MetaData } from "@/services/client/meta";
-import { DataStore } from "@/services/client/data-store";
-import { SearchOptions, SearchResult } from "@/services/client/data";
-import { Row as RowRenderer } from "../renderers/row";
-import { Cell as CellRenderer } from "../renderers/cell";
+
 import { useAsync } from "@/hooks/use-async";
 import { useDataStore } from "@/hooks/use-data-store";
-import uniq from "lodash/uniq";
+import { SearchOptions, SearchResult } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
+import { MetaData } from "@/services/client/meta";
+import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import format from "@/utils/format";
+
+import { Cell as CellRenderer } from "../renderers/cell";
+import { Row as RowRenderer } from "../renderers/row";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -124,7 +127,7 @@ export function Grid(
       rowIndex: number
     ) => {
       if (col.name === "$$edit") {
-        onEdit && onEdit(row.record);
+        onEdit?.(row.record);
       }
     },
     [onEdit]
@@ -132,11 +135,7 @@ export function Grid(
 
   const handleRowDoubleClick = useCallback(
     (e: React.SyntheticEvent, row: GridRow, rowIndex: number) => {
-      onView &&
-        onView({
-          id: row.record.id,
-          mode: "view",
-        });
+      onView?.(row.record);
     },
     [onView]
   );

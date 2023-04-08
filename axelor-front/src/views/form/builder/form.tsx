@@ -26,10 +26,10 @@ export function useFormHandlers(
   record: DataRecord,
   parent?: FormAtom
 ) {
-  const { model = "", fields = {}, related } = meta;
+  const { model = "", fields = {} } = meta;
   const formAtom = useMemo(
-    () => createFormAtom({ model, record, fields, related, parent }),
-    [fields, model, parent, record, related]
+    () => createFormAtom({ model, record, fields, parent }),
+    [fields, model, parent, record]
   );
 
   const prepareContext = useSetAtom(contextAtom);

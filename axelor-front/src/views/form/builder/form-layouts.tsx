@@ -7,13 +7,18 @@ import { FormWidget } from "./form-widget";
 
 import styles from "./form-layouts.module.scss";
 
-export const GridLayout: FormLayout = ({ schema, formAtom, className }) => {
+export const GridLayout: FormLayout = ({
+  schema,
+  formAtom,
+  className,
+  readonly,
+}) => {
   const { cols, items = [] } = schema;
   return (
     <div className={clsx(className, styles.grid)} data-cols={cols}>
       {items.map((item) => (
         <GridItem key={item.uid} schema={item}>
-          <FormWidget schema={item} formAtom={formAtom} />
+          <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
         </GridItem>
       ))}
     </div>

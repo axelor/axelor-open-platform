@@ -12,7 +12,7 @@ const withHeaderBodyProps: StyleProps = {
 };
 
 export function Panel(props: WidgetProps) {
-  const { schema, formAtom } = props;
+  const { schema, formAtom, readonly } = props;
   const { title, showTitle } = schema;
 
   const hasHeader = showTitle !== false && title;
@@ -27,7 +27,7 @@ export function Panel(props: WidgetProps) {
         </Box>
       )}
       <Box className={styles.panelBody} {...bodyProps}>
-        <GridLayout formAtom={formAtom} schema={schema} />
+        <GridLayout readonly={readonly} formAtom={formAtom} schema={schema} />
       </Box>
     </Box>
   );

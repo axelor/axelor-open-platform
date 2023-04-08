@@ -32,6 +32,8 @@ export type TabProps = {
   scrollY?: number;
   scrollX?: number;
   selectedCell?: number[];
+  readonly?: boolean;
+  recordId?: boolean;
 };
 
 /**

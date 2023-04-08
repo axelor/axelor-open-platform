@@ -158,8 +158,8 @@ export function useViewFilters() {
  * @param type the view type for which to get the route options
  * @returns TabRoute option of the given view type
  */
-export function useViewRoute(type: string) {
-  const [{ routes }] = useViewState();
+export function useViewRoute() {
+  const [{ type, routes }] = useViewState();
   const options = routes?.[type] ?? {};
   return options as TabRoute;
 }

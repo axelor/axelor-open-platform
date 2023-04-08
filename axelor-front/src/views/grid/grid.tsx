@@ -28,7 +28,7 @@ export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, domains } = props;
   const { view, fields } = meta;
 
-  const viewRoute = useViewRoute("grid");
+  const viewRoute = useViewRoute();
   const [viewProps, setViewProps] = useViewProps();
   const pageSetRef = useRef(false);
 
@@ -92,9 +92,9 @@ export function Grid(props: ViewProps<GridView>) {
 
   const onEdit = useCallback(
     (record: GridRow["record"]) => {
-      switchTo({
-        id: record.id,
-        mode: "edit",
+      switchTo("form", {
+        route: { id: record.id },
+        props: { readonly: false },
       });
     },
     [switchTo]
@@ -102,9 +102,9 @@ export function Grid(props: ViewProps<GridView>) {
 
   const onView = useCallback(
     (record: GridRow["record"]) => {
-      switchTo({
-        id: record.id,
-        mode: "view",
+      switchTo("form", {
+        route: { id: record.id },
+        props: { readonly: true },
       });
     },
     [switchTo]
@@ -168,9 +168,8 @@ export function Grid(props: ViewProps<GridView>) {
     if (offset > totalCount) {
       nextPage = Math.ceil(totalCount / limit) || nextPage;
     }
-    switchTo({
-      id: String(nextPage),
-      mode: "list",
+    switchTo("grid", {
+      route: { id: String(nextPage) },
     });
   }, [currentPage, limit, offset, switchTo, totalCount]);
 
@@ -261,9 +260,13 @@ export function Grid(props: ViewProps<GridView>) {
             canPrev,
             canNext,
             onPrev: () =>
-              switchTo({ id: String(currentPage - 1), mode: "list" }),
+              switchTo("grid", {
+                route: { id: String(currentPage - 1) },
+              }),
             onNext: () =>
-              switchTo({ id: String(currentPage + 1), mode: "list" }),
+              switchTo("grid", {
+                route: { id: String(currentPage + 1) },
+              }),
             text: () => <PageText dataStore={dataStore} />,
           }}
         >

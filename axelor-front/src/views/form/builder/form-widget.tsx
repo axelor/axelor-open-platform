@@ -33,7 +33,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
     schema,
     formAtom,
     widgetAtom,
-    readonly: readonly ?? attrs.readonly,
+    readonly: readonly || attrs.readonly,
   };
 
   if (Comp) {
