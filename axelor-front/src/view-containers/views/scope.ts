@@ -1,4 +1,4 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { useCallback } from "react";
 
@@ -66,15 +66,22 @@ interface SwitchTo {
    * Switch to the given view type.
    *
    * @param type view type
+   * @param options additional options for the given view type
    */
-  (type: string): void;
+  (
+    type: string,
+    options?: {
+      /**
+       * The route options for the given view type
+       */
+      route?: { mode?: string; id?: string; qs?: Record<string, string> };
 
-  /**
-   * Update the route with the given options.
-   *
-   * @param options route options
-   */
-  (route: { mode?: string; id?: string; qs?: Record<string, string> }): void;
+      /**
+       * The additional state for the given view type
+       */
+      props?: Record<string, any>;
+    }
+  ): void;
 }
 
 /**
@@ -86,20 +93,15 @@ interface SwitchTo {
 export function useViewSwitch() {
   const tab = useViewTab();
   const action = tab.id;
-  const setViewState = useSetAtom(tab.state);
   const { open } = useTabs();
 
   const switchTo = useCallback<SwitchTo>(
-    (arg) => {
-      // XXX: this may happen during HMR as useViewTab may pickup fallbackTab
-      if (!action) return;
-      if (typeof arg === "string") {
-        setViewState({ type: arg });
-      } else {
-        open(action, arg);
+    (type, options) => {
+      if (action) {
+        open(action, { type, ...options });
       }
     },
-    [action, open, setViewState]
+    [action, open]
   );
 
   return switchTo;

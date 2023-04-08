@@ -61,8 +61,10 @@ export function View() {
       const path = getURL(viewAction, viewMode, viewId);
       pathRef.current = path;
       await open(viewAction, {
-        mode: viewMode,
-        id: viewId,
+        route: {
+          mode: viewMode,
+          id: viewId,
+        },
       });
     } else {
       const homeAction = session.info?.user.action;

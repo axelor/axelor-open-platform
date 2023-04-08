@@ -7,10 +7,10 @@ import {
 } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNil, omitBy } from "lodash";
+import { useCallback } from "react";
 
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView, SavedFilter } from "@/services/client/meta.types";
-import { useCallback } from "react";
 import { useRoute } from "../use-route";
 
 /**
@@ -163,84 +163,106 @@ const activeAtom = selectAtom(tabsAtom, (state) =>
 const viewName = (view: ActionView | string) =>
   typeof view === "string" ? view : view.name;
 
-const getViewMode = (type: string, mode?: string) => {
-  if (type === "form") {
-    if (mode === "view" || mode === "edit") return mode;
-    return "view";
-  }
+const getViewMode = (type: string) => {
+  if (type === "form") return "edit";
   if (type === "grid") return "list";
   return type;
 };
 
 const getViewType = (mode: string) => {
-  if (mode === "view" || mode === "edit") return "form";
+  if (mode === "edit") return "form";
   if (mode === "list") return "grid";
   return mode;
 };
 
 /**
- * This function updates route state of a specific view type.
+ * This function updates tab state of a specific view type.
  *
- * The target view type will be determined by the `route.mode`
- * or if not given by the `state.type`.
+ * The target view type will be determined by the `options.type` or
+ * `route.mode` or `state.type`.
  *
  * @param action the action name
  * @param state the `tab.state` to update
- * @param route the route options to update
+ * @param options the options for the view type
  * @returns updated `state`
  */
-const updateRouteState = (
+const updateTabState = (
   action: string,
   state: TabState,
-  route?: Partial<TabRoute>
+  options: {
+    type?: string;
+    route?: Partial<TabRoute>;
+    props?: Record<string, any>;
+  }
 ) => {
-  const type = getViewType(route?.mode ?? state.type);
+  const { route, props } = options;
+  const type = getViewType(options.type ?? route?.mode ?? state.type);
+  const mode = getViewMode(type);
+
   const { id = "", qs = "" } = route ?? state.routes?.[type] ?? {};
-  const mode = route?.mode ?? getViewMode(state.type);
-  const prev = state.routes?.[type];
-  const next = {
-    action,
-    mode,
-    id,
-    qs,
-  };
 
-  let p = omitBy(prev, isNil) as any;
-  let n = omitBy(next, isNil) as any;
+  const prevRoute = omitBy(state.routes?.[type], isNil) as TabRoute;
+  const nextRoute = omitBy({ action, mode, id, qs }, isNil) as TabRoute;
 
-  let routeSame = isEqual(p, n);
-  if (routeSame && type === state.type) {
+  const prevProps = omitBy(state.props?.[type], isNil);
+  const nextProps =
+    props === null ? {} : omitBy({ ...prevProps, ...props }, isNil);
+
+  const routeSame = isEqual(prevRoute, nextRoute);
+  const propsSame = isEqual(prevProps, nextProps);
+
+  if (routeSame && propsSame && type === state.type) {
     return state;
   }
 
-  if (routeSame) n = prev;
+  const newState = { ...state, type };
 
-  return { ...state, type, routes: { ...state.routes, [type]: n } };
+  if (!routeSame) newState.routes = { ...newState.routes, [type]: nextRoute };
+  if (!propsSame) newState.props = { ...newState.props, [type]: nextProps };
+
+  return newState;
 };
 
 /**
- * Open the given view with the given optional route options.
+ * Open the given view with the optional view route and props.
  *
  * @param view the action-view or name
- * @param route the route options
+ * @param options the options for the view type
  * @returns a Tab or null if no tab was opened (due to non-existance of the action-view)
  */
 export type OpenTab = (
   view: ActionView | string,
-  route?: Omit<TabRoute, "action">
+  options?: {
+    type?: string;
+    route?: Omit<TabRoute, "action">;
+    props?: Record<string, any>;
+  }
 ) => Promise<Tab | null>;
 
 /**
  * Close the given view.
  *
  * @param view the action-view or name
+ * @param type the intial view type
  */
 export type CloseTab = (view: ActionView | string) => void;
 
+/**
+ * Initialize a view tab for the given action-view.
+ *
+ * @param view the action-view or name
+ * @param options additional options for a view type
+ * @returns a Tab or null if unable to find the action-view
+ */
 export async function initTab(
   view: ActionView | string,
-  route?: Omit<TabRoute, "action">
+  options?: {
+    type?: string;
+    route?: Omit<TabRoute, "action">;
+    props?: Record<string, any>;
+  }
 ) {
+  const { route, props } = options ?? {};
   const actionName = viewName(view);
   const actionView =
     typeof view === "object" && view.views?.length
@@ -248,11 +270,9 @@ export async function initTab(
       : await findActionView(actionName);
 
   if (actionView) {
-    const { name: id, title, viewType } = actionView;
-    const type = getViewType(route?.mode ?? viewType);
-    const mode = getViewMode(type, route?.mode);
-
-    const initState = updateRouteState(id, { type, title }, { ...route, mode });
+    const { name: id, title } = actionView;
+    const type = getViewType(options?.type ?? actionView.viewType);
+    const initState = updateTabState(id, { type, title }, { route, props });
 
     const tabAtom = atom<TabState>(initState);
 
@@ -265,7 +285,8 @@ export async function initTab(
           set(tabAtom, (state) => {
             const type = arg?.type ?? prev.type;
             const route = arg?.routes?.[type] ?? prev.routes?.[type];
-            return updateRouteState(id, { ...state, ...arg }, route);
+            const props = arg?.props?.[type] ?? prev.props?.[type];
+            return updateTabState(id, { ...state, ...arg }, { route, props });
           });
         }
       }
@@ -300,7 +321,11 @@ const openTabAtom = atom(
     get,
     set,
     view: ActionView | string,
-    route?: Omit<TabRoute, "action">
+    options: {
+      type?: string;
+      route?: Omit<TabRoute, "action">;
+      props?: Record<string, any>;
+    } = {}
   ): Promise<Tab | null> => {
     const { active, tabs, popups } = get(tabsAtom);
 
@@ -310,7 +335,7 @@ const openTabAtom = atom(
 
     if (found) {
       const viewState = get(found.state);
-      const newState = updateRouteState(name, viewState, route);
+      const newState = updateTabState(name, viewState, options);
       set(found.state, newState);
     }
 
@@ -322,7 +347,7 @@ const openTabAtom = atom(
       return found;
     }
 
-    const tab = await initTab(view, route);
+    const tab = await initTab(view, options);
 
     if (tab) {
       set(tabsAtom, (state) => {
