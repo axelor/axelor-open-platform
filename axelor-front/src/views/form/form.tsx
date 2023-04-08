@@ -15,6 +15,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewProps,
   useViewRoute,
+  useViewState,
   useViewSwitch,
   useViewTab,
 } from "@/view-containers/views/scope";
@@ -28,7 +29,6 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
-import { useRoute } from "@/hooks/use-route";
 import { useAtomValue, useSetAtom } from "jotai";
 import styles from "./form.module.scss";
 
@@ -84,9 +84,9 @@ function FormContainer({
 
   const { attrs } = useAtomValue(widgetAtom);
   const setAttrs = useSetAtom(widgetAtom);
-  const { navigate } = useRoute();
 
   const readonly = attrs.readonly ?? props.readonly;
+  const [{ prevType }] = useViewState();
 
   const switchTo = useViewSwitch();
 
@@ -131,8 +131,10 @@ function FormContainer({
   }, [setAttrs]);
 
   const onBack = useCallback(async () => {
-    navigate(-1);
-  }, [navigate]);
+    if (prevType) {
+      switchTo(prevType);
+    }
+  }, [prevType, switchTo]);
 
   const onSave = useAtomCallback(
     useCallback(

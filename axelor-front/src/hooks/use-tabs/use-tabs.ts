@@ -54,6 +54,12 @@ export type TabState = {
   type: string;
 
   /**
+   * Previous view type.
+   *
+   */
+  prevType?: string;
+
+  /**
    * Whether the tab is dirty
    *
    * Can be used to show confirmation dialong before closing the tab.
@@ -217,7 +223,8 @@ const updateTabState = (
     return state;
   }
 
-  const newState = { ...state, type };
+  const prevType = type !== state.type ? state.type : state.prevType;
+  const newState = { ...state, type, prevType };
 
   if (!routeSame) newState.routes = { ...newState.routes, [type]: nextRoute };
   if (!propsSame) newState.props = { ...newState.props, [type]: nextProps };
