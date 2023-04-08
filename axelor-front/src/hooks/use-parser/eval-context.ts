@@ -4,6 +4,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
+import { i18n } from "@/services/client/i18n";
 import { ActionOptions } from "@/view-containers/action";
 import { moment } from "@/services/client/l10n";
 
@@ -188,6 +189,9 @@ export function createEvalContext(
             );
           });
       }
+    },
+    __t(key: string, ...args: any[]) {
+      return i18n.get(key, ...args);
     },
     __lowercase(value: any) {
       return typeof value === "string" ? value.toLowerCase() : value;
