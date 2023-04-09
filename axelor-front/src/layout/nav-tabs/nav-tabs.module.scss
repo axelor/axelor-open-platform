@@ -18,11 +18,19 @@
   display: flex;
 }
 
+.dirty {
+  .tabTitle::after {
+    content: "*";
+  }
+}
+
 .tab {
   display: flex;
   align-items: center;
   .tabTitle {
     margin: 0 0.5rem;
+    display: inline-flex;
+    gap: 0.25rem;
   }
   .tabClose {
     display: inline-flex;

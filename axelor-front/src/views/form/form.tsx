@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -13,9 +14,10 @@ import { FormView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  useSelectViewState,
+  useViewDirtyAtom,
   useViewProps,
   useViewRoute,
-  useViewState,
   useViewSwitch,
   useViewTab,
 } from "@/view-containers/views/scope";
@@ -29,7 +31,6 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
-import { useAtomValue, useSetAtom } from "jotai";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -86,9 +87,15 @@ function FormContainer({
   const setAttrs = useSetAtom(widgetAtom);
 
   const readonly = attrs.readonly ?? props.readonly;
-  const [{ prevType }] = useViewState();
+  const prevType = useSelectViewState(
+    useCallback((state) => state.prevType, [])
+  );
 
   const switchTo = useViewSwitch();
+
+  const dirtyAtom = useViewDirtyAtom();
+  const isDirty = useAtomValue(dirtyAtom);
+  const setDirty = useSetAtom(dirtyAtom);
 
   const doRead = useCallback(
     async (id: number | string) => {
@@ -107,13 +114,15 @@ function FormContainer({
       ) => {
         const id = String(record?.id ?? "");
         switchTo("form", { route: { id }, props: options });
+        setDirty(false);
         set(formAtom, (prev) => ({
           ...prev,
+          dirty: false,
           states: {},
           record: record ?? {},
         }));
       },
-      [formAtom, switchTo]
+      [formAtom, setDirty, switchTo]
     )
   );
 
@@ -248,12 +257,22 @@ function FormContainer({
               hidden: readonly,
             },
             {
+              key: "cancel",
+              text: i18n.get("Cancel"),
+              iconProps: {
+                icon: "refresh",
+              },
+              onClick: onRefresh,
+              hidden: !isDirty,
+            },
+            {
               key: "back",
               text: i18n.get("Back"),
               iconProps: {
                 icon: "arrow_back",
               },
               onClick: onBack,
+              hidden: isDirty,
             },
             {
               key: "more",

@@ -1,9 +1,19 @@
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
-import { Tab, TabAtom, TabProps, TabRoute, useTabs } from "@/hooks/use-tabs";
+import {
+  Tab,
+  TabAtom,
+  TabProps,
+  TabRoute,
+  TabState,
+  useTabs,
+} from "@/hooks/use-tabs";
 import { SavedFilter } from "@/services/client/meta.types";
+import { focusAtom } from "jotai-optics";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { isEqual } from "lodash";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -52,13 +62,13 @@ export function useViewAction() {
 }
 
 /**
- * This scoped hook can be used to access current tab state.
- *
- * @returns tuple of current state and setter
+ * This hook can be used to access current tab state.
+ * @param selector the selector function
+ * @returns selected state value
  */
-export function useViewState() {
+export function useSelectViewState<T>(selector: (state: TabState) => T) {
   const tab = useViewTab();
-  return useAtom(tab.state);
+  return useAtomValue(selectAtom(tab.state, selector, isEqual));
 }
 
 interface SwitchTo {
@@ -112,27 +122,40 @@ export function useViewSwitch() {
  *
  */
 export function useViewProps() {
-  const [{ type, props }, setViewState] = useViewState();
+  const tab = useViewTab();
+  const { type, props } = useSelectViewState(
+    useCallback(({ type, props }) => ({ type, props }), [])
+  );
 
   const state = props?.[type];
-  const setState = useCallback(
-    (partial: Partial<TabProps>) => {
-      const newState = {
-        ...state,
-        ...partial,
-      };
+  const setState = useAtomCallback(
+    useCallback(
+      (get, set, partial: Partial<TabProps>) => {
+        const newState = {
+          ...state,
+          ...partial,
+        };
 
-      const newProps = {
-        ...props,
-        [type]: newState,
-      };
+        const newProps = {
+          ...props,
+          [type]: newState,
+        };
 
-      setViewState({ props: newProps });
-    },
-    [props, setViewState, state, type]
+        set(tab.state, { props: newProps });
+      },
+      [props, state, tab.state, type]
+    )
   );
 
   return [state, setState] as const;
+}
+
+export function useViewDirtyAtom() {
+  const tab = useViewTab();
+  return useMemo(
+    () => focusAtom(tab.state, (o) => o.prop("dirty")),
+    [tab.state]
+  );
 }
 
 /**
@@ -140,13 +163,15 @@ export function useViewProps() {
  *
  */
 export function useViewFilters() {
-  const [{ filters: state }, setViewState] = useViewState();
-
-  const setState = useCallback(
-    (filters: SavedFilter[]) => {
-      setViewState({ filters });
-    },
-    [setViewState]
+  const tab = useViewTab();
+  const state = useSelectViewState(useCallback(({ filters }) => filters, []));
+  const setState = useAtomCallback(
+    useCallback(
+      (get, set, filters: SavedFilter[]) => {
+        set(tab.state, { filters });
+      },
+      [tab.state]
+    )
   );
 
   return [state, setState] as const;
@@ -159,7 +184,9 @@ export function useViewFilters() {
  * @returns TabRoute option of the given view type
  */
 export function useViewRoute() {
-  const [{ type, routes }] = useViewState();
+  const { type, routes } = useSelectViewState(
+    useCallback(({ type, routes }) => ({ type, routes }), [])
+  );
   const options = routes?.[type] ?? {};
   return options as TabRoute;
 }

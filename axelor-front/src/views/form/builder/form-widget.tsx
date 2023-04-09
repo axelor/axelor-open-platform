@@ -1,7 +1,8 @@
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
 
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
 import { useWidgetComp } from "./hooks";
 import { useActionAttrs, useFormScope } from "./scope";
@@ -53,6 +54,8 @@ function FormField({
   const { schema, formAtom } = props;
   const name = schema.name!;
   const onChange = schema.onChange;
+  const dirtyAtom = useViewDirtyAtom();
+  const setDirty = useSetAtom(dirtyAtom);
 
   const { actionExecutor } = useFormScope();
 
@@ -61,7 +64,12 @@ function FormField({
     return atom(
       (get) => get(lensAtom),
       (get, set, value: any, fireOnChange: boolean = false) => {
-        set(lensAtom, value);
+        const prev = get(lensAtom);
+        if (prev !== value) {
+          set(lensAtom, value);
+          set(formAtom, (prev) => ({ ...prev, dirty: true }));
+          setDirty(true);
+        }
         if (onChange && fireOnChange) {
           actionExecutor.execute(onChange, {
             context: {
@@ -71,7 +79,7 @@ function FormField({
         }
       }
     );
-  }, [actionExecutor, formAtom, name, onChange]);
+  }, [actionExecutor, formAtom, name, onChange, setDirty]);
 
   return <Comp {...props} valueAtom={valueAtom} />;
 }

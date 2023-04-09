@@ -22,6 +22,7 @@ export interface WidgetState {
 }
 
 export interface FormState {
+  dirty?: boolean;
   record: DataRecord;
   states: Record<string, WidgetState>;
   readonly model: string;

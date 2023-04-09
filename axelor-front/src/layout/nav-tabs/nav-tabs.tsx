@@ -75,7 +75,7 @@ const NavTab = memo(function NavTab({
   ...props
 }: NavItemProps & { close: (view: any) => any }) {
   const tab = props as Tab;
-  const { title } = useAtomValue(tab.state);
+  const { title, dirty } = useAtomValue(tab.state);
   const { icon, iconColor } = useIcon(tab.id);
 
   const { data } = useSession();
@@ -91,7 +91,11 @@ const NavTab = memo(function NavTab({
   );
 
   return (
-    <div className={styles.tab}>
+    <div
+      className={clsx(styles.tab, {
+        [styles.dirty]: dirty,
+      })}
+    >
       {icon && <NavIcon icon={icon} iconColor={iconColor} />}
       <div className={styles.tabTitle}>{title}</div>
       {showClose && (
