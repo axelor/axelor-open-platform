@@ -23,14 +23,14 @@
 
 .formLayout {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .main,
 .side {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .main {
