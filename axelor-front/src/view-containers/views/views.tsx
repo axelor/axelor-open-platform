@@ -1,7 +1,11 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
+import { selectAtom } from "jotai/utils";
 import { memo, useMemo } from "react";
 
+import { Box, Fade } from "@axelor/ui";
+
+import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
@@ -10,8 +14,6 @@ import { findView } from "@/services/client/meta-cache";
 import { SearchFilter, SearchFilters } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
-import { Loader } from "@/components/loader/loader";
-import { Box, Fade } from "@axelor/ui";
 import { ViewScope } from "./scope";
 
 async function loadComp(viewType: string) {
@@ -83,12 +85,12 @@ function ViewPane({
   const {
     action: { views = [] },
   } = tab;
-  const tabAtom = tab.state;
-  const viewState = useAtomValue(tabAtom);
-  const view = useMemo(
-    () => views.find((x) => x.type === viewState.type),
-    [viewState.type, views]
-  );
+  const typeAtom = useMemo(() => {
+    return selectAtom(tab.state, (x) => x.type);
+  }, [tab.state]);
+
+  const type = useAtomValue(typeAtom);
+  const view = useMemo(() => views.find((x) => x.type === type), [type, views]);
 
   if (view) {
     return (
