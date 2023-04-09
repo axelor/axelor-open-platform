@@ -8,7 +8,7 @@ import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
-import AdvanceSearch from "@/view-containers/advance-search";
+import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {

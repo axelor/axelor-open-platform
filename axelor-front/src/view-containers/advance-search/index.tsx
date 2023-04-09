@@ -9,7 +9,7 @@ import { useViewAction, useViewFilters } from "../views/scope";
 import { dialogs } from "@/components/dialogs";
 import AdvanceSearchComponent from "./advance-search";
 
-export interface AdvancedSearchProps {
+export interface AdvanceSearchProps {
   dataStore: DataStore;
   items?: View["items"];
   value?: any;
@@ -20,10 +20,10 @@ export interface AdvancedSearchProps {
   onDelete?: any;
 }
 
-export default function AdvancedSearch({
+export function AdvanceSearch({
   dataStore,
   ...props
-}: AdvancedSearchProps) {
+}: AdvanceSearchProps) {
   const { data: sessionInfo } = useSession();
   const [filters, setFilters] = useViewFilters();
   const { name, params } = useViewAction();
