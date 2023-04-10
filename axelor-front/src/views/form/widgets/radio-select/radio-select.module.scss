@@ -1,0 +1,49 @@
+.ibox {
+  display: inline-block;
+  width: inherit;
+  margin: 0;
+  overflow: hidden;
+  .pointer & {
+    cursor: pointer;
+  }
+  & .box {
+    display: inline-block;
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    outline: none;
+    &:before {
+      content: ' ';
+      display: inline-block;
+      border: 1px solid #ccc;
+      height: 1.25rem;
+      width: 1.25rem;
+      transition: all 0.2s;
+      .radio & {
+        border-radius: 20px;
+      }
+    }
+  }
+
+  &.checked .box:before {
+    border-color: var(--bs-primary);
+    background-color: var(--bs-primary);
+  }
+
+  &.checked .box:after {
+    content: ' ';
+    display: inline-block;
+    position: absolute;
+    top: 5px;
+    left: 4px;
+    width: 12px;
+    height: 7px;
+    border: 2px solid #fff;
+    border-top: 0;
+    border-right: 0;
+    transform: rotate(-45deg);
+    .radio & {
+      width: 11px;
+    }
+  }
+}
