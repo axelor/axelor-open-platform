@@ -9,17 +9,16 @@ import { download } from "@/utils/download";
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 
+import { TaskQueue } from "./queue";
 import { ActionExecutor, ActionHandler, ActionOptions } from "./types";
+
+const queue = new TaskQueue();
 
 export class DefaultActionExecutor implements ActionExecutor {
   #handler;
 
   constructor(handler: ActionHandler) {
     this.#handler = handler;
-  }
-
-  #fail(reason?: string) {
-    return Promise.reject(reason);
   }
 
   #ensureLast(actions: string[], name: string) {
@@ -35,9 +34,13 @@ export class DefaultActionExecutor implements ActionExecutor {
     return index > -1;
   }
 
+  #enqueue(action: string, options?: ActionOptions) {
+    return queue.add(() => this.#execute(action, options));
+  }
+
   async execute(action: string, options?: ActionOptions) {
     try {
-      return this.#execute(action, options);
+      return this.#enqueue(action, options);
     } catch (e) {
       if (typeof e === "string") {
         dialogs.error({
