@@ -25,6 +25,7 @@ export interface FormState {
   dirty?: boolean;
   record: DataRecord;
   states: Record<string, WidgetState>;
+  statesByName: Record<string, WidgetState>;
   readonly model: string;
   readonly fields: Record<string, Property>;
   readonly parent?: FormAtom;

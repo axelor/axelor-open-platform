@@ -13,6 +13,7 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 
+import { useAtomCallback } from "jotai/utils";
 import { fallbackFormAtom } from "./atoms";
 import { FormAtom, WidgetAtom } from "./types";
 
@@ -109,6 +110,37 @@ function useActionData<T extends ActionData>(
       dataRef.current = null;
     }
   }, [handler, data]);
+}
+
+export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
+  useActionData<ActionAttrData>(
+    useCallback((x) => x.type === "attr", []),
+    useAtomCallback(
+      useCallback(
+        (get, set, data) => {
+          const { statesByName } = get(formAtom);
+          const state = statesByName[data.target] ?? {};
+          const newState = {
+            ...state,
+            attrs: {
+              ...state.attrs,
+              [data.name]: data.value,
+            },
+          };
+          const newStates = {
+            ...statesByName,
+            [data.target]: newState,
+          };
+          set(formAtom, (prev) => ({
+            ...prev,
+            statesByName: newStates,
+          }));
+        },
+        [formAtom]
+      )
+    )
+  );
+  return null;
 }
 
 export function useActionAttrs(schema: Schema, widgetAtom: WidgetAtom) {

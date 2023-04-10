@@ -9,7 +9,7 @@ import { DefaultActionExecutor } from "@/view-containers/action";
 
 import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
-import { FormActionHandler, FormScope } from "./scope";
+import { ActionDataHandler, FormActionHandler, FormScope } from "./scope";
 import { FormAtom, FormProps } from "./types";
 import { processView } from "./utils";
 
@@ -74,12 +74,15 @@ export function Form({
         formAtom,
       }}
     >
-      <Layout
-        className={className}
-        readonly={readonly}
-        schema={schema}
-        formAtom={formAtom}
-      />
+      <>
+        <ActionDataHandler formAtom={formAtom} />
+        <Layout
+          className={className}
+          readonly={readonly}
+          schema={schema}
+          formAtom={formAtom}
+        />
+      </>
     </ScopeProvider>
   );
 }

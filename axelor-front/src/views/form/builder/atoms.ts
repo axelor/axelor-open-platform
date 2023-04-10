@@ -4,6 +4,7 @@ import { focusAtom } from "jotai-optics";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
 
+import { SetStateAction } from "react";
 import { FormAtom, FormState, WidgetState } from "./types";
 import { defaultAttrs } from "./utils";
 
@@ -15,10 +16,12 @@ export function createFormAtom(props: {
 }) {
   const { model, record, fields, parent } = props;
   const states: Record<string, WidgetState> = {};
+  const statesByName: Record<string, WidgetState> = {};
   return atom<FormState>({
     model,
     record: { ...record },
     states,
+    statesByName,
     fields,
     parent,
   });
@@ -29,11 +32,36 @@ export function createWidgetAtom(props: {
   formAtom: FormAtom;
 }) {
   const { schema, formAtom } = props;
-  const { uid } = schema;
+  const { uid, name = "__" } = schema;
   const attrs = defaultAttrs(schema);
-  return focusAtom(formAtom, (o) =>
-    o.prop("states").prop(uid).valueOr({ attrs })
+
+  const lenseAtom = focusAtom(formAtom, (o) =>
+    o
+      .prop("states")
+      .prop(uid)
+      .valueOr({ attrs } as WidgetState)
   );
+
+  const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
+    (get) => {
+      const { statesByName } = get(formAtom);
+      const { attrs: attrsByName } = statesByName[name] ?? {};
+      const state = get(lenseAtom);
+      return {
+        ...state,
+        attrs: {
+          ...attrs,
+          ...attrsByName,
+          ...state.attrs,
+        },
+      };
+    },
+    (get, set, state) => {
+      set(lenseAtom, state);
+    }
+  );
+
+  return widgetAtom;
 }
 
 export const fallbackFormAtom = createFormAtom({
