@@ -31,6 +31,7 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -57,21 +58,40 @@ export function Form(props: ViewProps<FormView>) {
   const readonly = action.params?.forceReadonly ?? viewProps.readonly;
   const recordId = id ?? action.context?._showRecord;
 
-  const { data: record = {} } = useAsync(
+  const { state, data: record = {} } = useAsync(
     () => fetchRecord(meta, dataStore, recordId),
     [recordId, meta, dataStore]
   );
 
-  return <FormContainer {...props} record={record} readonly={readonly} />;
+  const isLoading = state !== "hasData";
+
+  return (
+    <FormContainer
+      {...props}
+      record={record}
+      readonly={readonly}
+      isLoading={isLoading}
+    />
+  );
 }
 
 function FormContainer({
   meta,
   dataStore,
   record,
+  isLoading,
   ...props
-}: ViewProps<FormView> & { record: DataRecord; readonly?: boolean }) {
+}: ViewProps<FormView> & {
+  record: DataRecord;
+  readonly?: boolean;
+  isLoading?: boolean;
+}) {
   const { view: schema } = meta;
+  const {
+    onNew: onNewAction,
+    onLoad: onLoadAction,
+    onSave: onSaveAction,
+  } = schema;
 
   const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
     meta,
@@ -113,16 +133,21 @@ function FormContainer({
         options?: { readonly?: boolean }
       ) => {
         const id = String(record?.id ?? "");
+        const prev = get(formAtom);
+        const action = record ? onLoadAction : onNewAction;
         switchTo("form", { route: { id }, props: options });
         setDirty(false);
-        set(formAtom, (prev) => ({
+        set(formAtom, {
           ...prev,
           dirty: false,
           states: {},
           record: record ?? {},
-        }));
+        });
+        if (action) {
+          await actionExecutor.execute(action);
+        }
       },
-      [formAtom, setDirty, switchTo]
+      [actionExecutor, formAtom, onLoadAction, onNewAction, setDirty, switchTo]
     )
   );
 
@@ -148,13 +173,14 @@ function FormContainer({
   const onSave = useAtomCallback(
     useCallback(
       async (get) => {
+        if (onSaveAction) await actionExecutor.execute(onSaveAction);
         let rec = get(formAtom).record;
         let res = await dataStore.save(rec);
         if (res.id) res = await doRead(res.id);
         doEdit(res);
         return res;
       },
-      [dataStore, doEdit, doRead, formAtom]
+      [actionExecutor, dataStore, doEdit, doRead, formAtom, onSaveAction]
     )
   );
 
@@ -213,6 +239,24 @@ function FormContainer({
   const setPopupHandlers = useSetAtom(popupHandlerAtom);
 
   const showToolbar = popupOptions?.showToolbar !== false;
+
+  const doOnLoad = useAtomCallback(
+    useCallback(
+      async (get) => {
+        if (isLoading) return;
+        const rec = get(formAtom).record;
+        const recId = rec.id ?? 0;
+        const action = recId > 0 ? onLoadAction : onNewAction;
+
+        if (action) {
+          await actionExecutor.execute(action);
+        }
+      },
+      [actionExecutor, formAtom, isLoading, onLoadAction, onNewAction]
+    )
+  );
+
+  useAsyncEffect(doOnLoad, [doOnLoad]);
 
   useEffect(() => {
     if (popup) {
