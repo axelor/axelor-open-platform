@@ -1,21 +1,21 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
-import { DataContext } from "@/services/client/data.types";
-import { Schema } from "@/services/client/meta.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   ActionAttrData,
   ActionData,
   ActionExecutor,
   ActionHandler,
+  ActionValueData,
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
 
 import { useAtomCallback } from "jotai/utils";
 import { fallbackFormAtom } from "./atoms";
-import { FormAtom, WidgetAtom } from "./types";
+import { FormAtom } from "./types";
 
 type ContextCreator = () => DataContext;
 
@@ -45,6 +45,21 @@ export class FormActionHandler extends DefaultActionHandler {
       type: "focus",
       target,
       value: true,
+    });
+  }
+
+  setValue(target: string, value: any): void {
+    this.notify({
+      op: "set",
+      type: "value",
+      target,
+      value,
+    });
+  }
+
+  async setValues(values: DataRecord) {
+    Object.entries(values).forEach(([name, value]) => {
+      this.setValue(name, value);
     });
   }
 }
@@ -79,22 +94,7 @@ function useActionData<T extends ActionData>(
   handler: (data: T) => void
 ) {
   const { actionHandler } = useFormScope();
-  const dataRef = useRef<ActionData | null>(null);
   const doneRef = useRef<boolean>(false);
-
-  const subscribe = useCallback(
-    (callback: () => any) => {
-      return actionHandler.subscribe((data) => {
-        if (check(data)) {
-          dataRef.current = data;
-          callback();
-        }
-      });
-    },
-    [actionHandler, check]
-  );
-
-  const data = useSyncExternalStore(subscribe, () => dataRef.current);
 
   useEffect(() => {
     doneRef.current = false;
@@ -104,15 +104,18 @@ function useActionData<T extends ActionData>(
   });
 
   useEffect(() => {
-    if (doneRef.current) return;
-    if (data) {
-      handler(data as T);
-      dataRef.current = null;
-    }
-  }, [handler, data]);
+    return actionHandler.subscribe((data) => {
+      if (doneRef.current) return;
+      if (data) {
+        if (check(data)) {
+          handler(data as T);
+        }
+      }
+    });
+  });
 }
 
-export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
+function useActionAttrs({ formAtom }: { formAtom: FormAtom }) {
   useActionData<ActionAttrData>(
     useCallback((x) => x.type === "attr", []),
     useAtomCallback(
@@ -140,28 +143,50 @@ export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
       )
     )
   );
-  return null;
 }
 
-export function useActionAttrs(schema: Schema, widgetAtom: WidgetAtom) {
-  const setAttrs = useSetAtom(widgetAtom);
-  useActionData<ActionAttrData>(
-    useCallback(
-      (data) => data.target === schema.name && data.type === "attr",
-      [schema.name]
-    ),
-    useCallback(
-      (data) => {
-        setAttrs((prev) => {
-          const { attrs } = prev;
-          const { name, value } = data;
-          return {
-            ...prev,
-            attrs: { ...attrs, [name]: value },
-          };
-        });
-      },
-      [setAttrs]
+function useActionValue({ formAtom }: { formAtom: FormAtom }) {
+  useActionData<ActionValueData>(
+    useCallback((x) => x.type === "value", []),
+    useAtomCallback(
+      useCallback(
+        (get, set, data) => {
+          const { record } = get(formAtom);
+          const { target, value, op } = data;
+          let newRecord = record;
+
+          if (op === "set") {
+            newRecord = {
+              ...record,
+              [target]: value,
+            };
+          }
+          if (op === "add") {
+            const items = record[target] ?? [];
+            newRecord = {
+              ...record,
+              [target]: [...items, value],
+            };
+          }
+          if (op === "del") {
+            const items = record[target] ?? [];
+            newRecord = {
+              ...record,
+              [target]: items.filter((x: any) => x.id !== value.id),
+            };
+          }
+          if (record !== newRecord) {
+            set(formAtom, (prev) => ({ ...prev, record: newRecord }));
+          }
+        },
+        [formAtom]
+      )
     )
   );
+}
+
+export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
+  useActionAttrs({ formAtom });
+  useActionValue({ formAtom });
+  return null;
 }
