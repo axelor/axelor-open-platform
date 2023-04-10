@@ -1,4 +1,4 @@
-import { request } from "./client";
+import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 
 export type SearchOptions = {
@@ -105,6 +105,11 @@ export class DataSource {
   }
 
   async save(data: DataRecord | DataRecord[]): Promise<DataRecord> {
+    if ((data as DataRecord)?.$upload) {
+      const upload = (data as DataRecord).$upload;
+      return this.upload(data, upload.field, upload.file);
+    }
+
     const url = `ws/rest/${this.model}`;
     const resp = await request({
       url,
@@ -173,5 +178,62 @@ export class DataSource {
     }
 
     return Promise.reject(resp.status);
+  }
+
+  async upload(
+    data: DataRecord,
+    field: string | Blob,
+    file: File,
+    onProgress?: (complete?: number) => void
+  ): Promise<DataRecord> {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    const url = `ws/rest/${this.model}/upload`;
+
+    formData.append("file", file);
+    formData.append("field", field);
+    formData.append("request", JSON.stringify({ data }));
+
+    return new Promise<DataRecord>(function (resolve, reject) {
+      if (onProgress) {
+        xhr.upload.addEventListener(
+          "progress",
+          function (e) {
+            const complete = Math.round((e.loaded * 100) / e.total);
+            onProgress(complete);
+          },
+          false
+        );
+      }
+
+      xhr.onerror = reject;
+      xhr.onabort = reject;
+
+      xhr.onload = function () {
+        let data: any = {};
+        try {
+          data = JSON.parse(xhr.response || xhr.responseText);
+        } catch {}
+
+        const response = {
+          data,
+          status: xhr.status,
+        };
+
+        if (xhr.status === 200) {
+          if (data?.status === 0) {
+            resolve(data?.data[0]);
+          } else {
+            reject(500);
+          }
+        } else {
+          reject(response.status);
+        }
+      };
+
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("X-CSRF-Token", readCookie("CSRF-TOKEN")!);
+      xhr.send(formData);
+    });
   }
 }

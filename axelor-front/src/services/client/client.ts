@@ -1,7 +1,7 @@
 import { isArrayLikeObject, isPlainObject } from "lodash";
 import { $request, $use } from "../http";
 
-const readCookie = (name: string) => {
+export const readCookie = (name: string) => {
   const match = document.cookie.match(
     new RegExp("(^|;\\s*)(" + name + ")=([^;]*)")
   );
