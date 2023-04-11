@@ -58,11 +58,16 @@ export function Form(props: ViewProps<FormView>) {
   const readonly =
     action.params?.forceReadonly ?? viewProps.readonly ?? Boolean(id);
   const recordId = id ?? action.context?._showRecord;
+  const popupRecord = action.params?.["_popup-record"];
 
-  const { state, data: record = {} } = useAsync(
-    () => fetchRecord(meta, dataStore, recordId),
-    [recordId, meta, dataStore]
-  );
+  const { state, data: record = {} } = useAsync(async () => {
+    if (popupRecord) {
+      if (popupRecord._dirty) return popupRecord;
+      const res = await fetchRecord(meta, dataStore, popupRecord.id);
+      return { ...popupRecord, ...res };
+    }
+    return await fetchRecord(meta, dataStore, recordId);
+  }, [popupRecord, recordId, meta, dataStore]);
 
   const isLoading = state !== "hasData";
 

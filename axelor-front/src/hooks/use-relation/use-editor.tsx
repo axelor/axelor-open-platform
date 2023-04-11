@@ -9,7 +9,6 @@ import { i18n } from "@/services/client/i18n";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
-import { useAsyncEffect } from "../use-async-effect";
 import { initTab } from "../use-tabs";
 
 export type EditorOptions = {
@@ -33,6 +32,7 @@ export function useEditor() {
       params: {
         popup: true,
         "show-toolbar": false,
+        "_popup-record": record,
       },
       context,
     });
@@ -43,27 +43,10 @@ export function useEditor() {
       tab,
       open: true,
       onClose: () => {},
-      handler: () => <Handler record={record} />,
       footer: () => <Footer onClose={() => close()} onSelect={onSelect} />,
       buttons: [],
     });
   }, []);
-}
-
-function Handler({ record }: { record?: DataRecord | null }) {
-  const handlerAtom = usePopupHandlerAtom();
-  const handler = useAtomValue(handlerAtom);
-
-  const { onEdit, onRead } = handler;
-
-  useAsyncEffect(async () => {
-    if (!onRead || !onEdit) return;
-    let rec = record ?? {};
-    if (rec.id && +rec.id > 0) rec = await onRead(rec.id);
-    onEdit(rec);
-  }, [record]);
-
-  return null;
 }
 
 function Footer({
