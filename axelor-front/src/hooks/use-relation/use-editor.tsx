@@ -34,7 +34,10 @@ export function useEditor() {
         "show-toolbar": false,
         "_popup-record": record,
       },
-      context,
+      context: {
+        _showRecord: record?.id,
+        ...context,
+      },
     });
 
     if (!tab) return;
