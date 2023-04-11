@@ -340,6 +340,12 @@ const openTabAtom = atom(
     const { active, tabs, popups } = get(tabsAtom);
 
     const name = viewName(view);
+
+    // special case of relational field popups
+    if (name.startsWith("$selector")) {
+      return name === view ? null : await initTab(view, options);
+    }
+
     const found =
       tabs.find((x) => x.id === name) ?? popups.find((x) => x.id === name);
 
