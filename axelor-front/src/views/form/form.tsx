@@ -164,11 +164,25 @@ function FormContainer({
     }));
   }, [setAttrs]);
 
-  const onBack = useCallback(async () => {
-    if (prevType) {
-      switchTo(prevType);
-    }
-  }, [prevType, switchTo]);
+  const onBack = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const record = get(formAtom).record;
+        const recordId = record.id || -1;
+        if (readonly || recordId < 0) {
+          if (prevType) {
+            switchTo(prevType);
+          }
+        } else {
+          setAttrs((prev) => ({
+            ...prev,
+            attrs: { ...prev.attrs, readonly: true },
+          }));
+        }
+      },
+      [formAtom, prevType, readonly, setAttrs, switchTo]
+    )
+  );
 
   const onSave = useAtomCallback(
     useCallback(
