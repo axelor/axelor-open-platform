@@ -83,7 +83,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           icons={[
             {
               icon: "edit",
-              onClick: handleEdit,
+              onClick: e => handleEdit(),
             },
             {
               icon: "search",
