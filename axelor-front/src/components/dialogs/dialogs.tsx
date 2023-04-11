@@ -143,6 +143,28 @@ export module dialogs {
     const { title = i18n.get("Error"), content } = options;
     return box({ title, content });
   }
+
+  export async function confirmDirty(
+    check: () => Promise<boolean>,
+    callback: () => Promise<any>,
+    options?: {
+      title?: string;
+      content?: React.ReactNode;
+    }
+  ) {
+    const {
+      title,
+      content = i18n.get(
+        "Current changes will be lost. Do you really want to proceed?"
+      ),
+    } = options ?? {};
+    const dirty = await check();
+    const confirmed = !dirty || (await confirm({ title, content }));
+    if (confirmed) {
+      await callback();
+    }
+    return confirmed;
+  }
 }
 
 export function DialogsProvider() {

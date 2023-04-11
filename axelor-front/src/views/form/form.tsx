@@ -55,7 +55,8 @@ export function Form(props: ViewProps<FormView>) {
 
   const { action } = useViewTab();
 
-  const readonly = action.params?.forceReadonly ?? viewProps.readonly ?? Boolean(id);
+  const readonly =
+    action.params?.forceReadonly ?? viewProps.readonly ?? Boolean(id);
   const recordId = id ?? action.context?._showRecord;
 
   const { state, data: record = {} } = useAsync(
@@ -114,7 +115,7 @@ function FormContainer({
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
-  const isDirty = useAtomValue(dirtyAtom);
+  const isDirty = useAtomValue(dirtyAtom) ?? false;
   const setDirty = useSetAtom(dirtyAtom);
 
   const doRead = useCallback(
@@ -161,10 +162,13 @@ function FormContainer({
   );
 
   const onNew = useCallback(async () => {
-    doEdit(null, {
-      readonly: false,
-    });
-  }, [doEdit]);
+    dialogs.confirmDirty(
+      async () => isDirty,
+      async () => {
+        doEdit(null, { readonly: false });
+      }
+    );
+  }, [doEdit, isDirty]);
 
   const onEdit = useCallback(async () => {
     setAttrs((prev) => ({
@@ -218,11 +222,16 @@ function FormContainer({
   const onRefresh = useAtomCallback(
     useCallback(
       async (get) => {
-        const cur = get(formAtom).record;
-        const rec = await doRead(cur.id ?? "");
-        await doEdit(rec);
+        dialogs.confirmDirty(
+          async () => isDirty,
+          async () => {
+            const cur = get(formAtom).record;
+            const rec = await doRead(cur.id ?? "");
+            await doEdit(rec);
+          }
+        );
       },
-      [doEdit, doRead, formAtom]
+      [doEdit, doRead, formAtom, isDirty]
     )
   );
 
@@ -373,6 +382,7 @@ function FormContainer({
                   key: "copy",
                   text: i18n.get("Duplicate"),
                   onClick: onCopy,
+                  disabled: isDirty,
                 },
                 {
                   key: "s1",

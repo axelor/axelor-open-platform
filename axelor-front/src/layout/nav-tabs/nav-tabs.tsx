@@ -12,6 +12,7 @@ import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Views } from "@/view-containers/views";
 
+import { dialogs } from "@/components/dialogs";
 import { PopupViews } from "@/view-containers/view-popup";
 import styles from "./nav-tabs.module.scss";
 
@@ -75,19 +76,22 @@ const NavTab = memo(function NavTab({
   ...props
 }: NavItemProps & { close: (view: any) => any }) {
   const tab = props as Tab;
-  const { title, dirty } = useAtomValue(tab.state);
+  const { title, dirty = false } = useAtomValue(tab.state);
   const { icon, iconColor } = useIcon(tab.id);
 
   const { data } = useSession();
   const showClose = tab.id !== data?.user?.action;
 
   const handleClose = useCallback<React.MouseEventHandler<HTMLDivElement>>(
-    (e) => {
+    async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      close(tab.id);
+      dialogs.confirmDirty(
+        async () => dirty,
+        async () => close(tab.id)
+      );
     },
-    [close, tab]
+    [close, dirty, tab.id]
   );
 
   return (

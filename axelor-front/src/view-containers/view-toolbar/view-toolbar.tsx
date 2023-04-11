@@ -1,8 +1,10 @@
+import { useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 
+import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
@@ -10,11 +12,12 @@ import { toTitleCase } from "@/utils/names";
 import {
   useSelectViewState,
   useViewAction,
+  useViewDirtyAtom,
   useViewSwitch,
   useViewTab,
 } from "../views/scope";
 
-import { useAtomCallback } from "jotai/utils";
+import { useAtomValue } from "jotai";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -52,6 +55,9 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   const pageActions = onPrev || onNext;
 
+  const dirtyAtom = useViewDirtyAtom();
+  const dirty = useAtomValue(dirtyAtom) ?? false;
+
   const { data: sessionInfo } = useSession();
   const { actionId, views = [] } = useViewAction();
   const viewType = useSelectViewState(useCallback((state) => state.type, []));
@@ -61,19 +67,38 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const switchToView = useAtomCallback(
     useCallback(
       (get, set, type: string) => {
-        const { props = {} } = get(viewTab.state);
-        const { selectedId = 0 } = props[viewType] ?? {};
-        if (viewType === "grid" && type === "form" && selectedId > 0) {
-          switchTo(type, {
-            route: { id: String(selectedId) },
-          });
-        } else {
-          switchTo(type);
-        }
+        dialogs.confirmDirty(
+          async () => dirty,
+          async () => {
+            const { props = {} } = get(viewTab.state);
+            const { selectedId = 0 } = props[viewType] ?? {};
+            if (viewType === "grid" && type === "form" && selectedId > 0) {
+              switchTo(type, {
+                route: { id: String(selectedId) },
+              });
+            } else {
+              switchTo(type);
+            }
+          }
+        );
       },
-      [switchTo, viewTab.state, viewType]
+      [dirty, switchTo, viewTab.state, viewType]
     )
   );
+
+  const handlePrev = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => dirty,
+      async () => onPrev?.()
+    );
+  }, [dirty, onPrev]);
+
+  const handleNext = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => dirty,
+      async () => onNext?.()
+    );
+  }, [dirty, onNext]);
 
   const switchActions = useMemo(() => {
     if (views.length === 1) return;
@@ -163,7 +188,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
                 icon: "navigate_before",
               },
               disabled: !canPrev,
-              onClick: onPrev,
+              onClick: handlePrev,
             },
             {
               key: "next",
@@ -173,7 +198,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
                 icon: "navigate_next",
               },
               disabled: !canNext,
-              onClick: onNext,
+              onClick: handleNext,
             },
           ]}
         />
