@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react";
+import uniq from "lodash/uniq";
 
 import { DataSource } from "@/services/client/data";
 import { DataContext } from "@/services/client/data.types";
@@ -29,19 +30,28 @@ export function useCompletion(options: {
     async (term: string) => {
       return dataSource.search({
         limit,
+        fields: uniq([
+          "id",
+          ...(targetName ? [targetName] : []),
+          ...(targetSearch || []),
+        ]),
         filter: {
           _domain: domain,
           _domainContext: context,
-          operator: "or",
-          criteria: names.map((name) => ({
-            fieldName: name,
-            operator: "like",
-            value: term,
-          })),
+          ...(term
+            ? {
+                operator: "or",
+                criteria: names.map((name) => ({
+                  fieldName: name,
+                  operator: "like",
+                  value: term,
+                })),
+              }
+            : {}),
         },
       });
     },
-    [context, dataSource, domain, limit, names]
+    [context, dataSource, domain, limit, names, targetName, targetSearch]
   );
 
   return search;
