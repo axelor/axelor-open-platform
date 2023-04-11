@@ -55,7 +55,7 @@ export function Form(props: ViewProps<FormView>) {
 
   const { action } = useViewTab();
 
-  const readonly = action.params?.forceReadonly ?? viewProps.readonly;
+  const readonly = action.params?.forceReadonly ?? viewProps.readonly ?? true;
   const recordId = id ?? action.context?._showRecord;
 
   const { state, data: record = {} } = useAsync(
@@ -177,10 +177,18 @@ function FormContainer({
         let rec = get(formAtom).record;
         let res = await dataStore.save(rec);
         if (res.id) res = await doRead(res.id);
-        doEdit(res);
+        doEdit(res, { readonly });
         return res;
       },
-      [actionExecutor, dataStore, doEdit, doRead, formAtom, onSaveAction]
+      [
+        actionExecutor,
+        dataStore,
+        doEdit,
+        doRead,
+        formAtom,
+        onSaveAction,
+        readonly,
+      ]
     )
   );
 
