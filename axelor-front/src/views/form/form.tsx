@@ -135,7 +135,8 @@ function FormContainer({
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
-        switchTo("form", { route: { id }, props: options });
+        const props = { readonly, ...options };
+        switchTo("form", { route: { id }, props });
         setDirty(false);
         set(formAtom, {
           ...prev,
@@ -147,7 +148,15 @@ function FormContainer({
           await actionExecutor.execute(action);
         }
       },
-      [actionExecutor, formAtom, onLoadAction, onNewAction, setDirty, switchTo]
+      [
+        actionExecutor,
+        formAtom,
+        onLoadAction,
+        onNewAction,
+        readonly,
+        setDirty,
+        switchTo,
+      ]
     )
   );
 
