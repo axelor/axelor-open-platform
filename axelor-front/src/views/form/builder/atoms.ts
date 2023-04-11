@@ -35,29 +35,35 @@ export function createWidgetAtom(props: {
   const { uid, name = "__" } = schema;
   const attrs = defaultAttrs(schema);
 
-  const lenseAtom = focusAtom(formAtom, (o) =>
+  const attrsByIdAtom = focusAtom(formAtom, (o) =>
     o
       .prop("states")
       .prop(uid)
       .valueOr({ attrs } as WidgetState)
   );
 
+  const attrsByNameAtom = focusAtom(formAtom, (o) =>
+    o
+      .prop("statesByName")
+      .prop(name)
+      .valueOr({ attrs } as WidgetState)
+  );
+
   const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
     (get) => {
-      const { statesByName } = get(formAtom);
-      const { attrs: attrsByName } = statesByName[name] ?? {};
-      const state = get(lenseAtom);
+      const { attrs: attrsByName } = get(attrsByNameAtom);
+      const { attrs: attrsById, ...rest } = get(attrsByIdAtom);
       return {
-        ...state,
+        ...rest,
         attrs: {
           ...attrs,
           ...attrsByName,
-          ...state.attrs,
+          ...attrsById,
         },
       };
     },
     (get, set, state) => {
-      set(lenseAtom, state);
+      set(attrsByIdAtom, state);
     }
   );
 
