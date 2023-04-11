@@ -1,7 +1,7 @@
 import { uniqueId } from "lodash";
 import { useCallback, useEffect, useMemo } from "react";
 
-import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridState } from "@axelor/ui/grid";
 
 import { PageText } from "@/components/page-text";
@@ -13,6 +13,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
+import { i18n } from "@/services/client/i18n";
 
 export type SelectorOptions = {
   model: string;
@@ -51,6 +52,8 @@ export function useSelector() {
       open: true,
       onClose: () => {},
       header: () => <Header />,
+      footer: () => <Footer onClose={() => close()} onSelect={onSelect} />,
+      buttons: [],
       handler: () => (
         <Handler
           close={() => close()}
@@ -147,6 +150,36 @@ function SelectorHeader({ dataStore }: { dataStore: DataStore }) {
     <Box d="flex" alignItems="center" g={2}>
       <PageText dataStore={dataStore} />
       <CommandBar items={commands} />
+    </Box>
+  );
+}
+
+function Footer({
+  onClose,
+  onSelect,
+}: {
+  onClose: () => void;
+  onSelect?: (records: DataRecord[]) => void;
+}) {
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+
+  const handleConfirm = useCallback(async () => {
+    const state = handler.data as GridState;
+    const records =
+      state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
+    onSelect?.(records);
+    onClose();
+  }, [handler, onSelect, onClose]);
+
+  return (
+    <Box d="flex" g={2}>
+      <Button variant="secondary" onClick={onClose}>
+        {i18n.get("Cancel")}
+      </Button>
+      <Button variant="primary" onClick={handleConfirm}>
+        {i18n.get("OK")}
+      </Button>
     </Box>
   );
 }
