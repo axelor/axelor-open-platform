@@ -11,11 +11,12 @@ import { selectAtom } from "jotai/utils";
 import { useAsync } from "@/hooks/use-async";
 import { findView } from "@/services/client/meta-cache";
 import { DataRecord } from "@/services/client/data.types";
-import { useEditor } from "@/hooks/use-relation";
+import { EditorOptions, useEditor } from "@/hooks/use-relation";
 import { i18n } from "@/services/client/i18n";
 import classes from "./one-to-many.module.scss";
 import { GridRow } from "@axelor/ui/src/grid";
 import { dialogs } from "@/components/dialogs";
+import { toKebabCase } from "@/utils/names";
 
 export function OneToMany({
   schema,
@@ -28,6 +29,9 @@ export function OneToMany({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
+  const isManyToMany =
+    toKebabCase(schema.serverType || schema.widget) === "many-to-many";
+
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const [records, setRecords] = useState<DataRecord[]>([]);
@@ -101,42 +105,68 @@ export function OneToMany({
     [value, name, model, parentId, dataStore]
   );
 
+  const openEditor = useCallback(
+    (
+      options?: Partial<EditorOptions>,
+      _onSelect?: (record: DataRecord) => void,
+      _onSave?: (record: DataRecord) => void
+    ) => {
+      showEditor({
+        title: title ?? "",
+        model,
+        record: { id: null },
+        readonly: false,
+        ...(isManyToMany
+          ? {
+              onSelect: (record) => {
+                shouldSearch.current = false;
+                _onSelect?.(record);
+              },
+            }
+          : {
+              onSave: async (record) => {
+                shouldSearch.current = false;
+                _onSave?.(record);
+                return record;
+              },
+            }),
+        ...options,
+      });
+    },
+    [isManyToMany, model, title, showEditor]
+  );
+
   const onAdd = useCallback(() => {
-    showEditor({
-      title: title ?? "",
-      model,
-      record: { id: null },
-      readonly: false,
-      onSave: async (record) => {
-        shouldSearch.current = false;
-        setValue([...(value || []), { ...record, _dirty: true }], true);
-        return record;
-      },
-    });
-  }, [model, title, value, setValue, showEditor]);
+    openEditor(
+      {},
+      (record) => setValue([...(value || []), { ...record }], true),
+      (record) =>
+        setValue([...(value || []), { ...record, _dirty: true }], true)
+    );
+  }, [openEditor, value, setValue]);
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       const matcher = (rec: DataRecord) =>
         rec.id === record.id || rec === record;
-      showEditor({
-        title: title ?? "",
-        model,
-        record,
-        readonly,
-        onSave: async (record) => {
-          shouldSearch.current = false;
+
+      openEditor(
+        { record, readonly },
+        (record) =>
+          setValue(
+            value?.map((val) => (matcher(val) ? { ...val, ...record } : val)),
+            true
+          ),
+        (record) =>
           setValue(
             value?.map((val) =>
               matcher(val) ? { ...val, ...record, _dirty: true } : val
             ),
             true
-          );
-          return record;
-        },
-      });
+          )
+      );
     },
-    [model, title, value, setValue, showEditor]
+    [value, setValue, openEditor]
   );
 
   const onView = useCallback(
