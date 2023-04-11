@@ -11,8 +11,10 @@ import {
   useSelectViewState,
   useViewAction,
   useViewSwitch,
+  useViewTab,
 } from "../views/scope";
 
+import { useAtomCallback } from "jotai/utils";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -53,7 +55,25 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const { data: sessionInfo } = useSession();
   const { actionId, views = [] } = useViewAction();
   const viewType = useSelectViewState(useCallback((state) => state.type, []));
+  const viewTab = useViewTab();
   const switchTo = useViewSwitch();
+
+  const switchToView = useAtomCallback(
+    useCallback(
+      (get, set, type: string) => {
+        const { props = {} } = get(viewTab.state);
+        const { selectedId = 0 } = props[viewType] ?? {};
+        if (viewType === "grid" && type === "form" && selectedId > 0) {
+          switchTo(type, {
+            route: { id: String(selectedId) },
+          });
+        } else {
+          switchTo(type);
+        }
+      },
+      [switchTo, viewTab.state, viewType]
+    )
+  );
 
   const switchActions = useMemo(() => {
     if (views.length === 1) return;
@@ -69,10 +89,10 @@ export function ViewToolBar(props: ViewToolBarProps) {
         iconProps: {
           icon: ViewIcons[key] ?? "table_view",
         },
-        onClick: () => switchTo(key),
+        onClick: () => switchToView(key),
       };
     });
-  }, [switchTo, views, viewType]);
+  }, [views, viewType, switchToView]);
 
   const farItems = useMemo(() => {
     const items: CommandItemProps[] = [];

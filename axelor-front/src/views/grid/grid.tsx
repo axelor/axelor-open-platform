@@ -175,9 +175,16 @@ export function Grid(props: ViewProps<GridView>) {
 
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
-      setViewProps({ selectedCell: state.selectedCell! });
+      const selectedCell = state.selectedCell || undefined;
+      const selectedId = selectedCell
+        ? state.rows[selectedCell[0]]?.record.id
+        : undefined;
+      setViewProps({
+        selectedCell,
+        selectedId,
+      });
     }
-  }, [viewProps, setViewProps, state.selectedCell]);
+  }, [viewProps, setViewProps, state.selectedCell, state.rows]);
 
   const searchOptions = useMemo(() => {
     if (currentPage) {
