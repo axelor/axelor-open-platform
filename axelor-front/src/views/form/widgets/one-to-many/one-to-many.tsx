@@ -4,14 +4,14 @@ import { DataStore } from "@/services/client/data-store";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
-import { Box, CommandBar } from "@axelor/ui";
+import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { GridView } from "@/services/client/meta.types";
 import { selectAtom } from "jotai/utils";
 import { useAsync } from "@/hooks/use-async";
 import { findView } from "@/services/client/meta-cache";
 import { DataRecord } from "@/services/client/data.types";
-import { EditorOptions, useEditor } from "@/hooks/use-relation";
+import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
 import { i18n } from "@/services/client/i18n";
 import classes from "./one-to-many.module.scss";
 import { GridRow } from "@axelor/ui/src/grid";
@@ -46,6 +46,7 @@ export function OneToMany({
   });
 
   const showEditor = useEditor();
+  const showSelector = useSelector();
   const [state, setState] = useGridState();
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
@@ -104,6 +105,22 @@ export function OneToMany({
     },
     [value, name, model, parentId, dataStore]
   );
+
+  const onSelect = useCallback(() => {
+    showSelector({
+      title: i18n.get("Select {0}", title ?? ""),
+      model,
+      multiple: true,
+      onSelect: (records) => {
+        shouldSearch.current = false;
+        const valIds = (value || []).map((x) => x.id);
+        setValue([
+          ...(value || []),
+          ...records.filter((rec) => !valIds.includes(rec.id)),
+        ]);
+      },
+    });
+  }, [value, setValue, showSelector, model, title]);
 
   const openEditor = useCallback(
     (
@@ -211,6 +228,18 @@ export function OneToMany({
             }}
             iconOnly
             items={[
+              ...(isManyToMany
+                ? [
+                    {
+                      key: "select",
+                      text: i18n.get("Select"),
+                      iconProps: {
+                        icon: "search",
+                      },
+                      onClick: onSelect,
+                    } as CommandItemProps,
+                  ]
+                : []),
               {
                 key: "new",
                 text: i18n.get("New"),
