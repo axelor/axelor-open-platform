@@ -105,13 +105,19 @@ export function useViewSwitch() {
   const action = tab.id;
   const { open } = useTabs();
 
-  const switchTo = useCallback<SwitchTo>(
-    (type, options) => {
-      if (action) {
-        open(action, { type, ...options });
-      }
-    },
-    [action, open]
+  const switchTo: SwitchTo = useAtomCallback(
+    useCallback(
+      (get, set, type, options) => {
+        if (action) {
+          const state = get(tab.state);
+          if (state.dirty && state.type !== type) {
+            set(tab.state, { dirty: false });
+          }
+          open(action, { type, ...options });
+        }
+      },
+      [action, open, tab.state]
+    )
   );
 
   return switchTo;
