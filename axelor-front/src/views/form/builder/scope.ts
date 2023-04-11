@@ -32,6 +32,15 @@ export class FormActionHandler extends DefaultActionHandler {
   }
 
   setAttr(target: string, name: string, value: any) {
+    if (name === "value" || name.startsWith("value:")) {
+      const op = value.substring(6) ?? "set";
+      return this.notify({
+        op,
+        type: "value",
+        target,
+        value,
+      });
+    }
     this.notify({
       type: "attr",
       target,
@@ -162,17 +171,27 @@ function useActionValue({ formAtom }: { formAtom: FormAtom }) {
             };
           }
           if (op === "add") {
-            const items = record[target] ?? [];
-            newRecord = {
-              ...record,
-              [target]: [...items, value],
-            };
+            const items: DataRecord[] = record[target] ?? [];
+            const found = items.find((x) => x.id === value.id);
+            if (found) {
+              newRecord = {
+                ...record,
+                [target]: items.map((x) =>
+                  x.id === value.id ? { ...found, ...value } : x
+                ),
+              };
+            } else {
+              newRecord = {
+                ...record,
+                [target]: [...items, value],
+              };
+            }
           }
           if (op === "del") {
-            const items = record[target] ?? [];
+            const items: DataRecord[] = record[target] ?? [];
             newRecord = {
               ...record,
-              [target]: items.filter((x: any) => x.id !== value.id),
+              [target]: items.filter((x) => x.id !== value.id),
             };
           }
           if (record !== newRecord) {
