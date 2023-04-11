@@ -55,7 +55,7 @@ export function Form(props: ViewProps<FormView>) {
 
   const { action } = useViewTab();
 
-  const readonly = action.params?.forceReadonly ?? viewProps.readonly ?? true;
+  const readonly = action.params?.forceReadonly ?? viewProps.readonly ?? Boolean(id);
   const recordId = id ?? action.context?._showRecord;
 
   const { state, data: record = {} } = useAsync(
