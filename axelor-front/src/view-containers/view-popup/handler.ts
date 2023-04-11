@@ -1,12 +1,14 @@
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
+import { FormState } from "@/views/form/builder";
 import { atom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 
 export type PopupHandler = {
   data?: any;
   dataStore?: DataStore;
+  getState?: () => FormState;
   onNew?: () => Promise<void>;
   onRead?: (id: string | number) => Promise<DataRecord>;
   onEdit?: (record: DataRecord | null) => Promise<void>;

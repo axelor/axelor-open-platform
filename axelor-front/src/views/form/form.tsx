@@ -285,6 +285,10 @@ function FormContainer({
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
+  const getState = useAtomCallback(
+    useCallback((get) => get(formAtom), [formAtom])
+  );
+
   const doOnLoad = useAtomCallback(
     useCallback(
       async (get) => {
@@ -306,12 +310,13 @@ function FormContainer({
   useEffect(() => {
     if (popup) {
       setPopupHandlers({
+        getState,
         onSave,
         onEdit: doEdit,
         onRead: doRead,
       });
     }
-  }, [doEdit, doRead, onSave, popup, setPopupHandlers]);
+  }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers]);
 
   return (
     <div className={styles.formViewContainer}>

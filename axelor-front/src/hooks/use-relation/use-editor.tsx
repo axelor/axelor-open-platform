@@ -15,14 +15,25 @@ export type EditorOptions = {
   model: string;
   title: string;
   record?: DataRecord | null;
+  readonly?: boolean;
   viewName?: string;
   context?: DataContext;
+  onSave?: (record: DataRecord) => Promise<DataRecord>;
   onSelect?: (record: DataRecord) => void;
 };
 
 export function useEditor() {
   return useCallback(async (options: EditorOptions) => {
-    const { title, model, record, viewName, context, onSelect } = options;
+    const {
+      title,
+      model,
+      record,
+      viewName,
+      context,
+      readonly: forceReadonly,
+      onSave,
+      onSelect,
+    } = options;
     const tab = await initTab({
       name: uniqueId("$selector"),
       title,
@@ -31,6 +42,7 @@ export function useEditor() {
       views: [{ type: "form", name: viewName }],
       params: {
         popup: true,
+        forceReadonly,
         "show-toolbar": false,
         "_popup-record": record,
       },
@@ -46,7 +58,9 @@ export function useEditor() {
       tab,
       open: true,
       onClose: () => {},
-      footer: () => <Footer onClose={() => close()} onSelect={onSelect} />,
+      footer: () => (
+        <Footer onSave={onSave} onClose={() => close()} onSelect={onSelect} />
+      ),
       buttons: [],
     });
   }, []);
@@ -54,9 +68,11 @@ export function useEditor() {
 
 function Footer({
   onClose,
+  onSave,
   onSelect,
 }: {
   onClose: () => void;
+  onSave?: (record: DataRecord) => Promise<DataRecord>;
   onSelect?: (record: DataRecord) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
@@ -67,13 +83,15 @@ function Footer({
   }, [onClose]);
 
   const handleConfirm = useCallback(async () => {
-    const { onSave } = handler;
     if (onSave) {
-      const rec = await onSave();
+      const state = handler.getState?.()!;
+      onSave(state.record);
+    } else if (handler.onSave) {
+      const rec = await handler.onSave();
       onSelect?.(rec);
     }
     onClose();
-  }, [handler, onClose, onSelect]);
+  }, [handler, onClose, onSave, onSelect]);
 
   return (
     <Box d="flex" g={2}>
