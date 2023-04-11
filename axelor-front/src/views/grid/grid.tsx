@@ -6,6 +6,7 @@ import { GridRow } from "@axelor/ui/grid";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
@@ -91,23 +92,26 @@ export function Grid(props: ViewProps<GridView>) {
   );
 
   const onEdit = useCallback(
-    (record: GridRow["record"]) => {
+    (record: DataRecord, readonly = false) => {
+      const recordId = record.id || 0;
+      const id = recordId > 0 ? String(recordId) : "";
       switchTo("form", {
-        route: { id: record.id },
-        props: { readonly: false },
+        route: { id },
+        props: { readonly },
       });
     },
     [switchTo]
   );
 
+  const onNew = useCallback(() => {
+    onEdit({});
+  }, [onEdit]);
+
   const onView = useCallback(
-    (record: GridRow["record"]) => {
-      switchTo("form", {
-        route: { id: record.id },
-        props: { readonly: true },
-      });
+    (record: DataRecord) => {
+      onEdit(record, true);
     },
-    [switchTo]
+    [onEdit]
   );
 
   const onArchiveOrUnArchive = useCallback(
@@ -217,6 +221,7 @@ export function Grid(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
+              onClick: onNew,
             },
             {
               key: "edit",
