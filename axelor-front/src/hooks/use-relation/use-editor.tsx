@@ -18,7 +18,7 @@ export type EditorOptions = {
   readonly?: boolean;
   viewName?: string;
   context?: DataContext;
-  onSave?: (record: DataRecord) => Promise<DataRecord>;
+  onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
 };
 
@@ -72,8 +72,8 @@ function Footer({
   onSelect,
 }: {
   onClose: () => void;
-  onSave?: (record: DataRecord) => Promise<DataRecord>;
-  onSelect?: (record: DataRecord) => void;
+  onSave?: EditorOptions["onSave"];
+  onSelect?: EditorOptions["onSelect"];
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);

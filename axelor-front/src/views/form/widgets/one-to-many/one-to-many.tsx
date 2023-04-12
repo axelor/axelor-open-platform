@@ -1,7 +1,7 @@
-import { useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { FieldProps } from "../../builder";
 import { DataStore } from "@/services/client/data-store";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
@@ -25,16 +25,46 @@ export function OneToMany({
   formAtom,
 }: FieldProps<DataRecord[]>) {
   const { title, name, target: model, fields } = schema;
-  const [value, setValue] = useAtom(valueAtom);
+  // use ref to avoid onSearch call
+  const shouldSearch = useRef(true);
+  const [records, setRecords] = useState<DataRecord[]>([]);
+  const [value, setValue] = useAtom(
+    useMemo(
+      () =>
+        atom(
+          (get) => get(valueAtom),
+          (
+            get,
+            set,
+            setter: SetStateAction<DataRecord[]>,
+            callOnChange: boolean = true
+          ) => {
+            shouldSearch.current = false;
+            const values =
+              typeof setter === "function" ? setter(get(valueAtom)!) : setter;
+
+            set(valueAtom, values, callOnChange);
+
+            setRecords((records) =>
+              [...(values || [])].map((val) => {
+                const rec = val.id
+                  ? records.find((r) => r.id === val.id)
+                  : null;
+                if (rec) return { ...rec, ...val };
+                return val;
+              })
+            );
+          }
+        ),
+      [valueAtom]
+    )
+  );
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
 
-  // use ref to avoid onSearch call
-  const shouldSearch = useRef(true);
-  const [records, setRecords] = useState<DataRecord[]>([]);
   const { state: viewState, data: viewData } = useAsync(async () => {
     const { items, gridView } = schema;
     if ((items || []).length > 0) return;
@@ -62,12 +92,6 @@ export function OneToMany({
       // avoid search for internal value changes
       if (!shouldSearch.current) {
         shouldSearch.current = true;
-        setRecords((records) => {
-          return [...(value || [])].map((val) => ({
-            ...records.find((r) => r.id === val.id),
-            ...val,
-          }));
-        });
         return;
       }
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
@@ -94,7 +118,12 @@ export function OneToMany({
         records = res.records;
       }
 
-      records = [...unsaved, ...records];
+      records = [
+        ...(
+          ids.map((id) => records.find((r) => r.id === id)) as DataRecord[]
+        ).filter((r) => r),
+        ...unsaved,
+      ];
 
       setRecords(records);
 
@@ -112,41 +141,29 @@ export function OneToMany({
       model,
       multiple: true,
       onSelect: (records) => {
-        shouldSearch.current = false;
-        const valIds = (value || []).map((x) => x.id);
-        setValue([
-          ...(value || []),
-          ...records.filter((rec) => !valIds.includes(rec.id)),
-        ]);
+        setValue((value) => {
+          const valIds = (value || []).map((x) => x.id);
+          return [
+            ...(value || []),
+            ...records.filter((rec) => !valIds.includes(rec.id)),
+          ];
+        });
       },
     });
-  }, [value, setValue, showSelector, model, title]);
+  }, [setValue, showSelector, model, title]);
 
   const openEditor = useCallback(
     (
       options?: Partial<EditorOptions>,
-      _onSelect?: (record: DataRecord) => void,
-      _onSave?: (record: DataRecord) => void
+      onSelect?: (record: DataRecord) => void,
+      onSave?: (record: DataRecord) => void
     ) => {
       showEditor({
         title: title ?? "",
         model,
         record: { id: null },
         readonly: false,
-        ...(isManyToMany
-          ? {
-              onSelect: (record) => {
-                shouldSearch.current = false;
-                _onSelect?.(record);
-              },
-            }
-          : {
-              onSave: async (record) => {
-                shouldSearch.current = false;
-                _onSave?.(record);
-                return record;
-              },
-            }),
+        ...(isManyToMany ? { onSelect } : { onSave }),
         ...options,
       });
     },
@@ -156,34 +173,32 @@ export function OneToMany({
   const onAdd = useCallback(() => {
     openEditor(
       {},
-      (record) => setValue([...(value || []), { ...record }], true),
+      (record) => setValue((value) => [...(value || []), { ...record }]),
       (record) =>
-        setValue([...(value || []), { ...record, _dirty: true }], true)
+        setValue((value) => [...(value || []), { ...record, _dirty: true }])
     );
-  }, [openEditor, value, setValue]);
+  }, [openEditor, setValue]);
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       const matcher = (rec: DataRecord) =>
-        rec.id === record.id || rec === record;
+        (rec.id && rec.id === record.id) || rec === record;
 
       openEditor(
         { record, readonly },
         (record) =>
-          setValue(
-            value?.map((val) => (matcher(val) ? { ...val, ...record } : val)),
-            true
+          setValue((value) =>
+            value?.map((val) => (matcher(val) ? { ...val, ...record } : val))
           ),
         (record) =>
-          setValue(
+          setValue((value) =>
             value?.map((val) =>
               matcher(val) ? { ...val, ...record, _dirty: true } : val
-            ),
-            true
+            )
           )
       );
     },
-    [value, setValue, openEditor]
+    [setValue, openEditor]
   );
 
   const onView = useCallback(
@@ -203,15 +218,13 @@ export function OneToMany({
       });
       if (confirmed) {
         const ids = records.map((r) => r.id);
-        shouldSearch.current = false;
-        setValue(
-          (value || []).filter(({ id }) => !ids.includes(id)),
-          true
+        setValue((value) =>
+          (value || []).filter(({ id }) => !ids.includes(id))
         );
         clearSelection();
       }
     },
-    [value, setValue, clearSelection]
+    [setValue, clearSelection]
   );
 
   if (viewState === "loading") return null;
