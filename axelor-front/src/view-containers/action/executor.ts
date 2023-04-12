@@ -115,6 +115,8 @@ export class DefaultActionExecutor implements ActionExecutor {
         await this.#handle(item, options);
       }
     }
+
+    return result;
   }
 
   async #handle(data: ActionResult, options?: ActionOptions) {

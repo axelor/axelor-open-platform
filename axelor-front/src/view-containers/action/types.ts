@@ -3,6 +3,7 @@ import {
   DataContext,
   DataRecord,
 } from "@/services/client/data.types";
+import { ActionResult } from "@/services/client/meta";
 
 export interface IActionData {
   type: string;
@@ -66,5 +67,8 @@ export type ActionOptions = {
 };
 
 export interface ActionExecutor {
-  execute(action: string, options?: ActionOptions): Promise<void>;
+  execute(
+    action: string,
+    options?: ActionOptions
+  ): Promise<ActionResult[] | void>;
 }
