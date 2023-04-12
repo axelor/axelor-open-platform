@@ -139,7 +139,7 @@ ui.formInput('Image', 'ImageLink', {
         if (value) {
           return value;
         }
-        if (record.id) {
+        if (record.id > 0) {
           return makeURL(model, field.name, record, undefined, scope) + "&image=true";
         }
         return BLANK;
