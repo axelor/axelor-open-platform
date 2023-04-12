@@ -232,70 +232,73 @@ export function OneToMany({
   const hasRowSelected = !!selectedRows?.length;
 
   return (
-    <Box d="flex" flexDirection="column" className={classes.container}>
-      <Box shadow>
-        {!readonly && (
-          <CommandBar
-            iconProps={{
-              weight: 300,
-            }}
-            iconOnly
-            items={[
-              ...(isManyToMany
-                ? [
-                    {
-                      key: "select",
-                      text: i18n.get("Select"),
-                      iconProps: {
-                        icon: "search",
-                      },
-                      onClick: onSelect,
-                    } as CommandItemProps,
-                  ]
-                : []),
-              {
-                key: "new",
-                text: i18n.get("New"),
-                iconProps: {
-                  icon: "add",
-                },
-                onClick: onAdd,
+    <Box d="flex" flexDirection="column" className={classes.container} border roundedTop>
+      <Box className={classes.header}>
+        <div className={classes.title}>{title}</div>
+        <CommandBar
+          iconProps={{
+            weight: 300,
+          }}
+          iconOnly
+          items={[
+            ...(isManyToMany
+              ? [
+                  {
+                    key: "select",
+                    text: i18n.get("Select"),
+                    iconProps: {
+                      icon: "search",
+                    },
+                    onClick: onSelect,
+                    hidden: readonly,
+                  } as CommandItemProps,
+                ]
+              : []),
+            {
+              key: "new",
+              text: i18n.get("New"),
+              iconProps: {
+                icon: "add",
               },
-              {
-                key: "edit",
-                text: i18n.get("Edit"),
-                iconProps: {
-                  icon: "edit",
-                },
-                disabled: !hasRowSelected,
-                onClick: () => {
-                  const [rowIndex] = selectedRows || [];
-                  const record = rows[rowIndex]?.record;
-                  record && onEdit(record);
-                },
+              onClick: onAdd,
+              hidden: readonly,
+            },
+            {
+              key: "edit",
+              text: i18n.get("Edit"),
+              iconProps: {
+                icon: "edit",
               },
-              {
-                key: "delete",
-                text: i18n.get("Delete"),
-                iconProps: {
-                  icon: "delete",
-                },
-                disabled: !hasRowSelected,
-                onClick: () => {
-                  onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-                },
+              disabled: !hasRowSelected,
+              onClick: () => {
+                const [rowIndex] = selectedRows || [];
+                const record = rows[rowIndex]?.record;
+                record && onEdit(record);
               },
-              {
-                key: "refresh",
-                text: i18n.get("Refresh"),
-                iconProps: {
-                  icon: "refresh",
-                },
-                onClick: () => onSearch(),
+            },
+            {
+              key: "delete",
+              text: i18n.get("Delete"),
+              iconProps: {
+                icon: "delete",
               },
-            ]}
-          />
-        )}
+              disabled: !hasRowSelected,
+              hidden: readonly,
+              onClick: () => {
+                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+              },
+            },
+            {
+              key: "refresh",
+              text: i18n.get("Refresh"),
+              iconProps: {
+                icon: "refresh",
+              },
+              onClick: () => onSearch(),
+              hidden: readonly,
+            },
+          ]}
+        />
       </Box>
       <GridComponent
         showEditIcon={!readonly}
