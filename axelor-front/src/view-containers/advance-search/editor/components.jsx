@@ -50,7 +50,7 @@ export function Select({ value, options, onChange, className, ...props }) {
       icons={[
         {
           id: "more",
-          icon: CaretDownFillIcon,
+          icon: "arrow_drop_down",
         },
       ]}
       {...props}
