@@ -643,6 +643,7 @@ export interface CustomView extends View {
 
 export interface HtmlView extends View {
   type: "html";
+  name?: string;
   resource?: string;
 }
 

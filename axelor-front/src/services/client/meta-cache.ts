@@ -29,18 +29,25 @@ export async function findView<T extends ViewType>({
   name?: string;
   model?: string;
 }): Promise<ViewData<T>> {
-  return cache.get(makeKey("view", model, type, name), () => {
+  return cache.get(makeKey("view", model, type, name), async () => {
+    if (type === "html") {
+      return Promise.resolve({ view: { name, type } });
+    }
+
     if (type === "chart") {
       return Promise.resolve({ view: { name, model, type } });
     }
-    return fetchView({ type: type as any, name, model }).then((data) => {
-      const { related } = findViewFields(data.view);
-      data.related = { ...data.related, ...related };
-      // process the meta data
-      processView(data, data.view);
-      processWidgets(data.view);
-      return data;
-    });
+
+    const data = await fetchView({ type: type as any, name, model });
+    const { related } = findViewFields(data.view);
+
+    data.related = { ...data.related, ...related };
+
+    // process the meta data
+    processView(data, data.view);
+    processWidgets(data.view);
+
+    return data;
   });
 }
 
