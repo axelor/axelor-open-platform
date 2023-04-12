@@ -23,6 +23,8 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
 
   const { state, data: Comp } = useWidgetComp(widget);
 
+  if (attrs.hidden) return null;
+
   if (state === "loading") {
     return <div>Loading...</div>;
   }

@@ -1,4 +1,3 @@
-import { dialogs } from "@/components/dialogs";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
@@ -6,6 +5,7 @@ import { useCallback, useMemo } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
+import { dialogs } from "@/components/dialogs";
 import { legacyClassNames } from "@/styles/legacy";
 
 import { FieldContainer, WidgetProps } from "../../builder";
