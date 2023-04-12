@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  position: relative;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  height: 100%;
+}
+
+$input-padding-x: 0.75rem;
+
+.numberInput {
+  padding-right: $input-padding-x * 2;
+}
+
+[dir="rtl"] {
+  .numberInput {
+    padding-right: $input-padding-x;
+    padding-left: $input-padding-x * 2;
+  }
+  .buttons {
+    left: 0;
+    right: auto;
+  }
+}
+
+.buttons > span {
+  line-height: 0.6;
+  cursor: pointer;
+  user-select: none;
+}

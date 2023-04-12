@@ -13,6 +13,8 @@ export const DEFAULT_ATTRS = {
   context: undefined as unknown as DataContext,
   precision: undefined as unknown as number,
   scale: undefined as unknown as number,
+  min: undefined as unknown as string | number,
+  max: undefined as unknown as string | number,
 };
 
 export type Attrs = Partial<typeof DEFAULT_ATTRS>;
