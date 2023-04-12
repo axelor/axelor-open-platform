@@ -35,6 +35,7 @@ export default defineConfig({
       "date-fns/locale/ja",
       "date-fns/locale/ru",
       "date-fns/locale/zh-CN",
+      "react-text-mask",
       "lodash",
       "lodash/uniq",
       "lodash/isNumber",
