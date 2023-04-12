@@ -7,6 +7,7 @@ import format from "@/utils/format";
 import { i18n } from "@/services/client/i18n";
 import { ActionOptions } from "@/view-containers/action";
 import { moment } from "@/services/client/l10n";
+import { MouseEvent } from "react";
 
 export type EvalContextOptions = {
   valid?: (name?: string) => boolean;
@@ -142,9 +143,13 @@ export function createEvalContext(
         : "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     },
     $action(name: string) {
-      return execute(name, {
-        context,
-      });
+      return (e: MouseEvent<HTMLElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        execute(name, {
+          context,
+        });
+      };
     },
   };
 
