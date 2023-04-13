@@ -1,17 +1,25 @@
 import { atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-
+import { ScopeProvider } from "jotai-molecules";
+import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 
+import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
-import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
+import {
+  GridSearchScope,
+  GridSearchScopeState,
+  SearchColumn,
+  SearchState,
+} from "./renderers/search";
+import { getSearchFilter } from "./renderers/search/utils";
 import {
   useViewProps,
   useViewRoute,
@@ -38,6 +46,7 @@ export function Grid(props: ViewProps<GridView>) {
   const [advanceSearch, setAdvancedSearch] = useAtom<any>(
     useMemo(() => atom({}), [])
   );
+  const [search, setSearch] = useAtom<any>(useMemo(() => atom({}), []));
 
   const [state, setState] = useGridState({
     selectedCell: viewProps?.selectedCell,
@@ -62,13 +71,43 @@ export function Grid(props: ViewProps<GridView>) {
       const sortBy = orderBy?.map(
         (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
       );
+      const { filter } = options;
+      let { freeSearchText, ...filterQuery } = query;
+      if (freeSearchText && filter?.criteria?.length) {
+        filterQuery = {
+          operator: "and",
+          criteria: [
+            { operator: "and", ...filter },
+            {
+              operator: query.operator || "or",
+              criteria: query.criteria,
+            },
+          ],
+        };
+      } else {
+        filterQuery.criteria = [...(filterQuery.criteria || [])].concat(
+          filter?.criteria || []
+        );
+        freeSearchText && (filterQuery.operator = "or");
+      }
+
       return dataStore.search({
         sortBy,
-        filter: { ...query, _archived },
         ...options,
+        filter: { ...filterQuery, _archived },
       });
     },
     [advanceSearch, dataStore, orderBy]
+  );
+
+  const onGridSearch = useCallback(
+    (searchValues: SearchState) => {
+      setSearch && (setSearch as CallableFunction)(searchValues);
+      return onSearch({
+        filter: getSearchFilter(fields as any, view.items, searchValues)!,
+      });
+    },
+    [fields, view.items, setSearch, onSearch]
   );
 
   const onDelete = useCallback(
@@ -190,6 +229,15 @@ export function Grid(props: ViewProps<GridView>) {
     }
   }, [viewProps, setViewProps, state.selectedCell, state.rows]);
 
+  const searchScope = useMemo<GridSearchScopeState>(
+    () => ({
+      search,
+      setSearch,
+      onSearch: onGridSearch,
+    }),
+    [search, setSearch, onGridSearch]
+  );
+
   const searchOptions = useMemo(() => {
     if (currentPage) {
       return { offset: (currentPage - 1) * limit };
@@ -292,20 +340,26 @@ export function Grid(props: ViewProps<GridView>) {
           />
         </ViewToolBar>
       )}
-      <GridComponent
-        dataStore={dataStore}
-        records={records}
-        view={view}
-        fields={fields}
-        state={state}
-        setState={setState}
-        sortType={"live"}
-        searchOptions={searchOptions}
-        onEdit={onEdit}
-        onView={onView}
-        onSearch={onSearch}
-        {...popupProps}
-      />
+
+      <ScopeProvider scope={GridSearchScope} value={searchScope}>
+        <GridComponent
+          dataStore={dataStore}
+          records={records}
+          view={view}
+          fields={fields}
+          state={state}
+          setState={setState}
+          sortType={"live"}
+          searchOptions={searchOptions}
+          onEdit={onEdit}
+          onView={onView}
+          onSearch={onSearch}
+          allowSearch
+          searchRowRenderer={Box}
+          searchColumnRenderer={SearchColumn}
+          {...popupProps}
+        />
+      </ScopeProvider>
     </div>
   );
 }

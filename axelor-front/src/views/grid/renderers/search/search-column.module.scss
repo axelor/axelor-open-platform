@@ -1,0 +1,13 @@
+.container {
+  --bs-input-shadow-focus: none;
+  flex: 1;
+}
+
+.select > * {
+  width: 100%;
+}
+.select > div > div {
+  border-color: transparent !important;
+  box-shadow: none;
+  font-weight: 500;
+}

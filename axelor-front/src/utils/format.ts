@@ -21,9 +21,12 @@ export function getTimeFormat(opts: FormatOptions = {}) {
   }
   return format;
 }
+export function getDateFormat(opts: FormatOptions = {}) {
+  return l10n.getDateFormat();
+}
 
 export function getDateTimeFormat(opts: FormatOptions = {}) {
-  const dateFormat = l10n.getDateFormat();
+  const dateFormat = getDateFormat(opts);
   return dateFormat + " " + getTimeFormat(opts);
 }
 

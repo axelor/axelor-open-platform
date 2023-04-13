@@ -69,6 +69,7 @@ export function Grid(
       }
 
       if (item.type === "button") {
+        columnAttrs.searchable = false;
         columnAttrs.computed = true;
         columnAttrs.width = columnAttrs.width || 32;
         columnAttrs.title = " ";
