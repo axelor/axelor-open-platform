@@ -66,7 +66,7 @@ const Editor = memo(function Editor({
 }) {
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [editor, setEditor] = useState<ManacoEditor>(null);
-  const changed = useRef(false);
+  const valueRef = useRef("");
 
   // set editor theme
   useEffect(() => {
@@ -87,9 +87,8 @@ const Editor = memo(function Editor({
 
   // set value in editor
   useEffect(() => {
-    if (editor) {
-      changed.current = true;
-      editor.setValue(value);
+    if (editor && valueRef.current !== value) {
+      editor.setValue((valueRef.current = value!));
     }
   }, [editor, value]);
 
@@ -101,8 +100,10 @@ const Editor = memo(function Editor({
   // trigger onChange on editor changes
   useEffect(() => {
     return addEvent(editor, "onDidChangeModelContent", () => {
-      if (changed.current) return (changed.current = false);
-      onChange && onChange(editor.getValue(), false);
+      const value = editor.getValue();
+      if (valueRef.current !== value) {
+        onChange && onChange((valueRef.current = editor.getValue()), false);
+      }
     });
   }, [editor, onChange]);
 
@@ -163,6 +164,7 @@ export function CodeEditor({
           readonly={readonly}
           value={value || ""}
           theme={codeTheme || THEMES[themeType]}
+          onChange={setValue}
           onBlur={handleBlur}
         />
       </Box>
