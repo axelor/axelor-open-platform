@@ -117,15 +117,15 @@ export class LoadingCache<T> extends Cache<T> {
    * @returns cached value or loaded value
    */
   get(key: string): T | undefined;
-  get(key: string, loader: () => T): T;
-  get(key: string, loader?: () => T): T | undefined {
+  get(key: string, loader: (key: string) => T): T;
+  get(key: string, loader?: (key: string) => T): T | undefined {
     let value = super.get(key);
     if (value) {
       return value;
     }
 
     if (loader !== undefined) {
-      value = loader();
+      value = loader(key);
       this.put(key, value);
     }
 
