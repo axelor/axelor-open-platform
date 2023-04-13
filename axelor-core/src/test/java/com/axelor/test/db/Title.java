@@ -21,8 +21,6 @@ package com.axelor.test.db;
 import com.axelor.db.Model;
 import com.axelor.db.annotations.Widget;
 import com.google.common.base.MoreObjects;
-import org.hibernate.annotations.Type;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,6 +29,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "CONTACT_TITLE")

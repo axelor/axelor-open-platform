@@ -449,10 +449,10 @@ public class TestActions extends MetaTest {
     Object value = action.execute(handler);
 
     Map<String, Object> expected =
-            Map.ofEntries(
-                    Map.entry("hasTitle", Map.of("value", true)),
-                    Map.entry("contactNickName", Map.of("value", "Some Name")),
-                    Map.entry("contactFirstName", Map.of("value", "myFirstName")));
+        Map.ofEntries(
+            Map.entry("hasTitle", Map.of("value", true)),
+            Map.entry("contactNickName", Map.of("value", "Some Name")),
+            Map.entry("contactFirstName", Map.of("value", "myFirstName")));
 
     assertEquals(expected, value);
   }

@@ -27,8 +27,6 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
-import org.junit.jupiter.api.BeforeEach;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -36,6 +34,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class MetaTest extends JpaTest {
 
@@ -76,14 +75,14 @@ public abstract class MetaTest extends JpaTest {
             .bind("model", Contact.class.getName())
             .bind("field", "attrs")
             .count()
-            == 0) {
+        == 0) {
 
       final Consumer<MetaJsonField> fields =
-              f -> {
-                f.setModel(Contact.class.getName());
-                f.setModelField("attrs");
-                jsonFields.save(f);
-              };
+          f -> {
+            f.setModel(Contact.class.getName());
+            f.setModelField("attrs");
+            jsonFields.save(f);
+          };
 
       MetaJsonField field;
 
@@ -131,5 +130,4 @@ public abstract class MetaTest extends JpaTest {
       fields.accept(field);
     }
   }
-
 }
