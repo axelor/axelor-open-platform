@@ -61,10 +61,22 @@
 }
 
 .react-datepicker__input-time-container {
-  margin: 5px 0 10px -10px;
-  text-align: center;
+  margin: 10px 0 10px -10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-datepicker-time__caption > * {
+  display: flex;
 }
 
 .react-datepicker__month-dropdown-container, .react-datepicker__year-dropdown-container {
   margin: 0px 20px;
+}
+
+.react-datepicker__year-read-view--down-arrow,
+.react-datepicker__month-read-view--down-arrow,
+.react-datepicker__month-year-read-view--down-arrow {
+  top: 4px;
 }
