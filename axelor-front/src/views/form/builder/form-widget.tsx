@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
+import { FieldEditor } from "./form-editors";
 import { useWidgetComp } from "./hooks";
 import { useFormScope } from "./scope";
 import { WidgetAtom, WidgetProps } from "./types";
@@ -51,7 +52,7 @@ function FormField({
   component: Comp,
   ...props
 }: WidgetProps & { component: React.ElementType }) {
-  const { schema, formAtom } = props;
+  const { schema, formAtom, readonly } = props;
   const name = schema.name!;
   const onChange = schema.onChange;
   const dirtyAtom = useViewDirtyAtom();
@@ -80,6 +81,10 @@ function FormField({
       }
     );
   }, [actionExecutor, formAtom, name, onChange, setDirty]);
+
+  if (schema.editor && !readonly) {
+    return <FieldEditor {...props} valueAtom={valueAtom} />;
+  }
 
   return <Comp {...props} valueAtom={valueAtom} />;
 }

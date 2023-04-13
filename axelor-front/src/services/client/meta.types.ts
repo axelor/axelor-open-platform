@@ -70,6 +70,7 @@ export interface Property {
 
   // by view service
   autoTitle?: string;
+  placeholder?: string;
   selectionList?: Selection[];
   widget?: string;
   widgetAttrs?: Record<string, any>; // incoming is string, processed to object
@@ -100,6 +101,8 @@ export interface Widget {
 }
 
 export interface Container extends Widget {
+  cols?: number;
+  colWidths?: (string | number)[];
   rowSpan?: number;
 }
 
