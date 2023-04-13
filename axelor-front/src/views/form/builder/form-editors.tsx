@@ -1,5 +1,7 @@
 import { useAtomValue } from "jotai";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { ViewData } from "@/services/client/meta";
 import { Editor, Schema } from "@/services/client/meta.types";
@@ -9,6 +11,11 @@ import { FieldContainer } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { ValueAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
+
+import { useEditor, useSelector } from "@/hooks/use-relation";
+import { DataRecord } from "@/services/client/data.types";
+import { useAtomCallback } from "jotai/utils";
+import styles from "./form-editors.module.scss";
 
 export type EditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
 
@@ -102,7 +109,78 @@ function ReferenceEditor({
   widgetAtom,
   valueAtom,
 }: EditorProps & { editor: Editor }) {
-  return null;
+  const showTitle = schema.showTitle ?? true;
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
+
+  const record = useAtomValue(valueAtom);
+  const model = schema.target!;
+
+  const showEditor = useEditor();
+  const showSelector = useSelector();
+
+  const handleSelect = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        showSelector({
+          model,
+          title: `Select ${title}`,
+          onSelect: (records) => {
+            set(valueAtom, records[0], true);
+          },
+        });
+      },
+      [model, showSelector, title, valueAtom]
+    )
+  );
+
+  const handleEdit = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        showEditor({
+          model,
+          title: title ?? "",
+          onSelect: (record) => {
+            set(valueAtom, record, true);
+          },
+        });
+      },
+      [model, showEditor, title, valueAtom]
+    )
+  );
+
+  const handleDelete = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        set(valueAtom, null, true);
+      },
+      [valueAtom]
+    )
+  );
+
+  return (
+    <FieldContainer>
+      <div className={styles.header}>
+        <div className={styles.title}>
+          {showTitle && <label>{title}</label>}
+        </div>
+        <div className={styles.actions}>
+          <MaterialIcon icon="edit" onClick={handleEdit} />
+          <MaterialIcon icon="search" onClick={handleSelect} />
+          <MaterialIcon icon="delete" onClick={handleDelete} />
+        </div>
+      </div>
+      <RecordEditor
+        schema={schema}
+        editor={editor}
+        formAtom={formAtom}
+        widgetAtom={widgetAtom}
+        valueAtom={valueAtom}
+        model={model}
+        record={record}
+      />
+    </FieldContainer>
+  );
 }
 
 function CollectionEditor({
@@ -113,4 +191,35 @@ function CollectionEditor({
   valueAtom,
 }: EditorProps & { editor: Editor }) {
   return null;
+}
+
+function RecordEditor({
+  editor,
+  formAtom: parent,
+  widgetAtom,
+  model,
+  record,
+  valueAtom,
+}: EditorProps & { editor: Editor; model: string; record: DataRecord }) {
+  const fields = editor.fields ?? {};
+  const meta: ViewData<any> = {
+    model,
+    fields,
+    view: editor,
+  };
+
+  const { formAtom, actionHandler, actionExecutor, recordHandler } =
+    useFormHandlers(meta, record, parent);
+
+  return (
+    <Form
+      schema={editor}
+      recordHandler={recordHandler}
+      actionExecutor={actionExecutor}
+      actionHandler={actionHandler}
+      fields={fields}
+      formAtom={formAtom}
+      widgetAtom={widgetAtom}
+    />
+  );
 }

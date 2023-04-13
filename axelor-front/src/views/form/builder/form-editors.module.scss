@@ -1,0 +1,22 @@
+.header {
+  display: flex;
+  align-items: center;
+
+  .title {
+    flex: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  span {
+    opacity: 0.5;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
