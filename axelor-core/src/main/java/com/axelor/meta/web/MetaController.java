@@ -177,7 +177,7 @@ public class MetaController {
         .forEach(
             attr -> {
               final Object value =
-                  attr.getName().matches("readonly|required|recommend|hidden|collapse")
+                  attr.getName().matches("readonly|required|hidden|collapse|refresh|focus|active")
                       ? sh.test(attr.getValue())
                       : sh.eval(attr.getValue());
               response.setAttr(attr.getField(), attr.getName(), value);
