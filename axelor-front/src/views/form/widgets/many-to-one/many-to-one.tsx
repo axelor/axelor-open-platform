@@ -28,21 +28,25 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     setValue(value);
   };
 
-  const handleEdit = useCallback(async () => {
-    showEditor({
-      title: title ?? "",
-      model: target,
-      record: value,
-      onSelect: (record) => {
-        setValue(record);
-      },
-    });
-  }, [setValue, showEditor, target, title, value]);
+  const handleEdit = useCallback(
+    async (readonly = false) => {
+      showEditor({
+        title: title ?? "",
+        model: target,
+        record: value,
+        readonly,
+        onSelect: (record) => {
+          setValue(record);
+        },
+      });
+    },
+    [setValue, showEditor, target, title, value]
+  );
 
   const handleView = useCallback(
     (e: MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      return handleEdit();
+      return handleEdit(true);
     },
     [handleEdit]
   );
@@ -83,7 +87,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           icons={[
             {
               icon: "edit",
-              onClick: e => handleEdit(),
+              onClick: () => handleEdit(),
             },
             {
               icon: "search",
