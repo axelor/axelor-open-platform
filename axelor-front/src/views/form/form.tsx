@@ -422,7 +422,6 @@ function FormContainer({
           readonly={readonly}
           schema={meta.view}
           fields={meta.fields!}
-          record={record}
           formAtom={formAtom}
           recordHandler={recordHandler}
           actionHandler={actionHandler}

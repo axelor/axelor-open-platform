@@ -60,7 +60,6 @@ export interface FieldProps<T> extends WidgetProps {
 }
 
 export interface FormProps extends WidgetProps {
-  record: DataRecord;
   fields: Record<string, Property>;
   actionHandler: ActionHandler;
   recordHandler: RecordHandler;
