@@ -1,12 +1,15 @@
 import { useAtomValue } from "jotai";
+import { useCallback, useMemo, useState } from "react";
 
 import { Input } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import { useCallback, useState } from "react";
+import format from "@/utils/format";
+
 import { FieldContainer, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { Field } from "@/services/client/meta.types";
 import styles from "./decimal.module.scss";
 
 const NUM_PATTERN = /^(-)?\d+(\.(\d+)?)?$/;
@@ -17,15 +20,28 @@ export function Decimal({
   widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
-  const { uid, title } = schema;
+  const { uid, title, min, max } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { required, min, max } = attrs;
+  const { required, scale } = attrs;
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "0",
   });
 
   const [changed, setChanged] = useState(false);
+
+  const parse = useCallback((value: string, scale?: number) => {
+    if (scale) {
+      const nums = value.split(".");
+      // scale the decimal part
+      const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(scale);
+      // increment the integer part if decimal part is greater than 0 (due to rounding)
+      const num = BigInt(nums[0]) + BigInt(parseInt(dec));
+      // append the decimal part
+      return num + dec.substring(1);
+    }
+    return value;
+  }, []);
 
   const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -42,10 +58,10 @@ export function Decimal({
     (e) => {
       if (changed) {
         setChanged(false);
-        setValue(value, true);
+        setValue(parse(value, scale), true);
       }
     },
-    [changed, setValue, value]
+    [changed, parse, scale, setValue, value]
   );
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
@@ -84,13 +100,18 @@ export function Decimal({
   const onUp = useCallback(() => increment(1n), [increment]);
   const onDown = useCallback(() => increment(-1n), [increment]);
 
+  const text = useMemo(
+    () => format(value, { props: { ...schema, scale } as Field }),
+    [scale, schema, value]
+  );
+
   return (
     <FieldContainer readonly={readonly}>
       <label htmlFor={uid}>{title}</label>
       {readonly && (
         <Input
           type="text"
-          value={value}
+          value={text}
           disabled
           readOnly
           bg="body"
