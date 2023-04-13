@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -13,9 +13,15 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { fallbackFormAtom } from "./atoms";
-import { FormAtom } from "./types";
+import { FormAtom, FormProps, RecordHandler } from "./types";
+import { FormRecordHandler } from "./handler";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import {
+  EvalContextOptions,
+  createEvalContext,
+} from "@/hooks/use-parser/eval-context";
 
 type ContextCreator = () => DataContext;
 
@@ -76,16 +82,19 @@ export class FormActionHandler extends DefaultActionHandler {
 type FormScopeState = {
   actionHandler: ActionHandler;
   actionExecutor: ActionExecutor;
+  recordHandler: RecordHandler;
   formAtom: FormAtom;
 };
 
 const fallbackHandler = new FormActionHandler(() => ({}));
 const fallbackExecutor = new DefaultActionExecutor(fallbackHandler);
+const fallbackRecordHandler = new FormRecordHandler();
 
 export const FormScope = createScope<FormScopeState>({
   actionHandler: fallbackHandler,
   actionExecutor: fallbackExecutor,
   formAtom: fallbackFormAtom,
+  recordHandler: fallbackRecordHandler,
 });
 
 const formMolecule = molecule((getMol, getScope) => {
@@ -207,5 +216,32 @@ function useActionValue({ formAtom }: { formAtom: FormAtom }) {
 export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
   useActionAttrs({ formAtom });
   useActionValue({ formAtom });
+  return null;
+}
+
+export function FormRecordUpdates({
+  fields,
+  readonly,
+  formAtom,
+  recordHandler,
+}: {
+  readonly?: boolean;
+  fields: FormProps["fields"];
+  formAtom: FormAtom;
+  recordHandler: RecordHandler;
+}) {
+  const record = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+  );
+
+  useAsyncEffect(async () => {
+    recordHandler.notify(
+      createEvalContext(record, {
+        fields: fields as unknown as EvalContextOptions["fields"],
+        readonly,
+      })
+    );
+  }, [record, recordHandler, fields, readonly]);
+
   return null;
 }

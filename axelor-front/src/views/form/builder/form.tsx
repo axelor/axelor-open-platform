@@ -9,9 +9,15 @@ import { DefaultActionExecutor } from "@/view-containers/action";
 
 import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
-import { ActionDataHandler, FormActionHandler, FormScope } from "./scope";
+import {
+  ActionDataHandler,
+  FormActionHandler,
+  FormRecordUpdates,
+  FormScope,
+} from "./scope";
 import { FormAtom, FormProps } from "./types";
 import { processView } from "./utils";
+import { FormRecordHandler } from "./handler";
 
 /**
  * Hook to create form atom and action handlers
@@ -47,8 +53,11 @@ export function useFormHandlers(
     [actionHandler]
   );
 
+  const recordHandler = useMemo(() => new FormRecordHandler(), []);
+
   return {
     formAtom,
+    recordHandler,
     actionHandler,
     actionExecutor,
   };
@@ -58,6 +67,7 @@ export function Form({
   schema: view,
   fields,
   formAtom,
+  recordHandler,
   actionHandler,
   actionExecutor,
   className,
@@ -71,10 +81,17 @@ export function Form({
       value={{
         actionHandler,
         actionExecutor,
+        recordHandler,
         formAtom,
       }}
     >
       <>
+        <FormRecordUpdates
+          fields={fields}
+          readonly={readonly}
+          formAtom={formAtom}
+          recordHandler={recordHandler}
+        />
         <ActionDataHandler formAtom={formAtom} />
         <Layout
           className={className}

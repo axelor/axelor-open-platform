@@ -63,6 +63,7 @@ export interface FormProps extends WidgetProps {
   record: DataRecord;
   fields: Record<string, Property>;
   actionHandler: ActionHandler;
+  recordHandler: RecordHandler;
   actionExecutor: ActionExecutor;
   className?: string;
   layout?: FormLayout;
@@ -73,3 +74,10 @@ export type FormLayout = (
     className?: string;
   }
 ) => JSX.Element;
+
+export type RecordListener = (data: FormState["record"]) => void;
+
+export interface RecordHandler {
+  subscribe(subscriber: RecordListener): () => void;
+  notify(data: FormState["record"]): void;
+}

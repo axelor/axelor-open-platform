@@ -99,10 +99,8 @@ function FormContainer({
     onSave: onSaveAction,
   } = schema;
 
-  const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
-    meta,
-    record
-  );
+  const { formAtom, actionHandler, recordHandler, actionExecutor } =
+    useFormHandlers(meta, record);
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -426,6 +424,7 @@ function FormContainer({
           fields={meta.fields!}
           record={record}
           formAtom={formAtom}
+          recordHandler={recordHandler}
           actionHandler={actionHandler}
           actionExecutor={actionExecutor}
           layout={Layout}

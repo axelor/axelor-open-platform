@@ -1,12 +1,14 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
 import { useWidgetComp } from "./hooks";
 import { useFormScope } from "./scope";
-import { WidgetProps } from "./types";
+import { WidgetAtom, WidgetProps } from "./types";
+import { parseExpression } from "@/hooks/use-parser/utils";
+import { Schema } from "@/services/client/meta.types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const { schema, formAtom, readonly } = props;
@@ -19,6 +21,9 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const type = schema.type;
   const { attrs } = useAtomValue(widgetAtom);
   const { state, data: Comp } = useWidgetComp(schema);
+
+  // eval field expression showIf, hideIf etc
+  useHandleFieldExpression({ schema, widgetAtom });
 
   if (attrs.hidden) return null;
   if (state === "loading") {
@@ -77,6 +82,59 @@ function FormField({
   }, [actionExecutor, formAtom, name, onChange, setDirty]);
 
   return <Comp {...props} valueAtom={valueAtom} />;
+}
+
+function useHandleFieldExpression({
+  schema,
+  widgetAtom,
+}: {
+  schema: Schema;
+  widgetAtom: WidgetAtom;
+}) {
+  const setWidgetAttrs = useSetAtom(widgetAtom);
+  const { recordHandler } = useFormScope();
+
+  useEffect(() => {
+    const { showIf, hideIf, readonlyIf, requiredIf } = schema;
+    const hasExpression = showIf || hideIf || readonlyIf || requiredIf;
+
+    if (hasExpression) {
+      return recordHandler.subscribe((record) => {
+        setWidgetAttrs((state) => {
+          const { attrs } = state;
+
+          let { hidden, readonly, required } = attrs;
+
+          if (showIf) {
+            hidden = !parseExpression(showIf)(record);
+          } else if (hideIf) {
+            hidden = parseExpression(hideIf)(record);
+          }
+
+          if (readonlyIf) {
+            readonly = parseExpression(readonlyIf)(record);
+          }
+
+          if (requiredIf) {
+            required = parseExpression(requiredIf)(record);
+          }
+
+          if (
+            attrs.hidden !== hidden ||
+            attrs.required !== required ||
+            attrs.readonly !== readonly
+          ) {
+            return {
+              ...state,
+              attrs: { ...attrs, required, hidden, readonly },
+            };
+          }
+
+          return state;
+        });
+      });
+    }
+  }, [schema, recordHandler, setWidgetAttrs]);
 }
 
 function Unknown(props: WidgetProps) {
