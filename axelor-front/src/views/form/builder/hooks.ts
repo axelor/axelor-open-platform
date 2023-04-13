@@ -2,16 +2,27 @@ import { useAtomValue, useSetAtom } from "jotai";
 import React, { useCallback, useState } from "react";
 
 import { useAsync } from "@/hooks/use-async";
+import { Schema } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
-export function useWidgetComp(type: string) {
-  return useAsync(async () => {
-    const module = toKebabCase(type);
-    const name = toCamelCase(type);
+const loadWidget = async (type: string) => {
+  const module = toKebabCase(type);
+  const name = toCamelCase(type);
+  try {
     const { [name]: Comp } = await import(`../widgets/${module}/index.ts`);
     return Comp as React.ElementType;
-  }, [type]);
+  } catch (error) {
+    console.error(`Unable to load widget ${type}`);
+    return Promise.reject(error);
+  }
+};
+
+export function useWidgetComp(schema: Schema) {
+  return useAsync(async () => {
+    const { widget, serverType } = schema;
+    return loadWidget(widget).catch(() => loadWidget(serverType));
+  }, [schema]);
 }
 
 /**
