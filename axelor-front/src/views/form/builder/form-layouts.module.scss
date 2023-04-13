@@ -1,8 +1,8 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: var(--grid-cols, repeat(12, 1fr));
   align-items: start;
-  gap: 1rem;
+  gap: var(--grid-gap, 1rem);
 }
 
 .grid > {
