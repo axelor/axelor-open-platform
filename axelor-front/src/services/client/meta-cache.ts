@@ -7,7 +7,7 @@ import {
   type MetaData,
   type ViewData,
 } from "./meta";
-import { processView, processWidgets } from "./meta-utils";
+import { findViewFields, processView, processWidgets } from "./meta-utils";
 import { type ActionView, type ViewType } from "./meta.types";
 
 const cache = new LoadingCache<Promise<any>>();
@@ -31,6 +31,8 @@ export async function findView<T extends ViewType>({
 }): Promise<ViewData<T>> {
   return cache.get(makeKey("view", model, type, name), () =>
     fetchView({ type: type as any, name, model }).then((data) => {
+      const { related } = findViewFields(data.view);
+      data.related = { ...data.related, ...related };
       // process the meta data
       processView(data, data.view);
       processWidgets(data.view);

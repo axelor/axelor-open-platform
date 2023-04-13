@@ -114,9 +114,6 @@ function processWidget(field: Schema) {
     }
     attrs[_.camelCase(name)] = val;
   });
-  if (field.serverType) {
-    field.serverType = _.kebabCase(field.serverType);
-  }
   if (field.widget) {
     field.widget = _.kebabCase(field.widget);
   }
@@ -161,9 +158,9 @@ function UseIncluded(view: Schema) {
   return items;
 }
 
-export function findFields(
+export function findViewFields(
   view: Schema,
-  res: { fields: string[]; related: Record<string, string[]> }
+  res?: { fields: string[]; related: Record<string, string[]> }
 ) {
   var result = res || {
     fields: [],
@@ -172,7 +169,7 @@ export function findFields(
   var items = result.fields;
   var fields = view.items;
 
-  if (!fields) return items;
+  if (!fields) return result;
   if (view.items && !view._included) {
     view._included = true;
     fields = view.items = UseIncluded(view);
@@ -231,7 +228,7 @@ export function findFields(
     if (item.name && item.type === "panel-related") {
       items.push(item.name);
     } else if (item.items) {
-      findFields(item, result);
+      findViewFields(item, result);
     } else if (item.name && item.type === "field") {
       items.push(item.name);
     }
