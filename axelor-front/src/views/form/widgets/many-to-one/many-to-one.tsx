@@ -95,7 +95,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       ) : (
         <Select
           onChange={handleChange}
-          value={value}
+          value={value ?? null}
           icons={
             isSuggestBox
               ? [{ icon: "arrow_drop_down" }]

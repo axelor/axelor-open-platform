@@ -91,7 +91,7 @@ export function Selection({
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       <Select
-        value={selectValue}
+        value={selectValue ?? null}
         onChange={handleChange}
         options={selectionList}
         optionLabel="title"
