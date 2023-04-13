@@ -16,15 +16,11 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
     [formAtom, schema]
   );
 
-  const { attrs } = useAtomValue(widgetAtom);
-
-  const widget = schema.widget!;
   const type = schema.type;
-
-  const { state, data: Comp } = useWidgetComp(widget);
+  const { attrs } = useAtomValue(widgetAtom);
+  const { state, data: Comp } = useWidgetComp(schema);
 
   if (attrs.hidden) return null;
-
   if (state === "loading") {
     return <div>Loading...</div>;
   }
