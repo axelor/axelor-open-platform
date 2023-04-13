@@ -18,6 +18,7 @@
  */
 package com.axelor.script;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 import java.util.UUID;
@@ -46,11 +47,16 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
   @Override
   public final boolean test(String expr) {
     if (StringUtils.isBlank(expr)) return true;
+
+    if ("true".equals(expr)) return true;
+    if ("false".equals(expr)) return false;
+
     Object result = eval(expr);
     if (result == null) return false;
-    if (result instanceof Number && result.equals(0)) return false;
     if (result instanceof Boolean) return (Boolean) result;
-    return true;
+    if (result instanceof Number) return Double.compare(((Number) result).doubleValue(), 0) != 0;
+
+    return ObjectUtils.notEmpty(result);
   }
 
   @Override
