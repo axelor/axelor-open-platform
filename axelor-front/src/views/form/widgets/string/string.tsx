@@ -17,10 +17,10 @@ export function String({
     "type" | "autoComplete" | "placeholder"
   >;
 }) {
-  const { uid, title } = schema;
+  const { uid, showTitle = true } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { required } = attrs;
+  const { title, required } = attrs;
 
   const { value, onChange, onBlur } = useInput(valueAtom, {
     defaultValue: "",
@@ -28,7 +28,7 @@ export function String({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly && (
         <Input
           type="text"
