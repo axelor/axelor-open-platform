@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 
-import { InputHTMLAttributes, useCallback, useState } from "react";
-import { Input, InputProps } from "@axelor/ui";
+import { Input } from "@axelor/ui";
+
 import { FieldContainer, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 
@@ -12,7 +12,10 @@ export function String({
   widgetAtom,
   valueAtom,
 }: FieldProps<string> & {
-  inputProps?: InputHTMLAttributes<HTMLInputElement>;
+  inputProps?: Pick<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "type" | "autoComplete" | "placeholder"
+  >;
 }) {
   const { uid, title } = schema;
 
@@ -29,23 +32,23 @@ export function String({
       {readonly && (
         <Input
           type="text"
-          value={value || ""}
+          value={value}
           disabled
           readOnly
           bg="body"
           border={false}
-          {...(inputProps as InputProps)}
+          {...inputProps}
         />
       )}
       {readonly || (
         <Input
           type="text"
           id={uid}
-          value={value || ""}
+          value={value}
           required={required}
           onChange={onChange}
           onBlur={onBlur}
-          {...(inputProps as InputProps)}
+          {...inputProps}
         />
       )}
     </FieldContainer>
