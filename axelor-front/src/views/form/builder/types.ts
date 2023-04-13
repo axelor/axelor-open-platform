@@ -9,12 +9,16 @@ export const DEFAULT_ATTRS = {
   readonly: undefined as unknown as boolean,
   required: undefined as unknown as boolean,
   hidden: undefined as unknown as boolean,
+  collapse: undefined as unknown as boolean,
   domain: undefined as unknown as string,
   context: undefined as unknown as DataContext,
   precision: undefined as unknown as number,
   scale: undefined as unknown as number,
-  min: undefined as unknown as string | number,
-  max: undefined as unknown as string | number,
+  prompt: undefined as unknown as string,
+  title: undefined as unknown as string,
+  css: undefined as unknown as string,
+  icon: undefined as unknown as string,
+  selectionIn: undefined as unknown as string,
 };
 
 export type Attrs = Partial<typeof DEFAULT_ATTRS>;
