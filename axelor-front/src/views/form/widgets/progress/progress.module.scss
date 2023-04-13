@@ -10,3 +10,10 @@
 .g [role="progressbar"] {
   background-color: #4caf50;
 }
+
+.progress {
+  height: 1.5rem;
+  & > div {
+    height: 100%;
+  }
+}
