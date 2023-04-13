@@ -8,13 +8,15 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 
 import { FieldContainer, FieldProps } from "../../builder";
+import { toKebabCase } from "@/utils/names";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, valueAtom, readonly } = props;
-  const { uid, title, target, targetName, targetSearch } = schema;
+  const { uid, title, target, targetName, targetSearch, widget } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
 
+  const isSuggestBox = toKebabCase(widget) === "suggest-box";
   const showSelector = useSelector();
   const showEditor = useEditor();
 
@@ -84,16 +86,20 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         <Select
           onChange={handleChange}
           value={value}
-          icons={[
-            {
-              icon: "edit",
-              onClick: () => handleEdit(),
-            },
-            {
-              icon: "search",
-              onClick: handleSelect,
-            },
-          ]}
+          icons={
+            isSuggestBox
+              ? [{ icon: "arrow_drop_down" }]
+              : [
+                  {
+                    icon: "edit",
+                    onClick: () => handleEdit(),
+                  },
+                  {
+                    icon: "search",
+                    onClick: handleSelect,
+                  },
+                ]
+          }
           fetchOptions={handleCompletion}
           optionLabel={targetName}
           optionValue={"id"}
