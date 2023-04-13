@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import moment from "dayjs";
 import clsx from "clsx";
 import { Box, Button, Badge, TBackground } from "@axelor/ui";
 
@@ -11,6 +10,7 @@ import { MessageTracks } from "./message-track";
 import { MessageInput } from "./message-input";
 import { getUser, getUserName } from "./utils";
 import { i18n } from "@/services/client/i18n";
+import { moment } from "@/services/client/l10n";
 import { FormProps } from "@/views/form/builder";
 import * as TYPES from "./types";
 import { MessageInputProps, MessageProps } from "./types";

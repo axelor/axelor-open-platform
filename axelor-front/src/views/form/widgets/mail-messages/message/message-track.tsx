@@ -1,5 +1,3 @@
-import moment from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { Formatters } from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { i18n } from "@/services/client/i18n";
@@ -7,9 +5,8 @@ import { Property } from "@/services/client/meta.types";
 import { MessageTrack } from "./types";
 import { Box } from "@axelor/ui";
 import { FormProps } from "@/views/form/builder";
+import { moment } from "@/services/client/l10n";
 import styles from "./message-track.module.scss";
-
-moment.extend(relativeTime);
 
 export function formatter(_item: MessageTrack, field?: Property) {
   const item = { ..._item };
