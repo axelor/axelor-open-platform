@@ -19,7 +19,10 @@
 package com.axelor.test.db;
 
 import com.axelor.db.Model;
+import com.axelor.db.annotations.Widget;
 import com.google.common.base.MoreObjects;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -49,6 +52,10 @@ public class Title extends Model {
   @Column(unique = true)
   private String name;
 
+  @Widget(title = "Attributes")
+  @Type(type = "json")
+  private String attrs;
+
   public Long getId() {
     return id;
   }
@@ -71,6 +78,14 @@ public class Title extends Model {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getAttrs() {
+    return attrs;
+  }
+
+  public void setAttrs(String attrs) {
+    this.attrs = attrs;
   }
 
   @Override

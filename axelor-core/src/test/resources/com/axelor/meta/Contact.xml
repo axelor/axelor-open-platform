@@ -156,4 +156,10 @@
       <action name="action-contact-attrs-multi"/>
     </action-group>
 
+    <action-attrs name="action-contact-context-proxy">
+        <attribute for="contactFirstName" name="value" expr="eval: __this__.firstName"/>
+        <attribute for="contactNickName" name="value" expr="eval: __this__.nickName" if="__this__.nickName"/>
+        <attribute for="hasTitle" name="value" expr="eval: true" if="title"/>
+    </action-attrs>
+
 </object-views>

@@ -35,6 +35,7 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.EnumStatusNumber;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -78,7 +79,7 @@ public class TestActions extends MetaTest {
 
     Map<String, Object> data = Maps.newHashMap();
     request.setData(data);
-    request.setModel("com.axelor.test.db.Contact");
+    request.setModel(Contact.class.getName());
     request.setAction(action);
 
     data.put("context", context);
@@ -420,5 +421,39 @@ public class TestActions extends MetaTest {
     Object forcedValues = actionExpected.execute(handlerExpected);
 
     assertEquals(expected, forcedValues);
+  }
+
+  @Test
+  void testContextProxy() throws JsonProcessingException {
+    Action action = MetaStore.getAction("action-contact-context-proxy");
+    Map<String, Object> context = Maps.newHashMap();
+
+    context.put("firstName", "myFirstName");
+    context.put("lastName", "myLastName");
+
+    Map<String, Object> customFieldsCtx = new HashMap<>();
+
+    customFieldsCtx.put("nickName", "Some Name");
+    customFieldsCtx.put("numerology", 2);
+
+    context.put("attrs", getObjectMapper().writeValueAsString(customFieldsCtx));
+
+    Map<String, Object> titleCtx = Maps.newHashMap();
+    titleCtx.put("code", "myTitle");
+    titleCtx.put("name", "myTitle");
+    titleCtx.put("_model", Title.class.getName());
+
+    context.put("title", titleCtx);
+
+    ActionHandler handler = createHandler(action, context);
+    Object value = action.execute(handler);
+
+    Map<String, Object> expected =
+            Map.ofEntries(
+                    Map.entry("hasTitle", Map.of("value", true)),
+                    Map.entry("contactNickName", Map.of("value", "Some Name")),
+                    Map.entry("contactFirstName", Map.of("value", "myFirstName")));
+
+    assertEquals(expected, value);
   }
 }
