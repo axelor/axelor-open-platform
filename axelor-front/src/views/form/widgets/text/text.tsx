@@ -10,10 +10,10 @@ export function Text({
   widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
-  const { uid, title, height } = schema;
+  const { uid, height, showTitle = true } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { required } = attrs;
+  const { title, required } = attrs;
 
   const [value, setValue] = useAtom(valueAtom);
   const [changed, setChanged] = useState(false);
@@ -40,7 +40,7 @@ export function Text({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         <Box
           p={1}

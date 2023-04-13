@@ -46,13 +46,16 @@ export function ProgressComponent({
 }
 
 export function Progress(props: FieldProps<number>) {
-  const { schema, readonly, valueAtom } = props;
-  const { uid, title } = schema;
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { uid, showTitle = true } = schema;
   const value = useAtomValue(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box className={classes.progress}>
         <ProgressComponent value={value!} schema={schema} />
       </Box>

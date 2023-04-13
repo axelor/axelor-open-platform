@@ -1,7 +1,7 @@
 import { NavSelect as NavSelectComponent, TNavSelectItem } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
-import { Field, Selection } from "@/services/client/meta.types";
+import { Selection } from "@/services/client/meta.types";
 import { getSelectionList } from "./utils";
 import { useMemo } from "react";
 
@@ -12,11 +12,12 @@ export function NavSelect({
   formAtom,
   widgetAtom,
 }: FieldProps<string | number>) {
-  const { uid, title } = schema;
+  const { uid, showTitle = true } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
   const selectionList = schema.selectionList as Selection[];
-  const selectionIn = ((attrs as Field).selectionIn ||
+  const selectionIn = (attrs.selectionIn ||
     schema["selection-in"] ||
     schema.selectionIn) as string;
 
@@ -37,7 +38,7 @@ export function NavSelect({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <NavSelectComponent
         disabled={readonly}
         items={list}

@@ -30,14 +30,17 @@ export function MultiSelectText({
 }
 
 export function MultiSelect(props: FieldProps<string | number | null>) {
-  const { readonly, schema, valueAtom } = props;
-  const { uid, title } = schema;
+  const { readonly, schema, widgetAtom, valueAtom } = props;
+  const { uid, showTitle = true } = schema;
   const value = useAtomValue(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   if (readonly) {
     return (
       <FieldContainer readonly={readonly}>
-        <label htmlFor={uid}>{title}</label>
+        {showTitle && <label htmlFor={uid}>{title}</label>}
         <MultiSelectText schema={schema} value={value} />
       </FieldContainer>
     );

@@ -1,5 +1,6 @@
 import { Box, StyleProps } from "@axelor/ui";
 import { GridLayout, WidgetProps } from "../../builder";
+import { useAtomValue } from "jotai";
 import styles from "./panel.module.css";
 
 const withHeaderProps: StyleProps = {
@@ -12,10 +13,13 @@ const withHeaderBodyProps: StyleProps = {
 };
 
 export function Panel(props: WidgetProps) {
-  const { schema, formAtom, readonly } = props;
-  const { title, showTitle } = schema;
+  const { schema, formAtom, widgetAtom, readonly } = props;
+  const { showTitle = true } = schema;
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
-  const hasHeader = showTitle !== false && title;
+  const hasHeader = showTitle && title;
   const moreProps = hasHeader && withHeaderProps;
   const bodyProps = hasHeader && withHeaderBodyProps;
 

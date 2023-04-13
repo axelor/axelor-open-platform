@@ -17,12 +17,16 @@ export function BinaryLink({
   schema,
   readonly,
   formAtom,
+  widgetAtom,
   valueAtom,
 }: FieldProps<DataRecord | undefined | null>) {
-  const { name, accept } = schema;
+  const { uid, name, accept, showTitle = true } = schema;
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(
@@ -87,6 +91,7 @@ export function BinaryLink({
 
   return (
     <FieldContainer readonly={readonly}>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box d="flex" flexDirection="column">
         <Box>
           {text && (

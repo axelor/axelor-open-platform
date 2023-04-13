@@ -13,13 +13,17 @@ export function Image({
   schema,
   readonly,
   formAtom,
+  widgetAtom,
   valueAtom,
 }: FieldProps<string | DataRecord | undefined | null>) {
-  const { uid, title, type, serverType } = schema;
+  const { uid, type, serverType, showTitle = true } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(
@@ -89,7 +93,7 @@ export function Image({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box
         bgColor="body"
         border

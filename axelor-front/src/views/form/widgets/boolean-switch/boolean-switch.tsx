@@ -1,17 +1,22 @@
 import { Switch } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 export function BooleanSwitch({
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<boolean>) {
-  const { uid, title } = schema;
+  const { uid, showTitle = true } = schema;
   const [value = false, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
+
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Switch
         id={uid}
         checked={value ?? false}

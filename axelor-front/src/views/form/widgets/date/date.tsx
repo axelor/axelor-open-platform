@@ -1,5 +1,5 @@
 import { Box, useClassNames } from "@axelor/ui";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import {
   FocusEvent,
   KeyboardEvent,
@@ -37,14 +37,15 @@ function toCalendarFormat(format: string) {
     .join("");
 }
 
-export function Date({ schema, readonly, valueAtom }: FieldProps<string>) {
-  const { uid, title } = schema;
+export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<string>) {
+  const { uid, showTitle = true } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
   const [value, setValue] = useAtom(valueAtom);
+  const { attrs: { title }} = useAtomValue(widgetAtom);
 
   const type = (schema.widget || schema.serverType || schema.type)!;
   const dateFormats = useMemo<Record<string, string[]>>(
@@ -147,7 +148,7 @@ export function Date({ schema, readonly, valueAtom }: FieldProps<string>) {
   const momentValue = value ? moment(value) : null;
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         momentValue?.isValid() && momentValue.format(format)
       ) : (

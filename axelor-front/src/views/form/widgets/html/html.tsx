@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
 
 import { i18n } from "@/services/client/i18n";
@@ -10,9 +10,17 @@ import ViewerComponent from "./viewer";
 
 import styles from "./html.module.scss";
 
-export function Html({ schema, readonly, valueAtom }: FieldProps<string>) {
-  const { uid, title, showTitle, lite } = schema;
+export function Html({
+  schema,
+  readonly,
+  widgetAtom,
+  valueAtom,
+}: FieldProps<string>) {
+  const { uid, showTitle = true, lite } = schema;
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const [changed, setChanged] = useState(false);
 
   const handleChange = useCallback(
@@ -40,7 +48,7 @@ export function Html({ schema, readonly, valueAtom }: FieldProps<string>) {
       })}
       readonly={readonly}
     >
-      {showTitle !== false && <label htmlFor={uid}>{title}</label>}
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         <ViewerComponent value={value || ""} />
       ) : (

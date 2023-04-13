@@ -22,9 +22,10 @@ export function OneToMany({
   schema,
   readonly,
   valueAtom,
+  widgetAtom,
   formAtom,
 }: FieldProps<DataRecord[]>) {
-  const { title, name, target: model, fields } = schema;
+  const { name, target: model, fields, showTitle = true } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const [records, setRecords] = useState<DataRecord[]>([]);
@@ -62,6 +63,10 @@ export function OneToMany({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
+  
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
+
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
 
@@ -232,9 +237,15 @@ export function OneToMany({
   const hasRowSelected = !!selectedRows?.length;
 
   return (
-    <Box d="flex" flexDirection="column" className={classes.container} border roundedTop>
+    <Box
+      d="flex"
+      flexDirection="column"
+      className={classes.container}
+      border
+      roundedTop
+    >
       <Box className={classes.header}>
-        <div className={classes.title}>{title}</div>
+        {showTitle && <div className={classes.title}>{title}</div>}
         <CommandBar
           iconProps={{
             weight: 300,

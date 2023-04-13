@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { FieldContainer, FieldProps } from "../../builder";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { FunctionComponent, useCallback, useMemo } from "react";
 import { Badge, Box, Select, SelectComponents, SelectProps } from "@axelor/ui";
@@ -39,14 +39,18 @@ export function Selection({
   selectProps,
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<string | number | null> & {
   selectProps?: Partial<SelectProps>;
   selectComponents?: SelectComponent[];
 }) {
-  const { uid, title } = schema;
+  const { uid, showTitle = true } = schema;
   const { isMulti } = selectProps || {};
 
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const [value, setValue] = useAtom(valueAtom);
   const selectionList = schema.selectionList as TSelection[];
 
@@ -85,7 +89,7 @@ export function Selection({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Select
         value={selectValue}
         onChange={handleChange}

@@ -20,9 +20,9 @@ export function Decimal({
   widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
-  const { uid, title, min, max } = schema;
+  const { uid, min, max, showTitle = true } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { required, scale } = attrs;
+  const { title, required, scale } = attrs;
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "0",
@@ -107,7 +107,7 @@ export function Decimal({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly && (
         <Input
           type="text"

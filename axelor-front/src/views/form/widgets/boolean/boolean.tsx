@@ -1,12 +1,22 @@
-import { Box, Input, InputLabel } from "@axelor/ui";
-import { useAtom } from "jotai";
+import { Box, Input } from "@axelor/ui";
+import { useAtom, useAtomValue } from "jotai";
 import { FieldContainer, FieldProps } from "../../builder";
+import { toKebabCase } from "@/utils/names";
 import classes from "./boolean.module.scss";
 
-export function Boolean({ schema, readonly, valueAtom }: FieldProps<boolean>) {
-  const { uid, name, title } = schema;
+export function Boolean({
+  schema,
+  readonly,
+  widgetAtom,
+  valueAtom,
+}: FieldProps<boolean>) {
+  const { uid, name, widget, showTitle = true } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const inline = schema.widget === "inline-checkbox";
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
+
+  const inline = toKebabCase(widget) === "inline-checkbox";
   return (
     <FieldContainer readonly={readonly}>
       <Box
@@ -18,9 +28,7 @@ export function Boolean({ schema, readonly, valueAtom }: FieldProps<boolean>) {
           justifyContent: "flex-end",
         })}
       >
-        <InputLabel htmlFor={uid} m={0}>
-          {title}
-        </InputLabel>
+        {showTitle && <label htmlFor={uid}>{title}</label>}
         <Input
           m={0}
           id={uid}

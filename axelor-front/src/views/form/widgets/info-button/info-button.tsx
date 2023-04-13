@@ -13,10 +13,18 @@ import { useFormScope } from "../../builder/scope";
 
 import styles from "./info-button.module.scss";
 
-export function InfoButton({ schema, readonly, formAtom }: WidgetProps) {
-  const { title, icon, iconHover, widgetAttrs } = schema;
+export function InfoButton({
+  schema,
+  readonly,
+  widgetAtom,
+  formAtom,
+}: WidgetProps) {
+  const { showTitle = true, icon, iconHover, widgetAttrs } = schema;
   const { field } = widgetAttrs || {};
 
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const value = useAtomValue(
     useMemo(
@@ -63,7 +71,7 @@ export function InfoButton({ schema, readonly, formAtom }: WidgetProps) {
 
         <Box className={styles.data}>
           {value && <div className={styles.value}>{value}</div>}
-          <div className={styles.title}>{title}</div>
+          {showTitle && <div className={styles.title}>{title}</div>}
         </Box>
       </Button>
     </FieldContainer>

@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { Box } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { Selection as TSelection } from "@/services/client/meta.types";
@@ -9,10 +9,14 @@ import { toKebabCase } from "@/utils/names";
 export function RadioSelect({
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<string | number | null>) {
-  const { uid, title, direction, nullable, widget } = schema;
+  const { uid, showTitle = true, direction, nullable, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const selectionList = schema.selectionList as TSelection[];
 
   const isRadio = toKebabCase(widget) === "radio-select";
@@ -38,7 +42,7 @@ export function RadioSelect({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box
         ps={1}
         pt={1}

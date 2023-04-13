@@ -5,16 +5,21 @@ import { FieldContainer, FieldProps } from "../../builder";
 
 export function Url(props: FieldProps<string>) {
   const {
-    schema: { uid, title },
+    schema: { uid, showTitle = true },
+    widgetAtom,
     readonly,
     valueAtom,
   } = props;
   const value = useAtomValue(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
+
   if (readonly) {
     return (
       value && (
         <FieldContainer readonly={readonly}>
-          <label htmlFor={uid}>{title}</label>
+          {showTitle && <label htmlFor={uid}>{title}</label>}
           <Box as="a" target="_blank" href={value}>
             {value}
           </Box>

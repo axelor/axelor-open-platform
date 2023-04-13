@@ -26,14 +26,17 @@ export function SingleSelectText({
 }
 
 export function SingleSelect(props: FieldProps<string | number | null>) {
-  const { readonly, schema, valueAtom } = props;
-  const { uid, title } = schema;
+  const { readonly, schema, widgetAtom, valueAtom } = props;
+  const { uid, showTitle = true } = schema;
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const value = useAtomValue(valueAtom);
 
   if (readonly) {
     return (
       <FieldContainer readonly={readonly}>
-        <label htmlFor={uid}>{title}</label>
+        {showTitle && <label htmlFor={uid}>{title}</label>}
         <SingleSelectText schema={schema} value={value} />
       </FieldContainer>
     );

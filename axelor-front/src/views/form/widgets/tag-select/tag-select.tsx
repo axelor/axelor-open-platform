@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { Box, Select } from "@axelor/ui";
 
@@ -9,9 +9,12 @@ import { FieldContainer, FieldProps } from "../../builder";
 import { Chip } from "../selection";
 
 export function TagSelect(props: FieldProps<DataRecord[]>) {
-  const { schema, valueAtom, readonly } = props;
-  const { uid, title, target, targetName, targetSearch } = schema;
+  const { schema, valueAtom, widgetAtom, readonly } = props;
+  const { uid, target, targetName, targetSearch, showTitle = true } = schema;
 
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const [value, setValue] = useAtom(valueAtom);
 
   const showEditor = useEditor();
@@ -75,7 +78,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   return (
     <FieldContainer>
-      {title && <label htmlFor={uid}>{title}</label>}
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         <Box d="flex">
           {(value || []).map((val) => (

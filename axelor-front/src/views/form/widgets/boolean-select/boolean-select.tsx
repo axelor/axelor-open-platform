@@ -1,6 +1,6 @@
 import { Input, Select } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 import { i18n } from "@/services/client/i18n";
 
@@ -12,15 +12,19 @@ type SelectOption = {
 export function BooleanSelect({
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<boolean | null>) {
-  const { uid, title, widgetAttrs, nullable } = schema;
+  const { uid, showTitle = true, widgetAttrs, nullable } = schema;
   const {
     nullText = " ",
     falseText = i18n.get("No"),
     trueText = i18n.get("Yes"),
   } = widgetAttrs || {};
   const [value = false, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   const handleOnChange = useCallback(
     (option: SelectOption) => {
@@ -42,7 +46,7 @@ export function BooleanSelect({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         <Input
           type="text"

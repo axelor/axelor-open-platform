@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback } from "react";
 
 import { Box, Select } from "@axelor/ui";
@@ -11,10 +11,20 @@ import { FieldContainer, FieldProps } from "../../builder";
 import { toKebabCase } from "@/utils/names";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
-  const { schema, valueAtom, readonly } = props;
-  const { uid, title, target, targetName, targetSearch, widget } = schema;
+  const { schema, valueAtom, widgetAtom, readonly } = props;
+  const {
+    uid,
+    target,
+    targetName,
+    targetSearch,
+    widget,
+    showTitle = true,
+  } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
   const showSelector = useSelector();
@@ -75,7 +85,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   return (
     <FieldContainer>
-      {title && <label htmlFor={uid}>{title}</label>}
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
         value && (
           <Box as="a" href="#" onClick={handleView}>

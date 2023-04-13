@@ -1,7 +1,7 @@
 import { SyntheticEvent, memo, useState, useEffect, useRef } from "react";
 import * as monaco from "monaco-editor";
 import { Box } from "@axelor/ui";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCallback } from "react";
 import { FieldContainer, FieldProps } from "../../builder";
 
@@ -132,19 +132,22 @@ const THEMES: Record<string, string> = {
 export function CodeEditor({
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
   const {
     uid,
-    title,
     mode,
-    showTitle,
+    showTitle = true,
     codeSyntax,
     codeTheme,
     height = 400,
     width = "100%",
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
   const $mode = mode || codeSyntax;
   const themeType = "light";
 
@@ -158,7 +161,7 @@ export function CodeEditor({
   return (
     <FieldContainer readonly={readonly}>
       <Box className={classes.container} style={{ height: +height, width }}>
-        {showTitle !== false && <label htmlFor={uid}>{title}</label>}
+        {showTitle && <label htmlFor={uid}>{title}</label>}
         <Editor
           mode={$mode}
           readonly={readonly}

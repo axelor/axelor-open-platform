@@ -24,11 +24,13 @@ function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
 export function Binary({
   schema,
   readonly,
+  widgetAtom,
   formAtom,
 }: FieldProps<string | DataRecord | undefined | null>) {
-  const { uid, name, title, accept } = schema;
+  const { uid, name, accept, showTitle = true } = schema;
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const { attrs: { title } } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(
@@ -104,7 +106,7 @@ export function Binary({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box d="flex">
         <form ref={formRef}>
           <Box

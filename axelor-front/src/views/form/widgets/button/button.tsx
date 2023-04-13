@@ -47,9 +47,10 @@ function ButtonIcon({ schema }: WidgetProps) {
 
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
-  const { title, link, icon } = schema;
+  const { showTitle = true, link, icon } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
+  const { title } = attrs;
 
   const variant = link ? "link" : "primary";
   const readonly = props.readonly || attrs.readonly;
@@ -69,7 +70,7 @@ export function Button(props: WidgetProps) {
     <FieldContainer readonly={readonly}>
       <Btn variant={variant} onClick={handleClick}>
         {icon && <ButtonIcon {...props} />}
-        {title}
+        {showTitle && title}
       </Btn>
     </FieldContainer>
   );

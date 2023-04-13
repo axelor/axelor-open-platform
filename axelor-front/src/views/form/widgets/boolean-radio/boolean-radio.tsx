@@ -1,17 +1,28 @@
 import { Box, Input } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { i18n } from "@/services/client/i18n";
 
 export function BooleanRadio({
   schema,
   readonly,
+  widgetAtom,
   valueAtom,
 }: FieldProps<boolean | null>) {
-  const { uid, name, title, widgetAttrs, nullable, direction } = schema;
+  const {
+    uid,
+    name,
+    widgetAttrs,
+    nullable,
+    direction,
+    showTitle = true,
+  } = schema;
   const { falseText = i18n.get("No"), trueText = i18n.get("Yes") } =
     widgetAttrs || {};
   const [value = false, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   function renderRadio($value: boolean, label: string) {
     const checked = value === $value;
@@ -35,10 +46,10 @@ export function BooleanRadio({
 
   return (
     <FieldContainer readonly={readonly}>
-      <label htmlFor={uid}>{title}</label>
+      {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box
         d="flex"
-        flexDirection={direction === 'vertical' ? "column" : "row"}
+        flexDirection={direction === "vertical" ? "column" : "row"}
         className="input"
       >
         {renderRadio(true, trueText)}
