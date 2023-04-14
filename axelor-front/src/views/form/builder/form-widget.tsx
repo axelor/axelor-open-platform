@@ -1,6 +1,7 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useEffect, useMemo } from "react";
+import isEqual from "lodash/isEqual";
 
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
@@ -106,33 +107,24 @@ function useHandleFieldExpression({
     if (hasExpression) {
       return recordHandler.subscribe((record) => {
         setWidgetAttrs((state) => {
-          const { attrs } = state;
-
-          let { hidden, readonly, required } = attrs;
+          const attrs = { ...state.attrs };
 
           if (showIf) {
-            hidden = !parseExpression(showIf)(record);
+            attrs.hidden = !parseExpression(showIf)(record);
           } else if (hideIf) {
-            hidden = parseExpression(hideIf)(record);
+            attrs.hidden = parseExpression(hideIf)(record);
           }
 
           if (readonlyIf) {
-            readonly = parseExpression(readonlyIf)(record);
+            attrs.readonly = parseExpression(readonlyIf)(record);
           }
 
           if (requiredIf) {
-            required = parseExpression(requiredIf)(record);
+            attrs.required = parseExpression(requiredIf)(record);
           }
 
-          if (
-            attrs.hidden !== hidden ||
-            attrs.required !== required ||
-            attrs.readonly !== readonly
-          ) {
-            return {
-              ...state,
-              attrs: { ...attrs, required, hidden, readonly },
-            };
+          if (!isEqual(attrs, state.attrs)) {
+            return { ...state, attrs };
           }
 
           return state;

@@ -12,12 +12,12 @@ import { GridLayout } from "./form-layouts";
 import {
   ActionDataHandler,
   FormActionHandler,
+  FormRecordHandler,
   FormRecordUpdates,
   FormScope,
 } from "./scope";
 import { FormAtom, FormProps } from "./types";
 import { processView } from "./utils";
-import { FormRecordHandler } from "./handler";
 
 /**
  * Hook to create form atom and action handlers

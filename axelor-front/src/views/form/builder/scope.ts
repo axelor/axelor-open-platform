@@ -15,8 +15,7 @@ import {
 
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { fallbackFormAtom } from "./atoms";
-import { FormAtom, FormProps, RecordHandler } from "./types";
-import { FormRecordHandler } from "./handler";
+import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   EvalContextOptions,
@@ -24,6 +23,24 @@ import {
 } from "@/hooks/use-parser/eval-context";
 
 type ContextCreator = () => DataContext;
+
+export class FormRecordHandler implements RecordHandler {
+  #listeners = new Set<RecordListener>();
+  #record: DataContext = {};
+
+  subscribe(subscriber: RecordListener) {
+    this.#listeners.add(subscriber);
+    subscriber(this.#record);
+    return () => {
+      this.#listeners.delete(subscriber);
+    };
+  }
+
+  notify(data: DataContext) {
+    this.#record = data;
+    this.#listeners.forEach((fn) => fn(data));
+  }
+}
 
 export class FormActionHandler extends DefaultActionHandler {
   #prepareContext: ContextCreator;
