@@ -1,0 +1,1 @@
+export { Panel as PanelStack } from '../panel';

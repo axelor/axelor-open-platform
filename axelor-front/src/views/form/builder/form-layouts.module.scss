@@ -32,6 +32,10 @@
   }
 }
 
+.grid.stack {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 767px) {
   .grid {
     grid-template-columns: 1fr !important;
@@ -40,3 +44,4 @@
     }
   }
 }
+

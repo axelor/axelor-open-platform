@@ -4,6 +4,7 @@ import { Schema } from "@/services/client/meta.types";
 
 import { FormWidget } from "./form-widget";
 import { FormLayout } from "./types";
+import { toKebabCase } from "@/utils/names";
 
 import { legacyClassNames } from "@/styles/legacy";
 import { useMemo } from "react";
@@ -53,6 +54,8 @@ export const GridLayout: FormLayout = ({
     <div
       className={clsx(className, styles.grid, {
         [styles.table]: schema.layout === "table",
+        [styles.stack]:
+          toKebabCase(schema.widget || schema.type) === "panel-stack",
       })}
       data-cols={widths ? undefined : cols}
       style={style}
