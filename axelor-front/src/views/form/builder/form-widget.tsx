@@ -84,6 +84,7 @@ function FormField({
   }, [actionExecutor, formAtom, name, onChange, setDirty]);
 
   if (schema.editor && !readonly) {
+  if (schema.editor && (!readonly || schema.editor.viewer)) {
     return <FieldEditor {...props} valueAtom={valueAtom} />;
   }
 

@@ -109,6 +109,7 @@ function SimpleEditor({
   fields,
   formAtom,
   widgetAtom,
+  readonly,
   ...rest
 }: FormEditorProps) {
   const showTitle = rest.schema.showTitle ?? true;
@@ -118,9 +119,9 @@ function SimpleEditor({
   const schema = useMemo(() => processView(editor, fields), [editor, fields]);
 
   return (
-    <FieldContainer>
+    <FieldContainer readonly={readonly}>
       {showTitle && <label>{title}</label>}
-      <GridLayout schema={schema} formAtom={formAtom} />
+      <GridLayout schema={schema} formAtom={formAtom} readonly={readonly} />
     </FieldContainer>
   );
 }
@@ -132,6 +133,7 @@ function ReferenceEditor({
   formAtom,
   widgetAtom,
   valueAtom,
+  readonly,
 }: FormEditorProps) {
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
@@ -166,9 +168,11 @@ function ReferenceEditor({
           onSelect: (record) => {
             set(valueAtom, record, true);
           },
+          record: get(valueAtom),
+          readonly,
         });
       },
-      [model, showEditor, title, valueAtom]
+      [model, readonly, showEditor, title, valueAtom]
     )
   );
 
@@ -182,16 +186,23 @@ function ReferenceEditor({
   );
 
   return (
-    <FieldContainer>
+    <FieldContainer readonly={readonly}>
       <div className={styles.header}>
         <div className={styles.title}>
           {showTitle && <label>{title}</label>}
         </div>
-        <div className={styles.actions}>
-          <MaterialIcon icon="edit" onClick={handleEdit} />
-          <MaterialIcon icon="search" onClick={handleSelect} />
-          <MaterialIcon icon="delete" onClick={handleDelete} />
-        </div>
+        {readonly && (
+          <div className={styles.actions}>
+            <MaterialIcon icon="edit" onClick={handleEdit} />
+          </div>
+        )}
+        {readonly || (
+          <div className={styles.actions}>
+            <MaterialIcon icon="edit" onClick={handleEdit} />
+            <MaterialIcon icon="search" onClick={handleSelect} />
+            <MaterialIcon icon="delete" onClick={handleDelete} />
+          </div>
+        )}
       </div>
       <RecordEditor
         schema={schema}
@@ -201,6 +212,7 @@ function ReferenceEditor({
         widgetAtom={widgetAtom}
         valueAtom={valueAtom}
         model={model}
+        readonly={readonly}
       />
     </FieldContainer>
   );
@@ -218,6 +230,7 @@ function CollectionEditor({
   formAtom,
   widgetAtom,
   valueAtom,
+  readonly,
 }: FormEditorProps) {
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
@@ -295,18 +308,22 @@ function CollectionEditor({
             widgetAtom={widgetAtom}
             valueAtom={itemsFamily(item)}
             remove={remove}
+            readonly={readonly}
           />
         ))}
       </div>
-      <div className={styles.actions}>
-        <MaterialIcon icon="add" onClick={addNew} />
-      </div>
+      {readonly || (
+        <div className={styles.actions}>
+          <MaterialIcon icon="add" onClick={addNew} />
+        </div>
+      )}
     </div>
   );
 }
 
 const ItemEditor = memo(function ItemEditor({
   remove,
+  readonly,
   ...props
 }: FormEditorProps & { model: string; remove: (record: DataRecord) => void }) {
   const valueAtom = props.valueAtom;
@@ -320,10 +337,12 @@ const ItemEditor = memo(function ItemEditor({
   );
   return (
     <div className={styles.item}>
-      <RecordEditor {...props} />
-      <div className={styles.actions}>
-        <MaterialIcon icon="close" onClick={handleRemove} />
-      </div>
+      <RecordEditor {...props} readonly={readonly} />
+      {readonly || (
+        <div className={styles.actions}>
+          <MaterialIcon icon="close" onClick={handleRemove} />
+        </div>
+      )}
     </div>
   );
 });
@@ -335,6 +354,7 @@ const RecordEditor = memo(function RecordEditor({
   formAtom: parent,
   widgetAtom,
   valueAtom,
+  readonly,
 }: FormEditorProps & { model: string }) {
   const meta: ViewData<any> = useMemo(
     () => ({
@@ -379,6 +399,7 @@ const RecordEditor = memo(function RecordEditor({
       fields={fields}
       formAtom={editorAtom}
       widgetAtom={widgetAtom}
+      readonly={readonly}
     />
   );
 });
