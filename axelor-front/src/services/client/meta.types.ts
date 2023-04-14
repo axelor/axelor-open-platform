@@ -100,11 +100,14 @@ export interface Widget {
   widgetAttrs?: Record<string, any>; // incoming is string, processed to object
 }
 
-export interface Container extends Widget {
+export interface LayoutContainer {
   cols?: number;
   colWidths?: (string | number)[];
   rowSpan?: number;
+  gap?: number | string;
 }
+
+export interface WidgetContainer extends Widget, LayoutContainer {}
 
 export interface Viewer {
   type: "viewer";
@@ -159,7 +162,7 @@ export interface Button extends Widget {
   field?: string;
 }
 
-export interface ButtonGroup extends Container {
+export interface ButtonGroup extends WidgetContainer {
   type: "button-group";
 }
 
@@ -275,7 +278,7 @@ export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   editor?: Editor;
 }
 
-export interface Panel extends Container {
+export interface Panel extends WidgetContainer {
   type: "panel";
   itemSpan?: number;
   showFrame?: boolean;
@@ -442,7 +445,7 @@ export interface View {
   items?: Widget[];
 }
 
-export interface FormView extends View {
+export interface FormView extends View, LayoutContainer {
   type: "form";
   onLoad?: string;
   onSave?: string;

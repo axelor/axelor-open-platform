@@ -4,7 +4,13 @@ import { useCallback, useMemo } from "react";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { ViewData } from "@/services/client/meta";
-import { Editor, Schema } from "@/services/client/meta.types";
+import {
+  Editor,
+  FormView,
+  Panel,
+  Property,
+  Schema,
+} from "@/services/client/meta.types";
 
 import { Form, useFormHandlers } from "./form";
 import { FieldContainer } from "./form-field";
@@ -17,7 +23,11 @@ import { DataRecord } from "@/services/client/data.types";
 import { useAtomCallback } from "jotai/utils";
 import styles from "./form-editors.module.scss";
 
-export type EditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
+export type FieldEditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
+export type FormEditorProps = FieldEditorProps & {
+  editor: FormView;
+  fields: Record<string, Property>;
+};
 
 function processEditor(schema: Schema) {
   const editor: Editor = schema.editor;
@@ -37,7 +47,7 @@ function processEditor(schema: Schema) {
     return result as Schema;
   };
 
-  const items = editor.items?.map(applyAttrs);
+  const items = editor.items?.map(applyAttrs) as Panel["items"];
   const hasColSpan = items?.some((x) => x.colSpan);
   const cols = hasColSpan ? 12 : items?.length;
   const colWidths = hasColSpan
@@ -47,51 +57,58 @@ function processEditor(schema: Schema) {
         return w ?? (x.widget === "toggle" ? 38 : "*");
       });
 
-  return {
+  const panel: Panel = {
     ...editor,
+    type: "panel",
     items: hasColSpan ? items : items?.map((x) => ({ ...x, colSpan: 1 })),
     cols,
     colWidths,
     gap: editor.layout === "table" ? "0.25rem" : undefined,
-  } as Editor;
+    showTitle: false,
+    showFrame: false,
+  };
+
+  const form: FormView = {
+    type: "form",
+    items: [panel],
+    cols: 1,
+  };
+
+  return { form, fields };
 }
 
-export function FieldEditor(props: EditorProps) {
+export function FieldEditor(props: FieldEditorProps) {
   const { schema } = props;
-  const { fields } = useAtomValue(props.formAtom);
+  const { fields: formFields } = useAtomValue(props.formAtom);
 
-  const editor = useMemo(
-    () => processEditor({ ...schema, fields: schema.fields ?? fields }),
-    [fields, schema]
+  const { form, fields } = useMemo(
+    () => processEditor({ ...schema, fields: schema.fields ?? formFields }),
+    [formFields, schema]
   );
 
   // reference field?
   if (schema.serverType?.endsWith("_TO_ONE")) {
-    return <ReferenceEditor {...props} editor={editor} />;
+    return <ReferenceEditor {...props} editor={form} fields={fields} />;
   }
   // collection field?
   if (schema.serverType?.endsWith("_TO_MANY")) {
-    return <CollectionEditor {...props} editor={editor} />;
+    return <CollectionEditor {...props} editor={form} fields={fields} />;
   }
 
-  return <SimpleEditor {...props} editor={editor} />;
+  return <SimpleEditor {...props} editor={form} fields={fields} />;
 }
 
 function SimpleEditor({
   editor,
+  fields,
   formAtom,
   widgetAtom,
   ...rest
-}: EditorProps & { editor: Editor }) {
+}: FormEditorProps) {
   const showTitle = rest.schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
-  const formState = useAtomValue(formAtom);
-  const fields = useMemo(
-    () => editor.fields ?? formState.fields ?? {},
-    [editor.fields, formState.fields]
-  );
   const schema = useMemo(() => processView(editor, fields), [editor, fields]);
 
   return (
@@ -105,10 +122,11 @@ function SimpleEditor({
 function ReferenceEditor({
   schema,
   editor,
+  fields,
   formAtom,
   widgetAtom,
   valueAtom,
-}: EditorProps & { editor: Editor }) {
+}: FormEditorProps) {
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
@@ -173,6 +191,7 @@ function ReferenceEditor({
       <RecordEditor
         schema={schema}
         editor={editor}
+        fields={fields}
         formAtom={formAtom}
         widgetAtom={widgetAtom}
         valueAtom={valueAtom}
@@ -189,19 +208,19 @@ function CollectionEditor({
   formAtom,
   widgetAtom,
   valueAtom,
-}: EditorProps & { editor: Editor }) {
+}: FormEditorProps) {
   return null;
 }
 
 function RecordEditor({
   editor,
+  fields,
   formAtom: parent,
   widgetAtom,
   model,
   record,
   valueAtom,
-}: EditorProps & { editor: Editor; model: string; record: DataRecord }) {
-  const fields = editor.fields ?? {};
+}: FormEditorProps & { model: string; record: DataRecord }) {
   const meta: ViewData<any> = {
     model,
     fields,
