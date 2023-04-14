@@ -12,7 +12,7 @@ import { useInput } from "../../builder/hooks";
 import { Field } from "@/services/client/meta.types";
 import styles from "./decimal.module.scss";
 
-const NUM_PATTERN = /^(-)?\d+(\.(\d+)?)?$/;
+const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal({
   schema,
@@ -25,7 +25,7 @@ export function Decimal({
   const { title, required, scale } = attrs;
 
   const { value, setValue } = useInput(valueAtom, {
-    defaultValue: "0",
+    defaultValue: "",
   });
 
   const [changed, setChanged] = useState(false);
@@ -58,7 +58,7 @@ export function Decimal({
     (e) => {
       if (changed) {
         setChanged(false);
-        setValue(parse(value, scale), true);
+        setValue(value ? parse(value, scale) : value, true);
       }
     },
     [changed, parse, scale, setValue, value]
@@ -91,6 +91,7 @@ export function Decimal({
     React.KeyboardEventHandler<HTMLInputElement>
   >(
     (e) => {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
       if (e.key === "ArrowUp") increment(1n);
       if (e.key === "ArrowDown") increment(-1n);
     },
