@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
 import { Box, Button } from "@axelor/ui";
@@ -9,6 +9,8 @@ import { dialogs } from "@/components/dialogs";
 import { legacyClassNames } from "@/styles/legacy";
 
 import { FieldContainer, WidgetProps } from "../../builder";
+import { Formatters } from "@/utils/format";
+import { Field } from "@/services/client/meta.types";
 import { useFormScope } from "../../builder/scope";
 
 import styles from "./info-button.module.scss";
@@ -28,7 +30,13 @@ export function InfoButton({
   const { actionExecutor } = useFormScope();
   const value = useAtomValue(
     useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop(field!)),
+      () => selectAtom(formAtom, (form) => form.record[field!]),
+      [formAtom, field]
+    )
+  );
+  const fieldSchema = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (form) => form.fields[field!]),
       [formAtom, field]
     )
   );
@@ -70,7 +78,13 @@ export function InfoButton({
         )}
 
         <Box className={styles.data}>
-          {value && <div className={styles.value}>{value}</div>}
+          {value && (
+            <div className={styles.value}>
+              {Formatters.decimal(value, {
+                props: fieldSchema as unknown as Field,
+              })}
+            </div>
+          )}
           {showTitle && <div className={styles.title}>{title}</div>}
         </Box>
       </Button>
