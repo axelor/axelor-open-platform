@@ -19,7 +19,6 @@ import { ValueAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
 
 import { useEditor, useSelector } from "@/hooks/use-relation";
-import { DataRecord } from "@/services/client/data.types";
 import { useAtomCallback } from "jotai/utils";
 import styles from "./form-editors.module.scss";
 
@@ -131,7 +130,6 @@ function ReferenceEditor({
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
-  const record = useAtomValue(valueAtom);
   const model = schema.target!;
 
   const showEditor = useEditor();
@@ -196,7 +194,6 @@ function ReferenceEditor({
         widgetAtom={widgetAtom}
         valueAtom={valueAtom}
         model={model}
-        record={record}
       />
     </FieldContainer>
   );
@@ -213,20 +210,19 @@ function CollectionEditor({
 }
 
 function RecordEditor({
+  model,
   editor,
   fields,
   formAtom: parent,
   widgetAtom,
-  model,
-  record,
   valueAtom,
-}: FormEditorProps & { model: string; record: DataRecord }) {
+}: FormEditorProps & { model: string }) {
   const meta: ViewData<any> = {
     model,
     fields,
     view: editor,
   };
-
+  const record = useAtomValue(valueAtom);
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record, parent);
 
