@@ -1,8 +1,11 @@
-import { useAtomValue } from "jotai";
+import { SetStateAction, atom, useAtomValue } from "jotai";
+import { atomFamily, useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
+import { useEditor, useSelector } from "@/hooks/use-relation";
+import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import {
   Editor,
@@ -15,11 +18,9 @@ import {
 import { Form, useFormHandlers } from "./form";
 import { FieldContainer } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { ValueAtom, WidgetProps } from "./types";
+import { FormState, ValueAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
 
-import { useEditor, useSelector } from "@/hooks/use-relation";
-import { useAtomCallback } from "jotai/utils";
 import styles from "./form-editors.module.scss";
 
 export type FieldEditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
@@ -226,6 +227,20 @@ function RecordEditor({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record, parent);
 
+  const editorAtom = useMemo(() => {
+    return atom(
+      (get) => get(formAtom),
+      (get, set, update: SetStateAction<FormState>) => {
+        const state =
+          typeof update === "function" ? update(get(formAtom)) : update;
+        const { record } = state;
+
+        set(formAtom, state);
+        set(valueAtom, record);
+      }
+    );
+  }, [formAtom, valueAtom]);
+
   return (
     <Form
       schema={editor}
@@ -233,7 +248,7 @@ function RecordEditor({
       actionExecutor={actionExecutor}
       actionHandler={actionHandler}
       fields={fields}
-      formAtom={formAtom}
+      formAtom={editorAtom}
       widgetAtom={widgetAtom}
     />
   );
