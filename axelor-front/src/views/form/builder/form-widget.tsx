@@ -1,16 +1,17 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { useEffect, useMemo } from "react";
 import isEqual from "lodash/isEqual";
+import { useEffect, useMemo } from "react";
 
+import { parseExpression } from "@/hooks/use-parser/utils";
+import { Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
+import { FieldViewer } from "./form-viewers";
 import { useWidgetComp } from "./hooks";
 import { useFormScope } from "./scope";
 import { WidgetAtom, WidgetProps } from "./types";
-import { parseExpression } from "@/hooks/use-parser/utils";
-import { Schema } from "@/services/client/meta.types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const { schema, formAtom, readonly } = props;
@@ -83,7 +84,10 @@ function FormField({
     );
   }, [actionExecutor, formAtom, name, onChange, setDirty]);
 
-  if (schema.editor && !readonly) {
+  if (readonly && schema.viewer) {
+    return <FieldViewer {...props} valueAtom={valueAtom} />;
+  }
+
   if (schema.editor && (!readonly || schema.editor.viewer)) {
     return <FieldEditor {...props} valueAtom={valueAtom} />;
   }
