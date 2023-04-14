@@ -206,15 +206,127 @@ function ReferenceEditor({
   );
 }
 
+const nextId = (() => {
+  let id = 0;
+  return () => --id;
+})();
+
 function CollectionEditor({
   schema,
   editor,
+  fields,
   formAtom,
   widgetAtom,
   valueAtom,
 }: FormEditorProps) {
-  return null;
+  const showTitle = schema.showTitle ?? true;
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
+
+  const model = schema.target!;
+
+  const itemsAtom = useMemo(() => {
+    return atom(
+      (get) => (get(valueAtom) ?? []) as DataRecord[],
+      (get, set, update: SetStateAction<DataRecord[]>) => {
+        set(valueAtom, update);
+      }
+    );
+  }, [valueAtom]);
+
+  const itemsFamily = useMemo(() => {
+    return atomFamily(
+      (record: DataRecord) =>
+        atom(
+          (get) => get(valueAtom)?.find((x: DataRecord) => x.id === record.id),
+          (get, set, value: DataRecord) => {
+            set(valueAtom, (items: DataRecord[] = []) => {
+              const found = items.find((x) => x.id === value.id);
+              if (found) {
+                return items.map((x) => (x.id === value.id ? value : x));
+              }
+              return items;
+            });
+          }
+        ),
+      (a, b) => a.id === b.id
+    );
+  }, [valueAtom]);
+
+  const items = useAtomValue(itemsAtom);
+
+  const addNew = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const record = { id: nextId() };
+        itemsFamily(record);
+        set(itemsAtom, (items = []) => [...items, record]);
+      },
+      [itemsAtom, itemsFamily]
+    )
+  );
+
+  const remove = useAtomCallback(
+    useCallback(
+      (get, set, record: DataRecord) => {
+        itemsFamily.remove(record);
+        set(itemsAtom, (items) => items.filter((x) => x.id !== record.id));
+      },
+      [itemsAtom, itemsFamily]
+    )
+  );
+
+  return (
+    <div className={styles.collection}>
+      <div className={styles.header}>
+        <div className={styles.title}>
+          {showTitle && <label>{title}</label>}
+        </div>
+      </div>
+      <div className={styles.items}>
+        {items.map((item) => (
+          <ItemEditor
+            key={item.id}
+            schema={schema}
+            model={model}
+            editor={editor}
+            fields={fields}
+            formAtom={formAtom}
+            widgetAtom={widgetAtom}
+            valueAtom={itemsFamily(item)}
+            remove={remove}
+          />
+        ))}
+      </div>
+      <div className={styles.actions}>
+        <MaterialIcon icon="add" onClick={addNew} />
+      </div>
+    </div>
+  );
 }
+
+const ItemEditor = memo(function ItemEditor({
+  remove,
+  ...props
+}: FormEditorProps & { model: string; remove: (record: DataRecord) => void }) {
+  const valueAtom = props.valueAtom;
+  const handleRemove = useAtomCallback(
+    useCallback(
+      (get) => {
+        remove(get(valueAtom));
+      },
+      [remove, valueAtom]
+    )
+  );
+  return (
+    <div className={styles.item}>
+      <RecordEditor {...props} />
+      <div className={styles.actions}>
+        <MaterialIcon icon="close" onClick={handleRemove} />
+      </div>
+    </div>
+  );
+});
 
 const RecordEditor = memo(function RecordEditor({
   model,
