@@ -45,7 +45,7 @@ export function Selection({
   selectProps?: Partial<SelectProps>;
   selectComponents?: SelectComponent[];
 }) {
-  const { uid, showTitle = true } = schema;
+  const { uid, placeholder, showTitle = true } = schema;
   const { isMulti } = selectProps || {};
 
   const {
@@ -96,6 +96,7 @@ export function Selection({
         options={selectionList}
         optionLabel="title"
         optionValue="value"
+        placeholder={placeholder}
         icons={
           hasValue
             ? [

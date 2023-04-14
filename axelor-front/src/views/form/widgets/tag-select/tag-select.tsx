@@ -10,7 +10,7 @@ import { Chip } from "../selection";
 
 export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { schema, valueAtom, widgetAtom, readonly } = props;
-  const { uid, target, targetName, targetSearch, showTitle = true } = schema;
+  const { uid, target, targetName, targetSearch, placeholder, showTitle = true } = schema;
 
   const {
     attrs: { title },
@@ -101,6 +101,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           fetchOptions={handleCompletion}
           optionLabel={targetName}
           optionValue={"id"}
+          placeholder={placeholder}
           components={components}
         />
       )}

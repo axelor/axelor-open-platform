@@ -38,7 +38,7 @@ function toCalendarFormat(format: string) {
 }
 
 export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<string>) {
-  const { uid, showTitle = true } = schema;
+  const { uid, placeholder, showTitle = true } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
   const classNames = useClassNames();
@@ -158,6 +158,7 @@ export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<str
             showYearDropdown
             todayButton={i18n.get("Today")}
             className={classNames("form-control")}
+            placeholderText={placeholder}
             showPopperArrow={false}
             portalId="root-app"
             autoFocus={open}

@@ -20,7 +20,7 @@ export function Decimal({
   widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
-  const { uid, min, max, showTitle = true } = schema;
+  const { uid, min, max, placeholder, showTitle = true } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, required, scale } = attrs;
 
@@ -125,6 +125,7 @@ export function Decimal({
             className={styles.numberInput}
             type="text"
             id={uid}
+            placeholder={placeholder}
             value={value}
             required={required}
             onChange={handleChange}

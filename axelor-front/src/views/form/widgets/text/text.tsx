@@ -10,7 +10,7 @@ export function Text({
   widgetAtom,
   valueAtom,
 }: FieldProps<string>) {
-  const { uid, height, showTitle = true } = schema;
+  const { uid, height, placeholder, showTitle = true } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { title, required } = attrs;
@@ -54,6 +54,7 @@ export function Text({
           as="textarea"
           rows={height || 5}
           id={uid}
+          placeholder={placeholder}
           value={value || ""}
           required={required}
           onChange={handleChange}

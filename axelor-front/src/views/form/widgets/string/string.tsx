@@ -17,7 +17,7 @@ export function String({
     "type" | "autoComplete" | "placeholder"
   >;
 }) {
-  const { uid, showTitle = true } = schema;
+  const { uid, placeholder, showTitle = true } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { title, required } = attrs;
@@ -44,6 +44,7 @@ export function String({
         <Input
           type="text"
           id={uid}
+          placeholder={placeholder}
           value={value}
           required={required}
           onChange={onChange}
