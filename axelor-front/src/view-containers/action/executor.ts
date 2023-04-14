@@ -347,17 +347,23 @@ export class DefaultActionExecutor implements ActionExecutor {
         switch (name) {
           case "value":
           case "value:set":
-            return this.#handler.setValue(target, value);
+            await this.#handler.setValue(target, value);
+            break;
           case "value:add":
-            return this.#handler.addValue(target, value);
+            await this.#handler.addValue(target, value);
+            break;
           case "value:del":
-            return this.#handler.delValue(target, value);
+            await this.#handler.delValue(target, value);
+            break;
           case "focus":
-            return this.#handler.setFocus(target);
+            await this.#handler.setFocus(target);
+            break;
           case "refresh":
-            return this.#handler.refresh(target);
+            await this.#handler.refresh(target);
+            break;
           default:
-            return this.#handler.setAttr(target, name, value);
+            await this.#handler.setAttr(target, name, value);
+            break;
         }
       }
     }
