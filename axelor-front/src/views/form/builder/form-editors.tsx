@@ -1,6 +1,6 @@
 import { SetStateAction, atom, useAtomValue } from "jotai";
-import { atomFamily, useAtomCallback } from "jotai/utils";
-import { useCallback, useMemo } from "react";
+import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import { memo, useCallback, useMemo } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
@@ -79,7 +79,13 @@ function processEditor(schema: Schema) {
 
 export function FieldEditor(props: FieldEditorProps) {
   const { schema } = props;
-  const { fields: formFields } = useAtomValue(props.formAtom);
+
+  const fieldsAtom = useMemo(
+    () => selectAtom(props.formAtom, (o) => o.fields),
+    [props.formAtom]
+  );
+
+  const formFields = useAtomValue(fieldsAtom);
 
   const { form, fields } = useMemo(
     () => processEditor({ ...schema, fields: schema.fields ?? formFields }),
@@ -210,7 +216,7 @@ function CollectionEditor({
   return null;
 }
 
-function RecordEditor({
+const RecordEditor = memo(function RecordEditor({
   model,
   editor,
   fields,
@@ -218,18 +224,29 @@ function RecordEditor({
   widgetAtom,
   valueAtom,
 }: FormEditorProps & { model: string }) {
-  const meta: ViewData<any> = {
-    model,
-    fields,
-    view: editor,
-  };
-  const record = useAtomValue(valueAtom);
+  const meta: ViewData<any> = useMemo(
+    () => ({
+      model,
+      fields,
+      view: editor,
+    }),
+    [editor, fields, model]
+  );
+
+  const record = useMemo(() => ({}), []);
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record, parent);
 
   const editorAtom = useMemo(() => {
     return atom(
-      (get) => get(formAtom),
+      (get) => {
+        const record = get(valueAtom);
+        const state = get(formAtom);
+        return {
+          ...state,
+          record,
+        };
+      },
       (get, set, update: SetStateAction<FormState>) => {
         const state =
           typeof update === "function" ? update(get(formAtom)) : update;
@@ -252,4 +269,4 @@ function RecordEditor({
       widgetAtom={widgetAtom}
     />
   );
-}
+});
