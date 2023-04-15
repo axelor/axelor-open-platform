@@ -9,7 +9,7 @@ import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
-import { useWidgetComp } from "./hooks";
+import { useLazyWidget } from "./hooks";
 import { useFormScope } from "./scope";
 import { WidgetAtom, WidgetProps } from "./types";
 
@@ -23,15 +23,13 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
 
   const type = schema.type;
   const { attrs } = useAtomValue(widgetAtom);
-  const { state, data: Comp } = useWidgetComp(schema);
+  const { loading, Comp } = useLazyWidget(schema);
 
   // eval field expression showIf, hideIf etc
   useHandleFieldExpression({ schema, widgetAtom });
 
   if (attrs.hidden) return null;
-  if (state === "loading") {
-    return <div>Loading...</div>;
-  }
+  if (loading) return null;
 
   const widgetProps = {
     schema,

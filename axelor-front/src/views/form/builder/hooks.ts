@@ -1,10 +1,13 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 
-import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Schema } from "@/services/client/meta.types";
+import { Cache } from "@/utils/cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 import { ValueAtom } from "./types";
+
+const cache = new Cache<React.ElementType>();
 
 const loadWidget = async (type: string) => {
   const module = toKebabCase(type);
@@ -18,11 +21,26 @@ const loadWidget = async (type: string) => {
   }
 };
 
-export function useWidgetComp(schema: Schema) {
-  return useAsync(async () => {
-    const { widget, serverType } = schema;
-    return loadWidget(widget).catch(() => loadWidget(serverType));
+export function useLazyWidget(schema: Schema) {
+  const name = schema.widget || schema.serverType;
+  const componentRef = useRef<React.ElementType | undefined>(cache.get(name));
+  const [loading, setLoading] = useState(false);
+  useAsyncEffect(async () => {
+    if (componentRef.current || loading) return;
+    setLoading(true);
+    try {
+      componentRef.current = await loadWidget(name).catch(() =>
+        loadWidget(schema.serverType)
+      );
+      cache.put(name, componentRef.current);
+    } finally {
+      setLoading(false);
+    }
   }, [schema]);
+  return {
+    loading,
+    Comp: componentRef.current,
+  };
 }
 
 /**
