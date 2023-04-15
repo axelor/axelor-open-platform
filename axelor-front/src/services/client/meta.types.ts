@@ -563,6 +563,11 @@ export interface ChartSeries {
 export interface ChartConfig {
   name?: string;
   value?: string;
+  scale?: number;
+  min?: number;
+  max?: number;
+  onClick?: string;
+  hideLegend?: boolean;
 }
 
 export interface ChartAction {
@@ -573,12 +578,16 @@ export interface ChartAction {
 
 export interface ChartView extends View {
   type: "chart";
+  title?: string;
+  xAxis?: string;
+  xTitle?: null | string;
+  xType?: string;
   stacked?: boolean;
   onInit?: string;
   searchFields?: SearchField[];
   category?: ChartCategory;
+  config?: ChartConfig;
   series?: ChartSeries[];
-  config?: ChartConfig[];
   actions?: ChartAction[];
 }
 

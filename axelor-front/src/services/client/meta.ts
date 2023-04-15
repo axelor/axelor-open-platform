@@ -2,6 +2,7 @@ import { request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 import {
   ActionView,
+  ChartView,
   HelpOverride,
   JsonField,
   MenuItem,
@@ -173,6 +174,29 @@ export async function view<
   return Promise.reject(resp.status);
 }
 
+export async function chart<T = ChartView>(
+  name: string,
+  data?: DataContext,
+  dataset = false
+): Promise<T> {
+  const resp = await request({
+    url: `ws/meta/chart/${name}`,
+    method: "POST",
+    body: {
+      data,
+      ...(dataset && { fields: ["dataset"] }),
+    },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0
+      ? ((dataset ? data.dataset : data) as T)
+      : Promise.reject(500);
+  }
+
+  return Promise.reject(resp.status);
+}
 export type ActionOptions = {
   action: string;
   model: string;

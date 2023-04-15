@@ -1,0 +1,26 @@
+$radioColor: #212121;
+
+.radio-button {
+  cursor: pointer;
+}
+
+.radio {
+  height: 0.8rem;
+  width: 0.8rem;
+  border: 2px solid $radioColor;
+  margin-top: 1px;
+
+  &-active {
+    background-color: mix(white, $radioColor, 20%);
+  }
+}
+
+.actions {
+  top: 3%;
+  z-index: 1;
+  left: 16%;
+  [dir="rtl"] & {
+    left: unset;
+    right: 16%;
+  }
+}
