@@ -44,6 +44,10 @@ function processEditor(schema: Schema) {
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
     result.serverType = item.serverType ?? field?.type;
 
+    if (result.selectionList) {
+      result.widget = result.widget ?? "selection";
+    }
+
     return result as Schema;
   };
 
