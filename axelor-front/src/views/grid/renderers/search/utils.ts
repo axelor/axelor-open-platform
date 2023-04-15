@@ -137,7 +137,7 @@ function getSearchCriteria(
           date: (v?: Dayjs) => v && v.format("YYYY-MM-DD"),
           datetime: (v?: Dayjs) => {
             const d: any = v && v.toDate();
-            return d && d instanceof Date && !isNaN(d) ? d.toISOString() : null;
+            return d && !isNaN(d) && d instanceof Date ? d.toISOString() : null;
           },
         };
         const toValue = mappers[type];
