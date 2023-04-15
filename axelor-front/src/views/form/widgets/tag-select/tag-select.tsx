@@ -80,10 +80,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     <FieldContainer>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
-        <Box d="flex">
+        <Box d="flex" flexWrap="wrap">
           {(value || []).map((val) => (
             <Box
-              me={1}
+              m={1}
               key={val?.id}
               as="a"
               href="#"

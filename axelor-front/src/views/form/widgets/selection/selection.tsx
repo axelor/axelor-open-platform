@@ -26,7 +26,14 @@ export function Chip({
         {title}
       </Box>
       {onRemove && (
-        <Box as="span" className={classes["tag-remove"]} onClick={onRemove}>
+        <Box
+          as="span"
+          className={classes["tag-remove"]}
+          onClick={onRemove}
+          onMouseDown={(e) => {
+            e.preventDefault();
+          }}
+        >
           <MaterialIcon icon="close" weight={300} opticalSize={20} />
         </Box>
       )}
