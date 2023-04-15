@@ -12,6 +12,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   GridSearchScope,
@@ -31,6 +32,7 @@ import { ViewProps } from "../types";
 import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
+import { useEditor } from "@/hooks/use-relation";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -38,10 +40,12 @@ export function Grid(props: ViewProps<GridView>) {
   const { view, fields } = meta;
 
   const viewRoute = useViewRoute();
-  const [viewProps, setViewProps] = useViewProps();
   const pageSetRef = useRef(false);
+  const [viewProps, setViewProps] = useViewProps();
+  const { dashlet, popup, popupOptions } = useViewTab();
 
   const switchTo = useViewSwitch();
+  const showEditor = useEditor();
 
   const [advanceSearch, setAdvancedSearch] = useAtom<any>(
     useMemo(() => atom({}), [])
@@ -130,8 +134,23 @@ export function Grid(props: ViewProps<GridView>) {
     [dataStore, clearSelection]
   );
 
+  const onViewInPopup = useCallback(
+    (record: DataRecord, readonly = false) => {
+      showEditor({
+        model: view.model!,
+        title: view.title ?? "",
+        record,
+        readonly,
+      });
+    },
+    [view, showEditor]
+  );
+
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
+      if (dashlet) {
+        return onViewInPopup(record, readonly);
+      }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
       switchTo("form", {
@@ -139,7 +158,7 @@ export function Grid(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [switchTo]
+    [dashlet, switchTo, onViewInPopup]
   );
 
   const onNew = useCallback(() => {
@@ -178,9 +197,9 @@ export function Grid(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
-  const { popup, popupOptions } = useViewTab();
   const popupHandlerAtom = usePopupHandlerAtom();
   const setPopupHandlers = useSetAtom(popupHandlerAtom);
+  const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {
     if (popup) {
@@ -191,6 +210,16 @@ export function Grid(props: ViewProps<GridView>) {
       });
     }
   }, [state, onSearch, popup, dataStore, setPopupHandlers]);
+
+  useEffect(() => {
+    if (dashlet) {
+      setDashletHandlers({
+        dataStore,
+        view,
+        onRefresh: () => onSearch({}),
+      });
+    }
+  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
 
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
@@ -207,6 +236,7 @@ export function Grid(props: ViewProps<GridView>) {
   }, [dataStore, offset, limit, viewRoute?.id]);
 
   useEffect(() => {
+    if (dashlet || popup) return;
     let nextPage = currentPage;
     if (offset > totalCount) {
       nextPage = Math.ceil(totalCount / limit) || nextPage;
@@ -214,7 +244,7 @@ export function Grid(props: ViewProps<GridView>) {
     switchTo("grid", {
       route: { id: String(nextPage) },
     });
-  }, [currentPage, limit, offset, switchTo, totalCount]);
+  }, [dashlet, popup, currentPage, limit, offset, switchTo, totalCount]);
 
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
@@ -256,6 +286,15 @@ export function Grid(props: ViewProps<GridView>) {
         allowCheckboxSelection: showCheckbox,
       }
     : {};
+  const dashletProps: any = dashlet
+    ? {
+        showEditIcon: viewProps?.readonly !== true,
+      }
+    : {
+        allowSearch: true,
+        searchRowRenderer: Box,
+        searchColumnRenderer: SearchColumn,
+      };
 
   return (
     <div className={styles.grid}>
@@ -354,9 +393,7 @@ export function Grid(props: ViewProps<GridView>) {
           onEdit={onEdit}
           onView={onView}
           onSearch={onSearch}
-          allowSearch
-          searchRowRenderer={Box}
-          searchColumnRenderer={SearchColumn}
+          {...dashletProps}
           {...popupProps}
         />
       </ScopeProvider>

@@ -124,6 +124,12 @@ export type Tab = {
   readonly popup?: boolean;
 
   /**
+   * Whether this tab is a dashlet view.
+   *
+   */
+  readonly dashlet?: boolean;
+
+  /**
    * Options for the popup views.
    *
    */
@@ -303,6 +309,7 @@ export async function initTab(
     );
 
     const popup = Boolean(actionView.params?.popup);
+    const dashlet = Boolean(actionView.params?.dashlet);
     const popupOptions = {
       fullScreen: Boolean(actionView.params?.["popup-maximized"]),
       showToolbar: actionView.params?.["show-toolbar"] !== false,
@@ -315,6 +322,7 @@ export async function initTab(
       title,
       action: actionView,
       state: state,
+      dashlet,
       popup,
       popupOptions,
     };
