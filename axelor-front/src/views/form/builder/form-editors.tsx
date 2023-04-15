@@ -372,7 +372,7 @@ const RecordEditor = memo(function RecordEditor({
   const editorAtom = useMemo(() => {
     return atom(
       (get) => {
-        const record = get(valueAtom);
+        const record = get(valueAtom) || {};
         const state = get(formAtom);
         return {
           ...state,
