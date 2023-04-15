@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -63,7 +63,7 @@ export function useFormHandlers(
   };
 }
 
-export function Form({
+export const Form = memo(function Form({
   schema: view,
   fields,
   formAtom,
@@ -102,4 +102,4 @@ export function Form({
       </>
     </ScopeProvider>
   );
-}
+});

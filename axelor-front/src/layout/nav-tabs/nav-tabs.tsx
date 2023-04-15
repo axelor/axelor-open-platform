@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -14,6 +14,7 @@ import { Views } from "@/view-containers/views";
 
 import { dialogs } from "@/components/dialogs";
 import { PopupViews } from "@/view-containers/view-popup";
+import { selectAtom } from "jotai/utils";
 import styles from "./nav-tabs.module.scss";
 
 function useIcon(id: string) {
@@ -76,8 +77,14 @@ const NavTab = memo(function NavTab({
   ...props
 }: NavItemProps & { close: (view: any) => any }) {
   const tab = props as Tab;
-  const { title, dirty = false } = useAtomValue(tab.state);
   const { icon, iconColor } = useIcon(tab.id);
+
+  const title = useAtomValue(
+    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state])
+  );
+  const dirty = useAtomValue(
+    useMemo(() => selectAtom(tab.state, (x) => x.dirty ?? false), [tab.state])
+  );
 
   const { data } = useSession();
   const showClose = tab.id !== data?.user?.action;

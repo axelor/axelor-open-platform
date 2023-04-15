@@ -159,7 +159,7 @@ export function useViewProps() {
 export function useViewDirtyAtom() {
   const tab = useViewTab();
   return useMemo(
-    () => focusAtom(tab.state, (o) => o.prop("dirty")),
+    () => focusAtom(tab.state, (o) => o.prop("dirty").valueOr(false)),
     [tab.state]
   );
 }

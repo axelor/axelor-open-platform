@@ -118,7 +118,7 @@ function FormContainer({
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
-  const isDirty = useAtomValue(dirtyAtom) ?? false;
+  const isDirty = useAtomValue(dirtyAtom);
   const setDirty = useSetAtom(dirtyAtom);
 
   const doRead = useCallback(
