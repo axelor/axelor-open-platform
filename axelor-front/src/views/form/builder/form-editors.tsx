@@ -58,7 +58,7 @@ function processEditor(schema: Schema) {
     ? undefined
     : items?.map((x) => {
         const w = x.width ?? x.widgetAttrs?.width;
-        return w ?? (x.widget === "toggle" ? 38 : "*");
+        return w ?? (x.widget === "toggle" ? "min-content" : "*");
       });
 
   const panel: Panel = {

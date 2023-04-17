@@ -44,8 +44,8 @@ export const GridLayout: FormLayout = ({
   const { cols, colWidths, gap, items = [] } = schema;
   const widths = useMemo(() => computeCols(cols, colWidths), [cols, colWidths]);
   const style = {
-    "--grid-cols": widths,
-    "--grid-gap": gap,
+    "--grid-cols": widths ?? cols,
+    "--grid-gap": gap ?? "1rem",
   } as React.CSSProperties;
 
   return (
@@ -54,7 +54,6 @@ export const GridLayout: FormLayout = ({
         [styles.table]: schema.layout === "table",
       })}
       data-cols={widths ? undefined : cols}
-      data-col-widths={widths}
       style={style}
     >
       {items.map((item) => (
