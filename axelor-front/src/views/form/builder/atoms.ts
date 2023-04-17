@@ -4,6 +4,7 @@ import { focusAtom } from "jotai-optics";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
 
+import { mergeDummy } from "@/services/client/data-utils";
 import { SetStateAction } from "react";
 import { FormAtom, FormState, WidgetState } from "./types";
 import { defaultAttrs } from "./utils";
@@ -106,7 +107,7 @@ export const contextAtom = atom(
       if (parent) {
         context._parent = prepare(parent, context);
       }
-      return context;
+      return mergeDummy(context);
     };
 
     return prepare(formAtom, options);

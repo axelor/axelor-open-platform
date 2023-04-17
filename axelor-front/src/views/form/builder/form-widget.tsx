@@ -4,8 +4,10 @@ import isEqual from "lodash/isEqual";
 import { useEffect, useMemo } from "react";
 
 import { parseExpression } from "@/hooks/use-parser/utils";
+import { isDummy } from "@/services/client/data-utils";
 import { Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
+
 import { createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
@@ -67,9 +69,12 @@ function FormField({
       (get, set, value: any, fireOnChange: boolean = false) => {
         const prev = get(lensAtom);
         if (prev !== value) {
+          const dirty = !isDummy(name);
           set(lensAtom, value);
-          set(formAtom, (prev) => ({ ...prev, dirty: true }));
-          setDirty(true);
+          set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty ?? dirty }));
+          if (dirty) {
+            setDirty(true);
+          }
         }
         if (onChange && fireOnChange) {
           actionExecutor.execute(onChange, {

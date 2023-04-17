@@ -32,6 +32,7 @@ import {
 import { createWidgetAtom } from "./builder/atoms";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { extractDummy } from "@/services/client/data-utils";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -203,10 +204,12 @@ function FormContainer({
   const onSave = useAtomCallback(
     useCallback(
       async (get) => {
+        const dummy = extractDummy(get(formAtom).record);
         if (onSaveAction) await actionExecutor.execute(onSaveAction);
         let rec = get(formAtom).record;
         let res = await dataStore.save(rec);
         if (res.id) res = await doRead(res.id);
+        res = { ...res, ...dummy }; // restore dummy values
         doEdit(res, { readonly });
         return res;
       },
