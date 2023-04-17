@@ -1,0 +1,3 @@
+---
+title: Fix going into edit mode in editable grid when clicking readonly cell
+type: fix
