@@ -193,16 +193,16 @@ function GridViewCtrl($scope, $element) {
       viewportScroll = { top: viewport.scrollTop(), left: viewport.scrollLeft() };
     }
 
-    //XXX: clear existing items (bug?)
-    if (dataView.getLength()) {
-      dataView.beginUpdate();
-      dataView.setItems([]);
-        dataView.endUpdate();
-    }
-
     dataView.beginUpdate();
+    try {
+      //XXX: clear existing items (bug?)
+      if (dataView.getLength()) {
+        dataView.setItems([]);
+      }
       dataView.setItems(items);
+    } finally {
       dataView.endUpdate();
+    }
 
     if (pageInfo) {
         page = pageInfo;
