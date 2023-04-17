@@ -2915,7 +2915,7 @@ Grid.prototype.onItemClick = function(event, args) {
 
   this.grid.setActiveCell(args.row, args.cell);
 
-  if (this.canEdit() && this.isCellEditable(args.row, args.cell)) {
+  if (this.canEdit()) {
     this.showEditor(args);
   } else if (this.handler.onItemClick) {
     this.handler.onItemClick(event, args);
