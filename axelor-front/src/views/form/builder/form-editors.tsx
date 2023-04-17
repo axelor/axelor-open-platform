@@ -39,7 +39,7 @@ function processEditor(schema: Schema) {
     const field = fields?.[item.name!];
 
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
-    result.title = item.title ?? field?.title ?? field?.autoTitle;
+    result.title = item.title ?? field?.title ?? field?.autoTitle ?? item.name;
     result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
     result.serverType = item.serverType ?? field?.type;

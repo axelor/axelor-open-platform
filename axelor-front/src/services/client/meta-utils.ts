@@ -26,8 +26,8 @@ function processFields(fields: Property[] | Record<string, Property>) {
   let result: Record<string, Property> = {};
   if (_.isArray(fields)) {
     _.forEach(fields, (field) => {
-      // field.type = _.kebabCase(field.type || "string");
-      // field.title = field.title || field.autoTitle;
+      field.type = field.type || "STRING";
+      field.title = field.title || field.autoTitle;
       if (field.name) {
         result[field.name] = field;
         // if nested field then make it readonly
@@ -46,7 +46,7 @@ function processFields(fields: Property[] | Record<string, Property>) {
 
 function processSelection(field: Schema) {
   if (field.selectionList && !field.widget) {
-    field.widget = 'selection';
+    field.widget = "selection";
   }
   _.each(field.selectionList, (item) => {
     if (_.isString(item.data)) {
@@ -203,6 +203,7 @@ export function findViewFields(
             collect.push(name);
           });
         }
+        processWidget(child);
       });
     };
     acceptItems(editor.items);

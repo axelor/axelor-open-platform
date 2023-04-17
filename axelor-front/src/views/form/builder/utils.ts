@@ -19,6 +19,13 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   // merge default attrs
   const res: Schema = { ...attrs, serverType: field?.type, ...schema };
 
+  if (res.type === "field") {
+    res.serverType = res.serverType ?? "STRING";
+  }
+  if (res.type === "panel-related") {
+    res.serverType = res.serverType ?? "ONE_TO_MANY";
+  }
+
   let type = res.widget ?? res.type;
   if (type === "field") {
     type = res.serverType;
@@ -27,8 +34,8 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   res.uid = uniqueId("w");
   res.widget = toKebabCase(type);
 
-  if (res.autoTitle && res.title === undefined) {
-    res.title = res.autoTitle;
+  if (res.title === undefined) {
+    res.title = res.autoTitle ?? field.title ?? field.autoTitle;
   }
 
   if (res.items) {
