@@ -96,17 +96,19 @@ export const fallbackWidgetAtom = createWidgetAtom({
 export const contextAtom = atom(
   null,
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
-    const { model, record, parent } = get(formAtom);
-    const context = {
-      ...options,
-      ...record,
-      _model: model,
+    const prepare = (formAtom: FormAtom, options?: DataContext) => {
+      const { model, record, parent } = get(formAtom);
+      const context = {
+        ...options,
+        ...record,
+        _model: model,
+      };
+      if (parent) {
+        context._parent = prepare(parent, context);
+      }
+      return context;
     };
 
-    if (parent) {
-      context._parent = set(contextAtom, parent);
-    }
-
-    return context;
+    return prepare(formAtom, options);
   }
 );
