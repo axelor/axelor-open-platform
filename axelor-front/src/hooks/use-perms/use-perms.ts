@@ -32,7 +32,7 @@ function attr(props: Schema, which: string) {
 }
 
 function perm(perms: Perms, which: keyof Perms) {
-  return perms[which] !== false;
+  return perms?.[which] !== false;
 }
 
 function can(props: Schema, perms: Perms, what: PermisionName) {

@@ -517,6 +517,13 @@ export function processView(
     }
   });
 
+  // process view boolean attributes starts with can
+  _.each(view, (value, key) => {
+    if (key.startsWith("can") && ["false", "true"].includes(value)) {
+      view[key] = value === "true";
+    }
+  });
+
   // include json fields in grid
   if (view.type === "grid") {
     var items: Schema[] = [];

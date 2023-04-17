@@ -34,6 +34,7 @@ import { createWidgetAtom } from "./builder/atoms";
 
 import { alerts } from "@/components/alerts";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePerms } from "@/hooks/use-perms";
 import { extractDummy } from "@/services/client/data-utils";
 import styles from "./form.module.scss";
 
@@ -117,6 +118,8 @@ function FormContainer({
 
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, record);
+
+  const { hasButton } = usePerms(meta.view, meta.perms);
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -352,6 +355,14 @@ function FormContainer({
     }
   }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers]);
 
+  const canNew = hasButton("new");
+  const canEdit = readonly && hasButton("edit");
+  const canSave = !readonly && hasButton("save");
+  const canDelete = hasButton("delete") && record.id;
+  const canCopy = !isDirty && canNew && hasButton("copy") && record.id;
+  const canArchive = hasButton("archive") && record.id;
+  const canAudit = hasButton("log") && record.id;
+
   return (
     <div className={styles.formViewContainer}>
       {showToolbar && (
@@ -361,6 +372,7 @@ function FormContainer({
             {
               key: "new",
               text: i18n.get("New"),
+              hidden: !canNew,
               iconProps: {
                 icon: "add",
               },
@@ -369,11 +381,11 @@ function FormContainer({
             {
               key: "edit",
               text: i18n.get("Edit"),
+              hidden: !canEdit,
               iconProps: {
                 icon: "edit",
               },
               onClick: onEdit,
-              hidden: !readonly,
             },
             {
               key: "save",
@@ -382,7 +394,7 @@ function FormContainer({
                 icon: "save",
               },
               onClick: handleOnSave,
-              hidden: readonly,
+              hidden: !canSave,
             },
             {
               key: "cancel",
@@ -417,6 +429,7 @@ function FormContainer({
                 {
                   key: "delete",
                   text: i18n.get("Delete"),
+                  disabled: !canDelete,
                   iconProps: {
                     icon: "delete",
                   },
@@ -426,25 +439,29 @@ function FormContainer({
                   key: "copy",
                   text: i18n.get("Duplicate"),
                   onClick: onCopy,
-                  disabled: isDirty,
+                  disabled: !canCopy,
                 },
                 {
                   key: "s1",
                   divider: true,
+                  hidden: !canArchive,
                 },
                 {
                   key: "archive",
                   text: i18n.get("Archive"),
                   onClick: onArchive,
+                  hidden: !canArchive,
                 },
                 {
                   key: "s2",
                   divider: true,
+                  hidden: !canAudit,
                 },
                 {
                   key: "audit",
                   text: i18n.get("Last modified..."),
                   onClick: onAudit,
+                  hidden: !canAudit,
                 },
               ],
             },

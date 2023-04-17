@@ -33,11 +33,13 @@ import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useEditor } from "@/hooks/use-relation";
+import { usePerms } from "@/hooks/use-perms";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, domains } = props;
   const { view, fields } = meta;
+  const { hasButton } = usePerms(meta.view, meta.perms);
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
@@ -305,6 +307,7 @@ export function Grid(props: ViewProps<GridView>) {
             {
               key: "new",
               text: i18n.get("New"),
+              hidden: !hasButton("new"),
               iconProps: {
                 icon: "add",
               },
@@ -313,6 +316,7 @@ export function Grid(props: ViewProps<GridView>) {
             {
               key: "edit",
               text: i18n.get("Edit"),
+              hidden: !hasButton("edit"),
               iconProps: {
                 icon: "edit",
               },
@@ -326,9 +330,20 @@ export function Grid(props: ViewProps<GridView>) {
             {
               key: "delete",
               text: i18n.get("Delete"),
+              hidden: !hasButton("delete"),
               iconProps: {
                 icon: "delete",
               },
+              disabled: !hasRowSelected,
+              onClick: () => {
+                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+              },
+            },
+            {
+              key: "archive",
+              text: "",
+              hidden: !hasButton("archive"),
+              disabled: !hasRowSelected,
               items: [
                 {
                   key: "archive",
@@ -341,10 +356,6 @@ export function Grid(props: ViewProps<GridView>) {
                   onClick: () => onArchiveOrUnArchive(false),
                 },
               ],
-              disabled: !hasRowSelected,
-              onClick: () => {
-                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-              },
             },
             {
               key: "refresh",
