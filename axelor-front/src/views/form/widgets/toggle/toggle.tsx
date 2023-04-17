@@ -1,8 +1,9 @@
-import { Box, Button } from "@axelor/ui";
-import { FieldContainer, FieldProps } from "../../builder";
-import { useAtom, useAtomValue } from "jotai";
 import { legacyClassNames } from "@/styles/legacy";
-import classes from "./toggle.module.scss";
+import { Button } from "@axelor/ui";
+import { useAtom, useAtomValue } from "jotai";
+import { useCallback } from "react";
+import { FieldContainer, FieldProps } from "../../builder";
+import styles from "./toggle.module.scss";
 
 export function Toggle({
   schema,
@@ -16,30 +17,37 @@ export function Toggle({
     attrs: { title },
   } = useAtomValue(widgetAtom);
 
+  const handleClick = useCallback(() => {
+    setValue(!value, true);
+  }, [setValue, value]);
+
+  const ico = value ? iconActive ?? icon : icon;
+
   return (
-    <FieldContainer className={classes.container} readonly={readonly}>
+    <FieldContainer className={styles.container} readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       <Button
-        variant="light"
         id={uid}
-        onClick={() => !readonly && setValue(!value, true)}
+        variant="light"
+        disabled={readonly}
+        onClick={handleClick}
       >
-        <Box
-          as="i"
-          me={2}
+        <i
+          className={legacyClassNames("fa", ico, styles.icon, {
+            [styles.active]: !!value,
+          })}
+        />
+        <i
           className={legacyClassNames(
             "fa",
-            (value ? iconActive : icon) || icon,
-            { [classes.icon]: iconHover }
+            iconHover ?? ico,
+            styles.icon,
+            styles.hoverIcon,
+            {
+              [styles.active]: !!value,
+            }
           )}
         />
-        {iconHover && (
-          <Box
-            as="i"
-            me={2}
-            className={legacyClassNames(classes.hoverIcon, "fa", iconHover)}
-          />
-        )}
       </Button>
     </FieldContainer>
   );

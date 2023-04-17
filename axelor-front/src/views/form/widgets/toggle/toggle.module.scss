@@ -1,17 +1,27 @@
 .icon {
   display: block;
-}
-.hoverIcon {
-  display: none;
+  opacity: 0.4;
 }
 
-.container {
-  &:hover {
-    & .icon {
-      display: none;
-    }
-    & .hoverIcon {
-      display: block;
-    }
+.icon::before {
+  line-height: 1.5;
+}
+
+.active {
+  opacity: 1;
+}
+
+.hoverIcon {
+  display: none;
+  opacity: 1;
+}
+
+.container:hover {
+  .icon {
+    display: none;
+  }
+
+  .hoverIcon {
+    display: block;
   }
 }
