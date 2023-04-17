@@ -242,6 +242,12 @@ function CollectionEditor({
 
   const model = schema.target!;
 
+  const exclusive = useMemo(() => {
+    const panel: Schema = editor.items?.[0] ?? {};
+    const items = panel.items ?? [];
+    return items.find((x) => x.exclusive)?.name;
+  }, [editor]);
+
   const itemsAtom = useMemo(() => {
     return atom(
       (get) => (get(valueAtom) ?? []) as DataRecord[],
@@ -258,17 +264,24 @@ function CollectionEditor({
           (get) => get(valueAtom)?.find((x: DataRecord) => x.id === record.id),
           (get, set, value: DataRecord) => {
             set(valueAtom, (items: DataRecord[] = []) => {
-              const found = items.find((x) => x.id === value.id);
+              let result = items;
+              let found = items.find((x) => x.id === value.id);
               if (found) {
-                return items.map((x) => (x.id === value.id ? value : x));
+                result = items.map((x) => (x.id === value.id ? value : x));
               }
-              return items;
+              if (exclusive && found && value[exclusive]) {
+                result = result.map((item) => ({
+                  ...item,
+                  [exclusive]: item.id === value.id ? value[exclusive] : false,
+                }));
+              }
+              return result;
             });
           }
         ),
       (a, b) => a.id === b.id
     );
-  }, [valueAtom]);
+  }, [valueAtom, exclusive]);
 
   const items = useAtomValue(itemsAtom);
 
