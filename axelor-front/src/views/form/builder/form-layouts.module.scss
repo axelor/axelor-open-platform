@@ -31,3 +31,12 @@
     grid-row: span #{$i};
   }
 }
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+    .gridItem {
+      grid-column: span 1 !important;
+    }
+  }
+}
