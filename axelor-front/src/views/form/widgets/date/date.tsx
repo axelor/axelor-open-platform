@@ -1,4 +1,3 @@
-import { Box, useClassNames } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import {
   FocusEvent,
@@ -10,16 +9,19 @@ import {
   useRef,
   useState,
 } from "react";
+
+import { Box, Input, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import { Field } from "@/services/client/meta.types";
-import { FieldContainer, FieldProps } from "../../builder";
-import { Picker } from "./picker";
 import { i18n } from "@/services/client/i18n";
-import { DateInput } from "./date-input";
-import { TimeInput } from "./time-input";
 import { l10n, moment } from "@/services/client/l10n";
+import { Field } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
+
+import { FieldContainer, FieldProps } from "../../builder";
+import { DateInput } from "./date-input";
+import { Picker } from "./picker";
+import { TimeInput } from "./time-input";
 
 function focusInput(inputEl?: HTMLElement) {
   let input = inputEl && inputEl.querySelector("input,textarea");
@@ -37,7 +39,12 @@ function toCalendarFormat(format: string) {
     .join("");
 }
 
-export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<string>) {
+export function Date({
+  schema,
+  readonly,
+  widgetAtom,
+  valueAtom,
+}: FieldProps<string>) {
   const { uid, placeholder, showTitle = true } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
@@ -45,7 +52,9 @@ export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<str
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
   const [value, setValue] = useAtom(valueAtom);
-  const { attrs: { title }} = useAtomValue(widgetAtom);
+  const {
+    attrs: { title },
+  } = useAtomValue(widgetAtom);
 
   const type = (schema.widget || schema.serverType || schema.type)!;
   const dateFormats = useMemo<Record<string, string[]>>(
@@ -145,12 +154,27 @@ export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<str
     [valueFormat, setValue]
   );
 
-  const momentValue = value ? moment(value) : null;
+  const dateValue = useMemo(
+    () => (value ? moment(value).toDate() : null),
+    [value]
+  );
+  const textValue = useMemo(
+    () => (value ? moment(value).format(format) : ""),
+    [format, value]
+  );
+
   return (
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
-        momentValue?.isValid() && momentValue.format(format)
+        <Input
+          type="text"
+          value={textValue}
+          disabled
+          readOnly
+          bg="body"
+          border={false}
+        />
       ) : (
         <Box ref={boxRef} d="flex">
           <Picker
@@ -165,7 +189,7 @@ export function Date({ schema, readonly, widgetAtom, valueAtom }: FieldProps<str
             open={open}
             ref={pickerRef}
             dateFormat={toCalendarFormat(format)}
-            selected={momentValue?.toDate ? momentValue.toDate() : null}
+            selected={dateValue}
             customInput={
               <DateInput
                 eventOnBlur={handleBlur}
