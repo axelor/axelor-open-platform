@@ -10,7 +10,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
-import { FormView } from "@/services/client/meta.types";
+import { FormView, Schema } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
@@ -482,6 +482,36 @@ function usePagination(
   };
 }
 
+function useFormWidth(
+  schema: Schema,
+  hasSide: boolean,
+  isPopup: boolean = false
+) {
+  const { width, minWidth, maxWidth } = schema;
+
+  const className = useMemo(
+    () => styles[width] ?? (hasSide ? undefined : styles.mid),
+    [hasSide, width]
+  );
+
+  const style = useMemo(() => {
+    const result = {
+      width,
+      minWidth,
+      maxWidth,
+    } as React.CSSProperties;
+    if (width === "*" || className) delete result.width;
+    return result;
+  }, [className, maxWidth, minWidth, width]);
+
+  const result = useMemo(
+    () => (isPopup ? {} : { className, style }),
+    [className, isPopup, style]
+  );
+
+  return result;
+}
+
 const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const isSmall = useContainerQuery(ref, "width < 768px");
@@ -511,11 +541,19 @@ const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
   const mainItems = isSmall ? small : main;
   const sideItems = isSmall ? [] : side;
 
+  const { popup } = useViewTab();
+  const { style, className: clsName } = useFormWidth(
+    schema,
+    side.length > 0,
+    popup
+  );
+
   return (
     <div
-      className={clsx(className, styles.formLayout, {
+      className={clsx(className, clsName, styles.formLayout, {
         [styles.small]: isSmall,
       })}
+      style={style}
       ref={ref}
     >
       <div className={styles.main}>
