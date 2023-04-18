@@ -63,7 +63,17 @@ function FormField({
   const { actionExecutor } = useFormScope();
 
   const valueAtom = useMemo(() => {
-    const lensAtom = focusAtom(formAtom, (o) => o.prop("record").prop(name));
+    const lensAtom = focusAtom(formAtom, (o) => {
+      let lens = o.prop("record");
+      let path = name.split(".");
+      let next = path.shift();
+      while (next) {
+        lens = lens.valueOr({});
+        lens = lens.prop(next);
+        next = path.shift();
+      }
+      return lens;
+    });
     return atom(
       (get) => get(lensAtom),
       (get, set, value: any, fireOnChange: boolean = false) => {
