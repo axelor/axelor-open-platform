@@ -5,6 +5,7 @@ import { Schema } from "@/services/client/meta.types";
 import { FormWidget } from "./form-widget";
 import { FormLayout } from "./types";
 
+import { legacyClassNames } from "@/styles/legacy";
 import { useMemo } from "react";
 import styles from "./form-layouts.module.scss";
 
@@ -57,7 +58,11 @@ export const GridLayout: FormLayout = ({
       style={style}
     >
       {items.map((item) => (
-        <GridItem key={item.uid} schema={item}>
+        <GridItem
+          key={item.uid}
+          schema={item}
+          className={legacyClassNames(item.css)}
+        >
           <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
         </GridItem>
       ))}
