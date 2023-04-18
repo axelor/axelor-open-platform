@@ -3,11 +3,6 @@ import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import {
-  EvalContextOptions,
-  createEvalContext,
-} from "@/hooks/use-parser/eval-context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   ActionAttrData,
@@ -21,6 +16,12 @@ import {
 
 import { fallbackFormAtom } from "./atoms";
 import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import {
+  EvalContextOptions,
+  createEvalContext,
+} from "@/hooks/use-parser/eval-context";
+import { processActionValue } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -85,7 +86,7 @@ export class FormActionHandler extends DefaultActionHandler {
       op: "set",
       type: "value",
       target,
-      value,
+      value: processActionValue(value),
     });
   }
 

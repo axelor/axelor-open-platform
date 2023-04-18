@@ -7,7 +7,7 @@ import { Property, Schema } from "@/services/client/meta.types";
 import { mergeDummy } from "@/services/client/data-utils";
 import { SetStateAction } from "react";
 import { FormAtom, FormState, WidgetState } from "./types";
-import { defaultAttrs } from "./utils";
+import { defaultAttrs, processContextValues } from "./utils";
 
 export function createFormAtom(props: {
   model: string;
@@ -120,7 +120,7 @@ export const contextAtom = atom(
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
       const { model, record, parent, statesByName } = get(formAtom);
-      const context: DataContext = {
+      let context: DataContext = {
         ...options,
         ...record,
         _model: model,
@@ -137,6 +137,8 @@ export const contextAtom = atom(
           );
         }
       }
+
+      context = processContextValues(context);
 
       if (parent) {
         context._parent = prepare(parent, context);

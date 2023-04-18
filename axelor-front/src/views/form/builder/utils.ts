@@ -1,15 +1,56 @@
 import { uniqueId } from "lodash";
 
 import { Property, Schema } from "@/services/client/meta.types";
+import { DataContext } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
 
 import { Attrs, DEFAULT_ATTRS } from "./types";
+
+const nextId = (() => {
+  let id = 0;
+  return () => --id;
+})();
 
 export function defaultAttrs(schema: Schema): Attrs {
   const attrs = Object.entries(schema)
     .filter(([name]) => name in DEFAULT_ATTRS)
     .reduce((prev, [name, value]) => ({ ...prev, [name]: value }), {});
   return attrs;
+}
+
+export function processActionValue(value: any) {
+  function updateNullIdObject(value: any): any {
+    if (value && typeof value === "object") {
+      if (Array.isArray(value)) {
+        return value.map(updateNullIdObject);
+      }
+      if (value.id === null) {
+        return { ...value, id: nextId() };
+      }
+    }
+    return value;
+  }
+  return updateNullIdObject(value);
+}
+
+export function processContextValues(context: DataContext) {
+  function setDummyIdToNull(value: any): any {
+    if (value && typeof value === "object") {
+      if (Array.isArray(value)) {
+        return value.map(setDummyIdToNull);
+      }
+      if (value.id < 0) {
+        return { ...value, id: null };
+      }
+    }
+    return value;
+  }
+
+  for (let k in context) {
+    context[k] = setDummyIdToNull(context[k]);
+  }
+
+  return context;
 }
 
 export function processView(schema: Schema, fields: Record<string, Property>) {
