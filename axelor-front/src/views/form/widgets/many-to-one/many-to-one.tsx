@@ -4,7 +4,8 @@ import { MouseEvent, useCallback } from "react";
 import { Select } from "@axelor/ui";
 
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
-import { DataRecord } from "@/services/client/data.types";
+import { usePerms } from "@/hooks/use-perms";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
@@ -20,10 +21,14 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     targetSearch,
     widget,
     placeholder,
+    formView,
+    gridView,
     showTitle = true,
   } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
+  const { hasButton } = usePerms(schema);
+
   const {
     attrs: { title },
   } = useAtomValue(widgetAtom);
@@ -42,19 +47,25 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     setValue(value);
   };
 
+  const canView = value && hasButton("view");
+  const canEdit = value && hasButton("edit") && schema.canEdit === true;
+  const canNew = hasButton("new") && schema.canNew === true;
+  const canSelect = hasButton("select");
+
   const handleEdit = useCallback(
-    async (readonly = false) => {
+    async (readonly = false, record?: DataContext) => {
       showEditor({
         title: title ?? "",
         model: target,
-        record: value,
+        viewName: formView,
+        record: record ?? value,
         readonly,
         onSelect: (record) => {
           setValue(record);
         },
       });
     },
-    [setValue, showEditor, target, title, value]
+    [setValue, showEditor, target, title, formView, value]
   );
 
   const handleView = useCallback(
@@ -69,12 +80,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     showSelector({
       title: i18n.get("Select {0}", title ?? ""),
       model: target,
+      viewName: gridView,
       multiple: false,
       onSelect: (records) => {
         setValue(records[0]);
       },
     });
-  }, [setValue, showSelector, target, title]);
+  }, [setValue, showSelector, target, title, gridView]);
 
   const handleCompletion = useCallback(
     async (value: string) => {
@@ -89,10 +101,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     <FieldContainer>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
-        value ? (
+        value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>{value[targetName]}</ViewerLink>
         ) : (
-          <ViewerInput value="" />
+          <ViewerInput value={value?.[targetName] || ""} />
         )
       ) : (
         <Select
@@ -104,10 +116,22 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
               ? [{ icon: "arrow_drop_down" }]
               : [
                   {
+                    hidden: !canEdit || !canView,
                     icon: "edit",
                     onClick: () => handleEdit(),
                   },
                   {
+                    hidden: canEdit || !canView,
+                    icon: "description",
+                    onClick: () => handleEdit(true),
+                  },
+                  {
+                    hidden: !canNew,
+                    icon: "add",
+                    onClick: () => handleEdit(false, { id: null }),
+                  },
+                  {
+                    hidden: !canSelect,
                     icon: "search",
                     onClick: handleSelect,
                   },
