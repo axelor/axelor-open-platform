@@ -19,10 +19,13 @@ export function Decimal({
   readonly,
   widgetAtom,
   valueAtom,
-}: FieldProps<string>) {
+}: FieldProps<string | number>) {
   const { uid, min, max, placeholder, showTitle = true } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, required, scale } = attrs;
+
+  const isDecimal =
+    schema.widget === "decimal" || schema.serverType === "DECIMAL";
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "",
@@ -30,18 +33,21 @@ export function Decimal({
 
   const [changed, setChanged] = useState(false);
 
-  const parse = useCallback((value: string, scale?: number) => {
-    if (scale) {
-      const nums = value.split(".");
-      // scale the decimal part
-      const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(scale);
-      // increment the integer part if decimal part is greater than 0 (due to rounding)
-      const num = BigInt(nums[0]) + BigInt(parseInt(dec));
-      // append the decimal part
-      return num + dec.substring(1);
-    }
-    return value;
-  }, []);
+  const parse = useCallback(
+    (value: string | number, scale?: number) => {
+      if (scale) {
+        const nums = String(value).split(".");
+        // scale the decimal part
+        const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(scale);
+        // increment the integer part if decimal part is greater than 0 (due to rounding)
+        const num = BigInt(nums[0]) + BigInt(parseInt(dec));
+        // append the decimal part
+        return num + dec.substring(1);
+      }
+      return isDecimal ? value : parseInt(String(value));
+    },
+    [isDecimal]
+  );
 
   const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -72,7 +78,7 @@ export function Decimal({
 
   const increment = useCallback(
     (step: bigint) => {
-      const text = value.trim();
+      const text = String(value).trim();
       const nums = text.split(".");
 
       const int = nums[0];
@@ -82,9 +88,9 @@ export function Decimal({
       const num = dec ? `${bigInt}.${dec}` : `${bigInt}`;
       const res = checkRange(num, min, max);
 
-      setValue(res);
+      setValue(parse(res, scale));
     },
-    [checkRange, max, min, setValue, value]
+    [checkRange, max, min, parse, scale, setValue, value]
   );
 
   const handleKeyDown = useCallback<
