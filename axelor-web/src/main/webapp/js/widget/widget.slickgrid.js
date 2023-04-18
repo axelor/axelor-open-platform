@@ -2502,6 +2502,7 @@ function commitEdit(noWait) {
   }
 
   var scope = this.editorScope;
+  scope.record.selected = true;
 
   function onFulfilled() {
     cleanUp();
