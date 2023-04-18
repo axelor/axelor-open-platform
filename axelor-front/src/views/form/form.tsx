@@ -3,10 +3,14 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
+import { usePerms } from "@/hooks/use-perms";
 import { DataStore } from "@/services/client/data-store";
+import { extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -32,10 +36,6 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
-import { alerts } from "@/components/alerts";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { usePerms } from "@/hooks/use-perms";
-import { extractDummy } from "@/services/client/data-utils";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (

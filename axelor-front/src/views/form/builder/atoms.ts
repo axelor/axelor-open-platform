@@ -119,12 +119,25 @@ export const contextAtom = atom(
   null,
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
-      const { model, record, parent } = get(formAtom);
-      const context = {
+      const { model, record, parent, statesByName } = get(formAtom);
+      const context: DataContext = {
         ...options,
         ...record,
         _model: model,
       };
+
+      // set selected flag for o2m/m2m fields
+      for (let name in statesByName) {
+        const { selected } = statesByName[name];
+        if (selected && Array.isArray(context[name])) {
+          context[name] = context[name].map((value: DataRecord) =>
+            value.id && selected.includes(value.id)
+              ? { ...value, selected: true }
+              : value
+          );
+        }
+      }
+
       if (parent) {
         context._parent = prepare(parent, context);
       }

@@ -12,11 +12,18 @@ import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/src/grid";
-import { atom, useAtom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
+import { SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FieldProps } from "../../builder";
+import { focusAtom } from "jotai-optics";
+import { isEqual } from "lodash";
 import classes from "./one-to-many.module.scss";
+
+const nextId = (() => {
+  let id = 0;
+  return () => --id;
+})();
 
 export function OneToMany({
   schema,
@@ -28,7 +35,23 @@ export function OneToMany({
   const { name, target: model, fields, showTitle = true } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
+  const selectedIdsRef = useRef<number[]>([]);
   const [records, setRecords] = useState<DataRecord[]>([]);
+  const widgetState = useMemo(
+    () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
+    [formAtom, name]
+  );
+  const setSelection = useSetAtom(
+    useMemo(
+      () =>
+        atom(null, (get, set, selectedIds: number[]) => {
+          const state = get(widgetState);
+          set(widgetState, { ...state, selected: selectedIds });
+        }),
+      [widgetState]
+    )
+  );
+
   const [value, setValue] = useAtom(
     useMemo(
       () =>
@@ -180,7 +203,10 @@ export function OneToMany({
       {},
       (record) => setValue((value) => [...(value || []), { ...record }]),
       (record) =>
-        setValue((value) => [...(value || []), { ...record, _dirty: true }])
+        setValue((value) => [
+          ...(value || []),
+          { ...record, _dirty: true, id: record.id ?? nextId() },
+        ])
     );
   }, [openEditor, setValue]);
 
@@ -232,9 +258,20 @@ export function OneToMany({
     [setValue, clearSelection]
   );
 
-  if (viewState === "loading") return null;
   const { selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
+
+  useEffect(() => {
+    const selectedIds = (selectedRows ?? []).map(
+      (ind) => rows[ind]?.record?.id
+    );
+    if (isEqual(selectedIdsRef.current, selectedIds)) return;
+
+    selectedIdsRef.current = selectedIds;
+    setSelection(selectedIds);
+  }, [selectedRows, rows, setSelection]);
+
+  if (viewState === "loading") return null;
 
   return (
     <Box

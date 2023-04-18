@@ -28,7 +28,9 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   );
 
   const type = schema.type;
-  const { attrs } = useAtomValue(widgetAtom);
+  const attrs = useAtomValue(
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs), [widgetAtom])
+  );
   const { loading, Comp } = useLazyWidget(schema);
 
   // eval field expression showIf, hideIf etc
