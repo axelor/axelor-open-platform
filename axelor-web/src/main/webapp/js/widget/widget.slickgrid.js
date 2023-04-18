@@ -2585,9 +2585,14 @@ function commitEdit(noWait) {
 
     // Force fetch if pop-up form view is opened.
     // This is needed if form view has fields no present in grid view.
-    _.forEach(data.getItems(), function(item) {
-      data.updateItem(item.id, _.extend(item || {}, { $fetched: false }));
-    });
+    data.beginUpdate();
+    try {
+      _.forEach(data.getItems(), function(item) {
+        data.updateItem(item.id, _.extend(item || {}, { $fetched: false }));
+      });
+    } finally {
+      data.endUpdate();
+    }
   }
 
   var scope = this.editorScope;
