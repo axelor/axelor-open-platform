@@ -48,7 +48,9 @@ function SimpleViewer(props: FormViewerProps) {
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
-  const { record } = useAtomValue(formAtom);
+  const record = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+  );
   return (
     <div className={styles.viewer}>
       {showTitle && title && <label>{title}</label>}
