@@ -162,7 +162,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     typeof pageTextOrComp === "function" ? pageTextOrComp : undefined;
 
   return (
-    <Box className={styles.toolbar} shadow>
+    <Box className={styles.toolbar} borderBottom>
       <CommandBar
         className={styles.actions}
         iconProps={{
