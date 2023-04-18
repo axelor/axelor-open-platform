@@ -50,7 +50,7 @@ export function MessageInput({
   }
 
   return (
-    <Box mb={1}>
+    <Box mb={3}>
       <Input
         name={"msgs"}
         value={value}
