@@ -1,5 +1,5 @@
 import produce from "immer";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
 import { PlusData, applyTitles } from "../../builder/utils";
@@ -20,7 +20,7 @@ const defaultOption = {
   series: [],
 };
 
-export function Hbar({ data, t, ...rest }: ChartProps) {
+export function Hbar({ data, ...rest }: ChartProps) {
   const [type, setType] = useState<ChartGroupType>(
     data.stacked ? "stack" : "group"
   );

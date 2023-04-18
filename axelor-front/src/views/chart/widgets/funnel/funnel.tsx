@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
 import produce from "immer";
+import { useEffect, useState } from "react";
 
-import { ChartProps, ECharts } from "../../builder";
+import { Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
+import { ChartProps, ECharts } from "../../builder";
 
 const defaultOption = {
   legend: {
@@ -58,23 +59,21 @@ export function Funnel({ data, ...rest }: ChartProps) {
   const [options, setOptions] = useState(defaultOption);
 
   useEffect(() => {
-    const {
-      xAxis,
-      dataset,
-      series: [{ key }],
-    } = data;
+    const { xAxis, dataset, series: [{ key }] = [] } = data;
 
     setOptions(
       produce((draft: any) => {
-        const values = dataset.map((x: any) => parseFloat(x[key]));
-        draft.series[0].min = Math.min(...values);
-        draft.series[0].max = Math.max(...values);
-        draft.series[0].data = dataset.map((x: any) => ({
-          name: x[xAxis],
-          value: x[key],
-        }));
+        if (key && xAxis) {
+          const values = dataset.map((x) => parseFloat(x[key]));
+          draft.series[0].min = Math.min(...values);
+          draft.series[0].max = Math.max(...values);
+          draft.series[0].data = dataset.map((x: any) => ({
+            name: x[xAxis],
+            value: x[key],
+          }));
+        }
         draft.tooltip.valueFormatter = (v: any) =>
-          Formatters.decimal(v, { props: data });
+          Formatters.decimal(v, { props: data as unknown as Field });
       })
     );
   }, [data]);
