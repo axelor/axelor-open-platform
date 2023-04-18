@@ -2348,6 +2348,9 @@ Grid.prototype._showEditor = function (activeCell) {
 
   if (!this.isCellEditable(args.row, args.cell)) {
     args = this.findNextEditable(args.row, 0);
+    if (!args) {
+      return;
+    }
     grid.setActiveCell(args.row, args.cell);
   }
 
