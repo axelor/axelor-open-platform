@@ -399,7 +399,7 @@ function replaceTag(str) {
 }
 
 export function processTemplate(template) {
-  const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag);
+  const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag).trim();
   const { childNodes = [] } = parseFragment(newTemplate);
   const hasSingleChild = childNodes.length === 1;
   const isCustomNode =
