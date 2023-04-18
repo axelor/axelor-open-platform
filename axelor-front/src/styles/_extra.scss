@@ -104,3 +104,56 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.dl-horizontal {
+  display: inherit;
+}
+
+.order-subtotal {
+  dl {
+    display: inline-grid;
+    grid-template-columns: 55% 45%;
+    float: right;
+  }
+
+  dt {
+    overflow: hidden;
+    text-align: right;
+    text-overflow: ellipsis;
+  }
+
+  dt,
+  dd {
+    margin: 0;
+    padding: 0.25rem 1rem;
+    align-self: end;
+    white-space: nowrap;
+  }
+
+  dt {
+    font-weight: normal;
+    white-space: normal;
+  }
+  dd {
+    margin-left: 0;
+    text-align: right;
+  }
+
+  dd:empty {
+    height: 26px;
+  }
+
+  .order-subtotal-total {
+    border-top: 1px solid #ccc;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+[dir="rtl"] {
+  .order-subtotal {
+    dl {
+      float: left;
+    }
+  }
+}
