@@ -4,6 +4,7 @@ import { Input } from "@axelor/ui";
 
 import { FieldContainer, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
+import { ViewerInput } from "./viewer";
 
 export function String({
   inputProps,
@@ -29,17 +30,7 @@ export function String({
   return (
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
-      {readonly && (
-        <Input
-          type="text"
-          value={value}
-          disabled
-          readOnly
-          bg="body"
-          border={false}
-          {...inputProps}
-        />
-      )}
+      {readonly && <ViewerInput value={value} />}
       {readonly || (
         <Input
           type="text"

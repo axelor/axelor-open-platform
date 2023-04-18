@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 
-import { Box, Input, useClassNames } from "@axelor/ui";
+import { Box, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { i18n } from "@/services/client/i18n";
@@ -19,6 +19,7 @@ import { Field } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
 
 import { FieldContainer, FieldProps } from "../../builder";
+import { ViewerInput } from "../string";
 import { DateInput } from "./date-input";
 import { Picker } from "./picker";
 import { TimeInput } from "./time-input";
@@ -167,14 +168,7 @@ export function Date({
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
-        <Input
-          type="text"
-          value={textValue}
-          disabled
-          readOnly
-          bg="body"
-          border={false}
-        />
+        <ViewerInput value={textValue} />
       ) : (
         <Box ref={boxRef} d="flex">
           <Picker

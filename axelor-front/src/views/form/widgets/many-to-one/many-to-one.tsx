@@ -1,14 +1,15 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback } from "react";
 
-import { Box, Select } from "@axelor/ui";
+import { Select } from "@axelor/ui";
 
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-
 import { toKebabCase } from "@/utils/names";
+
 import { FieldContainer, FieldProps } from "../../builder";
+import { ViewerInput, ViewerLink } from "../string";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, valueAtom, widgetAtom, readonly } = props;
@@ -57,7 +58,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const handleView = useCallback(
-    (e: MouseEvent<HTMLAnchorElement>) => {
+    (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       return handleEdit(true);
     },
@@ -88,10 +89,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     <FieldContainer>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       {readonly ? (
-        value && (
-          <Box as="a" href="#" onClick={handleView}>
-            {value[targetName]}
-          </Box>
+        value ? (
+          <ViewerLink onClick={handleView}>{value[targetName]}</ViewerLink>
+        ) : (
+          <ViewerInput value="" />
         )
       ) : (
         <Select

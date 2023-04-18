@@ -4,12 +4,13 @@ import { useCallback, useMemo, useState } from "react";
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
+import { Field } from "@/services/client/meta.types";
 import format from "@/utils/format";
 
 import { FieldContainer, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
+import { ViewerInput } from "../string";
 
-import { Field } from "@/services/client/meta.types";
 import styles from "./decimal.module.scss";
 
 const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
@@ -115,16 +116,7 @@ export function Decimal({
   return (
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
-      {readonly && (
-        <Input
-          type="text"
-          value={text}
-          disabled
-          readOnly
-          bg="body"
-          border={false}
-        />
-      )}
+      {readonly && <ViewerInput value={text} />}
       {readonly || (
         <div className={styles.container}>
           <Input
