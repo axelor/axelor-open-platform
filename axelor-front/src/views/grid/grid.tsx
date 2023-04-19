@@ -37,7 +37,7 @@ import { usePerms } from "@/hooks/use-perms";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
-  const { meta, dataStore, domains } = props;
+  const { meta, dataStore, searchAtom, domains } = props;
   const { view, fields } = meta;
   const { hasButton } = usePerms(meta.view, meta.perms);
 
@@ -49,10 +49,8 @@ export function Grid(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
 
-  const [advanceSearch, setAdvancedSearch] = useAtom<any>(
-    useMemo(() => atom({}), [])
-  );
   const [search, setSearch] = useAtom<any>(useMemo(() => atom({}), []));
+  const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
 
   const [state, setState] = useGridState({
     selectedCell: viewProps?.selectedCell,
@@ -386,7 +384,7 @@ export function Grid(props: ViewProps<GridView>) {
             fields={fields}
             domains={domains}
             value={advanceSearch}
-            setValue={setAdvancedSearch}
+            setValue={setAdvancedSearch as any}
           />
         </ViewToolBar>
       )}

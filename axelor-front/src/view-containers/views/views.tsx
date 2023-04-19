@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom } from "jotai/utils";
 import { memo, useMemo } from "react";
@@ -11,7 +11,11 @@ import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { filters as fetchFilters } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
-import { SearchFilter, SearchFilters } from "@/services/client/meta.types";
+import {
+  AdvancedSearchAtom,
+  SearchFilter,
+  SearchFilters,
+} from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
 import { ViewScope } from "./scope";
@@ -40,11 +44,13 @@ async function loadView({
 function ViewContainer({
   tab,
   view,
+  searchAtom,
   dataStore,
   domains,
 }: {
   tab: Tab;
   view: { name?: string; type: string };
+  searchAtom?: AdvancedSearchAtom;
   dataStore?: DataStore;
   domains?: SearchFilter[];
 }) {
@@ -64,7 +70,12 @@ function ViewContainer({
     return (
       <Fade in={true} timeout={400} mountOnEnter>
         <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
-          <Comp meta={meta} dataStore={dataStore} domains={domains} />
+          <Comp
+            meta={meta}
+            dataStore={dataStore}
+            domains={domains}
+            searchAtom={searchAtom}
+          />
         </Box>
       </Fade>
     );
@@ -88,6 +99,7 @@ function ViewPane({
   const typeAtom = useMemo(() => {
     return selectAtom(tab.state, (x) => x.type);
   }, [tab.state]);
+  const searchAtom = useMemo<AdvancedSearchAtom>(() => atom({}), []); // advanced search
 
   const type = useAtomValue(typeAtom);
   const view = useMemo(() => views.find((x) => x.type === type), [type, views]);
@@ -99,6 +111,7 @@ function ViewPane({
           view={view}
           tab={tab}
           dataStore={dataStore}
+          searchAtom={searchAtom}
           domains={domains}
         />
       </ScopeProvider>

@@ -1,3 +1,4 @@
+import { PrimitiveAtom } from "jotai";
 import { DataContext, DataRecord } from "./data.types";
 
 export type PropertyType =
@@ -700,6 +701,8 @@ export interface SearchFilters extends View {
   items?: Widget[];
   filters?: SearchFilter[];
 }
+
+export type AdvancedSearchAtom = PrimitiveAtom<any>;
 
 export interface SavedFilter {
   id: number;

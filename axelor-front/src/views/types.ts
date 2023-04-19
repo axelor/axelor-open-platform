@@ -1,6 +1,7 @@
 import { DataStore } from "@/services/client/data-store";
 import { ViewData } from "@/services/client/meta";
 import {
+  AdvancedSearchAtom,
   CalendarView,
   CardsView,
   FormView,
@@ -21,6 +22,7 @@ export type ViewProps<T extends View> = T extends
   ? {
       meta: ViewData<T>;
       dataStore: DataStore;
+      searchAtom?: AdvancedSearchAtom;
       domains?: SearchFilter[];
     }
   : {
