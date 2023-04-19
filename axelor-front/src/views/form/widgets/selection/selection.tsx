@@ -1,12 +1,17 @@
 import clsx from "clsx";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
-import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { FunctionComponent, useCallback, useMemo } from "react";
+
 import { Badge, Box, Select, SelectComponents, SelectProps } from "@axelor/ui";
-import { legacyClassNames } from "@/styles/legacy";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import classes from "./selection.module.scss";
+
+import { Schema, Selection as TSelection } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
+
+import { FieldContainer, FieldProps } from "../../builder";
+import { ViewerInput } from "../string";
+
+import styles from "./selection.module.scss";
 
 export function Chip({
   title,
@@ -20,15 +25,15 @@ export function Chip({
   return (title && (
     <Badge
       px={2}
-      className={clsx(classes["tag"], legacyClassNames(`hilite-${color}`))}
+      className={clsx(styles["tag"], legacyClassNames(`hilite-${color}`))}
     >
-      <Box as="span" className={classes["tag-text"]}>
+      <Box as="span" className={styles["tag-text"]}>
         {title}
       </Box>
       {onRemove && (
         <Box
           as="span"
-          className={classes["tag-remove"]}
+          className={styles["tag-remove"]}
           onClick={onRemove}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -39,6 +44,22 @@ export function Chip({
       )}
     </Badge>
   )) as React.ReactElement;
+}
+
+export function SelectText({
+  schema,
+  value,
+}: {
+  schema: Schema;
+  value?: string | number | null;
+}) {
+  const selectionList = (schema.selectionList ?? []) as TSelection[];
+  const selected = selectionList.find((item) => String(item.value) === value);
+  return (
+    <Box d="flex">
+      <ViewerInput value={selected?.title ?? ""} />
+    </Box>
+  );
 }
 
 export function Selection({
@@ -97,26 +118,29 @@ export function Selection({
   return (
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
-      <Select
-        value={selectValue ?? null}
-        onChange={handleChange}
-        options={selectionList}
-        optionLabel="title"
-        optionValue="value"
-        placeholder={placeholder}
-        icons={
-          hasValue
-            ? [
-                {
-                  icon: "close",
-                  onClick: handleClear,
-                },
-              ]
-            : []
-        }
-        {...selectProps}
-        components={components}
-      />
+      {readonly && <SelectText schema={schema} value={value} />}
+      {readonly || (
+        <Select
+          value={selectValue ?? null}
+          onChange={handleChange}
+          options={selectionList}
+          optionLabel="title"
+          optionValue="value"
+          placeholder={placeholder}
+          icons={
+            hasValue
+              ? [
+                  {
+                    icon: "close",
+                    onClick: handleClear,
+                  },
+                ]
+              : []
+          }
+          {...selectProps}
+          components={components}
+        />
+      )}
     </FieldContainer>
   );
 }
