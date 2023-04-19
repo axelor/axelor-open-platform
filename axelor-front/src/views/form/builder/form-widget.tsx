@@ -1,11 +1,14 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
+import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { isDummy } from "@/services/client/data-utils";
 import { Schema } from "@/services/client/meta.types";
+import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { createWidgetAtom } from "./atoms";
@@ -13,7 +16,7 @@ import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useLazyWidget } from "./hooks";
 import { useFormScope } from "./scope";
-import { WidgetAtom, WidgetProps } from "./types";
+import { ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const { schema, formAtom, readonly } = props;
@@ -75,7 +78,7 @@ function FormField({
       return lens;
     });
     return atom(
-      (get) => get(lensAtom),
+      (get) => get(lensAtom) as any,
       (get, set, value: any, fireOnChange: boolean = false) => {
         const prev = get(lensAtom);
         if (prev !== value) {
@@ -105,7 +108,50 @@ function FormField({
     return <FieldEditor {...props} valueAtom={valueAtom} />;
   }
 
-  return <Comp {...props} valueAtom={valueAtom} />;
+  return <ValidatingField {...props} component={Comp} valueAtom={valueAtom} />;
+}
+
+function ValidatingField({
+  component: Comp,
+  ...props
+}: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {
+  const { schema, formAtom, widgetAtom, valueAtom } = props;
+
+  const valueCheck = useAtomCallback(
+    useCallback(
+      (get, set, value: any) => {
+        const prev = get(widgetAtom);
+        const errors = validate(value, {
+          props: {
+            ...schema,
+            ...get(widgetAtom).attrs,
+          } as any,
+          context: get(formAtom).record,
+        });
+        if (isEqual(prev.errors ?? {}, errors ?? {})) return;
+        set(widgetAtom, (prev) => ({ ...prev, errors }));
+      },
+      [formAtom, schema, widgetAtom]
+    )
+  );
+
+  const valueRef = useRef<any>();
+  const value = useAtomValue(valueAtom);
+
+  useAsyncEffect(async (signal) => {
+    if (signal.aborted) return;
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      value !== valueRef.current
+    ) {
+      valueRef.current = value;
+      valueCheck(value);
+    }
+  });
+
+  return <Comp {...props} />;
 }
 
 function useHandleFieldExpression({

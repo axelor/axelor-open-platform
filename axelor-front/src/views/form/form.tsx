@@ -27,10 +27,12 @@ import {
   Form as FormComponent,
   FormLayout,
   FormWidget,
+  WidgetErrors,
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
+import { alerts } from "@/components/alerts";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { extractDummy } from "@/services/client/data-utils";
 import styles from "./form.module.scss";
@@ -46,6 +48,19 @@ const fetchRecord = async (
     return dataStore.read(+id, { fields, related });
   }
   return {};
+};
+
+const showErrors = (errors: WidgetErrors[]) => {
+  const titles = Object.values(errors).flatMap((e) => Object.values(e));
+  alerts.error({
+    message: (
+      <ul>
+        {titles.map((title, i) => (
+          <li key={i}>{title}</li>
+        ))}
+      </ul>
+    ),
+  });
 };
 
 export function Form(props: ViewProps<FormView>) {
@@ -205,10 +220,19 @@ function FormContainer({
   const onSave = useAtomCallback(
     useCallback(
       async (get) => {
-        const dummy = extractDummy(get(formAtom).record);
+        const { record, states } = get(formAtom);
+        const errors = Object.values(states)
+          .map((s) => s.errors ?? {})
+          .filter((x) => Object.keys(x).length > 0);
+
+        if (errors.length > 0) {
+          showErrors(errors);
+          return Promise.reject();
+        }
+
+        const dummy = extractDummy(record);
         if (onSaveAction) await actionExecutor.execute(onSaveAction);
-        let rec = get(formAtom).record;
-        let res = await dataStore.save(rec);
+        let res = await dataStore.save(record);
         if (res.id) res = await doRead(res.id);
         res = { ...res, ...dummy }; // restore dummy values
         doEdit(res, { readonly });
@@ -225,6 +249,14 @@ function FormContainer({
       ]
     )
   );
+
+  const handleOnSave = useCallback(async () => {
+    try {
+      await onSave();
+    } catch (error) {
+      // TODO: show error notification
+    }
+  }, [onSave]);
 
   const onRefresh = useAtomCallback(
     useCallback(
@@ -349,7 +381,7 @@ function FormContainer({
               iconProps: {
                 icon: "save",
               },
-              onClick: onSave,
+              onClick: handleOnSave,
               hidden: readonly,
             },
             {

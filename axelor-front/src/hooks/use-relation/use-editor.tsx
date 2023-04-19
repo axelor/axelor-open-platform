@@ -83,14 +83,18 @@ function Footer({
   }, [onClose]);
 
   const handleConfirm = useCallback(async () => {
-    if (onSave) {
-      const state = handler.getState?.()!;
-      onSave(state.record);
-    } else if (handler.onSave) {
-      const rec = await handler.onSave();
-      onSelect?.(rec);
+    try {
+      if (onSave) {
+        const state = handler.getState?.()!;
+        onSave(state.record);
+      } else if (handler.onSave) {
+        const rec = await handler.onSave();
+        onSelect?.(rec);
+      }
+      onClose();
+    } catch (e) {
+      // TODO: show error
     }
-    onClose();
   }, [handler, onClose, onSave, onSelect]);
 
   return (

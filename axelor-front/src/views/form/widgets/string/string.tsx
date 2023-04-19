@@ -20,8 +20,10 @@ export function String({
 }) {
   const { uid, placeholder, showTitle = true } = schema;
 
-  const { attrs } = useAtomValue(widgetAtom);
+  const { attrs, errors } = useAtomValue(widgetAtom);
   const { title, required } = attrs;
+
+  const invalid = Boolean(errors?.invalid || errors?.required);
 
   const { value, onChange, onBlur } = useInput(valueAtom, {
     defaultValue: "",
@@ -37,6 +39,7 @@ export function String({
           id={uid}
           placeholder={placeholder}
           value={value}
+          invalid={invalid}
           required={required}
           onChange={onChange}
           onBlur={onBlur}

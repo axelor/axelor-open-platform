@@ -23,8 +23,15 @@ export const DEFAULT_ATTRS = {
 
 export type Attrs = Partial<typeof DEFAULT_ATTRS>;
 
+export type WidgetErrors = {
+  required?: string;
+  invalid?: string;
+  error?: string;
+};
+
 export interface WidgetState {
   attrs: Attrs;
+  errors?: WidgetErrors;
   columns?: Record<string, Attrs>;
 }
 

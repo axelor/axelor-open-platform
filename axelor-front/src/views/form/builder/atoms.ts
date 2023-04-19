@@ -54,12 +54,14 @@ export function createWidgetAtom(props: {
     (get) => {
       const {
         attrs: attrsByName,
+        errors: errorsByName,
         columns: columnsByName,
         ...restByName
       } = get(attrsByNameAtom);
 
       const {
         attrs: attrsById,
+        errors: errorsById,
         columns: columnsById,
         ...restById
       } = get(attrsByIdAtom);
@@ -70,6 +72,10 @@ export function createWidgetAtom(props: {
         columns: {
           ...columnsByName,
           ...columnsById,
+        },
+        errors: {
+          ...errorsByName,
+          ...errorsById,
         },
         attrs: {
           ...attrs,
