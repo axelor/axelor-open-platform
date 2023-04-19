@@ -241,6 +241,15 @@ function ScopeTransformer({ types: t, template }) {
         if (t.isMemberExpression(parent) && !parent.computed) return;
         if (t.isOptionalMemberExpression(parent) && !parent.computed) return;
         if (scope.hasBinding(node.name)) return;
+
+        if (
+          t.isPrivateName(parent) ||
+          t.isClassProperty(parent) ||
+          t.isClassMethod(parent)
+        ) {
+          return;
+        }
+
         path.replaceWith(t.memberExpression(ctx, node));
       },
       JSXAttribute(path, state) {

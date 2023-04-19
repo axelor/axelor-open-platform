@@ -166,8 +166,10 @@ describe("parser", () => {
   it("should handle expressions with class declaration", () => {
     const fn = parser.parse(`
     class Hello {
-      constructor(msg) { this.msg = msg; }
-      say() { return this.msg; }
+      #message;
+      constructor(msg) { this.#message = msg; }
+      get message() { return this.#message;}
+      say() { return this.#message; }
     }
     const hello = new Hello('Hello!!!');
     hello.say();
