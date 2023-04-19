@@ -239,6 +239,7 @@ function ScopeTransformer({ types: t, template }) {
 
         if (t.isObjectProperty(parent) && parent.key === node) return;
         if (t.isMemberExpression(parent) && !parent.computed) return;
+        if (t.isOptionalMemberExpression(parent) && !parent.computed) return;
         if (scope.hasBinding(node.name)) return;
         path.replaceWith(t.memberExpression(ctx, node));
       },
@@ -281,6 +282,53 @@ function ScopeTransformer({ types: t, template }) {
           helpers.some((name) => state.file.declarations[name] === path.node)
         ) {
           path.skip();
+        }
+      },
+      OptionalMemberExpression(path, state) {
+        const { node, scope } = path;
+        const obj =
+          node.object.name &&
+          !isReact(node.object) &&
+          !scope.hasBinding(node.object.name)
+            ? t.optionalMemberExpression(ctx, node.object, node.computed, true)
+            : node.object;
+
+        const name =
+          t.isTemplateLiteral(node.property) &&
+          node.property.quasis.length === 1
+            ? node.property.quasis[0].value.raw
+            : node.property.name || node.property.value;
+
+        const isCreateElement = () =>
+          node.loc &&
+          ["createElement", "createFactory", "cloneElement"].includes(name);
+        const isConstructor = () => name === "constructor";
+
+        // don't allow access to 'constructor' and `React.createElement` methods
+        if (
+          !t.isAssignmentExpression(path.container) &&
+          (isConstructor() ||
+            isCreateElement() ||
+            (t.isTemplateLiteral(node.property) &&
+              node.property.expressions.length) ||
+            (node.computed &&
+              (t.isIdentifier(node.property) || !t.isLiteral(node.property))))
+        ) {
+          path.replaceWith(
+            t.callExpression(validateFunction(state.file), [
+              obj,
+              t.isIdentifier(node.property) && !node.computed
+                ? t.stringLiteral(node.property.name)
+                : node.property,
+            ])
+          );
+        } else if (
+          (node.loc || node.object[jsxMemberObject]) &&
+          obj !== node.object
+        ) {
+          path.replaceWith(
+            t.optionalMemberExpression(obj, node.property, node.computed, true)
+          );
         }
       },
       MemberExpression(path, state) {
@@ -369,8 +417,13 @@ const defaultOptions = {
     [
       "env",
       {
-        modules: false,
-        shippedProposals: true,
+        targets: {
+          chrome: "88",
+          edge: "88",
+          firefox: "91",
+          safari: "16",
+        },
+        exclude: ["proposal-optional-chaining"],
       },
     ],
     "react",
