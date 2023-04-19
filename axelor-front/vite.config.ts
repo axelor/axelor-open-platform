@@ -30,6 +30,6 @@ export default defineConfig({
     ],
   },
   build: {
-    target: ["chrome89", "edge89", "firefox89", "safari15", "es2022"],
+    target: ["es2022", "chrome89", "edge89", "firefox89", "safari15"],
   },
 });

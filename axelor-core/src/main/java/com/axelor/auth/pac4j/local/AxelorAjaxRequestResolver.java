@@ -44,7 +44,7 @@ public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
       RedirectionActionBuilder redirectionActionBuilder) {
     if (isAjax(context, sessionStore)
         && getUrl(context, sessionStore, redirectionActionBuilder)
-            .filter(url -> url != null && url.endsWith(AxelorFormClient.LOGIN_URL))
+            .filter(url -> url.endsWith(AxelorFormClient.LOGIN_URL))
             .isPresent()) {
       return UnauthorizedAction.INSTANCE;
     }
