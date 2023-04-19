@@ -25,6 +25,7 @@ export type Attrs = Partial<typeof DEFAULT_ATTRS>;
 
 export interface WidgetState {
   attrs: Attrs;
+  columns?: Record<string, Attrs>;
 }
 
 export interface FormState {

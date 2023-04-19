@@ -16,6 +16,7 @@ import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import format from "@/utils/format";
 
+import { Attrs } from "@/views/form/builder";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Row as RowRenderer } from "../renderers/row";
 
@@ -32,6 +33,7 @@ export function Grid(
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
     showEditIcon?: boolean;
+    columnAttrs?: Record<string, Partial<Attrs>>;
     onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
@@ -42,6 +44,7 @@ export function Grid(
     fields,
     searchOptions,
     showEditIcon = true,
+    columnAttrs,
     onSearch,
     onEdit,
     onView,
@@ -55,7 +58,8 @@ export function Grid(
       const title = item.title ?? item.autoTitle;
       const attrs = item.widgetAttrs;
       const serverType = field?.type;
-      const columnAttrs: Partial<GridColumn> = {};
+      const columnProps: Partial<GridColumn> = {};
+      const extraAttrs = columnAttrs?.[item.name!];
 
       if ((item as JsonField).jsonField) {
         names.push((item as JsonField).jsonField as string);
@@ -64,23 +68,23 @@ export function Grid(
       }
 
       if (item.width) {
-        columnAttrs.width = parseInt(item.width as string);
-        columnAttrs.computed = true;
+        columnProps.width = parseInt(item.width as string);
+        columnProps.computed = true;
       }
 
       if (item.type === "button") {
-        columnAttrs.searchable = false;
-        columnAttrs.computed = true;
-        columnAttrs.width = columnAttrs.width || 32;
-        columnAttrs.title = " ";
+        columnProps.searchable = false;
+        columnProps.computed = true;
+        columnProps.width = columnProps.width || 32;
+        columnProps.title = " ";
       }
 
       if (field?.type === "BOOLEAN" && !item.widget) {
-        (columnAttrs as Field).widget = "boolean";
+        (columnProps as Field).widget = "boolean";
       }
 
-      if (item.hidden) {
-        columnAttrs.visible = false;
+      if (item.hidden || extraAttrs?.hidden) {
+        columnProps.visible = false;
       }
 
       return {
@@ -90,7 +94,7 @@ export function Grid(
         serverType,
         title,
         formatter,
-        ...columnAttrs,
+        ...columnProps,
       } as any;
     });
 
@@ -107,7 +111,7 @@ export function Grid(
     }
 
     return { columns, names: uniq(names) };
-  }, [view.items, view.editIcon, showEditIcon, fields]);
+  }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
 
   const init = useAsync(async () => {
     onSearch({ ...searchOptions, fields: names });

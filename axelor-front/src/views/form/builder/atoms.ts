@@ -52,10 +52,25 @@ export function createWidgetAtom(props: {
 
   const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
     (get) => {
-      const { attrs: attrsByName } = get(attrsByNameAtom);
-      const { attrs: attrsById, ...rest } = get(attrsByIdAtom);
+      const {
+        attrs: attrsByName,
+        columns: columnsByName,
+        ...restByName
+      } = get(attrsByNameAtom);
+
+      const {
+        attrs: attrsById,
+        columns: columnsById,
+        ...restById
+      } = get(attrsByIdAtom);
+
       return {
-        ...rest,
+        ...restByName,
+        ...restById,
+        columns: {
+          ...columnsByName,
+          ...columnsById,
+        },
         attrs: {
           ...attrs,
           ...attrsByName,

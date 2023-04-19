@@ -147,6 +147,7 @@ function FormContainer({
           ...prev,
           dirty: false,
           states: {},
+          statesByName: {},
           record: record ?? {},
         });
         if (action) {

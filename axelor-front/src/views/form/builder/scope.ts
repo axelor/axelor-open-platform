@@ -1,7 +1,13 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import {
+  EvalContextOptions,
+  createEvalContext,
+} from "@/hooks/use-parser/eval-context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   ActionAttrData,
@@ -13,14 +19,8 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 
-import { selectAtom, useAtomCallback } from "jotai/utils";
 import { fallbackFormAtom } from "./atoms";
 import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import {
-  EvalContextOptions,
-  createEvalContext,
-} from "@/hooks/use-parser/eval-context";
 
 type ContextCreator = () => DataContext;
 
@@ -156,7 +156,39 @@ function useActionAttrs({ formAtom }: { formAtom: FormAtom }) {
     useAtomCallback(
       useCallback(
         (get, set, data) => {
-          const { statesByName } = get(formAtom);
+          const { statesByName, fields } = get(formAtom);
+          const { target, name, value } = data;
+
+          // collection field column ?
+          if (target.includes(".")) {
+            const fieldName = target.split(".")[0];
+            const field = fields[fieldName];
+            if (field?.type.endsWith("_TO_MANY")) {
+              const state = statesByName[fieldName] ?? {};
+              const column = target.split(".")[1];
+              const columns = state.columns ?? {};
+              const newState = {
+                ...state,
+                columns: {
+                  ...columns,
+                  [column]: {
+                    ...columns[column],
+                    [name]: value,
+                  },
+                },
+              };
+              const newStates = {
+                ...statesByName,
+                [fieldName]: newState,
+              };
+              set(formAtom, (prev) => ({
+                ...prev,
+                statesByName: newStates,
+              }));
+              return;
+            }
+          }
+
           const state = statesByName[data.target] ?? {};
           const newState = {
             ...state,

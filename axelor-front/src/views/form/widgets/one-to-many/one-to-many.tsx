@@ -1,22 +1,22 @@
-import { atom, useAtom, useAtomValue } from "jotai";
-import { FieldProps } from "../../builder";
+import { dialogs } from "@/components/dialogs";
+import { useAsync } from "@/hooks/use-async";
+import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
+import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { findView } from "@/services/client/meta-cache";
+import { GridView } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
-import { SearchOptions, SearchResult } from "@/services/client/data";
-import { GridView } from "@/services/client/meta.types";
-import { selectAtom } from "jotai/utils";
-import { useAsync } from "@/hooks/use-async";
-import { findView } from "@/services/client/meta-cache";
-import { DataRecord } from "@/services/client/data.types";
-import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
-import { i18n } from "@/services/client/i18n";
-import classes from "./one-to-many.module.scss";
 import { GridRow } from "@axelor/ui/src/grid";
-import { dialogs } from "@/components/dialogs";
-import { toKebabCase } from "@/utils/names";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
+import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
+import { FieldProps } from "../../builder";
+import classes from "./one-to-many.module.scss";
 
 export function OneToMany({
   schema,
@@ -63,8 +63,8 @@ export function OneToMany({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
-  
-  const { attrs } = useAtomValue(widgetAtom);
+
+  const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
   const isManyToMany =
@@ -316,6 +316,7 @@ export function OneToMany({
         records={records}
         view={(viewData?.view || schema) as GridView}
         fields={viewData?.fields || fields}
+        columnAttrs={columnAttrs}
         state={state}
         setState={setState}
         onEdit={onEdit}
