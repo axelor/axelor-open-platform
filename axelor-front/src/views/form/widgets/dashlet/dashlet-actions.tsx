@@ -120,6 +120,7 @@ function DashletMenu({
             {
               key: "export",
               text: i18n.get("Export"),
+              hidden: !onExport,
               onClick: onExport,
             },
             ...getViewActions(),
@@ -130,13 +131,13 @@ function DashletMenu({
   );
 }
 
-// grid/card dashlet pagination 
+// grid/card dashlet pagination
 function DashletListMenu(
   props: DashletMenuProps & {
     dataStore: DataStore;
   }
 ) {
-  const { dataStore, ...menuProps } = props;
+  const { dataStore, viewType, ...menuProps } = props;
   const page = useDataStore(dataStore, (store) => store.page);
   const { offset = 0, limit = 40, totalCount = 0 } = page;
   const canPrev = offset > 0;
@@ -155,7 +156,7 @@ function DashletListMenu(
       <PageText dataStore={dataStore} />
       <DashletMenu
         {...menuProps}
-        onExport={onExport}
+        {...(viewType === "grid" && { onExport })}
         items={[
           {
             key: "prev",

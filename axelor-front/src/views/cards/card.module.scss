@@ -1,0 +1,18 @@
+.card {
+  float: left;
+  width: 33.33333333%;
+  cursor: pointer;
+  position: relative;
+  .menuIcon {
+    position: absolute;
+    top: 0;
+    right: 0.75rem;
+    height: 1.5rem;
+    display: none;
+  }
+  &:hover .menuIcon,
+  .menuIcon:focus,
+  .menuIcon.show {
+    display: block;
+  }
+}

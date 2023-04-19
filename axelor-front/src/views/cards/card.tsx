@@ -1,0 +1,157 @@
+import {
+  MouseEvent,
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  memo,
+} from "react";
+import { Box, Menu, MenuItem } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import clsx from "clsx";
+
+import { DataContext, DataRecord } from "@/services/client/data.types";
+import { FormActionHandler } from "../form/builder/scope";
+import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
+import { EvalContextOptions } from "@/hooks/use-parser/eval-context";
+import classes from "./card.module.scss";
+import { i18n } from "@/services/client/i18n";
+
+export const Card = memo(function Card({
+  record,
+  model,
+  fields,
+  onEdit,
+  onView,
+  onDelete,
+  Template,
+}: {
+  record: DataRecord;
+  model?: string;
+  fields?: any;
+  onEdit?: (record: DataRecord) => void;
+  onView?: (record: DataRecord) => void;
+  onDelete?: (record: DataRecord) => void;
+  Template: FunctionComponent<{
+    context: DataContext;
+    options?: EvalContextOptions;
+  }>;
+}) {
+  // state to store updated action values
+  const [values, setValues] = useState<DataRecord>({});
+  const [showMenu, setShowMenu] = useState(false);
+  const menuIconRef = useRef<HTMLAnchorElement | null>(null);
+
+  const { context, actionExecutor } = useMemo(() => {
+    const $record = { ...record, ...values };
+    const context = { record: $record, ...$record, _model: model };
+    const actionExecutor = new DefaultActionExecutor(
+      new FormActionHandler((options?: DataContext) => context)
+    );
+    return { context, actionExecutor };
+  }, [model, record, values]);
+
+  function handleMenuOpen() {
+    setShowMenu(true);
+  }
+
+  function handleMenuClose() {
+    setShowMenu(false);
+  }
+
+  function handleClick(e: MouseEvent<HTMLDivElement>) {
+    const iconEl = menuIconRef.current;
+    // check menu icon click
+    if (e.target === iconEl || iconEl?.contains?.(e.target as Node)) {
+      handleMenuOpen();
+    } else {
+      onView?.(record);
+    }
+  }
+
+  const execute = useCallback(
+    async (action: string, options?: ActionOptions) => {
+      const res = await actionExecutor.execute(action, options);
+      const values = res?.reduce?.(
+        (obj, { values }) => ({
+          ...obj,
+          ...values,
+        }),
+        {}
+      );
+      values && setValues(values);
+    },
+    [actionExecutor]
+  );
+
+  // reset values on record update(fetch)
+  useEffect(() => {
+    setValues({});
+  }, [record]);
+
+  const hasMenu = onEdit || onDelete;
+  return (
+    <>
+      <Box
+        d="flex"
+        px={2}
+        mb={3}
+        className={classes.card}
+        onClick={handleClick}
+      >
+        <Box p={3} bgColor="light" w={100} rounded shadow>
+          <Template
+            context={context}
+            options={{
+              execute,
+              fields,
+            }}
+          />
+          {hasMenu && (
+            <Box
+              className={clsx(classes.menuIcon, {
+                [classes.show]: showMenu,
+              })}
+            >
+              <Box as="a" ref={menuIconRef}>
+                <MaterialIcon icon="arrow_drop_down" />
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Box>
+      {hasMenu && (
+        <Menu
+          placement="bottom-end"
+          show={showMenu}
+          target={menuIconRef.current}
+          onHide={handleMenuClose}
+          offset={[0, -5]}
+        >
+          {onEdit && (
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                onEdit(record);
+              }}
+            >
+              {i18n.get("Edit")}
+            </MenuItem>
+          )}
+          {onDelete && (
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                onDelete(record);
+              }}
+            >
+              {i18n.get("Delete")}
+            </MenuItem>
+          )}
+        </Menu>
+      )}
+    </>
+  );
+});
