@@ -255,6 +255,7 @@ Choose the right option by environment :
 | `reports.design-dir` | external directory for birt report designs | \{user.home}/.axelor/reports
 | `reports.fonts-config` | custom fonts config path for birt report designs |
 | `data.upload.dir` | storage path for upload files | \{user.home}/.axelor/attachments
+| `data.upload.temp-dir` | storage path for temporary files | \{java.io.tmpdir}/.axelor
 | `data.upload.max-size` | maximum upload size (in MB) | 5
 | `data.upload.filename-pattern` | upload filename pattern |
 | `data.upload.allowlist.pattern` | allowlist file name pattern, only matching files will be allowed |

@@ -38,6 +38,9 @@ import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.dms.db.DMSFile;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
@@ -453,9 +456,9 @@ public class RestService extends ResourceService {
     if (StringUtils.isBlank(fileName)) {
       fileName = (String) metaFile.getFileName();
     }
-    final String filePath = (String) metaFile.getFilePath();
-    final File inputFile = MetaFiles.getPath(filePath).toFile();
-    if (!inputFile.exists()) {
+
+    Store store = FileStoreFactory.getStore();
+    if (!store.hasFile(metaFile.getFilePath())) {
       return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
@@ -468,7 +471,7 @@ public class RestService extends ResourceService {
 
               @Override
               public void write(OutputStream output) throws IOException, WebApplicationException {
-                uploadSave(new FileInputStream(inputFile), output);
+                uploadSave(store.getStream(metaFile.getFilePath()), output);
               }
             })
         .header(
@@ -772,7 +775,7 @@ public class RestService extends ResourceService {
   @Path("export/{name}")
   @Hidden
   public jakarta.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
-    return Files.exists(MetaFiles.findTempFile(name))
+    return Files.exists(TempFiles.findTempFile(name))
         ? jakarta.ws.rs.core.Response.ok().build()
         : jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
   }
@@ -783,7 +786,7 @@ public class RestService extends ResourceService {
   @Hidden
   public StreamingOutput export(@PathParam("name") final String name) {
 
-    final java.nio.file.Path temp = MetaFiles.findTempFile(name);
+    final java.nio.file.Path temp = TempFiles.findTempFile(name);
     if (Files.notExists(temp)) {
       throw new IllegalArgumentException(name);
     }

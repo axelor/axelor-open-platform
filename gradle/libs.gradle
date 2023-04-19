@@ -315,3 +315,5 @@ libs.tomcat_embed = [
 libs.tomcat_embed_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcat_embed}"
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
+
+libs.minio = "io.minio:minio:8.5.2"

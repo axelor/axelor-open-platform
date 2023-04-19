@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.axelor.dms.db.DMSFile;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
@@ -88,15 +89,15 @@ public class TestFiles extends MetaTest {
     contact.setLastName("DMS");
     contact = contacts.save(contact);
 
-    Path tmp1 = MetaFiles.createTempFile(null, null);
-    Path tmp2 = MetaFiles.createTempFile(null, null);
+    Path tmp1 = TempFiles.createTempFile();
+    Path tmp2 = TempFiles.createTempFile();
 
     // test tmp file helpers
     assertNotNull(tmp1);
     assertNotNull(tmp2);
     assertNotEquals(tmp1, tmp2);
-    assertEquals(tmp1, MetaFiles.findTempFile(tmp1.getFileName().toString()));
-    assertEquals(tmp2, MetaFiles.findTempFile(tmp2.getFileName().toString()));
+    assertEquals(tmp1, TempFiles.findTempFile(tmp1.getFileName().toString()));
+    assertEquals(tmp2, TempFiles.findTempFile(tmp2.getFileName().toString()));
 
     Files.write(tmp1, "Hello...".getBytes());
     Files.write(tmp2, "World...".getBytes());

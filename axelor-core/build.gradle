@@ -67,6 +67,8 @@ dependencies {
 
   implementation libs.jasypt
 
+  implementation libs.minio
+
   testImplementation libs.greenmail
   testImplementation libs.unboundid_ldapsdk
 

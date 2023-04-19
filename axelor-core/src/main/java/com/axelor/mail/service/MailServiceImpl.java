@@ -81,7 +81,6 @@ import jakarta.mail.search.SearchTerm;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -466,9 +465,8 @@ public class MailServiceImpl implements MailService, MailConstants {
     }
 
     for (MetaAttachment attachment : messages.findAttachments(message)) {
-      final Path filePath = MetaFiles.getPath(attachment.getMetaFile());
-      final File file = filePath.toFile();
-      builder.attach(file.getName(), file.toString());
+      final File filePath = MetaFiles.getPath(attachment.getMetaFile()).toFile();
+      builder.attach(attachment.getMetaFile().getFileName(), filePath.toString());
     }
 
     final MimeMessage email;

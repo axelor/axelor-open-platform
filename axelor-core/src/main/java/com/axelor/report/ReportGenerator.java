@@ -20,7 +20,7 @@ package com.axelor.report;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
-import com.axelor.meta.MetaFiles;
+import com.axelor.file.temp.TempFiles;
 import com.google.common.base.Preconditions;
 import jakarta.inject.Inject;
 import java.io.File;
@@ -166,7 +166,7 @@ public class ReportGenerator {
   public File generate(String designName, String format, Map<String, Object> params, Locale locale)
       throws IOException, BirtException {
     Preconditions.checkNotNull(designName, "no report design name given");
-    final Path tmpFile = MetaFiles.createTempFile(null, "");
+    final Path tmpFile = TempFiles.createTempFile(null, "");
     try (FileOutputStream stream = new FileOutputStream(tmpFile.toFile())) {
       generate(stream, designName, format, params, locale);
     }

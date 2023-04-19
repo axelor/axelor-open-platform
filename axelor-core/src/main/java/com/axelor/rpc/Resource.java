@@ -51,11 +51,11 @@ import com.axelor.events.PostRequest;
 import com.axelor.events.PreRequest;
 import com.axelor.events.RequestEvent;
 import com.axelor.events.qualifiers.EntityTypes;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -637,7 +637,7 @@ public class Resource<T extends Model> {
     final Map<String, Object> data = new HashMap<>();
 
     try {
-      final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
+      final java.nio.file.Path tempFile = TempFiles.createTempFile(null, ".csv");
       try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
         try (final Writer writer = new OutputStreamWriter(os, charset)) {
           if (StandardCharsets.UTF_8.equals(charset)) {

@@ -24,13 +24,18 @@ import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.google.common.base.Preconditions;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -297,5 +302,123 @@ public final class FileUtils {
     }
 
     return fileName;
+  }
+
+  /**
+   * Return the name of the file
+   *
+   * @param filePath the file path
+   * @return name of the file
+   */
+  public static String getFileName(String filePath) {
+    if (filePath == null) {
+      return null;
+    }
+
+    return getFileName(Paths.get(filePath));
+  }
+
+  /**
+   * Return the name of the file
+   *
+   * @param filePath the file path
+   * @return name of the file
+   */
+  public static String getFileName(Path filePath) {
+    if (filePath == null) {
+      return null;
+    }
+
+    return filePath.getFileName().toString();
+  }
+
+  /**
+   * Copy the contents of the given source file to the given destination file.
+   *
+   * @param source the source file to copy from
+   * @param destination the destination file to copy to
+   * @throws IOException in case of I/O errors
+   */
+  public static void copyFile(File source, File destination) throws IOException {
+    if (!source.exists()) {
+      return;
+    }
+
+    write(destination, new FileInputStream(source));
+  }
+
+  private static final int BUFFER_SIZE = 4096;
+
+  /**
+   * Copy the contents of the given InputStream to the given File.
+   *
+   * @param file the file to copy to
+   * @param inputStream the inputStream to copy from
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(File file, InputStream inputStream) throws IOException {
+    write(file, inputStream, false);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given File.
+   *
+   * @param file the file to copy to
+   * @param inputStream the inputStream to copy from
+   * @param append write to the end of the file rather than the beginning
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(File file, InputStream inputStream, boolean append) throws IOException {
+    write(file.toPath(), inputStream, append);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given Path.
+   *
+   * @param path the path to copy to
+   * @param inputStream the inputStream to copy from
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(Path path, InputStream inputStream) throws IOException {
+    write(path, inputStream, false);
+  }
+
+  /**
+   * Copy the contents of the given InputStream to the given Path.
+   *
+   * @param path the path to copy to
+   * @param inputStream the inputStream to copy from
+   * @param append write to the end of the file rather than the beginning
+   * @throws IOException in case of I/O errors
+   */
+  public static void write(Path path, InputStream inputStream, boolean append) throws IOException {
+    Files.createDirectories(path.getParent());
+
+    final BufferedOutputStream bos =
+        new BufferedOutputStream(new FileOutputStream(path.toFile(), append));
+    try {
+      int read = 0;
+      byte[] bytes = new byte[BUFFER_SIZE];
+      while ((read = inputStream.read(bytes)) != -1) {
+        bos.write(bytes, 0, read);
+      }
+      bos.flush();
+    } finally {
+      bos.close();
+    }
+  }
+
+  /**
+   * Check if the candidate path is located inside the parent path
+   *
+   * @param parent the parent path
+   * @param candidate the candidate path
+   * @return tru if the candidate path is located inside the parent path, otherwise false
+   */
+  public static boolean isChildPath(Path parent, Path candidate) {
+    final Path normalizedParent = parent.normalize();
+    final Path normalizedCandidate = normalizedParent.resolve(candidate).normalize();
+    return normalizedCandidate.startsWith(normalizedParent)
+        && !normalizedCandidate.equals(normalizedParent);
   }
 }

@@ -72,6 +72,11 @@
     <option value="white" color="white">White</option>
   </selection>
 
+  <selection name="file.store.type.selection">
+    <option value="1">File system</option>
+    <option value="2">Object Storage</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <field name="name"/>

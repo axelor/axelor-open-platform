@@ -253,6 +253,7 @@
     ]]>
     <string name="fileName" required="true" namecolumn="true"/>
     <string name="filePath" required="true"/>
+    <integer name="storeType" title="Store type" default="" required="true" selection="file.storage.store.selection"/>
     <long name="fileSize" title="Size in bytes" readonly="true"/>
     <string name="fileType" title="File type"/>
     <string name="description" multiline="true"/>

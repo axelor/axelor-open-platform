@@ -21,6 +21,7 @@ package com.axelor.web.service;
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
@@ -49,6 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,7 +99,7 @@ public class FileService extends AbstractService {
       return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
 
-    final java.nio.file.Path file = MetaFiles.findTempFile(link);
+    final java.nio.file.Path file = TempFiles.findTempFile(link);
     if (file == null || !file.toFile().isFile()) {
       throw new IllegalArgumentException(new FileNotFoundException(name));
     }
@@ -145,7 +147,7 @@ public class FileService extends AbstractService {
   @Hidden
   public jakarta.ws.rs.core.Response clean(@PathParam("fileId") String fileId) {
     try {
-      files.clean(fileId);
+      TempFiles.clean(fileId);
     } catch (IOException e) {
     }
     return jakarta.ws.rs.core.Response.ok().build();
@@ -180,7 +182,7 @@ public class FileService extends AbstractService {
 
     final Map<String, Object> data = new HashMap<>();
     try {
-      fileName = URLDecoder.decode(fileName, "UTF-8");
+      fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
       final String safeFileName = FileUtils.safeFileName(fileName);
 
       // check if file name is valid

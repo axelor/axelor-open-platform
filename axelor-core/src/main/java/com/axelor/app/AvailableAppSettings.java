@@ -97,6 +97,7 @@ public interface AvailableAppSettings {
   String TEMPLATE_SEARCH_DIR = "template.search-dir";
 
   String DATA_UPLOAD_DIR = "data.upload.dir";
+  String DATA_UPLOAD_TEMP_DIR = "data.upload.temp-dir";
   String FILE_UPLOAD_SIZE = "data.upload.max-size";
   String FILE_UPLOAD_FILENAME_PATTERN = "data.upload.filename-pattern";
   String FILE_UPLOAD_WHITELIST_PATTERN = "data.upload.allowlist.pattern";
@@ -114,6 +115,15 @@ public interface AvailableAppSettings {
   String DATA_EXPORT_COLLECTIONS_SEPARATOR = "data.export.collections.separator";
 
   String DATA_IMPORT_DEMO_DATA = "data.import.demo-data";
+
+  String DATA_OBJECT_STORAGE_ENABLED = "data.object-storage.enabled";
+  String DATA_OBJECT_STORAGE_ENDPOINT = "data.object-storage.endpoint";
+  String DATA_OBJECT_STORAGE_PATH_STYLE = "data.object-storage.path-style";
+  String DATA_OBJECT_STORAGE_SECURE = "data.object-storage.secure";
+  String DATA_OBJECT_STORAGE_ACCESS_KEY = "data.object-storage.access-key";
+  String DATA_OBJECT_STORAGE_SECRET_KEY = "data.object-storage.secret-key";
+  String DATA_OBJECT_STORAGE_BUCKET = "data.object-storage.bucket";
+  String DATA_OBJECT_STORAGE_REGION = "data.object-storage.region";
 
   String CORS_ALLOW_ORIGIN = "cors.allow-origin";
   String CORS_ALLOW_CREDENTIALS = "cors.allow-credentials";
