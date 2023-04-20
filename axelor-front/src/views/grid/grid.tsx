@@ -8,7 +8,7 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -30,7 +30,7 @@ import {
 
 import { ViewProps } from "../types";
 import { Grid as GridComponent } from "./builder";
-import { useGridState } from "./builder/utils";
+import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useEditor } from "@/hooks/use-relation";
 import { usePerms } from "@/hooks/use-perms";
@@ -43,8 +43,9 @@ export function Grid(props: ViewProps<GridView>) {
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
+  const selectedIdsRef = useRef<number[]>([]);
   const [viewProps, setViewProps] = useViewProps();
-  const { dashlet, popup, popupOptions } = useViewTab();
+  const { action, dashlet, popup, popupOptions } = useViewTab();
 
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
@@ -235,6 +236,19 @@ export function Grid(props: ViewProps<GridView>) {
     return Math.floor(offset / limit) + 1;
   }, [dataStore, offset, limit, viewRoute?.id]);
 
+  const getContext = useCallback<() => DataContext>(
+    () => ({
+      ...action.context,
+      _ids: selectedIdsRef.current,
+      _model: action.model,
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    }),
+    [action]
+  );
+  const actionExecutor = useGridActionExecutor(view, getContext);
+
   useEffect(() => {
     if (dashlet || popup) return;
     let nextPage = currentPage;
@@ -258,6 +272,12 @@ export function Grid(props: ViewProps<GridView>) {
       });
     }
   }, [viewProps, setViewProps, state.selectedCell, state.rows]);
+
+  useEffect(() => {
+    selectedIdsRef.current = (state.selectedRows || []).map(
+      (ind) => state.rows[ind]?.record?.id
+    );
+  }, [state.selectedRows, state.rows]);
 
   const searchScope = useMemo<GridSearchScopeState>(
     () => ({
@@ -399,6 +419,7 @@ export function Grid(props: ViewProps<GridView>) {
           setState={setState}
           sortType={"live"}
           searchOptions={searchOptions}
+          actionExecutor={actionExecutor}
           onEdit={onEdit}
           onView={onView}
           onSearch={onSearch}

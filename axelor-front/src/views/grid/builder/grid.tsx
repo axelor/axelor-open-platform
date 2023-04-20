@@ -9,6 +9,7 @@ import {
   GridRow,
   GridRowProps,
 } from "@axelor/ui/grid";
+import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 import { useAsync } from "@/hooks/use-async";
 import { SearchOptions, SearchResult } from "@/services/client/data";
@@ -19,6 +20,8 @@ import format from "@/utils/format";
 import { Attrs } from "@/views/form/builder";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Row as RowRenderer } from "../renderers/row";
+import { DataContext } from "@/services/client/data.types";
+import { ActionExecutor } from "@/view-containers/action";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -34,6 +37,7 @@ export function Grid(
     searchOptions?: Partial<SearchOptions>;
     showEditIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
+    actionExecutor?: ActionExecutor;
     onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
@@ -43,6 +47,7 @@ export function Grid(
     view,
     fields,
     searchOptions,
+    actionExecutor,
     showEditIcon = true,
     columnAttrs,
     onSearch,
@@ -147,12 +152,30 @@ export function Grid(
     );
   }, [view]);
 
+  const ActionCellRenderer = useMemo(() => {
+    return (props: GridColumnProps) => (
+      <CellRenderer
+        {...props}
+        onAction={(action: string, context?: DataContext) =>
+          actionExecutor!.execute(action, { context })
+        }
+      />
+    );
+  }, [actionExecutor]);
+
+  const hasActionCell = useMemo(
+    () => columns.some((c) => ["button"].includes(c.type!)),
+    [columns]
+  );
+
   if (init.state === "loading") return null;
 
   return (
     <AxGridProvider>
       <AxGrid
-        cellRenderer={CellRenderer}
+        cellRenderer={
+          hasActionCell && actionExecutor ? ActionCellRenderer : CellRenderer
+        }
         rowRenderer={CustomRowRenderer}
         allowColumnResize
         allowGrouping

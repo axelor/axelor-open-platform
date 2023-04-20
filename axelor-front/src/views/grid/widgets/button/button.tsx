@@ -1,16 +1,22 @@
-import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/src/grid/grid-column";
 
-export function Button(props: GridColumnProps) {
-  const { data: field } = props;
+import { Field } from "@/services/client/meta.types";
+import { Button as ButtonField } from "@/services/client/meta.types";
+import { GridCellProps } from "../../builder/types";
+
+export function Button(props: GridCellProps) {
+  const { record, data: field, onAction } = props;
+  const { onClick } = field as ButtonField;
   const { name, icon, css, help } = field as Field;
 
   if (!icon) return null;
 
   function handleClick(e: React.MouseEvent<HTMLElement>) {
     e.preventDefault();
+    if (onClick && onAction) {
+      onAction(onClick, { ...record, selected: true, _signal: name });
+    }
   }
 
   function renderIcon() {
