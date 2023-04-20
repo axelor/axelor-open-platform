@@ -1,0 +1,19 @@
+---
+title: Support ordering authentication form client
+type: feature
+description: |
+  By default, form client is default client. You can now specify form client as non-default,
+  by specifying `form` in `auth.provider-order` after other clients.
+
+  Example:
+  `auth.provider-order = google, form`
+
+  Default client is the first client specified in `auth.provider-order`.
+  You can require another client via the `client_name` query parameter in login url.
+
+  Example:
+  // Default client is used
+  http://localhost:8080/open-platform-demo/
+
+  // Require another client
+  http://localhost:8080/open-platform-demo/?client_name=form

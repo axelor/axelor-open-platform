@@ -26,20 +26,31 @@ interface ClientInfo {
 interface PublicInfo {
   application: ApplicationInfo;
   clients?: ClientInfo[];
+  defaultClient: string;
+  exclusive?: string;
 }
 
 const publicInfoAtom = atom(async () => {
   const url = "ws/public/app/info";
   const response = await request({ url });
-  const data = await response.json();
-  return data as PublicInfo;
+  const info = (await response.json()) as PublicInfo;
+  return info;
 });
 
 const loadablePublicInfoAtom = loadable(publicInfoAtom);
 
 const LOGIN_ENDPOINT = "login";
 const FORCE_CLIENT_PARAM = "force_client";
+
+const CALLBACK_ENDPOINT = "callback";
+const CLIENT_NAME_PARAM = "client_name";
+
 const HASH_LOCATION_PARAM = "hash_location";
+const FORM_CLIENT_NAME = "AxelorFormClient";
+
+const CLIENT_NAME_ALIASES: Record<string, string> = {
+  form: FORM_CLIENT_NAME,
+};
 
 const YEAR = new Date().getFullYear();
 
@@ -71,11 +82,31 @@ export function Login() {
   const location = useLocation();
   const { state, data, error, login } = useSession();
 
+  const publicInfo = useAtomValue<any>(loadablePublicInfoAtom);
+
+  const [centralClients, setCentralClients] = useState<ClientInfo[]>([]);
+  const [application, setApplication] = useState<ApplicationInfo>({});
+  const {
+    name = "Axelor",
+    logo = defaultLogo,
+    copyright = `&copy; 2005 - ${YEAR} Axelor. ${t("All Rights Reserved")}.`,
+  } = application || {};
+  const [client, setClient] = useState<string>();
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const clientNameParam = queryParams.get(CLIENT_NAME_PARAM);
+  const clientName =
+    CLIENT_NAME_ALIASES[clientNameParam || ""] ?? clientNameParam;
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
       event.preventDefault();
       const credentialsError = t("Wrong username or password");
-      login({ username, password })
+      const params = new URLSearchParams({
+        [CLIENT_NAME_PARAM]: FORM_CLIENT_NAME,
+      });
+      const url = `${CALLBACK_ENDPOINT}?${params}`;
+      login({ username, password, url })
         .then(() => {
           if (error) {
             setErrorMessage(credentialsError);
@@ -85,7 +116,7 @@ export function Login() {
           setErrorMessage(credentialsError);
         });
     },
-    [error, login, username, password]
+    [login, username, password, error]
   );
 
   useEffect(() => {
@@ -98,25 +129,15 @@ export function Login() {
     }
   }, []);
 
-  const publicInfo = useAtomValue<any>(loadablePublicInfoAtom);
-
-  const [centralClients, setCentralClients] = useState<any[]>([]);
-  const [application, setApplication] = useState<any>({});
-  const {
-    name = "Axelor",
-    logo = defaultLogo,
-    copyright = `&copy; 2005 - ${YEAR} Axelor. ${t("All Rights Reserved")}.`,
-  } = application || {};
-
   useEffect(() => {
     const info = (publicInfo.data || {}) as PublicInfo;
     setCentralClients(info.clients || []);
     setApplication(info.application);
-  }, [publicInfo.data]);
+    setClient(clientName || info.defaultClient);
+  }, [publicInfo.data, clientName]);
 
-  const queryParams = new URLSearchParams(window.location.search);
-  if (queryParams.get(FORCE_CLIENT_PARAM)) {
-    window.location.href = `${LOGIN_ENDPOINT}?${queryParams}`;
+  if (client && client !== FORM_CLIENT_NAME) {
+    loginWithClient(client);
     return null;
   }
 

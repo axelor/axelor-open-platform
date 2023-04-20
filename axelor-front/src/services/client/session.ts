@@ -142,9 +142,11 @@ export class Session {
   async login(args: {
     username: string;
     password: string;
+    url?: string;
   }): Promise<SessionInfo> {
+    const url = args.url ?? "callback";
     const { status, ok } = await request({
-      url: "callback",
+      url,
       method: "POST",
       body: args,
     });

@@ -21,6 +21,7 @@ package com.axelor.web.service;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.ClientListProvider;
 import com.axelor.common.ObjectUtils;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
@@ -46,9 +47,20 @@ public class PublicInfoService extends AbstractService {
 
   @Context private HttpServletRequest request;
 
-  @Inject private AuthPac4jInfo pac4jInfo;
+  private final AuthPac4jInfo pac4jInfo;
+
+  private final String defaultClient;
+  private final boolean exclusive;
 
   private static final AppSettings SETTINGS = AppSettings.get();
+
+  @Inject
+  public PublicInfoService(AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
+    super();
+    this.pac4jInfo = pac4jInfo;
+    this.defaultClient = clientListProvider.get().get(0).getName();
+    this.exclusive = clientListProvider.isExclusive();
+  }
 
   @GET
   @Path("info")
@@ -62,6 +74,12 @@ public class PublicInfoService extends AbstractService {
     map.put("application", appInfo());
     if (ObjectUtils.notEmpty(pac4jInfo.getCentralClients())) {
       map.put("clients", clientsInfo());
+    }
+
+    map.put("defaultClient", defaultClient);
+
+    if (exclusive) {
+      map.put("exclusive", exclusive);
     }
 
     return map;
