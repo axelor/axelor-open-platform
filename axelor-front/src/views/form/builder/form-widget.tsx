@@ -1,12 +1,13 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { isDummy } from "@/services/client/data-utils";
+import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
@@ -116,40 +117,55 @@ function ValidatingField({
   ...props
 }: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {
   const { schema, formAtom, widgetAtom, valueAtom } = props;
+  const { validIf } = schema;
 
   const valueCheck = useAtomCallback(
     useCallback(
-      (get, set, value: any) => {
+      (get, set) => {
+        const value = get(valueAtom);
         const prev = get(widgetAtom);
-        const errors = validate(value, {
+        const record = get(formAtom).record;
+
+        let errors = validate(value, {
           props: {
             ...schema,
-            ...get(widgetAtom).attrs,
+            ...prev.attrs,
           } as any,
-          context: get(formAtom).record,
+          context: record,
         });
+
+        if (validIf) {
+          const valid = !validIf || parseExpression(validIf)(record);
+          errors = valid
+            ? errors
+            : {
+                ...errors,
+                invalid: i18n.get("{0} is invalid", prev.attrs.title),
+              };
+        }
+
         if (isEqual(prev.errors ?? {}, errors ?? {})) return;
         set(widgetAtom, (prev) => ({ ...prev, errors }));
       },
-      [formAtom, schema, widgetAtom]
+      [formAtom, schema, validIf, valueAtom, widgetAtom]
     )
   );
 
-  const valueRef = useRef<any>();
   const value = useAtomValue(valueAtom);
+  const triggerAtom = useMemo(
+    () => (validIf ? selectAtom(formAtom, (x) => x.record) : atom(value)),
+    [formAtom, validIf, value]
+  );
 
-  useAsyncEffect(async (signal) => {
-    if (signal.aborted) return;
-    if (
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      value !== valueRef.current
-    ) {
-      valueRef.current = value;
-      valueCheck(value);
-    }
-  });
+  const triggerValue = useAtomValue(triggerAtom);
+
+  useAsyncEffect(
+    async (signal) => {
+      if (signal.aborted) return;
+      valueCheck();
+    },
+    [triggerValue]
+  );
 
   return <Comp {...props} />;
 }
