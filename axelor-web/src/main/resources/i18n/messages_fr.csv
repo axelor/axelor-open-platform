@@ -204,7 +204,7 @@
 "Log in","Se connecter",,
 "Log in attempt failed.","Tentative de connexion échouée.",,
 "Log in time","Heure de connexion",,
-"Log in with %s","Se connecter avec %s",,
+"Log in with {0}","Se connecter avec {0}",,
 "Log out","Déconnexion",,
 "Mar","Mars",,
 "March","Mars",,

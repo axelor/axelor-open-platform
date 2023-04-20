@@ -1,26 +1,20 @@
-import { useSession } from "@/hooks/use-session";
-import { Box, Button, Image, Input, InputLabel } from "@axelor/ui";
-import {
-  FormEventHandler,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { atom, useAtom, useAtomValue } from "jotai";
-
-import logo from "@/assets/axelor.svg";
+import { FormEventHandler, useCallback, useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import styles from "./login.module.scss";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { atom, useAtomValue } from "jotai";
+import { loadable } from "jotai/utils";
+import { Box, Button, Image, Input, InputLabel } from "@axelor/ui";
+
+import { useSession } from "@/hooks/use-session";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
-import { loadable } from "jotai/utils";
+
+import defaultLogo from "@/assets/axelor.svg";
+import styles from "./login.module.scss";
 
 interface ApplicationInfo {
   name?: string;
-  copyright?: string;
   logo?: string;
+  copyright?: string;
   language?: string;
   callbackUrl?: string;
 }
@@ -51,26 +45,22 @@ const YEAR = new Date().getFullYear();
 
 const t = i18n.get;
 
-const SERVER_ERROR = t("Sorry, something went wrong. Please try again later.");
-const CREDENTIALS_ERROR = t("Wrong username or password");
-
-function loginWithClient(client: string): void {
+function loginWithClient(client: string) {
   const currentParams = new URLSearchParams(window.location.search);
   const forceClient = client || currentParams.get(FORCE_CLIENT_PARAM);
   const hashLocation =
     window.location.hash || currentParams.get(HASH_LOCATION_PARAM);
-
-  const queryParams = new URLSearchParams();
+  const params = new URLSearchParams();
 
   if (forceClient) {
-    queryParams.append(FORCE_CLIENT_PARAM, forceClient);
+    params.append(FORCE_CLIENT_PARAM, forceClient);
   }
 
   if (hashLocation) {
-    queryParams.append(HASH_LOCATION_PARAM, hashLocation);
+    params.append(HASH_LOCATION_PARAM, hashLocation);
   }
 
-  window.location.href = `${LOGIN_ENDPOINT}?${queryParams}`;
+  window.location.href = `${LOGIN_ENDPOINT}?${params}`;
 }
 
 export function Login() {
@@ -84,14 +74,15 @@ export function Login() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
       event.preventDefault();
+      const credentialsError = t("Wrong username or password");
       login({ username, password })
         .then(() => {
           if (error) {
-            setErrorMessage(CREDENTIALS_ERROR);
+            setErrorMessage(credentialsError);
           }
         })
         .catch((err: any) => {
-          setErrorMessage(CREDENTIALS_ERROR);
+          setErrorMessage(credentialsError);
         });
     },
     [error, login, username, password]
@@ -101,7 +92,9 @@ export function Login() {
     const params = new URLSearchParams(window.location.search);
     const error = params.get("error");
     if (error != null) {
-      setErrorMessage(error || SERVER_ERROR);
+      setErrorMessage(
+        error || t("Sorry, something went wrong. Please try again later.")
+      );
     }
   }, []);
 
@@ -111,7 +104,7 @@ export function Login() {
   const [application, setApplication] = useState<any>({});
   const {
     name = "Axelor",
-    logo = "img/axelor.png",
+    logo = defaultLogo,
     copyright = `&copy; 2005 - ${YEAR} Axelor. ${t("All Rights Reserved")}.`,
   } = application || {};
 
@@ -144,12 +137,9 @@ export function Login() {
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={logo} alt="Logo" />
-        <Box as="h4" fontWeight="normal" my={2}>
-          Log In to Your Account
-        </Box>
+        <Image className={styles.logo} src={logo} alt={name} />
         <Box as="form" w={100} onSubmit={handleSubmit}>
-          <InputLabel htmlFor="username">Username</InputLabel>
+          <InputLabel htmlFor="username">{t("Username")}</InputLabel>
           <Input
             id="username"
             name="username"
@@ -160,7 +150,7 @@ export function Login() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <InputLabel htmlFor="password">Password</InputLabel>
+          <InputLabel htmlFor="password">{t("Password")}</InputLabel>
           <Input
             name="password"
             type="password"
@@ -174,7 +164,7 @@ export function Login() {
           <Box d="flex" alignItems="center">
             <Input type="checkbox" p={0} m={0} me={1} />
             <Box as="p" mb={0}>
-              Remember me
+              {t("Remember me")}
             </Box>
           </Box>
           {errorMessage && (
@@ -192,17 +182,17 @@ export function Login() {
             </Box>
           )}
           <Button type="submit" variant="primary" mt={2} w={100}>
-            Login
+            {t("Log in")}
           </Button>
         </Box>
 
         <Box as="form" w={100}>
           <CentralClients centralClients={centralClients} />
         </Box>
-
       </Box>
+
       <Box as="p" textAlign="center">
-        &copy; 2005 - {YEAR} Axelor. All Rights Reserved.
+        {copyright}
       </Box>
     </Box>
   );
@@ -217,9 +207,11 @@ function CentralClients(props: { centralClients: any[] }) {
 
   return (
     <>
-      {centralClients.map(client => {
+      {centralClients.map((client) => {
         const { name, title, icon } = client;
-        return <CentralClient key={name} name={name} title={title} icon={icon} />;
+        return (
+          <CentralClient key={name} name={name} title={title} icon={icon} />
+        );
       })}
     </>
   );
@@ -228,14 +220,13 @@ function CentralClients(props: { centralClients: any[] }) {
 function CentralClient(props: { name: string; title?: string; icon?: string }) {
   const { name, title: _title, icon } = props;
   const title = _title || name;
-  const loginWith = useMemo(() => t('Log in with {0}', title), [title, t]);
 
   const handleClick = useCallback(
     (e: React.SyntheticEvent) => {
       e.preventDefault();
       loginWithClient(name);
     },
-    [name],
+    [name]
   );
 
   return (
@@ -251,7 +242,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
         onClick={handleClick}
       >
         {icon && <Image className={styles.socialLogo} src={icon} alt={title} />}
-        <Box>{loginWith}</Box>
+        <Box>{t("Log in with {0}", title)}</Box>
       </Button>
     </Box>
   );
