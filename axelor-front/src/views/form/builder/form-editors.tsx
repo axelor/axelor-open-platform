@@ -23,6 +23,7 @@ import { GridLayout } from "./form-layouts";
 import { FormState, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
 
+import { DataStore } from "@/services/client/data-store";
 import { isEqual } from "lodash";
 import styles from "./form-editors.module.scss";
 
@@ -433,11 +434,14 @@ const RecordEditor = memo(function RecordEditor({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record, parent);
 
+  const [loaded, setLoaded] = useState<DataRecord>({});
+
   const editorAtom = useMemo(() => {
     return atom(
       (get) => {
-        const record = get(valueAtom) || {};
+        const value = get(valueAtom) || {};
         const state = get(formAtom);
+        const record = loaded.id && loaded.id === value.id ? loaded : value;
         return {
           ...state,
           record,
@@ -452,7 +456,7 @@ const RecordEditor = memo(function RecordEditor({
         set(valueAtom, record);
       }
     );
-  }, [formAtom, valueAtom]);
+  }, [formAtom, loaded, valueAtom]);
 
   const invalidAtom = useMemo(
     () =>
@@ -474,7 +478,25 @@ const RecordEditor = memo(function RecordEditor({
     )
   );
 
+  const ds = useMemo(() => new DataStore(model), [model]);
+  const load = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const value = get(valueAtom) ?? {};
+        const names = Object.keys(fields ?? {});
+        const missing = names.some((x) => !Object.hasOwn(value, x));
+        const id = value.id;
+        if (id && id > 0 && missing) {
+          const rec = await ds.read(id, { fields: names });
+          setLoaded(rec);
+        }
+      },
+      [ds, fields, valueAtom]
+    )
+  );
+
   useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
+  useAsyncEffect(async () => load(), [load]);
 
   return (
     <Form
