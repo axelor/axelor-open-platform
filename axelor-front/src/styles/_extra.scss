@@ -112,7 +112,7 @@
 .order-subtotal {
   dl {
     display: inline-grid;
-    grid-template-columns: 55% 45%;
+    grid-template-columns: 1.25fr 1fr;
     float: right;
   }
 
@@ -126,13 +126,11 @@
   dd {
     margin: 0;
     padding: 0.25rem 1rem;
-    align-self: end;
     white-space: nowrap;
   }
 
   dt {
     font-weight: normal;
-    white-space: normal;
   }
   dd {
     margin-left: 0;
