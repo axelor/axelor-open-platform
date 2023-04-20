@@ -143,14 +143,9 @@ function ValidatingField({
     )
   );
 
-  const value = useAtomValue(valueAtom);
-
-  useAsyncEffect(
-    async (signal) => {
-      signal.aborted || valueCheck();
-    },
-    [value]
-  );
+  useAsyncEffect(async (signal) => {
+    signal.aborted || valueCheck();
+  });
 
   const invalidAtom = useMemo(
     () =>
