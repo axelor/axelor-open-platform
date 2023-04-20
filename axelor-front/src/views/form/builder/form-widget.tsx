@@ -7,11 +7,11 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { isDummy } from "@/services/client/data-utils";
-import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
+import { i18n } from "@/services/client/i18n";
 import { createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
@@ -119,7 +119,6 @@ function ValidatingField({
   ...props
 }: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {
   const { schema, formAtom, widgetAtom, valueAtom } = props;
-  const { validIf } = schema;
 
   const valueCheck = useAtomCallback(
     useCallback(
@@ -136,43 +135,28 @@ function ValidatingField({
           context: record,
         });
 
-        if (validIf) {
-          const valid = !validIf || parseExpression(validIf)(record);
-          errors = valid
-            ? errors
-            : {
-                ...errors,
-                invalid: i18n.get("{0} is invalid", prev.attrs.title),
-              };
-        }
-
         if (isEqual(prev.errors ?? {}, errors ?? {})) return;
+
         set(widgetAtom, (prev) => ({ ...prev, errors }));
       },
-      [formAtom, schema, validIf, valueAtom, widgetAtom]
+      [formAtom, schema, valueAtom, widgetAtom]
     )
   );
 
   const value = useAtomValue(valueAtom);
-  const triggerAtom = useMemo(
-    () => (validIf ? selectAtom(formAtom, (x) => x.record) : atom(value)),
-    [formAtom, validIf, value]
-  );
-
-  const triggerValue = useAtomValue(triggerAtom);
 
   useAsyncEffect(
     async (signal) => {
-      if (signal.aborted) return;
-      valueCheck();
+      signal.aborted || valueCheck();
     },
-    [triggerValue]
+    [value]
   );
 
   const invalidAtom = useMemo(
     () =>
-      selectAtom(widgetAtom, ({ errors = {} }) =>
-        Boolean(errors.invalid || errors.required)
+      selectAtom(
+        widgetAtom,
+        ({ errors = {} }) => Object.values(errors).filter(Boolean).length > 0
       ),
     [widgetAtom]
   );
@@ -192,13 +176,15 @@ function useHandleFieldExpression({
   const { recordHandler } = useFormScope();
 
   useEffect(() => {
-    const { showIf, hideIf, readonlyIf, requiredIf } = schema;
-    const hasExpression = showIf || hideIf || readonlyIf || requiredIf;
+    const { showIf, hideIf, readonlyIf, requiredIf, validIf } = schema;
+    const hasExpression =
+      showIf || hideIf || readonlyIf || requiredIf || validIf;
 
     if (hasExpression) {
       return recordHandler.subscribe((record) => {
         setWidgetAttrs((state) => {
           const attrs = { ...state.attrs };
+          let errors = state.errors;
 
           if (showIf) {
             attrs.hidden = !parseExpression(showIf)(record);
@@ -214,8 +200,17 @@ function useHandleFieldExpression({
             attrs.required = parseExpression(requiredIf)(record);
           }
 
-          if (!isEqual(attrs, state.attrs)) {
-            return { ...state, attrs };
+          if (validIf) {
+            errors = {
+              ...errors,
+              invalid: i18n.get("{0} is invalid", attrs.title),
+            };
+            const valid = parseExpression(validIf)(record);
+            if (valid) delete errors.invalid;
+          }
+
+          if (!isEqual(attrs, state.attrs) || !isEqual(errors, state.errors)) {
+            return { ...state, attrs, errors };
           }
 
           return state;

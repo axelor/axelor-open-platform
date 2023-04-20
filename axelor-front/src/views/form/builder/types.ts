@@ -27,6 +27,9 @@ export type WidgetErrors = {
   required?: string;
   invalid?: string;
   error?: string;
+  min?: string;
+  max?: string;
+  pattern?: string;
 };
 
 export interface WidgetState {
@@ -40,7 +43,7 @@ export interface FormState {
   dirty?: boolean;
   record: DataRecord;
   states: Record<string, WidgetState>;
-  statesByName: Record<string, WidgetState>;  
+  statesByName: Record<string, WidgetState>;
   readonly model: string;
   readonly fields: Record<string, Property>;
   readonly parent?: FormAtom;

@@ -28,7 +28,7 @@ const validateRequired: Validate = (value, { props }) => {
 const validatePattern: Validate = (value, { props }) => {
   const { title, pattern } = props;
   if (pattern && !new RegExp(pattern).test(value)) {
-    return { invalid: i18n.get("{0} is invalid", title) };
+    return { pattern: i18n.get("{0} is not in proper format", title) };
   }
 };
 
@@ -37,10 +37,10 @@ const validateRange: Validate = (value, { props }) => {
   const min = +minSize;
   const max = +maxSize;
   if (min && value < min) {
-    return { invalid: i18n.get("{0} is too small", title) };
+    return { min: i18n.get("{0} is too small", title) };
   }
   if (max && value > max) {
-    return { invalid: i18n.get("{0} is too big", title) };
+    return { max: i18n.get("{0} is too big", title) };
   }
 };
 
