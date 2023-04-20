@@ -24,11 +24,15 @@ import com.axelor.file.store.Store;
 import com.axelor.file.store.StoreType;
 import com.axelor.file.store.UploadedFile;
 import com.axelor.file.temp.TempFiles;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
+import io.minio.ServerSideEncryption;
+import io.minio.ServerSideEncryptionKms;
+import io.minio.ServerSideEncryptionS3;
 import io.minio.StatObjectArgs;
 import io.minio.UploadObjectArgs;
 import io.minio.errors.ErrorResponseException;
@@ -146,7 +150,8 @@ public class S3Store implements Store {
               .bucket(getBucketName())
               .object(fileName)
               .contentType(contentType)
-              .filename(path.toString());
+              .filename(path.toString())
+              .sse(getEncryption());
       getClient().uploadObject(builder.build());
       return new UploadedFile(
           FileUtils.getFileName(fileName), fileName, Files.size(path), contentType, getStoreType());
@@ -210,6 +215,17 @@ public class S3Store implements Store {
         | ServerException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private ServerSideEncryption getEncryption()
+      throws NoSuchAlgorithmException, JsonProcessingException {
+    ServerSideEncryption sse = null;
+    if (_s3ClientManager.getEncryptionType() == S3EncryptionType.SSE_S3) {
+      sse = new ServerSideEncryptionS3();
+    } else if (_s3ClientManager.getEncryptionType() == S3EncryptionType.SSE_KMS) {
+      sse = new ServerSideEncryptionKms(_s3ClientManager.getEncryptionKmsKeyId(), null);
+    }
+    return sse;
   }
 
   @Override

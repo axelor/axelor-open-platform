@@ -124,6 +124,8 @@ public interface AvailableAppSettings {
   String DATA_OBJECT_STORAGE_SECRET_KEY = "data.object-storage.secret-key";
   String DATA_OBJECT_STORAGE_BUCKET = "data.object-storage.bucket";
   String DATA_OBJECT_STORAGE_REGION = "data.object-storage.region";
+  String DATA_OBJECT_STORAGE_ENCRYPTION = "data.object-storage.encryption";
+  String DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID = "data.object-storage.encryption-kms-key-id";
 
   String CORS_ALLOW_ORIGIN = "cors.allow-origin";
   String CORS_ALLOW_CREDENTIALS = "cors.allow-credentials";

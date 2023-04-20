@@ -20,6 +20,7 @@ package com.axelor.file.store.s3;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.common.StringUtils;
 import io.minio.MinioClient;
 import jakarta.inject.Singleton;
 
@@ -46,13 +47,22 @@ public class DefaultS3ClientManager implements S3ClientManager {
   private S3Configuration getDefaultConfiguration() {
     final AppSettings settings = AppSettings.get();
     return new S3Configuration(
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENDPOINT, ""),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENDPOINT),
         settings.getBoolean(AvailableAppSettings.DATA_OBJECT_STORAGE_PATH_STYLE, false),
         settings.getBoolean(AvailableAppSettings.DATA_OBJECT_STORAGE_SECURE, true),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ACCESS_KEY, ""),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_SECRET_KEY, ""),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_BUCKET, ""),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_REGION, ""));
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ACCESS_KEY),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_SECRET_KEY),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_BUCKET),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_REGION),
+        getEncryption(settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION)),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID));
+  }
+
+  private S3EncryptionType getEncryption(String encryptionName) {
+    if (StringUtils.isEmpty(encryptionName)) {
+      return null;
+    }
+    return S3EncryptionType.from(encryptionName);
   }
 
   public static DefaultS3ClientManager getInstance() {
@@ -73,5 +83,15 @@ public class DefaultS3ClientManager implements S3ClientManager {
   @Override
   public String getBucketName() {
     return s3Configuration.getBucket();
+  }
+
+  @Override
+  public S3EncryptionType getEncryptionType() {
+    return s3Configuration.getEncryption();
+  }
+
+  @Override
+  public String getEncryptionKmsKeyId() {
+    return s3Configuration.getKmsKeyId();
   }
 }

@@ -35,6 +35,10 @@ public class S3Configuration {
 
   public String region;
 
+  public S3EncryptionType encryption;
+
+  public String kmsKeyId;
+
   public S3Configuration(
       String endpoint,
       boolean pathStyle,
@@ -42,7 +46,9 @@ public class S3Configuration {
       String accessKey,
       String secretKey,
       String bucket,
-      String region) {
+      String region,
+      S3EncryptionType encryption,
+      String kmsKeyId) {
     this.endpoint = endpoint;
     this.pathStyle = pathStyle;
     this.secure = secure;
@@ -50,6 +56,8 @@ public class S3Configuration {
     this.secretKey = secretKey;
     this.bucket = bucket;
     this.region = region;
+    this.encryption = encryption;
+    this.kmsKeyId = kmsKeyId;
   }
 
   public String getEndpoint() {
@@ -108,6 +116,22 @@ public class S3Configuration {
     this.region = region;
   }
 
+  public S3EncryptionType getEncryption() {
+    return encryption;
+  }
+
+  public void setEncryption(S3EncryptionType encryption) {
+    this.encryption = encryption;
+  }
+
+  public String getKmsKeyId() {
+    return kmsKeyId;
+  }
+
+  public void setKmsKeyId(String kmsKeyId) {
+    this.kmsKeyId = kmsKeyId;
+  }
+
   @Override
   public String toString() {
     MoreObjects.ToStringHelper helper =
@@ -116,7 +140,9 @@ public class S3Configuration {
             .add("pathStyle", pathStyle)
             .add("secure", secure)
             .add("bucket", bucket)
-            .add("region", region);
+            .add("region", region)
+            .add("encryption", encryption)
+            .add("kmsKeyId", kmsKeyId);
     if (StringUtils.notEmpty(accessKey)) {
       helper.add("accessKey", "******");
     }

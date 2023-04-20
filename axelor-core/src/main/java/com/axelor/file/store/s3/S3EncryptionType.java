@@ -18,15 +18,27 @@
  */
 package com.axelor.file.store.s3;
 
-import io.minio.MinioClient;
+public enum S3EncryptionType {
+  SSE_S3("SSE-S3"),
+  SSE_KMS("SSE-KMS");
 
-public interface S3ClientManager {
+  private final String name;
 
-  MinioClient getClient();
+  private S3EncryptionType(String name) {
+    this.name = name;
+  }
 
-  String getBucketName();
+  public String getName() {
+    return name;
+  }
 
-  S3EncryptionType getEncryptionType();
-
-  String getEncryptionKmsKeyId();
+  public static S3EncryptionType from(String value) {
+    for (S3EncryptionType type : values()) {
+      if (type.getName().equals(value)) {
+        return type;
+      }
+    }
+    throw new IllegalArgumentException(
+        "Unable to get the correct S3 encryption type for '" + value + "'");
+  }
 }
