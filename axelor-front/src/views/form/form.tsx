@@ -264,16 +264,19 @@ function FormContainer({
   const onRefresh = useAtomCallback(
     useCallback(
       async (get) => {
+        const id = get(formAtom).record.id ?? 0;
+        if (id <= 0) {
+          return onNew();
+        }
         dialogs.confirmDirty(
           async () => isDirty,
           async () => {
-            const cur = get(formAtom).record;
-            const rec = await doRead(cur.id ?? "");
+            const rec = await doRead(id);
             await doEdit(rec);
           }
         );
       },
-      [doEdit, doRead, formAtom, isDirty]
+      [doEdit, doRead, formAtom, isDirty, onNew]
     )
   );
 
