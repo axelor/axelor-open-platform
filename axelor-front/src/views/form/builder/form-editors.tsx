@@ -1,11 +1,13 @@
-import { SetStateAction, atom, useAtomValue } from "jotai";
+import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEditor, useSelector } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import {
   Editor,
@@ -18,9 +20,10 @@ import {
 import { Form, useFormHandlers } from "./form";
 import { FieldContainer } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { FormState, ValueAtom, WidgetProps } from "./types";
+import { FormState, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
 
+import { isEqual } from "lodash";
 import styles from "./form-editors.module.scss";
 
 export type FieldEditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
@@ -189,6 +192,14 @@ function ReferenceEditor({
     )
   );
 
+  const setInvalid = useSetAtom(setInvalidAtom);
+  const handleInvalid = useCallback(
+    (value: any, invalid: boolean) => {
+      setInvalid(widgetAtom, invalid);
+    },
+    [setInvalid, widgetAtom]
+  );
+
   return (
     <FieldContainer readonly={readonly}>
       <div className={styles.header}>
@@ -217,6 +228,7 @@ function ReferenceEditor({
         valueAtom={valueAtom}
         model={model}
         readonly={readonly}
+        setInvalid={handleInvalid}
       />
     </FieldContainer>
   );
@@ -306,6 +318,17 @@ function CollectionEditor({
     )
   );
 
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const setInvalid = useSetAtom(setInvalidAtom);
+  const handleInvalid = useCallback((value: DataRecord, invalid: boolean) => {
+    setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
+  }, []);
+
+  useAsyncEffect(async () => {
+    const invalid = items.map((x) => errors[x.id!]).some((x) => x);
+    setInvalid(widgetAtom, invalid);
+  });
+
   return (
     <div className={styles.collection}>
       <div className={styles.header}>
@@ -326,6 +349,7 @@ function CollectionEditor({
             valueAtom={itemsFamily(item)}
             remove={remove}
             readonly={readonly}
+            setInvalid={handleInvalid}
           />
         ))}
       </div>
@@ -341,8 +365,13 @@ function CollectionEditor({
 const ItemEditor = memo(function ItemEditor({
   remove,
   readonly,
+  setInvalid,
   ...props
-}: FormEditorProps & { model: string; remove: (record: DataRecord) => void }) {
+}: FormEditorProps & {
+  model: string;
+  remove: (record: DataRecord) => void;
+  setInvalid: (value: DataRecord, invalid: boolean) => void;
+}) {
   const valueAtom = props.valueAtom;
   const handleRemove = useAtomCallback(
     useCallback(
@@ -354,7 +383,7 @@ const ItemEditor = memo(function ItemEditor({
   );
   return (
     <div className={styles.item}>
-      <RecordEditor {...props} readonly={readonly} />
+      <RecordEditor {...props} readonly={readonly} setInvalid={setInvalid} />
       {readonly || (
         <div className={styles.actions}>
           <MaterialIcon icon="close" onClick={handleRemove} />
@@ -364,6 +393,20 @@ const ItemEditor = memo(function ItemEditor({
   );
 });
 
+const setInvalidAtom = atom(
+  null,
+  (get, set, widgetAtom: WidgetAtom, invalid: boolean) => {
+    const prev = get(widgetAtom);
+    const errors = invalid
+      ? {
+          invalid: i18n.get("{0} is invalid", prev.attrs.title),
+        }
+      : {};
+    if (isEqual(errors, prev.errors ?? {})) return;
+    set(widgetAtom, { ...prev, errors });
+  }
+);
+
 const RecordEditor = memo(function RecordEditor({
   model,
   editor,
@@ -372,7 +415,11 @@ const RecordEditor = memo(function RecordEditor({
   widgetAtom,
   valueAtom,
   readonly,
-}: FormEditorProps & { model: string }) {
+  setInvalid,
+}: FormEditorProps & {
+  model: string;
+  setInvalid: (value: DataRecord, invalid: boolean) => void;
+}) {
   const meta: ViewData<any> = useMemo(
     () => ({
       model,
@@ -406,6 +453,28 @@ const RecordEditor = memo(function RecordEditor({
       }
     );
   }, [formAtom, valueAtom]);
+
+  const invalidAtom = useMemo(
+    () =>
+      selectAtom(editorAtom, (state) =>
+        Object.values(state.states).some(
+          (x) => x.errors && Object.keys(x.errors).length > 0
+        )
+      ),
+    [editorAtom]
+  );
+
+  const invalid = useAtomValue(invalidAtom);
+  const invalidCheck = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        setInvalid(get(valueAtom), invalid);
+      },
+      [invalid, setInvalid, valueAtom]
+    )
+  );
+
+  useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
 
   return (
     <Form
