@@ -39,6 +39,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-grid-layout": "^1.3.4",
     "react-router-dom": "^6.8.2",
     "react-text-mask": "^5.5.0",
     "react-transition-group": "^4.4.5"
@@ -53,6 +54,7 @@
     "@types/react": "^18.0.28",
     "@types/react-datepicker": "^4.10.0",
     "@types/react-dom": "^18.0.11",
+    "@types/react-grid-layout": "^1.3.2",
     "@types/react-text-mask": "^5.4.11",
     "@types/react-transition-group": "^4.4.5",
     "@types/testing-library__jest-dom": "^5.14.5",
