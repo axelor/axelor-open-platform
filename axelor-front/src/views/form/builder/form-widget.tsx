@@ -167,7 +167,16 @@ function ValidatingField({
     [triggerValue]
   );
 
-  return <Comp {...props} />;
+  const invalidAtom = useMemo(
+    () =>
+      selectAtom(widgetAtom, ({ errors = {} }) =>
+        Boolean(errors.invalid || errors.required)
+      ),
+    [widgetAtom]
+  );
+  const invalid = useAtomValue(invalidAtom);
+
+  return <Comp {...props} invalid={invalid} />;
 }
 
 function useHandleFieldExpression({

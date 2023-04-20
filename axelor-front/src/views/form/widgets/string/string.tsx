@@ -12,6 +12,7 @@ export function String({
   readonly,
   widgetAtom,
   valueAtom,
+  invalid,
 }: FieldProps<string> & {
   inputProps?: Pick<
     React.InputHTMLAttributes<HTMLInputElement>,
@@ -20,10 +21,8 @@ export function String({
 }) {
   const { uid, placeholder, showTitle = true } = schema;
 
-  const { attrs, errors } = useAtomValue(widgetAtom);
+  const { attrs } = useAtomValue(widgetAtom);
   const { title, required } = attrs;
-
-  const invalid = Boolean(errors?.invalid || errors?.required);
 
   const { value, onChange, onBlur } = useInput(valueAtom, {
     defaultValue: "",

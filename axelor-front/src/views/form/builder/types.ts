@@ -65,6 +65,7 @@ export interface WidgetProps {
 export interface FieldProps<T> extends WidgetProps {
   schema: Schema & { name: string };
   valueAtom: ValueAtom<T>;
+  invalid?: boolean;
 }
 
 export interface FormProps extends WidgetProps {
