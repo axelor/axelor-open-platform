@@ -444,7 +444,10 @@ const RecordEditor = memo(function RecordEditor({
         const record = loaded.id && loaded.id === value.id ? loaded : value;
         return {
           ...state,
-          record,
+          record: {
+            ...record,
+            ...value,
+          },
         };
       },
       (get, set, update: SetStateAction<FormState>) => {
@@ -482,11 +485,12 @@ const RecordEditor = memo(function RecordEditor({
   const load = useAtomCallback(
     useCallback(
       async (get, set) => {
-        const value = get(valueAtom) ?? {};
+        const value = get(valueAtom);
+        const id = value?.id ?? 0;
+        if (id <= 0) return;
         const names = Object.keys(fields ?? {});
         const missing = names.some((x) => !Object.hasOwn(value, x));
-        const id = value.id;
-        if (id && id > 0 && missing) {
+        if (missing) {
           const rec = await ds.read(id, { fields: names });
           setLoaded(rec);
         }
