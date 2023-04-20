@@ -1,0 +1,11 @@
+= X.X Migration Guide
+
+
+== S3 compatible Object Storage
+
+We now support S3 compatible object storage service to store upload files.
+
+Default implementation use disk storage using the existing `data.upload.dir` property. Object
+storage can be activated using `data.object-storage.*` properties.
+
+

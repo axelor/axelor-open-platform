@@ -2,6 +2,7 @@
 
 ** xref:application/index.adoc[Application]
 *** xref:application/config.adoc[Configuration]
+*** xref:application/file-storage.adoc[Files storage]
 *** xref:application/multi-tenancy.adoc[Multi-Tenancy]
 *** xref:application/logging.adoc[Logging]
 *** xref:application/develop.adoc[Develop]

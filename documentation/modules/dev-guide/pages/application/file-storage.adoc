@@ -1,0 +1,80 @@
+= Files Storage
+:toc:
+:toc-title:
+
+== Upload files
+
+Used to store upload files.
+
+=== File System
+
+The filesystem object store is the easiest to get started. This is also the default
+implementation to store upload files.
+
+It uses a file system (local or a mounted share) to store files. It can be configured using
+the following property :
+
+[source,properties]
+----
+# Storage path for upload files
+data.upload.dir = {user.home}/.axelor/attachments
+----
+
+=== S3 Object Storage
+
+Simple storage service (S3) is a cloud-based storage solution that can be used to store files.
+
+It can be configured using the following properties :
+
+[source,properties]
+----
+data.object-storage.enabled = true
+data.object-storage.endpoint = 127.0.0.1:9000
+data.object-storage.path-style = true
+data.object-storage.secure = true
+data.object-storage.access-key = my-access-key
+data.object-storage.secret-key = my-secret-key
+data.object-storage.bucket = files
+data.object-storage.region =
+data.object-storage.encryption =
+data.object-storage.encryption-kms-key-id =
+----
+
+[cols="2,7,2"]
+|===
+| Setting | Description | Defaultvalue
+
+| enabled | Enable or disable object storage | false
+| endpoint | URL of the S3 service such as 127.0.0.1:9000 |
+| path-style | Set to true to use `host/bucket/object` style paths instead of `bucket.host/object` | false
+| secure | Set to true to use secure connection (`https`) | true
+| access-key | Access key (aka user ID) of an account in the S3 service |
+| secret-key | Secret key (aka password) of an account in the S3 service |
+| bucket | The bucket name; Should follow following https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html[rules] |
+| region | S3 region |
+| encryption | Encryption mode : `SSE-S3` or `SSE-KMS` |
+| encryption-kms-key-id | KMS key ID. Only needed when `SSE-KMS` in `encryption` |
+|===
+
+== Temp files
+
+To deal with temporary files, following property can be configured as a dedicated directory :
+
+[source,properties]
+----
+# Storage path for temp files
+data.upload.temp-dir = {user.home}/.axelor-temp
+----
+
+Then use `com.axelor.file.temp.TempFile` to deal with temporary files and directories :
+
+[source,java]
+----
+// Create a temporary file
+Path tempFile = TempFiles.createTempFile();
+
+// Create a temporary directory
+Path tempFile = TempFiles.createTempDir();
+----
+
+
