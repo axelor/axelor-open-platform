@@ -22,7 +22,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.common.ObjectUtils;
-import com.axelor.inject.Beans;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
 import java.util.ArrayList;

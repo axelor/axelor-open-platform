@@ -146,7 +146,6 @@ public class AxelorUtils {
     // Try in jar
 
     synchronized (LOCK) {
-
       try (final URLClassLoader loader =
               new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
           final InputStream in = loader.getResourceAsStream("META-INF/axelor-module.properties")) {
@@ -155,10 +154,10 @@ public class AxelorUtils {
           props.load(in);
           return (String) props.get("name");
         } else {
-          throw new IOException("Unable to locate axelor-module.properties in " + artifact.getName());
+          throw new IOException(
+              "Unable to locate axelor-module.properties in " + artifact.getName());
         }
       }
-
     }
   }
 

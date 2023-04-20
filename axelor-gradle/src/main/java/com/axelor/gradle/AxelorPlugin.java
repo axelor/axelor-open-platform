@@ -125,7 +125,12 @@ public class AxelorPlugin implements Plugin<Project> {
     AxelorUtils.findIncludedBuildProjects(project).stream()
         .map(included -> included.getTasks().findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME))
         .filter(Objects::nonNull)
-        .forEach(task -> project.getTasks().getByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME).dependsOn(task));
+        .forEach(
+            task ->
+                project
+                    .getTasks()
+                    .getByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME)
+                    .dependsOn(task));
   }
 
   private void configureCodeGeneration(Project project) {

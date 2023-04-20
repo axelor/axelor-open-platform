@@ -60,7 +60,7 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
   @XmlAttribute private Integer cols;
 
   @XmlAttribute private String colWidths;
-  
+
   @XmlAttribute private String gap;
 
   @XmlAttribute private Integer itemSpan;
@@ -191,11 +191,11 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
   public void setColWidths(String colWidths) {
     this.colWidths = colWidths;
   }
-  
+
   public String getGap() {
     return gap;
   }
-  
+
   public void setGap(String gap) {
     this.gap = gap;
   }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.pac4j;  
+package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;

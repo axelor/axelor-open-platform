@@ -128,7 +128,7 @@ public class AppInfo {
 
     final List<String> themes = new ArrayList<>();
     // TODO: there is no more theme on v7
-    if(ObjectUtils.notEmpty(context.getResourcePaths("/css"))) {
+    if (ObjectUtils.notEmpty(context.getResourcePaths("/css"))) {
       for (String path : context.getResourcePaths("/css")) {
         try {
           if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {

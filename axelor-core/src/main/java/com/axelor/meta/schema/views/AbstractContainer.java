@@ -29,9 +29,9 @@ public abstract class AbstractContainer extends SimpleWidget {
   @XmlAttribute private Integer cols;
 
   @XmlAttribute private String colWidths;
-  
+
   @XmlAttribute private String gap;
-  
+
   @XmlAttribute private Integer itemSpan;
 
   public Integer getCols() {
@@ -49,19 +49,19 @@ public abstract class AbstractContainer extends SimpleWidget {
   public void setColWidths(String colWidths) {
     this.colWidths = colWidths;
   }
-  
+
   public String getGap() {
     return gap;
   }
-  
+
   public void setGap(String gap) {
     this.gap = gap;
   }
-  
+
   public Integer getItemSpan() {
     return itemSpan;
   }
-  
+
   public void setItemSpan(Integer itemSpan) {
     this.itemSpan = itemSpan;
   }

@@ -184,15 +184,15 @@ public abstract class SimpleWidget extends AbstractWidget {
   public void setColOffset(String colOffset) {
     this.colOffset = colOffset;
   }
-  
+
   public String getRowSpan() {
     return rowSpan;
   }
-  
+
   public String getRowOffset() {
     return rowOffset;
   }
-  
+
   public String getCss() {
     return css;
   }
