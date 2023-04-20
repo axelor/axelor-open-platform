@@ -482,10 +482,10 @@ const RecordEditor = memo(function RecordEditor({
   );
 
   const ds = useMemo(() => new DataStore(model), [model]);
+  const value = useAtomValue(valueAtom);
   const load = useAtomCallback(
     useCallback(
       async (get, set) => {
-        const value = get(valueAtom);
         const id = value?.id ?? 0;
         if (id <= 0) return;
         const names = Object.keys(fields ?? {});
@@ -495,7 +495,7 @@ const RecordEditor = memo(function RecordEditor({
           setLoaded(rec);
         }
       },
-      [ds, fields, valueAtom]
+      [ds, fields, value]
     )
   );
 
