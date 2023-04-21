@@ -42,17 +42,17 @@ function load(res: MenuItem[]) {
 }
 
 export function NavDrawer() {
-  const tabs = useTabs();
+  const { open: openTab } = useTabs();
   const { loading, menus } = useMenu();
 
   const handleClick = useCallback(
     async (e: any, item: any) => {
       const menu = menus.find((x) => x.name === item.id);
       if (menu?.action) {
-        await tabs.open(menu.action);
+        await openTab(menu.action);
       }
     },
-    [tabs, menus]
+    [openTab, menus]
   );
 
   const items = useMemo(() => load(menus), [menus]);
