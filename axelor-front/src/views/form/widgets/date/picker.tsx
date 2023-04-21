@@ -1,11 +1,12 @@
 import { l10n } from "@/services/client/l10n";
-import { ReactElement, forwardRef, useEffect, useState } from "react";
+import { ReactElement, forwardRef, useState } from "react";
 import ReactDatePicker, {
   ReactDatePickerProps,
   registerLocale,
   setDefaultLocale,
 } from "react-datepicker";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import "react-datepicker/dist/react-datepicker.css";
 import "./picker.scss";
 
@@ -25,26 +26,31 @@ const LOCALE_LOADERS: Record<string, any> = {
   "zh-CN": () => import("date-fns/locale/zh-CN"),
 };
 
+const load = async (locale: string) => {
+  const short = locale.split(/-_/)[0];
+  const loader =
+    LOCALE_LOADERS[locale] ??
+    LOCALE_LOADERS[short] ??
+    LOCALE_LOADERS[DEFAULT_LOCALE];
+  return await loader();
+};
+
 export const Picker = forwardRef<any, ReactDatePickerProps>((props, ref) => {
   const locale = l10n.getLocale() || DEFAULT_LOCALE;
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    const loader = LOCALE_LOADERS[locale];
-    loader().then((module: any) => {
-      if (!cancelled) {
-        if (module) {
-          registerLocale(locale, module.default);
-        }
-        setDefaultLocale(locale);
-        setLoaded(true);
+  useAsyncEffect(
+    async (signal) => {
+      const mod = await load(locale);
+      if (signal.aborted) return;
+      if (mod) {
+        registerLocale(locale, mod.default);
       }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [locale]);
+      setDefaultLocale(locale);
+      setLoaded(true);
+    },
+    [locale]
+  );
 
   return (loaded && (
     <ReactDatePicker {...props} ref={ref} locale={locale} />
