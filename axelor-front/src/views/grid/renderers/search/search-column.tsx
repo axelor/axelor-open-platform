@@ -2,7 +2,7 @@ import { Field } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Box, Input, Select } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
-import { ChangeEvent, KeyboardEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, SyntheticEvent, useState } from "react";
 import { i18n } from "@/services/client/i18n";
 import { SearchState, useGridSearchFieldScope } from "./scope";
 import styles from "./search-column.module.scss";
@@ -58,7 +58,8 @@ function SearchInput({ column }: { column: GridColumn }) {
         <Select
           value={selected ?? null}
           placeholder={focus ? i18n.get("Search...") : ""}
-          onChange={({ value }) => {
+          onChange={(e) => {
+            const value = e?.value ?? null;
             setValue(value);
             applySearch(value);
           }}
@@ -73,13 +74,14 @@ function SearchInput({ column }: { column: GridColumn }) {
                   {
                     icon: "close",
                     onClick: () => {
-                      setValue('');
+                      setValue("");
                       applySearch(null);
                     },
                   },
                 ]
               : []
           }
+          onKeyDown={handleKeyDown as (e: SyntheticEvent) => void}
         />
       </Box>
     );
