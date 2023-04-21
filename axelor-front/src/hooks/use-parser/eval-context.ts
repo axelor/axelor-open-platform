@@ -16,6 +16,7 @@ export type EvalContextOptions = {
   required?: boolean;
   popup?: boolean;
   fields?: Record<string, Field>;
+  components?: Record<string, (props: any) => JSX.Element | null>;
 };
 
 export function createEvalContext(
@@ -29,6 +30,7 @@ export function createEvalContext(
     required = false,
     popup = false,
     fields = {},
+    components = {}, // custom components
   } = options ?? {};
 
   const helpers = {
@@ -40,6 +42,9 @@ export function createEvalContext(
     },
     get $userId() {
       return session.info?.user.id;
+    },
+    $component(name: string) {
+      return components[name];
     },
     $get(path: string) {
       return get(context, path);

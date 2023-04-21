@@ -25,7 +25,7 @@ function reactComponent(element, _props = {}, _component, context, ref) {
   const { tagName } = element;
   const props = Object.assign({}, _props);
   const compName = _component || tagName.toLowerCase();
-  const CustomComponent = CUSTOM_COMPONENTS[compName];
+  const CustomComponent = context?.$component(compName);
 
   if (CustomComponent) {
     return (
