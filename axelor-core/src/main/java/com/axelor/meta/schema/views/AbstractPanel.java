@@ -26,8 +26,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 public abstract class AbstractPanel extends AbstractContainer {
 
-  @XmlAttribute private Integer itemSpan;
-
   @XmlAttribute private Boolean showFrame;
 
   @XmlAttribute private Boolean sidebar;
@@ -37,10 +35,6 @@ public abstract class AbstractPanel extends AbstractContainer {
   @XmlAttribute private Boolean attached;
 
   @XmlAttribute private String onTabSelect;
-
-  public Integer getItemSpan() {
-    return itemSpan;
-  }
 
   public Boolean getShowFrame() {
     return showFrame;
