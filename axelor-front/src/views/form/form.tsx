@@ -371,6 +371,8 @@ function FormContainer({
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          actionExecutor={actionExecutor}
+          recordHandler={recordHandler}
           actions={[
             {
               key: "new",

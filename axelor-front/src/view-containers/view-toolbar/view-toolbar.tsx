@@ -1,7 +1,7 @@
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 
 import { dialogs } from "@/components/dialogs";
@@ -18,10 +18,23 @@ import {
 } from "../views/scope";
 
 import { useAtomValue } from "jotai";
+import { legacyClassNames } from "@/styles/legacy";
+import { ActionExecutor } from "../action";
+import { RecordHandler } from "@/views/form/builder";
+import {
+  Button,
+  Menu,
+  MenuDivider,
+  MenuItem,
+  Widget,
+} from "@/services/client/meta.types";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
+  actionExecutor?: ActionExecutor;
+  recordHandler?: RecordHandler;
   children?: React.ReactNode;
   pagination?: {
     text?: string | (() => JSX.Element);
@@ -45,14 +58,125 @@ const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
   dashboard: "dashboard",
 };
 
+function ActionCommandItem({
+  recordHandler,
+  showIf,
+  hideIf,
+  readonlyIf,
+  ...props
+}: CommandItemProps &
+  Pick<ViewToolBarProps, "recordHandler"> &
+  Pick<Widget, "showIf" | "hideIf" | "readonlyIf">) {
+  const [hidden, setHidden] = useState<boolean | undefined>(props.hidden);
+  const [readonly, setReadonly] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (recordHandler) {
+      return recordHandler.subscribe((record) => {
+        (showIf || hideIf) &&
+          setHidden((hidden) => {
+            if (showIf) {
+              hidden = !parseExpression(showIf)(record);
+            } else if (hideIf) {
+              hidden = parseExpression(hideIf)(record);
+            }
+            return hidden;
+          });
+        readonlyIf && setReadonly(parseExpression(readonlyIf)(record));
+      });
+    }
+  }, [showIf, hideIf, readonlyIf, recordHandler]);
+
+  return (
+    <CommandItem
+      {...props}
+      hidden={hidden}
+      {...(readonly && { onClick: undefined })}
+    />
+  );
+}
+
+function ToolbarActions({
+  buttons,
+  menus,
+  recordHandler,
+  actionExecutor,
+}: Pick<ViewToolBarProps, "actionExecutor" | "recordHandler"> & {
+  buttons?: Button[];
+  menus?: Menu[];
+}) {
+  const items = useMemo(() => {
+    let ind = 0;
+    const mapItem = (
+      item: Menu | MenuItem | MenuDivider | Button
+    ): CommandItemProps => {
+      const action = (item as Button).onClick || (item as MenuItem).action;
+      const text = item.showTitle !== false ? item.title : "";
+      const icon = (item as Button).icon;
+      const key = `action_${++ind}`;
+      const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
+      return {
+        key,
+        text,
+        divider: item.type === "menu-item-devider",
+        iconOnly: !text && icon,
+        ...(icon && {
+          icon: ({ className }: { className: string }) => (
+            <i
+              className={legacyClassNames("fa", icon, styles.icon, className)}
+            />
+          ),
+        }),
+        ...(action && {
+          onClick: () =>
+            actionExecutor?.execute(action, {
+              context: {
+                _signal: item.name,
+                _source: item.name,
+              },
+            }),
+        }),
+        ...((item as Menu).items && {
+          items: (item as Menu).items?.map(mapItem),
+        }),
+        ...(hasExpr && {
+          render: (props) => (
+            <ActionCommandItem
+              {...props}
+              showIf={item.showIf}
+              hideIf={item.hideIf}
+              readonlyIf={item.readonlyIf}
+              recordHandler={recordHandler}
+            />
+          ),
+        }),
+      } as CommandItemProps;
+    };
+
+    return [...(buttons || []), ...(menus || [])].map(mapItem);
+  }, [buttons, menus, actionExecutor, recordHandler]);
+
+  return (
+    <CommandBar
+      iconProps={{
+        weight: 300,
+      }}
+      items={items}
+    />
+  );
+}
+
 export function ViewToolBar(props: ViewToolBarProps) {
   const {
     meta,
     actions = [],
+    actionExecutor,
+    recordHandler,
     children,
     pagination: { text: pageTextOrComp, canNext, canPrev, onNext, onPrev } = {},
   } = props;
-
+  const { view } = meta;
+  const { toolbar, menubar } = view;
   const pageActions = onPrev || onNext;
 
   const dirtyAtom = useViewDirtyAtom();
@@ -171,6 +295,14 @@ export function ViewToolBar(props: ViewToolBarProps) {
         iconOnly
         items={actions}
       />
+      {toolbar?.length > 0 && (
+        <ToolbarActions
+          buttons={toolbar}
+          menus={menubar}
+          actionExecutor={actionExecutor}
+          recordHandler={recordHandler}
+        />
+      )}
       <Box className={styles.extra}>{children}</Box>
       {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
       {PageComp && <PageComp />}

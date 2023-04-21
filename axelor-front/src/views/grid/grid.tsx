@@ -384,6 +384,7 @@ export function Grid(props: ViewProps<GridView>) {
               onClick: () => onSearch(),
             },
           ]}
+          actionExecutor={actionExecutor}
           pagination={{
             canPrev,
             canNext,
