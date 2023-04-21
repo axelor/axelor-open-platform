@@ -247,3 +247,46 @@
     }
   }
 }
+
+.report-box {
+  padding: 15px 20px 20px 20px;
+  overflow: hidden;
+}
+
+.report-box .report-tags {
+  position: absolute;
+  top: 9px;
+  right: 48px;
+}
+
+.report-box h1 {
+  margin-bottom: 0;
+}
+
+.report-box .report-icon {
+  position: absolute;
+  top: 65px;
+  font-size: 30px;
+  & + div {
+    margin-left: 42px;
+  }
+}
+
+.report-box .report-data {
+  width: 100%;
+}
+.text-error {
+  color: #a94442;
+}
+
+.text-success {
+  color: #3c763d;
+}
+
+.text-info {
+  color: #31708f;
+}
+
+.text-warning {
+  color: #8a6d3b;
+}

@@ -197,6 +197,35 @@ export async function chart<T = ChartView>(
 
   return Promise.reject(resp.status);
 }
+
+export async function custom(
+  name: string,
+  data?: DataContext
+): Promise<{
+  data: DataRecord[];
+  first?: DataRecord;
+}> {
+  const resp = await request({
+    url: `ws/meta/custom/${name}`,
+    method: "POST",
+    body: {
+      data,
+    },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0
+      ? {
+          data: data?.dataset || [],
+          first: data?.dataset?.[0],
+        }
+      : Promise.reject(500);
+  }
+
+  return Promise.reject(resp.status);
+}
+
 export type ActionOptions = {
   action: string;
   model: string;
