@@ -1,0 +1,11 @@
+.dashlet-container {
+  background: #fff;
+}
+
+.dashlet {
+  height: 100%;
+  width: 100%;
+  & > div:first-child {
+    cursor: move;
+  }
+}
