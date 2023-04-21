@@ -31,12 +31,14 @@ async function loadView({
   name,
   type,
   model,
+  resource,
 }: {
   type: string;
   name?: string;
   model?: string;
+  resource?: string;
 }) {
-  const meta = await findView({ type, name, model });
+  const meta = await findView({ type, name, model, resource });
   const Comp = await loadComp(type);
   return { meta, type, Comp };
 }

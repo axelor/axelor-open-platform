@@ -24,14 +24,16 @@ export async function findView<T extends ViewType>({
   type,
   name,
   model,
+  resource,
 }: {
   type: string;
   name?: string;
   model?: string;
+  resource?: string;
 }): Promise<ViewData<T>> {
-  return cache.get(makeKey("view", model, type, name), async () => {
+  return cache.get(makeKey("view", model, type, name ?? resource), async () => {
     if (type === "html") {
-      return Promise.resolve({ view: { name, type } });
+      return Promise.resolve({ view: { name: name ?? resource, type } });
     }
 
     if (type === "chart") {
