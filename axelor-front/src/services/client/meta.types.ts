@@ -91,8 +91,10 @@ export interface Widget {
   hideIf?: string;
   readonlyIf?: string;
   depends?: string;
-  colSpan?: number;
+  colSpan?: string | number;
   colOffset?: number;
+  rowSpan?: string | number;
+  rowOffset?: number;
   css?: string;
   height?: string;
   width?: string;
@@ -103,8 +105,8 @@ export interface Widget {
 
 export interface LayoutContainer {
   cols?: number;
-  colWidths?: (string | number)[];
-  rowSpan?: number;
+  colWidths?: string;
+  itemSpan?: number;
   gap?: number | string;
 }
 

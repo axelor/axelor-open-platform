@@ -1,30 +1,24 @@
 import clsx from "clsx";
+import { useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
+import { toKebabCase } from "@/utils/names";
 
 import { FormWidget } from "./form-widget";
 import { FormLayout } from "./types";
-import { toKebabCase } from "@/utils/names";
 
-import { legacyClassNames } from "@/styles/legacy";
-import { useMemo } from "react";
 import styles from "./form-layouts.module.scss";
 
-function computeCols(cols: number, colWidths?: string | (string | number)[]) {
-  const widths: string[] = [];
-  if (typeof colWidths === "string") colWidths.split(",");
-  if (Array.isArray(colWidths)) {
-    for (const width of colWidths) {
-      const w = String(width).trim();
-      if (w === "*") {
-        widths.push("1fr");
-      } else if (/^(\d+(.\d+)?)$/.test(w)) {
-        widths.push(`${w}px`);
-      } else {
-        widths.push(w);
-      }
-    }
-  }
+function computeCols(cols: number, colWidths: string = "") {
+  const widths = colWidths
+    .split(",")
+    .map((w) => w.trim())
+    .map((w) => {
+      if (w === "*") return "1fr";
+      if (/^(\d+(.\d+)?)$/.test(w)) return `${w}px`;
+      return w;
+    });
 
   if (widths.length === 0) {
     return undefined;
