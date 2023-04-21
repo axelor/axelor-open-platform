@@ -14,6 +14,7 @@ function computeCols(cols: number, colWidths: string = "") {
   const widths = colWidths
     .split(",")
     .map((w) => w.trim())
+    .filter(Boolean)
     .map((w) => {
       if (w === "*") return "1fr";
       if (/^(\d+(.\d+)?)$/.test(w)) return `${w}px`;
