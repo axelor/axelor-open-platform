@@ -41,18 +41,32 @@ const COLS: Record<MEDIA_TYPE, number> = {
   xxs: 4,
 } as const;
 
+const toNumbers = (str: number | string) =>
+  str ? String(str).split(",").map(Number) : [];
+
 const getHeight = (span: number) => (180 * span) / CARD_HEIGHT;
+
 const getAttrs = (item: PanelDashlet, type: MEDIA_TYPE) => {
-  return item.help
-    ? (() => {
-        try {
-          const meta = JSON.parse(item.help);
-          return (meta && meta[type]) || {};
-        } catch {
-          return {};
-        }
-      })()
-    : {};
+  const { colOffset = "", rowOffset = "", colSpan = "", rowSpan = "" } = item;
+
+  const X = toNumbers(colOffset);
+  const Y = toNumbers(rowOffset);
+  const W = toNumbers(colSpan);
+  const H = toNumbers(rowSpan);
+
+  const obj = ["lg", "md", "sm", "xs", "xxs"].reduce(
+    (obj: any, k, ind) => ({
+      ...obj,
+      [k]: {
+        x: X[ind],
+        y: Y[ind],
+        w: W[ind],
+        h: H[ind],
+      },
+    }),
+    {}
+  );
+  return obj[type];
 };
 
 export function Dashboard({ meta }: ViewProps<DashboardView>) {
@@ -114,13 +128,19 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
 
   const handleDashletViewLoad = useCallback(
     (schema: Schema, viewId?: number, viewType?: string) => {
+      const viewItems = items;
       updateLayout((type: MEDIA_TYPE, items?: Layout[]) => {
         return (items || []).map((item) =>
           String(item.i) === String(viewId)
             ? (() => {
                 const custom = viewType === "custom";
                 const bounded = ["chart", "grid"].includes(viewType!);
-                const attrs = getAttrs(item as unknown as PanelDashlet, type);
+                const attrs = getAttrs(
+                  viewItems[
+                    item.i as unknown as number
+                  ] as unknown as PanelDashlet,
+                  type
+                );
                 return {
                   ...item,
                   h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
@@ -132,7 +152,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         );
       });
     },
-    [updateLayout]
+    [updateLayout, items]
   );
 
   useEffect(() => {
@@ -171,24 +191,36 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
 
   useEffect(() => {
     if (saved.current) {
+      saved.current = false;
       (async () => {
         const { items } = view;
         function getItem(item: PanelDashlet, index: number) {
-          const meta: any = {};
-          layouts &&
-            Object.keys(layouts).forEach((key) => {
-              const layout = layouts[key];
-              const $item = layout.find((x) => `${x.i}` === `${index}`);
+          const rowOffset: number[] = [];
+          const colOffset: number[] = [];
+          const rowSpan: number[] = [];
+          const colSpan: number[] = [];
+
+          if (layouts) {
+            ["lg", "md", "sm", "xs", "xxs"].forEach((m) => {
+              const $item = layouts[m as MEDIA_TYPE]?.find?.(
+                (x) => String(x.i) === String(index)
+              );
               if ($item) {
-                meta[key] = {
-                  x: $item.x,
-                  y: $item.y,
-                  w: $item.w,
-                  h: $item.h,
-                };
+                colOffset.push($item.x);
+                rowOffset.push($item.y);
+                colSpan.push($item.w);
+                rowSpan.push($item.h);
               }
             });
-          return { ...item, help: JSON.stringify(meta) };
+          }
+
+          return {
+            ...item,
+            rowOffset: rowOffset.join(","),
+            colOffset: colOffset.join(","),
+            rowSpan: rowSpan.join(","),
+            colSpan: colSpan.join(","),
+          };
         }
 
         items &&

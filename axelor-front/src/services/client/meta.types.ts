@@ -92,9 +92,9 @@ export interface Widget {
   readonlyIf?: string;
   depends?: string;
   colSpan?: string | number;
-  colOffset?: number;
+  colOffset?: string | number;
   rowSpan?: string | number;
-  rowOffset?: number;
+  rowOffset?: string | number;
   css?: string;
   height?: string;
   width?: string;
