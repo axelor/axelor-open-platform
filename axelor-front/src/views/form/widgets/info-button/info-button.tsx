@@ -1,31 +1,26 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
+import { Formatters } from "@/utils/format";
 
 import { FieldContainer, WidgetProps } from "../../builder";
-import { Formatters } from "@/utils/format";
-import { Field } from "@/services/client/meta.types";
 import { useFormScope } from "../../builder/scope";
 
 import styles from "./info-button.module.scss";
 
-export function InfoButton({
-  schema,
-  readonly,
-  widgetAtom,
-  formAtom,
-}: WidgetProps) {
+export function InfoButton({ schema, widgetAtom, formAtom }: WidgetProps) {
   const { showTitle = true, icon, iconHover, widgetAttrs } = schema;
   const { field } = widgetAttrs || {};
 
   const {
-    attrs: { title },
+    attrs: { title, readonly },
   } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const value = useAtomValue(
@@ -41,6 +36,8 @@ export function InfoButton({
     )
   );
 
+  const [wait, setWait] = useState(false);
+
   const handleClick = useCallback(async () => {
     const { prompt, onClick } = schema;
     if (prompt) {
@@ -49,15 +46,23 @@ export function InfoButton({
       });
       if (!confirmed) return;
     }
-    actionExecutor.execute(onClick);
+    try {
+      setWait(true);
+      actionExecutor.execute(onClick);
+    } finally {
+      setWait(false);
+    }
   }, [actionExecutor, schema]);
 
+  const disabled = wait || readonly;
+
   return (
-    <FieldContainer readonly={readonly}>
+    <FieldContainer>
       <Button
         title={title}
         variant="primary"
         className={clsx(styles.button)}
+        disabled={disabled}
         onClick={handleClick}
       >
         <Box
@@ -76,7 +81,6 @@ export function InfoButton({
             )}
           />
         )}
-
         <Box className={styles.data}>
           {value && (
             <div className={styles.value}>

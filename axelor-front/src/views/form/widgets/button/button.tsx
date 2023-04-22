@@ -1,5 +1,6 @@
+import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
@@ -9,7 +10,6 @@ import { legacyClassNames } from "@/styles/legacy";
 import { FieldContainer, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
-import clsx from "clsx";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -53,7 +53,7 @@ export function Button(props: WidgetProps) {
   const { title } = attrs;
 
   const variant = link ? "link" : "primary";
-  const readonly = props.readonly || attrs.readonly;
+  const [wait, setWait] = useState(false);
 
   const handleClick = useCallback(async () => {
     const { prompt, onClick } = schema;
@@ -63,12 +63,19 @@ export function Button(props: WidgetProps) {
       });
       if (!confirmed) return;
     }
-    actionExecutor.execute(onClick);
+    try {
+      setWait(true);
+      await actionExecutor.execute(onClick);
+    } finally {
+      setWait(false);
+    }
   }, [actionExecutor, schema]);
 
+  const disabled = wait || attrs.readonly;
+
   return (
-    <FieldContainer readonly={readonly}>
-      <Btn variant={variant} onClick={handleClick}>
+    <FieldContainer>
+      <Btn variant={variant} onClick={handleClick} disabled={disabled}>
         {icon && <ButtonIcon {...props} />}
         {showTitle && title}
       </Btn>
