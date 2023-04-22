@@ -4,6 +4,7 @@ import { useCallback } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
+import { dialogs } from "@/components/dialogs";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { showPopup } from "@/view-containers/view-popup";
@@ -79,17 +80,25 @@ function Footer({
   const handler = useAtomValue(handlerAtom);
 
   const handleClose = useCallback(() => {
-    onClose();
-  }, [onClose]);
+    dialogs.confirmDirty(
+      async () => handler.getState?.().dirty ?? false,
+      async () => onClose()
+    );
+  }, [handler, onClose]);
 
   const handleConfirm = useCallback(async () => {
+    if (handler.getState === undefined) return onClose();
+    const state = handler.getState();
+    const record = state.record;
+    const canSave = state.dirty || !record.id;
     try {
-      if (onSave) {
-        const state = handler.getState?.()!;
-        onSave(state.record);
-      } else if (handler.onSave) {
-        const rec = await handler.onSave();
-        onSelect?.(rec);
+      if (canSave) {
+        if (onSave) {
+          onSave(record);
+        } else if (onSelect && handler.onSave) {
+          const rec = await handler.onSave();
+          onSelect(rec);
+        }
       }
       onClose();
     } catch (e) {
