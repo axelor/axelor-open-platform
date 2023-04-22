@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 
@@ -14,6 +13,7 @@ import {
 
 import { DashletComponent } from "../form/widgets/dashlet";
 import { ViewProps } from "../types";
+import { useResizeDetector } from "@/hooks/use-resize-detector";
 
 import "react-grid-layout/css/styles.css";
 import "./react-grid-layout.css";
@@ -74,7 +74,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const { view } = meta;
   const { items = [] } = view;
   const [layouts, setLayouts] = useState<Layouts | null>(null);
-  const [dragging, setDragging] = useState(false);
+  const { ref, width } = useResizeDetector();
   const saved = useRef(false);
 
   const hasViewCustomize = Boolean(
@@ -98,12 +98,10 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
 
   const handleDragStart = useCallback(() => {
     saved.current = true;
-    setDragging(true);
   }, []);
 
   const handleDragStop = useCallback(() => {
     saved.current = true;
-    setDragging(false);
   }, []);
 
   const handleInit = useCallback(() => {
@@ -238,6 +236,12 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
     }
   }, [items, view, layouts]);
 
+  useEffect(() => {
+    if (ref.current && width) {
+      window.dispatchEvent(new Event("resize"));
+    }
+  }, [ref, width]);
+
   const children = useMemo(
     () =>
       items.map((item, index) => (
@@ -260,13 +264,8 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   );
 
   return (
-    <Box d="flex" overflow="auto" flexGrow={1}>
-      <Box
-        className={clsx({
-          [styles.dragging]: dragging,
-        })}
-        w={100}
-      >
+    <Box ref={ref} d="flex" overflow="auto" flexGrow={1}>
+      <Box w={100}>
         {layouts && (
           <GridLayout
             isBounded={true}
