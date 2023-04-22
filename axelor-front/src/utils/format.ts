@@ -119,8 +119,8 @@ const formatNumber: Formatter = (value, opts = {}) => {
   if (num === 0 || num) {
     const opts: Intl.NumberFormatOptions = {};
     if (scale || currency) {
-      opts.minimumFractionDigits = +(scale ?? 2);
-      opts.maximumFractionDigits = +(scale ?? 2);
+      opts.minimumFractionDigits = +(scale ?? 2) || 2;
+      opts.maximumFractionDigits = +(scale ?? 2) || 2;
     }
     if (currency) {
       opts.style = "currency";
@@ -144,8 +144,8 @@ const formatPercent: Formatter = (value, opts = {}) => {
   if (num === 0 || num) {
     const opts: Intl.NumberFormatOptions = { style: "percent" };
     if (scale) {
-      opts.minimumFractionDigits = +scale;
-      opts.maximumFractionDigits = +scale;
+      opts.minimumFractionDigits = +scale || 2;
+      opts.maximumFractionDigits = +scale || 2;
     }
     return l10n.formatNumber(num, opts);
   }
