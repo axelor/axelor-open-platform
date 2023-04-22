@@ -9,19 +9,28 @@ export function useResizeDetector() {
     const { current } = ref;
     if (current == null) return;
 
+    let cancelled = false;
+    let timer: NodeJS.Timeout;
+
     const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === current) {
-          const { height, width } = entry.contentRect;
-          setHeight(height);
-          setWidth(width);
+      if (cancelled) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        for (const entry of entries) {
+          if (entry.target === current) {
+            const { height, width } = entry.contentRect;
+            setHeight(height);
+            setWidth(width);
+          }
         }
-      }
+      }, 500);
     });
 
     observer.observe(current);
 
     return () => {
+      cancelled = true;
+      clearTimeout(timer);
       observer.unobserve(current);
       observer.disconnect();
     };
