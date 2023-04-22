@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -31,6 +31,8 @@ export function Decimal({
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "",
   });
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [changed, setChanged] = useState(false);
 
@@ -105,8 +107,23 @@ export function Decimal({
     [increment]
   );
 
-  const onUp = useCallback(() => increment(1n), [increment]);
-  const onDown = useCallback(() => increment(-1n), [increment]);
+  const handleUp = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+    (e) => {
+      e.preventDefault();
+      if (inputRef.current) inputRef.current.focus();
+      increment(1n);
+    },
+    [increment]
+  );
+
+  const handleDown = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
+    (e) => {
+      e.preventDefault();
+      if (inputRef.current) inputRef.current.focus();
+      increment(-1n);
+    },
+    [increment]
+  );
 
   const text = useMemo(
     () => format(value, { props: { ...schema, scale } as Field }),
@@ -123,6 +140,7 @@ export function Decimal({
             className={styles.numberInput}
             type="text"
             id={uid}
+            ref={inputRef}
             placeholder={placeholder}
             value={value}
             required={required}
@@ -131,8 +149,12 @@ export function Decimal({
             onKeyDown={handleKeyDown}
           />
           <div className={styles.buttons}>
-            <MaterialIcon icon="arrow_drop_up" onClick={onUp} />
-            <MaterialIcon icon="arrow_drop_down" onClick={onDown} />
+            <span onMouseDown={handleUp}>
+              <MaterialIcon icon="arrow_drop_up" />
+            </span>
+            <span onMouseDown={handleDown}>
+              <MaterialIcon icon="arrow_drop_down" />
+            </span>
           </div>
         </div>
       )}
