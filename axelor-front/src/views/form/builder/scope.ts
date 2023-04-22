@@ -43,12 +43,29 @@ export class FormRecordHandler implements RecordHandler {
   }
 }
 
+interface SaveHandler {
+  (): Promise<void>;
+  (record?: DataRecord): Promise<void>;
+}
+
+type RefreshHandler = () => Promise<void>;
+
 export class FormActionHandler extends DefaultActionHandler {
   #prepareContext: ContextCreator;
+  #saveHandler?: SaveHandler;
+  #refreshHandler?: RefreshHandler;
 
   constructor(prepareContext: ContextCreator) {
     super();
     this.#prepareContext = prepareContext;
+  }
+
+  setSaveHandler(handler: SaveHandler) {
+    this.#saveHandler = handler;
+  }
+
+  setRefreshHandler(handler: RefreshHandler) {
+    this.#refreshHandler = handler;
   }
 
   getContext() {
@@ -94,6 +111,14 @@ export class FormActionHandler extends DefaultActionHandler {
     Object.entries(values).forEach(([name, value]) => {
       this.setValue(name, value);
     });
+  }
+
+  async save(record?: DataRecord) {
+    return await this.#saveHandler?.(record);
+  }
+
+  async refresh() {
+    return await this.#refreshHandler?.();
   }
 }
 

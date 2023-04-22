@@ -222,7 +222,7 @@ function FormContainer({
 
   const onSave = useAtomCallback(
     useCallback(
-      async (get) => {
+      async (get, set, callOnSave: boolean = true) => {
         const { record, states } = get(formAtom);
         const errors = Object.values(states)
           .map((s) => s.errors ?? {})
@@ -234,7 +234,8 @@ function FormContainer({
         }
 
         const dummy = extractDummy(record);
-        if (onSaveAction) await actionExecutor.execute(onSaveAction);
+        if (onSaveAction && callOnSave)
+          await actionExecutor.execute(onSaveAction);
         let res = await dataStore.save(record);
         if (res.id) res = await doRead(res.id);
         res = { ...res, ...dummy }; // restore dummy values
@@ -277,6 +278,19 @@ function FormContainer({
         );
       },
       [doEdit, doRead, formAtom, isDirty, onNew]
+    )
+  );
+
+  actionHandler.setRefreshHandler(onRefresh);
+  actionHandler.setSaveHandler(
+    useCallback(
+      async (record?: DataRecord) => {
+        if (record) {
+          await dataStore.save(record);
+        }
+        await onSave(false);
+      },
+      [dataStore, onSave]
     )
   );
 
