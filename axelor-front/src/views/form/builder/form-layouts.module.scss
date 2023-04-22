@@ -45,3 +45,8 @@
   }
 }
 
+.grid {
+  .gridItem:empty {
+    display: none;
+  }
+}
