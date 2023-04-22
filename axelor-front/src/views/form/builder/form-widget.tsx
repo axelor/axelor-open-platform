@@ -143,6 +143,8 @@ function ValidatingField({
     )
   );
 
+  // trigger validation on value change
+  useAtomValue(valueAtom);
   useAsyncEffect(async (signal) => {
     signal.aborted || valueCheck();
   });
