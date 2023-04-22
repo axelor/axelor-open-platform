@@ -441,9 +441,11 @@ const RecordEditor = memo(function RecordEditor({
       (get) => {
         const value = get(valueAtom) || {};
         const state = get(formAtom);
+        const dirty = get(parent).dirty;
         const record = loaded.id && loaded.id === value.id ? loaded : value;
         return {
           ...state,
+          dirty,
           record: {
             ...record,
             ...value,
@@ -456,10 +458,12 @@ const RecordEditor = memo(function RecordEditor({
         const { record } = state;
 
         set(formAtom, state);
-        set(valueAtom, record);
+        if (state.dirty) {
+          set(valueAtom, record);
+        }
       }
     );
-  }, [formAtom, loaded, valueAtom]);
+  }, [formAtom, loaded, parent, valueAtom]);
 
   const invalidAtom = useMemo(
     () =>
