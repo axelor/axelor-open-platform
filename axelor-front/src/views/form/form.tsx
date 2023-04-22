@@ -331,7 +331,7 @@ function FormContainer({
 
   const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
 
-  const pagination = usePagination(dataStore, record, doEdit);
+  const pagination = usePagination(dataStore, record, readonly);
 
   const { popup, popupOptions } = useViewTab();
   const popupHandlerAtom = usePopupHandlerAtom();
@@ -509,10 +509,12 @@ function FormContainer({
 function usePagination(
   dataStore: DataStore,
   record: DataRecord,
-  doEdit: (rec: DataRecord) => any
+  readonly?: boolean
 ) {
   const { offset = 0, limit = 0, totalCount = 0 } = dataStore.page;
   const index = dataStore.records.findIndex((x) => x.id === record.id);
+
+  const switchTo = useViewSwitch();
 
   const onPrev = useCallback(async () => {
     let prev = dataStore.records[index - 1];
@@ -522,8 +524,10 @@ function usePagination(
       });
       prev = records[records.length - 1];
     }
-    doEdit(prev);
-  }, [dataStore, doEdit, index, limit, offset]);
+    const id = String(prev.id);
+    const props = { readonly };
+    switchTo("form", { route: { id }, props });
+  }, [dataStore, index, limit, offset, readonly, switchTo]);
 
   const onNext = useCallback(async () => {
     let next = dataStore.records[index + 1];
@@ -533,8 +537,10 @@ function usePagination(
       });
       next = records[0];
     }
-    doEdit(next);
-  }, [dataStore, doEdit, index, limit, offset]);
+    const id = String(next.id);
+    const props = { readonly };
+    switchTo("form", { route: { id }, props });
+  }, [dataStore, index, limit, offset, readonly, switchTo]);
 
   const canPrev = index > -1 && offset + index > 0;
   const canNext = index > -1 && offset + index < totalCount - 1;
