@@ -196,7 +196,7 @@ export function Date({
             timeInputLabel={
               (
                 <Box>
-                  <MaterialIcon icon="schedule" weight={300} opticalSize={20} />
+                  <MaterialIcon icon="schedule" fontSize={20} />
                 </Box>
               ) as any
             }

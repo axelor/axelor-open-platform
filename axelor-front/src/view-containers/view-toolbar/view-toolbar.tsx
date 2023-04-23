@@ -17,10 +17,7 @@ import {
   useViewTab,
 } from "../views/scope";
 
-import { useAtomValue } from "jotai";
-import { legacyClassNames } from "@/styles/legacy";
-import { ActionExecutor } from "../action";
-import { RecordHandler } from "@/views/form/builder";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import {
   Button,
   Menu,
@@ -28,7 +25,10 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { parseExpression } from "@/hooks/use-parser/utils";
+import { legacyClassNames } from "@/styles/legacy";
+import { RecordHandler } from "@/views/form/builder";
+import { useAtomValue } from "jotai";
+import { ActionExecutor } from "../action";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -156,14 +156,7 @@ function ToolbarActions({
     return [...(buttons || []), ...(menus || [])].map(mapItem);
   }, [buttons, menus, actionExecutor, recordHandler]);
 
-  return (
-    <CommandBar
-      iconProps={{
-        weight: 300,
-      }}
-      items={items}
-    />
-  );
+  return <CommandBar items={items} />;
 }
 
 export function ViewToolBar(props: ViewToolBarProps) {
@@ -287,14 +280,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   return (
     <Box className={styles.toolbar} borderBottom>
-      <CommandBar
-        className={styles.actions}
-        iconProps={{
-          weight: 300,
-        }}
-        iconOnly
-        items={actions}
-      />
+      <CommandBar className={styles.actions} iconOnly items={actions} />
       {toolbar?.length > 0 && (
         <ToolbarActions
           buttons={toolbar}
@@ -309,9 +295,6 @@ export function ViewToolBar(props: ViewToolBarProps) {
       {pageActions && (
         <CommandBar
           className={styles.pageActions}
-          iconProps={{
-            weight: 300,
-          }}
           items={[
             {
               key: "prev",
@@ -336,22 +319,10 @@ export function ViewToolBar(props: ViewToolBarProps) {
         />
       )}
       {switchActions && (
-        <CommandBar
-          items={switchActions}
-          className={styles.viewSwitch}
-          iconProps={{
-            weight: 300,
-          }}
-        />
+        <CommandBar items={switchActions} className={styles.viewSwitch} />
       )}
       {sessionInfo?.user.technical && (
-        <CommandBar
-          items={farItems}
-          className={styles.farItems}
-          iconProps={{
-            weight: 300,
-          }}
-        />
+        <CommandBar items={farItems} className={styles.farItems} />
       )}
     </Box>
   );

@@ -73,7 +73,7 @@ export function MessageInput({
             onClick={handleAttachment}
             d="inline-flex"
           >
-            <MaterialIcon icon="attach_file" weight={300} opticalSize={20} />
+            <MaterialIcon icon="attach_file" fontSize={20} />
           </Button>
           <Button
             size="sm"
@@ -83,7 +83,7 @@ export function MessageInput({
             onClick={handleEdit}
             d="inline-flex"
           >
-            <MaterialIcon icon="edit" weight={300} opticalSize={20} />
+            <MaterialIcon icon="edit" fontSize={20} />
           </Button>
         </Box>
       )}

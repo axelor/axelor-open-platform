@@ -39,7 +39,7 @@ export function Chip({
             e.preventDefault();
           }}
         >
-          <MaterialIcon icon="close" weight={300} opticalSize={20} />
+          <MaterialIcon icon="close" fontSize={20} />
         </Box>
       )}
     </Badge>

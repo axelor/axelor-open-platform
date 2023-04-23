@@ -111,7 +111,7 @@ const NavTab = memo(function NavTab({
       <div className={styles.tabTitle}>{title}</div>
       {showClose && (
         <div className={styles.tabClose} onClick={handleClose}>
-          <MaterialIcon icon="close" weight={300} opticalSize={20} />
+          <MaterialIcon icon="close" fontSize={20} />
         </div>
       )}
     </div>

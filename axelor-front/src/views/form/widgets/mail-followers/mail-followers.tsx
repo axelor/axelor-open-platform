@@ -43,7 +43,7 @@ export function MailFollowers({ schema }: WidgetProps) {
 
   const isLoginUserFollowing = React.useMemo(
     () =>
-      followers?.find(
+      followers?.some(
         ({ $author }) => String($author?.code) === String(session?.user.login)
       ),
     [followers, session]
@@ -61,7 +61,7 @@ export function MailFollowers({ schema }: WidgetProps) {
               isLoginUserFollowing ? handleUnfollow() : handleFollow()
             }
           >
-            <MaterialIcon icon="star" fill={isLoginUserFollowing ? 1 : 0} />
+            <MaterialIcon icon="star" fill={isLoginUserFollowing} />
           </Box>
           <Box as="span" className={classes.icon}>
             <MaterialIcon icon="add" />
@@ -86,7 +86,7 @@ export function MailFollowers({ schema }: WidgetProps) {
                 className={classes.icon}
                 onClick={() => handleUnfollow(id)}
               >
-                <MaterialIcon icon="close" weight={700} opticalSize={20} />
+                <MaterialIcon icon="close" fontSize={20} />
               </Box>
               <Link
                 title={title!}

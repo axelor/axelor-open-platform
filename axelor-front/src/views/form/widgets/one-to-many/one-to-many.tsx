@@ -284,9 +284,6 @@ export function OneToMany({
       <Box className={classes.header}>
         {showTitle && <div className={classes.title}>{title}</div>}
         <CommandBar
-          iconProps={{
-            weight: 300,
-          }}
           iconOnly
           items={[
             ...(isManyToMany
