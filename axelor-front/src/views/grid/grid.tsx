@@ -96,13 +96,17 @@ export function Grid(props: ViewProps<GridView>) {
         freeSearchText && (filterQuery.operator = "or");
       }
 
+      setState((draft) => {
+        draft.selectedCell = null;
+      });
+      
       return dataStore.search({
         sortBy,
         ...options,
         filter: { ...filterQuery, _archived },
       });
     },
-    [advanceSearch, dataStore, orderBy]
+    [advanceSearch, dataStore, orderBy, setState]
   );
 
   const onGridSearch = useCallback(
