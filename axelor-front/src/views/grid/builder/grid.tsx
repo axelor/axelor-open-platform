@@ -80,7 +80,7 @@ export function Grid(
       if (item.type === "button") {
         columnProps.searchable = false;
         columnProps.computed = true;
-        columnProps.width = columnProps.width || 32;
+        columnProps.width = columnProps.width || 40;
         columnProps.title = " ";
       }
 
@@ -111,7 +111,7 @@ export function Grid(
         computed: true,
         sortable: false,
         searchable: false,
-        width: 32,
+        width: 40,
       } as GridColumn);
     }
 
