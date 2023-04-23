@@ -11,7 +11,7 @@ import { GridProvider as TreeProvider } from "@axelor/ui/grid";
 
 import { DataStore } from "@/services/client/data-store";
 import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { ViewProps } from "../types";
@@ -20,25 +20,31 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useViewTab } from "@/view-containers/views/scope";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { useDataStore } from "@/hooks/use-data-store";
+import { useGridActionExecutor } from "../grid/builder/utils";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { Formatters } from "@/utils/format";
 import { i18n } from "@/services/client/i18n";
-import { useDataStore } from "@/hooks/use-data-store";
-
-function getNodeOfTreeRecord(
-  view: TreeView,
-  record: TreeRecord,
-  isNext = false
-) {
-  return view.nodes?.[
-    Math.min((record.level ?? 0) + (isNext ? 1 : 0), view.nodes?.length - 1)
-  ];
-}
+import { TreeNode as TreeNodeComponent, TreeNodeProps } from "./tree-node";
+import { getNodeOfTreeRecord } from "./utils";
 
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
   const { action, dashlet, popup, popupOptions } = useViewTab();
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
+
+  const actionExecutor = useGridActionExecutor(
+    view,
+    useCallback<() => DataContext>(
+      () => ({
+        ...action.context,
+        _viewName: action.name,
+        _viewType: action.viewType,
+        _views: action.views,
+      }),
+      [action]
+    )
+  );
 
   // check parent/child is of same model
   const isSameModelTree = useMemo(() => {
@@ -262,6 +268,18 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
+  const nodeRenderer = useMemo(
+    () => (props: TreeNodeProps) =>
+      (
+        <TreeNodeComponent
+          {...props}
+          view={view}
+          actionExecutor={actionExecutor}
+        />
+      ),
+    [view, actionExecutor]
+  );
+
   return (
     <Box d="flex" flexDirection="column" overflow="auto" w={100}>
       {showToolbar && (
@@ -296,6 +314,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           columns={columns}
           records={records}
           sortable
+          nodeRenderer={nodeRenderer}
           onSort={handleSort}
           onLoad={onSearchNode}
           onNodeMove={handleNodeMove}
