@@ -356,24 +356,20 @@ export function Grid(props: ViewProps<GridView>) {
               onClick: () => {
                 onDelete(selectedRows!.map((ind) => rows[ind]?.record));
               },
-            },
-            {
-              key: "archive",
-              text: "",
-              hidden: !hasButton("archive"),
-              disabled: !hasRowSelected,
-              items: [
-                {
-                  key: "archive",
-                  text: i18n.get("Archive"),
-                  onClick: () => onArchiveOrUnArchive(true),
-                },
-                {
-                  key: "unarchive",
-                  text: i18n.get("Unarchive"),
-                  onClick: () => onArchiveOrUnArchive(false),
-                },
-              ],
+              items: hasButton("archive")
+                ? [
+                    {
+                      key: "archive",
+                      text: i18n.get("Archive"),
+                      onClick: () => onArchiveOrUnArchive(true),
+                    },
+                    {
+                      key: "unarchive",
+                      text: i18n.get("Unarchive"),
+                      onClick: () => onArchiveOrUnArchive(false),
+                    },
+                  ]
+                : undefined,
             },
             {
               key: "refresh",
