@@ -42,6 +42,7 @@ export type ViewToolBarProps = {
     canPrev?: boolean;
     onNext: () => any;
     onPrev: () => any;
+    actions?: CommandItemProps[];
   };
   meta: ViewData<any>;
 };
@@ -166,11 +167,18 @@ export function ViewToolBar(props: ViewToolBarProps) {
     actionExecutor,
     recordHandler,
     children,
-    pagination: { text: pageTextOrComp, canNext, canPrev, onNext, onPrev } = {},
+    pagination: {
+      text: pageTextOrComp,
+      canNext,
+      canPrev,
+      onNext,
+      onPrev,
+      actions: paginationActions,
+    } = {},
   } = props;
   const { view } = meta;
   const { toolbar, menubar } = view;
-  const pageActions = onPrev || onNext;
+  const pageActions = onPrev || onNext || paginationActions;
 
   const dirtyAtom = useViewDirtyAtom();
   const dirty = useAtomValue(dirtyAtom) ?? false;
@@ -315,6 +323,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               disabled: !canNext,
               onClick: handleNext,
             },
+            ...(paginationActions || []),
           ]}
         />
       )}

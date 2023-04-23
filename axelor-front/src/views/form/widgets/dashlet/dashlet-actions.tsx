@@ -23,7 +23,7 @@ export function DashletActions({
 }: Pick<DashletMenuProps, "viewType">) {
   const { view, dataStore, onAction, onLegendShowHide, onRefresh, onExport } =
     useAtomValue(useDashletHandlerAtom());
-  const hasPagination = ["grid", "cards"].includes(viewType!);
+  const hasPagination = ["grid", "cards", "tree"].includes(viewType!);
 
   return (
     <Box className={classes.actions}>

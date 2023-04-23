@@ -12,7 +12,7 @@ import { DashletView } from "@/view-containers/view-dashlet";
 import { WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
-import { CustomView, Schema } from "@/services/client/meta.types";
+import { Schema } from "@/services/client/meta.types";
 import { ActionHandler } from "@/view-containers/action";
 import classes from "./dashlet.module.scss";
 import { useAtomValue } from "jotai";
