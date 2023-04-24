@@ -12,6 +12,9 @@ import { useSidebar } from "./nav-drawer/hook";
 import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 
+// import global utils for external apps
+import "../utils/globals";
+
 import styles from "./layout.module.scss";
 
 export function Layout() {

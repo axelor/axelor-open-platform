@@ -450,6 +450,22 @@ export function useTabs() {
 }
 
 // for internal use only with action handler
-export function openTab_internal(view: ActionView) {
-  getDefaultStore().set(openTabAtom, view);
+export function openTab_internal(
+  view: string | ActionView,
+  options: {
+    type?: string;
+    route?: Omit<TabRoute, "action">;
+    props?: Record<string, any>;
+  } = {}
+) {
+  getDefaultStore().set(openTabAtom, view, options);
+}
+
+export function useActiveTab_internal() {
+  const active = getDefaultStore().get(activeAtom);
+  const state = active ? getDefaultStore().get(active.state) : undefined;
+  const setState = (state: Partial<TabState>) => {
+    if (active) getDefaultStore().set(active.state, state);
+  };
+  return [state, setState] as const;
 }
