@@ -57,7 +57,7 @@ export function Progress(props: FieldProps<number>) {
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       <Box className={classes.progress}>
-        <ProgressComponent value={value!} schema={schema} />
+        <ProgressComponent value={value || 0} schema={schema} />
       </Box>
     </FieldContainer>
   );
