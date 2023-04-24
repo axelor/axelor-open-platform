@@ -126,7 +126,7 @@ export function createValueAtom({
       if (prev !== value) {
         const dirty = Boolean(name && !isDummy(name));
         set(lensAtom, value);
-        set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty ?? dirty }));
+        set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
         if (dirty) {
           set(dirtyAtom, true);
         }
