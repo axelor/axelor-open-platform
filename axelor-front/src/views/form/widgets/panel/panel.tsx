@@ -14,12 +14,11 @@ const withHeaderBodyProps: StyleProps = {
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
-  const { showTitle = true } = schema;
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
+  const { showTitle = true, showFrame = true } = schema;
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
 
-  const hasHeader = showTitle && title;
+  const hasHeader = showTitle !== false && showFrame !== false && title;
   const moreProps = hasHeader && withHeaderProps;
   const bodyProps = hasHeader && withHeaderBodyProps;
 

@@ -6,3 +6,7 @@
 .panelHeader {
   font-weight: 600;
 }
+
+.panel .panel {
+  border: 0 !important;
+}
