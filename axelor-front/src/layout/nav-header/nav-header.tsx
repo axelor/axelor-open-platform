@@ -259,6 +259,7 @@ function FarItems() {
             iconProps: {
               icon: "mail",
             },
+            onClick: () => openTab("mail.inbox"),
           },
           {
             key: "messages",
@@ -267,6 +268,21 @@ function FarItems() {
             iconProps: {
               icon: "notifications",
             },
+            items: [
+              {
+                key: "tasks.due",
+                text: i18n.get("Tasks due"),
+                subtext: i18n.get("no tasks"),
+                onClick: () => openTab("team.tasks.due"),
+              },
+              { key: "m-div", divider: true },
+              {
+                key: "tasks.todo",
+                text: i18n.get("Tasks todo"),
+                subtext: i18n.get("no tasks"),
+                onClick: () => openTab("team.tasks.todo"),
+              },
+            ],
           },
           {
             key: "user",
