@@ -75,8 +75,8 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   res.uid = uniqueId("w");
   res.widget = toKebabCase(type);
 
-  if (res.title === undefined) {
-    res.title = res.autoTitle ?? field.title ?? field.autoTitle;
+  if (res.widget !== "panel" && res.widget !== "separator") {
+    res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;
   }
 
   if (res.items) {
