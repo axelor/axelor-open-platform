@@ -311,7 +311,7 @@ function FormContainer({
   const onCopy = useCallback(async () => {
     if (record.id) {
       const rec = await dataStore.copy(record.id);
-      doEdit(rec);
+      doEdit(rec, { readonly : false });
     }
   }, [dataStore, doEdit, record.id]);
 
