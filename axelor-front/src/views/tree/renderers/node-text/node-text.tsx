@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { TreeColumn, TreeNode } from "@axelor/ui";
+import { TreeNode } from "@axelor/ui";
 import { get } from "lodash";
 
 import {
   Field,
-  Property,
+  TreeColumn,
   TreeField,
   TreeView,
 } from "@/services/client/meta.types";
@@ -59,7 +59,7 @@ export function NodeText({
       props: {
         ...field,
         ...column,
-        ...(column as Property)?.widgetAttrs,
+        ...column.widgetAttrs,
       } as Field,
       context: record,
     });
