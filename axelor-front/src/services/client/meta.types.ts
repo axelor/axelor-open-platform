@@ -123,6 +123,7 @@ export interface Editor extends Omit<Panel, "type"> {
   type: "editor";
   layout?: string;
   viewer?: boolean;
+  flexbox?: boolean;
   showOnNew?: boolean;
   onNew?: string;
   items?: (Field | Button | Spacer | Separator | Label | Panel)[];

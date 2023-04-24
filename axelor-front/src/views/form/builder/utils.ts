@@ -1,7 +1,7 @@
 import { uniqueId } from "lodash";
 
-import { Property, Schema } from "@/services/client/meta.types";
 import { DataContext } from "@/services/client/data.types";
+import { Property, Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
 import { Attrs, DEFAULT_ATTRS } from "./types";
@@ -82,6 +82,13 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   if (res.items) {
     res.items = res.items.map((item) =>
       processView(item, res.fields ?? fields)
+    );
+  }
+
+  if (Array.isArray(res.jsonFields)) {
+    res.jsonFields = res.jsonFields.reduce(
+      (prev, field) => ({ ...prev, [field.name!]: field }),
+      {}
     );
   }
 

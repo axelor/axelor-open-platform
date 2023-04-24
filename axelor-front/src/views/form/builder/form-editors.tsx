@@ -24,6 +24,7 @@ import { FormState, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 import { processView } from "./utils";
 
 import { DataStore } from "@/services/client/data-store";
+import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { isEqual } from "lodash";
 import styles from "./form-editors.module.scss";
 
@@ -37,6 +38,7 @@ function processEditor(schema: Schema) {
   const editor: Editor = schema.editor;
   const widgetAttrs = editor.widgetAttrs ?? {};
   const fields = editor.fields ?? schema.fields;
+  const flexbox = editor.flexbox ?? false;
 
   const applyAttrs = (item: Schema) => {
     const result = { ...item };
@@ -56,14 +58,16 @@ function processEditor(schema: Schema) {
   };
 
   const items = editor.items?.map(applyAttrs) as Panel["items"];
-  const hasColSpan = items?.some((x) => x.colSpan);
+  const hasColSpan = flexbox || items?.some((x) => x.colSpan);
   const cols = hasColSpan ? 12 : items?.length;
   const colWidths = hasColSpan
     ? undefined
-    : items?.map((x) => {
-        const w = x.width ?? x.widgetAttrs?.width;
-        return w ?? (x.widget === "toggle" ? "min-content" : "*");
-      }).join(",");
+    : items
+        ?.map((x) => {
+          const w = x.width ?? x.widgetAttrs?.width;
+          return w ?? (x.widget === "toggle" ? "min-content" : "*");
+        })
+        .join(",");
 
   const panel: Panel = {
     ...editor,
@@ -89,8 +93,11 @@ export function FieldEditor(props: FieldEditorProps) {
   const { schema } = props;
 
   const fieldsAtom = useMemo(
-    () => selectAtom(props.formAtom, (o) => o.fields),
-    [props.formAtom]
+    () =>
+      schema.json
+        ? atom(schema.jsonFields)
+        : selectAtom(props.formAtom, (o) => o.fields),
+    [props.formAtom, schema.json, schema.jsonFields]
   );
 
   const formFields = useAtomValue(fieldsAtom);
@@ -99,6 +106,11 @@ export function FieldEditor(props: FieldEditorProps) {
     () => processEditor({ ...schema, fields: schema.fields ?? formFields }),
     [formFields, schema]
   );
+
+  // json field?
+  if (schema.json) {
+    return <JsonEditor {...props} editor={form} fields={fields} />;
+  }
 
   // reference field?
   if (schema.serverType?.endsWith("_TO_ONE")) {
@@ -519,3 +531,63 @@ const RecordEditor = memo(function RecordEditor({
     />
   );
 });
+
+function JsonEditor({
+  schema,
+  editor,
+  fields,
+  formAtom,
+  widgetAtom,
+  valueAtom,
+  readonly,
+}: FormEditorProps) {
+  const jsonAtom = useMemo(() => {
+    return atom(
+      (get) => {
+        const value = get(valueAtom) || "{}";
+        return JSON.parse(value);
+      },
+      (get, set, update: SetStateAction<any>) => {
+        const state =
+          typeof update === "function" ? update(get(valueAtom)) : update;
+        set(valueAtom, state ? JSON.stringify(state) : null);
+      }
+    );
+  }, [valueAtom]);
+
+  const jsonEditor = useMemo(
+    () => processJsonView(editor) as FormView,
+    [editor]
+  );
+
+  const { model } = useAtomValue(formAtom);
+
+  return (
+    <RecordEditor
+      model={model}
+      schema={schema}
+      editor={jsonEditor}
+      fields={fields}
+      formAtom={formAtom}
+      widgetAtom={widgetAtom}
+      valueAtom={jsonAtom}
+      setInvalid={() => {}}
+      readonly={readonly}
+    />
+  );
+}
+
+function processJsonView(schema: Schema) {
+  const result = { ...schema };
+  if (schema.serverType) {
+    result.type = "field";
+    result.widget = toKebabCase(schema.serverType);
+    result.serverType = toSnakeCase(schema.serverType).toUpperCase();
+  }
+
+  if (Array.isArray(result.items)) {
+    result.items = result.items.map(processJsonView);
+  }
+
+  return result;
+}
