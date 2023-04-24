@@ -2,15 +2,15 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 
 import { Box, CommandItemProps } from "@axelor/ui/core";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
-
-import { CalendarView } from "@/services/client/meta.types";
+import { Event } from "@axelor/ui/scheduler/types";
 
 import { useAsync } from "@/hooks/use-async";
 import { useSession } from "@/hooks/use-session";
 
 import { i18n } from "@/services/client/i18n";
 import { l10n } from "@/services/client/l10n";
-import { Criteria } from "@/services/client/data.types";
+import { CalendarView } from "@/services/client/meta.types";
+import { Criteria, DataRecord } from "@/services/client/data.types";
 
 import { ViewProps } from "../types";
 
@@ -18,13 +18,22 @@ import DatePicker from "./components/date-picker";
 import Filters from "./components/filters";
 import { Filter } from "./components/types";
 
-import { formatDate, getEventFilters, getTimes } from "./utils";
+import {
+  formatDate,
+  getEventFilters,
+  getTimes,
+  toDateOnlyString,
+  toDatetimeString,
+  toDateOnly,
+  toDatetime,
+} from "./utils";
 
 import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
-import { addDate } from "@/utils/date";
+import { addDate, getNextOf } from "@/utils/date";
+import { usePerms } from "@/hooks/use-perms";
 
 const { get: t } = i18n;
 
@@ -35,6 +44,8 @@ const eventStyler = ({
 }) => ({
   style: { backgroundColor: event.$backgroundColor },
 });
+
+l10n.getLocale();
 
 export function Calendar(props: ViewProps<CalendarView>) {
   const { meta, dataStore } = props;
@@ -47,7 +58,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
     mode: initialMode = "month",
   } = metaView;
 
-  l10n.getLocale();
+  const { hasButton } = usePerms(metaView, metaPerms);
+  const can = useCallback(
+    (name: string) => metaView.editable !== false && hasButton(name),
+    [hasButton, metaView.editable]
+  );
+
   const session = useSession();
   const maxPerPage = useMemo(
     () => session.data?.api?.pagination?.maxPerPage || -1,
@@ -58,6 +74,18 @@ export function Calendar(props: ViewProps<CalendarView>) {
     () => metaFields?.[eventStart]?.type === "DATE",
     [metaFields, eventStart]
   );
+
+  const convertDate = useMemo(() => {
+    return isDateCalendar
+      ? {
+          toDate: toDateOnly,
+          toString: toDateOnlyString,
+        }
+      : {
+          toDate: toDatetime,
+          toString: toDatetimeString,
+        };
+  }, [isDateCalendar]);
 
   const components = useMemo(() => {
     const timeComponents = isDateCalendar
@@ -146,14 +174,20 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   useAsync(handleRefresh, [dataStore, filter]);
 
+  const [records, setRecords] = useState<DataRecord[]>([]);
+  useEffect(() => setRecords(dataStore.records), [dataStore.records]);
+
   const unfilteredCalendarEvents: SchedulerEvent[] = useMemo(() => {
-    return (dataStore.records || []).map((record) => {
+    return records.map((record) => {
       const { id, name: title } = record;
-      const start = new Date(record[eventStart] as string);
+      const start = convertDate.toDate(record[eventStart] as string);
       const recordStop = eventStop && (record[eventStop] as string);
-      const end = recordStop
-        ? new Date(recordStop)
-        : addDate(start, eventLength, "hours");
+      let end = convertDate.toDate(
+        recordStop ? recordStop : addDate(start, eventLength, "hours")
+      );
+      if (end && isDateCalendar) {
+        end = convertDate.toDate(getNextOf(end, "days"));
+      }
       return {
         id,
         title,
@@ -163,7 +197,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         allDay: isDateCalendar,
       } as SchedulerEvent;
     });
-  }, [dataStore.records, eventStart, eventStop, eventLength, isDateCalendar]);
+  }, [records, eventStart, eventStop, eventLength, convertDate]);
 
   const handleNavigationChange = useCallback((date: Date) => {
     setCalendarDate(date);
@@ -311,6 +345,56 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [handleNavigationChange]
   );
 
+  // Update
+
+  const _handleEventUpdate = useCallback(
+    async ({ event, start, end }: Event) => {
+      const record = (event as any).record as DataRecord;
+      const { id, version } = record;
+
+      const eventData = {
+        id,
+        version,
+        [eventStart]: convertDate.toString(start),
+      } as DataRecord;
+
+      if (eventStop) {
+        const _end = isDateCalendar ? addDate(end, -1, "days") : end;
+        eventData[eventStop] = convertDate.toString(_end);
+      }
+
+      const eventStartJsonField =
+        eventStart && metaFields?.[eventStart]?.jsonField;
+      const eventStopJsonField =
+        eventStop && metaFields?.[eventStop]?.jsonField;
+      if (eventStartJsonField) {
+        eventData[eventStartJsonField] = record[eventStartJsonField];
+      }
+      if (eventStopJsonField) {
+        eventData[eventStopJsonField] = record[eventStopJsonField];
+      }
+
+      setRecords((records) =>
+        records.map((record) =>
+          record.id === eventData.id ? { ...record, ...eventData } : record
+        )
+      );
+
+      const updatedRecord = await dataStore.save(eventData);
+
+      setRecords((records) =>
+        records.map((record) =>
+          record.id === updatedRecord.id
+            ? { ...record, ...updatedRecord }
+            : record
+        )
+      );
+    },
+    [eventStart, convertDate, eventStop, dataStore, metaFields, isDateCalendar]
+  );
+
+  const handleEventUpdate = can("edit") ? _handleEventUpdate : undefined;
+
   return (
     <div className={styles.calendar}>
       <ViewToolBar
@@ -332,6 +416,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
             view={calendarMode}
             onNavigationChange={handleNavigationChange}
             onViewChange={handleViewChange}
+            onEventResize={handleEventUpdate}
+            onEventDrop={handleEventUpdate}
             eventStyler={eventStyler}
             components={components}
             style={{ width: "100%" }}

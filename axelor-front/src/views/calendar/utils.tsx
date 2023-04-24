@@ -82,3 +82,19 @@ export function formatDate(date: Date, unit: ManipulateType) {
   const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;
   return formatter(date);
 }
+
+export function toDateOnlyString(date: Date | string) {
+  return dayjs(date).format("YYYY-MM-DD");
+}
+
+export function toDatetimeString(date: Date | string) {
+  return dayjs(date).toISOString();
+}
+
+export function toDateOnly(date: Date | string) {
+  return dayjs(date).startOf("day").toDate();
+}
+
+export function toDatetime(date: Date | string) {
+  return dayjs(date).toDate();
+}
