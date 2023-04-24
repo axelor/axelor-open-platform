@@ -39,7 +39,14 @@ export function OneToMany({
   widgetAtom,
   formAtom,
 }: FieldProps<DataRecord[]>) {
-  const { name, target: model, fields, showTitle = true } = schema;
+  const {
+    name,
+    target: model,
+    fields,
+    showTitle = true,
+    formView,
+    gridView,
+  } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
@@ -175,6 +182,7 @@ export function OneToMany({
       title: i18n.get("Select {0}", title ?? ""),
       model,
       multiple: true,
+      viewName: gridView,
       onSelect: (records) => {
         setValue((value) => {
           const valIds = (value || []).map((x) => x.id);
@@ -185,7 +193,7 @@ export function OneToMany({
         });
       },
     });
-  }, [setValue, showSelector, model, title]);
+  }, [showSelector, title, model, gridView, setValue]);
 
   const openEditor = useCallback(
     (
@@ -198,11 +206,12 @@ export function OneToMany({
         model,
         record: { id: null },
         readonly: false,
+        viewName: formView,
         ...(isManyToMany ? { onSelect } : { onSave }),
         ...options,
       });
     },
-    [isManyToMany, model, title, showEditor]
+    [showEditor, title, model, formView, isManyToMany]
   );
 
   const onAdd = useCallback(() => {
