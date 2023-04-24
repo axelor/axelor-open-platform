@@ -74,7 +74,7 @@ export function Form(props: ViewProps<FormView>) {
 
   const readonly =
     action.params?.forceReadonly ?? viewProps.readonly ?? Boolean(id);
-  const recordId = id ?? action.context?._showRecord;
+  const recordId = id || action.context?._showRecord;
   const popupRecord = action.params?.["_popup-record"];
 
   const { state, data: record = {} } = useAsync(async () => {
