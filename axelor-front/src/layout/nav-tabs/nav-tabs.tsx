@@ -132,12 +132,14 @@ export function NavTabs() {
       flexGrow={1}
       className={styles.tabs}
     >
-      <Tabs
-        items={items}
-        value={value}
-        onItemRender={(item) => <NavTab {...item} close={close} />}
-        onChange={handleSelect}
-      />
+      {items.length > 0 && (
+        <Tabs
+          items={items}
+          value={value}
+          onItemRender={(item) => <NavTab {...item} close={close} />}
+          onChange={handleSelect}
+        />
+      )}
       {items.map((tab) => (
         <div
           key={tab.id}
