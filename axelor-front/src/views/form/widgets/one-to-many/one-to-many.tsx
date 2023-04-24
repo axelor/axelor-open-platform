@@ -13,11 +13,18 @@ import { useGridState } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/src/grid";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { selectAtom } from "jotai/utils";
-import { SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FieldProps } from "../../builder";
 import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { isEqual } from "lodash";
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { FieldProps } from "../../builder";
 import classes from "./one-to-many.module.scss";
 
 const nextId = (() => {
@@ -282,7 +289,9 @@ export function OneToMany({
       roundedTop
     >
       <Box className={classes.header}>
-        {showTitle && <div className={classes.title}>{title}</div>}
+        <div className={classes.title}>
+          {showTitle && <span className={classes.titleText}>{title}</span>}
+        </div>
         <CommandBar
           iconOnly
           items={[
