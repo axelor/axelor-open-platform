@@ -178,6 +178,8 @@ Unlike the object permission rules, view permission rules follows `Grant all -> 
 
 == Single Sign-On
 
+=== Common Configuration
+
 :direct-vs-indirect-clients: https://www.pac4j.org/docs/clients.html#1-direct-vs-indirect-clients
 
 Single sign-on in {page-component-title} relies on the various clients from the {pac4j}. There are two kinds of clients: {direct-vs-indirect-clients}[direct and indirect clients].
@@ -288,6 +290,8 @@ public class MyOidcClient extends OidcClient {
 }
 -----
 
+=== Provider Order
+
 Each client needs to have a unique name. The provider names in the property keys are only used to group settings.
 If you want to use the same client for multiple providers, you have to make sure they have different names.
 
@@ -311,6 +315,31 @@ auth.provider.my-oidc2.name = MyOidcClient2
 # comma-separated list of provider names
 auth.provider-order = my-oidc1, my-oidc2
 -----
+
+=== Default Provider
+
+Normally, form client is the default client used for authentification.
+When an authentification provider is defined as exclusive, form client is not loaded at all.
+
+However, with `auth.provider-default` configuration, you can specify another non-exclusive client as default.
+
+Example:
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider-default = google  # google auth provider is used by default
+-----
+
+You can specify another client via the `client_name` query parameter in login URL.
+
+Examples:
+[cols="7,3"]
+|===
+| URL                                                         | Description
+| \http://localhost:8080/open-platform-demo/                 | default client is used
+| \http://localhost:8080/open-platform-demo/?client_name=form| another client is specified
+|===
 
 === OpenID Connect
 

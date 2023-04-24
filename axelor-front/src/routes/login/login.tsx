@@ -50,6 +50,16 @@ const FORM_CLIENT_NAME = "AxelorFormClient";
 
 const CLIENT_NAME_ALIASES: Record<string, string> = {
   form: FORM_CLIENT_NAME,
+  oidc: "OidcClient",
+  keycloak: "KeycloakOidcClient",
+  google: "GoogleOidcClient",
+  azure: "AzureAd2Client",
+  apple: "AppleClient",
+  oauth: "GenericOAuth20Client",
+  facebook: "FacebookClient",
+  github: "GitHubClient",
+  saml: "SAML2Client",
+  cas: "CasClient",
 };
 
 const YEAR = new Date().getFullYear();

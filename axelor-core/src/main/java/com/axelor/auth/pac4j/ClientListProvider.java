@@ -53,7 +53,6 @@ import javax.inject.Singleton;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
-import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 import org.slf4j.Logger;
@@ -226,43 +225,50 @@ public class ClientListProvider implements Provider<List<Client>> {
               config.toMap().forEach(props::putIfAbsent);
             });
 
-    // order of providers displayed on login form
-    final Map<String, Map<String, Object>> configs;
-    final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
-    if (ObjectUtils.isEmpty(authOrder)) {
-      configs = initConfigs;
+    // add form as if no exclusive client
+    if (initConfigs.isEmpty()
+        || initConfigs.size() > 1
+        || !((boolean) initConfigs.values().iterator().next().getOrDefault("exclusive", false))) {
+      initConfigs.put("form", CONFIGS.get("form").toMap());
+      exclusive = false;
     } else {
-      configs = new LinkedHashMap<>();
-      authOrder.forEach(
-          name -> {
-            Map<String, Object> config = initConfigs.remove(name);
-            if (config == null) {
-              config =
-                  Optional.ofNullable(CONFIGS.get(name))
-                      .orElseThrow(() -> new NoSuchElementException(name))
-                      .toMap();
-            }
-            configs.put(name, config);
-          });
-      configs.putAll(initConfigs);
+      exclusive = true;
     }
+
+    // order of providers
+    // first one is default, the rest is for display order on login form
+    final Map<String, Map<String, Object>> configs = new LinkedHashMap<>();
+
+    final Consumer<String> addConfig =
+        name -> {
+          Map<String, Object> config = initConfigs.remove(name);
+          if (config == null) {
+            config =
+                Optional.ofNullable(CONFIGS.get(name))
+                    .orElseThrow(() -> new NoSuchElementException(name))
+                    .toMap();
+          }
+          configs.put(name, config);
+        };
+
+    final String authDefault =
+        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
+    if (StringUtils.notBlank(authDefault)) {
+      addConfig.accept(authDefault);
+    }
+
+    final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
+    if (ObjectUtils.notEmpty(authOrder)) {
+      authOrder.forEach(addConfig::accept);
+    }
+
+    configs.putAll(initConfigs);
+    initConfigs.clear();
 
     final List<Client> configuredClients =
         configs.entrySet().stream()
             .map(e -> createClient(e.getKey(), e.getValue()))
             .collect(Collectors.toList());
-
-    // check for exclusive clients
-    if (configs.isEmpty()
-        || configs.size() > 1
-        || !((boolean) configs.values().iterator().next().getOrDefault("exclusive", false))) {
-      if (configuredClients.stream().noneMatch(FormClient.class::isInstance)) {
-        clients.add(createClient("form", CONFIGS.get("form").toMap()));
-      }
-      exclusive = false;
-    } else {
-      exclusive = true;
-    }
 
     clients.addAll(configuredClients);
 

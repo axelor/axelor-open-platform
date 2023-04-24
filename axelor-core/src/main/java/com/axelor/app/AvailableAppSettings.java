@@ -163,6 +163,7 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
   String AUTH_ORDER = "auth.provider-order";
+  String AUTH_DEFAULT = "auth.provider-default";
   String AUTH_CALLBACK_URL = "auth.callback-url";
 
   String AUTH_USER_PROVISIONING = "auth.user.provisioning";
