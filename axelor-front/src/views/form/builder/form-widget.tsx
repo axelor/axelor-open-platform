@@ -1,18 +1,16 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { parseExpression } from "@/hooks/use-parser/utils";
-import { isDummy } from "@/services/client/data-utils";
 import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { i18n } from "@/services/client/i18n";
-import { createWidgetAtom } from "./atoms";
+import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useLazyWidget } from "./hooks";
@@ -27,14 +25,54 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
     [formAtom, schema]
   );
 
+  const dirtyAtom = useViewDirtyAtom();
+  const { actionExecutor } = useFormScope();
+
+  const valueAtom = useMemo(
+    () =>
+      isField(schema)
+        ? createValueAtom({ schema, formAtom, dirtyAtom, actionExecutor })
+        : undefined,
+    [actionExecutor, dirtyAtom, formAtom, schema]
+  );
+
+  // eval field expression showIf, hideIf etc
+  useHandleFieldExpression({ schema, widgetAtom });
+
+  const hidden = useAtomValue(
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
+  );
+
+  if (hidden) {
+    return null;
+  }
+
+  if (schema.viewer && valueAtom && readonly) {
+    return (
+      <FieldViewer {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
+    );
+  }
+
+  if (schema.editor && valueAtom && (!readonly || schema.editor.viewer)) {
+    return (
+      <FieldEditor {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
+    );
+  }
+
+  return <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />;
+}
+
+function isField(schema: Schema) {
   const type = schema.type;
+  return type === "field" || type === "panel-related";
+}
+
+function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {
+  const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const attrs = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs), [widgetAtom])
   );
   const { loading, Comp } = useLazyWidget(schema);
-
-  // eval field expression showIf, hideIf etc
-  useHandleFieldExpression({ schema, widgetAtom });
 
   if (attrs.hidden) return null;
   if (loading) return null;
@@ -47,8 +85,8 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   };
 
   if (Comp) {
-    return ["field", "panel-related"].includes(type!) ? (
-      <FormField component={Comp} {...widgetProps} />
+    return valueAtom ? (
+      <FormField component={Comp} {...widgetProps} valueAtom={valueAtom} />
     ) : (
       <Comp {...widgetProps} />
     );
@@ -57,64 +95,6 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
 }
 
 function FormField({
-  component: Comp,
-  ...props
-}: WidgetProps & { component: React.ElementType }) {
-  const { schema, formAtom, readonly } = props;
-  const name = schema.name!;
-  const onChange = schema.onChange;
-  const dirtyAtom = useViewDirtyAtom();
-  const setDirty = useSetAtom(dirtyAtom);
-
-  const { actionExecutor } = useFormScope();
-
-  const valueAtom = useMemo(() => {
-    const lensAtom = focusAtom(formAtom, (o) => {
-      let lens = o.prop("record");
-      let path = name.split(".");
-      let next = path.shift();
-      while (next) {
-        lens = lens.reread((v) => v || {});
-        lens = lens.prop(next);
-        next = path.shift();
-      }
-      return lens;
-    });
-    return atom(
-      (get) => get(lensAtom) as any,
-      (get, set, value: any, fireOnChange: boolean = false) => {
-        const prev = get(lensAtom);
-        if (prev !== value) {
-          const dirty = !isDummy(name);
-          set(lensAtom, value);
-          set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty ?? dirty }));
-          if (dirty) {
-            setDirty(true);
-          }
-        }
-        if (onChange && fireOnChange) {
-          actionExecutor.execute(onChange, {
-            context: {
-              _source: name,
-            },
-          });
-        }
-      }
-    );
-  }, [actionExecutor, formAtom, name, onChange, setDirty]);
-
-  if (readonly && schema.viewer) {
-    return <FieldViewer {...props} valueAtom={valueAtom} />;
-  }
-
-  if (schema.editor && (!readonly || schema.editor.viewer)) {
-    return <FieldEditor {...props} valueAtom={valueAtom} />;
-  }
-
-  return <ValidatingField {...props} component={Comp} valueAtom={valueAtom} />;
-}
-
-function ValidatingField({
   component: Comp,
   ...props
 }: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {

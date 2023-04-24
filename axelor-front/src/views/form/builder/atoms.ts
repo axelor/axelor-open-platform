@@ -1,11 +1,12 @@
 import { PrimitiveAtom, atom } from "jotai";
 import { focusAtom } from "jotai-optics";
+import { SetStateAction } from "react";
 
+import { isDummy, mergeDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
+import { ActionExecutor } from "@/view-containers/action";
 
-import { mergeDummy } from "@/services/client/data-utils";
-import { SetStateAction } from "react";
 import { FormAtom, FormState, WidgetState } from "./types";
 import { defaultAttrs, processContextValues } from "./utils";
 
@@ -90,6 +91,54 @@ export function createWidgetAtom(props: {
   );
 
   return widgetAtom;
+}
+
+export function createValueAtom({
+  schema,
+  formAtom,
+  dirtyAtom,
+  actionExecutor,
+}: {
+  schema: Schema;
+  formAtom: FormAtom;
+  dirtyAtom: PrimitiveAtom<boolean>;
+  actionExecutor: ActionExecutor;
+}) {
+  const { name, onChange } = schema;
+  const lensAtom = focusAtom(formAtom, (o) => {
+    let lens = o.prop("record");
+    if (name) {
+      let path = name.split(".");
+      let next = path.shift();
+      while (next) {
+        lens = lens.reread((v) => v || {});
+        lens = lens.rewrite((v) => v || {});
+        lens = lens.prop(next);
+        next = path.shift();
+      }
+    }
+    return lens;
+  });
+  return atom(
+    (get) => get(lensAtom) as any,
+    (get, set, value: any, fireOnChange: boolean = false) => {
+      const prev = get(lensAtom);
+      if (prev !== value) {
+        const dirty = Boolean(name && !isDummy(name));
+        set(lensAtom, value);
+        set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty ?? dirty }));
+        if (dirty) {
+          set(dirtyAtom, true);
+        }
+      }
+      if (onChange && fireOnChange) {
+        actionExecutor.execute(
+          onChange,
+          name ? { context: { _source: name } } : {}
+        );
+      }
+    }
+  );
 }
 
 export const fallbackFormAtom = createFormAtom({
