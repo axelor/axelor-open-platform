@@ -3,3 +3,9 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.fieldContainer label[for] {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
