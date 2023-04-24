@@ -102,6 +102,7 @@ export function NavHeader() {
   const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
   const appHome = data?.app.home ?? "#/";
+  const appLogo = data?.app.logo;
   return (
     <Box className={styles.header} borderBottom>
       <Box className={styles.menuToggle} onClick={(e) => setSidebar(!sidebar)}>
@@ -109,7 +110,7 @@ export function NavHeader() {
       </Box>
       <Box className={styles.appLogo}>
         <a href={appHome}>
-          <AppLogo />
+          {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
         </a>
       </Box>
       <Box className={styles.topMenu}></Box>
