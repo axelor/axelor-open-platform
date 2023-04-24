@@ -6,12 +6,22 @@ import {
   CommandBar,
   CommandItem,
   CommandItemProps,
+  MenuItem,
   Input,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import { DataStore } from "@/services/client/data-store";
+import {
+  ActionExecutor,
+  DefaultActionExecutor,
+  DefaultActionHandler,
+} from "@/view-containers/action";
+import {
+  QuickMenu,
+  QuickMenuItem as TQuickMenuItem,
+} from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
 import { dialogs } from "@/components/dialogs";
 import { useTabs } from "@/hooks/use-tabs";
@@ -19,6 +29,7 @@ import { useRoute } from "@/hooks/use-route";
 import { useSidebar } from "../nav-drawer/hook";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { i18n } from "@/services/client/i18n";
+import { quick } from "./utils";
 import styles from "./nav-header.module.scss";
 
 function FavoriteItem(props: CommandItemProps) {
@@ -130,13 +141,99 @@ function FavoriteItem(props: CommandItemProps) {
   );
 }
 
+function QuickMenuItem({
+  menu,
+  data,
+  actionExecutor,
+  onClick,
+  onRefresh,
+}: CommandItemProps & {
+  menu: QuickMenu;
+  data: TQuickMenuItem;
+  actionExecutor: ActionExecutor;
+  onClick?: (e: any) => void;
+  onRefresh?: () => void;
+}) {
+  async function handleClick(e: any) {
+    onClick?.(e);
+    if (data.action) {
+      await actionExecutor.execute(data.action, {
+        context: {
+          ...data.context,
+          _model: data.model ?? "com.axelor.meta.db.MetaAction",
+        },
+      });
+      await onRefresh?.();
+    }
+  }
+
+  return (
+    <MenuItem onClick={handleClick}>
+      {menu.showingSelected && (
+        <Input
+          me={2}
+          type="radio"
+          checked={data.selected}
+          onChange={() => {}}
+        />
+      )}
+      {data.title}
+    </MenuItem>
+  );
+}
+
 function FarItems() {
+  const [quickMenus, setQuickMenus] = useState<QuickMenu[]>([]);
+
   const { data, logout } = useSession();
   const { navigate } = useRoute();
+  const { open: openTab } = useTabs();
+
+  const refreshQuickMenus = useCallback(async () => {
+    setQuickMenus(await quick());
+  }, []);
+
+  useAsyncEffect(async () => {
+    await refreshQuickMenus();
+  }, [refreshQuickMenus]);
+
+  const actionExecutor = useMemo(
+    () => new DefaultActionExecutor(new DefaultActionHandler()),
+    []
+  );
+
+  const quickItems = useMemo(
+    () =>
+      quickMenus.map((menu, ind) => ({
+        key: `quick_menu_${ind}`,
+        text: menu.title,
+        showDownArrow: true,
+        items: menu?.items?.map((item, ind) => {
+          const key = `quick_menu_item_${ind}`;
+          return {
+            key,
+            text: item.title,
+            render: (props: CommandItemProps) => (
+              <QuickMenuItem
+                key={key}
+                data={item}
+                menu={menu}
+                actionExecutor={actionExecutor}
+                onClick={props.onClick}
+                onRefresh={refreshQuickMenus}
+              />
+            ),
+          };
+        }),
+      })),
+    [quickMenus, actionExecutor, refreshQuickMenus]
+  );
+
   return (
     <>
       <CommandBar
         items={[
+          ...quickItems,
           {
             key: "home",
             text: "Home",

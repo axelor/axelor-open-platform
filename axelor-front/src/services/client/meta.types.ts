@@ -767,3 +767,18 @@ export interface Schema {
   items?: Schema[];
   [K: string]: any;
 }
+
+export type QuickMenuItem = {
+  title: string;
+  action?: string;
+  selected?: boolean;
+  model?: string;
+  context?: DataContext;
+};
+
+export type QuickMenu = {
+  title: string;
+  order?: number;
+  showingSelected?: boolean;
+  items?: QuickMenuItem[];
+};
