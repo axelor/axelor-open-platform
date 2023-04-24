@@ -10,19 +10,18 @@ import { useAsync } from "@/hooks/use-async";
 import { findActionView } from "@/services/client/meta-cache";
 import { DashletView } from "@/view-containers/view-dashlet";
 import { WidgetProps } from "../../builder";
-import { useFormScope } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 import { Schema } from "@/services/client/meta.types";
-import { ActionHandler } from "@/view-containers/action";
-import classes from "./dashlet.module.scss";
 import { useAtomValue } from "jotai";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { DataContext } from "@/services/client/data.types";
+import classes from "./dashlet.module.scss";
 
 interface DashletProps {
   schema: Schema;
   className?: string;
   readonly?: boolean;
-  actionHandler?: ActionHandler;
+  getContext?: () => DataContext;
   viewId?: number;
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
 }
@@ -31,15 +30,15 @@ export function DashletComponent({
   schema,
   className,
   readonly,
-  actionHandler,
   viewId,
   onViewLoad,
+  getContext,
 }: DashletProps): any {
   const { action } = schema;
 
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const actionView = await findActionView(action);
-    const context = actionHandler?.getContext();
+    const context = getContext?.();
 
     return await initTab({
       ...actionView,
@@ -51,11 +50,11 @@ export function DashletComponent({
       context: {
         ...actionView.context,
         ...context,
-        _id: context?.id!,
+        _id: context?.id || undefined,
         _domainAction: action,
       },
     });
-  }, [action, actionHandler]);
+  }, [action, getContext]);
 
   const setGridViewProps = useAtomCallback(
     useCallback((get, set, tab: Tab, readonly: boolean = false) => {
@@ -136,13 +135,20 @@ function DashletViewLoad({
 }
 
 export function Dashlet(props: WidgetProps) {
-  const { schema, readonly } = props;
-  const { actionHandler } = useFormScope();
+  const { schema, readonly, formAtom } = props;
+  
+  const getContext = useAtomCallback(
+    useCallback(
+      (get) => (formAtom ? get(formAtom).record : {}) as DataContext,
+      [formAtom]
+    )
+  );
+
   return (
     <DashletComponent
       schema={schema}
       readonly={readonly}
-      actionHandler={actionHandler}
+      getContext={getContext}
     />
   );
 }
