@@ -3,21 +3,16 @@ import { ReactElement, cloneElement, useCallback } from "react";
 
 import { TreeView } from "@/services/client/meta.types";
 import { ActionExecutor } from "@/view-containers/action";
-import { getNodeOfTreeRecord } from "./utils";
+import { getNodeOfTreeRecord } from "../../utils";
 
-export interface TreeNodeProps {
+export interface NodeProps {
   data: TreeRecord;
   view: TreeView;
   children: ReactElement;
   actionExecutor: ActionExecutor;
 }
 
-export function TreeNode({
-  data,
-  view,
-  actionExecutor,
-  children,
-}: TreeNodeProps) {
+export function Node({ data, view, actionExecutor, children }: NodeProps) {
   const node = getNodeOfTreeRecord(view, data);
   const onDoubleClick = useCallback<React.MouseEventHandler>(
     (e) => {

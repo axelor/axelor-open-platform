@@ -531,6 +531,7 @@ export interface TreeNode {
 export interface TreeField extends Field {
   as?: string;
   selection?: string;
+  onClick?: string;
 }
 
 export interface TreeColumn extends SearchField {}

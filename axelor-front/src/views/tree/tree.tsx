@@ -23,9 +23,12 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useGridActionExecutor } from "../grid/builder/utils";
 import { toKebabCase, toTitleCase } from "@/utils/names";
-import { Formatters } from "@/utils/format";
 import { i18n } from "@/services/client/i18n";
-import { TreeNode as TreeNodeComponent, TreeNodeProps } from "./tree-node";
+import { Node as NodeComponent, NodeProps } from "./renderers/node";
+import {
+  NodeText as NodeTextComponent,
+  NodeTextProps,
+} from "./renderers/node-text";
 import { getNodeOfTreeRecord } from "./utils";
 
 export function Tree({ meta }: ViewProps<TreeView>) {
@@ -125,10 +128,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       if (type === "button") {
         attrs.title = "";
         attrs.width = 50;
-      }
-
-      if ((Formatters as any)[type]) {
-        attrs.formatter = (Formatters as any)[type];
       }
 
       return { ...column, ...attrs };
@@ -269,9 +268,15 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const canNext = offset + limit < totalCount;
 
   const nodeRenderer = useMemo(
-    () => (props: TreeNodeProps) =>
+    () => (props: NodeProps) =>
+      <NodeComponent {...props} view={view} actionExecutor={actionExecutor} />,
+    [view, actionExecutor]
+  );
+
+  const nodeTextRenderer = useMemo(
+    () => (props: NodeTextProps) =>
       (
-        <TreeNodeComponent
+        <NodeTextComponent
           {...props}
           view={view}
           actionExecutor={actionExecutor}
@@ -315,6 +320,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           records={records}
           sortable
           nodeRenderer={nodeRenderer}
+          textRenderer={nodeTextRenderer}
           onSort={handleSort}
           onLoad={onSearchNode}
           onNodeMove={handleNodeMove}
