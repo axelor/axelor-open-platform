@@ -17,6 +17,7 @@ import { ViewProps } from "../types";
 import DatePicker from "./components/date-picker";
 import Filters from "./components/filters";
 import { Filter } from "./components/types";
+import Popover from "./components/popover";
 
 import {
   formatDate,
@@ -57,6 +58,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     colorBy,
     mode: initialMode = "month",
   } = metaView;
+
+  const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
   const { hasButton } = usePerms(metaView, metaPerms);
   const can = useCallback(
@@ -179,7 +182,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const unfilteredCalendarEvents: SchedulerEvent[] = useMemo(() => {
     return records.map((record) => {
-      const { id, name: title } = record;
+      const { id, [nameField]: title } = record;
       const start = convertDate.toDate(record[eventStart] as string);
       const recordStop = eventStop && (record[eventStop] as string);
       let end = convertDate.toDate(
@@ -197,7 +200,15 @@ export function Calendar(props: ViewProps<CalendarView>) {
         allDay: isDateCalendar,
       } as SchedulerEvent;
     });
-  }, [records, eventStart, eventStop, eventLength, convertDate]);
+  }, [
+    records,
+    nameField,
+    convertDate,
+    eventStart,
+    eventStop,
+    eventLength,
+    isDateCalendar,
+  ]);
 
   const handleNavigationChange = useCallback((date: Date) => {
     setCalendarDate(date);
@@ -395,6 +406,36 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const handleEventUpdate = can("edit") ? _handleEventUpdate : undefined;
 
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<SchedulerEvent | null>(
+    null
+  );
+
+  const closePopover = useCallback(() => {
+    setAnchorEl(null);
+    setSelectedEvent(null);
+  }, []);
+
+  const handleEventSelect = useCallback(
+    ({ event }: Event, e: React.SyntheticEvent<any>) => {
+      setSelectedEvent(event);
+      setAnchorEl(e.currentTarget);
+    },
+    []
+  );
+
+  const _handleEditEvent = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const handleEditEvent = can("edit") ? _handleEditEvent : undefined;
+
+  const _handleRemoveEvent = useCallback(() => {
+    closePopover();
+  }, [closePopover]);
+
+  const handleRemoveEvent = can("delete") ? _handleRemoveEvent : undefined;
+
   return (
     <div className={styles.calendar}>
       <ViewToolBar
@@ -418,9 +459,20 @@ export function Calendar(props: ViewProps<CalendarView>) {
             onViewChange={handleViewChange}
             onEventResize={handleEventUpdate}
             onEventDrop={handleEventUpdate}
+            onEventSelect={handleEventSelect}
             eventStyler={eventStyler}
             components={components}
             style={{ width: "100%" }}
+          />
+          <Popover
+            anchorEl={anchorEl}
+            data={selectedEvent}
+            onEdit={handleEditEvent}
+            onRemove={handleRemoveEvent}
+            onClose={closePopover}
+            eventStart={eventStart}
+            eventStop={eventStop}
+            isDateCalendar={isDateCalendar}
           />
         </Box>
         <Box flex={1} p={2} className={styles["calendar-panel"]}>
