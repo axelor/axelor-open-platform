@@ -74,7 +74,7 @@ function FormField({
       let path = name.split(".");
       let next = path.shift();
       while (next) {
-        lens = lens.valueOr({});
+        lens = lens.reread((v) => v || {});
         lens = lens.prop(next);
         next = path.shift();
       }
