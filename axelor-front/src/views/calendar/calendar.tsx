@@ -441,6 +441,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const handleEventSelect = useCallback(
     ({ event }: Event, e: React.SyntheticEvent<any>) => {
+      e.stopPropagation();
       setSelectedEvent(event);
       setAnchorEl(e.currentTarget);
     },

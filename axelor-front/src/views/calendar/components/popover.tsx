@@ -53,7 +53,8 @@ export default function CalendarEventPopper({
   }, [record, eventStart, eventStop, formatDate]);
 
   return (
-    data && (
+    data &&
+    anchorEl && (
       <Popper
         open={Boolean(anchorEl)}
         target={anchorEl}
