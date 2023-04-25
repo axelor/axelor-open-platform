@@ -8,8 +8,12 @@ import {
   CommandItemProps,
   MenuItem,
   Input,
+  Badge,
 } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import {
+  MaterialIcon,
+  MaterialIconProps,
+} from "@axelor/ui/icons/meterial-icon";
 
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import { DataStore } from "@/services/client/data-store";
@@ -30,7 +34,26 @@ import { useSidebar } from "../nav-drawer/hook";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { i18n } from "@/services/client/i18n";
 import { quick } from "./utils";
+import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
 import styles from "./nav-header.module.scss";
+
+function BadgeIcon({
+  count,
+  ...props
+}: MaterialIconProps & {
+  count?: number;
+}) {
+  return (
+    <Box as="span" d="flex" position="relative">
+      <MaterialIcon {...props} />
+      {count ? (
+        <Badge bg="danger" className={styles.badge}>
+          {count}
+        </Badge>
+      ) : null}
+    </Box>
+  );
+}
 
 function FavoriteItem(props: CommandItemProps) {
   const { open: openTab, active } = useTabs();
@@ -188,6 +211,9 @@ function FarItems() {
   const { data, logout } = useSession();
   const { navigate } = useRoute();
   const { open: openTab } = useTabs();
+  const { unread: unreadMailCount } = useTagsMail();
+  const { current: currentTaskCount, pending: pendingTaskCount } =
+    useTagsTasks();
 
   const refreshQuickMenus = useCallback(async () => {
     setQuickMenus(await quick());
@@ -255,6 +281,9 @@ function FarItems() {
           {
             key: "mail",
             text: "Mails",
+            icon: (props: any) => (
+              <BadgeIcon {...props} icon="mail" count={unreadMailCount} />
+            ),
             iconOnly: true,
             iconProps: {
               icon: "mail",
@@ -264,6 +293,13 @@ function FarItems() {
           {
             key: "messages",
             text: "Messages",
+            icon: (props: any) => (
+              <BadgeIcon
+                {...props}
+                icon="notifications"
+                count={currentTaskCount}
+              />
+            ),
             iconOnly: true,
             iconProps: {
               icon: "notifications",
@@ -272,14 +308,18 @@ function FarItems() {
               {
                 key: "tasks.due",
                 text: i18n.get("Tasks due"),
-                subtext: i18n.get("no tasks"),
+                subtext: pendingTaskCount
+                  ? i18n.get("{0} tasks", pendingTaskCount)
+                  : i18n.get("no tasks"),
                 onClick: () => openTab("team.tasks.due"),
               },
               { key: "m-div", divider: true },
               {
                 key: "tasks.todo",
                 text: i18n.get("Tasks todo"),
-                subtext: i18n.get("no tasks"),
+                subtext: currentTaskCount
+                  ? i18n.get("{0} tasks", currentTaskCount)
+                  : i18n.get("no tasks"),
                 onClick: () => openTab("team.tasks.todo"),
               },
             ],

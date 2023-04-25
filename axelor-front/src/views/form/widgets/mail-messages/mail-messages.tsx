@@ -7,6 +7,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
 import { useViewAction } from "@/view-containers/views/scope";
+import { useTags } from "@/hooks/use-tags";
 
 function getMessages(
   id: number,
@@ -39,6 +40,8 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const { name } = useViewAction();
   const { model, modelId: recordId } = schema;
   const { offset, limit } = pagination;
+  const { fetchTags } = useTags();
+
   const setEmpty = useSetAtom(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
@@ -139,9 +142,10 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }
         setMessages([...messages]);
       }
+      fetchTags();
       // TODO: refresh tags
     },
-    [messages]
+    [messages, fetchTags]
   );
 
   const handleFlagsAction = useCallback(
@@ -162,7 +166,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       }
 
       if ($flags && $flags.isRead !== attrs.isRead) {
-        // TODO: refresh tags
+        fetchTags();
       }
 
       const flag = { ...attrs, version: undefined };
@@ -198,7 +202,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
       return flag as MessageFlag;
     },
-    [fetchAll, limit]
+    [fetchAll, fetchTags, limit]
   );
 
   const loadMore = useCallback(() => {
@@ -215,7 +219,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       setEmpty(total === 0);
     }
   }, [isMessageBox, total, setEmpty]);
-  
+
   return (
     <MessageBox
       fields={fields}

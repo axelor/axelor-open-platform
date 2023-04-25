@@ -8,9 +8,10 @@ import { DialogsProvider } from "@/components/dialogs";
 import { PopupsProvider } from "@/view-containers/view-popup";
 
 import { NavDrawer } from "./nav-drawer";
-import { useSidebar } from "./nav-drawer/hook";
 import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
+import { NavTags } from "./nav-tags";
+import { useSidebar } from "./nav-drawer/hook";
 
 // import global utils for external apps
 import "../utils/globals";
@@ -47,6 +48,7 @@ export function Layout() {
           </div>
         </Box>
       </Box>
+      <NavTags />
       <PopupsProvider />
       <DialogsProvider />
       <AlertsProvider />

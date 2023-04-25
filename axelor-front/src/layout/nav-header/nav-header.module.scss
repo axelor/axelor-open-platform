@@ -27,3 +27,13 @@
     vertical-align: middle;
   }
 }
+
+.badge {
+  position: absolute !important;
+  left: 0.75rem;
+  font-size: 0.65rem;
+  [dir='rtl'] & {
+    left: unset;
+    right: 0.75rem;
+  }
+}

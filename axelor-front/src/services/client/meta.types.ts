@@ -782,3 +782,9 @@ export type QuickMenu = {
   showingSelected?: boolean;
   items?: QuickMenuItem[];
 };
+
+export type Tag = {
+  name: string;
+  value: string;
+  style: string;
+};
