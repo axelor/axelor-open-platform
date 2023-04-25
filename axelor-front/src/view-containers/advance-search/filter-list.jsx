@@ -53,10 +53,16 @@ export function FilterList({
           {title}
         </Box>
       </Box>
-      <Box px={1} w={100} d="flex" flexDirection="column" alignItems="flex-start">
-        {items.map((filter) => (
+      <Box
+        px={1}
+        w={100}
+        d="flex"
+        flexDirection="column"
+        alignItems="flex-start"
+      >
+        {items.map((filter, ind) => (
           <FilterListItem
-            key={filter.id}
+            key={filter.id ?? `filter_${ind}`}
             filter={filter}
             isChecked={active.includes(filter.id)}
             disabled={disabled}
