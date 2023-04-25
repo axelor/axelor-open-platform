@@ -77,11 +77,12 @@ export function Grid(
         columnProps.computed = true;
       }
 
-      if (item.type === "button") {
+      if (item.type === 'button' || attrs?.type === 'icon') {
         columnProps.searchable = false;
         columnProps.computed = true;
         columnProps.width = columnProps.width || 40;
         columnProps.title = " ";
+        columnProps.action = true;
       }
 
       if (field?.type === "BOOLEAN" && !item.widget) {
