@@ -36,6 +36,10 @@ import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 import { addDate, getNextOf } from "@/utils/date";
 import { usePerms } from "@/hooks/use-perms";
 import { dialogs } from "@/components/dialogs";
+import { useEditor } from "@/hooks/use-relation";
+import { useViewTab } from "@/view-containers/views/scope";
+import { findView } from "@/services/client/meta-cache";
+import { FormView } from "@/services/client/meta.types";
 
 const { get: _t } = i18n;
 
@@ -429,9 +433,42 @@ export function Calendar(props: ViewProps<CalendarView>) {
     []
   );
 
-  const _handleEditEvent = useCallback(() => {
-    setAnchorEl(null);
-  }, []);
+  const showEditor = useEditor();
+  const viewTab = useViewTab();
+
+  const _handleEditEvent = useCallback(
+    async (event: SchedulerEvent) => {
+      setAnchorEl(null);
+      const record = (event as Record<string, any>).record as DataRecord;
+      const readonly = !can("edit");
+      const action = viewTab.action;
+      const type = "form";
+      const formView = (action.views?.find((view) => view.type === "form") ||
+        {}) as FormView;
+      const name = formView.name || action.model;
+      const model = formView.model || action.model || "";
+
+      const view = await findView({ type, name, model });
+
+      showEditor({
+        title: view.view.title || "",
+        model,
+        viewName: view.view.name,
+        record,
+        readonly,
+        onSelect: (updatedRecord) => {
+          setRecords((records) =>
+            records.map((record) =>
+              record.id === updatedRecord.id
+                ? { ...record, ...updatedRecord }
+                : record
+            )
+          );
+        },
+      });
+    },
+    [can, showEditor, viewTab.action]
+  );
 
   const handleEditEvent = can("edit") ? _handleEditEvent : undefined;
 
