@@ -13,7 +13,7 @@ interface CalendarEventPopperProps {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   onEdit?: (event: SchedulerEvent) => void;
-  onRemove?: (event: SchedulerEvent) => void;
+  onDelete?: (event: SchedulerEvent) => void;
   eventStart: string;
   eventStop?: string;
   isDateCalendar: boolean;
@@ -24,7 +24,7 @@ export default function CalendarEventPopper({
   anchorEl,
   onClose,
   onEdit,
-  onRemove,
+  onDelete,
   eventStart,
   eventStop,
   isDateCalendar,
@@ -84,8 +84,8 @@ export default function CalendarEventPopper({
               justifyContent="space-between"
               alignItems="center"
             >
-              {onRemove && (
-                <Button variant="link" as="a" onClick={() => onRemove(data)}>
+              {onDelete && (
+                <Button variant="link" as="a" onClick={() => onDelete(data)}>
                   {_t("Delete")}
                 </Button>
               )}

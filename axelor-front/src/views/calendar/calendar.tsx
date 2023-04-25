@@ -35,6 +35,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 import { addDate, getNextOf } from "@/utils/date";
 import { usePerms } from "@/hooks/use-perms";
+import { dialogs } from "@/components/dialogs";
 
 const { get: _t } = i18n;
 
@@ -434,11 +435,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const handleEditEvent = can("edit") ? _handleEditEvent : undefined;
 
-  const _handleRemoveEvent = useCallback(() => {
-    closePopover();
-  }, [closePopover]);
+  const _handleDeleteEvent = useCallback(
+    async (event: SchedulerEvent) => {
+      closePopover();
 
-  const handleRemoveEvent = can("delete") ? _handleRemoveEvent : undefined;
+      const confirmed = await dialogs.box({
+        title: _t("Deletion confirmation"),
+        content: _t('Are you sure you want to delete "{0}"?', event.title),
+        yesTitle: _t("Delete"),
+        noTitle: _t("Cancel"),
+      });
+
+      if (!confirmed) return;
+
+      const record = (event as Record<string, any>).record as DataRecord;
+      const { id, version } = record;
+      if (id == null || version == null) return;
+
+      await dataStore.delete({ id, version });
+      setRecords((records) => records.filter((record) => record.id !== id));
+    },
+    [closePopover, dataStore]
+  );
+
+  const handleDeleteEvent = can("delete") ? _handleDeleteEvent : undefined;
 
   return (
     <div className={styles.calendar}>
@@ -472,7 +492,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             anchorEl={anchorEl}
             data={selectedEvent}
             onEdit={handleEditEvent}
-            onRemove={handleRemoveEvent}
+            onDelete={handleDeleteEvent}
             onClose={closePopover}
             eventStart={eventStart}
             eventStop={eventStop}
