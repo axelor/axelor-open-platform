@@ -6,7 +6,7 @@ import { i18n } from "@/services/client/i18n";
 import { SchedulerEvent } from "@axelor/ui/src/scheduler";
 import { DataRecord } from "@/services/client/data.types";
 
-const { get: t } = i18n;
+const { get: _t } = i18n;
 
 interface CalendarEventPopperProps {
   data: SchedulerEvent | null;
@@ -86,12 +86,12 @@ export default function CalendarEventPopper({
             >
               {onRemove && (
                 <Button variant="link" as="a" onClick={() => onRemove(data)}>
-                  {t("Delete")}
+                  {_t("Delete")}
                 </Button>
               )}
               {onEdit && (
                 <Button variant="link" as="a" onClick={() => onEdit(data)}>
-                  {t("Edit event")}
+                  {_t("Edit event")}
                 </Button>
               )}
             </Box>

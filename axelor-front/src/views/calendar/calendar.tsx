@@ -36,7 +36,7 @@ import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 import { addDate, getNextOf } from "@/utils/date";
 import { usePerms } from "@/hooks/use-perms";
 
-const { get: t } = i18n;
+const { get: _t } = i18n;
 
 const eventStyler = ({
   event,
@@ -289,15 +289,19 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }[] = [
       {
         view: "month",
-        text: t("Month"),
+        text: _t("Month"),
         iconProps: { icon: "calendar_view_month" },
       },
       {
         view: "week",
-        text: t("Week"),
+        text: _t("Week"),
         iconProps: { icon: "calendar_view_week" },
       },
-      { view: "day", text: t("Day"), iconProps: { icon: "calendar_view_day" } },
+      {
+        view: "day",
+        text: _t("Day"),
+        iconProps: { icon: "calendar_view_day" },
+      },
     ];
 
     const today = new Date();
@@ -319,8 +323,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
       },
       {
         key: "today",
-        text: t("Today"),
-        description: t("Today"),
+        text: _t("Today"),
+        description: _t("Today"),
         iconProps: {
           icon: "today",
         },
@@ -330,8 +334,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
       },
       {
         key: "refresh",
-        text: t("Refresh"),
-        description: t("Refresh"),
+        text: _t("Refresh"),
+        description: _t("Refresh"),
         iconProps: {
           icon: "refresh",
         },
