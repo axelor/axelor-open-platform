@@ -541,6 +541,13 @@ function JsonEditor({
   valueAtom,
   readonly,
 }: FormEditorProps) {
+  const modelAtom = useMemo(
+    () => selectAtom(formAtom, (x) => x.model),
+    [formAtom]
+  );
+  const model = useAtomValue(modelAtom);
+  const jsonModel = schema.jsonModel;
+
   const jsonAtom = useMemo(() => {
     return atom(
       (get) => {
@@ -550,17 +557,26 @@ function JsonEditor({
       (get, set, update: SetStateAction<any>) => {
         const state =
           typeof update === "function" ? update(get(valueAtom)) : update;
-        set(valueAtom, state ? JSON.stringify(state) : null);
+        const record = state ? compactJson(state) : state;
+        set(valueAtom, state ? JSON.stringify(record) : null);
+
+        if (jsonModel) {
+          const formState = get(formAtom);
+          if (formState.record.jsonModel !== jsonModel) {
+            set(formAtom, {
+              ...formState,
+              record: { ...formState.record, jsonModel },
+            });
+          }
+        }
       }
     );
-  }, [valueAtom]);
+  }, [formAtom, jsonModel, valueAtom]);
 
   const jsonEditor = useMemo(
-    () => ({...processJsonView(editor), json: true}) as FormView,
+    () => ({ ...processJsonView(editor), json: true } as FormView),
     [editor]
   );
-
-  const { model } = useAtomValue(formAtom);
 
   return (
     <RecordEditor
@@ -590,4 +606,20 @@ function processJsonView(schema: Schema) {
   }
 
   return result;
+}
+
+function compactJson(record: DataRecord) {
+  const rec: DataRecord = {};
+  Object.entries(record).forEach(([k, v]) => {
+    if (k.indexOf("$") === 0 || v === null || v === undefined) return;
+    if (typeof v === "string" && v.trim() === "") return;
+    if (Array.isArray(v)) {
+      if (v.length === 0) return;
+      v = v.map(function (x) {
+        return x.id ? { id: x.id } : x;
+      });
+    }
+    rec[k] = v;
+  });
+  return rec;
 }
