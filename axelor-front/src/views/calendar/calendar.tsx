@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useAtomValue } from "jotai";
 
 import { Box, CommandItemProps } from "@axelor/ui/core";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
@@ -54,7 +55,7 @@ const eventStyler = ({
 l10n.getLocale();
 
 export function Calendar(props: ViewProps<CalendarView>) {
-  const { meta, dataStore } = props;
+  const { meta, dataStore, searchAtom } = props;
   const { view: metaView, fields: metaFields, perms: metaPerms } = meta;
   const {
     eventStart,
@@ -63,6 +64,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     colorBy,
     mode: initialMode = "month",
   } = metaView;
+
+  const advancedSearch = useAtomValue(searchAtom!);
 
   const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
@@ -162,13 +165,23 @@ export function Calendar(props: ViewProps<CalendarView>) {
           ],
         } as Criteria)
       : null;
-    return stopCriteria
+    let filter = stopCriteria
       ? ({
           operator: "or",
           criteria: [startCriteria, stopCriteria],
         } as Criteria)
       : startCriteria;
-  }, [calendarStart, calendarEnd, eventStart, eventStop]);
+
+    if (advancedSearch.query) {
+      filter = {
+        ...advancedSearch.query,
+        operator: "and",
+        criteria: [advancedSearch.query, filter],
+      };
+    }
+
+    return filter;
+  }, [eventStart, calendarStart, calendarEnd, eventStop, advancedSearch.query]);
 
   const handleRefresh = useCallback(
     async () =>
