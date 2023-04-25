@@ -5,7 +5,7 @@ import { selectAtom } from "jotai/utils";
 import { isEqual } from "lodash";
 
 import { Tag } from "@/services/client/meta.types";
-import { Socket } from "@/services/client/socket";
+import { SocketChannel } from "@/services/client/socket";
 
 const tagsAtom = atomWithImmer<{
   tasks: {
@@ -51,25 +51,21 @@ export function useTagsTasks() {
   );
 }
 
+const tagsChannel = new SocketChannel("tags");
+
 export function useTags() {
   const setTags = useSetAtom(tagsAtom);
-  const channel = useMemo(() => Socket("tags"), []);
 
-  const fetchTags = useCallback(
-    async function refresh() {
-      if (!channel || channel.state !== WebSocket.OPEN) return;
-      
-      const names = Array.from(document.querySelectorAll("[data-tag-name]"))
-        .map((el) => (el as HTMLElement).dataset.tagName)
-        .filter((tag) => tag);
+  const fetchTags = useCallback(async function refresh() {
+    const names = Array.from(document.querySelectorAll("[data-tag-name]"))
+      .map((el) => (el as HTMLElement).dataset.tagName)
+      .filter((tag) => tag);
 
-      return channel.send(names);
-    },
-    [channel]
-  );
+    return tagsChannel.send(names);
+  }, []);
 
   useEffect(() => {
-    return channel.subscribe((message: any) => {
+    return tagsChannel.subscribe((message: any) => {
       const { mail, tasks, tags } = message?.values || {};
       setTags((draft) => {
         if (tasks) {
@@ -85,7 +81,7 @@ export function useTags() {
         }
       });
     });
-  }, [channel, setTags]);
+  }, [setTags]);
 
   return { fetchTags };
 }
