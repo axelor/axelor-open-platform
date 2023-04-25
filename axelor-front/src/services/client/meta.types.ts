@@ -124,6 +124,7 @@ export interface Editor extends Omit<Panel, "type"> {
   layout?: string;
   viewer?: boolean;
   flexbox?: boolean;
+  json?: boolean;
   showOnNew?: boolean;
   onNew?: string;
   items?: (Field | Button | Spacer | Separator | Label | Panel)[];
@@ -451,6 +452,7 @@ export interface View {
 
 export interface FormView extends View, LayoutContainer {
   type: "form";
+  json?: boolean;
   onLoad?: string;
   onSave?: string;
   onNew?: string;

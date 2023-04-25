@@ -556,7 +556,7 @@ function JsonEditor({
   }, [valueAtom]);
 
   const jsonEditor = useMemo(
-    () => processJsonView(editor) as FormView,
+    () => ({...processJsonView(editor), json: true}) as FormView,
     [editor]
   );
 

@@ -38,14 +38,16 @@ export function useFormHandlers(
     [fields, model, parent, record]
   );
 
+  const json = meta.view.json ?? false;
+  const ctxAtom = json && parent ? parent : formAtom;
   const prepareContext = useSetAtom(contextAtom);
 
   const actionHandler = useMemo(
     () =>
       new FormActionHandler((options?: DataContext) =>
-        prepareContext(formAtom, options)
+        prepareContext(ctxAtom, options)
       ),
-    [formAtom, prepareContext]
+    [ctxAtom, prepareContext]
   );
 
   const actionExecutor = useMemo(
