@@ -3,14 +3,23 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { Box, CommandItemProps } from "@axelor/ui/core";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 import { Event } from "@axelor/ui/scheduler/types";
-
-import { useAsync } from "@/hooks/use-async";
-import { useSession } from "@/hooks/use-session";
+import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 
 import { i18n } from "@/services/client/i18n";
 import { l10n } from "@/services/client/l10n";
-import { CalendarView } from "@/services/client/meta.types";
+import { findView } from "@/services/client/meta-cache";
+import { CalendarView, FormView } from "@/services/client/meta.types";
 import { Criteria, DataRecord } from "@/services/client/data.types";
+
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { dialogs } from "@/components/dialogs";
+import { addDate, getNextOf } from "@/utils/date";
+
+import { useViewTab } from "@/view-containers/views/scope";
+import { usePerms } from "@/hooks/use-perms";
+import { useEditor } from "@/hooks/use-relation";
+import { useAsync } from "@/hooks/use-async";
+import { useSession } from "@/hooks/use-session";
 
 import { ViewProps } from "../types";
 
@@ -31,15 +40,6 @@ import {
 
 import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
-import { addDate, getNextOf } from "@/utils/date";
-import { usePerms } from "@/hooks/use-perms";
-import { dialogs } from "@/components/dialogs";
-import { useEditor } from "@/hooks/use-relation";
-import { useViewTab } from "@/view-containers/views/scope";
-import { findView } from "@/services/client/meta-cache";
-import { FormView } from "@/services/client/meta.types";
 
 const { get: _t } = i18n;
 
@@ -67,7 +67,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
   const { hasButton } = usePerms(metaView, metaPerms);
-  const can = useCallback(
+  const editableAndButton = useCallback(
     (name: string) => metaView.editable !== false && hasButton(name),
     [hasButton, metaView.editable]
   );
@@ -413,7 +413,9 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [eventStart, convertDate, eventStop, dataStore, metaFields, isDateCalendar]
   );
 
-  const handleEventUpdate = can("edit") ? _handleEventUpdate : undefined;
+  const handleEventUpdate = editableAndButton("edit")
+    ? _handleEventUpdate
+    : undefined;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<SchedulerEvent | null>(
@@ -436,24 +438,26 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const showEditor = useEditor();
   const viewTab = useViewTab();
 
-  const _handleEditEvent = useCallback(
-    async (event: SchedulerEvent) => {
+  const handleOpenEvent = useCallback(
+    async (event: SchedulerEvent, readonly: boolean) => {
       setAnchorEl(null);
+
       const record = (event as Record<string, any>).record as DataRecord;
-      const readonly = !can("edit");
       const action = viewTab.action;
       const type = "form";
-      const formView = (action.views?.find((view) => view.type === "form") ||
+      const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
-      const name = formView.name || action.model;
-      const model = formView.model || action.model || "";
+      const { name, model = action.model ?? "" } = formView;
 
       const view = await findView({ type, name, model });
+      const {
+        view: { title = "", name: viewName },
+      } = view;
 
       showEditor({
-        title: view.view.title || "",
+        title,
         model,
-        viewName: view.view.name,
+        viewName,
         record,
         readonly,
         onSelect: (updatedRecord) => {
@@ -467,17 +471,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
         },
       });
     },
-    [can, showEditor, viewTab.action]
+    [showEditor, viewTab.action]
   );
 
-  const handleEditEvent = can("edit") ? _handleEditEvent : undefined;
+  const _handleEditEvent = useCallback(
+    (event: SchedulerEvent) => handleOpenEvent(event, false),
+    [handleOpenEvent]
+  );
+
+  const _handleViewEvent = useCallback(
+    (event: SchedulerEvent) => handleOpenEvent(event, true),
+    [handleOpenEvent]
+  );
+
+  const handleEditEvent = editableAndButton("edit")
+    ? _handleEditEvent
+    : undefined;
+  const handleViewEvent = hasButton("view") ? _handleViewEvent : undefined;
 
   const _handleDeleteEvent = useCallback(
     async (event: SchedulerEvent) => {
       closePopover();
 
       const confirmed = await dialogs.box({
-        title: _t("Deletion confirmation"),
+        title: _t("Deletion Confirmation"),
         content: _t('Are you sure you want to delete "{0}"?', event.title),
         yesTitle: _t("Delete"),
         noTitle: _t("Cancel"),
@@ -495,7 +512,9 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [closePopover, dataStore]
   );
 
-  const handleDeleteEvent = can("delete") ? _handleDeleteEvent : undefined;
+  const handleDeleteEvent = editableAndButton("delete")
+    ? _handleDeleteEvent
+    : undefined;
 
   return (
     <div className={styles.calendar}>
@@ -529,6 +548,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             anchorEl={anchorEl}
             data={selectedEvent}
             onEdit={handleEditEvent}
+            onView={handleViewEvent}
             onDelete={handleDeleteEvent}
             onClose={closePopover}
             eventStart={eventStart}

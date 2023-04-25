@@ -13,6 +13,7 @@ interface CalendarEventPopperProps {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   onEdit?: (event: SchedulerEvent) => void;
+  onView?: (event: SchedulerEvent) => void;
   onDelete?: (event: SchedulerEvent) => void;
   eventStart: string;
   eventStop?: string;
@@ -24,6 +25,7 @@ export default function CalendarEventPopper({
   anchorEl,
   onClose,
   onEdit,
+  onView,
   onDelete,
   eventStart,
   eventStop,
@@ -94,6 +96,11 @@ export default function CalendarEventPopper({
                   {_t("Edit event")}
                 </Button>
               )}
+              {!onEdit && onView && (
+                <Button variant="link" as="a" onClick={() => onView(data)}>
+                  {_t("View event")}
+                </Button>
+              )}{" "}
             </Box>
           </Box>
         </ClickAwayListener>
