@@ -183,15 +183,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return filter;
   }, [eventStart, calendarStart, calendarEnd, eventStop, advancedSearch.query]);
 
-  const handleRefresh = useCallback(
-    async () =>
-      await dataStore.search({
-        filter,
-        fields: searchFieldNames,
-        limit: maxPerPage,
-      }),
-    [dataStore, filter, searchFieldNames, maxPerPage]
-  );
+  const handleRefresh = useCallback(async () => {
+    const res = await dataStore.search({
+      filter,
+      fields: searchFieldNames,
+      limit: maxPerPage,
+    });
+    setRecords(res.records);
+  }, [dataStore, filter, searchFieldNames, maxPerPage]);
 
   useAsync(handleRefresh, [dataStore, filter]);
 
