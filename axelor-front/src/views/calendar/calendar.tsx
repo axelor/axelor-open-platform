@@ -438,11 +438,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const showEditor = useEditor();
   const viewTab = useViewTab();
 
-  const handleOpenEvent = useCallback(
-    async (event: SchedulerEvent, readonly: boolean) => {
-      setAnchorEl(null);
-
-      const record = (event as Record<string, any>).record as DataRecord;
+  const showRecord = useCallback(
+    async (
+      record: DataRecord,
+      readonly: boolean,
+      onSelect: (data: DataRecord) => void
+    ) => {
       const action = viewTab.action;
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
@@ -460,27 +461,39 @@ export function Calendar(props: ViewProps<CalendarView>) {
         viewName,
         record,
         readonly,
-        onSelect: (updatedRecord) => {
-          setRecords((records) =>
-            records.map((record) =>
-              record.id === updatedRecord.id
-                ? { ...record, ...updatedRecord }
-                : record
-            )
-          );
-        },
+        onSelect,
       });
     },
     [showEditor, viewTab.action]
   );
 
+  const handleOpenEvent = useCallback(
+    (
+      event: SchedulerEvent,
+      readonly: boolean,
+      onSelect: (data: DataRecord) => void
+    ) => {
+      setAnchorEl(null);
+      const record = (event as Record<string, any>).record as DataRecord;
+      showRecord(record, readonly, onSelect);
+    },
+    [showRecord]
+  );
+
   const _handleEditEvent = useCallback(
-    (event: SchedulerEvent) => handleOpenEvent(event, false),
+    (event: SchedulerEvent) =>
+      handleOpenEvent(event, false, (data: DataRecord) => {
+        setRecords((records) =>
+          records.map((record) =>
+            record.id === data.id ? { ...record, ...data } : record
+          )
+        );
+      }),
     [handleOpenEvent]
   );
 
   const _handleViewEvent = useCallback(
-    (event: SchedulerEvent) => handleOpenEvent(event, true),
+    (event: SchedulerEvent) => handleOpenEvent(event, true, () => {}),
     [handleOpenEvent]
   );
 
@@ -488,6 +501,28 @@ export function Calendar(props: ViewProps<CalendarView>) {
     ? _handleEditEvent
     : undefined;
   const handleViewEvent = hasButton("view") ? _handleViewEvent : undefined;
+
+  const _handleEventCreate = useCallback(
+    ({ start, end }: Event) => {
+      const record = {
+        [eventStart]: convertDate.toString(start),
+      } as DataRecord;
+
+      if (eventStop) {
+        const _end = isDateCalendar ? addDate(end, -1, "days") : end;
+        record[eventStop] = convertDate.toString(_end);
+      }
+
+      showRecord(record, false, (data: DataRecord) => {
+        setRecords((records) => [...records, data]);
+      });
+    },
+    [convertDate, eventStart, eventStop, isDateCalendar, showRecord]
+  );
+
+  const handleEventCreate = editableAndButton("new")
+    ? _handleEventCreate
+    : undefined;
 
   const _handleDeleteEvent = useCallback(
     async (event: SchedulerEvent) => {
@@ -540,9 +575,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
             onEventResize={handleEventUpdate}
             onEventDrop={handleEventUpdate}
             onEventSelect={handleEventSelect}
+            onEventCreate={handleEventCreate}
             eventStyler={eventStyler}
             components={components}
             style={{ width: "100%" }}
+            selectable="ignoreEvents"
           />
           <Popover
             anchorEl={anchorEl}
