@@ -49,3 +49,4 @@ export * from "./text";
 export * from "./toggle";
 export * from "./url";
 export * from "./wkf-status";
+export * from "./widget-select";
