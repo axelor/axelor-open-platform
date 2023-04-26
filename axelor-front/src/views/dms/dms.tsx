@@ -5,7 +5,7 @@ import {
   useState,
   useRef,
   useMemo,
-  Fragment,
+  useEffect,
 } from "react";
 import { Box, Input, Link } from "@axelor/ui";
 import { GridRow, GridColumn } from "@axelor/ui/src/grid";
@@ -36,7 +36,9 @@ import { Grid as GridComponent } from "../grid/builder";
 import { DmsTree } from "./dms-tree";
 import { DmsOverlay } from "./dms-overlay";
 import { downloadAsBatch, toStrongText } from "./utils";
+import { Uploader } from "./uploader";
 import styles from "./dms.module.scss";
+import { DataRecord } from "@/services/client/data.types";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
 
@@ -81,6 +83,7 @@ export function Dms(props: ViewProps<GridView>) {
 
   const { orderBy, rows, selectedRows } = state;
   const uploadSize = session?.api?.upload?.maxSize ?? 0;
+  const uploader = useMemo(() => new Uploader(), []);
 
   const getSelectedNode = useCallback(
     () => treeRecords.find((r) => r.id === selected),
@@ -295,8 +298,10 @@ export function Dms(props: ViewProps<GridView>) {
   }, [getSelectedDocuments, getSelectedNode, dataStore]);
 
   const handleUpload = useCallback(
-    (files: FileList | null) => {
-      for (let i = 0; i < (files?.length ?? 0); i++) {
+    async (files: FileList | null) => {
+      if (!files) return;
+
+      for (let i = 0; i < files.length; i++) {
         const file = files?.[i];
         if (file && uploadSize > 0 && file.size > 1048576 * uploadSize) {
           return dialogs.info({
@@ -307,9 +312,18 @@ export function Dms(props: ViewProps<GridView>) {
           });
         }
       }
-      // TODO file upload in chunk
+
+      for (let i = 0; i < files.length; i++) {
+        uploader.queue({
+          file: files[i],
+        });
+      }
+
+      await uploader.process();
+
+      await onSearch();
     },
-    [uploadSize]
+    [uploadSize, uploader, onSearch]
   );
 
   const handleNodeSelect = useCallback((record: TreeRecord) => {
@@ -368,6 +382,20 @@ export function Dms(props: ViewProps<GridView>) {
     }
     return collect(selected);
   }, [treeRecords, selected]);
+
+  useEffect(() => {
+    const parent = getSelectedNode();
+    uploader.setSaveHandler((data: DataRecord) => {
+      return dataStore.save({
+        ...data,
+        ...(parent?.id && {
+          parent: {
+            id: parent.id,
+          },
+        }),
+      });
+    });
+  }, [uploader, dataStore, getSelectedNode]);
 
   return (
     <DndProvider backend={HTML5Backend}>
