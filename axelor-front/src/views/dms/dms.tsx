@@ -25,6 +25,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { i18n } from "@/services/client/i18n";
 import { ViewProps } from "../types";
+import { DataRecord } from "@/services/client/data.types";
 import { TreeRecord } from "./types";
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
@@ -37,8 +38,8 @@ import { DmsTree } from "./dms-tree";
 import { DmsOverlay } from "./dms-overlay";
 import { downloadAsBatch, toStrongText } from "./utils";
 import { Uploader } from "./uploader";
+import { DmsUpload } from "./dms-upload";
 import styles from "./dms.module.scss";
-import { DataRecord } from "@/services/client/data.types";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
 
@@ -545,6 +546,7 @@ export function Dms(props: ViewProps<GridView>) {
             />
           </Box>
         </Box>
+        <DmsUpload uploader={uploader} />
       </DmsOverlay>
     </DndProvider>
   );

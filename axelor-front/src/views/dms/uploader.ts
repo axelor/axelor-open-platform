@@ -6,6 +6,8 @@ import { readCookie } from "@/services/client/client";
 import { TreeRecord } from "./types";
 import { DataRecord } from "@/services/client/data.types";
 
+export type UploaderListener = () => void;
+
 export type UploadFile = {
   file: File;
   uuid?: null | string;
@@ -17,7 +19,7 @@ export type UploadFile = {
   active?: boolean;
   failed?: boolean;
   complete?: boolean;
-  progress?: number | string;
+  progress?: number;
   transfer?: string;
   abort?: () => void;
   retry?: () => void;
@@ -49,9 +51,29 @@ export class Uploader {
   #pending: UploadFile[] = [];
   #running = false;
   #saveHandler: ((data: DataRecord) => Promise<DataRecord>) | null = null;
+  #listeners = new Set<UploaderListener>();
+
+  get running() {
+    return this.#running;
+  }
+
+  get items() {
+    return this.#items;
+  }
 
   setSaveHandler(handler: (data: DataRecord) => Promise<DataRecord>) {
     this.#saveHandler = handler;
+  }
+
+  subscribe(listener: UploaderListener) {
+    this.#listeners.add(listener);
+    return () => {
+      this.#listeners.delete(listener);
+    };
+  }
+
+  notify() {
+    this.#listeners.forEach((fn) => fn());
   }
 
   queue(info: UploadFile) {
@@ -61,10 +83,12 @@ export class Uploader {
     info.abort = () => {
       info.transfer = i18n.get("Cancelled");
       info.pending = false;
+      this.notify();
     };
     info.retry = () => {
       this.queue(info);
       this.process();
+      this.notify();
     };
 
     if (!this.#items.includes(info)) {
@@ -73,6 +97,7 @@ export class Uploader {
     if (!this.#pending.includes(info)) {
       this.#pending.push(info);
     }
+    this.notify();
   }
 
   process() {
@@ -80,9 +105,11 @@ export class Uploader {
       if (this.#items.every((item) => item.complete)) {
         this.#items.length = 0;
       }
-      return;
+      return this.notify();
     }
+
     this.#running = true;
+    this.notify();
 
     let info = this.#pending.shift();
 
@@ -92,6 +119,7 @@ export class Uploader {
 
     if (!info) {
       this.#running = false;
+      this.notify();
       return;
     }
 
@@ -105,6 +133,7 @@ export class Uploader {
         info.progress = 0;
         info.transfer = reason.message;
         info.failed = true;
+        this.notify();
       }
       return this.process();
     };
@@ -115,7 +144,8 @@ export class Uploader {
         info.active = false;
         info.pending = false;
         info.complete = true;
-        info.progress = "100%";
+        info.progress = 100;
+        this.notify();
       }
       return this.process();
     };
@@ -127,12 +157,14 @@ export class Uploader {
     this.#running = false;
     this.#items.length = 0;
     this.#pending.length = 0;
+    this.notify();
   }
 
   async upload(info: UploadFile) {
     const xhr = new XMLHttpRequest();
     const file = info.file;
     const onSave = this.#saveHandler;
+    const notify = () => this.notify();
 
     return new Promise<any>((resolve, reject) => {
       function doClean() {
@@ -176,6 +208,9 @@ export class Uploader {
         if (response && response.fileId) {
           info.uuid = response.fileId;
         }
+
+        notify();
+
         if (response && response.id) {
           return onSuccess(response);
         }
@@ -206,6 +241,7 @@ export class Uploader {
 
         if (info._end! > file.size) {
           info._end = file.size;
+          notify();
         }
 
         const chunk = file.slice(info._start, info._end);
@@ -223,6 +259,7 @@ export class Uploader {
       info.abort = function () {
         xhr.abort();
         onCancel();
+        notify();
       };
 
       info.retry = () => {
@@ -231,12 +268,14 @@ export class Uploader {
         this.process();
       };
 
+      notify();
       xhr.upload.addEventListener("progress", function (e) {
         const total = (info._start ?? 0) + e.loaded;
         const done = Math.round((total / file.size) * 100);
-        info.progress = done > 95 ? "95%" : done + "%";
+        info.progress = done > 95 ? 95 : done;
         info.transfer = formatSize(total, file.size);
         info.loaded = total === file.size;
+        notify();
       });
 
       xhr.onreadystatechange = function (e) {
