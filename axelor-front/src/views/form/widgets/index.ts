@@ -37,6 +37,7 @@ export * from "./password";
 export * from "./phone";
 export * from "./progress";
 export * from "./radio-select";
+export * from "./ref-text";
 export * from "./selection";
 export * from "./separator";
 export * from "./single-select";

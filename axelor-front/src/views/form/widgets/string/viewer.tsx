@@ -5,7 +5,7 @@ export function ViewerInput({ value }: { value: string | number }) {
   return (
     <Input
       type="text"
-      value={value}
+      defaultValue={value}
       disabled
       readOnly
       bg="body"
