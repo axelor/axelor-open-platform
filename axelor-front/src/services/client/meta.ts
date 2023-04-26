@@ -137,6 +137,15 @@ export async function fields(model: string): Promise<MetaData> {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
+    if (status === 0 && data?.fields) {
+      data.fields = data.fields.reduce(
+        (acc: Record<string, Property>, field: Property) => {
+          acc[field.name] = field;
+          return acc;
+        },
+        {} as Record<string, Property>
+      );
+    }
     return status === 0 ? data : Promise.reject(500);
   }
 
