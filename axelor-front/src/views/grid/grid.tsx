@@ -29,6 +29,7 @@ import {
 } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
+import { Dms } from "../dms";
 import { Grid as GridComponent } from "./builder";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
@@ -38,6 +39,14 @@ import styles from "./grid.module.scss";
 import { commonClassNames } from "@/styles/common";
 
 export function Grid(props: ViewProps<GridView>) {
+  const { action } = useViewTab();
+  if (action.params?.["ui-template:grid"] === "dms-file-list") {
+    return <Dms {...props} />;
+  }
+  return <GridInner {...props} />;
+}
+
+function GridInner(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom, domains } = props;
   const { view, fields } = meta;
   const { hasButton } = usePerms(meta.view, meta.perms);
@@ -414,7 +423,6 @@ export function Grid(props: ViewProps<GridView>) {
 
       <ScopeProvider scope={GridSearchScope} value={searchScope}>
         <GridComponent
-          dataStore={dataStore}
           records={records}
           view={view}
           fields={fields}

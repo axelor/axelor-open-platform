@@ -294,3 +294,45 @@
 .text-warning {
   color: #8a6d3b;
 }
+
+i.fa-colored {
+  &.fa-folder {
+    color: #ffa726;
+  }
+
+  &.fa-file-o {
+    color: #767676;
+  }
+
+  &.fa-file-text-o {
+    color: #2185d0;
+  }
+
+  &.fa-file-word-o {
+    color: #2185d0;
+  }
+
+  &.fa-file-excel-o {
+    color: #21ba45;
+  }
+
+  &.fa-file-powerpoint-o {
+    color: #a33e03;
+  }
+
+  &.fa-file-pdf-o {
+    color: #db2828;
+  }
+
+  &.fa-file-image-o {
+    color: #6435c9;
+  }
+
+  &.fa-file-video-o {
+    color: #db2828;
+  }
+
+  &.fa-file-archive-o {
+    color: #a5673f;
+  }
+}

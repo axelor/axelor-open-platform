@@ -1,0 +1,21 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.node {
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  &.active {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.icon.hide {
+  visibility: hidden;
+}

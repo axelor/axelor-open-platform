@@ -1,0 +1,53 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.content {
+  overflow: hidden;
+}
+
+.content,
+.grid {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.grid,
+.tree {
+  overflow: auto;
+}
+
+.tree {
+  display: flex;
+  width: 300px;
+  transition: all 0.25s;
+  &.hide {
+    width: 0px;
+  }
+}
+
+.breadcrumbs {
+  min-width: 0;
+  ul {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+  }
+  li {
+    display: flex;
+    & > * {
+      display: flex;
+      align-items: center;
+    }
+  }
+  a {
+    cursor: pointer;
+  }
+}
