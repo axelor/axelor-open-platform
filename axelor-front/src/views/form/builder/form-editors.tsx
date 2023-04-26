@@ -578,6 +578,14 @@ function JsonEditor({
     [editor]
   );
 
+  const setInvalid = useSetAtom(setInvalidAtom);
+  const handleInvalid = useCallback(
+    (value: any, invalid: boolean) => {
+      setInvalid(widgetAtom, invalid);
+    },
+    [setInvalid, widgetAtom]
+  );
+
   return (
     <RecordEditor
       model={model}
@@ -587,7 +595,7 @@ function JsonEditor({
       formAtom={formAtom}
       widgetAtom={widgetAtom}
       valueAtom={jsonAtom}
-      setInvalid={() => {}}
+      setInvalid={handleInvalid}
       readonly={readonly}
     />
   );
