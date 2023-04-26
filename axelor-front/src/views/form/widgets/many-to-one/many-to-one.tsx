@@ -3,19 +3,21 @@ import { MouseEvent, useCallback } from "react";
 
 import { Select } from "@axelor/ui";
 
-import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
 import { usePerms } from "@/hooks/use-perms";
+import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
+import { useAtomCallback } from "jotai/utils";
 import { FieldContainer, FieldProps } from "../../builder";
 import { ViewerInput, ViewerLink } from "../string";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
-  const { schema, valueAtom, widgetAtom, readonly } = props;
+  const { schema, formAtom, valueAtom, widgetAtom, readonly } = props;
   const {
     uid,
+    domain,
     target,
     targetName,
     targetSearch,
@@ -88,13 +90,18 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     });
   }, [setValue, showSelector, target, title, gridView]);
 
-  const handleCompletion = useCallback(
-    async (value: string) => {
-      const res = await search(value);
-      const { records } = res;
-      return records;
-    },
-    [search]
+  const handleCompletion = useAtomCallback(
+    useCallback(
+      async (get, set, value: string) => {
+        const res = await search(value, {
+          _domain: domain,
+          _domainContext: get(formAtom).record,
+        });
+        const { records } = res;
+        return records;
+      },
+      [domain, formAtom, search]
+    )
   );
 
   return (

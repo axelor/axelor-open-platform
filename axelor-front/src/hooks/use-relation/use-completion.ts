@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from "react";
 import uniq from "lodash/uniq";
+import { useCallback, useMemo } from "react";
 
 import { DataSource } from "@/services/client/data";
 import { DataContext } from "@/services/client/data.types";
@@ -8,18 +8,9 @@ export function useCompletion(options: {
   target: string;
   targetName?: string;
   targetSearch?: string[];
-  domain?: string;
-  context?: DataContext;
   limit?: number;
 }) {
-  const {
-    target,
-    targetName,
-    targetSearch,
-    domain,
-    context,
-    limit = 20,
-  } = options;
+  const { target, targetName, targetSearch, limit = 20 } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
     () => [[targetName], targetSearch].flat().filter(Boolean) as string[],
@@ -27,7 +18,14 @@ export function useCompletion(options: {
   );
 
   const search = useCallback(
-    async (term: string) => {
+    async (
+      term: string,
+      options?: {
+        _domain?: string;
+        _domainContext?: DataContext;
+      }
+    ) => {
+      const { _domain, _domainContext } = options || {};
       return dataSource.search({
         limit,
         fields: uniq([
@@ -36,8 +34,8 @@ export function useCompletion(options: {
           ...(targetSearch || []),
         ]),
         filter: {
-          _domain: domain,
-          _domainContext: context,
+          _domain,
+          _domainContext,
           ...(term
             ? {
                 operator: "or",
@@ -51,7 +49,7 @@ export function useCompletion(options: {
         },
       });
     },
-    [context, dataSource, domain, limit, names, targetName, targetSearch]
+    [dataSource, limit, names, targetName, targetSearch]
   );
 
   return search;
