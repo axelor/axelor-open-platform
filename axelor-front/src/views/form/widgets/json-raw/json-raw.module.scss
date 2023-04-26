@@ -1,0 +1,24 @@
+.container {
+  gap: 1rem;
+}
+
+.item {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+
+  .name,
+  .value {
+    flex: 1;
+  }
+
+  .name {
+    font-weight: bold;
+  }
+}
+
+.container button {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
