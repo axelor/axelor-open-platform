@@ -3,7 +3,6 @@ import dayjsLocale from "dayjs/locale.json";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
 
 import { toKebabCase } from "@/utils/names";
 import { session } from "./session";
@@ -36,18 +35,6 @@ const SUPPORTED_CURRENCY_CODES: Record<string, string> = {
   "zh": "CNY",
 };
 
-// prettier-ignore
-const DATEFNS_LOCALES = [
-  "af", "ar-DZ", "ar-MA", "ar-SA", "ar-TN", "az", "be", "bg", "bn", "bs", "ca",
-  "cs", "cy", "da", "de", "de-AT", "el", "en-AU", "en-CA", "en-GB", "en-IN",
-  "en-NZ", "en-US", "en-ZA", "eo", "es", "et", "eu", "fa-IR", "fi", "fr",
-  "fr-CA", "fr-CH", "gd", "gl", "gu", "he", "hi", "hr", "ht", "hu", "hy", "id",
-  "is", "it", "ja", "ja-Hira", "ka", "kk", "kn", "ko", "lb", "lt", "lv", "mk",
-  "mn", "ms", "mt", "nb", "nl", "nl-BE", "nn", "pl", "pt", "pt-BR", "ro", "ru",
-  "sk", "sl", "sq", "sr", "sr-Latn", "sv", "ta", "te", "th", "tr", "ug", "uk",
-  "uz", "vi", "zh-CN", "zh-TW",
-];
-
 const getNormalizedLocale = (locale: string) => toKebabCase(locale);
 const getShortLocale = (locale: string) => toKebabCase(locale).split("-")[0];
 const getCountry = (locale: string) => toKebabCase(locale).split("-")[1];
@@ -69,8 +56,6 @@ async function init() {
 
   const dayjsLocale = await initDayjs();
   dateFormat = findDateFormat(dayjsLocale);
-
-  await initDatefns();
 }
 
 async function initDayjs() {
@@ -79,31 +64,12 @@ async function initDayjs() {
   return data;
 }
 
-async function initDatefns() {
-  const data = await findDateFnsLocale();
-  if (data) {
-    registerLocale(locale, data);
-  }
-  setDefaultLocale(locale);
-}
-
 async function findDayjsLocale() {
   const supportedLocales = dayjsLocale.map((locale) => locale.key);
   const found = _findLocale(supportedLocales, locale);
   if (found) {
     const { default: data } = await import(
       `../../../node_modules/dayjs/esm/locale/${found}.js`
-    );
-    return data;
-  }
-  return null;
-}
-
-async function findDateFnsLocale() {
-  const found = _findLocale(DATEFNS_LOCALES, locale);
-  if (found) {
-    const { default: data } = await import(
-      `../../../node_modules/date-fns/esm/locale/${found}/index.js`
     );
     return data;
   }

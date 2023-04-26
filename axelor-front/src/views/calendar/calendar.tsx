@@ -24,7 +24,7 @@ import { useSession } from "@/hooks/use-session";
 
 import { ViewProps } from "../types";
 
-import DatePicker from "./components/date-picker";
+import { Picker as DatePicker } from "../form/widgets/date/picker";
 import Filters from "./components/filters";
 import { Filter } from "./components/types";
 import Popover from "./components/popover";
