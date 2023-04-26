@@ -13,7 +13,7 @@ import { i18n } from "@/services/client/i18n";
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
-import { useLazyWidget } from "./hooks";
+import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
 import { ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
@@ -72,10 +72,9 @@ function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {
   const attrs = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs), [widgetAtom])
   );
-  const { loading, Comp } = useLazyWidget(schema);
+  const Comp = useWidget(schema);
 
   if (attrs.hidden) return null;
-  if (loading) return null;
 
   const widgetProps = {
     schema,

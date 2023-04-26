@@ -1,46 +1,32 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import React, { useCallback, useRef, useState } from "react";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Schema } from "@/services/client/meta.types";
-import { Cache } from "@/utils/cache";
-import { toCamelCase, toKebabCase } from "@/utils/names";
+import { toCamelCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
-const cache = new Cache<React.ElementType>();
+import * as WIDGETS from "../widgets";
 
-const loadWidget = async (type: string) => {
-  const module = toKebabCase(type);
-  const name = toCamelCase(type);
-  try {
-    const { [name]: Comp } = await import(`../widgets/${module}/index.ts`);
-    return Comp as React.ElementType;
-  } catch (error) {
-    console.error(`Unable to load widget ${type}`);
-    return Promise.reject(error);
+export function useWidget(schema: Schema) {
+  const compRef = useRef<React.ElementType>();
+  if (compRef.current) {
+    return compRef.current;
   }
-};
 
-export function useLazyWidget(schema: Schema) {
-  const name = schema.widget || schema.serverType;
-  const componentRef = useRef<React.ElementType | undefined>(cache.get(name));
-  const [loading, setLoading] = useState(false);
-  useAsyncEffect(async () => {
-    if (componentRef.current || loading) return;
-    setLoading(true);
-    try {
-      componentRef.current = await loadWidget(name).catch(() =>
-        loadWidget(schema.serverType)
-      );
-      cache.put(name, componentRef.current);
-    } finally {
-      setLoading(false);
-    }
-  }, [schema]);
-  return {
-    loading,
-    Comp: componentRef.current,
-  };
+  const name = toCamelCase(schema.widget);
+  const type = toCamelCase(schema.serverType);
+
+  const Comp =
+    WIDGETS[name as keyof typeof WIDGETS] ||
+    WIDGETS[type as keyof typeof WIDGETS];
+
+  compRef.current = Comp as React.ElementType;
+
+  if (!(name in WIDGETS)) {
+    console.log("Unknown widget:", schema.widget);
+  }
+
+  return compRef.current;
 }
 
 /**
