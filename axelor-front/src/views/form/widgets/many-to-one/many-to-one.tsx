@@ -1,14 +1,16 @@
 import { useAtom, useAtomValue } from "jotai";
-import { MouseEvent, useCallback } from "react";
+import { MouseEvent, useCallback, useState } from "react";
 
 import { Select } from "@axelor/ui";
 
 import { usePerms } from "@/hooks/use-perms";
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
+import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useAtomCallback } from "jotai/utils";
 import { FieldContainer, FieldProps } from "../../builder";
 import { ViewerInput, ViewerLink } from "../string";
@@ -46,7 +48,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   });
 
   const handleChange = (value: any) => {
-    setValue(value);
+    setValue(value, true);
   };
 
   const canView = value && hasButton("view");
@@ -63,7 +65,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         record: record ?? value,
         readonly,
         onSelect: (record) => {
-          setValue(record);
+          setValue(record, true);
         },
       });
     },
@@ -84,11 +86,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       model: target,
       viewName: gridView,
       multiple: false,
-      onSelect: (records) => {
-        setValue(records[0]);
+      onSelect: async (records) => {
+        setValue(records[0], true);
       },
     });
-  }, [setValue, showSelector, target, title, gridView]);
+  }, [showSelector, title, target, gridView, setValue]);
 
   const handleCompletion = useAtomCallback(
     useCallback(
@@ -104,6 +106,42 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
+  const [selectedValue, setSelectedValue] = useState(value);
+
+  const ensureNameValue = useAtomCallback(
+    useCallback(
+      async (get, set, signal: AbortSignal) => {
+        if (signal.aborted) return;
+        let current = selectedValue || value;
+        if ((current || {}).id !== (value || {}).id) {
+          current = value;
+        }
+        if (
+          current &&
+          current.id &&
+          current.id > 0 &&
+          current[targetName] === undefined
+        ) {
+          const ds = new DataSource(target);
+          const rec = await ds.read(current.id, {
+            fields: [targetName],
+          });
+          const newValue = {
+            ...value,
+            [targetName]: rec[targetName],
+          };
+          if (signal.aborted) return;
+          setSelectedValue(newValue);
+        } else if (current !== selectedValue) {
+          setSelectedValue(current);
+        }
+      },
+      [selectedValue, target, targetName, value]
+    )
+  );
+
+  useAsyncEffect(ensureNameValue, [ensureNameValue]);
+
   return (
     <FieldContainer>
       {showTitle && <label htmlFor={uid}>{title}</label>}
@@ -116,7 +154,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       ) : (
         <Select
           onChange={handleChange}
-          value={value ?? null}
+          value={selectedValue ?? null}
           placeholder={placeholder}
           icons={
             isSuggestBox
