@@ -1,5 +1,5 @@
 import { session, SessionInfo } from "@/services/client/session";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "../use-async";
 
 async function init() {
@@ -11,7 +11,7 @@ async function init() {
 }
 
 const login = session.login.bind(session);
-const logout = session.logout.bind(session);
+const sessionLogout = session.logout.bind(session);
 
 export function useSession() {
   const { state, error } = useAsync(init, []);
@@ -21,6 +21,16 @@ export function useSession() {
     return session.subscribe((info) => {
       setData(info);
     });
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await sessionLogout();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      document.location.reload();
+    }
   }, []);
 
   return {
