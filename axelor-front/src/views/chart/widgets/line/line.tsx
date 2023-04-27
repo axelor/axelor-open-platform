@@ -1,21 +1,20 @@
-import produce from 'immer';
-import { useState, useEffect } from 'react';
+import produce from "immer";
+import { useState, useEffect } from "react";
 
-import { PlotData, applyTitles } from '../../builder/utils';
-import { ChartProps, ECharts } from '../../builder';
-
+import { PlotData, applyTitles } from "../../builder/utils";
+import { ChartProps, ECharts } from "../../builder";
 
 const defaultOption = {
   legend: {
     bottom: 5,
-    type: 'scroll',
+    type: "scroll",
   },
   tooltip: {
-    trigger: 'axis',
+    trigger: "axis",
   },
-  xAxis: { type: 'category', boundaryGap: false },
+  xAxis: { type: "category", boundaryGap: false },
   yAxis: {
-    type: 'value',
+    type: "value",
   },
   series: [],
 };
@@ -29,16 +28,16 @@ export function Line({ data, type, ...rest }: ChartProps) {
       produce((draft: any) => {
         applyTitles(draft, data);
         draft.series = series.map((line: any) => ({
-          type: 'line',
+          type: "line",
           name: line.key,
-          stack: 'all',
+          stack: "all",
           data: line.values.map(({ y }: any) => y),
-          ...(type === 'area' ? { areaStyle: {} } : {}),
+          ...(type === "area" ? { areaStyle: {} } : {}),
         }));
         draft.xAxis.data = types;
         draft.legend.data = series.map((x: any) => x.key);
         draft.tooltip.valueFormatter = formatter;
-      }),
+      })
     );
   }, [type, data]);
 
