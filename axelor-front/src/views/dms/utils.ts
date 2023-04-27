@@ -23,6 +23,7 @@ export function prepareFormView(view: GridView, record: DataRecord) {
     viewType: "form",
     views: [
       {
+        name: `dms-html-or-spreadsheet-form`,
         type: "form",
         width: "large",
         items: [

@@ -8,7 +8,7 @@ import {
   type ViewData,
 } from "./meta";
 import { findViewFields, processView, processWidgets } from "./meta-utils";
-import { type ActionView, type ViewType } from "./meta.types";
+import { type ActionView, type ViewType, FormView } from "./meta.types";
 
 const cache = new LoadingCache<Promise<any>>();
 
@@ -25,6 +25,7 @@ export async function findView<T extends ViewType>({
   name,
   model,
   resource,
+  ...props
 }: {
   type: string;
   name?: string;
@@ -38,6 +39,11 @@ export async function findView<T extends ViewType>({
 
     if (type === "chart") {
       return Promise.resolve({ view: { name, model, type } });
+    }
+
+    // for custom form view like dms spreadsheet/html view
+    if ((props as FormView).items) {
+      return { view: { name, model, type, ...props }, fields: {} };
     }
 
     const data = await fetchView({ type: type as any, name, model });

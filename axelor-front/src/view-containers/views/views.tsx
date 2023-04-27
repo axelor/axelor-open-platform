@@ -27,18 +27,14 @@ async function loadComp(viewType: string) {
   return Comp as React.ElementType;
 }
 
-async function loadView({
-  name,
-  type,
-  model,
-  resource,
-}: {
+async function loadView(props: {
   type: string;
   name?: string;
   model?: string;
   resource?: string;
 }) {
-  const meta = await findView({ type, name, model, resource });
+  const { type } = props;
+  const meta = await findView(props);
   const Comp = await loadComp(type);
   return { meta, type, Comp };
 }

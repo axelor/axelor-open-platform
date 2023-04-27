@@ -117,6 +117,23 @@ export function Dms(props: ViewProps<GridView>) {
     return getSelectedDocument() || getSelectedNode();
   }, [getSelectedDocument, getSelectedNode]);
 
+  const openDMSFile = useCallback(
+    (record: TreeRecord) => {
+      if (popup) return;
+      if (
+        [CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
+          record.contentType
+        )
+      ) {
+        // open HTML/spreadsheet view
+        openTab(prepareFormView(view, record));
+      } else {
+        navigate(`/ds/dms.file/edit/${record.id}`);
+      }
+    },
+    [navigate, view, popup, openTab]
+  );
+
   const setRootIfNeeded = useCallback(
     ({ parent }: TreeRecord) => {
       if (parent && root.id === UNDEFINED_ID) {
@@ -218,6 +235,7 @@ export function Dms(props: ViewProps<GridView>) {
           const rootChanged = setRootIfNeeded(record);
           !rootChanged && onSearch({});
         }
+        return record;
       }
     },
     [
@@ -237,18 +255,28 @@ export function Dms(props: ViewProps<GridView>) {
   }, [onNew]);
 
   const onDocumentNew = useCallback(async () => {
-    return onNew(i18n.get("Create document"), i18n.get("New Document"), {
-      isDirectory: false,
-      contentType: CONTENT_TYPE.HTML,
-    });
-  }, [onNew]);
+    const record = await onNew(
+      i18n.get("Create document"),
+      i18n.get("New Document"),
+      {
+        isDirectory: false,
+        contentType: CONTENT_TYPE.HTML,
+      }
+    );
+    record && openDMSFile(record);
+  }, [onNew, openDMSFile]);
 
   const onSpreadsheetNew = useCallback(async () => {
-    return onNew(i18n.get("Create spreadsheet"), i18n.get("New Spreadsheet"), {
-      isDirectory: false,
-      contentType: CONTENT_TYPE.SPREADSHEET,
-    });
-  }, [onNew]);
+    const record = await onNew(
+      i18n.get("Create spreadsheet"),
+      i18n.get("New Spreadsheet"),
+      {
+        isDirectory: false,
+        contentType: CONTENT_TYPE.SPREADSHEET,
+      }
+    );
+    record && openDMSFile(record);
+  }, [onNew, openDMSFile]);
 
   const onDocumentRename = useCallback(async () => {
     const doc = getSelectedDocument();
@@ -391,10 +419,10 @@ export function Dms(props: ViewProps<GridView>) {
       if (row?.record?.isDirectory) {
         handleNodeSelect(row.record);
       } else if (row?.record?.id) {
-        navigate(`/ds/dms.file/edit/${row.record.id}`);
+        openDMSFile(row?.record);
       }
     },
-    [handleNodeSelect, navigate]
+    [handleNodeSelect, openDMSFile]
   );
 
   const handleGridCellClick = useCallback(
@@ -414,19 +442,10 @@ export function Dms(props: ViewProps<GridView>) {
       } else if (cellValue === "fa fa-info-circle") {
         // TODO open details view of record
       } else if (cellValue?.includes("fa")) {
-        if (
-          [CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
-            record.contentType
-          )
-        ) {
-          // open HTML/spreadsheet view
-          openTab(prepareFormView(view, record));
-        } else {
-          handleDocumentOpen(e, row);
-        }
+        handleDocumentOpen(e, row);
       }
     },
-    [view, handleDocumentOpen, openTab]
+    [handleDocumentOpen]
   );
 
   const showToolbar = popupOptions?.showToolbar !== false;
