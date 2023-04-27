@@ -30,9 +30,9 @@ export function Criteria({ t, value, fields, index, onRemove, onChange }) {
   }
 
   return (
-    <Box d="flex" alignItems="center" mb={1}>
-      <Box d="flex" me={1} onClick={handleRemove} >
-        <MaterialIcon icon="close" />
+    <Box d="flex" alignItems="center" g={2}>
+      <Box d="flex" onClick={handleRemove}>
+        <MaterialIcon icon="close" className={styles.icon} />
       </Box>
 
       {renderSelect("fieldName", fields)}

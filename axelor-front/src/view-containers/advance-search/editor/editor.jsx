@@ -1,19 +1,18 @@
-import { useCallback, useEffect, useMemo } from "react";
-import produce from "immer";
-import { Input, Divider, Box } from "@axelor/ui";
+import { Box, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import produce from "immer";
+import { useCallback, useEffect, useMemo } from "react";
 
-import {
-  Select,
-  ButtonLink,
-  BooleanRadio,
-  BooleanCheckBox,
-  SimpleButton,
-  RelationalWidget,
-} from "./components";
 import { moment } from "@/services/client/l10n";
+import {
+  BooleanCheckBox,
+  BooleanRadio,
+  ButtonLink,
+  RelationalWidget,
+  Select,
+  SimpleButton,
+} from "./components";
 import Criteria from "./criteria";
-import styles from "./editor.module.css";
 
 export const defaultState = {
   title: "",
@@ -23,10 +22,6 @@ export const defaultState = {
   criteria: [{}],
   selected: false,
 };
-
-function VerticalDivider() {
-  return <Divider vertical className={styles["vertical-divider"]} />;
-}
 
 function EditorInput({
   t,
@@ -40,17 +35,15 @@ function EditorInput({
 }) {
   const hide = ["", null, undefined].includes(id);
   return (
-    <>
-      <Box d="flex" alignItems="center">
-        <Box me={1}>
-          <Input
-            name="title"
-            className="title"
-            placeholder={t("Save filter as")}
-            value={title}
-            onChange={(e) => onChange("title", e.target.value)}
-          />
-        </Box>
+    <Box d="flex" flexDirection="column" p={1} g={2}>
+      <Box d="flex" g={2} alignItems="center">
+        <Input
+          name="title"
+          className="title"
+          placeholder={t("Save filter as")}
+          value={title}
+          onChange={(e) => onChange("title", e.target.value)}
+        />
         {canShare && (
           <BooleanCheckBox
             title={t("Share")}
@@ -60,22 +53,23 @@ function EditorInput({
           />
         )}
       </Box>
-      <Box p={1} d="flex" alignItems="center">
-        <SimpleButton
-          hide={id !== undefined || !title}
-          title={t("Save")}
-          onClick={onSave}
-        />
-        <SimpleButton onClick={onSave} title={t("Update")} hide={hide} />
-
-        <SimpleButton
-          variant="danger"
-          onClick={onRemove}
-          title={t("Delete")}
-          hide={hide}
-        />
-      </Box>
-    </>
+      {(id || title || !hide) && (
+        <Box d="flex" alignItems="center">
+          {id || title ? (
+            <SimpleButton title={t("Save")} onClick={onSave} />
+          ) : null}
+          {hide || <SimpleButton onClick={onSave} title={t("Update")} />}
+          {hide || (
+            <SimpleButton
+              variant="danger"
+              onClick={onRemove}
+              title={t("Delete")}
+              hide={hide}
+            />
+          )}
+        </Box>
+      )}
+    </Box>
   );
 }
 
@@ -290,7 +284,7 @@ export default function Editor({
     contextFields.find((x) => x.name === contextField.name);
 
   return (
-    <>
+    <Box d="flex" flexDirection="column" alignItems="start" g={2}>
       {contextFields.length > 0 && (
         <Box d="flex" alignItems="center">
           <Box
@@ -322,7 +316,7 @@ export default function Editor({
           )}
         </Box>
       )}
-      <Box d="flex" alignItems="center">
+      <Box d="flex" alignItems="center" g={2}>
         <BooleanRadio
           name="operator"
           onChange={(e) => handleChange("operator", e.target.value)}
@@ -340,21 +334,18 @@ export default function Editor({
           className="archived"
         />
       </Box>
-      <Box d="flex" alignItems="center">
-        <Box d="flex" flexDirection="column" alignItems="flex-start" mt={1}>
-          {criterias.map((item, index) => (
-            <Box key={index}>
-              <Criteria
-                t={t}
-                index={index}
-                value={item}
-                fields={$fields}
-                onRemove={handleCriteriaRemove}
-                onChange={handleCriteriaChange}
-              />
-            </Box>
-          ))}
-        </Box>
+      <Box d="flex" flexDirection="column" alignItems="flex-start" g={2}>
+        {criterias.map((item, index) => (
+          <Criteria
+            t={t}
+            key={index}
+            index={index}
+            value={item}
+            fields={$fields}
+            onRemove={handleCriteriaRemove}
+            onChange={handleCriteriaChange}
+          />
+        ))}
       </Box>
       <Box d="flex" alignItems="center">
         <ButtonLink
@@ -362,18 +353,14 @@ export default function Editor({
           className={"add-filter"}
           onClick={handleCriteriaAdd}
         />
-        <VerticalDivider />
         <ButtonLink title={t("Clear")} className={"clear"} onClick={onClear} />
-        <VerticalDivider />
         <ButtonLink title={t("Export")} onClick={(e) => onExport()} />
-        <VerticalDivider />
         {canExportFull && (
           <>
             <ButtonLink
               title={t("Export full")}
               onClick={(e) => onExport(true)}
             />
-            <VerticalDivider />
           </>
         )}
         <ButtonLink
@@ -382,7 +369,6 @@ export default function Editor({
           onClick={() => onApply(filter)}
         />
       </Box>
-      <Divider mt={1} />
       <EditorInput
         t={t}
         canShare={canShare}
@@ -393,7 +379,7 @@ export default function Editor({
         onSave={handleFilterSave}
         onRemove={handleFilterRemove}
       />
-    </>
+    </Box>
   );
 }
 

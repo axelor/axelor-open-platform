@@ -1,26 +1,25 @@
+import clsx from "clsx";
+import isNaN from "lodash/isNaN";
+import isNumber from "lodash/isNumber";
+import isObject from "lodash/isObject";
 import React, {
   useCallback,
-  useRef,
-  useState,
   useEffect,
   useReducer,
+  useRef,
+  useState,
 } from "react";
-import { Box, TextField, Divider, Popper, ClickAwayListener } from "@axelor/ui";
-import { ReactComponent as BiSearchIcon } from "bootstrap-icons/icons/search.svg";
-import { ReactComponent as BiDropDownIcon } from "bootstrap-icons/icons/caret-down.svg";
-import { ReactComponent as BiCloseIcon } from "bootstrap-icons/icons/x-lg.svg";
-import { ReactComponent as BiClearIcon } from "bootstrap-icons/icons/x-lg.svg";
-import isNumber from "lodash/isNumber";
-import isNaN from "lodash/isNaN";
-import isObject from "lodash/isObject";
-import clsx from "clsx";
+
+import { Box, ClickAwayListener, Divider, Popper, TextField } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
+import { toKebabCase } from "@/utils/names";
 
 import ChipList from "./chip-list";
-import FilterList from "./filter-list";
 import FilterEditor, { defaultState as initialEditorState } from "./editor";
+import FilterList from "./filter-list";
 import { getCriteria } from "./utils";
-import { toKebabCase } from "@/utils/names";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
 import styles from "./advance-search.module.scss";
 
 function getJSON(data) {
@@ -159,11 +158,11 @@ function AdvanceFilterInput({
 
   const icons = React.useMemo(
     () => [
-      { name: "dropdown", as: BiDropDownIcon, onClick: onOpen },
-      { name: "clear", as: BiCloseIcon, onClick: onClear },
-      { name: "search", as: BiSearchIcon },
+      { icon: "arrow_drop_down", onClick: onOpen },
+      { icon: "clear", onClick: onClear },
+      { icon: "search", onClick: onSearch },
     ],
-    [onOpen, onClear]
+    [onOpen, onClear, onSearch]
   );
 
   React.useEffect(() => {
@@ -197,11 +196,25 @@ function AdvanceFilterInput({
             onClick: onOpen,
           })}
       icons={[
-        { id: "dropdown", icon: BiDropDownIcon, onClick: onOpen },
+        {
+          icon: "arrow_drop_down",
+          className: styles.icon,
+          onClick: onOpen,
+        },
         ...(hasValue
-          ? [{ id: "clear", icon: BiClearIcon, onClick: handleClear }]
+          ? [
+              {
+                icon: "clear",
+                className: styles.icon,
+                onClick: handleClear,
+              },
+            ]
           : []),
-        { id: "search", icon: BiSearchIcon, onClick: handleSearch },
+        {
+          icon: "search",
+          className: styles.icon,
+          onClick: handleSearch,
+        },
       ]}
     />
   );
@@ -545,7 +558,7 @@ function AdvanceSearch({
 
   useEffect(() => {
     applyCount && handleApply(customFilter, true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applyCount]);
 
   return (
@@ -572,7 +585,7 @@ function AdvanceSearch({
             {...(rtl ? { dir: "rtl" } : {})}
             shadow
             className={styles.popper}
-            p={1}
+            p={2}
           >
             <Box d="flex" flexDirection="column">
               <Box d="flex" alignItems="center">

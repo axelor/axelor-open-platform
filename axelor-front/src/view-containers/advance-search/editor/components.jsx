@@ -1,11 +1,10 @@
-import React, { useRef } from "react";
-import clsx from "clsx";
-import { Box, Select as AxSelect, Button, Input } from "@axelor/ui";
-import { ReactComponent as CaretDownFillIcon } from "bootstrap-icons/icons/caret-down-fill.svg";
-import { toKebabCase } from "@/utils/names";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
 import { moment } from "@/services/client/l10n";
+import { toKebabCase } from "@/utils/names";
+import { Select as AxSelect, Box, Button, Input } from "@axelor/ui";
+import clsx from "clsx";
+import React, { useRef } from "react";
 import styles from "./components.module.css";
 
 function TextField(props) {
@@ -40,7 +39,6 @@ export function Select({ value, options, onChange, className, ...props }) {
       as={AxSelect}
       classNamePrefix="ax-select"
       className={clsx(styles.select, className)}
-      me={1}
       isClearable={false}
       options={options}
       optionLabel="title"
@@ -61,13 +59,7 @@ export function Select({ value, options, onChange, className, ...props }) {
 export function ButtonLink({ title, ...rest }) {
   return (
     title && (
-      <Button
-        variant="link"
-        size="sm"
-        me={1}
-        className={styles.button}
-        {...rest}
-      >
+      <Button variant="link" size="sm" className={styles.button} {...rest}>
         {title}
       </Button>
     )
@@ -86,7 +78,7 @@ export function BooleanRadio({ name, onChange, value: valueProp, data }) {
             onChange={onChange}
             name={name}
             m={0}
-            me={1}
+            me={2}
           />
           <Box as="p" mb={0}>
             {label}
@@ -117,7 +109,7 @@ export function BooleanCheckBox({
         name={name}
         disabled={isDisabled}
         m={0}
-        me={1}
+        me={2}
         {...rest}
       />
     );
@@ -131,7 +123,7 @@ export function BooleanCheckBox({
         value={name}
         name={name}
         m={0}
-        me={1}
+        me={2}
         {...rest}
       />
       <Box as="p" mb={0}>
@@ -182,7 +174,7 @@ export function SimpleWidget({
       <>
         <Component
           name="value"
-          style={{ marginRight: 8, ...style }}
+          style={{ ...style }}
           onChange={(value) => onChange({ name: "value", value })}
           value={value}
           {...rest}

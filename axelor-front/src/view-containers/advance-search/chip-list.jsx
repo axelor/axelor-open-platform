@@ -1,7 +1,7 @@
-import React from "react";
-import { Box, Icon } from "@axelor/ui";
-import { Chip } from "./chip";
 import { legacyClassNames } from "@/styles/legacy";
+import { Box } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { Chip } from "./chip";
 import styles from "./chip-list.module.scss";
 
 function ChipList({ className, value, icons, onClear }) {
@@ -32,12 +32,9 @@ function ChipList({ className, value, icons, onClear }) {
         className={styles.actions}
       >
         {icons.map((icon) => (
-          <Icon
+          <MaterialIcon
             key={icon.name}
-            ms={1}
-            me={1}
-            color="secondary"
-            as={icon.as}
+            icon={icon.icon}
             onClick={icon.onClick}
             className={styles.pointer}
           />
