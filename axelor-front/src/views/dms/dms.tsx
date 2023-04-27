@@ -48,6 +48,7 @@ import {
 import styles from "./dms.module.scss";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
+const UNDEFINED_ID = -1;
 
 const promptInput = async (title: string, inputValue: string = "") => {
   const confirmed = await dialogs.confirm({
@@ -72,26 +73,30 @@ const promptInput = async (title: string, inputValue: string = "") => {
 export function Dms(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom, domains } = props;
   const { view, fields } = meta;
-  const { action, popupOptions } = useViewTab();
+  const { action, popup, popupOptions } = useViewTab();
   const { data: session } = useSession();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const { open: openTab } = useTabs();
+  const { navigate } = useRoute();
   const showEditor = useEditor();
+
+  const popupRecord = action.params?.["_popup-record"];
 
   const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
   const [state, setState] = useGridState();
-  const { navigate } = useRoute();
+  const [root, setRoot] = useState<TreeRecord>(popupRecord ?? ROOT);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // tree state
-  const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([ROOT]);
-  const [expanded, setExpanded] = useState<TreeRecord["id"][]>([ROOT.id]);
-  const [selected, setSelected] = useState<TreeRecord["id"]>(ROOT.id);
+  const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([root]);
+  const [expanded, setExpanded] = useState<TreeRecord["id"][]>([root.id]);
+  const [selected, setSelected] = useState<TreeRecord["id"]>(root.id);
   const [showTree, toggleTree] = useReducer((show) => !show, true);
 
   const { orderBy, rows, selectedRows } = state;
   const uploadSize = session?.api?.upload?.maxSize ?? 0;
   const uploader = useMemo(() => new Uploader(), []);
+  const { relatedId, relatedModel } = popupRecord || {};
 
   const getSelectedNode = useCallback(
     () => treeRecords.find((r) => r.id === selected),
@@ -111,6 +116,28 @@ export function Dms(props: ViewProps<GridView>) {
   const getSelected = useCallback(() => {
     return getSelectedDocument() || getSelectedNode();
   }, [getSelectedDocument, getSelectedNode]);
+
+  const setRootIfNeeded = useCallback(
+    ({ parent }: TreeRecord) => {
+      if (parent && root.id === UNDEFINED_ID) {
+        setRoot((record) => ({
+          ...record,
+          ...parent,
+        }));
+        setTreeRecords((records) =>
+          records.map((rec) =>
+            rec.id === root.id ? { ...rec, ...parent } : rec
+          )
+        );
+        setSelected((id) => (id === root.id ? parent.id : id));
+        setExpanded((ids) =>
+          ids.map((id) => (id === root.id ? parent.id : id))
+        );
+        return true;
+      }
+    },
+    [root]
+  );
 
   const onSearch = useCallback(
     (options: Partial<SearchOptions> = {}) => {
@@ -176,18 +203,31 @@ export function Dms(props: ViewProps<GridView>) {
 
       if (input) {
         const record = await dataStore.save({
+          relatedId,
+          relatedModel,
           fileName: input,
           ...data,
-          ...(node?.id && {
-            parent: {
-              id: node.id,
-            },
-          }),
+          ...(node?.id &&
+            node.id > 0 && {
+              parent: {
+                id: node.id,
+              },
+            }),
         });
-        record && onSearch({});
+        if (record) {
+          const rootChanged = setRootIfNeeded(record);
+          !rootChanged && onSearch({});
+        }
       }
     },
-    [dataStore, getSelectedNode, onSearch]
+    [
+      relatedId,
+      relatedModel,
+      dataStore,
+      setRootIfNeeded,
+      getSelectedNode,
+      onSearch,
+    ]
   );
 
   const onFolderNew = useCallback(async () => {
@@ -299,11 +339,11 @@ export function Dms(props: ViewProps<GridView>) {
 
         // set to root when selected node is deleted
         setSelected((selected) =>
-          dirIds.includes(selected) ? ROOT.id : selected
+          dirIds.includes(selected) ? root.id : selected
         );
       }
     }
-  }, [getSelectedDocuments, getSelectedNode, dataStore]);
+  }, [getSelectedDocuments, getSelectedNode, root, dataStore]);
 
   const handleUpload = useCallback(
     async (files: FileList | null) => {
@@ -374,13 +414,15 @@ export function Dms(props: ViewProps<GridView>) {
       } else if (cellValue === "fa fa-info-circle") {
         // TODO open details view of record
       } else if (cellValue?.includes("fa")) {
-        if ([CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
-          record.contentType
-        )) {
+        if (
+          [CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
+            record.contentType
+          )
+        ) {
           // open HTML/spreadsheet view
           openTab(prepareFormView(view, record));
         } else {
-          handleDocumentOpen(e, row)
+          handleDocumentOpen(e, row);
         }
       }
     },
@@ -403,21 +445,38 @@ export function Dms(props: ViewProps<GridView>) {
 
   useEffect(() => {
     const parent = getSelectedNode();
-    uploader.setSaveHandler((data: DataRecord) => {
-      return dataStore.save({
+    uploader.setSaveHandler(async (data: DataRecord) => {
+      const record = await dataStore.save({
+        relatedId,
+        relatedModel,
         ...data,
-        ...(parent?.id && {
-          parent: {
-            id: parent.id,
-          },
-        }),
+        ...(parent?.id &&
+          parent.id > 0 && {
+            parent: {
+              id: parent.id,
+            },
+          }),
       });
+      record && setRootIfNeeded(record);
+      return record;
     });
-  }, [uploader, dataStore, getSelectedNode]);
+  }, [
+    relatedId,
+    relatedModel,
+    uploader,
+    dataStore,
+    getSelectedNode,
+    setRootIfNeeded,
+  ]);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <DmsOverlay className={styles.container} onUpload={handleUpload}>
+      <DmsOverlay
+        className={clsx(styles.container, {
+          [styles.popup]: popup,
+        })}
+        onUpload={handleUpload}
+      >
         {showToolbar && (
           <ViewToolBar
             meta={meta}
@@ -468,7 +527,7 @@ export function Dms(props: ViewProps<GridView>) {
                 iconProps: {
                   icon: "more_vert",
                 },
-                disabled: selected === ROOT.id && !selectedRows?.length,
+                disabled: selected === root.id && !selectedRows?.length,
                 items: [
                   {
                     key: "rename",
@@ -512,6 +571,7 @@ export function Dms(props: ViewProps<GridView>) {
                 className={styles.breadcrumbs}
               >
                 <Breadcrumbs
+                  root={root}
                   data={breadcrumbs}
                   selected={selected}
                   onSelect={handleNodeSelect}
@@ -542,6 +602,7 @@ export function Dms(props: ViewProps<GridView>) {
             })}
           >
             <DmsTree
+              root={root}
               data={treeRecords}
               expanded={expanded}
               selected={selected}
@@ -570,10 +631,12 @@ export function Dms(props: ViewProps<GridView>) {
 }
 
 function Breadcrumbs({
+  root,
   data,
   selected,
   onSelect,
 }: {
+  root: TreeRecord;
   data: TreeRecord[];
   selected?: TreeRecord["id"];
   onSelect?: (data: TreeRecord) => void;
@@ -582,7 +645,7 @@ function Breadcrumbs({
     <Box as="ul">
       {data.map((item, ind) => {
         function render() {
-          return item.id === ROOT.id ? (
+          return item.id === root.id ? (
             <MaterialIcon icon="home" fontSize={20} fill />
           ) : (
             item.fileName

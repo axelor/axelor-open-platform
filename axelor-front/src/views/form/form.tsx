@@ -1,7 +1,10 @@
 import clsx from "clsx";
-import { useAtomValue, useSetAtom } from "jotai";
+import { Box } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { focusAtom } from "jotai-optics";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
@@ -35,6 +38,7 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
+import { useDMSPopup } from "../dms/hooks";
 
 import { useTabs } from "@/hooks/use-tabs";
 import styles from "./form.module.scss";
@@ -121,6 +125,14 @@ function FormContainer({
     useFormHandlers(meta, record);
 
   const { hasButton } = usePerms(meta.view, meta.perms);
+  const showDMSPopup = useDMSPopup();
+  const [$attachments, setAttachmentCount] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
+      [formAtom]
+    )
+  );
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -333,6 +345,21 @@ function FormContainer({
 
   const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
 
+  const onAttachment = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { record, model, fields } = get(formAtom);
+        return showDMSPopup({
+          record,
+          model,
+          fields,
+          onCountChanged: (totalCount) => setAttachmentCount(totalCount),
+        });
+      },
+      [formAtom, showDMSPopup, setAttachmentCount]
+    )
+  );
+
   const pagination = usePagination(dataStore, record, readonly);
 
   const { popup, popupOptions } = useViewTab();
@@ -393,6 +420,7 @@ function FormContainer({
   const canCopy = !isDirty && canNew && hasButton("copy") && record.id;
   const canArchive = hasButton("archive") && record.id;
   const canAudit = hasButton("log") && record.id;
+  const canAttach = hasButton("attach") && record.id;
 
   return (
     <div className={styles.formViewContainer}>
@@ -446,6 +474,25 @@ function FormContainer({
               },
               onClick: onBack,
               hidden: isDirty,
+            },
+            {
+              key: "attachment",
+              text: i18n.get("Attachment"),
+              icon: (props: any) => (
+                <Box as="span" d="flex" position="relative">
+                  <MaterialIcon icon="attach_file" {...props} />
+                  {$attachments ? (
+                    <Box d="flex" as="small" alignItems="flex-end">
+                      {$attachments}
+                    </Box>
+                  ) : null}
+                </Box>
+              ),
+              iconProps: {
+                icon: "attach_file",
+              },
+              onClick: onAttachment,
+              hidden: !canAttach,
             },
             {
               key: "more",

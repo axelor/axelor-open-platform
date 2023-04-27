@@ -8,6 +8,7 @@ import { isEqual } from "lodash";
 import styles from "./dms-tree.module.scss";
 
 interface TreeProps {
+  root: TreeRecord;
   data: TreeRecord[];
   expanded?: TreeRecord["id"][];
   selected?: TreeRecord["id"];
@@ -80,6 +81,7 @@ const TreeNodeList = memo(function TreeNodeList({
 
 export const DmsTree = memo(function DmsTree({
   data,
+  root,
   selected,
   expanded,
   ...props
@@ -108,8 +110,8 @@ export const DmsTree = memo(function DmsTree({
 
       return (recordsRef.current[record.id!] = $record);
     }
-    return data.filter((record) => record.id === null).map(toTreeNode);
-  }, [data, selected, expanded]);
+    return data.filter((record) => record.id === root.id).map(toTreeNode);
+  }, [data, root, selected, expanded]);
 
   return <TreeNodeList {...props} data={treeData} />;
 });

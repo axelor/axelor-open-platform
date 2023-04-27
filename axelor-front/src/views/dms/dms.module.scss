@@ -4,6 +4,9 @@
   flex: 1;
   min-width: 0;
   position: relative;
+  &.popup {
+    height: 500px;
+  }
 }
 
 .content {
