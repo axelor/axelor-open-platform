@@ -25,6 +25,7 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
+import { i18n } from "@/services/client/i18n";
 import { legacyClassNames } from "@/styles/legacy";
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
@@ -306,7 +307,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
           items={[
             {
               key: "prev",
-              text: "Prev",
+              text: i18n.get("Prev"),
               iconProps: {
                 icon: "navigate_before",
               },
@@ -315,7 +316,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             },
             {
               key: "next",
-              text: "Next",
+              text: i18n.get("Next"),
               iconSide: "end",
               iconProps: {
                 icon: "navigate_next",
