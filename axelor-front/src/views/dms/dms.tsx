@@ -28,6 +28,7 @@ import { ViewProps } from "../types";
 import { DataRecord } from "@/services/client/data.types";
 import { TreeRecord } from "./types";
 import { dialogs } from "@/components/dialogs";
+import { useTabs } from "@/hooks/use-tabs";
 import { useSession } from "@/hooks/use-session";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useGridState } from "../grid/builder/utils";
@@ -36,9 +37,14 @@ import { useRoute } from "@/hooks/use-route";
 import { Grid as GridComponent } from "../grid/builder";
 import { DmsTree } from "./dms-tree";
 import { DmsOverlay } from "./dms-overlay";
-import { downloadAsBatch, toStrongText } from "./utils";
 import { Uploader } from "./uploader";
 import { DmsUpload } from "./dms-upload";
+import {
+  CONTENT_TYPE,
+  downloadAsBatch,
+  prepareFormView,
+  toStrongText,
+} from "./utils";
 import styles from "./dms.module.scss";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
@@ -69,6 +75,7 @@ export function Dms(props: ViewProps<GridView>) {
   const { action, popupOptions } = useViewTab();
   const { data: session } = useSession();
   const { hasButton } = usePerms(meta.view, meta.perms);
+  const { open: openTab } = useTabs();
   const showEditor = useEditor();
 
   const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
@@ -192,14 +199,14 @@ export function Dms(props: ViewProps<GridView>) {
   const onDocumentNew = useCallback(async () => {
     return onNew(i18n.get("Create document"), i18n.get("New Document"), {
       isDirectory: false,
-      contentType: "html",
+      contentType: CONTENT_TYPE.HTML,
     });
   }, [onNew]);
 
   const onSpreadsheetNew = useCallback(async () => {
     return onNew(i18n.get("Create spreadsheet"), i18n.get("New Spreadsheet"), {
       isDirectory: false,
-      contentType: "spreadsheet",
+      contentType: CONTENT_TYPE.SPREADSHEET,
     });
   }, [onNew]);
 
@@ -358,16 +365,26 @@ export function Dms(props: ViewProps<GridView>) {
       row: GridRow,
       rowIndex: number
     ) => {
-      const cellValue = row?.record[col?.name];
+      const record = row?.record;
+      const cellValue = record?.[col?.name];
       if (cellValue === "fa fa-folder") {
         handleDocumentOpen(e, row);
       } else if (cellValue === "fa fa-download") {
         row?.record && downloadAsBatch(row.record);
       } else if (cellValue === "fa fa-info-circle") {
         // TODO open details view of record
+      } else if (cellValue?.includes("fa")) {
+        if ([CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
+          record.contentType
+        )) {
+          // open HTML/spreadsheet view
+          openTab(prepareFormView(view, record));
+        } else {
+          handleDocumentOpen(e, row)
+        }
       }
     },
-    [handleDocumentOpen]
+    [view, handleDocumentOpen, openTab]
   );
 
   const showToolbar = popupOptions?.showToolbar !== false;
