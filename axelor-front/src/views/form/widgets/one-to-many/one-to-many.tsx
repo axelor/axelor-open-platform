@@ -258,10 +258,10 @@ export function OneToMany({
   const onDelete = useCallback(
     async (records: GridRow["record"][]) => {
       const confirmed = await dialogs.confirm({
-        title: i18n.get("Question"),
         content: i18n.get(
           "Do you really want to delete the selected record(s)?"
         ),
+        yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         const ids = records.map((r) => r.id);

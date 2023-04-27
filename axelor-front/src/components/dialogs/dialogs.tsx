@@ -60,7 +60,7 @@ function showDialog(options: DialogOptions) {
   };
 }
 
-export module dialogs {
+export namespace dialogs {
   export async function modal(options: DialogOptions) {
     const { onClose, open = true, ...rest } = options;
     const handleClose = async (result: boolean) => {
@@ -131,9 +131,16 @@ export module dialogs {
   export async function confirm(options: {
     title?: string;
     content: React.ReactNode;
+    yesTitle?: string;
+    noTitle?: string;
   }) {
-    const { title = i18n.get("Question"), content } = options;
-    return box({ title, content });
+    const {
+      title = i18n.get("Question"),
+      content,
+      yesTitle,
+      noTitle,
+    } = options;
+    return box({ title, content, yesTitle, noTitle });
   }
 
   export async function error(options: {
@@ -189,7 +196,7 @@ function Dialogs() {
 const defaultButtons: DialogButton[] = [
   {
     name: "cancel",
-    title: "Cancel",
+    title: i18n.get("Cancel"),
     variant: "secondary",
     onClick(fn) {
       fn(false);
@@ -197,7 +204,7 @@ const defaultButtons: DialogButton[] = [
   },
   {
     name: "confirm",
-    title: "OK",
+    title: i18n.get("OK"),
     variant: "primary",
     onClick(fn) {
       fn(true);

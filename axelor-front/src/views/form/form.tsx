@@ -298,6 +298,7 @@ function FormContainer({
     if (record.id) {
       const confirmed = await dialogs.confirm({
         content: i18n.get("Do you really want to delete the selected record?"),
+        yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         const id = record.id!;
@@ -311,7 +312,7 @@ function FormContainer({
   const onCopy = useCallback(async () => {
     if (record.id) {
       const rec = await dataStore.copy(record.id);
-      doEdit(rec, { readonly : false });
+      doEdit(rec, { readonly: false });
     }
   }, [dataStore, doEdit, record.id]);
 

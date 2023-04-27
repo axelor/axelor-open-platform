@@ -53,10 +53,10 @@ export function Cards(props: ViewProps<CardsView>) {
   const onDelete = useCallback(
     async (record: DataRecord) => {
       const confirmed = await dialogs.confirm({
-        title: i18n.get("Question"),
         content: i18n.get(
           "Do you really want to delete the selected record(s)?"
         ),
+        yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         try {

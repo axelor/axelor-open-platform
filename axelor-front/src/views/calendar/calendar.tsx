@@ -541,11 +541,9 @@ export function Calendar(props: ViewProps<CalendarView>) {
     async (event: SchedulerEvent) => {
       closePopover();
 
-      const confirmed = await dialogs.box({
-        title: _t("Deletion Confirmation"),
-        content: _t('Are you sure you want to delete "{0}"?', event.title),
+      const confirmed = await dialogs.confirm({
+        content: _t("Do you really want to delete the selected record(s)?"),
         yesTitle: _t("Delete"),
-        noTitle: _t("Cancel"),
       });
 
       if (!confirmed) return;

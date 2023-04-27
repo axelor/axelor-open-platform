@@ -99,7 +99,7 @@ export function Grid(props: ViewProps<GridView>) {
       setState((draft) => {
         draft.selectedCell = null;
       });
-      
+
       return dataStore.search({
         sortBy,
         ...options,
@@ -122,10 +122,10 @@ export function Grid(props: ViewProps<GridView>) {
   const onDelete = useCallback(
     async (records: GridRow["record"][]) => {
       const confirmed = await dialogs.confirm({
-        title: i18n.get("Question"),
         content: i18n.get(
           "Do you really want to delete the selected record(s)?"
         ),
+        yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         try {
