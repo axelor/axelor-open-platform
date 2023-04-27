@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer"
 import { useEffect, useState } from "react";
 
 import { Field } from "@/services/client/meta.types";

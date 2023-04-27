@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import { useState, useEffect } from "react";
 
 import { PlotData, applyTitles } from "../../builder/utils";

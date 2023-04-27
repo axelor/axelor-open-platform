@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import produce from "immer";
+import { produce } from "immer"
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";
 import { PlusData, applyTitles } from "../../builder/utils";

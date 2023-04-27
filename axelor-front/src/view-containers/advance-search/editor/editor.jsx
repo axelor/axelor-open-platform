@@ -1,6 +1,6 @@
 import { Box, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import produce from "immer";
+import { produce } from "immer"
 import { useCallback, useEffect, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
