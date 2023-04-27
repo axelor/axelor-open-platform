@@ -1,13 +1,17 @@
-import { l10n } from "@/services/client/l10n";
-import { ReactElement, forwardRef, useState } from "react";
+import { forwardRef, useState } from "react";
 import ReactDatePicker, {
   ReactDatePickerProps,
+  getDefaultLocale,
   registerLocale,
   setDefaultLocale,
 } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import "react-datepicker/dist/react-datepicker.css";
+import { l10n } from "@/services/client/l10n";
+
+import { ViewerInput } from "../string";
+
 import "./picker.scss";
 
 const DEFAULT_LOCALE = "en";
@@ -54,12 +58,19 @@ const load = async (locale: string) => {
   return await loader();
 };
 
-export const Picker = forwardRef<any, ReactDatePickerProps>((props, ref) => {
+export const Picker = forwardRef<
+  any,
+  ReactDatePickerProps & {
+    textValue?: string;
+  }
+>(({ textValue, ...props }, ref) => {
   const locale = l10n.getLocale() || DEFAULT_LOCALE;
-  const [loaded, setLoaded] = useState(false);
+  const defaultLocale = getDefaultLocale();
+  const [loaded, setLoaded] = useState(locale === defaultLocale);
 
   useAsyncEffect(
     async (signal) => {
+      if (loaded) return;
       const mod = await load(locale);
       if (signal.aborted) return;
       if (mod) {
@@ -71,7 +82,9 @@ export const Picker = forwardRef<any, ReactDatePickerProps>((props, ref) => {
     [locale]
   );
 
-  return (loaded && (
-    <ReactDatePicker {...props} ref={ref} locale={locale} />
-  )) as ReactElement;
+  if (loaded) {
+    return <ReactDatePicker {...props} ref={ref} locale={locale} />;
+  }
+
+  return <ViewerInput value={textValue || ""} />;
 });

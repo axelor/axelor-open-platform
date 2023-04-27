@@ -184,6 +184,7 @@ export function Date({
             ref={pickerRef}
             dateFormat={toCalendarFormat(format)}
             selected={dateValue}
+            textValue={textValue}
             customInput={
               <DateInput
                 eventOnBlur={handleBlur}
