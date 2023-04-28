@@ -7,6 +7,7 @@ import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
 
+import { useViewAction } from "@/view-containers/views/scope";
 import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
 import {
@@ -40,15 +41,27 @@ export function useFormHandlers(
 
   const json = meta.view.json ?? false;
   const ctxAtom = json && parent ? parent : formAtom;
-  const prepareContext = useSetAtom(contextAtom);
+  const actView = useViewAction();
 
-  const actionHandler = useMemo(
-    () =>
-      new FormActionHandler((options?: DataContext) =>
-        prepareContext(ctxAtom, options)
-      ),
-    [ctxAtom, prepareContext]
-  );
+  const prepareContext = useSetAtom(contextAtom);
+  const actionHandler = useMemo(() => {
+    // include action view details in root context
+    const { context, views } = actView;
+    const ctx: DataContext = parent
+      ? {}
+      : {
+          ...context,
+          _viewType: "form",
+          _viewName: views?.find((x) => x.type === "form")?.name,
+          _views: views?.map((x) => ({ name: x.name, type: x.type })),
+        };
+    return new FormActionHandler((options?: DataContext) =>
+      prepareContext(ctxAtom, {
+        ...ctx,
+        ...options,
+      })
+    );
+  }, [actView, ctxAtom, parent, prepareContext]);
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(actionHandler),

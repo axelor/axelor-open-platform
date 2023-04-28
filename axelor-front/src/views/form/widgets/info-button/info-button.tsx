@@ -48,7 +48,12 @@ export function InfoButton({ schema, widgetAtom, formAtom }: WidgetProps) {
     }
     try {
       setWait(true);
-      actionExecutor.execute(onClick);
+      actionExecutor.execute(onClick, {
+        context: {
+          _signal: schema.name,
+          _source: schema.name,
+        },
+      });
     } finally {
       setWait(false);
     }

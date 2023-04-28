@@ -99,8 +99,8 @@ export class DefaultActionExecutor implements ActionExecutor {
     const data = {
       ...options,
       context: {
-        ...options?.context,
         ...context,
+        ...options?.context,
       },
     };
 
