@@ -41,14 +41,14 @@ export function createWidgetAtom(props: {
     o
       .prop("states")
       .prop(uid)
-      .valueOr({ attrs } as WidgetState)
+      .valueOr({ attrs: {} } as WidgetState)
   );
 
   const attrsByNameAtom = focusAtom(formAtom, (o) =>
     o
       .prop("statesByName")
       .prop(name)
-      .valueOr({ attrs } as WidgetState)
+      .valueOr({ attrs: {} } as WidgetState)
   );
 
   const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
