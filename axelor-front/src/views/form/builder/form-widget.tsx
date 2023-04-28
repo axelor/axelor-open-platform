@@ -18,7 +18,7 @@ import { useFormScope } from "./scope";
 import { ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
-  const { schema, formAtom, readonly } = props;
+  const { schema, formAtom } = props;
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -42,6 +42,14 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
   );
+
+  const readonly =
+    useAtomValue(
+      useMemo(
+        () => selectAtom(widgetAtom, (a) => a.attrs.readonly),
+        [widgetAtom]
+      )
+    ) || props.readonly;
 
   if (hidden) {
     return null;
