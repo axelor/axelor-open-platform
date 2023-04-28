@@ -20,6 +20,10 @@
   min-width: 0;
 }
 
+.grid {
+  position: relative;
+}
+
 .grid,
 .tree {
   overflow: auto;

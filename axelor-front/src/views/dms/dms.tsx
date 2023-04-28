@@ -39,6 +39,7 @@ import { DmsTree } from "./dms-tree";
 import { DmsOverlay } from "./dms-overlay";
 import { Uploader } from "./uploader";
 import { DmsUpload } from "./dms-upload";
+import { DmsDetails } from "./dms-details";
 import {
   CONTENT_TYPE,
   downloadAsBatch,
@@ -85,6 +86,8 @@ export function Dms(props: ViewProps<GridView>) {
   const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
   const [state, setState] = useGridState();
   const [root, setRoot] = useState<TreeRecord>(popupRecord ?? ROOT);
+  const [detailsId, setDetailsId] = useState<TreeRecord["id"]>(null);
+  const [showDetails, setDetailsPopup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // tree state
@@ -318,13 +321,13 @@ export function Dms(props: ViewProps<GridView>) {
       // TODO: permissions dialog
       showEditor({
         title: i18n.get("Permissions {0}", doc.fileName),
-        model: "com.axelor.dms.db.DMSFile",
+        model: view.model!,
         viewName: "dms-file-permission-form",
         record: doc,
         readonly: false,
       });
     }
-  }, [showEditor, getSelectedDocument]);
+  }, [view, showEditor, getSelectedDocument]);
 
   const onDocumentDelete = useCallback(async () => {
     const docs = getSelectedDocuments();
@@ -425,6 +428,10 @@ export function Dms(props: ViewProps<GridView>) {
     [handleNodeSelect, openDMSFile]
   );
 
+  const handleDetailsPopupClose = useCallback(() => {
+    setDetailsPopup(false);
+  }, []);
+
   const handleGridCellClick = useCallback(
     (
       e: React.SyntheticEvent,
@@ -440,7 +447,8 @@ export function Dms(props: ViewProps<GridView>) {
       } else if (cellValue === "fa fa-download") {
         row?.record && downloadAsBatch(row.record);
       } else if (cellValue === "fa fa-info-circle") {
-        // TODO open details view of record
+        setDetailsPopup(true);
+        setDetailsId(record.id);
       } else if (cellValue?.includes("fa")) {
         handleDocumentOpen(e, row);
       }
@@ -461,6 +469,10 @@ export function Dms(props: ViewProps<GridView>) {
     }
     return collect(selected);
   }, [treeRecords, selected]);
+  const detailRecord = useMemo(
+    () => (detailsId ? records.find((r) => r.id === detailsId) : null),
+    [records, detailsId]
+  );
 
   useEffect(() => {
     const parent = getSelectedNode();
@@ -487,6 +499,10 @@ export function Dms(props: ViewProps<GridView>) {
     getSelectedNode,
     setRootIfNeeded,
   ]);
+
+  useEffect(() => {
+    !showDetails && setDetailsId(null);
+  }, [showDetails]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -640,6 +656,13 @@ export function Dms(props: ViewProps<GridView>) {
               onSearch={onSearch}
               onCellClick={handleGridCellClick}
               onRowDoubleClick={handleDocumentOpen}
+            />
+            <DmsDetails
+              open={showDetails}
+              data={detailRecord}
+              onSave={onSearch}
+              onView={openDMSFile}
+              onClose={handleDetailsPopupClose}
             />
           </Box>
         </Box>
