@@ -1,11 +1,14 @@
 import { useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
+import { isEqual } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
-import { FormAtom, FormWidget, WidgetProps } from "../../builder";
-import { createWidgetAtom } from "../../builder/atoms";
+
+import { FormWidget, WidgetProps } from "../../builder";
+import { useFormScope } from "../../builder/scope";
 
 function TabContent({
   schema,
@@ -26,65 +29,85 @@ function TabContent({
   );
 }
 
-function Tab(
-  props: NavItemProps & {
-    schema?: Schema;
-    formAtom?: FormAtom;
-  }
-) {
-  const schema = props.schema!;
-  const formAtom = props.formAtom!;
-
-  const widgetAtom = useMemo(
-    () => createWidgetAtom({ schema, formAtom }),
-    [formAtom, schema]
-  );
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title, hidden } = attrs;
-
-  if (hidden) {
-    return null;
-  }
-
-  return <div>{title}</div>;
-}
-
 export function PanelTabs(props: WidgetProps) {
   const { schema, formAtom, readonly } = props;
-  const { items = [] } = schema;
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const handleChange = useCallback((id: string) => setActiveTab(id), []);
 
-  const handleChange = useCallback(function handleChange(
-    id: string,
-    tab: NavItemProps
-  ) {
-    setActiveTab(id);
-  },
-  []);
+  const items = useMemo(() => schema.items || [], [schema]);
+  const tabItems = useMemo(
+    () =>
+      items.map((item) => ({
+        ...item,
+        id: item.uid,
+      })) as NavItemProps[],
+    [items]
+  );
 
-  const tabItems = useMemo(() => {
-    return items.map((item) => ({
-      ...item,
-      schema: item,
+  const hiddenStateAtom = useMemo(() => {
+    return selectAtom(
       formAtom,
-      id: item.uid,
-    })) as NavItemProps[];
-  }, [formAtom, items]);
+      (formState) => {
+        const { states = {}, statesByName = {} } = formState;
+        return tabItems.reduce((acc, item: Schema) => {
+          const attrs = item.name
+            ? {
+                hidden: item.hidden,
+                ...statesByName[item.name]?.attrs,
+                ...states[item.uid]?.attrs,
+              }
+            : item;
+          if (attrs.hidden) {
+            acc[item.uid] = true;
+          }
+          return acc;
+        }, {} as Record<string, boolean>);
+      },
+      isEqual
+    );
+  }, [formAtom, tabItems]);
+
+  const hiddenState = useAtomValue(hiddenStateAtom);
+  const visibleTabs = useMemo(
+    () =>
+      tabItems.filter((item) => !hiddenState[item.id] || item.id === activeTab),
+    [activeTab, hiddenState, tabItems]
+  );
+
+  const { actionHandler } = useFormScope();
 
   useEffect(() => {
-    const [firstItem] = tabItems;
-    firstItem && setActiveTab(firstItem.id);
-  }, [tabItems]);
+    return actionHandler.subscribe((data) => {
+      if (
+        data.type === "attr" &&
+        data.name === "active" &&
+        data.value &&
+        items.some((item: Schema) => item.name === data.target)
+      ) {
+        let item = items.find((item: Schema) => item.name === data.target);
+        if (item) {
+          setActiveTab(item.uid);
+        }
+      }
+    });
+  }, [actionHandler, items]);
+
+  useEffect(() => {
+    if (visibleTabs.some((item) => item.id === activeTab)) return;
+    let first = visibleTabs[0];
+    if (first) {
+      setActiveTab(first.id ?? null);
+    }
+  }, [activeTab, visibleTabs]);
 
   return (
     <Box d="flex" flexDirection="column">
       <Tabs
-        items={tabItems}
+        items={visibleTabs}
         value={activeTab ?? undefined}
         onChange={handleChange}
-        onItemRender={Tab}
       />
-      {tabItems.map((item) => {
+      {visibleTabs.map((item) => {
         const active = activeTab === item.id;
         return (
           <TabContent
