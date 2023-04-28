@@ -8,66 +8,77 @@ import { initTab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { Property } from "@/services/client/meta.types";
 import { TreeRecord } from "./types";
+import { DataRecord } from "@/services/client/data.types";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useAtomValue } from "jotai";
 
 export type DMSPopupOptions = {
-  model: string;
-  record: TreeRecord;
+  model?: string;
+  record?: TreeRecord;
   fields?: Record<string, Property>;
+  onSelect?: (dmsFiles: DataRecord[]) => void;
   onCountChanged?: (totalCount: number) => void;
 };
 
-export function useDMSPopup() {
-  const model = "com.axelor.dms.db.DMSFile";
+const DMSModel = "com.axelor.dms.db.DMSFile";
+const dmsDataStore = new DataStore(DMSModel);
 
-  return useCallback(async (options: DMSPopupOptions) => {
-    const {
-      record,
-      model: relatedModel,
-      fields,
-      onCountChanged,
-    } = options;
-    const relatedId = record.id;
-    const ds = new DataStore(model);
-
-    function findName() {
-      for (const name in fields) {
-        if (fields[name].nameColumn) {
-          return record[name];
-        }
+async function getDMSFileFromRecord({
+  record,
+  model: relatedModel,
+  fields,
+}: DMSPopupOptions) {
+  const relatedId = record!.id;
+  function findName() {
+    for (const name in fields) {
+      if (fields[name].nameColumn) {
+        return record![name];
       }
-      return record.name || `00000${record.id}`.slice(-5);
     }
+    return record!.name || `00000${record!.id}`.slice(-5);
+  }
 
-    const {
-      records: [dmsRecord],
-    } = await ds.search({
-      filter: {
-        _domain:
-          "self.isDirectory = true AND self.relatedId = :id AND self.relatedModel = :model AND self.parent.relatedModel = :model AND (self.parent.relatedId is null OR self.parent.relatedId = 0)",
-        _domainContext: {
-          id: relatedId,
-          model: relatedModel,
-        },
+  const {
+    records: [dmsRecord],
+  } = await dmsDataStore.search({
+    filter: {
+      _domain:
+        "self.isDirectory = true AND self.relatedId = :id AND self.relatedModel = :model AND self.parent.relatedModel = :model AND (self.parent.relatedId is null OR self.parent.relatedId = 0)",
+      _domainContext: {
+        id: relatedId,
+        model: relatedModel,
       },
-      fields: ["fileName", "relatedModel", "relatedId"],
-      limit: 1,
-      offset: 0,
-    });
+    },
+    fields: ["fileName", "relatedModel", "relatedId"],
+    limit: 1,
+    offset: 0,
+  });
+
+  return (
+    dmsRecord || {
+      id: -1,
+      fileName: findName(),
+      relatedId,
+      relatedModel,
+    }
+  );
+}
+
+export function useDMSPopup() {
+  return useCallback(async (options: DMSPopupOptions) => {
+    const { record, model, onSelect, onCountChanged } = options;
+
+    const popupRecord = record && (await getDMSFileFromRecord(options));
 
     const tab = await initTab({
       name: uniqueId("$dms"),
       title: i18n.get("Attachments"),
-      model,
+      model: DMSModel,
       viewType: "grid",
       views: [{ name: "dms-file-grid", type: "grid" }],
       params: {
         popup: true,
-        "_popup-record": dmsRecord || {
-          id: -1,
-          fileName: findName(),
-          relatedId,
-          relatedModel,
-        },
+        "_popup-record": popupRecord,
         "ui-template:grid": "dms-file-list",
       },
       context: {
@@ -78,27 +89,31 @@ export function useDMSPopup() {
     if (!tab) return;
 
     async function onClose() {
-      const { page } = await ds.search({
-        filter: {
-          _domain:
-            "self.relatedModel = :model AND self.relatedId = :id AND COALESCE(self.isDirectory, FALSE) = FALSE",
-          _domainContext: {
-            id: relatedId,
-            model: relatedModel,
+      if (onCountChanged && record?.id && model) {
+        const { page } = await dmsDataStore.search({
+          filter: {
+            _domain:
+              "self.relatedModel = :model AND self.relatedId = :id AND COALESCE(self.isDirectory, FALSE) = FALSE",
+            _domainContext: {
+              id: record.id,
+              model,
+            },
           },
-        },
-        fields: ["fileName", "relatedModel", "relatedId"],
-        limit: 1,
-        offset: 0,
-      });
-      onCountChanged?.(page.totalCount ?? 0);
+          fields: ["fileName", "relatedModel", "relatedId"],
+          limit: 1,
+          offset: 0,
+        });
+        onCountChanged(page.totalCount ?? 0);
+      }
     }
+
     const close = await showPopup({
       tab,
       open: true,
       onClose,
       footer: () => (
         <Footer
+          onSelect={onSelect}
           onClose={() => {
             close();
             onClose();
@@ -110,10 +125,37 @@ export function useDMSPopup() {
   }, []);
 }
 
-function Footer({ onClose }: { onClose: () => void }) {
+function Footer({
+  onSelect,
+  onClose,
+}: Pick<DMSPopupOptions, "onSelect"> & { onClose: () => void }) {
   return (
-    <Button variant="secondary" onClick={onClose}>
-      {i18n.get("Close")}
+    <>
+      {onSelect && (
+        <FooterSelectButton
+          onSelect={(list) => {
+            onSelect(list);
+            onClose();
+          }}
+        />
+      )}
+      <Button variant="secondary" onClick={onClose}>
+        {i18n.get("Close")}
+      </Button>
+    </>
+  );
+}
+
+function FooterSelectButton({ onSelect }: Pick<DMSPopupOptions, "onSelect">) {
+  const handler = useAtomValue(usePopupHandlerAtom());
+  return (
+    <Button
+      variant="primary"
+      onClick={() => {
+        onSelect?.(handler?.data?.selected ?? []);
+      }}
+    >
+      {i18n.get("Select")}
     </Button>
   );
 }

@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Box, Input, Link } from "@axelor/ui";
 import { GridRow, GridColumn } from "@axelor/ui/src/grid";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { uniq } from "lodash";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -33,6 +33,7 @@ import { useDataStore } from "@/hooks/use-data-store";
 import { useGridState } from "../grid/builder/utils";
 import { useEditor } from "@/hooks/use-relation";
 import { useRoute } from "@/hooks/use-route";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { Grid as GridComponent } from "../grid/builder";
 import { Uploader } from "./builder/scope";
 import {
@@ -82,6 +83,7 @@ export function Dms(props: ViewProps<GridView>) {
   const { open: openTab } = useTabs();
   const { navigate } = useRoute();
   const showEditor = useEditor();
+  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
 
   const popupRecord = action.params?.["_popup-record"];
 
@@ -505,6 +507,16 @@ export function Dms(props: ViewProps<GridView>) {
   useEffect(() => {
     !showDetails && setDetailsId(null);
   }, [showDetails]);
+
+  useEffect(() => {
+    if (popup) {
+      setPopupHandlers({
+        data: {
+          selected: getSelectedDocuments(),
+        },
+      });
+    }
+  }, [popup, getSelectedDocuments, setPopupHandlers]);
 
   return (
     <DndProvider backend={HTML5Backend}>

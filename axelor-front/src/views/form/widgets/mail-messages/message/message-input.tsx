@@ -3,6 +3,8 @@ import { Message, MessageFile, MessageInputProps } from "../message/types";
 import { Box, Input, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { i18n } from "@/services/client/i18n";
+import { useDMSPopup } from "@/views/dms/builder/hooks";
+import { MessageFiles } from "./message-files";
 
 export function MessageInput({
   focus = false,
@@ -13,6 +15,7 @@ export function MessageInput({
   const [value, setValue] = useState("");
   const [files, setFiles] = useState<MessageFile[]>([]);
   const hasValue = Boolean(value);
+  const showDMSPopup = useDMSPopup();
 
   function resetState() {
     setValue("");
@@ -23,6 +26,10 @@ export function MessageInput({
     target: { value },
   }: ChangeEvent<HTMLInputElement>) {
     setValue(value);
+  }
+
+  function handleFileRemove(file: MessageFile) {
+    setFiles((files) => files.filter((f) => f !== file));
   }
 
   function handlePost() {
@@ -42,7 +49,14 @@ export function MessageInput({
   }
 
   function handleAttachment() {
-    // TODO: open DMS view
+    showDMSPopup({
+      onSelect: (dmsFiles) => {
+        dmsFiles &&
+          setFiles(
+            dmsFiles.filter((f) => f.isDirectory !== true) as MessageFile[]
+          );
+      },
+    });
   }
 
   function handleEdit() {
@@ -60,6 +74,14 @@ export function MessageInput({
         placeholder={i18n.get("Write your comment here")}
         autoFocus={focus}
       />
+      {files && (
+        <MessageFiles
+          showIcon={false}
+          stack
+          data={files}
+          onRemove={handleFileRemove}
+        />
+      )}
       {hasValue && (
         <Box mt={2}>
           <Button variant="primary" size="sm" onClick={handlePost}>

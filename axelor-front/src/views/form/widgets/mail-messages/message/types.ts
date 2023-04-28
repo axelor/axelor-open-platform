@@ -14,6 +14,7 @@ export type MessageFile = {
   id: number;
   fileName: string;
   fileIcon?: string;
+  typeIcon?: string;
   "metaFile.id"?: number;
 };
 

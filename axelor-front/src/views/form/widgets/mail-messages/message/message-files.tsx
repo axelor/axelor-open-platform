@@ -1,9 +1,11 @@
 import { ReactElement } from "react";
 import { Box } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
 import { MessageFile } from "./types";
 import { download as downloadFile } from "@/utils/download";
-import clsx from "clsx";
-import styles from "./message-menu.module.scss";
+import { legacyClassNames } from "@/styles/legacy";
+import styles from "./message-files.module.scss";
 
 function download(file: MessageFile) {
   downloadFile(
@@ -14,16 +16,49 @@ function download(file: MessageFile) {
   );
 }
 
-export function MessageFiles({ data = [] }: { data?: MessageFile[] }) {
+export function MessageFiles({
+  stack,
+  data = [],
+  showIcon = true,
+  onRemove,
+}: {
+  data?: MessageFile[];
+  showIcon?: boolean;
+  stack?: boolean;
+  onRemove?: (file: MessageFile, index: number) => void;
+}) {
   return (data.length > 0 && (
     <Box as="ul" m={1} ms={0} me={0} p={0} className={styles.list}>
-      {data.map(($file) => (
-        <Box as="li" d="inline-block" p={0} ps={1} pe={1} key={$file.id}>
-          <Box
-            as="i"
-            me={1}
-            className={clsx("fa", $file.fileIcon || "fa-paperclip")}
-          />
+      {data.map(($file, ind) => (
+        <Box
+          as="li"
+          d={stack ? "flex" : "inline-block"}
+          p={0}
+          ps={1}
+          pe={1}
+          key={$file.id}
+        >
+          {onRemove && (
+            <Box d="flex" alignItems="center" as="span" me={1}>
+              <MaterialIcon
+                className={styles.close}
+                fill
+                icon="close"
+                onClick={() => onRemove($file, ind)}
+                fontSize={"1rem"}
+              />
+            </Box>
+          )}
+          {showIcon && (
+            <Box
+              as="i"
+              me={1}
+              className={legacyClassNames(
+                "fa",
+                $file.typeIcon || $file.fileIcon || "fa-paperclip"
+              )}
+            />
+          )}
           <Box
             as="a"
             onClick={(e) => {
