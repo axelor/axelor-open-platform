@@ -26,7 +26,6 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { i18n } from "@/services/client/i18n";
 import { ViewProps } from "../types";
 import { DataRecord } from "@/services/client/data.types";
-import { TreeRecord } from "./types";
 import { dialogs } from "@/components/dialogs";
 import { useTabs } from "@/hooks/use-tabs";
 import { useSession } from "@/hooks/use-session";
@@ -35,17 +34,20 @@ import { useGridState } from "../grid/builder/utils";
 import { useEditor } from "@/hooks/use-relation";
 import { useRoute } from "@/hooks/use-route";
 import { Grid as GridComponent } from "../grid/builder";
-import { DmsTree } from "./dms-tree";
-import { DmsOverlay } from "./dms-overlay";
-import { Uploader } from "./uploader";
-import { DmsUpload } from "./dms-upload";
-import { DmsDetails } from "./dms-details";
+import { Uploader } from "./builder/scope";
+import {
+  TreeRecord,
+  DmsOverlay,
+  DmsUpload,
+  DmsTree,
+  DmsDetails,
+} from "./builder";
 import {
   CONTENT_TYPE,
   downloadAsBatch,
-  prepareFormView,
   toStrongText,
-} from "./utils";
+  prepareCustomView,
+} from "./builder/utils";
 import styles from "./dms.module.scss";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
@@ -129,7 +131,7 @@ export function Dms(props: ViewProps<GridView>) {
         )
       ) {
         // open HTML/spreadsheet view
-        openTab(prepareFormView(view, record));
+        openTab(prepareCustomView(view, record));
       } else {
         navigate(`/ds/dms.file/edit/${record.id}`);
       }

@@ -12,7 +12,7 @@ export const CONTENT_TYPE = {
 export const toStrongText = (text: string, quote?: boolean) =>
   `<strong>${quote ? `<em>${text}</em>` : text}</strong>`;
 
-export function prepareFormView(view: GridView, record: DataRecord) {
+export function prepareCustomView(view: GridView, record: DataRecord) {
   return {
     name: `$act:dms${record.id}`,
     model: view.model,

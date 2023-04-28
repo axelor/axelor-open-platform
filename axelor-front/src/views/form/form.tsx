@@ -38,7 +38,7 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { useDMSPopup } from "../dms/hooks";
+import { useDMSPopup } from "../dms/builder/hooks";
 
 import { useTabs } from "@/hooks/use-tabs";
 import styles from "./form.module.scss";

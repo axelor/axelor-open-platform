@@ -3,7 +3,7 @@ import { Box, Link } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { ProgressComponent } from "@/views/form/widgets/progress";
-import { Uploader } from "./uploader";
+import { Uploader } from "./scope";
 import { i18n } from "@/services/client/i18n";
 import styles from "./dms-upload.module.scss";
 
