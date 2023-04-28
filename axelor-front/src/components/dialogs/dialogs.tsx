@@ -228,7 +228,7 @@ export function ModalDialog(props: DialogOptions) {
   const close = useCallback((result: boolean) => onClose(result), [onClose]);
 
   return (
-    <>
+    <Portal>
       <Dialog
         open={open}
         scrollable
@@ -262,6 +262,6 @@ export function ModalDialog(props: DialogOptions) {
       <Fade in={open} unmountOnExit mountOnEnter>
         <Box className={styles.backdrop}></Box>
       </Fade>
-    </>
+    </Portal>
   );
 }
