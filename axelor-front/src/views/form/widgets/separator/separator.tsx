@@ -4,10 +4,11 @@ import { WidgetProps } from "../../builder";
 
 export function Separator({ schema, widgetAtom }: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
-  const { title = "Hello World" } = attrs;
+  const { title } = attrs;
+  const showTitle = title && schema.showTitle !== false;
   return (
     <Box>
-      <Box fontWeight="bold">{title}</Box>
+      {showTitle && <Box fontWeight="bold">{title}</Box>}
       <Box as="hr" my={2} />
     </Box>
   );
