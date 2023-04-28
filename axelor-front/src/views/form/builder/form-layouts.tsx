@@ -2,7 +2,6 @@ import clsx from "clsx";
 import { useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { toKebabCase } from "@/utils/names";
 
 import { FormWidget } from "./form-widget";
@@ -56,11 +55,7 @@ export const GridLayout: FormLayout = ({
       style={style}
     >
       {items.map((item) => (
-        <GridItem
-          key={item.uid}
-          schema={item}
-          className={legacyClassNames(item.css)}
-        >
+        <GridItem key={item.uid} schema={item}>
           <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
         </GridItem>
       ))}

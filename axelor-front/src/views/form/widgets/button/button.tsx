@@ -10,6 +10,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { FieldContainer, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
+import { Schema } from "@/services/client/meta.types";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -45,14 +46,34 @@ function ButtonIcon({ schema }: WidgetProps) {
   );
 }
 
+const variants = [
+  "primary",
+  "secondary",
+  "success",
+  "danger",
+  "info",
+  "warning",
+  "light",
+  "dark",
+] as const;
+
+function findVariant(schema: Schema) {
+  if (schema.link) return "link";
+  if (schema.css) {
+    let variant = schema.css.replace("btn-", "");
+    if (variants.includes(variant)) return variant;
+  }
+  return "primary";
+}
+
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
-  const { showTitle = true, link, icon } = schema;
+  const { showTitle = true, icon } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const { title } = attrs;
 
-  const variant = link ? "link" : "primary";
+  const variant = findVariant(schema);
   const [wait, setWait] = useState(false);
 
   const handleClick = useCallback(async () => {
