@@ -25,7 +25,18 @@ export default mergeConfig(
     plugins,
     base,
     server: {
-      proxy: ["callback", "login", "logout", "img", "ws", "js", "websocket"].reduce(
+      proxy: [
+        "callback",
+        "login",
+        "logout",
+        "img",
+        "ws",
+        "js",
+        "websocket",
+        "wkf-editor",
+        "studio",
+        "baml-editor",
+      ].reduce(
         (prev, path) => ({
           ...prev,
           [`${base}${path}`]: {
