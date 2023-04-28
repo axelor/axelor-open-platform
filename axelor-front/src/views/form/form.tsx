@@ -36,6 +36,7 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
+import { useTabs } from "@/hooks/use-tabs";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -372,6 +373,18 @@ function FormContainer({
       });
     }
   }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers]);
+
+  const tab = useViewTab();
+  const { close: closeTab } = useTabs();
+
+  useEffect(() => {
+    if (popup) return;
+    return actionHandler.subscribe((data) => {
+      if (data.type === "close") {
+        closeTab(tab.action);
+      }
+    });
+  }, [actionHandler, closeTab, isDirty, popup, tab.action]);
 
   const canNew = hasButton("new");
   const canEdit = readonly && hasButton("edit");

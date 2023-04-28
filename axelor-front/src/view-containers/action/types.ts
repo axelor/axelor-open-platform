@@ -7,25 +7,36 @@ import { ActionResult } from "@/services/client/meta";
 
 export interface IActionData {
   type: string;
-  target: string;
-  value: any;
 }
 
 export interface ActionAttrData extends IActionData {
   type: "attr";
+  target: string;
   name: string;
+  value: any;
 }
 
 export interface ActionValueData extends IActionData {
   type: "value";
+  target: string;
+  value: any;
   op: "set" | "add" | "del";
 }
 
 export interface ActionFocusData extends IActionData {
   type: "focus";
+  target: string;
 }
 
-export type ActionData = ActionAttrData | ActionValueData | ActionFocusData;
+export interface ActionCloseData extends IActionData {
+  type: "close";
+}
+
+export type ActionData =
+  | ActionAttrData
+  | ActionValueData
+  | ActionFocusData
+  | ActionCloseData;
 
 export type ActionListener = (data: ActionData) => void;
 

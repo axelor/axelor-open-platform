@@ -94,7 +94,6 @@ export class FormActionHandler extends DefaultActionHandler {
     this.notify({
       type: "focus",
       target,
-      value: true,
     });
   }
 
@@ -119,6 +118,12 @@ export class FormActionHandler extends DefaultActionHandler {
 
   async refresh() {
     return await this.#refreshHandler?.();
+  }
+
+  async close() {
+    this.notify({
+      type: "close",
+    });
   }
 }
 
