@@ -69,7 +69,7 @@ function ReferenceViewer(props: FormViewerProps) {
   return (
     <div className={styles.viewer}>
       {showTitle && title && <label>{title}</label>}
-      <RecordViewer {...props} record={{ record }} />
+      <RecordViewer {...props} record={record} />
     </div>
   );
 }
@@ -86,7 +86,7 @@ function CollectionViewer(props: FormViewerProps) {
     <div className={styles.viewer}>
       {showTitle && title && <label>{title}</label>}
       {records.map((record) => (
-        <RecordViewer key={record.id} {...props} record={{ record }} />
+        <RecordViewer key={record.id} {...props} record={record} />
       ))}
     </div>
   );
@@ -95,9 +95,11 @@ function CollectionViewer(props: FormViewerProps) {
 function RecordViewer(props: FormViewerProps & { record: DataRecord }) {
   const { template, record, fields } = props;
   const Template = useTemplate(template);
+  // legacy templates may be useing `record.` prefix
+  const rec = useMemo(() => ({ ...record, record }), [record]);
   return (
     <div className={styles.content}>
-      <Template context={record} options={{ fields } as any} />
+      <Template context={rec} options={{ fields } as any} />
     </div>
   );
 }

@@ -93,7 +93,7 @@ export const ATTR_EVALUATOR = {
     const parser = parseExpression(val);
     return (context) => {
       const show = parser(context);
-      if (!show) return "hide";
+      if (!show) return "ng-hide";
       else return "";
     };
   },
