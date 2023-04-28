@@ -64,9 +64,9 @@ const CLIENT_NAME_ALIASES: Record<string, string> = {
 
 const YEAR = new Date().getFullYear();
 
-const t = i18n.get;
+const { get: _t } = i18n;
 
-function loginWithClient(client: string) {
+function doLogin(client?: string) {
   const currentParams = new URLSearchParams(window.location.search);
   const forceClient = client || currentParams.get(FORCE_CLIENT_PARAM);
   const hashLocation =
@@ -92,26 +92,31 @@ export function Login() {
   const location = useLocation();
   const { state, data, error, login } = useSession();
 
-  const publicInfo = useAtomValue<any>(loadablePublicInfoAtom);
-
-  const [centralClients, setCentralClients] = useState<ClientInfo[]>([]);
-  const [application, setApplication] = useState<ApplicationInfo>({});
-  const {
-    name = "Axelor",
-    logo = defaultLogo,
-    copyright = `&copy; 2005 - ${YEAR} Axelor. ${t("All Rights Reserved")}.`,
-  } = application || {};
-  const [client, setClient] = useState<string>();
-
   const queryParams = new URLSearchParams(window.location.search);
   const clientNameParam = queryParams.get(CLIENT_NAME_PARAM);
   const clientName =
     CLIENT_NAME_ALIASES[clientNameParam || ""] ?? clientNameParam;
 
+  const publicInfo = useAtomValue<any>(loadablePublicInfoAtom);
+
+  const {
+    exclusive,
+    clients: centralClients = [],
+    defaultClient,
+    application,
+  } = (publicInfo.data || {}) as PublicInfo;
+  const client = clientName || defaultClient;
+
+  const {
+    name = "Axelor",
+    logo = defaultLogo,
+    copyright = `&copy; 2005 - ${YEAR} Axelor. ${_t("All Rights Reserved")}.`,
+  } = application || {};
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
       event.preventDefault();
-      const credentialsError = t("Wrong username or password");
+      const credentialsError = _t("Wrong username or password");
       const params = new URLSearchParams({
         [CLIENT_NAME_PARAM]: FORM_CLIENT_NAME,
       });
@@ -134,24 +139,23 @@ export function Login() {
     const error = params.get("error");
     if (error != null) {
       setErrorMessage(
-        error || t("Sorry, something went wrong. Please try again later.")
+        error || _t("Sorry, something went wrong. Please try again later.")
       );
     }
   }, []);
 
-  useEffect(() => {
-    const info = (publicInfo.data || {}) as PublicInfo;
-    setCentralClients(info.clients || []);
-    setApplication(info.application);
-    setClient(clientName || info.defaultClient);
-  }, [publicInfo.data, clientName]);
+  if (publicInfo.state === "loading" || state === "loading") return null;
 
-  if (client && client !== FORM_CLIENT_NAME) {
-    loginWithClient(client);
+  if (exclusive) {
+    doLogin();
     return null;
   }
 
-  if (state === "loading") return null;
+  if (client && client !== FORM_CLIENT_NAME) {
+    doLogin(client);
+    return null;
+  }
+
   if (data) {
     let { from } = location.state || { from: { pathname: "/" } };
     if (from === "/login") from = "/";
@@ -170,7 +174,7 @@ export function Login() {
       >
         <Image className={styles.logo} src={logo} alt={name} />
         <Box as="form" w={100} onSubmit={handleSubmit}>
-          <InputLabel htmlFor="username">{t("Username")}</InputLabel>
+          <InputLabel htmlFor="username">{_t("Username")}</InputLabel>
           <Input
             id="username"
             name="username"
@@ -181,7 +185,7 @@ export function Login() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <InputLabel htmlFor="password">{t("Password")}</InputLabel>
+          <InputLabel htmlFor="password">{_t("Password")}</InputLabel>
           <Input
             name="password"
             type="password"
@@ -195,7 +199,7 @@ export function Login() {
           <Box d="flex" alignItems="center">
             <Input type="checkbox" p={0} m={0} me={1} />
             <Box as="p" mb={0}>
-              {t("Remember me")}
+              {_t("Remember me")}
             </Box>
           </Box>
           {errorMessage && (
@@ -213,7 +217,7 @@ export function Login() {
             </Box>
           )}
           <Button type="submit" variant="primary" mt={2} w={100}>
-            {t("Log in")}
+            {_t("Log in")}
           </Button>
         </Box>
 
@@ -232,7 +236,7 @@ export function Login() {
 function CentralClients(props: { centralClients: any[] }) {
   const { centralClients } = props;
 
-  if (!centralClients.length) {
+  if (!centralClients?.length) {
     return null;
   }
 
@@ -255,7 +259,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
   const handleClick = useCallback(
     (e: React.SyntheticEvent) => {
       e.preventDefault();
-      loginWithClient(name);
+      doLogin(name);
     },
     [name]
   );
@@ -273,7 +277,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
         onClick={handleClick}
       >
         {icon && <Image className={styles.socialLogo} src={icon} alt={title} />}
-        <Box>{t("Log in with {0}", title)}</Box>
+        <Box>{_t("Log in with {0}", title)}</Box>
       </Button>
     </Box>
   );

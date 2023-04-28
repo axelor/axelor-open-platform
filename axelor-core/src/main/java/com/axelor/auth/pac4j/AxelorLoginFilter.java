@@ -1,3 +1,21 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.axelor.auth.pac4j;
 
 import com.axelor.auth.AuthUtils;
@@ -16,7 +34,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.profile.UserProfile;
-import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 import org.slf4j.Logger;
@@ -26,14 +43,11 @@ public class AxelorLoginFilter implements Filter {
 
   private final AxelorSecurityFilter axelorSecurityFilter;
 
-  private final Clients clients;
-
   private static final Logger logger = LoggerFactory.getLogger(AxelorLoginFilter.class);
 
   @Inject
   public AxelorLoginFilter(AxelorSecurityFilter axelorSecurityFilter, Clients clients) {
     this.axelorSecurityFilter = axelorSecurityFilter;
-    this.clients = clients;
   }
 
   @Override
@@ -52,12 +66,13 @@ public class AxelorLoginFilter implements Filter {
       }
     }
 
-    // if already authenticated or if form login is not configured, redirect to base url
-    if (authenticated || clients.getClients().stream().noneMatch(FormClient.class::isInstance)) {
+    // If already authenticated, redirect to base URL.
+    if (authenticated) {
       ((HttpServletResponse) response).sendRedirect(".");
       return;
     }
 
+    // When not authenticated, this triggers login process.
     axelorSecurityFilter.doFilter(request, response, chain);
   }
 
