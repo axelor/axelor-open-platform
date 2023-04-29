@@ -21,11 +21,21 @@ function TabContent({
   formAtom: WidgetProps["formAtom"];
   readonly?: boolean;
 }) {
+  const [mount, setMount] = useState(false);
   const display = active ? "block" : "none";
+
+  useEffect(() => {
+    active && setMount(true);
+  }, [active]);
+
   return (
-    <Box d={display} pt={3}>
-      <FormWidget readonly={readonly} schema={schema} formAtom={formAtom} />
-    </Box>
+    <>
+      {mount && (
+        <Box d={display} pt={3}>
+          <FormWidget readonly={readonly} schema={schema} formAtom={formAtom} />
+        </Box>
+      )}
+    </>
   );
 }
 
