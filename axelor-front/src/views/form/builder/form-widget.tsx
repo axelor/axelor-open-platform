@@ -9,6 +9,8 @@ import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
+import { parseTemplate } from "@/hooks/use-parser/utils";
+import { DataContext } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
@@ -37,7 +39,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   );
 
   // eval field expression showIf, hideIf etc
-  useHandleFieldExpression({ schema, widgetAtom });
+  useHandleFieldExpression({ schema, widgetAtom, valueAtom });
 
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
@@ -152,56 +154,121 @@ function FormField({
 function useHandleFieldExpression({
   schema,
   widgetAtom,
+  valueAtom,
 }: {
   schema: Schema;
   widgetAtom: WidgetAtom;
+  valueAtom?: ValueAtom<any>;
 }) {
   const setWidgetAttrs = useSetAtom(widgetAtom);
   const { recordHandler } = useFormScope();
 
+  const handleBind = useAtomCallback(
+    useCallback(
+      (get, set, context: DataContext, bind: string) => {
+        if (valueAtom) {
+          const value = parseTemplate(bind)(context) ?? null;
+          set(valueAtom, value, false, false);
+        }
+      },
+      [valueAtom]
+    )
+  );
+
+  const handleCondition = useCallback(
+    (context: DataContext, attr: string, expr: string, negate = false) => {
+      const value = parseExpression(expr)(context);
+      setWidgetAttrs((state) => {
+        const attrs = { ...state.attrs, [attr]: negate ? !value : value };
+        if (isEqual(state.attrs, attrs)) return state;
+        return { ...state, attrs };
+      });
+    },
+    [setWidgetAttrs]
+  );
+
+  const handleValidation = useCallback(
+    (context: DataContext, expr: string) => {
+      const value = parseExpression(expr)(context);
+      setWidgetAttrs((state) => {
+        const errors = {
+          ...state.errors,
+          invalid: i18n.get("{0} is invalid", state.attrs.title),
+        };
+        if (value) Reflect.deleteProperty(errors, "invalid");
+        if (isEqual(state.errors, errors)) return state;
+        return { ...state, errors };
+      });
+    },
+    [setWidgetAttrs]
+  );
+
   useEffect(() => {
-    const { showIf, hideIf, readonlyIf, requiredIf, validIf } = schema;
+    const {
+      showIf,
+      hideIf,
+      readonlyIf,
+      requiredIf,
+      validIf,
+      collapseIf,
+      canNew,
+      canEdit,
+      canSave,
+      canCopy,
+      canRemove,
+      canDelete,
+      canArchive,
+      canAttach,
+      canSelect,
+      bind,
+    } = schema;
+
     const hasExpression =
-      showIf || hideIf || readonlyIf || requiredIf || validIf;
+      showIf ||
+      hideIf ||
+      readonlyIf ||
+      requiredIf ||
+      validIf ||
+      collapseIf ||
+      canNew ||
+      canEdit ||
+      canSave ||
+      canCopy ||
+      canRemove ||
+      canDelete ||
+      canArchive ||
+      canAttach ||
+      canSelect;
 
-    if (hasExpression) {
+    if (hasExpression || bind) {
       return recordHandler.subscribe((record) => {
-        setWidgetAttrs((state) => {
-          const attrs = { ...state.attrs };
-          let errors = state.errors;
+        if (bind) handleBind(record, bind);
+        if (showIf) handleCondition(record, "hidden", showIf, true);
+        if (hideIf) handleCondition(record, "hidden", hideIf);
+        if (readonlyIf) handleCondition(record, "readonly", readonlyIf);
+        if (requiredIf) handleCondition(record, "required", requiredIf);
+        if (collapseIf) handleCondition(record, "collapsed", collapseIf);
+        if (validIf) handleValidation(record, validIf);
 
-          if (showIf) {
-            attrs.hidden = !parseExpression(showIf)(record);
-          } else if (hideIf) {
-            attrs.hidden = parseExpression(hideIf)(record);
-          }
-
-          if (readonlyIf) {
-            attrs.readonly = parseExpression(readonlyIf)(record);
-          }
-
-          if (requiredIf) {
-            attrs.required = parseExpression(requiredIf)(record);
-          }
-
-          if (validIf) {
-            errors = {
-              ...errors,
-              invalid: i18n.get("{0} is invalid", attrs.title),
-            };
-            const valid = parseExpression(validIf)(record);
-            if (valid) delete errors.invalid;
-          }
-
-          if (!isEqual(attrs, state.attrs) || !isEqual(errors, state.errors)) {
-            return { ...state, attrs, errors };
-          }
-
-          return state;
-        });
+        if (canNew) handleCondition(record, "canNew", canNew);
+        if (canEdit) handleCondition(record, "canEdit", canEdit);
+        if (canSave) handleCondition(record, "canSave", canSave);
+        if (canCopy) handleCondition(record, "canCopy", canCopy);
+        if (canRemove) handleCondition(record, "canRemove", canRemove);
+        if (canDelete) handleCondition(record, "canDelete", canDelete);
+        if (canArchive) handleCondition(record, "canArchive", canArchive);
+        if (canAttach) handleCondition(record, "canAttach", canAttach);
+        if (canSelect) handleCondition(record, "canSelect", canSelect);
       });
     }
-  }, [schema, recordHandler, setWidgetAttrs]);
+  }, [
+    schema,
+    recordHandler,
+    setWidgetAttrs,
+    handleBind,
+    handleCondition,
+    handleValidation,
+  ]);
 }
 
 function Unknown(props: WidgetProps) {

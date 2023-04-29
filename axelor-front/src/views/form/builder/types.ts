@@ -19,6 +19,15 @@ export const DEFAULT_ATTRS = {
   css: undefined as unknown as string,
   icon: undefined as unknown as string,
   selectionIn: undefined as unknown as string,
+  canNew: undefined as unknown as boolean,
+  canEdit: undefined as unknown as boolean,
+  canSave: undefined as unknown as boolean,
+  canCopy: undefined as unknown as boolean,
+  canRemove: undefined as unknown as boolean,
+  canDelete: undefined as unknown as boolean,
+  canArchive: undefined as unknown as boolean,
+  canAttach: undefined as unknown as boolean,
+  canSelect: undefined as unknown as boolean,
 };
 
 export type Attrs = Partial<typeof DEFAULT_ATTRS>;
@@ -55,7 +64,7 @@ export type FormAtom = PrimitiveAtom<FormState>;
 
 export type ValueAtom<T> = WritableAtom<
   T | null | undefined,
-  [value: T | null | undefined, fireOnChange?: boolean],
+  [value: T | null | undefined, fireOnChange?: boolean, markDirty?: boolean],
   void
 >;
 

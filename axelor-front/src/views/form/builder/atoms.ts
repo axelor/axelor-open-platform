@@ -121,10 +121,16 @@ export function createValueAtom({
   });
   return atom(
     (get) => get(lensAtom) as any,
-    (get, set, value: any, fireOnChange: boolean = false) => {
+    (
+      get,
+      set,
+      value: any,
+      fireOnChange: boolean = false,
+      markDirty: boolean = true
+    ) => {
       const prev = get(lensAtom);
       if (prev !== value) {
-        const dirty = Boolean(name && !isDummy(name));
+        const dirty = markDirty && Boolean(name && !isDummy(name));
         set(lensAtom, value);
         set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
         if (dirty) {
