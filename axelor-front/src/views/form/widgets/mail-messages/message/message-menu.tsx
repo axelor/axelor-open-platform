@@ -2,7 +2,6 @@ import { i18n } from "@/services/client/i18n";
 import { useState } from "react";
 import { Message, MessageFlag } from "./types";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { legacyClassNames } from "@/styles/legacy";
 import { Box, Menu, MenuItem } from "@axelor/ui";
 import styles from "./message-menu.module.scss";
 import clsx from "clsx";

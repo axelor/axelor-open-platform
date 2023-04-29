@@ -309,8 +309,8 @@ export function MessageBox({
             me={1}
             mb={3}
           >
-            {i18n.get("load more")}
-            <Box as="span" ms={1}>
+            <Box d="flex" as="span" ms={1}>
+              {i18n.get("load more")}
               <MaterialIcon icon="east" />
             </Box>
           </Button>

@@ -50,7 +50,8 @@ export type Message = {
   relatedModel?: string;
   relatedName?: string;
   parent?: Message;
-  files?: MessageFile["id"][];
+  files?: MessageFile[];
+  recipients?: MessageRecipient[];
   $flags?: MessageFlag;
   $author?: MessageAuthor;
   $authorModel?: string;
@@ -112,3 +113,5 @@ export interface MessageProps {
     reload?: boolean
   ) => Promise<Message[] | void>;
 }
+
+export type MessageRecipient = { address: string; personal: string };

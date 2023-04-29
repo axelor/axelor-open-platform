@@ -1,6 +1,6 @@
 import { session } from "@/services/client/session";
 import { getName } from "../avatar/utils";
-import { Message, MessageFile } from "./types";
+import { Message } from "./types";
 
 export function getUser(message: Message) {
   const author = message.$author || message.$from;

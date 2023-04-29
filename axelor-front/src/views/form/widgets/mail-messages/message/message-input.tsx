@@ -2,9 +2,11 @@ import { ChangeEvent, useState } from "react";
 import { Message, MessageFile, MessageInputProps } from "../message/types";
 import { Box, Input, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
+import { MessageFiles } from "./message-files";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
-import { MessageFiles } from "./message-files";
+import { useMessagePopup } from "./message-form";
 
 export function MessageInput({
   focus = false,
@@ -16,6 +18,7 @@ export function MessageInput({
   const [files, setFiles] = useState<MessageFile[]>([]);
   const hasValue = Boolean(value);
   const showDMSPopup = useDMSPopup();
+  const showMessagePopup = useMessagePopup();
 
   function resetState() {
     setValue("");
@@ -32,35 +35,52 @@ export function MessageInput({
     setFiles((files) => files.filter((f) => f !== file));
   }
 
-  function handlePost() {
+  const handleSave = (data?: any) => {
     onSave &&
       onSave({
+        type: "comment",
         ...(parent
           ? {
               relatedId: parent.relatedId,
               relatedModel: parent.relatedModel,
             }
           : {}),
-        body: value,
-        files: files.map((x) => x["metaFile.id"] || x.id),
-        type: "comment",
+        ...data,
+        files: data?.files?.map((x: MessageFile) => x["metaFile.id"] || x.id),
       } as Message);
     resetState();
+  };
+
+  function handlePost() {
+    handleSave({
+      body: value,
+      files,
+    });
   }
 
   function handleAttachment() {
     showDMSPopup({
       onSelect: (dmsFiles) => {
         dmsFiles &&
-          setFiles(
-            dmsFiles.filter((f) => f.isDirectory !== true) as MessageFile[]
-          );
+          setFiles((_files) => {
+            const ids = _files.map((f) => f.id);
+            return _files.concat(
+              dmsFiles.filter(
+                (f) => !ids.includes(f.id!) && f.isDirectory !== true
+              ) as MessageFile[]
+            );
+          });
       },
     });
   }
 
-  function handleEdit() {
-    // TODO: edit message, open dialog
+  async function handleEdit() {
+    showMessagePopup({
+      title: i18n.get("Email"),
+      yesTitle: i18n.get("Send"),
+      record: { body: value, files } as Message,
+      onSave: handleSave,
+    });
   }
 
   return (

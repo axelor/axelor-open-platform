@@ -32,14 +32,17 @@ export function MessageFiles({
       {data.map(($file, ind) => (
         <Box
           as="li"
-          d={stack ? "flex" : "inline-block"}
+          d={stack ? "flex" : "inline-flex"}
           p={0}
           ps={1}
           pe={1}
           key={$file.id}
+          {...(!stack && {
+            alignItems: "center",
+          })}
         >
           {onRemove && (
-            <Box d="flex" alignItems="center" as="span" me={1}>
+            <Box d="inline-flex" alignItems="center" as="span" me={1}>
               <MaterialIcon
                 className={styles.close}
                 fill
@@ -61,6 +64,7 @@ export function MessageFiles({
           )}
           <Box
             as="a"
+            className={styles.link}
             onClick={(e) => {
               e.preventDefault();
               download($file);

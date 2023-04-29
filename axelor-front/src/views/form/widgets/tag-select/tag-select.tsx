@@ -1,16 +1,58 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useMemo } from "react";
-import { Box, Select } from "@axelor/ui";
+import { Box, Select, SelectProps } from "@axelor/ui";
 
 import { useCompletion, useEditor } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
 
 import { FieldContainer, FieldProps } from "../../builder";
 import { Chip } from "../selection";
+import { Schema } from "@/services/client/meta.types";
+
+export function TagSelectComponent({
+  schema,
+  ...props
+}: { schema: Schema } & SelectProps) {
+  const { targetName } = schema;
+  const components = useMemo(
+    () => ({
+      MultiValue: (props: any) => {
+        const { data, removeProps } = props;
+        return (
+          <Box me={1}>
+            <Chip
+              color={"indigo"}
+              title={data?.[targetName]}
+              onRemove={removeProps.onClick}
+            />
+          </Box>
+        );
+      },
+    }),
+    [targetName]
+  );
+
+  return (
+    <Select
+      isMulti
+      optionLabel={targetName}
+      optionValue={"id"}
+      components={components}
+      {...props}
+    />
+  );
+}
 
 export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { schema, valueAtom, widgetAtom, readonly } = props;
-  const { uid, target, targetName, targetSearch, placeholder, showTitle = true } = schema;
+  const {
+    uid,
+    target,
+    targetName,
+    targetSearch,
+    placeholder,
+    showTitle = true,
+  } = schema;
 
   const {
     attrs: { title },
@@ -58,24 +100,6 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [search]
   );
 
-  const components = useMemo(
-    () => ({
-      MultiValue: (props: any) => {
-        const { data, removeProps } = props;
-        return (
-          <Box me={1}>
-            <Chip
-              color={"indigo"}
-              title={data?.[targetName]}
-              onRemove={removeProps.onClick}
-            />
-          </Box>
-        );
-      },
-    }),
-    [targetName]
-  );
-
   return (
     <FieldContainer>
       {showTitle && <label htmlFor={uid}>{title}</label>}
@@ -94,15 +118,12 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           ))}
         </Box>
       ) : (
-        <Select
-          isMulti
+        <TagSelectComponent
+          schema={schema}
           onChange={handleChange}
           value={value}
           fetchOptions={handleCompletion}
-          optionLabel={targetName}
-          optionValue={"id"}
           placeholder={placeholder}
-          components={components}
         />
       )}
     </FieldContainer>
