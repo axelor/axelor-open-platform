@@ -1,18 +1,36 @@
 import React, { useCallback, useState } from "react";
-import { WidgetProps } from "../../builder";
 import { Box, Link, ListItem } from "@axelor/ui";
-import { i18n } from "@/services/client/i18n";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { useAtomCallback } from "jotai/utils";
+
+import { WidgetProps } from "../../builder";
+import { i18n } from "@/services/client/i18n";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { dialogs } from "@/components/dialogs";
 import { Follower, follow, getFollowers, unfollow } from "./utils";
 import { useSession } from "@/hooks/use-session";
+import { useMessagePopup } from "../mail-messages/message/message-form";
+import { Message } from "../mail-messages/message/types";
 import classes from "./mail-followers.module.scss";
 
-export function MailFollowers({ schema }: WidgetProps) {
+export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const [followers, setFollowers] = useState<Follower[]>([]);
   const { data: session } = useSession();
   const { model, modelId } = schema;
+  const showMessagePopup = useMessagePopup();
+
+  const getRecordTitle = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { record, fields } = get(formAtom);
+        const nameColumn = Object.keys(fields ?? {}).find(
+          (k: string) => fields[k]?.nameColumn === true
+        );
+        return record[nameColumn!] || record.name || record.code || "";
+      },
+      [formAtom]
+    )
+  );
 
   useAsyncEffect(async () => {
     const list = await getFollowers(model, modelId);
@@ -41,6 +59,15 @@ export function MailFollowers({ schema }: WidgetProps) {
     [model, modelId]
   );
 
+  const handleAddFollower = useCallback(async () => {
+    showMessagePopup({
+      title: i18n.get("Add followers"),
+      yesTitle: i18n.get("Add"),
+      record: { subject: getRecordTitle() } as Message,
+      onSave: handleFollow,
+    });
+  }, [getRecordTitle, handleFollow, showMessagePopup]);
+
   const isLoginUserFollowing = React.useMemo(
     () =>
       followers?.some(
@@ -63,7 +90,7 @@ export function MailFollowers({ schema }: WidgetProps) {
           >
             <MaterialIcon icon="star" fill={isLoginUserFollowing} />
           </Box>
-          <Box as="span" className={classes.icon}>
+          <Box as="span" className={classes.icon} onClick={handleAddFollower}>
             <MaterialIcon icon="add" />
           </Box>
         </Box>
