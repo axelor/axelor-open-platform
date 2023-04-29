@@ -10,7 +10,14 @@ import React, {
   useState,
 } from "react";
 
-import { Box, ClickAwayListener, Divider, Popper, TextField } from "@axelor/ui";
+import {
+  Box,
+  ClickAwayListener,
+  Divider,
+  FocusTrap,
+  Popper,
+  TextField,
+} from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { toKebabCase } from "@/utils/names";
@@ -587,68 +594,70 @@ function AdvanceSearch({
             className={styles.popper}
             p={2}
           >
-            <Box d="flex" flexDirection="column">
-              <Box d="flex" alignItems="center">
-                <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
-                  {t("Advanced Search")}
+            <FocusTrap enabled={open}>
+              <Box d="flex" flexDirection="column">
+                <Box d="flex" alignItems="center">
+                  <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+                    {t("Advanced Search")}
+                  </Box>
+                  <Box as="span" className={styles.close} onClick={handleClose}>
+                    <MaterialIcon icon="close" />
+                  </Box>
                 </Box>
-                <Box as="span" className={styles.close} onClick={handleClose}>
-                  <MaterialIcon icon="close" />
-                </Box>
-              </Box>
-              <Divider />
-              <Box d="flex" alignItems="flex-start" mb={customSearch ? 0 : 1}>
-                {domains.length > 0 && (
-                  <FilterList
-                    title={t("Filters")}
-                    items={domains}
-                    active={activeFilters}
-                    disabled={isSingleFilter}
-                    onFilterClick={handleFilterClick}
-                    onFilterChange={handleFilterCheck}
-                  />
-                )}
-                {filters.length > 0 && (
-                  <FilterList
-                    title={t("My Filter")}
-                    items={filters}
-                    active={activeFilters}
-                    disabled={isSingleFilter}
-                    onFilterClick={handleFilterClick}
-                    onFilterChange={handleFilterCheck}
-                  />
-                )}
-                {!customSearch &&
-                  domains.length === 0 &&
-                  filters.length === 0 && (
-                    <Box as="p" mb={0} p={1} flex={1}>
-                      {t("No filters available")}
-                    </Box>
+                <Divider />
+                <Box d="flex" alignItems="flex-start" mb={customSearch ? 0 : 1}>
+                  {domains.length > 0 && (
+                    <FilterList
+                      title={t("Filters")}
+                      items={domains}
+                      active={activeFilters}
+                      disabled={isSingleFilter}
+                      onFilterClick={handleFilterClick}
+                      onFilterChange={handleFilterCheck}
+                    />
                   )}
+                  {filters.length > 0 && (
+                    <FilterList
+                      title={t("My Filter")}
+                      items={filters}
+                      active={activeFilters}
+                      disabled={isSingleFilter}
+                      onFilterClick={handleFilterClick}
+                      onFilterChange={handleFilterCheck}
+                    />
+                  )}
+                  {!customSearch &&
+                    domains.length === 0 &&
+                    filters.length === 0 && (
+                      <Box as="p" mb={0} p={1} flex={1}>
+                        {t("No filters available")}
+                      </Box>
+                    )}
+                </Box>
+                {customSearch && (filters.length > 0 || domains.length > 0) && (
+                  <Divider mt={1} />
+                )}
+                {customSearch && (
+                  <FilterEditor
+                    {...{
+                      t,
+                      canShare,
+                      canExportFull,
+                      fields,
+                      contextField,
+                      setContextField,
+                      filter: customFilter,
+                      setFilter: setCustomFilter,
+                      onApply: handleApply,
+                      onClear: handleClear,
+                      onExport,
+                      onSave: handleFilterSave,
+                      onDelete: handleFilterRemove,
+                    }}
+                  />
+                )}
               </Box>
-              {customSearch && (filters.length > 0 || domains.length > 0) && (
-                <Divider mt={1} />
-              )}
-              {customSearch && (
-                <FilterEditor
-                  {...{
-                    t,
-                    canShare,
-                    canExportFull,
-                    fields,
-                    contextField,
-                    setContextField,
-                    filter: customFilter,
-                    setFilter: setCustomFilter,
-                    onApply: handleApply,
-                    onClear: handleClear,
-                    onExport,
-                    onSave: handleFilterSave,
-                    onDelete: handleFilterRemove,
-                  }}
-                />
-              )}
-            </Box>
+            </FocusTrap>
           </Box>
         </ClickAwayListener>
       </Popper>
