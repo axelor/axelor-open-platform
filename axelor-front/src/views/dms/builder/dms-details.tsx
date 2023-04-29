@@ -1,7 +1,8 @@
-import { ReactElement, memo, useCallback, useState } from "react";
+import { ReactElement, memo, useCallback, useEffect, useState } from "react";
 import { Box, Button, Link } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { useAtomCallback } from "jotai/utils";
+import { useSetAtom } from "jotai";
 import clsx from "clsx";
 
 import { TreeRecord } from "./types";
@@ -16,6 +17,7 @@ import { Form, useFormHandlers } from "../../form/builder";
 import { FormView } from "@/services/client/meta.types";
 import { ViewData } from "@/services/client/meta";
 import { DataStore } from "@/services/client/data-store";
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import styles from "./dms-details.module.scss";
 
 const tagsFormName = "dms-file-tags-form";
@@ -170,6 +172,7 @@ function TagsForm({ meta, record, onSave }: TagFormProps) {
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
   const { model } = meta.view;
+  const setDirty = useSetAtom(useViewDirtyAtom());
 
   const handleSave = useAtomCallback(
     useCallback(
@@ -185,10 +188,17 @@ function TagsForm({ meta, record, onSave }: TagFormProps) {
         });
 
         onSave(res);
+        setDirty(false);
       },
-      [model, formAtom, onSave]
+      [model, formAtom, onSave, setDirty]
     )
   );
+
+  useEffect(() => {
+    return () => {
+      setDirty(false);
+    };
+  }, [setDirty]);
 
   return (
     <>
