@@ -69,9 +69,8 @@ export function PanelTabs(props: WidgetProps) {
 
   const hiddenState = useAtomValue(hiddenStateAtom);
   const visibleTabs = useMemo(
-    () =>
-      tabItems.filter((item) => !hiddenState[item.id] || item.id === activeTab),
-    [activeTab, hiddenState, tabItems]
+    () => tabItems.filter((item) => !hiddenState[item.id]),
+    [hiddenState, tabItems]
   );
 
   const { actionHandler } = useFormScope();
@@ -94,11 +93,23 @@ export function PanelTabs(props: WidgetProps) {
 
   useEffect(() => {
     if (visibleTabs.some((item) => item.id === activeTab)) return;
+    if (activeTab) {
+      let index = items.findIndex((item) => item.uid === activeTab);
+      let prevIndex = index - 1;
+      while (prevIndex >= 0) {
+        let prev = items[prevIndex];
+        if (!hiddenState[prev.uid]) {
+          setActiveTab(prev.uid);
+          return;
+        }
+        prevIndex--;
+      }
+    }
     let first = visibleTabs[0];
     if (first) {
       setActiveTab(first.id ?? null);
     }
-  }, [activeTab, visibleTabs]);
+  }, [activeTab, hiddenState, items, visibleTabs]);
 
   return (
     <Box d="flex" flexDirection="column">
