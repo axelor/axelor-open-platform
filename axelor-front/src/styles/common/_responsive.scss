@@ -1,0 +1,35 @@
+.hide {
+  display: none;
+}
+
+.hide-md {
+  display: none;
+}
+
+.show-sm {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hide-md,
+  .show-sm {
+    display: inherit !important;
+  }
+  .show-md,
+  .hide-sm {
+    display: none !important;
+  }
+}
+
+.show-print {
+  display: none !important;
+}
+
+@media print {
+  .show-print {
+    display: inherit !important;
+  }
+  .hide-print {
+    display: none !important;
+  }
+}
