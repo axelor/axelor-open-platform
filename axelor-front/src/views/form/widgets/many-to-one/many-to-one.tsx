@@ -18,7 +18,7 @@ import {
 } from "../tag-select/creatable-select";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
-  const { schema, formAtom, valueAtom, widgetAtom, readonly } = props;
+  const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
     uid,
     domain,
@@ -169,6 +169,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canCreate={canNew}
           onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
+          invalid={invalid}
           value={selectedValue ?? null}
           placeholder={placeholder}
           icons={

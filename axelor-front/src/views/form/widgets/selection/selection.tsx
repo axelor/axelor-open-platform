@@ -67,6 +67,7 @@ export function Selection({
   selectProps,
   schema,
   readonly,
+  invalid,
   widgetAtom,
   valueAtom,
 }: FieldProps<string | number | null> & {
@@ -121,6 +122,7 @@ export function Selection({
       {readonly && <SelectText schema={schema} value={value} />}
       {readonly || (
         <Select
+          invalid={invalid}
           value={selectValue ?? null}
           onChange={handleChange}
           options={selectionList}

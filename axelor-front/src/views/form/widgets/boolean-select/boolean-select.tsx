@@ -14,6 +14,7 @@ export function BooleanSelect({
   readonly,
   widgetAtom,
   valueAtom,
+  invalid,
 }: FieldProps<boolean | null>) {
   const { uid, showTitle = true, widgetAttrs, nullable } = schema;
   const {
@@ -58,6 +59,7 @@ export function BooleanSelect({
         />
       ) : (
         <Select
+          invalid={invalid}
           value={selected}
           onChange={handleOnChange}
           options={options}
