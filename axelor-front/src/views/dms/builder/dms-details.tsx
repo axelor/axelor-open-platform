@@ -114,23 +114,28 @@ export const DmsDetails = memo(function DmsDetails({
               </Box>
             ) : tags?.length > 0 ? (
               <>
-                {tags?.map?.((tag: DataRecord) => (
+                <Box d="flex" flexWrap="wrap">
+                  {tags?.map?.((tag: DataRecord) => (
+                    <Box
+                      key={tag.id}
+                      ms={1}
+                      mt={1}
+                      className={legacyClassNames("label", tag.style)}
+                    >
+                      {tag.name}
+                    </Box>
+                  ))}
                   <Box
-                    key={tag.id}
+                    d="flex"
                     ms={1}
-                    className={legacyClassNames("label", tag.style)}
+                    mt={1}
+                    alignItems="center"
+                    className={styles.icon}
+                    title={i18n.get("Edit")}
+                    onClick={handleEdit}
                   >
-                    {tag.name}
+                    <MaterialIcon icon="edit" fill fontSize={"1rem"} />
                   </Box>
-                ))}
-                <Box
-                  d="flex"
-                  ms={1}
-                  className={styles.icon}
-                  title={i18n.get("Edit")}
-                  onClick={handleEdit}
-                >
-                  <MaterialIcon icon="edit" fill fontSize={"1rem"} />
                 </Box>
               </>
             ) : (
