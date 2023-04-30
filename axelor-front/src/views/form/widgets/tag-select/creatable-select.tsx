@@ -16,7 +16,7 @@ const ADD_ON_OPTIONS: Record<string, number> = {
 export type CreatableSelectProps = SelectProps & {
   schema: Schema;
   canCreate?: boolean;
-  onCreate: (
+  onCreate?: (
     value: DataRecord,
     readonly?: boolean,
     onSelect?: EditorOptions["onSelect"]
@@ -69,14 +69,14 @@ export function CreatableSelect({
           const ds = new DataStore(target);
           const newRecord = await ds.save(record);
           newRecord && updateValue(newRecord);
-        } else {
+        } else if (onCreate) {
           await onCreate(record, false, updateValue);
         }
       } else {
         onChange(value);
       }
     },
-    [target, createNames, onChange, onCreate]
+    [onCreate, onChange, createNames, target]
   );
 
   const addOnOptions = useMemo(() => {
