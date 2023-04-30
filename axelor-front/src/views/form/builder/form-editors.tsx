@@ -41,8 +41,8 @@ function processEditor(schema: Schema) {
   const flexbox = editor.flexbox ?? false;
 
   const applyTitle = (item: Schema) => {
-    const result = { ...item };
     const field = fields?.[item.name!];
+    const result = { ...field, ...item };
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
     result.title = item.title ?? field?.title ?? field?.autoTitle ?? item.name;
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
