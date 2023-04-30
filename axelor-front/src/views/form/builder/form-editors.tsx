@@ -40,18 +40,28 @@ function processEditor(schema: Schema) {
   const fields = editor.fields ?? schema.fields;
   const flexbox = editor.flexbox ?? false;
 
-  const applyAttrs = (item: Schema) => {
+  const applyTitle = (item: Schema) => {
     const result = { ...item };
     const field = fields?.[item.name!];
-
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
     result.title = item.title ?? field?.title ?? field?.autoTitle ?? item.name;
-    result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
+    return result;
+  };
+
+  const applyAttrs = (item: Schema) => {
+    const result = applyTitle(item);
+    const field = fields?.[item.name!];
+
+    result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
     result.serverType = item.serverType ?? field?.type;
 
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
+    }
+
+    if (item.items) {
+      item.items = item.items.map(applyTitle);
     }
 
     return result as Schema;
