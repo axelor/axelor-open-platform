@@ -16,6 +16,16 @@
   flex: 1;
 }
 
+.menus {
+  display: flex;
+  flex: 1;
+}
+
+.farItems {
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
 .appLogo {
   svg {
     display: block;
@@ -32,7 +42,7 @@
   position: absolute !important;
   left: 0.75rem;
   font-size: 0.65rem;
-  [dir='rtl'] & {
+  [dir="rtl"] & {
     left: unset;
     right: 0.75rem;
   }

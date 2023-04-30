@@ -1,41 +1,42 @@
 import { useSession } from "@/hooks/use-session";
-import { useCallback, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 import {
+  Badge,
   Box,
   CommandBar,
   CommandItem,
   CommandItemProps,
-  MenuItem,
   Input,
-  Badge,
+  MenuItem,
 } from "@axelor/ui";
 import {
   MaterialIcon,
   MaterialIconProps,
 } from "@axelor/ui/icons/meterial-icon";
+import { useCallback, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+import { dialogs } from "@/components/dialogs";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useRoute } from "@/hooks/use-route";
+import { useTabs } from "@/hooks/use-tabs";
+import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
 import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import {
+  QuickMenu,
+  QuickMenuItem as TQuickMenuItem,
+} from "@/services/client/meta.types";
+import { commonClassNames } from "@/styles/common";
 import {
   ActionExecutor,
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-import {
-  QuickMenu,
-  QuickMenuItem as TQuickMenuItem,
-} from "@/services/client/meta.types";
-import { DataRecord } from "@/services/client/data.types";
-import { dialogs } from "@/components/dialogs";
-import { useTabs } from "@/hooks/use-tabs";
-import { useRoute } from "@/hooks/use-route";
+import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import { useSidebar } from "../nav-drawer/hook";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { i18n } from "@/services/client/i18n";
-import { quick } from "./utils";
-import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
 import styles from "./nav-header.module.scss";
+import { quick } from "./utils";
 
 function BadgeIcon({
   count,
@@ -136,31 +137,29 @@ function FavoriteItem(props: CommandItemProps) {
   }, [favoriteDataStore]);
 
   return (
-    <>
-      <CommandItem
-        {...props}
-        items={[
-          {
-            key: "fav-add",
-            text: "Add to favorites...",
-            disabled: !tabTitle,
-            onClick: handleFavoriteAdd,
-          },
-          { key: "fav-d1", divider: true, hidden: favorites.length === 0 },
-          ...favorites.map((fav, ind) => ({
-            key: String(fav.id ?? `fav_${ind}`),
-            text: fav.title,
-            onClick: () => handleFavoriteClick(fav),
-          })),
-          { key: "fav-d2", divider: true },
-          {
-            key: "fav-organise",
-            text: i18n.get("Organize favorites..."),
-            onClick: handleOrganizeFavorites,
-          },
-        ]}
-      />
-    </>
+    <CommandItem
+      {...props}
+      items={[
+        {
+          key: "fav-add",
+          text: "Add to favorites...",
+          disabled: !tabTitle,
+          onClick: handleFavoriteAdd,
+        },
+        { key: "fav-d1", divider: true, hidden: favorites.length === 0 },
+        ...favorites.map((fav, ind) => ({
+          key: String(fav.id ?? `fav_${ind}`),
+          text: fav.title,
+          onClick: () => handleFavoriteClick(fav),
+        })),
+        { key: "fav-d2", divider: true },
+        {
+          key: "fav-organise",
+          text: i18n.get("Organize favorites..."),
+          onClick: handleOrganizeFavorites,
+        },
+      ]}
+    />
   );
 }
 
@@ -205,37 +204,29 @@ function QuickMenuItem({
   );
 }
 
-function FarItems() {
-  const [quickMenus, setQuickMenus] = useState<QuickMenu[]>([]);
-
-  const { data, logout } = useSession();
-  const { navigate } = useRoute();
-  const { open: openTab } = useTabs();
-  const { unread: unreadMailCount } = useTagsMail();
-  const { current: currentTaskCount, pending: pendingTaskCount } =
-    useTagsTasks();
-
-  const refreshQuickMenus = useCallback(async () => {
-    setQuickMenus(await quick());
+function QuickMenuBar() {
+  const [menus, setMenus] = useState<QuickMenu[]>([]);
+  const refresh = useCallback(async () => {
+    setMenus(await quick());
   }, []);
 
   useAsyncEffect(async () => {
-    await refreshQuickMenus();
-  }, [refreshQuickMenus]);
+    await refresh();
+  }, [refresh]);
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(new DefaultActionHandler()),
     []
   );
 
-  const quickItems = useMemo(
+  const items = useMemo(
     () =>
-      quickMenus.map((menu, ind) => ({
+      menus.map((menu, ind) => ({
         key: `quick_menu_${ind}`,
         text: menu.title,
         showDownArrow: true,
-        items: menu?.items?.map((item, ind) => {
-          const key = `quick_menu_item_${ind}`;
+        items: menu?.items?.map((item, index) => {
+          const key = String(index);
           return {
             key,
             text: item.title,
@@ -246,121 +237,129 @@ function FarItems() {
                 menu={menu}
                 actionExecutor={actionExecutor}
                 onClick={props.onClick}
-                onRefresh={refreshQuickMenus}
+                onRefresh={refresh}
               />
             ),
           };
         }),
       })),
-    [quickMenus, actionExecutor, refreshQuickMenus]
+    [menus, actionExecutor, refresh]
   );
 
+  return <CommandBar items={items} />;
+}
+
+function FarItems() {
+  const { data, logout } = useSession();
+  const { navigate } = useRoute();
+  const { open: openTab } = useTabs();
+  const { unread: unreadMailCount } = useTagsMail();
+  const { current: currentTaskCount, pending: pendingTaskCount } =
+    useTagsTasks();
+
   return (
-    <>
-      <CommandBar
-        items={[
-          ...quickItems,
-          {
-            key: "home",
-            text: "Home",
-            iconOnly: true,
-            iconProps: {
-              icon: "home",
-            },
-            onClick: () => navigate("/"),
+    <CommandBar
+      items={[
+        {
+          key: "home",
+          text: "Home",
+          iconOnly: true,
+          iconProps: {
+            icon: "home",
           },
-          {
-            key: "fav",
-            text: "Favorite",
-            iconOnly: true,
-            iconProps: {
-              icon: "star",
-            },
-            render: FavoriteItem,
+          onClick: () => navigate("/"),
+        },
+        {
+          key: "fav",
+          text: "Favorite",
+          iconOnly: true,
+          iconProps: {
+            icon: "star",
           },
-          {
-            key: "mail",
-            text: "Mails",
-            icon: (props: any) => (
-              <BadgeIcon {...props} icon="mail" count={unreadMailCount} />
-            ),
-            iconOnly: true,
-            iconProps: {
-              icon: "mail",
-            },
-            onClick: () => openTab("mail.inbox"),
+          render: FavoriteItem,
+        },
+        {
+          key: "mail",
+          text: "Mails",
+          icon: (props: any) => (
+            <BadgeIcon {...props} icon="mail" count={unreadMailCount} />
+          ),
+          iconOnly: true,
+          iconProps: {
+            icon: "mail",
           },
-          {
-            key: "messages",
-            text: "Messages",
-            icon: (props: any) => (
-              <BadgeIcon
-                {...props}
-                icon="notifications"
-                count={currentTaskCount}
-              />
-            ),
-            iconOnly: true,
-            iconProps: {
-              icon: "notifications",
-            },
-            items: [
-              {
-                key: "tasks.due",
-                text: i18n.get("Tasks due"),
-                subtext: pendingTaskCount
-                  ? i18n.get("{0} tasks", pendingTaskCount)
-                  : i18n.get("no tasks"),
-                onClick: () => openTab("team.tasks.due"),
-              },
-              { key: "m-div", divider: true },
-              {
-                key: "tasks.todo",
-                text: i18n.get("Tasks todo"),
-                subtext: currentTaskCount
-                  ? i18n.get("{0} tasks", currentTaskCount)
-                  : i18n.get("no tasks"),
-                onClick: () => openTab("team.tasks.todo"),
-              },
-            ],
+          onClick: () => openTab("mail.inbox"),
+        },
+        {
+          key: "messages",
+          text: "Messages",
+          icon: (props: any) => (
+            <BadgeIcon
+              {...props}
+              icon="notifications"
+              count={currentTaskCount}
+            />
+          ),
+          iconOnly: true,
+          iconProps: {
+            icon: "notifications",
           },
-          {
-            key: "user",
-            text: "User",
-            iconOnly: true,
-            iconProps: {
-              icon: "person",
+          items: [
+            {
+              key: "tasks.due",
+              text: i18n.get("Tasks due"),
+              subtext: pendingTaskCount
+                ? i18n.get("{0} tasks", pendingTaskCount)
+                : i18n.get("no tasks"),
+              onClick: () => openTab("team.tasks.due"),
             },
-            items: [
-              {
-                key: "profile",
-                text: data?.user.name,
-                subtext: "Preferences",
-                onClick: () => navigate("/profile"),
-              },
-              {
-                key: "d-person",
-                divider: true,
-              },
-              {
-                key: "shortcuts",
-                text: "Shortcuts",
-              },
-              {
-                key: "about",
-                text: "About",
-                onClick: () => navigate("/about"),
-              },
-              {
-                key: "logout",
-                text: "Logout",
-                onClick: () => logout(),
-              },
-            ],
+            { key: "m-div", divider: true },
+            {
+              key: "tasks.todo",
+              text: i18n.get("Tasks todo"),
+              subtext: currentTaskCount
+                ? i18n.get("{0} tasks", currentTaskCount)
+                : i18n.get("no tasks"),
+              onClick: () => openTab("team.tasks.todo"),
+            },
+          ],
+        },
+        {
+          key: "user",
+          text: "User",
+          iconOnly: true,
+          iconProps: {
+            icon: "person",
           },
-        ]}
-      />
-    </>
+          items: [
+            {
+              key: "profile",
+              text: data?.user.name,
+              subtext: "Preferences",
+              onClick: () => navigate("/profile"),
+            },
+            {
+              key: "d-person",
+              divider: true,
+            },
+            {
+              key: "shortcuts",
+              text: "Shortcuts",
+            },
+            {
+              key: "about",
+              text: "About",
+              onClick: () => navigate("/about"),
+            },
+            {
+              key: "logout",
+              text: "Logout",
+              onClick: () => logout(),
+            },
+          ],
+        },
+      ]}
+    />
   );
 }
 
@@ -379,8 +378,12 @@ export function NavHeader() {
           {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
         </a>
       </Box>
-      <Box className={styles.topMenu}></Box>
-      <Box className={styles.quickMenu}></Box>
+      <Box className={styles.menus}>
+        <Box className={commonClassNames("hide-sm", styles.topMenu)}></Box>
+        <Box className={commonClassNames("hide-sm", styles.quickMenu)}>
+          <QuickMenuBar />
+        </Box>
+      </Box>
       <Box className={styles.farItems}>
         <FarItems />
       </Box>
