@@ -37,7 +37,7 @@ export const GridLayout: FormLayout = ({
   className,
   readonly,
 }) => {
-  const { cols, colWidths, gap, items = [] } = schema;
+  const { cols = 12, colWidths, itemSpan, gap, items = [] } = schema;
   const widths = useMemo(() => computeCols(cols, colWidths), [cols, colWidths]);
   const style = {
     "--grid-cols": widths ?? cols,
@@ -55,7 +55,7 @@ export const GridLayout: FormLayout = ({
       style={style}
     >
       {items.map((item) => (
-        <GridItem key={item.uid} schema={item}>
+        <GridItem key={item.uid} schema={item} itemSpan={itemSpan}>
           <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
         </GridItem>
       ))}
@@ -67,9 +67,10 @@ function GridItem(props: {
   schema: Schema;
   children: React.ReactNode;
   className?: string;
+  itemSpan?: number;
 }) {
-  const { schema, className, children } = props;
-  const { colSpan, rowSpan } = schema;
+  const { schema, className, itemSpan, children } = props;
+  const { colSpan = itemSpan, rowSpan } = schema;
   return (
     <div
       className={clsx(styles.gridItem, className)}
