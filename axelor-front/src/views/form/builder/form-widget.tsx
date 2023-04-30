@@ -177,7 +177,7 @@ function useHandleFieldExpression({
 
   const handleCondition = useCallback(
     (context: DataContext, attr: string, expr: string, negate = false) => {
-      const value = parseExpression(expr)(context);
+      const value = Boolean(parseExpression(expr)(context));
       setWidgetAttrs((state) => {
         const attrs = { ...state.attrs, [attr]: negate ? !value : value };
         if (isEqual(state.attrs, attrs)) return state;
