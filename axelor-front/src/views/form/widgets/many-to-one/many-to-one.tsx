@@ -128,6 +128,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         if ((current || {}).id !== (value || {}).id) {
           current = value;
         }
+        if (value && (current || {})[targetName] !== value[targetName]) {
+          current = {
+            ...(current || {}),
+            [targetName]: value[targetName],
+          };
+        }
         if (
           current &&
           current.id &&
