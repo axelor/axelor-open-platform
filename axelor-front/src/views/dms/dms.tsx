@@ -329,6 +329,7 @@ export function Dms(props: ViewProps<GridView>) {
         viewName: "dms-file-permission-form",
         record: doc,
         readonly: false,
+        onSelect: () => {},
       });
     }
   }, [view, showEditor, getSelectedDocument]);
