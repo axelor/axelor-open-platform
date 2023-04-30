@@ -35,6 +35,7 @@ import { useDataStore } from "@/hooks/use-data-store";
 import { useEditor } from "@/hooks/use-relation";
 import { usePerms } from "@/hooks/use-perms";
 import styles from "./grid.module.scss";
+import { commonClassNames } from "@/styles/common";
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom, domains } = props;
@@ -343,6 +344,7 @@ export function Grid(props: ViewProps<GridView>) {
                 icon: "edit",
               },
               disabled: !hasRowSelected,
+              className: commonClassNames("hide-sm"),
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
                 const record = rows[rowIndex]?.record;

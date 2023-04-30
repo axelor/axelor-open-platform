@@ -18,6 +18,7 @@ import {
 } from "../views/scope";
 
 import { parseExpression } from "@/hooks/use-parser/utils";
+import { i18n } from "@/services/client/i18n";
 import {
   Button,
   Menu,
@@ -25,7 +26,7 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { i18n } from "@/services/client/i18n";
+import { commonClassNames } from "@/styles/common";
 import { legacyClassNames } from "@/styles/legacy";
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
@@ -299,11 +300,19 @@ export function ViewToolBar(props: ViewToolBarProps) {
         />
       )}
       <Box className={styles.extra}>{children}</Box>
-      {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
-      {PageComp && <PageComp />}
+      {pageText && (
+        <Box className={commonClassNames(styles.pageInfo, "hide-sm")}>
+          {pageText}
+        </Box>
+      )}
+      {PageComp && (
+        <Box className={commonClassNames(styles.pageInfo, "hide-sm")}>
+          <PageComp />
+        </Box>
+      )}
       {pageActions && (
         <CommandBar
-          className={styles.pageActions}
+          className={commonClassNames(styles.pageActions, "hide-sm")}
           items={[
             {
               key: "prev",
@@ -329,10 +338,16 @@ export function ViewToolBar(props: ViewToolBarProps) {
         />
       )}
       {switchActions && (
-        <CommandBar items={switchActions} className={styles.viewSwitch} />
+        <CommandBar
+          items={switchActions}
+          className={commonClassNames(styles.viewSwitch, "hide-sm")}
+        />
       )}
       {sessionInfo?.user.technical && (
-        <CommandBar items={farItems} className={styles.farItems} />
+        <CommandBar
+          items={farItems}
+          className={commonClassNames(styles.farItems, "hide-sm")}
+        />
       )}
     </Box>
   );
