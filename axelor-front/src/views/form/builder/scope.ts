@@ -22,6 +22,7 @@ import {
   createEvalContext,
 } from "@/hooks/use-parser/eval-context";
 import { processActionValue } from "./utils";
+import { isEqual } from "lodash";
 
 type ContextCreator = () => DataContext;
 
@@ -310,11 +311,14 @@ export function FormRecordUpdates({
   formAtom: FormAtom;
   recordHandler: RecordHandler;
 }) {
+  const recordRef = useRef<DataRecord | undefined | null>();
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
   );
 
   useAsyncEffect(async () => {
+    if (isEqual(recordRef.current, record)) return;
+    recordRef.current = record;
     recordHandler.notify(
       createEvalContext(record, {
         fields: fields as unknown as EvalContextOptions["fields"],
