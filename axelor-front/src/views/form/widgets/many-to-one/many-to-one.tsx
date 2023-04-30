@@ -1,8 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useState } from "react";
 
-import { Select } from "@axelor/ui";
-
 import { usePerms } from "@/hooks/use-perms";
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
@@ -14,6 +12,10 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useAtomCallback } from "jotai/utils";
 import { FieldContainer, FieldProps } from "../../builder";
 import { ViewerInput, ViewerLink } from "../string";
+import {
+  CreatableSelect,
+  CreatableSelectProps,
+} from "../tag-select/creatable-select";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly } = props;
@@ -47,9 +49,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     targetSearch,
   });
 
-  const handleChange = (value: any) => {
-    setValue(value, true);
-  };
+  const handleChange = useCallback(
+    (value: DataRecord | null) => {
+      setValue(value, true);
+    },
+    [setValue]
+  );
 
   const canView = value && hasButton("view");
   const canEdit = value && hasButton("edit") && schema.canEdit === true;
@@ -76,6 +81,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       return handleEdit(true);
+    },
+    [handleEdit]
+  );
+
+  const handleCreate = useCallback(
+    (record?: DataContext, readonly?: boolean) => {
+      return handleEdit(readonly ?? false, record);
     },
     [handleEdit]
   );
@@ -152,7 +164,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           <ViewerInput value={value?.[targetName] || ""} />
         )
       ) : (
-        <Select
+        <CreatableSelect
+          schema={schema}
+          canCreate={canNew}
+          onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
           value={selectedValue ?? null}
           placeholder={placeholder}
