@@ -217,7 +217,11 @@ export function createEvalContext(
     get(target, p, receiver) {
       if (p in helpers) return helpers[p as keyof typeof helpers];
       if (p in filters) return filters[p as keyof typeof filters];
-      return Reflect.get(target, p, receiver);
+      const value = Reflect.get(target, p, receiver);
+      if (p === "id" && value && value <= 0) {
+        return null;
+      }
+      return value;
     },
     set(target, p, newValue, receiver) {
       throw new Error("Cannot update eval context");
