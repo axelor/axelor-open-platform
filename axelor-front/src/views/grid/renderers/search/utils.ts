@@ -1,6 +1,6 @@
 import { Dayjs, ManipulateType, OpUnitType } from "dayjs";
 import { Field, GridView } from "@/services/client/meta.types";
-import { SearchState } from "./scope";
+import { SearchState } from "./types";
 import { Criteria } from "@/services/client/data.types";
 import { Filter } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";

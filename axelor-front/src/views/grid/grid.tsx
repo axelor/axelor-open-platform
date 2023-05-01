@@ -1,8 +1,8 @@
 import { atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { ScopeProvider } from "jotai-molecules";
 import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
+import { useAtomCallback } from "jotai/utils";
 
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
@@ -14,12 +14,7 @@ import { GridView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import {
-  GridSearchScope,
-  GridSearchScopeState,
-  SearchColumn,
-  SearchState,
-} from "./renderers/search";
+import { SearchColumn, SearchState } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 import {
   useViewProps,
@@ -35,8 +30,8 @@ import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useEditor } from "@/hooks/use-relation";
 import { usePerms } from "@/hooks/use-perms";
-import styles from "./grid.module.scss";
 import { commonClassNames } from "@/styles/common";
+import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
   const { action } = useViewTab();
@@ -60,7 +55,7 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
 
-  const [search, setSearch] = useAtom<any>(useMemo(() => atom({}), []));
+  const gridSearchAtom = useMemo(() => atom<SearchState>({}), []);
   const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
 
   const [state, setState] = useGridState({
@@ -81,7 +76,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
-      const { query = {} } = advanceSearch;
+      const query = advanceSearch?.query || {};
       const { archived: _archived } = query;
       const sortBy = orderBy?.map(
         (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
@@ -100,6 +95,7 @@ function GridInner(props: ViewProps<GridView>) {
           ],
         };
       } else {
+        filterQuery.operator = filter?.operator;
         filterQuery.criteria = [...(filterQuery.criteria || [])].concat(
           filter?.criteria || []
         );
@@ -116,17 +112,19 @@ function GridInner(props: ViewProps<GridView>) {
         filter: { ...filterQuery, _archived },
       });
     },
-    [advanceSearch, dataStore, orderBy, setState]
+    [advanceSearch?.query, dataStore, orderBy, setState]
   );
 
-  const onGridSearch = useCallback(
-    (searchValues: SearchState) => {
-      setSearch && (setSearch as CallableFunction)(searchValues);
-      return onSearch({
-        filter: getSearchFilter(fields as any, view.items, searchValues)!,
-      });
-    },
-    [fields, view.items, setSearch, onSearch]
+  const onGridSearch = useAtomCallback(
+    useCallback(
+      (get) => {
+        const search = get(gridSearchAtom);
+        return onSearch({
+          filter: getSearchFilter(fields as any, view.items, search)!,
+        });
+      },
+      [gridSearchAtom, fields, view.items, onSearch]
+    )
   );
 
   const onDelete = useCallback(
@@ -293,20 +291,21 @@ function GridInner(props: ViewProps<GridView>) {
     );
   }, [state.selectedRows, state.rows]);
 
-  const searchScope = useMemo<GridSearchScopeState>(
-    () => ({
-      search,
-      setSearch,
-      onSearch: onGridSearch,
-    }),
-    [search, setSearch, onGridSearch]
-  );
-
   const searchOptions = useMemo(() => {
     if (currentPage) {
       return { offset: (currentPage - 1) * limit };
     }
   }, [currentPage, limit]);
+
+  const searchColumnRenderer = useMemo(() => {
+    return (props: any) => (
+      <SearchColumn
+        {...props}
+        dataAtom={gridSearchAtom}
+        onSearch={onGridSearch}
+      />
+    );
+  }, [gridSearchAtom, onGridSearch]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
   const showEditIcon = popupOptions?.showEditIcon !== false;
@@ -327,7 +326,7 @@ function GridInner(props: ViewProps<GridView>) {
     : {
         allowSearch: true,
         searchRowRenderer: Box,
-        searchColumnRenderer: SearchColumn,
+        searchColumnRenderer: searchColumnRenderer,
       };
 
   return (
@@ -420,24 +419,21 @@ function GridInner(props: ViewProps<GridView>) {
           />
         </ViewToolBar>
       )}
-
-      <ScopeProvider scope={GridSearchScope} value={searchScope}>
-        <GridComponent
-          records={records}
-          view={view}
-          fields={fields}
-          state={state}
-          setState={setState}
-          sortType={"live"}
-          searchOptions={searchOptions}
-          actionExecutor={actionExecutor}
-          onEdit={onEdit}
-          onView={onView}
-          onSearch={onSearch}
-          {...dashletProps}
-          {...popupProps}
-        />
-      </ScopeProvider>
+      <GridComponent
+        records={records}
+        view={view}
+        fields={fields}
+        state={state}
+        setState={setState}
+        sortType={"live"}
+        searchOptions={searchOptions}
+        actionExecutor={actionExecutor}
+        onEdit={onEdit}
+        onView={onView}
+        onSearch={onSearch}
+        {...dashletProps}
+        {...popupProps}
+      />
     </div>
   );
 }

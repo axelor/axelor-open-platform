@@ -2,23 +2,37 @@ import { Field } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Box, Input, Select } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
-import { ChangeEvent, KeyboardEvent, SyntheticEvent, useState } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  SyntheticEvent,
+  useMemo,
+  useState,
+} from "react";
 import { i18n } from "@/services/client/i18n";
-import { SearchState, useGridSearchFieldScope } from "./scope";
+import { SearchState } from "./types";
+import { PrimitiveAtom, useAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
 import styles from "./search-column.module.scss";
 
-function SearchInput({ column }: { column: GridColumn }) {
-  const { search, setSearch, onSearch } = useGridSearchFieldScope();
+export interface SearchColumnProps {
+  column: GridColumn;
+  dataAtom: PrimitiveAtom<SearchState>;
+  onSearch?: () => void;
+}
+
+function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   const field = column as Field;
-  const [value, setValue] = useState<string>(search[field.name] || "");
+  const [value, setValue] = useAtom(
+    useMemo(
+      () => focusAtom(dataAtom, (o) => o.prop(column.name).valueOr("")),
+      [column.name, dataAtom]
+    )
+  );
   const [focus, setFocus] = useState(false);
 
-  function applySearch(value: any) {
-    onSearch &&
-      onSearch({
-        ...search,
-        [field.name]: value,
-      });
+  function applySearch() {
+    onSearch?.();
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -31,14 +45,6 @@ function SearchInput({ column }: { column: GridColumn }) {
 
   function handleBlur(e: ChangeEvent<HTMLInputElement>) {
     setFocus(false);
-    setSearch &&
-      setSearch((state: SearchState) => {
-        const value = e.target.value;
-        return {
-          ...state,
-          [field.name]: value,
-        };
-      });
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -47,7 +53,7 @@ function SearchInput({ column }: { column: GridColumn }) {
     }
     if (e.key === "Enter") {
       e.preventDefault();
-      applySearch(value);
+      applySearch();
     }
   }
 
@@ -61,7 +67,7 @@ function SearchInput({ column }: { column: GridColumn }) {
           onChange={(e) => {
             const value = e?.value ?? null;
             setValue(value);
-            applySearch(value);
+            applySearch();
           }}
           options={field.selectionList}
           optionLabel="title"
@@ -75,7 +81,7 @@ function SearchInput({ column }: { column: GridColumn }) {
                     icon: "close",
                     onClick: () => {
                       setValue("");
-                      applySearch(null);
+                      applySearch();
                     },
                   },
                 ]
@@ -103,7 +109,8 @@ function SearchInput({ column }: { column: GridColumn }) {
   );
 }
 
-export function SearchColumn({ column }: { column: GridColumn }) {
+export function SearchColumn(props: SearchColumnProps) {
+  const { column } = props;
   const field = column as Field;
   if (
     column.searchable === false ||
@@ -115,5 +122,5 @@ export function SearchColumn({ column }: { column: GridColumn }) {
     return <Box h={100} w={100} bg="light" />;
   }
 
-  return <SearchInput column={column} />;
+  return <SearchInput {...props} />;
 }
