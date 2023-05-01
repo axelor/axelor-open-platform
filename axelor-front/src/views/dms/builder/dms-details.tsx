@@ -16,7 +16,6 @@ import { findView } from "@/services/client/meta-cache";
 import { Form, useFormHandlers } from "../../form/builder";
 import { FormView } from "@/services/client/meta.types";
 import { ViewData } from "@/services/client/meta";
-import { DataStore } from "@/services/client/data-store";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import styles from "./dms-details.module.scss";
 
@@ -38,7 +37,7 @@ export const DmsDetails = memo(function DmsDetails({
   open?: boolean;
   model?: string;
   data?: TreeRecord | null;
-  onSave?: () => void;
+  onSave?: (data: TreeRecord) => void;
   onView?: (data: TreeRecord) => void;
   onClose?: () => void;
 }) {
@@ -50,10 +49,13 @@ export const DmsDetails = memo(function DmsDetails({
     setEdit(true);
   }, []);
 
-  const handleSave = useCallback(() => {
-    setEdit(false);
-    onSave?.();
-  }, [onSave]);
+  const handleSave = useCallback(
+    (data: DataRecord) => {
+      setEdit(false);
+      onSave?.(data);
+    },
+    [onSave]
+  );
 
   useEffect(() => {
     data && setEdit(false);
@@ -176,26 +178,22 @@ function TagsFormView({
 function TagsForm({ meta, record, onSave }: TagFormProps) {
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
-  const { model } = meta.view;
   const setDirty = useSetAtom(useViewDirtyAtom());
 
   const handleSave = useAtomCallback(
     useCallback(
       async (get) => {
-        const ds = new DataStore(model!);
         const { record: data } = get(formAtom);
         const { id, version, tags } = data;
 
-        const res = await ds.save({
+        onSave({
           id,
           version,
           tags,
         });
-
-        onSave(res);
         setDirty(false);
       },
-      [model, formAtom, onSave, setDirty]
+      [formAtom, onSave, setDirty]
     )
   );
 

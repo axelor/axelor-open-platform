@@ -55,7 +55,11 @@ import styles from "./dms.module.scss";
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
 const UNDEFINED_ID = -1;
 
-const promptInput = async (title: string, inputValue: string = "") => {
+const promptInput = async (
+  title: string,
+  inputValue: string = "",
+  yesTitle?: string
+) => {
   const confirmed = await dialogs.confirm({
     title,
     content: (
@@ -70,7 +74,7 @@ const promptInput = async (title: string, inputValue: string = "") => {
         />
       </Box>
     ),
-    yesTitle: i18n.get("Create"),
+    yesTitle: yesTitle ?? i18n.get("Create"),
   });
   return confirmed && inputValue;
 };
@@ -296,7 +300,11 @@ export function Dms(props: ViewProps<GridView>) {
 
     if (!record) return;
 
-    let input = await promptInput(i18n.get("Information"), record.fileName);
+    let input = await promptInput(
+      i18n.get("Information"),
+      record.fileName,
+      i18n.get("Save")
+    );
 
     if (input) {
       const updated = await dataStore.save({
@@ -304,19 +312,20 @@ export function Dms(props: ViewProps<GridView>) {
         version: record.version,
         fileName: input,
       });
-      if (updated) {
-        if (doc) {
-          onSearch({});
-        } else {
-          setTreeRecords((records) =>
-            records.map((r) =>
-              r.id === updated.id ? { ...r, fileName: updated.fileName } : r
-            )
-          );
-        }
+      if (updated && !doc) {
+        setTreeRecords((records) =>
+          records.map((r) =>
+            r.id === updated.id ? { ...r, fileName: updated.fileName } : r
+          )
+        );
       }
     }
-  }, [getSelectedNode, getSelectedDocument, onSearch, dataStore]);
+  }, [getSelectedNode, getSelectedDocument, dataStore]);
+
+  const onDocumentSave = useCallback(
+    (record: TreeRecord) => dataStore.save(record),
+    [dataStore]
+  );
 
   const onDocumentDownload = useCallback(async () => {
     const record = getSelected();
@@ -408,10 +417,8 @@ export function Dms(props: ViewProps<GridView>) {
       }
 
       await uploader.process();
-
-      await onSearch();
     },
-    [uploadSize, uploader, onSearch]
+    [uploadSize, uploader]
   );
 
   const handleNodeSelect = useCallback((record: TreeRecord) => {
@@ -681,8 +688,8 @@ export function Dms(props: ViewProps<GridView>) {
             <DmsDetails
               open={showDetails}
               data={detailRecord}
-              onSave={onSearch}
               onView={openDMSFile}
+              onSave={onDocumentSave}
               onClose={handleDetailsPopupClose}
             />
           </Box>
