@@ -127,6 +127,33 @@ export class DataStore extends DataSource {
     return res;
   }
 
+  async save(data: DataRecord | DataRecord[]): Promise<DataRecord> {
+    const res = await super.save(data);
+
+    if (Array.isArray(data) || !res) return res;
+
+    let records = this.#records.slice();
+    let page = this.#page;
+
+    if (data.id) {
+      records = records.map((record) =>
+        record.id === (data as DataRecord).id ? { ...record, ...res } : record
+      );
+    } else if (res.id && res.id !== data.id) {
+      const totalCount = page.totalCount ?? this.records.length;
+
+      records.push(res);
+      page = {
+        ...page,
+        totalCount: totalCount + 1,
+      };
+    }
+
+    this.#accept(this.#options, page, records);
+
+    return res;
+  }
+
   async export(options: SearchOptions): Promise<ExportResult> {
     const opts = this.#prepareOption(options);
     return super.export(opts);
