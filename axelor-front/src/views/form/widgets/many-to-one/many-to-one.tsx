@@ -61,6 +61,27 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canNew = hasButton("new") && schema.canNew === true;
   const canSelect = hasButton("select");
 
+  const ensureName = useCallback(
+    async (value: DataRecord) => {
+      if (value && value[targetName]) {
+        return value;
+      }
+      const id = value?.id ?? 0;
+      if (id <= 0) {
+        return value;
+      }
+      const ds = new DataSource(target);
+      const rec = await ds.read(id, {
+        fields: [targetName],
+      });
+      return {
+        ...value,
+        [targetName]: rec[targetName],
+      };
+    },
+    [target, targetName]
+  );
+
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
       showEditor({
@@ -99,10 +120,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       viewName: gridView,
       multiple: false,
       onSelect: async (records) => {
-        setValue(records[0], true);
+        const value = await ensureName(records[0]);
+        setValue(value, true);
       },
     });
-  }, [showSelector, title, target, gridView, setValue]);
+  }, [showSelector, title, target, gridView, ensureName, setValue]);
 
   const handleCompletion = useAtomCallback(
     useCallback(
@@ -140,21 +162,14 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           current.id > 0 &&
           current[targetName] === undefined
         ) {
-          const ds = new DataSource(target);
-          const rec = await ds.read(current.id, {
-            fields: [targetName],
-          });
-          const newValue = {
-            ...value,
-            [targetName]: rec[targetName],
-          };
+          const newValue = await ensureName(current);
           if (signal.aborted) return;
           setSelectedValue(newValue);
         } else if (current !== selectedValue) {
           setSelectedValue(current);
         }
       },
-      [selectedValue, target, targetName, value]
+      [ensureName, selectedValue, targetName, value]
     )
   );
 
