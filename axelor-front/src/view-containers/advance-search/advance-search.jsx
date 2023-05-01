@@ -257,6 +257,7 @@ function AdvanceSearch({
   onExport,
   onSave,
   onDelete,
+  onSearch,
 }) {
   let anchorEl = useRef();
   const [open, setOpen] = useState(false);
@@ -378,6 +379,7 @@ function AdvanceSearch({
         criteria: getCriteria(),
       },
     });
+    onSearch?.({});
   }
 
   function applyCustomFilters(filterCustom, selected = [null]) {
@@ -399,6 +401,7 @@ function AdvanceSearch({
         }),
       },
     });
+    onSearch?.({});
   }
 
   const applyFilters = useCallback(
@@ -445,6 +448,7 @@ function AdvanceSearch({
         selected: [...values],
         query: query,
       });
+      onSearch?.({});
     },
     [
       archived,
@@ -456,6 +460,7 @@ function AdvanceSearch({
       contextField,
       userId,
       userGroup,
+      onSearch,
     ]
   );
 
@@ -505,6 +510,7 @@ function AdvanceSearch({
     setFilterSingle(false);
     setContextField((state) => ({ ...state, value: null }));
     resetCustomFilter();
+    onSearch?.({});
   }
 
   function handleApply(customFilter, hasAuto) {

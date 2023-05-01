@@ -10,6 +10,7 @@ export type SearchOptions = {
   filter?: Criteria & {
     _domain?: string;
     _domainContext?: DataContext;
+    _archived?: boolean;
   };
 };
 

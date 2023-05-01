@@ -1,8 +1,9 @@
-import { atom, useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 import { useAtomCallback } from "jotai/utils";
+import { focusAtom } from "jotai-optics";
 
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
@@ -14,7 +15,7 @@ import { GridView } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { SearchColumn, SearchState } from "./renderers/search";
+import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 import {
   useViewProps,
@@ -55,8 +56,10 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
 
-  const gridSearchAtom = useMemo(() => atom<SearchState>({}), []);
-  const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
+  const gridSearchAtom = useMemo(
+    () => focusAtom(searchAtom!, (o) => o.prop("state").prop("search")),
+    [searchAtom]
+  );
 
   const [state, setState] = useGridState({
     selectedCell: viewProps?.selectedCell,
@@ -74,56 +77,55 @@ function GridInner(props: ViewProps<GridView>) {
     });
   }, [setState]);
 
-  const onSearch = useCallback(
-    (options: SearchOptions = {}) => {
-      const query = advanceSearch?.query || {};
-      const { archived: _archived } = query;
-      const sortBy = orderBy?.map(
-        (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
-      );
-      const { filter } = options;
-      let { freeSearchText, ...filterQuery } = query;
-      if (freeSearchText && filter?.criteria?.length) {
-        filterQuery = {
-          operator: "and",
-          criteria: [
-            { operator: "and", ...filter },
-            {
-              operator: query.operator || "or",
-              criteria: query.criteria,
-            },
-          ],
-        };
-      } else {
-        filterQuery.operator = filter?.operator;
-        filterQuery.criteria = [...(filterQuery.criteria || [])].concat(
-          filter?.criteria || []
-        );
-        freeSearchText && (filterQuery.operator = "or");
-      }
-
-      setState((draft) => {
-        draft.selectedCell = null;
-      });
-
-      return dataStore.search({
-        sortBy,
-        ...options,
-        filter: { ...filterQuery, _archived },
-      });
-    },
-    [advanceSearch?.query, dataStore, orderBy, setState]
-  );
-
-  const onGridSearch = useAtomCallback(
+  const onSearch = useAtomCallback(
     useCallback(
-      (get) => {
-        const search = get(gridSearchAtom);
-        return onSearch({
-          filter: getSearchFilter(fields as any, view.items, search)!,
+      (get, set, options: SearchOptions = {}) => {
+        const sortBy = orderBy?.map(
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+        );
+        const { query = {}, state } = get(searchAtom!);
+
+        const searchQuery = getSearchFilter(
+          fields as any,
+          view.items,
+          state.search
+        );
+        const { freeSearchText, ...filterQuery } = query;
+
+        let q: SearchOptions["filter"] = {
+          ...filterQuery,
+          operator: searchQuery?.operator ?? filterQuery.operator,
+        };
+
+        if (freeSearchText && searchQuery?.criteria?.length) {
+          q = {
+            operator: "and",
+            criteria: [
+              { operator: "and", ...searchQuery },
+              {
+                operator: query.operator || "or",
+                criteria: query.criteria,
+              },
+            ],
+          };
+        } else {
+          q.criteria = [...(filterQuery.criteria || [])].concat(
+            searchQuery?.criteria || []
+          );
+          freeSearchText && (q.operator = "or");
+        }
+
+        setState((draft) => {
+          draft.selectedCell = null;
+        });
+
+        return dataStore.search({
+          sortBy,
+          ...options,
+          filter: { ...q, _archived: query.archived },
         });
       },
-      [gridSearchAtom, fields, view.items, onSearch]
+      [dataStore, fields, view.items, searchAtom, orderBy, setState]
     )
   );
 
@@ -299,13 +301,9 @@ function GridInner(props: ViewProps<GridView>) {
 
   const searchColumnRenderer = useMemo(() => {
     return (props: any) => (
-      <SearchColumn
-        {...props}
-        dataAtom={gridSearchAtom}
-        onSearch={onGridSearch}
-      />
+      <SearchColumn {...props} dataAtom={gridSearchAtom} onSearch={onSearch} />
     );
-  }, [gridSearchAtom, onGridSearch]);
+  }, [gridSearchAtom, onSearch]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
   const showEditIcon = popupOptions?.showEditIcon !== false;
@@ -409,14 +407,16 @@ function GridInner(props: ViewProps<GridView>) {
             text: () => <PageText dataStore={dataStore} />,
           }}
         >
-          <AdvanceSearch
-            dataStore={dataStore}
-            items={view.items}
-            fields={fields}
-            domains={domains}
-            value={advanceSearch}
-            setValue={setAdvancedSearch as any}
-          />
+          {searchAtom && (
+            <AdvanceSearch
+              stateAtom={searchAtom}
+              dataStore={dataStore}
+              items={view.items}
+              fields={fields}
+              domains={domains}
+              onSearch={onSearch}
+            />
+          )}
         </ViewToolBar>
       )}
       <GridComponent

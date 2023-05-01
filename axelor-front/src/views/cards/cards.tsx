@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { Box } from "@axelor/ui";
+import { useAtomCallback } from "jotai/utils";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
@@ -29,18 +30,18 @@ export function Cards(props: ViewProps<CardsView>) {
   const { hasButton } = usePerms(meta.view, meta.perms);
   const switchTo = useViewSwitch();
 
-  const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
-
-  const onSearch = useCallback(
-    (options: Partial<SearchOptions> = {}) => {
-      const { query = {} } = advanceSearch;
-      const { archived: _archived } = query;
-      return dataStore.search({
-        filter: { ...query, _archived },
-        ...options,
-      });
-    },
-    [dataStore, advanceSearch]
+  const onSearch = useAtomCallback(
+    useCallback(
+      (get, set, options: Partial<SearchOptions> = {}) => {
+        const { query = {} } = searchAtom ? get(searchAtom) : {};
+        const { archived: _archived } = query;
+        return dataStore.search({
+          filter: { ...query, _archived },
+          ...options,
+        });
+      },
+      [dataStore, searchAtom]
+    )
   );
 
   const records = useDataStore(dataStore, (ds) => ds.records);
@@ -152,14 +153,16 @@ export function Cards(props: ViewProps<CardsView>) {
             text: () => <PageText dataStore={dataStore} />,
           }}
         >
-          <AdvanceSearch
-            dataStore={dataStore}
-            items={view.items}
-            fields={fields}
-            domains={domains}
-            value={advanceSearch}
-            setValue={setAdvancedSearch as any}
-          />
+          {searchAtom && (
+            <AdvanceSearch
+              stateAtom={searchAtom}
+              dataStore={dataStore}
+              items={view.items}
+              fields={fields}
+              domains={domains}
+              onSearch={onSearch}
+            />
+          )}
         </ViewToolBar>
       )}
       <Box p={2} py={3} d="flex" flexWrap="wrap" overflow="auto">

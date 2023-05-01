@@ -9,7 +9,8 @@ import {
 } from "react";
 import { Box, Input, Link } from "@axelor/ui";
 import { GridRow, GridColumn } from "@axelor/ui/src/grid";
-import { useAtom, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -87,7 +88,6 @@ export function Dms(props: ViewProps<GridView>) {
 
   const popupRecord = action.params?.["_popup-record"];
 
-  const [advanceSearch, setAdvancedSearch] = useAtom(searchAtom!);
   const [state, setState] = useGridState();
   const [root, setRoot] = useState<TreeRecord>(popupRecord ?? ROOT);
   const [detailsId, setDetailsId] = useState<TreeRecord["id"]>(null);
@@ -163,51 +163,55 @@ export function Dms(props: ViewProps<GridView>) {
     [root]
   );
 
-  const onSearch = useCallback(
-    (options: Partial<SearchOptions> = {}) => {
-      const { query = {} } = advanceSearch;
-      const { archived: _archived } = query;
+  const onSearch = useAtomCallback(
+    useCallback(
+      (get, set, options: Partial<SearchOptions> = {}) => {
+        const { query = {} } = searchAtom ? get(searchAtom) : {};
+        const { archived: _archived } = query;
 
-      const sortBy = orderBy?.map(
-        (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
-      );
+        const sortBy = orderBy?.map(
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+        );
 
-      return dataStore
-        .search({
-          sortBy,
-          filter: {
-            ...query,
-            _archived,
-            _domain: `${action.domain ? `${action.domain} AND ` : ""}${
-              selected ? `self.parent.id = ${selected}` : "self.parent is null"
-            }`,
-          },
-          ...options,
-          ...(options.fields && {
-            fields: uniq([
-              ...options.fields,
-              "isDirectory",
-              "parent.id",
-              "relatedModel",
-              "relatedId",
-              "metaFile.id",
-            ]),
-          }),
-        })
-        .then((result) => {
-          const { records } = result;
-          const dirs = records.filter((r) => r.isDirectory);
-          const dirIds = dirs.map((r) => r.id);
+        return dataStore
+          .search({
+            sortBy,
+            filter: {
+              ...query,
+              _archived,
+              _domain: `${action.domain ? `${action.domain} AND ` : ""}${
+                selected
+                  ? `self.parent.id = ${selected}`
+                  : "self.parent is null"
+              }`,
+            },
+            ...options,
+            ...(options.fields && {
+              fields: uniq([
+                ...options.fields,
+                "isDirectory",
+                "parent.id",
+                "relatedModel",
+                "relatedId",
+                "metaFile.id",
+              ]),
+            }),
+          })
+          .then((result) => {
+            const { records } = result;
+            const dirs = records.filter((r) => r.isDirectory);
+            const dirIds = dirs.map((r) => r.id);
 
-          setTreeRecords((records) => [
-            ...records.filter((r) => !dirIds.includes(r.id)),
-            ...dirs,
-          ]);
+            setTreeRecords((records) => [
+              ...records.filter((r) => !dirIds.includes(r.id)),
+              ...dirs,
+            ]);
 
-          return result;
-        });
-    },
-    [action.domain, dataStore, selected, orderBy, advanceSearch]
+            return result;
+          });
+      },
+      [searchAtom, action.domain, dataStore, selected, orderBy]
+    )
   );
 
   const onNew = useCallback(
@@ -627,14 +631,16 @@ export function Dms(props: ViewProps<GridView>) {
                   onSelect={handleNodeSelect}
                 />
               </Box>
-              <AdvanceSearch
-                dataStore={dataStore}
-                items={view.items}
-                fields={fields}
-                domains={domains}
-                value={advanceSearch}
-                setValue={setAdvancedSearch as any}
-              />
+              {searchAtom && (
+                <AdvanceSearch
+                  stateAtom={searchAtom}
+                  dataStore={dataStore}
+                  items={view.items}
+                  fields={fields}
+                  domains={domains}
+                  onSearch={onSearch}
+                />
+              )}
             </Box>
           </ViewToolBar>
         )}

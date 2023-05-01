@@ -19,6 +19,7 @@ import {
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
 import { ViewScope } from "./scope";
+import { AdvancedSearchState } from "../advance-search/types";
 
 async function loadComp(viewType: string) {
   const type = toKebabCase(viewType);
@@ -97,7 +98,17 @@ function ViewPane({
   const typeAtom = useMemo(() => {
     return selectAtom(tab.state, (x) => x.type);
   }, [tab.state]);
-  const searchAtom = useMemo<AdvancedSearchAtom>(() => atom({}), []); // advanced search
+
+  // advanced search
+  const searchAtom = useMemo<AdvancedSearchAtom>(
+    () =>
+      atom<AdvancedSearchState>({
+        state: {
+          search: {},
+        },
+      }),
+    []
+  );
 
   const type = useAtomValue(typeAtom);
   const view = useMemo(() => views.find((x) => x.type === type), [type, views]);

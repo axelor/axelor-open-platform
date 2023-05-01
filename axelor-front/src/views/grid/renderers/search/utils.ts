@@ -230,9 +230,9 @@ function getSearchCriteria(
 export function getSearchFilter(
   fields: Record<string, Field>,
   viewItems: GridView["items"],
-  search: SearchState
+  search?: SearchState
 ): Criteria | null {
-  return Object.keys(search || {}).length > 0
+  return search && Object.keys(search || {}).length > 0
     ? {
         operator: "and",
         criteria: getSearchCriteria(fields, viewItems, search),

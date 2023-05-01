@@ -1,16 +1,26 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { atom, useAtom } from "jotai";
+
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
-import { SavedFilter, SearchFilter, View } from "@/services/client/meta.types";
+import {
+  AdvancedSearchAtom,
+  SavedFilter,
+  SearchFilter,
+  View,
+} from "@/services/client/meta.types";
 import { MetaData, removeFilter, saveFilter } from "@/services/client/meta";
 import { DataStore } from "@/services/client/data-store";
 import { download } from "@/utils/download";
 import { useViewAction, useViewFilters } from "../views/scope";
 import { dialogs } from "@/components/dialogs";
+import { SearchOptions, SearchResult } from "@/services/client/data";
+import { AdvancedSearchState } from "./types";
 import AdvanceSearchComponent from "./advance-search";
 
 export interface AdvanceSearchProps {
   dataStore: DataStore;
+  stateAtom: AdvancedSearchAtom;
   items?: View["items"];
   value?: any;
   setValue?: () => any;
@@ -18,12 +28,28 @@ export interface AdvanceSearchProps {
   domains?: SearchFilter[];
   onSave?: any;
   onDelete?: any;
+  onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
 }
 
 export function AdvanceSearch({
   dataStore,
+  stateAtom,
   ...props
 }: AdvanceSearchProps) {
+  const [value, setValue] = useAtom(
+    useMemo(() => {
+      return atom(
+        (get) => get(stateAtom),
+        (get, set, $state: AdvancedSearchState) => {
+          $state.state = {
+            ...get(stateAtom).state,
+            ...$state.state,
+          };
+          set(stateAtom, $state);
+        }
+      );
+    }, [stateAtom])
+  );
   const { data: sessionInfo } = useSession();
   const [filters, setFilters] = useViewFilters();
   const { name, params } = useViewAction();
@@ -79,6 +105,8 @@ export function AdvanceSearch({
       userGroup={user.group}
       translate={i18n.get}
       filters={filters}
+      value={value}
+      setValue={setValue}
       onSave={handleSave}
       onDelete={handleDelete}
       onExport={handleExport}

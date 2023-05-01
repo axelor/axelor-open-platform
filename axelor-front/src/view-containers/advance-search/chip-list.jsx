@@ -31,9 +31,9 @@ function ChipList({ className, value, icons, onClear }) {
         position="relative"
         className={styles.actions}
       >
-        {icons.map((icon) => (
+        {icons.map((icon, ind) => (
           <MaterialIcon
-            key={icon.name}
+            key={icon.name ?? `icon_${ind}`}
             icon={icon.icon}
             onClick={icon.onClick}
             className={styles.pointer}
