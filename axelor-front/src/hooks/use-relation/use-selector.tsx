@@ -22,13 +22,22 @@ export type SelectorOptions = {
   viewName?: string;
   domain?: string;
   context?: DataContext;
+  onClose?: () => void;
   onSelect?: (records: DataRecord[]) => void;
 };
 
 export function useSelector() {
   return useCallback(async function showSelector(options: SelectorOptions) {
-    const { title, model, viewName, multiple, domain, context, onSelect } =
-      options;
+    const {
+      title,
+      model,
+      viewName,
+      multiple,
+      domain,
+      context,
+      onClose,
+      onSelect,
+    } = options;
     const tab = await initTab({
       name: uniqueId("$selector"),
       title,
@@ -50,10 +59,19 @@ export function useSelector() {
     await showPopup({
       tab,
       open: true,
-      onClose: () => {},
+      onClose: () => {
+        onClose?.();
+      },
       header: () => <Header />,
       footer: (close) => (
-        <Footer multiple={multiple} onClose={close} onSelect={onSelect} />
+        <Footer
+          multiple={multiple}
+          onClose={(result: boolean) => {
+            close(result);
+            onClose?.();
+          }}
+          onSelect={onSelect}
+        />
       ),
       buttons: [],
     });

@@ -19,6 +19,7 @@ export type EditorOptions = {
   readonly?: boolean;
   viewName?: string;
   context?: DataContext;
+  onClose?: () => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
 };
@@ -32,6 +33,7 @@ export function useEditor() {
       viewName,
       context,
       readonly: forceReadonly,
+      onClose,
       onSave,
       onSelect,
     } = options;
@@ -58,9 +60,18 @@ export function useEditor() {
     await showPopup({
       tab,
       open: true,
-      onClose: () => {},
+      onClose: () => {
+        onClose?.();
+      },
       footer: (close) => (
-        <Footer onSave={onSave} onClose={close} onSelect={onSelect} />
+        <Footer
+          onSave={onSave}
+          onClose={(result: boolean) => {
+            close(result);
+            onClose?.();
+          }}
+          onSelect={onSelect}
+        />
       ),
       buttons: [],
     });
