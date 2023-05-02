@@ -129,8 +129,27 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       fields,
       model: (view as Schema).target || view?.model,
     };
+    const editColumnName = columns?.[cellIndex ?? -1]?.name;
+    const initFormFieldsStates = useMemo(() => {
+      const item = view.items?.find((item) => item.name === editColumnName);
+      if (item) {
+        return {
+          [item.name as string]: {
+            attrs: {
+              focus: true,
+            },
+          },
+        };
+      }
+    }, [editColumnName, view.items]);
+
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
-      useFormHandlers(meta as unknown as ViewData<FormView>, record);
+      useFormHandlers(
+        meta as unknown as ViewData<FormView>,
+        record,
+        undefined,
+        initFormFieldsStates
+      );
 
     const handleSave = useAtomCallback(
       useCallback(

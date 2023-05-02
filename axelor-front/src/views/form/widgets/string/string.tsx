@@ -22,7 +22,7 @@ export function String({
   const { uid, placeholder, showTitle = true } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, required } = attrs;
+  const { title, focus, required } = attrs;
 
   const { value, onChange, onBlur } = useInput(valueAtom, {
     defaultValue: "",
@@ -37,6 +37,7 @@ export function String({
           data-input
           type="text"
           id={uid}
+          autoFocus={focus}
           placeholder={placeholder}
           value={value}
           invalid={invalid}

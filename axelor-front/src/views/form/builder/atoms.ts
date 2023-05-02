@@ -15,10 +15,10 @@ export function createFormAtom(props: {
   record: DataRecord;
   fields: Record<string, Property>;
   parent?: PrimitiveAtom<FormState>;
+  statesByName?: Record<string, WidgetState>;
 }) {
-  const { model, record, fields, parent } = props;
+  const { model, record, fields, parent, statesByName = {} } = props;
   const states: Record<string, WidgetState> = {};
-  const statesByName: Record<string, WidgetState> = {};
   return atom<FormState>({
     model,
     record: { ...record },

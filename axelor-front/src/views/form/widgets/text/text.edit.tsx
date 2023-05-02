@@ -1,15 +1,19 @@
 import { Box } from "@axelor/ui";
-import { FocusEvent, useCallback, useRef, useState } from "react";
+import { FocusEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useAtomValue } from "jotai";
 
 import { FieldProps } from "../../builder";
 import { String } from "../string";
 import { Text } from "./text";
 
 export function TextEdit(props: FieldProps<string>) {
+  const { widgetAtom } = props;
   const [popup, setPopup] = useState<any>(null);
   const targetRef = useRef<HTMLDivElement>(null);
 
-  const handleFocus = useCallback((e: FocusEvent<HTMLInputElement>) => {
+  const { attrs: { focus } } = useAtomValue(widgetAtom);
+
+  const handleFocus = useCallback(() => {
     const target = targetRef.current;
     if (target) {
       const { top, left, width } = target.getBoundingClientRect();
@@ -29,6 +33,10 @@ export function TextEdit(props: FieldProps<string>) {
   const handleBlur = useCallback((e: FocusEvent<HTMLTextAreaElement>) => {
     setPopup(null);
   }, []);
+
+  useEffect(() => {
+    focus && handleFocus();
+  }, [focus, handleFocus]);
 
   return (
     <Box d="flex" flex={1}>

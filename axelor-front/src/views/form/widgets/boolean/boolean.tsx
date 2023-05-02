@@ -13,7 +13,7 @@ export function Boolean({
   const { uid, name, widget, showTitle = true } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
 
   const inline = toKebabCase(widget) === "inline-checkbox";
@@ -31,6 +31,7 @@ export function Boolean({
         {showTitle && <label htmlFor={uid}>{title}</label>}
         <Input
           data-input
+          autoFocus={focus}
           m={0}
           id={uid}
           type="checkbox"

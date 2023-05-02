@@ -5,7 +5,7 @@ import {
   Popper,
   TextField,
 } from "@axelor/ui";
-import { atom, useAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
 
@@ -24,7 +24,7 @@ import { toKebabCase } from "@/utils/names";
 
 export function OneToManyEdit({
   schema,
-  formAtom,
+  widgetAtom,
   valueAtom,
 }: FieldProps<DataRecord[] | undefined>) {
   const [popup, setPopup] = useState(false);
@@ -62,6 +62,9 @@ export function OneToManyEdit({
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
   const { rows, selectedRows } = state;
   const { title, target: model, formView, gridView } = schema;
+  const {
+    attrs: { focus },
+  } = useAtomValue(widgetAtom);
 
   const { data: meta } = useAsync(async () => {
     return await findView<GridView>({
@@ -172,6 +175,7 @@ export function OneToManyEdit({
       <TextField
         ref={inputRef}
         readOnly
+        autoFocus={focus}
         value={value?.length ? `(${value.length})` : ""}
         onChange={() => {}}
         icons={[

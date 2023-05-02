@@ -11,7 +11,7 @@ export function BooleanSwitch({
   const { uid, showTitle = true } = schema;
   const [value = false, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
 
   return (
@@ -19,6 +19,7 @@ export function BooleanSwitch({
       {showTitle && <label htmlFor={uid}>{title}</label>}
       <Switch
         data-input
+        autoFocus={focus}
         id={uid}
         checked={value ?? false}
         readOnly={readonly}

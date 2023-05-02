@@ -36,7 +36,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { hasButton } = usePerms(schema);
 
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
@@ -186,6 +186,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         )
       ) : (
         <CreatableSelect
+          autoFocus={focus}
           schema={schema}
           canCreate={canNew}
           onCreate={handleCreate as CreatableSelectProps["onCreate"]}

@@ -24,7 +24,7 @@ export function BooleanSelect({
   } = widgetAttrs || {};
   const [value = false, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
 
   const handleOnChange = useCallback(
@@ -59,6 +59,7 @@ export function BooleanSelect({
         />
       ) : (
         <Select
+          autoFocus={focus}
           invalid={invalid}
           value={selected}
           onChange={handleOnChange}

@@ -23,7 +23,7 @@ export function Decimal({
 }: FieldProps<string | number>) {
   const { uid, min, max, placeholder, showTitle = true } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, required, scale } = attrs;
+  const { title, focus, required, scale } = attrs;
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
@@ -140,6 +140,7 @@ export function Decimal({
           <Input
             data-input
             className={styles.numberInput}
+            autoFocus={focus}
             type="text"
             id={uid}
             ref={inputRef}

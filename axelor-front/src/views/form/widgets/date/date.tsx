@@ -54,7 +54,7 @@ export function Date({
   const [changed, setChanged] = useState(false);
   const [value, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
 
   const type = (schema.widget || schema.serverType || schema.type)!;
@@ -179,7 +179,7 @@ export function Date({
             placeholderText={placeholder}
             showPopperArrow={false}
             portalId="root-app"
-            autoFocus={open}
+            autoFocus={focus || open}
             open={open}
             ref={pickerRef}
             dateFormat={toCalendarFormat(format)}

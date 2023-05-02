@@ -8,6 +8,7 @@ import { ActionExecutor, ActionHandler } from "@/view-containers/action";
 export const DEFAULT_ATTRS = {
   readonly: undefined as unknown as boolean,
   required: undefined as unknown as boolean,
+  focus: undefined as unknown as boolean,
   hidden: undefined as unknown as boolean,
   collapse: undefined as unknown as boolean,
   domain: undefined as unknown as string,

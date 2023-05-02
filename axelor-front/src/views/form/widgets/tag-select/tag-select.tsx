@@ -56,7 +56,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const [value, setValue] = useAtom(valueAtom);
   const showEditor = useEditor();
 
-  const { title } = attrs;
+  const { title, focus } = attrs;
   const canNew = schema.canNew !== false;
   const search = useCompletion({
     target,
@@ -122,6 +122,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         </Box>
       ) : (
         <TagSelectComponent
+          autoFocus={focus}
           schema={schema}
           placeholder={placeholder}
           value={value}

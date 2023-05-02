@@ -78,7 +78,7 @@ export function Selection({
   const { isMulti } = selectProps || {};
 
   const {
-    attrs: { title },
+    attrs: { title, focus },
   } = useAtomValue(widgetAtom);
   const [value, setValue] = useAtom(valueAtom);
   const selectionList = schema.selectionList as TSelection[];
@@ -122,6 +122,7 @@ export function Selection({
       {readonly && <SelectText schema={schema} value={value} />}
       {readonly || (
         <Select
+          autoFocus={focus}
           invalid={invalid}
           value={selectValue ?? null}
           onChange={handleChange}

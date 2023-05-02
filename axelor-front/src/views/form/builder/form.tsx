@@ -17,7 +17,7 @@ import {
   FormRecordUpdates,
   FormScope,
 } from "./scope";
-import { FormAtom, FormProps } from "./types";
+import { FormAtom, FormProps, WidgetState } from "./types";
 import { processView } from "./utils";
 
 /**
@@ -31,12 +31,20 @@ import { processView } from "./utils";
 export function useFormHandlers(
   meta: ViewData<FormView>,
   record: DataRecord,
-  parent?: FormAtom
+  parent?: FormAtom,
+  initStates?: Record<string, WidgetState>
 ) {
   const { model = "", fields = {} } = meta;
   const formAtom = useMemo(
-    () => createFormAtom({ model, record, fields, parent }),
-    [fields, model, parent, record]
+    () =>
+      createFormAtom({
+        model,
+        record,
+        fields,
+        parent,
+        statesByName: initStates,
+      }),
+    [fields, model, parent, record, initStates]
   );
 
   const json = meta.view.json ?? false;
