@@ -1,5 +1,5 @@
 import uniq from "lodash/uniq";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import {
   Grid as AxGrid,
@@ -20,7 +20,8 @@ import format from "@/utils/format";
 import { Attrs } from "@/views/form/builder";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Row as RowRenderer } from "../renderers/row";
-import { DataContext } from "@/services/client/data.types";
+import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
 
 function formatter(column: Field, value: any, record: any) {
@@ -35,6 +36,7 @@ export function Grid(
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
+    editable?: boolean;
     showEditIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
     actionExecutor?: ActionExecutor;
@@ -49,6 +51,7 @@ export function Grid(
     searchOptions,
     actionExecutor,
     showEditIcon = true,
+    editable = true,
     columnAttrs,
     onSearch,
     onEdit,
@@ -56,8 +59,25 @@ export function Grid(
     ...gridProps
   } = props;
 
-  const { columns, names } = useMemo(() => {
-    const names: string[] = [];
+  const formRef = useRef<GridFormHandler>(null);
+
+  const names = useMemo(
+    () =>
+      uniq(
+        view.items!.reduce((names, item) => {
+          const field = fields?.[item.name!];
+          if ((item as JsonField).jsonField) {
+            return [...names, (item as JsonField).jsonField as string];
+          } else if (field) {
+            return [...names, field.name];
+          }
+          return names;
+        }, [] as string[])
+      ),
+    [fields, view.items]
+  );
+
+  const columns = useMemo(() => {
     const columns: GridColumn[] = view.items!.map((item) => {
       const field = fields?.[item.name!];
       const title = item.title ?? item.autoTitle;
@@ -66,18 +86,12 @@ export function Grid(
       const columnProps: Partial<GridColumn> = {};
       const extraAttrs = columnAttrs?.[item.name!];
 
-      if ((item as JsonField).jsonField) {
-        names.push((item as JsonField).jsonField as string);
-      } else if (field) {
-        names.push(field.name);
-      }
-
       if (item.width) {
         columnProps.width = parseInt(item.width as string);
         columnProps.computed = true;
       }
 
-      if (item.type === 'button' || attrs?.type === 'icon') {
+      if (item.type === "button" || attrs?.type === "icon") {
         columnProps.searchable = false;
         columnProps.computed = true;
         columnProps.width = columnProps.width || 40;
@@ -116,7 +130,7 @@ export function Grid(
       } as GridColumn);
     }
 
-    return { columns, names: uniq(names) };
+    return columns;
   }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
 
   const init = useAsync(async () => {
@@ -145,6 +159,29 @@ export function Grid(
     [onView]
   );
 
+  const handleRecordEdit = useCallback(
+    async (
+      row: GridRow,
+      rowIndex?: number,
+      column?: GridColumn,
+      colIndex?: number
+    ) => {
+      // skip edit row for edit icon
+      if (column?.name === "$$edit") return null;
+
+      // save current edit row
+      const form = formRef.current;
+      if (form) {
+        return await form?.onSave?.();
+      }
+    },
+    []
+  );
+
+  const handleRecordDiscard = useCallback(async (record: DataRecord) => {
+    // TODO: on record discard
+  }, []);
+
   const CustomRowRenderer = useMemo(() => {
     const { hilites } = view;
     if (!(hilites || []).length) return;
@@ -163,6 +200,12 @@ export function Grid(
       />
     );
   }, [actionExecutor]);
+
+  const CustomFormRenderer = useMemo(() => {
+    return (props: GridRowProps) => (
+      <FormRenderer ref={formRef} {...props} view={view} fields={fields} />
+    );
+  }, [view, fields]);
 
   const hasActionCell = useMemo(
     () => columns.some((c) => ["button"].includes(c.type!)),
@@ -188,6 +231,13 @@ export function Grid(
         allowColumnCustomize
         sortType="state"
         selectionType="multiple"
+        {...(editable &&
+          view.editable && {
+            editable: true,
+            editRowRenderer: CustomFormRenderer,
+            onRecordEdit: handleRecordEdit,
+            onRecordDiscard: handleRecordDiscard,
+          })}
         onCellClick={handleCellClick}
         onRowDoubleClick={handleRowDoubleClick}
         {...gridProps}

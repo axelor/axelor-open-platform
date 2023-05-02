@@ -1,1 +1,4 @@
-export { OneToMany as ManyToMany } from "../one-to-many";
+export {
+  OneToMany as ManyToMany,
+  OneToManyEdit as ManyToManyEdit,
+} from "../one-to-many";

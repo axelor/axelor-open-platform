@@ -187,6 +187,14 @@ function GridInner(props: ViewProps<GridView>) {
     [onEdit]
   );
 
+  const onSave = useCallback(
+    async (record: DataRecord) => {
+      const saved = await dataStore.save(record);
+      return saved;
+    },
+    [dataStore]
+  );
+
   const onArchiveOrUnArchive = useCallback(
     async (archived: boolean) => {
       const confirmed = await dialogs.confirm({
@@ -431,6 +439,7 @@ function GridInner(props: ViewProps<GridView>) {
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
+        onRecordSave={onSave}
         {...dashletProps}
         {...popupProps}
       />

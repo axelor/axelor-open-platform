@@ -214,17 +214,30 @@ export function OneToMany({
     [showEditor, title, model, formView, isManyToMany]
   );
 
+  const onSave = useCallback(
+    (record: DataRecord) => {
+      record = { ...record, _dirty: true, id: record.id ?? nextId() };
+      if (record.id) {
+        setValue((value) =>
+          value?.map((val) =>
+            val.id === record.id ? { ...val, ...record } : val
+          )
+        );
+      } else {
+        setValue((vals) => [...(vals || []), record]);
+      }
+      return record;
+    },
+    [setValue]
+  );
+
   const onAdd = useCallback(() => {
     openEditor(
       {},
       (record) => setValue((value) => [...(value || []), { ...record }]),
-      (record) =>
-        setValue((value) => [
-          ...(value || []),
-          { ...record, _dirty: true, id: record.id ?? nextId() },
-        ])
+      onSave
     );
-  }, [openEditor, setValue]);
+  }, [openEditor, setValue, onSave]);
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
@@ -237,15 +250,10 @@ export function OneToMany({
           setValue((value) =>
             value?.map((val) => (matcher(val) ? { ...val, ...record } : val))
           ),
-        (record) =>
-          setValue((value) =>
-            value?.map((val) =>
-              matcher(val) ? { ...val, ...record, _dirty: true } : val
-            )
-          )
+        onSave
       );
     },
-    [setValue, openEditor]
+    [openEditor, setValue, onSave]
   );
 
   const onView = useCallback(
@@ -333,6 +341,7 @@ export function OneToMany({
                 icon: "edit",
               },
               disabled: !hasRowSelected,
+              hidden: readonly,
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
                 const record = rows[rowIndex]?.record;
@@ -365,6 +374,7 @@ export function OneToMany({
       </Box>
       <GridComponent
         showEditIcon={!readonly}
+        editable={!readonly}
         records={records}
         view={(viewData?.view || schema) as GridView}
         fields={viewData?.fields || fields}
@@ -374,6 +384,7 @@ export function OneToMany({
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
+        onRecordSave={onSave}
       />
     </Box>
   );

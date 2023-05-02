@@ -13,12 +13,12 @@ export function useWidget(schema: Schema) {
     return compRef.current;
   }
 
-  const name = toCamelCase(schema.widget);
-  const type = toCamelCase(schema.serverType);
+  const name = toCamelCase(schema.widget) as keyof typeof WIDGETS;
+  const editName = `${name}Edit` as keyof typeof WIDGETS;
+  const type = toCamelCase(schema.serverType) as keyof typeof WIDGETS;
 
   const Comp =
-    WIDGETS[name as keyof typeof WIDGETS] ||
-    WIDGETS[type as keyof typeof WIDGETS];
+    (schema.editable && WIDGETS[editName]) || WIDGETS[name] || WIDGETS[type];
 
   compRef.current = Comp as React.ElementType;
 
