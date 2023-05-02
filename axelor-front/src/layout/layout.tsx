@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useCallback } from "react";
 import { Outlet } from "react-router-dom";
 
 import { Box } from "@axelor/ui";
@@ -6,6 +7,7 @@ import { Box } from "@axelor/ui";
 import { AlertsProvider } from "@/components/alerts";
 import { DialogsProvider } from "@/components/dialogs";
 import { HttpWatch } from "@/components/http-watch";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { PopupsProvider } from "@/view-containers/view-popup";
 
 import { NavDrawer } from "./nav-drawer";
@@ -20,7 +22,13 @@ import "../utils/globals";
 import styles from "./layout.module.scss";
 
 export function Layout() {
-  const { sidebar } = useSidebar();
+  const { sidebar, setSidebar } = useSidebar();
+
+  useShortcut({
+    key: "F9",
+    action: useCallback(() => setSidebar(!sidebar), [setSidebar, sidebar]),
+  });
+
   return (
     <Box d="flex" flexDirection="column" vh={100}>
       <NavHeader />

@@ -34,6 +34,7 @@ export function String({
       {readonly && <ViewerInput value={value} />}
       {readonly || (
         <Input
+          data-input
           type="text"
           id={uid}
           placeholder={placeholder}

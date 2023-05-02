@@ -1,10 +1,11 @@
 import clsx from "clsx";
-import { Box } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { focusAtom } from "jotai-optics";
+
+import { Box } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
@@ -12,6 +13,8 @@ import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { usePerms } from "@/hooks/use-perms";
+import { useShortcut } from "@/hooks/use-shortcut";
+import { useTabs } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
@@ -29,6 +32,7 @@ import {
   useViewTab,
 } from "@/view-containers/views/scope";
 
+import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
 import {
   Form as FormComponent,
@@ -38,9 +42,7 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { useDMSPopup } from "../dms/builder/hooks";
 
-import { useTabs } from "@/hooks/use-tabs";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -422,6 +424,33 @@ function FormContainer({
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const handleFocus = useCallback(() => {
+    const elem = containerRef.current;
+    if (elem) {
+      const selector = ["input", "select", "textarea"]
+        .map((name) => `${name}[data-input], [data-input] ${name}`)
+        .join(", ");
+      const input = elem.querySelector(selector) as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+  }, []);
+
+  // register shortcuts
+  useShortcuts({
+    onNew: canNew ? onNew : undefined,
+    onEdit: canEdit ? onEdit : undefined,
+    onSave: canSave ? handleOnSave : undefined,
+    onDelete: canDelete ? onDelete : undefined,
+    onRefresh: onRefresh,
+    onFocus: handleFocus,
+    onPrev: pagination.canPrev ? pagination.onPrev : undefined,
+    onNext: pagination.canNext ? pagination.onNext : undefined,
+  });
+
   return (
     <div className={styles.formViewContainer}>
       {showToolbar && (
@@ -549,7 +578,7 @@ function FormContainer({
           pagination={pagination}
         />
       )}
-      <div className={styles.formViewScroller}>
+      <div className={styles.formViewScroller} ref={containerRef}>
         <FormComponent
           className={styles.formView}
           readonly={readonly}
@@ -565,6 +594,87 @@ function FormContainer({
       </div>
     </div>
   );
+}
+
+function useShortcuts({
+  onNew,
+  onEdit,
+  onSave,
+  onDelete,
+  onRefresh,
+  onFocus,
+  onNext,
+  onPrev,
+}: {
+  onNew?: () => void;
+  onEdit?: () => void;
+  onSave?: () => void;
+  onDelete?: () => void;
+  onRefresh?: () => void;
+  onFocus?: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+}) {
+  const { active } = useTabs();
+  const { id } = useViewTab();
+
+  const canHandle = useCallback(() => active?.id === id, [active?.id, id]);
+
+  useShortcut({
+    key: "Insert",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onNew?.(), [onNew]),
+  });
+
+  useShortcut({
+    key: "e",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onEdit?.(), [onEdit]),
+  });
+
+  useShortcut({
+    key: "s",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onSave?.(), [onSave]),
+  });
+
+  useShortcut({
+    key: "d",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onDelete?.(), [onDelete]),
+  });
+
+  useShortcut({
+    key: "r",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onRefresh?.(), [onRefresh]),
+  });
+
+  useShortcut({
+    key: "g",
+    altKey: true,
+    canHandle,
+    action: useCallback(() => onFocus?.(), [onFocus]),
+  });
+
+  useShortcut({
+    key: "j",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onPrev?.(), [onPrev]),
+  });
+
+  useShortcut({
+    key: "k",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onNext?.(), [onNext]),
+  });
 }
 
 function usePagination(
