@@ -1,0 +1,22 @@
+.container {
+  max-width: 468px;
+  margin: 0 auto;
+}
+
+.paper {
+  margin-bottom: 1rem;
+  form {
+    margin-top: 1rem;
+  }
+}
+
+.logo {
+  max-height: 96px;
+  max-width: 368px;
+  margin-bottom: 1rem;
+}
+
+.error {
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}

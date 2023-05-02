@@ -1,0 +1,18 @@
+.indicator {
+  position: fixed;
+  top: 0;
+  width: 100px;
+  padding: 0.25rem 1rem;
+  background-color: var(--bs-danger);
+  color: var(--bs-white);
+  border-radius: 0.5rem;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+[dir="rtl"] .indicator {
+  right: 50%;
+  transform: translateX(50%);
+}
