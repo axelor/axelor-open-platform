@@ -40,7 +40,7 @@ export function Grid(
     showEditIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
     actionExecutor?: ActionExecutor;
-    onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
+    onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
   }
@@ -134,7 +134,7 @@ export function Grid(
   }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
 
   const init = useAsync(async () => {
-    onSearch({ ...searchOptions, fields: names });
+    onSearch?.({ ...searchOptions, fields: names });
   }, [onSearch, searchOptions, names]);
 
   const handleCellClick = useCallback(
