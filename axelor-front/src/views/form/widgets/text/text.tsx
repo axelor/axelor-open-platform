@@ -1,16 +1,23 @@
+import React, { useCallback, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useState } from "react";
 import { Box, Input } from "@axelor/ui";
-import classes from "./text.module.scss";
 import { FieldContainer, FieldProps } from "../../builder";
+import classes from "./text.module.scss";
 
 export function Text({
   schema,
   readonly,
   widgetAtom,
   valueAtom,
-}: FieldProps<string>) {
+  inputProps,
+}: FieldProps<string> & {
+  inputProps?: Pick<
+    React.InputHTMLAttributes<HTMLTextAreaElement>,
+    "onFocus" | "onBlur" | "autoFocus"
+  >;
+}) {
   const { uid, height, placeholder, showTitle = true } = schema;
+  const { onBlur } = inputProps || {};
 
   const { attrs } = useAtomValue(widgetAtom);
   const { title, required } = attrs;
@@ -34,8 +41,9 @@ export function Text({
         setChanged(false);
         setValue(e.target.value, true);
       }
+      onBlur?.(e);
     },
-    [changed, setValue]
+    [changed, setValue, onBlur]
   );
 
   return (
@@ -58,6 +66,7 @@ export function Text({
           placeholder={placeholder}
           value={value || ""}
           required={required}
+          {...inputProps}
           onChange={handleChange}
           onBlur={handleBlur}
         />

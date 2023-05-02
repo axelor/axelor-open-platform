@@ -225,7 +225,7 @@ const format: Formatter = (value, opts = {}) => {
     return func(val, opts);
   }
 
-  return "";
+  return val ?? "";
 };
 
 export default format;

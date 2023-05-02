@@ -16,7 +16,7 @@ export function String({
 }: FieldProps<string> & {
   inputProps?: Pick<
     React.InputHTMLAttributes<HTMLInputElement>,
-    "type" | "autoComplete" | "placeholder"
+    "type" | "autoComplete" | "placeholder" | "onFocus"
   >;
 }) {
   const { uid, placeholder, showTitle = true } = schema;
