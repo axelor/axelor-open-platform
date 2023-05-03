@@ -439,11 +439,21 @@ function FormContainer({
     }
   }, []);
 
+  const handleSave = useCallback(() => {
+    const input = document.activeElement as HTMLInputElement;
+    const elem = containerRef.current;
+    if (input && elem?.contains(input)) {
+      input.blur?.();
+      input.focus?.();
+    }
+    actionExecutor.wait().then(handleOnSave);
+  }, [actionExecutor, handleOnSave]);
+
   // register shortcuts
   useShortcuts({
     onNew: canNew ? onNew : undefined,
     onEdit: canEdit ? onEdit : undefined,
-    onSave: canSave ? handleOnSave : undefined,
+    onSave: canSave ? handleSave : undefined,
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: handleFocus,
