@@ -53,6 +53,7 @@ export const DateInput = forwardRef<any, any>(
       <Box className={classes.inputWrapper}>
         <MaskedInput
           {...props}
+          data-input
           className={
             open
               ? className

@@ -137,6 +137,7 @@ export function Decimal({
       {readonly || (
         <div className={styles.container}>
           <Input
+            data-input
             className={styles.numberInput}
             type="text"
             id={uid}

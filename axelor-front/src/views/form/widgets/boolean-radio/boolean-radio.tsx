@@ -29,6 +29,7 @@ export function BooleanRadio({
     return (
       <Box d="flex" alignItems="center">
         <Input
+          data-input
           m={0}
           name={name}
           type="radio"

@@ -30,6 +30,7 @@ export function Boolean({
       >
         {showTitle && <label htmlFor={uid}>{title}</label>}
         <Input
+          data-input
           m={0}
           id={uid}
           type="checkbox"

@@ -18,6 +18,7 @@ export function BooleanSwitch({
     <FieldContainer readonly={readonly}>
       {showTitle && <label htmlFor={uid}>{title}</label>}
       <Switch
+        data-input
         id={uid}
         checked={value ?? false}
         readOnly={readonly}

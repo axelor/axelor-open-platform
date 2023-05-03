@@ -51,6 +51,7 @@ export function Text({
         />
       ) : (
         <Input
+          data-input
           as="textarea"
           rows={height || 5}
           id={uid}
