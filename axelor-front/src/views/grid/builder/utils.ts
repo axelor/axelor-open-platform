@@ -4,18 +4,25 @@ import { atomWithImmer } from "jotai-immer";
 import { useMemo } from "react";
 
 import { GridActionHandler } from "./scope";
-import { View } from "@/services/client/meta.types";
+import { GridView, View } from "@/services/client/meta.types";
 import { DataContext } from "@/services/client/data.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
 
-export function useGridState(initialState?: Partial<GridState>, deps = []) {
+export function useGridState(
+  initialState?: Partial<GridState> & { view?: GridView },
+  deps = []
+) {
+  const { view, ...gridState } = initialState || {};
   return useAtom(
     useMemo(
       () =>
         atomWithImmer<GridState>({
           rows: [],
           columns: [],
-          ...initialState,
+          ...(view?.groupBy && {
+            groupBy: [{ name: view.groupBy }],
+          }),
+          ...gridState,
         }),
       // eslint-disable-next-line react-hooks/exhaustive-deps
       deps

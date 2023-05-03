@@ -65,6 +65,7 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const [state, setState] = useGridState({
+    view,
     selectedCell: viewProps?.selectedCell,
     selectedRows: viewProps?.selectedCell
       ? [viewProps?.selectedCell?.[0]!]
