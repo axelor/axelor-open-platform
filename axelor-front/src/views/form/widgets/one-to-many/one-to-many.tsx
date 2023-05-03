@@ -287,7 +287,7 @@ export function OneToMany({
     [setValue, clearSelection]
   );
 
-  const { selectedRows, rows } = state;
+  const { selectedRows, rows, editRow } = state;
   const hasRowSelected = !!selectedRows?.length;
 
   useEffect(() => {
@@ -346,7 +346,7 @@ export function OneToMany({
                 icon: "edit",
               },
               disabled: !hasRowSelected,
-              hidden: readonly,
+              hidden: readonly || Boolean(editRow),
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
                 const record = rows[rowIndex]?.record;
@@ -372,7 +372,7 @@ export function OneToMany({
                 icon: "refresh",
               },
               onClick: () => onSearch(),
-              hidden: readonly,
+              hidden: readonly || Boolean(editRow),
             },
           ]}
         />

@@ -187,7 +187,7 @@ export const Grid = forwardRef<
     // save current edit row
     const form = formRef.current;
     if (form) {
-      return await form?.onSave?.();
+      return await form?.onSave?.(true);
     }
   }, []);
 
@@ -288,6 +288,10 @@ export const Grid = forwardRef<
     async (signal: AbortSignal) => {
       if (signal.aborted) return;
       if (event === "editable:add-new") {
+        const form = formRef.current;
+        if (form && form.invalid?.()) {
+          return;
+        }
         doAdd();
       }
       setEvent("");

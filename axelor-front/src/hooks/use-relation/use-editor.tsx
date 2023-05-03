@@ -11,12 +11,14 @@ import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { initTab } from "../use-tabs";
+import { FormView } from "@/services/client/meta.types";
 
 export type EditorOptions = {
   model: string;
   title: string;
   record?: DataRecord | null;
   readonly?: boolean;
+  view?: FormView;
   viewName?: string;
   context?: DataContext;
   onClose?: () => void;
@@ -30,6 +32,7 @@ export function useEditor() {
       title,
       model,
       record,
+      view,
       viewName,
       context,
       readonly: forceReadonly,
@@ -42,7 +45,7 @@ export function useEditor() {
       title,
       model,
       viewType: "form",
-      views: [{ type: "form", name: viewName }],
+      views: [{ type: "form", name: viewName, ...view }],
       params: {
         popup: true,
         forceReadonly,

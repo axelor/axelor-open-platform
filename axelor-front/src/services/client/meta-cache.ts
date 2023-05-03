@@ -43,7 +43,8 @@ export async function findView<T extends ViewType>({
 
     // for custom form view like dms spreadsheet/html view
     if ((props as FormView).items) {
-      return { view: { name, model, type, ...props }, fields: {} };
+      const { fields = {}, ...viewProps } = props as ViewData<FormView>;
+      return { view: { name, model, type, ...viewProps }, fields };
     }
 
     const data = await fetchView({ type: type as any, name, model });
