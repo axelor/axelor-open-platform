@@ -1,8 +1,12 @@
-import { Dialog, DialogContent, Fade, Portal } from "@axelor/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useHttpWatch } from "./use-watch";
+
+import { Dialog, DialogContent, Fade, Portal } from "@axelor/ui";
+
+import { SessionInfo, session } from "@/services/client/session";
 
 import { LoginForm } from "../login-form";
+import { useHttpWatch } from "./use-watch";
+
 import styles from "./http-watch.module.scss";
 
 export function HttpWatch() {
@@ -50,11 +54,23 @@ function HttpIndicator({ count }: { count: number }) {
 }
 
 function HttpAuth({ resume }: { resume?: () => void }) {
+  const handleSuccess = useCallback(
+    (info: SessionInfo) => {
+      const prev = session.info?.user.login;
+      const curr = info.user.login;
+      if (prev !== curr) {
+        window.location.reload();
+      } else {
+        resume?.();
+      }
+    },
+    [resume]
+  );
   return (
     <Portal>
       <Dialog open={Boolean(resume)} backdrop>
         <DialogContent>
-          <LoginForm onSuccess={() => resume?.()} />
+          <LoginForm onSuccess={handleSuccess} />
         </DialogContent>
       </Dialog>
     </Portal>
