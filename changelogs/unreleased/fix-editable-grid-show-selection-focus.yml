@@ -1,0 +1,3 @@
+---
+title: Fix selection widget stealing focus after focusing another cell
+type: fix

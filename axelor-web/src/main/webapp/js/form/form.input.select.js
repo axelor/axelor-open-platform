@@ -95,8 +95,12 @@ ui.formWidget('BaseSelect', {
       input.addClass('.x-focus');
       doSetup(input);
       setTimeout(function () {
-        var inSlickEditor = input.parents(".slick-editor").first().length;
-        if (input.is(':focus') || inSlickEditor) {
+        var inSlickEditor = input.parents(".slick-editor").first().length > 0;
+        function isSlickEditorFocused() {
+          var active = $(document.activeElement);
+          return inSlickEditor && (!active.is("input, textarea") || active.is(input));
+        }
+        if (input.is(':focus') || isSlickEditorFocused()) {
           input.autocomplete("search" , '');
           input.removeClass('.x-focus');
           if (inSlickEditor) input.focus();
