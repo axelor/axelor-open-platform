@@ -9,7 +9,7 @@ import { findView } from "@/services/client/meta-cache";
 import { GridView } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
-import { useGridState, nextId } from "@/views/grid/builder/utils";
+import { useGridState } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -25,6 +25,7 @@ import {
   useState,
 } from "react";
 import { FieldProps } from "../../builder";
+import { nextId } from "../../builder/utils";
 import classes from "./one-to-many.module.scss";
 
 export function OneToMany({

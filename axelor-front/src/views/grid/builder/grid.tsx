@@ -23,6 +23,7 @@ import { useAsync } from "@/hooks/use-async";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
+import { nextId } from "@/views/form/builder/utils";
 import format from "@/utils/format";
 
 import { Attrs } from "@/views/form/builder";
@@ -31,7 +32,6 @@ import { Row as RowRenderer } from "../renderers/row";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
-import { nextId } from "./utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 function formatter(column: Field, value: any, record: any) {

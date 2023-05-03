@@ -6,7 +6,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { Attrs, DEFAULT_ATTRS } from "./types";
 
-const nextId = (() => {
+export const nextId = (() => {
   let id = 0;
   return () => --id;
 })();

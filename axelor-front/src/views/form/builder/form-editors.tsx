@@ -21,7 +21,7 @@ import { Form, useFormHandlers } from "./form";
 import { FieldContainer } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { FormState, ValueAtom, WidgetAtom, WidgetProps } from "./types";
-import { processView } from "./utils";
+import { nextId, processView } from "./utils";
 
 import { DataStore } from "@/services/client/data-store";
 import { toKebabCase, toSnakeCase } from "@/utils/names";
@@ -256,11 +256,6 @@ function ReferenceEditor({
     </FieldContainer>
   );
 }
-
-const nextId = (() => {
-  let id = 0;
-  return () => --id;
-})();
 
 function CollectionEditor({
   schema,

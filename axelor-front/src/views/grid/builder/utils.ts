@@ -8,11 +8,6 @@ import { View } from "@/services/client/meta.types";
 import { DataContext } from "@/services/client/data.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
 
-export const nextId = (() => {
-  let id = 0;
-  return () => --id;
-})();
-
 export function useGridState(initialState?: Partial<GridState>, deps = []) {
   return useAtom(
     useMemo(
