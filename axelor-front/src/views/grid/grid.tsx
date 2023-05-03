@@ -18,6 +18,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 import {
+  useViewDirtyAtom,
   useViewProps,
   useViewRoute,
   useViewSwitch,
@@ -26,7 +27,7 @@ import {
 
 import { ViewProps } from "../types";
 import { Dms } from "../dms";
-import { Grid as GridComponent } from "./builder";
+import { Grid as GridComponent, GridHandler } from "./builder";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useEditor } from "@/hooks/use-relation";
@@ -49,9 +50,11 @@ function GridInner(props: ViewProps<GridView>) {
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
+  const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
   const [viewProps, setViewProps] = useViewProps();
   const { action, dashlet, popup, popupOptions } = useViewTab();
+  const setDirty = useSetAtom(useViewDirtyAtom());
 
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
@@ -180,6 +183,10 @@ function GridInner(props: ViewProps<GridView>) {
     onEdit({});
   }, [onEdit]);
 
+  const onNewInGrid = useCallback(() => {
+    gridRef.current?.onAdd?.();
+  }, []);
+
   const onView = useCallback(
     (record: DataRecord) => {
       onEdit(record, true);
@@ -189,11 +196,19 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onSave = useCallback(
     async (record: DataRecord) => {
-      const saved = await dataStore.save(record);
+      const saved = await dataStore.save({
+        ...record,
+        ...((record.id || -1) < 0 && { id: undefined }),
+      });
+      saved && setDirty(false);
       return saved;
     },
-    [dataStore]
+    [dataStore, setDirty]
   );
+
+  const onDiscard = useCallback(() => {
+    setDirty(false);
+  }, [setDirty]);
 
   const onArchiveOrUnArchive = useCallback(
     async (archived: boolean) => {
@@ -316,6 +331,7 @@ function GridInner(props: ViewProps<GridView>) {
   const showToolbar = popupOptions?.showToolbar !== false;
   const showEditIcon = popupOptions?.showEditIcon !== false;
   const showCheckbox = popupOptions?.multiSelect !== false;
+  const { editable } = view;
 
   const popupProps: any = popup
     ? {
@@ -348,7 +364,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
-              onClick: onNew,
+              onClick: editable ? onNewInGrid : onNew,
             },
             {
               key: "edit",
@@ -428,18 +444,21 @@ function GridInner(props: ViewProps<GridView>) {
         </ViewToolBar>
       )}
       <GridComponent
+        ref={gridRef}
         records={records}
         view={view}
         fields={fields}
         state={state}
         setState={setState}
         sortType={"live"}
+        editable={editable}
         searchOptions={searchOptions}
         actionExecutor={actionExecutor}
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
-        onRecordSave={onSave}
+        onSave={onSave}
+        onDiscard={onDiscard}
         {...dashletProps}
         {...popupProps}
       />

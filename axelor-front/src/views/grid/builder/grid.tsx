@@ -1,5 +1,11 @@
 import uniq from "lodash/uniq";
-import { useCallback, useMemo, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
 
 import {
   Grid as AxGrid,
@@ -8,6 +14,7 @@ import {
   GridProps,
   GridRow,
   GridRowProps,
+  getRows,
 } from "@axelor/ui/grid";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
@@ -23,6 +30,7 @@ import { Row as RowRenderer } from "../renderers/row";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
+import { nextId } from "./utils";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -31,8 +39,14 @@ function formatter(column: Field, value: any, record: any) {
   });
 }
 
-export function Grid(
-  props: Partial<GridProps> & {
+export type GridHandler = {
+  onAdd?: () => void;
+  onSave?: () => void;
+};
+
+export const Grid = forwardRef<
+  GridHandler,
+  Partial<GridProps> & {
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
@@ -43,8 +57,10 @@ export function Grid(
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
+    onSave?: (record: GridRow["record"]) => void;
+    onDiscard?: (record: GridRow["record"]) => void;
   }
-) {
+>(function Grid(props, ref) {
   const {
     view,
     fields,
@@ -53,9 +69,14 @@ export function Grid(
     showEditIcon = true,
     editable = true,
     columnAttrs,
+    records,
+    state,
+    setState,
     onSearch,
     onEdit,
     onView,
+    onSave,
+    onDiscard,
     ...gridProps
   } = props;
 
@@ -159,6 +180,37 @@ export function Grid(
     [onView]
   );
 
+  const commitForm = useCallback(async () => {
+    // save current edit row
+    const form = formRef.current;
+    if (form) {
+      return await form?.onSave?.();
+    }
+  }, []);
+
+  const handleRecordAdd = useCallback(async () => {
+    const newRecord = { id: nextId() };
+    const newRecords = [...(records || []), newRecord];
+    setState?.((draft) => {
+      const { rows, columns, orderBy, groupBy } = draft;
+      const newRows: GridRow[] = getRows({
+        rows,
+        columns,
+        orderBy,
+        groupBy,
+        records: newRecords,
+      });
+
+      draft.rows = newRows;
+      draft.selectedCell = null;
+      draft.selectedRows = null;
+      draft.editRow = [
+        newRows.findIndex((r) => r?.record?.id === newRecord.id),
+        null,
+      ];
+    });
+  }, [records, setState]);
+
   const handleRecordEdit = useCallback(
     async (
       row: GridRow,
@@ -168,19 +220,23 @@ export function Grid(
     ) => {
       // skip edit row for edit icon
       if (column?.name === "$$edit") return null;
-
-      // save current edit row
-      const form = formRef.current;
-      if (form) {
-        return await form?.onSave?.();
-      }
+      await commitForm();
     },
-    []
+    [commitForm]
   );
 
-  const handleRecordDiscard = useCallback(async (record: DataRecord) => {
-    // TODO: on record discard
-  }, []);
+  const handleRecordDiscard = useCallback(
+    async (record: DataRecord) => {
+      // on record discard
+      if ((record.id ?? -1) < 0 && !record._dirty) {
+        setState?.((draft) => {
+          draft.rows = draft.rows.filter((r) => r?.record?.id !== record.id);
+        });
+      }
+      onDiscard?.(record);
+    },
+    [onDiscard, setState]
+  );
 
   const CustomRowRenderer = useMemo(() => {
     const { hilites } = view;
@@ -212,6 +268,14 @@ export function Grid(
     [columns]
   );
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      onAdd: handleRecordAdd,
+    }),
+    [handleRecordAdd]
+  );
+
   if (init.state === "loading") return null;
 
   return (
@@ -235,17 +299,19 @@ export function Grid(
           view.editable && {
             editable: true,
             editRowRenderer: CustomFormRenderer,
+            onRecordSave: onSave,
+            onRecordAdd: handleRecordAdd,
             onRecordEdit: handleRecordEdit,
             onRecordDiscard: handleRecordDiscard,
           })}
         onCellClick={handleCellClick}
         onRowDoubleClick={handleRowDoubleClick}
+        state={state!}
+        setState={setState!}
+        records={records!}
         {...gridProps}
-        records={gridProps.records!}
-        state={gridProps.state!}
-        setState={gridProps.setState!}
         columns={columns}
       />
     </AxGridProvider>
   );
-}
+});

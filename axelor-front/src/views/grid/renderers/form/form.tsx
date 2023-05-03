@@ -6,6 +6,7 @@ import {
   useCallback,
   useImperativeHandle,
   useMemo,
+  useRef,
 } from "react";
 import { useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
@@ -70,7 +71,7 @@ export const FormLayoutComponent = ({
 
   const handleKeyDown = useCallback(
     function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-      if (e.defaultPrevented) return;
+      if (e.defaultPrevented && e.detail !== 1) return;
       if (e.key === `Escape`) {
         return onCancel?.();
       }
@@ -123,7 +124,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onSave,
       onCancel,
     } = props;
-
+    const containerRef = useRef<HTMLDivElement>(null);
     const meta = {
       view,
       fields,
@@ -131,7 +132,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     };
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
-      const item = view.items?.find((item) => item.name === editColumnName);
+      const name =
+        editColumnName || view.items?.find((item) => !item.readonly)?.name;
+      const item = view.items?.find((item) => item.name === name);
       if (item) {
         return {
           [item.name as string]: {
@@ -153,7 +156,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const handleSave = useAtomCallback(
       useCallback(
-        (get) => {
+        async (get) => {
           const { record: saveRecord, states } = get(formAtom);
 
           // check record changes
@@ -168,9 +171,18 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             return Promise.reject();
           }
 
-          return onSave?.(saveRecord, rowIndex, cellIndex!, true);
+          const input = document.activeElement as HTMLInputElement;
+          const elem = containerRef.current;
+          if (input && elem?.contains(input)) {
+            input.blur?.();
+            input.focus?.();
+          }
+
+          await actionExecutor.wait();
+
+          return onSave?.(saveRecord, rowIndex, cellIndex!, true, true);
         },
-        [formAtom, onSave, record, rowIndex, cellIndex]
+        [formAtom, actionExecutor, onSave, record, rowIndex, cellIndex]
       )
     );
 
@@ -205,7 +217,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     return (
       <FocusTrap>
-        <Box d="flex" className={className}>
+        <Box ref={containerRef} d="flex" className={className}>
           <FormComponent
             {...({} as FormProps)}
             schema={view}

@@ -8,10 +8,10 @@ import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
 import { GridView } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
-import { Grid as GridComponent } from "@/views/grid/builder";
-import { useGridState } from "@/views/grid/builder/utils";
+import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
+import { useGridState, nextId } from "@/views/grid/builder/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
-import { GridRow } from "@axelor/ui/src/grid";
+import { GridRow } from "@axelor/ui/grid";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
@@ -26,11 +26,6 @@ import {
 } from "react";
 import { FieldProps } from "../../builder";
 import classes from "./one-to-many.module.scss";
-
-const nextId = (() => {
-  let id = 0;
-  return () => --id;
-})();
 
 export function OneToMany({
   schema,
@@ -50,6 +45,8 @@ export function OneToMany({
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
+  const gridRef = useRef<GridHandler>(null);
+
   const [records, setRecords] = useState<DataRecord[]>([]);
   const widgetState = useMemo(
     () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
@@ -106,6 +103,7 @@ export function OneToMany({
 
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
+  const editable = schema.editable && !readonly;
 
   const { state: viewState, data: viewData } = useAsync(async () => {
     const { items, gridView } = schema;
@@ -217,15 +215,14 @@ export function OneToMany({
   const onSave = useCallback(
     (record: DataRecord) => {
       record = { ...record, _dirty: true, id: record.id ?? nextId() };
-      if (record.id) {
-        setValue((value) =>
-          value?.map((val) =>
+      setValue((value) => {
+        if (value?.find((v) => v.id === record.id)) {
+          return value?.map((val) =>
             val.id === record.id ? { ...val, ...record } : val
-          )
-        );
-      } else {
-        setValue((vals) => [...(vals || []), record]);
-      }
+          );
+        }
+        return [...(value || []), record];
+      });
       return record;
     },
     [setValue]
@@ -238,6 +235,13 @@ export function OneToMany({
       onSave
     );
   }, [openEditor, setValue, onSave]);
+
+  const onAddInGrid = useCallback(async () => {
+    const gridHandler = gridRef.current;
+    if (gridHandler) {
+      await gridHandler.onAdd?.();
+    }
+  }, []);
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
@@ -331,7 +335,7 @@ export function OneToMany({
               iconProps: {
                 icon: "add",
               },
-              onClick: onAdd,
+              onClick: editable ? onAddInGrid : onAdd,
               hidden: readonly,
             },
             {
@@ -373,8 +377,9 @@ export function OneToMany({
         />
       </Box>
       <GridComponent
+        ref={gridRef}
         showEditIcon={!readonly}
-        editable={!readonly}
+        editable={editable}
         records={records}
         view={(viewData?.view || schema) as GridView}
         fields={viewData?.fields || fields}

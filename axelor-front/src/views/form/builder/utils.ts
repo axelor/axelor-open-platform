@@ -25,7 +25,7 @@ export function processActionValue(value: any) {
         return value.map(updateNullIdObject);
       }
       if (value.id === null) {
-        return { ...value, id: nextId() };
+        return { ...value, id: nextId(), _dirty: true };
       }
     }
     return value;
