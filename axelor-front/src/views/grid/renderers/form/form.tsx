@@ -1,4 +1,4 @@
-import { Box, FocusTrap } from "@axelor/ui";
+import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
 import { GridRowProps } from "@axelor/ui/grid";
 import {
   KeyboardEvent,
@@ -23,6 +23,7 @@ import {
   useFormHandlers,
 } from "@/views/form/builder";
 import { alerts } from "@/components/alerts";
+import { DataRecord } from "@/services/client/data.types";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -125,6 +126,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onCancel,
     } = props;
     const containerRef = useRef<HTMLDivElement>(null);
+    const recordRef = useRef<DataRecord>({});
     const meta = {
       view,
       fields,
@@ -154,13 +156,20 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         initFormFieldsStates
       );
 
+    const handleCancel = useCallback(
+      () => onCancel?.(record, rowIndex, cellIndex!),
+      [onCancel, record, rowIndex, cellIndex]
+    );
+
     const handleSave = useAtomCallback(
       useCallback(
         async (get) => {
           const { record: saveRecord, states } = get(formAtom);
 
           // check record changes
-          if (isEqual(record, saveRecord)) return;
+          if (isEqual(record, saveRecord)) {
+            return onSave?.(record, rowIndex, cellIndex!, false);
+          }
 
           const errors = Object.values(states)
             .map((s) => s.errors ?? {})
@@ -180,15 +189,34 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
           await actionExecutor.wait();
 
-          return onSave?.(saveRecord, rowIndex, cellIndex!, true, true);
+          return await onSave?.(saveRecord, rowIndex, cellIndex!, true);
         },
-        [formAtom, actionExecutor, onSave, record, rowIndex, cellIndex]
+        [formAtom, record, rowIndex, cellIndex, onSave, actionExecutor]
       )
     );
 
-    const handleCancel = useCallback(
-      () => onCancel?.(record, rowIndex, cellIndex!),
-      [onCancel, record, rowIndex, cellIndex]
+    const handleClickOutside = useAtomCallback(
+      useCallback(
+        (get, set, e: Event) => {
+          if (e.defaultPrevented) return;
+
+          const { record } = get(formAtom);
+
+          if (isEqual(record, recordRef.current)) {
+            return;
+          }
+
+          recordRef.current = record;
+
+          // except id, other fields is exist
+          if (Object.keys(record).length > 1) {
+            handleSave();
+          } else {
+            handleCancel();
+          }
+        },
+        [formAtom, handleSave, handleCancel]
+      )
     );
 
     const CustomLayout = useMemo(
@@ -218,17 +246,21 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     return (
       <FocusTrap>
         <Box ref={containerRef} d="flex" className={className}>
-          <FormComponent
-            {...({} as FormProps)}
-            schema={view}
-            fields={fields!}
-            layout={CustomLayout as unknown as FormLayout}
-            readonly={false}
-            formAtom={formAtom}
-            actionHandler={actionHandler}
-            actionExecutor={actionExecutor}
-            recordHandler={recordHandler}
-          />
+          <ClickAwayListener onClickAway={handleClickOutside}>
+            <Box d="flex">
+              <FormComponent
+                {...({} as FormProps)}
+                schema={view}
+                fields={fields!}
+                layout={CustomLayout as unknown as FormLayout}
+                readonly={false}
+                formAtom={formAtom}
+                actionHandler={actionHandler}
+                actionExecutor={actionExecutor}
+                recordHandler={recordHandler}
+              />
+            </Box>
+          </ClickAwayListener>
         </Box>
       </FocusTrap>
     );

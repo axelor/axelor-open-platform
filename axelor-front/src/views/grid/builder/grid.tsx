@@ -5,6 +5,7 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from "react";
 
 import {
@@ -31,6 +32,7 @@ import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
 import { nextId } from "./utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -81,6 +83,7 @@ export const Grid = forwardRef<
   } = props;
 
   const formRef = useRef<GridFormHandler>(null);
+  const [event, setEvent] = useState("");
 
   const names = useMemo(
     () =>
@@ -188,7 +191,7 @@ export const Grid = forwardRef<
     }
   }, []);
 
-  const handleRecordAdd = useCallback(async () => {
+  const doAdd = useCallback(async () => {
     const newRecord = { id: nextId() };
     const newRecords = [...(records || []), newRecord];
     setState?.((draft) => {
@@ -210,6 +213,11 @@ export const Grid = forwardRef<
       ];
     });
   }, [records, setState]);
+
+  const handleRecordAdd = useCallback(async () => {
+    setEvent("editable:add-new");
+    return true;
+  }, []);
 
   const handleRecordEdit = useCallback(
     async (
@@ -274,6 +282,17 @@ export const Grid = forwardRef<
       onAdd: handleRecordAdd,
     }),
     [handleRecordAdd]
+  );
+
+  useAsyncEffect(
+    async (signal: AbortSignal) => {
+      if (signal.aborted) return;
+      if (event === "editable:add-new") {
+        doAdd();
+      }
+      setEvent("");
+    },
+    [doAdd, event]
   );
 
   if (init.state === "loading") return null;
