@@ -616,12 +616,12 @@ function useShortcuts({
   onNext?: () => void;
 }) {
   const { active } = useTabs();
-  const { id } = useViewTab();
-  const type = useSelectViewState((x) => x.type);
+  const tab = useViewTab();
+  const type = useSelectViewState(useCallback((x) => x.type, []));
 
   const canHandle = useCallback(
-    () => active?.id === id && type === "form",
-    [active?.id, id, type]
+    () => active === tab && type === "form",
+    [active, tab, type]
   );
 
   useShortcut({
