@@ -2463,6 +2463,7 @@ Grid.prototype.isEditCancelled = function () {
 };
 
 Grid.prototype.commitEdit = function (noWait) {
+  this.commitRecordId = (this.editorScope.record || {}).id;
   if (!noWait) {
     var that = this;
     var defer = this.handler._defer();
@@ -2563,7 +2564,9 @@ function commitEdit(noWait) {
 
     delete that._committing;
     that.saveChanges(null, function () {
-      that.cancelEdit();
+      if (that.commitRecordId === (that.editorScope.record || {}).id) {
+        that.cancelEdit();
+      }
       defer.resolve();
     }, defer.reject, noWait);
   };
