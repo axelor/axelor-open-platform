@@ -91,6 +91,7 @@ export function Decimal({
       const num = dec ? `${bigInt}.${dec}` : `${bigInt}`;
       const res = checkRange(num, min, max);
 
+      setChanged(true);
       setValue(parse(res, scale));
     },
     [checkRange, max, min, parse, scale, setValue, value]
