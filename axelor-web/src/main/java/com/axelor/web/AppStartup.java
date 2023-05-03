@@ -26,6 +26,7 @@ import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
+import com.axelor.report.tool.ReportExecutor;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.ServletException;
@@ -78,6 +79,7 @@ public class AppStartup extends HttpServlet {
     try {
       shutdownEvent.fire(new ShutdownEvent());
       jobRunner.stop();
+      ReportExecutor.shutdown();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

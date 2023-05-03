@@ -1,0 +1,72 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.axelor.report.tool;
+
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
+import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaFileRepository;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/** This class provides some helper methods to deal with Image in Reports */
+public class ImageTool {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ImageTool.class);
+
+  /**
+   * Get the bytes of the given MetaFile identified by the id
+   *
+   * @param metaFileId id of the MetaFile
+   * @return the bytes read from the file
+   */
+  public static byte[] getImageBytes(Long metaFileId) {
+    try {
+      MetaFile metaFile = getMetaFile(metaFileId);
+      if (metaFile == null) {
+        return null;
+      }
+      return getBytes(metaFile.getFilePath());
+    } catch (Exception e) {
+      LOG.error("Unable to retrieve the MetaFile with id {}", metaFileId, e);
+      return null;
+    }
+  }
+
+  private static MetaFile getMetaFile(Long metaFileId)
+      throws ExecutionException, InterruptedException {
+    if (metaFileId == null || metaFileId <= 0) {
+      return null;
+    }
+    Callable<MetaFile> callableTask = () -> Beans.get(MetaFileRepository.class).find(metaFileId);
+    return ReportExecutor.submit(callableTask).get();
+  }
+
+  private static byte[] getBytes(String filePath) throws IOException {
+    Store store = FileStoreFactory.getStore();
+    InputStream stream = store.getStream(filePath);
+    return IOUtils.toByteArray(stream);
+  }
+}
