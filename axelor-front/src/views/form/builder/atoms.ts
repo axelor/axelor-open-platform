@@ -1,6 +1,7 @@
 import { PrimitiveAtom, atom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { SetStateAction } from "react";
+import { isEqual } from "lodash";
 
 import { isDummy, mergeDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -37,6 +38,8 @@ export function createWidgetAtom(props: {
   const { uid, name = "__" } = schema;
   const attrs = defaultAttrs(schema);
 
+  let prevState: WidgetState = { attrs: {} };
+
   const attrsByIdAtom = focusAtom(formAtom, (o) =>
     o
       .prop("states")
@@ -50,6 +53,9 @@ export function createWidgetAtom(props: {
       .prop(name)
       .valueOr({ attrs: {} } as WidgetState)
   );
+
+  const getStateByName = (key: keyof WidgetState, values: any) =>
+    isEqual(prevState[key], values) ? prevState.columns : values;
 
   const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
     (get) => {
@@ -67,13 +73,13 @@ export function createWidgetAtom(props: {
         ...restById
       } = get(attrsByIdAtom);
 
-      return {
+      return (prevState = {
         ...restByName,
         ...restById,
-        columns: {
+        columns: getStateByName("columns", {
           ...columnsByName,
           ...columnsById,
-        },
+        }),
         errors: {
           ...errorsByName,
           ...errorsById,
@@ -83,7 +89,7 @@ export function createWidgetAtom(props: {
           ...attrsByName,
           ...attrsById,
         },
-      };
+      });
     },
     (get, set, state) => {
       set(attrsByIdAtom, state);
