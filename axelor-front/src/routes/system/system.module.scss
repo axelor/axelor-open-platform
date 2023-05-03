@@ -1,0 +1,7 @@
+.dlist {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  dd {
+    padding: 0 1rem;
+  }
+}

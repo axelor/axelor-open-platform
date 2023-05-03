@@ -7,11 +7,9 @@ import {
 
 import { useSession } from "@/hooks/use-session";
 
-import { About } from "./about";
 import { Login } from "./login";
 import { Profile } from "./profile";
 import { Root } from "./root";
-import { System } from "./system";
 import { View } from "./view";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -46,16 +44,8 @@ const router = createHashRouter([
         element: <View />,
       },
       {
-        path: "/about",
-        element: <About />,
-      },
-      {
         path: "/profile",
         element: <Profile />,
-      },
-      {
-        path: "/system",
-        element: <System />,
       },
     ],
   },

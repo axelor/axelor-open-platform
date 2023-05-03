@@ -20,6 +20,8 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useRoute } from "@/hooks/use-route";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
+import { About } from "@/routes/about";
+import { Shortcuts } from "@/routes/shortcuts";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -326,7 +328,7 @@ function FarItems() {
         },
         {
           key: "user",
-          text: "User",
+          text: i18n.get("User"),
           iconOnly: true,
           iconProps: {
             icon: "person",
@@ -335,7 +337,7 @@ function FarItems() {
             {
               key: "profile",
               text: data?.user.name,
-              subtext: "Preferences",
+              subtext: i18n.get("Preferences"),
               onClick: () => navigate("/profile"),
             },
             {
@@ -344,16 +346,17 @@ function FarItems() {
             },
             {
               key: "shortcuts",
-              text: "Shortcuts",
+              text: i18n.get("Shortcuts"),
+              onClick: showShortcuts,
             },
             {
               key: "about",
-              text: "About",
-              onClick: () => navigate("/about"),
+              text: i18n.get("About"),
+              onClick: showAbout,
             },
             {
               key: "logout",
-              text: "Logout",
+              text: i18n.get("Logout"),
               onClick: () => logout(),
             },
           ],
@@ -361,6 +364,22 @@ function FarItems() {
       ]}
     />
   );
+}
+
+function showAbout() {
+  dialogs.info({
+    size: "lg",
+    title: i18n.get("About"),
+    content: <About />,
+  });
+}
+
+function showShortcuts() {
+  dialogs.info({
+    size: "md",
+    title: i18n.get("Keyboard Shortcuts"),
+    content: <Shortcuts />,
+  });
 }
 
 export function NavHeader() {
