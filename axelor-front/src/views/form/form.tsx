@@ -30,6 +30,7 @@ import {
   useViewRoute,
   useViewSwitch,
   useViewTab,
+  useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
 import { useDMSPopup } from "../dms/builder/hooks";
@@ -463,6 +464,9 @@ function FormContainer({
     onPrev: pagination.canPrev ? pagination.onPrev : undefined,
     onNext: pagination.canNext ? pagination.onNext : undefined,
   });
+
+  // register tab:refresh
+  useViewTabRefresh("form", onRefresh);
 
   return (
     <div className={styles.formViewContainer}>

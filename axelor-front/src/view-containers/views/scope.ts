@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import {
   Tab,
@@ -195,4 +195,28 @@ export function useViewRoute() {
   );
   const options = routes?.[type] ?? {};
   return options as TabRoute;
+}
+
+export function useViewTabRefresh(viewType: string, refresh: () => void) {
+  const tab = useViewTab();
+  const type = useSelectViewState(useCallback(({ type }) => type, []));
+  const handleRefresh = useCallback(
+    (e: Event) => {
+      if (
+        e instanceof CustomEvent &&
+        e.detail === tab.id &&
+        type === viewType
+      ) {
+        refresh();
+      }
+    },
+    [refresh, tab.id, type, viewType]
+  );
+
+  useEffect(() => {
+    document.addEventListener("tab:refresh", handleRefresh);
+    return () => {
+      document.removeEventListener("tab:refresh", handleRefresh);
+    };
+  }, [handleRefresh]);
 }
