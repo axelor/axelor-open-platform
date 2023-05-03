@@ -38,6 +38,10 @@ export class DefaultActionExecutor implements ActionExecutor {
     return queue.add(() => this.#execute(action, options));
   }
 
+  async wait() {
+    return queue.wait();
+  }
+
   async execute(action: string, options?: ActionOptions) {
     try {
       return this.#enqueue(action, options);
