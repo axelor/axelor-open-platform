@@ -1,15 +1,18 @@
 import { Box, Button, Input } from "@axelor/ui";
 import { useMemo } from "react";
 
+const noop = () => {};
+
 export function ViewerInput({ value }: { value: string | number }) {
   return (
     <Input
       type="text"
-      defaultValue={value}
+      value={value}
       disabled
       readOnly
       bg="body"
       border={false}
+      onChange={noop}
     />
   );
 }
