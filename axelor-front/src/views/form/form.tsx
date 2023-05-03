@@ -429,7 +429,10 @@ function FormContainer({
     const elem = containerRef.current;
     if (elem) {
       const selector = ["input", "select", "textarea"]
-        .map((name) => `${name}[data-input], [data-input] ${name}`)
+        .map(
+          (name) =>
+            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly])`
+        )
         .join(", ");
       const input = elem.querySelector(selector) as HTMLInputElement;
       if (input) {
