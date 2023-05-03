@@ -116,7 +116,7 @@ public class PublicInfoService extends AbstractService {
         "copyright",
         SETTINGS.get(
             AvailableAppSettings.APPLICATION_COPYRIGHT,
-            "&copy; 2005–{year} Axelor. All Rights Reserved."));
+            "\u00A9 2005–{year} Axelor. All Rights Reserved."));
     map.put("logo", info.getLogo());
     map.put("language", info.getPageLang());
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());
