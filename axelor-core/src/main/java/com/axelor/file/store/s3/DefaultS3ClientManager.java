@@ -23,13 +23,18 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import io.minio.MinioClient;
 import jakarta.inject.Singleton;
+import okhttp3.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class DefaultS3ClientManager implements S3ClientManager {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultS3ClientManager.class);
+
   private static volatile DefaultS3ClientManager instance;
 
-  private final MinioClient client;
+  private final S3Client s3Client;
   private final S3Configuration s3Configuration;
 
   private DefaultS3ClientManager() {
@@ -40,8 +45,7 @@ public class DefaultS3ClientManager implements S3ClientManager {
     }
 
     s3Configuration = getDefaultConfiguration();
-    S3Client s3Client = new S3Client(s3Configuration);
-    client = s3Client.getClient();
+    s3Client = new S3Client(s3Configuration).build();
   }
 
   private S3Configuration getDefaultConfiguration() {
@@ -76,8 +80,22 @@ public class DefaultS3ClientManager implements S3ClientManager {
   }
 
   @Override
+  public void shutdown() {
+    try {
+      Cache cache = s3Client.getOkHttpClient().cache();
+      if (cache != null) {
+        cache.close();
+      }
+      s3Client.getOkHttpClient().dispatcher().executorService().shutdown();
+      s3Client.getOkHttpClient().connectionPool().evictAll();
+    } catch (Exception e) {
+      LOG.error("Unable to shutdown s3 connections", e);
+    }
+  }
+
+  @Override
   public MinioClient getClient() {
-    return client;
+    return s3Client.getMinioClient();
   }
 
   @Override

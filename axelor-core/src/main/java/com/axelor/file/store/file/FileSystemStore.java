@@ -154,4 +154,9 @@ public class FileSystemStore implements Store {
   public StoreType getStoreType() {
     return StoreType.FILE_SYSTEM;
   }
+
+  @Override
+  public void shutdown() {
+    // nothing to do
+  }
 }

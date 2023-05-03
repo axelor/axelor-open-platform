@@ -24,6 +24,7 @@ import com.axelor.db.tenants.TenantModule;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
+import com.axelor.file.store.FileStoreFactory;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 import com.axelor.report.tool.ReportExecutor;
@@ -80,6 +81,7 @@ public class AppStartup extends HttpServlet {
       shutdownEvent.fire(new ShutdownEvent());
       jobRunner.stop();
       ReportExecutor.shutdown();
+      FileStoreFactory.shutdown();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

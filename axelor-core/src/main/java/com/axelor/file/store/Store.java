@@ -45,4 +45,6 @@ public interface Store {
   InputStream getStream(String fileName);
 
   StoreType getStoreType();
+
+  void shutdown();
 }

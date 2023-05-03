@@ -29,4 +29,6 @@ public interface S3ClientManager {
   S3EncryptionType getEncryptionType();
 
   String getEncryptionKmsKeyId();
+
+  void shutdown();
 }

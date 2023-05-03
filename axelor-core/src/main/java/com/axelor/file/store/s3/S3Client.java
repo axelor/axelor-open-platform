@@ -20,17 +20,25 @@ package com.axelor.file.store.s3;
 
 import com.axelor.common.StringUtils;
 import io.minio.MinioClient;
+import io.minio.http.HttpUtils;
+import java.util.concurrent.TimeUnit;
 import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 
 public class S3Client {
 
+  private static final long DEFAULT_CONNECTION_TIMEOUT = TimeUnit.MINUTES.toMillis(5);
+
   private final S3Configuration configuration;
+
+  private OkHttpClient okHttpClient;
+  private MinioClient minioClient;
 
   public S3Client(S3Configuration configuration) {
     this.configuration = configuration;
   }
 
-  public MinioClient getClient() {
+  public S3Client build() {
     MinioClient.Builder builder =
         MinioClient.builder()
             .endpoint(getEndpoint())
@@ -40,7 +48,14 @@ public class S3Client {
       builder.region(configuration.getRegion());
     }
 
-    return builder.build();
+    this.okHttpClient =
+        HttpUtils.newDefaultHttpClient(
+            DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
+
+    builder.httpClient(okHttpClient);
+    this.minioClient = builder.build();
+
+    return this;
   }
 
   private HttpUrl getEndpoint() {
@@ -50,5 +65,13 @@ public class S3Client {
     }
     String scheme = configuration.isSecure() ? "https" : "http";
     return HttpUrl.get(scheme + "://" + host);
+  }
+
+  public OkHttpClient getOkHttpClient() {
+    return okHttpClient;
+  }
+
+  public MinioClient getMinioClient() {
+    return minioClient;
   }
 }

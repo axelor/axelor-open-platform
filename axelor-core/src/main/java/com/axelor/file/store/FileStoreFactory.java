@@ -44,4 +44,10 @@ public class FileStoreFactory {
 
     return _store;
   }
+
+  public static void shutdown() {
+    if (_store != null) {
+      _store.shutdown();
+    }
+  }
 }

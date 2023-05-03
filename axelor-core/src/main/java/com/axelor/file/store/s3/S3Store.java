@@ -232,4 +232,9 @@ public class S3Store implements Store {
   public StoreType getStoreType() {
     return StoreType.OBJECT_STORAGE;
   }
+
+  @Override
+  public void shutdown() {
+    _s3ClientManager.shutdown();
+  }
 }
