@@ -17,6 +17,7 @@ import { useLocation } from "react-router-dom";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useEditor } from "@/hooks/use-relation";
 import { useRoute } from "@/hooks/use-route";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
@@ -29,6 +30,7 @@ import {
   QuickMenu,
   QuickMenuItem as TQuickMenuItem,
 } from "@/services/client/meta.types";
+import { session } from "@/services/client/session";
 import { commonClassNames } from "@/styles/common";
 import {
   ActionExecutor,
@@ -259,6 +261,22 @@ function FarItems() {
   const { current: currentTaskCount, pending: pendingTaskCount } =
     useTagsTasks();
 
+  const showEditor = useEditor();
+
+  const showPreferences = useCallback(() => {
+    showEditor({
+      model: "com.axelor.auth.db.User",
+      title: i18n.get("Preferences"),
+      viewName: "user-preferences-form",
+      record: {
+        id: session.info?.user.id,
+      },
+      onSelect() {
+        window.location.reload();
+      },
+    });
+  }, [showEditor]);
+
   return (
     <CommandBar
       items={[
@@ -338,7 +356,7 @@ function FarItems() {
               key: "profile",
               text: data?.user.name,
               subtext: i18n.get("Preferences"),
-              onClick: () => navigate("/profile"),
+              onClick: showPreferences,
             },
             {
               key: "d-person",

@@ -8,7 +8,6 @@ import {
 import { useSession } from "@/hooks/use-session";
 
 import { Login } from "./login";
-import { Profile } from "./profile";
 import { Root } from "./root";
 import { View } from "./view";
 
@@ -42,10 +41,6 @@ const router = createHashRouter([
       {
         path: "/ds/:action/:mode?/:id?",
         element: <View />,
-      },
-      {
-        path: "/profile",
-        element: <Profile />,
       },
     ],
   },
