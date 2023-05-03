@@ -81,12 +81,14 @@ export namespace dialogs {
   }
 
   export async function box({
+    size,
     title = i18n.get("Information"),
     content,
     yesNo = true,
     yesTitle,
     noTitle,
   }: {
+    size?: DialogOptions["size"];
     title?: string;
     content: React.ReactNode;
     yesNo?: boolean;
@@ -108,6 +110,7 @@ export namespace dialogs {
     return new Promise<boolean>(async (resolve) => {
       const close = await modal({
         open: true,
+        size,
         title,
         content,
         buttons,
@@ -121,34 +124,38 @@ export namespace dialogs {
   }
 
   export async function info(options: {
+    size?: DialogOptions["size"];
     title?: string;
     content: React.ReactNode;
   }) {
-    const { title, content } = options;
-    return box({ title, content, yesNo: false });
+    const { title, size, content } = options;
+    return box({ size, title, content, yesNo: false });
   }
 
   export async function confirm(options: {
+    size?: DialogOptions["size"];
     title?: string;
     content: React.ReactNode;
     yesTitle?: string;
     noTitle?: string;
   }) {
     const {
+      size,
       title = i18n.get("Question"),
       content,
       yesTitle,
       noTitle,
     } = options;
-    return box({ title, content, yesTitle, noTitle });
+    return box({ size, title, content, yesTitle, noTitle });
   }
 
   export async function error(options: {
+    size?: DialogOptions["size"];
     title?: string;
     content: React.ReactNode;
   }) {
-    const { title = i18n.get("Error"), content } = options;
-    return box({ title, content });
+    const { size, title = i18n.get("Error"), content } = options;
+    return box({ size, title, content });
   }
 
   export async function confirmDirty(
