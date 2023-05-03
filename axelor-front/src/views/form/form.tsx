@@ -617,8 +617,12 @@ function useShortcuts({
 }) {
   const { active } = useTabs();
   const { id } = useViewTab();
+  const type = useSelectViewState((x) => x.type);
 
-  const canHandle = useCallback(() => active?.id === id, [active?.id, id]);
+  const canHandle = useCallback(
+    () => active?.id === id && type === "form",
+    [active?.id, id, type]
+  );
 
   useShortcut({
     key: "Insert",
