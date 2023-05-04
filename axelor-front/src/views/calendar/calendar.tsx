@@ -542,7 +542,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       closePopover();
 
       const confirmed = await dialogs.confirm({
-        content: _t("Do you really want to delete the selected record(s)?"),
+        content: _t("Do you really want to delete the selected record?"),
         yesTitle: _t("Delete"),
       });
 
