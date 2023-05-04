@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import {
   Box,
@@ -232,12 +232,23 @@ export function ModalDialog(props: DialogOptions) {
     onClose,
   } = props;
 
-  const close = useCallback((result: boolean) => onClose(result), [onClose]);
+  const [show, setShow] = useState(open);
+  const [result, setResult] = useState(false);
+
+  const close = useCallback((result: boolean) => {
+    setShow(false);
+    setResult(result);
+  }, []);
+
+  const onHide = useCallback(() => {
+    onClose?.(result);
+  }, [onClose, result]);
 
   return (
     <Portal>
       <Dialog
-        open={open}
+        open={show}
+        onHide={onHide}
         scrollable
         size={size}
         className={clsx(classes.root, styles.root)}
