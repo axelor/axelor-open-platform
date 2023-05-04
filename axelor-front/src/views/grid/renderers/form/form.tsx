@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
 } from "react";
+import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -26,6 +27,7 @@ import {
 import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
 import { checkErrors } from "@/views/form/builder/utils";
+import styles from './form.module.scss';
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -80,8 +82,8 @@ export const FormLayoutComponent = ({
         const item = items.find((item) => item.name === column.name);
         return (
           <Box
-            p={1}
             key={item?.uid ?? `column_${ind}`}
+            className={styles.column}
             {...(column.width && {
               style: {
                 width: column.width,
@@ -297,7 +299,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       <FocusTrap initialFocus={false}>
         <Box
           ref={containerRef}
-          className={className}
+          className={clsx(className, styles.container)}
           d="flex"
           onKeyDown={handleKeyDown}
         >

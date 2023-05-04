@@ -353,7 +353,7 @@ function GridInner(props: ViewProps<GridView>) {
       };
 
   return (
-    <div className={styles.grid}>
+    <div className={styles.container}>
       {showToolbar && (
         <ViewToolBar
           meta={meta}
@@ -445,6 +445,9 @@ function GridInner(props: ViewProps<GridView>) {
         </ViewToolBar>
       )}
       <GridComponent
+        {...(editable && {
+          className: styles["grid-editable"],
+        })}
         ref={gridRef}
         records={records}
         view={view}
