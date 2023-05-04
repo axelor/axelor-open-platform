@@ -41,6 +41,7 @@ export type DialogOptions = {
     footer?: string;
   };
   open: boolean;
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   onClose: (result: boolean) => void;
 };
 
@@ -222,6 +223,7 @@ const defaultButtons: DialogButton[] = [
 export function ModalDialog(props: DialogOptions) {
   const {
     open,
+    setOpen,
     size,
     title,
     content,
@@ -235,19 +237,28 @@ export function ModalDialog(props: DialogOptions) {
   const [show, setShow] = useState(open);
   const [result, setResult] = useState(false);
 
-  const close = useCallback((result: boolean) => {
-    setShow(false);
-    setResult(result);
-  }, []);
+  const close = useCallback(
+    (result: boolean) => {
+      setOpen?.(false);
+      setShow(false);
+      setResult(result);
+    },
+    [setOpen]
+  );
 
   const onHide = useCallback(() => {
     onClose?.(result);
   }, [onClose, result]);
 
+  const canShow = setOpen ? open : show;
+
   return (
     <Portal>
+      <Fade in={canShow} unmountOnExit mountOnEnter>
+        <Box className={styles.backdrop}></Box>
+      </Fade>
       <Dialog
-        open={show}
+        open={canShow}
         onHide={onHide}
         scrollable
         size={size}
@@ -277,9 +288,6 @@ export function ModalDialog(props: DialogOptions) {
           ))}
         </DialogFooter>
       </Dialog>
-      <Fade in={open} unmountOnExit mountOnEnter>
-        <Box className={styles.backdrop}></Box>
-      </Fade>
     </Portal>
   );
 }
