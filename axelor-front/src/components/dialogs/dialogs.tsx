@@ -31,7 +31,7 @@ export type DialogOptions = {
   title?: string;
   content: React.ReactNode;
   header?: React.ReactNode;
-  footer?: React.ReactNode;
+  footer?: (close: (result: boolean) => void) => React.ReactNode;
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
   classes?: {
@@ -264,7 +264,7 @@ export function ModalDialog(props: DialogOptions) {
           {content}
         </DialogContent>
         <DialogFooter className={classes.footer}>
-          {footer}
+          {footer && footer(close)}
           {buttons.map((button) => (
             <Button
               key={button.name}

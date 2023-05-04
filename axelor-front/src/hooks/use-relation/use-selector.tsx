@@ -10,10 +10,10 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
+import { i18n } from "@/services/client/i18n";
 import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
-import { i18n } from "@/services/client/i18n";
 
 export type SelectorOptions = {
   model: string;
@@ -47,31 +47,26 @@ export function useSelector() {
 
     if (!tab) return;
 
-    const close = await showPopup({
+    await showPopup({
       tab,
       open: true,
       onClose: () => {},
       header: () => <Header />,
-      footer: () => <Footer onClose={() => close()} onSelect={onSelect} />,
-      buttons: [],
-      handler: () => (
-        <Handler
-          close={() => close()}
-          multiple={multiple}
-          onSelect={onSelect}
-        />
+      footer: (close) => (
+        <Footer multiple={multiple} onClose={close} onSelect={onSelect} />
       ),
+      buttons: [],
     });
   }, []);
 }
 
 function Handler({
   multiple,
-  close,
+  onClose,
   onSelect,
 }: {
   multiple?: boolean;
-  close: () => void;
+  onClose: (result: boolean) => void;
   onSelect?: (records: DataRecord[]) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
@@ -81,9 +76,9 @@ function Handler({
     (index: number, records: DataRecord[]) => {
       if (index === 0 && multiple) return;
       onSelect?.(records);
-      close();
+      onClose(true);
     },
-    [close, multiple, onSelect]
+    [multiple, onClose, onSelect]
   );
 
   useEffect(() => {
@@ -155,26 +150,33 @@ function SelectorHeader({ dataStore }: { dataStore: DataStore }) {
 }
 
 function Footer({
+  multiple = false,
   onClose,
   onSelect,
 }: {
-  onClose: () => void;
+  multiple?: boolean;
+  onClose: (result: boolean) => void;
   onSelect?: (records: DataRecord[]) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
+
+  const handleCancel = useCallback(() => {
+    onClose(false);
+  }, [onClose]);
 
   const handleConfirm = useCallback(async () => {
     const state = handler.data as GridState;
     const records =
       state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
     onSelect?.(records);
-    onClose();
+    onClose(true);
   }, [handler, onSelect, onClose]);
 
   return (
     <Box d="flex" g={2}>
-      <Button variant="secondary" onClick={onClose}>
+      <Handler multiple={multiple} onClose={onClose} onSelect={onSelect} />
+      <Button variant="secondary" onClick={handleCancel}>
         {i18n.get("Cancel")}
       </Button>
       <Button variant="primary" onClick={handleConfirm}>

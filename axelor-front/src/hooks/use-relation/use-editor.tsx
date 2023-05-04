@@ -55,12 +55,12 @@ export function useEditor() {
 
     if (!tab) return;
 
-    const close = await showPopup({
+    await showPopup({
       tab,
       open: true,
       onClose: () => {},
-      footer: () => (
-        <Footer onSave={onSave} onClose={() => close()} onSelect={onSelect} />
+      footer: (close) => (
+        <Footer onSave={onSave} onClose={close} onSelect={onSelect} />
       ),
       buttons: [],
     });
@@ -72,7 +72,7 @@ function Footer({
   onSave,
   onSelect,
 }: {
-  onClose: () => void;
+  onClose: (result: boolean) => void;
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
 }) {
@@ -82,12 +82,12 @@ function Footer({
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => handler.getState?.().dirty ?? false,
-      async () => onClose()
+      async () => onClose(false)
     );
   }, [handler, onClose]);
 
   const handleConfirm = useCallback(async () => {
-    if (handler.getState === undefined) return onClose();
+    if (handler.getState === undefined) return onClose(true);
     const state = handler.getState();
     const record = state.record;
     const canSave = state.dirty || !record.id;
@@ -100,7 +100,7 @@ function Footer({
           onSelect(rec);
         }
       }
-      onClose();
+      onClose(true);
     } catch (e) {
       // TODO: show error
     }

@@ -39,7 +39,7 @@ export type PopupProps = {
    * Additioanl footer component
    *
    */
-  footer?: () => JSX.Element | null;
+  footer?: (close: (result: boolean) => void) => JSX.Element | null;
 
   /**
    * Additional handler component
@@ -81,7 +81,7 @@ export const PopupDialog = memo(function PopupDialog({
           </>
         }
         header={header?.()}
-        footer={footer?.()}
+        footer={footer}
         buttons={buttons}
         onClose={onClose}
       />
