@@ -42,7 +42,11 @@ public interface Store {
 
   File getFile(String fileName);
 
+  File getFile(String fileName, boolean cache);
+
   InputStream getStream(String fileName);
+
+  InputStream getStream(String fileName, boolean cache);
 
   StoreType getStoreType();
 

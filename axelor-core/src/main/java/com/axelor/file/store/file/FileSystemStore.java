@@ -142,12 +142,22 @@ public class FileSystemStore implements Store {
   }
 
   @Override
+  public File getFile(String fileName, boolean cache) {
+    return getFile(fileName);
+  }
+
+  @Override
   public InputStream getStream(String fileName) {
     try {
       return new FileInputStream(resolveFilePath(fileName).toFile());
     } catch (FileNotFoundException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public InputStream getStream(String fileName, boolean cache) {
+    return getStream(fileName);
   }
 
   @Override

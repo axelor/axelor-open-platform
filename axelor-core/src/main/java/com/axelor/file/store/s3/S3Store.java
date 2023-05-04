@@ -41,7 +41,10 @@ import io.minio.errors.InternalException;
 import io.minio.errors.InvalidResponseException;
 import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -52,6 +55,7 @@ import java.security.NoSuchAlgorithmException;
 public class S3Store implements Store {
 
   private final S3ClientManager _s3ClientManager;
+  private final S3Cache _s3Cache;
 
   public S3Store(S3ClientManager s3ClientManager) {
     this._s3ClientManager = s3ClientManager;
@@ -69,6 +73,8 @@ public class S3Store implements Store {
         | XmlParserException e) {
       throw new RuntimeException(e);
     }
+
+    this._s3Cache = S3Cache.getInstance();
   }
 
   private void createBucket()
@@ -189,9 +195,32 @@ public class S3Store implements Store {
 
   @Override
   public File getFile(String fileName) {
-    try (InputStream inputStream = getStream(fileName)) {
+    return getFile(fileName, false);
+  }
+
+  @Override
+  public File getFile(String fileName, boolean cache) {
+    File cacheFile = _s3Cache.get(fileName);
+    if (cacheFile != null) {
+      // if in cache, return it
+      try {
+        Path tempFile = TempFiles.createTempFile();
+        FileUtils.copyFile(cacheFile, tempFile.toFile());
+        return tempFile.toFile();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    // fetch stream from s3
+    try (InputStream inputStream = _fetchStream(fileName)) {
+      // create tmp file from stream
       Path tempFile = TempFiles.createTempFile();
       FileUtils.write(tempFile, inputStream);
+      if (cache) {
+        // put in the cache
+        _s3Cache.put(tempFile.toFile(), fileName);
+      }
       return tempFile.toFile();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -200,6 +229,40 @@ public class S3Store implements Store {
 
   @Override
   public InputStream getStream(String fileName) {
+    return getStream(fileName, false);
+  }
+
+  @Override
+  public InputStream getStream(String fileName, boolean cache) {
+    try {
+      // if in cache, return it
+      File cacheFile = _s3Cache.get(fileName);
+      if (cacheFile != null) {
+        return new FileInputStream(cacheFile);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    // fetch stream from s3
+    InputStream inputStream = _fetchStream(fileName);
+
+    if (cache) {
+      // put in the cache
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      try {
+        inputStream.transferTo(baos);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      _s3Cache.put(new ByteArrayInputStream(baos.toByteArray()), fileName);
+      return new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    return inputStream;
+  }
+
+  private InputStream _fetchStream(String fileName) {
     try {
       GetObjectArgs.Builder builder =
           GetObjectArgs.builder().bucket(getBucketName()).object(fileName);

@@ -43,12 +43,23 @@ public class ImageTool {
    * @return the bytes read from the file
    */
   public static byte[] getImageBytes(Long metaFileId) {
+    return getImageBytes(metaFileId, false);
+  }
+
+  /**
+   * Get the bytes of the given MetaFile identified by the id
+   *
+   * @param metaFileId id of the MetaFile
+   * @param cache whether to cache the file
+   * @return the bytes read from the file
+   */
+  public static byte[] getImageBytes(Long metaFileId, boolean cache) {
     try {
       MetaFile metaFile = getMetaFile(metaFileId);
       if (metaFile == null) {
         return null;
       }
-      return getBytes(metaFile.getFilePath());
+      return getBytes(metaFile.getFilePath(), cache);
     } catch (Exception e) {
       LOG.error("Unable to retrieve the MetaFile with id {}", metaFileId, e);
       return null;
@@ -64,9 +75,9 @@ public class ImageTool {
     return ReportExecutor.submit(callableTask).get();
   }
 
-  private static byte[] getBytes(String filePath) throws IOException {
+  private static byte[] getBytes(String filePath, boolean cache) throws IOException {
     Store store = FileStoreFactory.getStore();
-    InputStream stream = store.getStream(filePath);
+    InputStream stream = store.getStream(filePath, cache);
     return IOUtils.toByteArray(stream);
   }
 }
