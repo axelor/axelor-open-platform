@@ -310,20 +310,32 @@ function FormContainer({
     )
   );
 
-  const onDelete = useCallback(async () => {
-    if (record.id) {
-      const confirmed = await dialogs.confirm({
-        content: i18n.get("Do you really want to delete the selected record?"),
-        yesTitle: i18n.get("Delete"),
-      });
-      if (confirmed) {
-        const id = record.id!;
-        const version = record.version!;
-        await dataStore.delete({ id, version });
-        switchTo("grid");
-      }
-    }
-  }, [dataStore, record.id, record.version, switchTo]);
+  const onDelete = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const record = get(formAtom).record;
+        const id = record.id || 0;
+        const version = record.version || 0;
+        if (id > 0 && version >= 0) {
+          const confirmed = await dialogs.confirm({
+            content: i18n.get(
+              "Do you really want to delete the selected record?"
+            ),
+            yesTitle: i18n.get("Delete"),
+          });
+          if (confirmed) {
+            await dataStore.delete({ id, version });
+            if (prevType) {
+              switchTo(prevType);
+            } else {
+              onNew();
+            }
+          }
+        }
+      },
+      [dataStore, formAtom, onNew, prevType, switchTo]
+    )
+  );
 
   const onCopy = useCallback(async () => {
     if (record.id) {
