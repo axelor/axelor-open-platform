@@ -107,17 +107,14 @@ export function useDMSPopup() {
       }
     }
 
-    const close = await showPopup({
+    await showPopup({
       tab,
       open: true,
       onClose,
-      footer: () => (
+      footer: (close) => (
         <Footer
           onSelect={onSelect}
-          onClose={() => {
-            close();
-            onClose();
-          }}
+          onClose={close}
         />
       ),
       buttons: [],
@@ -128,18 +125,18 @@ export function useDMSPopup() {
 function Footer({
   onSelect,
   onClose,
-}: Pick<DMSPopupOptions, "onSelect"> & { onClose: () => void }) {
+}: Pick<DMSPopupOptions, "onSelect"> & { onClose: (result: boolean) => void }) {
   return (
     <>
       {onSelect && (
         <FooterSelectButton
           onSelect={(list) => {
             onSelect(list);
-            onClose();
+            onClose(true);
           }}
         />
       )}
-      <Button variant="secondary" onClick={onClose}>
+      <Button variant="secondary" onClick={() => onClose(false)}>
         {i18n.get("Close")}
       </Button>
     </>
