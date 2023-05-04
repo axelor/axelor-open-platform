@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { SyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -455,15 +455,28 @@ function FormContainer({
     }
   }, []);
 
-  const handleSave = useCallback(() => {
-    const input = document.activeElement as HTMLInputElement;
-    const elem = containerRef.current;
-    if (input && elem?.contains(input)) {
-      input.blur?.();
-      input.focus?.();
-    }
-    actionExecutor.wait().then(handleOnSave);
-  }, [actionExecutor, handleOnSave]);
+  const handleSave = useCallback(
+    async (e?: SyntheticEvent) => {
+      const onSaveClick = e?.type === "click";
+      if (!onSaveClick) {
+        const input = document.activeElement as HTMLInputElement;
+        const elem = containerRef.current;
+
+        // fake click to trigger outside click logic of any editable row
+        elem?.click?.();
+
+        if (input && elem?.contains(input)) {
+          input.blur?.();
+          input.focus?.();
+        }
+      }
+      await new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), 50);
+      });
+      actionExecutor.wait().then(handleOnSave);
+    },
+    [actionExecutor, handleOnSave]
+  );
 
   // register shortcuts
   useShortcuts({
@@ -512,7 +525,7 @@ function FormContainer({
               iconProps: {
                 icon: "save",
               },
-              onClick: handleOnSave,
+              onClick: handleSave,
               hidden: !canSave,
             },
             {
