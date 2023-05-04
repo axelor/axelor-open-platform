@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useRef } from "react";
 import { PrimitiveAtom, atom, useAtom, useSetAtom } from "jotai";
-import { Box, Input, Button } from "@axelor/ui";
+import { useCallback, useEffect, useRef } from "react";
+
+import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import HtmlEditor from "../../html/editor";
-import { i18n } from "@/services/client/i18n";
 import { dialogs } from "@/components/dialogs";
-import { TagSelectComponent } from "../../tag-select";
 import { request } from "@/services/client/client";
+import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
-import { MessageFiles } from "./message-files";
+
+import HtmlEditor from "../../html/editor";
+import { TagSelectComponent } from "../../tag-select";
 import { Message, MessageFile } from "../message/types";
+import { MessageFiles } from "./message-files";
 
 export function useMessagePopup() {
   return useCallback(
@@ -30,13 +32,7 @@ export function useMessagePopup() {
       let formData = { ...record };
       const formAtom = atom<Message>(formData);
       const isOk = await new Promise<boolean>(async (resolve) => {
-        function doClose(flag: boolean) {
-          return dialogs.confirmDirty(
-            async () => !flag && (formData as any)._dirty,
-            async () => close(flag)
-          );
-        }
-        const close = await dialogs.modal({
+        await dialogs.modal({
           open: true,
           title,
           content: (
@@ -48,17 +44,26 @@ export function useMessagePopup() {
             />
           ),
           buttons: [],
-          footer: (
+          footer: (close) => (
             <FormFooter
               formAtom={formAtom}
               yesTitle={yesTitle}
               noTitle={noTitle}
-              onClose={doClose}
+              onClose={async (result) => {
+                if (
+                  result ||
+                  (await dialogs.confirmDirty(
+                    async () => (formData as any)._dirty,
+                    async () => close(result)
+                  ))
+                ) {
+                  close(result);
+                }
+              }}
             />
           ),
           size: "lg",
           onClose: async (result) => {
-            await close(result);
             resolve(result);
           },
         });
