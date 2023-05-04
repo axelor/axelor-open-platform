@@ -121,9 +121,9 @@ function AdvanceFilterInput({
   const [inputText, setInputText] = useState("");
   const hasValue = value.length > 0;
 
-  function handleSearch() {
-    onSearch && onSearch(inputText);
-  }
+  const handleSearch = useCallback(() => {
+    onSearch?.(inputText);
+  }, [onSearch, inputText]);
 
   function handleClear() {
     setInputText("");
@@ -167,9 +167,9 @@ function AdvanceFilterInput({
     () => [
       { icon: "arrow_drop_down", onClick: onOpen },
       { icon: "clear", onClick: onClear },
-      { icon: "search", onClick: onSearch },
+      { icon: "search", onClick: handleSearch },
     ],
-    [onOpen, onClear, onSearch]
+    [onOpen, onClear, handleSearch]
   );
 
   React.useEffect(() => {
@@ -284,6 +284,7 @@ function AdvanceSearch({
   }, []);
 
   function applyCustomSearch(text) {
+    if (!text) return handleApply(customFilter);
     const freeSearchList = freeSearch.split(",");
     const viewFields = (items || []).filter((item) => {
       if (item.searchable === false) return false;
