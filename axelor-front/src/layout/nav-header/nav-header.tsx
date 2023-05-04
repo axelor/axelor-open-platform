@@ -386,7 +386,6 @@ function FarItems() {
 
 function showAbout() {
   dialogs.info({
-    size: "lg",
     title: i18n.get("About"),
     content: <About />,
   });

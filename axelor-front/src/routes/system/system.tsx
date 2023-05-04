@@ -45,7 +45,7 @@ export function System() {
     <Box flex={1}>
       <Box>
         <Box>
-          <h4>{i18n.get("Environment")}</h4>
+          <h5>{i18n.get("Environment")}</h5>
         </Box>
         <Box p={2}>
           <dl className={styles.dlist}>
@@ -62,7 +62,7 @@ export function System() {
       </Box>
       <Box>
         <Box>
-          <h4>{i18n.get("Memory")}</h4>
+          <h5>{i18n.get("Memory")}</h5>
         </Box>
         <Box p={2}>
           <dl className={styles.dlist}>
@@ -79,7 +79,7 @@ export function System() {
       </Box>
       <Box>
         <Box>
-          <h4>{i18n.get("Active Users")}</h4>
+          <h5>{i18n.get("Active Users")}</h5>
         </Box>
         <Box p={2}>
           <Table flex={1}>
