@@ -23,6 +23,7 @@ export type SelectorOptions = {
   domain?: string;
   context?: DataContext;
   onClose?: () => void;
+  onCreate?: () => void;
   onSelect?: (records: DataRecord[]) => void;
 };
 
@@ -36,6 +37,7 @@ export function useSelector() {
       domain,
       context,
       onClose,
+      onCreate,
       onSelect,
     } = options;
     const tab = await initTab({
@@ -70,6 +72,7 @@ export function useSelector() {
             close(result);
             onClose?.();
           }}
+          onCreate={onCreate}
           onSelect={onSelect}
         />
       ),
@@ -170,10 +173,12 @@ function SelectorHeader({ dataStore }: { dataStore: DataStore }) {
 function Footer({
   multiple = false,
   onClose,
+  onCreate,
   onSelect,
 }: {
   multiple?: boolean;
   onClose: (result: boolean) => void;
+  onCreate?: () => void;
   onSelect?: (records: DataRecord[]) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
@@ -194,12 +199,29 @@ function Footer({
   return (
     <Box d="flex" g={2}>
       <Handler multiple={multiple} onClose={onClose} onSelect={onSelect} />
-      <Button variant="secondary" onClick={handleCancel}>
-        {i18n.get("Cancel")}
-      </Button>
-      <Button variant="primary" onClick={handleConfirm}>
-        {i18n.get("OK")}
-      </Button>
+      <Box d="flex" {...(onCreate && { flex: 1 })}>
+        {onCreate && (
+          <Box d="flex" flex={1}>
+            <Button
+              variant="light"
+              onClick={() => {
+                onClose(false);
+                onCreate();
+              }}
+            >
+              {i18n.get("Create")}
+            </Button>
+          </Box>
+        )}
+      </Box>
+      <Box d="flex" g={2}>
+        <Button variant="secondary" onClick={handleCancel}>
+          {i18n.get("Cancel")}
+        </Button>
+        <Button variant="primary" onClick={handleConfirm}>
+          {i18n.get("OK")}
+        </Button>
+      </Box>
     </Box>
   );
 }

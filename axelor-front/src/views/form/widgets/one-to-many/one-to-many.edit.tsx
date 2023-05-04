@@ -144,37 +144,18 @@ export function OneToManyEdit({
     };
   }, []);
 
-  const onAdd = useCallback(() => {
-    const onClose = onPopupViewInit();
-    showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
-      model,
-      multiple: true,
-      viewName: gridView,
-      onClose,
-      onSelect: (records) => {
-        setValue((value) => {
-          const valIds = (value || []).map((x) => x.id);
-          return [
-            ...(value || []),
-            ...records.filter((rec) => !valIds.includes(rec.id)),
-          ];
-        });
-      },
-    });
-  }, [showSelector, title, model, gridView, setValue, onPopupViewInit]);
-
   const onEdit = useCallback(
     async (record: DataRecord) => {
       const onClose = onPopupViewInit();
       const save = (record: DataRecord) => {
-        if (record.id) {
-          setValue((value) =>
-            value?.map((val) =>
-              val.id === record.id ? { ...val, ...record, _dirty: true } : val
-            )
-          );
-        }
+        setValue((value) => {
+          if (value?.some((v) => v.id === record.id)) {
+            return value?.map((val) =>
+              val.id === record.id ? { ...val, ...record } : val
+            );
+          }
+          return [...(value || []), record];
+        });
       };
       let form = views?.find?.((v: View) => v.type === "form");
       if (form) {
@@ -205,6 +186,42 @@ export function OneToManyEdit({
       onPopupViewInit,
     ]
   );
+
+  const onAdd = useCallback(() => {
+    const onClose = onPopupViewInit();
+    showSelector({
+      title: i18n.get("Select {0}", title ?? ""),
+      model,
+      multiple: true,
+      viewName: gridView,
+      onClose,
+      onSelect: (records) => {
+        setValue((value) => {
+          const valIds = (value || []).map((x) => x.id);
+          return [
+            ...(value || []),
+            ...records.filter((rec) => !valIds.includes(rec.id)),
+          ];
+        });
+      },
+      ...(!isManyToMany && {
+        onCreate: () => {
+          setTimeout(() => {
+            onEdit({});
+          });
+        },
+      }),
+    });
+  }, [
+    title,
+    model,
+    gridView,
+    isManyToMany,
+    setValue,
+    onEdit,
+    showSelector,
+    onPopupViewInit,
+  ]);
 
   const showPopup = useCallback(
     async (popup: boolean) => {
