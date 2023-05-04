@@ -165,7 +165,7 @@ const DataViews = memo(function DataViews({
     });
     return (res?.view?.filters || []).map((filter) => ({
       ...filter,
-      id: filter.name,
+      id: filter.name ?? filter.title,
     }));
   }, [model, filterName]);
 
