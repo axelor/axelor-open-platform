@@ -126,13 +126,15 @@ public class TempFiles {
    * @throws IOException if an I/O error occurs
    */
   public static void clean() throws IOException {
-    if (!Files.isDirectory(getTempPath())) {
+    Path tempPath = getTempPath();
+    if (!Files.isDirectory(tempPath)) {
       return;
     }
     final long currentTime = System.currentTimeMillis();
     Files.walkFileTree(
-        getTempPath(),
+        tempPath,
         new SimpleFileVisitor<Path>() {
+
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
               throws IOException {
@@ -140,6 +142,23 @@ public class TempFiles {
             if (diff >= TEMP_THRESHOLD) {
               Files.deleteIfExists(file);
             }
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path directory, IOException ioException)
+              throws IOException {
+
+            if (tempPath.equals(directory)) {
+              return FileVisitResult.CONTINUE;
+            }
+
+            try (Stream<Path> stream = Files.list(directory)) {
+              if (!stream.iterator().hasNext()) {
+                Files.delete(directory);
+              }
+            }
+
             return FileVisitResult.CONTINUE;
           }
         });
