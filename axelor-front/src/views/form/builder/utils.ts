@@ -4,7 +4,7 @@ import { DataContext } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
-import { Attrs, DEFAULT_ATTRS } from "./types";
+import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
 export const nextId = (() => {
   let id = 0;
@@ -93,4 +93,12 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   }
 
   return res;
+}
+
+export function checkErrors(states: FormState["states"]) {
+  const errors = Object.values(states)
+    .map((s) => s.errors ?? {})
+    .filter((x) => Object.keys(x).length > 0);
+
+  return errors.length ? errors : null;
 }

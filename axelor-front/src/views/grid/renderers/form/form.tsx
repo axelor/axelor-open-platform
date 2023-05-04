@@ -25,6 +25,7 @@ import {
 } from "@/views/form/builder";
 import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
+import { checkErrors } from "@/views/form/builder/utils";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -168,11 +169,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       useCallback(
         (get) => {
           const { states } = get(formAtom);
-          const errors = Object.values(states)
-            .map((s) => s.errors ?? {})
-            .filter((x) => Object.keys(x).length > 0);
-
-          return errors.length ? errors : null;
+          return checkErrors(states);
         },
         [formAtom]
       )

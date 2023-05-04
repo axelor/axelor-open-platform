@@ -12,6 +12,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { initTab } from "../use-tabs";
 import { FormView } from "@/services/client/meta.types";
+import { checkErrors } from "@/views/form/builder/utils";
 
 export type EditorOptions = {
   model: string;
@@ -105,9 +106,13 @@ function Footer({
     const state = handler.getState();
     const record = state.record;
     const canSave = state.dirty || !record.id;
+
     try {
       if (canSave) {
         if (onSave) {
+          if (checkErrors(state.states)) {
+            return Promise.reject();
+          }
           onSave(record);
         } else if (onSelect && handler.onSave) {
           const rec = await handler.onSave();
