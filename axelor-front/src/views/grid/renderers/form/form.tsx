@@ -27,7 +27,7 @@ import {
 import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
 import { checkErrors } from "@/views/form/builder/utils";
-import styles from './form.module.scss';
+import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -53,6 +53,16 @@ const showErrors = (errors: WidgetErrors[]) => {
   });
 };
 
+const findColumnIndexByNode = (ele: HTMLElement) => {
+  function getParent(ele: HTMLElement): string {
+    if (!ele) return "";
+    ele = ele?.offsetParent as HTMLElement;
+    return ele?.dataset?.columnIndex || getParent(ele);
+  }
+  const colIndex = getParent(ele as HTMLElement);
+  return colIndex ? +colIndex : undefined;
+};
+
 export type GridFormHandler = {
   invalid?: () => null | WidgetErrors[];
   onSave?: (saveFromEdit?: boolean) => void;
@@ -71,8 +81,10 @@ export const FormLayoutComponent = ({
       (schema.items || []).map((item) => ({
         ...item,
         editable: true,
+        editIndex: columns.findIndex((c) => c.name === item.name),
         showTitle: false,
       })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [schema.items]
   );
 
@@ -84,6 +96,7 @@ export const FormLayoutComponent = ({
           <Box
             key={item?.uid ?? `column_${ind}`}
             className={styles.column}
+            data-column-index={ind}
             {...(column.width && {
               style: {
                 width: column.width,
@@ -178,18 +191,25 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
 
     const handleCancel = useCallback(
-      () => onCancel?.(record, rowIndex, cellIndex!),
+      (columnIndex?: number) =>
+        onCancel?.(record, rowIndex, columnIndex ?? cellIndex!),
       [onCancel, record, rowIndex, cellIndex]
     );
 
     const handleSave = useAtomCallback(
       useCallback(
-        async (get, set, saveFromEdit?: boolean) => {
+        async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
           const { record: saveRecord } = get(formAtom);
 
           // check record changes
           if (isEqual(record, saveRecord)) {
-            return onSave?.(record, rowIndex, cellIndex!, false, saveFromEdit);
+            return onSave?.(
+              record,
+              rowIndex,
+              columnIndex ?? cellIndex!,
+              false,
+              saveFromEdit
+            );
           }
 
           const errors = getErrors();
@@ -211,7 +231,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           return await onSave?.(
             saveRecord,
             rowIndex,
-            cellIndex!,
+            columnIndex ?? cellIndex!,
             true,
             saveFromEdit
           );
@@ -232,10 +252,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
         if (e.defaultPrevented && e.detail !== 1) return;
         if (e.key === `Escape`) {
-          return handleCancel?.();
+          return handleCancel?.(findColumnIndexByNode(e.target as HTMLElement));
         }
         if (e.key === `Enter`) {
-          return handleSave?.();
+          return handleSave?.(
+            undefined,
+            findColumnIndexByNode(e.target as HTMLElement)
+          );
         }
       },
       [handleSave, handleCancel]

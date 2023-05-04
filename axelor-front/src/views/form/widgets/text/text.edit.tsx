@@ -7,11 +7,13 @@ import { String } from "../string";
 import { Text } from "./text";
 
 export function TextEdit(props: FieldProps<string>) {
-  const { widgetAtom } = props;
+  const { widgetAtom, schema } = props;
   const [popup, setPopup] = useState<any>(null);
   const targetRef = useRef<HTMLDivElement>(null);
 
-  const { attrs: { focus } } = useAtomValue(widgetAtom);
+  const {
+    attrs: { focus },
+  } = useAtomValue(widgetAtom);
 
   const handleFocus = useCallback(() => {
     const target = targetRef.current;
@@ -49,7 +51,13 @@ export function TextEdit(props: FieldProps<string>) {
         />
       </Box>
       {popup && (
-        <Box d="flex" bgColor="body" style={{ ...popup?.style }} shadow>
+        <Box
+          d="flex"
+          bgColor="body"
+          style={{ ...popup?.style }}
+          shadow
+          data-column-index={schema.editIndex}
+        >
           <Box>
             <Text
               {...props}
