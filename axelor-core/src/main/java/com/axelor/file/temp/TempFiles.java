@@ -28,10 +28,12 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
+import java.util.stream.Stream;
 
 public class TempFiles {
 
   private static final String DEFAULT_UPLOAD_TEMP_PATH = "{java.io.tmpdir}/.axelor";
+  private static final String TEMP_DIR_NAME = "tmp_files";
 
   private static final Path TMP_PATH =
       Paths.get(
@@ -42,11 +44,20 @@ public class TempFiles {
   private static final long TEMP_THRESHOLD = 24 * 3600 * 1000;
 
   /**
-   * Get the path to deal with temp file/dir
+   * Get the path to deal with temp upload file/dir
    *
    * @return the temp path
    */
   public static Path getTempPath() {
+    return getRootTempPath().resolve(TEMP_DIR_NAME);
+  }
+
+  /**
+   * Get the root path to deal with temp file/dir
+   *
+   * @return the root temp path
+   */
+  public static Path getRootTempPath() {
     return TMP_PATH;
   }
 
