@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { Box } from "@axelor/ui";
 import { String } from "../string";
 import { FieldContainer, FieldProps } from "../../builder";
+import styles from './phone.module.scss';
 
 export function Phone(props: FieldProps<string>) {
   const {
@@ -19,9 +20,16 @@ export function Phone(props: FieldProps<string>) {
       value && (
         <FieldContainer readonly={readonly}>
           {showTitle && <label htmlFor={uid}>{title}</label>}
-          <Box as="a" target="_blank" href={`tel:${value}`}>
-            {value}
-          </Box>
+          {value && (
+            <Box
+              as="a"
+              target="_blank"
+              href={`tel:${value}`}
+              className={styles.link}
+            >
+              {value}
+            </Box>
+          )}
         </FieldContainer>
       )
     );
