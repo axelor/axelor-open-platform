@@ -127,6 +127,11 @@ public interface AvailableAppSettings {
   String DATA_OBJECT_STORAGE_ENCRYPTION = "data.object-storage.encryption";
   String DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID = "data.object-storage.encryption-kms-key-id";
 
+  String DATA_OBJECT_STORAGE_CACHE_ENABLED = "data.object-storage.cache.enabled";
+  String DATA_OBJECT_STORAGE_CACHE_MAX_ENTRIES = "data.object-storage.cache.max-entries";
+  String DATA_OBJECT_STORAGE_CACHE_TIME_TO_LIVE = "data.object-storage.cache.time-to-live";
+  String DATA_OBJECT_STORAGE_CACHE_CLEAN_FREQUENCY = "data.object-storage.cache.clean-frequency";
+
   String CORS_ALLOW_ORIGIN = "cors.allow-origin";
   String CORS_ALLOW_CREDENTIALS = "cors.allow-credentials";
   String CORS_ALLOW_METHODS = "cors.allow-methods";

@@ -180,6 +180,9 @@ public class S3Store implements Store {
       RemoveObjectArgs.Builder builder =
           RemoveObjectArgs.builder().bucket(getBucketName()).object(fileName);
       getClient().removeObject(builder.build());
+      if (S3Cache.CACHE_ENABLED) {
+        _s3Cache.remove(fileName);
+      }
     } catch (IOException
         | ErrorResponseException
         | InsufficientDataException
@@ -200,7 +203,7 @@ public class S3Store implements Store {
 
   @Override
   public File getFile(String fileName, boolean cache) {
-    File cacheFile = _s3Cache.get(fileName);
+    File cacheFile = S3Cache.CACHE_ENABLED ? _s3Cache.get(fileName) : null;
     if (cacheFile != null) {
       // if in cache, return it
       try {
@@ -217,7 +220,7 @@ public class S3Store implements Store {
       // create tmp file from stream
       Path tempFile = TempFiles.createTempFile();
       FileUtils.write(tempFile, inputStream);
-      if (cache) {
+      if (S3Cache.CACHE_ENABLED && cache) {
         // put in the cache
         _s3Cache.put(tempFile.toFile(), fileName);
       }
@@ -234,20 +237,22 @@ public class S3Store implements Store {
 
   @Override
   public InputStream getStream(String fileName, boolean cache) {
-    try {
-      // if in cache, return it
-      File cacheFile = _s3Cache.get(fileName);
-      if (cacheFile != null) {
-        return new FileInputStream(cacheFile);
+    if (S3Cache.CACHE_ENABLED) {
+      try {
+        // if in cache, return it
+        File cacheFile = _s3Cache.get(fileName);
+        if (cacheFile != null) {
+          return new FileInputStream(cacheFile);
+        }
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
 
     // fetch stream from s3
     InputStream inputStream = _fetchStream(fileName);
 
-    if (cache) {
+    if (S3Cache.CACHE_ENABLED && cache) {
       // put in the cache
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       try {

@@ -38,11 +38,16 @@ data.object-storage.bucket = files
 data.object-storage.region =
 data.object-storage.encryption =
 data.object-storage.encryption-kms-key-id =
+
+data.object-storage.cache.enabled =
+data.object-storage.cache.max-entries =
+data.object-storage.cache.time-to-live =
+data.object-storage.cache.clean-frequency =
 ----
 
 [cols="2,7,2"]
 |===
-| Setting | Description | Defaultvalue
+| Setting | Description | Default value
 
 | enabled | Enable or disable object storage | false
 | endpoint | URL of the S3 service such as 127.0.0.1:9000 |
@@ -54,6 +59,10 @@ data.object-storage.encryption-kms-key-id =
 | region | S3 region |
 | encryption | Encryption mode : `SSE-S3` or `SSE-KMS` |
 | encryption-kms-key-id | KMS key ID. Only needed when `SSE-KMS` in `encryption` |
+| cache.enabled | Enable or disable s3 cache  | true
+| cache.max-entries | Maximum number of entries in cache, -1 means unlimited  | 2000
+| cache.time-to-live | Time-to-live of a cache entry, in seconds, -1 means unlimited | 600
+| cache.clean-frequency | Number of hits from which the cache is cleaned, -1 means no disabled  | 1000
 |===
 
 == Temp files
@@ -77,4 +86,5 @@ Path tempFile = TempFiles.createTempFile();
 Path tempFile = TempFiles.createTempDir();
 ----
 
+Files will be created under `tmp_files` directory.
 
