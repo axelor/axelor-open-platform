@@ -106,7 +106,7 @@ export const FormLayoutComponent = ({
           >
             {!item && ind === 0 && (
               <Box d="flex" justifyContent="center" alignItems="center">
-                <MaterialIcon icon="undo" onClick={onCancel} />
+                <MaterialIcon icon="undo" onClick={() => onCancel()} />
               </Box>
             )}
             {item && (
