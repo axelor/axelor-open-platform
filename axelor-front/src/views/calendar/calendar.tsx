@@ -575,7 +575,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           text: calendarTitle,
         }}
       />
-      <Box d="flex" flexDirection="row" flexGrow={1}>
+      <Box d="flex" flexDirection="row" flexGrow={1} overflow="auto">
         <Box d="flex" p={2} pe={0} className={styles["scheduler-panel"]}>
           <Scheduler
             events={calendarEvents}
