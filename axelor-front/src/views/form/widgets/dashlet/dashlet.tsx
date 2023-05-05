@@ -1,20 +1,21 @@
-import { useCallback, useEffect } from "react";
-import { useAtomCallback } from "jotai/utils";
 import { Box } from "@axelor/ui";
-import uniqueId from "lodash/uniqueId";
 import clsx from "clsx";
+import { useAtomCallback } from "jotai/utils";
+import uniqueId from "lodash/uniqueId";
+import { useCallback, useEffect } from "react";
 
-import { Tab, initTab } from "@/hooks/use-tabs";
-import { Views } from "@/view-containers/views";
 import { useAsync } from "@/hooks/use-async";
+import { Tab, initTab } from "@/hooks/use-tabs";
+import { DataContext } from "@/services/client/data.types";
 import { findActionView } from "@/services/client/meta-cache";
+import { Schema } from "@/services/client/meta.types";
 import { DashletView } from "@/view-containers/view-dashlet";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { Views } from "@/view-containers/views";
+import { useViewTab } from "@/view-containers/views/scope";
+import { useAtomValue } from "jotai";
 import { WidgetProps } from "../../builder";
 import { DashletActions } from "./dashlet-actions";
-import { Schema } from "@/services/client/meta.types";
-import { useAtomValue } from "jotai";
-import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { DataContext } from "@/services/client/data.types";
 import classes from "./dashlet.module.scss";
 
 interface DashletProps {
@@ -136,11 +137,18 @@ function DashletViewLoad({
 
 export function Dashlet(props: WidgetProps) {
   const { schema, readonly, formAtom } = props;
+  const tab = useViewTab();
 
   const getContext = useAtomCallback(
     useCallback(
-      (get) => (formAtom ? get(formAtom).record : {}) as DataContext,
-      [formAtom]
+      (get) => {
+        const ctx = formAtom ? get(formAtom).record : {};
+        return {
+          ...tab.action.context,
+          ...ctx,
+        } as DataContext;
+      },
+      [formAtom, tab.action.context]
     )
   );
 
