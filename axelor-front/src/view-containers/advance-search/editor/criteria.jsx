@@ -6,9 +6,9 @@ import { Select, Widget } from "./components";
 import { useField } from "./utils";
 import styles from "./criteria.module.css";
 
-export function Criteria({ t, value, fields, index, onRemove, onChange }) {
+export function Criteria({ value, fields, index, onRemove, onChange }) {
   const { fieldName, operator } = value || {};
-  const { type, field, options } = useField(fields, fieldName, t);
+  const { type, field, options } = useField(fields, fieldName);
 
   function handleRemove() {
     onRemove(index);
@@ -42,7 +42,6 @@ export function Criteria({ t, value, fields, index, onRemove, onChange }) {
       {operator && (
         <Widget
           {...{
-            t,
             operator,
             type,
             field,
@@ -55,9 +54,5 @@ export function Criteria({ t, value, fields, index, onRemove, onChange }) {
     </Box>
   );
 }
-
-Criteria.defaultProps = {
-  t: (e) => e,
-};
 
 export default React.memo(Criteria);

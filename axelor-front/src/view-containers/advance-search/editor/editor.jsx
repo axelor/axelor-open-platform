@@ -1,9 +1,10 @@
 import { Box, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { produce } from "immer"
+import { produce } from "immer";
 import { useCallback, useEffect, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
+import { i18n } from "@/services/client/i18n";
 import {
   BooleanCheckBox,
   BooleanRadio,
@@ -24,7 +25,6 @@ export const defaultState = {
 };
 
 function EditorInput({
-  t,
   canShare,
   id,
   title,
@@ -40,13 +40,13 @@ function EditorInput({
         <Input
           name="title"
           className="title"
-          placeholder={t("Save filter as")}
+          placeholder={i18n.get("Save filter as")}
           value={title}
           onChange={(e) => onChange("title", e.target.value)}
         />
         {canShare && (
           <BooleanCheckBox
-            title={t("Share")}
+            title={i18n.get("Share")}
             name="shared"
             value={shared}
             onChange={({ name, checked }) => onChange(name, checked)}
@@ -56,14 +56,14 @@ function EditorInput({
       {(id || title || !hide) && (
         <Box d="flex" alignItems="center">
           {id || title ? (
-            <SimpleButton title={t("Save")} onClick={onSave} />
+            <SimpleButton title={i18n.get("Save")} onClick={onSave} />
           ) : null}
-          {hide || <SimpleButton onClick={onSave} title={t("Update")} />}
+          {hide || <SimpleButton onClick={onSave} title={i18n.get("Update")} />}
           {hide || (
             <SimpleButton
               variant="danger"
               onClick={onRemove}
-              title={t("Delete")}
+              title={i18n.get("Delete")}
               hide={hide}
             />
           )}
@@ -74,7 +74,6 @@ function EditorInput({
 }
 
 export default function Editor({
-  t,
   canExportFull,
   canShare,
   contextField,
@@ -322,13 +321,13 @@ export default function Editor({
           onChange={(e) => handleChange("operator", e.target.value)}
           value={operator}
           data={[
-            { label: t("and"), value: "and" },
-            { label: t("or"), value: "or" },
+            { label: i18n.get("and"), value: "and" },
+            { label: i18n.get("or"), value: "or" },
           ]}
         />
         <BooleanCheckBox
           name="isArchived"
-          title={t("Show archived")}
+          title={i18n.get("Show archived")}
           value={isArchived}
           onChange={({ name, checked }) => handleChange(name, checked)}
           className="archived"
@@ -337,7 +336,6 @@ export default function Editor({
       <Box d="flex" flexDirection="column" alignItems="flex-start" g={2}>
         {criterias.map((item, index) => (
           <Criteria
-            t={t}
             key={index}
             index={index}
             value={item}
@@ -349,28 +347,31 @@ export default function Editor({
       </Box>
       <Box d="flex" alignItems="center">
         <ButtonLink
-          title={t("Add filter")}
+          title={i18n.get("Add filter")}
           className={"add-filter"}
           onClick={handleCriteriaAdd}
         />
-        <ButtonLink title={t("Clear")} className={"clear"} onClick={onClear} />
-        <ButtonLink title={t("Export")} onClick={(e) => onExport()} />
+        <ButtonLink
+          title={i18n.get("Clear")}
+          className={"clear"}
+          onClick={onClear}
+        />
+        <ButtonLink title={i18n.get("Export")} onClick={(e) => onExport()} />
         {canExportFull && (
           <>
             <ButtonLink
-              title={t("Export full")}
-              onClick={(e) => onExport(true)}
+              title={i18n.get("Export full")}
+              onClick={() => onExport(true)}
             />
           </>
         )}
         <ButtonLink
-          title={t("Apply")}
+          title={i18n.get("Apply")}
           className={"apply-filter"}
           onClick={() => onApply(filter)}
         />
       </Box>
       <EditorInput
-        t={t}
         canShare={canShare}
         id={id}
         title={title}
@@ -382,7 +383,3 @@ export default function Editor({
     </Box>
   );
 }
-
-Editor.defaultProps = {
-  t: (e) => e,
-};

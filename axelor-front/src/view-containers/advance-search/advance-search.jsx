@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import isNaN from "lodash/isNaN";
 import isNumber from "lodash/isNumber";
 import isObject from "lodash/isObject";
@@ -10,24 +9,18 @@ import React, {
   useState,
 } from "react";
 
-import {
-  Box,
-  ClickAwayListener,
-  Divider,
-  FocusTrap,
-  Popper,
-  TextField,
-} from "@axelor/ui";
+import { Box, ClickAwayListener, Divider, FocusTrap, Popper } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { toKebabCase } from "@/utils/names";
+import { i18n } from "@/services/client/i18n";
 
-import ChipList from "./chip-list";
 import FilterEditor, { defaultState as initialEditorState } from "./editor";
 import FilterList from "./filter-list";
 import { getCriteria } from "./utils";
 
 import styles from "./advance-search.module.scss";
+import { SearchInput } from "./search-input";
 
 function getJSON(data) {
   try {
@@ -106,131 +99,6 @@ function getFilter(
   return graphqlFilter;
 }
 
-function AdvanceFilterInput({
-  t,
-  text,
-  search = true,
-  count,
-  filters,
-  domains,
-  value,
-  onOpen,
-  onClear,
-  onSearch,
-}) {
-  const [inputText, setInputText] = useState("");
-  const hasValue = value.length > 0;
-
-  const handleSearch = useCallback(() => {
-    onSearch?.(inputText);
-  }, [onSearch, inputText]);
-
-  function handleClear() {
-    setInputText("");
-  }
-
-  function handleChange(e) {
-    setInputText(e.target.value);
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
-  }
-
-  const $value = React.useMemo(() => {
-    if (value.length === 0) return "";
-
-    if (value.length > 1) {
-      return t("Filters ({0})", value.length);
-    }
-
-    if (value.length === 1) {
-      const filter = filters.find((f) => f.id === value[0]);
-
-      if (filter) {
-        return filter.title;
-      } else {
-        const $domain = domains.find((d) => d.id === value[0]);
-        return $domain
-          ? $domain.title
-          : count > 1
-          ? t("Custom ({0})", count)
-          : t("Custom");
-      }
-    }
-    return "";
-  }, [t, count, value, domains, filters]);
-
-  const icons = React.useMemo(
-    () => [
-      { icon: "arrow_drop_down", onClick: onOpen },
-      { icon: "clear", onClick: onClear },
-      { icon: "search", onClick: handleSearch },
-    ],
-    [onOpen, onClear, handleSearch]
-  );
-
-  React.useEffect(() => {
-    hasValue && setInputText("");
-  }, [hasValue]);
-
-  React.useEffect(() => {
-    text && setInputText(text);
-  }, [text]);
-
-  return hasValue ? (
-    <ChipList
-      className={styles.chipList}
-      value={$value}
-      icons={icons}
-      onClear={onClear}
-    />
-  ) : (
-    <TextField
-      className={styles.input}
-      name="search"
-      {...(search
-        ? {
-            value: inputText,
-            placeholder: t("Search"),
-            onChange: handleChange,
-            onKeyDown: handleKeyDown,
-          }
-        : {
-            readOnly: true,
-            onClick: onOpen,
-          })}
-      icons={[
-        {
-          icon: "arrow_drop_down",
-          className: styles.icon,
-          onClick: onOpen,
-        },
-        ...(hasValue
-          ? [
-              {
-                icon: "clear",
-                className: styles.icon,
-                onClick: handleClear,
-              },
-            ]
-          : []),
-        {
-          icon: "search",
-          className: styles.icon,
-          onClick: handleSearch,
-        },
-      ]}
-    />
-  );
-}
-
-AdvanceFilterInput.defaultProps = {
-  value: [],
-};
-
 const useStateReset = (value, setter) => {
   useEffect(() => {
     value !== undefined && setter(value);
@@ -238,16 +106,12 @@ const useStateReset = (value, setter) => {
 };
 
 function AdvanceSearch({
-  translate: t,
   canShare = true,
   canExportFull = true,
   customSearch = true,
   freeSearch = "all",
   userId,
   userGroup,
-  className,
-  name,
-  defaultValue,
   value,
   setValue,
   fields,
@@ -538,7 +402,7 @@ function AdvanceSearch({
   }
 
   async function handleFilterSave(filter) {
-    const record = await onSave({ ...filter, filterView: name });
+    const record = await onSave(filter);
     record && setSavedFilter(record);
   }
 
@@ -556,12 +420,6 @@ function AdvanceSearch({
   useStateReset(state.contextField, setContextField);
 
   useEffect(() => {
-    if (defaultValue) {
-      setActiveFilters(defaultValue);
-    }
-  }, [defaultValue]);
-
-  useEffect(() => {
     if (savedFilter) {
       // apply new saved filter
       handleFilterClick(savedFilter, true);
@@ -576,9 +434,8 @@ function AdvanceSearch({
   }, [applyCount]);
 
   return (
-    <Box className={clsx(styles.root, className)} ref={anchorEl}>
-      <AdvanceFilterInput
-        t={t}
+    <Box className={styles.root} ref={anchorEl}>
+      <SearchInput
         text={state.searchText}
         search={freeSearch !== "none"}
         value={value && value.selected}
@@ -605,7 +462,7 @@ function AdvanceSearch({
               <Box d="flex" flexDirection="column">
                 <Box d="flex" alignItems="center">
                   <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
-                    {t("Advanced Search")}
+                    {i18n.get("Advanced Search")}
                   </Box>
                   <Box as="span" className={styles.close} onClick={handleClose}>
                     <MaterialIcon icon="close" />
@@ -615,7 +472,7 @@ function AdvanceSearch({
                 <Box d="flex" alignItems="flex-start" mb={customSearch ? 0 : 1}>
                   {domains.length > 0 && (
                     <FilterList
-                      title={t("Filters")}
+                      title={i18n.get("Filters")}
                       items={domains}
                       active={activeFilters}
                       disabled={isSingleFilter}
@@ -625,7 +482,7 @@ function AdvanceSearch({
                   )}
                   {filters.length > 0 && (
                     <FilterList
-                      title={t("My Filter")}
+                      title={i18n.get("My Filter")}
                       items={filters}
                       active={activeFilters}
                       disabled={isSingleFilter}
@@ -637,7 +494,7 @@ function AdvanceSearch({
                     domains.length === 0 &&
                     filters.length === 0 && (
                       <Box as="p" mb={0} p={1} flex={1}>
-                        {t("No filters available")}
+                        {i18n.get("No filters available")}
                       </Box>
                     )}
                 </Box>
@@ -647,7 +504,6 @@ function AdvanceSearch({
                 {customSearch && (
                   <FilterEditor
                     {...{
-                      t,
                       canShare,
                       canExportFull,
                       fields,
@@ -673,7 +529,6 @@ function AdvanceSearch({
 }
 
 AdvanceSearch.defaultProps = {
-  translate: (e) => e,
   filters: [],
   domains: [],
 };

@@ -1,10 +1,12 @@
-import { useDataStore } from "@/hooks/use-data-store";
-import { DataStore } from "@/services/client/data-store";
-import { moment } from "@/services/client/l10n";
-import { toKebabCase } from "@/utils/names";
-import { Select as AxSelect, Box, Button, Input } from "@axelor/ui";
 import clsx from "clsx";
 import React, { useRef } from "react";
+import { Select as AxSelect, Box, Button, Input } from "@axelor/ui";
+
+import { DataStore } from "@/services/client/data-store";
+import { moment } from "@/services/client/l10n";
+import { i18n } from "@/services/client/i18n";
+import { toKebabCase } from "@/utils/names";
+import { useDataStore } from "@/hooks/use-data-store";
 import styles from "./components.module.css";
 
 function TextField(props) {
@@ -155,7 +157,6 @@ export function SimpleWidget({
   value,
   value2,
   style,
-  t,
   ...rest
 }) {
   if (["=", "!=", ">", ">=", "<", "<=", "like", "notLike"].includes(operator)) {
@@ -239,6 +240,22 @@ export function RelationalWidget({ operator, onChange, ...rest }) {
   }
 }
 
+const CurrentSelection = [
+  { name: "day", title: i18n.get("Day") },
+  { name: "week", title: i18n.get("Week") },
+  { name: "month", title: i18n.get("Month") },
+  { name: "quarter", title: i18n.get("Quarter") },
+  { name: "year", title: i18n.get("Year") },
+];
+
+const PastOrNextSelection = [
+  { name: "day", title: i18n.get("Days") },
+  { name: "week", title: i18n.get("Weeks") },
+  { name: "month", title: i18n.get("Months") },
+  { name: "quarter", title: i18n.get("Quarters") },
+  { name: "year", title: i18n.get("Years") },
+];
+
 export function Widget({ type, operator, onChange, value, ...rest }) {
   const props = {
     operator,
@@ -264,7 +281,7 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
         time: ["HH:mm", "LT"],
       };
       const [format, displayFormat] = dateFormats[type];
-      const { t, value, value2, timeUnit, onChange } = props;
+      const { value, value2, timeUnit, onChange } = props;
 
       function renderSelect() {
         const props = {
@@ -272,10 +289,9 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
           name: "timeUnit",
           value: timeUnit,
           onChange: (value) => onChange({ name: "timeUnit", value }),
-          options: ["day", "week", "month", "quarter", "year"].map((name) => ({
-            name,
-            title: t(["$inCurrent"].includes(operator) ? name : `${name}s`),
-          })),
+          options: ["$inCurrent"].includes(operator)
+            ? CurrentSelection
+            : PastOrNextSelection,
         };
         return <Select {...props} />;
       }

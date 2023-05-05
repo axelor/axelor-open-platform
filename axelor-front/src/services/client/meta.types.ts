@@ -692,6 +692,7 @@ export interface SearchSelectField {
 export interface SearchResultField extends SearchField {}
 
 export interface SearchFilter {
+  id?: string;
   name?: string;
   title?: string;
   domain?: string;

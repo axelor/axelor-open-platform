@@ -1,37 +1,53 @@
 import React from "react";
-
 import { Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { BooleanCheckBox, ButtonLink } from "./editor/components";
+import { SavedFilter } from "@/services/client/meta.types";
+
+interface FilterListProps {
+  title: string;
+  active?: number[];
+  items?: SavedFilter[];
+  disabled?: boolean;
+  onFilterClick?: (filter: SavedFilter, isChecked: boolean) => void;
+  onFilterChange?: (filter: SavedFilter, isChecked: boolean) => void;
+}
 
 const FilterListItem = React.memo(function FilterListItem({
   filter,
   disabled,
-  isChecked,
+  checked,
   onClick,
   onChange,
+}: {
+  filter: SavedFilter;
+  disabled?: boolean;
+  checked?: boolean;
+  onClick?: FilterListProps["onFilterClick"];
+  onChange?: FilterListProps["onFilterChange"];
 }) {
   const { title } = filter;
 
-  function handleChange(value) {
-    onChange(filter, value);
+  function handleChange(value: boolean) {
+    onChange?.(filter, value);
   }
 
   return (
     <Box d="flex" alignItems="center">
       <BooleanCheckBox
         name={title.replace(" ", "_").toLowerCase()}
-        value={isChecked}
+        value={checked}
         onChange={handleChange}
         inline
         isDisabled={disabled}
+        {...({} as any)}
       />
       <ButtonLink
         title={title}
         position="relative"
-        onClick={() => (!disabled || isChecked) && onClick(filter, !isChecked)}
-        {...(disabled && !isChecked ? { color: "muted" } : {})}
+        onClick={() => (!disabled || checked) && onClick?.(filter, !checked)}
+        {...(disabled && !checked ? { color: "muted" } : {})}
       />
     </Box>
   );
@@ -44,7 +60,7 @@ export function FilterList({
   disabled,
   onFilterClick,
   onFilterChange,
-}) {
+}: FilterListProps) {
   return (
     <Box flexDirection="column" alignItems="baseline" w={100}>
       <Box d="flex" alignItems="center">
@@ -64,7 +80,7 @@ export function FilterList({
           <FilterListItem
             key={filter.id ?? `filter_${ind}`}
             filter={filter}
-            isChecked={active.includes(filter.id)}
+            checked={active.includes(filter.id)}
             disabled={disabled}
             onClick={onFilterClick}
             onChange={onFilterChange}

@@ -99,18 +99,19 @@ export function AdvanceSearch({
 
   return (
     <AdvanceSearchComponent
+      {...props}
       canShare={advanceSearchConfig?.share !== false}
       canExportFull={advanceSearchConfig?.exportFull !== false}
       userId={user.id}
       userGroup={user.group}
-      translate={i18n.get}
       filters={filters}
       value={value}
       setValue={setValue}
       onSave={handleSave}
       onDelete={handleDelete}
       onExport={handleExport}
-      {...(props as any)}
+      items={props.items!}
+      fields={props.fields!}
     />
   );
 }

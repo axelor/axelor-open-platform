@@ -1,5 +1,6 @@
-import { toKebabCase } from "@/utils/names";
 import React from "react";
+import { i18n } from "@/services/client/i18n";
+import { toKebabCase } from "@/utils/names";
 
 const typesConfig = [
   {
@@ -71,29 +72,29 @@ const types = typesConfig.reduce(
 );
 
 const operators = [
-  { name: "=", title: "equals" },
-  { name: "!=", title: "not equal" },
-  { name: ">", title: "greater than" },
-  { name: ">=", title: "greater or equal" },
-  { name: "<", title: "less than" },
-  { name: "<=", title: "less or equal" },
-  { name: "in", title: "in" },
-  { name: "between", title: "in range" },
-  { name: "notBetween", title: "not in range" },
-  { name: "notIn", title: "not in" },
-  { name: "isNull", title: "is null" },
-  { name: "notNull", title: "is not null" },
-  { name: "like", title: "contains" },
-  { name: "notLike", title: "doesn't contain" },
-  { name: "$isTrue", title: "is true" },
-  { name: "$isFalse", title: "is false" },
-  { name: "$isEmpty", title: "is empty" },
-  { name: "$notEmpty", title: "is not empty" },
-  { name: "$inPast", title: "in the past" },
-  { name: "$inNext", title: "in the next" },
-  { name: "$inCurrent", title: "in the current" },
-  { name: "$isCurrentUser", title: "is current user" },
-  { name: "$isCurrentGroup", title: "is current group" },
+  { name: "=", title: i18n.get("equals") },
+  { name: "!=", title: i18n.get("not equal") },
+  { name: ">", title: i18n.get("greater than") },
+  { name: ">=", title: i18n.get("greater or equal") },
+  { name: "<", title: i18n.get("less than") },
+  { name: "<=", title: i18n.get("less or equal") },
+  { name: "in", title: i18n.get("in") },
+  { name: "between", title: i18n.get("in range") },
+  { name: "notBetween", title: i18n.get("not in range") },
+  { name: "notIn", title: i18n.get("not in") },
+  { name: "isNull", title: i18n.get("is null") },
+  { name: "notNull", title: i18n.get("is not null") },
+  { name: "like", title: i18n.get("contains") },
+  { name: "notLike", title: i18n.get("doesn't contain") },
+  { name: "$isTrue", title: i18n.get("is true") },
+  { name: "$isFalse", title: i18n.get("is false") },
+  { name: "$isEmpty", title: i18n.get("is empty") },
+  { name: "$notEmpty", title: i18n.get("is not empty") },
+  { name: "$inPast", title: i18n.get("in the past") },
+  { name: "$inNext", title: i18n.get("in the next") },
+  { name: "$inCurrent", title: i18n.get("in the current") },
+  { name: "$isCurrentUser", title: i18n.get("is current user") },
+  { name: "$isCurrentGroup", title: i18n.get("is current group") },
 ];
 
 const EXTRA_OPERATORS_BY_TARGET = {
@@ -101,7 +102,7 @@ const EXTRA_OPERATORS_BY_TARGET = {
   "com.axelor.auth.db.Group": ["$isCurrentGroup"],
 };
 
-export function useField(fields, name, t = (e) => e) {
+export function useField(fields, name) {
   return React.useMemo(() => {
     const field = fields.find((item) => item.name === name);
 
@@ -126,9 +127,7 @@ export function useField(fields, name, t = (e) => e) {
     return {
       type,
       field,
-      options: operators
-        .filter((item) => typeOperators.includes(item.name))
-        .map((item) => ({ ...item, title: t(item.title) })),
+      options: operators.filter((item) => typeOperators.includes(item.name)),
     };
-  }, [t, name, fields]);
+  }, [name, fields]);
 }
