@@ -18,6 +18,7 @@ import {
 } from "../views/scope";
 
 import { parseExpression } from "@/hooks/use-parser/utils";
+import { useRoute } from "@/hooks/use-route";
 import { i18n } from "@/services/client/i18n";
 import {
   Button,
@@ -190,6 +191,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const viewType = useSelectViewState(useCallback((state) => state.type, []));
   const viewTab = useViewTab();
   const switchTo = useViewSwitch();
+  const { navigate } = useRoute();
 
   const switchToView = useAtomCallback(
     useCallback(
@@ -254,6 +256,9 @@ export function ViewToolBar(props: ViewToolBarProps) {
       items.push({
         key: "view",
         text: "View...",
+        onClick: () => {
+          navigate(`/ds/form::com.axelor.meta.db.MetaView/edit/${view.viewId}`);
+        },
       });
     }
 
@@ -261,6 +266,11 @@ export function ViewToolBar(props: ViewToolBarProps) {
       items.push({
         key: "model",
         text: "Model...",
+        onClick: () => {
+          navigate(
+            `/ds/form::com.axelor.meta.db.MetaModel/edit/${view.modelId}`
+          );
+        },
       });
     }
 
@@ -268,6 +278,9 @@ export function ViewToolBar(props: ViewToolBarProps) {
       items.push({
         key: "action",
         text: "Action...",
+        onClick: () => {
+          navigate(`/ds/form::com.axelor.meta.db.MetaAction/edit/${actionId}`);
+        },
       });
     }
 
@@ -281,7 +294,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     };
 
     return [command];
-  }, [actionId, meta.view]);
+  }, [actionId, meta.view, navigate]);
 
   const pageText =
     typeof pageTextOrComp === "string" ? pageTextOrComp : undefined;
