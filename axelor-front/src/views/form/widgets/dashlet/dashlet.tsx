@@ -34,7 +34,7 @@ export function DashletComponent({
   onViewLoad,
   getContext,
 }: DashletProps): any {
-  const { action } = schema;
+  const { title, action } = schema;
 
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const actionView = await findActionView(action);
@@ -96,7 +96,7 @@ export function DashletComponent({
           roundedTop
         >
           <Box className={classes.header}>
-            <Box className={classes.title}>{tab?.title}</Box>
+            <Box className={classes.title}>{title || tab?.title}</Box>
             <DashletActions viewType={viewType} />
             {viewType && onViewLoad && (
               <DashletViewLoad
@@ -136,7 +136,7 @@ function DashletViewLoad({
 
 export function Dashlet(props: WidgetProps) {
   const { schema, readonly, formAtom } = props;
-  
+
   const getContext = useAtomCallback(
     useCallback(
       (get) => (formAtom ? get(formAtom).record : {}) as DataContext,
