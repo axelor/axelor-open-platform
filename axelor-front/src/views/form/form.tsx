@@ -254,7 +254,7 @@ function FormContainer({
           await actionExecutor.execute(onSaveAction);
         let res = await dataStore.save(record);
         if (res.id) res = await doRead(res.id);
-        res = { ...res, ...dummy }; // restore dummy values
+        res = { ...dummy, ...res }; // restore dummy values
         doEdit(res, { readonly });
         return res;
       },
