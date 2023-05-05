@@ -1,11 +1,15 @@
+import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect } from "react";
 
-import { DialogButton, ModalDialog } from "@/components/dialogs";
+import { Box, Button } from "@axelor/ui";
+
+import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
+import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
-import { PopupScope } from "./handler";
+import { PopupScope, usePopupHandlerAtom } from "./handler";
 
 import styles from "./view-popup.module.scss";
 
@@ -93,5 +97,63 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   const { id } = tab;
   const { close } = useTabs();
   const handleClose = useCallback(() => close(id), [close, id]);
-  return <PopupDialog tab={tab} open={true} onClose={handleClose} />;
+  return (
+    <PopupDialog
+      tab={tab}
+      open={true}
+      footer={(close) => <Footer close={close} />}
+      buttons={[]}
+      onClose={handleClose}
+    />
+  );
 });
+
+function Footer({ close }: { close: (result: boolean) => void }) {
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+
+  const handleCancel = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => handler.getState?.().dirty ?? false,
+      async () => close(false)
+    );
+  }, [close, handler]);
+
+  const handleConfirm = useCallback(async () => {
+    if (handler.getState === undefined) return close(true);
+    const state = handler.getState();
+    const record = state.record;
+    const canSave = state.dirty || !record.id;
+    const onSave = handler.onSave;
+
+    try {
+      if (canSave) {
+        if (onSave) {
+          await onSave();
+        }
+      }
+      close(true);
+    } catch (e) {
+      // TODO: show error
+    }
+  }, [close, handler]);
+
+  useEffect(() => {
+    return handler.actionHandler?.subscribe((data) => {
+      if (data.type === "close") {
+        close(false);
+      }
+    });
+  }, [close, handleCancel, handleConfirm, handler]);
+
+  return (
+    <Box d="flex" g={2}>
+      <Button variant="secondary" onClick={handleCancel}>
+        {i18n.get("Cancel")}
+      </Button>
+      <Button variant="primary" onClick={handleConfirm}>
+        {i18n.get("OK")}
+      </Button>
+    </Box>
+  );
+}

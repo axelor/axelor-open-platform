@@ -412,9 +412,18 @@ function FormContainer({
         onSave,
         onEdit: doEdit,
         onRead: doRead,
+        actionHandler,
       });
     }
-  }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers]);
+  }, [
+    getState,
+    doEdit,
+    doRead,
+    onSave,
+    popup,
+    setPopupHandlers,
+    actionHandler,
+  ]);
 
   const tab = useViewTab();
   const { close: closeTab } = useTabs();
