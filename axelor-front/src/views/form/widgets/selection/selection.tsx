@@ -55,7 +55,9 @@ export function SelectText({
   value?: string | number | null;
 }) {
   const selectionList = (schema.selectionList ?? []) as TSelection[];
-  const selected = selectionList.find((item) => String(item.value) === value);
+  const selected = selectionList.find(
+    (item) => String(item.value) === String(value)
+  );
   return (
     <Box d="flex">
       <ViewerInput value={selected?.title ?? ""} />
