@@ -167,7 +167,7 @@ function ReferenceEditor({
 }: FormEditorProps) {
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+  const { title, domain } = attrs;
 
   const model = schema.target!;
 
@@ -180,12 +180,14 @@ function ReferenceEditor({
         showSelector({
           model,
           title: `Select ${title}`,
+          domain,
+          context: get(formAtom).record,
           onSelect: (records) => {
             set(valueAtom, records[0], true);
           },
         });
       },
-      [model, showSelector, title, valueAtom]
+      [domain, formAtom, model, showSelector, title, valueAtom]
     )
   );
 

@@ -14,7 +14,7 @@ import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { selectAtom } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
 import {
   SetStateAction,
@@ -100,7 +100,7 @@ export function OneToMany({
   );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+  const { title, domain } = attrs;
 
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
@@ -176,23 +176,30 @@ export function OneToMany({
     [value, name, model, parentId, dataStore]
   );
 
-  const onSelect = useCallback(() => {
-    showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
-      model,
-      multiple: true,
-      viewName: gridView,
-      onSelect: (records) => {
-        setValue((value) => {
-          const valIds = (value || []).map((x) => x.id);
-          return [
-            ...(value || []),
-            ...records.filter((rec) => !valIds.includes(rec.id)),
-          ];
+  const onSelect = useAtomCallback(
+    useCallback(
+      (get) => {
+        showSelector({
+          title: i18n.get("Select {0}", title ?? ""),
+          model,
+          multiple: true,
+          viewName: gridView,
+          domain: domain,
+          context: get(formAtom).record,
+          onSelect: (records) => {
+            setValue((value) => {
+              const valIds = (value || []).map((x) => x.id);
+              return [
+                ...(value || []),
+                ...records.filter((rec) => !valIds.includes(rec.id)),
+              ];
+            });
+          },
         });
       },
-    });
-  }, [showSelector, title, model, gridView, setValue]);
+      [showSelector, title, model, gridView, domain, formAtom, setValue]
+    )
+  );
 
   const openEditor = useCallback(
     (

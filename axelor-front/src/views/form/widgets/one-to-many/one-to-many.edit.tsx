@@ -5,25 +5,25 @@ import {
   Popper,
   TextField,
 } from "@axelor/ui";
-import { atom, useAtom, useAtomValue } from "jotai";
-import { selectAtom } from "jotai/utils";
-import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 
-import { Grid as GridComponent } from "@/views/grid/builder";
-import { DataRecord } from "@/services/client/data.types";
-import { FieldProps } from "../../builder";
 import { dialogs } from "@/components/dialogs";
-import { useEditor, useSelector } from "@/hooks/use-relation";
 import { useAsync } from "@/hooks/use-async";
-import { useGridState } from "@/views/grid/builder/utils";
-import { findFields, findView } from "@/services/client/meta-cache";
-import { i18n } from "@/services/client/i18n";
-import { GridView, View } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
+import { useEditor, useSelector } from "@/hooks/use-relation";
 import { SearchOptions } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
+import { findFields, findView } from "@/services/client/meta-cache";
+import { GridView, View } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
+import { Grid as GridComponent } from "@/views/grid/builder";
+import { useGridState } from "@/views/grid/builder/utils";
+import { FieldProps } from "../../builder";
 import styles from "./one-to-many.edit.module.scss";
 
 export function OneToManyEdit({
@@ -79,7 +79,7 @@ export function OneToManyEdit({
   const { rows, selectedRows } = state;
   const { title, name, target: model, formView, gridView, views } = schema;
   const {
-    attrs: { focus },
+    attrs: { focus, domain },
   } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
@@ -187,41 +187,50 @@ export function OneToManyEdit({
     ]
   );
 
-  const onAdd = useCallback(() => {
-    const onClose = onPopupViewInit();
-    showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
-      model,
-      multiple: true,
-      viewName: gridView,
-      onClose,
-      onSelect: (records) => {
-        setValue((value) => {
-          const valIds = (value || []).map((x) => x.id);
-          return [
-            ...(value || []),
-            ...records.filter((rec) => !valIds.includes(rec.id)),
-          ];
+  const onAdd = useAtomCallback(
+    useCallback(
+      (get) => {
+        const onClose = onPopupViewInit();
+        showSelector({
+          title: i18n.get("Select {0}", title ?? ""),
+          model,
+          multiple: true,
+          viewName: gridView,
+          domain: domain,
+          context: get(formAtom).record,
+          onClose,
+          onSelect: (records) => {
+            setValue((value) => {
+              const valIds = (value || []).map((x) => x.id);
+              return [
+                ...(value || []),
+                ...records.filter((rec) => !valIds.includes(rec.id)),
+              ];
+            });
+          },
+          ...(!isManyToMany && {
+            onCreate: () => {
+              setTimeout(() => {
+                onEdit({});
+              });
+            },
+          }),
         });
       },
-      ...(!isManyToMany && {
-        onCreate: () => {
-          setTimeout(() => {
-            onEdit({});
-          });
-        },
-      }),
-    });
-  }, [
-    title,
-    model,
-    gridView,
-    isManyToMany,
-    setValue,
-    onEdit,
-    showSelector,
-    onPopupViewInit,
-  ]);
+      [
+        onPopupViewInit,
+        showSelector,
+        title,
+        model,
+        gridView,
+        domain,
+        formAtom,
+        isManyToMany,
+        setValue,
+        onEdit,
+      ]
+    )
+  );
 
   const showPopup = useCallback(
     async (popup: boolean) => {

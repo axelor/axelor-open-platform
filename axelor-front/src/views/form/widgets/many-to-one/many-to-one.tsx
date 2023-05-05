@@ -21,7 +21,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
     uid,
-    domain,
     target,
     targetName,
     targetSearch,
@@ -36,7 +35,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { hasButton } = usePerms(schema);
 
   const {
-    attrs: { title, focus },
+    attrs: { title, focus, domain },
   } = useAtomValue(widgetAtom);
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
@@ -113,18 +112,34 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [handleEdit]
   );
 
-  const handleSelect = useCallback(() => {
-    showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
-      model: target,
-      viewName: gridView,
-      multiple: false,
-      onSelect: async (records) => {
-        const value = await ensureName(records[0]);
-        setValue(value, true);
+  const handleSelect = useAtomCallback(
+    useCallback(
+      (get) => {
+        showSelector({
+          title: i18n.get("Select {0}", title ?? ""),
+          model: target,
+          viewName: gridView,
+          multiple: false,
+          domain: domain,
+          context: get(formAtom).record,
+          onSelect: async (records) => {
+            const value = await ensureName(records[0]);
+            setValue(value, true);
+          },
+        });
       },
-    });
-  }, [showSelector, title, target, gridView, ensureName, setValue]);
+      [
+        showSelector,
+        title,
+        target,
+        gridView,
+        domain,
+        formAtom,
+        ensureName,
+        setValue,
+      ]
+    )
+  );
 
   const handleCompletion = useAtomCallback(
     useCallback(
