@@ -250,9 +250,11 @@ function FormContainer({
         }
 
         const dummy = extractDummy(record);
-        if (onSaveAction && callOnSave)
+        if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
-        let res = await dataStore.save(record);
+        }
+        let rec = get(formAtom).record; // record may have changed by actions
+        let res = await dataStore.save(rec);
         if (res.id) res = await doRead(res.id);
         res = { ...dummy, ...res }; // restore dummy values
         doEdit(res, { readonly });
