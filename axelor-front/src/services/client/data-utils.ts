@@ -57,3 +57,19 @@ export function equals(value: DataRecord, other: DataRecord): boolean {
   const b = compact(other);
   return isEqual(a, b);
 }
+
+export function diff(a: DataRecord, b: DataRecord): DataRecord {
+  if (a === b) return a;
+  if (a === null || b === null) return a;
+  if (!a && !b) return a;
+  if (!a.id || a.id < 1) return a;
+
+  const result = Object.entries(a).reduce((prev, [key, value]) => {
+    if (key === "id" || key === "version" || !equals(value, b[key])) {
+      return { ...prev, [key]: value };
+    }
+    return prev;
+  }, {});
+
+  return result;
+}

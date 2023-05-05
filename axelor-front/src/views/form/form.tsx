@@ -16,7 +16,7 @@ import { usePerms } from "@/hooks/use-perms";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
-import { extractDummy } from "@/services/client/data-utils";
+import { diff, extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -183,9 +183,30 @@ function FormContainer({
           states: {},
           statesByName: {},
           record: record ?? {},
+          original: record ? { ...record } : {},
         });
+
         if (action) {
+          // execute action
           await actionExecutor.execute(action);
+
+          // fix undefined values set by action
+          let { record: current, original = {} } = get(formAtom);
+          let changed = false;
+          let res = Object.entries(current).reduce(
+            (acc, [key, value]) => {
+              if (value === undefined && original[key] === null) {
+                changed = true;
+                acc[key] = null;
+              }
+              return acc;
+            },
+            { ...current }
+          );
+
+          if (changed) {
+            set(formAtom, { ...prev, record: res });
+          }
         }
       },
       [
@@ -253,11 +274,17 @@ function FormContainer({
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
         }
-        let rec = get(formAtom).record; // record may have changed by actions
-        let res = await dataStore.save(rec);
+
+        const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
+        const vals = diff(rec, original);
+
+        let res = await dataStore.save(vals);
         if (res.id) res = await doRead(res.id);
+
         res = { ...dummy, ...res }; // restore dummy values
+
         doEdit(res, { readonly });
+
         return res;
       },
       [

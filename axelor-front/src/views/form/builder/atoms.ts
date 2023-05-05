@@ -23,6 +23,7 @@ export function createFormAtom(props: {
   return atom<FormState>({
     model,
     record: { ...record },
+    original: { ...record },
     states,
     statesByName,
     fields,
