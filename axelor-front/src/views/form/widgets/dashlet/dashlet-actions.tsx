@@ -9,8 +9,9 @@ import {
 import { DataStore } from "@/services/client/data-store";
 import { useDataStore } from "@/hooks/use-data-store";
 import { download } from "@/utils/download";
-import { ChartView } from "@/services/client/meta.types";
+import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
+import { ToolbarActions } from "@/view-containers/view-toolbar";
 import classes from "./dashlet-actions.module.scss";
 
 interface DashletMenuProps extends DashletHandler {
@@ -21,12 +22,27 @@ interface DashletMenuProps extends DashletHandler {
 export function DashletActions({
   viewType,
 }: Pick<DashletMenuProps, "viewType">) {
-  const { view, dataStore, onAction, onLegendShowHide, onRefresh, onExport } =
-    useAtomValue(useDashletHandlerAtom());
+  const {
+    view,
+    actionExecutor,
+    dataStore,
+    onAction,
+    onLegendShowHide,
+    onRefresh,
+    onExport,
+  } = useAtomValue(useDashletHandlerAtom());
   const hasPagination = ["grid", "cards", "tree"].includes(viewType!);
+  const { toolbar, menubar } = (view as GridView | CardsView) || {};
 
   return (
-    <Box className={classes.actions}>
+    <Box className={classes.actions} gap={1}>
+      {(toolbar || menubar) && (
+        <ToolbarActions
+          buttons={toolbar}
+          menus={menubar}
+          actionExecutor={actionExecutor}
+        />
+      )}
       {dataStore && hasPagination ? (
         <DashletListMenu
           view={view}

@@ -99,7 +99,7 @@ function ActionCommandItem({
   );
 }
 
-function ToolbarActions({
+export function ToolbarActions({
   buttons,
   menus,
   recordHandler,

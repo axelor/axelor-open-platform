@@ -236,30 +236,6 @@ function GridInner(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
-  const popupHandlerAtom = usePopupHandlerAtom();
-  const setPopupHandlers = useSetAtom(popupHandlerAtom);
-  const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
-
-  useEffect(() => {
-    if (popup) {
-      setPopupHandlers({
-        data: state,
-        dataStore: dataStore,
-        onSearch,
-      });
-    }
-  }, [state, onSearch, popup, dataStore, setPopupHandlers]);
-
-  useEffect(() => {
-    if (dashlet) {
-      setDashletHandlers({
-        dataStore,
-        view,
-        onRefresh: () => onSearch({}),
-      });
-    }
-  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
-
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
 
@@ -286,6 +262,31 @@ function GridInner(props: ViewProps<GridView>) {
     [action]
   );
   const actionExecutor = useGridActionExecutor(view, getContext);
+
+  const popupHandlerAtom = usePopupHandlerAtom();
+  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+  const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
+
+  useEffect(() => {
+    if (popup) {
+      setPopupHandlers({
+        data: state,
+        dataStore: dataStore,
+        onSearch,
+      });
+    }
+  }, [state, onSearch, popup, dataStore, setPopupHandlers]);
+
+  useEffect(() => {
+    if (dashlet) {
+      setDashletHandlers({
+        dataStore,
+        view,
+        actionExecutor,
+        onRefresh: () => onSearch({}),
+      });
+    }
+  }, [dashlet, view, dataStore, actionExecutor, onSearch, setDashletHandlers]);
 
   useEffect(() => {
     if (dashlet || popup) return;
