@@ -4,7 +4,9 @@ import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 import { useAtomCallback } from "jotai/utils";
 import { focusAtom } from "jotai-optics";
+import { uniqueId } from "lodash";
 
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
@@ -153,7 +155,7 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, clearSelection]
   );
 
-  const onViewInPopup = useCallback(
+  const onViewInDashlet = useCallback(
     (record: DataRecord, readonly = false) => {
       showEditor({
         model: view.model!,
@@ -165,10 +167,27 @@ function GridInner(props: ViewProps<GridView>) {
     [view, showEditor]
   );
 
+  const onEditInDashlet = useCallback(
+    (record: DataRecord, forceReadonly = false) => {
+      openTab({
+        ...action,
+        name: uniqueId("$act"),
+        viewType: "form",
+        context: {
+          forceReadonly,
+          _showRecord: record.id,
+        },
+      });
+    },
+    [action]
+  );
+
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       if (dashlet) {
-        return onViewInPopup(record, readonly);
+        return readonly
+          ? onViewInDashlet(record, readonly)
+          : onEditInDashlet(record, readonly);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
@@ -177,7 +196,7 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, switchTo, onViewInPopup]
+    [dashlet, switchTo, onEditInDashlet, onViewInDashlet]
   );
 
   const onNew = useCallback(() => {
