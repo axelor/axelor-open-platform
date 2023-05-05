@@ -20,7 +20,7 @@ export function useGridState(
           rows: [],
           columns: [],
           ...(view?.groupBy && {
-            groupBy: [{ name: view.groupBy }],
+            groupBy: view.groupBy.split(",").map((name) => ({ name })),
           }),
           ...(view?.orderBy && {
             orderBy: view.orderBy
