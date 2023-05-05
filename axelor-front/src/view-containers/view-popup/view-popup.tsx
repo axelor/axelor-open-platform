@@ -1,8 +1,9 @@
 import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { memo, useCallback, useEffect } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
@@ -11,6 +12,7 @@ import { i18n } from "@/services/client/i18n";
 import { Views } from "../views";
 import { PopupScope, usePopupHandlerAtom } from "./handler";
 
+import clsx from "clsx";
 import styles from "./view-popup.module.scss";
 
 export type PopupProps = {
@@ -59,11 +61,17 @@ export type PopupProps = {
    *
    */
   buttons?: DialogButton[];
+
+  /**
+   * Whether to maximize the popup or not
+   */
+  maximize?: boolean;
 };
 
 export const PopupDialog = memo(function PopupDialog({
   tab,
   open,
+  maximize,
   onClose,
   header,
   footer,
@@ -71,30 +79,81 @@ export const PopupDialog = memo(function PopupDialog({
   buttons,
 }: PopupProps) {
   const { title } = tab;
+  const [maximized, setMaximized] = useState<boolean>(maximize ?? false);
+  const [expanded, setExpanded] = useState<boolean>(true);
+
   return (
     <ScopeProvider scope={PopupScope} value={{}}>
       <ModalDialog
         open={open}
         title={title}
         size="xl"
-        classes={{ content: styles.content }}
+        classes={{
+          root: clsx({
+            [styles.collapsed]: !expanded,
+          }),
+          footer: styles.footer,
+          content: styles.content,
+        }}
         content={
           <>
             <Views tab={tab} />
             {handler?.()}
           </>
         }
-        header={header?.()}
+        header={
+          <Header
+            header={header}
+            maximized={maximized}
+            expanded={expanded}
+            setMaximized={setMaximized}
+            setExpanded={setExpanded}
+          />
+        }
         footer={footer}
         buttons={buttons}
         onClose={onClose}
+        maximize={maximized}
       />
     </ScopeProvider>
   );
 });
 
+function Header({
+  header: HeaderComp,
+  maximized,
+  expanded,
+  setMaximized,
+  setExpanded,
+}: {
+  header?: () => JSX.Element | null;
+  maximized: boolean;
+  expanded: boolean;
+  setMaximized: React.Dispatch<React.SetStateAction<boolean>>;
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <div>
+      {HeaderComp && <HeaderComp />}
+      <Box d="flex" alignItems="center">
+        <MaterialIcon
+          icon={expanded ? "expand_less" : "expand_more"}
+          className={styles.icon}
+          onClick={() => setExpanded((prev) => !prev)}
+        />
+        <MaterialIcon
+          icon={maximized ? "fullscreen_exit" : "fullscreen"}
+          className={styles.icon}
+          onClick={() => setMaximized((prev) => !prev)}
+        />
+      </Box>
+    </div>
+  );
+}
+
 export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
-  const { id } = tab;
+  const { id, action } = tab;
+  const params = action?.params ?? {};
   const { close } = useTabs();
   const handleClose = useCallback(() => close(id), [close, id]);
   return (
@@ -104,6 +163,7 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
       footer={(close) => <Footer close={close} />}
       buttons={[]}
       onClose={handleClose}
+      maximize={params["popup.maximized"]}
     />
   );
 });
@@ -127,10 +187,8 @@ function Footer({ close }: { close: (result: boolean) => void }) {
     const onSave = handler.onSave;
 
     try {
-      if (canSave) {
-        if (onSave) {
-          await onSave();
-        }
+      if (canSave && onSave) {
+        await onSave();
       }
       close(true);
     } catch (e) {

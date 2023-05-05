@@ -41,6 +41,7 @@ export type DialogOptions = {
     footer?: string;
   };
   open: boolean;
+  maximize?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   onClose: (result: boolean) => void;
 };
@@ -232,6 +233,7 @@ export function ModalDialog(props: DialogOptions) {
     buttons = defaultButtons,
     classes = {},
     onClose,
+    maximize,
   } = props;
 
   const [show, setShow] = useState(open);
@@ -261,6 +263,7 @@ export function ModalDialog(props: DialogOptions) {
         open={canShow}
         onHide={onHide}
         scrollable
+        fullscreen={maximize}
         size={size}
         className={clsx(classes.root, styles.root)}
       >

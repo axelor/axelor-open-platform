@@ -2,3 +2,18 @@
   display: flex;
   padding: 0;
 }
+
+.icon {
+  cursor: pointer;
+}
+
+.collapsed > div {
+  height: auto;
+}
+
+.collapsed {
+  .content,
+  .footer {
+    display: none;
+  }
+}
