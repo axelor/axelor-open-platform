@@ -22,6 +22,15 @@ export function useGridState(
           ...(view?.groupBy && {
             groupBy: [{ name: view.groupBy }],
           }),
+          ...(view?.orderBy && {
+            orderBy: view.orderBy
+              .split(",")
+              .map((name) =>
+                name.startsWith("-")
+                  ? { name: name.slice(1), order: "desc" }
+                  : { name, order: "asc" }
+              ),
+          }),
           ...gridState,
         }),
       // eslint-disable-next-line react-hooks/exhaustive-deps
