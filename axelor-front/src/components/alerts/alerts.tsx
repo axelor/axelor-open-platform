@@ -4,7 +4,7 @@ import { uniqueId } from "lodash";
 import { createRef, useEffect } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-import { Alert, AlertHeader, Portal, useTheme } from "@axelor/ui";
+import { Alert, AlertHeader, Fade, Portal, useTheme } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
 import { SenitizedContent } from "@/utils/sanitize";
@@ -86,27 +86,29 @@ function Alerts() {
   const { dir } = useTheme();
   return (
     <Portal>
-      <TransitionGroup
-        className={clsx(styles.alerts, { [styles.rtl]: dir === "rtl" })}
-      >
-        {alerts.map((item: AlertProps & { nodeRef?: any }) => (
-          <CSSTransition
-            key={item.id}
-            timeout={500}
-            nodeRef={item.nodeRef}
-            classNames={{
-              enter: styles["item-enter"],
-              enterActive: styles["item-enter-active"],
-              exit: styles["item-exit"],
-              exitActive: styles["item-exit-active"],
-            }}
-          >
-            <div ref={item.nodeRef}>
-              <AlertContainer {...item} />
-            </div>
-          </CSSTransition>
-        ))}
-      </TransitionGroup>
+      <Fade in={alerts.length > 0} timeout={500} mountOnEnter unmountOnExit>
+        <div className={clsx(styles.alerts, { [styles.rtl]: dir === "rtl" })}>
+          <TransitionGroup component={null}>
+            {alerts.map((item: AlertProps & { nodeRef?: any }) => (
+              <CSSTransition
+                key={item.id}
+                timeout={500}
+                nodeRef={item.nodeRef}
+                classNames={{
+                  enter: styles["item-enter"],
+                  enterActive: styles["item-enter-active"],
+                  exit: styles["item-exit"],
+                  exitActive: styles["item-exit-active"],
+                }}
+              >
+                <div ref={item.nodeRef}>
+                  <AlertContainer {...item} />
+                </div>
+              </CSSTransition>
+            ))}
+          </TransitionGroup>
+        </div>
+      </Fade>
     </Portal>
   );
 }
