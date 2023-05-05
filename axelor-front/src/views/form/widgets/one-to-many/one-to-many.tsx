@@ -176,6 +176,29 @@ export function OneToMany({
     [value, name, model, parentId, dataStore]
   );
 
+  const handleSelect = useAtomCallback(
+    useCallback(
+      (get, set, records: DataRecord[]) => {
+        setValue((prev) => {
+          const items = prev || [];
+          const ids = items.map((x) => x.id);
+          const selected = records || [];
+          const newItems = selected
+            .filter((rec) => !ids.includes(rec.id))
+            .map((item) => {
+              if (isManyToMany && item.id && item.id > 0) {
+                const { version, ...res } = item;
+                return res;
+              }
+              return item;
+            });
+          return [...items, ...newItems];
+        });
+      },
+      [isManyToMany, setValue]
+    )
+  );
+
   const onSelect = useAtomCallback(
     useCallback(
       (get) => {
@@ -186,18 +209,10 @@ export function OneToMany({
           viewName: gridView,
           domain: domain,
           context: get(formAtom).record,
-          onSelect: (records) => {
-            setValue((value) => {
-              const valIds = (value || []).map((x) => x.id);
-              return [
-                ...(value || []),
-                ...records.filter((rec) => !valIds.includes(rec.id)),
-              ];
-            });
-          },
+          onSelect: handleSelect,
         });
       },
-      [showSelector, title, model, gridView, domain, formAtom, setValue]
+      [showSelector, title, model, gridView, domain, formAtom, handleSelect]
     )
   );
 
@@ -223,26 +238,15 @@ export function OneToMany({
   const onSave = useCallback(
     (record: DataRecord) => {
       record = { ...record, _dirty: true, id: record.id ?? nextId() };
-      setValue((value) => {
-        if (value?.find((v) => v.id === record.id)) {
-          return value?.map((val) =>
-            val.id === record.id ? { ...val, ...record } : val
-          );
-        }
-        return [...(value || []), record];
-      });
+      handleSelect([record]);
       return record;
     },
-    [setValue]
+    [handleSelect]
   );
 
   const onAdd = useCallback(() => {
-    openEditor(
-      {},
-      (record) => setValue((value) => [...(value || []), { ...record }]),
-      onSave
-    );
-  }, [openEditor, setValue, onSave]);
+    openEditor({}, (record) => handleSelect([record]), onSave);
+  }, [openEditor, onSave, handleSelect]);
 
   const onAddInGrid = useCallback(async () => {
     const gridHandler = gridRef.current;
@@ -253,19 +257,13 @@ export function OneToMany({
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
-      const matcher = (rec: DataRecord) =>
-        (rec.id && rec.id === record.id) || rec === record;
-
       openEditor(
         { record, readonly },
-        (record) =>
-          setValue((value) =>
-            value?.map((val) => (matcher(val) ? { ...val, ...record } : val))
-          ),
+        (record) => handleSelect([record]),
         onSave
       );
     },
-    [openEditor, setValue, onSave]
+    [openEditor, onSave, handleSelect]
   );
 
   const onView = useCallback(

@@ -50,7 +50,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const handleChange = useCallback(
     (value: DataRecord | null) => {
-      setValue(value, true);
+      if (value && value.id && value.id > 0) {
+        const { version, ...rec } = value;
+        setValue(rec, true);
+      } else {
+        setValue(value, true);
+      }
     },
     [setValue]
   );
@@ -89,12 +94,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         viewName: formView,
         record: record ?? value,
         readonly,
-        onSelect: (record) => {
-          setValue(record, true);
-        },
+        onSelect: handleChange,
       });
     },
-    [setValue, showEditor, target, title, formView, value]
+    [showEditor, title, target, formView, value, handleChange]
   );
 
   const handleView = useCallback(
@@ -124,7 +127,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           context: get(formAtom).record,
           onSelect: async (records) => {
             const value = await ensureName(records[0]);
-            setValue(value, true);
+            handleChange(value);
           },
         });
       },
@@ -136,7 +139,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         domain,
         formAtom,
         ensureName,
-        setValue,
+        handleChange,
       ]
     )
   );
