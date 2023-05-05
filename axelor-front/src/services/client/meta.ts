@@ -11,6 +11,7 @@ import {
   SavedFilter,
   ViewTypes,
 } from "./meta.types";
+import { reject } from "./reject";
 
 export type MenuType = "all" | "quick" | "fav";
 
@@ -20,7 +21,7 @@ export async function menus(type: MenuType): Promise<MenuItem[]> {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? data : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -37,8 +38,12 @@ export async function actionView(name: string): Promise<ActionView> {
   });
 
   if (resp.ok) {
-    const { status, data: [{ view }] = [{ view: null }] } = await resp.json();
-    return status === 0 ? view : Promise.reject(500);
+    const { status, data } = await resp.json();
+    if (status === 0) {
+      const [{ view }] = data || [{ view: null }];
+      return view;
+    }
+    return reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -63,7 +68,7 @@ export async function filters(name: string): Promise<SavedFilter[]> {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? data : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -86,7 +91,7 @@ export async function saveFilter(filter: SavedFilter) {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? data : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -109,7 +114,7 @@ export async function removeFilter(filter: SavedFilter) {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? data : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -146,7 +151,7 @@ export async function fields(model: string): Promise<MetaData> {
         {} as Record<string, Property>
       );
     }
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? data : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -177,7 +182,7 @@ export async function view<
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? { model, ...data } : Promise.reject(500);
+    return status === 0 ? { model, ...data } : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -199,9 +204,7 @@ export async function chart<T = ChartView>(
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0
-      ? ((dataset ? data.dataset : data) as T)
-      : Promise.reject(500);
+    return status === 0 ? ((dataset ? data.dataset : data) as T) : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -229,7 +232,7 @@ export async function custom(
           data: data?.dataset || [],
           first: data?.dataset?.[0],
         }
-      : Promise.reject(500);
+      : reject(data);
   }
 
   return Promise.reject(resp.status);
@@ -315,7 +318,7 @@ export async function action(options: ActionOptions): Promise<ActionResult[]> {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? prepareActionResult(data) : Promise.reject(500);
+    return status === 0 ? prepareActionResult(data) : reject(data);
   }
 
   return Promise.reject(resp.status);

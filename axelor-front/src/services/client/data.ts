@@ -1,8 +1,6 @@
-import { alerts } from "@/components/alerts";
-import { dialogs } from "@/components/dialogs";
 import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
-import { i18n } from "./i18n";
+import { reject } from "./reject";
 
 export type SearchOptions = {
   limit?: number;
@@ -44,62 +42,6 @@ export type ExportResult = {
   exportSize: number;
   fileName: string;
 };
-
-function reject(report: any) {
-  let message;
-  let exception;
-  let stacktrace;
-  let cause;
-
-  if (report.popup) {
-    message =
-      report.message ||
-      i18n.get("A server error occurred. Please contact the administrator.");
-    dialogs.error({
-      title: report.title,
-      content: message,
-    });
-    return Promise.reject(500);
-  }
-
-  if (report.stacktrace) {
-    message = report.message || report.string;
-    exception = report["class"] || "";
-
-    if (
-      exception.match(/(OptimisticLockException|StaleObjectStateException)/)
-    ) {
-      message =
-        "<b>" + i18n.get("Concurrent updates error") + "</b><br>" + message;
-    }
-
-    stacktrace = report.stacktrace;
-    cause = report.cause;
-  } else if (report.message) {
-    message = "<p>" + report.message.replace("\n", "<br>") + "</p>";
-    alerts.error({ message });
-    return Promise.reject(500);
-  } else if (typeof report === "string") {
-    stacktrace = report.replace(/.*<body>|<\/body>.*/g, "");
-  } else {
-    return; // no error report, so ignore
-  }
-
-  const error = {
-    title: report.title,
-    message: message,
-    stacktrace: stacktrace,
-    cause: cause,
-  };
-
-  // TODO: show error dialog with stacktrace
-  dialogs.error({
-    title: error.title,
-    content: error.message,
-  });
-
-  return Promise.reject(500);
-}
 
 export class DataSource {
   #model;
