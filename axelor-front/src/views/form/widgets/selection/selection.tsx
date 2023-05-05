@@ -10,6 +10,7 @@ import { legacyClassNames } from "@/styles/legacy";
 
 import { FieldContainer, FieldProps } from "../../builder";
 import { ViewerInput } from "../string";
+import { useSelectionList } from "./hooks";
 
 import styles from "./selection.module.scss";
 
@@ -81,7 +82,7 @@ export function Selection({
     attrs: { title, focus },
   } = useAtomValue(widgetAtom);
   const [value, setValue] = useAtom(valueAtom);
-  const selectionList = schema.selectionList as TSelection[];
+  const selectionList = useSelectionList({ schema, widgetAtom, value });
 
   const hasValue = (value ?? null) !== null;
   const selectValue = hasValue
