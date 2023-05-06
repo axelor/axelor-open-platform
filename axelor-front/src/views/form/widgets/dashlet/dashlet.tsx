@@ -52,6 +52,7 @@ export function DashletComponent({
         ...actionView.context,
         ...context,
         _id: context?.id || undefined,
+        _model: actionView.model,
         _domainAction: action,
       },
     });
