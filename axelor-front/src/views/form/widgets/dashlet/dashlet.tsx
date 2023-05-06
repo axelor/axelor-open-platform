@@ -47,6 +47,7 @@ export function DashletComponent({
       params: {
         dashlet: true,
         "show-toolbar": false,
+        ...actionView.params,
       },
       context: {
         ...actionView.context,
