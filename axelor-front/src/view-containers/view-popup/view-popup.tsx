@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -12,6 +12,7 @@ import { i18n } from "@/services/client/i18n";
 import { Views } from "../views";
 import { PopupScope, usePopupHandlerAtom } from "./handler";
 
+import { DataRecord } from "@/services/client/data.types";
 import clsx from "clsx";
 import styles from "./view-popup.module.scss";
 
@@ -160,7 +161,7 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
     <PopupDialog
       tab={tab}
       open={true}
-      footer={(close) => <Footer close={close} />}
+      footer={(close) => <Footer close={close} params={action.params} />}
       buttons={[]}
       onClose={handleClose}
       maximize={params["popup.maximized"]}
@@ -168,9 +169,41 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   );
 });
 
-function Footer({ close }: { close: (result: boolean) => void }) {
+function Footer({
+  close,
+  params,
+}: {
+  close: (result: boolean) => void;
+  params?: DataRecord;
+}) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
+
+  const parentId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (parentId.current) return;
+    const elems = [
+      document.querySelector(`[data-tab-content][data-tab-active='true']`),
+      ...document.querySelectorAll("body > [data-dialog='true']"),
+    ];
+
+    elems.pop();
+
+    const elem = elems[elems.length - 1] as HTMLElement;
+    const parent = elem.querySelector("[data-view-id]") as HTMLElement;
+    if (parent) {
+      parentId.current = parent.getAttribute("data-view-id");
+    }
+  }, []);
+
+  const triggerReload = useCallback(() => {
+    if (parentId.current) {
+      const detail = parentId.current;
+      const event = new CustomEvent("tab:refresh", { detail });
+      document.dispatchEvent(event);
+    }
+  }, []);
 
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
@@ -190,11 +223,14 @@ function Footer({ close }: { close: (result: boolean) => void }) {
       if (canSave && onSave) {
         await onSave();
       }
+      if (params?.popup === "reload") {
+        triggerReload();
+      }
       close(true);
     } catch (e) {
       // TODO: show error
     }
-  }, [close, handler]);
+  }, [close, handler, params?.popup, triggerReload]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe((data) => {

@@ -68,7 +68,7 @@ function ViewContainer({
   if (Comp) {
     return (
       <Fade in={true} timeout={400} mountOnEnter>
-        <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
+        <Box data-view-id={tab.id} d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
           <Comp
             meta={meta}
             dataStore={dataStore}

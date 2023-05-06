@@ -266,6 +266,7 @@ export function ModalDialog(props: DialogOptions) {
         fullscreen={maximize}
         size={size}
         className={clsx(classes.root, styles.root)}
+        data-dialog="true"
       >
         <DialogHeader
           onCloseClick={(e) => close(false)}

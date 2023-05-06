@@ -233,6 +233,8 @@ export function NavTabs() {
       {items.map((tab) => (
         <div
           key={tab.id}
+          data-tab-content={tab.id}
+          data-tab-active={tab.id === value}
           className={clsx(styles.tabContent, {
             [styles.active]: tab.id === value,
           })}
