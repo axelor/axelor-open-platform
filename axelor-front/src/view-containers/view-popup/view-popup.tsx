@@ -133,7 +133,7 @@ function Header({
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <div>
+    <Box d="flex" g={2}>
       {HeaderComp && <HeaderComp />}
       <Box d="flex" alignItems="center">
         <MaterialIcon
@@ -147,7 +147,7 @@ function Header({
           onClick={() => setMaximized((prev) => !prev)}
         />
       </Box>
-    </div>
+    </Box>
   );
 }
 
