@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { MouseEvent, useCallback, useState } from "react";
+import { MouseEvent, useCallback, useRef } from "react";
 
 import { usePerms } from "@/hooks/use-perms";
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
@@ -65,25 +65,30 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canNew = hasButton("new") && schema.canNew === true;
   const canSelect = hasButton("select");
 
-  const ensureName = useCallback(
-    async (value: DataRecord) => {
-      if (value && value[targetName]) {
+  const ensureRelated = useAtomCallback(
+    useCallback(
+      async (get, set, value: DataRecord) => {
+        if (value && value.id && value.id > 0) {
+          const name = schema.name;
+          const prefix = name + ".";
+          const { fields } = get(formAtom);
+          const related = Object.keys(fields)
+            .filter((x) => x.startsWith(prefix))
+            .map((x) => x.substring(prefix.length));
+          const names = [targetName, ...related];
+          const missing = names.filter((x) => value[x] === undefined);
+          if (missing.length > 0) {
+            const ds = new DataSource(target);
+            const rec = await ds.read(value.id, {
+              fields: missing,
+            });
+            return { ...value, ...rec, version: undefined };
+          }
+        }
         return value;
-      }
-      const id = value?.id ?? 0;
-      if (id <= 0) {
-        return value;
-      }
-      const ds = new DataSource(target);
-      const rec = await ds.read(id, {
-        fields: [targetName],
-      });
-      return {
-        ...value,
-        [targetName]: rec[targetName],
-      };
-    },
-    [target, targetName]
+      },
+      [formAtom, schema.name, target, targetName]
+    )
   );
 
   const handleEdit = useCallback(
@@ -126,21 +131,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           domain: domain,
           context: get(formAtom).record,
           onSelect: async (records) => {
-            const value = await ensureName(records[0]);
-            handleChange(value);
+            handleChange(records[0]);
           },
         });
       },
-      [
-        showSelector,
-        title,
-        target,
-        gridView,
-        domain,
-        formAtom,
-        ensureName,
-        handleChange,
-      ]
+      [showSelector, title, target, gridView, domain, formAtom, handleChange]
     )
   );
 
@@ -158,40 +153,28 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
-  const [selectedValue, setSelectedValue] = useState(value);
+  const valueRef = useRef(value);
 
-  const ensureNameValue = useAtomCallback(
+  const ensureRelatedValues = useAtomCallback(
     useCallback(
       async (get, set, signal: AbortSignal) => {
-        if (signal.aborted) return;
-        let current = selectedValue || value;
-        if ((current || {}).id !== (value || {}).id) {
-          current = value;
-        }
-        if (value && (current || {})[targetName] !== value[targetName]) {
-          current = {
-            ...(current || {}),
-            [targetName]: value[targetName],
-          };
-        }
-        if (
-          current &&
-          current.id &&
-          current.id > 0 &&
-          current[targetName] === undefined
-        ) {
-          const newValue = await ensureName(current);
-          if (signal.aborted) return;
-          setSelectedValue(newValue);
-        } else if (current !== selectedValue) {
-          setSelectedValue(current);
+        if (valueRef.current === value) return;
+        if (value) {
+          const newValue = await ensureRelated(value);
+          if (newValue !== value) {
+            valueRef.current = newValue;
+            if (signal.aborted) return;
+            setValue(newValue, false, false);
+          } else {
+            valueRef.current = value;
+          }
         }
       },
-      [ensureName, selectedValue, targetName, value]
+      [ensureRelated, setValue, value]
     )
   );
 
-  useAsyncEffect(ensureNameValue, [ensureNameValue]);
+  useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
   return (
     <FieldContainer>
@@ -210,7 +193,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
           invalid={invalid}
-          value={selectedValue ?? null}
+          value={value ?? null}
           placeholder={placeholder}
           icons={
             isSuggestBox
