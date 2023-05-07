@@ -24,7 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { FieldProps } from "../../builder";
+import { FieldLabel, FieldProps } from "../../builder";
 import { nextId } from "../../builder/utils";
 import classes from "./one-to-many.module.scss";
 
@@ -317,7 +317,15 @@ export function OneToMany({
     >
       <Box className={classes.header}>
         <div className={classes.title}>
-          {showTitle && <span className={classes.titleText}>{title}</span>}
+          {showTitle && (
+            <FieldLabel
+              className={classes.titleText}
+              schema={schema}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+              valueAtom={valueAtom}
+            />
+          )}
         </div>
         <CommandBar
           iconOnly

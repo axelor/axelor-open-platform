@@ -17,11 +17,6 @@
   font-weight: 600;
   flex: 1;
   margin: 0 1rem;
-}
-
-.title,
-.titleText {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
 }

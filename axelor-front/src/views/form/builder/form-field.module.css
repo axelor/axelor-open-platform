@@ -12,7 +12,6 @@
 .title .label,
 .title label[for] {
   color: rgba(var(--bs-body-color-rgb), 0.65);
-  margin: 0;
 }
 
 .title .actions {
@@ -25,4 +24,39 @@
 .content {
   display: flex;
   flex-direction: column;
+}
+
+.label {
+  margin: 0;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label.help::after {
+  position: absolute;
+  content: "?";
+  font-size: 0.75rem;
+  color: var(--bs-green);
+  font-weight: 600;
+  margin: 0 2px;
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  font-size: 0.9rem;
+}
+
+.tooltip dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
