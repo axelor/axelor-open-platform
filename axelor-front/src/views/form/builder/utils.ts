@@ -12,7 +12,11 @@ export const nextId = (() => {
 })();
 
 export function defaultAttrs(schema: Schema): Attrs {
-  const attrs = Object.entries(schema)
+  const props = {
+    ...schema,
+    ...schema.widgetAttrs,
+  };
+  const attrs = Object.entries(props)
     .filter(([name]) => name in DEFAULT_ATTRS)
     .reduce((prev, [name, value]) => ({ ...prev, [name]: value }), {});
   return attrs;
