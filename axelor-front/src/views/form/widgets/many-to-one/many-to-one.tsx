@@ -10,7 +10,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useAtomCallback } from "jotai/utils";
-import { FieldContainer, FieldProps, usePrepareContext } from "../../builder";
+import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
 import { ViewerInput, ViewerLink } from "../string";
 import {
   CreatableSelect,
@@ -20,7 +20,6 @@ import {
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
-    uid,
     target,
     targetName,
     targetSearch,
@@ -28,7 +27,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     placeholder,
     formView,
     gridView,
-    showTitle = true,
   } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
@@ -173,8 +171,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
   return (
-    <FieldContainer>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly ? (
         value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>{value[targetName]}</ViewerLink>
@@ -222,6 +219,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           optionValue={"id"}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

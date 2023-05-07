@@ -1,30 +1,23 @@
 import { useAtomValue } from "jotai";
+
 import { Box } from "@axelor/ui";
+
 import { String } from "../string";
-import { FieldContainer, FieldProps } from "../../builder";
+
+import { FieldControl, FieldProps } from "../../builder";
 
 export function Url(props: FieldProps<string>) {
-  const {
-    schema: { uid, showTitle = true },
-    widgetAtom,
-    readonly,
-    valueAtom,
-  } = props;
+  const { readonly, valueAtom } = props;
   const value = useAtomValue(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
-
   if (readonly) {
     return (
-      value && (
-        <FieldContainer readonly={readonly}>
-          {showTitle && <label htmlFor={uid}>{title}</label>}
+      <FieldControl {...props}>
+        {value && (
           <Box as="a" target="_blank" href={value}>
             {value}
           </Box>
-        </FieldContainer>
-      )
+        )}
+      </FieldControl>
     );
   }
   return <String {...props} inputProps={{ type: "url" }} />;

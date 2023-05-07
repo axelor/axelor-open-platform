@@ -1,22 +1,23 @@
-import { useRef, useMemo, ChangeEvent } from "react";
-import { Box, Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { META_FILE_MODEL, makeImageURL, validateFileSize } from "./utils";
+import { ChangeEvent, useMemo, useRef } from "react";
+
+import { Box, Input } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
-import classes from "./image.module.scss";
 
-export function Image({
-  schema,
-  readonly,
-  formAtom,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string | DataRecord | undefined | null>) {
-  const { uid, type, serverType, showTitle = true } = schema;
+import { FieldControl, FieldProps } from "../../builder";
+import { META_FILE_MODEL, makeImageURL, validateFileSize } from "./utils";
+
+import styles from "./image.module.scss";
+
+export function Image(
+  props: FieldProps<string | DataRecord | undefined | null>
+) {
+  const { schema, readonly, formAtom, widgetAtom, valueAtom } = props;
+  const { type, serverType } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -92,8 +93,7 @@ export function Image({
   }
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       <Box
         bgColor="body"
         border
@@ -101,7 +101,7 @@ export function Image({
         position="relative"
         maxW={100}
         maxH={100}
-        className={classes.image}
+        className={styles.image}
       >
         <Box
           ref={imageRef}
@@ -131,7 +131,7 @@ export function Image({
           />
         </form>
         <Box
-          className={classes.actions}
+          className={styles.actions}
           bgColor="body"
           d={readonly ? "none" : "flex"}
           alignItems={"center"}
@@ -141,6 +141,6 @@ export function Image({
           <MaterialIcon icon="close" onClick={handleRemove} />
         </Box>
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }

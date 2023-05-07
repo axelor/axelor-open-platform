@@ -5,12 +5,12 @@ import { useCallback, useState } from "react";
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 
-import { FieldContainer, WidgetProps } from "../../builder";
+import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
-import { Schema } from "@/services/client/meta.types";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -100,11 +100,11 @@ export function Button(props: WidgetProps) {
   const disabled = wait || attrs.readonly;
 
   return (
-    <FieldContainer>
+    <WidgetControl {...props}>
       <Btn variant={variant} onClick={handleClick} disabled={disabled}>
         {icon && <ButtonIcon {...props} />}
         {showTitle && title}
       </Btn>
-    </FieldContainer>
+    </WidgetControl>
   );
 }

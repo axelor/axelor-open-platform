@@ -1,18 +1,46 @@
 import clsx from "clsx";
+import { useAtomValue } from "jotai";
 
-import { Box } from "@axelor/ui";
+import { Box, InputLabel } from "@axelor/ui";
+
+import { FieldProps, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
 
-export function FieldContainer({
-  className,
-  children,
-}: {
-  children: React.ReactNode;
+export type WidgetControlProps = WidgetProps & {
   className?: string;
-  readonly?: boolean;
-}) {
+  children: React.ReactNode;
+};
+
+export function WidgetControl({ className, children }: WidgetControlProps) {
+  return <Box className={clsx(className, styles.container)}>{children}</Box>;
+}
+
+export type FieldControlProps<T> = FieldProps<T> & {
+  className?: string;
+  showTitle?: boolean;
+  children: React.ReactNode;
+};
+
+export function FieldControl({
+  schema,
+  className,
+  showTitle,
+  widgetAtom,
+  children,
+}: FieldControlProps<any>) {
+  const { uid } = schema;
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
+  const canShowTitle = showTitle ?? schema.showTitle ?? true;
   return (
-    <Box className={clsx(className, styles.fieldContainer)}>{children}</Box>
+    <Box className={clsx(className, styles.container)}>
+      {canShowTitle && (
+        <Box className={styles.title}>
+          <InputLabel htmlFor={uid}>{title}</InputLabel>
+        </Box>
+      )}
+      <Box className={styles.content}>{children}</Box>
+    </Box>
   );
 }

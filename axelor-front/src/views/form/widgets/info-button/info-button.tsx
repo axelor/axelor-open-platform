@@ -10,12 +10,13 @@ import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Formatters } from "@/utils/format";
 
-import { FieldContainer, WidgetProps } from "../../builder";
+import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
 import styles from "./info-button.module.scss";
 
-export function InfoButton({ schema, widgetAtom, formAtom }: WidgetProps) {
+export function InfoButton(props: WidgetProps) {
+  const { schema, widgetAtom, formAtom } = props;
   const { showTitle = true, icon, iconHover, widgetAttrs } = schema;
   const { field } = widgetAttrs || {};
 
@@ -62,7 +63,7 @@ export function InfoButton({ schema, widgetAtom, formAtom }: WidgetProps) {
   const disabled = wait || readonly;
 
   return (
-    <FieldContainer>
+    <WidgetControl {...props}>
       <Button
         title={title}
         variant="primary"
@@ -97,6 +98,6 @@ export function InfoButton({ schema, widgetAtom, formAtom }: WidgetProps) {
           {showTitle && <div className={styles.title}>{title}</div>}
         </Box>
       </Button>
-    </FieldContainer>
+    </WidgetControl>
   );
 }

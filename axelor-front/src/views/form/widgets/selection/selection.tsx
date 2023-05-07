@@ -8,7 +8,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string";
 import { useSelectionList } from "./hooks";
 
@@ -68,20 +68,16 @@ export function SelectText({
 export function Selection({
   selectComponents = [],
   selectProps,
-  schema,
-  readonly,
-  invalid,
-  widgetAtom,
-  valueAtom,
+  ...props
 }: FieldProps<string | number | null> & {
   selectProps?: Partial<SelectProps>;
   selectComponents?: SelectComponent[];
 }) {
-  const { uid, placeholder, showTitle = true } = schema;
+  const { schema, readonly, invalid, widgetAtom, valueAtom } = props;
+  const { placeholder } = schema;
   const { isMulti } = selectProps || {};
-
   const {
-    attrs: { title, focus },
+    attrs: { focus },
   } = useAtomValue(widgetAtom);
   const [value, setValue] = useAtom(valueAtom);
   const selectionList = useSelectionList({ schema, widgetAtom, value });
@@ -120,8 +116,7 @@ export function Selection({
   const components = useComponents(schema, ["Option", ...selectComponents]);
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly && <SelectText schema={schema} value={value} />}
       {readonly || (
         <Select
@@ -147,7 +142,7 @@ export function Selection({
           components={components}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }
 

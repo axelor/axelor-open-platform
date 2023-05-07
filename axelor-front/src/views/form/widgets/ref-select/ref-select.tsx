@@ -1,20 +1,20 @@
+import { atom, useAtomValue } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useMemo, useRef } from "react";
+
+import { Box } from "@axelor/ui";
+
 import { useAsync } from "@/hooks/use-async";
 import { DataRecord } from "@/services/client/data.types";
 import { findFields } from "@/services/client/meta-cache";
 import { Selection as SelectionType } from "@/services/client/meta.types";
-import { Box } from "@axelor/ui";
-import { atom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
-import { useMemo, useRef } from "react";
-import { FieldContainer, FieldProps, ValueAtom } from "../../builder";
+
+import { FieldControl, FieldProps, ValueAtom } from "../../builder";
 import { ManyToOne } from "../many-to-one";
 import { Selection } from "../selection";
 
 export function RefSelect(props: FieldProps<any>) {
-  const { schema, widgetAtom, valueAtom } = props;
-  const { uid, showTitle = true } = schema;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+  const { schema, valueAtom } = props;
 
   const selection = useMemo(() => {
     const items: SelectionType[] = schema.selectionList || [];
@@ -58,8 +58,7 @@ export function RefSelect(props: FieldProps<any>) {
   }, [valueAtom]);
 
   return (
-    <FieldContainer>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       <Box d="flex" g={3}>
         <Box style={{ width: 200 }}>
           <Selection {...props} schema={selectSchema} valueAtom={selectAtom} />
@@ -68,7 +67,7 @@ export function RefSelect(props: FieldProps<any>) {
           {target && <RefItem {...props} schema={refSchema} />}
         </Box>
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }
 

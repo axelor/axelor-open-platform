@@ -1,16 +1,16 @@
-import { useRef, useMemo, ChangeEvent } from "react";
+import { DataRecord } from "@/services/client/data.types";
+import { download } from "@/utils/download";
 import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { FieldContainer, FieldProps, FormAtom } from "../../builder";
 import { useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
+import { ChangeEvent, useMemo, useRef } from "react";
+import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import {
   META_FILE_MODEL,
   makeImageURL,
   validateFileSize,
 } from "../image/utils";
-import { DataRecord } from "@/services/client/data.types";
-import { download } from "@/utils/download";
 
 function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   return useSetAtom(
@@ -21,16 +21,13 @@ function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   );
 }
 
-export function Binary({
-  schema,
-  readonly,
-  widgetAtom,
-  formAtom,
-}: FieldProps<string | DataRecord | undefined | null>) {
-  const { uid, name, accept, showTitle = true } = schema;
+export function Binary(
+  props: FieldProps<string | DataRecord | undefined | null>
+) {
+  const { schema, readonly, formAtom } = props;
+  const { name, accept } = schema;
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { attrs: { title } } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(
@@ -105,8 +102,7 @@ export function Binary({
   }
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       <Box d="flex">
         <form ref={formRef}>
           <Box
@@ -134,6 +130,6 @@ export function Binary({
           </Button>
         )}
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }

@@ -18,7 +18,7 @@ import { l10n, moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string";
 import { DateInput } from "./date-input";
 import { Picker } from "./picker";
@@ -40,13 +40,9 @@ function toCalendarFormat(format: string) {
     .join("");
 }
 
-export function Date({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string>) {
-  const { uid, placeholder, showTitle = true } = schema;
+export function Date(props: FieldProps<string>) {
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { uid, placeholder } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
   const classNames = useClassNames();
@@ -54,7 +50,7 @@ export function Date({
   const [changed, setChanged] = useState(false);
   const [value, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title, focus },
+    attrs: { focus },
   } = useAtomValue(widgetAtom);
 
   const type = (schema.widget || schema.serverType || schema.type)!;
@@ -165,13 +161,13 @@ export function Date({
   );
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly ? (
         <ViewerInput value={textValue} />
       ) : (
         <Box ref={boxRef} d="flex">
           <Picker
+            id={uid}
             showMonthDropdown
             showYearDropdown
             todayButton={i18n.get("Today")}
@@ -213,6 +209,6 @@ export function Date({
           />
         </Box>
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

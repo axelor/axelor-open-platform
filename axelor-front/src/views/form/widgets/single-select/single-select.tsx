@@ -1,9 +1,12 @@
-import { Schema, Selection as TSelection } from "@/services/client/meta.types";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtomValue } from "jotai";
-import { Chip, Selection } from "../selection";
-import { Box } from "@axelor/ui";
 import { ReactElement } from "react";
+
+import { Box } from "@axelor/ui";
+
+import { Schema, Selection as TSelection } from "@/services/client/meta.types";
+
+import { FieldControl, FieldProps } from "../../builder";
+import { Chip, Selection } from "../selection";
 
 export function SingleSelectText({
   schema,
@@ -26,19 +29,14 @@ export function SingleSelectText({
 }
 
 export function SingleSelect(props: FieldProps<string | number | null>) {
-  const { readonly, schema, widgetAtom, valueAtom } = props;
-  const { uid, showTitle = true } = schema;
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
+  const { readonly, schema, valueAtom } = props;
   const value = useAtomValue(valueAtom);
 
   if (readonly) {
     return (
-      <FieldContainer readonly={readonly}>
-        {showTitle && <label htmlFor={uid}>{title}</label>}
+      <FieldControl {...props}>
         <SingleSelectText schema={schema} value={value} />
-      </FieldContainer>
+      </FieldControl>
     );
   }
 

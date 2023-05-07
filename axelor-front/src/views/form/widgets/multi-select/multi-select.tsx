@@ -1,9 +1,12 @@
-import { Schema, Selection as TSelection } from "@/services/client/meta.types";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtomValue } from "jotai";
-import { Chip, Selection } from "../selection";
-import { Box } from "@axelor/ui";
 import { ReactElement } from "react";
+
+import { Box } from "@axelor/ui";
+
+import { Schema, Selection as TSelection } from "@/services/client/meta.types";
+
+import { FieldControl, FieldProps } from "../../builder";
+import { Chip, Selection } from "../selection";
 
 export function MultiSelectText({
   schema,
@@ -30,19 +33,14 @@ export function MultiSelectText({
 }
 
 export function MultiSelect(props: FieldProps<string | number | null>) {
-  const { readonly, schema, widgetAtom, valueAtom } = props;
-  const { uid, showTitle = true } = schema;
+  const { readonly, schema, valueAtom } = props;
   const value = useAtomValue(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
 
   if (readonly) {
     return (
-      <FieldContainer readonly={readonly}>
-        {showTitle && <label htmlFor={uid}>{title}</label>}
+      <FieldControl {...props}>
         <MultiSelectText schema={schema} value={value} />
-      </FieldContainer>
+      </FieldControl>
     );
   }
 

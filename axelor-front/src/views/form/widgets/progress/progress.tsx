@@ -1,9 +1,13 @@
-import { useMemo } from "react";
-import { Box, LinearProgress } from "@axelor/ui";
-import { Schema } from "@/services/client/meta.types";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtomValue } from "jotai";
-import classes from "./progress.module.scss";
+import { useMemo } from "react";
+
+import { Box, LinearProgress } from "@axelor/ui";
+
+import { Schema } from "@/services/client/meta.types";
+
+import { FieldControl, FieldProps } from "../../builder";
+
+import styles from "./progress.module.scss";
 
 // colors "r:24,y:49,b:74,g:100" -> [{code:'r', max:24}...]
 type TransformColor = {
@@ -39,26 +43,20 @@ export function ProgressComponent({
       code: "",
     };
 
-    return { value: $value, className: classes[code] };
+    return { value: $value, className: styles[code] };
   }, [value, schema]);
 
   return <LinearProgress flex={1} {...progressProps} striped animated />;
 }
 
 export function Progress(props: FieldProps<number>) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
-  const { uid, showTitle = true } = schema;
+  const { schema, valueAtom } = props;
   const value = useAtomValue(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
-
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
-      <Box className={classes.progress}>
+    <FieldControl {...props}>
+      <Box className={styles.progress}>
         <ProgressComponent value={value || 0} schema={schema} />
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }

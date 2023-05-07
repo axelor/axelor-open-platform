@@ -1,22 +1,19 @@
-import { Switch } from "@axelor/ui";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
 
-export function BooleanSwitch({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<boolean>) {
-  const { uid, showTitle = true } = schema;
+import { Switch } from "@axelor/ui";
+
+import { FieldControl, FieldProps } from "../../builder";
+
+export function BooleanSwitch(props: FieldProps<boolean>) {
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { uid } = schema;
   const [value = false, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title, focus },
+    attrs: { focus },
   } = useAtomValue(widgetAtom);
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       <Switch
         data-input
         autoFocus={focus}
@@ -26,6 +23,6 @@ export function BooleanSwitch({
         onChange={() => setValue(!value, true)}
         value=""
       />
-    </FieldContainer>
+    </FieldControl>
   );
 }

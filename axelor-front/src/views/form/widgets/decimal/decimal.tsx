@@ -7,7 +7,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { Field } from "@/services/client/meta.types";
 import format from "@/utils/format";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "../string";
 
@@ -15,15 +15,11 @@ import styles from "./decimal.module.scss";
 
 const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
-export function Decimal({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string | number>) {
-  const { uid, min, max, placeholder, showTitle = true } = schema;
+export function Decimal(props: FieldProps<string | number>) {
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { uid, min, max, placeholder } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, focus, required, scale } = attrs;
+  const { focus, required, scale } = attrs;
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
@@ -132,8 +128,7 @@ export function Decimal({
   );
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly && <ViewerInput value={text} />}
       {readonly || (
         <div className={styles.container}>
@@ -161,6 +156,6 @@ export function Decimal({
           </div>
         </div>
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

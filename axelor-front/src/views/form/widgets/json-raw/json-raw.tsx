@@ -8,7 +8,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { DataRecord } from "@/services/client/data.types";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 
 import styles from "./json-raw.module.scss";
 
@@ -73,7 +73,8 @@ function JsonItem({
   );
 }
 
-export function JsonRaw({ valueAtom, readonly }: FieldProps<string>) {
+export function JsonRaw(props: FieldProps<string>) {
+  const { valueAtom, readonly } = props;
   const recordAtom = useMemo(
     () =>
       atom(
@@ -170,7 +171,7 @@ export function JsonRaw({ valueAtom, readonly }: FieldProps<string>) {
   );
 
   return (
-    <FieldContainer className={styles.container}>
+    <FieldControl {...props} showTitle={false} className={styles.container}>
       {items.map((item) => {
         return (
           <JsonItem
@@ -186,6 +187,6 @@ export function JsonRaw({ valueAtom, readonly }: FieldProps<string>) {
           <MaterialIcon icon="add" />
         </Button>
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

@@ -1,16 +1,25 @@
-import { SyntheticEvent, memo, useState, useEffect, useRef } from "react";
-import * as monaco from "monaco-editor";
-import { Box } from "@axelor/ui";
-import { useAtom, useAtomValue } from "jotai";
-import { useCallback } from "react";
-import { FieldContainer, FieldProps } from "../../builder";
+import { useAtom } from "jotai";
+import {
+  SyntheticEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
+import * as monaco from "monaco-editor";
 import editorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import cssWorker from "monaco-editor/esm/vs/language/css/css.worker?worker";
 import htmlWorker from "monaco-editor/esm/vs/language/html/html.worker?worker";
+import jsonWorker from "monaco-editor/esm/vs/language/json/json.worker?worker";
 import tsWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
-import classes from "./code-editor.module.scss";
+
+import { Box } from "@axelor/ui";
+
+import { FieldControl, FieldProps } from "../../builder";
+
+import styles from "./code-editor.module.scss";
 
 (window as any).MonacoEnvironment = {
   getWorker(_: any, label: string) {
@@ -129,25 +138,10 @@ const THEMES: Record<string, string> = {
   light: "vs-light",
 };
 
-export function CodeEditor({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string>) {
-  const {
-    uid,
-    mode,
-    showTitle = true,
-    codeSyntax,
-    codeTheme,
-    height = 400,
-    width = "100%",
-  } = schema;
+export function CodeEditor(props: FieldProps<string>) {
+  const { schema, readonly, valueAtom } = props;
+  const { mode, codeSyntax, codeTheme, height = 400, width = "100%" } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
   const $mode = mode || codeSyntax;
   const themeType = "light";
 
@@ -159,9 +153,8 @@ export function CodeEditor({
   );
 
   return (
-    <FieldContainer readonly={readonly}>
-      <Box className={classes.container} style={{ height: +height, width }}>
-        {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
+      <Box className={styles.container} style={{ height: +height, width }}>
         <Editor
           mode={$mode}
           readonly={readonly}
@@ -171,6 +164,6 @@ export function CodeEditor({
           onBlur={handleBlur}
         />
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }

@@ -1,11 +1,12 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useMemo } from "react";
+
 import { Box } from "@axelor/ui";
 
 import { EditorOptions, useCompletion, useEditor } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
@@ -42,14 +43,7 @@ export function TagSelectComponent(props: CreatableSelectProps) {
 
 export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { schema, valueAtom, widgetAtom, readonly } = props;
-  const {
-    uid,
-    target,
-    targetName,
-    targetSearch,
-    placeholder,
-    showTitle = true,
-  } = schema;
+  const { target, targetName, targetSearch, placeholder } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
 
@@ -104,8 +98,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   );
 
   return (
-    <FieldContainer>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly ? (
         <Box d="flex" flexWrap="wrap">
           {(value || []).map((val) => (
@@ -132,6 +125,6 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           fetchOptions={handleCompletion}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

@@ -18,9 +18,9 @@ import {
 } from "@/services/client/meta.types";
 
 import { Form, useFormHandlers } from "./form";
-import { FieldContainer } from "./form-field";
+import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { FormState, ValueAtom, WidgetAtom, WidgetProps } from "./types";
+import { FieldProps, FormState, WidgetAtom } from "./types";
 import { nextId, processView } from "./utils";
 
 import { DataStore } from "@/services/client/data-store";
@@ -28,7 +28,7 @@ import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { isEqual } from "lodash";
 import styles from "./form-editors.module.scss";
 
-export type FieldEditorProps = WidgetProps & { valueAtom: ValueAtom<any> };
+export type FieldEditorProps = FieldProps<any>;
 export type FormEditorProps = FieldEditorProps & {
   editor: FormView;
   fields: Record<string, Property>;
@@ -134,14 +134,8 @@ export function FieldEditor(props: FieldEditorProps) {
   return <SimpleEditor {...props} editor={form} fields={fields} />;
 }
 
-function SimpleEditor({
-  editor,
-  fields,
-  formAtom,
-  widgetAtom,
-  readonly,
-  ...rest
-}: FormEditorProps) {
+function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
+  const { formAtom, widgetAtom, readonly, ...rest } = props;
   const showTitle = rest.schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
@@ -149,22 +143,15 @@ function SimpleEditor({
   const schema = useMemo(() => processView(editor, fields), [editor, fields]);
 
   return (
-    <FieldContainer readonly={readonly}>
+    <FieldControl {...props}>
       {showTitle && <label>{title}</label>}
       <GridLayout schema={schema} formAtom={formAtom} readonly={readonly} />
-    </FieldContainer>
+    </FieldControl>
   );
 }
 
-function ReferenceEditor({
-  schema,
-  editor,
-  fields,
-  formAtom,
-  widgetAtom,
-  valueAtom,
-  readonly,
-}: FormEditorProps) {
+function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
+  const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, domain } = attrs;
@@ -226,7 +213,7 @@ function ReferenceEditor({
   );
 
   return (
-    <FieldContainer readonly={readonly}>
+    <FieldControl {...props} showTitle={false}>
       <div className={styles.header}>
         <div className={styles.title}>
           {showTitle && <label>{title}</label>}
@@ -255,19 +242,12 @@ function ReferenceEditor({
         readonly={readonly}
         setInvalid={handleInvalid}
       />
-    </FieldContainer>
+    </FieldControl>
   );
 }
 
-function CollectionEditor({
-  schema,
-  editor,
-  fields,
-  formAtom,
-  widgetAtom,
-  valueAtom,
-  readonly,
-}: FormEditorProps) {
+function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
+  const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;

@@ -1,26 +1,24 @@
-import React, { useCallback, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
 import { Box, Input } from "@axelor/ui";
-import { FieldContainer, FieldProps } from "../../builder";
+import { useAtom, useAtomValue } from "jotai";
+import React, { useCallback, useState } from "react";
+import { FieldControl, FieldProps } from "../../builder";
 import classes from "./text.module.scss";
 
 export function Text({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
   inputProps,
+  ...props
 }: FieldProps<string> & {
   inputProps?: Pick<
     React.InputHTMLAttributes<HTMLTextAreaElement>,
     "onFocus" | "onBlur" | "autoFocus"
   >;
 }) {
-  const { uid, height, placeholder, showTitle = true } = schema;
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { uid, height, placeholder } = schema;
   const { onBlur } = inputProps || {};
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, required } = attrs;
+  const { required } = attrs;
 
   const [value, setValue] = useAtom(valueAtom);
   const [changed, setChanged] = useState(false);
@@ -47,8 +45,7 @@ export function Text({
   );
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly ? (
         <Box
           p={1}
@@ -71,6 +68,6 @@ export function Text({
           onBlur={handleBlur}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

@@ -1,26 +1,19 @@
 import clsx from "clsx";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
 
 import { i18n } from "@/services/client/i18n";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import EditorComponent from "./editor";
 import ViewerComponent from "./viewer";
 
 import styles from "./html.module.scss";
 
-export function Html({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string>) {
-  const { uid, showTitle = true, lite } = schema;
+export function Html(props: FieldProps<string>) {
+  const { schema, readonly, valueAtom } = props;
+  const { lite } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
   const [changed, setChanged] = useState(false);
 
   const handleChange = useCallback(
@@ -41,17 +34,12 @@ export function Html({
     [changed, setValue]
   );
 
+  const className = clsx(styles.container, { [styles.readonly]: readonly });
+
   return (
-    <FieldContainer
-      className={clsx(styles.container, {
-        [styles.readonly]: readonly,
-      })}
-      readonly={readonly}
-    >
-      {showTitle && <label htmlFor={uid}>{title}</label>}
-      {readonly ? (
-        <ViewerComponent value={value || ""} />
-      ) : (
+    <FieldControl {...props} className={className}>
+      {readonly && <ViewerComponent value={value || ""} />}
+      {readonly || (
         <EditorComponent
           t={i18n.get}
           lite={Boolean(lite)}
@@ -61,6 +49,6 @@ export function Html({
           {...({} as any)}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

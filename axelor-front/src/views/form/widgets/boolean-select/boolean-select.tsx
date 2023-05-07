@@ -1,22 +1,20 @@
-import { Input, Select } from "@axelor/ui";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
+
+import { Input, Select } from "@axelor/ui";
+
 import { i18n } from "@/services/client/i18n";
+
+import { FieldControl, FieldProps } from "../../builder";
 
 type SelectOption = {
   title: string;
   value: boolean | null;
 };
 
-export function BooleanSelect({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-  invalid,
-}: FieldProps<boolean | null>) {
-  const { uid, showTitle = true, widgetAttrs, nullable } = schema;
+export function BooleanSelect(props: FieldProps<boolean | null>) {
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
+  const { widgetAttrs, nullable } = schema;
   const {
     nullText = " ",
     falseText = i18n.get("No"),
@@ -24,7 +22,7 @@ export function BooleanSelect({
   } = widgetAttrs || {};
   const [value = false, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title, focus },
+    attrs: { focus },
   } = useAtomValue(widgetAtom);
 
   const handleOnChange = useCallback(
@@ -46,8 +44,7 @@ export function BooleanSelect({
   const selected = options.find((option) => option.value === value);
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly ? (
         <Input
           type="text"
@@ -71,6 +68,6 @@ export function BooleanSelect({
           isClearOnDelete={false}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

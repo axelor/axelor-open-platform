@@ -1,31 +1,28 @@
-import { legacyClassNames } from "@/styles/legacy";
-import { Button } from "@axelor/ui";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useCallback } from "react";
-import { FieldContainer, FieldProps } from "../../builder";
+
+import { Button } from "@axelor/ui";
+
+import { legacyClassNames } from "@/styles/legacy";
+
+import { FieldControl, FieldProps } from "../../builder";
+
 import styles from "./toggle.module.scss";
 
-export function Toggle({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<boolean>) {
-  const { uid, icon, iconActive, iconHover, showTitle = true } = schema;
+export function Toggle(props: FieldProps<boolean>) {
+  const { schema, readonly, valueAtom } = props;
+  const { uid, icon, iconActive, iconHover } = schema;
   const [value = false, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
 
-  const handleClick = useCallback(() => {
-    setValue(!value, true);
-  }, [setValue, value]);
+  const handleClick = useCallback(
+    () => setValue(!value, true),
+    [setValue, value]
+  );
 
   const ico = value ? iconActive ?? icon : icon;
 
   return (
-    <FieldContainer className={styles.container} readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props} className={styles.container}>
       <Button
         id={uid}
         variant="light"
@@ -49,6 +46,6 @@ export function Toggle({
           )}
         />
       </Button>
-    </FieldContainer>
+    </FieldControl>
   );
 }

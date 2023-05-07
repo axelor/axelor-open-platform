@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldProps } from "../../builder";
 import { Selection } from "../selection";
 
 const NAMES = [
@@ -45,9 +45,5 @@ export function WidgetSelect(props: FieldProps<any>) {
     };
   }, [props.schema]);
 
-  return (
-    <FieldContainer>
-      <Selection {...props} schema={schema} />
-    </FieldContainer>
-  );
+  return <Selection {...props} schema={schema} />;
 }

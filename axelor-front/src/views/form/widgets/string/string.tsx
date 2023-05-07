@@ -2,35 +2,31 @@ import { useAtomValue } from "jotai";
 
 import { Input } from "@axelor/ui";
 
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "./viewer";
 
 export function String({
   inputProps,
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-  invalid,
+  ...props
 }: FieldProps<string> & {
   inputProps?: Pick<
     React.InputHTMLAttributes<HTMLInputElement>,
     "type" | "autoComplete" | "placeholder" | "onFocus"
   >;
 }) {
-  const { uid, placeholder, showTitle = true } = schema;
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
+  const { uid, placeholder } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, focus, required } = attrs;
+  const { focus, required } = attrs;
 
   const { value, onChange, onBlur } = useInput(valueAtom, {
     defaultValue: "",
   });
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       {readonly && <ViewerInput value={value} />}
       {readonly || (
         <Input
@@ -47,6 +43,6 @@ export function String({
           {...inputProps}
         />
       )}
-    </FieldContainer>
+    </FieldControl>
   );
 }

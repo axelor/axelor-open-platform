@@ -1,22 +1,19 @@
-import { useAtom, useAtomValue } from "jotai";
-import { Box } from "@axelor/ui";
-import { FieldContainer, FieldProps } from "../../builder";
-import { Selection as TSelection } from "@/services/client/meta.types";
-import classes from "./radio-select.module.scss";
 import clsx from "clsx";
+import { useAtom } from "jotai";
+
+import { Box } from "@axelor/ui";
+
+import { Selection as TSelection } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
-export function RadioSelect({
-  schema,
-  readonly,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<string | number | null>) {
-  const { uid, showTitle = true, direction, nullable, widget } = schema;
+import { FieldControl, FieldProps } from "../../builder";
+
+import styles from "./radio-select.module.scss";
+
+export function RadioSelect(props: FieldProps<string | number | null>) {
+  const { schema, readonly, valueAtom } = props;
+  const { direction, nullable, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
   const selectionList = schema.selectionList as TSelection[];
 
   const isRadio = toKebabCase(widget) === "radio-select";
@@ -41,8 +38,7 @@ export function RadioSelect({
   const vertical = direction === "vertical";
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
+    <FieldControl {...props}>
       <Box
         ps={1}
         pt={1}
@@ -50,9 +46,9 @@ export function RadioSelect({
         d="flex"
         flexDirection={vertical ? "column" : "row"}
         className={clsx({
-          [classes.pointer]: !readonly,
-          [classes.radio]: isRadio,
-          [classes.vertical]: vertical,
+          [styles.pointer]: !readonly,
+          [styles.radio]: isRadio,
+          [styles.vertical]: vertical,
         })}
       >
         {selectionList.map((option) => {
@@ -67,18 +63,18 @@ export function RadioSelect({
               <Box
                 d="flex"
                 alignItems="center"
-                className={clsx(classes.ibox, {
-                  [classes.checked]: checked,
+                className={clsx(styles.ibox, {
+                  [styles.checked]: checked,
                 })}
                 me={vertical ? 0 : 2}
               >
-                <Box as="span" className={classes.box} me={2} />
+                <Box as="span" className={styles.box} me={2} />
                 <Box as="span">{option.title}</Box>
               </Box>
             </Box>
           );
         })}
       </Box>
-    </FieldContainer>
+    </FieldControl>
   );
 }

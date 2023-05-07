@@ -1,32 +1,28 @@
-import { useRef, useMemo, ChangeEvent } from "react";
-import { Box, Button } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
+import { ChangeEvent, useMemo, useRef } from "react";
+
+import { Box, Button } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
+import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
-import { DataStore } from "@/services/client/data-store";
+
+import { FieldControl, FieldProps } from "../../builder";
 import {
   META_FILE_MODEL,
   makeImageURL,
   validateFileSize,
 } from "../image/utils";
 
-export function BinaryLink({
-  schema,
-  readonly,
-  formAtom,
-  widgetAtom,
-  valueAtom,
-}: FieldProps<DataRecord | undefined | null>) {
-  const { uid, name, accept, showTitle = true } = schema;
+export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
+  const { schema, readonly, formAtom, valueAtom } = props;
+  const { name, accept } = schema;
+
+  const [value, setValue] = useAtom(valueAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const [value, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { title },
-  } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(
@@ -90,41 +86,34 @@ export function BinaryLink({
   const text = value?.fileName;
 
   return (
-    <FieldContainer readonly={readonly}>
-      {showTitle && <label htmlFor={uid}>{title}</label>}
-      <Box d="flex" flexDirection="column">
-        <Box>
-          {text && (
-            <Button
-              variant="link"
-              title={name}
-              onClick={() => handleDownload()}
-            >
-              {text}
-            </Button>
-          )}
-        </Box>
-        {!readonly && (
-          <Box d="flex" justifyContent="center">
-            <form ref={formRef}>
-              <Box
-                as={"input"}
-                onChange={handleInputChange}
-                type="file"
-                ref={inputRef}
-                d="none"
-                accept={accept}
-              />
-            </form>
-            <Button variant="light" size="sm" d="flex" alignItems="center">
-              <MaterialIcon icon="upload" onClick={handleUpload} />
-            </Button>
-            <Button variant="light" size="sm" d="flex" alignItems="center">
-              <MaterialIcon icon="close" onClick={handleRemove} />
-            </Button>
-          </Box>
+    <FieldControl {...props}>
+      <Box>
+        {text && (
+          <Button variant="link" title={name} onClick={() => handleDownload()}>
+            {text}
+          </Button>
         )}
       </Box>
-    </FieldContainer>
+      {!readonly && (
+        <Box d="flex" justifyContent="center">
+          <form ref={formRef}>
+            <Box
+              as={"input"}
+              onChange={handleInputChange}
+              type="file"
+              ref={inputRef}
+              d="none"
+              accept={accept}
+            />
+          </form>
+          <Button variant="light" size="sm" d="flex" alignItems="center">
+            <MaterialIcon icon="upload" onClick={handleUpload} />
+          </Button>
+          <Button variant="light" size="sm" d="flex" alignItems="center">
+            <MaterialIcon icon="close" onClick={handleRemove} />
+          </Button>
+        </Box>
+      )}
+    </FieldControl>
   );
 }
