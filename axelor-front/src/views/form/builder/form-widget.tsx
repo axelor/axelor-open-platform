@@ -17,7 +17,7 @@ import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
-import { ValueAtom, WidgetAtom, WidgetProps } from "./types";
+import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const { schema, formAtom } = props;
@@ -58,14 +58,24 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   }
 
   if (schema.viewer && valueAtom && readonly) {
+    const viewerProps = props as FieldProps<any>;
     return (
-      <FieldViewer {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
+      <FieldViewer
+        {...viewerProps}
+        widgetAtom={widgetAtom}
+        valueAtom={valueAtom}
+      />
     );
   }
 
   if (schema.editor && valueAtom && (!readonly || schema.editor.viewer)) {
+    const editorProps = props as FieldProps<any>;
     return (
-      <FieldEditor {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
+      <FieldEditor
+        {...editorProps}
+        widgetAtom={widgetAtom}
+        valueAtom={valueAtom}
+      />
     );
   }
 
