@@ -13,6 +13,7 @@ export * from "./datetime";
 export * from "./decimal";
 export * from "./email";
 export * from "./eval-ref-select";
+export * from "./help";
 export * from "./html";
 export * from "./image";
 export * from "./info-button";
