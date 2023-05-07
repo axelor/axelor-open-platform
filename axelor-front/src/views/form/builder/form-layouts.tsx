@@ -7,6 +7,7 @@ import { toKebabCase } from "@/utils/names";
 import { FormWidget } from "./form-widget";
 import { FormLayout } from "./types";
 
+import { legacyClassNames } from "@/styles/legacy";
 import styles from "./form-layouts.module.scss";
 
 function computeCols(cols: number, colWidths: string = "") {
@@ -29,6 +30,20 @@ function computeCols(cols: number, colWidths: string = "") {
   }
 
   return widths.join(" ");
+}
+
+function layoutClassName(item: Schema) {
+  const css: string = item.css || "";
+  const names = css
+    .split(" ")
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .filter((name) => {
+      if (/^span\d+/.test(name)) return false;
+      if (/^btn-?/.test(name)) return false;
+      return true;
+    });
+  return legacyClassNames(names);
 }
 
 export const GridLayout: FormLayout = ({
@@ -55,7 +70,12 @@ export const GridLayout: FormLayout = ({
       style={style}
     >
       {items.map((item) => (
-        <GridItem key={item.uid} schema={item} itemSpan={itemSpan}>
+        <GridItem
+          key={item.uid}
+          schema={item}
+          itemSpan={itemSpan}
+          className={layoutClassName(item)}
+        >
           <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
         </GridItem>
       ))}
