@@ -19,6 +19,7 @@ export function WidgetControl({ className, children }: WidgetControlProps) {
 export type FieldControlProps<T> = FieldProps<T> & {
   className?: string;
   showTitle?: boolean;
+  titleActions?: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -27,6 +28,7 @@ export function FieldControl({
   className,
   showTitle,
   widgetAtom,
+  titleActions,
   children,
 }: FieldControlProps<any>) {
   const { uid } = schema;
@@ -37,7 +39,10 @@ export function FieldControl({
     <Box className={clsx(className, styles.container)}>
       {canShowTitle && (
         <Box className={styles.title}>
-          <InputLabel htmlFor={uid}>{title}</InputLabel>
+          <InputLabel htmlFor={uid} className={styles.label}>
+            {title}
+          </InputLabel>
+          {titleActions && <Box className={styles.actions}>{titleActions}</Box>}
         </Box>
       )}
       <Box className={styles.content}>{children}</Box>

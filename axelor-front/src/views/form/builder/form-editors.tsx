@@ -135,16 +135,11 @@ export function FieldEditor(props: FieldEditorProps) {
 }
 
 function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
-  const { formAtom, widgetAtom, readonly, ...rest } = props;
-  const showTitle = rest.schema.showTitle ?? true;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
-
+  const { formAtom, readonly } = props;
   const schema = useMemo(() => processView(editor, fields), [editor, fields]);
 
   return (
     <FieldControl {...props}>
-      {showTitle && <label>{title}</label>}
       <GridLayout schema={schema} formAtom={formAtom} readonly={readonly} />
     </FieldControl>
   );
@@ -152,7 +147,6 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
-  const showTitle = schema.showTitle ?? true;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, domain } = attrs;
 
@@ -212,25 +206,20 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     [setInvalid, widgetAtom]
   );
 
+  const titleActions = readonly ? (
+    <div className={styles.actions}>
+      <MaterialIcon icon="edit" onClick={handleEdit} />
+    </div>
+  ) : (
+    <div className={styles.actions}>
+      <MaterialIcon icon="edit" onClick={handleEdit} />
+      <MaterialIcon icon="search" onClick={handleSelect} />
+      <MaterialIcon icon="delete" onClick={handleDelete} />
+    </div>
+  );
+
   return (
-    <FieldControl {...props} showTitle={false}>
-      <div className={styles.header}>
-        <div className={styles.title}>
-          {showTitle && <label>{title}</label>}
-        </div>
-        {readonly && (
-          <div className={styles.actions}>
-            <MaterialIcon icon="edit" onClick={handleEdit} />
-          </div>
-        )}
-        {readonly || (
-          <div className={styles.actions}>
-            <MaterialIcon icon="edit" onClick={handleEdit} />
-            <MaterialIcon icon="search" onClick={handleSelect} />
-            <MaterialIcon icon="delete" onClick={handleDelete} />
-          </div>
-        )}
-      </div>
+    <FieldControl {...props} titleActions={titleActions}>
       <RecordEditor
         schema={schema}
         editor={editor}
@@ -248,10 +237,6 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
 function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
-  const showTitle = schema.showTitle ?? true;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
-
   const model = schema.target!;
 
   const exclusive = useMemo(() => {
@@ -330,35 +315,32 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   });
 
   return (
-    <div className={styles.collection}>
-      <div className={styles.header}>
-        <div className={styles.title}>
-          {showTitle && <label>{title}</label>}
+    <FieldControl {...props}>
+      <div className={styles.collection}>
+        <div className={styles.items}>
+          {items.map((item) => (
+            <ItemEditor
+              key={item.id}
+              schema={schema}
+              model={model}
+              editor={editor}
+              fields={fields}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+              valueAtom={itemsFamily(item)}
+              remove={remove}
+              readonly={readonly}
+              setInvalid={handleInvalid}
+            />
+          ))}
         </div>
+        {readonly || (
+          <div className={styles.actions}>
+            <MaterialIcon icon="add" onClick={addNew} />
+          </div>
+        )}
       </div>
-      <div className={styles.items}>
-        {items.map((item) => (
-          <ItemEditor
-            key={item.id}
-            schema={schema}
-            model={model}
-            editor={editor}
-            fields={fields}
-            formAtom={formAtom}
-            widgetAtom={widgetAtom}
-            valueAtom={itemsFamily(item)}
-            remove={remove}
-            readonly={readonly}
-            setInvalid={handleInvalid}
-          />
-        ))}
-      </div>
-      {readonly || (
-        <div className={styles.actions}>
-          <MaterialIcon icon="add" onClick={addNew} />
-        </div>
-      )}
-    </div>
+    </FieldControl>
   );
 }
 

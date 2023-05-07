@@ -9,9 +9,17 @@
   align-items: center;
 }
 
+.title .label,
 .title label[for] {
   color: rgba(var(--bs-body-color-rgb), 0.65);
   margin: 0;
+}
+
+.title .actions {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: end;
 }
 
 .content {
