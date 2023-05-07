@@ -6,11 +6,12 @@ import { useTemplate } from "@/hooks/use-parser";
 import { DataRecord } from "@/services/client/data.types";
 import { Property } from "@/services/client/meta.types";
 
-import { ValueAtom, WidgetProps } from "./types";
+import { FieldControl } from "./form-field";
+import { FieldProps } from "./types";
 
 import styles from "./form-viewers.module.scss";
 
-export type FieldViewerProps = WidgetProps & { valueAtom: ValueAtom<any> };
+export type FieldViewerProps = FieldProps<any>;
 export type FormViewerProps = FieldViewerProps & {
   template: string;
   fields: Record<string, Property>;
@@ -43,59 +44,66 @@ export function FieldViewer(props: FieldViewerProps) {
   return <SimpleViewer {...props} template={template} fields={fields} />;
 }
 
-function SimpleViewer(props: FormViewerProps) {
-  const { schema, formAtom, widgetAtom } = props;
-  const showTitle = schema.showTitle ?? true;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+function SimpleViewer({ template, fields, ...props }: FormViewerProps) {
+  const { formAtom } = props;
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
   );
   return (
-    <div className={styles.viewer}>
-      {showTitle && title && <label>{title}</label>}
-      <RecordViewer {...props} record={record} />
-    </div>
+    <FieldControl {...props} className={styles.viewer}>
+      <RecordViewer
+        template={template}
+        fields={fields}
+        record={record}
+        {...props}
+      />
+    </FieldControl>
   );
 }
 
-function ReferenceViewer(props: FormViewerProps) {
-  const { schema, valueAtom, widgetAtom } = props;
-  const showTitle = schema.showTitle ?? true;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+function ReferenceViewer({ template, fields, ...props }: FormViewerProps) {
+  const { valueAtom } = props;
   const value = useAtomValue(valueAtom);
   const record = useMemo(() => value ?? {}, [value]);
   return (
-    <div className={styles.viewer}>
-      {showTitle && title && <label>{title}</label>}
-      <RecordViewer {...props} record={record} />
-    </div>
+    <FieldControl {...props} className={styles.viewer}>
+      <RecordViewer
+        template={template}
+        fields={fields}
+        record={record}
+        {...props}
+      />
+    </FieldControl>
   );
 }
 
-function CollectionViewer(props: FormViewerProps) {
-  const { schema, valueAtom, widgetAtom } = props;
-  const showTitle = schema.showTitle ?? true;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
+function CollectionViewer({ template, fields, ...props }: FormViewerProps) {
+  const { valueAtom } = props;
   const items = useAtomValue(valueAtom);
   const records: DataRecord[] = useMemo(() => items ?? [], [items]);
 
   return (
-    <div className={styles.viewer}>
-      {showTitle && title && <label>{title}</label>}
+    <FieldControl {...props} className={styles.viewer}>
       {records.map((record) => (
-        <RecordViewer key={record.id} {...props} record={record} />
+        <RecordViewer
+          key={record.id}
+          template={template}
+          fields={fields}
+          record={record}
+          {...props}
+        />
       ))}
-    </div>
+    </FieldControl>
   );
 }
 
-function RecordViewer(props: FormViewerProps & { record: DataRecord }) {
-  const { template, record, fields } = props;
+function RecordViewer({
+  template,
+  fields,
+  record,
+}: FormViewerProps & { record: DataRecord }) {
   const Template = useTemplate(template);
-  // legacy templates may be useing `record.` prefix
+  // legacy templates may be using `record.` prefix
   const rec = useMemo(() => ({ ...record, record }), [record]);
   return (
     <div className={styles.content}>
