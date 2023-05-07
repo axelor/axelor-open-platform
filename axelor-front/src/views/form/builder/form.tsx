@@ -1,6 +1,5 @@
-import { useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { memo, useMemo } from "react";
+import { memo, useCallback, useMemo, useRef } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -8,6 +7,7 @@ import { FormView } from "@/services/client/meta.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
 
 import { useViewAction } from "@/view-containers/views/scope";
+import { useAtomCallback } from "jotai/utils";
 import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
 import {
@@ -34,42 +34,27 @@ export function useFormHandlers(
   parent?: FormAtom,
   initStates?: Record<string, WidgetState>
 ) {
-  const { model = "", fields = {} } = meta;
   const formAtom = useMemo(
     () =>
       createFormAtom({
-        model,
+        meta,
         record,
-        fields,
         parent,
         statesByName: initStates,
       }),
-    [fields, model, parent, record, initStates]
+    [meta, record, parent, initStates]
   );
 
-  const json = meta.view.json ?? false;
-  const ctxAtom = json && parent ? parent : formAtom;
-  const actView = useViewAction();
-
-  const prepareContext = useSetAtom(contextAtom);
+  const prepareContext = usePrepareContext(formAtom);
   const actionHandler = useMemo(() => {
-    // include action view details in root context
-    const { context, views } = actView;
-    const ctx: DataContext = parent
-      ? {}
-      : {
-          ...context,
-          _viewType: "form",
-          _viewName: views?.find((x) => x.type === "form")?.name,
-          _views: views?.map((x) => ({ name: x.name, type: x.type })),
-        };
-    return new FormActionHandler((options?: DataContext) =>
-      prepareContext(ctxAtom, {
+    return new FormActionHandler((options?: DataContext) => {
+      const ctx = prepareContext();
+      return {
         ...ctx,
         ...options,
-      })
-    );
-  }, [actView, ctxAtom, parent, prepareContext]);
+      };
+    });
+  }, [prepareContext]);
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(actionHandler),
@@ -84,6 +69,43 @@ export function useFormHandlers(
     actionHandler,
     actionExecutor,
   };
+}
+
+export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
+  const actionView = useViewAction();
+  const recordRef = useRef<DataRecord>();
+  const contextRef = useRef<DataContext>();
+  return useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const { meta, record, parent } = get(formAtom);
+        if (recordRef.current === record) {
+          return contextRef.current;
+        }
+
+        const json = meta.view.json ?? false;
+        const ctxAtom = json && parent ? parent : formAtom;
+
+        const { context, views } = actionView;
+        const ctx: DataContext = parent
+          ? {}
+          : {
+              ...context,
+              _viewType: meta.view.type,
+              _viewName: meta.view.name,
+              _views: views?.map((x) => ({ name: x.name, type: x.type })),
+            };
+        const res = set(contextAtom, ctxAtom, {
+          ...ctx,
+          ...options,
+        });
+        recordRef.current = record;
+        contextRef.current = res;
+        return res;
+      },
+      [actionView, formAtom, options]
+    )
+  );
 }
 
 export const Form = memo(function Form({

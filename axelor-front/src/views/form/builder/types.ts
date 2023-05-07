@@ -1,8 +1,9 @@
 import { PrimitiveAtom, WritableAtom } from "jotai";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Property, Schema } from "@/services/client/meta.types";
+import { FormView, Property, Schema } from "@/services/client/meta.types";
 import { ActionExecutor, ActionHandler } from "@/view-containers/action";
+import { ViewData } from "@/services/client/meta";
 
 // TODO: add more attrs that can be changed
 export const DEFAULT_ATTRS = {
@@ -55,6 +56,7 @@ export interface FormState {
   original?: DataRecord;
   states: Record<string, WidgetState>;
   statesByName: Record<string, WidgetState>;
+  readonly meta: ViewData<FormView>;
   readonly model: string;
   readonly fields: Record<string, Property>;
   readonly parent?: FormAtom;

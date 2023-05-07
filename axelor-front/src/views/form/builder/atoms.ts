@@ -1,26 +1,28 @@
 import { PrimitiveAtom, atom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { SetStateAction } from "react";
 import { isEqual } from "lodash";
+import { SetStateAction } from "react";
 
 import { isDummy, mergeDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Property, Schema } from "@/services/client/meta.types";
+import { FormView, Schema } from "@/services/client/meta.types";
 import { ActionExecutor } from "@/view-containers/action";
 
+import { ViewData } from "@/services/client/meta";
 import { FormAtom, FormState, WidgetState } from "./types";
 import { defaultAttrs, processContextValues } from "./utils";
 
 export function createFormAtom(props: {
-  model: string;
+  meta: ViewData<FormView>;
   record: DataRecord;
-  fields: Record<string, Property>;
   parent?: PrimitiveAtom<FormState>;
   statesByName?: Record<string, WidgetState>;
 }) {
-  const { model, record, fields, parent, statesByName = {} } = props;
+  const { meta, record, parent, statesByName = {} } = props;
+  const { model = "", fields = {} } = meta;
   const states: Record<string, WidgetState> = {};
   return atom<FormState>({
+    meta,
     model,
     record: { ...record },
     original: { ...record },
@@ -155,9 +157,8 @@ export function createValueAtom({
 }
 
 export const fallbackFormAtom = createFormAtom({
-  model: "",
+  meta: { view: { type: "form" } },
   record: {},
-  fields: {},
 });
 
 export const fallbackWidgetAtom = createWidgetAtom({
