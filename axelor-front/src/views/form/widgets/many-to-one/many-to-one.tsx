@@ -10,7 +10,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useAtomCallback } from "jotai/utils";
-import { FieldContainer, FieldProps } from "../../builder";
+import { FieldContainer, FieldProps, usePrepareContext } from "../../builder";
 import { ViewerInput, ViewerLink } from "../string";
 import {
   CreatableSelect,
@@ -120,37 +120,33 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [handleEdit]
   );
 
-  const handleSelect = useAtomCallback(
-    useCallback(
-      (get) => {
-        showSelector({
-          title: i18n.get("Select {0}", title ?? ""),
-          model: target,
-          viewName: gridView,
-          multiple: false,
-          domain: domain,
-          context: get(formAtom).record,
-          onSelect: async (records) => {
-            handleChange(records[0]);
-          },
-        });
-      },
-      [showSelector, title, target, gridView, domain, formAtom, handleChange]
-    )
-  );
+  const getContext = usePrepareContext(formAtom);
 
-  const handleCompletion = useAtomCallback(
-    useCallback(
-      async (get, set, value: string) => {
-        const res = await search(value, {
-          _domain: domain,
-          _domainContext: get(formAtom).record,
-        });
-        const { records } = res;
-        return records;
+  const handleSelect = useCallback(() => {
+    showSelector({
+      title: i18n.get("Select {0}", title ?? ""),
+      model: target,
+      viewName: gridView,
+      multiple: false,
+      domain: domain,
+      context: domain ? getContext() : {},
+      onSelect: async (records) => {
+        handleChange(records[0]);
       },
-      [domain, formAtom, search]
-    )
+    });
+  }, [showSelector, title, target, gridView, domain, getContext, handleChange]);
+
+  const handleCompletion = useCallback(
+    async (value: string) => {
+      const options = {
+        _domain: domain,
+        _domainContext: domain ? getContext() : {},
+      };
+      const res = await search(value, options);
+      const { records } = res;
+      return records;
+    },
+    [domain, getContext, search]
   );
 
   const valueRef = useRef(value);
