@@ -411,9 +411,7 @@ export function OneToMany({
         />
       </Box>
       <GridComponent
-        {...(editable && {
-          className: styles["grid-editable"],
-        })}
+        className={styles["grid"]}
         ref={gridRef}
         showEditIcon={canEdit || canView}
         editable={editable && canEdit}

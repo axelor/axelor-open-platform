@@ -465,9 +465,7 @@ function GridInner(props: ViewProps<GridView>) {
         </ViewToolBar>
       )}
       <GridComponent
-        {...(editable && {
-          className: styles["grid-editable"],
-        })}
+        className={styles["grid"]}
         ref={gridRef}
         records={records}
         view={view}
