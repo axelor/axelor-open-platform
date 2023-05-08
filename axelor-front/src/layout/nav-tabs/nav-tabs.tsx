@@ -115,6 +115,7 @@ const NavTab = memo(function NavTab({
       className={clsx(styles.tab, {
         [styles.dirty]: dirty,
       })}
+      onAuxClick={handleClose}
     >
       {icon && <NavIcon icon={icon} iconColor={iconColor} />}
       <div className={styles.tabTitle}>{title}</div>
