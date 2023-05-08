@@ -191,7 +191,7 @@ function Footer({
     elems.pop();
 
     const elem = elems[elems.length - 1] as HTMLElement;
-    const parent = elem.querySelector("[data-view-id]") as HTMLElement;
+    const parent = elem && elem.querySelector("[data-view-id]") as HTMLElement;
     if (parent) {
       parentId.current = parent.getAttribute("data-view-id");
     }
