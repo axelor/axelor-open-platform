@@ -21,7 +21,10 @@ interface DashletMenuProps extends DashletHandler {
 
 export function DashletActions({
   viewType,
-}: Pick<DashletMenuProps, "viewType">) {
+  showBars,
+}: Pick<DashletMenuProps, "viewType"> & {
+  showBars?: boolean;
+}) {
   const {
     view,
     actionExecutor,
@@ -36,7 +39,7 @@ export function DashletActions({
 
   return (
     <Box className={classes.actions} gap={1}>
-      {(toolbar || menubar) && (
+      {showBars && (toolbar || menubar) && (
         <ToolbarActions
           buttons={toolbar}
           menus={menubar}

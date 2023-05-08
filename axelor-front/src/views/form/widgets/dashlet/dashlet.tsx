@@ -35,7 +35,7 @@ export function DashletComponent({
   onViewLoad,
   getContext,
 }: DashletProps): any {
-  const { title, action } = schema;
+  const { title, action, widgetAttrs } = schema;
 
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const actionView = await findActionView(action);
@@ -100,7 +100,10 @@ export function DashletComponent({
         >
           <Box className={classes.header}>
             <Box className={classes.title}>{title || tab?.title}</Box>
-            <DashletActions viewType={viewType} />
+            <DashletActions
+              viewType={viewType}
+              showBars={widgetAttrs?.showBars}
+            />
             {viewType && onViewLoad && (
               <DashletViewLoad
                 schema={schema}
