@@ -85,18 +85,27 @@ export function OneToMany({
             shouldSearch.current = false;
             const values =
               typeof setter === "function" ? setter(get(valueAtom)!) : setter;
+            const valIds = (values || []).map((v) => v.id);
 
             set(valueAtom, values, callOnChange);
 
-            setRecords((records) =>
-              [...(values || [])].map((val) => {
-                const rec = val.id
-                  ? records.find((r) => r.id === val.id)
-                  : null;
-                if (rec) return { ...rec, ...val };
-                return val;
-              })
-            );
+            setRecords((records) => {
+              const recIds = records.map((r) => r.id);
+              const deleteIds = recIds.filter((id) => !valIds.includes(id));
+              const newRecords = (values || []).filter(
+                (v) => !recIds.includes(v.id)
+              );
+
+              return records
+                .filter((rec) => !deleteIds.includes(rec.id))
+                .map((rec) => {
+                  const val = rec.id
+                    ? values.find((v) => v.id === rec.id)
+                    : null;
+                  return val ? { ...rec, ...val } : rec;
+                })
+                .concat(newRecords);
+            });
           }
         ),
       [valueAtom]
@@ -169,14 +178,7 @@ export function OneToMany({
         records = res.records;
       }
 
-      records = [
-        ...(
-          ids.map((id) => records.find((r) => r.id === id)) as DataRecord[]
-        ).filter((r) => r),
-        ...unsaved,
-      ];
-
-      setRecords(records);
+      setRecords([...records, ...unsaved]);
 
       return {
         page,
@@ -192,17 +194,19 @@ export function OneToMany({
         setValue((prev) => {
           const items = prev || [];
           const ids = items.map((x) => x.id);
-          const selected = records || [];
-          const newItems = selected
-            .filter((rec) => !ids.includes(rec.id))
-            .map((item) => {
-              if (isManyToMany && item.id && item.id > 0) {
-                const { version, ...res } = item;
-                return res;
+          const newItems = records.filter(({ id }) => !ids.includes(id));
+          return [
+            ...items.map((item) => {
+              const record = records.find((r) => r.id === item.id);
+              return record ? { ...item, ...record } : item;
+            }),
+            ...newItems.map((item) => {
+              if (isManyToMany && (item.id ?? 0) > 0) {
+                return { ...item, version: undefined };
               }
               return item;
-            });
-          return [...items, ...newItems];
+            }),
+          ];
         });
       },
       [isManyToMany, setValue]
@@ -302,7 +306,7 @@ export function OneToMany({
     [setValue, clearSelection]
   );
 
-  const { selectedRows, rows, editRow } = state;
+  const { selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
 
   useEffect(() => {
@@ -421,8 +425,8 @@ export function OneToMany({
         setState={setState}
         onEdit={canEdit ? onEdit : noop}
         onView={canView ? onView : noop}
+        onSave={onSave}
         onSearch={onSearch}
-        onRecordSave={onSave}
       />
     </Box>
   );
