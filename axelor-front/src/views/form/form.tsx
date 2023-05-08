@@ -67,7 +67,7 @@ const fetchRecord = async (
   return {};
 };
 
-const showErrors = (errors: WidgetErrors[]) => {
+export const showErrors = (errors: WidgetErrors[]) => {
   const titles = Object.values(errors).flatMap((e) => Object.values(e));
   alerts.error({
     message: (

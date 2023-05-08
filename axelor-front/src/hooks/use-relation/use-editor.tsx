@@ -10,9 +10,10 @@ import { i18n } from "@/services/client/i18n";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
-import { initTab } from "../use-tabs";
 import { FormView } from "@/services/client/meta.types";
 import { checkErrors } from "@/views/form/builder/utils";
+import { initTab } from "../use-tabs";
+import { showErrors } from "@/views/form";
 
 export type EditorOptions = {
   model: string;
@@ -108,11 +109,13 @@ function Footer({
     const canSave = state.dirty || !record.id;
 
     try {
+      const errors = checkErrors(state.states);
+      if (errors) {
+        showErrors(errors);
+        return;
+      }
       if (canSave) {
         if (onSave) {
-          if (checkErrors(state.states)) {
-            return Promise.reject();
-          }
           onSave(record);
         } else if (onSelect && handler.onSave) {
           const rec = await handler.onSave();
