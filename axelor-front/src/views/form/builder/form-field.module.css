@@ -35,12 +35,17 @@
 }
 
 .label.help::after {
-  position: absolute;
   content: "?";
   font-size: 0.75rem;
   color: var(--bs-green);
   font-weight: 600;
   margin: 0 2px;
+  vertical-align: super;
+  float: right;
+}
+
+[dir="rtl"] .label.help::after {
+  float: left;
 }
 
 .tooltip {

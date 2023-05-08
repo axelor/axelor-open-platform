@@ -340,7 +340,6 @@ export function OneToMany({
               schema={schema}
               formAtom={formAtom}
               widgetAtom={widgetAtom}
-              valueAtom={valueAtom}
             />
           )}
         </div>

@@ -34,7 +34,6 @@ export function FieldControl({
   showTitle,
   formAtom,
   widgetAtom,
-  valueAtom,
   titleActions,
   children,
 }: FieldControlProps<any>) {
@@ -47,7 +46,6 @@ export function FieldControl({
             schema={schema}
             formAtom={formAtom}
             widgetAtom={widgetAtom}
-            valueAtom={valueAtom}
           />
           {titleActions && <Box className={styles.actions}>{titleActions}</Box>}
         </Box>
@@ -61,56 +59,74 @@ export function FieldLabel({
   schema,
   formAtom,
   widgetAtom,
-  valueAtom,
   className,
-}: FieldProps<any> & { className?: string }) {
+}: WidgetProps & { className?: string }) {
   const { uid, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
-  const technical = session.info?.user.technical;
+  return (
+    <HelpPopover schema={schema} formAtom={formAtom} widgetAtom={widgetAtom}>
+      <InputLabel
+        htmlFor={uid}
+        className={clsx(className, styles.label, { [styles.help]: help })}
+      >
+        {title}
+      </InputLabel>
+    </HelpPopover>
+  );
+}
+
+export function HelpPopover({
+  schema,
+  formAtom,
+  widgetAtom,
+  children,
+  content,
+}: WidgetProps & {
+  children: React.ReactElement;
+  content?: () => JSX.Element | null;
+}) {
+  const { name, help } = schema;
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title } = attrs;
+
+  const technical = session.info?.user.technical && name;
   const canShowHelp = help || technical;
 
   if (canShowHelp) {
     return (
       <Tooltip
         title={title}
-        content={() => (
-          <HelpContent
-            schema={schema}
-            formAtom={formAtom}
-            widgetAtom={widgetAtom}
-            valueAtom={valueAtom}
-          />
-        )}
+        content={
+          content ??
+          (() => (
+            <HelpContent
+              schema={schema}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+            />
+          ))
+        }
       >
-        <InputLabel
-          htmlFor={uid}
-          className={clsx(className, styles.label, { [styles.help]: help })}
-        >
-          {title}
-        </InputLabel>
+        {children}
       </Tooltip>
     );
   }
 
-  return (
-    <InputLabel htmlFor={uid} className={clsx(styles.label)}>
-      {title}
-    </InputLabel>
-  );
+  return children;
 }
 
-function HelpContent(props: FieldProps<any>) {
+function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
   const { name, serverType, target, help } = schema;
   const { model, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
 
-  const technical = session.info?.user.technical;
+  const technical = session.info?.user.technical && name;
 
-  const value = original?.[name];
+  const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });
 
   if (serverType && serverType.endsWith("_ONE") && value) {
