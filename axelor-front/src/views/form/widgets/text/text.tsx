@@ -1,8 +1,11 @@
-import { Box, Input } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import React, { useCallback, useState } from "react";
+
+import { Input } from "@axelor/ui";
+
 import { FieldControl, FieldProps } from "../../builder";
-import classes from "./text.module.scss";
+
+const noop = () => {};
 
 export function Text({
   inputProps,
@@ -47,12 +50,19 @@ export function Text({
   return (
     <FieldControl {...props}>
       {readonly ? (
-        <Box
-          p={1}
-          w={100}
-          className={classes.content}
-          dangerouslySetInnerHTML={{ __html: value ?? "" }}
-          {...(value ? { as: "pre" } : {})}
+        <Input
+          data-input
+          as="textarea"
+          rows={height || 5}
+          value={value || ""}
+          onChange={noop}
+          disabled
+          readOnly
+          bg="body"
+          border={false}
+          style={{
+            resize: "none",
+          }}
         />
       ) : (
         <Input
