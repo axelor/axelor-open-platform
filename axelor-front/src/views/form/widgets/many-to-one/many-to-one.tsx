@@ -33,9 +33,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
-  const {
-    attrs: { title, focus, domain },
-  } = useAtomValue(widgetAtom);
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title, focus, domain } = attrs;
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
   const showSelector = useSelector();
@@ -60,8 +59,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const canView = value && hasButton("view");
-  const canEdit = value && hasButton("edit");
-  const canNew = hasButton("new");
+  const canEdit = value && hasButton("edit") && attrs.canEdit;
+  const canNew = hasButton("new") && attrs.canNew;
   const canSelect = hasButton("select");
 
   const ensureRelated = useAtomCallback(
