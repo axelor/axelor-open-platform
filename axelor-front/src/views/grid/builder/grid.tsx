@@ -18,6 +18,7 @@ import {
   getRows,
 } from "@axelor/ui/grid";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { ScopeProvider } from "jotai-molecules";
 
 import { useAsync } from "@/hooks/use-async";
 import { SearchOptions, SearchResult } from "@/services/client/data";
@@ -33,6 +34,7 @@ import { Attrs } from "@/views/form/builder";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
+import { GridScope } from "./scope";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -53,6 +55,7 @@ export const Grid = forwardRef<
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
     editable?: boolean;
+    readonly?: boolean;
     showEditIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
     actionExecutor?: ActionExecutor;
@@ -70,6 +73,7 @@ export const Grid = forwardRef<
     actionExecutor,
     showEditIcon = true,
     editable = true,
+    readonly,
     columnAttrs,
     records,
     state,
@@ -147,7 +151,6 @@ export const Grid = forwardRef<
         title: "",
         name: "$$edit",
         widget: "edit-icon",
-        readonly: onEdit === onView,
         computed: true,
         sortable: false,
         searchable: false,
@@ -156,15 +159,7 @@ export const Grid = forwardRef<
     }
 
     return columns;
-  }, [
-    view.items,
-    view.editIcon,
-    showEditIcon,
-    fields,
-    columnAttrs,
-    onEdit,
-    onView,
-  ]);
+  }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
 
   const init = useAsync(async () => {
     onSearch?.({ ...searchOptions, fields: names });
@@ -312,38 +307,40 @@ export const Grid = forwardRef<
 
   return (
     <AxGridProvider>
-      <AxGrid
-        cellRenderer={
-          hasActionCell && actionExecutor ? ActionCellRenderer : CellRenderer
-        }
-        rowRenderer={CustomRowRenderer}
-        allowColumnResize
-        allowGrouping
-        allowSorting
-        allowSelection
-        allowCellSelection
-        allowColumnHide
-        allowColumnOptions
-        allowColumnCustomize
-        sortType="state"
-        selectionType="multiple"
-        {...(editable &&
-          view.editable && {
-            editable: true,
-            editRowRenderer: CustomFormRenderer,
-            onRecordSave: onSave,
-            onRecordAdd: handleRecordAdd,
-            onRecordEdit: handleRecordEdit,
-            onRecordDiscard: handleRecordDiscard,
-          })}
-        onCellClick={handleCellClick}
-        onRowDoubleClick={handleRowDoubleClick}
-        state={state!}
-        setState={setState!}
-        records={records!}
-        {...gridProps}
-        columns={columns}
-      />
+      <ScopeProvider scope={GridScope} value={{ readonly }}>
+        <AxGrid
+          cellRenderer={
+            hasActionCell && actionExecutor ? ActionCellRenderer : CellRenderer
+          }
+          rowRenderer={CustomRowRenderer}
+          allowColumnResize
+          allowGrouping
+          allowSorting
+          allowSelection
+          allowCellSelection
+          allowColumnHide
+          allowColumnOptions
+          allowColumnCustomize
+          sortType="state"
+          selectionType="multiple"
+          {...(editable &&
+            view.editable && {
+              editable: true,
+              editRowRenderer: CustomFormRenderer,
+              onRecordSave: onSave,
+              onRecordAdd: handleRecordAdd,
+              onRecordEdit: handleRecordEdit,
+              onRecordDiscard: handleRecordDiscard,
+            })}
+          onCellClick={handleCellClick}
+          onRowDoubleClick={handleRowDoubleClick}
+          state={state!}
+          setState={setState!}
+          records={records!}
+          {...gridProps}
+          columns={columns}
+        />
+      </ScopeProvider>
     </AxGridProvider>
   );
 });

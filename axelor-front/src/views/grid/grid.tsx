@@ -364,7 +364,7 @@ function GridInner(props: ViewProps<GridView>) {
     : {};
   const dashletProps: any = dashlet
     ? {
-        showEditIcon: viewProps?.readonly !== true,
+        readonly: viewProps?.readonly,
       }
     : {
         allowSearch: true,

@@ -414,6 +414,7 @@ export function OneToMany({
         className={styles["grid"]}
         ref={gridRef}
         showEditIcon={canEdit || canView}
+        readonly={readonly || !canEdit}
         editable={editable && canEdit}
         records={records}
         view={(viewData?.view || schema) as GridView}

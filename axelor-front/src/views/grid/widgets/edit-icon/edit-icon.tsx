@@ -1,10 +1,10 @@
 import { Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import { GridColumnProps } from "@axelor/ui/src/grid/grid-column";
+import { useGridScope } from "../../builder/scope";
 
-export function EditIcon(props: GridColumnProps) {
-  const data = (props.data || {}) as any;
-  const icon = data.readonly ? "description" : "edit";
+export function EditIcon() {
+  const { readonly } = useGridScope();
+  const icon = readonly ? "description" : "edit";
   return (
     <Box h={100} d="flex" justifyContent="center" alignItems="center">
       <MaterialIcon icon={icon} fontSize={20} />
