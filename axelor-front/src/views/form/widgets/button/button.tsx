@@ -11,6 +11,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
+import { Tooltip } from "@/components/tooltip";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -68,7 +69,7 @@ function findVariant(schema: Schema) {
 
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
-  const { showTitle = true, icon } = schema;
+  const { showTitle = true, icon, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const { title } = attrs;
@@ -98,13 +99,28 @@ export function Button(props: WidgetProps) {
   }, [actionExecutor, schema]);
 
   const disabled = wait || attrs.readonly;
+  const hasHelp = !!help;
+
+  const button = (
+    <Btn
+      variant={variant}
+      onClick={handleClick}
+      disabled={disabled}
+      className={clsx(styles.button, {
+        [styles.help]: hasHelp,
+      })}
+    >
+      {icon && <ButtonIcon {...props} />}
+      {showTitle && title}
+    </Btn>
+  );
 
   return (
     <WidgetControl {...props}>
-      <Btn variant={variant} onClick={handleClick} disabled={disabled}>
-        {icon && <ButtonIcon {...props} />}
-        {showTitle && title}
-      </Btn>
+      {hasHelp && (
+        <Tooltip content={() => <span>{help}</span>}>{button}</Tooltip>
+      )}
+      {hasHelp || button}
     </WidgetControl>
   );
 }

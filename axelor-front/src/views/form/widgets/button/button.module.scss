@@ -14,3 +14,16 @@
     display: inline-flex;
   }
 }
+
+.button {
+  position: relative;
+}
+
+.help::after {
+  position: absolute;
+  content: "?";
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 2px;
+  vertical-align: super;
+}

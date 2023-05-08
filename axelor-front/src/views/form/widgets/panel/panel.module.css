@@ -4,6 +4,8 @@
 }
 
 .panelHeader {
+  display: flex;
+  align-items: center;
   font-weight: 600;
 }
 
