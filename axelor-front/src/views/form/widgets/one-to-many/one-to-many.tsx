@@ -415,7 +415,7 @@ export function OneToMany({
           className: styles["grid-editable"],
         })}
         ref={gridRef}
-        showEditIcon={canEdit}
+        showEditIcon={canEdit || canView}
         editable={editable && canEdit}
         records={records}
         view={(viewData?.view || schema) as GridView}
@@ -423,7 +423,7 @@ export function OneToMany({
         columnAttrs={columnAttrs}
         state={state}
         setState={setState}
-        onEdit={canEdit ? onEdit : noop}
+        onEdit={canEdit ? onEdit : canView ? onView : noop}
         onView={canView ? onView : noop}
         onSave={onSave}
         onSearch={onSearch}

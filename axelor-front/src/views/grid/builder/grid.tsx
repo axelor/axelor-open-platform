@@ -23,16 +23,16 @@ import { useAsync } from "@/hooks/use-async";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
-import { nextId } from "@/views/form/builder/utils";
 import format from "@/utils/format";
+import { nextId } from "@/views/form/builder/utils";
 
-import { Attrs } from "@/views/form/builder";
-import { Cell as CellRenderer } from "../renderers/cell";
-import { Row as RowRenderer } from "../renderers/row";
-import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { Attrs } from "@/views/form/builder";
+import { Cell as CellRenderer } from "../renderers/cell";
+import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
+import { Row as RowRenderer } from "../renderers/row";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -147,6 +147,7 @@ export const Grid = forwardRef<
         title: "",
         name: "$$edit",
         widget: "edit-icon",
+        readonly: onEdit === onView,
         computed: true,
         sortable: false,
         searchable: false,
@@ -155,7 +156,15 @@ export const Grid = forwardRef<
     }
 
     return columns;
-  }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
+  }, [
+    view.items,
+    view.editIcon,
+    showEditIcon,
+    fields,
+    columnAttrs,
+    onEdit,
+    onView,
+  ]);
 
   const init = useAsync(async () => {
     onSearch?.({ ...searchOptions, fields: names });
