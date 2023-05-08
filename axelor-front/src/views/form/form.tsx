@@ -2,7 +2,14 @@ import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import { SyntheticEvent, useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -44,6 +51,7 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
+import { parseExpression } from "@/hooks/use-parser/utils";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -145,7 +153,18 @@ function FormContainer({
   const { attrs } = useAtomValue(widgetAtom);
   const setAttrs = useSetAtom(widgetAtom);
 
-  const readonly = attrs.readonly ?? props.readonly;
+  const [readonlyExclusive, setReadonlyExclusive] = useState(false);
+
+  useEffect(() => {
+    const readonlyIf = schema.readonlyIf;
+    if (!readonlyIf) return;
+    return recordHandler.subscribe((record) => {
+      const value = Boolean(parseExpression(readonlyIf)(record));
+      setReadonlyExclusive((prev) => value);
+    });
+  }, [recordHandler, schema.readonlyIf]);
+
+  const readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
   const prevType = useSelectViewState(
     useCallback((state) => state.prevType, [])
   );
@@ -467,7 +486,7 @@ function FormContainer({
   }, [actionHandler, closeTab, isDirty, popup, tab.action]);
 
   const canNew = hasButton("new");
-  const canEdit = readonly && hasButton("edit");
+  const canEdit = readonly && !readonlyExclusive && hasButton("edit");
   const canSave = !readonly && hasButton("save");
   const canDelete = hasButton("delete") && record.id;
   const canCopy = !isDirty && canNew && hasButton("copy") && record.id;
