@@ -36,16 +36,26 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const { action, dashlet, popup, popupOptions } = useViewTab();
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
 
+  const getContext = useCallback(
+    () => ({
+      ...action.context,
+      ...(dashlet && {
+        _model: action.context?._model || view.nodes?.[0]?.model,
+      }),
+    }),
+    [action, view, dashlet]
+  );
+
   const actionExecutor = useGridActionExecutor(
     view,
     useCallback<() => DataContext>(
       () => ({
-        ...action.context,
+        ...getContext(),
         _viewName: action.name,
         _viewType: action.viewType,
         _views: action.views,
       }),
-      [action]
+      [action, getContext]
     )
   );
 
@@ -103,7 +113,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           filter: {
             _domain: domain,
             _domainContext: {
-              ...action.context,
+              ...getContext(),
               ...(isSameModelTree
                 ? { _countOn: nodes?.[1]?.parent }
                 : {
@@ -116,7 +126,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           },
         })
       : null;
-  }, [view, isSameModelTree, action]);
+  }, [view, isSameModelTree, getContext]);
 
   const columns = useMemo(() => {
     return (view.columns || []).map((column) => {
@@ -165,7 +175,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
             }`,
           }),
           _domainContext: {
-            ...action.context,
+            ...getContext(),
             ...(countOn && { _countOn: countOn }),
             _parentId: treeNode.id,
           },
@@ -177,7 +187,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         (await ds.search(getSearchOptions(node))).records
       );
     },
-    [action, view, isSameModelTree, toTreeData, getSearchOptions]
+    [view, isSameModelTree, toTreeData, getContext, getSearchOptions]
   );
 
   const handleNodeMove = useCallback(
