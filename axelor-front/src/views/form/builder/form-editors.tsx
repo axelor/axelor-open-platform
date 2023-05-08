@@ -17,7 +17,7 @@ import {
   Schema,
 } from "@/services/client/meta.types";
 
-import { Form, useFormHandlers } from "./form";
+import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { FieldProps, FormState, WidgetAtom } from "./types";
@@ -254,6 +254,9 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
     );
   }, [valueAtom]);
 
+  const { hasButton } = usePermission(schema, widgetAtom);
+  const canNew = !readonly && hasButton("new");
+
   const itemsFamily = useMemo(() => {
     return atomFamily(
       (record: DataRecord) =>
@@ -334,7 +337,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
             />
           ))}
         </div>
-        {readonly || (
+        {canNew && (
           <div className={styles.actions}>
             <MaterialIcon icon="add" onClick={addNew} />
           </div>

@@ -53,11 +53,30 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
       )
     ) || props.readonly;
 
+  const canEdit = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetAtom, (a) => a.attrs.canEdit ?? true),
+      [widgetAtom]
+    )
+  );
+
+  const canView = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetAtom, (a) => a.attrs.canView ?? true),
+      [widgetAtom]
+    )
+  );
+
+  const canShowEditor = schema.editor && valueAtom && canEdit && !readonly;
+  const canShowViewer = schema.viewer && valueAtom && canView && readonly;
+  const showEditorAsViewer =
+    schema.editor?.viewer && valueAtom && canView && readonly;
+
   if (hidden) {
     return null;
   }
 
-  if (schema.viewer && valueAtom && readonly) {
+  if (canShowViewer) {
     const viewerProps = props as FieldProps<any>;
     return (
       <FieldViewer
@@ -68,7 +87,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
     );
   }
 
-  if (schema.editor && valueAtom && (!readonly || schema.editor.viewer)) {
+  if (canShowEditor || showEditorAsViewer) {
     const editorProps = props as FieldProps<any>;
     return (
       <FieldEditor

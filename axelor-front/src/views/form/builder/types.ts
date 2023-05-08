@@ -22,6 +22,7 @@ export const DEFAULT_ATTRS = {
   icon: undefined as unknown as string,
   selectionIn: undefined as unknown as string,
   canNew: undefined as unknown as boolean,
+  canView: undefined as unknown as boolean,
   canEdit: undefined as unknown as boolean,
   canSave: undefined as unknown as boolean,
   canCopy: undefined as unknown as boolean,
