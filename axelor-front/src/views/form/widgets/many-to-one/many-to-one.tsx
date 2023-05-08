@@ -1,16 +1,17 @@
 import { useAtom, useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useRef } from "react";
 
-import { usePerms } from "@/hooks/use-perms";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useAtomCallback } from "jotai/utils";
-import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
+import { usePermission, usePrepareContext } from "../../builder/form";
+import { FieldControl } from "../../builder/form-field";
+import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string";
 import {
   CreatableSelect,
@@ -30,7 +31,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
-  const { hasButton } = usePerms(schema);
+  const { hasButton } = usePermission(schema, widgetAtom);
 
   const {
     attrs: { title, focus, domain },
@@ -59,8 +60,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const canView = value && hasButton("view");
-  const canEdit = value && hasButton("edit") && schema.canEdit === true;
-  const canNew = hasButton("new") && schema.canNew === true;
+  const canEdit = value && hasButton("edit");
+  const canNew = hasButton("new");
   const canSelect = hasButton("select");
 
   const ensureRelated = useAtomCallback(

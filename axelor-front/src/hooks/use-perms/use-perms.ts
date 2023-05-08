@@ -31,7 +31,7 @@ const ACTIONS = {
   attach: "canAttach",
 } as const;
 
-type PermisionName = keyof typeof PERMS | keyof typeof ACTIONS;
+type PermissionName = keyof typeof PERMS | keyof typeof ACTIONS;
 
 function attr(props: Schema, which: string) {
   return props[which] !== false;
@@ -41,7 +41,7 @@ function perm(perms: Perms, which: keyof Perms) {
   return perms?.[which] !== false;
 }
 
-function can(props: Schema, perms: Perms, what: PermisionName) {
+function can(props: Schema, perms: Perms, what: PermissionName) {
   return attr(props, ACTIONS[what]) && perm(perms, PERMS[what] as keyof Perms);
 }
 
@@ -62,7 +62,7 @@ export function usePerms(state: Schema, perms = defaultPerms) {
      * @param name operation name
      * @returns true if permitted false otherwise
      */
-    (name: PermisionName) => {
+    (name: PermissionName) => {
       return can(state, perms, name);
     },
     [perms, state]
@@ -79,7 +79,7 @@ export function usePerms(state: Schema, perms = defaultPerms) {
      * @returns true if permitted false otherwise
      */
     (name: string) => {
-      return can(state, perms, name as PermisionName) && state[name] !== false;
+      return can(state, perms, name as PermissionName) && state[name] !== false;
     },
     [perms, state]
   );

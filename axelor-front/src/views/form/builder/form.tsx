@@ -3,10 +3,12 @@ import { memo, useCallback, useMemo, useRef } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
-import { FormView } from "@/services/client/meta.types";
+import { FormView, Perms, Schema } from "@/services/client/meta.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
 
+import { usePerms } from "@/hooks/use-perms";
 import { useViewAction } from "@/view-containers/views/scope";
+import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
@@ -17,7 +19,7 @@ import {
   FormRecordUpdates,
   FormScope,
 } from "./scope";
-import { FormAtom, FormProps, WidgetState } from "./types";
+import { FormAtom, FormProps, WidgetAtom, WidgetState } from "./types";
 import { processView } from "./utils";
 
 /**
@@ -106,6 +108,16 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
       [actionView, formAtom, options]
     )
   );
+}
+
+export function usePermission(
+  schema: Schema,
+  widgetAtom: WidgetAtom,
+  perms?: Perms
+) {
+  const { attrs } = useAtomValue(widgetAtom);
+  const props = useMemo(() => ({ ...schema, ...attrs }), [attrs, schema]);
+  return usePerms(props, perms);
 }
 
 export const Form = memo(function Form({
