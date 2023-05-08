@@ -1,17 +1,3 @@
-import { dialogs } from "@/components/dialogs";
-import { useAsync } from "@/hooks/use-async";
-import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
-import { SearchOptions, SearchResult } from "@/services/client/data";
-import { DataStore } from "@/services/client/data-store";
-import { DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
-import { findView } from "@/services/client/meta-cache";
-import { GridView } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
-import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
-import { useGridState } from "@/views/grid/builder/utils";
-import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
-import { GridRow } from "@axelor/ui/grid";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
@@ -24,9 +10,29 @@ import {
   useRef,
   useState,
 } from "react";
-import { FieldLabel, FieldProps } from "../../builder";
+
+import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+import { GridRow } from "@axelor/ui/grid";
+
+import { dialogs } from "@/components/dialogs";
+import { useAsync } from "@/hooks/use-async";
+import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
+import { SearchOptions, SearchResult } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { findView } from "@/services/client/meta-cache";
+import { GridView } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
+import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
+import { useGridState } from "@/views/grid/builder/utils";
+
+import { FieldLabel, FieldProps, usePermission } from "../../builder";
 import { nextId } from "../../builder/utils";
-import classes from "./one-to-many.module.scss";
+
+import styles from "./one-to-many.module.scss";
+
+const noop = () => {};
 
 export function OneToMany({
   schema,
@@ -53,6 +59,7 @@ export function OneToMany({
     () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
     [formAtom, name]
   );
+
   const setSelection = useSetAtom(
     useMemo(
       () =>
@@ -95,6 +102,9 @@ export function OneToMany({
       [valueAtom]
     )
   );
+
+  const { hasButton } = usePermission(schema, widgetAtom);
+
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
@@ -248,10 +258,10 @@ export function OneToMany({
     openEditor({}, (record) => handleSelect([record]), onSave);
   }, [openEditor, onSave, handleSelect]);
 
-  const onAddInGrid = useCallback(async () => {
+  const onAddInGrid = useCallback(() => {
     const gridHandler = gridRef.current;
     if (gridHandler) {
-      await gridHandler.onAdd?.();
+      gridHandler.onAdd?.();
     }
   }, []);
 
@@ -307,19 +317,26 @@ export function OneToMany({
 
   if (viewState === "loading") return null;
 
+  const canNew = !readonly && hasButton("new");
+  const canView = readonly && hasButton("view");
+  const canEdit = !readonly && hasButton("edit");
+  const canDelete = !readonly && hasButton("delete");
+  const canSelect = !readonly && hasButton("select");
+  const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
+
   return (
     <Box
       d="flex"
       flexDirection="column"
-      className={classes.container}
+      className={styles.container}
       border
       roundedTop
     >
-      <Box className={classes.header}>
-        <div className={classes.title}>
+      <Box className={styles.header}>
+        <div className={styles.title}>
           {showTitle && (
             <FieldLabel
-              className={classes.titleText}
+              className={styles.titleText}
               schema={schema}
               formAtom={formAtom}
               widgetAtom={widgetAtom}
@@ -339,7 +356,7 @@ export function OneToMany({
                       icon: "search",
                     },
                     onClick: onSelect,
-                    hidden: readonly,
+                    hidden: !canSelect,
                   } as CommandItemProps,
                 ]
               : []),
@@ -350,7 +367,7 @@ export function OneToMany({
                 icon: "add",
               },
               onClick: editable ? onAddInGrid : onAdd,
-              hidden: readonly,
+              hidden: !canNew,
             },
             {
               key: "edit",
@@ -359,7 +376,7 @@ export function OneToMany({
                 icon: "edit",
               },
               disabled: !hasRowSelected,
-              hidden: readonly || Boolean(editRow),
+              hidden: !canEdit,
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
                 const record = rows[rowIndex]?.record;
@@ -373,7 +390,7 @@ export function OneToMany({
                 icon: "delete",
               },
               disabled: !hasRowSelected,
-              hidden: readonly,
+              hidden: !canDelete,
               onClick: () => {
                 onDelete(selectedRows!.map((ind) => rows[ind]?.record));
               },
@@ -385,26 +402,26 @@ export function OneToMany({
                 icon: "refresh",
               },
               onClick: () => onSearch(),
-              hidden: readonly || Boolean(editRow),
+              hidden: !canRefresh,
             },
           ]}
         />
       </Box>
       <GridComponent
         {...(editable && {
-          className: classes["grid-editable"],
+          className: styles["grid-editable"],
         })}
         ref={gridRef}
-        showEditIcon={!readonly}
-        editable={editable}
+        showEditIcon={canEdit}
+        editable={editable && hasButton("edit")}
         records={records}
         view={(viewData?.view || schema) as GridView}
         fields={viewData?.fields || fields}
         columnAttrs={columnAttrs}
         state={state}
         setState={setState}
-        onEdit={onEdit}
-        onView={onView}
+        onEdit={canEdit ? onEdit : noop}
+        onView={canView ? onView : noop}
         onSearch={onSearch}
         onRecordSave={onSave}
       />
