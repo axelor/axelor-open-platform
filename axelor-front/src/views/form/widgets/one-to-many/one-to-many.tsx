@@ -318,8 +318,8 @@ export function OneToMany({
   if (viewState === "loading") return null;
 
   const canNew = !readonly && hasButton("new");
-  const canView = readonly && hasButton("view");
   const canEdit = !readonly && hasButton("edit");
+  const canView = (readonly || !canEdit) && hasButton("view");
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
   const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
@@ -365,7 +365,7 @@ export function OneToMany({
               iconProps: {
                 icon: "add",
               },
-              onClick: editable ? onAddInGrid : onAdd,
+              onClick: editable && canEdit ? onAddInGrid : onAdd,
               hidden: !canNew,
             },
             {
@@ -375,7 +375,7 @@ export function OneToMany({
                 icon: "edit",
               },
               disabled: !hasRowSelected,
-              hidden: !canEdit,
+              hidden: !canEdit || !hasRowSelected,
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
                 const record = rows[rowIndex]?.record;
@@ -389,7 +389,7 @@ export function OneToMany({
                 icon: "delete",
               },
               disabled: !hasRowSelected,
-              hidden: !canDelete,
+              hidden: !canDelete || !hasRowSelected,
               onClick: () => {
                 onDelete(selectedRows!.map((ind) => rows[ind]?.record));
               },
@@ -412,7 +412,7 @@ export function OneToMany({
         })}
         ref={gridRef}
         showEditIcon={canEdit}
-        editable={editable && hasButton("edit")}
+        editable={editable && canEdit}
         records={records}
         view={(viewData?.view || schema) as GridView}
         fields={viewData?.fields || fields}
