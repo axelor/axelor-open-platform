@@ -7,7 +7,7 @@ import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
-import { FormWidget, WidgetProps } from "../../builder";
+import { FormAtom, FormWidget, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
 function TabContent({
@@ -79,7 +79,14 @@ export function PanelTabs(props: WidgetProps) {
 
   const hiddenState = useAtomValue(hiddenStateAtom);
   const visibleTabs = useMemo(
-    () => tabItems.filter((item) => !hiddenState[item.id]),
+    () =>
+      tabItems
+        .filter((item) => !hiddenState[item.id])
+        .map((item) => {
+          // remove showIf/hideIf to avoid double evaluation
+          const { showIf, hideIf, ...rest } = item as Schema;
+          return rest as NavItemProps;
+        }),
     [hiddenState, tabItems]
   );
 
@@ -128,6 +135,7 @@ export function PanelTabs(props: WidgetProps) {
         value={activeTab ?? undefined}
         onChange={handleChange}
       />
+      <DummyTabs items={tabItems} formAtom={formAtom} />
       {visibleTabs.map((item) => {
         const active = activeTab === item.id;
         return (
@@ -140,6 +148,29 @@ export function PanelTabs(props: WidgetProps) {
           />
         );
       })}
+    </Box>
+  );
+}
+
+// required for showIf/hideIf
+function DummyTabs({
+  items,
+  formAtom,
+}: {
+  formAtom: FormAtom;
+  items: NavItemProps[];
+}) {
+  const tabs = useMemo(() => {
+    return items.map((item) => {
+      const { id, uid, name, showIf, hideIf } = item as Schema;
+      return { id, uid, name, showIf, hideIf } as NavItemProps;
+    });
+  }, [items]);
+  return (
+    <Box d="none">
+      {tabs.map((item) => (
+        <FormWidget key={item.id} schema={item} formAtom={formAtom} />
+      ))}
     </Box>
   );
 }
