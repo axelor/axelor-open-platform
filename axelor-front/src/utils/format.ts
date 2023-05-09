@@ -94,6 +94,17 @@ const formatString: Formatter = (value, opts = {}) => {
   return value;
 };
 
+function addCurrency(value: string, symbol: string) {
+  if (value && symbol) {
+    const lang = l10n.getLocale().split(/-|_/)[0];
+    if (lang === "fr") {
+      return value.endsWith(symbol) ? value : value + " " + symbol;
+    }
+    return value.startsWith(symbol) ? value : symbol + " " + value;
+  }
+  return value;
+}
+
 const formatNumber: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
   let { scale, currency } = props ?? {};
@@ -126,7 +137,22 @@ const formatNumber: Formatter = (value, opts = {}) => {
       opts.style = "currency";
       opts.currency = currency;
     }
-    return l10n.formatNumber(num, opts);
+    try {
+      return l10n.formatNumber(num, opts);
+    } catch (e) {
+      // Fall back to adding currency symbol
+      if (currency) {
+        const result = l10n.formatNumber(num, {
+          minimumFractionDigits: opts.minimumFractionDigits,
+          maximumFractionDigits: opts.maximumFractionDigits,
+        });
+        return addCurrency(result, currency);
+      }
+      throw e;
+    }
+  }
+  if (typeof value === "string" && currency) {
+    return addCurrency(value, currency);
   }
   return value;
 };
