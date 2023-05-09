@@ -25,8 +25,8 @@ function computeCols(cols: number, colWidths: string = "") {
     return undefined;
   }
 
-  while (widths.length < cols) {
-    widths.push("1fr");
+  if (widths.length < cols) {
+    widths.push(`repeat(${cols - widths.length}, auto-fit)`);
   }
 
   return widths.join(" ");
