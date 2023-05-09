@@ -1,7 +1,4 @@
 .container {
   margin: 0.5rem 0;
-
-  &:not(.readonly) {
-    border: 1px solid var(--bs-border-color);
-  }
+  border: 1px solid var(--bs-border-color);
 }

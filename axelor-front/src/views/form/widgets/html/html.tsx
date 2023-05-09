@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
 
@@ -34,10 +33,8 @@ export function Html(props: FieldProps<string>) {
     [changed, setValue]
   );
 
-  const className = clsx(styles.container, { [styles.readonly]: readonly });
-
   return (
-    <FieldControl {...props} className={className}>
+    <FieldControl {...props}>
       {readonly && <ViewerComponent value={value || ""} />}
       {readonly || (
         <EditorComponent
@@ -46,6 +43,7 @@ export function Html(props: FieldProps<string>) {
           value={value || ""}
           onChange={handleChange}
           onBlur={handleBlur}
+          className={styles.container}
           {...({} as any)}
         />
       )}

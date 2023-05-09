@@ -16,6 +16,7 @@ import {
 } from "./utils";
 
 import "./editor.scss";
+import clsx from "clsx";
 
 function Link(props) {
   return (
@@ -69,6 +70,7 @@ function HTMLEditor({
   onChange,
   onBlur,
   onKeyDown: _onKeyDown,
+  className,
 }) {
   const containerRef = useRef(null);
   const contentEditableRef = useRef(null);
@@ -400,7 +402,7 @@ function HTMLEditor({
   }, [toggle, autoFocus]);
 
   return (
-    <div className="relative">
+    <div className={clsx(className, "relative")}>
       <div ref={containerRef} className="custom-html-editor-container">
         {actions.length > 0 && (
           <Toolbar
