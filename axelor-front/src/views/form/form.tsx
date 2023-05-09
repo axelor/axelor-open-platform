@@ -64,7 +64,7 @@ const fetchRecord = async (
     const related = meta.related;
     return dataStore.read(+id, { fields, related });
   }
-  return {};
+  return getDefaultValues(meta);
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {
@@ -79,6 +79,16 @@ export const showErrors = (errors: WidgetErrors[]) => {
     ),
   });
 };
+
+function getDefaultValues(meta: ViewData<FormView>) {
+  const { fields = {} } = meta;
+  const result: DataRecord = Object.entries(fields).reduce(
+    (acc, [key, { defaultValue }]) =>
+      defaultValue === undefined ? acc : { ...acc, [key]: defaultValue },
+    {}
+  );
+  return result;
+}
 
 export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
@@ -194,6 +204,13 @@ function FormContainer({
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
         const props = { readonly, ...options };
+
+        record = record ?? {};
+        record =
+          record.id && record.id > 0
+            ? record
+            : { ...getDefaultValues(prev.meta), ...record };
+
         switchTo("form", { route: { id }, props });
         setDirty(false);
         set(formAtom, {
@@ -201,8 +218,8 @@ function FormContainer({
           dirty: false,
           states: {},
           statesByName: {},
-          record: record ?? {},
-          original: record ? { ...record } : {},
+          record: record,
+          original: { ...record },
         });
 
         if (action) {
