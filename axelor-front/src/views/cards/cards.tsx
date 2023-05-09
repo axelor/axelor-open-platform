@@ -1,7 +1,8 @@
-import { Box } from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+
+import { Box } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
@@ -13,21 +14,24 @@ import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { CardsView } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
+
 import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
-import classes from "./cards.module.scss";
+
+import styles from "./cards.module.scss";
+import { legacyClassNames } from "@/styles/legacy";
 
 export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom, domains } = props;
   const { view, fields } = meta;
   const { action, dashlet: dasheen, popup, popupOptions } = useViewTab();
+
   const { hasButton } = usePerms(meta.view, meta.perms);
   const switchTo = useViewSwitch();
 
@@ -51,6 +55,18 @@ export function Cards(props: ViewProps<CardsView>) {
       [action, getContext]
     )
   );
+
+  const { width, minWidth } = useMemo(() => {
+    const width = view.width || "calc(100% / 3)";
+    const widths = width
+      .split(":")
+      .map((x) => x.trim())
+      .filter(Boolean);
+    return {
+      width: widths[0],
+      minWidth: widths[1],
+    };
+  }, [view.width]);
 
   const onSearch = useAtomCallback(
     useCallback(
@@ -144,7 +160,7 @@ export function Cards(props: ViewProps<CardsView>) {
   const canNext = offset + limit < totalCount;
 
   return (
-    <Box className={legacyClassNames(classes.cards, "cards-view", "row-fluid")}>
+    <Box className={legacyClassNames(styles.cards, "cards-view", "row-fluid")}>
       {showToolbar && (
         <ViewToolBar
           meta={meta}
@@ -197,6 +213,8 @@ export function Cards(props: ViewProps<CardsView>) {
             fields={fields}
             onView={onView}
             Template={Template}
+            width={width}
+            minWidth={minWidth}
             {...(hasButton("edit") && { onEdit })}
             {...(hasButton("delete") && { onDelete })}
           />

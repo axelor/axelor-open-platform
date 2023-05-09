@@ -27,6 +27,8 @@ export const Card = memo(function Card({
   onView,
   onDelete,
   Template,
+  width,
+  minWidth,
 }: {
   record: DataRecord;
   model?: string;
@@ -38,6 +40,8 @@ export const Card = memo(function Card({
     context: DataContext;
     options?: EvalContextOptions;
   }>;
+  width?: string;
+  minWidth?: string;
 }) {
   // state to store updated action values
   const [values, setValues] = useState<DataRecord>({});
@@ -100,6 +104,10 @@ export const Card = memo(function Card({
         mb={3}
         className={classes.card}
         onClick={handleClick}
+        style={{
+          width,
+          minWidth,
+        }}
       >
         <Box p={3} bgColor="light" w={100} rounded shadow>
           <Template

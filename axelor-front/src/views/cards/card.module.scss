@@ -1,6 +1,5 @@
 .card {
-  float: left;
-  width: 33.33333333%;
+  width: calc(100% / 3);
   cursor: pointer;
   position: relative;
   .menuIcon {
