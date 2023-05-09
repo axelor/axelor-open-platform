@@ -201,28 +201,21 @@ function useExpressions({
   const actionView = useViewAction();
   const popup = !!actionView.params?.popup;
 
-  const invalidAtom = useMemo(
-    () =>
-      selectAtom(
-        formAtom,
-        ({ states = {} }) =>
-          Object.entries(states)
-            .filter(([k, v]) => v.errors && Object.keys(v.errors).length > 0)
-            .map(([k]) => k),
-        isEqual
-      ),
-    [formAtom]
-  );
-
-  const invalid = useAtomValue(invalidAtom);
-  const valid = useCallback(
-    (name?: string) =>
-      name ? invalid.indexOf(name) === -1 : invalid.length === 0,
-    [invalid]
+  const valid = useAtomCallback(
+    useCallback(
+      (get, set, name?: string) => {
+        const { states = {} } = get(formAtom);
+        const invalid = Object.entries(states).some(
+          ([k, { errors = {} }]) =>
+            (name === undefined || k === name) && Object.keys(errors).length > 0
+        );
+        return !invalid;
+      },
+      [formAtom]
+    )
   );
 
   const modeRef = useRef(readonly);
-  const invalidRef = useRef(invalid);
   const recordRef = useRef<DataRecord>();
   const contextRef = useRef<DataContext>();
 
@@ -232,8 +225,7 @@ function useExpressions({
       if (
         ctx === undefined ||
         recordRef.current !== record ||
-        modeRef.current !== readonly ||
-        invalidRef.current !== invalid
+        modeRef.current !== readonly
       ) {
         ctx = createEvalContext(record, {
           valid,
@@ -241,13 +233,12 @@ function useExpressions({
           popup,
         });
         modeRef.current = readonly;
-        invalidRef.current = invalid;
         recordRef.current = record;
         contextRef.current = ctx;
       }
       return ctx;
     },
-    [invalid, popup, readonly, valid]
+    [popup, readonly, valid]
   );
 
   const handleBind = useAtomCallback(
@@ -266,9 +257,13 @@ function useExpressions({
     (context: DataContext, attr: string, expr: string, negate = false) => {
       const value = Boolean(parseExpression(expr)(context));
       setWidgetAttrs((state) => {
-        const attrs = { ...state.attrs, [attr]: negate ? !value : value };
-        if (isEqual(state.attrs, attrs)) return state;
-        return { ...state, attrs };
+        const attrs = state.attrs ?? {};
+        const prev = attrs[attr as keyof typeof attrs];
+        const next = negate ? !value : value;
+        if (next !== prev) {
+          return { ...state, attrs: { ...attrs, [attr]: next } };
+        }
+        return state;
       });
     },
     [setWidgetAttrs]
