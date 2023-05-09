@@ -163,7 +163,7 @@ function DummyTabs({
   const tabs = useMemo(() => {
     return items.map((item) => {
       const { id, uid, name, showIf, hideIf } = item as Schema;
-      return { id, uid, name, showIf, hideIf } as NavItemProps;
+      return { id, uid, name, showIf, hideIf, widget: "spacer" } as NavItemProps;
     });
   }, [items]);
   return (
