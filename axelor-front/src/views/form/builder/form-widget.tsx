@@ -1,17 +1,17 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { parseExpression } from "@/hooks/use-parser/utils";
+import { createEvalContext } from "@/hooks/use-parser/eval-context";
+import { parseExpression, parseTemplate } from "@/hooks/use-parser/utils";
+import { DataContext, DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 
-import { parseTemplate } from "@/hooks/use-parser/utils";
-import { DataContext } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
@@ -192,6 +192,19 @@ function useHandleFieldExpression({
   const setWidgetAttrs = useSetAtom(widgetAtom);
   const { recordHandler } = useFormScope();
 
+  const recordRef = useRef<DataRecord>();
+  const contextRef = useRef<DataContext>();
+
+  const createContext = useCallback((record: DataRecord) => {
+    let ctx = contextRef.current;
+    if (ctx === undefined || recordRef.current !== record) {
+      ctx = createEvalContext(record);
+      recordRef.current = record;
+      contextRef.current = ctx;
+    }
+    return ctx;
+  }, []);
+
   const handleBind = useAtomCallback(
     useCallback(
       (get, set, context: DataContext, bind: string) => {
@@ -271,23 +284,24 @@ function useHandleFieldExpression({
 
     if (hasExpression || bind) {
       return recordHandler.subscribe((record) => {
-        if (bind) handleBind(record, bind);
-        if (showIf) handleCondition(record, "hidden", showIf, true);
-        if (hideIf) handleCondition(record, "hidden", hideIf);
-        if (readonlyIf) handleCondition(record, "readonly", readonlyIf);
-        if (requiredIf) handleCondition(record, "required", requiredIf);
-        if (collapseIf) handleCondition(record, "collapsed", collapseIf);
-        if (validIf) handleValidation(record, validIf);
+        const ctx = createContext(record);
+        if (bind) handleBind(ctx, bind);
+        if (showIf) handleCondition(ctx, "hidden", showIf, true);
+        if (hideIf) handleCondition(ctx, "hidden", hideIf);
+        if (readonlyIf) handleCondition(ctx, "readonly", readonlyIf);
+        if (requiredIf) handleCondition(ctx, "required", requiredIf);
+        if (collapseIf) handleCondition(ctx, "collapsed", collapseIf);
+        if (validIf) handleValidation(ctx, validIf);
 
-        if (canNew) handleCondition(record, "canNew", canNew);
-        if (canEdit) handleCondition(record, "canEdit", canEdit);
-        if (canSave) handleCondition(record, "canSave", canSave);
-        if (canCopy) handleCondition(record, "canCopy", canCopy);
-        if (canRemove) handleCondition(record, "canRemove", canRemove);
-        if (canDelete) handleCondition(record, "canDelete", canDelete);
-        if (canArchive) handleCondition(record, "canArchive", canArchive);
-        if (canAttach) handleCondition(record, "canAttach", canAttach);
-        if (canSelect) handleCondition(record, "canSelect", canSelect);
+        if (canNew) handleCondition(ctx, "canNew", canNew);
+        if (canEdit) handleCondition(ctx, "canEdit", canEdit);
+        if (canSave) handleCondition(ctx, "canSave", canSave);
+        if (canCopy) handleCondition(ctx, "canCopy", canCopy);
+        if (canRemove) handleCondition(ctx, "canRemove", canRemove);
+        if (canDelete) handleCondition(ctx, "canDelete", canDelete);
+        if (canArchive) handleCondition(ctx, "canArchive", canArchive);
+        if (canAttach) handleCondition(ctx, "canAttach", canAttach);
+        if (canSelect) handleCondition(ctx, "canSelect", canSelect);
       });
     }
   }, [
@@ -297,6 +311,7 @@ function useHandleFieldExpression({
     handleBind,
     handleCondition,
     handleValidation,
+    createContext,
   ]);
 }
 
