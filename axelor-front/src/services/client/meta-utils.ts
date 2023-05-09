@@ -76,7 +76,6 @@ function processWidget(field: Schema) {
         "showTitle",
         "editable",
         "canMove",
-        "showBars",
         "canExport",
         "showFrame",
         "sidebar",
@@ -93,7 +92,7 @@ function processWidget(field: Schema) {
         "hideModeSwitch",
       ].indexOf(name) !== -1
     ) {
-      val = Boolean(value);
+      val = value?.toLowerCase?.() === "true";
     } else if (
       [
         "rowSpan",
