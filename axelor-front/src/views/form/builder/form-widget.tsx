@@ -10,7 +10,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { validate } from "@/utils/validate";
-import { useViewDirtyAtom } from "@/view-containers/views/scope";
+import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
@@ -37,9 +37,6 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
         : undefined,
     [actionExecutor, dirtyAtom, formAtom, schema]
   );
-
-  // eval field expression showIf, hideIf etc
-  useHandleFieldExpression({ schema, widgetAtom, valueAtom });
 
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
@@ -71,6 +68,14 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const canShowViewer = schema.viewer && valueAtom && canView && readonly;
   const showEditorAsViewer =
     schema.editor?.viewer && valueAtom && canView && readonly;
+
+  // eval field expression showIf, hideIf etc
+  useExpressions({
+    schema,
+    widgetAtom,
+    valueAtom,
+    readonly,
+  });
 
   if (hidden) {
     return null;
@@ -180,30 +185,70 @@ function FormField({
   return <Comp {...props} invalid={invalid} />;
 }
 
-function useHandleFieldExpression({
+function useExpressions({
   schema,
   widgetAtom,
   valueAtom,
+  readonly = false,
 }: {
   schema: Schema;
   widgetAtom: WidgetAtom;
   valueAtom?: ValueAtom<any>;
+  readonly?: boolean;
 }) {
   const setWidgetAttrs = useSetAtom(widgetAtom);
-  const { recordHandler } = useFormScope();
+  const { formAtom, recordHandler } = useFormScope();
+  const actionView = useViewAction();
+  const popup = !!actionView.params?.popup;
 
+  const invalidAtom = useMemo(
+    () =>
+      selectAtom(
+        formAtom,
+        ({ states = {} }) =>
+          Object.entries(states)
+            .filter(([k, v]) => v.errors && Object.keys(v.errors).length > 0)
+            .map(([k]) => k),
+        isEqual
+      ),
+    [formAtom]
+  );
+
+  const invalid = useAtomValue(invalidAtom);
+  const valid = useCallback(
+    (name?: string) =>
+      name ? invalid.indexOf(name) === -1 : invalid.length === 0,
+    [invalid]
+  );
+
+  const modeRef = useRef(readonly);
+  const invalidRef = useRef(invalid);
   const recordRef = useRef<DataRecord>();
   const contextRef = useRef<DataContext>();
 
-  const createContext = useCallback((record: DataRecord) => {
-    let ctx = contextRef.current;
-    if (ctx === undefined || recordRef.current !== record) {
-      ctx = createEvalContext(record);
-      recordRef.current = record;
-      contextRef.current = ctx;
-    }
-    return ctx;
-  }, []);
+  const createContext = useCallback(
+    (record: DataRecord) => {
+      let ctx = contextRef.current;
+      if (
+        ctx === undefined ||
+        recordRef.current !== record ||
+        modeRef.current !== readonly ||
+        invalidRef.current !== invalid
+      ) {
+        ctx = createEvalContext(record, {
+          valid,
+          readonly,
+          popup,
+        });
+        modeRef.current = readonly;
+        invalidRef.current = invalid;
+        recordRef.current = record;
+        contextRef.current = ctx;
+      }
+      return ctx;
+    },
+    [invalid, popup, readonly, valid]
+  );
 
   const handleBind = useAtomCallback(
     useCallback(
