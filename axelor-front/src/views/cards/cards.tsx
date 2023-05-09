@@ -1,24 +1,25 @@
-import { useCallback, useEffect } from "react";
-import { useSetAtom } from "jotai";
 import { Box } from "@axelor/ui";
+import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect } from "react";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { usePerms } from "@/hooks/use-perms";
-import { useTemplate } from "@/hooks/use-parser";
-import { legacyClassNames } from "@/styles/legacy";
-import { CardsView } from "@/services/client/meta.types";
-import { useDataStore } from "@/hooks/use-data-store";
-import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { i18n } from "@/services/client/i18n";
-import { SearchOptions } from "@/services/client/data";
-import { PageText } from "@/components/page-text";
-import { DataRecord } from "@/services/client/data.types";
 import { dialogs } from "@/components/dialogs";
+import { PageText } from "@/components/page-text";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useDataStore } from "@/hooks/use-data-store";
+import { useTemplate } from "@/hooks/use-parser";
+import { usePerms } from "@/hooks/use-perms";
+import { SearchOptions } from "@/services/client/data";
+import { DataContext, DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { CardsView } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
 import { AdvanceSearch } from "@/view-containers/advance-search";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
+import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 import classes from "./cards.module.scss";
@@ -26,9 +27,30 @@ import classes from "./cards.module.scss";
 export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom, domains } = props;
   const { view, fields } = meta;
-  const { dashlet, popup, popupOptions } = useViewTab();
+  const { action, dashlet: dasheen, popup, popupOptions } = useViewTab();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const switchTo = useViewSwitch();
+
+  const getContext = useCallback(
+    () => ({
+      ...action.context,
+      _model: action.model,
+    }),
+    [action.context, action.model]
+  );
+
+  const actionExecutor = useGridActionExecutor(
+    view,
+    useCallback<() => DataContext>(
+      () => ({
+        ...getContext(),
+        _viewName: action.name,
+        _viewType: action.viewType,
+        _views: action.views,
+      }),
+      [action, getContext]
+    )
+  );
 
   const onSearch = useAtomCallback(
     useCallback(
@@ -106,14 +128,14 @@ export function Cards(props: ViewProps<CardsView>) {
   }, [onSearch, popup, dataStore, setPopupHandlers]);
 
   useEffect(() => {
-    if (dashlet) {
+    if (dasheen) {
       setDashletHandlers({
         dataStore,
         view,
         onRefresh: () => onSearch({}),
       });
     }
-  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
+  }, [dasheen, view, dataStore, onSearch, setDashletHandlers]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
@@ -126,6 +148,7 @@ export function Cards(props: ViewProps<CardsView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          actionExecutor={actionExecutor}
           actions={[
             {
               key: "new",
