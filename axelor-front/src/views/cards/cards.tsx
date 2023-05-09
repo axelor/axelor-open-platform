@@ -24,8 +24,8 @@ import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
-import styles from "./cards.module.scss";
 import { legacyClassNames } from "@/styles/legacy";
+import styles from "./cards.module.scss";
 
 export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom, domains } = props;
@@ -204,22 +204,31 @@ export function Cards(props: ViewProps<CardsView>) {
           )}
         </ViewToolBar>
       )}
-      <Box p={2} py={3} d="flex" flexWrap="wrap" overflow="auto">
-        {records.map((record) => (
-          <Card
-            key={record.id}
-            model={view.model}
-            record={record}
-            fields={fields}
-            onView={onView}
-            Template={Template}
-            width={width}
-            minWidth={minWidth}
-            {...(hasButton("edit") && { onEdit })}
-            {...(hasButton("delete") && { onDelete })}
-          />
-        ))}
-      </Box>
+      {records.length > 0 && (
+        <Box p={2} py={3} d="flex" flexWrap="wrap" overflow="auto">
+          {records.map((record) => (
+            <Card
+              key={record.id}
+              model={view.model}
+              record={record}
+              fields={fields}
+              onView={onView}
+              Template={Template}
+              width={width}
+              minWidth={minWidth}
+              {...(hasButton("edit") && { onEdit })}
+              {...(hasButton("delete") && { onDelete })}
+            />
+          ))}
+        </Box>
+      )}
+      {records.length === 0 && (
+        <Box d="flex" flex={1} justifyContent="center" alignItems="center">
+          <Box style={{ fontSize: "0.9rem" }}>
+            {i18n.get("No records found.")}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }

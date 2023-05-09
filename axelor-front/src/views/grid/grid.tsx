@@ -481,6 +481,7 @@ function GridInner(props: ViewProps<GridView>) {
         onSearch={onSearch}
         onSave={onSave}
         onDiscard={onDiscard}
+        noRecordsText={i18n.get("No records found.")}
         {...dashletProps}
         {...popupProps}
       />
