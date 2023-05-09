@@ -11,6 +11,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
+import { useFormScope } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string";
 import {
@@ -28,6 +29,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     placeholder,
     formView,
     gridView,
+    onSelect: onSelectAction,
   } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
@@ -120,31 +122,69 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const getContext = usePrepareContext(formAtom);
 
-  const handleSelect = useCallback(() => {
+  const { actionExecutor } = useFormScope();
+
+  const beforeSelectRef = useRef<string | null>(null);
+  const beforeSelect = useCallback(
+    async (force = false) => {
+      if ((force || beforeSelectRef.current === null) && onSelectAction) {
+        const res = await actionExecutor.execute(onSelectAction);
+        if (res && res.length > 0) {
+          const attrs = res[0].attrs || {};
+          const domain = attrs[schema.name]?.domain ?? "";
+          beforeSelectRef.current = domain;
+          return domain;
+        }
+      }
+    },
+    [actionExecutor, onSelectAction, schema.name]
+  );
+
+  const handleMenuOpen = useCallback(() => {
+    beforeSelectRef.current = null;
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    beforeSelectRef.current = null;
+  }, []);
+
+  const handleSelect = useCallback(async () => {
+    const _domain = (await beforeSelect(true)) ?? domain;
+    const _domainContext = _domain ? getContext() : {};
     showSelector({
       title: i18n.get("Select {0}", title ?? ""),
       model: target,
       viewName: gridView,
       multiple: false,
-      domain: domain,
-      context: domain ? getContext() : {},
-      onSelect: async (records) => {
+      domain: _domain,
+      context: _domainContext,
+      onSelect: (records) => {
         handleChange(records[0]);
       },
     });
-  }, [showSelector, title, target, gridView, domain, getContext, handleChange]);
+  }, [
+    beforeSelect,
+    showSelector,
+    title,
+    target,
+    gridView,
+    domain,
+    getContext,
+    handleChange,
+  ]);
 
   const handleCompletion = useCallback(
     async (value: string) => {
+      const _domain = (await beforeSelect()) ?? domain;
+      const _domainContext = _domain ? getContext() : {};
       const options = {
-        _domain: domain,
-        _domainContext: domain ? getContext() : {},
+        _domain,
+        _domainContext,
       };
-      const res = await search(value, options);
-      const { records } = res;
+      const { records } = await search(value, options);
       return records;
     },
-    [domain, getContext, search]
+    [beforeSelect, domain, getContext, search]
   );
 
   const valueRef = useRef(value);
@@ -185,6 +225,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canCreate={canNew}
           onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
+          onMenuOpen={handleMenuOpen}
+          onMenuClose={handleMenuClose}
           invalid={invalid}
           value={value ?? null}
           placeholder={placeholder}
