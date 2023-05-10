@@ -14,8 +14,8 @@
     <string name="suffix" />
     <integer name="padding" required="true" default="0" />
     <integer name="increment" column="increment_by" required="true" default="1"/>
-    <long name="initial" column="initial_value" required="true" default="0"/>
-    <long name="next" column="next_value" required="true" default="1"/>
+    <long name="initial" title="Initial value" column="initial_value" required="true" default="0"/>
+    <long name="next" title="Next value" column="next_value" required="true" default="1"/>
     <finder-method name="findByName" using="name" flush="false"/>
   </entity>
 
