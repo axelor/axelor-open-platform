@@ -251,48 +251,9 @@ export function Editor({
     [editor, onDelete]
   );
 
-  const contextFields = useMemo(
-    () =>
-      Object.values(fields || {}).reduce((ctxFields, field) => {
-        const {
-          contextField,
-          contextFieldTitle,
-          contextFieldValue,
-          contextFieldTarget,
-          contextFieldTargetName,
-        } = field as any;
-        if (contextField && !ctxFields.find((x) => x.name === contextField)) {
-          ctxFields.push({
-            name: contextField,
-            title: `${contextField[0].toUpperCase()}${contextField.substr(1)}`,
-            value: {
-              id: contextFieldValue,
-              [contextFieldTargetName]: contextFieldTitle,
-            },
-            target: contextFieldTarget,
-            targetName: contextFieldTargetName,
-          } as unknown as Field);
-        }
-        return ctxFields;
-      }, [] as Field[]) as Field[],
-    [fields]
-  );
-
-  useEffect(() => {
-    contextFields.length &&
-      setContextField((field) => ({
-        name: field?.name || contextFields[0]?.name,
-      }));
-  }, [contextFields, setContextField]);
-
   const $fields = useMemo(() => {
     const fieldList = Object.values(fields || {}).filter((field: Property) => {
-      const {
-        type,
-        large,
-        contextField: contextFieldName,
-        contextFieldValue,
-      } = field as any;
+      const { type, large } = field as any;
       if (
         type === "binary" ||
         large ||
@@ -303,12 +264,6 @@ export function Editor({
         return false;
       }
 
-      if (contextFieldName) {
-        return (
-          contextField?.name === contextFieldName &&
-          String(contextField?.value?.id) === String(contextFieldValue)
-        );
-      }
       return true;
     });
 
@@ -337,7 +292,58 @@ export function Editor({
     });
 
     return sortBy(fieldList, "title") as unknown as Field[];
-  }, [fields, jsonFields, contextField]);
+  }, [fields, jsonFields]);
+
+  const criteriaFields = useMemo(
+    () =>
+      $fields.filter((field) => {
+        const { contextField: contextFieldName, contextFieldValue } =
+          field as any;
+        return (
+          !contextFieldName ||
+          (contextField?.name === contextFieldName &&
+            String(contextField?.value?.id) === String(contextFieldValue))
+        );
+      }),
+    [$fields, contextField]
+  );
+
+  const contextFields = useMemo(
+    () =>
+      $fields.reduce((ctxFields, field) => {
+        const {
+          contextField,
+          contextFieldTitle,
+          contextFieldValue,
+          contextFieldTarget,
+          contextFieldTargetName,
+        } = field as any;
+        if (contextField && !ctxFields.find((x) => x.name === contextField)) {
+          ctxFields.push({
+            name: contextField,
+            title: `${contextField[0].toUpperCase()}${contextField.substr(1)}`,
+            value: {
+              id: contextFieldValue,
+              [contextFieldTargetName]: contextFieldTitle,
+            },
+            target: contextFieldTarget,
+            targetName: contextFieldTargetName,
+          } as unknown as Field);
+        }
+        return ctxFields;
+      }, [] as Field[]) as Field[],
+    [$fields]
+  );
+
+  const defaultContextFieldName = contextFields?.[0]?.name;
+
+  useEffect(() => {
+    defaultContextFieldName &&
+      setContextField((field) => ({
+        ...field,
+        name: field?.name || defaultContextFieldName,
+      }));
+  }, [defaultContextFieldName, setContextField]);
 
   const selectedContextField =
     contextField?.name &&
@@ -348,7 +354,7 @@ export function Editor({
   return (
     <Box d="flex" flexDirection="column" alignItems="start" g={2}>
       {contextFields.length > 0 && (
-        <Box d="flex" alignItems="center">
+        <Box d="flex" alignItems="center" gap={8}>
           <Box
             aria-label="close"
             onClick={() =>
@@ -404,7 +410,7 @@ export function Editor({
             key={index}
             index={index}
             value={item as Filter}
-            fields={$fields}
+            fields={criteriaFields}
             onRemove={handleCriteriaRemove}
             onChange={handleCriteriaChange}
           />
