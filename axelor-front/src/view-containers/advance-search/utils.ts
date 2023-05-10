@@ -176,12 +176,10 @@ export function getCriteria(
       }
       case "one-to-many":
       case "many-to-many": {
-        if (!["isNull", "notNull"].includes(operator)) {
+        if (["in", "notIn"].includes(operator)) {
           if (!value) return null;
           fieldName = `${jsonField ? fieldName : field.name}.id`;
-          if (["in", "notIn"].includes(operator)) {
-            value = value && value.map((v: DataRecord) => v.id);
-          }
+          value = value && value.map((v: DataRecord) => v.id);
         }
         break;
       }

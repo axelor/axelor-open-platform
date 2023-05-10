@@ -1,5 +1,6 @@
 import clsx from "clsx";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import isNumber from "lodash/isNumber";
 import { Select as AxSelect, Box, Input } from "@axelor/ui";
 
 import { DataStore } from "@/services/client/data-store";
@@ -126,16 +127,42 @@ export function SimpleWidget({
 }
 
 export function RelationalWidget({ operator, onChange, ...rest }: any) {
-  const { field } = rest;
+  const { field, value } = rest;
   const dataStore = useRef(new DataStore(field.target, {})).current;
   const options = useDataStore(dataStore, (res) => res.records);
 
   const fetchData = React.useCallback(
-    async () => dataStore.search({}),
+    async () =>
+      dataStore.search({
+        filter: {
+          _domain: undefined,
+          _domainContext: {},
+        },
+      }),
     [dataStore]
   );
 
-  if (["like", "notLike"].includes(operator)) {
+  const isTextField = ["like", "notLike"].includes(operator);
+  const isSelection = ["=", "in", "notIn"].includes(operator);
+
+  useEffect(() => {
+    if (isSelection) {
+      const ids = value?.filter?.((id: any) => isNumber(id));
+      if (ids?.length) {
+        dataStore.search({
+          filter: {
+            _domain: "self.id in (:_ids)",
+            _domainContext: {
+              _ids: ids as number[],
+            },
+          },
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSelection, dataStore]);
+
+  if (isTextField) {
     return (
       <TextField
         name="value"
@@ -143,17 +170,23 @@ export function RelationalWidget({ operator, onChange, ...rest }: any) {
         {...rest}
       />
     );
-  } else if (["=", "in", "notIn"].includes(operator)) {
+  } else if (isSelection) {
     const { isMulti = operator !== "=", field, value, className } = rest;
     const { targetName } = field;
-
+    const $value = value?.map?.((id: any) =>
+      isNumber(id)
+        ? options.find((opt) => opt.id === id) || {
+            id,
+          }
+        : id
+    );
     return (
       <AxSelect
         placeholder={operator === "=" ? rest.placeholder : ""}
         className={clsx(styles.select, className)}
         optionLabel={targetName}
         optionValue="id"
-        value={value}
+        value={$value}
         isMulti={isMulti}
         options={options}
         onFocus={fetchData}
