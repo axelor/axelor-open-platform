@@ -1,19 +1,29 @@
+import { SearchOptions } from "@/services/client/data";
 import { Criteria } from "@/services/client/data.types";
+import { MetaData } from "@/services/client/meta";
+import { SavedFilter, SearchFilter } from "@/services/client/meta.types";
 
 export type AdvancedSearchState = {
-  query?: Criteria & {
-    archived?: boolean;
-    freeSearchText?: string;
+  query?: SearchOptions["filter"];
+  search?: Record<string, string>; // grid search column state
+  editor?: Criteria & {
+    id?: number;
+    name?: string;
+    title?: string;
+    version?: number;
+    shared?: boolean;
+    selected?: boolean;
   };
-  selected?: any[];
-  state: {
-    search?: Record<string, string>;
-    activeFilters?: any[];
-    contentField?: {
-      name?: string;
-      value?: any;
-    };
-    customFilter?: any;
-    isSingleFilter?: boolean;
+  contextField?: {
+    name?: string;
+    value?: any;
   };
+  archived?: boolean;
+  searchText?: string;
+  searchTextLabel?: string;
+  filterType?: "all" | "single";
+  domains?: SearchFilter[];
+  filters?: SavedFilter[];
+  fields?: MetaData['fields'];
+  jsonFields?: MetaData['jsonFields'];
 };

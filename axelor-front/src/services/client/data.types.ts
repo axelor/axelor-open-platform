@@ -1,3 +1,4 @@
+import { ManipulateType } from "dayjs";
 import { View } from "./meta.types";
 
 export type DataRecord = {
@@ -43,6 +44,7 @@ export interface Filter {
   fieldName?: string;
   value?: any;
   value2?: any;
+  timeUnit?: ManipulateType;
 }
 
 export interface Criteria {

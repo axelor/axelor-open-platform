@@ -1,65 +1,58 @@
 import React from "react";
-import { Box } from "@axelor/ui";
+import { Box, Input, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import { BooleanCheckBox, ButtonLink } from "./editor/components";
-import { SavedFilter } from "@/services/client/meta.types";
+import { SavedFilter, SearchFilter } from "@/services/client/meta.types";
 
 interface FilterListProps {
   title: string;
-  active?: number[];
-  items?: SavedFilter[];
+  active?: (string | number)[];
+  items?: SavedFilter[] | SearchFilter[];
   disabled?: boolean;
-  onFilterClick?: (filter: SavedFilter, isChecked: boolean) => void;
-  onFilterChange?: (filter: SavedFilter, isChecked: boolean) => void;
+  onFilterCheck?: (
+    filter: SavedFilter | SearchFilter,
+    type?: "click" | "change"
+  ) => void;
 }
 
 const FilterListItem = React.memo(function FilterListItem({
   filter,
   disabled,
-  checked,
-  onClick,
-  onChange,
+  onCheck,
 }: {
-  filter: SavedFilter;
+  filter: SavedFilter | SearchFilter;
   disabled?: boolean;
-  checked?: boolean;
-  onClick?: FilterListProps["onFilterClick"];
-  onChange?: FilterListProps["onFilterChange"];
+  onCheck?: FilterListProps["onFilterCheck"];
 }) {
-  const { title } = filter;
-
-  function handleChange(value: boolean) {
-    onChange?.(filter, value);
-  }
+  const { title, checked } = filter;
 
   return (
     <Box d="flex" alignItems="center">
-      <BooleanCheckBox
-        name={title.replace(" ", "_").toLowerCase()}
-        value={checked}
-        onChange={handleChange}
-        inline
-        isDisabled={disabled}
-        {...({} as any)}
+      <Input
+        type="checkbox"
+        checked={checked ?? false}
+        onChange={() => onCheck?.(filter, "change")}
+        disabled={disabled}
+        m={0}
       />
-      <ButtonLink
-        title={title}
+      <Button
+        variant="link"
         position="relative"
-        onClick={() => (!disabled || checked) && onClick?.(filter, !checked)}
+        size="sm"
+        onClick={() => (!disabled || checked) && onCheck?.(filter, "click")}
         {...(disabled && !checked ? { color: "muted" } : {})}
-      />
+      >
+        {title}
+      </Button>
     </Box>
   );
 });
 
 export function FilterList({
   title,
-  active = [],
   items = [],
   disabled,
-  onFilterClick,
-  onFilterChange,
+  onFilterCheck,
 }: FilterListProps) {
   return (
     <Box flexDirection="column" alignItems="baseline" w={100}>
@@ -78,12 +71,10 @@ export function FilterList({
       >
         {items.map((filter, ind) => (
           <FilterListItem
-            key={filter.id ?? `filter_${ind}`}
+            key={(filter as SavedFilter).id ?? `filter_${ind}`}
             filter={filter}
-            checked={active.includes(filter.id)}
             disabled={disabled}
-            onClick={onFilterClick}
-            onChange={onFilterChange}
+            onCheck={onFilterCheck}
           />
         ))}
       </Box>

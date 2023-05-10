@@ -1,8 +1,14 @@
-import React from "react";
+import { useMemo } from "react";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
+import { Field } from "@/services/client/meta.types";
 
-const typesConfig = [
+type Config = {
+  types: string[];
+  operators: string[];
+};
+
+const typesConfig: Config[] = [
   {
     types: ["enum"],
     operators: ["=", "!=", "isNull", "notNull"],
@@ -62,7 +68,7 @@ const typesConfig = [
   },
 ];
 
-const types = typesConfig.reduce(
+const types: Record<string, string[]> = typesConfig.reduce(
   (typeSet, { types, operators }) =>
     types.reduce(
       (typeSet, type) => ({ ...typeSet, [type]: operators }),
@@ -102,11 +108,13 @@ const EXTRA_OPERATORS_BY_TARGET = {
   "com.axelor.auth.db.Group": ["$isCurrentGroup"],
 };
 
-export function useField(fields, name) {
-  return React.useMemo(() => {
-    const field = fields.find((item) => item.name === name);
+export function useField(fields?: Field[], name?: string) {
+  return useMemo(() => {
+    const field = fields?.find(
+      (item) => item.name === name || item.name === name?.split(".")[0]
+    );
 
-    let type = toKebabCase(field?.type);
+    let type = toKebabCase(field?.type!);
 
     if (field && field.selectionList) {
       type = "enum";
@@ -119,7 +127,7 @@ export function useField(fields, name) {
         typeOperators = ["isNull", "notNull"];
       } else {
         typeOperators = typeOperators.concat(
-          EXTRA_OPERATORS_BY_TARGET[field.target] || []
+          (EXTRA_OPERATORS_BY_TARGET as any)[field.target] || []
         );
       }
     }

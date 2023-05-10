@@ -13,7 +13,7 @@ import { PageText } from "@/components/page-text";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { GridView } from "@/services/client/meta.types";
+import { GridView, Widget } from "@/services/client/meta.types";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -46,7 +46,7 @@ export function Grid(props: ViewProps<GridView>) {
 }
 
 function GridInner(props: ViewProps<GridView>) {
-  const { meta, dataStore, searchAtom, domains } = props;
+  const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
   const { hasButton } = usePerms(meta.view, meta.perms);
 
@@ -62,7 +62,7 @@ function GridInner(props: ViewProps<GridView>) {
   const showEditor = useEditor();
 
   const gridSearchAtom = useMemo(
-    () => focusAtom(searchAtom!, (o) => o.prop("state").prop("search")),
+    () => focusAtom(searchAtom!, (o) => o.prop("search")),
     [searchAtom]
   );
 
@@ -89,33 +89,30 @@ function GridInner(props: ViewProps<GridView>) {
         const sortBy = orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
         );
-        const { query = {}, state } = get(searchAtom!);
+        const {
+          searchText: freeSearchText,
+          query = {},
+          search,
+        } = get(searchAtom!);
 
-        const searchQuery = getSearchFilter(
-          fields as any,
-          view.items,
-          state.search
-        );
-        const { freeSearchText, ...filterQuery } = query;
+        const searchQuery = getSearchFilter(fields as any, view.items, search);
 
         let q: SearchOptions["filter"] = {
-          ...filterQuery,
-          operator: searchQuery?.operator ?? filterQuery.operator,
+          ...query,
+          operator: searchQuery?.operator ?? query.operator,
         };
 
         if (freeSearchText && searchQuery?.criteria?.length) {
-          q = {
-            operator: "and",
-            criteria: [
-              { operator: "and", ...searchQuery },
-              {
-                operator: query.operator || "or",
-                criteria: query.criteria,
-              },
-            ],
-          };
+          q.operator = "and";
+          q.criteria = [
+            { operator: "and", ...searchQuery },
+            {
+              operator: query.operator || "or",
+              criteria: query.criteria,
+            },
+          ];
         } else {
-          q.criteria = [...(filterQuery.criteria || [])].concat(
+          q.criteria = [...(query.criteria || [])].concat(
             searchQuery?.criteria || []
           );
           freeSearchText && (q.operator = "or");
@@ -128,7 +125,7 @@ function GridInner(props: ViewProps<GridView>) {
         return dataStore.search({
           sortBy,
           ...options,
-          filter: { ...q, _archived: query.archived },
+          filter: { ...q },
         });
       },
       [dataStore, fields, view.items, searchAtom, orderBy, setState]
@@ -456,9 +453,9 @@ function GridInner(props: ViewProps<GridView>) {
             <AdvanceSearch
               stateAtom={searchAtom}
               dataStore={dataStore}
-              items={view.items}
-              fields={fields}
-              domains={domains}
+              items={state.columns as Widget[]}
+              customSearch={view.customSearch}
+              freeSearch={view.freeSearch}
               onSearch={onSearch}
             />
           )}

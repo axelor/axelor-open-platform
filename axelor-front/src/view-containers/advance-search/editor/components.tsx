@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import React, { useRef } from "react";
-import { Select as AxSelect, Box, Button, Input } from "@axelor/ui";
+import { Select as AxSelect, Box, Input } from "@axelor/ui";
 
 import { DataStore } from "@/services/client/data-store";
 import { moment } from "@/services/client/l10n";
@@ -9,7 +9,7 @@ import { toKebabCase } from "@/utils/names";
 import { useDataStore } from "@/hooks/use-data-store";
 import styles from "./components.module.css";
 
-function TextField(props) {
+function TextField(props: any) {
   return (
     <Input
       {...props}
@@ -19,7 +19,7 @@ function TextField(props) {
   );
 }
 
-function DateTimePicker(props) {
+function DateTimePicker(props: any) {
   return (
     <TextField
       {...props}
@@ -31,11 +31,11 @@ function DateTimePicker(props) {
   );
 }
 
-function NumberField(props) {
+function NumberField(props: any) {
   return <TextField {...props} type="number" />;
 }
 
-export function Select({ value, options, onChange, className, ...props }) {
+export function Select({ value, options, onChange, className, ...props }: any) {
   return (
     <Box
       as={AxSelect}
@@ -45,8 +45,8 @@ export function Select({ value, options, onChange, className, ...props }) {
       options={options}
       optionLabel="title"
       optionValue="name"
-      onChange={(option) => onChange(option && option.name)}
-      value={options.find((o) => o.name === value) || null}
+      onChange={(option: any) => onChange(option?.name)}
+      value={options.find((o: any) => o.name === value) || null}
       icons={[
         {
           id: "more",
@@ -58,20 +58,10 @@ export function Select({ value, options, onChange, className, ...props }) {
   );
 }
 
-export function ButtonLink({ title, ...rest }) {
-  return (
-    title && (
-      <Button variant="link" size="sm" className={styles.button} {...rest}>
-        {title}
-      </Button>
-    )
-  );
-}
-
-export function BooleanRadio({ name, onChange, value: valueProp, data }) {
+export function BooleanRadio({ name, onChange, value: valueProp, data }: any) {
   return (
     <Box d="flex" alignItems="center" ms={1} me={1}>
-      {data.map(({ value, label }, index) => (
+      {data.map(({ value, label }: any, index: number) => (
         <Box d="flex" alignItems="center" key={index} me={2}>
           <Input
             type="radio"
@@ -91,65 +81,6 @@ export function BooleanRadio({ name, onChange, value: valueProp, data }) {
   );
 }
 
-export function BooleanCheckBox({
-  name,
-  value,
-  onChange,
-  title,
-  inline = false,
-  isDisabled,
-  classes,
-  ...rest
-}) {
-  if (inline) {
-    return (
-      <Input
-        type="checkbox"
-        checked={Boolean(value)}
-        onChange={({ target: { checked } }) => onChange(checked)}
-        value={name}
-        name={name}
-        disabled={isDisabled}
-        m={0}
-        me={2}
-        {...rest}
-      />
-    );
-  }
-  return (
-    <Box d="flex" alignItems="center">
-      <Input
-        type="checkbox"
-        checked={Boolean(value)}
-        onChange={({ target: { checked } }) => onChange({ name, checked })}
-        value={name}
-        name={name}
-        m={0}
-        me={2}
-        {...rest}
-      />
-      <Box as="p" mb={0}>
-        {title}
-      </Box>
-    </Box>
-  );
-}
-
-export function SimpleButton({ title, hide, ...rest }) {
-  return (
-    <Button
-      me={1}
-      outline
-      size="sm"
-      variant="primary"
-      {...rest}
-      {...(hide ? { d: "none" } : {})}
-    >
-      {title}
-    </Button>
-  );
-}
-
 export function SimpleWidget({
   component: Component,
   operator,
@@ -158,12 +89,12 @@ export function SimpleWidget({
   value2,
   style,
   ...rest
-}) {
+}: any) {
   if (["=", "!=", ">", ">=", "<", "<=", "like", "notLike"].includes(operator)) {
     return (
       <Component
         name="value"
-        onChange={(value) => onChange({ name: "value", value: value })}
+        onChange={(value: any) => onChange({ name: "value", value: value })}
         value={value}
         {...rest}
       />
@@ -176,14 +107,14 @@ export function SimpleWidget({
         <Component
           name="value"
           style={{ ...style }}
-          onChange={(value) => onChange({ name: "value", value })}
+          onChange={(value: any) => onChange({ name: "value", value })}
           value={value}
           {...rest}
         />
 
         <Component
           name="value2"
-          onChange={(value) => onChange({ name: "value2", value })}
+          onChange={(value: any) => onChange({ name: "value2", value })}
           value={value2}
           {...rest}
         />
@@ -194,7 +125,7 @@ export function SimpleWidget({
   return null;
 }
 
-export function RelationalWidget({ operator, onChange, ...rest }) {
+export function RelationalWidget({ operator, onChange, ...rest }: any) {
   const { field } = rest;
   const dataStore = useRef(new DataStore(field.target, {})).current;
   const options = useDataStore(dataStore, (res) => res.records);
@@ -208,7 +139,7 @@ export function RelationalWidget({ operator, onChange, ...rest }) {
     return (
       <TextField
         name="value"
-        onChange={(value) => onChange({ name: "value", value: value })}
+        onChange={(value: any) => onChange({ name: "value", value: value })}
         {...rest}
       />
     );
@@ -222,7 +153,6 @@ export function RelationalWidget({ operator, onChange, ...rest }) {
         className={clsx(styles.select, className)}
         optionLabel={targetName}
         optionValue="id"
-        name="value"
         value={value}
         isMulti={isMulti}
         options={options}
@@ -238,6 +168,7 @@ export function RelationalWidget({ operator, onChange, ...rest }) {
       />
     );
   }
+  return null;
 }
 
 const CurrentSelection = [
@@ -256,7 +187,7 @@ const PastOrNextSelection = [
   { name: "year", title: i18n.get("Years") },
 ];
 
-export function Widget({ type, operator, onChange, value, ...rest }) {
+export function Widget({ type, operator, onChange, value, ...rest }: any) {
   const props = {
     operator,
     value: value.value,
@@ -280,7 +211,8 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
         datetime: ["YYYY-MM-DD", "MM/DD/YYYY"],
         time: ["HH:mm", "LT"],
       };
-      const [format, displayFormat] = dateFormats[type];
+      const [format, displayFormat] =
+        dateFormats[type as "date" | "datetime" | "time"];
       const { value, value2, timeUnit, onChange } = props;
 
       function renderSelect() {
@@ -288,7 +220,7 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
           isClearOnDelete: false,
           name: "timeUnit",
           value: timeUnit,
-          onChange: (value) => onChange({ name: "timeUnit", value }),
+          onChange: (value: any) => onChange({ name: "timeUnit", value }),
           options: ["$inCurrent"].includes(operator)
             ? CurrentSelection
             : PastOrNextSelection,
@@ -301,7 +233,9 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
           <>
             <TextField
               name="value"
-              onChange={(value) => onChange({ name: "value", value: value })}
+              onChange={(value: any) =>
+                onChange({ name: "value", value: value })
+              }
               value={value}
               {...rest}
             />
@@ -320,7 +254,7 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
           format={displayFormat}
           value={value ? moment(value, format) : null}
           value2={value2 ? moment(value2, format) : null}
-          onChange={({ name, value }) => onChange({ name, value })}
+          onChange={({ name, value }: any) => onChange({ name, value })}
           {...{ component: DateTimePicker, type: "date" }}
         />
       );
@@ -330,7 +264,7 @@ export function Widget({ type, operator, onChange, value, ...rest }) {
       return <SimpleWidget {...props} {...{ component: NumberField, type }} />;
     case "enum":
       const options = rest.field.selectionList.map(
-        ({ title, value, data }) => ({
+        ({ title, value, data }: any) => ({
           name: (data && data.value) || value,
           title: title,
         })

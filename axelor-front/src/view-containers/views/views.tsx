@@ -7,16 +7,18 @@ import { Box, Fade } from "@axelor/ui";
 
 import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { filters as fetchFilters } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
-  SearchFilter,
+  SavedFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
+import { findFields } from "@/services/client/meta-cache";
 
 import { ViewScope } from "./scope";
 import { AdvancedSearchState } from "../advance-search/types";
@@ -45,13 +47,11 @@ function ViewContainer({
   view,
   searchAtom,
   dataStore,
-  domains,
 }: {
   tab: Tab;
   view: { name?: string; type: string };
   searchAtom?: AdvancedSearchAtom;
   dataStore?: DataStore;
-  domains?: SearchFilter[];
 }) {
   const { model } = tab.action;
   const { state, data } = useAsync(
@@ -68,13 +68,13 @@ function ViewContainer({
   if (Comp) {
     return (
       <Fade in={true} timeout={400} mountOnEnter>
-        <Box data-view-id={tab.id} d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
-          <Comp
-            meta={meta}
-            dataStore={dataStore}
-            domains={domains}
-            searchAtom={searchAtom}
-          />
+        <Box
+          data-view-id={tab.id}
+          d="flex"
+          flex={1}
+          style={{ minWidth: 0, minHeight: 0 }}
+        >
+          <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
         </Box>
       </Fade>
     );
@@ -86,11 +86,11 @@ function ViewContainer({
 function ViewPane({
   tab,
   dataStore,
-  domains,
+  searchAtom,
 }: {
   tab: Tab;
   dataStore?: DataStore;
-  domains?: SearchFilter[];
+  searchAtom?: AdvancedSearchAtom;
 }) {
   const {
     action: { views = [] },
@@ -98,17 +98,6 @@ function ViewPane({
   const typeAtom = useMemo(() => {
     return selectAtom(tab.state, (x) => x.type);
   }, [tab.state]);
-
-  // advanced search
-  const searchAtom = useMemo<AdvancedSearchAtom>(
-    () =>
-      atom<AdvancedSearchState>({
-        state: {
-          search: {},
-        },
-      }),
-    []
-  );
 
   const type = useAtomValue(typeAtom);
   const view = useMemo(() => views.find((x) => x.type === type), [type, views]);
@@ -121,7 +110,6 @@ function ViewPane({
           tab={tab}
           dataStore={dataStore}
           searchAtom={searchAtom}
-          domains={domains}
         />
       </ScopeProvider>
     );
@@ -146,30 +134,45 @@ const DataViews = memo(function DataViews({
       _domainContext: context,
     },
   });
-  const setViewState = useSetAtom(tab.state);
+
+  // advanced search
+  const searchAtom = useMemo<AdvancedSearchAtom>(
+    () =>
+      atom<AdvancedSearchState>({
+        search: {},
+        editor: { criteria: [] },
+      }),
+    []
+  );
+  const setSearchState = useSetAtom(searchAtom);
 
   const filterName = (params || {})["search-filters"];
 
   useAsync<void>(async () => {
     const name = filterName || `act:${actionName}`;
     const filters = await fetchFilters(name);
-    setViewState({ filters: filters });
-  }, [actionName, filterName]);
+    setSearchState((state) => ({ ...state, filters }));
+  }, [actionName, filterName, setSearchState]);
 
-  const { data: searchFilters } = useAsync<SearchFilter[]>(async () => {
-    if (!filterName) return [];
+  useAsyncEffect(async () => {
+    const { fields, jsonFields } = await findFields(model);
+    fields && setSearchState((state) => ({ ...state, fields, jsonFields }));
+  }, [model]);
+
+  useAsyncEffect(async () => {
+    if (!filterName) return;
     const res = await findView<SearchFilters>({
       name: filterName,
       type: "search-filters",
       model,
     });
-    return (res?.view?.filters || []).map((filter) => ({
-      ...filter,
-      id: filter.name ?? filter.title,
+    setSearchState((state) => ({
+      ...state,
+      domains: res?.view?.filters || [],
     }));
-  }, [model, filterName]);
+  }, [model, filterName, setSearchState]);
 
-  return <ViewPane tab={tab} dataStore={dataStore} domains={searchFilters} />;
+  return <ViewPane tab={tab} dataStore={dataStore} searchAtom={searchAtom} />;
 });
 
 export const Views = memo(function Views({ tab }: { tab: Tab }) {

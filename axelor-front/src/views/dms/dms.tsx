@@ -80,7 +80,7 @@ const promptInput = async (
 };
 
 export function Dms(props: ViewProps<GridView>) {
-  const { meta, dataStore, searchAtom, domains } = props;
+  const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
   const { action, popup, popupOptions } = useViewTab();
   const { data: session } = useSession();
@@ -171,7 +171,6 @@ export function Dms(props: ViewProps<GridView>) {
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
         const { query = {} } = searchAtom ? get(searchAtom) : {};
-        const { archived: _archived } = query;
 
         const sortBy = orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
@@ -182,7 +181,6 @@ export function Dms(props: ViewProps<GridView>) {
             sortBy,
             filter: {
               ...query,
-              _archived,
               _domain: `${action.domain ? `${action.domain} AND ` : ""}${
                 selected
                   ? `self.parent.id = ${selected}`
@@ -643,8 +641,8 @@ export function Dms(props: ViewProps<GridView>) {
                   stateAtom={searchAtom}
                   dataStore={dataStore}
                   items={view.items}
-                  fields={fields}
-                  domains={domains}
+                  customSearch={view.customSearch}
+                  freeSearch={view.freeSearch}
                   onSearch={onSearch}
                 />
               )}

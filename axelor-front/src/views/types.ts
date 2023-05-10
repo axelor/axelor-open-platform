@@ -23,7 +23,6 @@ export type ViewProps<T extends View> = T extends
       meta: ViewData<T>;
       dataStore: DataStore;
       searchAtom?: AdvancedSearchAtom;
-      domains?: SearchFilter[];
     }
   : {
       meta: ViewData<T>;

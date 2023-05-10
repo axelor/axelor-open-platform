@@ -1,15 +1,16 @@
-import { moment } from "@/services/client/l10n";
+import { Dayjs } from "dayjs";
+import isNumber from "lodash/isNumber";
+
+import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
+import { moment, l10n } from "@/services/client/l10n";
+import { Property, Widget } from "@/services/client/meta.types";
+import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
+import { session } from "@/services/client/session";
+import { MetaData } from "@/services/client/meta";
+import { Field } from "@/services/client/meta.types";
 
-function getNextOf(mm, timeUnit) {
-  return mm.add(1, timeUnit).startOf(timeUnit);
-}
-
-function getPreferredLocale() {
-  return "en";
-}
-
-export function getFieldName(field) {
+export function getFieldName(field: Property) {
   switch (toKebabCase(field?.type)) {
     case "one-to-one":
     case "many-to-one":
@@ -22,19 +23,23 @@ export function getFieldName(field) {
   }
 }
 
-function fieldNameAppend(fieldName, append) {
-  return (fieldName || "").endsWith(`.${append}`)
+function fieldNameAppend(fieldName?: string, append?: string) {
+  return (fieldName || "").endsWith(`.${append || ""}`)
     ? fieldName
     : `${fieldName}.${append}`;
 }
 
-export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
-  let { fieldName, operator, timeUnit, value, value2 } = criteria;
-  const field = fields[criteria.fieldName];
+export function getCriteria(criteria: Filter, fields?: MetaData["fields"]) {
+  let { fieldName, timeUnit = "d", value, value2 } = criteria;
+  let operator = criteria.operator as any;
+  const field = criteria.fieldName && fields?.[criteria.fieldName];
+  const user = session.info!.user;
+  const userId = user?.id;
+  const userGroup = user?.group;
 
-  function getValue(value) {
-    if (value instanceof moment) {
-      if ((field?.type || "").toLowerCase() === "date") {
+  function getValue(value: Date | Dayjs) {
+    if (value instanceof Dayjs) {
+      if (((field as any)?.type || "").toLowerCase() === "date") {
         return value.startOf("day").format("YYYY-MM-DD");
       }
       return value.toDate();
@@ -59,7 +64,7 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
   }
 
   if (operator === "$inCurrent") {
-    const now = moment().locale(getPreferredLocale());
+    const now = moment().locale(l10n.getLocale());
     return {
       operator: "and",
       criteria: [
@@ -78,7 +83,7 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
   }
 
   if (operator === "$inPast") {
-    const now = moment().locale(getPreferredLocale());
+    const now = moment().locale(l10n.getLocale());
     return {
       operator: "and",
       criteria: [
@@ -99,7 +104,7 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
   }
 
   if (operator === "$inNext") {
-    const now = moment().locale(getPreferredLocale());
+    const now = moment().locale(l10n.getLocale());
     return {
       operator: "and",
       criteria: [
@@ -170,7 +175,7 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
           let subField = field.targetName;
           if (["in", "notIn"].includes(operator)) {
             subField = "id";
-            value = value && value.map((v) => v[subField]);
+            value = value && value.map((v: DataRecord) => v.id);
           }
           fieldName = `${field.name}.${subField}`;
         }
@@ -182,7 +187,7 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
           if (!value) return null;
           fieldName = `${field.name}.id`;
           if (["in", "notIn"].includes(operator)) {
-            value = value && value.map((v) => v.id);
+            value = value && value.map((v: DataRecord) => v.id);
           }
         }
         break;
@@ -245,9 +250,78 @@ export function getCriteria(criteria, fields, { userId, userGroup } = {}) {
       fieldName,
       value,
       value2: value2 === null ? undefined : value2,
-      timeUnit: !timeUnit ? undefined : timeUnit,
+      timeUnit: !criteria.timeUnit ? undefined : timeUnit,
     };
   }
 
   return criteria;
+}
+
+export function getFreeSearchCriteria(
+  text?: string,
+  items?: Widget[],
+  fields?: MetaData["fields"]
+) {
+  if (text) {
+    const filters: Filter[] = [];
+    const number = +text;
+
+    items?.forEach((item) => {
+      let fieldName = "";
+      let operator = "like";
+      let value: any = text;
+
+      const field = fields?.[item?.name || ""] || item;
+      const { name, targetName, jsonField } = field as Field;
+
+      const type = toKebabCase(field.type);
+      switch (type) {
+        case "integer":
+        case "long":
+        case "decimal":
+          if (isNaN(number) || !isNumber(number)) return;
+          if (
+            type === "integer" &&
+            (number > 2147483647 || number < -2147483648)
+          )
+            return;
+          fieldName = name;
+          operator = "=";
+          value = number;
+          break;
+        case "text":
+        case "string":
+          fieldName = name;
+          break;
+        case "one-to-one":
+        case "many-to-one":
+          if (jsonField) {
+            fieldName = name;
+          } else if (targetName) {
+            fieldName = name + "." + targetName;
+          }
+          break;
+        case "boolean":
+          if (/^(t|f|y|n|true|false|yes|no)$/.test(text)) {
+            fieldName = name;
+            operator = "=";
+            value = /^(t|y|true|yes)$/.test(text);
+          }
+          break;
+        default:
+          break;
+      }
+
+      if (!fieldName) return;
+
+      filters.push({
+        fieldName: fieldName,
+        operator: operator as FilterOp,
+        value: value,
+      });
+    });
+
+    return filters;
+  }
+  return [];
 }

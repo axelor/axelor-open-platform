@@ -165,25 +165,6 @@ export function useViewDirtyAtom() {
 }
 
 /**
- * This hook can be used to get/set filters of tab
- *
- */
-export function useViewFilters() {
-  const tab = useViewTab();
-  const state = useSelectViewState(useCallback(({ filters }) => filters, []));
-  const setState = useAtomCallback(
-    useCallback(
-      (get, set, filters: SavedFilter[]) => {
-        set(tab.state, { filters });
-      },
-      [tab.state]
-    )
-  );
-
-  return [state, setState] as const;
-}
-
-/**
  * This hook should be used by views to get the current route options.
  *
  * @param type the view type for which to get the route options

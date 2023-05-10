@@ -1,5 +1,6 @@
 import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
+import { SearchFilter } from "./meta.types";
 import { reject } from "./reject";
 
 export type SearchOptions = {
@@ -9,9 +10,11 @@ export type SearchOptions = {
   translate?: boolean;
   fields?: string[];
   filter?: Criteria & {
+    _domains?: SearchFilter[];
     _domain?: string;
     _domainContext?: DataContext;
     _archived?: boolean;
+    _searchText?: string;
   };
 };
 

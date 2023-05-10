@@ -28,7 +28,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import styles from "./cards.module.scss";
 
 export function Cards(props: ViewProps<CardsView>) {
-  const { meta, dataStore, searchAtom, domains } = props;
+  const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
   const { action, dashlet: dasheen, popup, popupOptions } = useViewTab();
 
@@ -71,10 +71,9 @@ export function Cards(props: ViewProps<CardsView>) {
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
-        const { query = {} } = searchAtom ? get(searchAtom) : {};
-        const { archived: _archived } = query;
+        const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
         return dataStore.search({
-          filter: { ...query, _archived },
+          filter,
           ...options,
         });
       },
@@ -197,8 +196,8 @@ export function Cards(props: ViewProps<CardsView>) {
               stateAtom={searchAtom}
               dataStore={dataStore}
               items={view.items}
-              fields={fields}
-              domains={domains}
+              customSearch={view.customSearch}
+              freeSearch={view.freeSearch}
               onSearch={onSearch}
             />
           )}

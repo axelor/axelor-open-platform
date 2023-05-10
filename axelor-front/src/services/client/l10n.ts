@@ -1,4 +1,4 @@
-import dayjs, { PluginFunc } from "dayjs";
+import dayjs, { Dayjs, PluginFunc } from "dayjs";
 import dayjsLocale from "dayjs/locale.json";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -133,6 +133,8 @@ function findLocale() {
 }
 
 export const moment = dayjs;
+
+export type Moment = Dayjs;
 
 export namespace l10n {
   export function getLocale() {
