@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
@@ -19,6 +19,7 @@ import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
@@ -45,13 +46,14 @@ import { ViewProps } from "../types";
 import {
   Form as FormComponent,
   FormLayout,
+  FormState,
   FormWidget,
   WidgetErrors,
+  WidgetState,
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
-import { parseExpression } from "@/hooks/use-parser/utils";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -78,6 +80,29 @@ export const showErrors = (errors: WidgetErrors[]) => {
       </ul>
     ),
   });
+};
+
+export const useGetErrors = () => {
+  const store = useStore();
+  return useCallback(
+    (formState: FormState, fieldName?: string) => {
+      const { states, statesByName = {} } = formState;
+      const isHidden = function isHidden(s: WidgetState): boolean {
+        return Boolean(
+          s.attrs.hidden ||
+            (s.name && statesByName[s.name]?.attrs?.hidden) ||
+            (s.parent && isHidden(store.get(s.parent)))
+        );
+      };
+      const errors = Object.values(states)
+        .filter((s) => fieldName === undefined || s.name === fieldName)
+        .filter((s) => !isHidden(s))
+        .filter((s) => Object.keys(s.errors ?? {}).length > 0)
+        .map((s) => s.errors ?? {});
+      return errors.length ? errors : null;
+    },
+    [store]
+  );
 };
 
 function getDefaultValues(meta: ViewData<FormView>) {
@@ -293,19 +318,19 @@ function FormContainer({
     )
   );
 
+  const getErrors = useGetErrors();
+
   const onSave = useAtomCallback(
     useCallback(
       async (get, set, callOnSave: boolean = true) => {
-        const { record, states } = get(formAtom);
-        const errors = Object.values(states)
-          .map((s) => s.errors ?? {})
-          .filter((x) => Object.keys(x).length > 0);
-
-        if (errors.length > 0) {
+        const formState = get(formAtom);
+        const errors = getErrors(formState);
+        if (errors) {
           showErrors(errors);
           return Promise.reject();
         }
 
+        const { record } = formState;
         const dummy = extractDummy(record);
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
@@ -329,6 +354,7 @@ function FormContainer({
         doEdit,
         doRead,
         formAtom,
+        getErrors,
         onSaveAction,
         readonly,
       ]
@@ -878,7 +904,13 @@ function useFormWidth(
   return result;
 }
 
-const Layout: FormLayout = ({ schema, formAtom, parentAtom, className, readonly }) => {
+const Layout: FormLayout = ({
+  schema,
+  formAtom,
+  parentAtom,
+  className,
+  readonly,
+}) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const isSmall = useContainerQuery(ref, "width < 768px");
 

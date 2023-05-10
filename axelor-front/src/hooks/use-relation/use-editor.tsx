@@ -11,9 +11,8 @@ import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { FormView } from "@/services/client/meta.types";
-import { checkErrors } from "@/views/form/builder/utils";
+import { showErrors, useGetErrors } from "@/views/form";
 import { initTab } from "../use-tabs";
-import { showErrors } from "@/views/form";
 
 export type EditorOptions = {
   model: string;
@@ -95,6 +94,8 @@ function Footer({
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
+  const getErrors = useGetErrors();
+
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => handler.getState?.().dirty ?? false,
@@ -109,7 +110,7 @@ function Footer({
     const canSave = state.dirty || !record.id;
 
     try {
-      const errors = checkErrors(state.states);
+      const errors = getErrors(state);
       if (errors) {
         showErrors(errors);
         return;
@@ -126,7 +127,7 @@ function Footer({
     } catch (e) {
       // TODO: show error
     }
-  }, [handler, onClose, onSave, onSelect]);
+  }, [getErrors, handler, onClose, onSave, onSelect]);
 
   return (
     <Box d="flex" g={2}>

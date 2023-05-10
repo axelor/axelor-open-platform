@@ -1,5 +1,6 @@
-import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
-import { GridRowProps } from "@axelor/ui/grid";
+import clsx from "clsx";
+import { useAtomCallback } from "jotai/utils";
+import { isEqual } from "lodash";
 import {
   KeyboardEvent,
   forwardRef,
@@ -8,13 +9,16 @@ import {
   useMemo,
   useRef,
 } from "react";
-import clsx from "clsx";
-import { useAtomCallback } from "jotai/utils";
-import { isEqual } from "lodash";
+
+import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
+import { GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
+import { alerts } from "@/components/alerts";
+import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
+import { useGetErrors } from "@/views/form";
 import {
   Form as FormComponent,
   FormLayout,
@@ -24,9 +28,7 @@ import {
   WidgetProps,
   useFormHandlers,
 } from "@/views/form/builder";
-import { alerts } from "@/components/alerts";
-import { DataRecord } from "@/services/client/data.types";
-import { checkErrors } from "@/views/form/builder/utils";
+
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
@@ -180,13 +182,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       }
     }, []);
 
-    const getErrors = useAtomCallback(
+    const getErrors = useGetErrors();
+
+    const checkInvalid = useAtomCallback(
       useCallback(
-        (get) => {
-          const { states } = get(formAtom);
-          return checkErrors(states);
-        },
-        [formAtom]
+        (get, set, name?: string) => getErrors(get(formAtom), name),
+        [formAtom, getErrors]
       )
     );
 
@@ -199,10 +200,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const handleSave = useAtomCallback(
       useCallback(
         async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
-          const { record: saveRecord } = get(formAtom);
+          const formState = get(formAtom);
 
           // check record changes
-          if (isEqual(record, saveRecord)) {
+          if (isEqual(record, formState.record)) {
             return onSave?.(
               record,
               rowIndex,
@@ -212,7 +213,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             );
           }
 
-          const errors = getErrors();
+          const errors = getErrors(formState);
 
           if (errors) {
             showErrors(errors);
@@ -229,7 +230,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           await actionExecutor.wait();
 
           return await onSave?.(
-            saveRecord,
+            formState.record,
             rowIndex,
             columnIndex ?? cellIndex!,
             true,
@@ -310,12 +311,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       ref,
       () => {
         return {
-          invalid: getErrors,
+          invalid: checkInvalid,
           onSave: handleSave,
           onCancel: handleCancel,
         };
       },
-      [getErrors, handleSave, handleCancel]
+      [checkInvalid, handleSave, handleCancel]
     );
 
     return (
