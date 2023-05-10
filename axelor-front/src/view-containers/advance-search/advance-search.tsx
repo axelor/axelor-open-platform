@@ -98,7 +98,14 @@ export function AdvanceSearch({
     useCallback(
       (get, set, hasEditorApply?: boolean) => {
         const state = get(stateAtom);
-        const { domains, filters, archived: _archived, editor, fields } = state;
+        const {
+          domains,
+          filters,
+          archived: _archived,
+          editor,
+          fields,
+          jsonFields,
+        } = state;
         const _domains = domains
           ?.filter((d) => d.checked)
           .map(({ checked, ...d }) => ({
@@ -107,7 +114,7 @@ export function AdvanceSearch({
 
         const getEditorCriteria = (criteria: Criteria["criteria"]) =>
           (criteria || [])
-            .map((c) => getCriteria(c as Filter, fields) as Filter)
+            .map((c) => getCriteria(c as Filter, fields, jsonFields) as Filter)
             .filter((c) => c);
 
         const getEditor = (filter: SavedFilter) => {
@@ -449,6 +456,7 @@ export function AdvanceSearch({
                     stateAtom={stateAtom}
                     canShare={advanceSearchConfig?.share}
                     canExportFull={advanceSearchConfig?.exportFull}
+                    items={items}
                     onApply={handleEditorApply}
                     onClear={handleClear}
                     onExport={handleExport}

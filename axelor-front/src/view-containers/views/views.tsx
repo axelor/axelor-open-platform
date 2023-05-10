@@ -155,7 +155,7 @@ const DataViews = memo(function DataViews({
   }, [actionName, filterName, setSearchState]);
 
   useAsyncEffect(async () => {
-    const { fields, jsonFields } = await findFields(model);
+    const { fields, jsonFields } = await findFields(model, context?.jsonModel);
     fields && setSearchState((state) => ({ ...state, fields, jsonFields }));
   }, [model]);
 

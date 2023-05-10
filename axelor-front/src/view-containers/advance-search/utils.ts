@@ -1,27 +1,15 @@
 import { Dayjs } from "dayjs";
 import isNumber from "lodash/isNumber";
+import get from "lodash/get";
 
 import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
 import { moment, l10n } from "@/services/client/l10n";
-import { Property, Widget } from "@/services/client/meta.types";
+import { Widget } from "@/services/client/meta.types";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { session } from "@/services/client/session";
 import { MetaData } from "@/services/client/meta";
 import { Field } from "@/services/client/meta.types";
-
-export function getFieldName(field: Property) {
-  switch (toKebabCase(field?.type)) {
-    case "one-to-one":
-    case "many-to-one":
-      return `${field.name}.${field.targetName}`;
-    case "one-to-many":
-    case "many-to-many":
-      return `${field.name}.id`;
-    default:
-      return field.name;
-  }
-}
 
 function fieldNameAppend(fieldName?: string, append?: string) {
   return (fieldName || "").endsWith(`.${append || ""}`)
@@ -29,10 +17,15 @@ function fieldNameAppend(fieldName?: string, append?: string) {
     : `${fieldName}.${append}`;
 }
 
-export function getCriteria(criteria: Filter, fields?: MetaData["fields"]) {
+export function getCriteria(
+  criteria: Filter,
+  fields?: MetaData["fields"],
+  jsonFields?: MetaData["jsonFields"]
+) {
   let { fieldName, timeUnit = "d", value, value2 } = criteria;
   let operator = criteria.operator as any;
-  const field = criteria.fieldName && fields?.[criteria.fieldName];
+  const jsonField = get(jsonFields || {}, fieldName!);
+  const field = fields?.[fieldName!] || jsonField;
   const user = session.info!.user;
   const userId = user?.id;
   const userGroup = user?.group;
@@ -167,7 +160,7 @@ export function getCriteria(criteria: Filter, fields?: MetaData["fields"]) {
   }
 
   if (field) {
-    switch (toKebabCase(field.type)) {
+    switch (toKebabCase(field.type as string)) {
       case "one-to-one":
       case "many-to-one": {
         if (!["isNull", "notNull"].includes(operator)) {
@@ -177,7 +170,7 @@ export function getCriteria(criteria: Filter, fields?: MetaData["fields"]) {
             subField = "id";
             value = value && value.map((v: DataRecord) => v.id);
           }
-          fieldName = `${field.name}.${subField}`;
+          fieldName = `${jsonField ? fieldName : field.name}.${subField}`;
         }
         break;
       }
@@ -185,7 +178,7 @@ export function getCriteria(criteria: Filter, fields?: MetaData["fields"]) {
       case "many-to-many": {
         if (!["isNull", "notNull"].includes(operator)) {
           if (!value) return null;
-          fieldName = `${field.name}.id`;
+          fieldName = `${jsonField ? fieldName : field.name}.id`;
           if (["in", "notIn"].includes(operator)) {
             value = value && value.map((v: DataRecord) => v.id);
           }

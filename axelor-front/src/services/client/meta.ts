@@ -134,9 +134,12 @@ export interface ViewData<T> extends Partial<MetaData> {
   related?: Record<string, string[]>; // additional fields after view processing
 }
 
-export async function fields(model: string): Promise<MetaData> {
+export async function fields(
+  model: string,
+  jsonModel?: string
+): Promise<MetaData> {
   const resp = await request({
-    url: `ws/meta/fields/${model}`,
+    url: `ws/meta/fields/${model}${jsonModel ? `?jsonModel=${jsonModel}` : ""}`,
     method: "GET",
   });
 

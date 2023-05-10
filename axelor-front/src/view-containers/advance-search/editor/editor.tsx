@@ -16,10 +16,13 @@ import { Filter } from "@/services/client/data.types";
 import {
   AdvancedSearchAtom,
   Field,
+  JsonField,
   Property,
   SavedFilter,
+  View,
 } from "@/services/client/meta.types";
 import { AdvancedSearchState } from "../types";
+import { toKebabCase } from "@/utils/names";
 import styles from "./editor.module.scss";
 
 export const getEditorDefaultState = () =>
@@ -55,6 +58,7 @@ export interface EditorProps {
   stateAtom: AdvancedSearchAtom;
   canExportFull?: boolean;
   canShare?: boolean;
+  items?: View["items"];
   onClear?: () => void;
   onApply?: () => void;
   onExport?: (exportFull?: boolean) => void;
@@ -66,6 +70,7 @@ export function Editor({
   canExportFull = true,
   canShare = true,
   stateAtom,
+  items,
   onClear,
   onApply,
   onSave,
@@ -74,6 +79,9 @@ export function Editor({
 }: EditorProps) {
   const fields = useAtomValue(
     useMemo(() => selectAtom(stateAtom, (s) => s.fields), [stateAtom])
+  );
+  const jsonFields = useAtomValue(
+    useMemo(() => selectAtom(stateAtom, (s) => s.jsonFields), [stateAtom])
   );
   const filters = useAtomValue(
     useMemo(() => selectAtom(stateAtom, (s) => s.filters), [stateAtom])
@@ -277,33 +285,59 @@ export function Editor({
       }));
   }, [contextFields, setContextField]);
 
-  const $fields = useMemo(
-    () =>
-      sortBy(
-        Object.values(fields || {}).filter((field: Property) => {
-          const { type, large, contextField, contextFieldValue } = field as any;
-          if (
-            type === "binary" ||
-            large ||
-            field.json ||
-            field.encrypted ||
-            ["id", "version", "archived", "selected"].includes(field.name!)
-          ) {
-            return false;
-          }
+  const $fields = useMemo(() => {
+    const fieldList = Object.values(fields || {}).filter((field: Property) => {
+      const {
+        type,
+        large,
+        contextField: contextFieldName,
+        contextFieldValue,
+      } = field as any;
+      if (
+        type === "binary" ||
+        large ||
+        field.json ||
+        field.encrypted ||
+        ["id", "version", "archived", "selected"].includes(field.name!)
+      ) {
+        return false;
+      }
 
-          if (contextField) {
-            return (
-              contextField?.name === contextField &&
-              String(contextField?.value?.id) === String(contextFieldValue)
-            );
-          }
-          return true;
-        }),
-        "title"
-      ) as unknown as Field[],
-    [fields]
-  );
+      if (contextFieldName) {
+        return (
+          contextField?.name === contextFieldName &&
+          String(contextField?.value?.id) === String(contextFieldValue)
+        );
+      }
+      return true;
+    });
+
+    Object.keys(jsonFields || {}).forEach((prefix) => {
+      const { title } = fields?.[prefix as any] || {};
+      const keys = Object.keys(jsonFields?.[prefix] || {});
+
+      keys?.forEach?.((name: string) => {
+        const field = (jsonFields?.[prefix]?.[name] || {}) as JsonField;
+        const type = toKebabCase(field.type);
+        if (["button", "panel", "separator", "many-to-many"].includes(type))
+          return;
+
+        let key = prefix + "." + name;
+        if (type !== "many-to-one") {
+          key += "::" + (field.jsonType || "text");
+        }
+        fieldList.push({
+          ...(field as any),
+          name: key,
+          title: `${field.title || field.autoTitle} ${
+            title ? `(${title})` : ""
+          }`,
+        } as Property);
+      });
+    });
+
+    return sortBy(fieldList, "title") as unknown as Field[];
+  }, [fields, jsonFields, contextField]);
 
   const selectedContextField =
     contextField?.name &&

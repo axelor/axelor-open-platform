@@ -60,6 +60,11 @@ export async function findView<T extends ViewType>({
   });
 }
 
-export async function findFields(model: string): Promise<MetaData> {
-  return cache.get(makeKey("meta", model), () => fetchFields(model));
+export async function findFields(
+  model: string,
+  jsonModel?: string
+): Promise<MetaData> {
+  return cache.get(makeKey("meta", model, jsonModel), () =>
+    fetchFields(model, jsonModel)
+  );
 }
