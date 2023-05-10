@@ -34,7 +34,12 @@ export function Panel(props: WidgetProps) {
         </Box>
       )}
       <Box className={styles.panelBody} {...bodyProps}>
-        <GridLayout readonly={readonly} formAtom={formAtom} schema={schema} />
+        <GridLayout
+          readonly={readonly}
+          formAtom={formAtom}
+          parentAtom={widgetAtom}
+          schema={schema}
+        />
       </Box>
     </Box>
   );

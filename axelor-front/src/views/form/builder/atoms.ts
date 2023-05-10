@@ -9,7 +9,7 @@ import { FormView, Schema } from "@/services/client/meta.types";
 import { ActionExecutor } from "@/view-containers/action";
 
 import { ViewData } from "@/services/client/meta";
-import { FormAtom, FormState, WidgetState } from "./types";
+import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
 import { defaultAttrs, processContextValues } from "./utils";
 
 export function createFormAtom(props: {
@@ -36,25 +36,26 @@ export function createFormAtom(props: {
 export function createWidgetAtom(props: {
   schema: Schema;
   formAtom: FormAtom;
+  parentAtom?: WidgetAtom;
 }) {
-  const { schema, formAtom } = props;
-  const { uid, name = "__" } = schema;
+  const { schema, formAtom, parentAtom: parent } = props;
+  const { uid, name } = schema;
   const attrs = defaultAttrs(schema);
 
-  let prevState: WidgetState = { attrs: {} };
+  let prevState: WidgetState = { name, parent, attrs: {} };
 
   const attrsByIdAtom = focusAtom(formAtom, (o) =>
     o
       .prop("states")
       .prop(uid)
-      .valueOr({ attrs: {} } as WidgetState)
+      .valueOr({ name, parent, attrs: {} } as WidgetState)
   );
 
   const attrsByNameAtom = focusAtom(formAtom, (o) =>
     o
       .prop("statesByName")
-      .prop(name)
-      .valueOr({ attrs: {} } as WidgetState)
+      .prop(name ?? "__")
+      .valueOr({ name, parent, attrs: {} } as WidgetState)
   );
 
   const getStateByName = (key: keyof WidgetState, values: any) =>
@@ -92,6 +93,8 @@ export function createWidgetAtom(props: {
           ...attrsByName,
           ...attrsById,
         },
+        name,
+        parent,
       });
     },
     (get, set, state) => {

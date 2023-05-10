@@ -1,9 +1,9 @@
 import { PrimitiveAtom, WritableAtom } from "jotai";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { ViewData } from "@/services/client/meta";
 import { FormView, Property, Schema } from "@/services/client/meta.types";
 import { ActionExecutor, ActionHandler } from "@/view-containers/action";
-import { ViewData } from "@/services/client/meta";
 
 // TODO: add more attrs that can be changed
 export const DEFAULT_ATTRS = {
@@ -49,6 +49,8 @@ export interface WidgetState {
   errors?: WidgetErrors;
   columns?: Record<string, Attrs>;
   selected?: number[];
+  readonly name?: string;
+  readonly parent?: WidgetAtom;
 }
 
 export interface FormState {
@@ -77,6 +79,7 @@ export interface WidgetProps {
   schema: Schema;
   formAtom: FormAtom;
   widgetAtom: WidgetAtom;
+  parentAtom?: WidgetAtom;
   readonly?: boolean;
 }
 

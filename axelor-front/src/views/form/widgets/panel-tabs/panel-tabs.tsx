@@ -7,18 +7,20 @@ import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
-import { FormAtom, FormWidget, WidgetProps } from "../../builder";
+import { FormAtom, FormWidget, WidgetAtom, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
 function TabContent({
   schema,
   active,
   formAtom,
+  parentAtom,
   readonly,
 }: {
   schema: NavItemProps;
   active: boolean;
   formAtom: WidgetProps["formAtom"];
+  parentAtom: WidgetProps["parentAtom"];
   readonly?: boolean;
 }) {
   const [mount, setMount] = useState(false);
@@ -32,7 +34,12 @@ function TabContent({
     <>
       {mount && (
         <Box d={display} pt={3}>
-          <FormWidget readonly={readonly} schema={schema} formAtom={formAtom} />
+          <FormWidget
+            readonly={readonly}
+            schema={schema}
+            formAtom={formAtom}
+            parentAtom={parentAtom}
+          />
         </Box>
       )}
     </>
@@ -40,7 +47,7 @@ function TabContent({
 }
 
 export function PanelTabs(props: WidgetProps) {
-  const { schema, formAtom, readonly } = props;
+  const { schema, formAtom, widgetAtom, readonly } = props;
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const handleChange = useCallback((id: string) => setActiveTab(id), []);
 
@@ -135,7 +142,7 @@ export function PanelTabs(props: WidgetProps) {
         value={activeTab ?? undefined}
         onChange={handleChange}
       />
-      <DummyTabs items={tabItems} formAtom={formAtom} />
+      <DummyTabs items={tabItems} formAtom={formAtom} parentAtom={widgetAtom} />
       {visibleTabs.map((item) => {
         const active = activeTab === item.id;
         return (
@@ -144,6 +151,7 @@ export function PanelTabs(props: WidgetProps) {
             schema={item}
             active={active}
             formAtom={formAtom}
+            parentAtom={widgetAtom}
             readonly={readonly}
           />
         );
@@ -156,20 +164,34 @@ export function PanelTabs(props: WidgetProps) {
 function DummyTabs({
   items,
   formAtom,
+  parentAtom,
 }: {
   formAtom: FormAtom;
+  parentAtom: WidgetAtom;
   items: NavItemProps[];
 }) {
   const tabs = useMemo(() => {
     return items.map((item) => {
       const { id, uid, name, showIf, hideIf } = item as Schema;
-      return { id, uid, name, showIf, hideIf, widget: "spacer" } as NavItemProps;
+      return {
+        id,
+        uid,
+        name,
+        showIf,
+        hideIf,
+        widget: "spacer",
+      } as NavItemProps;
     });
   }, [items]);
   return (
     <Box d="none">
       {tabs.map((item) => (
-        <FormWidget key={item.id} schema={item} formAtom={formAtom} />
+        <FormWidget
+          key={item.id}
+          schema={item}
+          formAtom={formAtom}
+          parentAtom={parentAtom}
+        />
       ))}
     </Box>
   );

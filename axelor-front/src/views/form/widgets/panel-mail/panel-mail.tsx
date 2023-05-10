@@ -9,7 +9,7 @@ const WIDGET_COLSPAN: Record<string, number> = {
 };
 
 export function PanelMail(props: WidgetProps) {
-  const { formAtom, schema } = props;
+  const { formAtom, widgetAtom, schema } = props;
   const recordId = useAtomValue(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
@@ -38,7 +38,11 @@ export function PanelMail(props: WidgetProps) {
 
   return (
     ((recordId ?? 0) > 0 || model === "com.axelor.mail.db.MailMessage") && (
-      <GridLayout formAtom={formAtom} schema={$schema} />
+      <GridLayout
+        formAtom={formAtom}
+        parentAtom={widgetAtom}
+        schema={$schema}
+      />
     )
   );
 }

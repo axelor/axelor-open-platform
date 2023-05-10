@@ -878,7 +878,7 @@ function useFormWidth(
   return result;
 }
 
-const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
+const Layout: FormLayout = ({ schema, formAtom, parentAtom, className, readonly }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const isSmall = useContainerQuery(ref, "width < 768px");
 
@@ -928,6 +928,7 @@ const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
             key={item.uid}
             schema={item}
             formAtom={formAtom}
+            parentAtom={parentAtom}
             readonly={readonly}
           />
         ))}
@@ -939,6 +940,7 @@ const Layout: FormLayout = ({ schema, formAtom, className, readonly }) => {
               key={item.uid}
               schema={item}
               formAtom={formAtom}
+              parentAtom={parentAtom}
               readonly={readonly}
             />
           ))}

@@ -124,6 +124,7 @@ export const Form = memo(function Form({
   schema: view,
   fields,
   formAtom,
+  widgetAtom,
   recordHandler,
   actionHandler,
   actionExecutor,
@@ -155,6 +156,7 @@ export const Form = memo(function Form({
           readonly={readonly}
           schema={schema}
           formAtom={formAtom}
+          parentAtom={widgetAtom}
         />
       </>
     </ScopeProvider>

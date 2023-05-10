@@ -49,6 +49,7 @@ function layoutClassName(item: Schema) {
 export const GridLayout: FormLayout = ({
   schema,
   formAtom,
+  parentAtom,
   className,
   readonly,
 }) => {
@@ -76,7 +77,12 @@ export const GridLayout: FormLayout = ({
           itemSpan={itemSpan}
           className={layoutClassName(item)}
         >
-          <FormWidget schema={item} formAtom={formAtom} readonly={readonly} />
+          <FormWidget
+            schema={item}
+            formAtom={formAtom}
+            parentAtom={parentAtom}
+            readonly={readonly}
+          />
         </GridItem>
       ))}
     </div>

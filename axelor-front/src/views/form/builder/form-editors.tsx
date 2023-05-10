@@ -138,12 +138,17 @@ export function FieldEditor(props: FieldEditorProps) {
 }
 
 function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
-  const { formAtom, readonly } = props;
+  const { formAtom, widgetAtom, readonly } = props;
   const schema = useMemo(() => processView(editor, fields), [editor, fields]);
 
   return (
     <FieldControl {...props}>
-      <GridLayout schema={schema} formAtom={formAtom} readonly={readonly} />
+      <GridLayout
+        schema={schema}
+        formAtom={formAtom}
+        parentAtom={widgetAtom}
+        readonly={readonly}
+      />
     </FieldControl>
   );
 }

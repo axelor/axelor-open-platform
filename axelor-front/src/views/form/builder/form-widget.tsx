@@ -20,11 +20,11 @@ import { useFormScope } from "./scope";
 import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
-  const { schema, formAtom } = props;
+  const { schema, formAtom, parentAtom } = props;
 
   const widgetAtom = useMemo(
-    () => createWidgetAtom({ schema, formAtom }),
-    [formAtom, schema]
+    () => createWidgetAtom({ schema, formAtom, parentAtom }),
+    [formAtom, parentAtom, schema]
   );
 
   const dirtyAtom = useViewDirtyAtom();
