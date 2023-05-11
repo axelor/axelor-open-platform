@@ -87,6 +87,10 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
     res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;
   }
 
+  if (res.showIf || res.hideIf) {
+    res.hidden = true;
+  }
+
   if (res.items) {
     res.items = res.items.map((item) =>
       processView(item, res.fields ?? fields)
