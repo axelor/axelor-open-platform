@@ -1,0 +1,13 @@
+.container {
+  min-width: 0;
+  min-height: 0;
+}
+
+.gantt {
+  --gantt-row-active-bg: #eee;
+  --gantt-cell-active-bg: none;
+}
+
+.cell {
+  pointer-events: all;
+}
