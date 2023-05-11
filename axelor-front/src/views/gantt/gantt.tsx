@@ -20,15 +20,11 @@ import { i18n } from "@/services/client/i18n";
 import { PageText } from "@/components/page-text";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { SearchOptions } from "@/services/client/data";
+import { useEditor } from "@/hooks/use-relation";
+import { dialogs } from "@/components/dialogs";
 import format from "@/utils/format";
 import styles from "./gantt.module.scss";
-
-function fieldFormatter(column: Field, value: any, record: any) {
-  return format(value, {
-    props: column,
-    context: record,
-  });
-}
+import { moment } from "@/services/client/l10n";
 
 const FILTERS: { key: GanttType; title: string }[] = [
   { key: GANTT_TYPES.YEAR, title: i18n.get("Year") },
@@ -58,7 +54,6 @@ function TreeCell({
   onExpand?: (record: DataRecord, expand?: boolean) => void;
 }) {
   const { _level: level, _children: children, _expand: expand = true } = data;
-  const isRoot = level === 1;
   const hasChildren = Boolean(children?.length);
   return (
     <Box
@@ -71,13 +66,14 @@ function TreeCell({
           paddingLeft: `${(level - 1) * 0.75}rem`,
         },
       })}
-      {...(isRoot && {
+      {...(hasChildren && {
         fontWeight: "bold",
       })}
     >
       <Box d="flex">
         {hasChildren ? (
           <MaterialIcon
+            className={styles.icon}
             icon={expand ? "arrow_drop_down" : "arrow_right"}
             onClick={() => onExpand?.(data, !expand)}
           />
@@ -85,6 +81,7 @@ function TreeCell({
           <Box style={{ width: 20 }} />
         )}
         <MaterialIcon
+          className={styles.icon}
           icon={hasChildren ? "folder_open" : "description"}
           fontSize={hasChildren ? "1.5rem" : "1.4rem"}
         />
@@ -94,10 +91,45 @@ function TreeCell({
   );
 }
 
+function ActionsCell({
+  data,
+  onAdd,
+  onRemove,
+}: {
+  data: DataRecord;
+  onAdd?: (record: DataRecord) => void;
+  onRemove?: (record: DataRecord) => void;
+}) {
+  return (
+    <Box d="flex" className={styles.cell}>
+      <MaterialIcon
+        className={styles.icon}
+        icon="add"
+        fontSize={"1.3rem"}
+        onClick={() => onAdd?.(data)}
+      />
+      <MaterialIcon
+        className={styles.icon}
+        icon="close"
+        fontSize={"1.3rem"}
+        onClick={() => onRemove?.(data)}
+      />
+    </Box>
+  );
+}
+
+function fieldFormatter(column: Field, value: any, record: any) {
+  return format(value, {
+    props: column,
+    context: record,
+  });
+}
+
 export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const [type, setType] = useState<GanttType>(GANTT_TYPES.WEEK);
   const [records, setRecords] = useState<DataRecord[]>([]);
   const { action } = useViewTab();
+  const showEditor = useEditor();
 
   const { fields, view } = meta;
   const { items } = view;
@@ -185,9 +217,78 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     [updateRecord]
   );
 
+  const handleRecordRemove = useCallback(
+    async (record: DataRecord) => {
+      const confirmed = await dialogs.confirm({
+        content: i18n.get("Do you really want to delete the selected task?"),
+        yesTitle: i18n.get("Delete"),
+      });
+      if (confirmed) {
+        const { id, version } = record;
+        if (id) {
+          const res = await dataStore.delete({ id, version: version ?? 0 });
+          res && setRecords((records) => records.filter((r) => r.id !== id));
+        }
+      }
+    },
+    [dataStore]
+  );
+
+  const handleRecordEdit = useCallback(
+    (record: DataRecord) => {
+      const { model, title } = view;
+      const isNew = !record.id;
+      model &&
+        showEditor({
+          title: title ?? "",
+          model,
+          record,
+          readonly: false,
+          onSelect: (record: DataRecord) => {
+            setRecords((records) => {
+              return isNew
+                ? [...records, record]
+                : records.map((r) =>
+                    r.id === record.id ? { ...r, ...record } : r
+                  );
+            });
+          },
+        });
+    },
+    [view, showEditor]
+  );
+
+  const handleRecordAddSubTask = useCallback(
+    async (record?: DataRecord) => {
+      const { taskParent, taskDuration, taskProgress, taskStart } = view;
+      handleRecordEdit({
+        ...(taskStart && {
+          [taskStart]: moment().format("YYYY-MM-DDTHH:mm:ss[Z]"),
+        }),
+        ...(taskDuration && { [taskDuration]: 1 }),
+        ...(taskProgress && { [taskProgress]: 0 }),
+        ...(taskParent &&
+          record && {
+            [taskParent]: {
+              id: record.id,
+              version: record.version,
+              name: record.name,
+            },
+          }),
+      });
+    },
+    [view, handleRecordEdit]
+  );
+
   useEffect(() => {
     onSearch();
   }, [onSearch]);
+
+  useEffect(() => {
+    return dataStore.subscribe(() => {
+      setRecords(dataStore.records);
+    });
+  }, [dataStore]);
 
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
@@ -213,8 +314,37 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           ...item,
           ...fields?.[item.name!],
           formatter: fieldFormatter,
-        })) as unknown as GanttField[],
-    [view, items, fields, handleExpand]
+        }))
+        .concat([
+          {
+            title: (
+              <Box d="flex">
+                <MaterialIcon
+                  className={styles.icon}
+                  icon="add"
+                  onClick={() => handleRecordAddSubTask()}
+                />
+              </Box>
+            ),
+            name: "$actions",
+            renderer: (props: any) => (
+              <ActionsCell
+                {...props}
+                onAdd={handleRecordAddSubTask}
+                onRemove={handleRecordRemove}
+              />
+            ),
+            width: 60,
+          } as any,
+        ]) as unknown as GanttField[],
+    [
+      view,
+      items,
+      fields,
+      handleExpand,
+      handleRecordAddSubTask,
+      handleRecordRemove,
+    ]
   );
 
   const ganttRecords = useMemo(() => {
@@ -225,10 +355,12 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       level: number = 1
     ): DataRecord[] {
       return records
-        .filter((item) =>
-          parent
-            ? (getParent(item) || {}).id === parent
-            : getParent(item) === parent
+        .filter(
+          (item) =>
+            item[view.taskStart!] &&
+            (parent
+              ? (getParent(item) || {}).id === parent
+              : getParent(item) === parent)
         )
         .reduce((list, _item) => {
           const item: DataRecord = { ..._item, _level: level };
@@ -244,9 +376,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     }
 
     const list = collect(null);
-    return list
-      .filter((item) => item[view.taskStart!])
-      .map(formatter) as GanttRecord[];
+    return list.map(formatter) as GanttRecord[];
   }, [view, formatter, records]);
 
   return (
@@ -291,6 +421,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
             view={type}
             items={ganttItems}
             records={ganttRecords}
+            onRecordView={handleRecordEdit}
             onRecordConnect={handleRecordConnect}
             onRecordDisconnect={handleRecordDisconnect}
             onRecordUpdate={handleRecordUpdate}
