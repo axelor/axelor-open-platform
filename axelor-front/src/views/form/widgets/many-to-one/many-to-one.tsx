@@ -158,18 +158,20 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       multiple: false,
       domain: _domain,
       context: _domainContext,
-      onSelect: (records) => {
-        handleChange(records[0]);
+      onSelect: async (records) => {
+        const value = await ensureRelated(records[0]);
+        handleChange(value);
       },
     });
   }, [
     beforeSelect,
+    domain,
+    getContext,
     showSelector,
     title,
     target,
     gridView,
-    domain,
-    getContext,
+    ensureRelated,
     handleChange,
   ]);
 
