@@ -92,7 +92,7 @@ function processWidget(field: Schema) {
         "hideModeSwitch",
       ].indexOf(name) !== -1
     ) {
-      val = value?.toLowerCase?.() === "true";
+      val = String(value)?.toLowerCase?.() === "true";
     } else if (
       [
         "rowSpan",
