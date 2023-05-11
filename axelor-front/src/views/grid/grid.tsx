@@ -369,6 +369,8 @@ function GridInner(props: ViewProps<GridView>) {
         searchColumnRenderer: searchColumnRenderer,
       };
 
+  const readonly = dashletProps.readonly;
+
   return (
     <div className={styles.container}>
       {showToolbar && (
@@ -473,7 +475,7 @@ function GridInner(props: ViewProps<GridView>) {
         editable={editable}
         searchOptions={searchOptions}
         actionExecutor={actionExecutor}
-        onEdit={onEdit}
+        onEdit={readonly ? onView : onEdit}
         onView={onView}
         onSearch={onSearch}
         onSave={onSave}
