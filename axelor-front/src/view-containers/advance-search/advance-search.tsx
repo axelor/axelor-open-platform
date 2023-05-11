@@ -32,8 +32,7 @@ import { dialogs } from "@/components/dialogs";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 
 import { FilterList } from "./filter-list";
-import { Criteria, Filter } from "@/services/client/data.types";
-import { getCriteria, getFreeSearchCriteria } from "./utils";
+import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
 import { getEditorDefaultState } from "./editor/editor";
 import { Editor } from "./editor";
 import { Chip } from "@/views/form/widgets";
@@ -98,75 +97,7 @@ export function AdvanceSearch({
     useCallback(
       (get, set, hasEditorApply?: boolean) => {
         const state = get(stateAtom);
-        const {
-          domains,
-          filters,
-          archived: _archived,
-          editor,
-          fields,
-          jsonFields,
-        } = state;
-        const _domains = domains
-          ?.filter((d) => d.checked)
-          .map(({ checked, ...d }) => ({
-            ...d,
-          }));
-
-        const getEditorCriteria = (criteria: Criteria["criteria"]) =>
-          (criteria || [])
-            .map((c) => getCriteria(c as Filter, fields, jsonFields) as Filter)
-            .filter((c) => c);
-
-        const getEditor = (filter: SavedFilter) => {
-          const editor: Criteria = JSON.parse(filter.filterCustom);
-          if (editor.criteria) {
-            editor.criteria = getEditorCriteria(editor.criteria);
-          }
-          return editor;
-        };
-
-        let { id, title, operator = "and" } = editor || {};
-
-        const $filters = filters?.filter(
-          (f) => f.id !== id && f.checked && f.filterCustom
-        );
-        let criteria: Criteria["criteria"] = getEditorCriteria(
-          editor?.criteria
-        );
-
-        if (!hasEditorApply) {
-          if ($filters?.length) {
-            criteria = [
-              ...criteria,
-              {
-                operator,
-                criteria: $filters.map(getEditor),
-              },
-            ];
-          }
-        }
-
-        const totalFilters = (_domains?.length ?? 0) + ($filters?.length ?? 0);
-        const totalCriteria =
-          criteria?.filter((c) => (c as Filter).fieldName)?.length ?? 0;
-        const filterTitle = id ? title : "";
-        const searchTextLabel =
-          filterTitle ||
-          (totalFilters ? i18n.get("Filters ({0})", totalFilters) : "") ||
-          (totalCriteria ? i18n.get("Custom ({0})", totalCriteria) : "");
-
-        set(stateAtom, {
-          ...state,
-          searchTextLabel,
-          searchText: "",
-          query: {
-            _archived,
-            _domains,
-            operator,
-            criteria,
-          },
-        });
-
+        set(stateAtom, prepareAdvanceSearchQuery(state, hasEditorApply));
         onSearch?.();
       },
       [stateAtom, onSearch]

@@ -14,7 +14,6 @@ import { filters as fetchFilters } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
-  SavedFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
@@ -22,6 +21,7 @@ import { findFields } from "@/services/client/meta-cache";
 
 import { ViewScope } from "./scope";
 import { AdvancedSearchState } from "../advance-search/types";
+import { prepareAdvanceSearchQuery } from "../advance-search/utils";
 
 async function loadComp(viewType: string) {
   const type = toKebabCase(viewType);
@@ -147,30 +147,48 @@ const DataViews = memo(function DataViews({
   const setSearchState = useSetAtom(searchAtom);
 
   const filterName = (params || {})["search-filters"];
-
-  useAsync<void>(async () => {
-    const name = filterName || `act:${actionName}`;
-    const filters = await fetchFilters(name);
-    setSearchState((state) => ({ ...state, filters }));
-  }, [actionName, filterName, setSearchState]);
+  const defaultSearchFilter = params?.["default-search-filters"];
+  const dashlet = actionName?.startsWith("$dashlet");
 
   useAsyncEffect(async () => {
-    const { fields, jsonFields } = await findFields(model, context?.jsonModel);
-    fields && setSearchState((state) => ({ ...state, fields, jsonFields }));
-  }, [model]);
-
-  useAsyncEffect(async () => {
-    if (!filterName) return;
-    const res = await findView<SearchFilters>({
-      name: filterName,
-      type: "search-filters",
+    if (dashlet) return;
+    const { fields = {}, jsonFields = {} } = await findFields(
       model,
-    });
+      context?.jsonModel
+    );
+    const filters = await fetchFilters(filterName || `act:${actionName}`);
+
     setSearchState((state) => ({
       ...state,
-      domains: res?.view?.filters || [],
+      filters,
+      fields,
+      jsonFields,
     }));
-  }, [model, filterName, setSearchState]);
+  }, []);
+
+  useAsyncEffect(async () => {
+    if (dashlet) return;
+    const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
+    const domains = filterName
+      ? await findView<SearchFilters>({
+          name: filterName,
+          type: "search-filters",
+          model,
+        })
+          .then((res) => res?.view?.filters || [])
+          .then((domains) =>
+            domains.map((d) => ({
+              ...d,
+              checked: selectedDomains.includes(d.name!),
+            }))
+          )
+      : [];
+
+    setSearchState((_state) => {
+      const state = { ..._state, domains };
+      return { ...state, ...prepareAdvanceSearchQuery(state) };
+    });
+  }, [model, defaultSearchFilter, filterName, setSearchState]);
 
   return <ViewPane tab={tab} dataStore={dataStore} searchAtom={searchAtom} />;
 });

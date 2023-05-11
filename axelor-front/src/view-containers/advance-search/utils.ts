@@ -2,14 +2,21 @@ import { Dayjs } from "dayjs";
 import isNumber from "lodash/isNumber";
 import get from "lodash/get";
 
-import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
+import {
+  Criteria,
+  DataRecord,
+  Filter,
+  FilterOp,
+} from "@/services/client/data.types";
 import { moment, l10n } from "@/services/client/l10n";
-import { Widget } from "@/services/client/meta.types";
+import { SavedFilter, Widget } from "@/services/client/meta.types";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { session } from "@/services/client/session";
 import { MetaData } from "@/services/client/meta";
 import { Field } from "@/services/client/meta.types";
+import { AdvancedSearchState } from "./types";
+import { i18n } from "@/services/client/i18n";
 
 function fieldNameAppend(fieldName?: string, append?: string) {
   return (fieldName || "").endsWith(`.${append || ""}`)
@@ -315,4 +322,81 @@ export function getFreeSearchCriteria(
     return filters;
   }
   return [];
+}
+
+export function prepareAdvanceSearchQuery(
+  state: AdvancedSearchState,
+  hasEditorApply?: boolean
+) {
+  const {
+    domains,
+    filters,
+    archived: _archived,
+    editor,
+    fields = {},
+    jsonFields = {},
+  } = state;
+  const _domains = domains
+    ?.filter((d) => d.checked)
+    .map(({ checked, ...d }) => ({
+      ...d,
+    }));
+
+  const getEditorCriteria = (criteria: Criteria["criteria"]) =>
+    (criteria || [])
+      .map((c) => getCriteria(c as Filter, fields, jsonFields) as Filter)
+      .filter((c) => c);
+
+  const getEditor = (filter: SavedFilter) => {
+    const editor: Criteria = JSON.parse(filter.filterCustom);
+    if (editor.criteria) {
+      editor.criteria = getEditorCriteria(editor.criteria);
+    }
+    return editor;
+  };
+
+  let { id, title, operator = "and" } = editor || {};
+
+  const $filters = filters?.filter(
+    (f) => f.id !== id && f.checked && f.filterCustom
+  );
+  let criteria: Criteria["criteria"] = getEditorCriteria(editor?.criteria);
+
+  if (!hasEditorApply) {
+    if ($filters?.length) {
+      criteria = [
+        ...criteria,
+        {
+          operator,
+          criteria: $filters.map(getEditor),
+        },
+      ];
+    }
+  }
+
+  const allfilters = [...(_domains || []), ...($filters || [])];
+  const totalFilters = allfilters.length;
+  const totalCriteria =
+    criteria?.filter((c) => (c as Filter).fieldName)?.length ?? 0;
+  const filterTitle = id ? title : "";
+  const searchTextLabel =
+    filterTitle ||
+    (totalFilters
+      ? totalFilters === 1
+        ? allfilters[0]?.title
+        : i18n.get("Filters ({0})", totalFilters)
+      : "") ||
+    (totalCriteria ? i18n.get("Custom ({0})", totalCriteria) : "");
+
+  return {
+    ...state,
+    searchTextLabel,
+    searchText: "",
+    query: {
+      _archived,
+      _domains,
+      operator,
+      criteria,
+    },
+  };
 }
