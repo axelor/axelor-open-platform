@@ -236,6 +236,9 @@ function FormContainer({
             ? record
             : { ...getDefaultValues(prev.meta), ...record };
 
+        // this is required to trigger expression re-evaluation
+        record = { ...record, $$time: Date.now() };
+
         switchTo("form", { route: { id }, props });
         setDirty(false);
         set(formAtom, {
