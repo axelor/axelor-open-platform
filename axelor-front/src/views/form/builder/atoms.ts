@@ -98,7 +98,14 @@ export function createWidgetAtom(props: {
       });
     },
     (get, set, state) => {
-      set(attrsByIdAtom, state);
+      set(attrsByIdAtom, (prevState) => {
+        const prev = get(widgetAtom);
+        const next = typeof state === "function" ? state(prev) : state;
+        if (next !== prev) {
+          return next;
+        }
+        return prevState;
+      });
     }
   );
 
