@@ -26,6 +26,7 @@ import { nextId, processView } from "./utils";
 import { DataStore } from "@/services/client/data-store";
 import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { isEqual } from "lodash";
+import { useGetErrors } from "../form";
 import styles from "./form-editors.module.scss";
 
 export type FieldEditorProps = FieldProps<any>;
@@ -457,14 +458,11 @@ const RecordEditor = memo(function RecordEditor({
     );
   }, [formAtom, loaded, parent, valueAtom]);
 
+  const getErrors = useGetErrors();
+
   const invalidAtom = useMemo(
-    () =>
-      selectAtom(editorAtom, (state) =>
-        Object.values(state.states).some(
-          (x) => x.errors && Object.keys(x.errors).length > 0
-        )
-      ),
-    [editorAtom]
+    () => selectAtom(editorAtom, (state) => getErrors(state) !== null),
+    [editorAtom, getErrors]
   );
 
   const invalid = useAtomValue(invalidAtom);
