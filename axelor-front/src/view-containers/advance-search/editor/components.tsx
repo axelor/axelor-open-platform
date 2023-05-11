@@ -4,10 +4,10 @@ import isNumber from "lodash/isNumber";
 import { Select as AxSelect, Box, Input } from "@axelor/ui";
 
 import { DataStore } from "@/services/client/data-store";
-import { moment } from "@/services/client/l10n";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { useDataStore } from "@/hooks/use-data-store";
+import { DateComponent } from "@/views/form/widgets";
 import styles from "./components.module.css";
 
 function TextField(props: any) {
@@ -20,16 +20,9 @@ function TextField(props: any) {
   );
 }
 
-function DateTimePicker(props: any) {
-  return (
-    <TextField
-      {...props}
-      type="date"
-      value={
-        props.value ? moment(props.value).format("YYYY-MM-DD") : props.value
-      }
-    />
-  );
+function DateField(props: any) {
+  const schema = useRef({ type: "date" }).current;
+  return <DateComponent schema={schema} trapFocus {...props} />;
 }
 
 function NumberField(props: any) {
@@ -239,13 +232,6 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
     case "date":
     case "time":
     case "datetime":
-      const dateFormats = {
-        date: ["YYYY-MM-DD", "MM/DD/YYYY"],
-        datetime: ["YYYY-MM-DD", "MM/DD/YYYY"],
-        time: ["HH:mm", "LT"],
-      };
-      const [format, displayFormat] =
-        dateFormats[type as "date" | "datetime" | "time"];
       const { value, value2, timeUnit, onChange } = props;
 
       function renderSelect() {
@@ -284,11 +270,10 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
       return (
         <SimpleWidget
           {...props}
-          format={displayFormat}
-          value={value ? moment(value, format) : null}
-          value2={value2 ? moment(value2, format) : null}
+          value={value}
+          value2={value2}
           onChange={({ name, value }: any) => onChange({ name, value })}
-          {...{ component: DateTimePicker, type: "date" }}
+          {...{ component: DateField }}
         />
       );
     case "integer":

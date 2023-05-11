@@ -152,7 +152,6 @@ function getSearchCriteria(
         if ($value) {
           const $op = _operator === $operator ? $operator : _operator;
           switch ($op) {
-            case "=":
             case "<":
             case ">=":
               op = $op;
@@ -166,8 +165,10 @@ function getSearchCriteria(
               op = "<";
               value = toValue(getNextOf(moment($value), granularity));
               break;
+            case "=":
             case "!=":
             case "between":
+            case "notBetween":
               const hasNot = $op === "!=";
               let $v1: any = $value;
               let $v2: any = (

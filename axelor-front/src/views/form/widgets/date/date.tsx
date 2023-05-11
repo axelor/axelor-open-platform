@@ -10,15 +10,15 @@ import {
   useState,
 } from "react";
 
-import { Box, useClassNames } from "@axelor/ui";
+import { Box, FocusTrap, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { i18n } from "@/services/client/i18n";
 import { l10n, moment } from "@/services/client/l10n";
-import { Field } from "@/services/client/meta.types";
+import { Field, Schema } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
 
-import { FieldControl, FieldProps } from "../../builder";
+import { FieldControl, FieldProps, WidgetState } from "../../builder";
 import { ViewerInput } from "../string";
 import { DateInput } from "./date-input";
 import { Picker } from "./picker";
@@ -40,18 +40,28 @@ function toCalendarFormat(format: string) {
     .join("");
 }
 
-export function Date(props: FieldProps<string>) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+export function DateComponent({
+  schema,
+  readonly,
+  attrs,
+  value,
+  onChange,
+  trapFocus,
+}: {
+  schema: Schema;
+  value?: string | null;
+  onChange: (value: string | null, callOnChange?: boolean) => void;
+  attrs?: WidgetState["attrs"];
+  readonly?: boolean;
+  trapFocus?: boolean;
+}) {
+  const { focus } = attrs || {};
   const { uid, placeholder } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
-  const [value, setValue] = useAtom(valueAtom);
-  const {
-    attrs: { focus },
-  } = useAtomValue(widgetAtom);
 
   const type = (schema.widget || schema.serverType || schema.type)!;
   const dateFormats = useMemo<Record<string, string[]>>(
@@ -98,7 +108,7 @@ export function Date(props: FieldProps<string>) {
     (e: FocusEvent<HTMLInputElement>) => {
       if (changed) {
         const value = e?.target?.value || null;
-        setValue(
+        onChange(
           value && moment(value, format).isValid()
             ? moment(value, format).format(valueFormat)
             : null,
@@ -107,7 +117,7 @@ export function Date(props: FieldProps<string>) {
         setChanged(false);
       }
     },
-    [changed, format, valueFormat, setValue]
+    [changed, format, valueFormat, onChange]
   );
 
   const handleClickOutSide = useCallback(
@@ -140,7 +150,7 @@ export function Date(props: FieldProps<string>) {
   const handleChange = useCallback(
     (value: Date | null, event: SyntheticEvent) => {
       const callOnChange = event.type === "click" ? true : false;
-      setValue(
+      onChange(
         value && moment(value).isValid()
           ? moment(value).format(valueFormat)
           : null,
@@ -148,7 +158,7 @@ export function Date(props: FieldProps<string>) {
       );
       setChanged(!callOnChange);
     },
-    [valueFormat, setValue]
+    [valueFormat, onChange]
   );
 
   const dateValue = useMemo(
@@ -160,55 +170,74 @@ export function Date(props: FieldProps<string>) {
     [format, value]
   );
 
+  function render() {
+    return (
+      <Box ref={boxRef} d="flex">
+        <Picker
+          id={uid}
+          showMonthDropdown
+          showYearDropdown
+          todayButton={i18n.get("Today")}
+          className={classNames("form-control")}
+          placeholderText={placeholder}
+          showPopperArrow={false}
+          portalId="root-app"
+          autoFocus={focus || open}
+          open={open}
+          ref={pickerRef}
+          dateFormat={toCalendarFormat(format)}
+          selected={dateValue}
+          textValue={textValue}
+          customInput={
+            <DateInput
+              eventOnBlur={handleBlur}
+              format={format}
+              open={open}
+              onOpen={handleOpen}
+              onClose={handleClose}
+            />
+          }
+          timeInputLabel={
+            (
+              <Box>
+                <MaterialIcon icon="schedule" fontSize={20} />
+              </Box>
+            ) as any
+          }
+          showTimeInput={type?.toLowerCase() !== "date"}
+          customTimeInput={<TimeInput format={format} onClose={handleClose} />}
+          onSelect={handleSelect}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          onClickOutside={handleClickOutSide}
+        />
+      </Box>
+    );
+  }
+
+  return readonly ? (
+    <ViewerInput value={textValue} />
+  ) : trapFocus ? (
+    <FocusTrap enabled={open}>{render()}</FocusTrap>
+  ) : (
+    render()
+  );
+}
+
+export function Date(props: FieldProps<string>) {
+  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const [value, setValue] = useAtom(valueAtom);
+  const { attrs } = useAtomValue(widgetAtom);
   return (
     <FieldControl {...props}>
-      {readonly ? (
-        <ViewerInput value={textValue} />
-      ) : (
-        <Box ref={boxRef} d="flex">
-          <Picker
-            id={uid}
-            showMonthDropdown
-            showYearDropdown
-            todayButton={i18n.get("Today")}
-            className={classNames("form-control")}
-            placeholderText={placeholder}
-            showPopperArrow={false}
-            portalId="root-app"
-            autoFocus={focus || open}
-            open={open}
-            ref={pickerRef}
-            dateFormat={toCalendarFormat(format)}
-            selected={dateValue}
-            textValue={textValue}
-            customInput={
-              <DateInput
-                eventOnBlur={handleBlur}
-                format={format}
-                open={open}
-                onOpen={handleOpen}
-                onClose={handleClose}
-              />
-            }
-            timeInputLabel={
-              (
-                <Box>
-                  <MaterialIcon icon="schedule" fontSize={20} />
-                </Box>
-              ) as any
-            }
-            showTimeInput={type?.toLowerCase() !== "date"}
-            customTimeInput={
-              <TimeInput format={format} onClose={handleClose} />
-            }
-            onSelect={handleSelect}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            onClickOutside={handleClickOutSide}
-          />
-        </Box>
-      )}
+      <DateComponent
+        schema={schema}
+        readonly={readonly}
+        attrs={attrs}
+        value={value}
+        onChange={setValue}
+      />
     </FieldControl>
   );
 }

@@ -1,4 +1,3 @@
-import { Dayjs } from "dayjs";
 import isNumber from "lodash/isNumber";
 import get from "lodash/get";
 
@@ -8,7 +7,7 @@ import {
   Filter,
   FilterOp,
 } from "@/services/client/data.types";
-import { moment, l10n } from "@/services/client/l10n";
+import { Moment, moment, l10n } from "@/services/client/l10n";
 import { SavedFilter, Widget } from "@/services/client/meta.types";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
@@ -37,12 +36,12 @@ export function getCriteria(
   const userId = user?.id;
   const userGroup = user?.group;
 
-  function getValue(value: Date | Dayjs) {
-    if (value instanceof Dayjs) {
+  function getValue(value: Date | Moment) {
+    if (typeof value === "object" && value instanceof moment) {
       if (((field as any)?.type || "").toLowerCase() === "date") {
-        return value.startOf("day").format("YYYY-MM-DD");
+        return (value as Moment).startOf("day").format("YYYY-MM-DD");
       }
-      return value.toDate();
+      return (value as Moment)?.toDate ? (value as Moment).toDate() : value;
     }
     return value;
   }
@@ -377,7 +376,7 @@ export function prepareAdvanceSearchQuery(
   const allfilters = [...(_domains || []), ...($filters || [])];
   const totalFilters = allfilters.length;
   const totalCriteria =
-    criteria?.filter((c) => (c as Filter).fieldName)?.length ?? 0;
+    criteria?.filter((c) => (c as Filter).operator)?.length ?? 0;
   const filterTitle = id ? title : "";
   const searchTextLabel =
     filterTitle ||
