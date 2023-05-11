@@ -131,7 +131,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         const res = await actionExecutor.execute(onSelectAction);
         if (res && res.length > 0) {
           const attrs = res[0].attrs || {};
-          const domain = attrs[schema.name]?.domain ?? "";
+          const domain = attrs[schema.name]?.domain ?? null;
           beforeSelectRef.current = domain;
           return domain;
         }
