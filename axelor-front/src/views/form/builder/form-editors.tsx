@@ -169,7 +169,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
       async (get, set) => {
         showSelector({
           model,
-          title: `Select ${title}`,
+          title: i18n.get("Select {0}", title ?? ""),
           domain,
           context: get(formAtom).record,
           onSelect: (records) => {
