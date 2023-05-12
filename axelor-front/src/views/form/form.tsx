@@ -937,7 +937,7 @@ function useFormWidth(
   return result;
 }
 
-const Layout: FormLayout = ({
+export const Layout: FormLayout = ({
   schema,
   formAtom,
   parentAtom,

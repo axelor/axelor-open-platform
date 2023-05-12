@@ -36,6 +36,7 @@ import {
 import { nextId } from "../../builder/utils";
 
 import styles from "./one-to-many.module.scss";
+import { DetailsFormView } from "./one-to-many.details";
 
 const noop = () => {};
 
@@ -53,6 +54,7 @@ export function OneToMany({
     fields,
     showTitle = true,
     formView,
+    summaryView,
     gridView,
   } = schema;
   // use ref to avoid onSearch call
@@ -342,106 +344,124 @@ export function OneToMany({
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
   const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
+  const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
+  const detailRecord =
+    hasMasterDetails && selectedRows?.length === 1
+      ? rows?.[selectedRows?.[0]]?.record
+      : null;
 
   return (
-    <Box
-      d="flex"
-      flexDirection="column"
-      className={styles.container}
-      border
-      roundedTop
-    >
-      <Box className={styles.header}>
-        <div className={styles.title}>
-          {showTitle && (
-            <FieldLabel
-              className={styles.titleText}
-              schema={schema}
-              formAtom={formAtom}
-              widgetAtom={widgetAtom}
-            />
-          )}
-        </div>
-        <CommandBar
-          iconOnly
-          items={[
-            ...(isManyToMany
-              ? [
-                  {
-                    key: "select",
-                    text: i18n.get("Select"),
-                    iconProps: {
-                      icon: "search",
-                    },
-                    onClick: onSelect,
-                    hidden: !canSelect,
-                  } as CommandItemProps,
-                ]
-              : []),
-            {
-              key: "new",
-              text: i18n.get("New"),
-              iconProps: {
-                icon: "add",
+    <>
+      <Box
+        d="flex"
+        flexDirection="column"
+        className={styles.container}
+        border
+        roundedTop
+      >
+        <Box className={styles.header}>
+          <div className={styles.title}>
+            {showTitle && (
+              <FieldLabel
+                className={styles.titleText}
+                schema={schema}
+                formAtom={formAtom}
+                widgetAtom={widgetAtom}
+              />
+            )}
+          </div>
+          <CommandBar
+            iconOnly
+            items={[
+              ...(isManyToMany
+                ? [
+                    {
+                      key: "select",
+                      text: i18n.get("Select"),
+                      iconProps: {
+                        icon: "search",
+                      },
+                      onClick: onSelect,
+                      hidden: !canSelect,
+                    } as CommandItemProps,
+                  ]
+                : []),
+              {
+                key: "new",
+                text: i18n.get("New"),
+                iconProps: {
+                  icon: "add",
+                },
+                onClick: editable && canEdit ? onAddInGrid : onAdd,
+                hidden: !canNew,
               },
-              onClick: editable && canEdit ? onAddInGrid : onAdd,
-              hidden: !canNew,
-            },
-            {
-              key: "edit",
-              text: i18n.get("Edit"),
-              iconProps: {
-                icon: "edit",
+              {
+                key: "edit",
+                text: i18n.get("Edit"),
+                iconProps: {
+                  icon: "edit",
+                },
+                disabled: !hasRowSelected,
+                hidden: !canEdit || !hasRowSelected,
+                onClick: () => {
+                  const [rowIndex] = selectedRows || [];
+                  const record = rows[rowIndex]?.record;
+                  record && onEdit(record);
+                },
               },
-              disabled: !hasRowSelected,
-              hidden: !canEdit || !hasRowSelected,
-              onClick: () => {
-                const [rowIndex] = selectedRows || [];
-                const record = rows[rowIndex]?.record;
-                record && onEdit(record);
+              {
+                key: "delete",
+                text: i18n.get("Delete"),
+                iconProps: {
+                  icon: "delete",
+                },
+                disabled: !hasRowSelected,
+                hidden: !canDelete || !hasRowSelected,
+                onClick: () => {
+                  onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+                },
               },
-            },
-            {
-              key: "delete",
-              text: i18n.get("Delete"),
-              iconProps: {
-                icon: "delete",
+              {
+                key: "refresh",
+                text: i18n.get("Refresh"),
+                iconProps: {
+                  icon: "refresh",
+                },
+                onClick: () => onSearch(),
+                hidden: !canRefresh,
               },
-              disabled: !hasRowSelected,
-              hidden: !canDelete || !hasRowSelected,
-              onClick: () => {
-                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-              },
-            },
-            {
-              key: "refresh",
-              text: i18n.get("Refresh"),
-              iconProps: {
-                icon: "refresh",
-              },
-              onClick: () => onSearch(),
-              hidden: !canRefresh,
-            },
-          ]}
+            ]}
+          />
+        </Box>
+        <GridComponent
+          className={styles["grid"]}
+          ref={gridRef}
+          showEditIcon={canEdit || canView}
+          readonly={readonly || !canEdit}
+          editable={editable && canEdit}
+          records={records}
+          view={(viewData?.view || schema) as GridView}
+          fields={viewData?.fields || fields}
+          columnAttrs={columnAttrs}
+          state={state}
+          setState={setState}
+          onEdit={canEdit ? onEdit : canView ? onView : noop}
+          onView={canView ? onView : noop}
+          onSave={onSave}
+          onSearch={onSearch}
         />
       </Box>
-      <GridComponent
-        className={styles["grid"]}
-        ref={gridRef}
-        showEditIcon={canEdit || canView}
-        readonly={readonly || !canEdit}
-        editable={editable && canEdit}
-        records={records}
-        view={(viewData?.view || schema) as GridView}
-        fields={viewData?.fields || fields}
-        columnAttrs={columnAttrs}
-        state={state}
-        setState={setState}
-        onEdit={canEdit ? onEdit : canView ? onView : noop}
-        onView={canView ? onView : noop}
-        onSave={onSave}
-        onSearch={onSearch}
-      />
-    </Box>
+      {hasMasterDetails && (
+        <Box d="flex" flexDirection="column" p={2}>
+          <DetailsFormView
+            readonly={readonly}
+            model={model}
+            record={detailRecord}
+            name={summaryView || formView}
+            onSave={onSave}
+          />
+        </Box>
+      )}
+    </>
   );
 }
