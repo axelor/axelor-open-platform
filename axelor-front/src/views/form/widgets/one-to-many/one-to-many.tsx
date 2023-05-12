@@ -164,8 +164,10 @@ export function OneToMany({
         shouldSearch.current = true;
         return;
       }
-      const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
-      const unsaved = (value || []).filter(({ id }) => !ids.includes(id));
+      const ids = (value || [])
+        .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
+        .map((v) => v.id);
+      const changedRecords = (value || []).filter(({ id }) => !ids.includes(id));
 
       let records: DataRecord[] = [];
       let page = dataStore.page;
@@ -192,7 +194,7 @@ export function OneToMany({
         records = res.records;
       }
 
-      setRecords([...records, ...unsaved]);
+      setRecords([...records, ...changedRecords]);
 
       return {
         page,
