@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { useCallback, useEffect, useMemo } from "react";
+import { SetStateAction, useCallback, useEffect, useMemo } from "react";
 
 import {
   Tab,
@@ -10,7 +10,6 @@ import {
   TabState,
   useTabs,
 } from "@/hooks/use-tabs";
-import { SavedFilter } from "@/services/client/meta.types";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
@@ -68,7 +67,12 @@ export function useViewAction() {
  */
 export function useSelectViewState<T>(selector: (state: TabState) => T) {
   const tab = useViewTab();
-  return useAtomValue(selectAtom(tab.state, selector, isEqual));
+  return useAtomValue(
+    useMemo(
+      () => selectAtom(tab.state, selector, isEqual),
+      [tab.state, selector]
+    )
+  );
 }
 
 interface SwitchTo {
@@ -136,20 +140,24 @@ export function useViewProps() {
   const state = props?.[type];
   const setState = useAtomCallback(
     useCallback(
-      (get, set, partial: Partial<TabProps>) => {
-        const newState = {
-          ...state,
-          ...partial,
+      (get, set, setter: SetStateAction<TabProps>) => {
+        const state = get(tab.state);
+        const { type, props } = state;
+        const viewState = state.props?.[type];
+
+        const newViewState = {
+          ...viewState,
+          ...(typeof setter === "function" ? setter(viewState || {}) : setter),
         };
 
         const newProps = {
           ...props,
-          [type]: newState,
+          [type]: newViewState,
         };
 
-        set(tab.state, { props: newProps });
+        set(tab.state, { ...state, props: newProps });
       },
-      [props, state, tab.state, type]
+      [tab.state]
     )
   );
 
