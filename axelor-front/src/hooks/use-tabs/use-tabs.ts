@@ -31,7 +31,8 @@ export type TabRoute = {
 export type TabProps = {
   scrollY?: number;
   scrollX?: number;
-  selectedCell?: number[];
+  selectedCell?: null | number[];
+  selectedRows?: null | number[];
   selectedId?: number;
   readonly?: boolean;
   recordId?: boolean;

@@ -69,12 +69,10 @@ function GridInner(props: ViewProps<GridView>) {
   const [state, setState] = useGridState({
     view,
     selectedCell: viewProps?.selectedCell,
-    selectedRows: viewProps?.selectedCell
-      ? [viewProps?.selectedCell?.[0]!]
-      : null,
+    selectedRows: viewProps?.selectedRows?.slice?.(0, 1),
   });
   const records = useDataStore(dataStore, (ds) => ds.records);
-  const { orderBy, rows, selectedRows } = state;
+  const { orderBy, rows, selectedRows, selectedCell } = state;
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -316,17 +314,23 @@ function GridInner(props: ViewProps<GridView>) {
   }, [dashlet, popup, currentPage, limit, offset, switchTo, totalCount]);
 
   useEffect(() => {
-    if (viewProps?.selectedCell !== state.selectedCell) {
-      const selectedCell = state.selectedCell || undefined;
-      const selectedId = selectedCell
-        ? state.rows[selectedCell[0]]?.record.id
-        : undefined;
-      setViewProps({
-        selectedCell,
-        selectedId,
-      });
-    }
-  }, [viewProps, setViewProps, state.selectedCell, state.rows]);
+    setViewProps((viewProps) => {
+      if (
+        viewProps?.selectedCell !== selectedCell ||
+        viewProps?.selectedRows !== selectedRows
+      ) {
+        const selectedId = selectedRows
+          ? rows[selectedRows?.[0]]?.record.id
+          : undefined;
+        return {
+          selectedId,
+          selectedCell: selectedCell,
+          selectedRows: selectedRows,
+        };
+      }
+      return viewProps;
+    });
+  }, [setViewProps, selectedCell, selectedRows, rows]);
 
   useEffect(() => {
     selectedIdsRef.current = (state.selectedRows || []).map(
