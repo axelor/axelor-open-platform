@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 import { Box, Button } from "@axelor/ui";
 import { useAtomCallback } from "jotai/utils";
 
@@ -7,15 +7,18 @@ import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import { FormView } from "@/services/client/meta.types";
-import { Form, useFormHandlers } from "../../builder";
-import { Layout, showErrors, useGetErrors } from "../../form";
 import { i18n } from "@/services/client/i18n";
-import styles from "./one-to-many.details.module.scss";
+import { DataStore } from "@/services/client/data-store";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { Form, useFormHandlers } from "../../builder";
+import { Layout, fetchRecord, showErrors, useGetErrors } from "../../form";
 import { nextId } from "../../builder/utils";
+import styles from "./one-to-many.details.module.scss";
 
 interface DetailsFormProps {
   meta: ViewData<FormView>;
   record: DataRecord;
+  dataStore: DataStore;
   readonly?: boolean;
   onSave: (data: DataRecord) => void;
 }
@@ -41,30 +44,29 @@ export function DetailsFormView({
   return (meta?.view && <DetailsForm meta={meta} {...props} />) as ReactElement;
 }
 
+const defaultRecord: DataRecord = {};
+
 export function DetailsForm({
   meta,
-  record,
+  dataStore,
   readonly,
+  record: selected,
   onSave,
 }: DetailsFormProps) {
-  const [recordId, setRecordId] = useState<null | number>();
-  const $record = useMemo<DataRecord>(
-    () => ({ id: recordId, ...(recordId === record?.id ? record : {}) }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [recordId]
-  );
+  const [record, setRecord] = useState<DataRecord | null>(null);
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, $record);
+    useFormHandlers(meta, record ?? defaultRecord);
+  const { onLoad, onNew } = meta.view;
 
   const getErrors = useGetErrors();
-  const isNew = ($record.id ?? 0) < 0 && !$record?._dirty;
+  const isNew = (record?.id ?? 0) < 0 && !record?._dirty;
 
   const handleNew = useCallback(() => {
-    setRecordId(nextId());
+    setRecord({ id: nextId() });
   }, []);
 
   const handleClose = useCallback(() => {
-    setRecordId(null);
+    setRecord(null);
   }, []);
 
   const handleSave = useAtomCallback(
@@ -84,12 +86,27 @@ export function DetailsForm({
     )
   );
 
-  useEffect(() => {
-    setRecordId(record?.id);
-  }, [record?.id]);
+  useAsyncEffect(
+    async (signal) => {
+      let record = selected?.id ? selected : null;
+      if (record?.id && !record._dirty) {
+        record = await fetchRecord(meta, dataStore, record.id);
+        if (signal.aborted) return;
+      }
+      setRecord(record);
+    },
+    [meta, selected?.id, setRecord, dataStore]
+  );
+
+  useAsyncEffect(async () => {
+    if (record) {
+      const action = (record?.id ?? 0) > 0 ? onLoad : onNew;
+      action && (await actionExecutor.execute(action));
+    }
+  }, [record, onLoad, onNew, actionExecutor]);
 
   return (
-    recordId ? (
+    record ? (
       <>
         <Box d="flex" flex={1} className={styles.container}>
           <Form

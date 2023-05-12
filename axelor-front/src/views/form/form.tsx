@@ -58,7 +58,7 @@ import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
 import styles from "./form.module.scss";
 
-const fetchRecord = async (
+export const fetchRecord = async (
   meta: ViewData<FormView>,
   dataStore: DataStore,
   id?: string | number

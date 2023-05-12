@@ -454,10 +454,11 @@ export function OneToMany({
       {hasMasterDetails && (
         <Box d="flex" flexDirection="column" p={2}>
           <DetailsFormView
-            readonly={readonly}
-            model={model}
-            record={detailRecord}
             name={summaryView || formView}
+            model={model}
+            readonly={readonly}
+            record={detailRecord}
+            dataStore={dataStore}
             onSave={onSave}
           />
         </Box>
