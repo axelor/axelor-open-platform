@@ -6,6 +6,8 @@ import logo from "@/assets/axelor.svg";
 import { i18n } from "@/services/client/i18n";
 import { SessionInfo } from "@/services/client/session";
 
+import { useLoginInfo } from "./login-info";
+
 import styles from "./login-form.module.scss";
 
 const YEAR = new Date().getFullYear();
@@ -27,13 +29,14 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
 
-  const { error: loginError, login } = useSession();
+  const appInfo = useLoginInfo();
+  const session = useSession();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
       try {
-        const info = await login({ username, password });
+        const info = await session.login({ username, password });
         if (info && info.user) {
           onSuccess?.(info);
         } else {
@@ -43,14 +46,26 @@ export function LoginForm({
         setShowError(true);
       }
     },
-    [login, username, password, onSuccess]
+    [session, username, password, onSuccess]
   );
 
+  if (appInfo.state === "loading" || appInfo.state === "hasError") {
+    return null;
+  }
+
+  const appLogo = appInfo.data?.application.logo || logo;
+  const appLegal = appInfo.data?.application.copyright?.replace("&copy;", "©");
+  const defaultLegal = `© 2005 - ${YEAR} Axelor. ${i18n.get(
+    "All Rights Reserved"
+  )}.`;
+
+  const copyright = appLegal || defaultLegal;
+
   let errorText = error;
-  if (loginError === 401 || showError) {
+  if (session.error === 401 || showError) {
     errorText = i18n.get("Wrong username or password");
   }
-  if (loginError === 500) {
+  if (session.error === 500) {
     errorText = i18n.get(
       "Sorry, something went wrong. Please try again later."
     );
@@ -68,7 +83,7 @@ export function LoginForm({
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={logo} alt="Logo" />
+        <Image className={styles.logo} src={appLogo} alt="Logo" />
         <Box as="form" w={100} onSubmit={handleSubmit}>
           <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
           <Input
@@ -110,7 +125,7 @@ export function LoginForm({
       </Box>
       {children}
       <Box as="p" textAlign="center">
-        &copy; 2005 - {YEAR} Axelor. {i18n.get("All Rights Reserved")}.
+        {copyright}
       </Box>
     </Box>
   );
