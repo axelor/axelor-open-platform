@@ -3,6 +3,7 @@ import { Box, Button, Image, Input, InputLabel } from "@axelor/ui";
 import { FormEventHandler, useCallback, useState } from "react";
 
 import logo from "@/assets/axelor.svg";
+import { i18n } from "@/services/client/i18n";
 import { SessionInfo } from "@/services/client/session";
 
 import styles from "./login-form.module.scss";
@@ -47,10 +48,10 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
       >
         <Image className={styles.logo} src={logo} alt="Logo" />
         <Box as="h4" fontWeight="normal" my={2}>
-          Log In to Your Account
+          {i18n.get("Log In to Your Account")}
         </Box>
         <Box as="form" w={100} onSubmit={handleSubmit}>
-          <InputLabel htmlFor="username">Username</InputLabel>
+          <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
           <Input
             id="username"
             name="username"
@@ -61,7 +62,7 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <InputLabel htmlFor="password">Password</InputLabel>
+          <InputLabel htmlFor="password">{i18n.get("Password")}</InputLabel>
           <Input
             name="password"
             type="password"
@@ -75,7 +76,7 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
           <Box d="flex" alignItems="center">
             <Input type="checkbox" p={0} m={0} me={1} />
             <Box as="p" mb={0}>
-              Remember me
+              {i18n.get("Remember me")}
             </Box>
           </Box>
           {error && showError && (
@@ -89,16 +90,16 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
               pb={2}
               className={styles.error}
             >
-              <span>Wrong username or password</span>
+              <span>{i18n.get("Wrong username or password")}</span>
             </Box>
           )}
           <Button type="submit" variant="primary" mt={2} w={100}>
-            Login
+            {i18n.get("Login")}
           </Button>
         </Box>
       </Box>
       <Box as="p" textAlign="center">
-        &copy; 2005 - {YEAR} Axelor. All Rights Reserved.
+        &copy; 2005 - {YEAR} Axelor. {i18n.get("All Rights Reserved")}.
       </Box>
     </Box>
   );
