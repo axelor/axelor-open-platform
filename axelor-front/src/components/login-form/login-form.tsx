@@ -1,5 +1,5 @@
 import { useSession } from "@/hooks/use-session";
-import { Box, Button, Image, Input, InputLabel } from "@axelor/ui";
+import { Alert, Box, Button, Image, Input, InputLabel } from "@axelor/ui";
 import { FormEventHandler, useCallback, useState } from "react";
 
 import logo from "@/assets/axelor.svg";
@@ -11,30 +11,52 @@ import styles from "./login-form.module.scss";
 const YEAR = new Date().getFullYear();
 
 export type LoginFormProps = {
-  onSuccess: (info: SessionInfo) => void;
+  onSuccess?: (info: SessionInfo) => void;
   shadow?: boolean;
+  error?: string;
+  children?: React.ReactNode;
 };
 
-export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
+export function LoginForm({
+  onSuccess,
+  error,
+  shadow,
+  children,
+}: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
 
-  const { error, login } = useSession();
+  const { error: loginError, login } = useSession();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
-      login({ username, password }).then((info) => {
-        if (error) {
-          setShowError(true);
+      try {
+        const info = await login({ username, password });
+        if (info && info.user) {
+          onSuccess?.(info);
         } else {
-          onSuccess(info);
+          setShowError(true);
         }
-      });
+      } catch (e) {
+        setShowError(true);
+      }
     },
-    [login, username, password, error, onSuccess]
+    [login, username, password, onSuccess]
   );
+
+  let errorText = error;
+  if (loginError === 401 || showError) {
+    errorText = i18n.get("Wrong username or password");
+  }
+  if (loginError === 500) {
+    errorText = i18n.get(
+      "Sorry, something went wrong. Please try again later."
+    );
+  }
+
+  const canShowError = Boolean(error || showError);
 
   return (
     <Box className={styles.container}>
@@ -47,9 +69,6 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
         p={3}
       >
         <Image className={styles.logo} src={logo} alt="Logo" />
-        <Box as="h4" fontWeight="normal" my={2}>
-          {i18n.get("Log In to Your Account")}
-        </Box>
         <Box as="form" w={100} onSubmit={handleSubmit}>
           <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
           <Input
@@ -57,7 +76,7 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
             name="username"
             autoComplete="username"
             autoFocus
-            mb={2}
+            mb={3}
             required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -68,7 +87,7 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
             type="password"
             id="password"
             autoComplete="current-password"
-            mb={2}
+            mb={3}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -79,25 +98,17 @@ export function LoginForm({ onSuccess, shadow }: LoginFormProps) {
               {i18n.get("Remember me")}
             </Box>
           </Box>
-          {error && showError && (
-            <Box
-              as="p"
-              color="danger"
-              mb={0}
-              rounded
-              p={1}
-              pt={2}
-              pb={2}
-              className={styles.error}
-            >
-              <span>{i18n.get("Wrong username or password")}</span>
-            </Box>
+          {canShowError && (
+            <Alert mt={3} mb={1} p={2} variant="danger">
+              {errorText}
+            </Alert>
           )}
-          <Button type="submit" variant="primary" mt={2} w={100}>
+          <Button type="submit" variant="primary" mt={3} w={100}>
             {i18n.get("Login")}
           </Button>
         </Box>
       </Box>
+      {children}
       <Box as="p" textAlign="center">
         &copy; 2005 - {YEAR} Axelor. {i18n.get("All Rights Reserved")}.
       </Box>
