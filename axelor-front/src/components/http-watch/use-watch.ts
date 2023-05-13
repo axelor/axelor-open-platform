@@ -3,6 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 
 type Pending = () => Promise<any>;
 
+function isLogin(input: RequestInfo | URL) {
+  const url = input instanceof Request ? input.url : input.toString();
+  return url.startsWith(`./callback`) || url.startsWith("callback");
+}
+
 export function useHttpWatch() {
   const [count, setCount] = useState(0);
   const [pending, setPending] = useState<Pending[]>([]);
@@ -15,6 +20,9 @@ export function useHttpWatch() {
 
   useEffect(() => {
     return $use(async (args, next) => {
+      // don't intercept login request
+      if (isLogin(args.input)) return next();
+
       setCount((count) => count + 1);
       try {
         const res = await next();
