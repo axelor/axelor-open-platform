@@ -5,6 +5,7 @@ import { Box, Button, Image } from "@axelor/ui";
 
 import { LoginForm } from "@/components/login-form";
 import { useLoginInfo } from "@/components/login-form/login-info";
+import { useAppTitle } from "@/hooks/use-app-title";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 
@@ -62,6 +63,8 @@ export function Login() {
     CLIENT_NAME_ALIASES[clientNameParam || ""] ?? clientNameParam;
 
   const publicInfo = useLoginInfo();
+
+  useAppTitle();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

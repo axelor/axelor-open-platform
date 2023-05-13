@@ -19,10 +19,14 @@ import { NavTags } from "./nav-tags";
 // import global utils for external apps
 import "../utils/globals";
 
+import { useAppTitle } from "@/hooks/use-app-title";
+
 import styles from "./layout.module.scss";
 
 export function Layout() {
   const { sidebar, setSidebar } = useSidebar();
+
+  useAppTitle();
 
   useShortcut({
     key: "F9",
