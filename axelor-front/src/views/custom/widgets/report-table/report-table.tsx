@@ -1,18 +1,20 @@
+import { useSetAtom } from "jotai";
 import { forwardRef, useCallback, useEffect, useMemo } from "react";
-import { useGridState } from "@/views/grid/builder/utils";
+
+import { DataRecord } from "@/services/client/data.types";
 import {
   CustomView,
   Field,
   GridView,
   Property,
+  Schema,
   Widget,
 } from "@/services/client/meta.types";
-import { Grid as GridComponent } from "@/views/grid/builder";
+import { download } from "@/utils/download";
 import { toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { useSetAtom } from "jotai";
-import { download } from "@/utils/download";
-import { DataRecord } from "@/services/client/data.types";
+import { Grid as GridComponent } from "@/views/grid/builder";
+import { useGridState } from "@/views/grid/builder/utils";
 
 export const ReportTable = forwardRef(function ReportTable(
   {
@@ -47,7 +49,8 @@ export const ReportTable = forwardRef(function ReportTable(
     const viewItems: Widget[] = [];
 
     names.forEach((name) => {
-      const item = view?.items?.find((item) => item.name === name);
+      const item: Schema =
+        view?.items?.find((item) => item.name === name) ?? {};
       if (item && !item.hidden) {
         const col = Object.assign({}, item, item.widgetAttrs, {
           name: name,
