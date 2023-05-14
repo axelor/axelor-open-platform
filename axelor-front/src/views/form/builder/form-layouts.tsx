@@ -74,6 +74,7 @@ export const GridLayout: FormLayout = ({
         <GridItem
           key={item.uid}
           schema={item}
+          cols={cols}
           itemSpan={itemSpan}
           className={layoutClassName(item)}
         >
@@ -94,12 +95,15 @@ function GridItem(props: {
   children: React.ReactNode;
   className?: string;
   itemSpan?: number;
+  cols?: number;
 }) {
-  const { schema, className, itemSpan, children } = props;
+  const { schema, className, itemSpan, cols = 12, children } = props;
   const { colSpan = itemSpan, rowSpan } = schema;
   return (
     <div
-      className={clsx(styles.gridItem, className)}
+      className={clsx(styles.gridItem, className, {
+        [styles.fill]: +colSpan === +cols,
+      })}
       data-colspan={colSpan}
       data-rowspan={rowSpan}
     >

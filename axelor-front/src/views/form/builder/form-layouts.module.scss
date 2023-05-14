@@ -46,7 +46,7 @@
 }
 
 .grid {
-  .gridItem:empty {
+  .gridItem.fill:empty {
     display: none;
   }
 }
