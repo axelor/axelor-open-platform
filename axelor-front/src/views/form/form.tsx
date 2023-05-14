@@ -54,6 +54,8 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 
+import { session } from "@/services/client/session";
+import { Formatters } from "@/utils/format";
 import styles from "./form.module.scss";
 
 const fetchRecord = async (
@@ -452,7 +454,35 @@ function FormContainer({
     }
   }, [dataStore, record.id, record.version, switchTo]);
 
-  const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
+  const onAudit = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const rec = get(formAtom).record;
+        const id = rec.id;
+        if (id && id > 0) {
+          const res = await dataStore.read(id, {
+            fields: ["createdBy", "createdOn", "updatedBy", "updatedOn"],
+          });
+          const name = session.info?.user.nameField ?? "name";
+          dialogs.info({
+            content: (
+              <dl className={styles.dlist}>
+                <dt>{i18n.get("Created By")}</dt>
+                <dd>{(res.createdBy || {})[name]}</dd>
+                <dt>{i18n.get("Created On")}</dt>
+                <dd>{Formatters.datetime(res.createdOn)}</dd>
+                <dt>{i18n.get("Updated By")}</dt>
+                <dd>{(res.updatedBy || {})[name]}</dd>
+                <dt>{i18n.get("Updated On")}</dt>
+                <dd>{Formatters.datetime(res.updatedOn)}</dd>
+              </dl>
+            ),
+          });
+        }
+      },
+      [dataStore, formAtom]
+    )
+  );
 
   const onAttachment = useAtomCallback(
     useCallback(

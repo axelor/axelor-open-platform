@@ -54,3 +54,19 @@
 .large {
   max-width: 1500px;
 }
+
+.dlist {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin: 0;
+  dd {
+    padding: 0 1rem;
+  }
+  dt,
+  dd {
+    min-height: 1.5rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
