@@ -71,7 +71,7 @@ export function FieldLabel({
         htmlFor={uid}
         className={clsx(className, styles.label, { [styles.help]: help })}
       >
-        {title}
+        <span className={styles.labelText}>{title}</span>
       </InputLabel>
     </HelpPopover>
   );

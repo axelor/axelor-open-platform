@@ -29,6 +29,11 @@
 .label {
   margin: 0;
   position: relative;
+  display: flex;
+}
+
+.label,
+.label .labelText {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
