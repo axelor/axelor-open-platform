@@ -91,6 +91,16 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
     res.hidden = true;
   }
 
+  if (res.type === "panel-tabs") {
+    res.items = res.items?.map((item) => {
+      return {
+        ...item,
+        showTitle: item.showTitle ?? false,
+        showFrame: item.showFrame ?? false,
+      };
+    });
+  }
+
   if (res.items) {
     res.items = res.items.map((item) =>
       processView(item, res.fields ?? fields)
