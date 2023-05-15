@@ -89,8 +89,33 @@ const INFO_MAPPINGS = {
 
 export type SessionListener = (info: SessionInfo | null) => void;
 
+async function init() {
+  const url = "ws/app/info";
+  const resp = await request({ url });
+
+  if (!resp.ok) {
+    return Promise.reject(resp.status);
+  }
+
+  const data = await resp.json();
+  const info: any = {};
+
+  if (data["data.upload.max-size"]) {
+    data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
+  }
+
+  for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
+    if (key in data) {
+      set(info, target, data[key]);
+    }
+  }
+
+  return info as SessionInfo;
+}
+
 export class Session {
   #info: SessionInfo | null = null;
+  #infoPromise: Promise<SessionInfo> | null = null;
   #listeners = new Set<SessionListener>();
 
   #notify() {
@@ -113,29 +138,9 @@ export class Session {
   }
 
   async #load() {
-    const url = "ws/app/info";
-    const resp = await request({ url });
-
-    if (!resp.ok) {
-      return Promise.reject(resp.status);
-    }
-
-    const data = await resp.json();
-    const tmp: any = {};
-
-    if (data["data.upload.max-size"]) {
-      data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
-    }
-
-    for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
-      if (key in data) {
-        set(tmp, target, data[key]);
-      }
-    }
-
-    this.#info = tmp as SessionInfo;
+    this.#infoPromise = this.#infoPromise || init();
+    this.#info = await this.#infoPromise;
     this.#notify();
-
     return this.#info;
   }
 
@@ -151,13 +156,19 @@ export class Session {
       body: args,
     });
 
-    return ok ? await this.#load() : Promise.reject(status);
+    if (ok) {
+      this.#infoPromise = init();
+      return this.#load();
+    }
+
+    return Promise.reject(status);
   }
 
   async logout() {
     const { status } = await request({ url: "logout" });
 
     this.#info = null;
+    this.#infoPromise = null;
     this.#notify();
 
     return status;
