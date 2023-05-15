@@ -101,6 +101,11 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
     });
   }
 
+  if (res.widget === "email") {
+    res.pattern =
+      "^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$";
+  }
+
   if (res.items) {
     res.items = res.items.map((item) =>
       processView(item, res.fields ?? fields)
