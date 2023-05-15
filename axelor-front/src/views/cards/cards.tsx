@@ -72,12 +72,14 @@ export function Cards(props: ViewProps<CardsView>) {
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
         const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
+        const names = Object.keys(fields ?? {});
         return dataStore.search({
           filter,
+          fields: names,
           ...options,
         });
       },
-      [dataStore, searchAtom]
+      [dataStore, fields, searchAtom]
     )
   );
 
