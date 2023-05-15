@@ -1,3 +1,12 @@
+## 6.1.3 (2023-05-15)
+
+#### Fixed
+
+* Align script helper test expressions with Action behavior
+* Fix attributes that need a test instead of an evaluation
+* Fix action test condition when context proxy is used
+* Do not try to generate binary download link on unsaved record
+
 ## 6.1.2 (2023-04-05)
 
 #### Changes
