@@ -27,7 +27,12 @@ import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 
-import { FieldLabel, FieldProps, usePermission } from "../../builder";
+import {
+  FieldLabel,
+  FieldProps,
+  usePermission,
+  usePrepareContext,
+} from "../../builder";
 import { nextId } from "../../builder/utils";
 
 import styles from "./one-to-many.module.scss";
@@ -135,6 +140,8 @@ export function OneToMany({
     });
   });
 
+  const getContext = usePrepareContext(formAtom);
+
   const showEditor = useEditor();
   const showSelector = useSelector();
   const [state, setState] = useGridState();
@@ -222,11 +229,11 @@ export function OneToMany({
           multiple: true,
           viewName: gridView,
           domain: domain,
-          context: get(formAtom).record,
+          context: getContext(),
           onSelect: handleSelect,
         });
       },
-      [showSelector, title, model, gridView, domain, formAtom, handleSelect]
+      [showSelector, title, model, gridView, domain, getContext, handleSelect]
     )
   );
 
@@ -242,11 +249,14 @@ export function OneToMany({
         record: { id: null },
         readonly: false,
         viewName: formView,
+        context: {
+          _parent: getContext(),
+        },
         ...(isManyToMany ? { onSelect } : { onSave }),
         ...options,
       });
     },
-    [showEditor, title, model, formView, isManyToMany]
+    [showEditor, title, model, formView, getContext, isManyToMany]
   );
 
   const onSave = useCallback(

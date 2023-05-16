@@ -30,6 +30,7 @@ import {
 } from "@/views/form/builder";
 
 import styles from "./form.module.scss";
+import { useFormScope } from "@/views/form/builder/scope";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -162,11 +163,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       }
     }, [editColumnName, view.items]);
 
+    const { formAtom: parent } = useFormScope();
+
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
       useFormHandlers(
         meta as unknown as ViewData<FormView>,
         record,
-        undefined,
+        parent,
         initFormFieldsStates
       );
 

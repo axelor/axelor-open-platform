@@ -39,6 +39,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { title, focus, domain } = attrs;
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
+
+  const getContext = usePrepareContext(formAtom);
   const showSelector = useSelector();
   const showEditor = useEditor();
 
@@ -99,10 +101,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         viewName: formView,
         record: record ?? value,
         readonly,
+        context: {
+          _parent: getContext(),
+        },
         onSelect: handleChange,
       });
     },
-    [showEditor, title, target, formView, value, handleChange]
+    [showEditor, title, target, formView, value, handleChange, getContext]
   );
 
   const handleView = useCallback(
@@ -119,8 +124,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     },
     [handleEdit]
   );
-
-  const getContext = usePrepareContext(formAtom);
 
   const { actionExecutor } = useFormScope();
 
