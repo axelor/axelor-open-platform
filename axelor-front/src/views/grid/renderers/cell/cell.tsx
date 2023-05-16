@@ -1,9 +1,12 @@
+import { Box } from "@axelor/ui";
+
+import { useHilites } from "@/hooks/use-parser";
 import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
-import { Box } from "@axelor/ui";
-import { useWidgetComp } from "../../hooks";
-import { useHilites } from "@/hooks/use-parser";
+import { sanitize } from "@/utils/sanitize";
+
 import { GridCellProps } from "../../builder/types";
+import { useWidgetComp } from "../../hooks";
 
 function CellRenderer(props: GridCellProps) {
   const { type, widget } = props.data as Field;
@@ -13,8 +16,8 @@ function CellRenderer(props: GridCellProps) {
 }
 
 export function Cell(props: GridCellProps) {
-  const { data, record } = props;
-  const { type, widget, hilites } = data as Field;
+  const { data, value, record } = props;
+  const { type, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const $className = useHilites(hilites ?? [])(record)?.[0]?.css;
@@ -22,6 +25,15 @@ export function Cell(props: GridCellProps) {
   function render() {
     if (widget || type !== "field") {
       return <CellRenderer {...props} />;
+    }
+    if (
+      typeof value === "string" &&
+      (serverType === "STRING" ||
+        serverType === "TEXT" ||
+        serverType === "ONE_TO_ONE" ||
+        serverType === "MANY_TO_ONE")
+    ) {
+      return <span dangerouslySetInnerHTML={{ __html: sanitize(value) }} />;
     }
     return children;
   }
