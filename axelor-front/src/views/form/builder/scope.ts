@@ -1,6 +1,8 @@
+import produce from "immer";
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import { isEqual, set as setDeep } from "lodash";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -14,15 +16,15 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 
-import { fallbackFormAtom } from "./atoms";
-import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   EvalContextOptions,
   createEvalContext,
 } from "@/hooks/use-parser/eval-context";
+
+import { fallbackFormAtom } from "./atoms";
+import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
 import { processActionValue } from "./utils";
-import { isEqual } from "lodash";
 
 type ContextCreator = () => DataContext;
 
@@ -255,35 +257,38 @@ function useActionValue({ formAtom }: { formAtom: FormAtom }) {
           let newRecord = record;
 
           if (op === "set") {
-            newRecord = {
-              ...record,
-              [target]: value,
-            };
+            newRecord = produce(record, (draft) => {
+              setDeep(draft, target, value);
+            });
           }
           if (op === "add") {
             const items: DataRecord[] = record[target] ?? [];
             const found = items.find((x) => x.id === value.id);
             if (found) {
-              newRecord = {
-                ...record,
-                [target]: items.map((x) =>
-                  x.id === value.id ? { ...found, ...value } : x
-                ),
-              };
+              newRecord = produce(record, (draft) => {
+                setDeep(
+                  draft,
+                  target,
+                  items.map((x) =>
+                    x.id === value.id ? { ...found, ...value } : x
+                  )
+                );
+              });
             } else {
-              newRecord = {
-                ...record,
-                [target]: [...items, value],
-              };
+              newRecord = produce(record, (draft) => {
+                setDeep(draft, target, [...items, value]);
+              });
             }
           }
           if (op === "del") {
             const items: DataRecord[] = record[target] ?? [];
-            newRecord = {
-              ...record,
-              [target]: items.filter((x) => x.id !== value.id),
-            };
+            newRecord = setDeep(
+              record,
+              target,
+              items.filter((x) => x.id !== value.id)
+            );
           }
+
           if (record !== newRecord) {
             set(formAtom, (prev) => ({ ...prev, record: newRecord }));
           }
