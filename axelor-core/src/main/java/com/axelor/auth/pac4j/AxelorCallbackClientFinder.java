@@ -18,10 +18,12 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.pac4j.local.AxelorFormClient;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
@@ -49,12 +51,15 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
         .forEach(
             indirectClient -> {
               try {
-                indirectClient.init();
+                indirectClient.init(indirectClient.getCredentialsExtractor() == null);
               } catch (Exception e) {
                 logger.error("{}: {}", indirectClient.getName(), e.getMessage());
                 return;
               }
-              indirectClients.add(indirectClient);
+              if (indirectClient.getCredentialsExtractor() == null) {
+                logger.error("{}: no credenetials extractor", indirectClient.getName());
+                return;
+              }
               if (indirectClient
                   .getCallbackUrlResolver()
                   .matches(indirectClient.getName(), context)) {
@@ -67,7 +72,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
     // fallback: no client found and we have a default client, use it
     if (result.isEmpty() && CommonHelper.isNotBlank(clientNames)) {
       final var defaultClient = clients.findClient(clientNames);
-      if (defaultClient.isPresent()) {
+      if (defaultClient.isPresent() && isInitialized(defaultClient.get())) {
         logger.debug("Defaulting to the configured client: {}", defaultClient);
         result.add(defaultClient.get());
       }
@@ -78,6 +83,18 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
       result.addAll(indirectClients);
     }
 
+    if (result.isEmpty()) {
+      final var formClient = clients.findClient(AxelorFormClient.class.getSimpleName());
+      formClient.ifPresent(result::add);
+    }
+
     return result;
+  }
+
+  private boolean isInitialized(Client client) {
+    if (client instanceof BaseClient) {
+      return ((BaseClient) client).getCredentialsExtractor() != null;
+    }
+    return true;
   }
 }
