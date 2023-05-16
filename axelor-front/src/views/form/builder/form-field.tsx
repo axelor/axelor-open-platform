@@ -40,13 +40,15 @@ export function FieldControl({
   const canShowTitle = showTitle ?? schema.showTitle ?? true;
   return (
     <Box className={clsx(className, styles.container)}>
-      {canShowTitle && (
+      {(canShowTitle || titleActions) && (
         <Box className={styles.title}>
-          <FieldLabel
-            schema={schema}
-            formAtom={formAtom}
-            widgetAtom={widgetAtom}
-          />
+          {canShowTitle && (
+            <FieldLabel
+              schema={schema}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+            />
+          )}
           {titleActions && <Box className={styles.actions}>{titleActions}</Box>}
         </Box>
       )}
