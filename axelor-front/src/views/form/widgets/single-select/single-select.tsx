@@ -17,7 +17,7 @@ export function SingleSelectText({
 }) {
   const { colorField = "color" } = schema;
   const selectionList = (schema.selectionList ?? []) as TSelection[];
-  const selected = selectionList.find((item) => String(item.value) === value);
+  const selected = selectionList.find((item) => String(item.value) === String(value));
   return (selected && (
     <Box d="flex">
       <Chip
