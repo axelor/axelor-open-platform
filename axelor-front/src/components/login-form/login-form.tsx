@@ -39,7 +39,7 @@ export function LoginForm({
     async (event) => {
       event.preventDefault();
 
-      // Need to specify client is default client is not form client.
+      // Need to specify client if default client is not form client.
       const params =
         defaultClient && defaultClient !== FORM_CLIENT_NAME
           ? new URLSearchParams({
@@ -131,7 +131,7 @@ export function LoginForm({
             </Alert>
           )}
           <Button type="submit" variant="primary" mt={3} w={100}>
-            {i18n.get("Login")}
+            {i18n.get("Log in")}
           </Button>
         </Box>
       </Box>

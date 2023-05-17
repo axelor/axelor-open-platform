@@ -374,7 +374,7 @@ function FarItems() {
             },
             {
               key: "logout",
-              text: i18n.get("Logout"),
+              text: i18n.get("Log out"),
               onClick: () => logout(),
             },
           ],
