@@ -54,9 +54,9 @@ function HttpIndicator({ count }: { count: number }) {
 }
 
 function HttpAuth({ resume }: { resume?: () => void }) {
+  const prev = session.info?.user.login;
   const handleSuccess = useCallback(
     (info: SessionInfo) => {
-      const prev = session.info?.user.login;
       const curr = info.user.login;
       if (prev !== curr) {
         window.location.reload();
@@ -64,7 +64,7 @@ function HttpAuth({ resume }: { resume?: () => void }) {
         resume?.();
       }
     },
-    [resume]
+    [prev, resume]
   );
   return (
     <Portal>
