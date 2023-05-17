@@ -1,29 +1,30 @@
-import { useCallback, useState, useMemo, useEffect } from "react";
 import {
   Box,
   Tree as TreeComponent,
   TreeNode as TreeRecord,
   TreeSortColumn,
 } from "@axelor/ui";
+import { GridProvider as TreeProvider } from "@axelor/ui/grid";
 import { useSetAtom } from "jotai";
 import { uniq } from "lodash";
-import { GridProvider as TreeProvider } from "@axelor/ui/grid";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { DataStore } from "@/services/client/data-store";
-import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
-import { DataContext, DataRecord } from "@/services/client/data.types";
-import { SearchOptions, SearchResult } from "@/services/client/data";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { ViewProps } from "../types";
 import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useViewTab } from "@/view-containers/views/scope";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useDataStore } from "@/hooks/use-data-store";
-import { useGridActionExecutor } from "../grid/builder/utils";
-import { toKebabCase, toTitleCase } from "@/utils/names";
+import { SearchOptions, SearchResult } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
+import { toKebabCase, toTitleCase } from "@/utils/names";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { useViewTab } from "@/view-containers/views/scope";
+
+import { useGridActionExecutor } from "../grid/builder/utils";
+import { ViewProps } from "../types";
 import { Node as NodeComponent, NodeProps } from "./renderers/node";
 import {
   NodeText as NodeTextComponent,
@@ -46,18 +47,19 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     [action, view, dashlet]
   );
 
-  const actionExecutor = useGridActionExecutor(
-    view,
-    useCallback<() => DataContext>(
-      () => ({
-        ...getContext(),
-        _viewName: action.name,
-        _viewType: action.viewType,
-        _views: action.views,
-      }),
-      [action, getContext]
-    )
-  );
+  const getActionContext = useCallback(() => {
+    return {
+      ...getContext(),
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    };
+  }, [action.name, action.viewType, action.views, getContext]);
+
+  const actionExecutor = useGridActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh: () => onSearch({}),
+  });
 
   // check parent/child is of same model
   const isSameModelTree = useMemo(() => {

@@ -3,10 +3,10 @@ import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useMemo } from "react";
 
-import { GridActionHandler } from "./scope";
-import { GridView, View } from "@/services/client/meta.types";
 import { DataContext } from "@/services/client/data.types";
+import { GridView, View } from "@/services/client/meta.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
+import { GridActionHandler } from "./scope";
 
 export function useGridState(
   initialState?: Partial<GridState> & { view?: GridView },
@@ -48,14 +48,23 @@ export function useGridState(
  */
 export function useGridActionExecutor(
   view: View,
-  getContext?: () => DataContext
+  options?: {
+    onRefresh?: () => Promise<any>;
+    getContext?: () => DataContext;
+  }
 ) {
+  const { onRefresh, getContext } = options || {};
   return useMemo(() => {
     const actionHandler = new GridActionHandler(() => ({
       ...getContext?.(),
       _viewName: view.name,
       _model: view.model,
     }));
+
+    actionHandler.refresh = async () => {
+      await onRefresh?.();
+    };
+
     return new DefaultActionExecutor(actionHandler);
-  }, [getContext, view]);
+  }, [getContext, onRefresh, view.model, view.name]);
 }

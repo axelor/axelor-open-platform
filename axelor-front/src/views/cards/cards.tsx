@@ -11,7 +11,7 @@ import { useDataStore } from "@/hooks/use-data-store";
 import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
 import { SearchOptions } from "@/services/client/data";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { CardsView } from "@/services/client/meta.types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
@@ -43,18 +43,19 @@ export function Cards(props: ViewProps<CardsView>) {
     [action.context, action.model]
   );
 
-  const actionExecutor = useGridActionExecutor(
-    view,
-    useCallback<() => DataContext>(
-      () => ({
-        ...getContext(),
-        _viewName: action.name,
-        _viewType: action.viewType,
-        _views: action.views,
-      }),
-      [action, getContext]
-    )
-  );
+  const getActionContext = useCallback(() => {
+    return {
+      ...getContext(),
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    };
+  }, [action.name, action.viewType, action.views, getContext]);
+
+  const actionExecutor = useGridActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh: () => onSearch({}),
+  });
 
   const { width, minWidth } = useMemo(() => {
     const width = view.width || "calc(100% / 3)";

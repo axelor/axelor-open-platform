@@ -301,7 +301,10 @@ function GridInner(props: ViewProps<GridView>) {
     }),
     [action]
   );
-  const actionExecutor = useGridActionExecutor(view, getContext);
+  const actionExecutor = useGridActionExecutor(view, {
+    getContext,
+    onRefresh: onSearch,
+  });
 
   const popupHandlerAtom = usePopupHandlerAtom();
   const setPopupHandlers = useSetAtom(popupHandlerAtom);
