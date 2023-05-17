@@ -51,6 +51,9 @@ export interface SessionInfo {
       location: string;
     };
   };
+  auth?: {
+    client: string;
+  };
 }
 
 const INFO_MAPPINGS = {
@@ -85,6 +88,7 @@ const INFO_MAPPINGS = {
   "view.menubar.location": "view.menubar.location",
   "view.adv-search.share": "view.advanceSearch.share",
   "view.adv-search.export-full": "view.advanceSearch.exportFull",
+  "auth.central.client": "auth.client",
 };
 
 export type SessionListener = (info: SessionInfo | null) => void;

@@ -8,8 +8,12 @@ import { SessionInfo } from "@/services/client/session";
 
 import { useLoginInfo } from "./login-info";
 
+import {
+  CLIENT_NAME_PARAM,
+  FORM_CLIENT_NAME,
+  requestLogin,
+} from "@/routes/login";
 import styles from "./login-form.module.scss";
-import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "@/routes/login";
 
 const YEAR = new Date().getFullYear();
 
@@ -63,6 +67,13 @@ export function LoginForm({
 
   if (appInfo.state === "loading" || appInfo.state === "hasError") {
     return null;
+  }
+
+  const authClient = session.data?.auth?.client;
+
+  if (authClient) {
+    requestLogin(authClient);
+    return <Reconnecting />;
   }
 
   const { logo: appLogo = logo, name: appName = "Axelor" } =
@@ -135,6 +146,24 @@ export function LoginForm({
       {children}
       <Box as="p" textAlign="center">
         {copyright}
+      </Box>
+    </Box>
+  );
+}
+
+function Reconnecting() {
+  return (
+    <Box className={styles.container}>
+      <Box
+        className={styles.paper}
+        d="flex"
+        flexDirection="column"
+        alignItems="center"
+        p={3}
+      >
+        <Box as="h4" fontWeight="normal" my={2}>
+          {i18n.get("Reconnecting…")}
+        </Box>
       </Box>
     </Box>
   );

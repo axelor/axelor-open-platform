@@ -35,7 +35,7 @@ const CLIENT_NAME_ALIASES: Record<string, string> = {
   cas: "CasClient",
 };
 
-function doLogin(client?: string) {
+export function requestLogin(client?: string) {
   const currentParams = new URLSearchParams(window.location.search);
   const forceClient = client || currentParams.get(FORCE_CLIENT_PARAM);
   const clientName = currentParams.get(CLIENT_NAME_PARAM);
@@ -95,12 +95,12 @@ export function Login() {
   }
 
   if (exclusive) {
-    doLogin();
+    requestLogin();
     return null;
   }
 
   if (notFormClient) {
-    doLogin(client);
+    requestLogin(client);
     return null;
   }
 
@@ -142,7 +142,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
   const handleClick = useCallback(
     (e: React.SyntheticEvent) => {
       e.preventDefault();
-      doLogin(name);
+      requestLogin(name);
     },
     [name]
   );
