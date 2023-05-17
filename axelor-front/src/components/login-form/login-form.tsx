@@ -9,6 +9,7 @@ import { SessionInfo } from "@/services/client/session";
 import { useLoginInfo } from "./login-info";
 
 import styles from "./login-form.module.scss";
+import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "@/routes/login";
 
 const YEAR = new Date().getFullYear();
 
@@ -32,11 +33,22 @@ export function LoginForm({
   const appInfo = useLoginInfo();
   const session = useSession();
 
+  const defaultClient = appInfo.data?.defaultClient;
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
+
+      // Need to specify client is default client is not form client.
+      const params =
+        defaultClient && defaultClient !== FORM_CLIENT_NAME
+          ? new URLSearchParams({
+              [CLIENT_NAME_PARAM]: FORM_CLIENT_NAME,
+            })
+          : undefined;
+
       try {
-        const info = await session.login({ username, password });
+        const info = await session.login({ username, password }, params);
         if (info && info.user) {
           onSuccess?.(info);
         } else {
@@ -46,7 +58,7 @@ export function LoginForm({
         setShowError(true);
       }
     },
-    [session, username, password, onSuccess]
+    [session, username, password, onSuccess, defaultClient]
   );
 
   if (appInfo.state === "loading" || appInfo.state === "hasError") {

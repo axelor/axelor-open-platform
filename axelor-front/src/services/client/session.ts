@@ -144,12 +144,14 @@ export class Session {
     return this.#info;
   }
 
-  async login(args: {
-    username: string;
-    password: string;
-    url?: string;
-  }): Promise<SessionInfo> {
-    const url = args.url ?? "callback";
+  async login(
+    args: {
+      username: string;
+      password: string;
+    },
+    params?: URLSearchParams
+  ): Promise<SessionInfo> {
+    const url = "callback" + (params ? `?${params}` : "");
     const { status, ok } = await request({
       url,
       method: "POST",

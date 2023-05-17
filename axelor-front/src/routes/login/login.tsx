@@ -14,10 +14,10 @@ import styles from "./login.module.scss";
 const LOGIN_ENDPOINT = "login";
 const FORCE_CLIENT_PARAM = "force_client";
 
-const CLIENT_NAME_PARAM = "client_name";
+export const CLIENT_NAME_PARAM = "client_name";
 
 const HASH_LOCATION_PARAM = "hash_location";
-const FORM_CLIENT_NAME = "AxelorFormClient";
+export const FORM_CLIENT_NAME = "AxelorFormClient";
 
 const CLIENT_NAME_ALIASES: Record<string, string> = {
   form: FORM_CLIENT_NAME,
