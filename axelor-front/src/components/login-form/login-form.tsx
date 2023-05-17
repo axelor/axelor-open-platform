@@ -65,25 +65,22 @@ export function LoginForm({
     return null;
   }
 
-  const appLogo = appInfo.data?.application.logo || logo;
+  const { logo: appLogo = logo, name: appName = "Axelor" } =
+    appInfo.data?.application || {};
   const appLegal = appInfo.data?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005 - ${YEAR} Axelor. ${i18n.get(
+  const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
     "All Rights Reserved"
   )}.`;
 
   const copyright = appLegal || defaultLegal;
 
-  let errorText = error;
-  if (session.error === 401 || showError) {
+  let errorText;
+  if (showError) {
     errorText = i18n.get("Wrong username or password");
+  } else if (error != null || session.error === 500) {
+    errorText =
+      error || i18n.get("Sorry, something went wrong. Please try again later.");
   }
-  if (session.error === 500) {
-    errorText = i18n.get(
-      "Sorry, something went wrong. Please try again later."
-    );
-  }
-
-  const canShowError = Boolean(error || showError);
 
   return (
     <Box className={styles.container}>
@@ -95,7 +92,7 @@ export function LoginForm({
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={appLogo} alt="Logo" />
+        <Image className={styles.logo} src={appLogo} alt={appName} />
         <Box as="form" w={100} onSubmit={handleSubmit}>
           <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
           <Input
@@ -125,7 +122,7 @@ export function LoginForm({
               {i18n.get("Remember me")}
             </Box>
           </Box>
-          {canShowError && (
+          {errorText && (
             <Alert mt={3} mb={1} p={2} variant="danger">
               {errorText}
             </Alert>
