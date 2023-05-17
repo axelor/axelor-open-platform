@@ -13,6 +13,7 @@ export type SearchOptions = {
     _domains?: SearchFilter[];
     _domain?: string;
     _domainContext?: DataContext;
+    _domainAction?: string;
     _archived?: boolean;
     _searchText?: string;
   };

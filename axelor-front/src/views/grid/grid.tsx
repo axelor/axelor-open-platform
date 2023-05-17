@@ -1,24 +1,27 @@
 import { useSetAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useAtomCallback } from "jotai/utils";
+import { uniqueId } from "lodash";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+
 import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
-import { useAtomCallback } from "jotai/utils";
-import { focusAtom } from "jotai-optics";
-import { uniqueId } from "lodash";
 
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
-import { AdvanceSearch } from "@/view-containers/advance-search";
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
+import { useDataStore } from "@/hooks/use-data-store";
+import { usePerms } from "@/hooks/use-perms";
+import { useEditor } from "@/hooks/use-relation";
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView, Widget } from "@/services/client/meta.types";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { commonClassNames } from "@/styles/common";
+import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { SearchColumn } from "./renderers/search";
-import { getSearchFilter } from "./renderers/search/utils";
 import {
   useViewDirtyAtom,
   useViewProps,
@@ -26,15 +29,16 @@ import {
   useViewSwitch,
   useViewTab,
 } from "@/view-containers/views/scope";
+import { SearchColumn } from "./renderers/search";
+import { getSearchFilter } from "./renderers/search/utils";
 
-import { ViewProps } from "../types";
 import { Dms } from "../dms";
+import { usePrepareContext } from "../form/builder";
+import { useFormScope } from "../form/builder/scope";
+import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
-import { useDataStore } from "@/hooks/use-data-store";
-import { useEditor } from "@/hooks/use-relation";
-import { usePerms } from "@/hooks/use-perms";
-import { commonClassNames } from "@/styles/common";
+
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -81,6 +85,9 @@ function GridInner(props: ViewProps<GridView>) {
     });
   }, [setState]);
 
+  const { formAtom } = useFormScope();
+  const getFormContext = usePrepareContext(formAtom);
+
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
@@ -120,13 +127,32 @@ function GridInner(props: ViewProps<GridView>) {
           draft.selectedCell = null;
         });
 
+        if (dashlet) {
+          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          const { _domainContext } = q;
+          q._domainContext = {
+            ..._domainContext,
+            ...formContext,
+          };
+          q._domainAction = _domainAction;
+        }
+
         return dataStore.search({
           sortBy,
           ...options,
           filter: { ...q },
         });
       },
-      [dataStore, fields, view.items, searchAtom, orderBy, setState]
+      [
+        orderBy,
+        searchAtom,
+        fields,
+        view.items,
+        setState,
+        dashlet,
+        dataStore,
+        getFormContext,
+      ]
     )
   );
 
