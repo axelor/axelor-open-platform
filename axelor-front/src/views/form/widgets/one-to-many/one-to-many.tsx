@@ -49,6 +49,7 @@ export function OneToMany({
   const {
     name,
     target: model,
+    orderBy: sortBy,
     fields,
     showTitle = true,
     formView,
@@ -170,8 +171,12 @@ export function OneToMany({
       if (ids.length > 0) {
         const res = await dataStore.search({
           ...options,
+          limit: -1,
+          offset: 0,
+          sortBy: sortBy?.split?.(","),
           filter: {
             ...options?.filter,
+            _archived: true,
             _domain: "self.id in (:_ids)",
             _domainContext: {
               id: parentId,
@@ -192,7 +197,7 @@ export function OneToMany({
         records,
       } as SearchResult;
     },
-    [value, name, model, parentId, dataStore]
+    [value, name, sortBy, model, parentId, dataStore]
   );
 
   const handleSelect = useAtomCallback(

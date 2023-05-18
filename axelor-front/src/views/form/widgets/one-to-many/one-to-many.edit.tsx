@@ -7,7 +7,7 @@ import {
 } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { selectAtom, useAtomCallback } from "jotai/utils";
+import { selectAtom } from "jotai/utils";
 import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
@@ -23,7 +23,7 @@ import { GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
-import { FieldProps } from "../../builder";
+import { FieldProps, usePrepareContext } from "../../builder";
 import styles from "./one-to-many.edit.module.scss";
 
 export function OneToManyEdit({
@@ -77,7 +77,15 @@ export function OneToManyEdit({
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
   const { rows, selectedRows } = state;
-  const { title, name, target: model, formView, gridView, views } = schema;
+  const {
+    title,
+    name,
+    target: model,
+    formView,
+    gridView,
+    views,
+    orderBy: sortBy,
+  } = schema;
   const {
     attrs: { focus, domain },
   } = useAtomValue(widgetAtom);
@@ -85,6 +93,7 @@ export function OneToManyEdit({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
   );
+  const getContext = usePrepareContext(formAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
   const { data: meta } = useAsync(async () => {
@@ -109,6 +118,9 @@ export function OneToManyEdit({
       if (ids.length > 0) {
         const { records } = await dataStore.search({
           ...options,
+          limit: -1,
+          offset: 0,
+          sortBy: sortBy?.split?.(","),
           filter: {
             ...options?.filter,
             _domain: "self.id in (:_ids)",
@@ -127,7 +139,7 @@ export function OneToManyEdit({
         );
       }
     },
-    [value, name, model, parentId, dataStore]
+    [value, sortBy, name, model, parentId, dataStore]
   );
 
   const focusInput = useCallback(() => {
@@ -187,50 +199,45 @@ export function OneToManyEdit({
     ]
   );
 
-  const onAdd = useAtomCallback(
-    useCallback(
-      (get) => {
-        const onClose = onPopupViewInit();
-        showSelector({
-          title: i18n.get("Select {0}", title ?? ""),
-          model,
-          multiple: true,
-          viewName: gridView,
-          domain: domain,
-          context: get(formAtom).record,
-          onClose,
-          onSelect: (records) => {
-            setValue((value) => {
-              const valIds = (value || []).map((x) => x.id);
-              return [
-                ...(value || []),
-                ...records.filter((rec) => !valIds.includes(rec.id)),
-              ];
-            });
-          },
-          ...(!isManyToMany && {
-            onCreate: () => {
-              setTimeout(() => {
-                onEdit({});
-              });
-            },
-          }),
+  const onAdd = useCallback(() => {
+    const onClose = onPopupViewInit();
+    showSelector({
+      title: i18n.get("Select {0}", title ?? ""),
+      model,
+      multiple: true,
+      viewName: gridView,
+      domain: domain,
+      context: getContext(),
+      onClose,
+      onSelect: (records) => {
+        setValue((value) => {
+          const valIds = (value || []).map((x) => x.id);
+          return [
+            ...(value || []),
+            ...records.filter((rec) => !valIds.includes(rec.id)),
+          ];
         });
       },
-      [
-        onPopupViewInit,
-        showSelector,
-        title,
-        model,
-        gridView,
-        domain,
-        formAtom,
-        isManyToMany,
-        setValue,
-        onEdit,
-      ]
-    )
-  );
+      ...(!isManyToMany && {
+        onCreate: () => {
+          setTimeout(() => {
+            onEdit({});
+          });
+        },
+      }),
+    });
+  }, [
+    onPopupViewInit,
+    showSelector,
+    title,
+    model,
+    gridView,
+    domain,
+    isManyToMany,
+    setValue,
+    getContext,
+    onEdit,
+  ]);
 
   const showPopup = useCallback(
     async (popup: boolean) => {
