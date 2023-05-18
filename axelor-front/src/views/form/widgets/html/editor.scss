@@ -11,7 +11,7 @@ $bg-white-shade: #eee;
   display: flex;
   flex-direction: column;
   min-height: 100px;
-  width: '100%';
+  width: "100%";
   border-radius: 0;
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@ $bg-white-shade: #eee;
   border-radius: 0.2rem;
   user-select: none;
 
-  [dir='rtl'] & {
+  [dir="rtl"] & {
     left: unset;
     right: -50%;
   }
@@ -96,6 +96,12 @@ $bg-white-shade: #eee;
   a:link,
   a:visited {
     text-decoration: none;
+    outline: none;
+  }
+  a:focus,
+  a:focus-visible,
+  a:hover {
+    background-color: $bg-white-shade;
   }
 }
 
@@ -112,6 +118,8 @@ $bg-white-shade: #eee;
       text-decoration: none;
       cursor: pointer;
     }
+    &:focus,
+    &:focus-visible,
     &:hover {
       color: $bg-white;
       background-color: $bg-white-shade;
@@ -183,7 +191,7 @@ input.custom-html-editor-input {
   margin: 0 0 0.5rem 2.5rem;
   border: none;
   padding: 0;
-  [dir='rtl'] & {
+  [dir="rtl"] & {
     margin: 0 2.5rem 0.5rem 0;
   }
 
@@ -195,10 +203,10 @@ input.custom-html-editor-input {
 }
 
 /** force same style on chrome */
-.html-item .html-content blockquote[style*='margin: 0 0 0 2.5rem'] {
+.html-item .html-content blockquote[style*="margin: 0 0 0 2.5rem"] {
   margin: 0 0 0.5rem 2.5rem !important;
 }
-[dir='rtl'] .html-item .html-content blockquote[style*='margin: 0 2.5rem 0 0'] {
+[dir="rtl"] .html-item .html-content blockquote[style*="margin: 0 2.5rem 0 0"] {
   margin: 0 2.5rem 0.5rem 0 !important;
 }
 
@@ -219,7 +227,7 @@ input.custom-html-editor-input {
   & .custom-html-editor-toolbar-icon {
     margin-left: $spacing;
     border-radius: $spacing;
-    [dir='rtl'] & {
+    [dir="rtl"] & {
       margin-left: unset;
       margin-right: $spacing;
     }
@@ -243,12 +251,12 @@ input.custom-html-editor-input {
   align-items: center;
   justify-content: center;
 
-  [dir='rtl'] & {
+  [dir="rtl"] & {
     left: unset;
     right: 0;
   }
 
-  & input[type='file'] {
+  & input[type="file"] {
     position: absolute;
     left: 0;
     top: 0;
@@ -256,7 +264,7 @@ input.custom-html-editor-input {
     height: 100%;
     opacity: 0;
     cursor: pointer;
-    [dir='rtl'] & {
+    [dir="rtl"] & {
       left: unset;
       right: 0;
     }
