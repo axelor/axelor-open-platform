@@ -5,7 +5,7 @@ import unique from "lodash/uniq";
 
 import { ChartView } from "@/services/client/meta.types";
 import { ViewProps } from "../types";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 import { chart as fetchChart } from "@/services/client/meta";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { download } from "@/utils/download";
@@ -21,37 +21,36 @@ import classes from "./chart.module.scss";
 export function Chart(props: ViewProps<ChartView>) {
   const { meta } = props;
   const chartName = meta.view.name!;
-  const {
-    action: { context },
-    dashlet,
-  } = useViewTab();
+  const { dashlet } = useViewTab();
   const [view, setView] = useState<ChartView>();
   const [records, setRecords] = useState<ChartDataRecord[]>([]);
   const [legend, showLegend] = useState(true);
 
+  const getContext = useViewContext();
+
   const actionExecutor = useMemo(() => {
     return new DefaultActionExecutor(
       new FormActionHandler(() => ({
-        ...context,
+        ...getContext(),
         _chart: chartName,
         _model: "com.axelor.script.ScriptBindings",
       }))
     );
-  }, [context, chartName]);
+  }, [getContext, chartName]);
 
   const loadView = useCallback(async () => {
-    const view = await fetchChart<ChartView>(chartName, context);
+    const view = await fetchChart<ChartView>(chartName, getContext());
     setView(view);
-  }, [chartName, context]);
+  }, [chartName, getContext]);
 
   const onRefresh = useCallback(async () => {
     const records = await fetchChart<ChartDataRecord[]>(
       chartName,
-      context,
+      getContext(),
       true
     );
     setRecords(records);
-  }, [chartName, context]);
+  }, [chartName, getContext]);
 
   const onExport = useCallback(async () => {
     if (!view || !records) return;

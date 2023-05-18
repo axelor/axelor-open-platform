@@ -21,8 +21,8 @@ import { i18n } from "@/services/client/i18n";
 
 export const Card = memo(function Card({
   record,
-  model,
   fields,
+  getContext,
   onEdit,
   onView,
   onDelete,
@@ -31,8 +31,8 @@ export const Card = memo(function Card({
   minWidth,
 }: {
   record: DataRecord;
-  model?: string;
   fields?: any;
+  getContext?: () => DataContext;
   onEdit?: (record: DataRecord) => void;
   onView?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
@@ -50,12 +50,12 @@ export const Card = memo(function Card({
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
-    const context = { record: $record, ...$record, _model: model };
+    const context = { ...getContext?.(), record: $record, ...$record };
     const actionExecutor = new DefaultActionExecutor(
       new FormActionHandler((options?: DataContext) => context)
     );
     return { context, actionExecutor };
-  }, [model, record, values]);
+  }, [getContext, record, values]);
 
   function handleMenuOpen() {
     setShowMenu(true);

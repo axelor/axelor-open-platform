@@ -14,14 +14,14 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 
 import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
@@ -34,30 +34,20 @@ import { getNodeOfTreeRecord } from "./utils";
 
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
-  const { action, dashlet, popup, popupOptions } = useViewTab();
+  const { dashlet, popup, popupOptions } = useViewTab();
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
+  const getViewContext = useViewContext();
 
-  const getContext = useCallback(
-    () => ({
-      ...action.context,
-      ...(dashlet && {
-        _model: action.context?._model || view.nodes?.[0]?.model,
-      }),
-    }),
-    [action, view, dashlet]
-  );
-
-  const getActionContext = useCallback(() => {
+  const getContext = useCallback(() => {
+    const ctx = getViewContext();
     return {
-      ...getContext(),
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
-    };
-  }, [action.name, action.viewType, action.views, getContext]);
+      ...ctx,
+      _model: ctx?._model || view.nodes?.[0]?.model,
+    } as DataContext;
+  }, [getViewContext, view]);
 
   const actionExecutor = useGridActionExecutor(view, {
-    getContext: getActionContext,
+    getContext,
     onRefresh: () => onSearch({}),
   });
 
@@ -107,28 +97,14 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const dataStore = useMemo<DataStore | null>(() => {
     const { nodes } = view;
-    const { model, domain, items = [] } = nodes?.[0] || {};
+    const { model, items = [] } = nodes?.[0] || {};
     const fields = uniq(items.map((item) => item.name)) as string[];
     return model
       ? new DataStore(model, {
           fields,
-          filter: {
-            _domain: domain,
-            _domainContext: {
-              ...getContext(),
-              ...(isSameModelTree
-                ? { _countOn: nodes?.[1]?.parent }
-                : {
-                    _childOn: {
-                      model: nodes?.[1]?.model,
-                      parent: nodes?.[1]?.parent,
-                    },
-                  }),
-            },
-          },
         })
       : null;
-  }, [view, isSameModelTree, getContext]);
+  }, [view]);
 
   const columns = useMemo(() => {
     return (view.columns || []).map((column) => {
@@ -149,19 +125,39 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const onSearch = useCallback(
     async (options: Partial<SearchOptions> = {}) => {
       if (dataStore) {
-        const rootNode = view.nodes?.[0];
+        const { nodes } = view;
+        const rootNode = nodes?.[0];
+        const { _domainAction, ..._domainContext } = getContext() || {};
         return dataStore.search({
           ...(rootNode && getSearchOptions(rootNode)),
           ...options,
+          filter: {
+            ...options.filter,
+            _domain: rootNode?.domain,
+            _domainAction,
+            _domainContext: {
+              ...options?.filter?._domainContext,
+              ..._domainContext,
+              ...(isSameModelTree
+                ? { _countOn: nodes?.[1]?.parent }
+                : {
+                    _childOn: {
+                      model: nodes?.[1]?.model,
+                      parent: nodes?.[1]?.parent,
+                    },
+                  }),
+            },
+          },
         });
       }
     },
-    [dataStore, view.nodes, getSearchOptions]
+    [dataStore, view, isSameModelTree, getSearchOptions, getContext]
   );
 
   const onSearchNode = useCallback(
     async (treeNode: TreeRecord) => {
       const node = getNodeOfTreeRecord(view, treeNode, true);
+      const { _domainAction, ..._domainContext } = getContext() ?? {};
 
       if (!node) return [];
 
@@ -176,8 +172,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
               domain ? `AND ${domain}` : ""
             }`,
           }),
+          _domainAction,
           _domainContext: {
-            ...getContext(),
+            ..._domainContext,
             ...(countOn && { _countOn: countOn }),
             _parentId: treeNode.id,
           },

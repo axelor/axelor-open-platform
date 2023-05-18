@@ -1,6 +1,9 @@
+import { SetStateAction, useCallback, useEffect, useMemo } from "react";
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { SetStateAction, useCallback, useEffect, useMemo } from "react";
+import { focusAtom } from "jotai-optics";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { isEqual } from "lodash";
 
 import {
   Tab,
@@ -10,9 +13,9 @@ import {
   TabState,
   useTabs,
 } from "@/hooks/use-tabs";
-import { focusAtom } from "jotai-optics";
-import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual } from "lodash";
+import { useFormScope } from "@/views/form/builder/scope";
+import { usePrepareContext } from "@/views/form/builder";
+import { DataContext } from "@/services/client/data.types";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -58,6 +61,27 @@ export function useViewTab() {
 export function useViewAction() {
   const tab = useViewTab();
   return tab.action;
+}
+
+/**
+ * This scoped hook can be used to access view context.
+ *
+ * @returns Context
+ */
+export function useViewContext() {
+  const { action, dashlet } = useViewTab();
+  const { formAtom } = useFormScope();
+  const getFormContext = usePrepareContext(formAtom);
+  return useCallback(
+    () =>
+      (dashlet
+        ? {
+            ...getFormContext(),
+            ...action.context,
+          }
+        : action.context) as DataContext,
+    [dashlet, action.context, getFormContext]
+  );
 }
 
 /**

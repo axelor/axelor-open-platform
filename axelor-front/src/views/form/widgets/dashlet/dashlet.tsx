@@ -39,8 +39,10 @@ export function DashletComponent({
 
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const actionView = await findActionView(action);
-    const context = getContext?.();
-
+    const ctx = {
+      ...actionView.context,
+      ...getContext?.(),
+    };
     return await initTab({
       ...actionView,
       name: uniqueId("$dashlet"),
@@ -50,10 +52,9 @@ export function DashletComponent({
         ...actionView.params,
       },
       context: {
-        ...actionView.context,
-        ...context,
-        _id: context?.id || undefined,
-        _model: actionView.model,
+        ...ctx,
+        _id: (ctx?._id ?? ctx?.id)!,
+        _model: ctx.model ?? ctx._model,
         _domainAction: action,
       },
     });

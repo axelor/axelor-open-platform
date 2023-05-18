@@ -3,9 +3,8 @@ import { useMemo } from "react";
 import { Box } from "@axelor/ui";
 
 import { useExpression } from "@/hooks/use-parser";
+import { useViewContext } from "@/view-containers/views/scope";
 import { HtmlView } from "@/services/client/meta.types";
-import { useViewTab } from "@/view-containers/views/scope";
-
 import { ViewProps } from "../types";
 
 import styles from "./html.module.scss";
@@ -16,8 +15,7 @@ export function Html(props: ViewProps<HtmlView>) {
   } = props;
   const name = view.name || view.resource;
   const parseURL = useExpression(name!);
-  const { action } = useViewTab();
-  const context = action.context;
+  const getContext = useViewContext();
 
   const url = useMemo(() => {
     let url = `${name}`;
@@ -25,13 +23,13 @@ export function Html(props: ViewProps<HtmlView>) {
     if (!url) return "";
 
     if (url && url.indexOf("{{") > -1) {
-      url = parseURL(context ?? {});
+      url = parseURL(getContext() ?? {});
     }
 
     const stamp = new Date().getTime();
 
     return `${url}${url.includes("?") ? "&" : "?"}${stamp}`;
-  }, [name, context, parseURL]);
+  }, [name, getContext, parseURL]);
 
   return (
     <Box flexGrow={1} position="relative" className={styles.container}>

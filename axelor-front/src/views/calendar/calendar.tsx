@@ -11,6 +11,7 @@ import { l10n } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
 import { CalendarView, FormView } from "@/services/client/meta.types";
 import { Criteria, DataRecord } from "@/services/client/data.types";
+import { SearchOptions } from "@/services/client/data";
 
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { dialogs } from "@/components/dialogs";
@@ -21,6 +22,8 @@ import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
 import { useAsync } from "@/hooks/use-async";
 import { useSession } from "@/hooks/use-session";
+import { useFormScope } from "../form/builder/scope";
+import { usePrepareContext } from "../form/builder";
 
 import { ViewProps } from "../types";
 
@@ -39,8 +42,8 @@ import {
   toDatetime,
 } from "./utils";
 
-import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
+import styles from "./calendar.module.scss";
 
 const { get: _t } = i18n;
 
@@ -70,6 +73,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
   const { hasButton } = usePerms(metaView, metaPerms);
+  const { formAtom } = useFormScope();
+  const getFormContext = usePrepareContext(formAtom);
+
+  const showEditor = useEditor();
+  const viewTab = useViewTab();
+
   const editableAndButton = useCallback(
     (name: string) => metaView.editable !== false && hasButton(name),
     [hasButton, metaView.editable]
@@ -165,7 +174,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           ],
         } as Criteria)
       : null;
-    let filter = stopCriteria
+    let filter: SearchOptions["filter"] = stopCriteria
       ? ({
           operator: "or",
           criteria: [startCriteria, stopCriteria],
@@ -179,9 +188,26 @@ export function Calendar(props: ViewProps<CalendarView>) {
         criteria: [advancedSearch.query, filter],
       };
     }
+    if (viewTab.dashlet) {
+      const { _domainAction, ...formContext } = getFormContext() ?? {};
+      const { _domainContext } = filter;
+      filter._domainContext = {
+        ..._domainContext,
+        ...formContext,
+      };
+      filter._domainAction = _domainAction;
+    }
 
     return filter;
-  }, [eventStart, calendarStart, calendarEnd, eventStop, advancedSearch.query]);
+  }, [
+    eventStart,
+    calendarStart,
+    calendarEnd,
+    eventStop,
+    viewTab.dashlet,
+    advancedSearch.query,
+    getFormContext,
+  ]);
 
   const handleRefresh = useCallback(async () => {
     const res = await dataStore.search({
@@ -447,9 +473,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
     },
     []
   );
-
-  const showEditor = useEditor();
-  const viewTab = useViewTab();
 
   const showRecord = useCallback(
     async (

@@ -21,6 +21,8 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
 
 import { useGridActionExecutor } from "../grid/builder/utils";
+import { useFormScope } from "../form/builder/scope";
+import { usePrepareContext } from "../form/builder";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -30,10 +32,12 @@ import styles from "./cards.module.scss";
 export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
-  const { action, dashlet: dasheen, popup, popupOptions } = useViewTab();
+  const { action, dashlet, popup, popupOptions } = useViewTab();
 
-  const { hasButton } = usePerms(meta.view, meta.perms);
   const switchTo = useViewSwitch();
+  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { formAtom } = useFormScope();
+  const getFormContext = usePrepareContext(formAtom);
 
   const getContext = useCallback(
     () => ({
@@ -74,13 +78,23 @@ export function Cards(props: ViewProps<CardsView>) {
       (get, set, options: Partial<SearchOptions> = {}) => {
         const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
         const names = Object.keys(fields ?? {});
+
+        if (dashlet) {
+          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          const { _domainContext } = filter;
+          filter._domainContext = {
+            ..._domainContext,
+            ...formContext,
+          };
+          filter._domainAction = _domainAction;
+        }
         return dataStore.search({
           filter,
           fields: names,
           ...options,
         });
       },
-      [dataStore, fields, searchAtom]
+      [dataStore, fields, dashlet, searchAtom, getFormContext]
     )
   );
 
@@ -146,14 +160,14 @@ export function Cards(props: ViewProps<CardsView>) {
   }, [onSearch, popup, dataStore, setPopupHandlers]);
 
   useEffect(() => {
-    if (dasheen) {
+    if (dashlet) {
       setDashletHandlers({
         dataStore,
         view,
         onRefresh: () => onSearch({}),
       });
     }
-  }, [dasheen, view, dataStore, onSearch, setDashletHandlers]);
+  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
@@ -211,13 +225,13 @@ export function Cards(props: ViewProps<CardsView>) {
           {records.map((record) => (
             <Card
               key={record.id}
-              model={view.model}
               record={record}
               fields={fields}
               onView={onView}
               Template={Template}
               width={width}
               minWidth={minWidth}
+              getContext={getContext}
               {...(hasButton("edit") && { onEdit })}
               {...(hasButton("delete") && { onDelete })}
             />

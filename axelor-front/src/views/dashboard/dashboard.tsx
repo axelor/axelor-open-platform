@@ -14,6 +14,7 @@ import {
 import { DashletComponent } from "../form/widgets/dashlet";
 import { ViewProps } from "../types";
 import { useResizeDetector } from "@/hooks/use-resize-detector";
+import { useViewContext } from "@/view-containers/views/scope";
 
 import "react-grid-layout/css/styles.css";
 import "./react-grid-layout.css";
@@ -76,6 +77,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const [layouts, setLayouts] = useState<Layouts | null>(null);
   const { ref, width } = useResizeDetector();
   const saved = useRef(false);
+  const getContext = useViewContext();
 
   const hasViewCustomize = Boolean(
     data?.view?.customization !== false && data?.view?.customizationPermission
@@ -257,10 +259,11 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             schema={item}
             viewId={index}
             onViewLoad={handleDashletViewLoad}
+            getContext={getContext}
           />
         </Box>
       )),
-    [items, handleDashletViewLoad]
+    [items, handleDashletViewLoad, getContext]
   );
 
   return (

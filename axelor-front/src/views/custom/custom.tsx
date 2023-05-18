@@ -5,7 +5,7 @@ import { Box } from "@axelor/ui";
 import { CustomView } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
 import { custom } from "@/services/client/meta";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTemplate } from "@/hooks/use-parser";
 import { ViewProps } from "../types";
@@ -16,23 +16,21 @@ import { ReportTable } from "./widgets/report-table";
 import styles from "./custom.module.scss";
 
 export function Custom({ meta }: ViewProps<CustomView>) {
-  const {
-    action: { context },
-    dashlet,
-  } = useViewTab();
+  const { dashlet } = useViewTab();
   const { view } = meta;
   const [dataContext, setDataContext] = useState<{
     data?: DataRecord[];
     first?: DataRecord;
   }>({});
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
+  const getContext = useViewContext();
 
   const onRefresh = useCallback(async () => {
     if (view.name) {
-      const result = await custom(view.name, context);
+      const result = await custom(view.name, getContext());
       setDataContext(result);
     }
-  }, [context, view]);
+  }, [getContext, view]);
 
   useAsyncEffect(async () => {
     await onRefresh();
