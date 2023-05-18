@@ -1,4 +1,27 @@
 .container {
   margin: 0.5rem 0;
   border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+.container:focus,
+.container:focus-within {
+  border: var(--bs-input-border-focus, 1px solid #86b7fe);
+  box-shadow: var(
+    --bs-input-shadow-focus,
+    0 0 0 0.25rem rgba(13, 110, 254, 0.25)
+  );
+}
+
+.invalid {
+  border: var(--bs-input-invalid-border-focus, 1px solid var(--bs-danger));
+}
+
+.invalid:focus,
+.invalid:focus-within {
+  border: var(--bs-input-invalid-border-focus, 1px solid var(--bs-danger));
+  box-shadow: var(
+    --bs-input-invalid-shadow-focus,
+    0 0 0 0.25rem rgb(var(--bs-danger-rgb), 0.25)
+  );
 }

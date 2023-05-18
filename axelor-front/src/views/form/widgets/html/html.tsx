@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useCallback, useState } from "react";
 
@@ -43,7 +44,9 @@ export function Html(props: FieldProps<string>) {
           value={value || ""}
           onChange={handleChange}
           onBlur={handleBlur}
-          className={styles.container}
+          className={clsx(styles.container, {
+            [styles.invalid]: props.invalid,
+          })}
           {...({} as any)}
         />
       )}
