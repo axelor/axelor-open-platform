@@ -1,9 +1,9 @@
-import { useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import { uniqueId } from "lodash";
-import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 
@@ -16,9 +16,9 @@ import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
+import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -38,7 +38,12 @@ import { useFormScope } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
-
+import { useAsync } from "@/hooks/use-async";
+import { findView } from "@/services/client/meta-cache";
+import { Details } from "./details";
+import { nextId } from "../form/builder/utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { fetchRecord } from "../form";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -58,9 +63,12 @@ function GridInner(props: ViewProps<GridView>) {
   const pageSetRef = useRef(false);
   const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
+  const saveIdRef = useRef<number | null>();
+  const initDetailsRef = useRef(false);
   const [viewProps, setViewProps] = useViewProps();
   const { action, dashlet, popup, popupOptions } = useViewTab();
-  const setDirty = useSetAtom(useViewDirtyAtom());
+  const [dirty, setDirty] = useAtom(useViewDirtyAtom());
+  const [detailsRecord, setDetailsRecord] = useState<DataRecord | null>(null);
 
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
@@ -77,6 +85,7 @@ function GridInner(props: ViewProps<GridView>) {
   });
   const records = useDataStore(dataStore, (ds) => ds.records);
   const { orderBy, rows, selectedRows, selectedCell } = state;
+  const hasDetailsView = String(action.params?.["details-view"]) === "true";
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -276,6 +285,74 @@ function GridInner(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
+  const { data: formMeta } = useAsync(async () => {
+    if (!hasDetailsView) return null;
+    const { name } = action.views?.find((v) => v.type === "form") || {};
+    return await findView<FormView>({
+      type: "form",
+      name,
+      model: view.model,
+    });
+  }, [view.model]);
+
+  const fetchAndSetDetailsRecord = useCallback(
+    async (record: DataRecord | null) => {
+      if (formMeta && record && (record?.id ?? 0) > 0) {
+        record = await fetchRecord(formMeta, dataStore, record.id!);
+      }
+      setDirty(false);
+      setDetailsRecord(record);
+    },
+    [setDirty, formMeta, dataStore]
+  );
+
+  const onSaveInDetails = useCallback(
+    async (record: DataRecord) => {
+      const saved = await onSave(record);
+      if (saved) {
+        fetchAndSetDetailsRecord(saved);
+        if ((record.id ?? 0) < 0) {
+          saveIdRef.current = saved.id;
+        }
+      }
+    },
+    [onSave, fetchAndSetDetailsRecord]
+  );
+
+  const onNewInDetails = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => dirty,
+      async () => {
+        initDetailsRef.current = false;
+        clearSelection();
+        fetchAndSetDetailsRecord({ id: nextId() });
+      }
+    );
+  }, [dirty, clearSelection, fetchAndSetDetailsRecord]);
+
+  const onRefreshInDetails = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => dirty,
+      async () => fetchAndSetDetailsRecord(detailsRecord)
+    );
+  }, [fetchAndSetDetailsRecord, dirty, detailsRecord]);
+
+  const onCancelInDetails = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => dirty,
+      async () => fetchAndSetDetailsRecord(null)
+    );
+  }, [dirty, fetchAndSetDetailsRecord]);
+
+  useAsyncEffect(async () => {
+    if (!formMeta) return;
+    const [ind = -1] = selectedRows || [];
+    const selected = rows?.[ind]?.record;
+    const record = selected?.id ? selected : null;
+    initDetailsRef.current && fetchAndSetDetailsRecord(record);
+    initDetailsRef.current = true;
+  }, [selectedRows, formMeta, dataStore]);
+
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
 
@@ -366,7 +443,16 @@ function GridInner(props: ViewProps<GridView>) {
     selectedIdsRef.current = (state.selectedRows || []).map(
       (ind) => state.rows[ind]?.record?.id
     );
-  }, [state.selectedRows, state.rows]);
+    const savedId = saveIdRef.current;
+    if (savedId) {
+      const savedInd = state.rows?.findIndex((r) => r.record?.id === savedId);
+      savedInd > 0 &&
+        setState((draft) => {
+          draft.selectedRows = [savedInd];
+        });
+    }
+    saveIdRef.current = null;
+  }, [state.selectedRows, state.rows, setState]);
 
   const searchOptions = useMemo(() => {
     if (currentPage) {
@@ -418,7 +504,11 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
-              onClick: editable ? onNewInGrid : onNew,
+              onClick: hasDetailsView
+                ? onNewInDetails
+                : editable
+                ? onNewInGrid
+                : onNew,
             },
             {
               key: "edit",
@@ -427,7 +517,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "edit",
               },
-              disabled: !hasRowSelected,
+              disabled: !hasRowSelected || (hasDetailsView && dirty),
               className: commonClassNames("hide-sm"),
               onClick: () => {
                 const [rowIndex] = selectedRows || [];
@@ -442,7 +532,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "delete",
               },
-              disabled: !hasRowSelected,
+              disabled: !hasRowSelected || (hasDetailsView && dirty),
               onClick: () => {
                 onDelete(selectedRows!.map((ind) => rows[ind]?.record));
               },
@@ -497,27 +587,47 @@ function GridInner(props: ViewProps<GridView>) {
           )}
         </ViewToolBar>
       )}
-      <GridComponent
-        className={styles["grid"]}
-        ref={gridRef}
-        records={records}
-        view={view}
-        fields={fields}
-        state={state}
-        setState={setState}
-        sortType={"live"}
-        editable={editable}
-        searchOptions={searchOptions}
-        actionExecutor={actionExecutor}
-        onEdit={readonly ? onView : onEdit}
-        onView={onView}
-        onSearch={onSearch}
-        onSave={onSave}
-        onDiscard={onDiscard}
-        noRecordsText={i18n.get("No records found.")}
-        {...dashletProps}
-        {...popupProps}
-      />
+      <div className={styles.views}>
+        <div className={styles["grid-view"]}>
+          <GridComponent
+            className={styles.grid}
+            ref={gridRef}
+            records={records}
+            view={view}
+            fields={fields}
+            state={state}
+            setState={setState}
+            sortType={"live"}
+            editable={editable}
+            searchOptions={searchOptions}
+            actionExecutor={actionExecutor}
+            onEdit={readonly ? onView : onEdit}
+            onView={onView}
+            onSearch={onSearch}
+            onSave={onSave}
+            onDiscard={onDiscard}
+            noRecordsText={i18n.get("No records found.")}
+            {...dashletProps}
+            {...popupProps}
+          />
+          {hasDetailsView && dirty && (
+            <Box bg="light" className={styles.overlay} />
+          )}
+        </div>
+        {hasDetailsView && formMeta && detailsRecord && (
+          <Box bg="light" className={styles["details-view"]}>
+            <Details
+              dirty={dirty}
+              meta={formMeta}
+              record={detailsRecord}
+              onNew={onNewInDetails}
+              onRefresh={onRefreshInDetails}
+              onSave={onSaveInDetails}
+              onCancel={onCancelInDetails}
+            />
+          </Box>
+        )}
+      </div>
     </div>
   );
 }

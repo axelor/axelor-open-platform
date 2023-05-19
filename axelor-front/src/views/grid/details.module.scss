@@ -1,0 +1,10 @@
+.container {
+  min-width: 0;
+}
+
+.form {
+  min-width: 0;
+  & > div {
+    flex: 1;
+  }
+}
