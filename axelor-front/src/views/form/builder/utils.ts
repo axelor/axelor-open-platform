@@ -93,11 +93,13 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 
   if (res.type === "panel-tabs") {
     res.items = res.items?.map((item) => {
-      return {
-        ...item,
-        showTitle: item.showTitle ?? false,
-        showFrame: item.showFrame ?? false,
-      };
+      return item.type === "panel"
+        ? {
+            ...item,
+            showTitle: item.showTitle ?? false,
+            showFrame: item.showFrame ?? false,
+          }
+        : item;
     });
   }
 
