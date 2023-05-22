@@ -19,6 +19,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
+import { useEditor } from "@/hooks/use-relation";
 
 import { useGridActionExecutor } from "../grid/builder/utils";
 import { useFormScope } from "../form/builder/scope";
@@ -33,11 +34,14 @@ export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
   const { action, dashlet, popup, popupOptions } = useViewTab();
+  const showEditor = useEditor();
 
   const switchTo = useViewSwitch();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const { formAtom } = useFormScope();
   const getFormContext = usePrepareContext(formAtom);
+  const hasEditPopup = view.editWindow === "popup";
+  const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
 
   const getContext = useCallback(
     () => ({
@@ -136,15 +140,32 @@ export function Cards(props: ViewProps<CardsView>) {
     [switchTo]
   );
 
+  const onEditInPopup = useCallback(
+    (record: DataRecord, readonly = false) => {
+      const viewName = action.views?.find((v) => v.type === "form")?.name;
+      const { title, model } = view;
+      model &&
+        showEditor({
+          title: title ?? "",
+          model,
+          viewName,
+          record,
+          readonly,
+          onSelect: () => onSearch({}),
+        });
+    },
+    [showEditor, view, action, onSearch]
+  );
+
   const onNew = useCallback(() => {
-    onEdit({});
-  }, [onEdit]);
+    hasAddPopup ? onEditInPopup({}) : onEdit({});
+  }, [hasAddPopup, onEdit, onEditInPopup]);
 
   const onView = useCallback(
     (record: DataRecord) => {
-      onEdit(record, true);
+      hasEditPopup ? onEditInPopup(record, true) : onEdit(record, true);
     },
-    [onEdit]
+    [hasEditPopup, onEdit, onEditInPopup]
   );
 
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
@@ -233,6 +254,9 @@ export function Cards(props: ViewProps<CardsView>) {
               minWidth={minWidth}
               getContext={getContext}
               {...(hasButton("edit") && { onEdit })}
+              {...(hasButton("edit") && {
+                onEdit: hasEditPopup ? onEditInPopup : onEdit,
+              })}
               {...(hasButton("delete") && { onDelete })}
             />
           ))}

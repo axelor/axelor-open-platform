@@ -16,8 +16,8 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { FormActionHandler } from "../form/builder/scope";
 import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import { EvalContextOptions } from "@/hooks/use-parser/eval-context";
-import classes from "./card.module.scss";
 import { i18n } from "@/services/client/i18n";
+import classes from "./card.module.scss";
 
 export const Card = memo(function Card({
   record,
