@@ -321,6 +321,7 @@ export const Grid = forwardRef<
           allowColumnHide
           allowColumnOptions
           allowColumnCustomize
+          allowRowReorder={view?.canMove === true && !readonly}
           sortType="state"
           selectionType="multiple"
           {...(editable &&

@@ -50,16 +50,17 @@ export function OneToMany({
   const {
     name,
     target: model,
-    orderBy: sortBy,
     fields,
     showTitle = true,
     formView,
     summaryView,
     gridView,
+    orderBy: sortBy,
   } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
+  const reorderRef = useRef(false);
   const gridRef = useRef<GridHandler>(null);
 
   const [records, setRecords] = useState<DataRecord[]>([]);
@@ -88,7 +89,8 @@ export function OneToMany({
             get,
             set,
             setter: SetStateAction<DataRecord[]>,
-            callOnChange: boolean = true
+            callOnChange: boolean = true,
+            resetRecords: boolean = false
           ) => {
             shouldSearch.current = false;
             const values =
@@ -98,6 +100,11 @@ export function OneToMany({
             set(valueAtom, values, callOnChange);
 
             setRecords((records) => {
+              if (resetRecords) {
+                return values
+                  .map((v) => records.find((r) => r.id === v.id))
+                  .filter((v) => v) as DataRecord[];
+              }
               const recIds = records.map((r) => r.id);
               const deleteIds = recIds.filter((id) => !valIds.includes(id));
               const newRecords = (values || []).filter(
@@ -167,7 +174,9 @@ export function OneToMany({
       const ids = (value || [])
         .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
         .map((v) => v.id);
-      const changedRecords = (value || []).filter(({ id }) => !ids.includes(id));
+      const changedRecords = (value || []).filter(
+        ({ id }) => !ids.includes(id)
+      );
 
       let records: DataRecord[] = [];
       let page = dataStore.page;
@@ -201,7 +210,7 @@ export function OneToMany({
         records,
       } as SearchResult;
     },
-    [value, name, sortBy, model, parentId, dataStore]
+    [value, sortBy, name, model, parentId, dataStore]
   );
 
   const handleSelect = useAtomCallback(
@@ -325,6 +334,10 @@ export function OneToMany({
     [setValue, clearSelection]
   );
 
+  const onRowReorder = useCallback(() => {
+    reorderRef.current = true;
+  }, []);
+
   const { selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
 
@@ -337,6 +350,27 @@ export function OneToMany({
     selectedIdsRef.current = selectedIds;
     setSelection(selectedIds);
   }, [selectedRows, rows, setSelection]);
+
+  useEffect(() => {
+    if (sortBy && reorderRef.current) {
+      setValue(
+        (values) => {
+          const valIds = values.map((v) => v.id);
+          return rows
+            .filter((r) => valIds.includes(r.record?.id ?? 0))
+            .map((r) => values.find((v) => v.id === r.record?.id))
+            .map((r, ind) => ({
+              ...r,
+              [sortBy]: ind + 1,
+              version: r?.version ?? r?.$version,
+            })) as DataRecord[];
+        },
+        false,
+        true
+      );
+    }
+    reorderRef.current = false;
+  }, [rows, sortBy, setValue]);
 
   if (viewState === "loading") return null;
 
@@ -451,6 +485,7 @@ export function OneToMany({
           onView={canView ? onView : noop}
           onSave={onSave}
           onSearch={onSearch}
+          onRowReorder={onRowReorder}
         />
       </Box>
       {hasMasterDetails && (
