@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { Box } from "@axelor/ui";
+import { Box, CommandItemProps } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { alerts } from "@/components/alerts";
@@ -44,6 +44,7 @@ import {
 import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
 import {
+  FormAtom,
   Form as FormComponent,
   FormLayout,
   FormState,
@@ -173,14 +174,7 @@ function FormContainer({
     useFormHandlers(meta, record);
 
   const { hasButton } = usePerms(meta.view, meta.perms);
-  const showDMSPopup = useDMSPopup();
-  const [$attachments, setAttachmentCount] = useAtom(
-    useMemo(
-      () =>
-        focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
-      [formAtom]
-    )
-  );
+  const attachmentItem = useFormAttachment(formAtom);
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -484,21 +478,6 @@ function FormContainer({
     )
   );
 
-  const onAttachment = useAtomCallback(
-    useCallback(
-      (get) => {
-        const { record, model, fields } = get(formAtom);
-        return showDMSPopup({
-          record,
-          model,
-          fields,
-          onCountChanged: (totalCount) => setAttachmentCount(totalCount),
-        });
-      },
-      [formAtom, showDMSPopup, setAttachmentCount]
-    )
-  );
-
   const pagination = usePagination(dataStore, record, readonly);
 
   const { popup, popupOptions } = useViewTab();
@@ -680,22 +659,7 @@ function FormContainer({
               hidden: isDirty,
             },
             {
-              key: "attachment",
-              text: i18n.get("Attachment"),
-              icon: (props: any) => (
-                <Box as="span" d="flex" position="relative">
-                  <MaterialIcon icon="attach_file" {...props} />
-                  {$attachments ? (
-                    <Box d="flex" as="small" alignItems="flex-end">
-                      {$attachments}
-                    </Box>
-                  ) : null}
-                </Box>
-              ),
-              iconProps: {
-                icon: "attach_file",
-              },
-              onClick: onAttachment,
+              ...attachmentItem,
               hidden: !canAttach,
             },
             {
@@ -1014,3 +978,48 @@ export const Layout: FormLayout = ({
     </div>
   );
 };
+
+export function useFormAttachment(formAtom: FormAtom) {
+  const showDMSPopup = useDMSPopup();
+  const [$attachments, setAttachmentCount] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
+      [formAtom]
+    )
+  );
+
+  const handleClick = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { record, model, fields } = get(formAtom);
+        return showDMSPopup({
+          record,
+          model,
+          fields,
+          onCountChanged: (totalCount) => setAttachmentCount(totalCount),
+        });
+      },
+      [formAtom, showDMSPopup, setAttachmentCount]
+    )
+  );
+
+  return {
+    key: "attachment",
+    text: i18n.get("Attachment"),
+    icon: (props: any) => (
+      <Box as="span" d="flex" position="relative">
+        <MaterialIcon icon="attach_file" {...props} />
+        {$attachments ? (
+          <Box d="flex" as="small" alignItems="flex-end">
+            {$attachments}
+          </Box>
+        ) : null}
+      </Box>
+    ),
+    iconProps: {
+      icon: "attach_file",
+    },
+    onClick: handleClick,
+  } as CommandItemProps;
+}

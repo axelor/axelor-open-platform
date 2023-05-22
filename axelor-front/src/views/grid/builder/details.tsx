@@ -1,17 +1,18 @@
-import { ReactElement, useCallback, useMemo } from "react";
+import { ReactElement, useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
-import { useAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { Box, CommandBar } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import { Form, useFormHandlers } from "../form/builder";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useDMSPopup } from "../dms/builder/hooks";
-import { Layout, showErrors, useGetErrors } from "../form";
+import { Form, useFormHandlers } from "../../form/builder";
+import {
+  Layout,
+  showErrors,
+  useFormAttachment,
+  useGetErrors,
+} from "../../form";
 import { i18n } from "@/services/client/i18n";
 import styles from "./details.module.scss";
 
@@ -38,16 +39,9 @@ export function Details({
     useFormHandlers(meta, record);
 
   const isNew = (record?.id ?? -1) < 0;
-  const [$attachments, setAttachmentCount] = useAtom(
-    useMemo(
-      () =>
-        focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
-      [formAtom]
-    )
-  );
+  const attachmentItem = useFormAttachment(formAtom);
 
   const getErrors = useGetErrors();
-  const showDMSPopup = useDMSPopup();
 
   const handleSave = useAtomCallback(
     useCallback(
@@ -65,21 +59,6 @@ export function Details({
     )
   );
 
-  const handleAttachment = useAtomCallback(
-    useCallback(
-      (get) => {
-        const { record, model, fields } = get(formAtom);
-        return showDMSPopup({
-          record,
-          model,
-          fields,
-          onCountChanged: (totalCount) => setAttachmentCount(totalCount),
-        });
-      },
-      [formAtom, showDMSPopup, setAttachmentCount]
-    )
-  );
-
   useAsyncEffect(async () => {
     const { onLoad, onNew } = meta.view;
     if (record) {
@@ -90,7 +69,12 @@ export function Details({
 
   return (record && (
     <>
-      <Box d="flex" flexDirection="column" flex={1} className={styles.container}>
+      <Box
+        d="flex"
+        flexDirection="column"
+        flex={1}
+        className={styles.container}
+      >
         <Box flex={1} bg="body">
           <CommandBar
             items={[
@@ -128,23 +112,8 @@ export function Details({
                 disabled: !dirty,
               },
               {
-                key: "attachment",
-                text: i18n.get("Attachment"),
-                icon: (props: any) => (
-                  <Box as="span" d="flex" position="relative">
-                    <MaterialIcon icon="attach_file" {...props} />
-                    {$attachments ? (
-                      <Box d="flex" as="small" alignItems="flex-end">
-                        {$attachments}
-                      </Box>
-                    ) : null}
-                  </Box>
-                ),
-                iconProps: {
-                  icon: "attach_file",
-                },
+                ...attachmentItem,
                 disabled: isNew,
-                onClick: handleAttachment,
               },
             ]}
             iconOnly

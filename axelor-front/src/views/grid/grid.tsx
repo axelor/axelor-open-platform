@@ -40,7 +40,7 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useAsync } from "@/hooks/use-async";
 import { findView } from "@/services/client/meta-cache";
-import { Details } from "./details";
+import { Details } from "./builder/details";
 import { nextId } from "../form/builder/utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { fetchRecord } from "../form";
