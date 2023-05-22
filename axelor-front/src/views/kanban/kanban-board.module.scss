@@ -1,0 +1,70 @@
+$spacing: 0.25rem;
+$bg: #fbfbff;
+
+.board {
+  padding: $spacing;
+  & > * {
+    max-width: 100%;
+  }
+}
+
+.board-responsive {
+  flex-direction: column;
+}
+
+.column-wrapper {
+  display: flex;
+  width: 24em;
+}
+
+.column {
+  background-color: $bg;
+}
+
+.column-title {
+  color: var(--bs-gray-700);
+  font-weight: 600;
+  user-select: none;
+}
+
+.record-list-wrapper {
+  width: 100%;
+  flex-grow: 1;
+  background-color: $bg;
+  display: flex;
+  flex-direction: column;
+}
+
+.record-list-wrapper-overflow {
+  overflow: auto;
+}
+
+.record-list-wrapper-no-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.record-list {
+  flex: 1;
+}
+
+.record {
+  &:hover .record-action {
+    display: block;
+  }
+}
+.record-action {
+  display: none;
+  right: 0.25rem;
+  position: absolute;
+  .rtl & {
+    right: unset;
+    left: 0.25rem;
+  }
+}
+
+.noRecordsText {
+  color: var(--bs-grey-500);
+}
+

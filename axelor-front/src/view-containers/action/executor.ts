@@ -101,7 +101,7 @@ export class DefaultActionExecutor implements ActionExecutor {
     const context = this.#handler.getContext();
     const model = context._model ?? options?.context?._model ?? "";
     const data = {
-      ...options,
+      ...options?.data,
       context: {
         ...context,
         ...options?.context,

@@ -1,0 +1,29 @@
+.kanban {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.board {
+  background-color: var(--bs-white);
+  padding: 0.5rem;
+}
+
+.kanban-card {
+  list-style: none;
+  position: relative;
+  background: var(--bs-white);
+  border: 1px solid var(--bs-gray-200);
+  margin-bottom: 0.75rem;
+  padding: 0.625rem;
+  border-radius: 2px;
+  box-sizing: content-box;
+  border-left: 3px solid var(--bs-gray-200);
+  user-select: none;
+}
+
+.kanban-card:hover {
+  cursor: pointer;
+}

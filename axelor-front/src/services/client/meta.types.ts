@@ -601,6 +601,10 @@ export interface ChartView extends View {
 
 export interface KanbanView extends View {
   type: "kanban";
+  template?: string;
+  customSearch?: boolean;
+  freeSearch?: string;
+  editWindow?: string;
   columnBy?: string;
   sequenceBy?: string;
   draggable?: boolean;
@@ -608,6 +612,7 @@ export interface KanbanView extends View {
   onMove?: string;
   limit?: number;
   columns?: Selection[];
+  hilites?: Hilite[];
 }
 
 export type CalendarModeType = "month" | "week" | "day";

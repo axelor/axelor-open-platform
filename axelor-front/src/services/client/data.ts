@@ -116,16 +116,17 @@ export class DataSource {
       return this.upload(data, upload.field, upload.file);
     }
 
+    const isRecords = Array.isArray(data);
     const url = `ws/rest/${this.model}`;
     const resp = await request({
       url,
       method: "POST",
-      body: Array.isArray(data) ? { records: data } : { data },
+      body: isRecords ? { records: data } : { data },
     });
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data[0] : reject(data);
+      return status === 0 ? (isRecords ? data : data[0]) : reject(data);
     }
 
     return Promise.reject(resp.status);
