@@ -26,8 +26,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
+import com.nimbusds.jose.JWSAlgorithm;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,11 +53,13 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.jasig.cas.client.util.PrivateKeyUtils;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,6 +171,21 @@ public class ClientListProvider implements Provider<List<Client>> {
           .put(boolean.class, Boolean.class)
           .put(char.class, Character.class)
           .build();
+
+  private static final Map<Class<?>, Function<Map<String, Object>, Object>> CONVERTERS =
+      Map.of(
+          PrivateKeyJWTClientAuthnMethodConfig.class,
+          map -> {
+            final String privateKeyPath = (String) map.get("privateKey.path");
+            final String privateKeyAlgorithm =
+                (String) map.getOrDefault("privateKey.algorithm", "RSA");
+            final JWSAlgorithm jwsAlgorithm =
+                JWSAlgorithm.parse((String) map.getOrDefault("jwsAlgorithm", "RS256"));
+            final String keyId = (String) map.get("keyId");
+            final PrivateKey privateKey =
+                PrivateKeyUtils.createKey(privateKeyPath, privateKeyAlgorithm);
+            return new PrivateKeyJWTClientAuthnMethodConfig(jwsAlgorithm, privateKey, keyId);
+          });
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -457,6 +477,16 @@ public class ClientListProvider implements Provider<List<Client>> {
     if (type.isAssignableFrom(value.getClass())) {
       return value;
     }
+
+    if (value instanceof Map) {
+      @SuppressWarnings("unchecked")
+      final Map<String, Object> map = getCamelizedMapKeys((Map<String, Object>) value);
+      final Function<Map<String, Object>, Object> converter = CONVERTERS.get(type);
+      if (converter != null) {
+        return converter.apply(map);
+      }
+    }
+
     final String valueStr = String.valueOf(value);
     if (type.isAssignableFrom(List.class)) {
       return Arrays.asList(valueStr.split("\\s*,\\s*"));
@@ -468,6 +498,17 @@ public class ClientListProvider implements Provider<List<Client>> {
       final Class<?> cls = Class.forName(valueStr);
       return Beans.get(cls);
     }
+  }
+
+  private Map<String, Object> getCamelizedMapKeys(Map<String, Object> map) {
+    final Map<String, Object> result = new HashMap<>();
+    final Inflector inflector = Inflector.getInstance();
+    for (final Map.Entry<String, Object> entry : map.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      result.put(inflector.camelize(key, true), value);
+    }
+    return result;
   }
 
   private Method findGetter(Class<?> klass, String property) throws NoSuchMethodException {
