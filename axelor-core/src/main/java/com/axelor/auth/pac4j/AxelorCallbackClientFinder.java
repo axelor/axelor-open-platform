@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.auth.pac4j.local.AxelorFormClient;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,21 +48,17 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
         .filter(IndirectClient.class::isInstance)
         .map(IndirectClient.class::cast)
         .forEach(
-            indirectClient -> {
+            client -> {
               try {
-                indirectClient.init(indirectClient.getCredentialsExtractor() == null);
+                client.init(!isInitialized(client));
               } catch (Exception e) {
-                logger.error("{}: {}", indirectClient.getName(), e.getMessage());
-                return;
+                logger.error("{}: {}", client.getName(), e.getMessage());
               }
-              if (indirectClient.getCredentialsExtractor() == null) {
-                logger.error("{}: no credenetials extractor", indirectClient.getName());
-                return;
-              }
-              if (indirectClient
-                  .getCallbackUrlResolver()
-                  .matches(indirectClient.getName(), context)) {
-                result.add(indirectClient);
+              if (isInitialized(client)) {
+                indirectClients.add(client);
+                if (client.getCallbackUrlResolver().matches(client.getName(), context)) {
+                  result.add(client);
+                }
               }
             });
 
@@ -71,21 +66,20 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
     // fallback: no client found and we have a default client, use it
     if (result.isEmpty() && CommonHelper.isNotBlank(clientNames)) {
-      final var defaultClient = clients.findClient(clientNames);
-      if (defaultClient.isPresent() && isInitialized(defaultClient.get())) {
-        logger.debug("Defaulting to the configured client: {}", defaultClient);
-        result.add(defaultClient.get());
-      }
+      clients
+          .findClient(clientNames)
+          .filter(this::isInitialized)
+          .ifPresent(
+              client -> {
+                logger.debug("Defaulting to the configured client: {}", client);
+                result.add(client);
+              });
     }
+
     // fallback: no client found and we only have one indirect client, use it
     if (result.isEmpty() && indirectClients.size() == 1) {
       logger.debug("Defaulting to the only client: {}", indirectClients.get(0));
       result.addAll(indirectClients);
-    }
-
-    if (result.isEmpty()) {
-      final var formClient = clients.findClient(AxelorFormClient.class.getSimpleName());
-      formClient.ifPresent(result::add);
     }
 
     return result;
@@ -93,7 +87,8 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
   private boolean isInitialized(Client client) {
     if (client instanceof BaseClient) {
-      return ((BaseClient) client).getCredentialsExtractor() != null;
+      final BaseClient baseClient = ((BaseClient) client);
+      return baseClient.getCredentialsExtractor() != null && baseClient.getAuthenticator() != null;
     }
     return true;
   }
