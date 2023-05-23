@@ -27,6 +27,7 @@ import com.axelor.inject.Beans;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -63,6 +64,7 @@ import org.pac4j.core.client.IndirectClient;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -417,7 +419,51 @@ public class ClientListProvider implements Provider<List<Client>> {
         .filter(item -> !EXTRA_CONFIGS.contains(item.getKey()))
         .forEach(configurer);
 
+    postprocessClient(client, config);
+
     return client;
+  }
+
+  private void postprocessClient(Client client, Object config) {
+
+    // Remove private_key_jwt from supported authentication methods
+    // if private key JWT config is missing.
+    if (config instanceof OidcConfiguration) {
+      final OidcConfiguration oidcConfig = (OidcConfiguration) config;
+      final PrivateKeyJWTClientAuthnMethodConfig privateKeyJwtConfig =
+          oidcConfig.getPrivateKeyJWTClientAuthnMethodConfig();
+      if (privateKeyJwtConfig != null) {
+        return;
+      }
+
+      final ClientAuthenticationMethod clientAuthenticationMethod =
+          oidcConfig.getClientAuthenticationMethod();
+      if (ClientAuthenticationMethod.PRIVATE_KEY_JWT.equals(clientAuthenticationMethod)) {
+        logger.error(
+            "{}: {} is specified as client authentication method, "
+                + "but privateKeyJWTClientAuthnMethodConfig is missing.",
+            client.getName(),
+            ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+      }
+
+      final Set<ClientAuthenticationMethod> supportedMethods =
+          oidcConfig.getSupportedClientAuthenticationMethods();
+      if (supportedMethods == null) {
+        final Set<ClientAuthenticationMethod> actualSupportedMethods =
+            new HashSet<>(
+                Arrays.asList(
+                    ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+                    ClientAuthenticationMethod.CLIENT_SECRET_POST,
+                    ClientAuthenticationMethod.NONE));
+        oidcConfig.setSupportedClientAuthenticationMethods(actualSupportedMethods);
+      } else if (supportedMethods.contains(ClientAuthenticationMethod.PRIVATE_KEY_JWT)) {
+        logger.error(
+            "{}: {} is specified as supported client authentication method, "
+                + "but privateKeyJWTClientAuthnMethodConfig is missing.",
+            client.getName(),
+            ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+      }
+    }
   }
 
   @Nullable

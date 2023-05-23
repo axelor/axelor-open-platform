@@ -436,17 +436,16 @@ auth.provider.oidc.discovery-uri = https://login.microsoftonline.com/38c46e5a-21
 
 Those advanced settings are available to all OpenID Connect providers.
 
-Beware that some providers, such as Keycloak, uses `private_key_jwt` authentication method by default.
-If you don't want that, you may use `client_secret_basic` authentication method instead:
+You can define how the client credentials (clientId and secret) are passed to the token endpoint:
 
 .axelor-config.properties
 [source,properties]
 -----
-# client authentication method
+# client_secret_basic / client_secret_post / private_key_jwt / none
 auth.provider.keycloak.client-authentication-method = client_secret_basic
 -----
 
-If you want to use the `private_key_jwt` authentication method, you _must_ provide the `PrivateKeyJWTClientAuthnMethodConfig` component:
+You can also use the `private_key_jwt` authentication method by providing the PrivateKeyJWTClientAuthnMethodConfig component:
 
 .axelor-config.properties
 [source,properties]
@@ -461,7 +460,7 @@ auth.provider.keycloak.private-key-jwt-client-authn-method-config.private-key.al
 auth.provider.keycloak.private-key-jwt-client-authn-method-config.key-id = 12345
 -----
 
-Note that to set the `PrivateKeyJWTClientAuthnMethodConfig` component, a custom converter is used instead of reflection.
+NOTE: To set the `PrivateKeyJWTClientAuthnMethodConfig` component, a custom converter is used instead of reflection.
 You need to specify the setting names as mentioned in the example above.
 
 When validating the ID token in the login process, you can set a clock skew:
