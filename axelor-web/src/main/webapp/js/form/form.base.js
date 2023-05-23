@@ -62,6 +62,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
     var fieldTitle = field.title;
     var fieldTitleSanitized = false;
     Object.defineProperty(field, 'title', {
+      configurable: true,
       get: function() {
         if (!fieldTitleSanitized) {
           fieldTitle = axelor.sanitize(fieldTitle);
@@ -78,6 +79,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
     var fieldText = field.text;
     var fieldTextSanitized = false;
     Object.defineProperty(field, 'text', {
+      configurable: true,
       get: function() {
         if (!fieldTextSanitized) {
           fieldText = axelor.sanitize(fieldText);
