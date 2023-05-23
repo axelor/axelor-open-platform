@@ -18,6 +18,7 @@ $input-padding-x: 0.75rem;
 
 .numberInput {
   padding-right: $input-padding-x * 2;
+  background-image: none !important;
 }
 
 [dir="rtl"] {

@@ -16,7 +16,7 @@ import styles from "./decimal.module.scss";
 const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal(props: FieldProps<string | number>) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, readonly, invalid, widgetAtom, valueAtom } = props;
   const { uid, min, max, placeholder } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale } = attrs;
@@ -141,6 +141,7 @@ export function Decimal(props: FieldProps<string | number>) {
             ref={inputRef}
             placeholder={placeholder}
             value={value}
+            invalid={invalid}
             required={required}
             onChange={handleChange}
             onBlur={handleBlur}
