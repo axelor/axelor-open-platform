@@ -158,6 +158,9 @@ function FormField({
           context: record,
         });
 
+        let invalid = prev.errors?.invalid;
+        errors = invalid ? { invalid, ...errors } : errors;
+
         if (isEqual(prev.errors ?? {}, errors ?? {})) return;
 
         set(widgetAtom, (prev) => ({ ...prev, errors }));
