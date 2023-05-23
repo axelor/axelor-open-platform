@@ -29,6 +29,8 @@ import com.google.inject.Provider;
 import com.nimbusds.jose.JWSAlgorithm;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +49,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -174,20 +176,24 @@ public class ClientListProvider implements Provider<List<Client>> {
           .put(char.class, Character.class)
           .build();
 
-  private static final Map<Class<?>, Function<Map<String, Object>, Object>> CONVERTERS =
-      Map.of(
-          PrivateKeyJWTClientAuthnMethodConfig.class,
-          map -> {
-            final String privateKeyPath = (String) map.get("privateKey.path");
-            final String privateKeyAlgorithm =
-                (String) map.getOrDefault("privateKey.algorithm", "RSA");
-            final JWSAlgorithm jwsAlgorithm =
-                JWSAlgorithm.parse((String) map.getOrDefault("jwsAlgorithm", "RS256"));
-            final String keyId = (String) map.get("keyId");
-            final PrivateKey privateKey =
-                PrivateKeyUtils.createKey(privateKeyPath, privateKeyAlgorithm);
-            return new PrivateKeyJWTClientAuthnMethodConfig(jwsAlgorithm, privateKey, keyId);
-          });
+  private static final Map<Class<?>, UnaryOperator<Object>> CONVERTERS =
+      new ImmutableMap.Builder<Class<?>, UnaryOperator<Object>>()
+          .put(
+              PrivateKeyJWTClientAuthnMethodConfig.class,
+              value -> {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> map = getCamelizedMapKeys((Map<String, Object>) value);
+                final String privateKeyPath = (String) map.get("privateKey.path");
+                final String privateKeyAlgorithm =
+                    (String) map.getOrDefault("privateKey.algorithm", "RSA");
+                final JWSAlgorithm jwsAlgorithm =
+                    JWSAlgorithm.parse((String) map.getOrDefault("jwsAlgorithm", "RS256"));
+                final String keyId = (String) map.get("keyId");
+                final PrivateKey privateKey =
+                    PrivateKeyUtils.createKey(privateKeyPath, privateKeyAlgorithm);
+                return new PrivateKeyJWTClientAuthnMethodConfig(jwsAlgorithm, privateKey, keyId);
+              })
+          .build();
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -471,50 +477,60 @@ public class ClientListProvider implements Provider<List<Client>> {
     final Method setter = findSetter(obj.getClass(), property);
     Class<?> type = setter.getParameterTypes()[0];
     type = PRIMITIVE_TYPES.getOrDefault(type, type);
-    final Object converted = convert(type, value);
+    final Type genericType = setter.getGenericParameterTypes()[0];
+    final Object converted = convert(value, type, genericType);
     setter.invoke(obj, converted);
   }
 
-  private Object convert(Class<?> type, Object value) throws ReflectiveOperationException {
-    if (type.isAssignableFrom(value.getClass())) {
-      return value;
-    }
-
-    if (value instanceof Map) {
-      @SuppressWarnings("unchecked")
-      final Map<String, Object> map = getCamelizedMapKeys((Map<String, Object>) value);
-      final Function<Map<String, Object>, Object> converter = CONVERTERS.get(type);
-      if (converter != null) {
-        return converter.apply(map);
-      }
-    }
-
+  private Object convert(Object value, Class<?> type, Type genericType) {
     final String valueStr = String.valueOf(value);
 
     if (Collection.class.isAssignableFrom(type)) {
-      final List<String> items = Arrays.asList(valueStr.split("\\s*,\\s*"));
+      List<?> items = Arrays.asList(valueStr.split("\\s*,\\s*"));
+      if (genericType instanceof ParameterizedType) {
+        final Class<?> itemType =
+            (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        items =
+            items.stream().map(item -> convert(item, itemType, null)).collect(Collectors.toList());
+      }
       if (type.isAssignableFrom(List.class)) {
         return items;
       }
       if (type.isAssignableFrom(Set.class)) {
         return new HashSet<>(items);
       }
+      value = items;
+    }
+
+    if (type.isAssignableFrom(value.getClass())) {
+      return value;
+    }
+
+    final UnaryOperator<Object> converter = CONVERTERS.get(type);
+    if (converter != null) {
+      return converter.apply(value);
     }
 
     for (final String name : List.of("valueOf", "parse")) {
       try {
-        final Method converter = type.getMethod(name, String.class);
-        return converter.invoke(null, valueStr);
+        final Method converterMethod = type.getMethod(name, String.class);
+        return converterMethod.invoke(null, valueStr);
       } catch (NoSuchMethodException e) {
         // Ignore
+      } catch (ReflectiveOperationException e) {
+        throw new RuntimeException(e);
       }
     }
 
-    final Class<?> cls = Class.forName(valueStr);
-    return Beans.get(cls);
+    try {
+      final Class<?> cls = Class.forName(valueStr);
+      return Beans.get(cls);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
   }
 
-  private Map<String, Object> getCamelizedMapKeys(Map<String, Object> map) {
+  private static Map<String, Object> getCamelizedMapKeys(Map<String, Object> map) {
     final Map<String, Object> result = new HashMap<>();
     final Inflector inflector = Inflector.getInstance();
     for (final Map.Entry<String, Object> entry : map.entrySet()) {
