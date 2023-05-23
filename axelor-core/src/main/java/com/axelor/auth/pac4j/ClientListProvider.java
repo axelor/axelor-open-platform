@@ -32,8 +32,10 @@ import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -488,9 +490,17 @@ public class ClientListProvider implements Provider<List<Client>> {
     }
 
     final String valueStr = String.valueOf(value);
-    if (type.isAssignableFrom(List.class)) {
-      return Arrays.asList(valueStr.split("\\s*,\\s*"));
+
+    if (Collection.class.isAssignableFrom(type)) {
+      final List<String> items = Arrays.asList(valueStr.split("\\s*,\\s*"));
+      if (type.isAssignableFrom(List.class)) {
+        return items;
+      }
+      if (type.isAssignableFrom(Set.class)) {
+        return new HashSet<>(items);
+      }
     }
+
     try {
       final Method valueOf = type.getMethod("valueOf", String.class);
       return valueOf.invoke(null, valueStr);
