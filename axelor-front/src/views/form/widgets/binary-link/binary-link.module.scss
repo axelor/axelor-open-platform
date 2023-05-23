@@ -1,0 +1,7 @@
+.container {
+  border-radius: var(--bs-input-border-radius, var(--bs-border-radius));
+}
+
+.invalid {
+  border: var(--bs-input-invalid-border, 1px solid var(--bs-danger));
+}

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { ChangeEvent, useMemo, useRef } from "react";
@@ -16,8 +17,10 @@ import {
   validateFileSize,
 } from "../image/utils";
 
+import styles from "./binary-link.module.scss";
+
 export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
-  const { schema, readonly, formAtom, valueAtom } = props;
+  const { schema, readonly, invalid, formAtom, valueAtom } = props;
   const { name, accept } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
@@ -95,7 +98,11 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
         )}
       </Box>
       {!readonly && (
-        <Box d="flex" justifyContent="center">
+        <Box
+          d="flex"
+          justifyContent="center"
+          className={clsx(styles.container, { [styles.invalid]: invalid })}
+        >
           <form ref={formRef}>
             <Box
               as={"input"}
