@@ -216,7 +216,7 @@ function Column(scope, col) {
           }
         }
         if (item.title) {
-          template += item.title;
+          template += _.escapeHTML(item.title);
         }
         template += "</a>";
       }
@@ -240,10 +240,10 @@ function Column(scope, col) {
         if (col.labels === false) {
           return image;
         }
-        return image + " " + res.title;
+        return image + " " + _.escapeHTML(res.title);
       }
 
-      return res.title;
+      return _.escapeHTML(res.title);
     }
     var type = col.type;
     if (type === 'reference') {
@@ -255,7 +255,7 @@ function Column(scope, col) {
     if (fn) {
       value = fn(attrs, value, record);
     }
-    return value === undefined || value === null ? '---' : value;
+    return value === undefined || value === null ? '---' : _.escapeHTML(value);
   };
 }
 
@@ -556,7 +556,7 @@ ui.directive('uiViewTree', function(){
         tr.data('$record', record);
 
         _.each(scope.columns, function(col) {
-          $('<td>').staticHtml(col.cellText(record)).appendTo(tr);
+          $('<td>').html(col.cellText(record)).appendTo(tr);
         });
 
         if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {
