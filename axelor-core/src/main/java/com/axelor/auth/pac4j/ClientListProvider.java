@@ -501,13 +501,17 @@ public class ClientListProvider implements Provider<List<Client>> {
       }
     }
 
-    try {
-      final Method valueOf = type.getMethod("valueOf", String.class);
-      return valueOf.invoke(null, valueStr);
-    } catch (NoSuchMethodException e) {
-      final Class<?> cls = Class.forName(valueStr);
-      return Beans.get(cls);
+    for (final String name : List.of("valueOf", "parse")) {
+      try {
+        final Method converter = type.getMethod(name, String.class);
+        return converter.invoke(null, valueStr);
+      } catch (NoSuchMethodException e) {
+        // Ignore
+      }
     }
+
+    final Class<?> cls = Class.forName(valueStr);
+    return Beans.get(cls);
   }
 
   private Map<String, Object> getCamelizedMapKeys(Map<String, Object> map) {
