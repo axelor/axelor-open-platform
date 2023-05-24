@@ -1,13 +1,15 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Box, Input, Button, Menu, MenuItem } from "@axelor/ui";
-import { Kanban } from "@axelor/ui/kanban";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
+import React, { useCallback, useMemo, useState } from "react";
+
+import { Box, Button, CommandBar, CommandItemProps, Input } from "@axelor/ui";
+import { Kanban } from "@axelor/ui/kanban";
 
 import { Loader } from "@/components/loader/loader";
 import { i18n } from "@/services/client/i18n";
-import { KanbanColumn, KanbanRecord } from "./types";
 import { legacyClassNames } from "@/styles/legacy";
+
+import { KanbanColumn, KanbanRecord } from "./types";
+
 import styles from "./kanban-board.module.scss";
 
 interface KanbanBoardProps {
@@ -64,32 +66,38 @@ function RecordRenderer({
   Card: KanbanBoardProps["components"]["Card"];
 }) {
   const { canDelete = true, canEdit = true } = column;
-  const [isMenuOpen, setMenuOpen] = useState(false);
-  const menuIconRef = useRef<HTMLButtonElement | null>(null);
 
-  const showMenu = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    setMenuOpen(true);
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    setMenuOpen(false);
-  }, []);
-
-  const menuItems = [
+  const commandItems: CommandItemProps[] = [
     {
-      active: canEdit,
-      onClick: () => onCardEdit && onCardEdit({ record }),
-      label: i18n.get("Edit"),
-      show: Boolean(onCardEdit),
+      key: "menu",
+      iconProps: { icon: "arrow_drop_down" },
+      items: [
+        {
+          key: "edit",
+          text: i18n.get("Edit"),
+          hidden: !canEdit,
+          onClick: () => onCardEdit && onCardEdit({ record }),
+        },
+        {
+          key: "delete",
+          text: i18n.get("Delete"),
+          hidden: !canDelete,
+          onClick: () => onCardDelete && onCardDelete({ record, column }),
+        },
+      ],
     },
-    {
-      active: canDelete,
-      onClick: () => onCardDelete && onCardDelete({ record, column }),
-      label: i18n.get("Delete"),
-      show: Boolean(onCardDelete),
+  ];
+
+  const showActions = canEdit || canDelete;
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (canEdit && onCardClick) {
+        onCardClick({ record });
+      }
     },
-  ].filter(({ show }) => show);
+    [canEdit, onCardClick, record]
+  );
 
   return (
     <Box
@@ -98,58 +106,13 @@ function RecordRenderer({
       alignItems="flex-start"
       justifyContent="space-between"
       position="relative"
-      onClick={(e) =>
-        !e.defaultPrevented &&
-        onCardClick &&
-        canEdit &&
-        !isMenuOpen &&
-        onCardClick({ record })
-      }
     >
-      <Box w={100}>
+      <Box w={100} onClick={handleClick}>
         <Card record={record} />
       </Box>
-      <Box
-        className={styles["record-action"]}
-        {...(isMenuOpen && { d: "block" })}
-      >
-        {!disabled && menuItems.length > 0 && (
-          <>
-            <Button
-              ref={menuIconRef}
-              variant="link"
-              p={0}
-              d="inline-flex"
-              onClick={showMenu}
-            >
-              <MaterialIcon icon="arrow_drop_down" />
-            </Button>
-            <Menu
-              placement="bottom-end"
-              target={menuIconRef.current}
-              offset={[0, 0]}
-              show={isMenuOpen}
-              onHide={closeMenu}
-            >
-              {menuItems.map(
-                ({ active, onClick, label, show }) =>
-                  active &&
-                  show && (
-                    <MenuItem
-                      key={label}
-                      onClick={() => {
-                        closeMenu();
-                        onClick();
-                      }}
-                    >
-                      {label}
-                    </MenuItem>
-                  )
-              )}
-            </Menu>
-          </>
-        )}
-      </Box>
+      {showActions && (
+        <CommandBar className={styles["record-action"]} items={commandItems} />
+      )}
     </Box>
   );
 }

@@ -46,18 +46,30 @@
 }
 
 .record {
-  &:hover .record-action {
+  &:hover .record-action button,
+  .record-action button[class*="open"] {
     display: block;
   }
 }
 
 .record-action {
-  display: none;
-  right: 0.25rem;
   position: absolute;
+
+  top: 0.25rem;
+  right: 0.5rem;
+
   .rtl & {
     right: unset;
     left: 0.25rem;
+  }
+
+  button {
+    display: none;
+    padding: 0;
+    background-color: transparent;
+    span > span {
+      line-height: 1;
+    }
   }
 }
 
