@@ -1,4 +1,4 @@
-import { produce } from "immer"
+import { produce } from "immer";
 import { useEffect, useState } from "react";
 
 import { ChartGroupType, ChartProps, ECharts } from "../../builder";

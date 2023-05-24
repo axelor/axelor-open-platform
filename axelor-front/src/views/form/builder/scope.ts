@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";

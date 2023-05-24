@@ -1,5 +1,5 @@
 import React from "react";
-import { produce } from "immer"
+import { produce } from "immer";
 import { ChartProps, ECharts } from "../../builder";
 import { PlusData } from "../../builder/utils";
 
