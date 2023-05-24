@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Box, Input, Button, Menu, MenuItem } from "@axelor/ui";
 import { Kanban } from "@axelor/ui/kanban";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -64,18 +64,17 @@ function RecordRenderer({
   Card: KanbanBoardProps["components"]["Card"];
 }) {
   const { canDelete = true, canEdit = true } = column;
-  const [target, setTarget] = useState<HTMLElement | null>(null);
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const menuIconRef = useRef<HTMLButtonElement | null>(null);
 
   const showMenu = useCallback((event: React.SyntheticEvent) => {
     event.preventDefault();
-    setTarget(event.currentTarget as HTMLElement);
+    setMenuOpen(true);
   }, []);
 
   const closeMenu = useCallback(() => {
-    setTarget(null);
+    setMenuOpen(false);
   }, []);
-
-  const isMenuOpen = Boolean(target);
 
   const menuItems = [
     {
@@ -112,16 +111,22 @@ function RecordRenderer({
       </Box>
       <Box
         className={styles["record-action"]}
-        {...(isMenuOpen ? { d: "block" } : {})}
+        {...(isMenuOpen && { d: "block" })}
       >
         {!disabled && menuItems.length > 0 && (
           <>
-            <Box as="a" onClick={showMenu}>
+            <Button
+              ref={menuIconRef}
+              variant="link"
+              p={0}
+              d="inline-flex"
+              onClick={showMenu}
+            >
               <MaterialIcon icon="arrow_drop_down" />
-            </Box>
+            </Button>
             <Menu
               placement="bottom-end"
-              target={target}
+              target={menuIconRef.current}
               offset={[0, 0]}
               show={isMenuOpen}
               onHide={closeMenu}
@@ -229,7 +234,12 @@ function ColumnRenderer({
           </Box>
         )}
         {noData && (
-          <Box as="p" m={0} textAlign="center" className={styles['no-records-text']}>
+          <Box
+            as="p"
+            m={0}
+            textAlign="center"
+            className={styles["no-records-text"]}
+          >
             {i18n.get("No records found.")}
           </Box>
         )}

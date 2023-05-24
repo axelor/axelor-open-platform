@@ -8,7 +8,7 @@ import {
   useState,
   memo,
 } from "react";
-import { Box, Menu, MenuItem } from "@axelor/ui";
+import { Button, Box, Menu, MenuItem } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
 
@@ -46,7 +46,7 @@ export const Card = memo(function Card({
   // state to store updated action values
   const [values, setValues] = useState<DataRecord>({});
   const [showMenu, setShowMenu] = useState(false);
-  const menuIconRef = useRef<HTMLAnchorElement | null>(null);
+  const menuIconRef = useRef<HTMLButtonElement | null>(null);
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
@@ -123,9 +123,9 @@ export const Card = memo(function Card({
                 [classes.show]: showMenu,
               })}
             >
-              <Box as="a" ref={menuIconRef}>
+              <Button ref={menuIconRef} variant="link" p={0} d="inline-flex">
                 <MaterialIcon icon="arrow_drop_down" />
-              </Box>
+              </Button>
             </Box>
           )}
         </Box>
