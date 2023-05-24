@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import dayjs from "dayjs";
-import { Button, Box, Popper, ClickAwayListener } from "@axelor/ui";
+import { Button, Box, Popper, ClickAwayListener, useTheme } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
 import { SchedulerEvent } from "@axelor/ui/src/scheduler";
@@ -31,7 +31,7 @@ export default function CalendarEventPopper({
   eventStop,
   isDateCalendar,
 }: CalendarEventPopperProps) {
-  const rtl = false;
+  const rtl = useTheme().dir === "rtl";
   const dateFormat = isDateCalendar ? "LL" : "LLL";
   const record = (data as Record<string, any>)?.record as DataRecord;
 

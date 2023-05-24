@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { useTheme } from "@axelor/ui";
 import { isOrContainsNode, addEvent, removeEvent } from "../utils";
 
 function getPopupPosition(container, popup, { top, left }) {
@@ -49,7 +50,7 @@ function Popup({ data, ...rest }) {
   } = data || {};
   const { container, commands } = rest;
   const isOpen = Boolean(data);
-  const rtl = false;
+  const rtl = useTheme().dir === "rtl";
 
   useEffect(() => {
     if (isOpen) {

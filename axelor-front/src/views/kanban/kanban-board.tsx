@@ -231,8 +231,6 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const { Card } = components;
 
-  const rtl = false;
-
   const $columns = useMemo(
     () =>
       columns.map((c) => ({
@@ -307,7 +305,6 @@ export function KanbanBoard({
 
   const className = clsx(styles.board, {
     [styles.responsive]: responsive,
-    [styles.rtl]: rtl,
   });
 
   return (

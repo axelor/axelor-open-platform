@@ -9,6 +9,7 @@ import {
   FocusTrap,
   Popper,
   TextField,
+  useTheme,
 } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 import {
@@ -87,7 +88,7 @@ export function AdvanceSearch({
 
   const { name, params } = useViewAction();
   const filterView = (params || {})["search-filters"] || `act:${name}`;
-  const rtl = false;
+  const rtl = useTheme().dir === "rtl";
   const advanceSearchConfig = sessionInfo?.view?.advanceSearch;
 
   const handleOpen = useCallback(() => setOpen(true), []);

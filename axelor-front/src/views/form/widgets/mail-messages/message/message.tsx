@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import clsx from "clsx";
-import { Box, Button, Badge, TBackground } from "@axelor/ui";
+import { Box, Button, Badge, TBackground, useTheme } from "@axelor/ui";
 
 import Avatar from "../avatar";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -270,7 +270,7 @@ export function MessageBox({
   onComment?: MessageProps["onComment"];
   onCommentRemove?: MessageProps["onRemove"];
 }) {
-  const rtl = false;
+  const rtl = useTheme().dir === "rtl";
   return (
     <Box
       flex={1}
