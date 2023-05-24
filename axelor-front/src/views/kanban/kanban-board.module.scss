@@ -1,15 +1,11 @@
-$spacing: 0.25rem;
-$bg: #fbfbff;
-
 .board {
-  padding: $spacing;
+  padding: 0.25rem;
   & > * {
     max-width: 100%;
   }
-}
-
-.board-responsive {
-  flex-direction: column;
+  &.responsive {
+    flex-direction: column;
+  }
 }
 
 .column-wrapper {
@@ -18,7 +14,8 @@ $bg: #fbfbff;
 }
 
 .column {
-  background-color: $bg;
+  padding: 0.25rem 0.35rem;
+  background-color: var(--bs-gray-100);
 }
 
 .column-title {
@@ -30,19 +27,18 @@ $bg: #fbfbff;
 .record-list-wrapper {
   width: 100%;
   flex-grow: 1;
-  background-color: $bg;
+  background-color: var(--bs-white);
+  padding: 0.625rem 0.625rem 2rem;
   display: flex;
   flex-direction: column;
-}
-
-.record-list-wrapper-overflow {
-  overflow: auto;
-}
-
-.record-list-wrapper-no-data {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  &.overflow {
+    overflow: auto;
+  }
+  &.no-data {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
 }
 
 .record-list {
@@ -54,6 +50,7 @@ $bg: #fbfbff;
     display: block;
   }
 }
+
 .record-action {
   display: none;
   right: 0.25rem;
@@ -64,7 +61,6 @@ $bg: #fbfbff;
   }
 }
 
-.noRecordsText {
-  color: var(--bs-grey-500);
+.no-records-text {
+  color: var(--bs-gray-700);
 }
-

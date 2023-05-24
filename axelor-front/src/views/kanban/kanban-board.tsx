@@ -95,8 +95,6 @@ function RecordRenderer({
   return (
     <Box
       className={styles["record"]}
-      ps={1}
-      pe={1}
       d="flex"
       alignItems="flex-start"
       justifyContent="space-between"
@@ -180,7 +178,6 @@ function ColumnRenderer({
 
   return (
     <Box
-      p={1}
       mx={1}
       h={100}
       d="flex"
@@ -209,10 +206,9 @@ function ColumnRenderer({
         </Box>
       )}
       <Box
-        pt={2}
         className={clsx(styles["record-list-wrapper"], {
-          [styles["record-list-wrapper-overflow"]]: overflow,
-          [styles["record-list-wrapper-no-data"]]: noData,
+          [styles["overflow"]]: overflow,
+          [styles["no-data"]]: noData,
         })}
       >
         <RecordList
@@ -233,7 +229,7 @@ function ColumnRenderer({
           </Box>
         )}
         {noData && (
-          <Box as="p" m={0} textAlign="center" className={styles.noRecordsText}>
+          <Box as="p" m={0} textAlign="center" className={styles['no-records-text']}>
             {i18n.get("No records found.")}
           </Box>
         )}
@@ -337,7 +333,7 @@ export function KanbanBoard({
   );
 
   const className = clsx(styles.board, {
-    [styles["board-responsive"]]: responsive,
+    [styles.responsive]: responsive,
     [styles.rtl]: rtl,
   });
 

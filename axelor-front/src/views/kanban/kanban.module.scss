@@ -14,7 +14,7 @@
 .kanban-card {
   list-style: none;
   position: relative;
-  background: var(--bs-white);
+  background: #fafafb;
   border: 1px solid var(--bs-gray-200);
   margin-bottom: 0.75rem;
   padding: 0.625rem;
@@ -22,8 +22,9 @@
   box-sizing: content-box;
   border-left: 3px solid var(--bs-gray-200);
   user-select: none;
+  &:hover {
+    cursor: pointer;
+    background-color: var(--bs-white);
+  }
 }
 
-.kanban-card:hover {
-  cursor: pointer;
-}
