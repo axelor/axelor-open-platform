@@ -337,8 +337,8 @@ Examples:
 [cols="7,3"]
 |===
 | URL                                                         | Description
-| \http://localhost:8080/open-platform-demo/                 | default client is used
-| \http://localhost:8080/open-platform-demo/?client_name=form| another client is specified
+| \http://localhost:8080/open-platform-demo/                  | default client is used
+| \http://localhost:8080/open-platform-demo/?client_name=form | another client is specified
 |===
 
 === OpenID Connect
