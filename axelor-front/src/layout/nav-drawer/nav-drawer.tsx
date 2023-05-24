@@ -8,6 +8,7 @@ import { useTabs } from "@/hooks/use-tabs";
 import { useTagsList } from "@/hooks/use-tags";
 import { MenuItem, Tag } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
+import { NavBarSearch, SearchItem } from "./search";
 
 function load(res: MenuItem[], tags: Tag[]) {
   const menus = res.filter((item) => item.left !== false);
@@ -28,7 +29,9 @@ function load(res: MenuItem[], tags: Tag[]) {
 
     if (icon || !item.parent) {
       props.icon = icon
-        ? ({ color }) => <i className={legacyClassNames("fa", icon)} style={{ color }} />
+        ? ({ color }) => (
+            <i className={legacyClassNames("fa", icon)} style={{ color }} />
+          )
         : ({ color }) => (
             <Box d="inline-flex" style={{ color }}>
               <MaterialIcon icon="list" />
@@ -43,6 +46,40 @@ function load(res: MenuItem[], tags: Tag[]) {
     return props;
   };
   return menus.filter((item) => !item.parent).map(toNavItemProps);
+}
+
+function toSearchItems(data: MenuItem[]) {
+  const items = data;
+  const nodes: Record<string, MenuItem> = {};
+  const searchItems: SearchItem[] = [];
+
+  items.forEach(function (item) {
+    nodes[item.name] = item;
+  });
+
+  items.forEach(function (item) {
+    let label = item.title;
+    let parent = nodes[item.parent ?? ""];
+    let lastParent;
+    while (parent) {
+      lastParent = parent;
+      parent = nodes[parent.parent ?? ""];
+      if (parent) {
+        label = lastParent.title + "/" + label;
+      }
+    }
+    item.action &&
+      searchItems.push({
+        id: item.name,
+        title: item.title,
+        label: label,
+        action: item.action,
+        category: lastParent ? lastParent.name : "",
+        categoryTitle: lastParent ? lastParent.title : "",
+      });
+  });
+
+  return searchItems;
 }
 
 export function NavDrawer() {
@@ -62,11 +99,13 @@ export function NavDrawer() {
   const tags = useTagsList();
 
   const items = useMemo(() => load(menus, tags), [menus, tags]);
+  const searchItems = useMemo(() => toSearchItems(menus), [menus]);
 
   if (loading) return null;
 
   return (
-    <Box>
+    <Box flex={1}>
+      <NavBarSearch items={searchItems} onClick={handleClick} />
       <NavBar items={items} onClick={handleClick} />
     </Box>
   );

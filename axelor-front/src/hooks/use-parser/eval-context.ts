@@ -4,6 +4,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
+import { unaccent } from "@/utils/sanitize";
 import { i18n } from "@/services/client/i18n";
 import { ActionOptions } from "@/view-containers/action";
 import { moment } from "@/services/client/l10n";
@@ -177,28 +178,7 @@ export function createEvalContext(
       return format(value, { props: { scale, type: "integer" } as any });
     },
     __unaccent(value: any) {
-      if (typeof value === "string") {
-        return value
-          .normalize("NFKD")
-          .replace(/\p{Diacritic}/gu, "")
-          .replace(/./g, function (c) {
-            return (
-              {
-                "’": "'",
-                æ: "ae",
-                Æ: "AE",
-                œ: "oe",
-                Œ: "OE",
-                ð: "d",
-                Ð: "D",
-                ł: "l",
-                Ł: "L",
-                ø: "o",
-                Ø: "O",
-              }[c] || c
-            );
-          });
-      }
+      return unaccent(value);
     },
     __t(key: string, ...args: any[]) {
       return i18n.get(key, ...args);

@@ -5,6 +5,32 @@ export function sanitize(text: string) {
   return DOMPurify.sanitize(text);
 }
 
+export function unaccent(value: string) {
+  if (typeof value === "string") {
+    return value
+      .normalize("NFKD")
+      .replace(/\p{Diacritic}/gu, "")
+      .replace(/./g, function (c) {
+        return (
+          {
+            "’": "'",
+            æ: "ae",
+            Æ: "AE",
+            œ: "oe",
+            Œ: "OE",
+            ð: "d",
+            Ð: "D",
+            ł: "l",
+            Ł: "L",
+            ø: "o",
+            Ø: "O",
+          }[c] || c
+        );
+      });
+  }
+  return value;
+}
+
 export const SenitizedContent = memo(function SenitizedContent({
   content,
 }: {
