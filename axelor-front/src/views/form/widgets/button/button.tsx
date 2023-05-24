@@ -5,13 +5,14 @@ import { useCallback, useState } from "react";
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Tooltip } from "@/components/tooltip";
 import { Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
+import { useReadonly } from "./hooks";
 
-import { Tooltip } from "@/components/tooltip";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -98,7 +99,8 @@ export function Button(props: WidgetProps) {
     }
   }, [actionExecutor, schema]);
 
-  const disabled = wait || attrs.readonly;
+  const readonly = useReadonly(widgetAtom);
+  const disabled = wait || readonly;
   const hasHelp = !!help;
 
   const button = (

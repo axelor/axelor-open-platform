@@ -12,6 +12,7 @@ import { Formatters } from "@/utils/format";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
+import { useReadonly } from "../button/hooks";
 
 import styles from "./info-button.module.scss";
 
@@ -21,7 +22,7 @@ export function InfoButton(props: WidgetProps) {
   const { field } = widgetAttrs || {};
 
   const {
-    attrs: { title, readonly },
+    attrs: { title },
   } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const value = useAtomValue(
@@ -60,6 +61,7 @@ export function InfoButton(props: WidgetProps) {
     }
   }, [actionExecutor, schema]);
 
+  const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
 
   return (
