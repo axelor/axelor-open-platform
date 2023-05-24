@@ -3,6 +3,7 @@ import dayjsLocale from "dayjs/locale.json";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
+import weekOfYear from "dayjs/plugin/weekOfYear";
 
 import { toKebabCase } from "@/utils/names";
 import { session } from "./session";
@@ -11,6 +12,7 @@ for (let plugin of [
   localizedFormat,
   customParseFormat,
   relativeTime,
+  weekOfYear,
 ] as PluginFunc[]) {
   dayjs.extend(plugin);
 }

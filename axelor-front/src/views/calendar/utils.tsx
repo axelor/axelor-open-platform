@@ -6,7 +6,7 @@ import { i18n } from "@/services/client/i18n";
 import { getStartOf, getNextOf } from "../../utils/date";
 import { getColor } from "./colors";
 
-const { get: t } = i18n;
+const { get: _t } = i18n;
 
 export function getTimes(date: Date | string, view: View) {
   if (view === "month") {
@@ -23,13 +23,12 @@ export function getEventFilters(events: SchedulerEvent[], colorField: any) {
   const { name, target, targetName, selectionList } = colorField;
   const getValue = (obj: any) => {
     const val = getObjectValue(obj, name);
-    return target ? val && val.id : val;
+    return target ? val?.id : val;
   };
   const getLabel = (val: any) => {
     if (selectionList) {
       return (
-        (selectionList.find((x: any) => `${x.value}` === `${val}`) || {})
-          .title || val
+        selectionList.find((x: any) => `${x.value}` === `${val}`)?.title || val
       );
     }
     if (target && targetName) {
@@ -71,10 +70,10 @@ export function formatDate(date: Date, unit: ManipulateType) {
   const DATE_FORMATTERS: DateFormatMap = {
     month: (date) => dayjs(date).format("MMMM YYYY"),
     week: (date) =>
-      t(
+      _t(
         "{0} – Week {1}",
         dayjs(date).format("MMMM YYYY"),
-        dayjs(date).format("w")
+        dayjs(date).week()
       ),
     day: (date) => dayjs(date).format("LL"),
   };
