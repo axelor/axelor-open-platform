@@ -75,7 +75,7 @@ export function Details({
         flex={1}
         className={styles.container}
       >
-        <Box flex={1} bg="body">
+        <Box w={100} bg="body">
           <CommandBar
             items={[
               {

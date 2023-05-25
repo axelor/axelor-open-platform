@@ -1,6 +1,7 @@
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
+import isString from "lodash/isString";
 
 import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -85,7 +86,8 @@ function GridInner(props: ViewProps<GridView>) {
   });
   const records = useDataStore(dataStore, (ds) => ds.records);
   const { orderBy, rows, selectedRows, selectedCell } = state;
-  const hasDetailsView = String(action.params?.["details-view"]) === "true";
+  const detailsView = action.params?.["details-view"];
+  const hasDetailsView = Boolean(detailsView);
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -287,7 +289,9 @@ function GridInner(props: ViewProps<GridView>) {
 
   const { data: formMeta } = useAsync(async () => {
     if (!hasDetailsView) return null;
-    const { name } = action.views?.find((v) => v.type === "form") || {};
+    const name = isString(detailsView)
+      ? detailsView
+      : (action.views?.find((v) => v.type === "form") || {})?.name;
     return await findView<FormView>({
       type: "form",
       name,
