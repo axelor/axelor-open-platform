@@ -1,16 +1,12 @@
 import {
-  MouseEvent,
   FunctionComponent,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
   memo,
 } from "react";
-import { Button, Box, Menu, MenuItem } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import clsx from "clsx";
+import { Box, CommandItemProps, CommandBar } from "@axelor/ui";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { FormActionHandler } from "../form/builder/scope";
@@ -45,8 +41,6 @@ export const Card = memo(function Card({
 }) {
   // state to store updated action values
   const [values, setValues] = useState<DataRecord>({});
-  const [showMenu, setShowMenu] = useState(false);
-  const menuIconRef = useRef<HTMLButtonElement | null>(null);
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
@@ -57,22 +51,8 @@ export const Card = memo(function Card({
     return { context, actionExecutor };
   }, [getContext, record, values]);
 
-  function handleMenuOpen() {
-    setShowMenu(true);
-  }
-
-  function handleMenuClose() {
-    setShowMenu(false);
-  }
-
-  function handleClick(e: MouseEvent<HTMLDivElement>) {
-    const iconEl = menuIconRef.current;
-    // check menu icon click
-    if (e.target === iconEl || iconEl?.contains?.(e.target as Node)) {
-      handleMenuOpen();
-    } else {
-      onView?.(record);
-    }
+  function handleClick() {
+    onView?.(record);
   }
 
   const execute = useCallback(
@@ -90,12 +70,33 @@ export const Card = memo(function Card({
     [actionExecutor]
   );
 
+  const commandItems: CommandItemProps[] = [
+    {
+      key: "menu",
+      iconProps: { icon: "arrow_drop_down" },
+      items: [
+        {
+          key: "edit",
+          text: i18n.get("Edit"),
+          hidden: !Boolean(onEdit),
+          onClick: () => onEdit?.(record),
+        },
+        {
+          key: "delete",
+          text: i18n.get("Delete"),
+          hidden: !Boolean(onDelete),
+          onClick: () => onDelete?.(record),
+        },
+      ],
+    },
+  ];
+
   // reset values on record update(fetch)
   useEffect(() => {
     setValues({});
   }, [record]);
 
-  const hasMenu = onEdit || onDelete;
+  const showActions = onEdit || onDelete;
   return (
     <>
       <Box
@@ -103,13 +104,12 @@ export const Card = memo(function Card({
         px={2}
         mb={3}
         className={classes.card}
-        onClick={handleClick}
         style={{
           width,
           minWidth,
         }}
       >
-        <Box p={3} bgColor="light" w={100} rounded shadow>
+        <Box p={3} bgColor="light" w={100} rounded shadow onClick={handleClick}>
           <Template
             context={context}
             options={{
@@ -117,49 +117,11 @@ export const Card = memo(function Card({
               fields,
             }}
           />
-          {hasMenu && (
-            <Box
-              className={clsx(classes.menuIcon, {
-                [classes.show]: showMenu,
-              })}
-            >
-              <Button ref={menuIconRef} variant="link" p={0} d="inline-flex">
-                <MaterialIcon icon="arrow_drop_down" />
-              </Button>
-            </Box>
-          )}
         </Box>
+        {showActions && (
+          <CommandBar className={classes.menuIcon} items={commandItems} />
+        )}
       </Box>
-      {hasMenu && (
-        <Menu
-          placement="bottom-end"
-          show={showMenu}
-          target={menuIconRef.current}
-          onHide={handleMenuClose}
-          offset={[0, -5]}
-        >
-          {onEdit && (
-            <MenuItem
-              onClick={() => {
-                handleMenuClose();
-                onEdit(record);
-              }}
-            >
-              {i18n.get("Edit")}
-            </MenuItem>
-          )}
-          {onDelete && (
-            <MenuItem
-              onClick={() => {
-                handleMenuClose();
-                onDelete(record);
-              }}
-            >
-              {i18n.get("Delete")}
-            </MenuItem>
-          )}
-        </Menu>
-      )}
     </>
   );
 });

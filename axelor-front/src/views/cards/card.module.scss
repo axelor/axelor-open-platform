@@ -2,17 +2,23 @@
   width: calc(100% / 3);
   cursor: pointer;
   position: relative;
+  
   .menuIcon {
     position: absolute;
     top: 0;
-    right: 0.75rem;
-    height: 1.5rem;
-    display: none;
+    right: 0.5rem;
+    button {
+      visibility: hidden;
+      padding: 0;
+      background-color: transparent;
+      span > span {
+        line-height: 1;
+      }
+    }
   }
-  &:hover .menuIcon,
-  .menuIcon:focus,
-  .menuIcon.show {
-    display: block;
+  &:hover .menuIcon button,
+  & .menuIcon button[class*="open"] {
+    visibility: inherit;
   }
 }
 
