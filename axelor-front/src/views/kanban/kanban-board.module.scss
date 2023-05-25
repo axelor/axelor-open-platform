@@ -48,7 +48,7 @@
 .record {
   &:hover .record-action button,
   .record-action button[class*="open"] {
-    display: block;
+    visibility: inherit;
   }
 }
 
@@ -59,7 +59,7 @@
   right: 0.5rem;
 
   button {
-    display: none;
+    visibility: hidden;
     padding: 0;
     background-color: transparent;
     span > span {
