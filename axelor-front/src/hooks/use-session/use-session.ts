@@ -11,7 +11,6 @@ async function init() {
 }
 
 const login = session.login.bind(session);
-const sessionLogout = session.logout.bind(session);
 
 export function useSession() {
   const { state, error } = useAsync(init, []);
@@ -24,13 +23,7 @@ export function useSession() {
   }, []);
 
   const logout = useCallback(async () => {
-    try {
-      await sessionLogout();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      document.location.reload();
-    }
+    window.location.href = "logout";
   }, []);
 
   return {

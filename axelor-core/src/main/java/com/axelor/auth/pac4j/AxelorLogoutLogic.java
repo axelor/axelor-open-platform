@@ -18,6 +18,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.pac4j.local.AxelorFormClient;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,13 +33,18 @@ import org.pac4j.core.http.ajax.AjaxRequestResolver;
 public class AxelorLogoutLogic extends DefaultLogoutLogic {
 
   private final AjaxRequestResolver ajaxRequestResolver;
-  private final boolean exclusive;
+  private final boolean exclusiveLike;
 
   @Inject
   public AxelorLogoutLogic(
-      AjaxRequestResolver ajaxRequestResolver, ClientListProvider clientListProvider) {
+      AjaxRequestResolver ajaxRequestResolver,
+      ClientListProvider clientListProvider,
+      AxelorCallbackFilter callbackFilter,
+      AxelorFormClient formClient) {
     this.ajaxRequestResolver = ajaxRequestResolver;
-    this.exclusive = clientListProvider.isExclusive();
+    this.exclusiveLike =
+        clientListProvider.isExclusive()
+            || !formClient.getName().equals(callbackFilter.getDefaultClient());
     setProfileManagerFactory(ShiroProfileManager::new);
   }
 
@@ -55,7 +61,7 @@ public class AxelorLogoutLogic extends DefaultLogoutLogic {
       Boolean inputCentralLogout) {
 
     final String redirectUrl =
-        exclusive
+        exclusiveLike
                 || Boolean.TRUE.equals(inputCentralLogout)
                 || !ajaxRequestResolver.isAjax(context, sessionStore)
             ? defaultUrl
