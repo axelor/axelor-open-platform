@@ -340,7 +340,6 @@ export function AdvanceSearch({
         <ClickAwayListener onClickAway={handleClose}>
           <Box
             {...(rtl ? { dir: "rtl" } : {})}
-            shadow
             className={styles.popper}
             p={2}
           >
