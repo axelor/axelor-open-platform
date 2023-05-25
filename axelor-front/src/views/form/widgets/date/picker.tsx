@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { l10n } from "@/services/client/l10n";
 
-import { ViewerInput } from "../string";
+import { ViewerInput } from "../string/viewer";
 
 import "./picker.scss";
 

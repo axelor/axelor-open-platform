@@ -13,7 +13,7 @@ import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
 import { useFormScope } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
-import { ViewerInput, ViewerLink } from "../string";
+import { ViewerInput, ViewerLink } from "../string/viewer";
 import {
   CreatableSelect,
   CreatableSelectProps,

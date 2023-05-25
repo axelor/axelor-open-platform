@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { TreeRecord } from "./types";
 import { i18n } from "@/services/client/i18n";
 import { Formatters } from "@/utils/format";
-import { ViewerInput } from "../../form/widgets";
+import { ViewerInput } from "../../form/widgets/string/viewer";
 import { DataRecord } from "@/services/client/data.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useAsync } from "@/hooks/use-async";

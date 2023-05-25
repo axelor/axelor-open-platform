@@ -19,7 +19,7 @@ import { Field, Schema } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
 
 import { FieldControl, FieldProps, WidgetState } from "../../builder";
-import { ViewerInput } from "../string";
+import { ViewerInput } from "../string/viewer";
 import { DateInput } from "./date-input";
 import { Picker } from "./picker";
 import { TimeInput } from "./time-input";

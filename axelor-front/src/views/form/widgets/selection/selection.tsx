@@ -9,7 +9,7 @@ import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { ViewerInput } from "../string";
+import { ViewerInput } from "../string/viewer";
 import { useSelectionList } from "./hooks";
 
 import styles from "./selection.module.scss";

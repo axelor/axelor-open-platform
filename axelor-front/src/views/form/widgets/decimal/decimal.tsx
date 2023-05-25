@@ -9,7 +9,7 @@ import format from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { ViewerInput } from "../string";
+import { ViewerInput } from "../string/viewer";
 
 import styles from "./decimal.module.scss";
 
