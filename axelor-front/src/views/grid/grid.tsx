@@ -283,10 +283,11 @@ function GridInner(props: ViewProps<GridView>) {
   const canNext = offset + limit < totalCount;
   const hasRowSelected = !!selectedRows?.length;
   const currentPage = useMemo(() => {
-    if (pageSetRef.current || dataStore.records.length === 0) {
+    const hasPageSet = pageSetRef.current;
+    pageSetRef.current = true;
+    if (hasPageSet || dataStore.records.length === 0) {
       return +(viewRoute?.id || 1);
     }
-    pageSetRef.current = true;
     return Math.floor(offset / limit) + 1;
   }, [dataStore, offset, limit, viewRoute?.id]);
 
