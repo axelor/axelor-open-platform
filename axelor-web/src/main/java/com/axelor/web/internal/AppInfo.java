@@ -26,6 +26,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.AxelorSecurityLogic;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
@@ -36,7 +37,6 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import io.buji.pac4j.profile.ShiroProfileManager;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +47,8 @@ import java.util.Optional;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
@@ -147,8 +149,10 @@ public class AppInfo {
     // find central client name
     final JEEContext jeeContext =
         new JEEContext(Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class));
-    final ShiroProfileManager profileManager =
-        new ShiroProfileManager(jeeContext, JEESessionStore.INSTANCE);
+    final ProfileManagerFactory profileManagerFactory =
+        Beans.get(AxelorSecurityLogic.class).getProfileManagerFactory();
+    final ProfileManager profileManager =
+        profileManagerFactory.apply(jeeContext, JEESessionStore.INSTANCE);
 
     profileManager
         .getProfile()

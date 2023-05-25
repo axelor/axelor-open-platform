@@ -62,8 +62,6 @@ public class AuthPac4jRealm extends Pac4jRealm {
       final User user = userService.getUser(profile);
 
       if (user != null && AuthUtils.isActive(user)) {
-        profile.removeLoginData();
-        profile.setRemembered(true);
         return new UserAuthenticationInfo(user.getCode(), profiles.hashCode(), getName(), user);
       }
     }

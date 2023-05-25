@@ -19,7 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.auth.AuthUtils;
-import io.buji.pac4j.profile.ShiroProfileManager;
+import io.buji.pac4j.filter.SecurityFilter;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
+import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 import org.slf4j.Logger;
@@ -41,13 +43,16 @@ import org.slf4j.LoggerFactory;
 
 public class AxelorLoginFilter implements Filter {
 
-  private final AxelorSecurityFilter axelorSecurityFilter;
+  private final SecurityFilter securityFilter;
+  private final ProfileManagerFactory profileManagerFactory;
 
   private static final Logger logger = LoggerFactory.getLogger(AxelorLoginFilter.class);
 
   @Inject
-  public AxelorLoginFilter(AxelorSecurityFilter axelorSecurityFilter, Clients clients) {
-    this.axelorSecurityFilter = axelorSecurityFilter;
+  public AxelorLoginFilter(
+      AxelorSecurityFilter securityFilter, AxelorSecurityLogic securityLogic, Clients clients) {
+    this.securityFilter = securityFilter;
+    this.profileManagerFactory = securityLogic.getProfileManagerFactory();
   }
 
   @Override
@@ -73,15 +78,14 @@ public class AxelorLoginFilter implements Filter {
     }
 
     // When not authenticated, this triggers login process.
-    axelorSecurityFilter.doFilter(request, response, chain);
+    securityFilter.doFilter(request, response, chain);
   }
 
   private Optional<UserProfile> getUserProfile(ServletRequest request, ServletResponse response) {
     final JEEContext context =
         new JEEContext((HttpServletRequest) request, (HttpServletResponse) response);
-    final ShiroProfileManager profileManager =
-        new ShiroProfileManager(context, JEESessionStore.INSTANCE);
-
+    final ProfileManager profileManager =
+        profileManagerFactory.apply(context, JEESessionStore.INSTANCE);
     return profileManager.getProfile();
   }
 }
