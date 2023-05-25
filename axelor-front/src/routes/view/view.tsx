@@ -42,6 +42,7 @@ export function View() {
 
   useEffect(() => {
     setActiveTabAtom(active ?? null);
+    if (active === null) pathRef.current = null;
   }, [active, setActiveTabAtom]);
 
   useAsyncEffect(async () => {
