@@ -4,6 +4,7 @@ import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
 import {
   SetStateAction,
+  SyntheticEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -22,7 +23,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
-import { GridView } from "@/services/client/meta.types";
+import { FormView, GridView } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
@@ -36,7 +37,9 @@ import {
 import { nextId } from "../../builder/utils";
 
 import styles from "./one-to-many.module.scss";
-import { DetailsFormView } from "./one-to-many.details";
+import { DetailsForm } from "./one-to-many.details";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { fetchRecord } from "../../form";
 
 const noop = () => {};
 
@@ -64,6 +67,7 @@ export function OneToMany({
   const gridRef = useRef<GridHandler>(null);
 
   const [records, setRecords] = useState<DataRecord[]>([]);
+  const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
   const widgetState = useMemo(
     () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
     [formAtom, name]
@@ -297,6 +301,10 @@ export function OneToMany({
     }
   }, []);
 
+  const onAddInDetail = useCallback(() => {
+    setDetailRecord({ id: nextId() });
+  }, []);
+
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       openEditor(
@@ -334,12 +342,30 @@ export function OneToMany({
     [setValue, clearSelection]
   );
 
+  const onCloseInDetail = useCallback(() => {
+    setDetailRecord(null);
+  }, []);
+
   const onRowReorder = useCallback(() => {
     reorderRef.current = true;
   }, []);
 
   const { selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
+  const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
+  const selected =
+    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedRows?.[0]!]?.record : null;
+  const recordId = detailRecord?.id;
+
+  const detailFormName = summaryView || formView;
+  const { data: detailMeta } = useAsync(async () => {
+    if (!hasMasterDetails) return;
+    return await findView<FormView>({
+      type: "form",
+      name: detailFormName,
+      model,
+    });
+  }, [model, detailFormName]);
 
   useEffect(() => {
     const selectedIds = (selectedRows ?? []).map(
@@ -372,6 +398,29 @@ export function OneToMany({
     reorderRef.current = false;
   }, [rows, sortBy, setValue]);
 
+  const fetchAndSetDetailRecord = useCallback(
+    async (selected: DataRecord) => {
+      let record = selected?.id ? selected : null;
+      if (detailMeta && record?.id && !record._dirty) {
+        record = await fetchRecord(detailMeta, dataStore, record.id);
+      }
+      setDetailRecord(record);
+    },
+    [detailMeta, dataStore]
+  );
+
+  useAsyncEffect(async () => {
+    if (!detailMeta || recordId === selected?.id) return;
+    fetchAndSetDetailRecord(selected);
+  }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
+
+  const onRowClick = useCallback(
+    (e: SyntheticEvent, row: GridRow, rowIndex: number) => {
+      selected?.id === row?.record?.id && fetchAndSetDetailRecord(row.record);
+    },
+    [selected, fetchAndSetDetailRecord]
+  );
+
   if (viewState === "loading") return null;
 
   const canNew = !readonly && hasButton("new");
@@ -380,21 +429,10 @@ export function OneToMany({
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
   const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
-  const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
-  const detailRecord =
-    hasMasterDetails && selectedRows?.length === 1
-      ? rows?.[selectedRows?.[0]]?.record
-      : null;
 
   return (
-    <>
-      <Box
-        d="flex"
-        flexDirection="column"
-        className={styles.container}
-        border
-        roundedTop
-      >
+    <Box d="flex" border flexDirection="column" roundedTop>
+      <Box d="flex" flexDirection="column" className={styles.container}>
         <Box className={styles.header}>
           <div className={styles.title}>
             {showTitle && (
@@ -486,20 +524,25 @@ export function OneToMany({
           onSave={onSave}
           onSearch={onSearch}
           onRowReorder={onRowReorder}
+          {...(hasMasterDetails &&
+            selected &&
+            !detailRecord && {
+              onRowClick,
+            })}
         />
       </Box>
-      {hasMasterDetails && (
+      {hasMasterDetails && detailMeta ? (
         <Box d="flex" flexDirection="column" p={2}>
-          <DetailsFormView
-            name={summaryView || formView}
-            model={model}
+          <DetailsForm
+            meta={detailMeta}
             readonly={readonly}
             record={detailRecord}
-            dataStore={dataStore}
+            onNew={onAddInDetail}
+            onClose={onCloseInDetail}
             onSave={onSave}
           />
         </Box>
-      )}
-    </>
+      ) : null}
+    </Box>
   );
 }
