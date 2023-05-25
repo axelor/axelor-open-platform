@@ -18,34 +18,28 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.auth.pac4j.local.AxelorFormClient;
-import io.buji.pac4j.profile.ShiroProfileManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultLogoutLogic;
+import org.pac4j.core.exception.http.NoContentAction;
+import org.pac4j.core.exception.http.OkAction;
+import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
-import org.pac4j.core.http.ajax.AjaxRequestResolver;
 
 @Singleton
 public class AxelorLogoutLogic extends DefaultLogoutLogic {
 
-  private final AjaxRequestResolver ajaxRequestResolver;
-  private final boolean exclusiveLike;
+  private final AuthPac4jInfo info;
 
   @Inject
-  public AxelorLogoutLogic(
-      AjaxRequestResolver ajaxRequestResolver,
-      ClientListProvider clientListProvider,
-      AxelorCallbackFilter callbackFilter,
-      AxelorFormClient formClient) {
-    this.ajaxRequestResolver = ajaxRequestResolver;
-    this.exclusiveLike =
-        clientListProvider.isExclusive()
-            || !formClient.getName().equals(callbackFilter.getDefaultClient());
-    setProfileManagerFactory(ShiroProfileManager::new);
+  public AxelorLogoutLogic(AuthPac4jInfo info) {
+    this.info = info;
   }
 
   @Override
@@ -60,19 +54,31 @@ public class AxelorLogoutLogic extends DefaultLogoutLogic {
       Boolean inputDestroySession,
       Boolean inputCentralLogout) {
 
-    final String redirectUrl =
-        exclusiveLike
-                || Boolean.TRUE.equals(inputCentralLogout)
-                || !ajaxRequestResolver.isAjax(context, sessionStore)
-            ? defaultUrl
-            : null;
+    final HttpActionAdapter ajaxAwareAdapter =
+        (action, ctx) -> {
+          if (action instanceof WithLocationAction && AuthPac4jInfo.isXHR(context)) {
+            final WithLocationAction withLocationAction = (WithLocationAction) action;
+            final String url = withLocationAction.getLocation();
+            if (info.getBaseUrl().equals(url)) {
+              action = NoContentAction.INSTANCE;
+            } else {
+              ctx.setResponseHeader(
+                  HttpConstants.CONTENT_TYPE_HEADER, HttpConstants.APPLICATION_JSON);
+              final ObjectMapper mapper = new ObjectMapper();
+              final ObjectNode json = mapper.createObjectNode();
+              json.put("redirectUrl", url);
+              action = new OkAction(json.toString());
+            }
+          }
+          return httpActionAdapter.adapt(action, ctx);
+        };
 
     return super.perform(
         context,
         sessionStore,
         config,
-        httpActionAdapter,
-        redirectUrl,
+        ajaxAwareAdapter,
+        defaultUrl,
         inputLogoutUrlPattern,
         inputLocalLogout,
         inputDestroySession,

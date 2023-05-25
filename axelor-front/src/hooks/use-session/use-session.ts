@@ -23,7 +23,16 @@ export function useSession() {
   }, []);
 
   const logout = useCallback(async () => {
-    window.location.href = "logout";
+    try {
+      const { redirectUrl } = await session.logout();
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        document.location.reload();
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   return {

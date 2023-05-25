@@ -19,8 +19,8 @@ describe("session tests", async () => {
   });
 
   it("should logout", async () => {
-    const res = await session.logout();
-    expect(res).toBeDefined();
-    expect(res).toBe(401);
+    const { status } = await session.logout();
+    expect(status).toBeDefined();
+    expect(status).toBe(204);
   });
 });
