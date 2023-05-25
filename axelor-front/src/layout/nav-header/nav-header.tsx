@@ -255,7 +255,6 @@ function QuickMenuBar() {
 
 function FarItems() {
   const { data, logout } = useSession();
-  const { navigate } = useRoute();
   const { open: openTab } = useTabs();
   const { unread: unreadMailCount } = useTagsMail();
   const { current: currentTaskCount, pending: pendingTaskCount } =
@@ -287,7 +286,11 @@ function FarItems() {
           iconProps: {
             icon: "home",
           },
-          onClick: () => navigate("/"),
+          onClick: () => {
+            if (session.info?.user?.action) {
+              openTab(session.info.user.action);
+            }
+          },
         },
         {
           key: "fav",
