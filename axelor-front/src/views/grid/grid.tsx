@@ -2,6 +2,7 @@ import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import isString from "lodash/isString";
+import clsx from "clsx";
 
 import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -87,6 +88,8 @@ function GridInner(props: ViewProps<GridView>) {
   const records = useDataStore(dataStore, (ds) => ds.records);
   const { orderBy, rows, selectedRows, selectedCell } = state;
   const detailsView = action.params?.["details-view"];
+  const detailsViewOverlay =
+    (action.params?.["details-view-mode"] || "default") === "overlay";
   const hasDetailsView = Boolean(detailsView);
 
   const clearSelection = useCallback(() => {
@@ -287,7 +290,7 @@ function GridInner(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
-  const { data: formMeta } = useAsync(async () => {
+  const { data: detailsMeta } = useAsync(async () => {
     if (!hasDetailsView) return null;
     const name = isString(detailsView)
       ? detailsView
@@ -301,13 +304,13 @@ function GridInner(props: ViewProps<GridView>) {
 
   const fetchAndSetDetailsRecord = useCallback(
     async (record: DataRecord | null) => {
-      if (formMeta && record && (record?.id ?? 0) > 0) {
-        record = await fetchRecord(formMeta, dataStore, record.id!);
+      if (detailsMeta && record && (record?.id ?? 0) > 0) {
+        record = await fetchRecord(detailsMeta, dataStore, record.id!);
       }
       setDirty(false);
       setDetailsRecord(record);
     },
-    [setDirty, formMeta, dataStore]
+    [setDirty, detailsMeta, dataStore]
   );
 
   const onSaveInDetails = useCallback(
@@ -348,14 +351,38 @@ function GridInner(props: ViewProps<GridView>) {
     );
   }, [dirty, fetchAndSetDetailsRecord]);
 
+  const selectedRow =
+    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedRows?.[0]!] : null;
+  const selectedDetail =
+    selectedRow?.type !== "row" ? null : selectedRow?.record;
+
+  const onLoadDetails = useCallback(
+    (e: any, row: GridRow) => {
+      selectedDetail?.id === row?.record?.id &&
+        fetchAndSetDetailsRecord(row.record);
+    },
+    [selectedDetail, fetchAndSetDetailsRecord]
+  );
+
+  const onClickDetails = useCallback(
+    (e: any, row: GridRow) => {
+      const isSameDetails = detailsRecord?.id === row?.record?.id;
+      const shouldClose = e.ctrlKey && isSameDetails;
+      if (shouldClose) {
+        fetchAndSetDetailsRecord(null);
+      } else if (!isSameDetails) {
+        fetchAndSetDetailsRecord(row.record);
+      }
+    },
+    [detailsRecord, fetchAndSetDetailsRecord]
+  );
+
   useAsyncEffect(async () => {
-    if (!formMeta) return;
-    const [ind = -1] = selectedRows || [];
-    const selected = rows?.[ind]?.record;
-    const record = selected?.id ? selected : null;
+    if (!detailsMeta || detailsViewOverlay) return;
+    const record = selectedDetail?.id ? selectedDetail : null;
     initDetailsRef.current && fetchAndSetDetailsRecord(record);
     initDetailsRef.current = true;
-  }, [selectedRows, formMeta, dataStore]);
+  }, [selectedDetail?.id, detailsMeta, dataStore]);
 
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
@@ -613,22 +640,60 @@ function GridInner(props: ViewProps<GridView>) {
             noRecordsText={i18n.get("No records found.")}
             {...dashletProps}
             {...popupProps}
+            {...(hasDetailsView &&
+              detailsViewOverlay && {
+                onView: undefined,
+              })}
+            {...(hasDetailsView && {
+              onRowClick: detailsViewOverlay
+                ? onClickDetails
+                : selectedDetail && !detailsRecord
+                ? onLoadDetails
+                : undefined,
+            })}
           />
           {hasDetailsView && dirty && (
             <Box bg="light" className={styles.overlay} />
           )}
         </div>
-        {hasDetailsView && formMeta && detailsRecord && (
-          <Box bg="light" className={styles["details-view"]}>
-            <Details
-              dirty={dirty}
-              meta={formMeta}
-              record={detailsRecord}
-              onNew={onNewInDetails}
-              onRefresh={onRefreshInDetails}
-              onSave={onSaveInDetails}
-              onCancel={onCancelInDetails}
-            />
+        {detailsMeta && (
+          <Box
+            bg="body"
+            className={clsx(styles["details-view"], {
+              [styles["details-view-overlay"]]: detailsViewOverlay,
+              [styles.hide]: !detailsRecord,
+            })}
+            {...(detailsViewOverlay &&
+              detailsRecord && {
+                shadow: "2xl",
+                dropShadow: "2xl",
+              })}
+          >
+            {detailsRecord ? (
+              <Details
+                dirty={dirty}
+                overlay={detailsViewOverlay}
+                meta={detailsMeta}
+                record={detailsRecord}
+                onNew={onNewInDetails}
+                onRefresh={onRefreshInDetails}
+                onSave={onSaveInDetails}
+                onCancel={onCancelInDetails}
+              />
+            ) : (
+              !detailsViewOverlay && (
+                <Box
+                  d="flex"
+                  flex={1}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Box as="span">
+                    {i18n.get("Either select or create a record.")}
+                  </Box>
+                </Box>
+              )
+            )}
           </Box>
         )}
       </div>

@@ -6,6 +6,9 @@
   min-height: 0;
 }
 
+.views {
+  overflow: hidden;
+}
 .views,
 .grid-view,
 .details-view {
@@ -18,6 +21,20 @@
 
 .grid {
   --bs-table-cell-padding: 0.625rem 0.5rem;
+}
+
+.details-view-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  height: 100%;
+  width: 50%;
+  transition: all 0.2s;
+  &.hide {
+    right: -50%;
+    z-index: 0;
+  }
 }
 
 .overlay {

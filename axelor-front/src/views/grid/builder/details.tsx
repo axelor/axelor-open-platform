@@ -1,6 +1,8 @@
 import { ReactElement, useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
-import { Box, CommandBar } from "@axelor/ui";
+import { Button, Box, CommandBar } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import clsx from "clsx";
 
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -20,6 +22,7 @@ export interface DetailsProps {
   meta: ViewData<FormView>;
   record: DataRecord;
   dirty?: boolean;
+  overlay?: boolean;
   onNew?: () => void;
   onRefresh?: () => void;
   onCancel?: () => void;
@@ -30,6 +33,7 @@ export function Details({
   meta,
   record,
   dirty = false,
+  overlay,
   onRefresh,
   onNew,
   onSave,
@@ -75,7 +79,7 @@ export function Details({
         flex={1}
         className={styles.container}
       >
-        <Box w={100} bg="body">
+        <Box d="flex" w={100} bg="body" borderBottom>
           <CommandBar
             items={[
               {
@@ -100,6 +104,7 @@ export function Details({
                 iconProps: {
                   icon: "undo",
                 },
+                hidden: overlay,
                 onClick: onCancel,
               },
               {
@@ -118,19 +123,41 @@ export function Details({
             ]}
             iconOnly
           />
+          {overlay && (
+            <Box
+              flex={1}
+              d="flex"
+              alignItems="center"
+              justifyContent="flex-end"
+              px={2}
+              className={styles.close}
+            >
+              <Button d="flex" p={0}>
+                <MaterialIcon icon="close" onClick={() => onCancel?.()} />
+              </Button>
+            </Box>
+          )}
         </Box>
-        <Box d="flex" m={3} bg="body" className={styles.form}>
-          <Form
-            schema={meta.view}
-            fields={meta.fields!}
-            readonly={false}
-            formAtom={formAtom}
-            actionHandler={actionHandler}
-            actionExecutor={actionExecutor}
-            recordHandler={recordHandler}
-            layout={Layout}
-            {...({} as any)}
-          />
+        <Box
+          d="flex"
+          flex={1}
+          className={clsx(styles["form-container"], {
+            [styles.overlay]: overlay,
+          })}
+        >
+          <Box d="flex" flex={1} m={3} bg="body" className={styles.form}>
+            <Form
+              schema={meta.view}
+              fields={meta.fields!}
+              readonly={false}
+              formAtom={formAtom}
+              actionHandler={actionHandler}
+              actionExecutor={actionExecutor}
+              recordHandler={recordHandler}
+              layout={Layout}
+              {...({} as any)}
+            />
+          </Box>
         </Box>
       </Box>
     </>
