@@ -20,6 +20,7 @@ package com.axelor.auth.pac4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.config.Config;
@@ -59,7 +60,7 @@ public class AxelorLogoutLogic extends DefaultLogoutLogic {
           if (action instanceof WithLocationAction && AuthPac4jInfo.isXHR(context)) {
             final WithLocationAction withLocationAction = (WithLocationAction) action;
             final String url = withLocationAction.getLocation();
-            if (info.getBaseUrl().equals(url)) {
+            if (Objects.equals(url, info.getBaseUrl())) {
               action = NoContentAction.INSTANCE;
             } else {
               ctx.setResponseHeader(

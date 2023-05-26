@@ -1,6 +1,9 @@
 import { session, SessionInfo } from "@/services/client/session";
+import { atom, useAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 import { useAsync } from "../use-async";
+
+const redirectUrlAtom = atom<string | null>(null);
 
 async function init() {
   let info = session.info;
@@ -15,6 +18,7 @@ const login = session.login.bind(session);
 export function useSession() {
   const { state, error } = useAsync(init, []);
   const [data, setData] = useState<SessionInfo | null>(session.info);
+  const [redirectUrl, setRedirectUrl] = useAtom(redirectUrlAtom);
 
   useEffect(() => {
     return session.subscribe((info) => {
@@ -24,16 +28,12 @@ export function useSession() {
 
   const logout = useCallback(async () => {
     try {
-      const { redirectUrl } = await session.logout();
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        document.location.reload();
-      }
+      const { redirectUrl: url } = await session.logout();
+      setRedirectUrl(url ?? "");
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }, [setRedirectUrl]);
 
   return {
     state,
@@ -41,5 +41,6 @@ export function useSession() {
     error,
     login,
     logout,
+    redirectUrl,
   };
 }
