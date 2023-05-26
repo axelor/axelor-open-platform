@@ -37,6 +37,32 @@
   }
 }
 
+@media screen and (max-width: 767px) {
+  .details-view-overlay {
+    width: 100%;
+    &.hide {
+      right: -100%;
+    }
+  }
+}
+
+[dir="rtl"] .details-view-overlay {
+  left: 0;
+  right: auto;
+  &.hide {
+    left: -50%;
+    right: auto;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  [dir="rtl"] .details-view-overlay {
+    &.hide {
+      left: -100%;
+    }
+  }
+}
+
 .overlay {
   position: absolute;
   top: 0;
