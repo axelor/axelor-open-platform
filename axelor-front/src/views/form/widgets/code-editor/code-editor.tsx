@@ -32,6 +32,7 @@ export function CodeEditor(props: FieldProps<string>) {
       {...props}
       className={clsx(styles.container, {
         [styles.invalid]: invalid,
+        [styles.readonly]: readonly,
       })}
     >
       <Editor
