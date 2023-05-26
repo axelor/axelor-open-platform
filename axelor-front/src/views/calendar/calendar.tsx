@@ -321,8 +321,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
   }, []);
 
   const calendarTitle = useMemo(() => {
-    return formatDate(calendarDate, calendarMode);
-  }, [calendarDate, calendarMode]);
+    return formatDate(calendarStart, calendarEnd, calendarMode);
+  }, [calendarStart, calendarEnd, calendarMode]);
 
   const actions = useMemo<CommandItemProps[]>(() => {
     const views: {

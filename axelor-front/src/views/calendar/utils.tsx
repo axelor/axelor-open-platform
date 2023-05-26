@@ -1,9 +1,9 @@
-import { View, SchedulerEvent } from "@axelor/ui/scheduler";
-import getObjectValue from "lodash/get";
+import { SchedulerEvent, View } from "@axelor/ui/scheduler";
 import dayjs, { ManipulateType } from "dayjs";
+import getObjectValue from "lodash/get";
 
 import { i18n } from "@/services/client/i18n";
-import { getStartOf, getNextOf } from "../../utils/date";
+import { getNextOf, getStartOf } from "../../utils/date";
 import { getColor } from "./colors";
 
 const { get: _t } = i18n;
@@ -63,23 +63,30 @@ export function getEventFilters(events: SchedulerEvent[], colorField: any) {
 }
 
 interface DateFormatMap {
-  [key: string]: (date: Date) => string;
+  [key: string]: (start: Date, end: Date | undefined) => string;
 }
 
-export function formatDate(date: Date, unit: ManipulateType) {
+export function formatDate(start: Date, end: Date, unit: ManipulateType) {
   const DATE_FORMATTERS: DateFormatMap = {
     month: (date) => dayjs(date).format("MMMM YYYY"),
-    week: (date) =>
-      _t(
-        "{0} – Week {1}",
-        dayjs(date).format("MMMM YYYY"),
-        dayjs(date).week()
-      ),
+    week: (start, end) => {
+      const startMonth = dayjs(start).format("MMM");
+      const startYear = dayjs(start).format("YYYY");
+      const endMonth = dayjs(end).format("MMM");
+      const endYear = dayjs(end).format("YYYY");
+      if (startYear === endYear) {
+        if (startMonth === endMonth) {
+          return `${startMonth} ${startYear}`;
+        }
+        return `${startMonth} – ${endMonth} ${endYear}`;
+      }
+      return `${startMonth} ${startYear} – ${endMonth} ${endYear}`;
+    },
     day: (date) => dayjs(date).format("LL"),
   };
 
   const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;
-  return formatter(date);
+  return formatter(start, end);
 }
 
 export function toDateOnlyString(date: Date | string) {
