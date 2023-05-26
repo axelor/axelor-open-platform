@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@axelor/ui";
-import { GridRow } from "@axelor/ui/grid";
+import { GridProps, GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
@@ -137,6 +137,7 @@ function GridInner(props: ViewProps<GridView>) {
           freeSearchText && (q.operator = "or");
         }
 
+        setDetailsRecord(null);
         setState((draft) => {
           draft.selectedCell = null;
         });
@@ -352,7 +353,7 @@ function GridInner(props: ViewProps<GridView>) {
   }, [dirty, fetchAndSetDetailsRecord]);
 
   const selectedRow =
-    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedRows?.[0]!] : null;
+    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedCell?.[0]!] : null;
   const selectedDetail =
     selectedRow?.type !== "row" ? null : selectedRow?.record;
 
@@ -364,21 +365,17 @@ function GridInner(props: ViewProps<GridView>) {
     [selectedDetail, fetchAndSetDetailsRecord]
   );
 
-  const onClickDetails = useCallback(
+  const onShowDetails = useCallback(
     (e: any, row: GridRow) => {
-      const isSameDetails = detailsRecord?.id === row?.record?.id;
-      const shouldClose = e.ctrlKey && isSameDetails;
-      if (shouldClose) {
-        fetchAndSetDetailsRecord(null);
-      } else if (!isSameDetails) {
+      !e.ctrlKey &&
+        row.record === selectedDetail &&
         fetchAndSetDetailsRecord(row.record);
-      }
     },
-    [detailsRecord, fetchAndSetDetailsRecord]
+    [selectedDetail, fetchAndSetDetailsRecord]
   );
 
   useAsyncEffect(async () => {
-    if (!detailsMeta || detailsViewOverlay) return;
+    if (!detailsMeta) return;
     const record = selectedDetail?.id ? selectedDetail : null;
     initDetailsRef.current && fetchAndSetDetailsRecord(record);
     initDetailsRef.current = true;
@@ -479,6 +476,7 @@ function GridInner(props: ViewProps<GridView>) {
       const savedInd = state.rows?.findIndex((r) => r.record?.id === savedId);
       savedInd > 0 &&
         setState((draft) => {
+          draft.selectedCell = [savedInd, 0];
           draft.selectedRows = [savedInd];
         });
     }
@@ -519,6 +517,18 @@ function GridInner(props: ViewProps<GridView>) {
         searchRowRenderer: Box,
         searchColumnRenderer: searchColumnRenderer,
       };
+  const detailsProps: Partial<GridProps> = hasDetailsView
+    ? {
+        ...(detailsViewOverlay && { onView: undefined }),
+        ...(!detailsRecord && {
+          onRowClick: detailsViewOverlay
+            ? onShowDetails
+            : selectedDetail
+            ? onLoadDetails
+            : undefined,
+        }),
+      }
+    : {};
 
   const readonly = dashletProps.readonly;
 
@@ -640,17 +650,7 @@ function GridInner(props: ViewProps<GridView>) {
             noRecordsText={i18n.get("No records found.")}
             {...dashletProps}
             {...popupProps}
-            {...(hasDetailsView &&
-              detailsViewOverlay && {
-                onView: undefined,
-              })}
-            {...(hasDetailsView && {
-              onRowClick: detailsViewOverlay
-                ? onClickDetails
-                : selectedDetail && !detailsRecord
-                ? onLoadDetails
-                : undefined,
-            })}
+            {...detailsProps}
           />
           {hasDetailsView && dirty && (
             <Box bg="light" className={styles.overlay} />

@@ -1,6 +1,6 @@
 import { ReactElement, useCallback } from "react";
 import { useAtomCallback } from "jotai/utils";
-import { Button, Box, CommandBar } from "@axelor/ui";
+import { Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
 
@@ -129,12 +129,11 @@ export function Details({
               d="flex"
               alignItems="center"
               justifyContent="flex-end"
-              px={2}
               className={styles.close}
             >
-              <Button d="flex" p={0}>
-                <MaterialIcon icon="close" onClick={() => onCancel?.()} />
-              </Button>
+              <Box d="flex" p={2} onClick={() => onCancel?.()}>
+                <MaterialIcon icon="close" />
+              </Box>
             </Box>
           )}
         </Box>
