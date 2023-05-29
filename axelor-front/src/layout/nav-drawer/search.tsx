@@ -255,6 +255,16 @@ export function NavBarSearch({
     };
   }, []);
 
+  const hasSearchResult = showSearchInput && input && options.length > 0;
+
+  useEffect(() => {
+    const navbarElement = containerRef.current?.nextSibling as HTMLElement;
+    navbarElement &&
+      navbarElement.classList?.[hasSearchResult ? "add" : "remove"]?.(
+        styles.hide
+      );
+  }, [hasSearchResult]);
+
   return (
     <>
       <Box
