@@ -8,6 +8,7 @@ import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
 import { useViewAction } from "@/view-containers/views/scope";
 import { useTags } from "@/hooks/use-tags";
+import { useFormRefresh } from "../../builder/scope";
 
 function getMessages(
   id: number,
@@ -205,13 +206,20 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
     [fetchAll, fetchTags, limit]
   );
 
+  const onRefresh = useCallback(() => {
+    fetchAll({ limit, offset: 0 });
+  }, [fetchAll, limit]);
+
   const loadMore = useCallback(() => {
     fetchAll({ offset: offset + limit, limit }, false);
   }, [offset, limit, fetchAll]);
 
   useAsyncEffect(async () => {
-    fetchAll({ ...pagination, offset: 0 });
-  }, [fetchAll]);
+    onRefresh();
+  }, [onRefresh]);
+
+  // register form:refresh
+  useFormRefresh(onRefresh);
 
   const { total } = pagination;
   useEffect(() => {

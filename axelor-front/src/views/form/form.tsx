@@ -170,6 +170,7 @@ function FormContainer({
     onSave: onSaveAction,
   } = schema;
 
+  const { id: tabId, popup, popupOptions } = useViewTab();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, record);
 
@@ -268,10 +269,14 @@ function FormContainer({
             set(formAtom, { ...prev, record: res });
           }
         }
+
+        const event = new CustomEvent("form:refresh", { detail: tabId });
+        document.dispatchEvent(event);
       },
       [
         actionExecutor,
         formAtom,
+        tabId,
         onLoadAction,
         onNewAction,
         readonly,
@@ -479,8 +484,6 @@ function FormContainer({
   );
 
   const pagination = usePagination(dataStore, record, readonly);
-
-  const { popup, popupOptions } = useViewTab();
   const popupHandlerAtom = usePopupHandlerAtom();
   const setPopupHandlers = useSetAtom(popupHandlerAtom);
 

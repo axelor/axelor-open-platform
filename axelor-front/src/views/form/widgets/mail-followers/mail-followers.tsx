@@ -10,6 +10,7 @@ import { dialogs } from "@/components/dialogs";
 import { Follower, follow, getFollowers, unfollow } from "./utils";
 import { useSession } from "@/hooks/use-session";
 import { useMessagePopup } from "../mail-messages/message/message-form";
+import { useFormRefresh } from "../../builder/scope";
 import { Message } from "../mail-messages/message/types";
 import classes from "./mail-followers.module.scss";
 
@@ -32,10 +33,14 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
     )
   );
 
-  useAsyncEffect(async () => {
+  const onRefresh = useCallback(async () => {
     const list = await getFollowers(model, modelId);
     setFollowers(list);
   }, [model, modelId]);
+
+  useAsyncEffect(async () => {
+    onRefresh();
+  }, [onRefresh]);
 
   const handleFollow = useCallback(
     async (data?: any) => {
@@ -75,6 +80,9 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       ),
     [followers, session]
   );
+  
+// register form:refresh
+  useFormRefresh(onRefresh);
 
   return (
     <Box d="flex" flexDirection="column" rounded border>

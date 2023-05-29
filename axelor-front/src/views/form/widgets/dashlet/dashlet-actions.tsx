@@ -8,6 +8,7 @@ import {
 } from "@/view-containers/view-dashlet/handler";
 import { DataStore } from "@/services/client/data-store";
 import { useDataStore } from "@/hooks/use-data-store";
+import { useFormRefresh } from "../../builder/scope";
 import { download } from "@/utils/download";
 import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
@@ -36,6 +37,9 @@ export function DashletActions({
   } = useAtomValue(useDashletHandlerAtom());
   const hasPagination = ["grid", "cards", "tree"].includes(viewType!);
   const { toolbar, menubar } = (view as GridView | CardsView) || {};
+
+  // register form:refresh
+  useFormRefresh(onRefresh);
 
   return (
     <Box className={classes.actions} gap={1}>

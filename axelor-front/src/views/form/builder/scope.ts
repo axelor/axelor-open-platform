@@ -25,6 +25,7 @@ import {
 import { fallbackFormAtom } from "./atoms";
 import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
 import { processActionValue } from "./utils";
+import { useViewTab } from "@/view-containers/views/scope";
 
 type ContextCreator = () => DataContext;
 
@@ -156,6 +157,22 @@ const formMolecule = molecule((getMol, getScope) => {
 export function useFormScope() {
   const scopeAtom = useMolecule(formMolecule);
   return useAtomValue(scopeAtom);
+}
+
+export function useFormRefresh(refresh?: () => Promise<any> | void) {
+  const tab = useViewTab();
+  const handleRefresh = useCallback(
+    (e: Event) =>
+      e instanceof CustomEvent && e.detail === tab.id && refresh?.(),
+    [refresh, tab.id]
+  );
+
+  useEffect(() => {
+    document.addEventListener("form:refresh", handleRefresh);
+    return () => {
+      document.removeEventListener("form:refresh", handleRefresh);
+    };
+  }, [handleRefresh]);
 }
 
 function useActionData<T extends ActionData>(
