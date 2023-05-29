@@ -108,33 +108,23 @@ function GridInner(props: ViewProps<GridView>) {
         const sortBy = orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
         );
-        const {
-          searchText: freeSearchText,
-          query = {},
-          search,
-        } = get(searchAtom!);
+        const { query = {}, search } = get(searchAtom!);
 
         const searchQuery = getSearchFilter(fields as any, view.items, search);
 
-        let q: SearchOptions["filter"] = {
+        let filter: SearchOptions["filter"] = {
           ...query,
-          operator: searchQuery?.operator ?? query.operator,
         };
 
-        if (freeSearchText && searchQuery?.criteria?.length) {
-          q.operator = "and";
-          q.criteria = [
-            { operator: "and", ...searchQuery },
+        if (searchQuery?.criteria?.length) {
+          filter.operator = "and";
+          filter.criteria = [
+            searchQuery,
             {
-              operator: query.operator || "or",
+              operator: query.operator || "and",
               criteria: query.criteria,
             },
           ];
-        } else {
-          q.criteria = [...(query.criteria || [])].concat(
-            searchQuery?.criteria || []
-          );
-          freeSearchText && (q.operator = "or");
         }
 
         setDetailsRecord(null);
@@ -144,18 +134,17 @@ function GridInner(props: ViewProps<GridView>) {
 
         if (dashlet) {
           const { _domainAction, ...formContext } = getFormContext() ?? {};
-          const { _domainContext } = q;
-          q._domainContext = {
-            ..._domainContext,
+          filter._domainContext = {
+            ...filter?._domainContext,
             ...formContext,
           };
-          q._domainAction = _domainAction;
+          filter._domainAction = _domainAction;
         }
 
         return dataStore.search({
           sortBy,
           ...options,
-          filter: { ...q },
+          filter,
         });
       },
       [
