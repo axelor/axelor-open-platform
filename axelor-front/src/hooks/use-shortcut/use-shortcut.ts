@@ -1,5 +1,7 @@
 import { useCallback, useEffect } from "react";
 
+export const isMac = /Mac OS/i.test(navigator.userAgent);
+
 export type Options = {
   key: string;
   altKey?: boolean;
@@ -9,6 +11,8 @@ export type Options = {
   action: (e: KeyboardEvent) => void;
 };
 
+const ctrlOrMetaKey = isMac ? "metaKey" : "ctrlKey";
+
 export function useShortcut(options: Options) {
   const { key, altKey, ctrlKey, shiftKey, canHandle, action } = options;
   const handleKeyDown = useCallback(
@@ -16,7 +20,7 @@ export function useShortcut(options: Options) {
       if (
         e.key === key &&
         (altKey === undefined || e.altKey === altKey) &&
-        (ctrlKey === undefined || e.ctrlKey === ctrlKey) &&
+        (ctrlKey === undefined || e[ctrlOrMetaKey] === ctrlKey) &&
         (shiftKey === undefined || e.shiftKey === shiftKey) &&
         (canHandle === undefined || canHandle(e))
       ) {
