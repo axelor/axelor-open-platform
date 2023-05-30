@@ -7,7 +7,7 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { Alert, AlertHeader, Fade, Portal, useTheme } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
-import { SenitizedContent } from "@/utils/sanitize";
+import { SanitizedContent } from "@/utils/sanitize";
 
 import styles from "./alerts.module.css";
 
@@ -121,7 +121,7 @@ function AlertContainer({ id, type = "info", title, message }: AlertProps) {
     };
   }, [id]);
   if (typeof message === "string") {
-    message = <SenitizedContent content={message} />;
+    message = <SanitizedContent content={message} />;
   }
   return (
     <Alert variant={type} shadow className={styles.alert}>

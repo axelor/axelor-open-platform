@@ -31,7 +31,7 @@ export function unaccent(value: string) {
   return value;
 }
 
-export const SenitizedContent = memo(function SenitizedContent({
+export const SanitizedContent = memo(function SanitizedContent({
   content,
 }: {
   content: string;
