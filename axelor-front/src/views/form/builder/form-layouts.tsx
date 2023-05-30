@@ -53,7 +53,14 @@ export const GridLayout: FormLayout = ({
   className,
   readonly,
 }) => {
-  const { cols = 12, colWidths, itemSpan, gap, items = [] } = schema;
+  const {
+    cols = 12,
+    widgetAttrs,
+    colWidths,
+    itemSpan = widgetAttrs?.itemSpan,
+    gap,
+    items = [],
+  } = schema;
   const widths = useMemo(() => computeCols(cols, colWidths), [cols, colWidths]);
   const style = {
     "--grid-cols": widths ?? cols,
