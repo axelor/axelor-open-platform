@@ -93,8 +93,15 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   );
 
   const handleChange = useCallback(
-    (value: any[]) => setValue(value, true),
-    [setValue]
+    (value: any[]) =>
+      setValue(
+        value?.map?.((v) => ({
+          id: v.id,
+          [targetName]: v[targetName],
+        })),
+        true
+      ),
+    [setValue, targetName]
   );
 
   return (
