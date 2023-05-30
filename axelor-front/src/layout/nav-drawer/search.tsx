@@ -1,14 +1,15 @@
-import {
-  useEffect,
-  useCallback,
-  useMemo,
-  useState,
-  useRef,
-  CSSProperties,
-} from "react";
 import { Box, Popper, ReactSelect } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
+import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import { unaccent } from "@/utils/sanitize";
 import styles from "./search.module.scss";
@@ -160,6 +161,12 @@ export function NavBarSearch({
   const handleExpandMoreClick = useCallback(() => {
     setShowSearchInput(true);
   }, []);
+
+  useShortcut({
+    key: "m",
+    ctrlKey: true,
+    action: handleExpandMoreClick,
+  });
 
   const handleInputChange = useCallback(
     (value: string, { action }: { action?: string } = {}) => {
