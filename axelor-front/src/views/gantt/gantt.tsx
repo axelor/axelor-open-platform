@@ -400,6 +400,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
                 key={filter.key}
                 variant="light"
                 bg={active ? "light" : "body"}
+                border={false}
                 onClick={() => setType(filter.key)}
               >
                 {filter.title}
@@ -414,7 +415,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           </Button>
         </Box>
       </ViewToolBar>
-      <Box d="flex" flex={1} overflow="auto">
+      <Box d="flex" flex={1} overflow="auto" px={1}>
         <DNDProvider>
           <GanttComponent
             className={styles.gantt}
