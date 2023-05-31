@@ -96,10 +96,16 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
     function update(_record, _fireOnLoad) {
       if (_record && _record.id > 0 && !_record.$fetched) {
+        _record = _.extend({}, _record);
         Object.keys(_record)
             .filter(function (name) { return name.indexOf(".") >= 0 })
             .forEach(function (name) {
               ui.setNested(_record, name, _record[name]);
+              delete _record[name];
+            });
+        Object.keys(_record)
+            .filter(function (name) { return _.isObject(_record[name]) && !_.isArray(_record[name]) && !_record[name]['id']; })
+            .forEach(function (name) {
               delete _record[name];
             });
         $scope.doRead(_record.id).success(function(rec){

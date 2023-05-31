@@ -1,0 +1,3 @@
+---
+title: Fix lost dotted fields in grid when using master-detail widget
+type: fix
