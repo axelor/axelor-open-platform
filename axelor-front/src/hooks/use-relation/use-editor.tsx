@@ -115,14 +115,14 @@ function Footer({
         showErrors(errors);
         return;
       }
-      if (canSave) {
-        if (onSave) {
-          onSave(record);
-        } else if (onSelect && handler.onSave) {
-          const rec = await handler.onSave();
-          onSelect(rec);
-        }
+
+      if (onSave) {
+        canSave && onSave(record);
+      } else if (onSelect && handler.onSave) {
+        const rec = await handler.onSave(true, canSave);
+        onSelect(rec);
       }
+
       onClose(true);
     } catch (e) {
       // TODO: show error

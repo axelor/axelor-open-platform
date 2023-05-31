@@ -220,8 +220,8 @@ function Footer({
     const onSave = handler.onSave;
 
     try {
-      if (canSave && onSave) {
-        await onSave();
+      if (onSave) {
+        await onSave(true, canSave);
       }
       if (params?.popup === "reload") {
         triggerReload();

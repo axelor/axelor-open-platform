@@ -339,7 +339,12 @@ function FormContainer({
 
   const onSave = useAtomCallback(
     useCallback(
-      async (get, set, callOnSave: boolean = true) => {
+      async (
+        get,
+        set,
+        callOnSave: boolean = true,
+        shouldSave: boolean = true
+      ) => {
         const formState = get(formAtom);
         const errors = getErrors(formState);
         if (errors) {
@@ -349,9 +354,12 @@ function FormContainer({
 
         const { record } = formState;
         const dummy = extractDummy(record);
+
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
         }
+
+        if (!shouldSave) return record;
 
         const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
         const vals = diff(rec, original);
