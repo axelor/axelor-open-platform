@@ -82,6 +82,6 @@ export interface ActionExecutor {
     action: string,
     options?: ActionOptions
   ): Promise<ActionResult[] | void>;
-
   wait(): Promise<void>;
+  waitFor(interval?: number): Promise<void>;
 }

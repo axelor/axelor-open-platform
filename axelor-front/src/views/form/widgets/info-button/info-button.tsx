@@ -50,7 +50,8 @@ export function InfoButton(props: WidgetProps) {
     }
     try {
       setWait(true);
-      actionExecutor.execute(onClick, {
+      await actionExecutor.waitFor();
+      await actionExecutor.execute(onClick, {
         context: {
           _signal: schema.name,
           _source: schema.name,

@@ -88,6 +88,7 @@ export function Button(props: WidgetProps) {
     }
     try {
       setWait(true);
+      await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
           _source: schema.name,

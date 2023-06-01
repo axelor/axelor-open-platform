@@ -613,9 +613,7 @@ function FormContainer({
           input.focus?.();
         }
       }
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 50);
-      });
+      await actionExecutor.waitFor();
       actionExecutor.wait().then(handleOnSave);
     },
     [actionExecutor, handleOnSave]

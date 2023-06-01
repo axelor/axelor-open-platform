@@ -38,6 +38,12 @@ export class DefaultActionExecutor implements ActionExecutor {
     return queue.add(() => this.#execute(action, options));
   }
 
+  async waitFor(interval = 50) {
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), interval);
+    });
+  }
+
   async wait() {
     return queue.wait();
   }
