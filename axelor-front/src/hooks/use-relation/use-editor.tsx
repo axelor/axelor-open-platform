@@ -116,11 +116,13 @@ function Footer({
         return;
       }
 
-      if (onSave) {
-        canSave && onSave(record);
-      } else if (onSelect && handler.onSave) {
-        const rec = await handler.onSave(true, canSave);
-        onSelect(rec);
+      if (canSave) {
+        if (onSave) {
+          onSave(record);
+        } else if (onSelect && handler.onSave) {
+          const rec = await handler.onSave();
+          onSelect(rec);
+        }
       }
 
       onClose(true);
