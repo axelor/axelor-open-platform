@@ -108,7 +108,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
 
 function isField(schema: Schema) {
   const type = schema.type;
-  return type === "field" || type === "panel-related";
+  return schema.jsonField || type === "field" || type === "panel-related";
 }
 
 function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {
