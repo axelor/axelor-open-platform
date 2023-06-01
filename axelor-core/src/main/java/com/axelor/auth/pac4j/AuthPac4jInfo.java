@@ -36,11 +36,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
+import org.pac4j.jee.context.JEEContext;
 
 @Singleton
 public class AuthPac4jInfo {

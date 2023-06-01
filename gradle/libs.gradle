@@ -13,7 +13,7 @@ versions.resteasy = "4.7.7.Final"
 versions.jackson = "2.14.2"
 versions.shiro = "1.11.0"
 versions.buji_pac4j = "8.0.0"
-versions.jee_pac4j = "6.1.0"
+versions.javaee_pac4j = "7.1.0"
 versions.pac4j = "5.7.1"
 versions.ldaptive = "2.1.1"
 
@@ -181,7 +181,7 @@ libs.apache_shiro = [
 
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
-  "org.pac4j:jee-pac4j:${versions.jee_pac4j}",
+  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
 
   dependencies.create("org.pac4j:pac4j-oidc:${versions.pac4j}") {
     exclude group: 'org.mockito', module: 'mockito-core'
@@ -200,7 +200,7 @@ libs.pac4j = [
 
 libs.buji_pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
-  "org.pac4j:jee-pac4j:${versions.jee_pac4j}",
+  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
 ]
 
 // UnboundID LDAP SDK (for testing only)
