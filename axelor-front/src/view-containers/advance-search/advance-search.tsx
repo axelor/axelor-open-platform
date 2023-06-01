@@ -18,6 +18,7 @@ import {
 } from "@axelor/ui/icons/meterial-icon";
 
 import { useSession } from "@/hooks/use-session";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import {
   AdvancedSearchAtom,
@@ -424,6 +425,14 @@ function SearchInput({
   onSearch?: () => void;
 }) {
   const [value = "", setValue] = useAtom(valueAtom);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useShortcut({
+    key: "f",
+    ctrlKey: true,
+    shiftKey: true,
+    action: useCallback(() => searchRef.current?.focus(), []),
+  });
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -457,6 +466,7 @@ function SearchInput({
   }
   return (
     <TextField
+      ref={searchRef}
       name="search"
       icons={icons}
       readOnly={readonly}
