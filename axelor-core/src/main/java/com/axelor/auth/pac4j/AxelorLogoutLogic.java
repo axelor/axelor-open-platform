@@ -79,7 +79,7 @@ public class AxelorLogoutLogic extends DefaultLogoutLogic {
         sessionStore,
         config,
         ajaxAwareAdapter,
-        defaultUrl,
+        info.getLogoutUrl(),
         inputLogoutUrlPattern,
         inputLocalLogout,
         inputDestroySession,
