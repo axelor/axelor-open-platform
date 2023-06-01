@@ -524,6 +524,10 @@ export function OneToMany({
           onSave={onSave}
           onSearch={onSearch}
           onRowReorder={onRowReorder}
+          {...(!canNew &&
+            editable && {
+              onRecordAdd: undefined,
+            })}
           {...(hasMasterDetails &&
             selected &&
             !detailRecord && {

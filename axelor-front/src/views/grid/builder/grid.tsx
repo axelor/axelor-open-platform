@@ -72,7 +72,7 @@ export const Grid = forwardRef<
     searchOptions,
     actionExecutor,
     showEditIcon = true,
-    editable = true,
+    editable = false,
     readonly,
     columnAttrs,
     records,
@@ -324,15 +324,14 @@ export const Grid = forwardRef<
           allowRowReorder={view?.canMove === true && !readonly}
           sortType="state"
           selectionType="multiple"
-          {...(editable &&
-            view.editable && {
-              editable: true,
-              editRowRenderer: CustomFormRenderer,
-              onRecordSave: onSave,
-              onRecordAdd: handleRecordAdd,
-              onRecordEdit: handleRecordEdit,
-              onRecordDiscard: handleRecordDiscard,
-            })}
+          {...(editable && {
+            editable,
+            editRowRenderer: CustomFormRenderer,
+            onRecordSave: onSave,
+            onRecordAdd: handleRecordAdd,
+            onRecordEdit: handleRecordEdit,
+            onRecordDiscard: handleRecordDiscard,
+          })}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
           state={state!}
