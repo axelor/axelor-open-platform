@@ -829,7 +829,8 @@ function useShortcuts({
 
   useShortcut({
     key: "g",
-    altKey: true,
+    ctrlKey: true,
+    shiftKey: true,
     canHandle,
     action: useCallback(() => onFocus?.(), [onFocus]),
   });

@@ -4,14 +4,14 @@ import styles from "./shortcuts.module.scss";
 
 export function Shortcuts() {
   let ctrlOrMeta;
-  let alt;
+  let shift;
 
   if (isMac) {
     ctrlOrMeta = "⌘";
-    alt = "⌥";
+    shift = "⇧";
   } else {
-    ctrlOrMeta = i18n.get("Ctrl");
-    alt = i18n.get("Alt");
+    ctrlOrMeta = i18n.get("Ctrl.Key");
+    shift = i18n.get("Shift.Key");
   }
 
   return (
@@ -55,13 +55,13 @@ export function Shortcuts() {
         </tr>
         <tr>
           <td className={styles.keys}>
-            <kbd>{alt}</kbd> + <kbd>F</kbd>
+            <kbd>{ctrlOrMeta}</kbd> + <kbd>{shift}</kbd> + <kbd>F</kbd>
           </td>
           <td>{i18n.get("search for records")}</td>
         </tr>
         <tr>
           <td className={styles.keys}>
-            <kbd>{alt}</kbd> + <kbd>G</kbd>
+            <kbd>{ctrlOrMeta}</kbd> + <kbd>{shift}</kbd> + <kbd>G</kbd>
           </td>
           <td>{i18n.get("focus first or selected item in view")}</td>
         </tr>

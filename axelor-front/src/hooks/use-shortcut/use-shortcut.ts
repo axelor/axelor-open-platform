@@ -13,12 +13,15 @@ export type Options = {
 
 const ctrlOrMetaKey = isMac ? "metaKey" : "ctrlKey";
 
+const compareKey = new Intl.Collator(undefined, { sensitivity: "base" })
+  .compare;
+
 export function useShortcut(options: Options) {
   const { key, altKey, ctrlKey, shiftKey, canHandle, action } = options;
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (
-        e.key === key &&
+        compareKey(e.key, key) === 0 &&
         (altKey === undefined || e.altKey === altKey) &&
         (ctrlKey === undefined || e[ctrlOrMetaKey] === ctrlKey) &&
         (shiftKey === undefined || e.shiftKey === shiftKey) &&
@@ -29,7 +32,7 @@ export function useShortcut(options: Options) {
         action(e);
       }
     },
-    [action, altKey, canHandle, ctrlKey, key, shiftKey]
+    [key, altKey, ctrlKey, shiftKey, canHandle, action]
   );
 
   useEffect(() => {
