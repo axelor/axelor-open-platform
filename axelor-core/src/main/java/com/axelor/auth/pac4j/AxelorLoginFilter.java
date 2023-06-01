@@ -59,15 +59,17 @@ public class AxelorLoginFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     final Subject subject = SecurityUtils.getSubject();
-    final boolean authenticated = subject.isAuthenticated();
+    boolean authenticated = subject.isAuthenticated();
 
     if (authenticated) {
       if (AuthUtils.getUser() == null) {
         logger.warn("Authenticated, but no user: {}", subject.getPrincipal());
         subject.logout();
+        authenticated = false;
       } else if (getUserProfile(request, response).isEmpty()) {
         logger.warn("Authenticated, but no user profile: {}", subject.getPrincipal());
         subject.logout();
+        authenticated = false;
       }
     }
 
