@@ -587,7 +587,7 @@ function FormContainer({
       const selector = ["input", "select", "textarea"]
         .map(
           (name) =>
-            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly])`
+            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly]), ${name}[tabindex]:not([readonly])`
         )
         .join(", ");
       const input = elem.querySelector(selector) as HTMLInputElement;
