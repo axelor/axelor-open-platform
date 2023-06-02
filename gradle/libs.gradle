@@ -204,7 +204,7 @@ libs.buji_pac4j = [
 ]
 
 // UnboundID LDAP SDK (for testing only)
-libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.7'
+libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.8'
 
 // commons
 libs.commons_cli = "commons-cli:commons-cli:1.5.0"
