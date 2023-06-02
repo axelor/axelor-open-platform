@@ -16,3 +16,17 @@
   right: 50%;
   transform: translateX(50%);
 }
+
+.block {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: wait;
+  display: flex;
+  align-items: center;
+  color: var(--bs-white);
+  font-size: 1rem;
+}
