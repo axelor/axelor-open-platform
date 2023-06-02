@@ -99,7 +99,10 @@ public class ViewGenerator {
   }
 
   private boolean _generateComputedView(MetaView view)
-      throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
+      throws ParserConfigurationException,
+          SAXException,
+          IOException,
+          XPathExpressionException,
           JAXBException {
 
     final MetaView originalView = getOriginalView(view);

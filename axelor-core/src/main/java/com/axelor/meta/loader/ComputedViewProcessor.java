@@ -67,7 +67,10 @@ public class ComputedViewProcessor {
   }
 
   public MetaView compute()
-      throws JAXBException, ParserConfigurationException, IOException, SAXException,
+      throws JAXBException,
+          ParserConfigurationException,
+          IOException,
+          SAXException,
           XPathExpressionException {
     MetaView computedView = getComputedView();
     if (computedView == null) {
