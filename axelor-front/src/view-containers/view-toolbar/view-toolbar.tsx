@@ -117,6 +117,7 @@ export function ToolbarActions({
       const action = (item as Button).onClick || (item as MenuItem).action;
       const text = item.showTitle !== false ? item.title : "";
       const icon = (item as Button).icon;
+      const prompt = (item as Button).prompt;
       const key = `action_${++ind}`;
       const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
       return {
@@ -132,13 +133,20 @@ export function ToolbarActions({
           ),
         }),
         ...(action && {
-          onClick: () =>
+          onClick: async () => {
+            if (prompt) {
+              const confirmed = await dialogs.confirm({
+                content: prompt,
+              });
+              if (!confirmed) return;
+            }
             actionExecutor?.execute(action, {
               context: {
                 _signal: item.name,
                 _source: item.name,
               },
-            }),
+            });
+          },
         }),
         ...((item as Menu).items && {
           items: (item as Menu).items?.map(mapItem),
