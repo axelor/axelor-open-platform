@@ -191,7 +191,8 @@ function Footer({
     elems.pop();
 
     const elem = elems[elems.length - 1] as HTMLElement;
-    const parent = elem && elem.querySelector("[data-view-id]") as HTMLElement;
+    const parent =
+      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
     if (parent) {
       parentId.current = parent.getAttribute("data-view-id");
     }
@@ -205,32 +206,36 @@ function Footer({
     }
   }, []);
 
+  const popupCanConfirm = params?.["show-confirm"] !== false;
+  const popupCanSave = params?.["popup-save"] !== false;
+  const popupCanReload = params?.reload;
+
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
-      async () => handler.getState?.().dirty ?? false,
+      async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
       async () => close(false)
     );
-  }, [close, handler]);
+  }, [close, handler, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
     if (handler.getState === undefined) return close(true);
     const state = handler.getState();
     const record = state.record;
-    const canSave = state.dirty || !record.id;
+    const canSave = popupCanSave && (state.dirty || !record.id);
     const onSave = handler.onSave;
 
     try {
       if (onSave) {
         await onSave(true, canSave);
       }
-      if (params?.popup === "reload") {
+      if (popupCanReload) {
         triggerReload();
       }
       close(true);
     } catch (e) {
       // TODO: show error
     }
-  }, [close, handler, params?.popup, triggerReload]);
+  }, [close, handler, popupCanReload, popupCanSave, triggerReload]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe((data) => {
