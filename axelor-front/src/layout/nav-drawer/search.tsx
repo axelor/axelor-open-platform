@@ -12,6 +12,7 @@ import {
 import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import { unaccent } from "@/utils/sanitize";
+import { useSidebar } from "./hook";
 import styles from "./search.module.scss";
 
 const customStyles = {
@@ -157,6 +158,7 @@ export function NavBarSearch({
   const selectRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { sidebar, setSidebar } = useSidebar();
 
   const handleExpandMoreClick = useCallback(() => {
     setShowSearchInput(true);
@@ -165,7 +167,12 @@ export function NavBarSearch({
   useShortcut({
     key: "m",
     ctrlKey: true,
-    action: handleExpandMoreClick,
+    action: useCallback(() => {
+      if (!sidebar) {
+        setSidebar(true);
+      }
+      handleExpandMoreClick();
+    }, [sidebar, setSidebar, handleExpandMoreClick]),
   });
 
   const handleInputChange = useCallback(
