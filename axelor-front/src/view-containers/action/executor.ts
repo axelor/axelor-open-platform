@@ -158,7 +158,6 @@ export class DefaultActionExecutor implements ActionExecutor {
         yesNo: false,
         yesTitle: data.info.confirmBtnTitle,
       });
-      await this.#handler.refresh();
       if (data.pending) {
         return this.#execute(data.pending, options);
       }
