@@ -21,7 +21,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
-import { useShortcut } from "@/hooks/use-shortcut";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { diff, extractDummy } from "@/services/client/data-utils";
@@ -621,6 +621,7 @@ function FormContainer({
 
   // register shortcuts
   useShortcuts({
+    viewType: schema.type,
     onNew: canNew ? onNew : undefined,
     onEdit: canEdit ? onEdit : undefined,
     onSave: canSave ? handleSave : undefined,
@@ -762,92 +763,6 @@ function FormContainer({
       </div>
     </div>
   );
-}
-
-function useShortcuts({
-  onNew,
-  onEdit,
-  onSave,
-  onDelete,
-  onRefresh,
-  onFocus,
-  onNext,
-  onPrev,
-}: {
-  onNew?: () => void;
-  onEdit?: () => void;
-  onSave?: () => void;
-  onDelete?: () => void;
-  onRefresh?: () => void;
-  onFocus?: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
-}) {
-  const { active } = useTabs();
-  const tab = useViewTab();
-  const type = useSelectViewState(useCallback((x) => x.type, []));
-
-  const canHandle = useCallback(
-    () => active === tab && type === "form",
-    [active, tab, type]
-  );
-
-  useShortcut({
-    key: "Insert",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onNew?.(), [onNew]),
-  });
-
-  useShortcut({
-    key: "e",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onEdit?.(), [onEdit]),
-  });
-
-  useShortcut({
-    key: "s",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onSave?.(), [onSave]),
-  });
-
-  useShortcut({
-    key: "d",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onDelete?.(), [onDelete]),
-  });
-
-  useShortcut({
-    key: "r",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onRefresh?.(), [onRefresh]),
-  });
-
-  useShortcut({
-    key: "g",
-    ctrlKey: true,
-    shiftKey: true,
-    canHandle,
-    action: useCallback(() => onFocus?.(), [onFocus]),
-  });
-
-  useShortcut({
-    key: "j",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onPrev?.(), [onPrev]),
-  });
-
-  useShortcut({
-    key: "k",
-    ctrlKey: true,
-    canHandle,
-    action: useCallback(() => onNext?.(), [onNext]),
-  });
 }
 
 function usePagination(
