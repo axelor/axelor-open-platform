@@ -79,7 +79,6 @@ export namespace dialogs {
       onClose: handleClose,
       ...rest,
     });
-    return handleClose;
   }
 
   export async function box({
@@ -109,19 +108,18 @@ export namespace dialogs {
       content = <SanitizedContent content={content} />;
     }
 
-    return new Promise<boolean>(async (resolve) => {
-      const close = await modal({
-        open: true,
-        size,
-        title,
-        content,
-        buttons,
-        classes: { content: styles.box },
-        onClose: async (result) => {
-          await close(result);
-          resolve(result);
-        },
-      });
+    return new Promise<boolean>((resolve) => {
+      void (async () => {
+        await modal({
+          open: true,
+          size,
+          title,
+          content,
+          buttons,
+          classes: { content: styles.box },
+          onClose: (result) => resolve(result),
+        });
+      })();
     });
   }
 
