@@ -1,13 +1,13 @@
+import clsx from "clsx";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import uniqueId from "lodash/uniqueId";
 import isString from "lodash/isString";
-import clsx from "clsx";
+import uniqueId from "lodash/uniqueId";
 
-import { useAtom, useSetAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@axelor/ui";
 import { GridProps, GridRow } from "@axelor/ui/grid";
+import { useAtom, useSetAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
@@ -18,9 +18,9 @@ import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
-import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -34,18 +34,19 @@ import {
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 
+import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useShortcuts } from "@/hooks/use-shortcut";
+import { findView } from "@/services/client/meta-cache";
 import { Dms } from "../dms";
+import { fetchRecord } from "../form";
 import { usePrepareContext } from "../form/builder";
 import { useFormScope } from "../form/builder/scope";
+import { nextId } from "../form/builder/utils";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
-import { useGridActionExecutor, useGridState } from "./builder/utils";
-import { useAsync } from "@/hooks/use-async";
-import { findView } from "@/services/client/meta-cache";
 import { Details } from "./builder/details";
-import { nextId } from "../form/builder/utils";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { fetchRecord } from "../form";
+import { useGridActionExecutor, useGridState } from "./builder/utils";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -523,6 +524,59 @@ function GridInner(props: ViewProps<GridView>) {
 
   const readonly = dashletProps.readonly;
 
+  const canNew = hasButton("new");
+  const handleNew = useMemo(() => {
+    if (hasDetailsView) {
+      return onNewInDetails;
+    }
+    if (editable) {
+      return onNewInGrid;
+    }
+    return onNew;
+  }, [hasDetailsView, editable, onNewInDetails, onNewInGrid, onNew]);
+
+  const canEdit = hasButton("edit");
+  const editEnabled = hasRowSelected && (!hasDetailsView || !dirty);
+  const handleEdit = useCallback(() => {
+    const [rowIndex] = selectedRows ?? [];
+    const record = rows[rowIndex]?.record;
+    record && onEdit(record);
+  }, [selectedRows, rows, onEdit]);
+
+  const canDelete = hasButton("delete");
+  const deleteEnabled = editEnabled;
+  const handleDelete = useCallback(() => {
+    void (async () => {
+      await onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+    })();
+  }, [onDelete, selectedRows, rows]);
+
+  const handlePrev = useCallback(
+    () =>
+      switchTo("grid", {
+        route: { id: String(Math.max(minPage, currentPage - 1)) },
+      }),
+    [currentPage, minPage, switchTo]
+  );
+  const handleNext = useCallback(
+    () =>
+      switchTo("grid", {
+        route: { id: String(Math.min(maxPage, currentPage + 1)) },
+      }),
+    [currentPage, maxPage, switchTo]
+  );
+
+  useShortcuts({
+    viewType: view.type,
+    canHandle: useCallback(() => state.editRow == null, [state.editRow]),
+    onNew: canNew ? handleNew : undefined,
+    onEdit: canEdit && editEnabled ? handleEdit : undefined,
+    onDelete: canDelete && deleteEnabled ? handleDelete : undefined,
+    onRefresh: onSearch,
+    onPrev: canPrev ? handlePrev : undefined,
+    onNext: canNext ? handleNext : undefined,
+  });
+
   return (
     <div className={styles.container}>
       {showToolbar && (
@@ -532,42 +586,32 @@ function GridInner(props: ViewProps<GridView>) {
             {
               key: "new",
               text: i18n.get("New"),
-              hidden: !hasButton("new"),
+              hidden: !canNew,
               iconProps: {
                 icon: "add",
               },
-              onClick: hasDetailsView
-                ? onNewInDetails
-                : editable
-                ? onNewInGrid
-                : onNew,
+              onClick: handleNew,
             },
             {
               key: "edit",
               text: i18n.get("Edit"),
-              hidden: !hasButton("edit"),
+              hidden: !canEdit,
               iconProps: {
                 icon: "edit",
               },
-              disabled: !hasRowSelected || (hasDetailsView && dirty),
+              disabled: !editEnabled,
               className: commonClassNames("hide-sm"),
-              onClick: () => {
-                const [rowIndex] = selectedRows || [];
-                const record = rows[rowIndex]?.record;
-                record && onEdit(record);
-              },
+              onClick: handleEdit,
             },
             {
               key: "delete",
               text: i18n.get("Delete"),
-              hidden: !hasButton("delete"),
+              hidden: !canDelete,
               iconProps: {
                 icon: "delete",
               },
-              disabled: !hasRowSelected || (hasDetailsView && dirty),
-              onClick: () => {
-                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-              },
+              disabled: !deleteEnabled,
+              onClick: handleDelete,
               items: hasButton("archive")
                 ? [
                     {
@@ -596,14 +640,8 @@ function GridInner(props: ViewProps<GridView>) {
           pagination={{
             canPrev,
             canNext,
-            onPrev: () =>
-              switchTo("grid", {
-                route: { id: String(Math.max(minPage, currentPage - 1)) },
-              }),
-            onNext: () =>
-              switchTo("grid", {
-                route: { id: String(Math.min(maxPage, currentPage + 1)) },
-              }),
+            onPrev: handlePrev,
+            onNext: handleNext,
             text: () => <PageText dataStore={dataStore} />,
           }}
         >

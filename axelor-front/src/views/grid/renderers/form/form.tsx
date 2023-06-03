@@ -29,8 +29,9 @@ import {
   useFormHandlers,
 } from "@/views/form/builder";
 
-import styles from "./form.module.scss";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { useFormScope } from "@/views/form/builder/scope";
+import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
@@ -267,6 +268,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       },
       [handleSave, handleCancel]
     );
+
+    useShortcut({
+      key: "s",
+      ctrlKey: true,
+      action: useCallback(() => {
+        void (async () => {
+          await handleSave?.();
+        })();
+      }, [handleSave]),
+    });
 
     const handleClickOutside = useAtomCallback(
       useCallback(
