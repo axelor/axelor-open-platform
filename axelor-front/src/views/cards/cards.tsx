@@ -10,6 +10,8 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
+import { useEditor } from "@/hooks/use-relation";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -19,11 +21,10 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
-import { useEditor } from "@/hooks/use-relation";
 
-import { useGridActionExecutor } from "../grid/builder/utils";
-import { useFormScope } from "../form/builder/scope";
 import { usePrepareContext } from "../form/builder";
+import { useFormScope } from "../form/builder/scope";
+import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -196,6 +197,25 @@ export function Cards(props: ViewProps<CardsView>) {
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
+  const canNew = hasButton("new");
+
+  const handlePrev = useCallback(
+    () => onSearch({ offset: offset - limit }),
+    [limit, offset, onSearch]
+  );
+  const handleNext = useCallback(
+    () => onSearch({ offset: offset + limit }),
+    [limit, offset, onSearch]
+  );
+
+  useShortcuts({
+    viewType: view.type,
+    onNew: canNew ? onNew : undefined,
+    onRefresh: onSearch,
+    onPrev: canPrev ? handlePrev : undefined,
+    onNext: canNext ? handleNext : undefined,
+  });
+
   return (
     <Box className={legacyClassNames(styles.cards, "cards-view", "row-fluid")}>
       {showToolbar && (
@@ -206,7 +226,7 @@ export function Cards(props: ViewProps<CardsView>) {
             {
               key: "new",
               text: i18n.get("New"),
-              hidden: !hasButton("new"),
+              hidden: !canNew,
               iconProps: {
                 icon: "add",
               },
@@ -224,8 +244,8 @@ export function Cards(props: ViewProps<CardsView>) {
           pagination={{
             canPrev,
             canNext,
-            onPrev: () => onSearch({ offset: offset - limit }),
-            onNext: () => onSearch({ offset: offset + limit }),
+            onPrev: handlePrev,
+            onNext: handleNext,
             text: () => <PageText dataStore={dataStore} />,
           }}
         >
