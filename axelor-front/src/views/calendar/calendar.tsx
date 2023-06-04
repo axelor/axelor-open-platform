@@ -1,48 +1,49 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
 import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, CommandItemProps } from "@axelor/ui/core";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 import { Event } from "@axelor/ui/scheduler/types";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 
+import { SearchOptions } from "@/services/client/data";
+import { Criteria, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { l10n } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
 import { CalendarView, FormView } from "@/services/client/meta.types";
-import { Criteria, DataRecord } from "@/services/client/data.types";
-import { SearchOptions } from "@/services/client/data";
 
-import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { dialogs } from "@/components/dialogs";
 import { addDate, getNextOf } from "@/utils/date";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
 
-import { useViewTab } from "@/view-containers/views/scope";
+import { useAsync } from "@/hooks/use-async";
 import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
-import { useAsync } from "@/hooks/use-async";
 import { useSession } from "@/hooks/use-session";
-import { useFormScope } from "../form/builder/scope";
+import { useShortcuts } from "@/hooks/use-shortcut";
+import { useViewTab } from "@/view-containers/views/scope";
 import { usePrepareContext } from "../form/builder";
+import { useFormScope } from "../form/builder/scope";
 
 import { ViewProps } from "../types";
 
 import { Picker as DatePicker } from "../form/widgets/date/picker";
 import Filters from "./components/filters";
-import { Filter } from "./components/types";
 import Popover from "./components/popover";
+import { Filter } from "./components/types";
 
+import { DEFAULT_COLOR } from "./colors";
 import {
   formatDate,
   getEventFilters,
   getTimes,
-  toDateOnlyString,
-  toDatetimeString,
   toDateOnly,
+  toDateOnlyString,
   toDatetime,
+  toDatetimeString,
 } from "./utils";
 
-import { DEFAULT_COLOR } from "./colors";
 import styles from "./calendar.module.scss";
 
 const { get: _t } = i18n;
@@ -394,6 +395,13 @@ export function Calendar(props: ViewProps<CalendarView>) {
     calendarMode,
     handleViewChange,
   ]);
+
+  useShortcuts({
+    viewType: metaView.type,
+    onRefresh: handleRefresh,
+    onPrev: handlePrev,
+    onNext: handleNext,
+  });
 
   const handleDateChange = useCallback(
     (date: Date) => {
