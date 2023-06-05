@@ -173,7 +173,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
     if (data.error) {
       await dialogs.box({
-        title: data.error.title,
+        title: data.error.title ?? i18n.get("Error"),
         content: data.error.message,
         yesTitle: data.error.confirmBtnTitle,
         noTitle: data.error.confirmBtnTitle,
@@ -186,7 +186,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
     if (data.alert) {
       const confirmed = await dialogs.box({
-        title: data.alert.title,
+        title: data.alert.title ?? i18n.get("Warning"),
         content: data.alert.message,
         yesTitle: data.alert.confirmBtnTitle,
         noTitle: data.alert.confirmBtnTitle,
