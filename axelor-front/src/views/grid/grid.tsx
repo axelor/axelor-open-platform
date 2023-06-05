@@ -200,8 +200,10 @@ function GridInner(props: ViewProps<GridView>) {
         ...action,
         name: uniqueId("$act"),
         viewType: "form",
-        context: {
+        params: {
           forceReadonly,
+        },
+        context: {
           _showRecord: record.id,
         },
       });
