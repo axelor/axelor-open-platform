@@ -53,6 +53,7 @@ export function useShortcuts({
   onNew,
   onEdit,
   onSave,
+  onCopy,
   onDelete,
   onRefresh,
   onFocus,
@@ -64,6 +65,7 @@ export function useShortcuts({
   onNew?: () => void;
   onEdit?: () => void;
   onSave?: () => void;
+  onCopy?: () => void;
   onDelete?: () => void;
   onRefresh?: () => void;
   onFocus?: () => void;
@@ -99,6 +101,13 @@ export function useShortcuts({
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onSave?.(), [onSave]),
+  });
+
+  useShortcut({
+    key: "y",
+    ctrlKey: true,
+    canHandle,
+    action: useCallback(() => onCopy?.(), [onCopy]),
   });
 
   useShortcut({

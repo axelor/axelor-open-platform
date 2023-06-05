@@ -37,6 +37,12 @@ export function Shortcuts() {
         </tr>
         <tr>
           <td className={styles.keys}>
+            <kbd>{ctrlOrMeta}</kbd> + <kbd>Y</kbd>
+          </td>
+          <td>{i18n.get("duplicate current record")}</td>
+        </tr>
+        <tr>
+          <td className={styles.keys}>
             <kbd>{ctrlOrMeta}</kbd> + <kbd>D</kbd>
           </td>
           <td>{i18n.get("delete current/selected record(s)")}</td>

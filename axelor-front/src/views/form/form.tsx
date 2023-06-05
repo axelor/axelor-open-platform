@@ -630,6 +630,7 @@ function FormContainer({
     onNew: canNew ? onNew : undefined,
     onEdit: canEdit ? onEdit : undefined,
     onSave: canSave ? handleSave : undefined,
+    onCopy: canCopy ? onCopy : undefined,
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: useHandleFocus(containerRef),
