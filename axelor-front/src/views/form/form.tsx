@@ -108,6 +108,27 @@ export const useGetErrors = () => {
   );
 };
 
+export const useHandleFocus = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const handleFocus = useCallback(() => {
+    const elem = containerRef.current;
+    if (elem) {
+      const selector = ["input", "select", "textarea"]
+        .map(
+          (name) =>
+            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly]), ${name}[tabindex]:not([readonly])`
+        )
+        .join(", ");
+      const input = elem.querySelector(selector) as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+  }, []);
+  return { containerRef, handleFocus };
+};
+
 function getDefaultValues(meta: ViewData<FormView>) {
   const { fields = {} } = meta;
   const result: DataRecord = Object.entries(fields).reduce(
@@ -580,23 +601,7 @@ function FormContainer({
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const handleFocus = useCallback(() => {
-    const elem = containerRef.current;
-    if (elem) {
-      const selector = ["input", "select", "textarea"]
-        .map(
-          (name) =>
-            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly]), ${name}[tabindex]:not([readonly])`
-        )
-        .join(", ");
-      const input = elem.querySelector(selector) as HTMLInputElement;
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }
-  }, []);
+  const { containerRef, handleFocus } = useHandleFocus();
 
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {

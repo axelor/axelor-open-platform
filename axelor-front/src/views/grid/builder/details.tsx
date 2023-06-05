@@ -1,25 +1,30 @@
-import { ReactElement, useCallback } from "react";
-import { useAtomCallback } from "jotai/utils";
 import { Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
+import { useAtomCallback } from "jotai/utils";
+import { ReactElement, useCallback } from "react";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePerms } from "@/hooks/use-perms";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { Form, useFormHandlers } from "../../form/builder";
 import {
   Layout,
   showErrors,
   useFormAttachment,
   useGetErrors,
+  useHandleFocus,
 } from "../../form";
-import { i18n } from "@/services/client/i18n";
+import { Form, useFormHandlers } from "../../form/builder";
+
 import styles from "./details.module.scss";
 
 export interface DetailsProps {
   meta: ViewData<FormView>;
+  relatedViewType: string;
   record: DataRecord;
   dirty?: boolean;
   overlay?: boolean;
@@ -31,6 +36,7 @@ export interface DetailsProps {
 
 export function Details({
   meta,
+  relatedViewType,
   record,
   dirty = false,
   overlay,
@@ -41,6 +47,7 @@ export function Details({
 }: DetailsProps) {
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
+  const { hasButton } = usePerms(meta.view, meta.perms);
 
   const isNew = (record?.id ?? -1) < 0;
   const attachmentItem = useFormAttachment(formAtom);
@@ -71,6 +78,21 @@ export function Details({
     }
   }, [record, meta.view, actionExecutor]);
 
+  const { containerRef, handleFocus } = useHandleFocus();
+
+  const canNew = hasButton("new");
+  const canSave = hasButton("save");
+
+  const handleRefresh = isNew ? onNew : onRefresh;
+
+  useShortcuts({
+    viewType: relatedViewType,
+    onNew: canNew ? onNew : undefined,
+    onSave: canSave ? handleSave : undefined,
+    onRefresh: dirty ? handleRefresh : undefined,
+    onFocus: handleFocus,
+  });
+
   return (record && (
     <>
       <Box
@@ -85,6 +107,7 @@ export function Details({
               {
                 key: "new",
                 text: i18n.get("New"),
+                hidden: !canNew,
                 iconProps: {
                   icon: "add",
                 },
@@ -93,6 +116,7 @@ export function Details({
               {
                 key: "save",
                 text: i18n.get("Save"),
+                hidden: !canSave,
                 iconProps: {
                   icon: "save",
                 },
@@ -113,7 +137,7 @@ export function Details({
                 iconProps: {
                   icon: "refresh",
                 },
-                onClick: isNew ? onNew : onRefresh,
+                onClick: handleRefresh,
                 disabled: !dirty,
               },
               {
@@ -144,7 +168,14 @@ export function Details({
             [styles.overlay]: overlay,
           })}
         >
-          <Box d="flex" flex={1} m={3} bg="body" className={styles.form}>
+          <Box
+            d="flex"
+            flex={1}
+            m={3}
+            bg="body"
+            className={styles.form}
+            ref={containerRef}
+          >
             <Form
               schema={meta.view}
               fields={meta.fields!}

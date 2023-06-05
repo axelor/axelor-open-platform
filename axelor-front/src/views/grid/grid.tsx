@@ -700,6 +700,7 @@ function GridInner(props: ViewProps<GridView>) {
           >
             {detailsRecord ? (
               <Details
+                relatedViewType={view.type}
                 dirty={dirty}
                 overlay={detailsViewOverlay}
                 meta={detailsMeta}
