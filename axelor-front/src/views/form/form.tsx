@@ -3,7 +3,6 @@ import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
-  MutableRefObject,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -124,7 +123,6 @@ export function Form(props: ViewProps<FormView>) {
 
   const { id } = useViewRoute();
   const [viewProps = {}] = useViewProps();
-  const recordRef = useRef<DataRecord | null>(null);
 
   const { action } = useViewTab();
 
@@ -133,27 +131,20 @@ export function Form(props: ViewProps<FormView>) {
   const recordId = id || action.context?._showRecord;
   const popupRecord = action.params?.["_popup-record"];
 
-  const $recordId = recordId ? String(recordId) : recordId;
   const { state, data: record = {} } = useAsync(async () => {
-    if (recordRef.current) {
-      const record = recordRef.current;
-      recordRef.current = null;
-      return record;
-    }
     if (popupRecord) {
       if (popupRecord._dirty) return popupRecord;
       const res = await fetchRecord(meta, dataStore, popupRecord.id);
       return { ...popupRecord, ...res };
     }
-    return await fetchRecord(meta, dataStore, $recordId);
-  }, [popupRecord, $recordId, meta, dataStore]);
+    return await fetchRecord(meta, dataStore, recordId);
+  }, [popupRecord, recordId, meta, dataStore]);
 
   const isLoading = state !== "hasData";
 
   return (
     <FormContainer
       {...props}
-      recordRef={recordRef}
       record={record}
       readonly={readonly}
       isLoading={isLoading}
@@ -165,12 +156,10 @@ function FormContainer({
   meta,
   dataStore,
   record,
-  recordRef,
   isLoading,
   ...props
 }: ViewProps<FormView> & {
   record: DataRecord;
-  recordRef?: MutableRefObject<DataRecord | null>;
   readonly?: boolean;
   isLoading?: boolean;
 }) {
@@ -231,12 +220,12 @@ function FormContainer({
         get,
         set,
         record: DataRecord | null,
-        options?: { readonly?: boolean; refresh?: boolean }
+        options?: { readonly?: boolean }
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
-        const { refresh = true, ...props } = { readonly, ...options };
+        const props = { readonly, ...options };
 
         record = record ?? {};
         record =
@@ -281,10 +270,8 @@ function FormContainer({
           }
         }
 
-        if (refresh) {
-          const event = new CustomEvent("form:refresh", { detail: tabId });
-          document.dispatchEvent(event);
-        }
+        const event = new CustomEvent("form:refresh", { detail: tabId });
+        document.dispatchEvent(event);
       },
       [
         actionExecutor,
@@ -367,15 +354,9 @@ function FormContainer({
         let res = await dataStore.save(vals);
         if (res.id) res = await doRead(res.id);
 
-        // new saved record
-        const hasNew = vals.id !== res.id;
-        if (recordRef && hasNew) {
-          recordRef.current = res;
-        }
-
         res = { ...dummy, ...res }; // restore dummy values
 
-        doEdit(res, { readonly, refresh: !hasNew });
+        doEdit(res, { readonly });
 
         return res;
       },
@@ -388,7 +369,6 @@ function FormContainer({
         getErrors,
         onSaveAction,
         readonly,
-        recordRef,
       ]
     )
   );
