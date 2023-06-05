@@ -1,5 +1,11 @@
+import { Box, Popper } from "@axelor/ui";
 import { useAtom, useSetAtom } from "jotai";
+import { atomWithImmer } from "jotai-immer";
 import { useAtomCallback } from "jotai/utils";
+import { uniq } from "lodash";
+import getValue from "lodash/get";
+import isObject from "lodash/isObject";
+import setValue from "lodash/set";
 import {
   FunctionComponent,
   useCallback,
@@ -8,33 +14,28 @@ import {
   useRef,
   useState,
 } from "react";
-import { atomWithImmer } from "jotai-immer";
-import { uniq } from "lodash";
-import { Box, Popper } from "@axelor/ui";
-import isObject from "lodash/isObject";
-import getValue from "lodash/get";
-import setValue from "lodash/set";
 
 import { dialogs } from "@/components/dialogs";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useHilites, useTemplate } from "@/hooks/use-parser";
+import { EvalContextOptions } from "@/hooks/use-parser/eval-context";
 import { usePerms } from "@/hooks/use-perms";
+import { useEditor } from "@/hooks/use-relation";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchPage } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData } from "@/services/client/meta";
 import { KanbanView, Property } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { EvalContextOptions } from "@/hooks/use-parser/eval-context";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
-import { useEditor } from "@/hooks/use-relation";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useHilites, useTemplate } from "@/hooks/use-parser";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { useGridActionExecutor } from "../grid/builder/utils";
 import { ViewProps } from "../types";
-import { legacyClassNames } from "@/styles/legacy";
 
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
@@ -44,6 +45,7 @@ import {
   getRecordIndex,
   reorderCards,
 } from "./utils";
+
 import styles from "./kanban.module.scss";
 
 const hasMorePage = ({
@@ -516,6 +518,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
     [view, fields, Template]
   );
 
+  const canNew = hasButton("new");
+
+  useShortcuts({
+    viewType: view.type,
+    onNew: canNew ? onNew : undefined,
+    onRefresh: onRefresh,
+  });
+
   return (
     <Box
       className={legacyClassNames(styles.kanban, "kanban-view", "row-fluid")}
@@ -528,7 +538,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
             {
               key: "new",
               text: i18n.get("New"),
-              hidden: !hasButton("new"),
+              hidden: !canNew,
               iconProps: {
                 icon: "add",
               },
