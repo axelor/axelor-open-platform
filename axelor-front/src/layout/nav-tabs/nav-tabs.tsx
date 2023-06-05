@@ -16,6 +16,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { dialogs } from "@/components/dialogs";
 import { useMenu } from "@/hooks/use-menu";
 import { useSession } from "@/hooks/use-session";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem } from "@/services/client/meta.types";
@@ -97,17 +98,30 @@ const NavTab = memo(function NavTab({
   const { data } = useSession();
   const showClose = tab.id !== data?.user?.action;
 
+  const handleCloseConfirm = useCallback(async () => {
+    await dialogs.confirmDirty(
+      async () => dirty,
+      async () => close(tab.id)
+    );
+  }, [close, dirty, tab.id]);
+
   const handleClose = useCallback<React.MouseEventHandler<HTMLDivElement>>(
     async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      dialogs.confirmDirty(
-        async () => dirty,
-        async () => close(tab.id)
-      );
+      await handleCloseConfirm();
     },
-    [close, dirty, tab.id]
+    [handleCloseConfirm]
   );
+
+  const { active } = useTabs();
+
+  useShortcut({
+    key: "q",
+    ctrlKey: true,
+    canHandle: useCallback(() => active?.id === tab.id, [active, tab.id]),
+    action: handleCloseConfirm,
+  });
 
   return (
     <div
