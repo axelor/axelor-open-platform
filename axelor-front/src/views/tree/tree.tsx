@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -294,6 +295,27 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     [view, actionExecutor]
   );
 
+  const handleRefresh = useCallback(async () => {
+    await onSearch({});
+  }, [onSearch]);
+
+  const handlePrev = useCallback(
+    () => onSearch({ offset: offset - limit }),
+    [limit, offset, onSearch]
+  );
+
+  const handleNext = useCallback(
+    () => onSearch({ offset: offset + limit }),
+    [limit, offset, onSearch]
+  );
+
+  useShortcuts({
+    viewType: view.type,
+    onRefresh: handleRefresh,
+    onPrev: canPrev ? handlePrev : undefined,
+    onNext: canNext ? handleNext : undefined,
+  });
+
   return (
     <Box d="flex" flexDirection="column" overflow="auto" w={100}>
       {showToolbar && (
@@ -303,8 +325,8 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           pagination={{
             canPrev,
             canNext,
-            onPrev: () => onSearch({ offset: offset - limit }),
-            onNext: () => onSearch({ offset: offset + limit }),
+            onPrev: handlePrev,
+            onNext: handleNext,
             text: () =>
               (dataStore && <PageText dataStore={dataStore} />) as JSX.Element,
             actions: [
@@ -315,7 +337,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
                 iconProps: {
                   icon: "refresh",
                 },
-                onClick: () => onSearch({}),
+                onClick: handleRefresh,
               },
             ],
           }}
