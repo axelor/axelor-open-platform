@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { FormEvent, KeyboardEvent, useCallback, useState } from "react";
 
 import { Button, Input } from "@axelor/ui";
 
@@ -14,17 +14,33 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
   const maxLimit = session.info?.api?.pagination?.maxPerPage ?? 40;
   const { offset = 0, totalCount = 0 } = page;
   const [showEditor, setShowEditor] = useState(false);
-  const [limit, setLimit] = useState(page.limit ?? maxLimit);
+  const initialLimit = page.limit ?? maxLimit;
+  const [limit, setLimit] = useState(initialLimit);
 
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => setLimit(+e.target.value),
     []
   );
 
-  const onApply = useCallback(() => {
-    dataStore.search({ limit });
-    setShowEditor(false);
-  }, [dataStore, limit]);
+  const onApply = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      dataStore.search({ limit });
+      setShowEditor(false);
+    },
+    [dataStore, limit]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLFormElement>) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setLimit(initialLimit);
+        setShowEditor(false);
+      }
+    },
+    [initialLimit]
+  );
 
   const onShow = useCallback(() => setShowEditor(true), []);
 
@@ -34,18 +50,26 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
 
   if (showEditor) {
     return (
-      <div className={styles.editor}>
+      <form
+        className={styles.editor}
+        onSubmit={onApply}
+        onKeyDown={handleKeyDown}
+      >
         <Input
+          name="limit"
           type="number"
           min={0}
           max={maxLimit}
           value={limit}
           onChange={onChange}
+          onFocus={(e) => e.target.select()}
+          autoFocus
+          style={{ width: "5rem" }}
         />
-        <Button variant="secondary" onClick={onApply}>
+        <Button variant="secondary" type="submit">
           {i18n.get("Apply")}
         </Button>
-      </div>
+      </form>
     );
   }
   return (
