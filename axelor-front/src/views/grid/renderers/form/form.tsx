@@ -18,7 +18,7 @@ import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
-import { useGetErrors } from "@/views/form";
+import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
   Form as FormComponent,
   FormLayout,
@@ -277,6 +277,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           await handleSave?.();
         })();
       }, [handleSave]),
+    });
+
+    useShortcut({
+      key: "g",
+      ctrlKey: true,
+      shiftKey: true,
+      action: useHandleFocus(containerRef),
     });
 
     const handleClickOutside = useAtomCallback(

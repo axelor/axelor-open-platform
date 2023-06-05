@@ -3,6 +3,7 @@ import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
+  RefObject,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -108,8 +109,7 @@ export const useGetErrors = () => {
   );
 };
 
-export const useHandleFocus = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
   const handleFocus = useCallback(() => {
     const elem = containerRef.current;
     if (elem) {
@@ -125,8 +125,8 @@ export const useHandleFocus = () => {
         input.select();
       }
     }
-  }, []);
-  return { containerRef, handleFocus };
+  }, [containerRef]);
+  return handleFocus;
 };
 
 function getDefaultValues(meta: ViewData<FormView>) {
@@ -601,8 +601,6 @@ function FormContainer({
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
 
-  const { containerRef, handleFocus } = useHandleFocus();
-
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {
       const onSaveClick = e?.type === "click";
@@ -624,6 +622,8 @@ function FormContainer({
     [actionExecutor, handleOnSave]
   );
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
@@ -632,7 +632,7 @@ function FormContainer({
     onSave: canSave ? handleSave : undefined,
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
-    onFocus: handleFocus,
+    onFocus: useHandleFocus(containerRef),
     onPrev: pagination.canPrev ? pagination.onPrev : undefined,
     onNext: pagination.canNext ? pagination.onNext : undefined,
   });

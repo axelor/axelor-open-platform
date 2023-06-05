@@ -2,7 +2,7 @@ import { Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
-import { ReactElement, useCallback } from "react";
+import { ReactElement, useCallback, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
@@ -78,7 +78,7 @@ export function Details({
     }
   }, [record, meta.view, actionExecutor]);
 
-  const { containerRef, handleFocus } = useHandleFocus();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const canNew = hasButton("new");
   const canSave = hasButton("save");
@@ -90,7 +90,7 @@ export function Details({
     onNew: canNew ? onNew : undefined,
     onSave: canSave ? handleSave : undefined,
     onRefresh: dirty ? handleRefresh : undefined,
-    onFocus: handleFocus,
+    onFocus: useHandleFocus(containerRef),
   });
 
   return (record && (
