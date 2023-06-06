@@ -10,24 +10,23 @@ import { useViewAction } from "@/view-containers/views/scope";
 import { useTags } from "@/hooks/use-tags";
 import { useFormRefresh } from "../../builder/scope";
 
-function getMessages(
+async function findMessages(
   id: number,
   model: string,
-  { parent, folder, offset = 0, limit = 4 }: MessageFetchOptions
+  { parent, folder, type, offset = 0, limit = 4 }: MessageFetchOptions
 ) {
-  return (
-    parent
-      ? DataSource.replies(parent)
-      : folder
-      ? DataSource.folder(folder!, limit, offset)
-      : DataSource.messages(id, model, limit, offset)
-  ).then(({ total = 0, data = [] }) => ({
+  const { total = 0, data = [] } = await (parent
+    ? DataSource.replies(parent)
+    : folder
+    ? DataSource.folder(folder!, limit, offset)
+    : DataSource.messages(id, model, { type, limit, offset }));
+  return {
     pageInfo: {
       totalRecords: total,
       hasNextPage: offset + limit < total,
     },
     data,
-  }));
+  };
 }
 
 export function MailMessages({ formAtom, schema }: WidgetProps) {
@@ -35,13 +34,15 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const [pagination, setPagination] = useState({
     hasNext: false,
     offset: 0,
-    limit: 4,
+    limit: schema.limit ?? 4,
     total: 0,
   });
   const { name } = useViewAction();
   const { model, modelId: recordId } = schema;
   const { offset, limit } = pagination;
   const { fetchTags } = useTags();
+
+  const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
   const setEmpty = useSetAtom(
     useMemo(
@@ -59,14 +60,17 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
       if (!hasMessages) return;
-      const { parent } = options || {};
+      const { parent, type } = options || {};
       const {
         data,
         pageInfo: { totalRecords, hasNextPage },
-      } = await getMessages(recordId as number, model, {
+      } = await findMessages(recordId as number, model, {
         folder,
         ...options,
       });
+
+      setFilter(type);
+
       if (parent) {
         setMessages((msgs) => {
           const msgInd = msgs.findIndex((x) => `${x.id}` === `${parent}`);
@@ -207,12 +211,12 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   );
 
   const onRefresh = useCallback(() => {
-    fetchAll({ limit, offset: 0 });
-  }, [fetchAll, limit]);
+    fetchAll({ type: filter, limit, offset: 0 });
+  }, [fetchAll, filter, limit]);
 
   const loadMore = useCallback(() => {
-    fetchAll({ offset: offset + limit, limit }, false);
-  }, [offset, limit, fetchAll]);
+    fetchAll({ type: filter, offset: offset + limit, limit }, false);
+  }, [fetchAll, filter, offset, limit]);
 
   useAsyncEffect(async () => {
     onRefresh();
@@ -233,6 +237,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       fields={fields}
       data={messages}
       isMail={isMessageBox}
+      filter={filter}
       onFetch={fetchAll}
       onComment={postComment}
       onCommentRemove={removeComment}

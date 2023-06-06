@@ -1,6 +1,13 @@
 import React, { useMemo, useState } from "react";
 import clsx from "clsx";
-import { Box, Button, Badge, TBackground, useTheme } from "@axelor/ui";
+import {
+  Box,
+  Button,
+  Badge,
+  TBackground,
+  useTheme,
+  ButtonGroup,
+} from "@axelor/ui";
 
 import Avatar from "../avatar";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -254,6 +261,7 @@ export function MessageBox({
   inputProps: MessageInputProps,
   data,
   fields,
+  filter,
   onFetch,
   onLoad,
   onAction,
@@ -264,6 +272,7 @@ export function MessageBox({
   data: TYPES.Message[];
   fields?: FormProps["fields"];
   inputProps?: MessageInputProps;
+  filter?: string;
   onFetch?: MessageProps["onFetch"];
   onLoad?: () => void;
   onAction?: MessageProps["onAction"];
@@ -281,7 +290,36 @@ export function MessageBox({
       })}
     >
       {!isMail && (
-        <MessageInput focus={false} onSave={onComment} {...MessageInputProps} />
+        <Box d="flex" flexDirection="column" g={2}>
+          <Box d="flex" g={2}>
+            <Button
+              variant="secondary"
+              outline={filter !== "comment"}
+              onClick={() => onFetch?.({ type: "comment" })}
+            >
+              {i18n.get("Comments")}
+            </Button>
+            <Button
+              variant="secondary"
+              outline={filter !== "notification"}
+              onClick={() => onFetch?.({ type: "notification" })}
+            >
+              {i18n.get("Notifications")}
+            </Button>
+            <Button
+              variant="secondary"
+              outline={!!filter}
+              onClick={() => onFetch?.({ type: undefined })}
+            >
+              {i18n.get("All")}
+            </Button>
+          </Box>
+          <MessageInput
+            focus={false}
+            onSave={onComment}
+            {...MessageInputProps}
+          />
+        </Box>
       )}
       <Box ms={3} mt={1} borderStart>
         {data.map((message, index) => (

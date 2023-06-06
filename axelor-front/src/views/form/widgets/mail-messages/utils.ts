@@ -5,6 +5,8 @@ type QueryParam = Record<string, any>;
 
 const paramsToQueryString = (params?: QueryParam) =>
   Object.keys(params || {})
+    .filter((k) => (params || {})[k] !== undefined)
+    .filter((k) => (params || {})[k] !== null)
     .map((k) => `${k}=${(params || {})[k]}`)
     .join("&");
 
@@ -26,10 +28,14 @@ export const DataSource = (() => {
   function getRecordMessages(
     relatedId: number,
     relatedModel: string,
-    limit: number,
-    offset: number
+    options?: {
+      type?: string;
+      limit?: number;
+      offset?: number;
+    }
   ) {
-    return getMessages({ relatedId, relatedModel, limit, offset });
+    const { type, limit, offset } = options ?? {};
+    return getMessages({ type, relatedId, relatedModel, limit, offset });
   }
 
   function getFolderMessages(folder: string, limit?: number, offset?: number) {

@@ -87,6 +87,7 @@ export type MessagePagination = {
 export type MessageFetchOptions = MessagePagination & {
   parent?: string | number;
   folder?: string;
+  type?: string;
 };
 
 export interface MessageInputProps {
