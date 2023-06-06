@@ -1,8 +1,11 @@
 .shortcuts {
-  .keys {
-    white-space: nowrap;
-  }
-  td {
-    padding: 0.25rem 1rem;
+  tbody {
+    vertical-align: text-top;
+    td {
+      padding: 0.25rem 1rem;
+    }
+    .keys {
+      white-space: nowrap;
+    }
   }
 }

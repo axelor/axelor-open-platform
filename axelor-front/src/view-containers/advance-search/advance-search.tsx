@@ -1,11 +1,7 @@
-import { KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
-import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useAtomCallback } from "jotai/utils";
-import { focusAtom } from "jotai-optics";
 import {
   Box,
-  Divider,
   ClickAwayListener,
+  Divider,
   FocusTrap,
   Popper,
   TextField,
@@ -16,30 +12,35 @@ import {
   MaterialIcon,
   MaterialIconProps,
 } from "@axelor/ui/icons/meterial-icon";
+import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useAtomCallback } from "jotai/utils";
+import { KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
 
+import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
+import { SearchOptions, SearchResult } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
+import { removeFilter, saveFilter } from "@/services/client/meta";
 import {
   AdvancedSearchAtom,
   SavedFilter,
   SearchFilter,
   View,
 } from "@/services/client/meta.types";
-import { removeFilter, saveFilter } from "@/services/client/meta";
-import { DataStore } from "@/services/client/data-store";
 import { download } from "@/utils/download";
 import { useViewAction, useViewTab } from "../views/scope";
-import { dialogs } from "@/components/dialogs";
-import { SearchOptions, SearchResult } from "@/services/client/data";
 
-import { FilterList } from "./filter-list";
-import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
-import { getEditorDefaultState } from "./editor/editor";
-import { Editor } from "./editor";
+import { isInputFocused } from "@/views/form";
 import { Chip } from "@/views/form/widgets";
 import styles from "./advance-search.module.scss";
+import { Editor } from "./editor";
+import { getEditorDefaultState } from "./editor/editor";
+import { FilterList } from "./filter-list";
+import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
 
 export interface AdvanceSearchProps {
   dataStore: DataStore;
@@ -340,11 +341,7 @@ export function AdvanceSearch({
         placement={`bottom-${rtl ? "end" : "start"}`}
       >
         <ClickAwayListener onClickAway={handleClose}>
-          <Box
-            {...(rtl ? { dir: "rtl" } : {})}
-            className={styles.popper}
-            p={2}
-          >
+          <Box {...(rtl ? { dir: "rtl" } : {})} className={styles.popper} p={2}>
             <FocusTrap initialFocus={false} enabled={open}>
               <Box d="flex" flexDirection="column">
                 <Box d="flex" alignItems="center">
@@ -429,12 +426,16 @@ function SearchInput({
   const searchRef = useRef<HTMLInputElement>(null);
   const { active } = useTabs();
   const tab = useViewTab();
-  const canHandle = useCallback(() => active === tab, [active, tab]);
+  const canHandle = useCallback(
+    () =>
+      active === tab &&
+      (document.activeElement === searchRef.current || !isInputFocused()),
+    [active, tab]
+  );
 
   useShortcut({
     key: "f",
     ctrlKey: true,
-    shiftKey: true,
     canHandle,
     action: useCallback(() => searchRef.current?.focus(), []),
   });

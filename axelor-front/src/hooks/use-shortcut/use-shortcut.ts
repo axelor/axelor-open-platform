@@ -1,32 +1,70 @@
-import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
 import { useCallback, useEffect } from "react";
+
+import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
+import { isInputFocused } from "@/views/form";
 import { useTabs } from "../use-tabs";
 
 export const isMac = /Mac OS/i.test(navigator.userAgent);
 
 export type Options = {
   key: string;
-  altKey?: boolean;
   ctrlKey?: boolean;
+  altKey?: boolean;
   shiftKey?: boolean;
   canHandle?: (e: KeyboardEvent) => boolean;
   action: (e: KeyboardEvent) => void;
 };
 
-const ctrlOrMetaKey = isMac ? "metaKey" : "ctrlKey";
+let getKeys: (options: Options) => {
+  ctrlKey?: boolean;
+  altKey?: boolean;
+  shiftKey?: boolean;
+  metaKey?: boolean;
+};
+let inputSensitive: () => boolean;
+
+if (isMac) {
+  // Command (Meta) is used instead of Control.
+  // Option (Alt) cannot be used alone for shortcuts,
+  // as it might be used to type special characters on some layouts.
+  // Ctrl -> ⌘
+  // Alt -> ⌘ + ⌥
+  getKeys = (options: Options) => {
+    const { ctrlKey, shiftKey, altKey } = options;
+    return {
+      metaKey: ctrlKey ?? altKey,
+      altKey,
+      shiftKey,
+    };
+  };
+  // Prevent conflict with Mac-specific navigation shortcuts.
+  inputSensitive = isInputFocused;
+} else {
+  getKeys = (options: Options) => {
+    const { ctrlKey, shiftKey, altKey } = options;
+    return {
+      ctrlKey,
+      altKey,
+      shiftKey,
+    };
+  };
+  inputSensitive = () => false;
+}
 
 const compareKey = new Intl.Collator(undefined, { sensitivity: "base" })
   .compare;
 
 export function useShortcut(options: Options) {
-  const { key, altKey, ctrlKey, shiftKey, canHandle, action } = options;
+  const { key, canHandle, action } = options;
+  const { ctrlKey, altKey, shiftKey, metaKey } = getKeys(options);
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (
         compareKey(e.key, key) === 0 &&
+        (ctrlKey === undefined || e.ctrlKey === ctrlKey) &&
         (altKey === undefined || e.altKey === altKey) &&
-        (ctrlKey === undefined || e[ctrlOrMetaKey] === ctrlKey) &&
         (shiftKey === undefined || e.shiftKey === shiftKey) &&
+        (metaKey === undefined || e.metaKey === metaKey) &&
         (canHandle === undefined || canHandle(e))
       ) {
         e.stopPropagation();
@@ -34,7 +72,7 @@ export function useShortcut(options: Options) {
         action(e);
       }
     },
-    [key, altKey, ctrlKey, shiftKey, canHandle, action]
+    [key, ctrlKey, shiftKey, altKey, metaKey, canHandle, action]
   );
 
   useEffect(() => {
@@ -82,6 +120,11 @@ export function useShortcuts({
     [active, tab, currentViewType, viewType, canHandleProp]
   );
 
+  const canHandleInputSensitive = useCallback(
+    (e: KeyboardEvent) => canHandle(e) && !inputSensitive(),
+    [canHandle]
+  );
+
   useShortcut({
     key: "Insert",
     ctrlKey: true,
@@ -104,7 +147,7 @@ export function useShortcuts({
   });
 
   useShortcut({
-    key: "y",
+    key: "k",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onCopy?.(), [onCopy]),
@@ -127,22 +170,21 @@ export function useShortcuts({
   useShortcut({
     key: "g",
     ctrlKey: true,
-    shiftKey: true,
     canHandle,
     action: useCallback(() => onFocus?.(), [onFocus]),
   });
 
   useShortcut({
-    key: "j",
+    key: "ArrowLeft",
     ctrlKey: true,
-    canHandle,
+    canHandle: canHandleInputSensitive,
     action: useCallback(() => onPrev?.(), [onPrev]),
   });
 
   useShortcut({
-    key: "k",
+    key: "ArrowRight",
     ctrlKey: true,
-    canHandle,
+    canHandle: canHandleInputSensitive,
     action: useCallback(() => onNext?.(), [onNext]),
   });
 }

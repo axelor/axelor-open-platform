@@ -129,6 +129,15 @@ export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
   return handleFocus;
 };
 
+export function isInputFocused() {
+  const activeElement = document.activeElement as HTMLElement | null;
+  return (
+    activeElement != null &&
+    (activeElement.contentEditable === "true" ||
+      ["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName))
+  );
+}
+
 function getDefaultValues(meta: ViewData<FormView>) {
   const { fields = {} } = meta;
   const result: DataRecord = Object.entries(fields).reduce(

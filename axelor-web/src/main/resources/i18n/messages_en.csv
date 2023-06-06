@@ -486,5 +486,6 @@
 "Reconnecting…",,,
 "Ctrl.Key","Ctrl",,
 "Shift.Key","Shift",,
+"Alt.Key","Alt",,
 "Insert.Key","Insert",,
 "duplicate current record",,,
