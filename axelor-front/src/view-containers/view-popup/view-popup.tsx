@@ -208,7 +208,7 @@ function Footer({
 
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
-  const popupCanReload = params?.reload;
+  const popupCanReload = params?.popup === "reload";
 
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
