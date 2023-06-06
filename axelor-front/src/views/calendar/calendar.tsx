@@ -399,8 +399,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
   useShortcuts({
     viewType: metaView.type,
     onRefresh: handleRefresh,
-    onPrev: handlePrev,
-    onNext: handleNext,
   });
 
   const handleDateChange = useCallback(

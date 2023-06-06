@@ -19,6 +19,7 @@ import {
 
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { useRoute } from "@/hooks/use-route";
+import { useNavShortcuts } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import {
   Button,
@@ -32,6 +33,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
 import { ActionExecutor } from "../action";
+
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -236,6 +238,12 @@ export function ViewToolBar(props: ViewToolBarProps) {
       async () => onNext?.()
     );
   }, [dirty, onNext]);
+
+  useNavShortcuts({
+    viewType: view.type,
+    onPrev: canPrev ? handlePrev : undefined,
+    onNext: canNext ? handleNext : undefined,
+  });
 
   const switchActions = useMemo(() => {
     if (views.length === 1) return;

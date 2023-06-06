@@ -15,13 +15,14 @@ export type Options = {
   action: (e: KeyboardEvent) => void;
 };
 
+const alwaysTrue = () => true;
+
 let getKeys: (options: Options) => {
   ctrlKey?: boolean;
   altKey?: boolean;
   shiftKey?: boolean;
   metaKey?: boolean;
 };
-let inputSensitive: () => boolean;
 
 if (isMac) {
   // Command (Meta) is used instead of Control.
@@ -38,7 +39,6 @@ if (isMac) {
     };
   };
   // Prevent conflict with Mac-specific navigation shortcuts.
-  inputSensitive = isInputFocused;
 } else {
   getKeys = (options: Options) => {
     const { ctrlKey, shiftKey, altKey } = options;
@@ -48,7 +48,6 @@ if (isMac) {
       shiftKey,
     };
   };
-  inputSensitive = () => false;
 }
 
 const compareKey = new Intl.Collator(undefined, { sensitivity: "base" })
@@ -83,11 +82,9 @@ export function useShortcut(options: Options) {
   }, [key, action, handleKeyDown]);
 }
 
-const defaultCanHandle = () => true;
-
 export function useShortcuts({
   viewType,
-  canHandle: canHandleProp = defaultCanHandle,
+  canHandle: canHandleProp = alwaysTrue,
   onNew,
   onEdit,
   onSave,
@@ -95,8 +92,6 @@ export function useShortcuts({
   onDelete,
   onRefresh,
   onFocus,
-  onNext,
-  onPrev,
 }: {
   viewType: string;
   canHandle?: (e: KeyboardEvent) => boolean;
@@ -107,8 +102,6 @@ export function useShortcuts({
   onDelete?: () => void;
   onRefresh?: () => void;
   onFocus?: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
 }) {
   const { active } = useTabs();
   const tab = useViewTab();
@@ -118,11 +111,6 @@ export function useShortcuts({
     (e: KeyboardEvent) =>
       active === tab && currentViewType === viewType && canHandleProp(e),
     [active, tab, currentViewType, viewType, canHandleProp]
-  );
-
-  const canHandleInputSensitive = useCallback(
-    (e: KeyboardEvent) => canHandle(e) && !inputSensitive(),
-    [canHandle]
   );
 
   useShortcut({
@@ -173,18 +161,43 @@ export function useShortcuts({
     canHandle,
     action: useCallback(() => onFocus?.(), [onFocus]),
   });
+}
+
+export function useNavShortcuts({
+  viewType,
+  canHandle: canHandleProp = alwaysTrue,
+  onNext,
+  onPrev,
+}: {
+  viewType: string;
+  canHandle?: (e: KeyboardEvent) => boolean;
+  onPrev?: () => void;
+  onNext?: () => void;
+}) {
+  const { active } = useTabs();
+  const tab = useViewTab();
+  const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
+
+  const canHandle = useCallback(
+    (e: KeyboardEvent) =>
+      active === tab &&
+      currentViewType === viewType &&
+      !isInputFocused() &&
+      canHandleProp(e),
+    [active, tab, currentViewType, viewType, canHandleProp]
+  );
 
   useShortcut({
     key: "ArrowLeft",
     ctrlKey: true,
-    canHandle: canHandleInputSensitive,
+    canHandle,
     action: useCallback(() => onPrev?.(), [onPrev]),
   });
 
   useShortcut({
     key: "ArrowRight",
     ctrlKey: true,
-    canHandle: canHandleInputSensitive,
+    canHandle,
     action: useCallback(() => onNext?.(), [onNext]),
   });
 }

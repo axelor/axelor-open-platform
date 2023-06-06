@@ -573,8 +573,6 @@ function GridInner(props: ViewProps<GridView>) {
     onEdit: canEdit && editEnabled ? handleEdit : undefined,
     onDelete: canDelete && deleteEnabled ? handleDelete : undefined,
     onRefresh: onSearch,
-    onPrev: canPrev ? handlePrev : undefined,
-    onNext: canNext ? handleNext : undefined,
   });
 
   return (

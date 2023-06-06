@@ -312,8 +312,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   useShortcuts({
     viewType: view.type,
     onRefresh: handleRefresh,
-    onPrev: canPrev ? handlePrev : undefined,
-    onNext: canNext ? handleNext : undefined,
   });
 
   return (

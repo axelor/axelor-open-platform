@@ -212,8 +212,6 @@ export function Cards(props: ViewProps<CardsView>) {
     viewType: view.type,
     onNew: canNew ? onNew : undefined,
     onRefresh: onSearch,
-    onPrev: canPrev ? handlePrev : undefined,
-    onNext: canNext ? handleNext : undefined,
   });
 
   return (

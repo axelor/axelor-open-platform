@@ -643,8 +643,6 @@ function FormContainer({
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: useHandleFocus(containerRef),
-    onPrev: pagination.canPrev ? pagination.onPrev : undefined,
-    onNext: pagination.canNext ? pagination.onNext : undefined,
   });
 
   // register tab:refresh
