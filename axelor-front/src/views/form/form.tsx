@@ -22,7 +22,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
-import { useShortcuts } from "@/hooks/use-shortcut";
+import { useShortcut, useShortcuts } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { diff, extractDummy } from "@/services/client/data-utils";
@@ -30,6 +30,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
+import { focusSearchTabIdAtom } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
@@ -58,6 +59,7 @@ import { createWidgetAtom } from "./builder/atoms";
 
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
+
 import styles from "./form.module.scss";
 
 export const fetchRecord = async (
@@ -590,7 +592,8 @@ function FormContainer({
   ]);
 
   const tab = useViewTab();
-  const { close: closeTab } = useTabs();
+  const { active, close: closeTab } = useTabs();
+  const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
   useEffect(() => {
     if (popup) return;
@@ -643,6 +646,27 @@ function FormContainer({
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: useHandleFocus(containerRef),
+  });
+
+  const setFocusSearchTabId = useSetAtom(focusSearchTabIdAtom);
+
+  useShortcut({
+    key: "f",
+    ctrlKey: true,
+    canHandle: useCallback(
+      () =>
+        prevType != null &&
+        active === tab &&
+        currentViewType === schema.type &&
+        !isInputFocused(),
+      [prevType, active, tab, currentViewType, schema.type]
+    ),
+    action: useCallback(() => {
+      if (!isDirty && prevType) {
+        setFocusSearchTabId(tab.id);
+        switchTo(prevType);
+      }
+    }, [isDirty, prevType, setFocusSearchTabId, tab.id, switchTo]),
   });
 
   // register tab:refresh

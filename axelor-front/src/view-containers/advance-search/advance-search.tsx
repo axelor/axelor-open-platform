@@ -12,10 +12,17 @@ import {
   MaterialIcon,
   MaterialIconProps,
 } from "@axelor/ui/icons/meterial-icon";
-import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { PrimitiveAtom, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import { KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
@@ -403,6 +410,8 @@ export function AdvanceSearch({
   );
 }
 
+export const focusSearchTabIdAtom = atom<string | null>(null);
+
 interface SearchInputIconProps extends MaterialIconProps {
   key: string;
 }
@@ -439,6 +448,15 @@ function SearchInput({
     canHandle,
     action: useCallback(() => searchRef.current?.focus(), []),
   });
+
+  const [focusSearchTabId, setFocusSearchTabId] = useAtom(focusSearchTabIdAtom);
+
+  useEffect(() => {
+    if (focusSearchTabId === tab.id) {
+      setFocusSearchTabId(null);
+      searchRef.current?.focus();
+    }
+  }, [tab.id, focusSearchTabId, setFocusSearchTabId]);
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
