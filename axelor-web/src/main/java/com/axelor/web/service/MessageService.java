@@ -106,6 +106,7 @@ public class MessageService extends AbstractService {
       @QueryParam("folder") @DefaultValue("inbox") String folder,
       @QueryParam("relatedId") Long relatedId,
       @QueryParam("relatedModel") String relatedModel,
+      @QueryParam("type") String type,
       @QueryParam("limit") @DefaultValue("10") Integer limit,
       @QueryParam("offset") @DefaultValue("0") Integer offset) {
 
@@ -114,6 +115,10 @@ public class MessageService extends AbstractService {
     req.setModel(relatedModel);
     req.setOffset(offset);
     req.setLimit(limit);
+
+    if (type != null) {
+      req.setData(Map.of("context", Map.of("type", type)));
+    }
 
     if (relatedId != null && relatedModel != null) {
       return findByRelated(req, relatedId, relatedModel);
