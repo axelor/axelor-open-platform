@@ -147,14 +147,14 @@ export function useShortcuts({
   });
 
   useShortcut({
-    key: "k",
+    key: "d",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onCopy?.(), [onCopy]),
   });
 
   useShortcut({
-    key: "d",
+    key: "Delete",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onDelete?.(), [onDelete]),

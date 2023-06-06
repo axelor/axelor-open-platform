@@ -28,11 +28,11 @@ export function Shortcuts() {
       description: i18n.get("save current record"),
     },
     {
-      keys: [ctrlKey, "K"],
+      keys: [ctrlKey, "D"],
       description: i18n.get("duplicate current record"),
     },
     {
-      keys: [ctrlKey, "D"],
+      keys: [ctrlKey, i18n.get("Delete.Key")],
       description: i18n.get("delete current/selected record(s)"),
     },
     {
