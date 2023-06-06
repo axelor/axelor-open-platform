@@ -122,7 +122,7 @@ export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
 
   const { id } = useViewRoute();
-  const [viewProps = {}] = useViewProps();
+  const [viewProps = {}, setViewProps] = useViewProps();
 
   const { action } = useViewTab();
 
@@ -131,7 +131,14 @@ export function Form(props: ViewProps<FormView>) {
   const recordId = String(id || action.context?._showRecord || "");
   const popupRecord = action.params?.["_popup-record"];
 
-  const { state, data: record = {} } = useAsync(async () => {
+  const { state, data: record = {} } = useAsync<DataRecord>(async () => {
+    const record = viewProps?.fetched;
+    if (record) {
+      setViewProps((props) => ({ ...props, fetched: undefined }));
+      if (String(record?.id) === recordId) {
+        return { ...record };
+      }
+    }
     if (popupRecord) {
       if (popupRecord._dirty) return popupRecord;
       const res = await fetchRecord(meta, dataStore, popupRecord.id);
@@ -140,7 +147,7 @@ export function Form(props: ViewProps<FormView>) {
     return await fetchRecord(meta, dataStore, recordId);
   }, [popupRecord, recordId, meta, dataStore]);
 
-  const isLoading = state !== "hasData";
+  const isLoading = state !== "hasData" || Boolean(recordId && !record.id);
 
   return (
     <FormContainer
@@ -169,6 +176,7 @@ function FormContainer({
     onLoad: onLoadAction,
     onSave: onSaveAction,
   } = schema;
+  const [, setViewProps] = useViewProps();
 
   const { id: tabId, popup, popupOptions } = useViewTab();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
@@ -220,12 +228,12 @@ function FormContainer({
         get,
         set,
         record: DataRecord | null,
-        options?: { readonly?: boolean }
+        options?: { readonly?: boolean; refresh?: boolean }
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
-        const props = { readonly, ...options };
+        const { refresh = true, ...props } = { readonly, ...options };
 
         record = record ?? {};
         record =
@@ -270,8 +278,10 @@ function FormContainer({
           }
         }
 
-        const event = new CustomEvent("form:refresh", { detail: tabId });
-        document.dispatchEvent(event);
+        if (refresh) {
+          const event = new CustomEvent("form:refresh", { detail: tabId });
+          document.dispatchEvent(event);
+        }
       },
       [
         actionExecutor,
@@ -356,7 +366,17 @@ function FormContainer({
 
         res = { ...dummy, ...res }; // restore dummy values
 
-        doEdit(res, { readonly });
+        let refresh = true;
+        // new record save
+        if (vals.id !== res.id) {
+          refresh = false;
+          setViewProps((props) => ({
+            ...props,
+            fetched: { ...res, $$fetched: true },
+          }));
+        }
+
+        doEdit(res, { readonly, refresh });
 
         return res;
       },
@@ -367,6 +387,7 @@ function FormContainer({
         doRead,
         formAtom,
         getErrors,
+        setViewProps,
         onSaveAction,
         readonly,
       ]
@@ -509,7 +530,7 @@ function FormContainer({
         const recId = rec.id ?? 0;
         const action = recId > 0 ? onLoadAction : onNewAction;
 
-        if (action) {
+        if (action && !rec.$$fetched) {
           await actionExecutor.execute(action);
         }
       },
