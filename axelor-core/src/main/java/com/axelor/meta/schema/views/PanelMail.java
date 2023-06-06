@@ -47,7 +47,17 @@ public class PanelMail extends AbstractPanel {
   @JsonTypeName("mail-messages")
   public static class MailMessages extends AbstractWidget {
 
+    @XmlAttribute private String filter;
+
     @XmlAttribute private Integer limit;
+
+    public String getFilter() {
+      return filter;
+    }
+
+    public void setFilter(String filter) {
+      this.filter = filter;
+    }
 
     public Integer getLimit() {
       return limit;

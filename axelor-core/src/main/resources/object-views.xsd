@@ -1575,6 +1575,13 @@
         <xsd:sequence>
           <xsd:element name="mail-messages">
             <xsd:complexType>
+              <xsd:attribute name="filter" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Specify the message type to show by default.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:attribute name="limit" type="xsd:int"></xsd:attribute>
             </xsd:complexType>
           </xsd:element>
