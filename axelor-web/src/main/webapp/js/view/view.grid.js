@@ -327,7 +327,7 @@ function GridViewCtrl($scope, $element) {
       options = {};
 
     function fixPage() {
-      var promise = ds.fixPage();
+      var promise = ds.fixPage(options);
       if (promise) {
         $scope.updateRoute();
         return promise;

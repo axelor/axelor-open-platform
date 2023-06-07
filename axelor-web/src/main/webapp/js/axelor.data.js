@@ -249,14 +249,15 @@
       },
 
       // if search count is less than current page boundary, adjust the page and do search again
-      fixPage: function () {
+      fixPage: function (options) {
         var page = this._page;
         if (page.from != 0 && page.total != 0 && page.from >= page.total) {
           page.from = page.total - (page.total % page.limit);
           page.from = page.from === page.total ? page.from - page.limit : page.from;
           page.from = Math.max(0, page.from);
           page.to = Math.min(page.from + page.limit, page.total);
-          return this.search();
+          delete options.offset;
+          return this.search(options);
         }
       },
 
