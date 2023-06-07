@@ -63,6 +63,10 @@ function showDialog(options: DialogOptions) {
   };
 }
 
+export function dialogsActive() {
+  return dialogsStore.get(dialogsAtom).length > 0;
+}
+
 export namespace dialogs {
   export async function modal(options: DialogOptions) {
     const { onClose, open = true, ...rest } = options;

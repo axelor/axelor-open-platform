@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react";
 
+import { dialogsActive } from "@/components/dialogs";
 import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
 import { isInputFocused } from "@/views/form";
 import { useTabs } from "../use-tabs";
@@ -145,14 +146,22 @@ export function useShortcuts({
     key: "Delete",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => onDelete?.(), [onDelete]),
+    action: useCallback(() => {
+      if (!dialogsActive()) {
+        onDelete?.();
+      }
+    }, [onDelete]),
   });
 
   useShortcut({
     key: "r",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => onRefresh?.(), [onRefresh]),
+    action: useCallback(() => {
+      if (!dialogsActive()) {
+        onRefresh?.();
+      }
+    }, [onRefresh]),
   });
 
   useShortcut({
@@ -192,13 +201,21 @@ export function useNavShortcuts({
     key: "ArrowLeft",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => onPrev?.(), [onPrev]),
+    action: useCallback(() => {
+      if (!dialogsActive()) {
+        onPrev?.();
+      }
+    }, [onPrev]),
   });
 
   useShortcut({
     key: "ArrowRight",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => onNext?.(), [onNext]),
+    action: useCallback(() => {
+      if (!dialogsActive()) {
+        onNext?.();
+      }
+    }, [onNext]),
   });
 }
