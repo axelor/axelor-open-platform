@@ -2,7 +2,6 @@ import { useCallback, useEffect } from "react";
 
 import { dialogsActive } from "@/components/dialogs";
 import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
-import { isInputFocused } from "@/views/form";
 import { useTabs } from "../use-tabs";
 
 export const isMac = /Mac OS/i.test(navigator.userAgent);
@@ -166,7 +165,7 @@ export function useShortcuts({
 
   useShortcut({
     key: "g",
-    ctrlKey: true,
+    altKey: true,
     canHandle,
     action: useCallback(() => onFocus?.(), [onFocus]),
   });
@@ -192,13 +191,12 @@ export function useNavShortcuts({
       !e.repeat &&
       active === tab &&
       currentViewType === viewType &&
-      !isInputFocused() &&
       canHandleProp(e),
     [active, tab, currentViewType, viewType, canHandleProp]
   );
 
   useShortcut({
-    key: "ArrowLeft",
+    key: "k",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => {
@@ -209,7 +207,7 @@ export function useNavShortcuts({
   });
 
   useShortcut({
-    key: "ArrowRight",
+    key: "j",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => {

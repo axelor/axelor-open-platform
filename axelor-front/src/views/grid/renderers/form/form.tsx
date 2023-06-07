@@ -281,7 +281,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     useShortcut({
       key: "g",
-      ctrlKey: true,
+      altKey: true,
       action: useHandleFocus(containerRef),
     });
 

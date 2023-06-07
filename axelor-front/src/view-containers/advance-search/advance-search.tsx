@@ -41,7 +41,6 @@ import {
 import { download } from "@/utils/download";
 import { useViewAction, useViewTab } from "../views/scope";
 
-import { isInputFocused } from "@/views/form";
 import { Chip } from "@/views/form/widgets";
 import styles from "./advance-search.module.scss";
 import { Editor } from "./editor";
@@ -437,16 +436,11 @@ function SearchInput({
   const searchRef = useRef<HTMLInputElement>(null);
   const { active } = useTabs();
   const tab = useViewTab();
-  const canHandle = useCallback(
-    () =>
-      active === tab &&
-      (document.activeElement === searchRef.current || !isInputFocused()),
-    [active, tab]
-  );
+  const canHandle = useCallback(() => active === tab, [active, tab]);
 
   useShortcut({
     key: "f",
-    ctrlKey: true,
+    altKey: true,
     canHandle,
     action: useCallback(() => searchRef.current?.focus(), []),
   });

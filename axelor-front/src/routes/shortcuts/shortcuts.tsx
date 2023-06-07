@@ -6,7 +6,16 @@ import { i18n } from "@/services/client/i18n";
 import styles from "./shortcuts.module.scss";
 
 export function Shortcuts() {
-  const ctrlKey = isMac ? "⌘" : i18n.get("Ctrl.Key");
+  let ctrlKey: string;
+  let altKey: string[];
+
+  if (isMac) {
+    ctrlKey = "⌘";
+    altKey = ["⌘", "⌥"];
+  } else {
+    ctrlKey = i18n.get("Ctrl.Key");
+    altKey = [i18n.get("Alt.Key")];
+  }
 
   const shortcuts = [
     {
@@ -38,23 +47,20 @@ export function Shortcuts() {
       description: i18n.get("close the current view tab"),
     },
     {
-      keys: [ctrlKey, "F"],
+      keys: [...altKey, "F"],
       description: i18n.get("search for records"),
-      activeWhenNotInput: true,
     },
     {
-      keys: [ctrlKey, "G"],
+      keys: [...altKey, "G"],
       description: i18n.get("focus first or selected item in view"),
     },
     {
-      keys: [ctrlKey, "←"],
-      description: i18n.get("navigate to previous page/record"),
-      activeWhenNotInput: true,
+      keys: [ctrlKey, "J"],
+      description: i18n.get("navigate to next page/record"),
     },
     {
-      keys: [ctrlKey, "→"],
-      description: i18n.get("navigate to next page/record"),
-      activeWhenNotInput: true,
+      keys: [ctrlKey, "K"],
+      description: i18n.get("navigate to previous page/record"),
     },
     {
       keys: [ctrlKey, "M"],
@@ -66,9 +72,6 @@ export function Shortcuts() {
     },
   ];
 
-  const activeWhenNotInputText = i18n.get(
-    "active when a text input is not focused"
-  );
 
   return (
     <table className={styles.shortcuts}>
@@ -76,10 +79,7 @@ export function Shortcuts() {
         {shortcuts.map((shortcut) => (
           <ShortcutRow key={`shortcut-row-${shortcut.keys}`} {...shortcut} />
         ))}
-        <tr className={styles.notes}>
-          <td colSpan={2}>1. {activeWhenNotInputText}</td>
-        </tr>
-      </tbody>
+       </tbody>
     </table>
   );
 }
@@ -87,11 +87,9 @@ export function Shortcuts() {
 function ShortcutRow({
   keys,
   description,
-  activeWhenNotInput,
 }: {
   keys: string[];
   description: string;
-  activeWhenNotInput?: boolean;
 }) {
   return (
     <tr>
@@ -102,7 +100,6 @@ function ShortcutRow({
             {index < keys.length - 1 && <> + </>}
           </Fragment>
         ))}
-        {activeWhenNotInput && <sup>&nbsp;1</sup>}
       </td>
       <td>{description}</td>
     </tr>

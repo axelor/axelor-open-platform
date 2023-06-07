@@ -135,15 +135,6 @@ export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
   return handleFocus;
 };
 
-export function isInputFocused() {
-  const activeElement = document.activeElement as HTMLElement | null;
-  return (
-    activeElement != null &&
-    (activeElement.contentEditable === "true" ||
-      ["INPUT", "TEXTAREA", "SELECT"].includes(activeElement.tagName))
-  );
-}
-
 function getDefaultValues(meta: ViewData<FormView>) {
   const { fields = {} } = meta;
   const result: DataRecord = Object.entries(fields).reduce(
@@ -675,13 +666,12 @@ function FormContainer({
 
   useShortcut({
     key: "f",
-    ctrlKey: true,
+    altKey: true,
     canHandle: useCallback(
       () =>
         active === tab &&
         currentViewType === schema.type &&
-        searchViewType != null &&
-        !isInputFocused(),
+        searchViewType != null,
       [searchViewType, active, tab, currentViewType, schema.type]
     ),
     action: useCallback(() => {
