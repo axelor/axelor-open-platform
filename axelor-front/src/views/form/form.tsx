@@ -640,16 +640,25 @@ function FormContainer({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const handleFocus = useHandleFocus(containerRef);
+
+  const handleEditFocus = useCallback(() => {
+    void (async () => {
+      await onEdit();
+      handleFocus();
+    })();
+  }, [handleFocus, onEdit]);
+
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
     onNew: canNew ? onNew : undefined,
-    onEdit: canEdit ? onEdit : undefined,
+    onEdit: canEdit ? handleEditFocus : undefined,
     onSave: canSave ? handleSave : undefined,
     onCopy: canCopy ? onCopy : undefined,
     onDelete: canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
-    onFocus: useHandleFocus(containerRef),
+    onFocus: handleFocus,
   });
 
   const { views = [] } = useViewAction();
