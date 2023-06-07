@@ -575,8 +575,14 @@ function GridInner(props: ViewProps<GridView>) {
     onRefresh: onSearch,
     onFocus: useCallback(() => {
       setState?.((draft) => {
-        draft.selectedCell = [0, 0];
-        draft.selectedRows = [0];
+        const row = draft.selectedRows?.[0];
+        if (row != null) {
+          const col = draft.selectedCell?.[1] ?? 0
+          draft.selectedCell = [row, col];
+        } else {
+          draft.selectedCell = [0, 0];
+          draft.selectedRows = [0];
+        }
       });
     }, [setState]),
   });
