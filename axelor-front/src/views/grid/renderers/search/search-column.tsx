@@ -119,7 +119,7 @@ export function SearchColumn(props: SearchColumnProps) {
     field.encrypted ||
     ["one-to-many", "many-to-many"].includes(toKebabCase(field.type))
   ) {
-    return <Box h={100} w={100} bg="light" />;
+    return <Box h={100} w={100} />;
   }
 
   return <SearchInput {...props} />;
