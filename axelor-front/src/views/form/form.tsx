@@ -633,18 +633,17 @@ function FormContainer({
 
   const handleFocus = useHandleFocus(containerRef);
 
-  const handleEditFocus = useCallback(() => {
-    void (async () => {
-      await onEdit();
+  useEffect(() => {
+    if (!readonly) {
       handleFocus();
-    })();
-  }, [handleFocus, onEdit]);
+    }
+  }, [readonly, handleFocus]);
 
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
     onNew: canNew ? onNew : undefined,
-    onEdit: canEdit ? handleEditFocus : undefined,
+    onEdit: canEdit ? onEdit : undefined,
     onSave: canSave ? handleSave : undefined,
     onCopy: canCopy ? onCopy : undefined,
     onDelete: canDelete ? onDelete : undefined,
