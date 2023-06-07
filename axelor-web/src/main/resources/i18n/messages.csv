@@ -490,3 +490,5 @@
 "Insert.Key",,,
 "Delete.Key",,,
 "duplicate current record",,,
+"active when a text input is not focused",,,
+

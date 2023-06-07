@@ -490,3 +490,4 @@
 "Insert.Key","Insert",,
 "Delete.Key","Suppr",,
 "duplicate current record","copier l’enregistrement actuel",,
+"active when a text input is not focused","actif en dehors des saisies de texte",,

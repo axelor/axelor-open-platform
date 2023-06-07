@@ -6,13 +6,7 @@ import { i18n } from "@/services/client/i18n";
 import styles from "./shortcuts.module.scss";
 
 export function Shortcuts() {
-  let ctrlKey: string;
-
-  if (isMac) {
-    ctrlKey = "⌘";
-  } else {
-    ctrlKey = i18n.get("Ctrl.Key");
-  }
+  const ctrlKey = isMac ? "⌘" : i18n.get("Ctrl.Key");
 
   const shortcuts = [
     {
@@ -46,6 +40,7 @@ export function Shortcuts() {
     {
       keys: [ctrlKey, "F"],
       description: i18n.get("search for records"),
+      activeWhenNotInput: true,
     },
     {
       keys: [ctrlKey, "G"],
@@ -54,10 +49,12 @@ export function Shortcuts() {
     {
       keys: [ctrlKey, "←"],
       description: i18n.get("navigate to previous page/record"),
+      activeWhenNotInput: true,
     },
     {
       keys: [ctrlKey, "→"],
       description: i18n.get("navigate to next page/record"),
+      activeWhenNotInput: true,
     },
     {
       keys: [ctrlKey, "M"],
@@ -69,16 +66,19 @@ export function Shortcuts() {
     },
   ];
 
+  const activeWhenNotInputText = i18n.get(
+    "active when a text input is not focused"
+  );
+
   return (
     <table className={styles.shortcuts}>
       <tbody>
         {shortcuts.map((shortcut) => (
-          <ShortcutRow
-            key={`shortcut-row-${shortcut.keys}`}
-            keys={shortcut.keys}
-            description={shortcut.description}
-          />
+          <ShortcutRow key={`shortcut-row-${shortcut.keys}`} {...shortcut} />
         ))}
+        <tr className={styles.notes}>
+          <td colSpan={2}>1. {activeWhenNotInputText}</td>
+        </tr>
       </tbody>
     </table>
   );
@@ -87,9 +87,11 @@ export function Shortcuts() {
 function ShortcutRow({
   keys,
   description,
+  activeWhenNotInput,
 }: {
   keys: string[];
   description: string;
+  activeWhenNotInput?: boolean;
 }) {
   return (
     <tr>
@@ -100,6 +102,7 @@ function ShortcutRow({
             {index < keys.length - 1 && <> + </>}
           </Fragment>
         ))}
+        {activeWhenNotInput && <sup>&nbsp;1</sup>}
       </td>
       <td>{description}</td>
     </tr>
