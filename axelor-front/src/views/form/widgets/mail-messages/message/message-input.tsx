@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { Message, MessageFile, MessageInputProps } from "../message/types";
 import { Box, Input, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -7,6 +7,24 @@ import { MessageFiles } from "./message-files";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
 import { useMessagePopup } from "./message-form";
+
+function TextareaAutoSizeInput(props: any) {
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const { value } = props;
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    const getHeight = () => {
+      if (!input || !value || !input?.scrollHeight) return "";
+      const diff = input.offsetHeight - input.clientHeight;
+      input.style.height = "auto";
+      return `${input.scrollHeight + diff}px`;
+    };
+    input && (input.style.height = getHeight());
+  }, [value]);
+
+  return <Input ref={inputRef} as="textarea" rows={1} {...props} />;
+}
 
 export function MessageInput({
   focus = false,
@@ -85,14 +103,12 @@ export function MessageInput({
 
   return (
     <Box mb={3}>
-      <Input
-        name={"msgs"}
+      <TextareaAutoSizeInput
         value={value}
+        autoFocus={focus}
+        placeholder={i18n.get("Write your comment here")}
         onChange={handleInputChange}
         onBlur={() => onBlur && onBlur(value)}
-        max={5}
-        placeholder={i18n.get("Write your comment here")}
-        autoFocus={focus}
       />
       {files && (
         <MessageFiles
@@ -104,7 +120,14 @@ export function MessageInput({
       )}
       {hasValue && (
         <Box mt={2}>
-          <Button variant="primary" size="sm" onClick={handlePost}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handlePost}
+            {...(!focus && {
+              onMouseDown: (e) => e.preventDefault(),
+            })}
+          >
             {i18n.get("Post")}
           </Button>
           <Button
