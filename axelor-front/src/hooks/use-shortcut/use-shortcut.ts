@@ -180,6 +180,7 @@ export function useNavShortcuts({
 
   const canHandle = useCallback(
     (e: KeyboardEvent) =>
+      !e.repeat &&
       active === tab &&
       currentViewType === viewType &&
       !isInputFocused() &&
