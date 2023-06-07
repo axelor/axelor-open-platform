@@ -49,6 +49,8 @@ import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
 import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
 
+export const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
+
 export interface AdvanceSearchProps {
   dataStore: DataStore;
   stateAtom: AdvancedSearchAtom;

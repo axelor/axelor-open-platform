@@ -30,11 +30,15 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
-import { focusSearchTabIdAtom } from "@/view-containers/advance-search";
+import {
+  ADVANCED_SEARCH_VIEWS,
+  focusSearchTabIdAtom,
+} from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
+  useViewAction,
   useViewDirtyAtom,
   useViewProps,
   useViewRoute,
@@ -648,6 +652,16 @@ function FormContainer({
     onFocus: useHandleFocus(containerRef),
   });
 
+  const { views = [] } = useViewAction();
+
+  const searchViewType = useMemo(
+    () =>
+      prevType != null && ADVANCED_SEARCH_VIEWS.has(prevType)
+        ? prevType
+        : views.find((view) => ADVANCED_SEARCH_VIEWS.has(view.type))?.type,
+    [prevType, views]
+  );
+
   const setFocusSearchTabId = useSetAtom(focusSearchTabIdAtom);
 
   useShortcut({
@@ -655,18 +669,18 @@ function FormContainer({
     ctrlKey: true,
     canHandle: useCallback(
       () =>
-        prevType != null &&
         active === tab &&
         currentViewType === schema.type &&
+        searchViewType != null &&
         !isInputFocused(),
-      [prevType, active, tab, currentViewType, schema.type]
+      [searchViewType, active, tab, currentViewType, schema.type]
     ),
     action: useCallback(() => {
-      if (!isDirty && prevType) {
+      if (!isDirty) {
         setFocusSearchTabId(tab.id);
-        switchTo(prevType);
+        switchTo(searchViewType!);
       }
-    }, [isDirty, prevType, setFocusSearchTabId, tab.id, switchTo]),
+    }, [isDirty, searchViewType, setFocusSearchTabId, tab.id, switchTo]),
   });
 
   // register tab:refresh
