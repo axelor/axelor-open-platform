@@ -573,6 +573,12 @@ function GridInner(props: ViewProps<GridView>) {
     onEdit: canEdit && editEnabled ? handleEdit : undefined,
     onDelete: canDelete && deleteEnabled ? handleDelete : undefined,
     onRefresh: onSearch,
+    onFocus: useCallback(() => {
+      setState?.((draft) => {
+        draft.selectedCell = [0, 0];
+        draft.selectedRows = [0];
+      });
+    }, [setState]),
   });
 
   return (
