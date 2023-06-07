@@ -109,7 +109,7 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
     promise.then(handleEmpty, handleEmpty);
     return promise.success(update).then(function () {
       $scope.handleEmpty();
-      return ds.fixPage();
+      return ds.fixPage(opts);
     });
   };
 
