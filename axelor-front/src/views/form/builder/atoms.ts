@@ -148,9 +148,10 @@ export function createValueAtom({
       markDirty: boolean = true
     ) => {
       const prev = get(lensAtom);
-      if (prev !== value) {
+      const next = typeof value === "string" && value.trim() === "" ? null : value;
+      if (prev !== next) {
         const dirty = markDirty && Boolean(name && !isDummy(name));
-        set(lensAtom, value);
+        set(lensAtom, next);
         set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
         if (dirty) {
           set(dirtyAtom, true);
