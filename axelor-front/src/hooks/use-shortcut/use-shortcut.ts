@@ -26,14 +26,14 @@ let getKeys: (options: Options) => {
 
 if (isMac) {
   // Command (Meta) is used instead of Control.
-  // Option (Alt) cannot be used alone for shortcuts,
+  // Option (Alt) cannot be combined alone with alpha keys for shortcuts,
   // as it might be used to type special characters on some layouts.
   // Ctrl -> ⌘
-  // Alt -> ⌘ + ⌥
+  // Alt -> ⌘ + ⌥ (if alpha key)
   getKeys = (options: Options) => {
-    const { ctrlKey, shiftKey, altKey } = options;
+    const { key, ctrlKey, altKey, shiftKey } = options;
     return {
-      metaKey: ctrlKey ?? altKey,
+      metaKey: ctrlKey ?? (altKey && /^[a-z]$/i.test(key)),
       altKey,
       shiftKey,
     };
@@ -41,7 +41,7 @@ if (isMac) {
   // Prevent conflict with Mac-specific navigation shortcuts.
 } else {
   getKeys = (options: Options) => {
-    const { ctrlKey, shiftKey, altKey } = options;
+    const { ctrlKey, altKey, shiftKey } = options;
     return {
       ctrlKey,
       altKey,
@@ -196,8 +196,8 @@ export function useNavShortcuts({
   );
 
   useShortcut({
-    key: "k",
-    ctrlKey: true,
+    key: "PageUp",
+    altKey: true,
     canHandle,
     action: useCallback(() => {
       if (!dialogsActive()) {
@@ -207,8 +207,8 @@ export function useNavShortcuts({
   });
 
   useShortcut({
-    key: "j",
-    ctrlKey: true,
+    key: "PageDown",
+    altKey: true,
     canHandle,
     action: useCallback(() => {
       if (!dialogsActive()) {
