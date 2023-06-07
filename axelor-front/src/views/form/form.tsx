@@ -676,10 +676,15 @@ function FormContainer({
       [searchViewType, active, tab, currentViewType, schema.type]
     ),
     action: useCallback(() => {
-      if (!isDirty) {
-        setFocusSearchTabId(tab.id);
-        switchTo(searchViewType!);
-      }
+      void (async () => {
+        await dialogs.confirmDirty(
+          async () => isDirty,
+          async () => {
+            setFocusSearchTabId(tab.id);
+            switchTo(searchViewType!);
+          }
+        );
+      })();
     }, [isDirty, searchViewType, setFocusSearchTabId, tab.id, switchTo]),
   });
 
