@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { useCallback, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useState } from "react";
 
 import {
   Box,
@@ -15,7 +15,6 @@ import {
   Portal,
 } from "@axelor/ui";
 
-import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import { SanitizedContent } from "@/utils/sanitize";
 
@@ -257,15 +256,14 @@ export function ModalDialog(props: DialogOptions) {
 
   const canShow = setOpen ? open : show;
 
-  const dialogRef = useRef<HTMLDivElement>(null);
-
-  useShortcut({
-    key: "Escape",
-    canHandle: useCallback((e: KeyboardEvent) => {
-      return dialogRef.current?.contains(e.target as Node) ?? false;
-    }, []),
-    action: useCallback(() => close(false), [close]),
-  });
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        close(false);
+      }
+    },
+    [close]
+  );
 
   return (
     <Portal>
@@ -273,7 +271,6 @@ export function ModalDialog(props: DialogOptions) {
         <Box className={styles.backdrop}></Box>
       </Fade>
       <Dialog
-        ref={dialogRef}
         open={canShow}
         onHide={onHide}
         scrollable
@@ -281,6 +278,7 @@ export function ModalDialog(props: DialogOptions) {
         size={size}
         className={clsx(classes.root, styles.root)}
         data-dialog="true"
+        onKeyDown={handleKeyDown}
       >
         <DialogHeader
           onCloseClick={(e) => close(false)}

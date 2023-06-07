@@ -68,7 +68,7 @@ export function useShortcut(options: Options) {
       ) {
         e.stopPropagation();
         e.preventDefault();
-        action(e);
+        !dialogsActive() && action(e);
       }
     },
     [key, ctrlKey, shiftKey, altKey, metaKey, canHandle, action]
@@ -145,22 +145,14 @@ export function useShortcuts({
     key: "Delete",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => {
-      if (!dialogsActive()) {
-        onDelete?.();
-      }
-    }, [onDelete]),
+    action: useCallback(() => onDelete?.(), [onDelete]),
   });
 
   useShortcut({
     key: "r",
     ctrlKey: true,
     canHandle,
-    action: useCallback(() => {
-      if (!dialogsActive()) {
-        onRefresh?.();
-      }
-    }, [onRefresh]),
+    action: useCallback(() => onRefresh?.(), [onRefresh]),
   });
 
   useShortcut({
@@ -199,21 +191,13 @@ export function useNavShortcuts({
     key: "PageUp",
     altKey: true,
     canHandle,
-    action: useCallback(() => {
-      if (!dialogsActive()) {
-        onPrev?.();
-      }
-    }, [onPrev]),
+    action: useCallback(() => onPrev?.(), [onPrev]),
   });
 
   useShortcut({
     key: "PageDown",
     altKey: true,
     canHandle,
-    action: useCallback(() => {
-      if (!dialogsActive()) {
-        onNext?.();
-      }
-    }, [onNext]),
+    action: useCallback(() => onNext?.(), [onNext]),
   });
 }
