@@ -6,7 +6,6 @@ import {
   Badge,
   TBackground,
   useTheme,
-  ButtonGroup,
 } from "@axelor/ui";
 
 import Avatar from "../avatar";
@@ -256,12 +255,19 @@ export const Message = React.memo(function Message(props: MessageProps) {
   );
 });
 
+const FILTERS = [
+  { title: i18n.get("Comments"), value: "comment" },
+  { title: i18n.get("Notifications"), value: "notification" },
+  { title: i18n.get("All"), value: undefined },
+] as const;
+
 export function MessageBox({
   isMail,
   inputProps: MessageInputProps,
   data,
   fields,
   filter,
+  onFilterChange,
   onFetch,
   onLoad,
   onAction,
@@ -273,6 +279,7 @@ export function MessageBox({
   fields?: FormProps["fields"];
   inputProps?: MessageInputProps;
   filter?: string;
+  onFilterChange?: (filter?: string) => void;
   onFetch?: MessageProps["onFetch"];
   onLoad?: () => void;
   onAction?: MessageProps["onAction"];
@@ -292,27 +299,16 @@ export function MessageBox({
       {!isMail && (
         <Box d="flex" flexDirection="column" g={2}>
           <Box d="flex" g={2}>
-            <Button
-              variant="secondary"
-              outline={filter !== "comment"}
-              onClick={() => onFetch?.({ type: "comment" })}
-            >
-              {i18n.get("Comments")}
-            </Button>
-            <Button
-              variant="secondary"
-              outline={filter !== "notification"}
-              onClick={() => onFetch?.({ type: "notification" })}
-            >
-              {i18n.get("Notifications")}
-            </Button>
-            <Button
-              variant="secondary"
-              outline={!!filter}
-              onClick={() => onFetch?.({ type: undefined })}
-            >
-              {i18n.get("All")}
-            </Button>
+            {FILTERS.map(({ title, value }, ind) => (
+              <Button
+                key={ind}
+                variant="secondary"
+                outline={filter !== value}
+                onClick={() => onFilterChange?.(value)}
+              >
+                {title}
+              </Button>
+            ))}
           </Box>
           <MessageInput
             focus={false}

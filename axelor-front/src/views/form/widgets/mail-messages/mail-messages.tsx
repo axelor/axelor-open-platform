@@ -60,16 +60,15 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
       if (!hasMessages) return;
-      const { parent, type } = options || {};
+      const { parent } = options || {};
       const {
         data,
         pageInfo: { totalRecords, hasNextPage },
       } = await findMessages(recordId as number, model, {
         folder,
+        type: filter,
         ...options,
       });
-
-      setFilter(type);
 
       if (parent) {
         setMessages((msgs) => {
@@ -96,7 +95,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }));
       }
     },
-    [hasMessages, recordId, model, folder]
+    [hasMessages, recordId, model, filter, folder]
   );
 
   const postComment = useCallback(
@@ -148,7 +147,6 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         setMessages([...messages]);
       }
       fetchTags();
-      // TODO: refresh tags
     },
     [messages, fetchTags]
   );
@@ -211,12 +209,12 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   );
 
   const onRefresh = useCallback(() => {
-    fetchAll({ type: filter, limit, offset: 0 });
-  }, [fetchAll, filter, limit]);
+    fetchAll({ limit, offset: 0 });
+  }, [fetchAll, limit]);
 
   const loadMore = useCallback(() => {
-    fetchAll({ type: filter, offset: offset + limit, limit }, false);
-  }, [fetchAll, filter, offset, limit]);
+    fetchAll({ offset: offset + limit, limit }, false);
+  }, [fetchAll, offset, limit]);
 
   useAsyncEffect(async () => {
     onRefresh();
@@ -238,6 +236,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       data={messages}
       isMail={isMessageBox}
       filter={filter}
+      onFilterChange={setFilter}
       onFetch={fetchAll}
       onComment={postComment}
       onCommentRemove={removeComment}
