@@ -1,4 +1,3 @@
-import { atom } from "jotai";
 import get from "lodash/get";
 import isNumber from "lodash/isNumber";
 
@@ -17,14 +16,16 @@ import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { AdvancedSearchState } from "./types";
 
-export const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
-
-export const focusSearchTabIdAtom = atom<string | null>(null);
+const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
 
 function fieldNameAppend(fieldName?: string, append?: string) {
   return (fieldName || "").endsWith(`.${append || ""}`)
     ? fieldName
     : `${fieldName}.${append}`;
+}
+
+export function isAdvancedSearchView(view?: string) {
+  return ADVANCED_SEARCH_VIEWS.has(view ?? "");
 }
 
 export function getCriteria(

@@ -24,6 +24,7 @@ export type AdvancedSearchState = {
   filterType?: "all" | "single";
   domains?: SearchFilter[];
   filters?: SavedFilter[];
-  fields?: MetaData['fields'];
-  jsonFields?: MetaData['jsonFields'];
+  fields?: MetaData["fields"];
+  jsonFields?: MetaData["jsonFields"];
+  focusTabId?: string | null;
 };

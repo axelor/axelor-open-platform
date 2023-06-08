@@ -46,11 +46,7 @@ import styles from "./advance-search.module.scss";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
-import {
-  focusSearchTabIdAtom,
-  getFreeSearchCriteria,
-  prepareAdvanceSearchQuery,
-} from "./utils";
+import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
 
 export interface AdvanceSearchProps {
   dataStore: DataStore;
@@ -82,6 +78,10 @@ export function AdvanceSearch({
   );
   const freeSearchTextAtom = useMemo(
     () => focusAtom(stateAtom, (o) => o.prop("searchText")),
+    [stateAtom]
+  );
+  const focusTabIdAtom = useMemo(
+    () => focusAtom(stateAtom, (o) => o.prop("focusTabId")),
     [stateAtom]
   );
   const searchTextLabel = useAtomValue(
@@ -340,6 +340,7 @@ export function AdvanceSearch({
         readonly={freeSearch === "none"}
         label={searchTextLabel}
         icons={inputIcons}
+        focusTabIdAtom={focusTabIdAtom}
         valueAtom={freeSearchTextAtom}
         onClear={handleClear}
         onSearch={handleFreeSearch}
@@ -422,12 +423,14 @@ function SearchInput({
   label,
   icons,
   valueAtom,
+  focusTabIdAtom,
   onClear,
   onSearch,
 }: {
   readonly?: boolean;
   label?: string;
   icons?: SearchInputIconProps[];
+  focusTabIdAtom: PrimitiveAtom<string | undefined | null>;
   valueAtom: PrimitiveAtom<string | undefined>;
   onClear?: () => void;
   onSearch?: () => void;
@@ -445,7 +448,7 @@ function SearchInput({
     action: useCallback(() => searchRef.current?.focus(), []),
   });
 
-  const [focusSearchTabId, setFocusSearchTabId] = useAtom(focusSearchTabIdAtom);
+  const [focusSearchTabId, setFocusSearchTabId] = useAtom(focusTabIdAtom);
 
   useEffect(() => {
     if (focusSearchTabId === tab.id) {

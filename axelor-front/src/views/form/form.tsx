@@ -30,10 +30,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
-import {
-  ADVANCED_SEARCH_VIEWS,
-  focusSearchTabIdAtom,
-} from "@/view-containers/advance-search/utils";
+import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
@@ -190,6 +187,7 @@ function FormContainer({
   meta,
   dataStore,
   record,
+  searchAtom,
   isLoading,
   ...props
 }: ViewProps<FormView> & {
@@ -655,13 +653,18 @@ function FormContainer({
 
   const searchViewType = useMemo(
     () =>
-      prevType != null && ADVANCED_SEARCH_VIEWS.has(prevType)
+      prevType != null && isAdvancedSearchView(prevType)
         ? prevType
-        : views.find((view) => ADVANCED_SEARCH_VIEWS.has(view.type))?.type,
+        : views.find((view) => isAdvancedSearchView(view.type))?.type,
     [prevType, views]
   );
 
-  const setFocusSearchTabId = useSetAtom(focusSearchTabIdAtom);
+  const setSearchFocusTabId = useSetAtom(
+    useMemo(
+      () => focusAtom(searchAtom!, (o) => o.prop("focusTabId")),
+      [searchAtom]
+    )
+  );
 
   useShortcut({
     key: "f",
@@ -678,12 +681,12 @@ function FormContainer({
         await dialogs.confirmDirty(
           async () => isDirty,
           async () => {
-            setFocusSearchTabId(tab.id);
+            setSearchFocusTabId(tab.id);
             switchTo(searchViewType!);
           }
         );
       })();
-    }, [isDirty, searchViewType, setFocusSearchTabId, tab.id, switchTo]),
+    }, [isDirty, searchViewType, setSearchFocusTabId, tab.id, switchTo]),
   });
 
   // register tab:refresh
