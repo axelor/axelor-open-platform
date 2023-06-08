@@ -489,4 +489,6 @@
 "Alt.Key","Alt",,
 "Insert.Key","Insert",,
 "Delete.Key","Suppr",,
+"PageUp.Key","Page préc",,
+"PageDown.Key","Page suiv",,
 "duplicate current record","copier l’enregistrement actuel",,

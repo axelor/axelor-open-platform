@@ -69,12 +69,12 @@ export function Shortcuts() {
     },
     {
       // No known conflicts
-      keys: [altKey, "⇞"],
+      keys: [altKey, i18n.get("PageUp.Key")],
       description: i18n.get("navigate to previous page/record"),
     },
     {
       // No known conflicts
-      keys: [altKey, "⇟"],
+      keys: [altKey, i18n.get("PageDown.Key")],
       description: i18n.get("navigate to next page/record"),
     },
     {
