@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { KeyboardEvent, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   Box,
@@ -256,15 +256,6 @@ export function ModalDialog(props: DialogOptions) {
 
   const canShow = setOpen ? open : show;
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        close(false);
-      }
-    },
-    [close]
-  );
-
   return (
     <Portal>
       <Fade in={canShow} unmountOnExit mountOnEnter>
@@ -278,7 +269,6 @@ export function ModalDialog(props: DialogOptions) {
         size={size}
         className={clsx(classes.root, styles.root)}
         data-dialog="true"
-        onKeyDown={handleKeyDown}
       >
         <DialogHeader
           onCloseClick={(e) => close(false)}
