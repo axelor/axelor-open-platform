@@ -375,6 +375,8 @@ function GridInner(props: ViewProps<GridView>) {
 
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
+  const minPage = 1;
+  const maxPage = Math.ceil(totalCount / limit);
   const hasRowSelected = !!selectedRows?.length;
   const currentPage = useMemo(() => {
     const hasPageSet = pageSetRef.current;
@@ -596,11 +598,11 @@ function GridInner(props: ViewProps<GridView>) {
             canNext,
             onPrev: () =>
               switchTo("grid", {
-                route: { id: String(currentPage - 1) },
+                route: { id: String(Math.max(minPage, currentPage - 1)) },
               }),
             onNext: () =>
               switchTo("grid", {
-                route: { id: String(currentPage + 1) },
+                route: { id: String(Math.min(maxPage, currentPage + 1)) },
               }),
             text: () => <PageText dataStore={dataStore} />,
           }}
