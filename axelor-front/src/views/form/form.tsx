@@ -33,7 +33,7 @@ import { FormView, Schema } from "@/services/client/meta.types";
 import {
   ADVANCED_SEARCH_VIEWS,
   focusSearchTabIdAtom,
-} from "@/view-containers/advance-search";
+} from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {

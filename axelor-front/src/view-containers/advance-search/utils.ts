@@ -1,5 +1,6 @@
-import isNumber from "lodash/isNumber";
+import { atom } from "jotai";
 import get from "lodash/get";
+import isNumber from "lodash/isNumber";
 
 import {
   Criteria,
@@ -7,15 +8,18 @@ import {
   Filter,
   FilterOp,
 } from "@/services/client/data.types";
-import { Moment, moment, l10n } from "@/services/client/l10n";
-import { SavedFilter, Widget } from "@/services/client/meta.types";
+import { i18n } from "@/services/client/i18n";
+import { Moment, l10n, moment } from "@/services/client/l10n";
+import { MetaData } from "@/services/client/meta";
+import { Field, SavedFilter, Widget } from "@/services/client/meta.types";
+import { session } from "@/services/client/session";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
-import { session } from "@/services/client/session";
-import { MetaData } from "@/services/client/meta";
-import { Field } from "@/services/client/meta.types";
 import { AdvancedSearchState } from "./types";
-import { i18n } from "@/services/client/i18n";
+
+export const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
+
+export const focusSearchTabIdAtom = atom<string | null>(null);
 
 function fieldNameAppend(fieldName?: string, append?: string) {
   return (fieldName || "").endsWith(`.${append || ""}`)

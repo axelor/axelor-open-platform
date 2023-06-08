@@ -12,7 +12,7 @@ import {
   MaterialIcon,
   MaterialIconProps,
 } from "@axelor/ui/icons/meterial-icon";
-import { PrimitiveAtom, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
@@ -46,9 +46,11 @@ import styles from "./advance-search.module.scss";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
-import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
-
-export const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
+import {
+  focusSearchTabIdAtom,
+  getFreeSearchCriteria,
+  prepareAdvanceSearchQuery,
+} from "./utils";
 
 export interface AdvanceSearchProps {
   dataStore: DataStore;
@@ -410,8 +412,6 @@ export function AdvanceSearch({
     </Box>
   );
 }
-
-export const focusSearchTabIdAtom = atom<string | null>(null);
 
 interface SearchInputIconProps extends MaterialIconProps {
   key: string;
