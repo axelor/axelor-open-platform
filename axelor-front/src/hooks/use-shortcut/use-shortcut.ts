@@ -17,11 +17,16 @@ export type Options = {
 
 const alwaysTrue = () => true;
 
-let getKeys: (options: Options) => {
-  ctrlKey?: boolean;
-  altKey?: boolean;
-  shiftKey?: boolean;
-  metaKey?: boolean;
+let getKeys: (
+  ctrlKey: boolean,
+  altKey: boolean,
+  shiftKey: boolean,
+  key: string
+) => {
+  ctrlKey: boolean;
+  altKey: boolean;
+  shiftKey: boolean;
+  metaKey: boolean;
 };
 
 if (isMac) {
@@ -30,22 +35,21 @@ if (isMac) {
   // as it might be used to type special characters on some layouts.
   // Ctrl -> ⌘
   // Alt -> ⌘ + ⌥ (if alpha key)
-  getKeys = (options: Options) => {
-    const { key, ctrlKey, altKey, shiftKey } = options;
+  getKeys = (ctrlKey, altKey, shiftKey, key) => {
     return {
-      metaKey: ctrlKey ?? (altKey && /^[a-z]$/i.test(key)),
+      ctrlKey: false,
       altKey,
       shiftKey,
+      metaKey: ctrlKey ?? (altKey && /^[a-z]$/i.test(key)),
     };
   };
-  // Prevent conflict with Mac-specific navigation shortcuts.
 } else {
-  getKeys = (options: Options) => {
-    const { ctrlKey, altKey, shiftKey } = options;
+  getKeys = (ctrlKey, altKey, shiftKey) => {
     return {
       ctrlKey,
       altKey,
       shiftKey,
+      metaKey: false,
     };
   };
 }
@@ -54,24 +58,36 @@ const compareKey = new Intl.Collator(undefined, { sensitivity: "base" })
   .compare;
 
 export function useShortcut(options: Options) {
-  const { key, canHandle, action } = options;
-  const { ctrlKey, altKey, shiftKey, metaKey } = getKeys(options);
+  const {
+    key,
+    canHandle = alwaysTrue,
+    action,
+    ctrlKey: ctrlKeyProp = false,
+    altKey: altKeyProp = false,
+    shiftKey: shiftKeyProp = false,
+  } = options;
+  const { ctrlKey, altKey, shiftKey, metaKey } = getKeys(
+    ctrlKeyProp,
+    altKeyProp,
+    shiftKeyProp,
+    key
+  );
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (
         compareKey(e.key, key) === 0 &&
-        (ctrlKey === undefined || e.ctrlKey === ctrlKey) &&
-        (altKey === undefined || e.altKey === altKey) &&
-        (shiftKey === undefined || e.shiftKey === shiftKey) &&
-        (metaKey === undefined || e.metaKey === metaKey) &&
-        (canHandle === undefined || canHandle(e))
+        e.ctrlKey === ctrlKey &&
+        e.altKey === altKey &&
+        e.shiftKey === shiftKey &&
+        e.metaKey === metaKey &&
+        canHandle(e)
       ) {
         e.stopPropagation();
         e.preventDefault();
         !dialogsActive() && action(e);
       }
     },
-    [key, ctrlKey, shiftKey, altKey, metaKey, canHandle, action]
+    [key, ctrlKey, altKey, shiftKey, metaKey, canHandle, action]
   );
 
   useEffect(() => {
