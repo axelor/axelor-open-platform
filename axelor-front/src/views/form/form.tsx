@@ -123,13 +123,17 @@ export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
         )
         .join(", ");
       const input = elem.querySelector(selector) as HTMLInputElement;
-      if (input) {
-        input.focus();
-        input.select();
-      }
+      focusAndSelectInput(input);
     }
   }, [containerRef]);
   return handleFocus;
+};
+
+export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
+  if (input) {
+    input.focus();
+    input.select();
+  }
 };
 
 function getDefaultValues(meta: ViewData<FormView>) {
@@ -632,10 +636,10 @@ function FormContainer({
   const handleFocus = useHandleFocus(containerRef);
 
   useEffect(() => {
-    if (!readonly) {
+    if (!isLoading && !readonly) {
       handleFocus();
     }
-  }, [readonly, handleFocus]);
+  }, [isLoading, readonly, handleFocus]);
 
   // register shortcuts
   useShortcuts({

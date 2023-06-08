@@ -41,12 +41,14 @@ import {
 import { download } from "@/utils/download";
 import { useViewAction, useViewTab } from "../views/scope";
 
+import { focusAndSelectInput } from "@/views/form";
 import { Chip } from "@/views/form/widgets";
-import styles from "./advance-search.module.scss";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
 import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
+
+import styles from "./advance-search.module.scss";
 
 export interface AdvanceSearchProps {
   dataStore: DataStore;
@@ -445,7 +447,7 @@ function SearchInput({
     key: "f",
     altKey: true,
     canHandle,
-    action: useCallback(() => searchRef.current?.focus(), []),
+    action: useCallback(() => focusAndSelectInput(searchRef.current), []),
   });
 
   const [focusSearchTabId, setFocusSearchTabId] = useAtom(focusTabIdAtom);
@@ -453,7 +455,7 @@ function SearchInput({
   useEffect(() => {
     if (focusSearchTabId === tab.id) {
       setFocusSearchTabId(null);
-      searchRef.current?.focus();
+      focusAndSelectInput(searchRef.current);
     }
   }, [tab.id, focusSearchTabId, setFocusSearchTabId]);
 
