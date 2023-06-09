@@ -152,7 +152,7 @@ export function OneToMany({
       name: gridView,
       model,
     });
-  });
+  }, [schema, model]);
 
   const getContext = usePrepareContext(formAtom);
 
