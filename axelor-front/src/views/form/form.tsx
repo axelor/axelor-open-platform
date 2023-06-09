@@ -3,8 +3,10 @@ import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
+  MutableRefObject,
   RefObject,
   SyntheticEvent,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -150,20 +152,20 @@ export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
 
   const { id } = useViewRoute();
-  const [viewProps = {}, setViewProps] = useViewProps();
-
+  const [viewProps = {}] = useViewProps();
   const { action } = useViewTab();
+  const recordRef = useRef<DataRecord | null>(null);
 
   const readonly =
     action.params?.forceReadonly || (viewProps.readonly ?? Boolean(id));
   const recordId = String(id || action.context?._showRecord || "");
   const popupRecord = action.params?.["_popup-record"];
 
-  const { state, data: record = {} } = useAsync<DataRecord>(async () => {
-    const record = viewProps?.fetched;
+  const { state, data: record = {} } = useAsync(async () => {
+    const record = recordRef.current;
     if (record) {
-      setViewProps((props) => ({ ...props, fetched: undefined }));
-      if (String(record?.id) === recordId) {
+      recordRef.current = null;
+      if (!recordId || String(record?.id) === recordId) {
         return { ...record };
       }
     }
@@ -175,27 +177,29 @@ export function Form(props: ViewProps<FormView>) {
     return await fetchRecord(meta, dataStore, recordId);
   }, [popupRecord, recordId, meta, dataStore]);
 
-  const isLoading = state !== "hasData" || Boolean(recordId && !record.id);
-
+  const isLoading = state !== "hasData";
   return (
     <FormContainer
       {...props}
-      record={record}
-      readonly={readonly}
       isLoading={isLoading}
+      record={record}
+      recordRef={recordRef}
+      readonly={readonly}
     />
   );
 }
 
-function FormContainer({
+const FormContainer = memo(function FormContainer({
   meta,
   dataStore,
   record,
+  recordRef,
   searchAtom,
   isLoading,
   ...props
 }: ViewProps<FormView> & {
   record: DataRecord;
+  recordRef: MutableRefObject<DataRecord | null>;
   readonly?: boolean;
   isLoading?: boolean;
 }) {
@@ -205,7 +209,6 @@ function FormContainer({
     onLoad: onLoadAction,
     onSave: onSaveAction,
   } = schema;
-  const [, setViewProps] = useViewProps();
 
   const { id: tabId, popup, popupOptions } = useViewTab();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
@@ -273,6 +276,10 @@ function FormContainer({
         // this is required to trigger expression re-evaluation
         record = { ...record, $$time: Date.now() };
 
+        if (isNew) {
+          recordRef.current = record;
+        }
+
         switchTo("form", { route: { id }, props });
         setDirty(false);
         set(formAtom, {
@@ -319,6 +326,7 @@ function FormContainer({
         onLoadAction,
         onNewAction,
         readonly,
+        recordRef,
         setDirty,
         switchTo,
       ]
@@ -329,7 +337,7 @@ function FormContainer({
     dialogs.confirmDirty(
       async () => isDirty,
       async () => {
-        doEdit(null, { readonly: false });
+        doEdit(null, { readonly: false, isNew: true });
       }
     );
   }, [doEdit, isDirty]);
@@ -396,13 +404,6 @@ function FormContainer({
         res = { ...dummy, ...res }; // restore dummy values
 
         const isNew = vals.id !== res.id;
-        // new record save
-        if (isNew) {
-          setViewProps((props) => ({
-            ...props,
-            fetched: res,
-          }));
-        }
 
         doEdit(res, { readonly, isNew });
 
@@ -415,7 +416,6 @@ function FormContainer({
         doRead,
         formAtom,
         getErrors,
-        setViewProps,
         onSaveAction,
         readonly,
       ]
@@ -492,7 +492,7 @@ function FormContainer({
   const onCopy = useCallback(async () => {
     if (record.id) {
       const rec = await dataStore.copy(record.id);
-      doEdit(rec, { readonly: false });
+      doEdit(rec, { readonly: false, isNew: true });
     }
   }, [dataStore, doEdit, record.id]);
 
@@ -578,15 +578,7 @@ function FormContainer({
         actionHandler,
       });
     }
-  }, [
-    getState,
-    doEdit,
-    doRead,
-    onSave,
-    popup,
-    setPopupHandlers,
-    actionHandler,
-  ]);
+  }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers, actionHandler]);
 
   const tab = useViewTab();
   const { active, close: closeTab } = useTabs();
@@ -824,7 +816,7 @@ function FormContainer({
       </div>
     </div>
   );
-}
+});
 
 function usePagination(
   dataStore: DataStore,

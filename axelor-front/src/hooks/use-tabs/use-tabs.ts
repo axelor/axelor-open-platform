@@ -12,7 +12,6 @@ import { useCallback } from "react";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView, SavedFilter } from "@/services/client/meta.types";
 import { useRoute } from "../use-route";
-import { DataRecord } from "@/services/client/data.types";
 
 /**
  * The route state of a specific view type.
@@ -37,7 +36,6 @@ export type TabProps = {
   selectedId?: number;
   readonly?: boolean;
   recordId?: boolean;
-  fetched?: DataRecord; // fetched record
 };
 
 /**
