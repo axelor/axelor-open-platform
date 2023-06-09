@@ -152,12 +152,12 @@ export function SearchObjects({
           </Box>
           <Box d="flex">
             <Button variant="primary" w={100} onClick={() => onSearch()}>
-              Search
+              {i18n.get("Search")}
             </Button>
           </Box>
           <Box d="flex">
             <Button variant="primary" w={100} onClick={() => handleClear()}>
-              Clear
+              {i18n.get("Clear")}
             </Button>
           </Box>
         </Box>
@@ -190,7 +190,7 @@ export function SearchObjects({
             </Box>
             <Box d="flex">
               <Button variant="primary" w={100} onClick={onGo}>
-                Go
+                {i18n.get("Go")}
               </Button>
             </Box>
           </Box>
