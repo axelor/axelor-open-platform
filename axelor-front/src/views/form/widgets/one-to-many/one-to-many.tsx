@@ -36,10 +36,11 @@ import {
 } from "../../builder";
 import { nextId } from "../../builder/utils";
 
-import styles from "./one-to-many.module.scss";
 import { DetailsForm } from "./one-to-many.details";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { fetchRecord } from "../../form";
+import { download } from "@/utils/download";
+import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
 
@@ -59,12 +60,16 @@ export function OneToMany({
     summaryView,
     gridView,
     orderBy: sortBy,
+    widgetAttrs,
+    canExport = widgetAttrs.canExport,
+    canCopy = widgetAttrs.canCopy,
   } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
   const gridRef = useRef<GridHandler>(null);
+  const saveIdRef = useRef<number | null>();
 
   const [records, setRecords] = useState<DataRecord[]>([]);
   const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
@@ -217,6 +222,14 @@ export function OneToMany({
     [value, sortBy, name, model, parentId, dataStore]
   );
 
+  const onExport = useCallback(async () => {
+    const { fileName } = await dataStore.export({});
+    download(
+      `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
+      fileName
+    );
+  }, [dataStore]);
+
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
@@ -368,6 +381,19 @@ export function OneToMany({
   }, [model, detailFormName]);
 
   useEffect(() => {
+    const savedId = saveIdRef.current;
+    if (savedId) {
+      const savedInd = rows?.findIndex((r) => r.record?.id === savedId);
+      savedInd > 0 &&
+        setState((draft) => {
+          draft.selectedCell = [savedInd, 0];
+          draft.selectedRows = [savedInd];
+        });
+      saveIdRef.current = null;
+    }
+  }, [selectedRows, rows, setState]);
+
+  useEffect(() => {
     const selectedIds = (selectedRows ?? []).map(
       (ind) => rows[ind]?.record?.id
     );
@@ -409,17 +435,27 @@ export function OneToMany({
     [detailMeta, dataStore]
   );
 
-  useAsyncEffect(async () => {
-    if (!detailMeta || recordId === selected?.id) return;
-    fetchAndSetDetailRecord(selected);
-  }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
-
   const onRowClick = useCallback(
     (e: SyntheticEvent, row: GridRow, rowIndex: number) => {
       selected?.id === row?.record?.id && fetchAndSetDetailRecord(row.record);
     },
     [selected, fetchAndSetDetailRecord]
   );
+
+  const onDuplicate = useCallback(async () => {
+    if (selected?.id) {
+      const rec =
+        selected.id < 0 ? { ...selected } : await dataStore.copy(selected.id);
+      const newId = nextId();
+      setValue((values) => [...values, { ...rec, id: newId }]);
+      saveIdRef.current = newId;
+    }
+  }, [dataStore, selected, setValue]);
+
+  useAsyncEffect(async () => {
+    if (!detailMeta || recordId === selected?.id) return;
+    fetchAndSetDetailRecord(selected);
+  }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
 
   if (viewState === "loading") return null;
 
@@ -429,6 +465,7 @@ export function OneToMany({
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
   const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
+  const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
   return (
     <Box d="flex" border flexDirection="column" roundedTop>
@@ -503,6 +540,28 @@ export function OneToMany({
                 },
                 onClick: () => onSearch(),
                 hidden: !canRefresh,
+              },
+              {
+                key: "more",
+                iconOnly: true,
+                hidden: !canCopy && !canExport,
+                iconProps: {
+                  icon: "arrow_drop_down",
+                },
+                items: [
+                  {
+                    key: "duplicate",
+                    text: i18n.get("Duplicate"),
+                    hidden: !canDuplicate,
+                    onClick: onDuplicate,
+                  },
+                  {
+                    key: "export",
+                    text: i18n.get("Export"),
+                    hidden: !canExport,
+                    onClick: onExport,
+                  },
+                ],
               },
             ]}
           />
