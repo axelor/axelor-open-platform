@@ -11,6 +11,9 @@ patchedDependencies:
   font-awesome@4.7.0:
     hash: b36n7p33c4ewtt5v6is5moc24u
     path: patches/font-awesome@4.7.0.patch
+  jotai-optics@0.3.0:
+    hash: nc42tsqrelbobqdc4skzu3byb4
+    path: patches/jotai-optics@0.3.0.patch
   optics-ts@2.4.0:
     hash: koes4b24nwceoodg4aaxu6pdvi
     path: patches/optics-ts@2.4.0.patch
@@ -63,7 +66,7 @@ dependencies:
     version: 1.1.1(jotai@2.1.1)(react@18.2.0)
   jotai-optics:
     specifier: ^0.3.0
-    version: 0.3.0(jotai@2.1.1)(optics-ts@2.4.0)
+    version: 0.3.0(patch_hash=nc42tsqrelbobqdc4skzu3byb4)(jotai@2.1.1)(optics-ts@2.4.0)
   jsdom:
     specifier: ^22.1.0
     version: 22.1.0
@@ -4969,7 +4972,7 @@ packages:
       react: 18.2.0
     dev: false
 
-  /jotai-optics@0.3.0(jotai@2.1.1)(optics-ts@2.4.0):
+  /jotai-optics@0.3.0(patch_hash=nc42tsqrelbobqdc4skzu3byb4)(jotai@2.1.1)(optics-ts@2.4.0):
     resolution: {integrity: sha512-5ttpCRREIBu6DJix0wlyBP6y1QDPlePnoMZSXNDi/FOkXZrhk9uIXKjwvw34/yBCHT5mYpFUD4sFDvRUU2vkvQ==}
     peerDependencies:
       jotai: '>=1.11.0'
@@ -4978,6 +4981,7 @@ packages:
       jotai: 2.1.1(react@18.2.0)
       optics-ts: 2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi)
     dev: false
+    patched: true
 
   /jotai@2.1.1(react@18.2.0):
     resolution: {integrity: sha512-LaaiuSaq+6XkwkrCtCkczyFVZOXe0dfjAFN4DVMsSZSRv/A/4xuLHnlpHMEDqvngjWYBotTIrnQ7OogMkUE6wA==}

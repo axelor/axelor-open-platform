@@ -76,7 +76,8 @@
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
       "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch",
-      "optics-ts@2.4.0": "patches/optics-ts@2.4.0.patch"
+      "optics-ts@2.4.0": "patches/optics-ts@2.4.0.patch",
+      "jotai-optics@0.3.0": "patches/jotai-optics@0.3.0.patch"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
