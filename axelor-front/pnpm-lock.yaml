@@ -11,6 +11,9 @@ patchedDependencies:
   font-awesome@4.7.0:
     hash: b36n7p33c4ewtt5v6is5moc24u
     path: patches/font-awesome@4.7.0.patch
+  optics-ts@2.4.0:
+    hash: koes4b24nwceoodg4aaxu6pdvi
+    path: patches/optics-ts@2.4.0.patch
 
 dependencies:
   '@axelor/ui':
@@ -72,7 +75,7 @@ dependencies:
     version: 0.39.0
   optics-ts:
     specifier: ^2.4.0
-    version: 2.4.0
+    version: 2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi)
   parse5:
     specifier: ^7.1.2
     version: 7.1.2
@@ -4973,7 +4976,7 @@ packages:
       optics-ts: '*'
     dependencies:
       jotai: 2.1.1(react@18.2.0)
-      optics-ts: 2.4.0
+      optics-ts: 2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi)
     dev: false
 
   /jotai@2.1.1(react@18.2.0):
@@ -5374,9 +5377,10 @@ packages:
       wrappy: 1.0.2
     dev: true
 
-  /optics-ts@2.4.0:
+  /optics-ts@2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi):
     resolution: {integrity: sha512-BIYgnqOTEf+WiXuxuBFXeoCtyIDOwnUwCMybdQh8qdHyWXunwVVt7iD9XwNq8SCd5vUo9vqgYxF5ati/6inIuQ==}
     dev: false
+    patched: true
 
   /optionator@0.9.1:
     resolution: {integrity: sha512-74RlY5FCnhq4jRxVUPKDaRwrVNXMqsGsiW6AJw4XK8hmtm10wC0ypZBLw5IIp85NZMr91+qd1RvvENwg7jjRFw==}
