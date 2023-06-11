@@ -40,7 +40,7 @@ const FilterListItem = React.memo(function FilterListItem({
         position="relative"
         size="sm"
         onClick={() => (!disabled || checked) && onCheck?.(filter, "click")}
-        {...(disabled && !checked ? { color: "muted" } : {})}
+        {...(disabled && !checked ? { color: "secondary" } : {})}
       >
         {title}
       </Button>

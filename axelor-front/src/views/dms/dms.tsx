@@ -727,7 +727,7 @@ function Breadcrumbs({
               <Link onClick={() => onSelect?.(item)}>{render()}</Link>
             )}
             {ind < data.length - 1 && (
-              <Box as="span" color="muted">
+              <Box as="span" color="secondary">
                 <MaterialIcon icon="chevron_right" />
               </Box>
             )}
