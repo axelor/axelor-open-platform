@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSetAtom } from "jotai";
 import { Box } from "@axelor/ui";
+import { useSetAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { CustomView } from "@/services/client/meta.types";
-import { DataRecord } from "@/services/client/data.types";
-import { custom } from "@/services/client/meta";
-import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTemplate } from "@/hooks/use-parser";
-import { ViewProps } from "../types";
+import { DataRecord } from "@/services/client/data.types";
+import { custom } from "@/services/client/meta";
+import { CustomView } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { useViewContext, useViewTab } from "@/view-containers/views/scope";
+import { ViewProps } from "../types";
+import styles from "./custom.module.scss";
 import { ReportBox } from "./widgets/report-box";
 import { ReportTable } from "./widgets/report-table";
-import styles from "./custom.module.scss";
 
 export function Custom({ meta }: ViewProps<CustomView>) {
   const { dashlet } = useViewTab();
@@ -49,7 +49,7 @@ export function Custom({ meta }: ViewProps<CustomView>) {
   const options = useMemo(
     () => ({
       components: {
-        "report-box": ReportBox,
+        "report-box": (props: any) => <ReportBox {...props} />,
         "report-table": (props: any) => <ReportTable {...props} view={view} />,
       },
     }),
