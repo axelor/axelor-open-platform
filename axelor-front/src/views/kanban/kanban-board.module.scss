@@ -14,12 +14,11 @@
 }
 
 .column {
+  background-color: var(--bs-tertiary-bg);
   padding: 0.25rem 0.35rem;
-  background-color: var(--bs-gray-100);
 }
 
 .column-title {
-  color: var(--bs-gray-700);
   font-weight: 600;
   user-select: none;
 }
@@ -27,7 +26,6 @@
 .record-list-wrapper {
   width: 100%;
   flex-grow: 1;
-  background-color: var(--bs-white);
   padding: 0.625rem 0.625rem 2rem;
   display: flex;
   flex-direction: column;
@@ -71,8 +69,4 @@
 [dir="rtl"] .record-action {
   right: unset;
   left: 0.25rem;
-}
-
-.no-records-text {
-  color: var(--bs-gray-700);
 }
