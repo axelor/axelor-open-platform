@@ -35,9 +35,9 @@
   }
   .tabClose {
     display: inline-flex;
-    color: rgba(0, 0, 0, 0.5);
+    opacity: 0.5;
     &:hover {
-      color: inherit;
+      opacity: 1;
     }
   }
   .tabIcon {
