@@ -223,8 +223,8 @@ export function NavBarSearch({
   );
 
   const handleFilterOption = useCallback(
-    (option: { data: SearchItem }, searchText?: string) => {
-      const { data: item } = option;
+    (option: { data: unknown }, searchText?: string) => {
+      const item = option.data as SearchItem;
       return filterSearchItem(item, searchText);
     },
     []
