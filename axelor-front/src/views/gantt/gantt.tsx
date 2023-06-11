@@ -398,8 +398,8 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
             return (
               <Button
                 key={filter.key}
-                variant="light"
-                bg={active ? "light" : "body"}
+                variant="secondary"
+                bg={active ? "body-tertiary" : "body"}
                 border={false}
                 onClick={() => setType(filter.key)}
               >
@@ -407,10 +407,10 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
               </Button>
             );
           })}
-          <Button variant="light" bg="body" ms={2} onClick={() => onSearch()}>
+          <Button variant="secondary" outline ms={2} onClick={() => onSearch()}>
             {i18n.get("Refresh")}
           </Button>
-          <Button variant="light" bg="body">
+          <Button variant="secondary" outline>
             {i18n.get("Print")}
           </Button>
         </Box>
