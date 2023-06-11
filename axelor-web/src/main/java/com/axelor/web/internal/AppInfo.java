@@ -81,6 +81,7 @@ public class AppInfo {
     map.put("user.action", user.getHomeAction());
     map.put("user.singleTab", user.getSingleTab());
     map.put("user.noHelp", Boolean.TRUE.equals(user.getNoHelp()));
+    map.put("user.theme", user.getTheme());
 
     if (user.getImage() != null) {
       map.put("user.image", getLink(user, null));
@@ -105,6 +106,7 @@ public class AppInfo {
     map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
     map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
     map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("application.theme", getTheme());
     map.put("application.logo", getLogo());
     map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));

@@ -114,6 +114,7 @@ public class PublicInfoService extends AbstractService {
     map.put("name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
     map.put("description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
     map.put("copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("application.theme", info.getTheme());
     map.put("logo", info.getLogo());
     map.put("language", info.getPageLang());
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());

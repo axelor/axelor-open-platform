@@ -18,6 +18,7 @@ export interface SessionInfo {
     copyright: string;
     description: string;
     sdk: string | null;
+    theme: string | null;
     logo: string | null;
     help: string | null;
     home: string | null;
@@ -32,6 +33,7 @@ export interface SessionInfo {
     group?: string | null;
     action?: string | null;
     navigator?: string | null;
+    theme?: string | null;
     noHelp: boolean;
     singleTab: boolean;
     technical: boolean;
@@ -64,6 +66,7 @@ const INFO_MAPPINGS = {
   "application.description": "app.description",
   "application.help": "app.help",
   "application.home": "app.home",
+  "application.theme": "app.theme",
   "application.logo": "app.logo",
   "application.mode": "app.mode",
   "application.name": "app.name",
@@ -74,6 +77,7 @@ const INFO_MAPPINGS = {
   "user.canViewCollaboration": "view.collaboration",
   "user.group": "user.group",
   "user.id": "user.id",
+  "user.theme": "user.theme",
   "user.lang": "user.lang",
   "user.login": "user.login",
   "user.name": "user.name",
