@@ -1,6 +1,6 @@
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/src/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 export function Icon({ value }: GridColumnProps) {
   return (

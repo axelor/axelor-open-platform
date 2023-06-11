@@ -2,7 +2,7 @@ import { useHilites } from "@/hooks/use-parser";
 import { Hilite } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
-import { GridRowProps } from "@axelor/ui/src/grid";
+import { GridRowProps } from "@axelor/ui/grid";
 import { memo } from "react";
 
 export const Row = memo(function Row(

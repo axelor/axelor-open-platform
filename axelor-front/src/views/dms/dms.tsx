@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import { Box, Input, Link } from "@axelor/ui";
-import { GridRow, GridColumn } from "@axelor/ui/src/grid";
+import { GridRow, GridColumn } from "@axelor/ui/grid";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";

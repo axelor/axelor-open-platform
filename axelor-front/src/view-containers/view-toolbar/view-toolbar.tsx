@@ -2,7 +2,7 @@ import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
-import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
+import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Button, Box, Popper, ClickAwayListener, useTheme } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
-import { SchedulerEvent } from "@axelor/ui/src/scheduler";
+import { SchedulerEvent } from "@axelor/ui/scheduler";
 import { DataRecord } from "@/services/client/data.types";
 
 const { get: _t } = i18n;
