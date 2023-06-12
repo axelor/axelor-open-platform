@@ -42,6 +42,7 @@ export * from "./progress";
 export * from "./radio-select";
 export * from "./ref-select";
 export * from "./ref-text";
+export * from "./relative-time";
 export * from "./selection";
 export * from "./separator";
 export * from "./single-select";
