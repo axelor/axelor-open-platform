@@ -12,7 +12,7 @@
   left: 3.5rem;
   top: 0.75rem;
   transform: rotate(-45deg);
-  background: var(--bs-white);
+  background: var(--bs-body-bg);
   .rtl & {
     left: unset;
     right: 3.5rem;
@@ -45,7 +45,7 @@
   user-select: none;
   border-radius: 50%;
   justify-content: center;
-  color: var(--bs-white);
+  color: var(--bs-body-color);
 }
 
 .pull-right {
