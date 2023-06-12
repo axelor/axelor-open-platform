@@ -5,10 +5,12 @@
 }
 
 .title {
-  background-color: rgba(0, 0, 0, 0.025);
   padding: 0.5rem;
   margin: 0;
   font-weight: 600;
+  background-color: var(--bs-tertiary-bg);
+  border-top-left-radius: var(--bs-border-radius);
+  border-top-right-radius: var(--bs-border-radius);
 }
 
 .content {
