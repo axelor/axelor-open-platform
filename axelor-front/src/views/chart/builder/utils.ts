@@ -487,3 +487,43 @@ export function getChartData(
   }
   return records;
 }
+
+export function prepareTheme(type: ChartType) {
+  const style = getComputedStyle(document.body);
+  const bg = style.getPropertyValue("--bs-body-bg");
+  const color = style.getPropertyValue("--bs-body-color");
+  const borderColor = style.getPropertyValue("--bs-border-color");
+
+  const axisValues = {
+    axisLine: { show: true, lineStyle: { color } },
+    axisTick: { show: true, lineStyle: { color } },
+    axisLabel: { show: true, color },
+    splitLine: { show: true, lineStyle: { color: borderColor } },
+    splitArea: { show: false, areaStyle: { color } },
+  };
+
+  return {
+    color: getColor(type),
+    backgroundColor: bg,
+    textStyle: {},
+    line: {
+      itemStyle: { borderWidth: 1 },
+      lineStyle: { width: 2 },
+      symbolSize: 4,
+      symbol: "circle",
+      smooth: false,
+    },
+    categoryAxis: axisValues,
+    valueAxis: axisValues,
+    logAxis: axisValues,
+    timeAxis: axisValues,
+    legend: { textStyle: { color } },
+    tooltip: {
+      backgroundColor: bg,
+      axisPointer: {
+        lineStyle: { color, width: "1" },
+        crossStyle: { color, width: "1" },
+      },
+    },
+  };
+}

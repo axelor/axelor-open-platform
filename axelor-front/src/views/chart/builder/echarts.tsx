@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 
 import { ChartProps, ChartType } from "./types";
-import { getColor } from "./utils";
+import { getColor, prepareTheme } from "./utils";
+import { useAppTheme } from "@/hooks/use-app-theme";
 import classes from "./echarts.module.scss";
 
 export function ECharts({
@@ -24,13 +25,18 @@ export function ECharts({
 }) {
   const divRef = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts | null>(null);
+  const theme = useAppTheme();
+
+  useEffect(() => {
+    echarts.registerTheme(theme, prepareTheme(type));
+  }, [type, theme]);
 
   useEffect(() => {
     if (divRef.current !== null) {
-      const $chart = (chart.current = echarts.init(divRef.current));
+      const $chart = (chart.current = echarts.init(divRef.current, theme));
       return () => $chart.dispose();
     }
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     const instance = chart.current;
