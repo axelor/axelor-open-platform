@@ -220,6 +220,8 @@ export function Search(props: ViewProps<SearchView>) {
         const { selectValue } = get(searchObjectsAtom);
 
         if (!Object.values(record).some((x) => x)) {
+          setDirty(false);
+          setRecords((records) => (records.length ? [] : records));
           return;
         }
 
@@ -422,7 +424,6 @@ export function Search(props: ViewProps<SearchView>) {
           actionExecutor={gridActionExecutor}
           onEdit={onEdit}
           onView={onView}
-          onSearch={onSearch as any}
         />
       </Box>
     </Box>
