@@ -26,6 +26,7 @@ export function Toggle(props: FieldProps<boolean>) {
       <Button
         id={uid}
         variant="light"
+        className={styles.toggle}
         disabled={readonly}
         onClick={handleClick}
       >
