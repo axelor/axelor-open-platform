@@ -1,6 +1,6 @@
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
-import { Box, Button } from "@axelor/ui";
+import { Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import { useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
@@ -114,21 +114,23 @@ export function Binary(
             accept={accept}
           />
         </form>
-        {!readonly && (
-          <Button variant="light" size="sm" d="flex" alignItems="center">
-            <MaterialIcon icon="upload" onClick={handleUpload} />
-          </Button>
-        )}
-        {canDownload() && (
-          <Button variant="light" size="sm" d="flex" alignItems="center">
-            <MaterialIcon icon="download" onClick={handleDownload} />
-          </Button>
-        )}
-        {!readonly && (
-          <Button variant="light" size="sm" d="flex" alignItems="center">
-            <MaterialIcon icon="close" onClick={handleRemove} />
-          </Button>
-        )}
+        <ButtonGroup>
+          {!readonly && (
+            <Button variant="secondary" outline d="flex" alignItems="center">
+              <MaterialIcon icon="upload" onClick={handleUpload} />
+            </Button>
+          )}
+          {canDownload() && (
+            <Button variant="secondary" outline d="flex" alignItems="center">
+              <MaterialIcon icon="download" onClick={handleDownload} />
+            </Button>
+          )}
+          {!readonly && (
+            <Button variant="secondary" outline d="flex" alignItems="center">
+              <MaterialIcon icon="close" onClick={handleRemove} />
+            </Button>
+          )}
+        </ButtonGroup>
       </Box>
     </FieldControl>
   );
