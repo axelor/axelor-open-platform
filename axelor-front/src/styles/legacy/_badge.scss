@@ -4,7 +4,7 @@
   font-size: 0.9rem;
   font-weight: bold;
   line-height: 1;
-  color: #fff;
+  color: var(--bs-body-color);
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
@@ -30,7 +30,7 @@ a.label:hover,
 a.label:focus,
 a.badge:hover,
 a.badge:focus {
-  color: #fff;
+  color: var(--bs-body-color);
   text-decoration: none;
   cursor: pointer;
 }
