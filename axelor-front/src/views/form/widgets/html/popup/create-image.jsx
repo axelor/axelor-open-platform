@@ -1,12 +1,16 @@
-import { useState } from 'react';
-import { filecontents, cancelEvent } from '../utils';
+import { useState } from "react";
+import { filecontents, cancelEvent } from "../utils";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { Box } from "@axelor/ui";
 
 function ImagePopup({ commands }) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
 
   function addImage(url) {
     commands.insertHTML(
-      ' <img src="' + url + '" style="max-width:100%;max-height:20em;"> <br><br> ',
+      ' <img src="' +
+        url +
+        '" style="max-width:100%;max-height:20em;"> <br><br> '
     );
     commands.closePopup();
   }
@@ -25,7 +29,8 @@ function ImagePopup({ commands }) {
 
   function handleSubmit(e) {
     cancelEvent(e);
-    value && addImage(!/^[a-z0-9]+:\/\//.test(value) ? `http://${value}` : value);
+    value &&
+      addImage(!/^[a-z0-9]+:\/\//.test(value) ? `http://${value}` : value);
   }
 
   return (
@@ -40,11 +45,16 @@ function ImagePopup({ commands }) {
           className="custom-html-editor-input"
           placeholder="www.example.com"
           value={value}
-          onChange={e => setValue(e.target.value)}
+          onChange={(e) => setValue(e.target.value)}
         />
-        <span onClick={handleSubmit} className="custom-html-editor-toolbar-icon">
-          <i className="fa fa-check"></i>
-        </span>
+        <Box
+          onClick={handleSubmit}
+          className="custom-html-editor-toolbar-icon"
+          p={0}
+          pt={1}
+        >
+          <MaterialIcon icon="check" p={0}/>
+        </Box>
       </div>
     </div>
   );

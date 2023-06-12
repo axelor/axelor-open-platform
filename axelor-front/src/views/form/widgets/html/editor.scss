@@ -38,20 +38,19 @@ $bg-white-shade: #eee;
 }
 
 .custom-html-editor-popup {
-  border-radius: 0;
-  background: $bg-white;
+  background: var(--bs-body-bg);
   box-shadow: 0 $spacing $spacing * 2 rgba(0, 0, 0, 0.2);
   background-clip: padding-box;
   width: auto !important;
   position: absolute;
   z-index: 9999;
   color: var(--text-color);
-  background: rgba(255, 255, 255, 0.9);
   left: -50%;
   border: 1px solid var(--bs-border-color);
   border-radius: $spacing * 2;
   border-radius: 0.2rem;
   user-select: none;
+  padding: 0.5rem;
 
   [dir="rtl"] & {
     left: unset;
@@ -59,6 +58,10 @@ $bg-white-shade: #eee;
   }
   &.custom-html-editor-popuphover {
     width: auto;
+  }
+
+  &:empty {
+    display: none;
   }
 }
 
@@ -71,10 +74,11 @@ $bg-white-shade: #eee;
   color: inherit;
   display: inline-block;
   cursor: pointer;
+  opacity: 0.7;
 
   &:hover {
-    color: inherit;
-    background-color: $bg-white-shade;
+    opacity: 1;
+    background-color: inherit;
   }
 
   &.disabled {
@@ -101,7 +105,7 @@ $bg-white-shade: #eee;
   a:focus,
   a:focus-visible,
   a:hover {
-    background-color: $bg-white-shade;
+    background-color: var(--bs-secondary-bg);
   }
 }
 
@@ -172,8 +176,31 @@ $bg-white-shade: #eee;
   }
 }
 
-input.custom-html-editor-input {
-  margin: 0;
+.custom-html-editor-popup input {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  background-clip: padding-box;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  appearance: none;
+
+  border-radius: var(--bs-border-radius);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  outline: 0;
+
+  &:focus {
+    border: var(--bs-input-border-focus, 1px solid #86b7fe);
+    box-shadow: var(
+      --bs-input-shadow-focus,
+      0 0 0 0.25rem rgba(13, 110, 254, 0.25)
+    );
+  }
 }
 
 .custom-html-editor-toolbar-divider {
@@ -221,9 +248,7 @@ input.custom-html-editor-input {
 }
 
 .custom-html-editor-form {
-  padding: $spacing * 2;
   white-space: nowrap;
-  background: $bg-white;
   & .custom-html-editor-toolbar-icon {
     margin-left: $spacing;
     border-radius: $spacing;
