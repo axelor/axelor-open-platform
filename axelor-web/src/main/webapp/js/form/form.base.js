@@ -711,6 +711,10 @@ var FormInput = {
         }
       });
 
+      scope.$on("on:edit", function() {
+        oldValue = getInputValue();
+      });
+
       function getInputValue() {
         var childInput = element.find('input:first');
         var valInput = childInput.length && childInput || element;
