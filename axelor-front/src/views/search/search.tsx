@@ -11,10 +11,13 @@ import {
   FormView,
   GridView,
   Property,
+  Schema,
+  SearchField,
   SearchView,
 } from "@/services/client/meta.types";
 import { ViewProps } from "../types";
 import { ViewData } from "@/services/client/meta";
+import { alerts } from "@/components/alerts";
 import { Form, useFormHandlers } from "../form/builder";
 import { SearchObjects, SearchObjectsState } from "./search-objects";
 import { Grid as GridComponent } from "@/views/grid/builder";
@@ -24,6 +27,8 @@ import { useGridActionExecutor, useGridState } from "../grid/builder/utils";
 import { useViewDirtyAtom, useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
+import { parseAngularExp } from "@/hooks/use-parser/utils";
+import { toKebabCase } from "@/utils/names";
 import { searchData } from "./utils";
 import styles from "./search.module.scss";
 
@@ -33,6 +38,10 @@ function prepareFields(fields: SearchView["searchFields"]) {
       ..._field,
       type: _field.type?.toUpperCase?.() ?? "STRING",
     };
+
+    if (field.selectionList) {
+      field.type = "SELECTION";
+    }
 
     if (field.type === "REFERENCE") {
       field.type = "MANY_TO_ONE";
@@ -83,6 +92,25 @@ export function Search(props: ViewProps<SearchView>) {
     const { view } = meta;
     const { title, name, searchFields } = view;
     const fields = prepareFields(searchFields);
+
+    function process(item: SearchField) {
+      const $item = { ...item, type: "field" } as Schema;
+      switch (toKebabCase($item.widget ?? "")) {
+        case "many-to-one":
+        case "one-to-one":
+        case "suggest-box":
+          $item.canNew = false;
+          $item.canEdit = false;
+          break;
+        case "one-to-many":
+        case "many-to-many":
+        case "master-detail":
+          $item.hidden = true;
+          break;
+      }
+      return $item;
+    }
+
     return {
       ...meta,
       view: {
@@ -93,7 +121,7 @@ export function Search(props: ViewProps<SearchView>) {
             name,
             type: "panel",
             title,
-            items: searchFields?.map((field) => ({ ...field, type: "field" })),
+            items: searchFields?.map(process),
           },
         ],
       },
@@ -102,35 +130,62 @@ export function Search(props: ViewProps<SearchView>) {
   }, [meta]);
 
   const gridView = useMemo(() => {
-    const { hilites, buttons, resultFields } = view;
+    const { name, hilites, buttons, resultFields } = view;
+    const items = [...(resultFields || [])];
+    const objItemInd = items?.findIndex((item) => item.name === "object");
+    const objItem = {
+      title: i18n.get("Object"),
+      name: "_modelTitle",
+    } as SearchField;
+
+    if (items[objItemInd]) {
+      items[objItemInd] = {
+        ...items[objItemInd],
+        ...objItem,
+        ...(+(items[objItemInd]?.width ?? -1) === 0 && {
+          hidden: true,
+        }),
+      };
+    } else {
+      items?.unshift(objItem);
+    }
+
     return {
+      name,
       type: "grid",
       hilites,
-      items: [
-        { title: i18n.get("Object"), name: "_modelTitle" },
-        ...(resultFields || []),
-        ...(buttons || []),
-      ],
+      items: [...(items || []), ...(buttons || [])].filter(
+        (item) => item.hidden !== true
+      ),
     } as GridView;
   }, [view]);
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(formMeta, record);
   const setDirty = useSetAtom(useViewDirtyAtom());
-  
+
   const onEdit = useAtomCallback(
     useCallback(
       (get, set, record: DataRecord, readonly: boolean = false) => {
-        const { _id, _model, _modelTitle, _form, _grid } = record;
+        const { $$id, _model, _modelTitle, _form, _grid } = record;
         if (!_model) return;
+        const viewTitle = selects?.find((s) => s.model === _model)?.viewTitle;
         const records = get(recordsAtom);
         const ids = records
           .filter((r) => r._model === _model)
-          .map((r) => r._id)
+          .map((r) => r.$$id)
           .join(",");
 
+        const title =
+          (viewTitle
+            ? parseAngularExp(viewTitle)({
+                ...record,
+                id: $$id,
+              })
+            : "") || _modelTitle;
+
         openTab({
-          title: _modelTitle!,
+          title,
           model: _model,
           name: uniqueId("$act"),
           viewType: "form",
@@ -142,14 +197,14 @@ export function Search(props: ViewProps<SearchView>) {
             forceReadonly: readonly,
           },
           context: {
-            _showRecord: _id,
+            _showRecord: $$id,
           },
           ...(ids && {
             domain: `self.id IN (${ids})`,
           }),
         });
       },
-      [recordsAtom]
+      [recordsAtom, selects]
     )
   );
 
@@ -178,7 +233,7 @@ export function Search(props: ViewProps<SearchView>) {
           },
           limit,
         });
-        const records = recordList.map((record: DataRecord) => {
+        const records = recordList.map((record: DataRecord, ind: number) => {
           const selectFields = selects?.find(
             (s) => s.model === record._model
           )?.fields;
@@ -197,15 +252,19 @@ export function Search(props: ViewProps<SearchView>) {
           });
           return {
             ...record,
-            _id: record.id,
-            id: `${record._model}_${record.id}`,
+            $$id: record.id,
+            id: ind + 1,
           };
         });
         setRecords(records);
         setDirty(false);
 
-        // check options to trigger on edit for initial search request only
-        if (options?.showSingle && records.length === 1) {
+        if (records.length === 0) {
+          alerts.info({
+            message: i18n.get("No records found."),
+          });
+          // check options to trigger on edit for initial search request only
+        } else if (options?.showSingle && records.length === 1) {
           onEdit(records[0], !options?.forceEdit);
         }
       },
@@ -281,6 +340,15 @@ export function Search(props: ViewProps<SearchView>) {
     )
   );
 
+  const handleFormKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" && !e.defaultPrevented) {
+        onSearch();
+      }
+    },
+    [onSearch]
+  );
+
   const gridActionExecutor = useGridActionExecutor(gridView, {
     getContext,
     onRefresh: onSearch,
@@ -323,16 +391,18 @@ export function Search(props: ViewProps<SearchView>) {
       p={2}
       className={styles.container}
     >
-      <Form
-        schema={formMeta.view}
-        fields={formMeta.fields}
-        readonly={false}
-        formAtom={formAtom}
-        actionHandler={actionHandler}
-        actionExecutor={actionExecutor}
-        recordHandler={recordHandler}
-        {...({} as any)}
-      />
+      <Box onKeyDown={handleFormKeyDown}>
+        <Form
+          schema={formMeta.view}
+          fields={formMeta.fields}
+          readonly={false}
+          formAtom={formAtom}
+          actionHandler={actionHandler}
+          actionExecutor={actionExecutor}
+          recordHandler={recordHandler}
+          {...({} as any)}
+        />
+      </Box>
       <SearchObjects
         hasActions={!params?.hideActions}
         selects={selects}

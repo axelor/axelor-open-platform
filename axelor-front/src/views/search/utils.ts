@@ -37,7 +37,7 @@ export async function searchData({
   });
 
   if (resp.ok) {
-    const { status, data } = await resp.json();
+    const { status, data = [] } = await resp.json();
     return status === 0 ? data : [];
   }
 

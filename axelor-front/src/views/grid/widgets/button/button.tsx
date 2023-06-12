@@ -15,7 +15,12 @@ export function Button(props: GridCellProps) {
   function handleClick(e: React.MouseEvent<HTMLElement>) {
     e.preventDefault();
     if (onClick && onAction) {
-      onAction(onClick, { ...record, selected: true, _signal: name });
+      onAction(onClick, {
+        ...record,
+        id: record.$$id ?? record.id,
+        selected: true,
+        _signal: name,
+      });
     }
   }
 
