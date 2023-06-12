@@ -1,6 +1,6 @@
 import React, { FocusEvent, KeyboardEvent, forwardRef } from "react";
 import ReactTextMask, { MaskedInputProps } from "react-text-mask";
-import { Input } from "@axelor/ui";
+import { Input, InputProps } from "@axelor/ui";
 
 function moveCaretToStart(el: HTMLInputElement) {
   const { value } = el;
@@ -15,50 +15,52 @@ function moveCaretToStart(el: HTMLInputElement) {
   }
 }
 
-export const MaskedInput = forwardRef<any, MaskedInputProps>((props, ref) => {
-  const [showMask, setShowMask] = React.useState(false);
-  const { onFocus, onKeyDown, onBlur, onChange } = props;
+export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
+  (props, ref) => {
+    const [showMask, setShowMask] = React.useState(false);
+    const { onFocus, onKeyDown, onBlur, onChange } = props;
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (["Delete", "Backspace"].includes(e.key)) {
-      const el = e.target as HTMLInputElement;
-      if (
-        el &&
-        el.selectionStart === 0 &&
-        el.selectionEnd === (el.value || "").length
-      ) {
-        el.value = "";
-        onChange && onChange(e as any);
+    function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+      if (["Delete", "Backspace"].includes(e.key)) {
+        const el = e.target as HTMLInputElement;
+        if (
+          el &&
+          el.selectionStart === 0 &&
+          el.selectionEnd === (el.value || "").length
+        ) {
+          el.value = "";
+          onChange && onChange(e as any);
+        }
       }
+      onKeyDown && onKeyDown(e);
     }
-    onKeyDown && onKeyDown(e);
-  }
 
-  function handleFocus(event: FocusEvent<HTMLInputElement>) {
-    const inputEl = event.currentTarget;
-    setShowMask(true);
-    setTimeout(function () {
-      moveCaretToStart(inputEl);
-    }, 10);
-    onFocus && onFocus(event);
-  }
+    function handleFocus(event: FocusEvent<HTMLInputElement>) {
+      const inputEl = event.currentTarget;
+      setShowMask(true);
+      setTimeout(function () {
+        moveCaretToStart(inputEl);
+      }, 10);
+      onFocus && onFocus(event);
+    }
 
-  function handleBlur(event: any) {
-    setShowMask(false);
-    onBlur && onBlur(event);
-  }
+    function handleBlur(event: any) {
+      setShowMask(false);
+      onBlur && onBlur(event);
+    }
 
-  return (
-    <ReactTextMask
-      showMask={showMask}
-      placeholderChar={"_"}
-      guide
-      ref={ref}
-      {...props}
-      onKeyDown={handleKeyDown}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      render={(ref, props) => <Input ref={ref} {...(props as any)} />}
-    />
-  );
-});
+    return (
+      <ReactTextMask
+        showMask={showMask}
+        placeholderChar={"_"}
+        guide
+        ref={ref}
+        {...props}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        render={(ref, props) => <Input ref={ref} {...(props as any)} />}
+      />
+    );
+  }
+);

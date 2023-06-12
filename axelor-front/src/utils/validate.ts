@@ -26,12 +26,12 @@ const validateRequired: Validate = (value, { props }) => {
 };
 
 const validatePattern: Validate = (value, { props }) => {
-  const { title, pattern } = props;
+  const { title, pattern, widget } = props;
   if (
     typeof value === "string" &&
     value &&
-    pattern &&
-    !new RegExp(pattern, "i").test(value)
+    ((widget === "duration" && value?.includes?.("_")) ||
+      (pattern && !new RegExp(pattern, "i").test(value)))
   ) {
     return { pattern: i18n.get("{0} is not in proper format", title) };
   }
