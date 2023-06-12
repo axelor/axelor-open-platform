@@ -186,11 +186,12 @@ function GridInner(props: ViewProps<GridView>) {
       showEditor({
         model: view.model!,
         title: view.title ?? "",
+        viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
         record,
         readonly,
       });
     },
-    [view, showEditor]
+    [view, action, showEditor]
   );
 
   const onEditInDashlet = useCallback(
@@ -577,7 +578,7 @@ function GridInner(props: ViewProps<GridView>) {
       setState?.((draft) => {
         const row = draft.selectedRows?.[0];
         if (row != null) {
-          const col = draft.selectedCell?.[1] ?? 0
+          const col = draft.selectedCell?.[1] ?? 0;
           draft.selectedCell = [row, col];
         } else {
           draft.selectedCell = [0, 0];
