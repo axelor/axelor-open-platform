@@ -1,10 +1,11 @@
 import { useAtom, useAtomValue } from "jotai";
+import { useCallback, useMemo, useState } from "react";
+import padStart from "lodash/padStart";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string/viewer";
 import { MaskedInput } from "../date/mask-input";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import padStart from "lodash/padStart";
+import { toKebabCase } from "@/utils/names";
 
 function getValue(
   value: number | string,
@@ -48,47 +49,43 @@ export function Duration(props: FieldProps<string | number>) {
   const { focus, required } = attrs;
   const [changed, setChanged] = useState(false);
   const [_value = "", setValue] = useAtom(valueAtom);
+  const isTime = toKebabCase(schema.widget!) === "time";
 
   const value = useMemo(
     () =>
-      (isValid(_value)
+      (isValid(_value) && !isTime
         ? getValue(_value ?? "", { big, seconds })
         : _value) as string,
-    [_value, big, seconds]
+    [_value, isTime, big, seconds]
   );
-  const [maskValue, setMaskValue] = useState(value);
 
   const update = useCallback(
     (value: string, fireOnChange = false) => {
-      const valid = isValid(value);
-      if (valid || fireOnChange) {
-        setChanged(true);
-        setValue(valid ? toValue(value) : value, fireOnChange);
-      }
+      setValue(
+        isValid(value) && !isTime ? toValue(value) : value,
+        fireOnChange
+      );
     },
-    [setValue]
+    [isTime, setValue]
   );
 
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
-      const value = e.target.value;
-      setMaskValue(value);
       update(e.target.value);
+      setChanged(true);
     },
     [update]
   );
 
   const onBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
     (e) => {
-      update(e.target.value, true);
-      setChanged(false);
+      if (changed) {
+        update(e.target.value, true);
+        setChanged(false);
+      }
     },
     [changed, update]
   );
-
-  useEffect(() => {
-    setMaskValue(value);
-  }, [value]);
 
   return (
     <FieldControl {...props}>
@@ -100,13 +97,13 @@ export function Duration(props: FieldProps<string | number>) {
           id={uid}
           autoFocus={focus}
           placeholder={placeholder}
-          value={maskValue}
+          value={value}
           invalid={invalid}
           required={required}
           onChange={onChange}
           onBlur={onBlur}
           mask={[
-            ...(big ? [/\d/] : []),
+            ...(big && !isTime ? [/\d/] : []),
             /\d/,
             /\d/,
             ":",

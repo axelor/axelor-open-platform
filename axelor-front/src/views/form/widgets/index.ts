@@ -52,6 +52,7 @@ export * from "./string";
 export * from "./suggest-box";
 export * from "./tag-select";
 export * from "./text";
+export * from "./time";
 export * from "./theme-select";
 export * from "./toggle";
 export * from "./url";
