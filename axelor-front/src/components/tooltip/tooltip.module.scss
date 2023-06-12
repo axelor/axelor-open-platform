@@ -16,3 +16,7 @@
 .content {
   padding: 1rem;
 }
+
+.tooltip[data-popper-placement^="bottom"] [data-popper-arrow]::before {
+  background-color: var(--bs-tertiary-bg);
+}

@@ -22,6 +22,7 @@ export function Tooltip({ children, title, content: Content }: TooltipProps) {
         ref: setTargetEl,
       })}
       <Popper
+        className={styles.tooltip}
         open={open}
         target={targetEl}
         offset={[0, 4]}
