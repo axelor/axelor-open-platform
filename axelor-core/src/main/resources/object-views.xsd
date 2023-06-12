@@ -1478,7 +1478,7 @@
         <xsd:attribute name="canSearch" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              Whether to enable search header on grid view dashlet.
+              Whether to enable search header (for grid views) or search box (for card views).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
