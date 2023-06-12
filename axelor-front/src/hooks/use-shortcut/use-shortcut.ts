@@ -75,6 +75,7 @@ export function useShortcut(options: Options) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (
+        !e.repeat &&
         compareKey(e.key, key) === 0 &&
         e.ctrlKey === ctrlKey &&
         e.altKey === altKey &&
@@ -196,10 +197,7 @@ export function useNavShortcuts({
 
   const canHandle = useCallback(
     (e: KeyboardEvent) =>
-      !e.repeat &&
-      active === tab &&
-      currentViewType === viewType &&
-      canHandleProp(e),
+      active === tab && currentViewType === viewType && canHandleProp(e),
     [active, tab, currentViewType, viewType, canHandleProp]
   );
 
