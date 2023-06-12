@@ -2,6 +2,7 @@ import Editor from "@monaco-editor/react";
 import clsx from "clsx";
 import { useCallback } from "react";
 
+import { useAppTheme } from "@/hooks/use-app-theme";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 
@@ -12,6 +13,9 @@ export function CodeEditor(props: FieldProps<string>) {
   const { mode, codeSyntax, height = 400, width = "100%" } = schema;
 
   const language = mode || codeSyntax;
+  const appTheme = useAppTheme();
+
+  const theme = appTheme === "dark" ? "vs-dark" : "light";
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "",
@@ -36,6 +40,7 @@ export function CodeEditor(props: FieldProps<string>) {
       })}
     >
       <Editor
+        theme={theme}
         language={language}
         value={value}
         width={w}
