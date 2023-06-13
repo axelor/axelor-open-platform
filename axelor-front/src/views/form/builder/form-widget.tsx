@@ -5,7 +5,10 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { createEvalContext } from "@/hooks/use-parser/eval-context";
-import { parseExpression, parseTemplate } from "@/hooks/use-parser/utils";
+import {
+  parseAngularExp,
+  parseExpression,
+} from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
@@ -248,7 +251,7 @@ function useExpressions({
     useCallback(
       (get, set, context: DataContext, bind: string) => {
         if (valueAtom) {
-          const value = parseTemplate(bind)(context) ?? null;
+          const value = parseAngularExp(bind)(context) ?? null;
           set(valueAtom, value, false, false);
         }
       },
