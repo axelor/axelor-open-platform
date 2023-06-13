@@ -12,18 +12,15 @@ export const CONTENT_TYPE = {
 export const toStrongText = (text: string, quote?: boolean) =>
   `<strong>${quote ? `<em>${text}</em>` : text}</strong>`;
 
-export function prepareCustomView(view: GridView, record: DataRecord) {
-  return {
-    name: `$act:dms${record.id}`,
-    model: view.model,
-    title:
-      record.contentType === CONTENT_TYPE.SPREADSHEET
-        ? i18n.get("Spreadsheet")
-        : i18n.get("Document"),
-    viewType: "form",
-    views: [
-      {
-        name: `dms-html-or-spreadsheet-form`,
+export function prepareCustomView({ model }: GridView, record: DataRecord) {
+  const isSpreadsheet = record.contentType === CONTENT_TYPE.SPREADSHEET;
+  const view = isSpreadsheet
+    ? {
+        name: `spreadsheet?id=${record.id}`,
+        type: "html",
+      }
+    : {
+        name: `dms-html-form`,
         type: "form",
         width: "large",
         items: [
@@ -60,8 +57,13 @@ export function prepareCustomView(view: GridView, record: DataRecord) {
             ],
           } as any,
         ],
-      },
-    ],
+      };
+  return {
+    name: `$act:dms${record.id}`,
+    model,
+    title: isSpreadsheet ? i18n.get("Spreadsheet") : i18n.get("Document"),
+    viewType: view.type,
+    views: [view],
     params: {
       "show-toolbar": false,
       forceReadonly: false,

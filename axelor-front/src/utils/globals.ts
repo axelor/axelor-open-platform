@@ -5,6 +5,7 @@ import {
   useActiveTab_internal as useActiveTab,
 } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
+import { ActionView } from "@/services/client/meta.types";
 import { uniqueId } from "lodash";
 
 const openView: typeof openTab = (view, options) => {
@@ -14,11 +15,20 @@ const openView: typeof openTab = (view, options) => {
   return openTab(view, options);
 };
 
+const $openHtmlTab = (url: string, title: string) => {
+  return openView({
+    title,
+    viewType: "html",
+    views: [{ type: "html", name: url }],
+  } as ActionView);
+};
+
 export const axelor = {
   i18n,
   alerts,
   dialogs,
   openView,
+  $openHtmlTab,
   useActiveTab,
 };
 
