@@ -3,7 +3,12 @@ import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useCompletion, useEditor, useSelector } from "@/hooks/use-relation";
+import {
+  useBeforeSelect,
+  useCompletion,
+  useEditor,
+  useSelector,
+} from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -11,7 +16,6 @@ import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
-import { useFormScope } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import {
@@ -29,7 +33,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     placeholder,
     formView,
     gridView,
-    onSelect: onSelectAction,
   } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
@@ -125,31 +128,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [handleEdit]
   );
 
-  const { actionExecutor } = useFormScope();
-
-  const beforeSelectRef = useRef<string | null>(null);
-  const beforeSelect = useCallback(
-    async (force = false) => {
-      if ((force || beforeSelectRef.current === null) && onSelectAction) {
-        const res = await actionExecutor.execute(onSelectAction);
-        if (res && res.length > 0) {
-          const attrs = res[0].attrs || {};
-          const domain = attrs[schema.name]?.domain ?? null;
-          beforeSelectRef.current = domain;
-          return domain;
-        }
-      }
-    },
-    [actionExecutor, onSelectAction, schema.name]
-  );
-
-  const handleMenuOpen = useCallback(() => {
-    beforeSelectRef.current = null;
-  }, []);
-
-  const handleMenuClose = useCallback(() => {
-    beforeSelectRef.current = null;
-  }, []);
+  const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
 
   const handleSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
@@ -230,8 +209,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canCreate={canNew}
           onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
-          onMenuOpen={handleMenuOpen}
-          onMenuClose={handleMenuClose}
           invalid={invalid}
           value={value ?? null}
           placeholder={placeholder}
@@ -264,6 +241,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           fetchOptions={handleCompletion}
           optionLabel={targetName}
           optionValue={"id"}
+          {...beforeSelectProps}
         />
       )}
     </FieldControl>
