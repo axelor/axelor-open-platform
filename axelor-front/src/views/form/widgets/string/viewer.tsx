@@ -41,8 +41,9 @@ export function ViewerLink({
   return (
     <Button
       variant="link"
-      alignSelf="start"
+      textAlign="start"
       textDecoration="none"
+      overflow="hidden"
       onClick={onClick}
     >
       {children}
