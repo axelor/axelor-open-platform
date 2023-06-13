@@ -8,6 +8,7 @@ import { useTabs } from "@/hooks/use-tabs";
 import { useTagsList } from "@/hooks/use-tags";
 import { MenuItem, Tag } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
+import { useSidebar } from "./hook";
 import { NavBarSearch, SearchItem } from "./search";
 
 function load(res: MenuItem[], tags: Tag[]) {
@@ -85,15 +86,17 @@ function toSearchItems(data: MenuItem[]) {
 export function NavDrawer() {
   const { open: openTab } = useTabs();
   const { loading, menus = [] } = useMenu();
+  const { small, setSidebar } = useSidebar();
 
   const handleClick = useCallback(
     async (e: any, item: any) => {
       const menu = menus.find((x) => x.name === item.id);
       if (menu?.action) {
+        if (small) setSidebar(false);
         await openTab(menu.action);
       }
     },
-    [openTab, menus]
+    [menus, small, setSidebar, openTab]
   );
 
   const tags = useTagsList();

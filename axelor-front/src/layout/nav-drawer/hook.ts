@@ -25,6 +25,7 @@ export function useSidebar() {
   }
 
   return {
+    small,
     sidebar,
     setSidebar,
   };
