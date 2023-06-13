@@ -17,7 +17,12 @@ import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
-import { EditorOptions, useEditor, useSelector } from "@/hooks/use-relation";
+import {
+  EditorOptions,
+  useBeforeSelect,
+  useEditor,
+  useSelector,
+} from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -255,22 +260,30 @@ export function OneToMany({
     )
   );
 
-  const onSelect = useAtomCallback(
-    useCallback(
-      (get) => {
-        showSelector({
-          title: i18n.get("Select {0}", title ?? ""),
-          model,
-          multiple: true,
-          viewName: gridView,
-          domain: domain,
-          context: getContext(),
-          onSelect: handleSelect,
-        });
-      },
-      [showSelector, title, model, gridView, domain, getContext, handleSelect]
-    )
-  );
+  const [beforeSelect] = useBeforeSelect(schema);
+
+  const onSelect = useCallback(async () => {
+    const _domain = (await beforeSelect()) ?? domain;
+    const _domainContext = _domain ? getContext() : {};
+    showSelector({
+      title: i18n.get("Select {0}", title ?? ""),
+      model,
+      multiple: true,
+      viewName: gridView,
+      domain: _domain,
+      context: _domainContext,
+      onSelect: handleSelect,
+    });
+  }, [
+    showSelector,
+    title,
+    model,
+    gridView,
+    domain,
+    getContext,
+    beforeSelect,
+    handleSelect,
+  ]);
 
   const openEditor = useCallback(
     (

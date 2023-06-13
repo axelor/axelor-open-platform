@@ -3,10 +3,15 @@ import { MouseEvent, useCallback, useMemo } from "react";
 
 import { Box } from "@axelor/ui";
 
-import { EditorOptions, useCompletion, useEditor } from "@/hooks/use-relation";
+import {
+  EditorOptions,
+  useBeforeSelect,
+  useCompletion,
+  useEditor,
+} from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
 
-import { FieldControl, FieldProps } from "../../builder";
+import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
@@ -42,15 +47,16 @@ export function TagSelectComponent(props: CreatableSelectProps) {
 }
 
 export function TagSelect(props: FieldProps<DataRecord[]>) {
-  const { schema, valueAtom, widgetAtom, readonly } = props;
+  const { schema, valueAtom, formAtom, widgetAtom, readonly } = props;
   const { target, targetName, targetSearch, placeholder } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
 
   const [value, setValue] = useAtom(valueAtom);
   const showEditor = useEditor();
+  const getContext = usePrepareContext(formAtom);
 
-  const { title, focus } = attrs;
+  const { title, focus, domain } = attrs;
   const canNew = schema.canNew !== false;
   const search = useCompletion({
     target,
@@ -83,13 +89,20 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [handleEdit]
   );
 
+  const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
+
   const handleCompletion = useCallback(
     async (value: string) => {
-      const res = await search(value);
-      const { records } = res;
+      const _domain = (await beforeSelect(true)) ?? domain;
+      const _domainContext = _domain ? getContext() : {};
+      const options = {
+        _domain,
+        _domainContext,
+      };
+      const { records } = await search(value, options);
       return records;
     },
-    [search]
+    [search, domain, beforeSelect, getContext]
   );
 
   const handleChange = useCallback(
@@ -127,9 +140,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           placeholder={placeholder}
           value={value}
           canCreate={canNew}
+          fetchOptions={handleCompletion}
           onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
-          fetchOptions={handleCompletion}
+          {...beforeSelectProps}
         />
       )}
     </FieldControl>
