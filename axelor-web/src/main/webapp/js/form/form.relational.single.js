@@ -286,7 +286,7 @@ ui.directive('uiCanSuggest', function () {
 
 var m2oTemplateReadonly = "" +
   "<span class='display-text' ng-show='text && !isHiddenSelf()'>" +
-    "<a href='' ng-show='canView()' ng-click='onEdit()'>{{text}}</a>" +
+    "<a href='' tabindex='-1' ng-show='canView()' ng-click='onEdit()'>{{text}}</a>" +
     "<span ng-show='!canView()'>{{text}}</span>" +
   "</span>";
 
