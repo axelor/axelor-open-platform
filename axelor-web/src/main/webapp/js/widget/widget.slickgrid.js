@@ -2908,6 +2908,10 @@ Grid.prototype.onItemClick = function(event, args) {
     return this.onButtonClick(event, args);
   }
 
+  if (source.parent().is('.edit-icon') && args.cell === 0) {
+    return false;
+  }
+
   // checkbox column
   if (this.scope.selector && args.cell === 0) {
     return false;
