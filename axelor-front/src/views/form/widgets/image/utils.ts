@@ -1,3 +1,5 @@
+import isNumber from "lodash/isNumber";
+
 import { session } from "@/services/client/session";
 import { Schema } from "@/services/client/meta.types";
 import { alerts } from "@/components/alerts";
@@ -17,7 +19,7 @@ export function makeImageURL(
 
   const image = target !== META_FILE_MODEL;
   const id = value.id ?? value;
-  if (!id || id <= 0) return BLANK;
+  if (!id || id <= 0 || !isNumber(id)) return BLANK;
 
   const ver = value.version ?? value.$version ?? new Date().getTime();
 

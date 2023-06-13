@@ -76,6 +76,10 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
     type = res.serverType;
   }
 
+  if (!res.widget && field.image) {
+    type = "image";
+  }
+
   res.uid = uniqueId("w");
   res.widget = toKebabCase(type);
 
