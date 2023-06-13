@@ -47,3 +47,22 @@
     right: 0.75rem;
   }
 }
+
+.user {
+  img {
+    background: transparent;
+    height: 1.75rem;
+    width: 1.75rem;
+    padding: 0;
+  }
+  & > button > * > *:not(img) {
+    background: var(--bs-indigo);
+    color: var(--bs-white);
+    font-size: 1rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    [data-bs-theme=dark] & {
+      color: var(--bs-body-color);
+    }
+  }
+}

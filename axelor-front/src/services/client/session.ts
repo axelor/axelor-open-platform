@@ -30,6 +30,7 @@ export interface SessionInfo {
     nameField?: string;
     login: string;
     lang?: string | null;
+    image?: string | null;
     group?: string | null;
     action?: string | null;
     navigator?: string | null;
@@ -80,6 +81,7 @@ const INFO_MAPPINGS = {
   "user.theme": "user.theme",
   "user.lang": "user.lang",
   "user.login": "user.login",
+  "user.image": "user.image",
   "user.name": "user.name",
   "user.nameField": "user.nameField",
   "user.navigator": "user.navigator",

@@ -26,6 +26,7 @@ import { Shortcuts } from "@/routes/shortcuts";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import Avatar from "@/views/form/widgets/mail-messages/avatar/avatar";
 import {
   QuickMenu,
   QuickMenuItem as TQuickMenuItem,
@@ -39,8 +40,8 @@ import {
 } from "@/view-containers/action";
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import { useSidebar } from "../nav-drawer/hook";
-import styles from "./nav-header.module.scss";
 import { quick } from "./utils";
+import styles from "./nav-header.module.scss";
 
 function BadgeIcon({
   count,
@@ -350,7 +351,15 @@ function FarItems() {
         {
           key: "user",
           text: i18n.get("User"),
+          className: styles.user,
           iconOnly: true,
+          icon: () => (
+            <Avatar
+              user={data?.user as any}
+              image={data?.user?.image ?? ""}
+              color={" "}
+            />
+          ),
           iconProps: {
             icon: "person",
           },
