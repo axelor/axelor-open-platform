@@ -38,3 +38,22 @@ export function useResponsiveContainer(
     xxl: xxl && !xl,
   };
 }
+
+export function useDevice() {
+  const ua = navigator.userAgent;
+  const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+  const isTablet = /iPad|Tablet/i.test(ua);
+  const isDesktop = !isMobile && !isTablet;
+  const isMac = /(Mac OS)|(Macintosh)/i.test(ua);
+  const isLinux = /(Linux|CrOS)/i.test(ua);
+  const isWindows = /Windows/i.test(ua);
+
+  return {
+    isMobile,
+    isTablet,
+    isDesktop,
+    isMac,
+    isLinux,
+    isWindows,
+  };
+}
