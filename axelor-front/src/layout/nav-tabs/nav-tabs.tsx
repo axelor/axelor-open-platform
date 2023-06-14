@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 
 import {
   Menu as AxMenu,
@@ -17,6 +17,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useMenu } from "@/hooks/use-menu";
+import { useResponsiveContainer } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { Tab, useTabs } from "@/hooks/use-tabs";
@@ -139,6 +140,10 @@ export function NavTabs() {
   const [menuOffset, setMenuOffset] = useState<[number, number]>([0, 0]);
   const [menuShow, setMenuShow] = useState(false);
 
+  const ref = useRef<HTMLDivElement>(null);
+  const size = useResponsiveContainer(ref);
+  const containerSize = Object.keys(size).find((x) => (size as any)[x]);
+
   const doClose = useAtomCallback(
     useCallback(
       (get, set, tab: string) => {
@@ -219,11 +224,13 @@ export function NavTabs() {
 
   return (
     <Box
+      ref={ref}
       d="flex"
       flexDirection="column"
       overflow="hidden"
       flexGrow={1}
       className={styles.tabs}
+      data-tab-container-size={containerSize}
     >
       {items.length > 0 && (
         <Tabs

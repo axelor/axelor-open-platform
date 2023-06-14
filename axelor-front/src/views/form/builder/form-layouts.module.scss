@@ -36,7 +36,8 @@
   grid-template-columns: 1fr;
 }
 
-@media (max-width: 767px) {
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
   .grid {
     grid-template-columns: 1fr !important;
     .gridItem {
