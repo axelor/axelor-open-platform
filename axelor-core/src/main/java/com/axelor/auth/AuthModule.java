@@ -58,9 +58,6 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
-    // observe authentication-related events
-    bind(AuthObserver.class);
-
     // Pac4j
     final AppSettings settings = AppSettings.get();
     final String userProvisioning =

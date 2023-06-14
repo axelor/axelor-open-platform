@@ -20,9 +20,11 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthFilter;
+import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.inject.Key;
 import com.google.inject.Provides;
@@ -255,6 +257,9 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       final Clients clients = new Clients(getCallbackUrl(), clientList);
       final Map<String, Authorizer<?>> authorizers = new LinkedHashMap<>();
 
+      authorizers.put(
+          AxelorUserAuthorizer.USER_AUTHORIZER_NAME,
+          new AxelorUserAuthorizer(Beans.get(AuthSessionService.class)));
       authorizers.put(CSRF_TOKEN_AUTHORIZER_NAME, new AxelorCsrfTokenGeneratorAuthorizer());
       authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
 

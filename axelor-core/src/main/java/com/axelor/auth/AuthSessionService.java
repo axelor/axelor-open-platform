@@ -22,7 +22,7 @@ import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 
 /** Manages session attributes. */
-class AuthSessionService {
+public class AuthSessionService {
   private static final String LOGIN_DATE = "com.axelor.internal.loginDate";
 
   public void updateLoginDate() {

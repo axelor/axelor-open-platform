@@ -690,7 +690,7 @@
         report = data.data || data, stacktrace = null, cause = null, exception;
 
       // unauthorized errors are handled separately
-      if (data.status === 401) {
+      if (data.status === 401 || data.status === 403) {
         return;
       }
 
