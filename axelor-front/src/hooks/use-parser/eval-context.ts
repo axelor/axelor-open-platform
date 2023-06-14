@@ -1,14 +1,15 @@
-import { get } from "lodash";
+import { MouseEvent } from "react";
+import get from "lodash/get";
+import set from "lodash/set";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
-import format from "@/utils/format";
 import { unaccent } from "@/utils/sanitize";
 import { i18n } from "@/services/client/i18n";
 import { ActionOptions } from "@/view-containers/action";
 import { moment } from "@/services/client/l10n";
-import { MouseEvent } from "react";
+import format from "@/utils/format";
 
 export type EvalContextOptions = {
   valid?: (name?: string) => boolean;
@@ -22,7 +23,8 @@ export type EvalContextOptions = {
 
 export function createEvalContext(
   context: DataContext,
-  options?: EvalContextOptions
+  options?: EvalContextOptions,
+  template?: boolean
 ) {
   const {
     execute = () => Promise.resolve(),
@@ -193,11 +195,17 @@ export function createEvalContext(
 
   type EvalContext = DataContext & typeof helpers & typeof filters;
 
-  const proxy = new Proxy<EvalContext>(context as any, {
+  const $context = template
+    ? Object.keys(context).reduce(
+        (ctx, key) => set(ctx, key, context[key]),
+        {} as any
+      )
+    : context;
+  const proxy = new Proxy<EvalContext>($context, {
     get(target, p, receiver) {
       if (p in helpers) return helpers[p as keyof typeof helpers];
       if (p in filters) return filters[p as keyof typeof filters];
-      const value = Reflect.get(target, p, receiver);
+      const value = Reflect.get(target, p, receiver) ?? get(target, p);
       if (p === "id" && value && value <= 0) {
         return null;
       }

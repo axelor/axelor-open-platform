@@ -27,7 +27,7 @@ export function useTemplate(template: string) {
   return useMemo(() => {
     const Comp = processTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
-      const context = createEvalContext(props.context, props.options);
+      const context = createEvalContext(props.context, props.options, true);
       return createElement(Comp, { context });
     };
   }, [template]);
