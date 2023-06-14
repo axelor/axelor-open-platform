@@ -6,7 +6,6 @@
   border-left: 3px solid #e7eaec;
 }
 
-
 .kanban-card.primary {
   border-left: 3px solid #428bca;
 }
@@ -42,12 +41,10 @@
   border-radius: 100%;
 }
 
-
 [dir="rtl"] .kanban-card img {
   right: unset;
   left: 0.25rem;
 }
-
 
 .rect-image .kanban-card img {
   border-radius: 0;
@@ -81,11 +78,11 @@
   width: 100%;
 }
 
-.cards-view .kanban-card address {
+.cards-view address {
   margin-bottom: 0;
 }
 
-.cards-view .kanban-card p {
+.cards-view p {
   margin: 9px 0;
 }
 
