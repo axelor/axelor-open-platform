@@ -336,7 +336,7 @@ function useExpressions({
         if (hideIf) handleCondition(ctx, "hidden", hideIf);
         if (readonlyIf) handleCondition(ctx, "readonly", readonlyIf);
         if (requiredIf) handleCondition(ctx, "required", requiredIf);
-        if (collapseIf) handleCondition(ctx, "collapsed", collapseIf);
+        if (collapseIf) handleCondition(ctx, "collapse", collapseIf);
         if (validIf) handleValidation(ctx, validIf);
 
         if (canNew) handleCondition(ctx, "canNew", canNew);

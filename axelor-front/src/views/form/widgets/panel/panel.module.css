@@ -8,3 +8,7 @@
   align-items: center;
   font-weight: 600;
 }
+.panelHeader.collapsible {
+  justify-content: space-between;
+  cursor: pointer;
+}
