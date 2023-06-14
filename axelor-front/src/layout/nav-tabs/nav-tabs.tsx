@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 
 import {
   Menu as AxMenu,
@@ -10,6 +10,8 @@ import {
   Box,
   NavItemProps,
   NavTabs as Tabs,
+  getRGB,
+  getSupportedColor,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
@@ -58,24 +60,11 @@ const NavIcon = memo(function NavIcon({
   icon: string;
   iconColor?: string;
 }) {
-  const color = iconColor?.startsWith("#") ? iconColor : undefined;
-  const colorClass = color ? undefined : `fg-${iconColor}`;
-
-  const elemRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (elemRef.current) {
-      const style = getComputedStyle(elemRef.current);
-      const bgColor = style.color.replace(/rgb\((.*?)\)/, "rgba($1, 0.25)");
-      elemRef.current.style.backgroundColor = bgColor;
-    }
-  }, []);
+  const color = iconColor && getSupportedColor(iconColor);
+  const backgroundColor = color && getRGB(color, 0.25);
 
   return (
-    <div
-      className={clsx(styles.tabIcon, legacyClassNames(colorClass))}
-      ref={elemRef}
-    >
+    <div className={clsx(styles.tabIcon)} style={{ color, backgroundColor }}>
       <i className={legacyClassNames("fa", icon)} />
     </div>
   );
