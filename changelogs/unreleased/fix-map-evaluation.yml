@@ -1,0 +1,3 @@
+---
+title: Fix script evaluation on Map when isEmpty is used
+type: fix
