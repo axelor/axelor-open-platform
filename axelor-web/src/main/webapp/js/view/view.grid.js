@@ -195,13 +195,10 @@ function GridViewCtrl($scope, $element) {
 
     dataView.beginUpdate();
     try {
-      //XXX: clear existing items (bug?)
-      if (dataView.getLength()) {
-        dataView.setItems([]);
-      }
       dataView.setItems(items);
     } finally {
       dataView.endUpdate();
+      $element.find('[ui-slick-grid]:first').data('grid').invalidate();
     }
 
     if (pageInfo) {
