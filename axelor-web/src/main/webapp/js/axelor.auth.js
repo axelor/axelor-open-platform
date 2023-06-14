@@ -82,7 +82,7 @@ angular.module('axelor.auth', []).provider('authService', function() {
               + "&hash_location=" + encodeURIComponent(window.location.hash);
             return $q.reject(response);
         }
-        if ((response.status === 401 || response.status === 502
+        if ((response.status === 401 || response.status === 403 || response.status === 502
             || (response.status === 0 && !response.data)) && response.config.url !== "callback") {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);

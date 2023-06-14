@@ -31,8 +31,12 @@ public class ConfigProvider implements Provider<Config> {
 
   @Inject
   public ConfigProvider(
-      Clients clients, AxelorCsrfAuthorizer csrfAuthorizer, AxelorCsrfMatcher csrfMatcher) {
+      Clients clients,
+      AxelorUserAuthorizer userAuthorizer,
+      AxelorCsrfAuthorizer csrfAuthorizer,
+      AxelorCsrfMatcher csrfMatcher) {
     config = new Config(clients);
+    config.addAuthorizer(AxelorUserAuthorizer.USER_AUTHORIZER_NAME, userAuthorizer);
     config.addAuthorizer(AxelorCsrfAuthorizer.CSRF_AUTHORIZER_NAME, csrfAuthorizer);
     config.addMatcher(AxelorCsrfMatcher.CSRF_MATCHER_NAME, csrfMatcher);
   }

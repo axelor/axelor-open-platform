@@ -52,9 +52,6 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
-    // observe authentication-related events
-    bind(AuthObserver.class);
-
     // pac4j
     bind(AuthPac4jObserver.class);
     install(new AuthPac4jModule(context));
