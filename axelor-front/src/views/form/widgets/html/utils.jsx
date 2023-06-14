@@ -522,6 +522,19 @@ export function getActions() {
     },
     divider(false),
     {
+      lite: false,
+      title: "Insert link",
+      image: "\uf08e",
+      popup: CreateLinkPopup,
+    },
+    {
+      lite: false,
+      title: "Insert image",
+      image: "\uf030",
+      popup: CreateImagePopup,
+    },
+    divider(false),
+    {
       title: "Left",
       image: "\uf036",
       command: "justifyLeft",
@@ -564,19 +577,6 @@ export function getActions() {
       title: "Outdent",
       image: "\uf03b",
       command: "outdent",
-    },
-    divider(false),
-    {
-      lite: false,
-      title: "Insert image",
-      image: "\uf030",
-      popup: CreateImagePopup,
-    },
-    {
-      lite: false,
-      title: "Insert link",
-      image: "\uf08e",
-      popup: CreateLinkPopup,
     },
     divider(false),
     {

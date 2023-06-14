@@ -1,7 +1,5 @@
 @use "sass:math";
 $spacing: 0.25rem;
-$bg-white: #fff;
-$bg-white-shade: #eee;
 
 .relative {
   position: relative;
@@ -11,7 +9,7 @@ $bg-white-shade: #eee;
   display: flex;
   flex-direction: column;
   min-height: 100px;
-  width: "100%";
+  width: 100%;
   border-radius: 0;
   display: flex;
   flex-direction: column;
@@ -90,8 +88,6 @@ $bg-white-shade: #eee;
 }
 
 .custom-html-editor-toolbar {
-  display: flex;
-  flex-wrap: nowrap;
   overflow: hidden;
   border-bottom: 1px solid var(--bs-border-color);
 
@@ -125,8 +121,8 @@ $bg-white-shade: #eee;
     &:focus,
     &:focus-visible,
     &:hover {
-      color: $bg-white;
-      background-color: $bg-white-shade;
+      color: var(--bs-secondary);
+      background-color: var(--bs-secondary-bg);
     }
   }
   & pre {
