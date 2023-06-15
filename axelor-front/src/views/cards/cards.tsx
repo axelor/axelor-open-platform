@@ -215,7 +215,7 @@ export function Cards(props: ViewProps<CardsView>) {
   });
 
   return (
-    <Box className={legacyClassNames(styles.cards, "cards-view", "row-fluid")}>
+    <Box className={legacyClassNames(styles.container, "cards-view", "row-fluid")}>
       {showToolbar && (
         <ViewToolBar
           meta={meta}
@@ -260,7 +260,7 @@ export function Cards(props: ViewProps<CardsView>) {
         </ViewToolBar>
       )}
       {records.length > 0 && (
-        <Box p={2} py={3} d="flex" flexWrap="wrap" overflow="auto">
+        <Box className={styles.cards}>
           {records.map((record) => (
             <Card
               key={record.id}

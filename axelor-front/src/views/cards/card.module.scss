@@ -1,8 +1,10 @@
 .card {
   width: calc(100% / 3);
+  min-width: 250px;
+  flex-grow: 1;
   cursor: pointer;
   position: relative;
-  
+
   .menuIcon {
     position: absolute;
     top: 0;
