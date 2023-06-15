@@ -19,3 +19,18 @@
 .pageInfo {
   white-space: nowrap;
 }
+
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
+  .pageInfo {
+    display: none;
+  }
+}
+
+[data-tab-container-size="xs"] {
+  .farItems,
+  .viewSwitch,
+  .pageActions {
+    display: none;
+  }
+}

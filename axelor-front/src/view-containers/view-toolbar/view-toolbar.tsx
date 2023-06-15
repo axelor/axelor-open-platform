@@ -28,7 +28,6 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { commonClassNames } from "@/styles/common";
 import { legacyClassNames } from "@/styles/legacy";
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
@@ -329,19 +328,15 @@ export function ViewToolBar(props: ViewToolBarProps) {
         />
       )}
       <Box className={styles.extra}>{children}</Box>
-      {pageText && (
-        <Box className={commonClassNames(styles.pageInfo, "hide-sm")}>
-          {pageText}
-        </Box>
-      )}
+      {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
       {PageComp && (
-        <Box className={commonClassNames(styles.pageInfo, "hide-sm")}>
+        <Box className={styles.pageInfo}>
           <PageComp />
         </Box>
       )}
       {pageActions && (
         <CommandBar
-          className={commonClassNames(styles.pageActions, "hide-sm")}
+          className={styles.pageActions}
           items={[
             {
               key: "prev",
@@ -367,16 +362,10 @@ export function ViewToolBar(props: ViewToolBarProps) {
         />
       )}
       {switchActions && (
-        <CommandBar
-          items={switchActions}
-          className={commonClassNames(styles.viewSwitch, "hide-sm")}
-        />
+        <CommandBar items={switchActions} className={styles.viewSwitch} />
       )}
       {sessionInfo?.user.technical && (
-        <CommandBar
-          items={farItems}
-          className={commonClassNames(styles.farItems, "hide-sm")}
-        />
+        <CommandBar items={farItems} className={styles.farItems} />
       )}
     </Box>
   );

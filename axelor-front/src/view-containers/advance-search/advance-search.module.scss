@@ -1,6 +1,13 @@
 .root {
-  width: 250px;
+  max-width: 250px;
+  min-width: 100px;
   margin: 0 0.25rem;
+}
+
+[data-tab-container-size="xs"] {
+  .root {
+    max-width: 100%;
+  }
 }
 
 .popperContent {
