@@ -353,6 +353,7 @@ function FarItems() {
           text: i18n.get("User"),
           className: styles.user,
           iconOnly: true,
+          showDownArrow: true,
           icon: () => (
             <Avatar
               user={data?.user as any}
