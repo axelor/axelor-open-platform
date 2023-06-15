@@ -1,16 +1,24 @@
 .board {
   padding: 0.25rem;
+  gap: 1rem;
   & > * {
     max-width: 100%;
   }
   &.responsive {
     flex-direction: column;
   }
+  overflow: auto;
 }
 
 .column-wrapper {
   display: flex;
   width: 24em;
+  min-width: 250px;
+}
+
+.board.responsive .column-wrapper {
+  width: auto;
+  flex-grow: 1;
 }
 
 .column {
