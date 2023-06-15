@@ -350,11 +350,12 @@ export function AdvanceSearch({
       <Popper
         bg="body"
         open={open}
+        className={styles.popper}
         target={containerRef.current}
         placement={`bottom-${rtl ? "end" : "start"}`}
       >
         <ClickAwayListener onClickAway={handleClose}>
-          <Box {...(rtl ? { dir: "rtl" } : {})} className={styles.popper} p={2}>
+          <Box {...(rtl ? { dir: "rtl" } : {})} className={styles.popperContent} p={2}>
             <FocusTrap initialFocus={false} enabled={open}>
               <Box d="flex" flexDirection="column">
                 <Box d="flex" alignItems="center">
@@ -366,7 +367,7 @@ export function AdvanceSearch({
                   </Box>
                 </Box>
                 <Divider />
-                <Box d="flex" alignItems="flex-start" mb={customSearch ? 0 : 1}>
+                <Box d="flex" className={styles.filterList} alignItems="flex-start" mb={customSearch ? 0 : 1}>
                   {(domains || []).length > 0 && (
                     <FilterList
                       title={i18n.get("Filters")}

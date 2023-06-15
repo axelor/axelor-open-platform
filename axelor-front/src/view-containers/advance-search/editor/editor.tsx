@@ -404,7 +404,7 @@ export function Editor({
           />
         </FormControl>
       </Box>
-      <Box d="flex" flexDirection="column" alignItems="flex-start" g={2}>
+      <Box d="flex" flexDirection="column" alignItems="flex-start" g={2} w={100}>
         {criteria.map((item: any, index: number) => (
           <Criteria
             key={index}

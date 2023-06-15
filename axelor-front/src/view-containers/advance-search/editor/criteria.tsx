@@ -52,28 +52,33 @@ export const Criteria = memo(function Criteria({
   }
 
   return (
-    <Box d="flex" alignItems="center" g={2}>
+    <Box d="flex" alignItems="center" g={2} w={100}>
       <Box d="flex" onClick={handleRemove}>
         <MaterialIcon icon="close" className={styles.icon} />
       </Box>
 
-      {fields &&
-        renderSelect("fieldName", fields as { name: string; title: string }[])}
+      <Box d="flex" g={2} className={styles.inputs}>
+        {fields &&
+          renderSelect(
+            "fieldName",
+            fields as { name: string; title: string }[]
+          )}
 
-      {renderSelect("operator", options)}
+        {renderSelect("operator", options)}
 
-      {operator && (
-        <Widget
-          {...{
-            operator,
-            type,
-            field,
-            value,
-            onChange: handleChange,
-            className: styles.criteria,
-          }}
-        />
-      )}
+        {operator && (
+          <Widget
+            {...{
+              operator,
+              type,
+              field,
+              value,
+              onChange: handleChange,
+              className: styles.criteria,
+            }}
+          />
+        )}
+      </Box>
     </Box>
   );
 });
