@@ -5,6 +5,11 @@ import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, set as setDeep } from "lodash";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import {
+  EvalContextOptions,
+  createEvalContext,
+} from "@/hooks/use-parser/eval-context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   ActionAttrData,
@@ -15,17 +20,17 @@ import {
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import {
-  EvalContextOptions,
-  createEvalContext,
-} from "@/hooks/use-parser/eval-context";
+import { useViewTab } from "@/view-containers/views/scope";
 
 import { fallbackFormAtom } from "./atoms";
-import { FormAtom, FormProps, RecordHandler, RecordListener } from "./types";
+import {
+  FormAtom,
+  FormProps,
+  RecordHandler,
+  RecordListener,
+  WidgetState,
+} from "./types";
 import { processActionValue } from "./utils";
-import { useViewTab } from "@/view-containers/views/scope";
 
 type ContextCreator = () => DataContext;
 
@@ -207,8 +212,20 @@ function useActionAttrs({ formAtom }: { formAtom: FormAtom }) {
     useAtomCallback(
       useCallback(
         (get, set, data) => {
-          const { statesByName, fields } = get(formAtom);
+          const { statesByName, states: statesById, fields } = get(formAtom);
           const { target, name, value } = data;
+
+          const updateStates = (fieldName: string, newState: WidgetState) => ({
+            statesByName: { ...statesByName, [fieldName]: newState },
+            states: produce(statesById, (prev) => {
+              // reset widget's own state so that the attibute set by the action get preference.
+              Object.values(prev).forEach((state) => {
+                if (state.name === fieldName && name in state.attrs) {
+                  delete (state.attrs as any)[name];
+                }
+              });
+            }),
+          });
 
           // collection field column ?
           if (target.includes(".")) {
@@ -228,13 +245,10 @@ function useActionAttrs({ formAtom }: { formAtom: FormAtom }) {
                   },
                 },
               };
-              const newStates = {
-                ...statesByName,
-                [fieldName]: newState,
-              };
+              const newStates = updateStates(fieldName, newState);
               set(formAtom, (prev) => ({
                 ...prev,
-                statesByName: newStates,
+                ...newStates,
               }));
               return;
             }
@@ -248,13 +262,11 @@ function useActionAttrs({ formAtom }: { formAtom: FormAtom }) {
               [data.name]: data.value,
             },
           };
-          const newStates = {
-            ...statesByName,
-            [data.target]: newState,
-          };
+
+          const newStates = updateStates(data.target, newState);
           set(formAtom, (prev) => ({
             ...prev,
-            statesByName: newStates,
+            ...newStates,
           }));
         },
         [formAtom]
