@@ -1,5 +1,7 @@
+import { i18n } from "@/services/client/i18n";
 import { $request, $use } from "@/services/http";
 import { useCallback, useEffect, useState } from "react";
+import { alerts } from "../alerts";
 
 type Pending = () => Promise<any>;
 
@@ -26,14 +28,18 @@ export function useHttpWatch() {
       setCount((count) => count + 1);
       try {
         const res = await next();
-        if (res instanceof Response && res.status === 401) {
-          setCount((count) => count - 1);
-          return new Promise((resolve, reject) => {
-            setPending((pending) => [
-              ...pending,
-              () => $request(args.input, args.init).then(resolve, reject),
-            ]);
-          });
+        if (res instanceof Response) {
+          if (res.status === 401) {
+            setCount((count) => count - 1);
+            return new Promise((resolve, reject) => {
+              setPending((pending) => [
+                ...pending,
+                () => $request(args.input, args.init).then(resolve, reject),
+              ]);
+            });
+          } else if (res.status === 403) {
+            alerts.error({ message: i18n.get("Access error") });
+          }
         }
         return res;
       } finally {
