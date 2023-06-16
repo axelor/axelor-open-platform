@@ -23,9 +23,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class I18nConfigExtension {
+public class I18nExtension {
 
-  public static final String EXTENSION_NAME = "i18nConfig";
+  public static final String EXTENSION_NAME = "i18n";
 
   private List<Path> extraSources;
 

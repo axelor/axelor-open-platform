@@ -19,7 +19,7 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.gradle.AxelorPlugin;
-import com.axelor.gradle.I18nConfigExtension;
+import com.axelor.gradle.I18nExtension;
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,8 +51,7 @@ public class I18nTask extends DefaultTask {
 
     extractor.extract(src, dest, update, withContext);
 
-    final I18nConfigExtension extension =
-        getProject().getExtensions().findByType(I18nConfigExtension.class);
+    final I18nExtension extension = getProject().getExtensions().findByType(I18nExtension.class);
 
     if (extension == null) {
       return;

@@ -34,7 +34,7 @@ jar {
   }
 }
 
-i18nConfig {
+i18n {
   extraSources = ["${rootDir}/axelor-front/src"]
 }
 
