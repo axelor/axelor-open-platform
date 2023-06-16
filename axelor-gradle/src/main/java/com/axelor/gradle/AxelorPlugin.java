@@ -66,6 +66,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project.getPlugins().apply(JavaLibraryPlugin.class);
     project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
+    project.getExtensions().create(I18nConfigExtension.EXTENSION_NAME, I18nConfigExtension.class);
 
     project.getPlugins().apply(JavaSupport.class);
     project.getPlugins().apply(PublishSupport.class);

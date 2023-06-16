@@ -65,11 +65,14 @@ public class I18nExtractor {
   private static final Pattern PATTERN_XML =
       Pattern.compile("\\" + File.separator + "(domains|objects|views)\\" + File.separator);
   private static final Pattern PATTERN_I18N =
-      Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(T.apply\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
+      Pattern.compile(
+          "((_t\\s*\\()|([Ii]18n.get\\s*\\()|(T.apply\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
   private static final Pattern PATTERN_HTML =
       Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
   private static final Pattern PATTERN_EXCLUDE =
-      Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)");
+      Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)|(\\.test\\.)");
+
+  private static final Set<String> JS_FILE_EXTENSIONS = Set.of(".js", ".jsx", ".ts", ".tsx");
 
   private static final Set<String> VIEW_TYPES =
       Sets.newHashSet(
@@ -141,7 +144,8 @@ public class I18nExtractor {
         if (name.endsWith(".java")) processJava(file);
         if (name.endsWith(".groovy")) processJava(file);
 
-        if (name.endsWith(".js") && !PATTERN_EXCLUDE.matcher(file.toString()).find()) {
+        if (JS_FILE_EXTENSIONS.stream().anyMatch(name::endsWith)
+            && !PATTERN_EXCLUDE.matcher(file.toString()).find()) {
           processJava(file);
           processHtml(file);
         }

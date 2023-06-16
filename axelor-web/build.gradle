@@ -34,4 +34,8 @@ jar {
   }
 }
 
+i18nConfig {
+  extraSources = ["${rootDir}/axelor-front/src"]
+}
+
 processResources.dependsOn ':axelor-front:buildFront'
