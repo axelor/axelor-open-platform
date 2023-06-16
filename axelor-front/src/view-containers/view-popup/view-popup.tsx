@@ -3,7 +3,7 @@ import { ScopeProvider } from "jotai-molecules";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";

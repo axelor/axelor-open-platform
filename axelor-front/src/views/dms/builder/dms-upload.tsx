@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useReducer } from "react";
 import { Box, Link } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { ProgressComponent } from "@/views/form/widgets/progress";
 import { Uploader } from "./scope";

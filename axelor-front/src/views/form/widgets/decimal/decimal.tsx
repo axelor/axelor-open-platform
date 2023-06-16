@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field } from "@/services/client/meta.types";
 import format from "@/utils/format";

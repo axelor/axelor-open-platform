@@ -2,7 +2,7 @@ import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
 import { memo, useCallback, useMemo, useState } from "react";
 
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEditor, useSelector } from "@/hooks/use-relation";

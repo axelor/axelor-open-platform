@@ -14,7 +14,7 @@ import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import clsx from "clsx";
 
 import { GridView } from "@/services/client/meta.types";

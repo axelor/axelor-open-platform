@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, CommandItemProps } from "@axelor/ui/core";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 import { Event } from "@axelor/ui/scheduler/types";
-import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { SearchOptions } from "@/services/client/data";
 import { Criteria, DataRecord } from "@/services/client/data.types";

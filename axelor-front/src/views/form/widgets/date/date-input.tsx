@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box } from "@axelor/ui";
 import { MaskedInput } from "./mask-input";
 import classes from "./date-input.module.scss";

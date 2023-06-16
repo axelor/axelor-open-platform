@@ -3,7 +3,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
 import { Badge, Box, Select, SelectComponents, SelectProps } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";

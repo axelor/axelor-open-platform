@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 
 import { Box, NavBar, NavItemProps } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useMenu } from "@/hooks/use-menu";
 import { useTabs } from "@/hooks/use-tabs";

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Box } from "@axelor/ui";
 import { useDrop } from "react-dnd";
 import { NativeTypes } from "react-dnd-html5-backend";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
 import styles from "./dms-overlay.module.scss";

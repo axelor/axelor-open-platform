@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Box, Link, ListItem } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomCallback } from "jotai/utils";
 
 import { WidgetProps } from "../../builder";

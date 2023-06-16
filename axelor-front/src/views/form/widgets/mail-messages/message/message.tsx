@@ -9,7 +9,7 @@ import {
 } from "@axelor/ui";
 
 import Avatar from "../avatar";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { MessageMenu } from "./message-menu";
 import { MessageFiles } from "./message-files";
 import { MessageTracks } from "./message-track";

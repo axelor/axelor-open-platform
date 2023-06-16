@@ -15,7 +15,7 @@ import {
 } from "react";
 
 import { Box, CommandItemProps } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";

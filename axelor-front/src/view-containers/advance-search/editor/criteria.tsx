@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { Box } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select, Widget } from "./components";
 import { useField } from "./utils";

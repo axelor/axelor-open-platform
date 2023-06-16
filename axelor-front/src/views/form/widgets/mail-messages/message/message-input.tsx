@@ -1,7 +1,7 @@
 import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { Message, MessageFile, MessageInputProps } from "../message/types";
 import { Box, Input, Button } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { MessageFiles } from "./message-files";
 import { i18n } from "@/services/client/i18n";

@@ -11,7 +11,7 @@ import {
 import {
   MaterialIcon,
   MaterialIconProps,
-} from "@axelor/ui/icons/meterial-icon";
+} from "@axelor/ui/icons/material-icon";
 import { useCallback, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 

@@ -1,7 +1,7 @@
 import { Box, Collapse, StyleProps } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import clsx from "clsx";
 
 import { FieldLabel, GridLayout, WidgetProps } from "../../builder";

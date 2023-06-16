@@ -4,7 +4,7 @@ import { atomFamily, useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
 import { Button, Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataRecord } from "@/services/client/data.types";
 

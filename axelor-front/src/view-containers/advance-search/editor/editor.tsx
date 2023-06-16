@@ -6,7 +6,7 @@ import { selectAtom } from "jotai/utils";
 import { sortBy } from "lodash";
 
 import { Box, Button, Divider, Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { moment, Moment } from "@/services/client/l10n";
 import { i18n } from "@/services/client/i18n";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { filecontents, cancelEvent } from "../utils";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box } from "@axelor/ui";
 
 function ImagePopup({ commands }) {

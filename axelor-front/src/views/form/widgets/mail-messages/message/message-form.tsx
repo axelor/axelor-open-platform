@@ -2,7 +2,7 @@ import { PrimitiveAtom, atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useRef } from "react";
 
 import { Box, Button, Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { request } from "@/services/client/client";

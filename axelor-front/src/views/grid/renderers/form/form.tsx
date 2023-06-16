@@ -12,7 +12,7 @@ import {
 
 import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
 import { GridRowProps } from "@axelor/ui/grid";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";

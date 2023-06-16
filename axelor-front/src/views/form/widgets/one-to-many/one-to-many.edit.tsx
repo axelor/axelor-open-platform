@@ -5,7 +5,7 @@ import {
   Popper,
   TextField,
 } from "@axelor/ui";
-import { MaterialIconProps } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { SetStateAction, useCallback, useMemo, useRef, useState } from "react";

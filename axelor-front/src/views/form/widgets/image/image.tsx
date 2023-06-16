@@ -3,7 +3,7 @@ import { focusAtom } from "jotai-optics";
 import { ChangeEvent, useMemo, useRef } from "react";
 
 import { Box, Input } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";

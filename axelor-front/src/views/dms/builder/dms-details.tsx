@@ -1,6 +1,6 @@
 import { ReactElement, memo, useCallback, useEffect, useState } from "react";
 import { Box, Button, Link } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomCallback } from "jotai/utils";
 import { useSetAtom } from "jotai";
 import clsx from "clsx";

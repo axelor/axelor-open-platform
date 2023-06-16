@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { Box } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { MessageFile } from "./types";
 import { download as downloadFile } from "@/utils/download";

@@ -8,7 +8,7 @@ import {
 } from "@axelor/ui/gantt";
 import { Box, Button } from "@axelor/ui";
 import { GridProvider as DNDProvider } from "@axelor/ui/grid";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field, GanttView, Widget } from "@/services/client/meta.types";
 import { ViewProps } from "../types";

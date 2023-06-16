@@ -11,7 +11,7 @@ import { GridColumn } from "@axelor/ui/grid";
 import {
   MaterialIcon,
   MaterialIconProps,
-} from "@axelor/ui/icons/meterial-icon";
+} from "@axelor/ui/icons/material-icon";
 import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";

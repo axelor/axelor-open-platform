@@ -1,7 +1,7 @@
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
 import { Box, Button, ButtonGroup } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { ChangeEvent, useMemo, useRef } from "react";

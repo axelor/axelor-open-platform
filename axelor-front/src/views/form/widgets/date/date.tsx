@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import { Box, FocusTrap, useClassNames } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
 import { l10n, moment } from "@/services/client/l10n";

@@ -13,7 +13,7 @@ import {
   getRGB,
   getSupportedColor,
 } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useMenu } from "@/hooks/use-menu";
