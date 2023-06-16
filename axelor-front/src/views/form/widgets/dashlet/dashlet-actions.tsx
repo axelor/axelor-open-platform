@@ -90,7 +90,7 @@ function DashletMenu({
       return [
         {
           key: "show-hide-legend",
-          text: legend ? i18n.get("Hide Legend") : i18n.get("Show Legend"),
+          text: legend ? i18n.get("Hide legend") : i18n.get("Show legend"),
           onClick: () => {
             showLegend(!legend);
             onLegendShowHide?.(!legend);

@@ -44,7 +44,7 @@ export function validateFileSize(file: File): boolean {
   if (maxSize > 0 && file.size > uploadMaxSize) {
     alerts.info({
       message: i18n.get(
-        "You are not allow to upload a file bigger than {0} MB",
+        "You are not allowed to upload a file bigger than {0} MB",
         maxSize
       ),
     });

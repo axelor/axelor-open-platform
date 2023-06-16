@@ -68,7 +68,7 @@ function HttpIndicator({ count }: { count: number }) {
       </Fade>
       <Fade in={block} mountOnEnter unmountOnExit>
         <div className={styles.block}>
-          <Loader text={i18n.get("Please Wait...")} />
+          <Loader text={i18n.get("Please wait...")} />
         </div>
       </Fade>
     </Portal>
