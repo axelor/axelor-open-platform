@@ -6,17 +6,15 @@ import { i18n } from "@/services/client/i18n";
 import { getNextOf, getStartOf } from "../../utils/date";
 import { getColor } from "./colors";
 
-const { get: _t } = i18n;
-
 export function getTimes(date: Date | string, view: View) {
-  if (view === "month") {
-    return {
-      start: getStartOf(getStartOf(date, "month"), "week"),
-      end: getNextOf(getNextOf(date, "month"), "week"),
-    };
-  }
+  const times = { start: getStartOf(date, view), end: getNextOf(date, view) };
 
-  return { start: getStartOf(date, view), end: getNextOf(date, view) };
+  return view === "month"
+    ? {
+        start: getStartOf(times.start, "week"),
+        end: getNextOf(times.end, "week"),
+      }
+    : times;
 }
 
 export function getEventFilters(events: SchedulerEvent[], colorField: any) {
