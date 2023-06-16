@@ -4,15 +4,17 @@ import {
   OverflowListButtonType,
   OverflowListItemProps,
 } from "@axelor/ui";
+import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 import { Field } from "@/services/client/meta.types";
 import { Chip } from "@/views/form/widgets";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 export function TagSelect(props: GridColumnProps) {
   const { record, data } = props;
   const { name, targetName = "" } = data as Field;
   const list = (record?.[name] || []) as OverflowListItemProps[];
+  const theme = useAppTheme();
   return (
     <OverflowList
       d="flex"
@@ -42,7 +44,10 @@ export function TagSelect(props: GridColumnProps) {
         if (type === "dropdown") {
           return (
             <Box {...props}>
-              <Chip title={`+${count ?? ""}`} color="white" />
+              <Chip
+                title={`+${count ?? ""}`}
+                color={theme === "dark" ? "gray" : "white"}
+              />
             </Box>
           );
         }

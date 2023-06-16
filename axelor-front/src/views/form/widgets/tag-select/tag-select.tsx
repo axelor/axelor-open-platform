@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useMemo } from "react";
 
-import { Box } from "@axelor/ui";
+import { Box, SelectProps } from "@axelor/ui";
 
 import {
   EditorOptions,
@@ -46,8 +46,13 @@ export function TagSelectComponent(props: CreatableSelectProps) {
   );
 }
 
-export function TagSelect(props: FieldProps<DataRecord[]>) {
-  const { schema, valueAtom, formAtom, widgetAtom, readonly } = props;
+export function TagSelect(
+  props: FieldProps<DataRecord[]> & {
+    selectProps?: Partial<SelectProps>;
+  }
+) {
+  const { schema, valueAtom, formAtom, widgetAtom, readonly, selectProps } =
+    props;
   const { target, targetName, targetSearch, placeholder } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
@@ -141,9 +146,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           value={value}
           canCreate={canNew}
           fetchOptions={handleCompletion}
+          {...beforeSelectProps}
+          {...selectProps}
           onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
-          {...beforeSelectProps}
         />
       )}
     </FieldControl>
