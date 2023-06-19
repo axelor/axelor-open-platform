@@ -577,15 +577,16 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
         if (editor.onNew) {
           schema.onNew = editor.onNew;
           form.data('$editorForm', form);
+          scope.$isEditor = true;
           handler = ActionService.handler(scope, form, {
             action: editor.onNew
           });
+          scope.$on('on:new', function(e, rec) {
+            if (handler) {
+              handler.onNew();
+            }
+          });
         }
-        scope.$watch('record.id', function editorRecordIdWatch(value, old) {
-          if (!value && handler) {
-            handler.onNew();
-          }
-        });
       }
 
       scope.isValid = function () {

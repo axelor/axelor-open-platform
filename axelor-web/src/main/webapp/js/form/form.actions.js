@@ -867,6 +867,9 @@ ActionHandler.prototype = {
     }
 
     if (data.values) {
+      if (scope.$isEditor && scope.record == null) {
+        scope.record = {};
+      }
       updateValues(data.values, scope.record, scope, formScope);
       if (scope.onChangeNotify) {
         scope.onChangeNotify(scope, data.values);
