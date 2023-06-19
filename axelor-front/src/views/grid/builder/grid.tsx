@@ -28,6 +28,7 @@ import format from "@/utils/format";
 import { nextId } from "@/views/form/builder/utils";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useDevice } from "@/hooks/use-responsive";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
@@ -88,6 +89,7 @@ export const Grid = forwardRef<
 
   const formRef = useRef<GridFormHandler>(null);
   const [event, setEvent] = useState("");
+  const { isMobile } = useDevice();
 
   const names = useMemo(
     () =>
@@ -175,9 +177,11 @@ export const Grid = forwardRef<
     ) => {
       if (col.name === "$$edit") {
         onEdit?.(row.record);
+      } else if (isMobile) {
+        onView?.(row.record);
       }
     },
-    [onEdit]
+    [isMobile, onEdit, onView]
   );
 
   const handleRowDoubleClick = useCallback(
@@ -324,14 +328,15 @@ export const Grid = forwardRef<
           allowRowReorder={view?.canMove === true && !readonly}
           sortType="state"
           selectionType="multiple"
-          {...(editable && {
-            editable,
-            editRowRenderer: CustomFormRenderer,
-            onRecordSave: onSave,
-            onRecordAdd: handleRecordAdd,
-            onRecordEdit: handleRecordEdit,
-            onRecordDiscard: handleRecordDiscard,
-          })}
+          {...(editable &&
+            !isMobile && {
+              editable,
+              editRowRenderer: CustomFormRenderer,
+              onRecordSave: onSave,
+              onRecordAdd: handleRecordAdd,
+              onRecordEdit: handleRecordEdit,
+              onRecordDiscard: handleRecordDiscard,
+            })}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
           state={state!}

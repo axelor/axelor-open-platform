@@ -47,6 +47,7 @@ import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
 import { Details } from "./builder/details";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
+import { useDevice } from "@/hooks/use-responsive";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -75,6 +76,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
+  const { isMobile } = useDevice();
 
   const gridSearchAtom = useMemo(
     () => focusAtom(searchAtom!, (o) => o.prop("search")),
@@ -92,6 +94,7 @@ function GridInner(props: ViewProps<GridView>) {
   const detailsViewOverlay =
     (action.params?.["details-view-mode"] || "default") === "overlay";
   const hasDetailsView = Boolean(detailsView);
+  const { editable } = view;
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -211,10 +214,11 @@ function GridInner(props: ViewProps<GridView>) {
     [action]
   );
 
+  const hasEditInMobile = isMobile && editable;
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
-      if (dashlet) {
-        return readonly
+      if (dashlet || hasEditInMobile) {
+        return readonly || hasEditInMobile
           ? onViewInDashlet(record, readonly)
           : onEditInDashlet(record, readonly);
       }
@@ -225,7 +229,7 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, switchTo, onEditInDashlet, onViewInDashlet]
+    [dashlet, hasEditInMobile, switchTo, onEditInDashlet, onViewInDashlet]
   );
 
   const onNew = useCallback(() => {
@@ -493,7 +497,6 @@ function GridInner(props: ViewProps<GridView>) {
   const showToolbar = popupOptions?.showToolbar !== false;
   const showEditIcon = popupOptions?.showEditIcon !== false;
   const showCheckbox = popupOptions?.multiSelect !== false;
-  const { editable } = view;
 
   const popupProps: any = popup
     ? {

@@ -474,7 +474,7 @@ export function OneToMany({
 
   const canNew = !readonly && hasButton("new");
   const canEdit = !readonly && hasButton("edit");
-  const canView = (readonly || !canEdit) && hasButton("view");
+  const canView = hasButton("view");
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
   const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
@@ -592,7 +592,7 @@ export function OneToMany({
           state={state}
           setState={setState}
           onEdit={canEdit ? onEdit : canView ? onView : noop}
-          onView={canView ? onView : noop}
+          onView={canView ? (canEdit ? onEdit : onView) : noop}
           onSave={onSave}
           onSearch={onSearch}
           onRowReorder={onRowReorder}
