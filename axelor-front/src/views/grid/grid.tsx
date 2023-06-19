@@ -184,7 +184,7 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, clearSelection]
   );
 
-  const onViewInDashlet = useCallback(
+  const onViewInPopup = useCallback(
     (record: DataRecord, readonly = false) => {
       showEditor({
         model: view.model!,
@@ -197,7 +197,7 @@ function GridInner(props: ViewProps<GridView>) {
     [view, action, showEditor]
   );
 
-  const onEditInDashlet = useCallback(
+  const onEditInTab = useCallback(
     (record: DataRecord, forceReadonly = false) => {
       openTab({
         ...action,
@@ -218,9 +218,12 @@ function GridInner(props: ViewProps<GridView>) {
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       if (dashlet || hasEditInMobile) {
-        return readonly || hasEditInMobile
-          ? onViewInDashlet(record, readonly)
-          : onEditInDashlet(record, readonly);
+        if (hasEditInMobile) {
+          return onViewInPopup(record, false);
+        }
+        return readonly
+          ? onViewInPopup(record, readonly)
+          : onEditInTab(record, readonly);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
@@ -229,7 +232,7 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, hasEditInMobile, switchTo, onEditInDashlet, onViewInDashlet]
+    [dashlet, hasEditInMobile, switchTo, onEditInTab, onViewInPopup]
   );
 
   const onNew = useCallback(() => {
