@@ -2,14 +2,20 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
 }
 
-.menuToggle {
+.toggle {
   display: flex;
   align-items: center;
+  justify-content: center;
   user-select: none;
-  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  .toggleIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 }
 
 .topMenu {

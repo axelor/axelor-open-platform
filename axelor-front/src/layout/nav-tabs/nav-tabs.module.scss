@@ -1,9 +1,12 @@
 .tabs {
+  --bs-nav-tabs-padding: 0.5rem;
+}
+
+.tabs {
   position: relative;
   z-index: 0;
   display: flex;
   flex-direction: column;
-  padding-top: 0.5rem;
 }
 
 .tabContent {
@@ -41,9 +44,9 @@
     }
   }
   .tabIcon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 1rem;
+    padding: 0.25rem;
+    border-radius: 100%;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;

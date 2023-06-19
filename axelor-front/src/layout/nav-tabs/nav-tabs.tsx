@@ -10,7 +10,6 @@ import {
   Box,
   NavItemProps,
   NavTabs as Tabs,
-  getRGB,
   getSupportedColor,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -62,10 +61,8 @@ const NavIcon = memo(function NavIcon({
   iconColor?: string;
 }) {
   const color = iconColor && getSupportedColor(iconColor);
-  const backgroundColor = color && getRGB(color, 0.25);
-
   return (
-    <div className={clsx(styles.tabIcon)} style={{ color, backgroundColor }}>
+    <div className={clsx(styles.tabIcon)} style={{ color }}>
       <i className={legacyClassNames("fa", icon)} />
     </div>
   );

@@ -19,14 +19,13 @@ import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEditor } from "@/hooks/use-relation";
 import { useRoute } from "@/hooks/use-route";
-import { useTabs } from "@/hooks/use-tabs";
+import { openTab_internal as openTab, useTabs } from "@/hooks/use-tabs";
 import { useTagsMail, useTagsTasks } from "@/hooks/use-tags";
 import { About } from "@/routes/about";
 import { Shortcuts } from "@/routes/shortcuts";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import Avatar from "@/views/form/widgets/mail-messages/avatar/avatar";
 import {
   QuickMenu,
   QuickMenuItem as TQuickMenuItem,
@@ -38,10 +37,12 @@ import {
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+import Avatar from "@/views/form/widgets/mail-messages/avatar/avatar";
+
 import { useSidebar } from "../nav-drawer/hook";
 import { quick } from "./utils";
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
+
+import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import styles from "./nav-header.module.scss";
 
 function BadgeIcon({
@@ -418,24 +419,24 @@ export function NavHeader() {
   const appHome = data?.app.home ?? "#/";
   const appLogo = data?.app.logo;
   return (
-    <Box className={styles.header} borderBottom>
-      <Box className={styles.menuToggle} onClick={(e) => setSidebar(!sidebar)}>
-        <MaterialIcon icon="menu" />
-      </Box>
-      <Box className={styles.appLogo}>
+    <div className={styles.header}>
+      <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
+        <MaterialIcon className={styles.toggleIcon} icon="menu" />
+      </div>
+      <div className={styles.appLogo}>
         <a href={appHome}>
           {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
         </a>
-      </Box>
-      <Box className={styles.menus}>
-        <Box className={commonClassNames("hide-sm", styles.topMenu)}></Box>
-        <Box className={commonClassNames("hide-sm", styles.quickMenu)}>
+      </div>
+      <div className={styles.menus}>
+        <div className={commonClassNames("hide-sm", styles.topMenu)}></div>
+        <div className={commonClassNames("hide-sm", styles.quickMenu)}>
           <QuickMenuBar />
-        </Box>
-      </Box>
-      <Box className={styles.farItems}>
+        </div>
+      </div>
+      <div className={styles.farItems}>
         <FarItems />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

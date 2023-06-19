@@ -1,5 +1,3 @@
-import clsx from "clsx";
-import { useCallback } from "react";
 import { Outlet } from "react-router-dom";
 
 import { Box } from "@axelor/ui";
@@ -10,11 +8,9 @@ import { HttpWatch } from "@/components/http-watch";
 import { Loader } from "@/components/loader/loader";
 import { useAppTitle } from "@/hooks/use-app-title";
 import { useMenu } from "@/hooks/use-menu";
-import { useShortcut } from "@/hooks/use-shortcut";
 import { PopupsProvider } from "@/view-containers/view-popup";
 
 import { NavDrawer } from "./nav-drawer";
-import { useSidebar } from "./nav-drawer/hook";
 import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 import { NavTags } from "./nav-tags";
@@ -25,15 +21,9 @@ import "../utils/globals";
 import styles from "./layout.module.scss";
 
 export function Layout() {
-  const { sidebar, setSidebar } = useSidebar();
   const { loading } = useMenu();
 
   useAppTitle();
-
-  useShortcut({
-    key: "F9",
-    action: useCallback(() => setSidebar(!sidebar), [setSidebar, sidebar]),
-  });
 
   if (loading) {
     return (
@@ -44,38 +34,24 @@ export function Layout() {
   }
 
   return (
-    <Box d="flex" flexDirection="column" vh={100}>
+    <div className={styles.container}>
       <NavHeader />
-      <Box
-        d="flex"
-        flexGrow={1}
-        className={clsx(styles.content, { [styles.showSidebar]: sidebar })}
-      >
-        <Box
-          as="nav"
-          flex="0 0 auto"
-          borderEnd
-          className={clsx(styles.sidebar)}
-        >
+      <div className={styles.content}>
+        <div className={styles.sidebar}>
           <NavDrawer />
-        </Box>
-        <Box
-          d="flex"
-          flexDirection="column"
-          flexGrow={1}
-          className={styles.tabs}
-        >
+        </div>
+        <div className={styles.tabs}>
           <NavTabs />
           <div className={styles.page}>
             <Outlet />
           </div>
-        </Box>
-      </Box>
+        </div>
+      </div>
       <NavTags />
       <PopupsProvider />
       <DialogsProvider />
       <AlertsProvider />
       <HttpWatch />
-    </Box>
+    </div>
   );
 }
