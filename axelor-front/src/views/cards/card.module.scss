@@ -1,7 +1,7 @@
 .card {
   width: calc(100% / 3);
   min-width: 250px;
-  flex-grow: 1;
+  height: fit-content;
   cursor: pointer;
   position: relative;
 
