@@ -17,6 +17,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
 import com.axelor.event.Event;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
 public class AuthPac4jListener implements AuthenticationListener {
 
   @Inject private Event<PostLogin> postLogin;
+  @Inject private AuthSessionService sessionService;
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -55,6 +57,7 @@ public class AuthPac4jListener implements AuthenticationListener {
 
       if (user != null) {
         Beans.get(HttpServletRequest.class).changeSessionId();
+        sessionService.updateLoginDate();
         firePostLoginSuccess(token, user);
         return;
       }
