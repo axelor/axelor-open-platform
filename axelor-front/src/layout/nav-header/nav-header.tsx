@@ -41,6 +41,7 @@ import {
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import { useSidebar } from "../nav-drawer/hook";
 import { quick } from "./utils";
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import styles from "./nav-header.module.scss";
 
 function BadgeIcon({
@@ -256,7 +257,6 @@ function QuickMenuBar() {
 
 function FarItems() {
   const { data, logout } = useSession();
-  const { open: openTab } = useTabs();
   const { unread: unreadMailCount } = useTagsMail();
   const { current: currentTaskCount, pending: pendingTaskCount } =
     useTagsTasks();
