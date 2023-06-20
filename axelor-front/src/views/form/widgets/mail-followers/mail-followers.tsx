@@ -115,7 +115,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
             >
               <Box
                 d="flex"
-                title="Remove"
+                title={i18n.get("Remove")}
                 pe={1}
                 ps={1}
                 className={classes.icon}
