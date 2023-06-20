@@ -196,10 +196,14 @@ export function createEvalContext(
   type EvalContext = DataContext & typeof helpers & typeof filters;
 
   const $context = template
-    ? Object.keys(context).reduce(
-        (ctx, key) => set(ctx, key, context[key]),
-        {} as any
-      )
+    ? Object.keys(context).reduce((ctx, key) => {
+        const value = context[key];
+        return set(
+          ctx,
+          key,
+          value && typeof value === "object" ? { ...value } : value
+        );
+      }, {} as any)
     : context;
   const proxy = new Proxy<EvalContext>($context, {
     get(target, p, receiver) {
