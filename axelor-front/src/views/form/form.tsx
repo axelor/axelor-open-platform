@@ -910,7 +910,13 @@ export const Layout: FormLayout = ({
   const isSmall = useContainerQuery(ref, "width < 768px");
 
   const { main, side, small } = useMemo(() => {
-    const items = [...(schema.items ?? [])];
+    const items = [...(schema.items ?? [])].map(
+      (item) =>
+        ({
+          ...item,
+          showBorder: true,
+        } as Schema)
+    );
     const head = items.filter((x) => x.widget === "wkf-status");
     const side = items.filter((x) => x.sidebar);
     const mail = items.filter((x) => x.type === "panel-mail");
@@ -923,7 +929,7 @@ export const Layout: FormLayout = ({
 
     const small = [...head, ...sideTop, ...rest, ...sideAll, ...mail];
     const main = [...head, ...rest, ...mail];
-
+    
     return {
       main,
       side,

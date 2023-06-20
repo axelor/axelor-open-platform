@@ -18,14 +18,19 @@ const withHeaderBodyProps: StyleProps = {
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
-  const { showTitle = true, showFrame = true, canCollapse } = schema;
+  const {
+    showBorder,
+    showTitle = true,
+    showFrame = true,
+    canCollapse,
+  } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, collapse } = attrs;
   const [isCollapse, setCollapse] = useState(collapse);
 
   const hasHeader = showTitle !== false && showFrame !== false && title;
-  const moreProps = hasHeader && withHeaderProps;
-  const bodyProps = hasHeader && withHeaderBodyProps;
+  const moreProps = (hasHeader || showBorder) && withHeaderProps;
+  const bodyProps = (hasHeader || showBorder) && withHeaderBodyProps;
 
   useEffect(() => {
     canCollapse && setCollapse(collapse);
