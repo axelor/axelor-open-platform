@@ -143,11 +143,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const recordRef = useRef<DataRecord>({});
     const parentRef = useRef<Element>();
-    const meta = {
-      view,
-      fields,
-      model: (view as Schema).target || view?.model,
-    };
+    const meta = useMemo(
+      () => ({
+        view,
+        fields,
+        model: (view as Schema).target || view?.model,
+      }),
+      [view, fields]
+    );
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
       const name =
