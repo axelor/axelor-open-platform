@@ -1,5 +1,9 @@
 .container {
   --bs-body-bg-rgb: var(--bs-table-active-bg);
+  button {
+    --bs-btn-padding-x: 0.4rem;
+    --bs-btn-padding-y: 0.2rem;
+  }
 }
 
 .column {
