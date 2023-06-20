@@ -582,6 +582,16 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           handler = ActionService.handler(scope, form, {
             action: editor.onNew
           });
+
+          if (!field.editor.viewer || field.viewer) {
+           var unwatchEditorRecordId = scope.$watch('record.id', function editorRecordIdWatch(value, old) {
+              unwatchEditorRecordId();
+             if ((scope.$parent.record || {}).id == null && handler) {
+                handler.onNew();
+              }
+            });
+          }
+
           scope.$on('on:new', function(e, rec) {
             if (handler) {
               handler.onNew();
