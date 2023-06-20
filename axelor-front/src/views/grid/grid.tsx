@@ -94,6 +94,7 @@ function GridInner(props: ViewProps<GridView>) {
   const detailsViewOverlay =
     (action.params?.["details-view-mode"] || "default") === "overlay";
   const hasDetailsView = Boolean(detailsView);
+  const gridWidth = action.params?.["grid-width"];
   const { editable } = view;
 
   const clearSelection = useCallback(() => {
@@ -596,6 +597,11 @@ function GridInner(props: ViewProps<GridView>) {
     }, [setState]),
   });
 
+  const gridViewStyles =
+    detailsMeta && !detailsViewOverlay && gridWidth
+      ? { minWidth: gridWidth, maxWidth: gridWidth }
+      : undefined;
+
   return (
     <div className={styles.container}>
       {showToolbar && (
@@ -677,7 +683,7 @@ function GridInner(props: ViewProps<GridView>) {
         </ViewToolBar>
       )}
       <div className={styles.views}>
-        <div className={styles["grid-view"]}>
+        <div className={styles["grid-view"]} style={gridViewStyles}>
           <GridComponent
             className={styles.grid}
             ref={gridRef}
