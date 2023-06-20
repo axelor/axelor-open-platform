@@ -201,11 +201,15 @@ export function createEvalContext(
         return set(
           ctx,
           key,
-          value && typeof value === "object" ? { ...value } : value
+          value && typeof value === "object"
+            ? Array.isArray(value)
+              ? [...value]
+              : { ...value }
+            : value
         );
       }, {} as any)
     : context;
-  const proxy = new Proxy<EvalContext>($context, {
+  const proxy = new Proxy<EvalContext>($context as any, {
     get(target, p, receiver) {
       if (p in helpers) return helpers[p as keyof typeof helpers];
       if (p in filters) return filters[p as keyof typeof filters];
