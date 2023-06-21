@@ -26,13 +26,13 @@ import { toKebabCase } from "@/utils/names";
 import styles from "./editor.module.scss";
 
 export const getEditorDefaultState = () =>
-  ({
-    title: "",
-    operator: "and",
-    shared: false,
-    selected: false,
-    criteria: [],
-  } as AdvancedSearchState["editor"]);
+({
+  title: "",
+  operator: "and",
+  shared: false,
+  selected: false,
+  criteria: [],
+} as AdvancedSearchState["editor"]);
 
 function FormControl({
   title,
@@ -70,13 +70,15 @@ export function Editor({
   canExportFull = true,
   canShare = true,
   stateAtom,
-  items,
   onClear,
   onApply,
   onSave,
   onExport,
   onDelete,
 }: EditorProps) {
+  const items = useAtomValue(
+    useMemo(() => selectAtom(stateAtom, (s) => s.items), [stateAtom])
+  );
   const fields = useAtomValue(
     useMemo(() => selectAtom(stateAtom, (s) => s.fields), [stateAtom])
   );
@@ -252,20 +254,28 @@ export function Editor({
   );
 
   const $fields = useMemo(() => {
-    const fieldList = Object.values(fields || {}).filter((field: Property) => {
-      const { type, large } = field as any;
-      if (
-        type === "binary" ||
-        large ||
-        field.json ||
-        field.encrypted ||
-        ["id", "version", "archived", "selected"].includes(field.name!)
-      ) {
-        return false;
-      }
+    const fieldList = Object.values(fields || {}).reduce(
+      (list: Property[], field: Property) => {
+        const { type, large } = field as any;
+        const item = items?.find(item => item.name === field.name);
+        if (
+          type === "binary" ||
+          large ||
+          field.json ||
+          field.encrypted ||
+          ["id", "version", "archived", "selected"].includes(field.name!) ||
+          (item?.hidden)
+        ) {
+          return list;
+        }
+        return [...list, item ? { ...field, title: item.title ?? field.title } : field];
+      }, [] as Property[]);
 
-      return true;
-    });
+    items?.forEach((item) => {
+      if (!fields?.[item.name] && !item.hidden) {
+        fieldList.push(item as unknown as Property);
+      }
+    })
 
     Object.keys(jsonFields || {}).forEach((prefix) => {
       const { title } = fields?.[prefix as any] || {};
@@ -284,15 +294,14 @@ export function Editor({
         fieldList.push({
           ...(field as any),
           name: key,
-          title: `${field.title || field.autoTitle} ${
-            title ? `(${title})` : ""
-          }`,
+          title: `${field.title || field.autoTitle} ${title ? `(${title})` : ""
+            }`,
         } as Property);
       });
     });
 
     return sortBy(fieldList, "title") as unknown as Field[];
-  }, [fields, jsonFields]);
+  }, [fields, jsonFields, items]);
 
   const criteriaFields = useMemo(
     () =>

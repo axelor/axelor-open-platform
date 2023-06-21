@@ -14,6 +14,8 @@ import { filters as fetchFilters } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
+  Field,
+  SearchFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
@@ -169,23 +171,24 @@ const DataViews = memo(function DataViews({
   useAsyncEffect(async () => {
     if (dashlet) return;
     const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
-    const domains = filterName
-      ? await findView<SearchFilters>({
-          name: filterName,
-          type: "search-filters",
-          model,
-        })
-          .then((res) => res?.view?.filters || [])
-          .then((domains) =>
-            domains.map((d) => ({
-              ...d,
-              checked: selectedDomains.includes(d.name!),
-            }))
-          )
-      : [];
+    let domains: SearchFilter[] = [];
+    let items: Field[] = [];
+
+    if (filterName) {
+      const res = await findView<SearchFilters>({
+        name: filterName,
+        type: "search-filters",
+        model,
+      });
+      items = (res?.view?.items || []) as Field[];
+      domains = (res?.view?.filters || []).map((d) => ({
+        ...d,
+        checked: selectedDomains.includes(d.name!),
+      }))
+    }
 
     setSearchState((_state) => {
-      const state = { ..._state, domains };
+      const state = { ..._state, domains, items };
       return { ...state, ...prepareAdvanceSearchQuery(state) };
     });
   }, [model, defaultSearchFilter, filterName, setSearchState]);
