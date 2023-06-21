@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { Badge, NavMenu, NavMenuItem } from "@axelor/ui";
 
@@ -78,10 +78,17 @@ export function NavDrawer() {
   const { open: openTab } = useTabs();
   const { loading, menus = [] } = useMenu();
   const { mode, show, small, sidebar, setSidebar } = useSidebar();
+  const [showSearch, setShowSearch] = useState(false);
 
   useShortcut({
     key: "F9",
     action: useCallback(() => setSidebar(!sidebar), [setSidebar, sidebar]),
+  });
+
+  useShortcut({
+    key: "M",
+    ctrlKey: true,
+    action: useCallback(() => setShowSearch(!showSearch), [showSearch]),
   });
 
   const handleClick = useCallback(
@@ -95,6 +102,9 @@ export function NavDrawer() {
     [menus, small, setSidebar, openTab]
   );
 
+  const handleSearchShow = useCallback(() => setShowSearch(true), []);
+  const handleSearchHide = useCallback(() => setShowSearch(false), []);
+
   const tags = useTagsList();
 
   const items = useMemo(() => load(menus, tags), [menus, tags]);
@@ -107,8 +117,11 @@ export function NavDrawer() {
       show={show}
       items={items}
       onItemClick={handleClick}
+      searchActive={showSearch}
       searchOptions={{
         title: i18n.get("Search"),
+        onShow: handleSearchShow,
+        onHide: handleSearchHide,
       }}
     />
   );
