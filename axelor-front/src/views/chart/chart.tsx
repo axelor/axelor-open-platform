@@ -143,7 +143,7 @@ export function Chart(props: ViewProps<ChartView>) {
 
   const hasAction = view?.config?.onClick;
   return (
-    <Box className={classes.chart} borderTop={dashlet}>
+    <Box className={classes.chart}>
       {chartOptions && (
         <ChartComponent
           legend={legend}

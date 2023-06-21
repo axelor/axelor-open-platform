@@ -250,8 +250,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         <Box
           key={index}
           d="flex"
-          className={styles["dashlet-container"]}
-          shadow
+          className={styles.container}
           rounded
         >
           <DashletComponent

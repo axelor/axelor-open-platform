@@ -57,7 +57,7 @@ export function Custom({ meta }: ViewProps<CustomView>) {
   );
 
   return (
-    <Box d="flex" flexGrow={1} borderTop className={styles.container}>
+    <Box d="flex" flexGrow={1} className={styles.container}>
       <Box d="flex" className={legacyClassNames(view.css)} flexGrow={1}>
         <Template context={dataContext} options={options} />
       </Box>

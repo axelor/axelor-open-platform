@@ -1,6 +1,11 @@
+.container {
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
 .dashlet {
   height: 100%;
   width: 100%;
+  background-color: var(--bs-body-bg);
   & > div:first-child {
     cursor: move;
   }
