@@ -146,7 +146,6 @@ function ColumnRenderer({
 
   return (
     <Box
-      mx={1}
       h={100}
       d="flex"
       rounded={3}
@@ -158,15 +157,11 @@ function ColumnRenderer({
         {title}
       </Box>
       {canCreate && onCardAdd && (
-        <Box d="flex" px={1} mb={2}>
+        <Box d="flex" g={2}>
           <Input value={text} onChange={(e) => setText(e.target.value)} />
-          &nbsp;
           <Button
             disabled={!text.trim()}
-            bg="primary"
-            mx={1}
-            size="sm"
-            color="white"
+            variant="primary"
             onClick={handleAdd}
           >
             {i18n.get("Add")}

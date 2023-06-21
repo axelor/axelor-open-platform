@@ -6,24 +6,19 @@
   min-height: 0;
 }
 
-.board {
-  padding: 0.5rem;
-}
-
 .kanban-card {
   list-style: none;
   position: relative;
   border: 1px solid var(--bs-border-color);
-  margin-bottom: 0.75rem;
   padding: 0.625rem;
-  border-radius: 2px;
+  border-radius: 0.5rem;
   box-sizing: content-box;
   border-left: 3px solid var(--bs-border-color);
   user-select: none;
-  background-color: var(--bs-tertiary-bg);
+  background-color: var(--bs-body-bg);
   &:hover {
     cursor: pointer;
-    background-color: var(--bs-secondary-bg);
+    box-shadow: var(--bs-box-shadow-sm);
   }
 }
 
