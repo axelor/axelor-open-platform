@@ -176,7 +176,7 @@ export class DefaultActionExecutor implements ActionExecutor {
         title: data.error.title ?? i18n.get("Error"),
         content: data.error.message,
         yesTitle: data.error.confirmBtnTitle,
-        noTitle: data.error.confirmBtnTitle,
+        yesNo: false,
       });
       if (data.error.action) {
         await this.#execute(data.error.action, options);

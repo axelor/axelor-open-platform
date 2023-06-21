@@ -159,7 +159,7 @@ export namespace dialogs {
     content: React.ReactNode;
   }) {
     const { size, title = i18n.get("Error"), content } = options;
-    return box({ size, title, content });
+    return box({ size, title, content, yesNo: false });
   }
 
   export async function confirmDirty(
