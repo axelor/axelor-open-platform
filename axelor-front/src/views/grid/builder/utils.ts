@@ -1,7 +1,7 @@
 import { GridState } from "@axelor/ui/grid";
-import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useMemo } from "react";
+import { useAtom } from "jotai";
 
 import { DataContext } from "@/services/client/data.types";
 import { GridView, View } from "@/services/client/meta.types";
@@ -13,30 +13,30 @@ export function useGridState(
   deps = []
 ) {
   const { view, ...gridState } = initialState || {};
-  return useAtom(
-    useMemo(
-      () =>
-        atomWithImmer<GridState>({
-          rows: [],
-          columns: [],
-          ...(view?.groupBy && {
-            groupBy: view.groupBy.split(",").map((name) => ({ name })),
-          }),
-          ...(view?.orderBy && {
-            orderBy: view.orderBy
-              .split(",")
-              .map((name) =>
-                name.startsWith("-")
-                  ? { name: name.slice(1), order: "desc" }
-                  : { name, order: "asc" }
-              ),
-          }),
-          ...gridState,
+  const gridAtom = useMemo(
+    () =>
+      atomWithImmer<GridState>({
+        rows: [],
+        columns: [],
+        ...(view?.groupBy && {
+          groupBy: view.groupBy.split(",").map((name) => ({ name })),
         }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      deps
-    )
+        ...(view?.orderBy && {
+          orderBy: view.orderBy
+            .split(",")
+            .map((name) =>
+              name.startsWith("-")
+                ? { name: name.slice(1), order: "desc" }
+                : { name, order: "asc" }
+            ),
+        }),
+        ...gridState,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    deps
   );
+  const [state, setState] = useAtom(gridAtom);
+  return [state, setState, gridAtom] as const;
 }
 
 /**

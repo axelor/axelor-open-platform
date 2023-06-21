@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+
 import { PageText } from "@/components/page-text";
 import {
   DashletHandler,
@@ -13,6 +15,7 @@ import { download } from "@/utils/download";
 import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
+import { SearchOptions } from "@/services/client/data";
 import classes from "./dashlet-actions.module.scss";
 
 interface DashletMenuProps extends DashletHandler {
@@ -30,6 +33,7 @@ export function DashletActions({
     view,
     actionExecutor,
     dataStore,
+    gridStateAtom,
     onAction,
     onLegendShowHide,
     onRefresh,
@@ -55,6 +59,7 @@ export function DashletActions({
           view={view}
           viewType={viewType}
           dataStore={dataStore}
+          gridStateAtom={gridStateAtom}
           onAction={onAction}
           onRefresh={onRefresh}
         />
@@ -155,21 +160,34 @@ function DashletMenu({
 function DashletListMenu(
   props: DashletMenuProps & {
     dataStore: DataStore;
+    gridStateAtom?: DashletHandler["gridStateAtom"];
   }
 ) {
-  const { dataStore, viewType, ...menuProps } = props;
+  const { dataStore, gridStateAtom, viewType, ...menuProps } = props;
   const page = useDataStore(dataStore, (store) => store.page);
   const { offset = 0, limit = 40, totalCount = 0 } = page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
-  const onExport = useCallback(async () => {
-    const { fileName } = await dataStore.export({});
-    download(
-      `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
-      fileName
-    );
-  }, [dataStore]);
+  const onExport = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const options: SearchOptions = {};
+        if (gridStateAtom) {
+          const { columns } = get(gridStateAtom);
+          options.fields = columns
+            .filter((c) => c.type === "field" && c.visible !== false)
+            .map((c) => c.name);
+        }
+        const { fileName } = await dataStore.export(options);
+        download(
+          `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
+          fileName
+        );
+      },
+      [dataStore, gridStateAtom]
+    )
+  );
 
   return (
     <>

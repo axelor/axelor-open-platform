@@ -83,7 +83,7 @@ function GridInner(props: ViewProps<GridView>) {
     [searchAtom]
   );
 
-  const [state, setState] = useGridState({
+  const [state, setState, gridStateAtom] = useGridState({
     view,
     selectedCell: viewProps?.selectedCell,
     selectedRows: viewProps?.selectedRows?.slice?.(0, 1),
@@ -95,9 +95,9 @@ function GridInner(props: ViewProps<GridView>) {
     (action.params?.["details-view-mode"] || "default") === "overlay";
   const hasDetailsView = Boolean(detailsView);
   const gridWidth = action.params?.["grid-width"];
-  const hasPopup = action.params?.['popup'];
+  const hasPopup = action.params?.["popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
-  const hasPopupReload = hasPopup === 'reload';
+  const hasPopupReload = hasPopup === "reload";
   const { editable } = view;
 
   const clearSelection = useCallback(() => {
@@ -199,7 +199,7 @@ function GridInner(props: ViewProps<GridView>) {
         readonly,
         ...(!readonly && {
           onSelect: () => hasPopupReload && onSearch({}),
-        })
+        }),
       });
     },
     [view, action, hasPopupMaximize, hasPopupReload, showEditor, onSearch]
@@ -222,15 +222,16 @@ function GridInner(props: ViewProps<GridView>) {
     [action]
   );
 
-  const hasEditInPopup = (isMobile && editable) || (hasPopup && dashlet && !viewProps?.readonly);
-  
+  const hasEditInPopup =
+    (isMobile && editable) || (hasPopup && dashlet && !viewProps?.readonly);
+
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
       if (dashlet || hasEditInPopup) {
         if (hasEditInPopup) {
           return onViewInPopup(record, false);
         }
-        return (readonly || hasPopup)
+        return readonly || hasPopup
           ? onViewInPopup(record, readonly)
           : onEditInTab(record, readonly);
       }
@@ -443,10 +444,19 @@ function GridInner(props: ViewProps<GridView>) {
         dataStore,
         view,
         actionExecutor,
+        gridStateAtom,
         onRefresh: () => onSearch({}),
       });
     }
-  }, [dashlet, view, dataStore, actionExecutor, onSearch, setDashletHandlers]);
+  }, [
+    dashlet,
+    view,
+    gridStateAtom,
+    dataStore,
+    actionExecutor,
+    onSearch,
+    setDashletHandlers,
+  ]);
 
   useEffect(() => {
     if (dashlet || popup) return;
@@ -510,14 +520,15 @@ function GridInner(props: ViewProps<GridView>) {
   const showEditIcon = popupOptions?.showEditIcon !== false;
   const showCheckbox = popupOptions?.multiSelect !== false;
 
-  const popupProps: any = !dashlet && popup
-    ? {
-        showEditIcon,
-        allowSelection: true,
-        selectionType: showCheckbox ? "multiple" : "single",
-        allowCheckboxSelection: showCheckbox,
-      }
-    : {};
+  const popupProps: any =
+    !dashlet && popup
+      ? {
+          showEditIcon,
+          allowSelection: true,
+          selectionType: showCheckbox ? "multiple" : "single",
+          allowCheckboxSelection: showCheckbox,
+        }
+      : {};
   const dashletProps: any = dashlet
     ? {
         readonly: viewProps?.readonly,
