@@ -109,7 +109,15 @@ export const Card = memo(function Card({
           minWidth,
         }}
       >
-        <Box p={3} bgColor="body-tertiary" w={100} rounded shadow onClick={handleClick}>
+        <Box
+          p={3}
+          bgColor="body"
+          w={100}
+          border
+          rounded
+          shadow="sm"
+          onClick={handleClick}
+        >
           <Template
             context={context}
             options={{

@@ -3,10 +3,13 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  min-height: 0;
 }
 
 .cards {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
   padding: 1rem 0.5rem;
+  overflow: auto;
 }
