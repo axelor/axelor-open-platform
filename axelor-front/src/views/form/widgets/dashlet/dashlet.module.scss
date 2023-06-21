@@ -8,12 +8,13 @@
 .header {
   display: flex;
   align-items: center;
+  padding: 0.25rem;
 }
 
 .title {
   font-weight: 600;
   flex: 1;
-  padding: 0.25rem 1rem;
+  padding: 0.5rem;
 }
 
 .content {
