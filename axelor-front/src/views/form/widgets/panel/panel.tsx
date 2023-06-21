@@ -56,9 +56,6 @@ export function Panel(props: WidgetProps) {
           className={clsx(styles.panelHeader, {
             [styles.collapsible]: canCollapse,
           })}
-          borderBottom
-          px={3}
-          py={2}
           {...(canCollapse && {
             onClick: () => setCollapse((c) => !c),
           })}
