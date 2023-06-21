@@ -2,17 +2,29 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  white-space: nowrap;
+  flex: 1;
+  overflow: auto;
 }
 
 .node {
-  cursor: pointer;
+  --bs-table-bg: var(--bs-body-bg);
+  --bs-table-active-bg: var(--ax-grid-active-bg, var(--bs-secondary-bg));
+  --bs-table-hover-bg: var(--ax-grid-hover-bg, var(--bs-secondary-bg));
+}
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.05);
+.node {
+  span:last-child {
+    flex: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
+  cursor: pointer;
   &.active {
-    background: rgba(0, 0, 0, 0.1);
+    background: var(--bs-table-active-bg);
+  }
+  &:hover {
+    background: var(--bs-table-hover-bg);
   }
 }
 

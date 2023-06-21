@@ -48,7 +48,7 @@ const TreeNode = memo(function TreeNode({
           })}
         />
         <MaterialIcon icon="folder" fill={true} />
-        <Box as="span" mx={2}>
+        <Box as="span" mx={2} title={data.fileName}>
           {data.fileName}
         </Box>
       </Box>

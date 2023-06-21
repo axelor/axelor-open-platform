@@ -11,6 +11,8 @@
 
 .content {
   overflow: hidden;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .content,
@@ -33,6 +35,9 @@
   display: flex;
   width: 300px;
   transition: all 0.25s;
+  background-color: var(--bs-tertiary-bg);
+  border-radius: 0.5rem;
+  min-width: 0;
   &.hide {
     width: 0px;
   }

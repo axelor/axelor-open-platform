@@ -671,7 +671,7 @@ export function Dms(props: ViewProps<GridView>) {
               onExpand={handleNodeExpand}
             />
           </Box>
-          <Box className={styles.grid} borderStart>
+          <Box className={styles.grid}>
             <GridComponent
               records={records}
               view={view}
