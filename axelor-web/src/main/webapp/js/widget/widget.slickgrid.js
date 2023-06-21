@@ -2071,9 +2071,12 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
         if (event) {
           event.stopPropagation();
         }
-        return that.addNewRow();
+        that.scope.waitForActions(function () {
+          return that.addNewRow();
+        });
+      } else {
+       return onNew.apply(that.handler, arguments);
       }
-      return onNew.apply(that.handler, arguments);
     };
   }
 
@@ -2831,7 +2834,10 @@ Grid.prototype.onItemClick = function(event, args) {
   this.grid.setActiveCell(args.row, args.cell);
 
   if (this.canEdit()) {
-    this.showEditor(args);
+    var that = this;
+    this.scope.waitForActions(function() {
+      that.showEditor(args);
+    });
   } else if (this.handler.onItemClick) {
     this.handler.onItemClick(event, args);
   }
