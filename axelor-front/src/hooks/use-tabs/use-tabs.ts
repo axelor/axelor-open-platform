@@ -253,6 +253,7 @@ export type OpenTab = (
     type?: string;
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
+    tab?: boolean;
   }
 ) => Promise<Tab | null>;
 
@@ -277,9 +278,10 @@ export async function initTab(
     type?: string;
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
+    tab?: boolean;
   }
 ) {
-  const { route, props } = options ?? {};
+  const { route, props, tab: initAsTab } = options ?? {};
   const actionName = viewName(view);
   const actionView =
     typeof view === "object" && view.views?.length
@@ -309,7 +311,7 @@ export async function initTab(
       }
     );
 
-    const popup = Boolean(actionView.params?.popup);
+    const popup = !initAsTab && Boolean(actionView.params?.popup);
     const dashlet = Boolean(actionView.params?.dashlet);
     const popupOptions = {
       fullScreen: Boolean(actionView.params?.["popup.maximized"]),
@@ -344,6 +346,7 @@ const openTabAtom = atom(
       type?: string;
       route?: Omit<TabRoute, "action">;
       props?: Record<string, any>;
+      tab?: boolean
     } = {}
   ): Promise<Tab | null> => {
     const { active, tabs, popups } = get(tabsAtom);

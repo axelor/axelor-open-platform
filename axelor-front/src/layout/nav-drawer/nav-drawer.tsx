@@ -93,7 +93,7 @@ export function NavDrawer() {
       const menu = menus.find((x) => x.name === item.id);
       if (menu?.action) {
         if (small) setSidebar(false);
-        await openTab(menu.action);
+        await openTab(menu.action, { tab: true });
       }
     },
     [menus, small, setSidebar, openTab]

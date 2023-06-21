@@ -66,11 +66,12 @@ export function View() {
           mode: viewMode,
           id: viewId,
         },
+        tab: true,
       });
     } else {
       const homeAction = session.info?.user.action;
       if (homeAction) {
-        await open(homeAction);
+        await open(homeAction, { tab: true });
       }
     }
   }, [open, viewAction, viewMode, viewId]);
