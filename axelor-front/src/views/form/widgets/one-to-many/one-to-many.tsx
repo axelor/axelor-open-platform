@@ -228,12 +228,16 @@ export function OneToMany({
   );
 
   const onExport = useCallback(async () => {
-    const { fileName } = await dataStore.export({});
+    const { fileName } = await dataStore.export({
+      fields: state.columns
+        .filter((c) => c.type === "field" && c.visible !== false)
+        .map((c) => c.name),
+    });
     download(
       `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
       fileName
     );
-  }, [dataStore]);
+  }, [dataStore, state.columns]);
 
   const handleSelect = useAtomCallback(
     useCallback(
