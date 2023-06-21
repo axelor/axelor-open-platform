@@ -41,7 +41,7 @@ export function Cards(props: ViewProps<CardsView>) {
   const { hasButton } = usePerms(meta.view, meta.perms);
   const { formAtom } = useFormScope();
   const getFormContext = usePrepareContext(formAtom);
-  const hasEditPopup = view.editWindow === "popup";
+  const hasEditPopup = dashlet || view.editWindow === "popup";
   const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
 
   const getContext = useCallback(

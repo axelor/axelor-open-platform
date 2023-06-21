@@ -95,6 +95,9 @@ function GridInner(props: ViewProps<GridView>) {
     (action.params?.["details-view-mode"] || "default") === "overlay";
   const hasDetailsView = Boolean(detailsView);
   const gridWidth = action.params?.["grid-width"];
+  const hasPopup = action.params?.['popup'];
+  const hasPopupMaximize = popupOptions?.fullScreen;
+  const hasPopupReload = hasPopup === 'reload';
   const { editable } = view;
 
   const clearSelection = useCallback(() => {
@@ -191,11 +194,15 @@ function GridInner(props: ViewProps<GridView>) {
         model: view.model!,
         title: view.title ?? "",
         viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
+        maximize: hasPopupMaximize,
         record,
         readonly,
+        ...(!readonly && {
+          onSelect: () => hasPopupReload && onSearch({}),
+        })
       });
     },
-    [view, action, showEditor]
+    [view, action, hasPopupMaximize, hasPopupReload, showEditor, onSearch]
   );
 
   const onEditInTab = useCallback(
@@ -215,14 +222,15 @@ function GridInner(props: ViewProps<GridView>) {
     [action]
   );
 
-  const hasEditInMobile = isMobile && editable;
+  const hasEditInPopup = (isMobile && editable) || (hasPopup && dashlet && !viewProps?.readonly);
+  
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
-      if (dashlet || hasEditInMobile) {
-        if (hasEditInMobile) {
+      if (dashlet || hasEditInPopup) {
+        if (hasEditInPopup) {
           return onViewInPopup(record, false);
         }
-        return readonly
+        return (readonly || hasPopup)
           ? onViewInPopup(record, readonly)
           : onEditInTab(record, readonly);
       }
@@ -233,7 +241,7 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, hasEditInMobile, switchTo, onEditInTab, onViewInPopup]
+    [dashlet, hasPopup, hasEditInPopup, switchTo, onEditInTab, onViewInPopup]
   );
 
   const onNew = useCallback(() => {
@@ -502,7 +510,7 @@ function GridInner(props: ViewProps<GridView>) {
   const showEditIcon = popupOptions?.showEditIcon !== false;
   const showCheckbox = popupOptions?.multiSelect !== false;
 
-  const popupProps: any = popup
+  const popupProps: any = !dashlet && popup
     ? {
         showEditIcon,
         allowSelection: true,

@@ -312,7 +312,7 @@ export async function initTab(
     const popup = Boolean(actionView.params?.popup);
     const dashlet = Boolean(actionView.params?.dashlet);
     const popupOptions = {
-      fullScreen: Boolean(actionView.params?.["popup-maximized"]),
+      fullScreen: Boolean(actionView.params?.["popup.maximized"]),
       showToolbar: actionView.params?.["show-toolbar"] !== false,
       showEditIcon: actionView.params?.["_popup-edit-icon"] !== false,
       multiSelect: actionView.params?.["_popup-multi-select"] !== false,

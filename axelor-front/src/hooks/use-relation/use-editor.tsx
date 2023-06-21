@@ -19,6 +19,7 @@ export type EditorOptions = {
   title: string;
   record?: DataRecord | null;
   readonly?: boolean;
+  maximize?: boolean;
   view?: FormView;
   viewName?: string;
   context?: DataContext;
@@ -37,6 +38,7 @@ export function useEditor() {
       viewName,
       context,
       readonly: forceReadonly,
+      maximize,
       onClose,
       onSave,
       onSelect,
@@ -64,6 +66,7 @@ export function useEditor() {
     await showPopup({
       tab,
       open: true,
+      maximize,
       onClose: () => {
         onClose?.();
       },
