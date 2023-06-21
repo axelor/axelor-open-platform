@@ -37,6 +37,9 @@ import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
 import { GridScope } from "./scope";
 
+import styles from "../grid.module.scss";
+import clsx from "clsx";
+
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
     props: column,
@@ -84,6 +87,7 @@ export const Grid = forwardRef<
     onView,
     onSave,
     onDiscard,
+    className,
     ...gridProps
   } = props;
 
@@ -344,6 +348,7 @@ export const Grid = forwardRef<
           records={records!}
           {...gridProps}
           columns={columns}
+          className={clsx(className, styles.grid)}
         />
       </ScopeProvider>
     </AxGridProvider>

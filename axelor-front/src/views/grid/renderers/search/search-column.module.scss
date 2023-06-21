@@ -1,13 +1,22 @@
 .container {
   --bs-input-shadow-focus: none;
+  --bs-input-border-focus: 0;
   flex: 1;
 }
 
 .select > * {
   width: 100%;
 }
+
 .select > div > div {
-  border-color: transparent !important;
-  box-shadow: none;
-  font-weight: 500;
+  --bs-input-shadow-focus: none;
+  --bs-input-border-focus: 0;
+  border: 0;
+  border-radius: var(--bs-input-border-radius, var(--bs-border-radius));
+  font-weight: normal;
+}
+
+.container,
+.select {
+  margin: 0.25rem 0.125rem;
 }

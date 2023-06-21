@@ -2,21 +2,18 @@
   max-height: 400px;
 }
 
-.grid {
-  --bs-table-cell-padding: 0.625rem 0.5rem;
-}
-
 .header {
   display: flex;
-  gap: 1rem;
+  gap: 0.5rem;
   align-items: center;
   min-height: 2.5rem;
+  padding: 0.25rem;
 }
 
 .title {
   font-weight: 600;
   flex: 1;
-  margin: 0 1rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   overflow: hidden;
