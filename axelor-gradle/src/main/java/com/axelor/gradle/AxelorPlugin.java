@@ -82,7 +82,7 @@ public class AxelorPlugin implements Plugin<Project> {
   }
 
   private void configureJarSupport(Project project) {
-    if (project != project.getRootProject()) {
+    if (!AxelorUtils.isAxelorApplication(project)) {
       // include webapp resources in jar
       project
           .getTasks()
@@ -99,7 +99,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
   private void configureWarSupport(Project project) {
     // only on root project
-    if (project != project.getRootProject()) return;
+    if (!AxelorUtils.isAxelorApplication(project)) return;
 
     project.getPlugins().apply(WarSupport.class);
     project.getPlugins().apply(ScriptsSupport.class);

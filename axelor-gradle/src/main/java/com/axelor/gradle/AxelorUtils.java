@@ -188,4 +188,10 @@ public class AxelorUtils {
   public static boolean isCore(String name) {
     return "axelor-core".equals(name) || "axelor-web".equals(name) || "axelor-test".equals(name);
   }
+
+  public static boolean isAxelorApplication(Project project) {
+    return project == project.getRootProject()
+        && (!project.hasProperty("axelor.application")
+            || Boolean.parseBoolean((String) project.getProperties().get("axelor.application")));
+  }
 }

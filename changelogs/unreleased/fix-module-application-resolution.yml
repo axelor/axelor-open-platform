@@ -1,0 +1,15 @@
+---
+title: Fix on how application and module are determinate during gradle resolution
+type: fix
+description: |
+  Due to the merge of `com.axelor.app` and `com.axelor.app-module` gradle
+  plugins, it is now hard to determinate who is the module from the
+  application. A module can be built itself, so it is seen as an
+  application (when checking `project == project.getRootProject()`) and
+  wrong plugins/dependencies/tasks are applied.
+
+  To overcomes this, when a module need to be built standalone,
+  `axelor.application = false` property can be added in `gradle.properties`. 
+  This way, it will be seen as a module instead of an application.
+
+  Better support will be added in a future version.
