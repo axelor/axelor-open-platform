@@ -399,8 +399,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
               <Button
                 key={filter.key}
                 variant="secondary"
-                bg={active ? "body-tertiary" : "body"}
-                border={false}
+                outline={!active}
                 onClick={() => setType(filter.key)}
               >
                 {filter.title}
