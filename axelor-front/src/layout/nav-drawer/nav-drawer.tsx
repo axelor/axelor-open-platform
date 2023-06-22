@@ -119,7 +119,7 @@ export function NavDrawer() {
       onItemClick={handleClick}
       searchActive={showSearch}
       searchOptions={{
-        title: i18n.get("Search"),
+        title: i18n.get("Search menu..."),
         onShow: handleSearchShow,
         onHide: handleSearchHide,
       }}
