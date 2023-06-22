@@ -1,23 +1,23 @@
 import { request } from "@/services/client/client";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { LoadingCache } from "@/utils/cache";
 
-const cache: Record<string, DataRecord[]> = {};
+const cache = new LoadingCache<Promise<DataRecord[]>>();
 
 export async function fetchMenus(parent?: string) {
-  const url = `ws/search/menu${parent ? `?parent=${parent}` : ""}`;
-  if (cache[url]) return cache[url];
+  const queryString = parent ? `?parent=${parent}` : "";
+  const url = `ws/search/menu${queryString}`;
 
-  const resp = await request({
-    url,
-    method: "GET",
+  return await cache.get(url, async () => {
+    const resp = await request({ url, method: "GET" });
+
+    if (resp.ok) {
+      const { status, data } = await resp.json();
+      return status === 0 ? data ?? [] : [];
+    }
+
+    return [];
   });
-
-  if (resp.ok) {
-    const { status, data } = await resp.json();
-    return (cache[url] = status === 0 ? data ?? [] : []);
-  }
-
-  return [];
 }
 
 export async function searchData({
