@@ -5,6 +5,7 @@ export * from "./boolean-radio";
 export * from "./boolean-select";
 export * from "./boolean-switch";
 export * from "./button";
+export * from "./button-group";
 export * from "./checkbox-select";
 export * from "./code-editor";
 export * from "./dashlet";

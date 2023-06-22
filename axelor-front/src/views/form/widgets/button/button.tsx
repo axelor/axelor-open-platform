@@ -118,12 +118,24 @@ export function Button(props: WidgetProps) {
     </Btn>
   );
 
+  function render() {
+    return (
+      <>
+        {hasHelp && (
+          <Tooltip content={() => <span>{help}</span>}>{button}</Tooltip>
+        )}
+        {hasHelp || button}
+      </>
+    )
+  }
+
+  if (schema.widget && schema.widget !== 'button') {
+    return render();
+  }
+
   return (
     <WidgetControl {...props}>
-      {hasHelp && (
-        <Tooltip content={() => <span>{help}</span>}>{button}</Tooltip>
-      )}
-      {hasHelp || button}
+      {render()}
     </WidgetControl>
   );
 }
