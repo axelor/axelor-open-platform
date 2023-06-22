@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Outlet } from "react-router-dom";
 
 import { Box } from "@axelor/ui";
@@ -19,9 +20,11 @@ import { NavTags } from "./nav-tags";
 import "../utils/globals";
 
 import styles from "./layout.module.scss";
+import { useSidebar } from "./nav-drawer/hook";
 
 export function Layout() {
   const { loading } = useMenu();
+  const { show } = useSidebar();
 
   useAppTitle();
 
@@ -34,12 +37,18 @@ export function Layout() {
   }
 
   return (
-    <div className={styles.container}>
-      <NavHeader />
+    <div
+      className={clsx(styles.container, {
+        [styles.hasSidebar]: show === "inline",
+      })}
+    >
+      <div className={styles.header}>
+        <NavHeader />
+      </div>
+      <div className={styles.sidebar}>
+        <NavDrawer />
+      </div>
       <div className={styles.content}>
-        <div className={styles.sidebar}>
-          <NavDrawer />
-        </div>
         <div className={styles.tabs}>
           <NavTabs />
           <div className={styles.page}>
