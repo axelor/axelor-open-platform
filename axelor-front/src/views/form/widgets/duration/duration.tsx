@@ -1,28 +1,38 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 import padStart from "lodash/padStart";
+import isString from "lodash/isString";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string/viewer";
 import { MaskedInput } from "../date/mask-input";
 import { toKebabCase } from "@/utils/names";
+import { moment } from "@/services/client/l10n";
 
 function getValue(
   value: number | string,
   { big = false, seconds = false } = {}
 ) {
   const timestamp = parseInt(String(value));
-  const [secs, mins, hrs] = [
+  let [secs, mins, hrs] = [
     timestamp % 60,
     Math.floor(timestamp / 60) % 60,
     Math.floor(timestamp / (60 * 60)),
   ];
 
+  try {
+    if (value && isString(value)) {
+      const d = moment(value);
+      if (d.isValid()) {
+        mins = d.minute();
+        secs = d.second();
+        hrs = d.hour();
+      }
+    }
+  } catch {}
+
   return timestamp > 0
-    ? `
-    ${padStart(`${hrs}`, big ? 3 : 2, "0")}
-    :${padStart(`${mins}`, 2, "0")}
-    ${seconds ? `:${padStart(`${secs}`, 2, "0")}` : ""}`
+    ? `${padStart(`${hrs}`, big ? 3 : 2, "0")}:${padStart(`${mins}`, 2, "0")}${seconds ? `:${padStart(`${secs}`, 2, "0")}` : ""}`
     : "";
 }
 
