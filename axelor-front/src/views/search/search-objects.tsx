@@ -1,21 +1,33 @@
-import { Box, Button, Select, SelectProps } from "@axelor/ui";
-import { useCallback, useEffect, useMemo } from "react";
 import { PrimitiveAtom, useAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
+import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { SearchView } from "@/services/client/meta.types";
-import { i18n } from "@/services/client/i18n";
+import { Box, Button, Select, SelectProps } from "@axelor/ui";
+
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { SearchView } from "@/services/client/meta.types";
 import { fetchMenus } from "./utils";
+
 import styles from "./search-objects.module.scss";
 
 function ActionM2O({
   value,
   parent,
+  actionMenus,
   ...props
-}: SelectProps & { parent?: DataRecord | null }) {
-  const fetchOptions = useCallback(() => fetchMenus(parent?.name), [parent]);
+}: SelectProps & {
+  actionMenus: SearchView["actionMenus"];
+  parent?: DataRecord | null;
+}) {
+  const parentName = parent?.name;
+  const fetchOptions = useCallback(async () => {
+    const menus =
+      actionMenus?.filter((menu) => menu.parent === parentName) ?? [];
+    const fetchedMenus = (await fetchMenus(parentName)) ?? [];
+    return [...menus, ...fetchedMenus];
+  }, [actionMenus, parentName]);
   return (
     <Select
       {...props}
@@ -42,6 +54,7 @@ export type SearchObjectsState = {
 export function SearchObjects({
   stateAtom,
   selects,
+  actionMenus,
   hasActions = true,
   onSearch,
   onClear,
@@ -49,6 +62,7 @@ export function SearchObjects({
 }: {
   stateAtom: PrimitiveAtom<SearchObjectsState>;
   selects: SearchView["selects"];
+  actionMenus: SearchView["actionMenus"];
   hasActions?: boolean;
   onSearch: () => void;
   onClear?: () => void;
@@ -167,6 +181,7 @@ export function SearchObjects({
           <Box className={styles["actions-section"]}>
             <Box d="flex" className={styles.select}>
               <ActionM2O
+                actionMenus={actionMenus}
                 placeholder={i18n.get("Action Category")}
                 value={actionCategory}
                 onChange={handleActionCategory}
@@ -175,6 +190,7 @@ export function SearchObjects({
             <Box d="flex" className={styles.select}>
               {actionCategory && (
                 <ActionM2O
+                  actionMenus={actionMenus}
                   placeholder={i18n.get("Action Sub-Category")}
                   parent={actionCategory}
                   value={actionSubCategory}
@@ -185,6 +201,7 @@ export function SearchObjects({
             <Box d="flex" className={styles.select}>
               {actionSubCategory && (
                 <ActionM2O
+                  actionMenus={actionMenus}
                   placeholder={i18n.get("Action")}
                   parent={actionSubCategory}
                   value={action}

@@ -674,6 +674,7 @@ export interface SearchView extends View {
   resultFields?: SearchResultField[];
   buttons?: Button[];
   selects?: SearchSelect[];
+  actionMenus?: MenuItem[];
 }
 
 export interface SearchSelect {

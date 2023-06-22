@@ -2510,6 +2510,7 @@
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="select" type="tns:SearchSelect" maxOccurs="unbounded" />
+          <xsd:element name="action-menu" type="tns:ActionMenuItem" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="limit" type="xsd:int" use="required">
           <xsd:annotation>

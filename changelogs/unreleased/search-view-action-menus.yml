@@ -1,0 +1,6 @@
+---
+title: Support `action-menu` elements specific to a `search` view
+type: feature
+description: |
+  `action-menu` elements can now be defined inside a `search` view
+  to specify that they are specific to that view, and not available to all search views.

@@ -14,7 +14,7 @@ export async function fetchMenus(parent?: string) {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return (cache[url] = status === 0 ? data : []);
+    return (cache[url] = status === 0 ? data ?? [] : []);
   }
 
   return [];

@@ -73,7 +73,7 @@ export function Search(props: ViewProps<SearchView>) {
   const record = useRef({}).current;
   const { meta } = props;
   const { view } = meta;
-  const { name, selects, limit = 80 } = view;
+  const { name, selects, actionMenus, limit = 80 } = view;
   const { action } = useViewTab();
   const { params } = action;
   const queryString = (location.search || "").slice(1);
@@ -408,6 +408,7 @@ export function Search(props: ViewProps<SearchView>) {
       <SearchObjects
         hasActions={!params?.hideActions}
         selects={selects}
+        actionMenus={actionMenus}
         stateAtom={searchObjectsAtom}
         onGo={onGo}
         onSearch={onSearch}
