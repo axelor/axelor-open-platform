@@ -192,13 +192,21 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
+  const getOptionLabel = useCallback(
+    (option: any) => {
+      const trKey = `$t:${targetName}`;
+      return option[trKey] ?? option[targetName];
+    },
+    [targetName]
+  );
+
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
   return (
     <FieldControl {...props}>
       {readonly ? (
         value && hasButton("view") ? (
-          <ViewerLink onClick={handleView}>{value[targetName]}</ViewerLink>
+          <ViewerLink onClick={handleView}>{getOptionLabel(value)}</ViewerLink>
         ) : (
           <ViewerInput value={value?.[targetName] || ""} />
         )
@@ -239,7 +247,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
                 ]
           }
           fetchOptions={handleCompletion}
-          optionLabel={targetName}
+          optionLabel={getOptionLabel}
           optionValue={"id"}
           {...beforeSelectProps}
         />

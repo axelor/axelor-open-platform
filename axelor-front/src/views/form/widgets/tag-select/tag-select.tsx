@@ -17,6 +17,15 @@ import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
 export function TagSelectComponent(props: CreatableSelectProps) {
   const { targetName } = props.schema;
+
+  const getOptionLabel = useCallback(
+    (option: any) => {
+      const trKey = `$t:${targetName}`;
+      return option[trKey] ?? option[targetName];
+    },
+    [targetName]
+  );
+
   const components = useMemo(
     () => ({
       MultiValue: (props: any) => {
@@ -25,20 +34,20 @@ export function TagSelectComponent(props: CreatableSelectProps) {
           <Box me={1}>
             <Chip
               color={"indigo"}
-              title={data?.[targetName]}
+              title={getOptionLabel(data)}
               onRemove={removeProps.onClick}
             />
           </Box>
         );
       },
     }),
-    [targetName]
+    [getOptionLabel]
   );
 
   return (
     <CreatableSelect
       isMulti
-      optionLabel={targetName}
+      optionLabel={getOptionLabel}
       optionValue={"id"}
       components={components}
       {...props}
@@ -122,6 +131,14 @@ export function TagSelect(
     [setValue, targetName]
   );
 
+  const getOptionLabel = useCallback(
+    (option: any) => {
+      const trKey = `$t:${targetName}`;
+      return option[trKey] ?? option[targetName];
+    },
+    [targetName]
+  );
+
   return (
     <FieldControl {...props}>
       {readonly ? (
@@ -134,7 +151,7 @@ export function TagSelect(
               href="#"
               onClick={(e) => handleView(e, val)}
             >
-              <Chip title={val[targetName]} color={"indigo"} />
+              <Chip title={getOptionLabel(val)} color={"indigo"} />
             </Box>
           ))}
         </Box>
@@ -150,6 +167,7 @@ export function TagSelect(
           {...selectProps}
           onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
+          optionLabel={getOptionLabel}
         />
       )}
     </FieldControl>
