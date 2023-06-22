@@ -33,6 +33,8 @@ import {
 } from "./renderers/node-text";
 import { getNodeOfTreeRecord } from "./utils";
 
+import styles from "./tree.module.scss";
+
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
   const { dashlet, popup, popupOptions } = useViewTab();
@@ -345,6 +347,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       )}
       <TreeProvider>
         <TreeComponent
+          className={styles.tree}
           columns={columns}
           records={records}
           sortable
