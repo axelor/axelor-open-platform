@@ -95,7 +95,7 @@ export const DmsDetails = memo(function DmsDetails({
               onClick={onClose}
             />
           </Box>
-          <Box p={2} borderTop>
+          <Box p={2}>
             {renderField(
               i18n.get("Type"),
               isDirectory ? i18n.get("Directory") : i18n.get("File")
@@ -103,11 +103,6 @@ export const DmsDetails = memo(function DmsDetails({
             {renderField(i18n.get("Owner"), createdBy?.name)}
             {renderField(i18n.get("Created"), Formatters.datetime(createdOn))}
             {renderField(i18n.get("Modified"), Formatters.datetime(updatedOn))}
-          </Box>
-          <Box borderTop borderBottom py={3} px={2}>
-            <Link className={styles.link} onClick={() => onView?.(data)}>
-              {i18n.get("Details")}
-            </Link>
           </Box>
           <Box d="flex" mt={2} px={1}>
             {edit ? (
@@ -147,6 +142,11 @@ export const DmsDetails = memo(function DmsDetails({
                 </Button>
               </Box>
             )}
+          </Box>
+          <Box py={3} px={2}>
+            <Link className={styles.link} onClick={() => onView?.(data)}>
+              {i18n.get("More details...")}
+            </Link>
           </Box>
         </>
       )}
