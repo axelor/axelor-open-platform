@@ -273,7 +273,7 @@ export function Editor({
 
     items?.forEach((item) => {
       if (!fields?.[item.name] && !item.hidden) {
-        fieldList.push(item as unknown as Property);
+        fieldList.push(item);
       }
     })
 

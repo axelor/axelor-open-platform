@@ -110,10 +110,8 @@ const EXTRA_OPERATORS_BY_TARGET = {
 
 export function useField(fields?: Field[], name?: string) {
   return useMemo(() => {
-    const field = fields?.find(
-      (item) => item.name === name || item.name === name?.split(".")[0]
-    );
-
+    const field = fields?.find((item) => item.name === name);
+    
     let type = toKebabCase(field?.type!);
 
     if (field && field.selectionList) {

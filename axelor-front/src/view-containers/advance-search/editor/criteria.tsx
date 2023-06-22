@@ -5,7 +5,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Select, Widget } from "./components";
 import { useField } from "./utils";
 import { Filter } from "@/services/client/data.types";
-import { Field, JsonField } from "@/services/client/meta.types";
+import { Field } from "@/services/client/meta.types";
 import styles from "./criteria.module.scss";
 
 export const Criteria = memo(function Criteria({
@@ -36,16 +36,12 @@ export const Criteria = memo(function Criteria({
     name: keyof Filter,
     options: { name: string; title: string }[]
   ) {
-    const $value = value?.[name];
-    const selectValue =
-      !(field as JsonField)?.jsonField && name === "fieldName" && $value
-        ? $value.split(".")[0]
-        : $value;
+    const $value = value?.[name];    
     return (
       <Select
         name={name}
         onChange={(value: string) => handleChange({ name, value })}
-        value={selectValue}
+        value={$value}
         options={options}
       />
     );

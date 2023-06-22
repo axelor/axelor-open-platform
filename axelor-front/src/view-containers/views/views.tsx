@@ -14,7 +14,7 @@ import { filters as fetchFilters } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
-  Field,
+  Property,
   SearchFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
@@ -172,7 +172,7 @@ const DataViews = memo(function DataViews({
     if (dashlet) return;
     const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
     let domains: SearchFilter[] = [];
-    let items: Field[] = [];
+    let items: Property[] = [];
 
     if (filterName) {
       const res = await findView<SearchFilters>({
@@ -180,7 +180,15 @@ const DataViews = memo(function DataViews({
         type: "search-filters",
         model,
       });
-      items = (res?.view?.items || []) as Field[];
+      const fields = res?.fields || {};
+      items = (res?.view?.items || []).map(item => {
+        const field = fields[item.name || ""] || {};
+        return {
+          ...field,
+          ...item,
+          type: field.type ?? "STRING",
+        } as Property
+      });
       domains = (res?.view?.filters || []).map((d) => ({
         ...d,
         checked: selectedDomains.includes(d.name!),

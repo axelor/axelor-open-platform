@@ -1,7 +1,7 @@
 import { SearchOptions } from "@/services/client/data";
 import { Criteria } from "@/services/client/data.types";
 import { MetaData } from "@/services/client/meta";
-import { Field, SavedFilter, SearchFilter } from "@/services/client/meta.types";
+import { Property, SavedFilter, SearchFilter } from "@/services/client/meta.types";
 
 export type AdvancedSearchState = {
   query?: SearchOptions["filter"];
@@ -24,7 +24,7 @@ export type AdvancedSearchState = {
   filterType?: "all" | "single";
   domains?: SearchFilter[];
   filters?: SavedFilter[];
-  items?: Field[];
+  items?: Property[];
   fields?: MetaData["fields"];
   jsonFields?: MetaData["jsonFields"];
   focusTabId?: string | null;
