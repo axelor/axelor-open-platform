@@ -4,14 +4,10 @@
   flex: 1;
   min-width: 0;
   position: relative;
-  &.popup {
-    height: 500px;
-  }
 }
 
 .content {
   overflow: hidden;
-  gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
@@ -36,10 +32,18 @@
   width: 300px;
   transition: all 0.25s;
   background-color: var(--bs-tertiary-bg);
-  border-radius: 0.5rem;
   min-width: 0;
+  margin-right: 0.5rem;
   &.hide {
     width: 0px;
+    margin: 0;
+  }
+}
+
+[dir="rtl"] {
+  .tree {
+    margin-right: 0;
+    margin-left: 0.5rem;
   }
 }
 
@@ -61,5 +65,16 @@
   }
   a {
     cursor: pointer;
+  }
+}
+
+// required for popup scrolling
+.container.popup {
+  .tree {
+    flex-direction: column;
+  }
+  .tree > ul {
+    flex: 1;
+    min-height: 400px;
   }
 }

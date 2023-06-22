@@ -4,6 +4,15 @@
   list-style: none;
   flex: 1;
   overflow: auto;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.125rem;
+
+  > li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
 }
 
 .node {
@@ -13,6 +22,7 @@
 }
 
 .node {
+  padding: 0.5rem;
   span:last-child {
     flex: 1;
     white-space: nowrap;

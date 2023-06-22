@@ -29,8 +29,6 @@ const TreeNode = memo(function TreeNode({
         className={clsx(styles.node, {
           [styles.active]: data._selected,
         })}
-        py={1}
-        pe={1}
         style={{ paddingLeft: `${(data._level ?? 0) * 0.75}rem` }}
         onClick={() => onSelect?.(data)}
       >
