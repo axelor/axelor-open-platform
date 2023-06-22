@@ -11,10 +11,26 @@ import {
   Widget,
 } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
-import { toTitleCase } from "@/utils/names";
+import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
+import format from "@/utils/format";
+import { i18n } from "@/services/client/i18n";
+
+function formatter(column: Field, value: any, record: any) {
+  if (column.translatable && toKebabCase(column.type) === "string") {
+    const trKey = "value:" + value;
+    const trValue = i18n.get(trKey);
+    if (trValue !== trKey) {
+      record = { ...record, ["$t:" + column.name]: trValue };
+    }
+  }
+  return format(value, {
+    props: column,
+    context: record,
+  });
+}
 
 export const ReportTable = forwardRef(function ReportTable(
   {
@@ -111,6 +127,7 @@ export const ReportTable = forwardRef(function ReportTable(
       fields={fields}
       state={state}
       setState={setState}
+      columnFormatter={formatter}
       onSearch={onSearch as any}
     />
   );

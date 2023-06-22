@@ -63,6 +63,7 @@ export const Grid = forwardRef<
     readonly?: boolean;
     showEditIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
+    columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
@@ -80,6 +81,7 @@ export const Grid = forwardRef<
     editable = false,
     readonly,
     columnAttrs,
+    columnFormatter,
     records,
     state,
     setState,
@@ -151,7 +153,7 @@ export const Grid = forwardRef<
         ...attrs,
         serverType,
         title,
-        formatter,
+        formatter: columnFormatter || formatter,
         ...columnProps,
       } as any;
     });
@@ -169,7 +171,14 @@ export const Grid = forwardRef<
     }
 
     return columns;
-  }, [view.items, view.editIcon, showEditIcon, fields, columnAttrs]);
+  }, [
+    view.items,
+    view.editIcon,
+    showEditIcon,
+    fields,
+    columnFormatter,
+    columnAttrs,
+  ]);
 
   const init = useAsync(async () => {
     onSearch?.({ ...searchOptions, fields: names });
