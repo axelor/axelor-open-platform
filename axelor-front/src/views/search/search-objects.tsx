@@ -173,20 +173,24 @@ export function SearchObjects({
               />
             </Box>
             <Box d="flex" className={styles.select}>
-              <ActionM2O
-                placeholder={i18n.get("Action Sub-Category")}
-                parent={actionCategory}
-                value={actionSubCategory}
-                onChange={handleActionSubCategory}
-              />
+              {actionCategory && (
+                <ActionM2O
+                  placeholder={i18n.get("Action Sub-Category")}
+                  parent={actionCategory}
+                  value={actionSubCategory}
+                  onChange={handleActionSubCategory}
+                />
+              )}
             </Box>
             <Box d="flex" className={styles.select}>
-              <ActionM2O
-                placeholder={i18n.get("Action")}
-                parent={actionSubCategory}
-                value={action}
-                onChange={handleAction}
-              />
+              {actionSubCategory && (
+                <ActionM2O
+                  placeholder={i18n.get("Action")}
+                  parent={actionSubCategory}
+                  value={action}
+                  onChange={handleAction}
+                />
+              )}
             </Box>
             <Box d="flex">
               <Button variant="primary" w={100} onClick={onGo}>
