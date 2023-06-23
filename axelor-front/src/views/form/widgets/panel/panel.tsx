@@ -1,9 +1,16 @@
 import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { Panel as AxPanel } from "@axelor/ui";
+import {
+  Panel as AxPanel,
+  CommandBarProps,
+  CommandItemProps,
+} from "@axelor/ui";
+
+import { MenuItem } from "@/services/client/meta.types";
 
 import { FieldLabel, GridLayout, WidgetProps } from "../../builder";
+import { useFormScope } from "../../builder/scope";
 
 import styles from "./panel.module.css";
 
@@ -19,6 +26,10 @@ export function Panel(props: WidgetProps) {
   const { title, collapse } = attrs;
   const [collapsed, setCollapsed] = useState(collapse);
 
+  useEffect(() => {
+    canCollapse && setCollapsed(collapse);
+  }, [canCollapse, collapse]);
+
   const hasHeader = showTitle !== false && showFrame !== false && !!title;
 
   let style: any = {};
@@ -26,9 +37,43 @@ export function Panel(props: WidgetProps) {
   if (showBorder === false) style["--ax-panel-border"] = "none";
   if (hasHeader === false) style["--ax-panel-border"] = "none";
 
-  useEffect(() => {
-    canCollapse && setCollapsed(collapse);
-  }, [canCollapse, collapse]);
+  const { actionExecutor } = useFormScope();
+
+  const toolbar = useMemo(() => {
+    const items: MenuItem[] = schema.menu?.items ?? [];
+    const actions = items.map((item) => {
+      const command: CommandItemProps = {
+        key: item.name,
+        text: item.title,
+        onClick: async () => {
+          await actionExecutor.waitFor();
+          await actionExecutor.execute(item.action!, {
+            context: {
+              _source: item.name,
+              _signal: item.name,
+            },
+          });
+        },
+      };
+      return command;
+    });
+
+    if (actions.length === 0) return;
+
+    const res: CommandBarProps = {
+      items: [
+        {
+          key: "menu",
+          iconProps: {
+            icon: "more_vert",
+          },
+          items: actions,
+        },
+      ],
+    };
+
+    return res;
+  }, [actionExecutor, schema.menu?.items]);
 
   const header = hasHeader ? (
     <div className={styles.title}>
@@ -39,6 +84,7 @@ export function Panel(props: WidgetProps) {
   return (
     <AxPanel
       header={header}
+      toolbar={toolbar}
       collapsible={canCollapse}
       collapsed={collapsed}
       className={styles.panel}
