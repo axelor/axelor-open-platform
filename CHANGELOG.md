@@ -1,3 +1,27 @@
+## 5.4.21 (2023-06-23)
+
+#### Features
+
+* Preserve grid scroll position on form save/reload
+
+#### Fixed
+
+* Fix going into edit mode in editable grid when clicking readonly cell
+* Fix selection widget stealing focus after focusing another cell
+* Readonly fields, included dot fields, shouldn't be focusable
+* Fix search request when adjusting page boundary
+* Fix onChange on Enter key in simple fields
+* Fix script evaluation on Map when isEmpty is used
+* Fix lost dotted fields in grid when using master-detail widget
+* Fix editable grid that don't wait for pending actions
+* Fix deselected row after save triggered by previous row in editable grid
+* Fix search box show/hide on cards view dashlet depending on dashlet `canSearch` attribute
+* Fix onNew action on editor
+
+#### Security
+
+* Check for unauthorized users inside security filter directly
+
 ## 5.4.20 (2023-04-05)
 
 #### Fixed
