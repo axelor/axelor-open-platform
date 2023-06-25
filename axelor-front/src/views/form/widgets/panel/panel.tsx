@@ -1,20 +1,11 @@
-import { Box, Collapse, StyleProps } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import clsx from "clsx";
+
+import { Panel as AxPanel } from "@axelor/ui";
 
 import { FieldLabel, GridLayout, WidgetProps } from "../../builder";
+
 import styles from "./panel.module.css";
-
-const withHeaderProps: StyleProps = {
-  rounded: true,
-  border: true,
-};
-
-const withHeaderBodyProps: StyleProps = {
-  p: 3,
-};
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
@@ -26,55 +17,39 @@ export function Panel(props: WidgetProps) {
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, collapse } = attrs;
-  const [isCollapse, setCollapse] = useState(collapse);
+  const [collapsed, setCollapsed] = useState(collapse);
 
-  const hasHeader = showTitle !== false && showFrame !== false && title;
-  const moreProps = (hasHeader || showBorder) && withHeaderProps;
-  const bodyProps = (hasHeader || showBorder) && withHeaderBodyProps;
+  const hasHeader = showTitle !== false && showFrame !== false && !!title;
+
+  let style: any = {};
+
+  if (showBorder === false) style["--ax-panel-border"] = "none";
+  if (hasHeader === false) style["--ax-panel-border"] = "none";
 
   useEffect(() => {
-    canCollapse && setCollapse(collapse);
+    canCollapse && setCollapsed(collapse);
   }, [canCollapse, collapse]);
 
-  function renderBody() {
-    return (
-      <Box className={styles.panelBody} {...bodyProps}>
-        <GridLayout
-          readonly={readonly}
-          formAtom={formAtom}
-          parentAtom={widgetAtom}
-          schema={schema}
-        />
-      </Box>
-    );
-  }
+  const header = hasHeader ? (
+    <div className={styles.title}>
+      <FieldLabel schema={schema} formAtom={formAtom} widgetAtom={widgetAtom} />
+    </div>
+  ) : undefined;
 
   return (
-    <Box className={styles.panel} {...moreProps}>
-      {hasHeader && (
-        <Box
-          className={clsx(styles.panelHeader, {
-            [styles.collapsible]: canCollapse,
-          })}
-          {...(canCollapse && {
-            onClick: () => setCollapse((c) => !c),
-          })}
-        >
-          <FieldLabel
-            schema={schema}
-            formAtom={formAtom}
-            widgetAtom={widgetAtom}
-          />
-          {canCollapse && (
-            <MaterialIcon icon={isCollapse ? "expand_more" : "expand_less"} />
-          )}
-        </Box>
-      )}
-      {canCollapse ? (
-        <Collapse in={!isCollapse}>{renderBody()}</Collapse>
-      ) : (
-        renderBody()
-      )}
-    </Box>
+    <AxPanel
+      header={header}
+      collapsible={canCollapse}
+      collapsed={collapsed}
+      className={styles.panel}
+      style={style}
+    >
+      <GridLayout
+        readonly={readonly}
+        formAtom={formAtom}
+        parentAtom={widgetAtom}
+        schema={schema}
+      />
+    </AxPanel>
   );
 }

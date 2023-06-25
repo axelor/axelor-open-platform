@@ -1,25 +1,8 @@
 .panel {
-  display: flex;
-  flex-direction: column;
+  --ax-panel-header-border: 0;
 }
 
-.panelHeader {
+.title {
   display: flex;
-  align-items: center;
-  font-weight: 600;
-  padding: 0.25rem;
-  background-color: var(--ax-panel-header-bg);
-  border-bottom: var(--ax-panel-header-border, none);
-  > label {
-    padding: 0.5rem;
-  }
-}
-.panelHeader.collapsible {
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.panel .panel {
-  border: none !important;
-  border-radius: 0 !important;
+  justify-content: start;
 }
