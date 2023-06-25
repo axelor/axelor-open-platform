@@ -1,12 +1,31 @@
 .tabs {
-  --bs-nav-tabs-padding: 0.5rem;
-}
-
-.tabs {
   position: relative;
-  z-index: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  flex-grow: 1;
+  z-index: 0;
+  --ax-nav-tabs-icon-padding: 0.5rem;
+}
+
+.tabList {
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.tabTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.tabClose {
+  display: flex;
+  line-height: 1;
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .tabContent {
@@ -22,33 +41,7 @@
 }
 
 .dirty {
-  .tabTitle::after {
+  .tabText::after {
     content: "*";
-  }
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  .tabTitle {
-    margin: 0 0.5rem;
-    display: inline-flex;
-    gap: 0.25rem;
-    white-space: nowrap;
-  }
-  .tabClose {
-    display: inline-flex;
-    opacity: 0.5;
-    &:hover {
-      opacity: 1;
-    }
-  }
-  .tabIcon {
-    padding: 0.25rem;
-    border-radius: 100%;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 }
