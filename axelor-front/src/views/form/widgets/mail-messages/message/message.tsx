@@ -289,11 +289,6 @@ export function MessageBox({
       className={clsx(styles.root, "mail-messages", {
         [styles.rtl]: rtl,
       })}
-      {...(!isMail && {
-        p: 3,
-        border: true,
-        rounded: true,
-      })}
     >
       {!isMail && (
         <Box d="flex" flexDirection="column" g={2}>
