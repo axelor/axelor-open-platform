@@ -1,15 +1,11 @@
+.icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
 .follower {
   display: flex;
   align-items: center;
-  padding: 0;
-}
-.follower a {
-  position: relative;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.icon {
-  cursor: pointer;
+  gap: 0.5rem;
 }

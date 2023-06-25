@@ -1,18 +1,18 @@
-import React, { useCallback, useState } from "react";
-import { Box, Link, ListItem } from "@axelor/ui";
+import { Link, ListItem, Panel } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomCallback } from "jotai/utils";
+import React, { useCallback, useState } from "react";
 
-import { WidgetProps } from "../../builder";
-import { i18n } from "@/services/client/i18n";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { dialogs } from "@/components/dialogs";
-import { Follower, follow, getFollowers, unfollow } from "./utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useSession } from "@/hooks/use-session";
-import { useMessagePopup } from "../mail-messages/message/message-form";
+import { i18n } from "@/services/client/i18n";
+import { WidgetProps } from "../../builder";
 import { useFormRefresh } from "../../builder/scope";
+import { useMessagePopup } from "../mail-messages/message/message-form";
 import { Message } from "../mail-messages/message/types";
 import classes from "./mail-followers.module.scss";
+import { Follower, follow, getFollowers, unfollow } from "./utils";
 
 export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const [followers, setFollowers] = useState<Follower[]>([]);
@@ -80,59 +80,64 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       ),
     [followers, session]
   );
-  
-// register form:refresh
+
+  // register form:refresh
   useFormRefresh(onRefresh);
 
   return (
-    <Box d="flex" flexDirection="column" rounded border>
-      <Box d="flex" fontWeight={"bold"} borderBottom px={3} py={2}>
-        <Box flex={1}>{i18n.get("Followers")}</Box>
-        <Box>
-          <Box
-            as="span"
-            className={classes.icon}
-            onClick={() =>
-              isLoginUserFollowing ? handleUnfollow() : handleFollow()
-            }
-          >
-            <MaterialIcon icon="star" fill={isLoginUserFollowing} />
-          </Box>
-          <Box as="span" className={classes.icon} onClick={handleAddFollower}>
-            <MaterialIcon icon="add" />
-          </Box>
-        </Box>
-      </Box>
-      <Box p={3}>
-        {followers.map(({ id, $author, $authorModel }) => {
-          const title = $author?.fullName || $author?.name;
-          return (
-            <ListItem
-              key={id}
-              className={classes.follower}
-              py={1}
-              border={false}
+    <Panel
+      header={i18n.get("Followers")}
+      toolbar={{
+        iconOnly: true,
+        items: [
+          {
+            key: "follow",
+            iconProps: {
+              icon: "star",
+              fill: false,
+            },
+            hidden: isLoginUserFollowing,
+            onClick: () => handleFollow(),
+          },
+          {
+            key: "unfollow",
+            iconProps: {
+              icon: "star",
+              fill: true,
+            },
+            hidden: !isLoginUserFollowing,
+            onClick: () => handleUnfollow(),
+          },
+          {
+            key: "add",
+            iconProps: {
+              icon: "add",
+            },
+            onClick: () => handleAddFollower(),
+          },
+        ],
+      }}
+    >
+      {followers.map(({ id, $author, $authorModel }) => {
+        const title = $author?.fullName || $author?.name;
+        return (
+          <ListItem key={id} className={classes.follower} py={1} border={false}>
+            <div
+              title={i18n.get("Remove")}
+              className={classes.icon}
+              onClick={() => handleUnfollow(id)}
             >
-              <Box
-                d="flex"
-                title={i18n.get("Remove")}
-                pe={1}
-                ps={1}
-                className={classes.icon}
-                onClick={() => handleUnfollow(id)}
-              >
-                <MaterialIcon icon="close" fontSize={20} />
-              </Box>
-              <Link
-                title={title!}
-                href={`#/ds/form::${$authorModel}/edit/${$author?.id || ""}`}
-              >
-                {title!}
-              </Link>
-            </ListItem>
-          );
-        })}
-      </Box>
-    </Box>
+              <MaterialIcon icon="close" fontSize={20} />
+            </div>
+            <Link
+              title={title!}
+              href={`#/ds/form::${$authorModel}/edit/${$author?.id || ""}`}
+            >
+              {title!}
+            </Link>
+          </ListItem>
+        );
+      })}
+    </Panel>
   );
 }
