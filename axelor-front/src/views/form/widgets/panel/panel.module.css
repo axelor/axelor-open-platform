@@ -1,5 +1,12 @@
 .panel {
   --ax-panel-header-border: 0;
+  --ax-panel-body-padding: 1rem;
+}
+
+.panel .panel {
+  --ax-panel-body-padding: 0;
+  --ax-panel-shadow: none;
+  --ax-panel-bg: transparent;
 }
 
 .title {
