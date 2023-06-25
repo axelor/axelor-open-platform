@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 
-import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+import { Box, CommandItemProps, Panel } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
@@ -41,10 +41,10 @@ import {
 } from "../../builder";
 import { nextId } from "../../builder/utils";
 
-import { DetailsForm } from "./one-to-many.details";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { fetchRecord } from "../../form";
 import { download } from "@/utils/download";
+import { fetchRecord } from "../../form";
+import { DetailsForm } from "./one-to-many.details";
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
@@ -485,132 +485,132 @@ export function OneToMany({
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
   return (
-    <Box d="flex" border flexDirection="column" roundedTop>
-      <Box d="flex" flexDirection="column" className={styles.container}>
-        <Box className={styles.header}>
+    <Panel
+      className={styles.container}
+      header={
+        showTitle && (
           <div className={styles.title}>
-            {showTitle && (
-              <FieldLabel
-                className={styles.titleText}
-                schema={schema}
-                formAtom={formAtom}
-                widgetAtom={widgetAtom}
-              />
-            )}
+            <FieldLabel
+              className={styles.titleText}
+              schema={schema}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+            />
           </div>
-          <CommandBar
-            iconOnly
-            items={[
-              ...(isManyToMany
-                ? [
-                    {
-                      key: "select",
-                      text: i18n.get("Select"),
-                      iconProps: {
-                        icon: "search",
-                      },
-                      onClick: onSelect,
-                      hidden: !canSelect,
-                    } as CommandItemProps,
-                  ]
-                : []),
-              {
-                key: "new",
-                text: i18n.get("New"),
-                iconProps: {
-                  icon: "add",
-                },
-                onClick: editable && canEdit ? onAddInGrid : onAdd,
-                hidden: !canNew,
-              },
-              {
-                key: "edit",
-                text: i18n.get("Edit"),
-                iconProps: {
-                  icon: "edit",
-                },
-                disabled: !hasRowSelected,
-                hidden: !canEdit || !hasRowSelected,
-                onClick: () => {
-                  const [rowIndex] = selectedRows || [];
-                  const record = rows[rowIndex]?.record;
-                  record && onEdit(record);
-                },
-              },
-              {
-                key: "delete",
-                text: i18n.get("Delete"),
-                iconProps: {
-                  icon: "delete",
-                },
-                disabled: !hasRowSelected,
-                hidden: !canDelete || !hasRowSelected,
-                onClick: () => {
-                  onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-                },
-              },
-              {
-                key: "refresh",
-                text: i18n.get("Refresh"),
-                iconProps: {
-                  icon: "refresh",
-                },
-                onClick: () => onSearch(),
-                hidden: !canRefresh,
-              },
-              {
-                key: "more",
-                iconOnly: true,
-                hidden: !canCopy && !canExport,
-                iconProps: {
-                  icon: "arrow_drop_down",
-                },
-                items: [
-                  {
-                    key: "duplicate",
-                    text: i18n.get("Duplicate"),
-                    hidden: !canDuplicate,
-                    onClick: onDuplicate,
+        )
+      }
+      toolbar={{
+        iconOnly: true,
+        items: [
+          ...(isManyToMany
+            ? [
+                {
+                  key: "select",
+                  text: i18n.get("Select"),
+                  iconProps: {
+                    icon: "search",
                   },
-                  {
-                    key: "export",
-                    text: i18n.get("Export"),
-                    hidden: !canExport,
-                    onClick: onExport,
-                  },
-                ],
+                  onClick: onSelect,
+                  hidden: !canSelect,
+                } as CommandItemProps,
+              ]
+            : []),
+          {
+            key: "new",
+            text: i18n.get("New"),
+            iconProps: {
+              icon: "add",
+            },
+            onClick: editable && canEdit ? onAddInGrid : onAdd,
+            hidden: !canNew,
+          },
+          {
+            key: "edit",
+            text: i18n.get("Edit"),
+            iconProps: {
+              icon: "edit",
+            },
+            disabled: !hasRowSelected,
+            hidden: !canEdit || !hasRowSelected,
+            onClick: () => {
+              const [rowIndex] = selectedRows || [];
+              const record = rows[rowIndex]?.record;
+              record && onEdit(record);
+            },
+          },
+          {
+            key: "delete",
+            text: i18n.get("Delete"),
+            iconProps: {
+              icon: "delete",
+            },
+            disabled: !hasRowSelected,
+            hidden: !canDelete || !hasRowSelected,
+            onClick: () => {
+              onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+            },
+          },
+          {
+            key: "refresh",
+            text: i18n.get("Refresh"),
+            iconProps: {
+              icon: "refresh",
+            },
+            onClick: () => onSearch(),
+            hidden: !canRefresh,
+          },
+          {
+            key: "more",
+            iconOnly: true,
+            hidden: !canCopy && !canExport,
+            iconProps: {
+              icon: "arrow_drop_down",
+            },
+            items: [
+              {
+                key: "duplicate",
+                text: i18n.get("Duplicate"),
+                hidden: !canDuplicate,
+                onClick: onDuplicate,
               },
-            ]}
-          />
-        </Box>
-        <GridComponent
-          className={styles["grid"]}
-          ref={gridRef}
-          showEditIcon={canEdit || canView}
-          readonly={readonly || !canEdit}
-          editable={editable && canEdit}
-          records={records}
-          view={(viewData?.view || schema) as GridView}
-          fields={viewData?.fields || fields}
-          columnAttrs={columnAttrs}
-          state={state}
-          setState={setState}
-          onEdit={canEdit ? onEdit : canView ? onView : noop}
-          onView={canView ? (canEdit ? onEdit : onView) : noop}
-          onSave={onSave}
-          onSearch={onSearch}
-          onRowReorder={onRowReorder}
-          {...(!canNew &&
-            editable && {
-              onRecordAdd: undefined,
-            })}
-          {...(hasMasterDetails &&
-            selected &&
-            !detailRecord && {
-              onRowClick,
-            })}
-        />
-      </Box>
+              {
+                key: "export",
+                text: i18n.get("Export"),
+                hidden: !canExport,
+                onClick: onExport,
+              },
+            ],
+          },
+        ],
+      }}
+    >
+      <GridComponent
+        className={styles["grid"]}
+        ref={gridRef}
+        showEditIcon={canEdit || canView}
+        readonly={readonly || !canEdit}
+        editable={editable && canEdit}
+        records={records}
+        view={(viewData?.view || schema) as GridView}
+        fields={viewData?.fields || fields}
+        columnAttrs={columnAttrs}
+        state={state}
+        setState={setState}
+        onEdit={canEdit ? onEdit : canView ? onView : noop}
+        onView={canView ? (canEdit ? onEdit : onView) : noop}
+        onSave={onSave}
+        onSearch={onSearch}
+        onRowReorder={onRowReorder}
+        {...(!canNew &&
+          editable && {
+            onRecordAdd: undefined,
+          })}
+        {...(hasMasterDetails &&
+          selected &&
+          !detailRecord && {
+            onRowClick,
+          })}
+      />
       {hasMasterDetails && detailMeta ? (
         <Box d="flex" flexDirection="column" p={2}>
           <DetailsForm
@@ -623,6 +623,6 @@ export function OneToMany({
           />
         </Box>
       ) : null}
-    </Box>
+    </Panel>
   );
 }

@@ -1,20 +1,9 @@
 .container {
   max-height: 400px;
-}
-
-.header {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: 0.25rem;
+  --ax-panel-body-padding: 0;
 }
 
 .title {
-  font-weight: 600;
-  flex: 1;
-  padding: 0.5rem;
   display: flex;
-  align-items: center;
-  overflow: hidden;
+  align-items: start;
 }
