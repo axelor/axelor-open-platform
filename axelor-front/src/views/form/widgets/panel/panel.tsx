@@ -41,9 +41,9 @@ export function Panel(props: WidgetProps) {
 
   const toolbar = useMemo(() => {
     const items: MenuItem[] = schema.menu?.items ?? [];
-    const actions = items.map((item) => {
+    const actions = items.map((item, ind) => {
       const command: CommandItemProps = {
-        key: item.name,
+        key: item.name || `menu_item_${ind}`,
         text: item.title,
         onClick: async () => {
           await actionExecutor.waitFor();
