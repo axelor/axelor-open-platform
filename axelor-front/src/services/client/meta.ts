@@ -120,6 +120,36 @@ export async function removeFilter(filter: SavedFilter) {
   return Promise.reject(resp.status);
 }
 
+export async function saveView(data: any) {
+  const resp = await request({
+    url: "ws/meta/view/save",
+    method: "POST",
+    body: { data },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0 ? data : reject(data);
+  }
+
+  return Promise.reject(resp.status);
+}
+
+export async function resetView(context: DataContext) {
+  const resp = await request({
+    url: "ws/action/com.axelor.meta.web.MetaController:removeUserCustomViews",
+    method: "POST",
+    body: { data: { context } },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0 ? data : reject(data);
+  }
+
+  return Promise.reject(resp.status);
+}
+
 export interface MetaData {
   model: string;
   fields: Record<string, Property>; // incoming is array, processed to object;

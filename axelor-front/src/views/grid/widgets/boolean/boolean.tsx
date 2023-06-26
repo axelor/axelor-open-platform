@@ -9,7 +9,7 @@ export function Boolean(props: GridColumnProps) {
       <Input
         type="checkbox"
         className={classes.checkbox}
-        checked={value}
+        checked={String(value) === 'true'}
         onChange={() => {}}
       />
     </Box>

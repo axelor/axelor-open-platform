@@ -48,6 +48,8 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { Details } from "./builder/details";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDevice } from "@/hooks/use-responsive";
+import { useSession } from "@/hooks/use-session";
+import { useCustomizePopup } from "./builder/customize";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -77,6 +79,7 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
   const { isMobile } = useDevice();
+  const userViewConfig = useSession().data?.view;
 
   const gridSearchAtom = useMemo(
     () => focusAtom(searchAtom!, (o) => o.prop("search")),
@@ -89,6 +92,8 @@ function GridInner(props: ViewProps<GridView>) {
     selectedRows: viewProps?.selectedRows?.slice?.(0, 1),
   });
   const records = useDataStore(dataStore, (ds) => ds.records);
+  const showCustomizeDialog = useCustomizePopup({ view, stateAtom: gridStateAtom });
+
   const { orderBy, rows, selectedRows, selectedCell } = state;
   const detailsView = action.params?.["details-view"];
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
@@ -615,6 +620,11 @@ function GridInner(props: ViewProps<GridView>) {
     }, [setState]),
   });
 
+  const canCustomize =
+    view.name &&
+    userViewConfig?.customizationPermission &&
+    userViewConfig?.customization !== false;
+
   const gridViewStyles =
     detailsMeta && !detailsViewOverlay && gridWidth
       ? { minWidth: gridWidth, maxWidth: gridWidth }
@@ -720,6 +730,9 @@ function GridInner(props: ViewProps<GridView>) {
             onSave={onSave}
             onDiscard={onDiscard}
             noRecordsText={i18n.get("No records found.")}
+            {...(canCustomize && {
+              onColumnCustomize: showCustomizeDialog,
+            })}
             {...dashletProps}
             {...popupProps}
             {...detailsProps}
