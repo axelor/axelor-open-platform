@@ -76,7 +76,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
         return relatives;
       }
       var path = $element.attr('x-path');
-      relatives = $element.parents().find('[x-field][x-path^="'+path+'."]:not(label,.panel,.btn)').map(function() {
+      relatives = $element.parents().find('[x-field][x-path^="'+path+'."]:not(label,.panel,.btn,.spacer-item,.separator-item)').map(function() {
         return $(this).attr('x-path').replace(path+'.','');
       }).get();
       relatives.push($scope.field.targetName);

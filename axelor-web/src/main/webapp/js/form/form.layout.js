@@ -508,7 +508,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           if (value <= 0 || !value || record.$fetched || record.$fetchedRelated) {
             return;
           }
-          var fields = element.find('[x-field]:not(label,.panel,.btn)').map(function() {
+          var fields = element.find('[x-field]:not(label,.panel,.btn,.spacer-item,.separator-item)').map(function() {
             return $(this).attr('x-field');
           }).get();
           var missing = _.filter(fields, function (name) {
