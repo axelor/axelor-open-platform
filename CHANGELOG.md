@@ -1,3 +1,11 @@
+## 5.4.22 (2023-08-16)
+
+#### Fixed
+
+* Fix label field title reset
+* Fix static widgets causing editor dirty
+* Fix setting/resetting widgets title
+
 ## 5.4.21 (2023-06-23)
 
 #### Features
