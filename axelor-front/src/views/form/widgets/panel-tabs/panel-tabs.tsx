@@ -21,18 +21,16 @@ export function PanelTabs(props: WidgetProps) {
     []
   );
 
-  const tabs = useMemo(() => schema.items || [], [schema]);
-  const items = useMemo(
+  const tabs = useMemo(
     () =>
-      tabs.map((tab) => {
-        const id = tab.uid;
-        const item: NavTabItem = {
-          id,
-          title: tab.title,
-        };
-        return item;
-      }),
-    [tabs]
+      (schema.items || []).map(
+        (tab) =>
+          ({
+            ...tab,
+            id: tab.uid,
+          } as Schema)
+      ),
+    [schema]
   );
 
   const hiddenStateAtom = useMemo(() => {
@@ -41,13 +39,11 @@ export function PanelTabs(props: WidgetProps) {
       (formState) => {
         const { states = {}, statesByName = {} } = formState;
         return tabs.reduce((acc, item) => {
-          const attrs = item.name
-            ? {
-                hidden: item.hidden,
-                ...statesByName[item.name]?.attrs,
-                ...states[item.uid]?.attrs,
-              }
-            : item;
+          const attrs = {
+            hidden: item.hidden,
+            ...statesByName[item.name ?? ""]?.attrs,
+            ...states[item.uid]?.attrs,
+          };
           if (attrs.hidden) {
             acc[item.uid] = true;
           }
@@ -87,7 +83,7 @@ export function PanelTabs(props: WidgetProps) {
         }
       }
     });
-  }, [actionHandler, items, tabs]);
+  }, [actionHandler, tabs]);
 
   useEffect(() => {
     if (visibleTabs.some((item) => item.uid === activeTab)) return;
@@ -107,12 +103,12 @@ export function PanelTabs(props: WidgetProps) {
     if (first) {
       setActiveTab(first.uid ?? null);
     }
-  }, [activeTab, hiddenState, items, tabs, visibleTabs]);
+  }, [activeTab, hiddenState, tabs, visibleTabs]);
 
   return (
     <div className={styles.tabs}>
       <NavTabs
-        items={items}
+        items={visibleTabs as NavTabItem[]}
         active={activeTab ?? undefined}
         onItemClick={handleChange}
       />
