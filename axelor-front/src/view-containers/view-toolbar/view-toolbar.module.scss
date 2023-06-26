@@ -10,10 +10,14 @@
 }
 
 .icon {
-  height: 2.25rem;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+i.icon {
+  line-height: 1;
+  font-size: 24px;
 }
 
 .pageInfo {
