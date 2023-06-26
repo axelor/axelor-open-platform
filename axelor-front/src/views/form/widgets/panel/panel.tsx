@@ -34,8 +34,7 @@ export function Panel(props: WidgetProps) {
 
   let style: any = {};
 
-  if (showBorder === false) style["--ax-panel-border"] = "none";
-  if (hasHeader === false) style["--ax-panel-border"] = "none";
+  if (!hasHeader && !showBorder) style["--ax-panel-border"] = "none";
 
   const { actionExecutor } = useFormScope();
 
