@@ -20,6 +20,15 @@
   }
 }
 
+.root {
+  --ax-panel-body-padding: 1rem;
+}
+
+.root.mail-box {
+  --ax-panel-border: none;
+  --ax-panel-body-padding: 0;
+}
+
 .root a {
   cursor: pointer;
   color: var(--bs-link-color) !important;

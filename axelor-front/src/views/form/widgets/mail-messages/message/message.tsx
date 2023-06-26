@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import clsx from "clsx";
-import { Box, Button, Badge, TBackground, useTheme } from "@axelor/ui";
+import { Box, Button, Badge, TBackground, useTheme, Panel } from "@axelor/ui";
 
 import Avatar from "../avatar";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -282,12 +282,10 @@ export function MessageBox({
 }) {
   const rtl = useTheme().dir === "rtl";
   return (
-    <Box
-      flex={1}
-      d="flex"
-      flexDirection="column"
+    <Panel
       className={clsx(styles.root, "mail-messages", {
         [styles.rtl]: rtl,
+        [styles["mail-box"]]: isMail,
       })}
     >
       {!isMail && (
@@ -344,6 +342,6 @@ export function MessageBox({
           </Button>
         </Box>
       )}
-    </Box>
+    </Panel>
   );
 }
