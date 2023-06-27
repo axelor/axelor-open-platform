@@ -4,20 +4,6 @@
   gap: 0.5rem;
 }
 
-.toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  padding: 0.25rem 0.5rem;
-  .toggleIcon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-}
-
 .topMenu {
   flex: 1;
 }
@@ -32,17 +18,6 @@
   overflow-x: auto;
 }
 
-.appLogo {
-  svg {
-    display: block;
-    height: 32px;
-    width: 100px !important;
-  }
-  img {
-    height: 32px !important;
-    vertical-align: middle;
-  }
-}
 
 .badge {
   position: absolute !important;

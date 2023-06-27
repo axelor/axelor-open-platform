@@ -8,6 +8,7 @@ import {
   MenuDivider as AxMenuDivider,
   MenuItem as AxMenuItem,
   NavTabItem,
+  Portal,
   NavTabs as Tabs,
 } from "@axelor/ui";
 
@@ -26,7 +27,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import styles from "./nav-tabs.module.scss";
 
-export function NavTabs() {
+export function NavTabs({ container }: { container: HTMLDivElement }) {
   const { active, items: tabs, popups, open, close } = useTabs();
   const value = active?.id;
 
@@ -134,12 +135,14 @@ export function NavTabs() {
   return (
     <div className={styles.tabs} data-tab-container-size={containerSize}>
       {items.length > 0 && (
-        <Tabs
-          className={styles.tabList}
-          items={items}
-          active={value}
-          onItemClick={handleItemClick}
-        />
+        <Portal container={container}>
+          <Tabs
+            className={styles.tabList}
+            items={items}
+            active={value}
+            onItemClick={handleItemClick}
+          />
+        </Portal>
       )}
       {tabs.map((tab) => (
         <div

@@ -39,10 +39,8 @@ import {
 } from "@/view-containers/action";
 import Avatar from "@/views/form/widgets/mail-messages/avatar/avatar";
 
-import { useSidebar } from "../nav-drawer/hook";
 import { quick } from "./utils";
 
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 import styles from "./nav-header.module.scss";
 
 function BadgeIcon({
@@ -414,20 +412,8 @@ function showShortcuts() {
 }
 
 export function NavHeader() {
-  const { data } = useSession();
-  const { sidebar, setSidebar } = useSidebar();
-  const appHome = data?.app.home ?? "#/";
-  const appLogo = data?.app.logo;
   return (
     <div className={styles.header}>
-      <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
-        <MaterialIcon className={styles.toggleIcon} icon="menu" />
-      </div>
-      <div className={styles.appLogo}>
-        <a href={appHome}>
-          {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
-        </a>
-      </div>
       <div className={styles.menus}>
         <div className={commonClassNames("hide-sm", styles.topMenu)}></div>
         <div className={commonClassNames("hide-sm", styles.quickMenu)}>

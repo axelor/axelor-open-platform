@@ -19,12 +19,15 @@ import { NavTags } from "./nav-tags";
 // import global utils for external apps
 import "../utils/globals";
 
+import { useState } from "react";
 import styles from "./layout.module.scss";
 import { useSidebar } from "./nav-drawer/hook";
 
 export function Layout() {
   const { loading } = useMenu();
   const { show } = useSidebar();
+
+  const [tabContainer, tabContainerRef] = useState<HTMLDivElement | null>(null);
 
   useAppTitle();
 
@@ -42,7 +45,7 @@ export function Layout() {
         [styles.hasSidebar]: show === "inline",
       })}
     >
-      <div className={styles.header}>
+      <div className={styles.header} ref={tabContainerRef}>
         <NavHeader />
       </div>
       <div className={styles.sidebar}>
@@ -50,7 +53,7 @@ export function Layout() {
       </div>
       <div className={styles.content}>
         <div className={styles.tabs}>
-          <NavTabs />
+          {tabContainer && <NavTabs container={tabContainer} />}
           <div className={styles.page}>
             <Outlet />
           </div>

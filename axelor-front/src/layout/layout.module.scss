@@ -3,7 +3,7 @@
   grid-template-areas:
     "sidebar header"
     "sidebar content";
-  grid-template-rows: 48px 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-columns: auto 1fr;
   height: 100vh;
   background-color: var(--ax-theme-shell-bg);
@@ -26,9 +26,11 @@
 .header {
   grid-area: header;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
+  flex-direction: row-reverse;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--bs-border-color);
 }
 
 .sidebar {

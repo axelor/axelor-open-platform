@@ -10,7 +10,13 @@ import { legacyClassNames } from "@/styles/legacy";
 
 import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useSidebar } from "./hook";
+
+import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+
+import { useSession } from "@/hooks/use-session";
+import styles from "./nav-drawer.module.scss";
 
 function MenuTag({
   item,
@@ -123,6 +129,26 @@ export function NavDrawer() {
         onShow: handleSearchShow,
         onHide: handleSearchHide,
       }}
+      header={<Header />}
     />
+  );
+}
+
+function Header() {
+  const { data } = useSession();
+  const { sidebar, setSidebar } = useSidebar();
+  const appHome = data?.app.home ?? "#/";
+  const appLogo = data?.app.logo;
+  return (
+    <div className={styles.header}>
+      <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
+        <MaterialIcon className={styles.toggleIcon} icon="menu" />
+      </div>
+      <div className={styles.appLogo}>
+        <a href={appHome}>
+          {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
+        </a>
+      </div>
+    </div>
   );
 }
