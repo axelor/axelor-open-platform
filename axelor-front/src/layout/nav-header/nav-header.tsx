@@ -280,19 +280,6 @@ function FarItems() {
     <CommandBar
       items={[
         {
-          key: "home",
-          text: "Home",
-          iconOnly: true,
-          iconProps: {
-            icon: "home",
-          },
-          onClick: () => {
-            if (session.info?.user?.action) {
-              openTab(session.info.user.action);
-            }
-          },
-        },
-        {
           key: "fav",
           text: "Favorite",
           iconOnly: true,
@@ -302,25 +289,13 @@ function FarItems() {
           render: FavoriteItem,
         },
         {
-          key: "mail",
-          text: "Mails",
-          icon: (props: any) => (
-            <BadgeIcon {...props} icon="mail" count={unreadMailCount} />
-          ),
-          iconOnly: true,
-          iconProps: {
-            icon: "mail",
-          },
-          onClick: () => openTab("mail.inbox"),
-        },
-        {
           key: "messages",
           text: "Messages",
           icon: (props: any) => (
             <BadgeIcon
               {...props}
               icon="notifications"
-              count={currentTaskCount}
+              count={currentTaskCount + unreadMailCount}
             />
           ),
           iconOnly: true,
@@ -329,6 +304,15 @@ function FarItems() {
           },
           items: [
             {
+              key: "mail.messages",
+              text: "Messages",
+              subtext: unreadMailCount
+                ? i18n.get("{0} messages", unreadMailCount)
+                : i18n.get("no messages"),
+              onClick: () => openTab("mail.inbox"),
+            },
+            { key: "m-div-1", divider: true },
+            {
               key: "tasks.due",
               text: i18n.get("Tasks due"),
               subtext: pendingTaskCount
@@ -336,7 +320,7 @@ function FarItems() {
                 : i18n.get("no tasks"),
               onClick: () => openTab("team.tasks.due"),
             },
-            { key: "m-div", divider: true },
+            { key: "m-div-2", divider: true },
             {
               key: "tasks.todo",
               text: i18n.get("Tasks todo"),

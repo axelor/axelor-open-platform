@@ -137,17 +137,24 @@ export function NavDrawer() {
 function Header() {
   const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
-  const appHome = data?.app.home ?? "#/";
+  const { open: openTab } = useTabs();
+
+  const appHome = data?.user.action;
   const appLogo = data?.app.logo;
+
+  const onLogoClick = useCallback(() => {
+    if (appHome) {
+      openTab(appHome);
+    }
+  }, [appHome, openTab]);
+
   return (
     <div className={styles.header}>
       <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
         <MaterialIcon className={styles.toggleIcon} icon="menu" />
       </div>
-      <div className={styles.appLogo}>
-        <a href={appHome}>
-          {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
-        </a>
+      <div className={styles.appLogo} onClick={onLogoClick}>
+        {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
       </div>
     </div>
   );

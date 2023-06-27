@@ -19,6 +19,8 @@
 }
 
 .appLogo {
+  cursor: pointer;
+  user-select: none;
   svg {
     display: block;
     height: 32px;
