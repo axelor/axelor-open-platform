@@ -120,7 +120,7 @@ libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.7.0") {
 }
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:9.15.2"
+libs.flywaydb = "org.flywaydb:flyway-core:9.20.0"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.12"
