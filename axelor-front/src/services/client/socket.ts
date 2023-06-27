@@ -14,10 +14,14 @@ export type SocketData = {
 
 export type SocketListener = (data: SocketData) => void;
 
+type EventName = "onopen" | "onclose";
+type Callback = (event: Event) => void;
+
 export class Socket {
   #ws: WebSocket | null = null;
   #connecting: Promise<void> = Promise.resolve();
   #listeners: Record<string, Set<SocketListener>> = {};
+  #callbacks: { [K in EventName]?: Callback[] } = {};
 
   async init() {
     if (!this.#ws) {
@@ -32,11 +36,13 @@ export class Socket {
           listeners.forEach((fn) => fn(msg.data));
         }
       };
-      this.#ws.onclose = () => {
+      this.#ws.onclose = (event) => {
+        this.#notifyCallbacks("onclose", event);
         this.#ws = null;
       };
       this.#connecting = new Promise((resolve) => {
-        this.#ws!.onopen = () => {
+        this.#ws!.onopen = (event) => {
+          this.#notifyCallbacks("onopen", event);
           resolve();
         };
       });
@@ -59,7 +65,15 @@ export class Socket {
     }
   }
 
-  subscribe(channel: string, listener: SocketListener) {
+  subscribe(
+    channel: string,
+    listener: SocketListener,
+    callbacks?: { [K in EventName]?: Callback }
+  ) {
+    const uncallbacks = Object.entries(callbacks ?? {}).map(([key, value]) =>
+      this.#registerCallback(key as EventName, value)
+    );
+
     const listenerSet =
       this.#listeners[channel] ||
       (this.#listeners[channel] = new Set<SocketListener>());
@@ -70,11 +84,30 @@ export class Socket {
       this.send("SUB", channel);
     }
     return () => {
+      uncallbacks.forEach((uncallback) => uncallback());
       listenerSet.delete(listener);
       if (listenerSet.size === 0) {
         this.send("UNS", channel);
       }
     };
+  }
+
+  #notifyCallbacks(eventName: EventName, event: Event) {
+    this.#callbacks[eventName]?.forEach((callback) => callback(event));
+  }
+
+  #registerCallback(eventName: EventName, callback: Callback) {
+    let callbacks = this.#callbacks[eventName];
+    if (callbacks == null) {
+      callbacks = this.#callbacks[eventName] = [];
+    }
+    return this.#addCallback(callbacks, callback);
+  }
+
+  #addCallback(callbacks: Callback[], callback: Callback) {
+    const index = callbacks.length;
+    callbacks.push(callback);
+    return () => callbacks.splice(index, 1);
   }
 }
 
@@ -82,9 +115,11 @@ export const socket = new Socket();
 
 export class SocketChannel {
   #channel: string;
+  #callbacks?: { [K in EventName]?: Callback };
 
-  constructor(channel: string) {
+  constructor(channel: string, callbacks?: { [K in EventName]?: Callback }) {
     this.#channel = channel;
+    this.#callbacks = callbacks;
   }
 
   send(data?: object) {
@@ -92,6 +127,6 @@ export class SocketChannel {
   }
 
   subscribe(listener: SocketListener) {
-    return socket.subscribe(this.#channel, listener);
+    return socket.subscribe(this.#channel, listener, this.#callbacks);
   }
 }
