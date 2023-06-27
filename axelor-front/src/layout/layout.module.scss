@@ -26,12 +26,29 @@
 .header {
   grid-area: header;
   display: flex;
-  flex-direction: row-reverse;
   align-items: center;
   min-width: 0;
   white-space: nowrap;
   height: 3rem;
   border-bottom: 1px solid var(--bs-border-color);
+
+  .tabsList {
+    flex-grow: 1;
+  }
+
+  .toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    padding: 0.5rem;
+    .toggleIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
 }
 
 .sidebar {

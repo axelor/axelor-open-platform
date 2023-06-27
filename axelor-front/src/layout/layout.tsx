@@ -22,10 +22,13 @@ import "../utils/globals";
 import { useState } from "react";
 import styles from "./layout.module.scss";
 import { useSidebar } from "./nav-drawer/hook";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { useResponsive } from "@/hooks/use-responsive";
 
 export function Layout() {
   const { loading } = useMenu();
-  const { show } = useSidebar();
+  const { show, sidebar, setSidebar } = useSidebar();
+  const { xs } = useResponsive();
 
   const [tabContainer, tabContainerRef] = useState<HTMLDivElement | null>(null);
 
@@ -45,7 +48,13 @@ export function Layout() {
         [styles.hasSidebar]: show === "inline" || show === "icons",
       })}
     >
-      <div className={styles.header} ref={tabContainerRef}>
+      <div className={styles.header}>
+        {xs && (
+          <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
+            <MaterialIcon className={styles.toggleIcon} icon="menu" />
+          </div>
+        )}
+        <div className={styles.tabsList} ref={tabContainerRef}></div>
         <NavHeader />
       </div>
       <div className={styles.sidebar}>
