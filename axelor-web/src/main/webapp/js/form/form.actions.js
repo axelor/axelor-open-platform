@@ -1103,7 +1103,12 @@ ActionHandler.prototype = {
               span = label;
             }
             if (span && span.length > 0) {
-              span.html(value);
+              if (span.children().is('span')) {
+                span.children().html(value);
+              } else {
+                span.html(value);
+              }
+              span.children().html(value);
             } else if (item.is('label')) {
               item.html(value);
             }
