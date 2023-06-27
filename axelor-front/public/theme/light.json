@@ -3,41 +3,43 @@
     "blue": "#6C67FA",
     "green": "#3ECF8E",
     "purple": "#C354F2",
-    "red": "#DF6A69",
+    "red": "#DD514C",
     "yellow": "#FFBE4E",
-    "cyan": "#48DCCF",
-    "black": "#333333"
+    "cyan": "#26C6F9",
+
+    "white": "#FFF",
+    "black": "#333",
+
+    "body_color": "#5A5A7C",
+    "emphasis_color": "#33325B"
   },
   "border": {
-    "width": "1px",
-    "style": "solid",
-    "color": "#EFEDFF"
+    "color": "#EAEAFE"
   },
   "components": {
     "Shell": {
-      "scrollbar": {
-        "color": null
-      },
       "sidebar": {
-        "bg": "#F2F2FF",
-        "border": {
-          "width": "1px",
-          "style": "solid",
-          "color": "#E1E1FF"
-        }
-      },
-      "view": {
-        "toolbar": {
-          "bg": null
-        },
-        "content": {
-          "bg": null
-        }
+        "bg": "#F8F8FF"
       }
     },
     "Panel": {
       "header": {
         "bg": "#FBFBFF"
+      }
+    },
+    "Dropdown": {
+      "border": {
+        "color": "#EAEAFE"
+      },
+      "item_hover": {
+        "bg": "#FBFBFF"
+      },
+      "item_active": {
+        "bg": "primary",
+        "color": "#fff"
+      },
+      "divider": {
+        "bg": "#EAEAFE"
       }
     },
     "NavMenu": {
@@ -54,10 +56,23 @@
         "color": "white"
       }
     },
+    "NavTabs": {
+      "item": {
+        "transform": "none"
+      }
+    },
+    "CommandBar": {
+      "button_hover": {
+        "bg": "#F8F8FF"
+      },
+      "button_active": {
+        "bg": "#EAEAFE"
+      }
+    },
     "Table": {
       "bg": "#FFF",
       "border": {
-        "color": "#EFEDFF"
+        "color": "#EFEDFE"
       },
       "header": {
         "bg": "#FBFBFF"
@@ -73,6 +88,19 @@
       },
       "cell_active": {
         "bg": "#F2F2FF"
+      }
+    },
+    "Badge": {
+      "border": {
+        "radius": "1rem"
+      }
+    },
+    "Input": {
+      "focus": {
+        "shadow": "none"
+      },
+      "invalid_focus": {
+        "shadow": "none"
       }
     }
   }

@@ -1,1 +1,92 @@
-{}
+{
+  "palette": {
+    "blue": null,
+    "green": null,
+    "purple": null,
+    "red": null,
+    "yellow": null,
+    "cyan": null,
+
+    "white": null,
+    "black": null,
+
+    "body_color": null,
+    "emphasis_color": null
+  },
+  "border": {
+    "color": null
+  },
+  "components": {
+    "Shell": {
+      "sidebar": {
+        "bg": null
+      }
+    },
+    "Panel": {
+      "header": {
+        "bg": null
+      }
+    },
+    "NavMenu": {
+      "item": {
+        "border": {
+          "radius": "1rem"
+        }
+      },
+      "item_hover": {
+        "bg": null
+      },
+      "item_active": {
+        "bg": null,
+        "color": null
+      }
+    },
+    "NavTabs": {
+      "item": {
+        "transform": "none"
+      }
+    },
+    "CommandBar": {
+      "button_hover": {
+        "bg": null
+      },
+      "button_active": {
+        "bg": null
+      }
+    },
+    "Table": {
+      "bg": null,
+      "border": {
+        "color": null
+      },
+      "header": {
+        "bg": null
+      },
+      "row_odd": {
+        "bg": null
+      },
+      "row_hover": {
+        "bg": null
+      },
+      "row_active": {
+        "bg": null
+      },
+      "cell_active": {
+        "bg": null
+      }
+    },
+    "Badge": {
+      "border": {
+        "radius": "1rem"
+      }
+    },
+    "Input": {
+      "focus": {
+        "shadow": "none"
+      },
+      "invalid": {
+        "shadow": "none"
+      }
+    }
+  }
+}
