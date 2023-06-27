@@ -5,6 +5,10 @@
   overflow: hidden;
   flex-grow: 1;
   z-index: 0;
+}
+
+.tabList {
+  --ax-nav-tabs-tab-padding: 0.5rem 0.75rem;
   --ax-nav-tabs-icon-padding: 0.5rem;
 }
 

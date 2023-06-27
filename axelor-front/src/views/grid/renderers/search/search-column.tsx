@@ -97,7 +97,6 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
     <Box className={styles.container} d="flex">
       <Input
         type="text"
-        border={false}
         value={value || ""}
         onChange={handleChange}
         placeholder={focus ? i18n.get("Search...") : ""}

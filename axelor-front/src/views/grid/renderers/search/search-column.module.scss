@@ -1,6 +1,4 @@
 .container {
-  --bs-input-shadow-focus: none;
-  --bs-input-border-focus: 0;
   flex: 1;
 }
 
@@ -9,10 +7,6 @@
 }
 
 .select > div > div {
-  --bs-input-shadow-focus: none;
-  --bs-input-border-focus: 0;
-  border: 0;
-  border-radius: var(--bs-input-border-radius, var(--bs-border-radius));
   font-weight: normal;
 }
 
