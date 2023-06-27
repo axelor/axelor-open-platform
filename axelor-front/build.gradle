@@ -3,7 +3,7 @@ description = 'Axelor\'s Front-end'
 buildscript {
     repositories repos
     dependencies {
-        classpath "com.github.node-gradle:gradle-node-plugin:3.5.1"
+        classpath "com.github.node-gradle:gradle-node-plugin:5.0.0"
     }
 }
 
