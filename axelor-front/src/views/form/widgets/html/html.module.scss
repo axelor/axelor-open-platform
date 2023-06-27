@@ -5,22 +5,25 @@
 
 .container:focus,
 .container:focus-within {
-  border: var(--bs-input-border-focus, 1px solid #86b7fe);
+  border: var(--ax-theme-input-focus-border, 1px solid var(--bs-primary));
   box-shadow: var(
-    --bs-input-shadow-focus,
-    0 0 0 0.25rem rgba(13, 110, 254, 0.25)
+    --ax-theme-input-focus-shadow,
+    0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25)
   );
 }
 
 .invalid {
-  border: var(--bs-input-invalid-border-focus, 1px solid var(--bs-danger));
+  border: var(--ax-theme-input-invalid-border, 1px solid var(--bs-danger));
 }
 
 .invalid:focus,
 .invalid:focus-within {
-  border: var(--bs-input-invalid-border-focus, 1px solid var(--bs-danger));
+  border: var(
+    --ax-theme-input-invalid-focus-border,
+    1px solid var(--bs-danger)
+  );
   box-shadow: var(
-    --bs-input-invalid-shadow-focus,
+    --ax-theme-input-invalid-focus-shadow,
     0 0 0 0.25rem rgb(var(--bs-danger-rgb), 0.25)
   );
 }
