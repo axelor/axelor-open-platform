@@ -76,6 +76,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
         } else {
           span.html(state.title);
         }
+      } else if (element.is('[ui-static-label]') && state.title) {
+        element.html(state.title);
       }
     }
 
