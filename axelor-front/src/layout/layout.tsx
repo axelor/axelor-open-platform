@@ -42,7 +42,7 @@ export function Layout() {
   return (
     <div
       className={clsx(styles.container, {
-        [styles.hasSidebar]: show === "inline",
+        [styles.hasSidebar]: show === "inline" || show === "icons",
       })}
     >
       <div className={styles.header} ref={tabContainerRef}>
