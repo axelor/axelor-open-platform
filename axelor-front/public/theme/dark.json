@@ -1,15 +1,82 @@
 {
+  "palette": {
+    "blue": "#666CFF",
+    "red": "#E04440",
+    "yellow": "#FDB528",
+    "cyan": "#26C6F9",
+    "green": "#72E128",
+
+    "black": "#333",
+
+    "body_bg": "#31334D",
+    "body_color": "#C7C8DC",
+
+    "secondary_bg": "#30334E",
+    "tertiary_bg": "#3F425C",
+
+    "primary": "#666CFF",
+    "secondary": "#6D788D"
+  },
+  "border": {
+    "color": "rgba(234, 234, 255, 0.12)"
+  },
   "components": {
+    "Shell": {
+      "bg": "#292A41"
+    },
+    "Dropdown": {
+      "item_hover": {
+        "bg": "rgba(234, 234, 255, 0.05)"
+      },
+      "item_active": {
+        "bg": "primary",
+        "color": "#fff"
+      },
+      "divider": {
+        "bg": "rgba(234, 234, 255, 0.12)"
+      }
+    },
     "NavMenu": {
       "item": {
         "border": {
           "radius": "1rem"
         }
+      },
+      "item_hover": {
+        "bg": "rgba(234, 234, 255, 0.05)"
+      },
+      "item_active": {
+        "bg": "primary",
+        "color": "white"
       }
     },
     "NavTabs": {
       "item": {
         "transform": "none"
+      }
+    },
+    "Panel": {
+      "bg": "#30334E"
+    },
+    "Table": {
+      "bg": "transparent",
+      "border": {
+        "color": "rgba(234, 234, 255, 0.12)"
+      },
+      "header": {
+        "bg": "#3A3E5B"
+      },
+      "row_odd": {
+        "bg": "transparent"
+      },
+      "row_hover": {
+        "bg": "rgba(234, 234, 255, 0.05)"
+      },
+      "row_active": {
+        "bg": "rgba(102, 108, 255, 0.16)"
+      },
+      "cell_active": {
+        "bg": "rgba(102, 108, 255, 0.18)"
       }
     },
     "Badge": {
@@ -21,7 +88,7 @@
       "focus": {
         "shadow": "none"
       },
-      "invalid": {
+      "invalid_focus": {
         "shadow": "none"
       }
     }
