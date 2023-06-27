@@ -13,6 +13,7 @@ import { i18n } from "@/services/client/i18n";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useSidebar } from "./hook";
 
+import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 
 import { useSession } from "@/hooks/use-session";
@@ -130,6 +131,7 @@ export function NavDrawer() {
         onHide: handleSearchHide,
       }}
       header={<Header />}
+      headerSmall={<HeaderSmall />}
     />
   );
 }
@@ -155,6 +157,22 @@ function Header() {
       </div>
       <div className={styles.appLogo} onClick={onLogoClick}>
         {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
+      </div>
+    </div>
+  );
+}
+
+function HeaderSmall() {
+  const { data } = useSession();
+  const appIcon = data?.app.icon;
+  return (
+    <div className={styles.header}>
+      <div className={styles.appIcon}>
+        {appIcon ? (
+          <img src={appIcon} alt="icon" />
+        ) : (
+          <AppIcon viewBox="0 0 241 228" />
+        )}
       </div>
     </div>
   );

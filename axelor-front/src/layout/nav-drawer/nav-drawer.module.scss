@@ -31,3 +31,19 @@
     vertical-align: middle;
   }
 }
+
+.appIcon {
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 100%;
+  margin: 0 0.125rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg,
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}

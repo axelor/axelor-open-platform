@@ -20,6 +20,7 @@ export interface SessionInfo {
     sdk: string | null;
     theme: string | null;
     logo: string | null;
+    icon: string | null;
     help: string | null;
     home: string | null;
     mode: string | null;
