@@ -1,1 +1,79 @@
-{}
+{
+  "palette": {
+    "blue": "#6C67FA",
+    "green": "#3ECF8E",
+    "purple": "#C354F2",
+    "red": "#DF6A69",
+    "yellow": "#FFBE4E",
+    "cyan": "#48DCCF",
+    "black": "#333333"
+  },
+  "border": {
+    "width": "1px",
+    "style": "solid",
+    "color": "#EFEDFF"
+  },
+  "components": {
+    "Shell": {
+      "scrollbar": {
+        "color": null
+      },
+      "sidebar": {
+        "bg": "#F2F2FF",
+        "border": {
+          "width": "1px",
+          "style": "solid",
+          "color": "#E1E1FF"
+        }
+      },
+      "view": {
+        "toolbar": {
+          "bg": null
+        },
+        "content": {
+          "bg": null
+        }
+      }
+    },
+    "Panel": {
+      "header": {
+        "bg": "#FBFBFF"
+      }
+    },
+    "NavMenu": {
+      "item": {
+        "border": {
+          "radius": "1rem"
+        }
+      },
+      "item_hover": {
+        "bg": "var(--bs-primary-bg-subtle)"
+      },
+      "item_active": {
+        "bg": "primary",
+        "color": "white"
+      }
+    },
+    "Table": {
+      "bg": "#FFF",
+      "border": {
+        "color": "#EFEDFF"
+      },
+      "header": {
+        "bg": "#FBFBFF"
+      },
+      "row_odd": {
+        "bg": "#FFF"
+      },
+      "row_hover": {
+        "bg": "#FBFBFF"
+      },
+      "row_active": {
+        "bg": "#FBFBFF"
+      },
+      "cell_active": {
+        "bg": "#F2F2FF"
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@
   grid-template-rows: 48px 1fr;
   grid-template-columns: auto 1fr;
   height: 100vh;
+  background-color: var(--ax-theme-shell-bg);
 }
 
 .container.hasSidebar {
@@ -34,7 +35,17 @@
   grid-area: sidebar;
   display: flex;
   flex: 0 0 auto;
-  padding: 0.25rem;
+  color: var(--ax-theme-shell-sidebar-color);
+  background-color: var(--ax-theme-shell-sidebar-bg);
+  padding: var(--ax-theme-shell-sidebar-padding);
+  border-right: var(--ax-theme-shell-sidebar-border);
+}
+
+[dir="rtl"] {
+  .sidebar {
+    border-right: none;
+    border-left: var(--ax-theme-shell-sidebar-border);
+  }
 }
 
 .tabs {
@@ -43,16 +54,4 @@
   flex-grow: 1;
   min-width: 0;
   min-height: 0;
-}
-
-.page {
-  position: fixed;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgb(var(--bs-body-bg-rgb));
-}
-
-.page:empty {
-  display: none;
 }

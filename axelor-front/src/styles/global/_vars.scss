@@ -1,0 +1,21 @@
+:root {
+  --ax-theme-shell-bg: var(--bs-body-bg);
+  --ax-theme-shell-color: var(--bs-body-color);
+  --ax-theme-shell-scrollbar-color: var(--bs-border-color);
+  --ax-theme-shell-sidebar-bg: inherit;
+  --ax-theme-shell-sidebar-color: inherit;
+  --ax-theme-shell-sidebar-padding: 0.25rem 0;
+  --ax-theme-shell-sidebar-border: none;
+  --ax-theme-shell-view-toolbar-bg: inherit;
+  --ax-theme-shell-view-toolbar-color: inherit;
+  --ax-theme-shell-view-toolbar-gap: 0.5rem;
+  --ax-theme-shell-view-toolbar-padding: 0.5rem;
+  --ax-theme-shell-view-toolbar-border: 1px solid var(--bs-border-color);
+  --ax-theme-shell-view-content-bg: inherit;
+  --ax-theme-shell-view-content-color: inherit;
+  --ax-theme-shell-view-content-padding: 0;
+  --ax-theme-shell-view-content-border: none;
+
+  --ax-theme-nav-menu-bg: var(--ax-theme-shell-sidebar-bg);
+  --ax-theme-nav-menu-color: var(--ax-theme-shell-sidebar-bg);
+}

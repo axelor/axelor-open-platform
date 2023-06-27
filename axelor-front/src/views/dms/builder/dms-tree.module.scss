@@ -16,12 +16,6 @@
 }
 
 .node {
-  --bs-table-bg: var(--bs-body-bg);
-  --bs-table-active-bg: var(--ax-grid-active-bg, var(--bs-secondary-bg));
-  --bs-table-hover-bg: var(--ax-grid-hover-bg, var(--bs-secondary-bg));
-}
-
-.node {
   padding: 0.5rem;
   span:last-child {
     flex: 1;
@@ -30,11 +24,13 @@
     overflow: hidden;
   }
   cursor: pointer;
-  &.active {
-    background: var(--bs-table-active-bg);
-  }
+  border-radius: var(--ax-theme-nav-menu-item-radius);
   &:hover {
-    background: var(--bs-table-hover-bg);
+    background: var(--ax-theme-nav-menu-item-hover-bg, var(--bs-secondary-bg));
+  }
+  &.active {
+    background: var(--ax-theme-nav-menu-item-active-bg, var(--bs-secondary-bg));
+    color: var(--ax-theme-nav-menu-item-active-color, var(--bs-body-bg));
   }
 }
 

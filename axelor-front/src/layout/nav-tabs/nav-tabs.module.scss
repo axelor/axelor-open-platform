@@ -34,6 +34,10 @@
   overflow: auto;
   min-height: 0;
   min-width: 0;
+  color: var(--ax-theme-shell-view-content-color);
+  background-color: var(--ax-theme-shell-view-content-bg);
+  padding: var(--ax-theme-shell-view-content-padding);
+  border: var(--ax-theme-shell-view-content-border);
 }
 
 .tabContent.active {
