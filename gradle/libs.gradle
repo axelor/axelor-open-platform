@@ -103,7 +103,7 @@ libs.hibernate = [
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.8"
 libs.redisson = "org.redisson:redisson-hibernate-53:3.19.3"
-libs.hazelcast = "com.hazelcast:hazelcast:5.2.3"
+libs.hazelcast = "com.hazelcast:hazelcast:5.3.1"
 libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.6"
 libs.infinispan = [
     "org.infinispan:infinispan-hibernate-cache-v53:13.0.18.Final",
