@@ -71,7 +71,11 @@ ui.formCompile = function(element, attrs, linkerFn) {
         if (span.length === 0) {
           span = label;
         }
-        span.html(state.title);
+        if (span.length === 1 && span.children().is('span')) {
+          span.children().html(state.title);
+        } else {
+          span.html(state.title);
+        }
       }
     }
 
