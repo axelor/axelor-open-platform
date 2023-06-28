@@ -1,0 +1,120 @@
+.container {
+  --ax-nav-select-color: var(--bs-body-color);
+  --ax-nav-select-border-color: var(--bs-border-color);
+
+  --ax-nav-select-active-color: var(--bs-primary);
+  --ax-nav-select-active-border-color: var(--bs-primary);
+
+  --ax-nav-select-hover-color: var(--bs-primary);
+  --ax-nav-select-hover-border-color: var(--bs-border-color);
+}
+
+.container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  position: relative;
+  margin-right: 1rem;
+}
+
+.text {
+  display: flex;
+  align-items: center;
+  border-top: 2px solid var(--ax-nav-select-border-color);
+  border-bottom: 2px solid var(--ax-nav-select-border-color);
+  padding: 0.375rem 0.5rem 0.375rem 1.75rem;
+}
+
+.item::before,
+.item::after {
+  content: "";
+  position: absolute;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--ax-nav-select-border-color);
+  border-left: none;
+  border-bottom: none;
+  border-top-right-radius: 4px;
+  background: transparent;
+  transform: rotate(45deg);
+}
+
+.item::before {
+  left: calc(-0.75rem - 2px);
+}
+
+.item::after {
+  right: calc(-0.75rem - 2px);
+}
+
+.item:hover {
+  &::before,
+  &::after,
+  .text {
+    color: var(--ax-nav-select-hover-color);
+    border-color: var(--ax-nav-select-hover-border-color);
+  }
+}
+
+.item.active {
+  &::before,
+  &::after,
+  .text {
+    font-weight: 600;
+    color: var(--ax-nav-select-active-color);
+    border-color: var(--ax-nav-select-active-border-color);
+  }
+}
+
+.text,
+.item::after {
+  cursor: pointer;
+}
+
+.item::after {
+  z-index: 1;
+}
+
+.more:hover,
+.more.open {
+  &::before,
+  &::after,
+  .text {
+    color: var(--ax-nav-select-hover-color);
+  }
+}
+
+[dir="rtl"] {
+  .item {
+    margin-left: 1rem;
+    margin-right: unset;
+  }
+
+  .text {
+    padding: 0.375rem 1.75rem 0.375rem 0.5rem;
+  }
+
+  .item::before,
+  .item::after {
+    transform: rotate(-135deg);
+  }
+
+  .item::before {
+    left: unset;
+    right: calc(-0.75rem - 2px);
+  }
+
+  .item::after {
+    right: unset;
+    left: calc(-0.75rem - 2px);
+  }
+
+  .item::after {
+    z-index: 1;
+  }
+}
