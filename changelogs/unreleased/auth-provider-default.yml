@@ -2,8 +2,8 @@
 title: Add `auth.provider-default` configuration
 type: feature
 description: |
-  Normally, form client is the default client used for authentification.
-  When an authentification provider is defined as exclusive, form client is not loaded at all.
+  Normally, form client is the default client used for authentication.
+  When an authentication provider is defined as exclusive, form client is not loaded at all.
 
   Now, with `auth.provider-default` configuration, you can specify another non-exclusive client as default.
 

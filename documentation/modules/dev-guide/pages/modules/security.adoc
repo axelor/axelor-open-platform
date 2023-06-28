@@ -331,8 +331,8 @@ auth.provider-order = my-oidc1, my-oidc2
 
 === Default Provider
 
-Normally, form client is the default client used for authentification.
-When an authentification provider is defined as exclusive, form client is not loaded at all.
+Normally, form client is the default client used for authentication.
+When an authentication provider is defined as exclusive, form client is not loaded at all.
 
 However, with `auth.provider-default` configuration, you can specify another non-exclusive client as default.
 
@@ -341,7 +341,8 @@ Example:
 .axelor-config.properties
 [source,properties]
 -----
-auth.provider-default = google  # google auth provider is used by default
+# google auth provider is used by default
+auth.provider-default = google
 -----
 
 You can specify another client via the `client_name` query parameter in login URL.
@@ -353,6 +354,8 @@ Examples:
 | \http://localhost:8080/open-platform-demo/                  | default client is used
 | \http://localhost:8080/open-platform-demo/?client_name=form | another client is specified
 |===
+
+NOTE: `auth.provider-default` is ignored if there is an exclusive provider configured.
 
 === OpenID Connect
 
