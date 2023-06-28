@@ -166,13 +166,15 @@ export function RelationalWidget({ operator, onChange, ...rest }: any) {
   } else if (isSelection) {
     const { isMulti = operator !== "=", field, value, className } = rest;
     const { targetName } = field;
-    const $value = value?.map?.((id: any) =>
-      isNumber(id)
-        ? options.find((opt) => opt.id === id) || {
-            id,
-          }
-        : id
-    );
+    const $value = isMulti
+      ? value?.map?.((id: any) =>
+          isNumber(id)
+            ? options.find((opt) => opt.id === id) || {
+                id,
+              }
+            : id
+        )
+      : value;
     return (
       <AxSelect
         placeholder={operator === "=" ? rest.placeholder : ""}
