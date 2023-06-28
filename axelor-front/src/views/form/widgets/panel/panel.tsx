@@ -12,7 +12,7 @@ import { MenuItem } from "@/services/client/meta.types";
 import { FieldLabel, GridLayout, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
-import styles from "./panel.module.css";
+import styles from "./panel.module.scss";
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
