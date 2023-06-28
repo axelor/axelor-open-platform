@@ -5,6 +5,7 @@ import {
   Panel as AxPanel,
   CommandBarProps,
   CommandItemProps,
+  clsx,
 } from "@axelor/ui";
 
 import { MenuItem } from "@/services/client/meta.types";
@@ -16,12 +17,7 @@ import styles from "./panel.module.scss";
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
-  const {
-    showBorder,
-    showTitle = true,
-    showFrame = true,
-    canCollapse,
-  } = schema;
+  const { showTitle = true, showFrame, canCollapse } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, collapse } = attrs;
   const [collapsed, setCollapsed] = useState(collapse);
@@ -31,10 +27,6 @@ export function Panel(props: WidgetProps) {
   }, [canCollapse, collapse]);
 
   const hasHeader = showTitle !== false && showFrame !== false && !!title;
-
-  let style: any = {};
-
-  if (!hasHeader && !showBorder) style["--ax-panel-border"] = "none";
 
   const { actionExecutor } = useFormScope();
 
@@ -84,10 +76,13 @@ export function Panel(props: WidgetProps) {
     <AxPanel
       header={header}
       toolbar={toolbar}
-      collapsible={canCollapse}
+      collapsible={hasHeader && canCollapse}
       collapsed={collapsed}
-      className={styles.panel}
-      style={style}
+      className={clsx(styles.panel, {
+        [styles.noFrame]: showFrame === false,
+        [styles.hasHeader]: hasHeader,
+        [styles.hasFrame]: showFrame === true,
+      })}
     >
       <GridLayout
         readonly={readonly}
