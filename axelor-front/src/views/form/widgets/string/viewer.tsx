@@ -6,6 +6,7 @@ const noop = () => {};
 export function ViewerInput({ value }: { value: string | number }) {
   return (
     <Input
+      px={0}
       type="text"
       value={value}
       disabled
@@ -24,7 +25,7 @@ export function ViewerBox({
   const newStyle = useMemo(
     () => ({
       ...style,
-      padding: "0.375rem 0.75rem",
+      padding: "0.375rem 0",
     }),
     [style]
   );
@@ -40,6 +41,7 @@ export function ViewerLink({
 }) {
   return (
     <Button
+      px={0}
       variant="link"
       textAlign="start"
       textDecoration="none"
