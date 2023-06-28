@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { focusAtom } from "jotai-optics";
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import isString from "lodash/isString";
 import uniqueId from "lodash/uniqueId";
 
 import { Box } from "@axelor/ui";
 import { GridProps, GridRow } from "@axelor/ui/grid";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
@@ -18,7 +18,11 @@ import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { FormView, GridView, Widget } from "@/services/client/meta.types";
+import {
+  FormView,
+  GridView,
+  Widget,
+} from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
@@ -43,6 +47,7 @@ import { fetchRecord } from "../form";
 import { usePrepareContext } from "../form/builder";
 import { useFormScope } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
+import { request } from "@/services/client/client";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
 import { Details } from "./builder/details";
@@ -50,6 +55,7 @@ import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { useCustomizePopup } from "./builder/customize";
+import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -62,8 +68,8 @@ export function Grid(props: ViewProps<GridView>) {
 
 function GridInner(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom } = props;
-  const { view, fields } = meta;
-  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { view, perms, fields } = meta;
+  const { hasButton } = usePerms(view, perms);
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
@@ -71,6 +77,8 @@ function GridInner(props: ViewProps<GridView>) {
   const selectedIdsRef = useRef<number[]>([]);
   const saveIdRef = useRef<number | null>();
   const initDetailsRef = useRef(false);
+  const [massUpdatePopperEl, setMassUpdatePopperEl] =
+    useState<HTMLElement | null>();
   const [viewProps, setViewProps] = useViewProps();
   const { action, dashlet, popup, popupOptions } = useViewTab();
   const [dirty, setDirty] = useAtom(useViewDirtyAtom());
@@ -85,6 +93,12 @@ function GridInner(props: ViewProps<GridView>) {
     () => focusAtom(searchAtom!, (o) => o.prop("search")),
     [searchAtom]
   );
+  const allFields = useAtomValue(
+    useMemo(
+      () => selectAtom(searchAtom!, (state) => state.fields),
+      [searchAtom]
+    )
+  );
 
   const [state, setState, gridStateAtom] = useGridState({
     view,
@@ -92,7 +106,10 @@ function GridInner(props: ViewProps<GridView>) {
     selectedRows: viewProps?.selectedRows?.slice?.(0, 1),
   });
   const records = useDataStore(dataStore, (ds) => ds.records);
-  const showCustomizeDialog = useCustomizePopup({ view, stateAtom: gridStateAtom });
+  const showCustomizeDialog = useCustomizePopup({
+    view,
+    stateAtom: gridStateAtom,
+  });
 
   const { orderBy, rows, selectedRows, selectedCell } = state;
   const detailsView = action.params?.["details-view"];
@@ -114,7 +131,7 @@ function GridInner(props: ViewProps<GridView>) {
   const { formAtom } = useFormScope();
   const getFormContext = usePrepareContext(formAtom);
 
-  const onSearch = useAtomCallback(
+  const getSearchOptions = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
         const sortBy = orderBy?.map(
@@ -139,11 +156,6 @@ function GridInner(props: ViewProps<GridView>) {
           ];
         }
 
-        setDetailsRecord(null);
-        setState((draft) => {
-          draft.selectedCell = null;
-        });
-
         if (dashlet) {
           const { _domainAction, ...formContext } = getFormContext() ?? {};
           filter._domainContext = {
@@ -153,23 +165,69 @@ function GridInner(props: ViewProps<GridView>) {
           filter._domainAction = _domainAction;
         }
 
-        return dataStore.search({
+        return {
           sortBy,
           ...options,
           filter,
-        });
+        };
       },
-      [
-        orderBy,
-        searchAtom,
-        fields,
-        view.items,
-        setState,
-        dashlet,
-        dataStore,
-        getFormContext,
-      ]
+      [orderBy, searchAtom, fields, view.items, dashlet, getFormContext]
     )
+  );
+
+  const onSearch = useCallback(
+    (options: SearchOptions = {}) =>
+      dataStore.search(getSearchOptions(options)),
+    [dataStore, getSearchOptions]
+  );
+
+  const onMassUpdate = useCallback(
+    async (values: Partial<DataRecord>, hasAll?: boolean) => {
+      const ids = hasAll
+        ? records.map((r) => r.id!)
+        : (selectedRows || [])
+            .map((ind) => rows[ind]?.record?.id)
+            .filter((id) => id > 0);
+      const { model } = view;
+
+      const confirmed = await dialogs.confirm({
+        content: i18n.get(
+          "Do you really want to update all {0} record(s)?",
+          ids.length
+        ),
+      });
+      if (confirmed) {
+        setMassUpdatePopperEl(null);
+
+        const { filter, ...data } = getSearchOptions();
+        const resp = await request({
+          url: `ws/rest/${model}/updateMass`,
+          method: "POST",
+          body: {
+            data: {
+              ...data,
+              ...filter,
+              ...(!hasAll && {
+                _domain: "self.id IN (:__ids__)",
+                _domainContext: {
+                  __ids__: ids,
+                  _model: model,
+                },
+              }),
+            },
+            records: [values],
+          },
+        });
+
+        if (resp.ok) {
+          const { status } = await resp.json();
+          if (status !== 0) return Promise.reject(500);
+        }
+
+        onSearch();
+      }
+    },
+    [onSearch, getSearchOptions, selectedRows, rows, records, view]
   );
 
   const onDelete = useCallback(
@@ -620,6 +678,8 @@ function GridInner(props: ViewProps<GridView>) {
     }, [setState]),
   });
 
+  const massUpdateFields = useMassUpdateFields(allFields);
+  const canMassUpdate = perms?.massUpdate && massUpdateFields.length > 0;
   const canCustomize =
     view.name &&
     userViewConfig?.customizationPermission &&
@@ -655,6 +715,18 @@ function GridInner(props: ViewProps<GridView>) {
               disabled: !editEnabled,
               className: commonClassNames("hide-sm"),
               onClick: handleEdit,
+            },
+            {
+              key: "massUpdate",
+              iconOnly: true,
+              iconProps: {
+                icon: "arrow_drop_down",
+              },
+              className: clsx(styles["mass-update"], {
+                [styles.active]: Boolean(massUpdatePopperEl),
+              }),
+              onClick: (e) => setMassUpdatePopperEl(e.target as HTMLElement),
+              hidden: !canMassUpdate,
             },
             {
               key: "delete",
@@ -783,6 +855,16 @@ function GridInner(props: ViewProps<GridView>) {
               )
             )}
           </Box>
+        )}
+
+        {canMassUpdate && (
+          <MassUpdater
+            open={Boolean(massUpdatePopperEl)}
+            target={massUpdatePopperEl}
+            fields={massUpdateFields}
+            onUpdate={onMassUpdate}
+            onClose={() => setMassUpdatePopperEl(null)}
+          />
         )}
       </div>
     </div>

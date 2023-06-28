@@ -8,7 +8,6 @@ import {
   GanttView,
   GridView,
   KanbanView,
-  SearchFilter,
   View,
 } from "@/services/client/meta.types";
 
