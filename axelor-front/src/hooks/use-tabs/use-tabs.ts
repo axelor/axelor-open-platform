@@ -194,6 +194,17 @@ const getViewType = (mode: string) => {
   return mode;
 };
 
+const getDefaultViewType = (action: ActionView) => {
+  const type = action.viewType;
+  const isPopup = !!action.params?.["popup"];
+  if (isPopup) return type;
+  // on mobile try to use cards view by defau;t
+  if (type === "grid" && device.isMobile) {
+    return action.views?.find((x) => x.type === "cards")?.type ?? type;
+  }
+  return type;
+};
+
 /**
  * This function updates tab state of a specific view type.
  *
@@ -293,7 +304,9 @@ export async function initTab(
 
   if (actionView) {
     const { name: id, title } = actionView;
-    const type = getViewType(options?.type ?? actionView.viewType);
+
+    const defaultType = getDefaultViewType(actionView);
+    const type = getViewType(options?.type ?? defaultType);
     const initState = updateTabState(id, { type, title }, { route, props });
 
     const tabAtom = atom<TabState>(initState);
