@@ -346,7 +346,7 @@ const openTabAtom = atom(
       type?: string;
       route?: Omit<TabRoute, "action">;
       props?: Record<string, any>;
-      tab?: boolean
+      tab?: boolean;
     } = {}
   ): Promise<Tab | null> => {
     const { active, tabs, popups } = get(tabsAtom);
@@ -380,6 +380,11 @@ const openTabAtom = atom(
     if (tab) {
       set(tabsAtom, (state) => {
         const { active, tabs, popups } = state;
+        const found =
+          tabs.find((x) => x.id === name) ?? popups.find((x) => x.id === name);
+        if (found) {
+          return state;
+        }
         const newState = tab.popup
           ? { active, tabs, popups: [...popups, tab] }
           : { active: tab.id, tabs: [...tabs, tab], popups };
