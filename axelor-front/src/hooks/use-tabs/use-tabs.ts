@@ -9,8 +9,11 @@ import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNil, omitBy } from "lodash";
 import { useCallback } from "react";
 
+import { dialogs } from "@/components/dialogs";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView, SavedFilter } from "@/services/client/meta.types";
+import { session } from "@/services/client/session";
+import { device } from "@/utils/device";
 import { useRoute } from "../use-route";
 
 /**
@@ -336,6 +339,17 @@ export async function initTab(
   return null;
 }
 
+function isSingleTab() {
+  const info = session.info;
+  return (
+    device.isMobile ||
+    info?.view?.singleTab ||
+    info?.user?.singleTab ||
+    info?.view?.maxTabs === 0 ||
+    info?.view?.maxTabs === 1
+  );
+}
+
 const openTabAtom = atom(
   null,
   async (
@@ -350,6 +364,9 @@ const openTabAtom = atom(
     } = {}
   ): Promise<Tab | null> => {
     const { active, tabs, popups } = get(tabsAtom);
+
+    const singleTab = isSingleTab();
+    const activeTab = tabs.find((x) => x.id === active);
 
     const name = viewName(view);
 
@@ -373,6 +390,15 @@ const openTabAtom = atom(
     }
     if (found) {
       return found;
+    }
+
+    if (singleTab && activeTab) {
+      // close current one
+      const closed = await dialogs.confirmDirty(
+        async () => get(activeTab.state).dirty ?? false,
+        async () => set(closeTabAtom, activeTab.action)
+      );
+      if (!closed) return activeTab;
     }
 
     const tab = await initTab(view, options);

@@ -54,6 +54,8 @@ export interface SessionInfo {
     menubar?: {
       location: string;
     };
+    singleTab?: boolean;
+    maxTabs?: number;
   };
   auth?: {
     client: string;
@@ -95,6 +97,8 @@ const INFO_MAPPINGS = {
   "view.menubar.location": "view.menubar.location",
   "view.adv-search.share": "view.advanceSearch.share",
   "view.adv-search.export-full": "view.advanceSearch.exportFull",
+  "view.single-tab": "view.singleTab",
+  "view.max-tabs": "view.maxTabs",
   "auth.central.client": "auth.client",
 };
 
@@ -113,6 +117,10 @@ async function init() {
 
   if (data["data.upload.max-size"]) {
     data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
+  }
+
+  if (data["view.max-tabs"]) {
+    data["view.max-tabs"] = parseInt(data["view.max-tabs"]);
   }
 
   for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
