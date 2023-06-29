@@ -26,3 +26,14 @@
 .card img {
   max-width: 64px;
 }
+
+[data-tab-container-size="sm"] {
+  .card {
+    width: 50% !important;
+  }
+}
+[data-tab-container-size="xs"] {
+  .card {
+    width: 100% !important;
+  }
+}
