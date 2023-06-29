@@ -1,4 +1,6 @@
 import { MutableRefObject } from "react";
+
+import { device } from "@/utils/device";
 import { useContainerQuery } from "../use-container-query";
 import { useMediaQuery } from "../use-media-query";
 
@@ -40,20 +42,5 @@ export function useResponsiveContainer(
 }
 
 export function useDevice() {
-  const ua = navigator.userAgent;
-  const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
-  const isTablet = /iPad|Tablet/i.test(ua);
-  const isDesktop = !isMobile && !isTablet;
-  const isMac = /(Mac OS)|(Macintosh)/i.test(ua);
-  const isLinux = /(Linux|CrOS)/i.test(ua);
-  const isWindows = /Windows/i.test(ua);
-
-  return {
-    isMobile,
-    isTablet,
-    isDesktop,
-    isMac,
-    isLinux,
-    isWindows,
-  };
+  return device;
 }
