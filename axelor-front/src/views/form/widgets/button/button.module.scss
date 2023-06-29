@@ -19,6 +19,19 @@
   position: relative;
 }
 
+.icons {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .help::after {
   position: absolute;
   content: "?";

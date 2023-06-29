@@ -1,10 +1,9 @@
 import { useAtom } from "jotai";
 import { useCallback } from "react";
 
-import { Button } from "@axelor/ui";
+import { Button, clsx } from "@axelor/ui";
 
-import { legacyClassNames } from "@/styles/legacy";
-
+import { Icon } from "@/components/icon";
 import { FieldControl, FieldProps } from "../../builder";
 
 import styles from "./toggle.module.scss";
@@ -30,21 +29,17 @@ export function Toggle(props: FieldProps<boolean>) {
         disabled={readonly}
         onClick={handleClick}
       >
-        <i
-          className={legacyClassNames("fa", ico, styles.icon, {
+        <Icon
+          icon={ico}
+          className={clsx(styles.icon, {
             [styles.active]: !!value,
           })}
         />
-        <i
-          className={legacyClassNames(
-            "fa",
-            iconHover ?? ico,
-            styles.icon,
-            styles.hoverIcon,
-            {
-              [styles.active]: !!value,
-            }
-          )}
+        <Icon
+          icon={iconHover ?? ico}
+          className={clsx(styles.icon, styles.hoverIcon, {
+            [styles.active]: !!value,
+          })}
         />
       </Button>
     </FieldControl>

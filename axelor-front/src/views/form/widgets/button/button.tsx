@@ -2,17 +2,17 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
 
-import { Box, Button as Btn, Image } from "@axelor/ui";
+import { Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Tooltip } from "@/components/tooltip";
 import { Schema } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 import { useReadonly } from "./hooks";
 
+import { Icon } from "@/components/icon";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -25,26 +25,20 @@ function ButtonIcon({ schema }: WidgetProps) {
   }
 
   return (
-    <Box d="inline" className={styles.button}>
-      <Box
-        as="i"
-        me={2}
-        className={clsx(styles.icon, legacyClassNames("fa", icon), {
+    <div className={styles.icons}>
+      <Icon
+        icon={icon}
+        className={clsx(styles.icon, {
           [styles.hideOnHover]: iconHover,
         })}
       />
       {iconHover && (
-        <Box
-          as="i"
-          me={2}
-          className={clsx(
-            styles.iconHover,
-            styles.showOnHover,
-            legacyClassNames("fa", iconHover)
-          )}
+        <Icon
+          icon={iconHover}
+          className={clsx(styles.iconHover, styles.showOnHover)}
         />
       )}
-    </Box>
+    </div>
   );
 }
 
@@ -113,8 +107,10 @@ export function Button(props: WidgetProps) {
         [styles.help]: hasHelp,
       })}
     >
-      {icon && <ButtonIcon {...props} />}
-      {showTitle && title}
+      <div className={styles.title}>
+        {icon && <ButtonIcon {...props} />}
+        {showTitle && title}
+      </div>
     </Btn>
   );
 
@@ -126,16 +122,12 @@ export function Button(props: WidgetProps) {
         )}
         {hasHelp || button}
       </>
-    )
+    );
   }
 
-  if (schema.widget && schema.widget !== 'button') {
+  if (schema.widget && schema.widget !== "button") {
     return render();
   }
 
-  return (
-    <WidgetControl {...props}>
-      {render()}
-    </WidgetControl>
-  );
+  return <WidgetControl {...props}>{render()}</WidgetControl>;
 }

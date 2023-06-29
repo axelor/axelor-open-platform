@@ -1,9 +1,9 @@
+import { Box, Select, SelectComponents } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
-import { Box, Select, SelectComponents } from "@axelor/ui";
 
+import { Icon } from "@/components/icon";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { FieldControl, FieldProps } from "../../builder";
 import { useSelectionList } from "../selection/hooks";
 import styles from "./image-select.module.scss";
@@ -21,7 +21,7 @@ function Image({
   return (
     <>
       {image && image.includes("fa-") ? (
-        <Box as={"i"} className={legacyClassNames("fa", image)} />
+        <Icon icon={image} />
       ) : (
         <img
           style={showLabel === false ? { maxHeight: 18 } : { maxWidth: 18 }}

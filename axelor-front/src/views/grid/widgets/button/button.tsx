@@ -1,13 +1,14 @@
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
-import { useMemo } from "react";
 import clsx from "clsx";
+import { useMemo } from "react";
 
-import { Field } from "@/services/client/meta.types";
-import { Button as ButtonField } from "@/services/client/meta.types";
-import { GridCellProps } from "../../builder/types";
+import { Icon } from "@/components/icon";
 import { parseExpression } from "@/hooks/use-parser/utils";
+import { Button as ButtonField, Field } from "@/services/client/meta.types";
 import { useViewAction } from "@/view-containers/views/scope";
+import { GridCellProps } from "../../builder/types";
+
 import styles from "./button.module.scss";
 
 export function Button(props: GridCellProps) {
@@ -53,7 +54,9 @@ export function Button(props: GridCellProps) {
   function renderIcon() {
     return (
       <a className={className} href=" " onClick={handleClick} title={help}>
-        <Box as="i" me={2} className={legacyClassNames("fa", css, icon)} />
+        <Box me={2} className={legacyClassNames(css)}>
+          {icon && <Icon icon={icon} />}
+        </Box>
       </a>
     );
   }

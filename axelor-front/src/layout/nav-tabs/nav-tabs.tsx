@@ -20,11 +20,11 @@ import { useShortcut } from "@/hooks/use-shortcut";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
 
 export function NavTabs({ container }: { container: HTMLDivElement }) {
@@ -293,5 +293,5 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
 }
 
 function TabIcon({ icon }: { icon: string }) {
-  return <i className={legacyClassNames("fa", icon)} />;
+  return <Icon icon={icon} />;
 }

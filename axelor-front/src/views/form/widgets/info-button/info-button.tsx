@@ -7,13 +7,13 @@ import { Box, Button } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Field } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { Formatters } from "@/utils/format";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 import { useReadonly } from "../button/hooks";
 
+import { Icon } from "@/components/icon";
 import styles from "./info-button.module.scss";
 
 export function InfoButton(props: WidgetProps) {
@@ -74,20 +74,16 @@ export function InfoButton(props: WidgetProps) {
         disabled={disabled}
         onClick={handleClick}
       >
-        <Box
-          as="i"
-          className={clsx(styles.icon, legacyClassNames("fa", icon), {
+        <Icon
+          icon={icon}
+          className={clsx(styles.icon, {
             [styles.hideOnHover]: iconHover,
           })}
         />
         {iconHover && (
-          <Box
-            as="i"
-            className={clsx(
-              styles.iconHover,
-              styles.showOnHover,
-              legacyClassNames("fa", iconHover)
-            )}
+          <Icon
+            icon={iconHover}
+            className={clsx(styles.iconHover, styles.showOnHover)}
           />
         )}
         <Box className={styles.data}>

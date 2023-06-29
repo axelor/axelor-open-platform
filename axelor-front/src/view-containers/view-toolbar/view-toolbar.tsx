@@ -17,6 +17,7 @@ import {
   useViewTab,
 } from "../views/scope";
 
+import { Icon } from "@/components/icon";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
@@ -28,13 +29,10 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
 import { ActionExecutor } from "../action";
-
 import styles from "./view-toolbar.module.scss";
-
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
   actionExecutor?: ActionExecutor;
@@ -128,9 +126,7 @@ export function ToolbarActions({
         iconOnly: !text && icon,
         ...(icon && {
           icon: ({ className }: { className: string }) => (
-            <i
-              className={legacyClassNames("fa", icon, styles.icon, className)}
-            />
+            <Icon icon={icon} className={className} />
           ),
         }),
         ...(action && {

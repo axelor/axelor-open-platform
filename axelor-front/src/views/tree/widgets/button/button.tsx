@@ -1,5 +1,5 @@
+import { Icon } from "@/components/icon";
 import { Link } from "@axelor/ui";
-import { legacyClassNames } from "@/styles/legacy";
 import { WidgetProps } from "../../types";
 import styles from "./button.module.scss";
 
@@ -22,7 +22,7 @@ export function Button({ field, node, record, actionExecutor }: WidgetProps) {
       }}
     >
       {icon && icon.includes?.("fa") ? (
-        <i className={legacyClassNames("fa", icon)} />
+        <Icon icon={icon} />
       ) : (
         <img width={16} alt="Tree Icon" src={icon} />
       )}

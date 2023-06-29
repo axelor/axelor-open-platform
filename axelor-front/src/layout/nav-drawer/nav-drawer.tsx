@@ -6,7 +6,6 @@ import { useMenu } from "@/hooks/use-menu";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTagsList } from "@/hooks/use-tags";
 import { MenuItem, Tag } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 
 import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
@@ -16,6 +15,7 @@ import { useSidebar } from "./hook";
 import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 
+import { Icon } from "@/components/icon";
 import { useSession } from "@/hooks/use-session";
 import styles from "./nav-drawer.module.scss";
 
@@ -36,12 +36,7 @@ function MenuTag({
 }
 
 function MenuIcon({ icon, color }: { icon: string; color?: string }) {
-  return (
-    <i
-      className={legacyClassNames("fa", icon)}
-      style={{ color, fontSize: 16 }}
-    />
-  );
+  return <Icon icon={icon} />;
 }
 
 function load(res: MenuItem[], tags: Tag[]) {
