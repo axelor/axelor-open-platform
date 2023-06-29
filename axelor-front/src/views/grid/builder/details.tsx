@@ -99,6 +99,8 @@ export function Details({
         d="flex"
         flexDirection="column"
         flex={1}
+        border
+        borderBottom={false}
         className={styles.container}
       >
         <Box d="flex" w={100} bg="body" borderBottom>
@@ -147,19 +149,17 @@ export function Details({
             ]}
             iconOnly
           />
-          {overlay && (
-            <Box
-              flex={1}
-              d="flex"
-              alignItems="center"
-              justifyContent="flex-end"
-              className={styles.close}
-            >
-              <Box d="flex" p={2} onClick={() => onCancel?.()}>
-                <MaterialIcon icon="close" />
-              </Box>
+          <Box
+            flex={1}
+            d="flex"
+            alignItems="center"
+            justifyContent="flex-end"
+            className={styles.close}
+          >
+            <Box d="flex" p={2} onClick={() => onCancel?.()}>
+              <MaterialIcon icon="close" />
             </Box>
-          )}
+          </Box>
         </Box>
         <Box
           d="flex"

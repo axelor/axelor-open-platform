@@ -91,8 +91,7 @@ function GridInner(props: ViewProps<GridView>) {
   const records = useDataStore(dataStore, (ds) => ds.records);
   const { orderBy, rows, selectedRows, selectedCell } = state;
   const detailsView = action.params?.["details-view"];
-  const detailsViewOverlay =
-    (action.params?.["details-view-mode"] || "default") === "overlay";
+  const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
   const hasDetailsView = Boolean(detailsView);
   const gridWidth = action.params?.["grid-width"];
   const hasPopup = action.params?.["popup"];
@@ -761,6 +760,8 @@ function GridInner(props: ViewProps<GridView>) {
                   flex={1}
                   justifyContent="center"
                   alignItems="center"
+                  border
+                  borderBottom={false}
                 >
                   <Box as="span">
                     {i18n.get("Either select or create a record.")}
