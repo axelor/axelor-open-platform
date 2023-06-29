@@ -54,3 +54,14 @@
     content: "*";
   }
 }
+
+// single tab
+.singleTab {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  background-color: var(--ax-theme-panel-header-bg);
+  .tabText {
+    flex-grow: 1;
+    font-weight: 600;
+  }
+}

@@ -27,7 +27,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
 
-export function NavTabs({ container }: { container: HTMLDivElement }) {
+export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const { active, items: tabs, popups, open, close } = useTabs();
   const value = active?.id;
 
@@ -132,13 +132,16 @@ export function NavTabs({ container }: { container: HTMLDivElement }) {
 
   const items = useItems(tabs, close, handleAuxClick, onContextMenu);
 
+  const showInPortal = items.length > 0 && !!container;
+  const showInplace = items.length > 0 && !showInPortal;
+
   return (
     <div
       ref={ref}
       className={styles.tabs}
       data-tab-container-size={containerSize}
     >
-      {items.length > 0 && (
+      {showInPortal && (
         <Portal container={container}>
           <Tabs
             className={styles.tabList}
@@ -148,6 +151,7 @@ export function NavTabs({ container }: { container: HTMLDivElement }) {
           />
         </Portal>
       )}
+      {showInplace && <SingleTab items={items} />}
       {tabs.map((tab) => (
         <div
           key={tab.id}
@@ -241,6 +245,15 @@ function useItems(
       return item;
     });
   }, [findIcon, onAuxClick, closeTab, onContextMenu, tabs]);
+}
+
+function SingleTab({ items }: { items: NavTabItem[] }) {
+  const [item] = items;
+  if (item) {
+    const { title } = item;
+    return <div className={styles.singleTab}>{title}</div>;
+  }
+  return null;
 }
 
 function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {

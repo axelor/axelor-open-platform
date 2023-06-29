@@ -23,12 +23,13 @@ import { useState } from "react";
 import styles from "./layout.module.scss";
 import { useSidebar } from "./nav-drawer/hook";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { useResponsive } from "@/hooks/use-responsive";
+import { useDevice, useResponsive } from "@/hooks/use-responsive";
 
 export function Layout() {
   const { loading } = useMenu();
   const { show, sidebar, setSidebar } = useSidebar();
   const { xs } = useResponsive();
+  const { isMobile } = useDevice();
 
   const [tabContainer, tabContainerRef] = useState<HTMLDivElement | null>(null);
 
@@ -41,6 +42,8 @@ export function Layout() {
       </Box>
     );
   }
+
+  const tabsPortal = isMobile ? null : tabContainer;
 
   return (
     <div
@@ -62,7 +65,7 @@ export function Layout() {
       </div>
       <div className={styles.content}>
         <div className={styles.tabs}>
-          {tabContainer && <NavTabs container={tabContainer} />}
+          <NavTabs container={tabsPortal} />
           <div className={styles.page}>
             <Outlet />
           </div>
