@@ -133,7 +133,11 @@ export function NavTabs({ container }: { container: HTMLDivElement }) {
   const items = useItems(tabs, close, handleAuxClick, onContextMenu);
 
   return (
-    <div className={styles.tabs} data-tab-container-size={containerSize}>
+    <div
+      ref={ref}
+      className={styles.tabs}
+      data-tab-container-size={containerSize}
+    >
       {items.length > 0 && (
         <Portal container={container}>
           <Tabs
