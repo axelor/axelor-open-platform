@@ -48,6 +48,9 @@
       "item_active": {
         "bg": "primary",
         "color": "white"
+      },
+      "icon_active": {
+        "bg": "white"
       }
     },
     "NavTabs": {
