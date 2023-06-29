@@ -54,7 +54,7 @@
       }
     },
     "NavTabs": {
-      "item": {
+      "text": {
         "transform": "none"
       }
     },
