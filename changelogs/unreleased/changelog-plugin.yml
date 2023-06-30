@@ -1,0 +1,24 @@
+---
+title: Add changelog plugin
+type: feature
+description: |
+  Provide a Gradle plugin to simplify changelog management.
+  
+  Each entry of the `CHANGELOG.md` file is generated from files in 
+  the `changelogs/unreleased/` folder.
+  
+  To use the plugin, in your `build.gradle` :
+  ```yaml
+  apply plugin: com.axelor.gradle.support.ChangelogSupport
+  
+  changelog {
+    version = "${project.version}"
+    output.set(file("CHANGELOG.md"))
+    inputPath.set(file("changelogs/unreleased"))
+    types.set(["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"])
+    header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
+  }
+  ```
+  
+  To generate the `CHANGELOG.md` with unreleased entries, run following Gradle task:
+  `./gradlew generateChangelog`

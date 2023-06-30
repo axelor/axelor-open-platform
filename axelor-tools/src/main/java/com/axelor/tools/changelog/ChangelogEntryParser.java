@@ -35,7 +35,7 @@ public class ChangelogEntryParser {
     if (ObjectUtils.isEmpty(values)) {
       throw new IllegalStateException(file + " content is empty");
     }
-    return createEntry(values);
+    return createEntry(values, file);
   }
 
   private Map<String, Object> loadYaml(File file) throws IOException {
@@ -45,7 +45,7 @@ public class ChangelogEntryParser {
     }
   }
 
-  private ChangelogEntry createEntry(Map<String, Object> entries) {
+  private ChangelogEntry createEntry(Map<String, Object> entries, File file) {
     ChangelogEntry changelogEntry = new ChangelogEntry();
     for (Map.Entry<String, Object> item : entries.entrySet()) {
       String value = item.getValue().toString();
@@ -55,9 +55,10 @@ public class ChangelogEntryParser {
       } else if ("description".equalsIgnoreCase(item.getKey())) {
         changelogEntry.setDescription(value.trim());
       } else if ("type".equalsIgnoreCase(item.getKey())) {
-        changelogEntry.setType(EntryType.valueOf(value.toUpperCase()));
+        changelogEntry.setType(value);
       }
     }
+    changelogEntry.setPath(file.toPath());
     return changelogEntry;
   }
 }

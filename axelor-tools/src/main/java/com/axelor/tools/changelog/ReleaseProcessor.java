@@ -18,11 +18,10 @@
  */
 package com.axelor.tools.changelog;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,23 +29,47 @@ import java.util.stream.Collectors;
 public class ReleaseProcessor {
 
   public Release process(
-      Collection<ChangelogEntry> changelogEntries, String version, LocalDate date) {
+      Collection<ChangelogEntry> changelogEntries,
+      String version,
+      String header,
+      List<String> types) {
 
     Objects.requireNonNull(version);
-    Objects.requireNonNull(date);
+    Objects.requireNonNull(header);
     Objects.requireNonNull(changelogEntries);
 
     validate(changelogEntries);
+    adjustEntriesTypes(changelogEntries, types);
 
     Release release = new Release();
     release.setVersion(version);
-    release.setDate(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    release.setHeader(header);
 
-    Map<EntryType, List<ChangelogEntry>> entriesGroupedByType =
-        changelogEntries.stream().collect(Collectors.groupingBy(ChangelogEntry::getType));
+    LinkedHashMap<String, List<ChangelogEntry>> entriesGroupedByType =
+        changelogEntries.stream()
+            .sorted(Comparator.comparingInt(e -> types.indexOf(e.getType())))
+            .collect(
+                Collectors.groupingBy(
+                    ChangelogEntry::getType, LinkedHashMap::new, Collectors.toList()));
     release.setEntries(entriesGroupedByType);
 
     return release;
+  }
+
+  private void adjustEntriesTypes(Collection<ChangelogEntry> changelogEntries, List<String> types) {
+    for (ChangelogEntry changelogEntry : changelogEntries) {
+      changelogEntry.setType(getTargetType(changelogEntry.getType(), types));
+    }
+  }
+
+  private String getTargetType(String type, List<String> types) {
+    for (String targetType : types) {
+      if (type.equalsIgnoreCase(targetType)) {
+        return targetType;
+      }
+    }
+    throw new IllegalArgumentException(
+        String.format("Type %s cannot be found in %s", type, String.join(",", types)));
   }
 
   private void validate(Collection<ChangelogEntry> changelogEntries) {

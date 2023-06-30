@@ -1,6 +1,6 @@
 ## 1.0.0 (2020-01-10)
 
-#### Features
+#### Feature
 
 * Add action to select a `panel` in `panel-tabs`
 
@@ -24,7 +24,7 @@
   
   </details>
 
-#### Fixed
+#### Fix
 
 * Fix going into edit mode in editable grid with large horizontal scrolling
 * Fix m2m field update issue

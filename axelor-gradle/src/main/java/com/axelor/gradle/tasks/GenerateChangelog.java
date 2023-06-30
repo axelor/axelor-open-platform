@@ -19,7 +19,8 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.common.ObjectUtils;
-import com.axelor.common.VersionUtils;
+import com.axelor.common.StringUtils;
+import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.changelog.ChangelogEntry;
 import com.axelor.tools.changelog.ChangelogEntryParser;
 import com.axelor.tools.changelog.Release;
@@ -31,22 +32,78 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDate;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
-import org.gradle.api.file.FileTree;
-import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
 public class GenerateChangelog extends DefaultTask {
 
-  private static final String CHANGELOG_PATH = "CHANGELOG.md";
+  public static final String TASK_DESCRIPTION = "Generate changelog from unreleased entries.";
 
-  private String version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "");
+  public static final String TASK_GROUP = AxelorPlugin.AXELOR_APP_GROUP;
+
+  public static final String TASK_NAME = "generateChangelog";
+
+  @OutputFile private File changelogPath;
+
+  public File getChangelogPath() {
+    return changelogPath;
+  }
+
+  public void setChangelogPath(File changelogPath) {
+    this.changelogPath = changelogPath;
+  }
+
+  @Input private String version;
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  @InputDirectory @SkipWhenEmpty private File inputPath;
+
+  public File getInputPath() {
+    return inputPath;
+  }
+
+  public void setInputPath(File inputPath) {
+    this.inputPath = inputPath;
+  }
+
+  @Input private List<String> types;
+
+  public List<String> getTypes() {
+    return types;
+  }
+
+  public void setTypes(List<String> types) {
+    this.types = types;
+  }
+
+  @Input private String header;
+
+  public String getHeader() {
+    return header;
+  }
+
+  public void setHeader(String header) {
+    this.header = header;
+  }
 
   private boolean preview;
 
@@ -55,18 +112,12 @@ public class GenerateChangelog extends DefaultTask {
     this.preview = preview;
   }
 
-  @InputFiles @SkipWhenEmpty private FileTree files;
-
-  public FileTree getFiles() {
-    return files;
-  }
-
-  public void setFiles(FileTree files) {
-    this.files = files;
-  }
-
   @TaskAction
   public void generate() throws IOException {
+    if (StringUtils.isEmpty(version)) {
+      throw new GradleException("Version is missing. Please provide `changelog.version` property.");
+    }
+
     List<ChangelogEntry> entries = getChangelogEntries();
 
     if (ObjectUtils.isEmpty(entries)) {
@@ -85,7 +136,7 @@ public class GenerateChangelog extends DefaultTask {
     }
 
     write(newChangelog);
-    clean();
+    clean(entries);
   }
 
   private List<ChangelogEntry> getChangelogEntries() throws IOException {
@@ -101,19 +152,21 @@ public class GenerateChangelog extends DefaultTask {
 
   private String generate(List<ChangelogEntry> entries) {
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(entries, version, LocalDate.now());
+    Release release = processor.process(entries, version, header, types);
 
     ReleaseGenerator generator = new ReleaseGenerator();
     return generator.generate(release);
   }
 
   private void write(String newChangelog) throws IOException {
-    getLogger().lifecycle("Generating new CHANGELOG.md file");
+    getLogger().lifecycle("Generating new " + changelogPath.getName() + " file");
 
-    File changelogFile = new File(CHANGELOG_PATH);
+    if (!changelogPath.exists()) {
+      Files.createFile(changelogPath.toPath());
+    }
 
     StringBuilder contentBuilder = new StringBuilder();
-    try (BufferedReader br = new BufferedReader(new FileReader(changelogFile))) {
+    try (BufferedReader br = new BufferedReader(new FileReader(changelogPath))) {
 
       String sCurrentLine;
       while ((sCurrentLine = br.readLine()) != null) {
@@ -121,23 +174,33 @@ public class GenerateChangelog extends DefaultTask {
       }
     }
 
-    changelogFile.delete();
+    Files.deleteIfExists(changelogPath.toPath());
 
-    try (FileOutputStream fos = new FileOutputStream(changelogFile)) {
+    try (FileOutputStream fos = new FileOutputStream(changelogPath)) {
       fos.write((newChangelog + System.lineSeparator() + contentBuilder.toString()).getBytes());
       fos.flush();
     }
   }
 
-  private void clean() {
+  private void clean(List<ChangelogEntry> entries) {
     getLogger().lifecycle("Clean up unreleased changelog entries");
-    for (File file : getFiles()) {
+    for (ChangelogEntry entry : entries) {
+      Path path = entry.getPath();
       try {
-        getLogger().lifecycle("Deleting {}", file);
-        Files.delete(file.toPath());
+        getLogger().trace("Deleting {}", path);
+        Files.delete(path);
       } catch (IOException ex) {
-        throw new GradleException("Could not delete file: " + file, ex);
+        throw new GradleException("Could not delete file: " + path, ex);
       }
     }
+  }
+
+  private List<File> getFiles() {
+    return Stream.of(Objects.requireNonNull(inputPath.listFiles()))
+        .filter(
+            file ->
+                !file.isDirectory()
+                    && (file.toString().endsWith(".yml") || file.toString().endsWith(".yaml")))
+        .collect(Collectors.toList());
   }
 }
