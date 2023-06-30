@@ -36,7 +36,7 @@ export function DashletComponent({
   getContext,
 }: DashletProps): any {
   const { title, action, widgetAttrs } = schema;
-
+  const height = schema.height ?? widgetAttrs?.height;
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const actionView = await findActionView(action);
     const ctx = {
@@ -98,6 +98,7 @@ export function DashletComponent({
           className={clsx(classes.container, className)}
           border
           roundedTop
+          style={{ height }}
         >
           <Box className={classes.header}>
             <Box className={classes.title}>{title || tab?.title}</Box>
