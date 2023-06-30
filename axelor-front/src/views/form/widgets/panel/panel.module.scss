@@ -6,6 +6,14 @@
   --ax-panel-body-padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
+  .panel {
+    --ax-panel-body-padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    --ax-panel-header-title-padding: 0.25rem;
+  }
+}
+
 .title {
   display: flex;
   justify-content: start;
