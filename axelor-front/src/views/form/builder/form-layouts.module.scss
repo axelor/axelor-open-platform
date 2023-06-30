@@ -59,17 +59,6 @@
   }
 }
 
-[data-tab-container-size="xs"],
-[data-tab-container-size="sm"] {
-  .gridItem {
-    &:empty {
-      display: none;
-    }
-    &:not(:empty) {
-      margin: calc(var(--grid-gap, 1rem) / 4) 0;
-    }
-  }
-}
 //
 // NOTE: for debug
 //

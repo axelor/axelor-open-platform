@@ -69,15 +69,3 @@
     }
   }
 }
-
-[data-tab-container-size="xs"],
-[data-tab-container-size="sm"] {
-  .formView {
-    padding: 0;
-  }
-  .formLayout,
-  .main,
-  .side {
-    gap: 0.5rem;
-  }
-}
