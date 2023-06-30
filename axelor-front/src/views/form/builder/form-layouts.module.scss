@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: var(--grid-cols, repeat(12, 1fr));
   align-items: start;
-  column-gap: var(--grid-gap, 1rem);
+  gap: var(--grid-gap, 1rem);
 }
 
 .grid > {
@@ -46,29 +46,8 @@
   }
 }
 
-//
-// IMPORTANT: sync with panel/form padding
-//
-
-.gridItem {
-  &:empty {
+.grid {
+  .gridItem.fill:empty {
     display: none;
   }
-  &:not(:empty) {
-    margin: calc(var(--grid-gap, 1rem) / 2) 0;
-  }
 }
-
-//
-// NOTE: for debug
-//
-
-// .grid {
-//   border: 1px dotted blue;
-//   padding: 2px;
-// }
-
-// .gridItem {
-//   border: 1px dotted orangered;
-//   padding: 2px;
-// }

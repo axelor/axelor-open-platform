@@ -1,9 +1,6 @@
-//
-// IMPORTANT: sync with GridLayout item margin
-//
 .panel {
   --ax-panel-header-border: 0;
-  --ax-panel-body-padding: 0.5rem 1rem 0.5rem 1rem;
+  --ax-panel-body-padding: 1rem;
 }
 
 .title {
