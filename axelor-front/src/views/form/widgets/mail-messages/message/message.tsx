@@ -290,13 +290,14 @@ export function MessageBox({
     >
       {!isMail && (
         <Box d="flex" flexDirection="column" g={2}>
-          <Box d="flex" g={2}>
+          <Box d="flex" flexDirection={{ base: "column", md: "row" }} g={2}>
             {FILTERS.map(({ title, value }, ind) => (
               <Button
                 key={ind}
-                variant="secondary"
+                variant="primary"
                 outline={filter !== value}
                 onClick={() => onFilterChange?.(value)}
+                flexGrow={{ base: 1, md: 0 }}
               >
                 {title}
               </Button>
