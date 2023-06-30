@@ -57,6 +57,39 @@ export function processContextValues(context: DataContext) {
   return context;
 }
 
+const NUMBER_ATTRS = [
+  "width",
+  "height",
+  "cols",
+  "colSpan",
+  "rowSpan",
+  "itemSpan",
+  "gap",
+];
+
+function parseNumber(value: unknown) {
+  if (typeof value === "string") {
+    if (/^(-)?(\d+)$/.test(value)) return parseInt(value);
+    if (/^(-)?(\d+(\.\d+)?)$/.test(value)) return parseFloat(value);
+  }
+  return value;
+}
+
+function processAttrs(
+  schema: Schema,
+  parse: (value: unknown) => unknown,
+  ...names: string[]
+) {
+  for (const name of names) {
+    const value = schema[name];
+    const val = parse(value);
+    if (value !== val) {
+      schema[name] = val;
+    }
+  }
+  return schema;
+}
+
 export function processView(schema: Schema, fields: Record<string, Property>) {
   const field = fields?.[schema.name!] ?? {};
   const attrs = defaultAttrs(field);
@@ -82,6 +115,10 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 
   res.uid = uniqueId("w");
   res.widget = toKebabCase(type);
+
+  // process attrs
+  processAttrs(res, parseNumber, ...NUMBER_ATTRS);
+  processAttrs(res.widgetAttrs ?? {}, parseNumber, ...NUMBER_ATTRS);
 
   if (
     res.widget !== "panel" &&
