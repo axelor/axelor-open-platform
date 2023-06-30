@@ -33,13 +33,13 @@
 }
 
 .grid.stack {
-  grid-template-columns: 1fr;
+  grid-template-columns: 100%;
 }
 
 [data-tab-container-size="xs"],
 [data-tab-container-size="sm"] {
   .grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 100% !important;
     .gridItem {
       grid-column: span 1 !important;
     }
