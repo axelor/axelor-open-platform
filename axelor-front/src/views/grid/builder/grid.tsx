@@ -29,6 +29,7 @@ import { nextId } from "@/views/form/builder/utils";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDevice } from "@/hooks/use-responsive";
+import { useSession } from "@/hooks/use-session";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
@@ -94,6 +95,9 @@ export const Grid = forwardRef<
   const formRef = useRef<GridFormHandler>(null);
   const [event, setEvent] = useState("");
   const { isMobile } = useDevice();
+  const { data: user } = useSession();
+  const allowCheckboxSelection =
+    (user?.view?.grid?.selection ?? "checkbox") === "checkbox";
 
   const names = useMemo(
     () =>
@@ -329,6 +333,7 @@ export const Grid = forwardRef<
           allowColumnHide
           allowColumnOptions
           allowColumnCustomize
+          allowCheckboxSelection={allowCheckboxSelection}
           allowRowReorder={view?.canMove === true && !readonly}
           sortType="state"
           selectionType="multiple"

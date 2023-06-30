@@ -588,7 +588,7 @@ function GridInner(props: ViewProps<GridView>) {
           showEditIcon,
           allowSelection: true,
           selectionType: showCheckbox ? "multiple" : "single",
-          allowCheckboxSelection: showCheckbox,
+          allowCheckboxSelection: true,
         }
       : {};
   const dashletProps: any = dashlet
