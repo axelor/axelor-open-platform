@@ -51,6 +51,7 @@ import {
   prepareCustomView,
 } from "./builder/utils";
 import styles from "./dms.module.scss";
+import { useResponsive } from "@/hooks/use-responsive";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
 const UNDEFINED_ID = -1;
@@ -102,7 +103,7 @@ export function Dms(props: ViewProps<GridView>) {
   const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([root]);
   const [expanded, setExpanded] = useState<TreeRecord["id"][]>([root.id]);
   const [selected, setSelected] = useState<TreeRecord["id"]>(root.id);
-  const [showTree, toggleTree] = useReducer((show) => !show, true);
+  const [showTree, setShowTree] = useState<boolean | undefined>(undefined);
 
   const { orderBy, rows, selectedRows } = state;
   const uploadSize = session?.api?.upload?.maxSize ?? 0;
@@ -528,6 +529,10 @@ export function Dms(props: ViewProps<GridView>) {
     }
   }, [popup, getSelectedDocuments, setPopupHandlers]);
 
+  const size = useResponsive();
+
+  const canShowTree = showTree ?? (size.xs || size.sm ? false : true);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <DmsOverlay
@@ -547,7 +552,7 @@ export function Dms(props: ViewProps<GridView>) {
                 iconProps: {
                   icon: "menu",
                 },
-                onClick: toggleTree,
+                onClick: () => setShowTree((show) => !show),
               },
               {
                 key: "new",
@@ -659,7 +664,7 @@ export function Dms(props: ViewProps<GridView>) {
           />
           <Box
             className={clsx(styles.tree, {
-              [styles.hide]: !showTree,
+              [styles.hide]: !canShowTree,
             })}
           >
             <DmsTree
