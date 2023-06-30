@@ -52,16 +52,28 @@
         "bg": "var(--bs-primary-bg-subtle)"
       },
       "item_active": {
-        "bg": "primary",
+        "bg": "rgba(var(--bs-primary-rgb), 0.8)",
         "color": "white"
       },
-      "icon_active": {
-        "bg": "white"
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
       }
     },
     "NavTabs": {
       "text": {
         "transform": "none"
+      },
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
+      },
+      "icon_active": {
+        "bg": "transparent"
       }
     },
     "CommandBar": {

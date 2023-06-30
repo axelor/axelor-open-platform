@@ -46,16 +46,28 @@
         "bg": "rgba(234, 234, 255, 0.05)"
       },
       "item_active": {
-        "bg": "primary",
+        "bg": "rgba(var(--bs-primary-rgb), 0.25)",
         "color": "white"
       },
-      "icon_active": {
-        "bg": "white"
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
       }
     },
     "NavTabs": {
       "text": {
         "transform": "none"
+      },
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
+      },
+      "icon_active": {
+        "bg": "transparent"
       }
     },
     "Panel": {
