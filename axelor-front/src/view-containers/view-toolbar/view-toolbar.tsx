@@ -165,7 +165,11 @@ export function ToolbarActions({
     return [...(buttons || []), ...(menus || [])].map(mapItem);
   }, [buttons, menus, actionExecutor, recordHandler]);
 
-  return <CommandBar items={items} />;
+  return (
+    <Box d={{ base: "none", md: "block" }} textWrap={false}>
+      <CommandBar items={items} />
+    </Box>
+  );
 }
 
 export function ViewToolBar(props: ViewToolBarProps) {
