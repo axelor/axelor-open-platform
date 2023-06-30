@@ -5,12 +5,17 @@ import { Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
 import { FormWidget } from "./form-widget";
-import { FormLayout } from "./types";
+import { FormLayout, WidgetProps } from "./types";
 
 import { legacyClassNames } from "@/styles/legacy";
 import styles from "./form-layouts.module.scss";
 
-function computeCols(cols: number, colWidths: string = "") {
+function computeLayout(schema: Schema) {
+  const gap = schema.gap ?? "1rem";
+  const cols = parseInt(schema.cols) || 12;
+  const itemSpan = parseInt(schema.itemSpan) || 6;
+  const colWidths: string = schema.colWidths ?? "";
+  const items = schema.items || [];
   const widths = colWidths
     .split(",")
     .map((w) => w.trim())
@@ -21,15 +26,47 @@ function computeCols(cols: number, colWidths: string = "") {
       return w;
     });
 
-  if (widths.length === 0) {
-    return undefined;
-  }
-
-  if (widths.length < cols) {
+  if (widths.length && widths.length < cols) {
     widths.push(`repeat(${cols - widths.length}, auto-fit)`);
   }
+  if (widths.length === 0) {
+    widths.push(`repeat(${cols}, 1fr)`);
+  }
 
-  return widths.join(" ");
+  let last = 1;
+
+  const numCols = widths.length > cols ? widths.length : cols;
+
+  const template = widths.join(" ");
+  const contents = items.map((item) => {
+    let colSpan = parseInt(item.colSpan) || itemSpan;
+    let colStart = last > numCols ? 1 : last;
+    let colEnd = colStart + colSpan;
+
+    // if not enough columns, move to next row
+    if (colEnd > numCols + 1) {
+      colStart = 1;
+      colEnd = Math.min(numCols, colSpan) + 1;
+    }
+
+    last = colEnd;
+    return {
+      style: {
+        gridColumnStart: colStart,
+        gridColumnEnd: colEnd,
+      },
+      content: item,
+    };
+  });
+
+  return {
+    style: {
+      display: "grid",
+      gridTemplateColumns: template,
+      gap,
+    },
+    contents,
+  };
 }
 
 function layoutClassName(item: Schema) {
@@ -53,68 +90,46 @@ export const GridLayout: FormLayout = ({
   className,
   readonly,
 }) => {
-  const {
-    cols = 12,
-    widgetAttrs,
-    colWidths,
-    itemSpan = widgetAttrs?.itemSpan,
-    gap,
-    items = [],
-  } = schema;
-  const widths = useMemo(() => computeCols(cols, colWidths), [cols, colWidths]);
-  const style = {
-    "--grid-cols": widths ?? cols,
-    "--grid-gap": gap ?? "1rem",
-  } as React.CSSProperties;
-
+  const { style, contents } = useMemo(() => computeLayout(schema), [schema]);
   return (
     <div
+      style={style}
       className={clsx(className, styles.grid, {
         [styles.table]: schema.layout === "table",
         [styles.stack]:
           toKebabCase(schema.widget || schema.type) === "panel-stack",
       })}
-      data-cols={widths ? undefined : cols}
-      style={style}
     >
-      {items.map((item) => (
+      {contents.map(({ style, content }) => (
         <GridItem
-          key={item.uid}
-          schema={item}
-          cols={cols}
-          itemSpan={itemSpan}
-          className={layoutClassName(item)}
-        >
-          <FormWidget
-            schema={item}
-            formAtom={formAtom}
-            parentAtom={parentAtom}
-            readonly={readonly}
-          />
-        </GridItem>
+          key={content.uid}
+          style={style}
+          schema={content}
+          formAtom={formAtom}
+          parentAtom={parentAtom}
+          readonly={readonly}
+        />
       ))}
     </div>
   );
 };
 
-function GridItem(props: {
-  schema: Schema;
-  children: React.ReactNode;
-  className?: string;
-  itemSpan?: number;
-  cols?: number;
-}) {
-  const { schema, className, itemSpan, cols = 12, children } = props;
-  const { colSpan = itemSpan, rowSpan } = schema;
+function GridItem(
+  props: Omit<WidgetProps, "widgetAtom"> & {
+    schema: Schema;
+    style?: React.CSSProperties;
+  }
+) {
+  const { schema, formAtom, parentAtom, readonly, style } = props;
+  const className = useMemo(() => layoutClassName(schema), [schema]);
   return (
-    <div
-      className={clsx(styles.gridItem, className, {
-        [styles.fill]: +colSpan === +cols,
-      })}
-      data-colspan={colSpan}
-      data-rowspan={rowSpan}
-    >
-      {children}
+    <div style={style} className={clsx(styles.gridItem, className)}>
+      <FormWidget
+        schema={schema}
+        formAtom={formAtom}
+        parentAtom={parentAtom}
+        readonly={readonly}
+      />
     </div>
   );
 }
