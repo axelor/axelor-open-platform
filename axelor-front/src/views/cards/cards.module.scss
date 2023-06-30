@@ -12,3 +12,10 @@
   padding: 1rem 0.5rem;
   overflow: auto;
 }
+
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
+  .cards {
+    padding: 0.5rem 0.25rem;
+  }
+}

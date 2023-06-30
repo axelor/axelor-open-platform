@@ -101,8 +101,8 @@ export const Card = memo(function Card({
     <>
       <Box
         d="flex"
-        px={2}
-        mb={3}
+        px={{base: 1, md: 2}}
+        mb={{base: 2, md: 3}}
         className={classes.card}
         style={{
           width,
@@ -110,7 +110,7 @@ export const Card = memo(function Card({
         }}
       >
         <Box
-          p={3}
+          p={{base: 2, md: 3}}
           bgColor="body"
           w={100}
           border
