@@ -5,8 +5,7 @@ import { Routes } from "./routes";
 import "./styles/global.scss";
 
 function App() {
-  const { theme, loading, options } = useAppThemeOption();
-  if (loading) return null;
+  const { theme, options } = useAppThemeOption();
   return (
     <ThemeProvider theme={theme} options={options}>
       <Routes />
