@@ -57,7 +57,7 @@ restricted when records can be moved). Also dummy and transient fields can be so
 
 == Grid pagination
 
-Previously, we implemented `api.pagination.max-items-per-page` to define the maximum number of records displayed per page.
+Previously, we implemented `api.pagination.max-per-page` to define the maximum number of records displayed per page.
 Current default behavior is unlimited (but can be changed in configuration file), so a user can change the settings in
 grid views and display an unlimited number of records. This is causing serious performance issues on large entities.
 
