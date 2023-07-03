@@ -1,0 +1,59 @@
+.viewCollaboration {
+  margin-right: 0.5em;
+  height: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  & > span {
+    font-weight: 500;
+    font-size: 85%;
+    line-height: 1;
+    padding: 0.25rem;
+    transition: all 0.1s ease-in-out;
+    &:hover {
+      background: var(--bs-light);
+    }
+  }
+}
+
+.avatarContainer {
+  font-size: 0.7rem;
+  border-radius: 50%;
+  border: 4px solid;
+  height: 40px;
+  width: 40px;
+}
+
+.avatar {
+  padding: 0;
+}
+
+.menu {
+  height: 100%;
+}
+
+.joined {
+  border-color: var(--bs-success);
+}
+
+.dirty {
+  border-color: var(--bs-warning);
+}
+
+.saved {
+  border-color: var(--bs-danger);
+}
+
+.left {
+  border-color: var(--bs-danger);
+}
+
+.left .avatar {
+  opacity: 0.5;
+}
+
+.grouped {
+  cursor: pointer;
+  overflow-x: clip;
+}

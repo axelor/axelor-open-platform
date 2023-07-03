@@ -14,7 +14,7 @@ import {
   useState,
 } from "react";
 
-import { Box, CommandItemProps } from "@axelor/ui";
+import { Block, Box, CommandItemProps } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
@@ -59,6 +59,7 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
+import { Collaboration } from "./widgets/collaboration";
 
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
@@ -794,7 +795,11 @@ const FormContainer = memo(function FormContainer({
             },
           ]}
           pagination={pagination}
-        />
+        >
+          <Block className={styles.collaboration}>
+            <Collaboration formAtom={formAtom} />
+          </Block>
+        </ViewToolBar>
       )}
       <div className={styles.formViewScroller} ref={containerRef}>
         <FormComponent

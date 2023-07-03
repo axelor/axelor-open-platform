@@ -41,7 +41,6 @@ export interface SessionInfo {
     technical: boolean;
   };
   view?: {
-    collaboration: boolean;
     customizationPermission: number;
     customization: boolean;
     advanceSearch?: {
@@ -57,6 +56,10 @@ export interface SessionInfo {
     };
     singleTab?: boolean;
     maxTabs?: number;
+    collaboration?: {
+      enabled: boolean;
+      canView: boolean;
+    }
   };
   auth?: {
     client: string;
@@ -79,7 +82,6 @@ const INFO_MAPPINGS = {
   "application.version": "app.version",
   "data.upload.max-size": "api.upload.maxSize",
   "user.action": "user.action",
-  "user.canViewCollaboration": "view.collaboration",
   "user.group": "user.group",
   "user.id": "user.id",
   "user.theme": "user.theme",
@@ -93,6 +95,7 @@ const INFO_MAPPINGS = {
   "user.singleTab": "user.singleTab",
   "user.technical": "user.technical",
   "user.viewCustomizationPermission": "view.customizationPermission",
+  "user.canViewCollaboration": "view.collaboration.canView",
   "view.allow-customization": "view.customization",
   "view.grid.selection": "view.grid.selection",
   "view.grid.editor-buttons": "view.grid.editorButtons",
@@ -101,6 +104,7 @@ const INFO_MAPPINGS = {
   "view.adv-search.export-full": "view.advanceSearch.exportFull",
   "view.single-tab": "view.singleTab",
   "view.max-tabs": "view.maxTabs",
+  "view.collaboration.enabled": "view.collaboration.enabled",
   "auth.central.client": "auth.client",
 };
 

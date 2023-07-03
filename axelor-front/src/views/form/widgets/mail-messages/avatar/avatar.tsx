@@ -13,7 +13,7 @@ function Avatar({
   color: propColor,
   ...props
 }: {
-  user: MessageAuthor;
+  user?: MessageAuthor;
   image?: string;
   title?: string;
   text?: string;
@@ -21,7 +21,7 @@ function Avatar({
   className?: string;
 }) {
   const [canShowImage, setCanShowImage] = useState(false);
-  const userName = useMemo(() => getName(user), [user]);
+  const userName = useMemo(() => user && getName(user), [user]);
   const image = propImage || user?.$avatar;
   const title = propTitle || userName;
   const [text, color] = useMemo(() => {
@@ -31,7 +31,7 @@ function Avatar({
       return ["", ""];
     }
     return [
-      propText || getAvatarText(user),
+      propText || (user && getAvatarText(user)),
       propColor || (user ? legacyClassNames(getColor(user)) : classes.text),
     ];
   }, [propText, propColor, user, image, canShowImage]);
