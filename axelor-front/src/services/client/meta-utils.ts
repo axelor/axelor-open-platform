@@ -344,13 +344,18 @@ export function processView(
     var items: Schema[] = [];
 
     if (Array.isArray(view.helpOverride) && view.helpOverride.length) {
-      helps = view.helpOverride.reduce((prev, help) => {
-        const all = prev[help.type] ?? (prev[help.type] = {});
-        all[help.field] = help;
-        return prev;
+      helps = meta.helps = view.helpOverride.reduce((all, help) => {
+        const { type, field } = help;
+        return {
+          ...all,
+          [type]: {
+            ...all[type],
+            [field]: help,
+          },
+        };
       }, {} as typeof helps);
 
-      if (helps.tooltip && helps.tooltip.__top__) {
+      if (helps?.tooltip?.__top__) {
         view.help = helps.tooltip.__top__.help;
       }
     }
