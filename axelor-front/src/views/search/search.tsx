@@ -194,7 +194,7 @@ export function Search(props: ViewProps<SearchView>) {
             { type: "form", name: _form },
           ],
           params: {
-            forceReadonly: readonly,
+            forceEdit: !readonly,
           },
           context: {
             _showRecord: $$id,

@@ -66,7 +66,7 @@ export function prepareCustomView({ model }: GridView, record: DataRecord) {
     views: [view],
     params: {
       "show-toolbar": false,
-      forceReadonly: false,
+      forceEdit: true,
     },
     context: {
       _showRecord: record?.id,

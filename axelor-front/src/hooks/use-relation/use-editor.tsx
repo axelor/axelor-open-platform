@@ -37,7 +37,7 @@ export function useEditor() {
       view,
       viewName,
       context,
-      readonly: forceReadonly,
+      readonly,
       maximize,
       onClose,
       onSave,
@@ -51,7 +51,7 @@ export function useEditor() {
       views: [{ type: "form", name: viewName, ...view }],
       params: {
         popup: true,
-        forceReadonly,
+        forceEdit: !readonly,
         "show-toolbar": false,
         "_popup-record": record,
       },

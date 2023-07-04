@@ -99,8 +99,8 @@ export const useGetErrors = () => {
       const isHidden = function isHidden(s: WidgetState): boolean {
         return Boolean(
           s.attrs.hidden ||
-            (s.name && statesByName[s.name]?.attrs?.hidden) ||
-            (s.parent && isHidden(store.get(s.parent)))
+          (s.name && statesByName[s.name]?.attrs?.hidden) ||
+          (s.parent && isHidden(store.get(s.parent)))
         );
       };
       const errors = Object.values(states)
@@ -156,10 +156,11 @@ export function Form(props: ViewProps<FormView>) {
   const { action } = useViewTab();
   const recordRef = useRef<DataRecord | null>(null);
 
-  const readonly =
-    action.params?.forceReadonly || (viewProps.readonly ?? Boolean(id));
+  const { params } = action;
   const recordId = String(id || action.context?._showRecord || "");
-  const popupRecord = action.params?.["_popup-record"];
+  const readonly = !params?.forceEdit && (params?.forceReadonly || (viewProps.readonly ?? Boolean(recordId)));
+
+  const popupRecord = params?.["_popup-record"];
 
   const { state, data: record = {} } = useAsync(async () => {
     const record = recordRef.current;

@@ -269,13 +269,13 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onEditInTab = useCallback(
-    (record: DataRecord, forceReadonly = false) => {
+    (record: DataRecord, readonly = false) => {
       openTab({
         ...action,
         name: uniqueId("$act"),
         viewType: "form",
         params: {
-          forceReadonly,
+          forceEdit: !readonly,
         },
         context: {
           _showRecord: record.id,
@@ -595,6 +595,7 @@ function GridInner(props: ViewProps<GridView>) {
   const dashletProps: any = dashlet
     ? {
       readonly: viewProps?.readonly,
+      onView: viewProps?.readonly === false ? onEdit : onView,
     }
     : {
       allowSearch: true,
@@ -800,7 +801,7 @@ function GridInner(props: ViewProps<GridView>) {
             editable={editable}
             searchOptions={searchOptions}
             actionExecutor={actionExecutor}
-            onEdit={readonly ? onView : onEdit}
+            onEdit={readonly === true ? onView : onEdit}
             onView={onView}
             onSearch={onSearch}
             onSave={onSave}
