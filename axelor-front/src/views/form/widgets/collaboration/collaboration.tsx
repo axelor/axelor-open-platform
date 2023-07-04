@@ -12,6 +12,7 @@ import {
 import { Block, Box, Menu, MenuItem, useClassNames } from "@axelor/ui";
 
 import { useSession } from "@/hooks/use-session";
+import { useNavTabsSize } from "@/layout/nav-tabs";
 import { i18n } from "@/services/client/i18n";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { FormAtom } from "../../builder";
@@ -104,8 +105,6 @@ const CollaborationContainer = memo(
   }
 );
 
-const containerSizeAttribute = "data-tab-container-size";
-
 function Users({
   recordVersion,
   users,
@@ -121,37 +120,7 @@ function Users({
     [users, sessionUser]
   );
 
-  const container = useMemo(
-    () => document.querySelector(`[${containerSizeAttribute}]`),
-    []
-  );
-
-  const [containerSize, setContainerSize] = useState<string | null | undefined>(
-    () => container?.getAttribute(containerSizeAttribute)
-  );
-
-  useEffect(() => {
-    if (!container) return;
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === containerSizeAttribute
-        ) {
-          setContainerSize(
-            (mutation.target as HTMLElement).getAttribute(
-              containerSizeAttribute
-            )
-          );
-          break;
-        }
-      }
-    });
-
-    observer.observe(container, { attributes: true });
-    return () => observer.disconnect();
-  }, [container]);
+  const containerSize = useNavTabsSize();
 
   const avatarLimit = useMemo(() => {
     switch (containerSize) {

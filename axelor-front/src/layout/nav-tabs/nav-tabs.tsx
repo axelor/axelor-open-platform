@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Menu as AxMenu,
@@ -27,6 +27,12 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
 
+const tabContainerSizeAtom = atom<string | undefined>(undefined);
+
+export function useNavTabsSize() {
+  return useAtomValue(tabContainerSizeAtom);
+}
+
 export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const { active, items: tabs, popups, open, close } = useTabs();
   const value = active?.id;
@@ -38,6 +44,12 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const ref = useRef<HTMLDivElement>(null);
   const size = useResponsiveContainer(ref);
   const containerSize = Object.keys(size).find((x) => (size as any)[x]);
+
+  const setTabContainerSize = useSetAtom(tabContainerSizeAtom);
+  useEffect(
+    () => setTabContainerSize(containerSize),
+    [setTabContainerSize, containerSize]
+  );
 
   const doClose = useAtomCallback(
     useCallback(
