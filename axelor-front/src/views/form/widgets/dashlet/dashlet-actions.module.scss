@@ -3,3 +3,11 @@
   display: flex;
   align-items: center;
 }
+
+.itemAction {
+  cursor: default;
+}
+
+.itemActionEnabled {
+  cursor: pointer !important;
+}

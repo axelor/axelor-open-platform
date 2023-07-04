@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
+import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
 
 import { PageText } from "@/components/page-text";
 import {
@@ -210,6 +210,9 @@ function DashletListMenu(
             iconProps: {
               icon: "navigate_before",
             },
+            className: clsx(classes.itemAction, {
+              [classes.itemActionEnabled]: canPrev,
+            }),
             disabled: !canPrev,
             onClick: () => dataStore.search({ offset: offset - limit }),
           },
@@ -220,6 +223,9 @@ function DashletListMenu(
             iconProps: {
               icon: "navigate_next",
             },
+            className: clsx(classes.itemAction, {
+              [classes.itemActionEnabled]: canNext,
+            }),
             disabled: !canNext,
             onClick: () => dataStore.search({ offset: offset + limit }),
           },
