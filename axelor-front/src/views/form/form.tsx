@@ -627,12 +627,6 @@ const FormContainer = memo(function FormContainer({
 
   const handleFocus = useHandleFocus(containerRef);
 
-  useEffect(() => {
-    if (!isLoading && !readonly) {
-      handleFocus();
-    }
-  }, [isLoading, readonly, handleFocus]);
-
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
