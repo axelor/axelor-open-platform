@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 
-import { Box } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 
 import { useSession } from "@/hooks/use-session";
 import { request } from "@/services/client/client";
@@ -190,7 +190,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   }, [items, updateLayout]);
 
   useEffect(() => {
-    if (saved.current) {
+    if (saved.current && hasViewCustomize) {
       saved.current = false;
       (async () => {
         const { items } = view;
@@ -236,7 +236,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           }));
       })();
     }
-  }, [items, view, layouts]);
+  }, [hasViewCustomize, items, view, layouts]);
 
   useEffect(() => {
     if (ref.current && width) {
@@ -255,7 +255,9 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         >
           <DashletComponent
             dashboard
-            className={styles.dashlet}
+            className={clsx(styles.dashlet, {
+              [styles.customize]: hasViewCustomize,
+            })}
             schema={item}
             viewId={index}
             onViewLoad={handleDashletViewLoad}
@@ -263,7 +265,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           />
         </Box>
       )),
-    [items, handleDashletViewLoad, getContext]
+    [items, hasViewCustomize, handleDashletViewLoad, getContext]
   );
 
   return (

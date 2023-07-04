@@ -6,7 +6,7 @@
   height: 100%;
   width: 100%;
   background-color: var(--bs-body-bg);
-  & > div:first-child {
+  &.customize > div:first-child {
     cursor: move;
   }
 }
