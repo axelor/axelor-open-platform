@@ -20,7 +20,7 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
+import { useViewSwitch, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 
 import { usePrepareContext } from "../form/builder";
 import { useFormScope } from "../form/builder/scope";
@@ -123,7 +123,7 @@ export function Cards(props: ViewProps<CardsView>) {
           await dataStore.delete([
             { id: record.id!, version: record.version! },
           ]);
-        } catch {}
+        } catch { }
       }
     },
     [dataStore]
@@ -213,6 +213,9 @@ export function Cards(props: ViewProps<CardsView>) {
     onNew: canNew ? onNew : undefined,
     onRefresh: onSearch,
   });
+
+  // register tab:refresh
+  useViewTabRefresh("cards", onSearch);
 
   return (
     <Box className={legacyClassNames(styles.container, "cards-view", "row-fluid")}>

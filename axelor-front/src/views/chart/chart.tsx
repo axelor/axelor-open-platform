@@ -5,7 +5,7 @@ import unique from "lodash/uniq";
 
 import { ChartView } from "@/services/client/meta.types";
 import { ViewProps } from "../types";
-import { useViewContext, useViewTab } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 import { chart as fetchChart } from "@/services/client/meta";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { download } from "@/utils/download";
@@ -140,6 +140,9 @@ export function Chart(props: ViewProps<ChartView>) {
       });
     }
   }, [dashlet, view, onDatasetAction, onRefresh, onExport, setDashletHandlers]);
+
+  // register tab:refresh
+  useViewTabRefresh("chart", onRefresh);
 
   const hasAction = view?.config?.onClick;
   return (

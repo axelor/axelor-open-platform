@@ -34,6 +34,7 @@ import {
   useViewRoute,
   useViewSwitch,
   useViewTab,
+  useViewTabRefresh,
 } from "@/view-containers/views/scope";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
@@ -186,8 +187,8 @@ function GridInner(props: ViewProps<GridView>) {
       const ids = hasAll
         ? records.map((r) => r.id!)
         : (selectedRows || [])
-            .map((ind) => rows[ind]?.record?.id)
-            .filter((id) => id > 0);
+          .map((ind) => rows[ind]?.record?.id)
+          .filter((id) => id > 0);
       const { model } = view;
 
       const confirmed = await dialogs.confirm({
@@ -244,7 +245,7 @@ function GridInner(props: ViewProps<GridView>) {
             records.map(({ id, version }) => ({ id, version }))
           );
           clearSelection();
-        } catch {}
+        } catch { }
       }
     },
     [dataStore, clearSelection]
@@ -358,7 +359,7 @@ function GridInner(props: ViewProps<GridView>) {
         await dataStore.save(records);
         onSearch();
         clearSelection();
-      } catch {}
+      } catch { }
     },
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
@@ -585,32 +586,32 @@ function GridInner(props: ViewProps<GridView>) {
   const popupProps: any =
     !dashlet && popup
       ? {
-          showEditIcon,
-          allowSelection: true,
-          selectionType: showCheckbox ? "multiple" : "single",
-          allowCheckboxSelection: true,
-        }
+        showEditIcon,
+        allowSelection: true,
+        selectionType: showCheckbox ? "multiple" : "single",
+        allowCheckboxSelection: true,
+      }
       : {};
   const dashletProps: any = dashlet
     ? {
-        readonly: viewProps?.readonly,
-      }
+      readonly: viewProps?.readonly,
+    }
     : {
-        allowSearch: true,
-        searchRowRenderer: Box,
-        searchColumnRenderer: searchColumnRenderer,
-      };
+      allowSearch: true,
+      searchRowRenderer: Box,
+      searchColumnRenderer: searchColumnRenderer,
+    };
   const detailsProps: Partial<GridProps> = hasDetailsView
     ? {
-        ...(detailsViewOverlay && { onView: undefined }),
-        ...(!detailsRecord && {
-          onRowClick: detailsViewOverlay
-            ? onShowDetails
-            : selectedDetail
+      ...(detailsViewOverlay && { onView: undefined }),
+      ...(!detailsRecord && {
+        onRowClick: detailsViewOverlay
+          ? onShowDetails
+          : selectedDetail
             ? onLoadDetails
             : undefined,
-        }),
-      }
+      }),
+    }
     : {};
 
   const readonly = dashletProps.readonly;
@@ -678,6 +679,9 @@ function GridInner(props: ViewProps<GridView>) {
     }, [setState]),
   });
 
+  // register tab:refresh
+  useViewTabRefresh("grid", onSearch);
+
   const massUpdateFields = useMassUpdateFields(allFields);
   const canMassUpdate = perms?.massUpdate && massUpdateFields.length > 0;
   const canCustomize =
@@ -739,17 +743,17 @@ function GridInner(props: ViewProps<GridView>) {
               onClick: handleDelete,
               items: hasButton("archive")
                 ? [
-                    {
-                      key: "archive",
-                      text: i18n.get("Archive"),
-                      onClick: () => onArchiveOrUnArchive(true),
-                    },
-                    {
-                      key: "unarchive",
-                      text: i18n.get("Unarchive"),
-                      onClick: () => onArchiveOrUnArchive(false),
-                    },
-                  ]
+                  {
+                    key: "archive",
+                    text: i18n.get("Archive"),
+                    onClick: () => onArchiveOrUnArchive(true),
+                  },
+                  {
+                    key: "unarchive",
+                    text: i18n.get("Unarchive"),
+                    onClick: () => onArchiveOrUnArchive(false),
+                  },
+                ]
                 : undefined,
             },
             {
@@ -822,9 +826,9 @@ function GridInner(props: ViewProps<GridView>) {
             })}
             {...(detailsViewOverlay &&
               detailsRecord && {
-                shadow: "2xl",
-                dropShadow: "2xl",
-              })}
+              shadow: "2xl",
+              dropShadow: "2xl",
+            })}
           >
             {detailsRecord ? (
               <Details

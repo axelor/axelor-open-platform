@@ -9,11 +9,11 @@ import { custom } from "@/services/client/meta";
 import { CustomView } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { useViewContext, useViewTab } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 import { ViewProps } from "../types";
-import styles from "./custom.module.scss";
 import { ReportBox } from "./widgets/report-box";
 import { ReportTable } from "./widgets/report-table";
+import styles from "./custom.module.scss";
 
 export function Custom({ meta }: ViewProps<CustomView>) {
   const { dashlet } = useViewTab();
@@ -55,6 +55,9 @@ export function Custom({ meta }: ViewProps<CustomView>) {
     }),
     [view]
   );
+
+  // register tab:refresh
+  useViewTabRefresh("custom", onRefresh);
 
   return (
     <Box d="flex" flexGrow={1} className={styles.container}>

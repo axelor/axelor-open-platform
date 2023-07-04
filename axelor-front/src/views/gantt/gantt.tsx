@@ -15,7 +15,7 @@ import { ViewProps } from "../types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DataRecord } from "@/services/client/data.types";
 import { formatRecord, transformRecord } from "./utils";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 import { i18n } from "@/services/client/i18n";
 import { PageText } from "@/components/page-text";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -378,6 +378,9 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     const list = collect(null);
     return list.map(formatter) as GanttRecord[];
   }, [view, formatter, records]);
+
+  // register tab:refresh
+  useViewTabRefresh("gantt", onSearch);
 
   return (
     <Box d="flex" className={styles.container} flex={1} flexDirection="column">

@@ -1,7 +1,6 @@
 import {
   SyntheticEvent,
   useCallback,
-  useReducer,
   useState,
   useRef,
   useMemo,
@@ -19,7 +18,7 @@ import clsx from "clsx";
 
 import { GridView } from "@/services/client/meta.types";
 import { PageText } from "@/components/page-text";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 import { usePerms } from "@/hooks/use-perms";
 import { SearchOptions } from "@/services/client/data";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -528,6 +527,9 @@ export function Dms(props: ViewProps<GridView>) {
       });
     }
   }, [popup, getSelectedDocuments, setPopupHandlers]);
+
+  // register tab:refresh
+  useViewTabRefresh("grid", onSearch);
 
   const size = useResponsive();
 
