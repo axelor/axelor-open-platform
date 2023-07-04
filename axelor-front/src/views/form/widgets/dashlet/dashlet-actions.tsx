@@ -17,16 +17,21 @@ import { i18n } from "@/services/client/i18n";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { SearchOptions } from "@/services/client/data";
 import classes from "./dashlet-actions.module.scss";
+import { useViewTabRefresh } from "@/view-containers/views/scope";
 
 interface DashletMenuProps extends DashletHandler {
   viewType?: string;
   items?: CommandItemProps[];
 }
 
+const noop = () => { };
+
 export function DashletActions({
   viewType,
+  dashboard,
   showBars,
 }: Pick<DashletMenuProps, "viewType"> & {
+  dashboard?: boolean;
   showBars?: boolean;
 }) {
   const {
@@ -44,6 +49,9 @@ export function DashletActions({
 
   // register form:refresh
   useFormRefresh(onRefresh);
+
+  // register tab:refresh
+  useViewTabRefresh(dashboard ? "dashboard" : "form", dashboard && onRefresh ? onRefresh : noop);
 
   return (
     <Box className={classes.actions} gap={1}>

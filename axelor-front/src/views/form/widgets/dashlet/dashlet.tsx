@@ -22,6 +22,7 @@ interface DashletProps {
   schema: Schema;
   className?: string;
   readonly?: boolean;
+  dashboard?: boolean;
   getContext?: () => DataContext;
   viewId?: number;
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
@@ -32,6 +33,7 @@ export function DashletComponent({
   className,
   readonly,
   viewId,
+  dashboard,
   onViewLoad,
   getContext,
 }: DashletProps): any {
@@ -103,6 +105,7 @@ export function DashletComponent({
           <Box className={classes.header}>
             <Box className={classes.title}>{title || tab?.title}</Box>
             <DashletActions
+              dashboard={dashboard}
               viewType={viewType}
               showBars={widgetAttrs?.showBars}
             />

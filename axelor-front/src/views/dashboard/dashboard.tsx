@@ -133,21 +133,21 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         return (items || []).map((item) =>
           String(item.i) === String(viewId)
             ? (() => {
-                const custom = viewType === "custom";
-                const bounded = ["chart", "grid"].includes(viewType!);
-                const attrs = getAttrs(
-                  viewItems[
-                    item.i as unknown as number
-                  ] as unknown as PanelDashlet,
-                  type
-                );
-                return {
-                  ...item,
-                  h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
-                  minH: item?.minH || (bounded ? getHeight(2) : getHeight(1)),
-                  minW: item?.minW || (bounded ? 4 : 1),
-                };
-              })()
+              const custom = viewType === "custom";
+              const bounded = ["chart", "grid"].includes(viewType!);
+              const attrs = getAttrs(
+                viewItems[
+                item.i as unknown as number
+                ] as unknown as PanelDashlet,
+                type
+              );
+              return {
+                ...item,
+                h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
+                minH: item?.minH || (bounded ? getHeight(2) : getHeight(1)),
+                minW: item?.minW || (bounded ? 4 : 1),
+              };
+            })()
             : item
         );
       });
@@ -254,6 +254,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           rounded
         >
           <DashletComponent
+            dashboard
             className={styles.dashlet}
             schema={item}
             viewId={index}
