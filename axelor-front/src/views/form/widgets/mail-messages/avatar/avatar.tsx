@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
 import clsx from "clsx";
-import { getName, getAvatarText, getColor, checkUrl } from "./utils";
+import React, { useEffect, useMemo, useState } from "react";
+
 import { legacyClassNames } from "@/styles/legacy";
 import { MessageAuthor } from "../message/types";
+import { checkUrl, getAvatarText, getColor, getName } from "./utils";
+
 import classes from "./avatar.module.scss";
 
 function Avatar({
@@ -20,7 +22,7 @@ function Avatar({
   color?: string;
   className?: string;
 }) {
-  const [canShowImage, setCanShowImage] = useState(false);
+  const [canShowImage, setCanShowImage] = useState<boolean | undefined>();
   const userName = useMemo(() => user && getName(user), [user]);
   const image = propImage || user?.$avatar;
   const title = propTitle || userName;
@@ -49,7 +51,7 @@ function Avatar({
     return (
       <img
         {...props}
-        className={clsx(classes["user-img"], props.className)}
+        className={clsx(classes.avatar, classes.image, props.className)}
         src={image}
         alt={userName}
         title={title}
@@ -60,7 +62,7 @@ function Avatar({
   return (
     <span
       {...props}
-      className={clsx(classes.avatar, color, props.className)}
+      className={clsx(classes.avatar, classes.letter, color, props.className)}
       title={title}
     >
       {text}

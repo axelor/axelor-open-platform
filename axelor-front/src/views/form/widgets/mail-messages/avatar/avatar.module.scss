@@ -1,17 +1,16 @@
-.user-img,
 .avatar {
   height: 100%;
   width: 100%;
 }
 
-.user-img {
+.image {
   border-radius: 50%;
   padding: 0.25rem;
   background-color: var(--bs-secondary-bg);
 }
 
-.avatar {
-  color: var(--bs-body-color);
+.letter {
+  color: var(--bs-white);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,6 +22,6 @@
 .text {
   color: var(--bs-body-color);
   background-color: var(--bs-secondary-bg);
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: normal;
 }
