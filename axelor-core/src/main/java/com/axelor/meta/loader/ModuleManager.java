@@ -291,7 +291,8 @@ public class ModuleManager {
   }
 
   /**
-   * Create the default user (<code>admin</code>) and groups (<code>admins</code>, <code>users</code>).
+   * Create the default user (<code>admin</code>) and groups (<code>admins</code>, <code>users
+   * </code>).
    */
   @Transactional
   void createDefault() {
@@ -335,5 +336,4 @@ public class ModuleManager {
 
     admin = users.save(admin);
   }
-
 }
