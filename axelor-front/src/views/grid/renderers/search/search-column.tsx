@@ -48,7 +48,7 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Tab") {
+    if (["Enter", "Tab", "ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)) {
       e.stopPropagation();
     }
     if (e.key === "Enter") {
@@ -77,14 +77,14 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
           icons={
             selected
               ? [
-                  {
-                    icon: "close",
-                    onClick: () => {
-                      setValue("");
-                      applySearch();
-                    },
+                {
+                  icon: "close",
+                  onClick: () => {
+                    setValue("");
+                    applySearch();
                   },
-                ]
+                },
+              ]
               : []
           }
           onKeyDown={handleKeyDown as (e: SyntheticEvent) => void}
