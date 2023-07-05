@@ -127,6 +127,7 @@ export const ReportTable = forwardRef(function ReportTable(
       fields={fields}
       state={state}
       setState={setState}
+      allowCheckboxSelection={false}
       columnFormatter={formatter}
       onSearch={onSearch as any}
     />
