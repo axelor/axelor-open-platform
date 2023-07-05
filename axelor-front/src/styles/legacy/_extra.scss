@@ -2,6 +2,12 @@
   display: none !important;
 }
 
+.field-append {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .kanban-card {
   border-left: 3px solid #e7eaec;
 }

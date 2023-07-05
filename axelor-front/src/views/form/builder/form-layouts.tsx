@@ -2,7 +2,6 @@ import clsx from "clsx";
 import { useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
 
 import { FormWidget } from "./form-widget";
 import { FormLayout, WidgetProps } from "./types";
@@ -83,6 +82,29 @@ function layoutClassName(item: Schema) {
   return legacyClassNames(names);
 }
 
+export const StackLayout: FormLayout = ({
+  schema,
+  formAtom,
+  parentAtom,
+  className,
+  readonly,
+}) => {
+  const { items = [] } = schema;
+  return (items && (
+    <div className={legacyClassNames(className, schema.css)}>
+      {items.map((item) => (
+        <FormWidget
+          key={item.uid}
+          schema={item}
+          formAtom={formAtom}
+          parentAtom={parentAtom}
+          readonly={readonly}
+        />
+      ))}
+    </div>
+  )) as JSX.Element;
+};
+
 export const GridLayout: FormLayout = ({
   schema,
   formAtom,
@@ -96,8 +118,6 @@ export const GridLayout: FormLayout = ({
       style={style}
       className={clsx(className, styles.grid, {
         [styles.table]: schema.layout === "table",
-        [styles.stack]:
-          toKebabCase(schema.widget || schema.type) === "panel-stack",
       })}
     >
       {contents.map(({ style, content }) => (

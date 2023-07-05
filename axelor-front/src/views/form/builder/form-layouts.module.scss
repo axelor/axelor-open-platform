@@ -6,10 +6,6 @@
   display: none;
 }
 
-.grid.stack {
-  grid-template-columns: 100%;
-}
-
 [data-tab-container-size="xs"],
 [data-tab-container-size="sm"] {
   .grid {

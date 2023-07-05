@@ -1,1 +1,1 @@
-export { Panel as PanelStack } from '../panel';
+export * from './panel-stack';

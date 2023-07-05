@@ -10,7 +10,7 @@ import {
 
 import { MenuItem } from "@/services/client/meta.types";
 
-import { FieldLabel, GridLayout, WidgetProps } from "../../builder";
+import { FieldLabel, FormLayout, GridLayout, StackLayout, WidgetProps } from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
 import styles from "./panel.module.css";
@@ -72,6 +72,8 @@ export function Panel(props: WidgetProps) {
     </div>
   ) : undefined;
 
+  const Layout: FormLayout = schema.stacked ? StackLayout : GridLayout;
+
   return (
     <AxPanel
       header={header}
@@ -84,7 +86,7 @@ export function Panel(props: WidgetProps) {
         [styles.hasFrame]: showFrame === true,
       })}
     >
-      <GridLayout
+      <Layout
         readonly={readonly}
         formAtom={formAtom}
         parentAtom={widgetAtom}
