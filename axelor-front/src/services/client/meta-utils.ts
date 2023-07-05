@@ -44,7 +44,7 @@ function processFields(fields: Property[] | Record<string, Property>) {
   return result;
 }
 
-function processSelection(field: Schema) {
+export function processSelection(field: Schema) {
   if (field.selectionList && !field.widget) {
     field.widget = "selection";
   }
@@ -55,7 +55,7 @@ function processSelection(field: Schema) {
   });
 }
 
-function processWidget(field: Schema) {
+export function processWidget(field: Schema) {
   var attrs: Record<string, any> = {};
   _.each(field.widgetAttrs || {}, (value, name) => {
     var val = value;

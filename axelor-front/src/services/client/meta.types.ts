@@ -592,11 +592,12 @@ export interface ChartView extends View {
   xType?: string;
   stacked?: boolean;
   onInit?: string;
-  searchFields?: SearchField[];
+  search?: SearchField[];
   category?: ChartCategory;
   config?: ChartConfig;
   series?: ChartSeries[];
   actions?: ChartAction[];
+  usingSQL?: boolean;
 }
 
 export interface KanbanView extends View {
