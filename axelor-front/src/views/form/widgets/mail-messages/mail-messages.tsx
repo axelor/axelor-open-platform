@@ -34,7 +34,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const [pagination, setPagination] = useState({
     hasNext: false,
     offset: 0,
-    limit: schema.limit ?? 4,
+    limit: schema.limit ?? 10,
     total: 0,
   });
   const { name } = useViewAction();

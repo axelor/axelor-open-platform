@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -51,8 +52,9 @@ public class PanelMail extends AbstractPanel {
 
     @XmlAttribute private Integer limit;
 
+    @JsonGetter("filter")
     public String getFilter() {
-      return filter;
+      return "all".equals(filter) ? null : filter;
     }
 
     public void setFilter(String filter) {

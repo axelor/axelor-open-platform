@@ -1575,14 +1575,27 @@
         <xsd:sequence>
           <xsd:element name="mail-messages">
             <xsd:complexType>
-              <xsd:attribute name="filter" type="xsd:string">
+              <xsd:attribute name="filter">
                 <xsd:annotation>
                   <xsd:documentation>
-                  Specify the message type to show by default.
+                  Specify the messages type to show: `all` (default), `comment`, `notification`.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="comment" />
+                    <xsd:enumeration value="notification" />
+                    <xsd:enumeration value="all" />
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+              <xsd:attribute name="limit" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Specify the maximum number of messages to display.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
-              <xsd:attribute name="limit" type="xsd:int"></xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="mail-followers" minOccurs="0"></xsd:element>

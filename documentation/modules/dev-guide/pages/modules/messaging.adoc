@@ -106,8 +106,10 @@ messages in threaded layout.
 * `<mail-messages>` - shows the messages in threaded layout
 * `<mail-followers>` - shows the list of followers/subscribers
 
-The messages are shown according the given `limit` on the `<mail-messages>` which
-is default to 30 messages.
+The messages are shown according to the `<mail-messages>` with following attributes :
+
+* `limit` : maximum number of messages to display. Default to 10 messages.
+* `filter` : messages type to show : `all` (default), `comment`, `notification`.
 
 The most recent messages are shown first. More messages can be loaded with a link
 provided at the end of message list (if there are more messages).
