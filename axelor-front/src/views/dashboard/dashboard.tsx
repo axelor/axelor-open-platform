@@ -4,7 +4,7 @@ import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 import { Box, clsx } from "@axelor/ui";
 
 import { useSession } from "@/hooks/use-session";
-import { request } from "@/services/client/client";
+import { saveView } from "@/services/client/meta-cache";
 import {
   Dashboard as DashboardView,
   PanelDashlet,
@@ -223,17 +223,10 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           };
         }
 
-        items &&
-          (await request({
-            url: "ws/meta/view/save",
-            method: "POST",
-            body: {
-              data: {
-                ...view,
-                items: items.map((item, index) => getItem(item, index)),
-              },
-            },
-          }));
+        items && await saveView({
+          ...view,
+          items: items.map((item, index) => getItem(item, index)),
+        });
       })();
     }
   }, [hasViewCustomize, items, view, layouts]);

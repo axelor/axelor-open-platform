@@ -9,7 +9,8 @@ import { i18n } from "@/services/client/i18n";
 import { Field, GridView } from "@/services/client/meta.types";
 import { useGridState } from "./utils";
 import { DataRecord } from "@/services/client/data.types";
-import { resetView, saveView } from "@/services/client/meta";
+import { resetView } from "@/services/client/meta";
+import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
 import { useSelector } from "@/hooks/use-relation";
 import { toTitleCase } from "@/utils/names";
@@ -224,24 +225,24 @@ export function useCustomizePopup({
         const buttons: DialogButton[] = (
           canReset
             ? [
-                {
-                  name: "reset",
-                  title: i18n.get("Reset"),
-                  variant: "danger",
-                  onClick: async (fn) => {
-                    const confirmed = await dialogs.confirm({
-                      content: i18n.get(
-                        "Are you sure you want to reset this view customization?"
-                      ),
-                    });
-                    if (confirmed) {
-                      fn(false);
-                      await resetView(view);
-                      reload();
-                    }
-                  },
-                } as DialogButton,
-              ]
+              {
+                name: "reset",
+                title: i18n.get("Reset"),
+                variant: "danger",
+                onClick: async (fn) => {
+                  const confirmed = await dialogs.confirm({
+                    content: i18n.get(
+                      "Are you sure you want to reset this view customization?"
+                    ),
+                  });
+                  if (confirmed) {
+                    fn(false);
+                    await resetView(view);
+                    reload();
+                  }
+                },
+              } as DialogButton,
+            ]
             : []
         ).concat([
           {
@@ -282,7 +283,7 @@ export function useCustomizePopup({
           ),
           buttons,
           size: "lg",
-          onClose: () => {},
+          onClose: () => { },
         });
       },
       [view, stateAtom]

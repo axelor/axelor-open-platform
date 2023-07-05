@@ -9,6 +9,8 @@ import {
 } from "./meta";
 import { findViewFields, processView, processWidgets } from "./meta-utils";
 import { type ActionView, type ViewType, FormView } from "./meta.types";
+import { request } from "./client";
+import { reject } from "./reject";
 
 const cache = new LoadingCache<Promise<any>>();
 
@@ -67,4 +69,25 @@ export async function findFields(
   return cache.get(makeKey("meta", model, jsonModel), () =>
     fetchFields(model, jsonModel)
   );
+}
+
+export async function saveView(data: any) {
+  const resp = await request({
+    url: "ws/meta/view/save",
+    method: "POST",
+    body: { data },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    if (status === 0) {
+      const { model, type, name } = data;
+      const key = makeKey("view", model, type, name);
+      cache.delete(key);
+      return data;
+    }
+    return reject(data);
+  }
+
+  return Promise.reject(resp.status);
 }
