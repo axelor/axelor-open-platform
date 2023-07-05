@@ -267,6 +267,7 @@ const FormContainer = memo(function FormContainer({
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
         const { isNew, ...props } = { readonly, ...options };
+        const isNewFromUnsaved = (isNew && record === null && !prev.record.id);
 
         record = record ?? {};
         record =
@@ -288,11 +289,11 @@ const FormContainer = memo(function FormContainer({
           dirty: false,
           states: {},
           statesByName: {},
-          record: record,
+          record,
           original: { ...record },
         });
 
-        if (action && !isNew) {
+        if (action && (!isNew || isNewFromUnsaved)) {
           // execute action
           await actionExecutor.execute(action);
 
