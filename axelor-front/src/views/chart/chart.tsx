@@ -302,6 +302,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   useEffect(() => {
     if (view && dashlet) {
       setDashletHandlers({
+        title: view.title,
         view,
         onLegendShowHide: showLegend,
         onAction: onDatasetAction,

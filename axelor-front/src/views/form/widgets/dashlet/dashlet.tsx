@@ -28,6 +28,11 @@ interface DashletProps {
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
 }
 
+function DashletTitle({ title }: { title?: string }) {
+  const dashlet = useAtomValue(useDashletHandlerAtom());
+  return <Box className={classes.title}>{dashlet.title || title}</Box>;
+}
+
 export function DashletComponent({
   schema,
   className,
@@ -103,7 +108,7 @@ export function DashletComponent({
           style={{ height }}
         >
           <Box className={classes.header}>
-            <Box className={classes.title}>{title || tab?.title}</Box>
+            <DashletTitle title={title || tab?.title} />
             <DashletActions
               dashboard={dashboard}
               viewType={viewType}

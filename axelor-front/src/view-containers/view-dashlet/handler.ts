@@ -9,6 +9,7 @@ import { ActionExecutor } from "../action";
 
 export type DashletHandler = {
   dataStore?: DataStore;
+  title?: string;
   view?: View;
   actionExecutor?: ActionExecutor;
   gridStateAtom?: PrimitiveAtom<GridState>;
