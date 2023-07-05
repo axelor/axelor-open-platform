@@ -55,6 +55,15 @@ export class Cache<T> {
   }
 
   /**
+   * Remove an entry from the cache.
+   *
+   * @param key cache key
+   */
+  delete(key: string) {
+    this.#cache.delete(key);
+  }
+
+  /**
    * Get an entry from the cache.
    *
    * @param key cache key
