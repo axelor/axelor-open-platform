@@ -43,6 +43,7 @@ function toCalendarFormat(format: string) {
 export function DateComponent({
   schema,
   readonly,
+  invalid,
   attrs,
   value,
   onChange,
@@ -53,6 +54,7 @@ export function DateComponent({
   onChange: (value: string | null, callOnChange?: boolean) => void;
   attrs?: WidgetState["attrs"];
   readonly?: boolean;
+  invalid?: boolean;
   trapFocus?: boolean;
 }) {
   const { focus } = attrs || {};
@@ -190,6 +192,7 @@ export function DateComponent({
           textValue={textValue}
           customInput={
             <DateInput
+              invalid={invalid}
               eventOnBlur={handleBlur}
               format={format}
               open={open}
@@ -226,7 +229,7 @@ export function DateComponent({
 }
 
 export function Date(props: FieldProps<string>) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const [value, setValue] = useAtom(valueAtom);
   const { attrs } = useAtomValue(widgetAtom);
   return (
@@ -234,6 +237,7 @@ export function Date(props: FieldProps<string>) {
       <DateComponent
         schema={schema}
         readonly={readonly}
+        invalid={invalid}
         attrs={attrs}
         value={value}
         onChange={setValue}

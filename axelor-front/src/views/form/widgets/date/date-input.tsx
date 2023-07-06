@@ -33,11 +33,15 @@ export const DateInput = forwardRef<any, any>(
     { className, format, open, onOpen, onClose, onKeyDown, ...props }: any,
     ref
   ) => {
-    const { eventOnBlur: onBlur, onFocus } = props;
+    const { eventOnBlur: onBlur, onChange, onFocus } = props;
 
     function handleBlur({ target: { name, value } }: any) {
       if (open) return;
-      onBlur && onBlur({ target: { name, value } });
+      const event = {
+        target: { name, value: value?.includes?.("_") ? "" : value },
+      };
+      onChange?.(event);
+      onBlur?.(event);
     }
 
     function handleKeyDown(e: any) {
