@@ -1,10 +1,11 @@
 import { uniqueId } from "lodash";
 
-import { DataContext } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
 import { Attrs, DEFAULT_ATTRS } from "./types";
+import { MetaData } from "@/services/client/meta";
 
 export const nextId = (() => {
   let id = 0;
@@ -163,4 +164,13 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   }
 
   return res;
+}
+
+export function getDefaultValues(fields?: MetaData["fields"]) {
+  const result: DataRecord = Object.entries(fields ?? {}).reduce(
+    (acc, [key, { defaultValue }]) =>
+      defaultValue === undefined ? acc : { ...acc, [key]: defaultValue },
+    {}
+  );
+  return result;
 }

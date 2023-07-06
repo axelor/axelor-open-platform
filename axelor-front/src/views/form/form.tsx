@@ -63,6 +63,7 @@ import { Collaboration } from "./widgets/collaboration";
 
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
+import { getDefaultValues } from "./builder/utils";
 
 import styles from "./form.module.scss";
 
@@ -76,7 +77,7 @@ export const fetchRecord = async (
     const related = meta.related;
     return dataStore.read(+id, { fields, related });
   }
-  return getDefaultValues(meta);
+  return getDefaultValues(meta.fields);
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {
@@ -138,18 +139,6 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
     input.select();
   }
 };
-
-function getDefaultValues(meta: ViewData<FormView>) {
-  const { fields = {} } = meta;
-  const result: DataRecord = Object.entries(fields).reduce(
-    (acc, [key, { defaultValue }]) =>
-      defaultValue === undefined || key.includes(".")
-        ? acc
-        : { ...acc, [key]: defaultValue },
-    {}
-  );
-  return result;
-}
 
 const timeSymbol = Symbol("$$time");
 
@@ -280,7 +269,7 @@ const FormContainer = memo(function FormContainer({
         record =
           record.id && record.id > 0
             ? record
-            : { ...getDefaultValues(prev.meta), ...record };
+            : { ...getDefaultValues(prev.meta.fields), ...record };
 
         // this is required to trigger expression re-evaluation
         record = { ...record, [timeSymbol]: Date.now() };

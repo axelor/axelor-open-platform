@@ -25,7 +25,7 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import format from "@/utils/format";
-import { nextId } from "@/views/form/builder/utils";
+import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDevice } from "@/hooks/use-responsive";
@@ -217,7 +217,7 @@ export const Grid = forwardRef<
   }, []);
 
   const doAdd = useCallback(async () => {
-    const newRecord = { id: nextId() };
+    const newRecord = { id: nextId(), ...getDefaultValues(fields) };
     const newRecords = [...(records || []), newRecord];
     setState?.((draft) => {
       const { rows, columns, orderBy, groupBy } = draft;
@@ -237,7 +237,7 @@ export const Grid = forwardRef<
         null,
       ];
     });
-  }, [records, setState]);
+  }, [fields, records, setState]);
 
   const handleRecordAdd = useCallback(async () => {
     setEvent("editable:add-new");
