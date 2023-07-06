@@ -51,7 +51,7 @@ export function useInput<T>(
   }
 ) {
   const { onChangeTrigger = "blur", defaultValue } = options;
-  const value = useAtomValue(valueAtom) || defaultValue;
+  const value = useAtomValue(valueAtom) ?? defaultValue;
   const setValue = useSetAtom(valueAtom);
   const [changed, setChanged] = useState(false);
 
