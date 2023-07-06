@@ -49,7 +49,6 @@ export interface SessionInfo {
     };
     grid?: {
       selection?: "checkbox";
-      editorButtons: boolean;
     };
     menubar?: {
       location: string;
@@ -98,7 +97,6 @@ const INFO_MAPPINGS = {
   "user.canViewCollaboration": "view.collaboration.canView",
   "view.allow-customization": "view.customization",
   "view.grid.selection": "view.grid.selection",
-  "view.grid.editor-buttons": "view.grid.editorButtons",
   "view.menubar.location": "view.menubar.location",
   "view.adv-search.share": "view.advanceSearch.share",
   "view.adv-search.export-full": "view.advanceSearch.exportFull",

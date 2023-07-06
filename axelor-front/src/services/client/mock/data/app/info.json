@@ -7,7 +7,6 @@
   "user.navigator": null,
   "application.help": "http://docs.axelor.com",
   "user.singleTab": false,
-  "view.grid.editor-buttons": false,
   "application.author": "Axelor",
   "view.allow-customization": true,
   "data.upload.max-size": "5",

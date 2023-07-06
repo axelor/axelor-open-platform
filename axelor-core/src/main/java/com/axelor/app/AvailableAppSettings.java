@@ -65,7 +65,6 @@ public interface AvailableAppSettings {
   String VIEW_ADV_SEARCH_SHARE = "view.adv-search.share";
 
   String VIEW_GRID_SELECTION = "view.grid.selection";
-  String VIEW_GRID_EDITOR_BUTTONS = "view.grid.editor-buttons";
 
   String VIEW_COLLABORATION_ENABLED = "view.collaboration.enabled";
 
