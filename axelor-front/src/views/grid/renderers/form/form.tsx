@@ -303,7 +303,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             return;
           }
 
-          const { record } = get(formAtom);
+          const { record, original } = get(formAtom);
 
           if (isEqual(record, recordRef.current)) {
             return;
@@ -311,11 +311,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
           recordRef.current = record;
 
-          // except id, other fields is exist
-          if (Object.keys(record).length > 1) {
-            handleSave(true);
-          } else {
+          // check if not changed then discard it.
+          if (isEqual(record, original)) {
             handleCancel();
+          } else {
+            handleSave(true);
           }
         },
         [getParent, formAtom, handleSave, handleCancel]
