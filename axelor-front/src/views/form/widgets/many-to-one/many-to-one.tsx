@@ -212,6 +212,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         )
       ) : (
         <CreatableSelect
+          {...(focus && { key: "focused" })}
           autoFocus={focus}
           schema={schema}
           canCreate={canNew}

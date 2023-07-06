@@ -41,6 +41,7 @@ export function String({
         <ViewerInput value={trValue ?? value} />
       ) : (
         <Input
+          {...(focus && { key: "focused" })}
           data-input
           type="text"
           id={uid}

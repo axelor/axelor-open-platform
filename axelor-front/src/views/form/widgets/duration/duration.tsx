@@ -102,6 +102,7 @@ export function Duration(props: FieldProps<string | number>) {
       {readonly && <ViewerInput value={value} />}
       {readonly || (
         <MaskedInput
+          {...(focus && { key: "focused" })}
           data-input
           type="text"
           id={uid}

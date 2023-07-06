@@ -366,9 +366,6 @@ export class DefaultActionExecutor implements ActionExecutor {
           case "value:del":
             await this.#handler.delValue(target, value);
             break;
-          case "focus":
-            await this.#handler.setFocus(target);
-            break;
           case "refresh":
             await this.#handler.refresh(target);
             break;

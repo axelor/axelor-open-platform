@@ -133,6 +133,7 @@ export function Decimal(props: FieldProps<string | number>) {
       {readonly || (
         <div className={styles.container}>
           <Input
+            {...(focus && { key: "focused" })}
             data-input
             className={styles.numberInput}
             autoFocus={focus}

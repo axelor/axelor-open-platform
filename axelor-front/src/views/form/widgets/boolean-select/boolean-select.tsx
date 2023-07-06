@@ -56,6 +56,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
         />
       ) : (
         <Select
+          {...(focus && { key: "focused" })}
           autoFocus={focus}
           invalid={invalid}
           value={selected}

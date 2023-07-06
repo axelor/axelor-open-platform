@@ -120,6 +120,7 @@ export function Selection({
       {readonly && <SelectText schema={schema} value={value} />}
       {readonly || (
         <Select
+          {...(focus && { key: "focused" })}
           autoFocus={focus}
           invalid={invalid}
           value={selectValue ?? null}

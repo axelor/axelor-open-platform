@@ -157,6 +157,7 @@ export function TagSelect(
         </Box>
       ) : (
         <TagSelectComponent
+          {...(focus && { key: "focused" })}
           autoFocus={focus}
           schema={schema}
           placeholder={placeholder}

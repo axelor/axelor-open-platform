@@ -110,6 +110,7 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
       )}
       {readonly || (
         <Select
+          {...(focus && { key: "focused" })}
           autoFocus={focus}
           invalid={invalid}
           value={selectValue ?? null}
