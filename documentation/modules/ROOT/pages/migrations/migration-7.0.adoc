@@ -17,3 +17,16 @@ Here are the following changes due to this change :
 
 - `npm-install` Gradle task has been removed.
 
+=== Font Awesome icons deprecated
+
+Font Awesome icons was used as main icons library. Now two library are used :
+https://marella.github.io/material-symbols/demo/[Material Symbols] and
+https://icons.getbootstrap.com/[Bootstrap Icons].
+
+Depending on the icons used, it will try to first use `Material Symbols` if the icon exist, then fallback to
+`Bootstrap icons`. To ensure easy migration steps, Font Awesome icons have been mapped to Bootstrap Icons.
+Please be aware that some Font Awesome icons don't have any equivalent in Bootstrap Icons, so an apps icon will be use
+instead. Missing icons will be log in console in non production mode.
+
+
+
