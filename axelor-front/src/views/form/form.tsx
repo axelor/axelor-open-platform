@@ -143,7 +143,7 @@ function getDefaultValues(meta: ViewData<FormView>) {
   const { fields = {} } = meta;
   const result: DataRecord = Object.entries(fields).reduce(
     (acc, [key, { defaultValue }]) =>
-      defaultValue === undefined ? acc : { ...acc, [key]: defaultValue },
+      defaultValue === undefined || key.includes(".") ? acc : { ...acc, [key]: defaultValue },
     {}
   );
   return result;
