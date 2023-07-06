@@ -89,9 +89,12 @@ export const StackLayout: FormLayout = ({
   className,
   readonly,
 }) => {
-  const { items = [] } = schema;
+  const { items = [], gap } = schema;
   return (items && (
-    <div className={legacyClassNames(className, schema.css)}>
+    <div
+      className={legacyClassNames(className, schema.css)}
+      {...(gap && { style: { gap } })}
+    >
       {items.map((item) => (
         <FormWidget
           key={item.uid}
