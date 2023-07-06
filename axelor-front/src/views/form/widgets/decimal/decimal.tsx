@@ -4,10 +4,11 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Field } from "@/services/client/meta.types";
+import { Field, Property } from "@/services/client/meta.types";
 import format from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
+import { parseDecimal } from "../../builder/utils";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "../string/viewer";
 
@@ -35,13 +36,7 @@ export function Decimal(props: FieldProps<string | number>) {
   const parse = useCallback(
     (value: string | number, scale?: number) => {
       if (scale) {
-        const nums = String(value).split(".");
-        // scale the decimal part
-        const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(scale);
-        // increment the integer part if decimal part is greater than 0 (due to rounding)
-        const num = BigInt(nums[0]) + BigInt(parseInt(dec));
-        // append the decimal part
-        return num + dec.substring(1);
+        return parseDecimal(value, { scale } as Property);
       }
       return isDecimal ? value : parseInt(String(value));
     },

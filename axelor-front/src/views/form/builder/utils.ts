@@ -166,10 +166,30 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   return res;
 }
 
+export function parseDecimal(value: any, { scale }: Property) {
+  if (scale) {
+    const nums = String(value).split(".");
+    // scale the decimal part
+    const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(+scale);
+    // increment the integer part if decimal part is greater than 0 (due to rounding)
+    const num = BigInt(nums[0]) + BigInt(parseInt(dec));
+    // append the decimal part
+    return num + dec.substring(1);
+  }
+  return value;
+}
+
 export function getDefaultValues(fields?: MetaData["fields"]) {
   const result: DataRecord = Object.entries(fields ?? {}).reduce(
-    (acc, [key, { defaultValue }]) =>
-      defaultValue === undefined ? acc : { ...acc, [key]: defaultValue },
+    (acc, [key, field]) => {
+      const { type, defaultValue } = field;
+      if (defaultValue === undefined || key.includes(".")) {
+        return acc;
+      }
+      const value =
+        type === "DECIMAL" ? parseDecimal(defaultValue, field) : defaultValue;
+      return { ...acc, [key]: value };
+    },
     {}
   );
   return result;
