@@ -92,7 +92,7 @@ export const StackLayout: FormLayout = ({
   const { items = [], gap } = schema;
   return (items && (
     <div
-      className={legacyClassNames(className, schema.css)}
+      className={legacyClassNames(styles.stack, className, schema.css)}
       {...(gap && { style: { gap } })}
     >
       {items.map((item) => (

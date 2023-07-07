@@ -4,8 +4,9 @@
 
 .field-append {
   display: flex;
-  align-items: center;
-  gap: 0.25rem;
+  align-items: center !important;
+  flex-direction: row !important;
+  gap: 0.25rem !important;
 }
 
 .kanban-card {
