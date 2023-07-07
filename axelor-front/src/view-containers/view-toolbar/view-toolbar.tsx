@@ -21,7 +21,6 @@ import { Icon } from "@/components/icon";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
-import { i18n } from "@/services/client/i18n";
 import {
   Button,
   Menu,
@@ -32,7 +31,9 @@ import {
 import { RecordHandler } from "@/views/form/builder";
 import { useAtomValue } from "jotai";
 import { ActionExecutor } from "../action";
+
 import styles from "./view-toolbar.module.scss";
+
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
   actionExecutor?: ActionExecutor;
@@ -340,7 +341,6 @@ export function ViewToolBar(props: ViewToolBarProps) {
           items={[
             {
               key: "prev",
-              text: i18n.get("Prev"),
               iconProps: {
                 icon: "navigate_before",
               },
@@ -349,7 +349,6 @@ export function ViewToolBar(props: ViewToolBarProps) {
             },
             {
               key: "next",
-              text: i18n.get("Next"),
               iconSide: "end",
               iconProps: {
                 icon: "navigate_next",

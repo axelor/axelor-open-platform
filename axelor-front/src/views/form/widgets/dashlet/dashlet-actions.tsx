@@ -1,30 +1,31 @@
-import { useCallback, useState } from "react";
+import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
+import { useCallback, useState } from "react";
 
 import { PageText } from "@/components/page-text";
+import { useDataStore } from "@/hooks/use-data-store";
+import { SearchOptions } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
+import { i18n } from "@/services/client/i18n";
+import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
+import { download } from "@/utils/download";
 import {
   DashletHandler,
   useDashletHandlerAtom,
 } from "@/view-containers/view-dashlet/handler";
-import { DataStore } from "@/services/client/data-store";
-import { useDataStore } from "@/hooks/use-data-store";
-import { useFormRefresh } from "../../builder/scope";
-import { download } from "@/utils/download";
-import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
-import { i18n } from "@/services/client/i18n";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
-import { SearchOptions } from "@/services/client/data";
-import classes from "./dashlet-actions.module.scss";
 import { useViewTabRefresh } from "@/view-containers/views/scope";
+import { useFormRefresh } from "../../builder/scope";
+
+import classes from "./dashlet-actions.module.scss";
 
 interface DashletMenuProps extends DashletHandler {
   viewType?: string;
   items?: CommandItemProps[];
 }
 
-const noop = () => { };
+const noop = () => {};
 
 export function DashletActions({
   viewType,
@@ -51,7 +52,10 @@ export function DashletActions({
   useFormRefresh(onRefresh);
 
   // register tab:refresh
-  useViewTabRefresh(dashboard ? "dashboard" : "form", dashboard && onRefresh ? onRefresh : noop);
+  useViewTabRefresh(
+    dashboard ? "dashboard" : "form",
+    dashboard && onRefresh ? onRefresh : noop
+  );
 
   return (
     <Box className={classes.actions} gap={1}>
@@ -206,7 +210,6 @@ function DashletListMenu(
         items={[
           {
             key: "prev",
-            text: i18n.get("Prev"),
             iconProps: {
               icon: "navigate_before",
             },
@@ -218,7 +221,6 @@ function DashletListMenu(
           },
           {
             key: "next",
-            text: i18n.get("Next"),
             iconSide: "end",
             iconProps: {
               icon: "navigate_next",
