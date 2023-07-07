@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
+import { ScopeProvider } from "jotai-molecules";
 import {
   MutableRefObject,
   RefObject,
@@ -64,6 +65,7 @@ import { Collaboration } from "./widgets/collaboration";
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
 import { getDefaultValues } from "./builder/utils";
+import { FormValiditityHandler, FormValidityScope } from "./builder/scope";
 
 import styles from "./form.module.scss";
 
@@ -238,6 +240,7 @@ const FormContainer = memo(function FormContainer({
     useCallback((state) => state.prevType, [])
   );
 
+  const widgetsRef = useRef(new Set<FormValiditityHandler>());
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
@@ -368,6 +371,11 @@ const FormContainer = memo(function FormContainer({
   );
 
   const getErrors = useGetErrors();
+  const getWidgetErrors = useCallback(() => {
+    return Array.from(widgetsRef.current).some((checkWidgetInvalid) =>
+      checkWidgetInvalid()
+    );
+  }, []);
 
   const onSave = useAtomCallback(
     useCallback(
@@ -379,8 +387,8 @@ const FormContainer = memo(function FormContainer({
       ) => {
         const formState = get(formAtom);
         const errors = getErrors(formState);
-        if (errors) {
-          showErrors(errors);
+        if (errors || getWidgetErrors()) {
+          errors && showErrors(errors);
           return Promise.reject();
         }
 
@@ -413,6 +421,7 @@ const FormContainer = memo(function FormContainer({
         doEdit,
         doRead,
         formAtom,
+        getWidgetErrors,
         getErrors,
         onSaveAction,
         readonly,
@@ -621,6 +630,11 @@ const FormContainer = memo(function FormContainer({
     [actionExecutor, handleOnSave]
   );
 
+  const handleAddWidgetValidator = useCallback((fn: FormValiditityHandler) => {
+    widgetsRef.current.add(fn);
+    return () => widgetsRef.current.delete(fn);
+  }, []);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleFocus = useHandleFocus(containerRef);
@@ -797,18 +811,25 @@ const FormContainer = memo(function FormContainer({
         </ViewToolBar>
       )}
       <div className={styles.formViewScroller} ref={containerRef}>
-        <FormComponent
-          className={styles.formView}
-          readonly={readonly}
-          schema={meta.view}
-          fields={meta.fields!}
-          formAtom={formAtom}
-          recordHandler={recordHandler}
-          actionHandler={actionHandler}
-          actionExecutor={actionExecutor}
-          layout={Layout}
-          widgetAtom={widgetAtom}
-        />
+        <ScopeProvider
+          scope={FormValidityScope}
+          value={{
+            add: handleAddWidgetValidator,
+          }}
+        >
+          <FormComponent
+            className={styles.formView}
+            readonly={readonly}
+            schema={meta.view}
+            fields={meta.fields!}
+            formAtom={formAtom}
+            recordHandler={recordHandler}
+            actionHandler={actionHandler}
+            actionExecutor={actionExecutor}
+            layout={Layout}
+            widgetAtom={widgetAtom}
+          />
+        </ScopeProvider>
       </div>
     </div>
   );

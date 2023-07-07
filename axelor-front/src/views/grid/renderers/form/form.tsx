@@ -5,6 +5,7 @@ import {
   KeyboardEvent,
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -30,7 +31,7 @@ import {
 } from "@/views/form/builder";
 
 import { useShortcut } from "@/hooks/use-shortcut";
-import { useFormScope } from "@/views/form/builder/scope";
+import { useFormScope, useFormValidityScope } from "@/views/form/builder/scope";
 import { useViewAction } from "@/view-containers/views/scope";
 import styles from "./form.module.scss";
 
@@ -173,6 +174,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       () => ({ ...context, ...record }),
       [context, record]
     );
+    const { add: addWidgetValidator } = useFormValidityScope();
     const { formAtom: parent } = useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
       useFormHandlers(
@@ -346,6 +348,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       },
       [checkInvalid, handleSave, handleCancel]
     );
+
+    useEffect(() => {
+      return addWidgetValidator(checkInvalid);
+    }, [addWidgetValidator, checkInvalid]);
 
     return (
       <FocusTrap initialFocus={false}>

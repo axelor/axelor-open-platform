@@ -28,6 +28,7 @@ import {
   FormProps,
   RecordHandler,
   RecordListener,
+  WidgetErrors,
   WidgetState,
 } from "./types";
 import { processActionValue } from "./utils";
@@ -161,6 +162,25 @@ const formMolecule = molecule((getMol, getScope) => {
 
 export function useFormScope() {
   const scopeAtom = useMolecule(formMolecule);
+  return useAtomValue(scopeAtom);
+}
+
+export type FormValiditityHandler = () => WidgetErrors[] | null;
+
+export type FormValidityScopeState = {
+  add: (fn: FormValiditityHandler) => void;
+};
+
+export const FormValidityScope = createScope<FormValidityScopeState>({
+  add: () => () => {},
+});
+
+const formValidityMolecule = molecule((getMol, getScope) => {
+  return atom(getScope(FormValidityScope));
+});
+
+export function useFormValidityScope() {
+  const scopeAtom = useMolecule(formValidityMolecule);
   return useAtomValue(scopeAtom);
 }
 
