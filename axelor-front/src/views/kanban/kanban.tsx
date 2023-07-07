@@ -69,7 +69,12 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const switchTo = useViewSwitch();
 
   const { params } = action;
-  const { columnBy, editWindow, limit, sequenceBy } = view;
+  const {
+    columnBy,
+    editWindow,
+    limit = +params?.limit || 20,
+    sequenceBy,
+  } = view;
   const hasEditPopup = editWindow === "popup";
   const hasAddPopup = hasEditPopup || editWindow === "popup-new";
   const hideCols = params?.["kanban-hide-columns"] || "";
