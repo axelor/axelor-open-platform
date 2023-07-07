@@ -100,8 +100,8 @@ export const useGetErrors = () => {
       const isHidden = function isHidden(s: WidgetState): boolean {
         return Boolean(
           s.attrs.hidden ||
-          (s.name && statesByName[s.name]?.attrs?.hidden) ||
-          (s.parent && isHidden(store.get(s.parent)))
+            (s.name && statesByName[s.name]?.attrs?.hidden) ||
+            (s.parent && isHidden(store.get(s.parent)))
         );
       };
       const errors = Object.values(states)
@@ -143,11 +143,15 @@ function getDefaultValues(meta: ViewData<FormView>) {
   const { fields = {} } = meta;
   const result: DataRecord = Object.entries(fields).reduce(
     (acc, [key, { defaultValue }]) =>
-      defaultValue === undefined || key.includes(".") ? acc : { ...acc, [key]: defaultValue },
+      defaultValue === undefined || key.includes(".")
+        ? acc
+        : { ...acc, [key]: defaultValue },
     {}
   );
   return result;
 }
+
+const timeSymbol = Symbol("$$time");
 
 export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
@@ -159,7 +163,9 @@ export function Form(props: ViewProps<FormView>) {
 
   const { params } = action;
   const recordId = String(id || action.context?._showRecord || "");
-  const readonly = !params?.forceEdit && (params?.forceReadonly || (viewProps.readonly ?? Boolean(recordId)));
+  const readonly =
+    !params?.forceEdit &&
+    (params?.forceReadonly || (viewProps.readonly ?? Boolean(recordId)));
 
   const popupRecord = params?.["_popup-record"];
 
@@ -268,7 +274,7 @@ const FormContainer = memo(function FormContainer({
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
         const { isNew, ...props } = { readonly, ...options };
-        const isNewFromUnsaved = (isNew && record === null && !prev.record.id);
+        const isNewFromUnsaved = isNew && record === null && !prev.record.id;
 
         record = record ?? {};
         record =
@@ -277,7 +283,7 @@ const FormContainer = memo(function FormContainer({
             : { ...getDefaultValues(prev.meta), ...record };
 
         // this is required to trigger expression re-evaluation
-        record = { ...record, $$time: Date.now() };
+        record = { ...record, [timeSymbol]: Date.now() };
 
         if (isNew) {
           recordRef.current = record;
