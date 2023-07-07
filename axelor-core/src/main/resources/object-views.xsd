@@ -1229,15 +1229,10 @@
             <xsd:documentation>Whether to fetch initial records.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="x-selector">
+        <xsd:attribute name="x-selector" type="tns:SelectorType">
           <xsd:annotation>
             <xsd:documentation>Specify the row selection control</xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="checkbox" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
@@ -1447,15 +1442,10 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="x-selector">
+        <xsd:attribute name="x-selector" type="tns:SelectorType">
           <xsd:annotation>
             <xsd:documentation>Specify the row selection control</xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="checkbox" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
@@ -4009,4 +3999,10 @@
     <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
+  <xsd:simpleType name="SelectorType">
+  	<xsd:restriction base="xsd:string">
+  		<xsd:enumeration value="checkbox"></xsd:enumeration>
+  		<xsd:enumeration value="single"></xsd:enumeration>
+  	</xsd:restriction>
+  </xsd:simpleType>
 </xsd:schema>
