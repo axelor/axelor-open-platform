@@ -1,1 +1,1 @@
-export { StackLayout as PanelStack } from "../../builder";
+export * from "./panel-stack";
