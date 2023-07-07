@@ -130,7 +130,10 @@ const DataViews = memo(function DataViews({
   const {
     action: { name: actionName, domain, context, params },
   } = tab;
+  const limit = +params?.limit || 0;
+
   const dataStore = new DataStore(model, {
+    ...(limit && { limit }),
     filter: {
       _domain: domain,
       _domainContext: context,
@@ -148,7 +151,7 @@ const DataViews = memo(function DataViews({
   );
   const setSearchState = useSetAtom(searchAtom);
 
-  const filterName = (params || {})["search-filters"];
+  const filterName = params?.["search-filters"];
   const defaultSearchFilter = params?.["default-search-filters"];
   const dashlet = actionName?.startsWith("$dashlet");
 
@@ -181,18 +184,18 @@ const DataViews = memo(function DataViews({
         model,
       });
       const fields = res?.fields || {};
-      items = (res?.view?.items || []).map(item => {
+      items = (res?.view?.items || []).map((item) => {
         const field = fields[item.name || ""] || {};
         return {
           ...field,
           ...item,
           type: field.type ?? "STRING",
-        } as Property
+        } as Property;
       });
       domains = (res?.view?.filters || []).map((d) => ({
         ...d,
         checked: selectedDomains.includes(d.name!),
-      }))
+      }));
     }
 
     setSearchState((_state) => {
