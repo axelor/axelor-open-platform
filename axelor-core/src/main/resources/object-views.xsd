@@ -4002,7 +4002,7 @@
   <xsd:simpleType name="SelectorType">
   	<xsd:restriction base="xsd:string">
   		<xsd:enumeration value="checkbox"></xsd:enumeration>
-  		<xsd:enumeration value="single"></xsd:enumeration>
+  		<xsd:enumeration value="none"></xsd:enumeration>
   	</xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>

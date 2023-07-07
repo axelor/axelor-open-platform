@@ -192,7 +192,7 @@ db.default.user = username
 db.default.password = secret
 ----
 
-== Others Settings
+== Other Settings
 
 [cols="1,8,1"]
 |===
@@ -221,7 +221,7 @@ db.default.password = secret
 | `view.menubar.location` | set menu style. Can be `left`, `top` or `both` | both
 | `view.toolbar.show-titles` | whether to show button titles in toolbar | false
 | `view.confirm-yes-no` | whether show confirm dialog with yes/no buttons (else is Cancel/OK) | false
-| `view.grid.selection` | if set to `checkbox`, grid widgets will have checkbox selection enabled | `checkbox`
+| `view.grid.selection` | set grid widget selection: `checkbox` or `none` | `checkbox`
 | `view.allow-customization` | whether to disable views customization | true
 | `view.adv-search.share` | whether to disable advance search sharing | true
 | `view.adv-search.export-full` | whether to disable export full option in advance search | true

@@ -1,5 +1,6 @@
 import { set } from "lodash";
 import { request } from "./client";
+import { SelectorType } from "./meta.types";
 
 export interface SessionInfo {
   api?: {
@@ -48,7 +49,7 @@ export interface SessionInfo {
       exportFull?: boolean;
     };
     grid?: {
-      selection?: "checkbox";
+      selection?: SelectorType;
     };
     menubar?: {
       location: string;

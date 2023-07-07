@@ -49,7 +49,7 @@ The grid view has the following attributes:
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `canArchive` | whether to allow archiving/unarchiving records
 | `x-no-fetch` | whether to fetch initial records
-| `x-selector` | specify the row selection control (`checkbox` to show checkbox selection)
+| `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 |===
 
 IMPORTANT: The object should have a numeric field named `sequence` to allow

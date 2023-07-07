@@ -313,7 +313,7 @@ export interface Panel extends WidgetContainer {
   )[];
 }
 
-export type SelectorType = "checkbox" | "single" | null;
+export type SelectorType = "checkbox" | "none";
 
 export interface PanelRelated extends Omit<Panel, "type"> {
   type: "panel-related";

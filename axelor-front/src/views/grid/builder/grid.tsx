@@ -99,7 +99,7 @@ export const Grid = forwardRef<
   const { isMobile } = useDevice();
   const { data: user } = useSession();
   const allowCheckboxSelection =
-    (user?.view?.grid?.selection ?? "checkbox") === "checkbox";
+    (view.selector ?? user?.view?.grid?.selection ?? "checkbox") === "checkbox";
 
   const names = useMemo(
     () =>
