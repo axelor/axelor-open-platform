@@ -4,8 +4,7 @@ import React, { useCallback, useState } from "react";
 import { Input } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
-
-const noop = () => {};
+import { useAppTheme } from "@/hooks/use-app-theme";
 
 export function Text({
   inputProps,
@@ -19,6 +18,7 @@ export function Text({
   const { schema, readonly, widgetAtom, valueAtom } = props;
   const { uid, height, placeholder } = schema;
   const { onBlur } = inputProps || {};
+  const theme = useAppTheme();
 
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
@@ -50,20 +50,9 @@ export function Text({
   return (
     <FieldControl {...props}>
       {readonly ? (
-        <Input
-          data-input
-          as="textarea"
-          rows={height || 5}
-          value={value || ""}
-          onChange={noop}
-          disabled
-          readOnly
-          bg="body"
-          border={false}
-          style={{
-            resize: "none",
-          }}
-        />
+        <Input as="pre" bg={theme === "dark" ? "body" : "light"}>
+          {value}
+        </Input>
       ) : (
         <Input
           data-input
