@@ -46,11 +46,14 @@ function MenuItem({ item }: ItemProps) {
 }
 
 function isSelected(selection: Selection, value: any) {
-  const val = selection.value;
-  return val === value || String(val) === String(value);
+  const selected = selection.value;
+  const val = typeof value === "object" ? value.id : value;
+  return selected === val || String(selected) === String(val);
 }
 
-export function NavSelect(props: FieldProps<string | number>) {
+export function NavSelect(
+  props: FieldProps<string | number | Record<string, number>>
+) {
   const { schema, readonly, widgetAtom, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
 
@@ -68,9 +71,14 @@ export function NavSelect(props: FieldProps<string | number>) {
   const onItemClick = useCallback(
     ({ selection }: SelectItem) => {
       if (readonly) return;
-      setValue(selection.value, true);
+      if (schema.serverType?.endsWith("_TO_ONE")) {
+        const id = +selection.value!;
+        setValue({ id }, true);
+      } else {
+        setValue(selection.value, true);
+      }
     },
-    [readonly, setValue]
+    [readonly, schema.serverType, setValue]
   );
 
   const isItemActive = useCallback(
