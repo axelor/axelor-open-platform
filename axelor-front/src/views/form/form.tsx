@@ -888,14 +888,10 @@ function useFormWidth(
     [hasSide, width]
   );
 
-  const style = useMemo(() => {
-    const result = {
-      width,
-      minWidth,
-      maxWidth,
-    } as React.CSSProperties;
-    if (width === "*" || className) delete result.width;
-    return result;
+  const style: React.CSSProperties = useMemo(() => {
+    if (width === "*") return { maxWidth: "unset" };
+    if (className) return { minWidth, maxWidth };
+    return { width, minWidth, maxWidth };
   }, [className, maxWidth, minWidth, width]);
 
   const result = useMemo(
