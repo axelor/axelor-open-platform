@@ -18,11 +18,7 @@ import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import {
-  FormView,
-  GridView,
-  Widget,
-} from "@/services/client/meta.types";
+import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
@@ -52,6 +48,7 @@ import { request } from "@/services/client/client";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
 import { Details } from "./builder/details";
+import { HelpComponent } from "../form/widgets";
 import { useGridActionExecutor, useGridState } from "./builder/utils";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
@@ -120,7 +117,7 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopup = action.params?.["popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
   const hasPopupReload = hasPopup === "reload";
-  const { editable } = view;
+  const { editable, inlineHelp } = view;
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -187,8 +184,8 @@ function GridInner(props: ViewProps<GridView>) {
       const ids = hasAll
         ? records.map((r) => r.id!)
         : (selectedRows || [])
-          .map((ind) => rows[ind]?.record?.id)
-          .filter((id) => id > 0);
+            .map((ind) => rows[ind]?.record?.id)
+            .filter((id) => id > 0);
       const { model } = view;
 
       const confirmed = await dialogs.confirm({
@@ -245,7 +242,7 @@ function GridInner(props: ViewProps<GridView>) {
             records.map(({ id, version }) => ({ id, version }))
           );
           clearSelection();
-        } catch { }
+        } catch {}
       }
     },
     [dataStore, clearSelection]
@@ -359,7 +356,7 @@ function GridInner(props: ViewProps<GridView>) {
         await dataStore.save(records);
         onSearch();
         clearSelection();
-      } catch { }
+      } catch {}
     },
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
@@ -586,33 +583,33 @@ function GridInner(props: ViewProps<GridView>) {
   const popupProps: any =
     !dashlet && popup
       ? {
-        showEditIcon,
-        allowSelection: true,
-        selectionType: showCheckbox ? "multiple" : "single",
-        allowCheckboxSelection: true,
-      }
+          showEditIcon,
+          allowSelection: true,
+          selectionType: showCheckbox ? "multiple" : "single",
+          allowCheckboxSelection: true,
+        }
       : {};
   const dashletProps: any = dashlet
     ? {
-      readonly: viewProps?.readonly,
-      onView: viewProps?.readonly === false ? onEdit : onView,
-    }
+        readonly: viewProps?.readonly,
+        onView: viewProps?.readonly === false ? onEdit : onView,
+      }
     : {
-      allowSearch: true,
-      searchRowRenderer: Box,
-      searchColumnRenderer: searchColumnRenderer,
-    };
+        allowSearch: true,
+        searchRowRenderer: Box,
+        searchColumnRenderer: searchColumnRenderer,
+      };
   const detailsProps: Partial<GridProps> = hasDetailsView
     ? {
-      ...(detailsViewOverlay && { onView: undefined }),
-      ...(!detailsRecord && {
-        onRowClick: detailsViewOverlay
-          ? onShowDetails
-          : selectedDetail
+        ...(detailsViewOverlay && { onView: undefined }),
+        ...(!detailsRecord && {
+          onRowClick: detailsViewOverlay
+            ? onShowDetails
+            : selectedDetail
             ? onLoadDetails
             : undefined,
-      }),
-    }
+        }),
+      }
     : {};
 
   const readonly = dashletProps.readonly;
@@ -744,17 +741,17 @@ function GridInner(props: ViewProps<GridView>) {
               onClick: handleDelete,
               items: hasButton("archive")
                 ? [
-                  {
-                    key: "archive",
-                    text: i18n.get("Archive"),
-                    onClick: () => onArchiveOrUnArchive(true),
-                  },
-                  {
-                    key: "unarchive",
-                    text: i18n.get("Unarchive"),
-                    onClick: () => onArchiveOrUnArchive(false),
-                  },
-                ]
+                    {
+                      key: "archive",
+                      text: i18n.get("Archive"),
+                      onClick: () => onArchiveOrUnArchive(true),
+                    },
+                    {
+                      key: "unarchive",
+                      text: i18n.get("Unarchive"),
+                      onClick: () => onArchiveOrUnArchive(false),
+                    },
+                  ]
                 : undefined,
             },
             {
@@ -786,6 +783,11 @@ function GridInner(props: ViewProps<GridView>) {
             />
           )}
         </ViewToolBar>
+      )}
+      {inlineHelp && (
+        <div className={styles.help}>
+          <HelpComponent text={inlineHelp.text} css={inlineHelp.css} />
+        </div>
       )}
       <div className={styles.views}>
         <div className={styles["grid-view"]} style={gridViewStyles}>
@@ -827,9 +829,9 @@ function GridInner(props: ViewProps<GridView>) {
             })}
             {...(detailsViewOverlay &&
               detailsRecord && {
-              shadow: "2xl",
-              dropShadow: "2xl",
-            })}
+                shadow: "2xl",
+                dropShadow: "2xl",
+              })}
           >
             {detailsRecord ? (
               <Details

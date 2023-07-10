@@ -71,3 +71,10 @@
     --bs-btn-padding-x: 0;
   }
 }
+
+.help {
+  margin: 0.5rem;
+  & > div {
+    margin: 0 !important;
+  }
+}
