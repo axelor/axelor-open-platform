@@ -1,13 +1,20 @@
 import clsx from "clsx";
+import { useMemo } from "react";
+import { selectAtom } from "jotai/utils";
 import { useAtomValue } from "jotai";
 
 import { Box, InputLabel } from "@axelor/ui";
 
-import { FieldProps, WidgetProps } from "./types";
+import { DataStore } from "@/services/client/data-store";
+import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
+import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import { Tooltip } from "@/components/tooltip";
 import { i18n } from "@/services/client/i18n";
 import { session } from "@/services/client/session";
+import { useTemplate } from "@/hooks/use-parser";
+import { useAsync } from "@/hooks/use-async";
+import { useFormScope } from "./scope";
 import format from "@/utils/format";
 
 import styles from "./form-field.module.css";
@@ -34,10 +41,16 @@ export function FieldControl({
   showTitle,
   formAtom,
   widgetAtom,
+  valueAtom,
   titleActions,
   children,
 }: FieldControlProps<any>) {
   const canShowTitle = showTitle ?? schema.showTitle ?? true;
+
+  function render() {
+    return <Box className={styles.content}>{children}</Box>;
+  }
+
   return (
     <Box className={clsx(className, styles.container)}>
       {(canShowTitle || titleActions) && (
@@ -52,7 +65,17 @@ export function FieldControl({
           {titleActions && <Box className={styles.actions}>{titleActions}</Box>}
         </Box>
       )}
-      <Box className={styles.content}>{children}</Box>
+      {schema.tooltip && children ? (
+        <Tooltip
+          content={() => (
+            <FieldTooltipContent schema={schema} valueAtom={valueAtom} />
+          )}
+        >
+          {render()}
+        </Tooltip>
+      ) : (
+        render()
+      )}
     </Box>
   );
 }
@@ -180,5 +203,57 @@ function HelpContent(props: WidgetProps) {
         </dl>
       )}
     </Box>
+  );
+}
+
+function FieldTooltipContent({
+  schema,
+  valueAtom,
+}: {
+  schema: Schema;
+  valueAtom: ValueAtom<any>;
+}) {
+  const { formAtom } = useFormScope();
+  const value = useAtomValue(valueAtom);
+
+  const data = schema.tooltip as TooltipType;
+  const { depends, template } = data;
+  const Template = useTemplate(template!);
+
+  const formModel = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom])
+  );
+  const formRecord = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+  );
+
+  const isRelational = Boolean(schema.target);
+  const record = isRelational ? value : formRecord;
+  const model = isRelational ? schema.target : formModel;
+
+  const { data: context } = useAsync(async () => {
+    const shouldFetch =
+      !isRelational || depends?.trim?.() !== schema.targetName;
+    const recordId = record?.id;
+
+    let values = { ...record };
+
+    if (shouldFetch && model && recordId && recordId > 0) {
+      const ds = new DataStore(model);
+      const newValues = await ds.read(recordId, {
+        fields: (depends || "")?.split?.(",").map((f) => f.trim()),
+      });
+      values = { ...values, ...newValues };
+    }
+
+    return { ...values, record: values };
+  }, [isRelational, schema, model, record]);
+
+  return (
+    context && (
+      <Box>
+        <Template context={context} />
+      </Box>
+    )
   );
 }
