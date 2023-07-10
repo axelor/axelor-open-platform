@@ -279,27 +279,26 @@ export const Grid = forwardRef<
     );
   }, [view]);
 
-  const ActionCellRenderer = useMemo(() => {
-    return (props: GridColumnProps) => (
-      <CellRenderer
-        {...props}
-        onAction={(action: string, context?: DataContext) =>
-          actionExecutor!.execute(action, { context })
-        }
-      />
-    );
-  }, [actionExecutor]);
+  const CustomCellRenderer = useMemo(
+    () => (props: GridColumnProps) =>
+      (
+        <CellRenderer
+          {...props}
+          {...(actionExecutor && {
+            onAction: (action: string, context?: DataContext) =>
+              actionExecutor.execute(action, { context }),
+          })}
+          view={view}
+        />
+      ),
+    []
+  );
 
   const CustomFormRenderer = useMemo(() => {
     return (props: GridRowProps) => (
       <FormRenderer ref={formRef} {...props} view={view} fields={fields} />
     );
   }, [view, fields]);
-
-  const hasActionCell = useMemo(
-    () => columns.some((c) => ["button"].includes(c.type!)),
-    [columns]
-  );
 
   useImperativeHandle(
     ref,
@@ -330,9 +329,7 @@ export const Grid = forwardRef<
     <AxGridProvider>
       <ScopeProvider scope={GridScope} value={{ readonly }}>
         <AxGrid
-          cellRenderer={
-            hasActionCell && actionExecutor ? ActionCellRenderer : CellRenderer
-          }
+          cellRenderer={CustomCellRenderer}
           rowRenderer={CustomRowRenderer}
           allowColumnResize
           allowGrouping
