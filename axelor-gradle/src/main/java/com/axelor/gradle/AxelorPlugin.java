@@ -46,14 +46,11 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.jvm.tasks.Jar;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
-import org.gradle.util.GradleVersion;
 
 public class AxelorPlugin implements Plugin<Project> {
 
   public static final String AXELOR_APP_GROUP = "axelor application";
   public static final String AXELOR_BUILD_GROUP = "axelor build";
-
-  public static final String GRADLE_VERSION = GradleVersion.current().getVersion();
 
   private final String version = VersionUtils.getVersion().version;
 
@@ -85,18 +82,13 @@ public class AxelorPlugin implements Plugin<Project> {
     configureEncryptionSupport(project);
   }
 
-  private boolean isCore(Project project) {
-    String name = project.getName();
-    return "axelor-core".equals(name) || "axelor-web".equals(name) || "axelor-test".equals(name);
-  }
-
   private void configureJarSupport(Project project) {
-    if (isCore(project)) {
+    if (AxelorUtils.isCore(project)) {
       return;
     }
 
-    // include webapp resources in jar
-    if (project != project.getRootProject()) {
+    if (!AxelorUtils.isAxelorApplication(project)) {
+      // include webapp resources in jar
       project
           .getTasks()
           .withType(Jar.class, jar -> jar.into("webapp", spec -> spec.from("src/main/webapp")));
@@ -110,7 +102,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
   private void configureWarSupport(Project project) {
     // only on root project
-    if (project != project.getRootProject()) return;
+    if (!AxelorUtils.isAxelorApplication(project)) return;
 
     project.getPlugins().apply(WarSupport.class);
     project.getPlugins().apply(ScriptsSupport.class);

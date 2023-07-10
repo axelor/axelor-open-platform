@@ -242,7 +242,7 @@ A `panel-dashlet` can have following attributes:
 | *`action`* |
 | `name` | name of the panel
 | `title` | title of the panel
-| `canSearch` | enable search header on grid view portlet
+| `canSearch` | enable search header (for grid views) or search box (for card views)
 | `height` | height taken by the widget
 | `colSpan` | number of columns taken by the widget
 | `hidden` | whether to hide the widget

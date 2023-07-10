@@ -234,6 +234,9 @@ public class ContextHandler<T> {
   }
 
   public Object interceptJsonAccess(Method method, Object[] args) throws Exception {
+    if ("isEmpty".equals(method.getName())) {
+      return values == null || values.size() == 0;
+    }
     final String name = (String) args[0];
     if ("class".equals(name)) return method.invoke(proxy, args);
     if ("get".equals(method.getName()) || "put".equals(method.getName())) {

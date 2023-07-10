@@ -20,19 +20,27 @@ package com.axelor.meta;
 
 import com.axelor.JpaTest;
 import com.axelor.common.ResourceUtils;
+import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.repo.MetaJsonFieldRepository;
+import com.axelor.test.db.Contact;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class MetaTest extends JpaTest {
 
   @Inject private ObjectMapper mapper;
+
+  @Inject private MetaJsonFieldRepository jsonFields;
 
   protected InputStream read(String resource) {
     return ResourceUtils.getResourceStream(resource);
@@ -52,5 +60,74 @@ public abstract class MetaTest extends JpaTest {
   protected String toJson(Object object)
       throws JsonGenerationException, JsonMappingException, IOException {
     return getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+  }
+
+  @BeforeEach
+  @Transactional
+  public void prepare() {
+    prepareCustomFields();
+  }
+
+  private void prepareCustomFields() {
+    if (jsonFields
+            .all()
+            .filter("self.model = :model AND self.modelField = :field")
+            .bind("model", Contact.class.getName())
+            .bind("field", "attrs")
+            .count()
+        == 0) {
+
+      final Consumer<MetaJsonField> fields =
+          f -> {
+            f.setModel(Contact.class.getName());
+            f.setModelField("attrs");
+            jsonFields.save(f);
+          };
+
+      MetaJsonField field;
+
+      field = new MetaJsonField();
+      field.setName("nickName");
+      field.setType("string");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("numerology");
+      field.setType("integer");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("birthDate");
+      field.setType("date");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("guardian");
+      field.setType("many-to-one");
+      field.setTargetModel(Contact.class.getName());
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("favColor");
+      field.setType("string");
+      field.setSelection("colors");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("isCustomer");
+      field.setType("boolean");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("orderAmount");
+      field.setType("decimal");
+      field.setScale(2);
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("lastActivity");
+      field.setType("datetime");
+      fields.accept(field);
+    }
   }
 }

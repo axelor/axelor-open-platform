@@ -1,3 +1,111 @@
+## 6.1.4 (2023-06-23)
+
+#### Features
+
+* Preserve grid scroll position on form save/reload
+
+#### Fixed
+
+* Fix buttons actions in Tree views
+* Fix on how application and module are determinate during gradle resolution
+
+  <details>
+  
+  Due to the merge of `com.axelor.app` and `com.axelor.app-module` gradle
+  plugins, it is now hard to determinate who is the module from the
+  application. A module can be built itself, so it is seen as an
+  application (when checking `project == project.getRootProject()`) and
+  wrong plugins/dependencies/tasks are applied.
+  
+  To overcomes this, when a module need to be built standalone,
+  `axelor.application = false` property can be added in `gradle.properties`. 
+  This way, it will be seen as a module instead of an application.
+  
+  Better support will be added in a future version.
+  
+  </details>
+
+* Fix going into edit mode in editable grid when clicking readonly cell
+* Fix selection widget stealing focus after focusing another cell
+* Readonly fields, included dot fields, shouldn't be focusable
+* Fix search request when adjusting page boundary
+* Fix onChange on Enter key in simple fields
+* Fix lost dotted fields in grid when using master-detail widget
+* Fix editable grid that don't wait for pending actions
+* Fix deselected row after save triggered by previous row in editable grid
+* Fix search box show/hide on cards view dashlet depending on dashlet `canSearch` attribute
+* Fix onNew action on editor
+* Don't create webapp folder in war
+* Fix toolbar buttons display when same grid is displayed multiple times
+
+#### Security
+
+* Check for unauthorized users inside security filter directly
+
+## 6.1.3 (2023-05-15)
+
+#### Fixed
+
+* Align script helper test expressions with Action behavior
+* Fix attributes that need a test instead of an evaluation
+* Fix action test condition when context proxy is used
+* Do not try to generate binary download link on unsaved record
+
+## 6.1.2 (2023-04-05)
+
+#### Changes
+
+* Improve resolution of AOP core dependencies
+
+  <details>
+  
+  Use AOP version defined in root project. This avoids to use a version
+  coming from transitive dependencies.
+  
+  For example, if a module is built and published using AOP version 6.1.2
+  and the root project use AOP version 6.1.1, it will now use the AOP
+  version of the project, ie 6.1.1 (instead of getting the AOP version of
+  the transitive dependency of the module).
+  
+  </details>
+
+#### Fixed
+
+* Don't reload dashlet custom view when the widget is not visible
+* Disable exporting on Kanban views
+* Fix empty recipients list when posting message or adding followers
+* Fix onChange triggered after grid edit cancel
+* Fix missing "refresh", "new", "prev", and "next" keyboard shortcuts on cards and kanban views
+* Fix moving record on top level grid
+* Fix grid not editable depending on readonly/canEdit conditions
+* Fix redefined User namecolumn in collaboration widget
+
+  <details>
+  
+  When the namecolumn of the User entity is redefined,
+  it was not taken into account in the collaboration widget.
+  
+  </details>
+
+* Fix editable grid preventing save
+
+  <details>
+  
+  On slow network and/or big grids, going in and out of grid edit
+  may trigger duplicate grid edit events and mess with the counting
+  of active editable grids. This could cause saving to fail.
+  
+  </details>
+
+* Fix export on relational fields
+* Fix spinner buttons triggering onChange inside editable grid
+* Escape data when generating xml
+* Don't allow to post message without body
+
+#### Security
+
+* Check `canNew` view attribute with "create new record" keyboard shortcut
+
 ## 6.1.1 (2023-02-06)
 
 #### Fixed

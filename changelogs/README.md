@@ -21,7 +21,7 @@ description: |
   with more details.
 
   And some details about breaking changes
-  and migrations stemps.
+  and migrations steps.
 
   ```
   $ find -iregex ".*domains.*.xml" | xargs -l sed -i 's|cachable="|cacheable="|g'
@@ -38,7 +38,7 @@ The `type` can be :
 * **fix** for any bug fixes.
 * **security** in case of vulnerabilities.
 
-The `description` is optionan and should provide detail description about the changes including
+The `description` is optional and should provide detail description about the changes including
 migration steps if any.
 
 #### Generate CHANGELOG.md

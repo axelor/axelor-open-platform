@@ -96,6 +96,7 @@ The `com.axelor.app` gradle plugin defines an extension point `axelor` where
 we can define various properties.
 
 * title - display title for the application
+* description - a short description of the application
 
 Another important build script is the `settings.gradle` where we configure
 the gradle build and aggregates all the feature module projects to be used
@@ -125,6 +126,19 @@ dependencyResolutionManagement {
     maven {
       url 'https://repository.axelor.com/nexus/repository/maven-public/'
     }
+    ivy { <4>
+      name = "Node.js"
+      setUrl("https://nodejs.org/dist/")
+      patternLayout {
+        artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]")
+      }
+      metadataSources {
+        artifact()
+      }
+      content {
+        includeModule("org.nodejs", "node")
+      }
+    }
   }
 }
 
@@ -136,14 +150,31 @@ include 'modules:axelor-contact'
 <1> The axelor maven repository
 <2> The axelor app gradle plugin version
 <3> Use maven central but don't load `com.axelor` from it
+<4> The Node.js repository
 
 The `include 'modules:axelor-contact'` line tells gradle to include the module
 `axelor-contact` in current build cycle. It is required to list all the modules
 used by the application in `settings.gradle` file.
 
-=== changelog plugin
+=== AOP dependencies resolution
 
-AOP provide a Gradle plugin to simplify changelog management.
+By default, Gradle resolves dependency version conflicts by using the newest version
+of the library. This is generally ok, but sometimes, depending on the modules used and
+on AOP versions used when they have been published, it may use an unwanted version.
+
+In order to avoid using an AOP version coming from transitive dependencies (selected by Gradle)
+and thus using the AOP version defined in the project itself, apply the `DependenciesSupport`
+plugin on the root project:
+
+.settings.gradle
+[source,gradle]
+----
+apply plugin: com.axelor.gradle.support.DependenciesSupport
+----
+
+=== Changelog plugin
+
+AOP provides a Gradle plugin to simplify changelog management.
 
 Each entry of the `CHANGELOG.md` file is generated from files in the `changelogs/unreleased/` folder.
 
@@ -166,17 +197,17 @@ description: |
   ```
 ----
 
-Where :
+Where:
 
-* `title` : describe the entry. (Mandatory)
-* `type` : type of the entry (feature, fix, ...). (Mandatory)
-* `description` : provide detail description about the changes including
+* `title`: describe the entry. (Mandatory)
+* `type`: type of the entry (feature, fix, ...). (Mandatory)
+* `description`: provide detail description about the changes including
 migration steps if any. (Optional)
 
 The plugin will parse all entries in the `changelogs/unreleased/` folder to generate the changelog
 of the version in `CHANGELOG.md`. The unreleased entries are also automatically removed.
 
-To use the plugin, in your `build.gradle` :
+To use the plugin, in your `build.gradle`:
 [source,gradle]
 ----
 apply plugin: com.axelor.gradle.support.ChangelogSupport
@@ -203,13 +234,13 @@ Plugin can be configured with the following properties set in the `changelog` ex
 | `header` | Header value when generating changelog for the current version | "${version.get()} (${new Date().format("yyyy-MM-dd")})"
 |===
 
-To generate the `CHANGELOG.md` with unreleased entries, run following Gradle task:
+To generate the `CHANGELOG.md` with unreleased entries, run the following Gradle task:
 
 ```
 ./gradlew generateChangelog
 ```
 
-NOTE: `--preview` arguments can also be used to preview the generated changelog without deleting/updating files.
+NOTE: `--preview` argument can also be used to preview the generated changelog without deleting/updating files.
 
 == Module
 

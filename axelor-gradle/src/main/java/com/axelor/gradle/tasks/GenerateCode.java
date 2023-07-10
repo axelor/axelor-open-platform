@@ -143,7 +143,7 @@ public class GenerateCode extends DefaultTask {
         .append(Joiner.on("\\n").join(descriptionLines))
         .append("\n");
 
-    if (project == project.getRootProject()) {
+    if (AxelorUtils.isAxelorApplication(project)) {
       text.append("\n").append("application = true").append("\n");
     }
 

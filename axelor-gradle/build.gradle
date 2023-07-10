@@ -30,6 +30,8 @@ gradlePlugin {
     axelorPlugin {
       id = "com.axelor.app"
       implementationClass = "com.axelor.gradle.AxelorPlugin"
+      displayName = "Axelor Gradle plugin"
+      description = "Gradle plugin for integrating Axelor"
     }
   }
 }
@@ -48,9 +50,4 @@ classes.doLast {
   generateLibsList "tomcat"
   generateLibsList "database"
   generateLibsList "provided"
-}
-
-// prevent double publish
-tasks.withType(PublishToMavenRepository).all {
-  enabled = name != 'publishMavenJavaPublicationToMavenRepository'
 }

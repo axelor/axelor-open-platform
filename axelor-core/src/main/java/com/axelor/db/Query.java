@@ -406,28 +406,21 @@ public class Query<T extends Model> {
   /**
    * Fetch the first matched record.
    *
-   * @return the first matched record.
+   * @return the first matched record, or null if there are no results.
    */
   public T fetchOne() {
-    try {
-      return fetch(1).get(0);
-    } catch (IndexOutOfBoundsException e) {
-    }
-    return null;
+    return fetchOne(0);
   }
 
   /**
    * Fetch a matched record at the given offset.
    *
    * @param offset the offset
-   * @return the matched record at given offset
+   * @return the matched record at given offset, or null if there are no results.
    */
   public T fetchOne(int offset) {
-    try {
-      return fetch(1, offset).get(0);
-    } catch (IndexOutOfBoundsException e) {
-    }
-    return null;
+    List<T> resultList = fetch(1, offset);
+    return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
   }
 
   /**

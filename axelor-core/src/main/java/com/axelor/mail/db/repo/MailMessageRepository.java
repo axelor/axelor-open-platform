@@ -20,6 +20,7 @@ package com.axelor.mail.db.repo;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
@@ -259,23 +260,20 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
     message = save(message);
 
-    if (files == null || files.isEmpty()) {
-      // notify all followers by email
-      email(message);
-      return message;
-    }
+    // Attach files if any
+    if (ObjectUtils.notEmpty(files)) {
+      final MetaAttachmentRepository repo = Beans.get(MetaAttachmentRepository.class);
 
-    final MetaAttachmentRepository repo = Beans.get(MetaAttachmentRepository.class);
+      for (MetaFile file : files) {
 
-    for (MetaFile file : files) {
+        MetaAttachment attachment = new MetaAttachment();
 
-      MetaAttachment attachment = new MetaAttachment();
+        attachment.setObjectId(message.getId());
+        attachment.setObjectName(message.getClass().getName());
+        attachment.setMetaFile(file);
 
-      attachment.setObjectId(message.getId());
-      attachment.setObjectName(message.getClass().getName());
-      attachment.setMetaFile(file);
-
-      repo.save(attachment);
+        repo.save(attachment);
+      }
     }
 
     // notify all followers by email

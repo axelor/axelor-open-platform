@@ -2,10 +2,10 @@
 :toc:
 :toc-title:
 
-Internationalization, often referred as i18n is very much important feature
+Internationalization, often referred as i18n, is a very important feature
 of any business application in today's globalized economy.
 
-The {page-component-title} provide very efficient way to make you application multilingual.
+The {page-component-title} provides a very efficient way to make your application multilingual.
 
 == Translations
 
