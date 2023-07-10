@@ -148,7 +148,8 @@ export function createValueAtom({
       markDirty: boolean = true
     ) => {
       const prev = get(lensAtom);
-      const next = typeof value === "string" && value.trim() === "" ? null : value;
+      const next =
+        typeof value === "string" && value.trim() === "" ? null : value;
       if (prev !== next) {
         const dirty = markDirty && Boolean(name && !isDummy(name));
         set(lensAtom, next);
@@ -194,11 +195,20 @@ export const contextAtom = atom(
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
       const { model, record, parent, statesByName } = get(formAtom);
+      const IGNORE = ["$attachments", "$processInstanceId", "_dirty"];
+
       let context: DataContext = {
         ...options,
         ...record,
         _model: model,
       };
+
+      // ignore values
+      IGNORE.forEach((key) => {
+        if (context[key] !== undefined) {
+          delete context[key];
+        }
+      });
 
       // set selected flag for o2m/m2m fields
       for (let name in statesByName) {
