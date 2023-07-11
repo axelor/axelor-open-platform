@@ -32,5 +32,6 @@ public class AxelorCallbackFilter extends CallbackFilter {
     setConfig(config);
     setDefaultClient(clientListProvider.getDefaultClientName());
     setCallbackLogic(callbackLogic);
+    setRenewSession(false);
   }
 }
