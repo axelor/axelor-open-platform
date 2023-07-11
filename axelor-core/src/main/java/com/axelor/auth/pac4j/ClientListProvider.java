@@ -74,6 +74,8 @@ public class ClientListProvider implements Provider<List<Client>> {
 
   private final List<Client> clients = new ArrayList<>();
 
+  private final String defaultClientName;
+
   private final Set<String> indirectClientNames;
 
   private final Set<String> directClientNames;
@@ -281,12 +283,6 @@ public class ClientListProvider implements Provider<List<Client>> {
           configs.put(name, config);
         };
 
-    final String authDefault =
-        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
-    if (StringUtils.notBlank(authDefault)) {
-      addConfig.accept(authDefault);
-    }
-
     final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
     if (ObjectUtils.notEmpty(authOrder)) {
       authOrder.forEach(addConfig::accept);
@@ -295,12 +291,16 @@ public class ClientListProvider implements Provider<List<Client>> {
     configs.putAll(initConfigs);
     initConfigs.clear();
 
-    final List<Client> configuredClients =
+    final Map<String, Client> configuredClients =
         configs.entrySet().stream()
-            .map(e -> createClient(e.getKey(), e.getValue()))
-            .collect(Collectors.toList());
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> createClient(e.getKey(), e.getValue()),
+                    (oldValue, newValue) -> oldValue,
+                    LinkedHashMap::new));
 
-    clients.addAll(configuredClients);
+    clients.addAll(configuredClients.values());
 
     settings
         .getList(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH)
@@ -320,7 +320,7 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     // set titles and icons
     final Iterator<Map<String, Object>> configIt = configs.values().iterator();
-    final Iterator<Client> clientIt = configuredClients.iterator();
+    final Iterator<Client> clientIt = configuredClients.values().iterator();
     while (configIt.hasNext() && clientIt.hasNext()) {
       final Map<String, Object> props = configIt.next();
       final Client client = clientIt.next();
@@ -337,6 +337,19 @@ public class ClientListProvider implements Provider<List<Client>> {
       }
       authPac4jInfo.setClientInfo(name, info);
     }
+
+    final String authDefault =
+        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
+    if (StringUtils.notBlank(authDefault)) {
+      defaultClientName =
+          Optional.ofNullable(configuredClients.get(authDefault))
+              .map(Client::getName)
+              .orElseThrow(() -> new NoSuchElementException(authDefault));
+    } else {
+      defaultClientName = configuredClients.values().iterator().next().getName();
+    }
+
+    logger.info("Default client: {}", defaultClientName);
 
     final Map<Boolean, List<Client>> groupedClients =
         clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
@@ -363,6 +376,10 @@ public class ClientListProvider implements Provider<List<Client>> {
   @Override
   public List<Client> get() {
     return clients;
+  }
+
+  public String getDefaultClientName() {
+    return defaultClientName;
   }
 
   public Set<String> getIndirectClientNames() {

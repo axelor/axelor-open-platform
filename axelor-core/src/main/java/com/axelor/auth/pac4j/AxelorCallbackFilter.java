@@ -27,9 +27,10 @@ import org.pac4j.jee.filter.CallbackFilter;
 public class AxelorCallbackFilter extends CallbackFilter {
 
   @Inject
-  public AxelorCallbackFilter(Config config, AxelorCallbackLogic callbackLogic) {
+  public AxelorCallbackFilter(
+      Config config, AxelorCallbackLogic callbackLogic, ClientListProvider clientListProvider) {
     setConfig(config);
-    setDefaultClient(config.getClients().getClients().get(0).getName());
+    setDefaultClient(clientListProvider.getDefaultClientName());
     setCallbackLogic(callbackLogic);
   }
 }

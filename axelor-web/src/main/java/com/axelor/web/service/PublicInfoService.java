@@ -58,7 +58,7 @@ public class PublicInfoService extends AbstractService {
   public PublicInfoService(AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
     super();
     this.pac4jInfo = pac4jInfo;
-    this.defaultClient = clientListProvider.get().get(0).getName();
+    this.defaultClient = clientListProvider.getDefaultClientName();
     this.exclusive = clientListProvider.isExclusive();
   }
 
