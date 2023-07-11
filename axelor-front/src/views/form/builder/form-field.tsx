@@ -6,6 +6,7 @@ import { useAtomValue } from "jotai";
 import { Box, InputLabel } from "@axelor/ui";
 
 import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
 import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
 import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
@@ -99,6 +100,40 @@ export function FieldLabel({
         <span className={styles.labelText}>{title}</span>
       </InputLabel>
     </HelpPopover>
+  );
+}
+
+export function FieldDetails({
+  fetch = true,
+  model,
+  record,
+  data,
+}: {
+  fetch?: boolean;
+  model?: string;
+  record?: DataRecord;
+  data: TooltipType;
+}) {
+  const { depends, template } = data;
+  const Template = useTemplate(template!);
+  const { data: context } = useAsync(async () => {
+    let values = { ...record };
+    if (fetch && model && record?.id) {
+      const ds = new DataStore(model);
+      const newValues = await ds.read(+record.id, {
+        fields: (depends || "")?.split?.(",").map((f) => f.trim()),
+      });
+      values = { ...values, ...newValues };
+    }
+    return { ...values, record: values };
+  }, [fetch, model, record]);
+
+  return (
+    context && (
+      <Box>
+        <Template context={context} />
+      </Box>
+    )
   );
 }
 
@@ -217,8 +252,7 @@ function FieldTooltipContent({
   const value = useAtomValue(valueAtom);
 
   const data = schema.tooltip as TooltipType;
-  const { depends, template } = data;
-  const Template = useTemplate(template!);
+  const { depends } = data;
 
   const formModel = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom])
@@ -230,30 +264,14 @@ function FieldTooltipContent({
   const isRelational = Boolean(schema.target);
   const record = isRelational ? value : formRecord;
   const model = isRelational ? schema.target : formModel;
-
-  const { data: context } = useAsync(async () => {
-    const shouldFetch =
-      !isRelational || depends?.trim?.() !== schema.targetName;
-    const recordId = record?.id;
-
-    let values = { ...record };
-
-    if (shouldFetch && model && recordId && recordId > 0) {
-      const ds = new DataStore(model);
-      const newValues = await ds.read(recordId, {
-        fields: (depends || "")?.split?.(",").map((f) => f.trim()),
-      });
-      values = { ...values, ...newValues };
-    }
-
-    return { ...values, record: values };
-  }, [isRelational, schema, model, record]);
+  const shouldFetch = !isRelational || depends?.trim?.() !== schema.targetName;
 
   return (
-    context && (
-      <Box>
-        <Template context={context} />
-      </Box>
-    )
+    <FieldDetails
+      fetch={shouldFetch}
+      data={data}
+      model={model}
+      record={record}
+    />
   );
 }
