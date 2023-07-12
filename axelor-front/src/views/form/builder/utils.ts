@@ -124,7 +124,8 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   if (
     res.widget !== "panel" &&
     res.widget !== "separator" &&
-    res.widget !== "button"
+    res.widget !== "button" && 
+    res.widget !== "label"
   ) {
     res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;
   }
