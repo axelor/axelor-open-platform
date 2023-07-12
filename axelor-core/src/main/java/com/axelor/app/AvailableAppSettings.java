@@ -33,6 +33,7 @@ public interface AvailableAppSettings {
   String APPLICATION_HELP = "application.help";
   String APPLICATION_COPYRIGHT = "application.copyright";
   String APPLICATION_LOGO = "application.logo";
+  String APPLICATION_ICON = "application.icon";
   String APPLICATION_MODE = "application.mode";
   String APPLICATION_BASE_URL = "application.base-url";
   String APPLICATION_CONFIG_PROVIDER = "application.config-provider";
@@ -73,6 +74,7 @@ public interface AvailableAppSettings {
 
   String CONTEXT_APP_STYLE = "context.appStyle";
   String CONTEXT_APP_LOGO = "context.appLogo";
+  String CONTEXT_APP_ICON = "context.appIcon";
 
   String DB_DEFAULT_DATASOURCE = "db.default.datasource";
   String DB_DEFAULT_DRIVER = "db.default.driver";

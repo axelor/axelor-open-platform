@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -54,10 +55,17 @@ public class AboutService extends AbstractService {
 
   @Context private HttpServletResponse response;
 
+  @Inject private AppInfo info;
+
+  /**
+   * Retrieves application information.
+   *
+   * @deprecated Use /public/app/info instead.
+   */
   @GET
   @Path("info")
+  @Deprecated(since = "7.0.0", forRemoval = true)
   public Map<String, Object> info() {
-    final AppInfo info = new AppInfo();
     return info.info(request.getServletContext());
   }
 
@@ -116,7 +124,6 @@ public class AboutService extends AbstractService {
   @Produces("text/css")
   @Path("custom.css")
   public String css() {
-    final AppInfo info = new AppInfo();
     final String style = info.getStyle();
     return StringUtils.notBlank(style) ? style : "";
   }

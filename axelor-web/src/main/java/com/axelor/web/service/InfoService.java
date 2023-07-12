@@ -20,11 +20,18 @@ package com.axelor.web.service;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.ClientListProvider;
+import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,15 +45,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/public/app")
-public class PublicInfoService extends AbstractService {
+public class InfoService extends AbstractService {
 
   @Context private HttpServletRequest request;
 
+  private final AppInfo info;
   private final AuthPac4jInfo pac4jInfo;
 
   private final String defaultClient;
@@ -55,28 +64,53 @@ public class PublicInfoService extends AbstractService {
   private static final AppSettings SETTINGS = AppSettings.get();
 
   @Inject
-  public PublicInfoService(AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
-    super();
+  public InfoService(
+      AppInfo appInfo, AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
+    this.info = appInfo;
     this.pac4jInfo = pac4jInfo;
     this.defaultClient = clientListProvider.getDefaultClientName();
     this.exclusive = clientListProvider.isExclusive();
   }
 
+  /**
+   * Retrieves either application login information or session information if the user is logged in.
+   */
   @GET
   @Path("info")
   public Map<String, Object> info() {
-    return info(request.getServletContext());
+    final User user = AuthUtils.getUser();
+    return user == null ? loginInfo() : info.info(user);
   }
 
-  private Map<String, Object> info(final ServletContext context) {
+  private Map<String, Object> loginInfo() {
+    return Map.of("application", appInfo(), "authentication", authInfo());
+  }
+
+  private Map<String, Object> appInfo() {
     final Map<String, Object> map = new HashMap<>();
 
-    map.put("application", appInfo());
+    map.put("name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
+    map.put("description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
+    map.put("copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("theme", info.getTheme());
+    map.put("logo", info.getLogo());
+    map.put("icon", info.getIcon());
+    map.put("lang", info.getPageLang());
+
+    return map;
+  }
+
+  private Map<String, Object> authInfo() {
+    final Map<String, Object> map = new HashMap<>();
+    map.put("callbackUrl", pac4jInfo.getCallbackUrl());
+
     if (ObjectUtils.notEmpty(pac4jInfo.getCentralClients())) {
       map.put("clients", clientsInfo());
     }
 
-    map.put("defaultClient", defaultClient);
+    if (StringUtils.notEmpty(defaultClient)) {
+      map.put("defaultClient", defaultClient);
+    }
 
     if (exclusive) {
       map.put("exclusive", exclusive);
@@ -96,9 +130,15 @@ public class PublicInfoService extends AbstractService {
       }
 
       clientMap.put("name", client);
-      clientMap.put("icon", info.get("icon"));
-      if (ObjectUtils.notEmpty(info.get("title"))) {
-        clientMap.put("title", info.get("title"));
+
+      final String icon = info.get("icon");
+      if (StringUtils.notEmpty(icon)) {
+        clientMap.put("icon", icon);
+      }
+
+      final String title = info.get("title");
+      if (StringUtils.notEmpty(title)) {
+        clientMap.put("title", title);
       }
 
       clients.add(clientMap);
@@ -107,18 +147,32 @@ public class PublicInfoService extends AbstractService {
     return clients;
   }
 
-  private Map<String, Object> appInfo() {
-    final Map<String, Object> map = new HashMap<>();
-    final AppInfo info = new AppInfo();
+  @GET
+  @Path("logo")
+  public Response getLogoContent() {
+    return getImageContent(info.getLogo());
+  }
 
-    map.put("name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
-    map.put("description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
-    map.put("copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
-    map.put("application.theme", info.getTheme());
-    map.put("logo", info.getLogo());
-    map.put("language", info.getPageLang());
-    map.put("callbackUrl", pac4jInfo.getCallbackUrl());
+  @GET
+  @Path("icon")
+  public Response getIconContent() {
+    return getImageContent(info.getIcon());
+  }
 
-    return map;
+  private Response getImageContent(String pathString) {
+    if (StringUtils.notEmpty(pathString)) {
+      final ServletContext context = request.getServletContext();
+      try (final InputStream inputStream = context.getResourceAsStream(pathString)) {
+        if (inputStream != null) {
+          final byte[] imageData = inputStream.readAllBytes();
+          final String mediaType = MimeTypesUtils.getContentType(pathString);
+          return Response.ok(imageData).type(mediaType).build();
+        }
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    }
+
+    return Response.status(Response.Status.NOT_FOUND).build();
   }
 }

@@ -27,7 +27,6 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorSecurityLogic;
-import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
@@ -37,13 +36,11 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,21 +49,25 @@ import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
+@Singleton
 public class AppInfo {
 
   private static final AppSettings SETTINGS = AppSettings.get();
   private static final String APP_THEME =
       SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
 
+  @Deprecated(forRemoval = true)
   public Map<String, Object> info(final ServletContext context) {
+    return info();
+  }
 
-    final Map<String, Object> map = new HashMap<>();
+  public Map<String, Object> info() {
     final User user = AuthUtils.getUser();
+    return user != null ? info(user) : Collections.emptyMap();
+  }
 
-    if (user == null) {
-      return map;
-    }
-
+  public Map<String, Object> info(User user) {
+    final Map<String, Object> map = new HashMap<>();
     final Group group = user.getGroup();
 
     // if name field is overridden
@@ -77,7 +78,7 @@ public class AppInfo {
     map.put("user.name", nameValue);
     map.put("user.login", user.getCode());
     map.put("user.nameField", nameField.getName());
-    map.put("user.lang", AppFilter.getLocale().getLanguage());
+    map.put("user.lang", getPageLang());
     map.put("user.action", user.getHomeAction());
     map.put("user.singleTab", user.getSingleTab());
     map.put("user.noHelp", Boolean.TRUE.equals(user.getNoHelp()));
@@ -108,6 +109,7 @@ public class AppInfo {
     map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
     map.put("application.theme", getTheme());
     map.put("application.logo", getLogo());
+    map.put("application.icon", getIcon());
     map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
@@ -129,24 +131,6 @@ public class AppInfo {
       }
       map.put(entry.getKey(), value);
     }
-
-    final List<String> themes = new ArrayList<>();
-    // TODO: there is no more theme on v7
-    if (ObjectUtils.notEmpty(context.getResourcePaths("/css"))) {
-      for (String path : context.getResourcePaths("/css")) {
-        try {
-          if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {
-            path = path.replace("/css/", "").replace("/", "");
-            themes.add(path);
-          }
-        } catch (MalformedURLException e) {
-        }
-      }
-    }
-
-    Collections.sort(themes);
-
-    map.put("application.themes", themes);
 
     // find central client name
     final JEEContext jeeContext =
@@ -202,9 +186,27 @@ public class AppInfo {
     return logo;
   }
 
+  /**
+   * Gets user specific application icon, or falls back to default application icon.
+   *
+   * @return
+   */
+  public String getIcon() {
+    final String icon = SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico");
+    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_ICON) != null) {
+      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
+      final ScriptHelper helper = new CompositeScriptHelper(bindings);
+      try {
+        return getLink(helper.eval("__config__.appIcon"), icon);
+      } catch (Exception e) {
+        // Ignore
+      }
+    }
+    return icon;
+  }
+
   public String getPageLang() {
-    String lang = AppFilter.getLocale().getLanguage();
-    return lang == null ? "en" : lang.substring(0, 2).toLowerCase();
+    return AppFilter.getLocale().getLanguage();
   }
 
   public String getTheme() {

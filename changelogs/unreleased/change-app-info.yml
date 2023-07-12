@@ -1,0 +1,7 @@
+---
+title: /ws/app/info endpoint moved to /ws/public/app/info
+type: change
+description: |
+  /ws/public/app/info either gives application login info
+  or session info if the user is logged in.
+  /ws/app/info is deprecated and will be dropped in a future release.

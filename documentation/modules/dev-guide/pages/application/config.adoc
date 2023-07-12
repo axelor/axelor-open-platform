@@ -203,6 +203,7 @@ db.default.password = secret
 | `application.author` | application author |
 | `application.copyright` | application copyright |
 | `application.logo` | header logo. Should be 40px in height with transparent background | img/axelor.png
+| `application.icon` | website icon. Must be a multiple of 48px square for favicon compatibility | ico/favicon.ico
 | `application.home` | home website. Link to be used with header logo |
 | `application.help` | online help. Link to be used in About page |
 | `application.mode` | application deployment mode. Can be `prod` or `dev` | dev
@@ -452,26 +453,27 @@ Now, we can use them in expressions like this:
 <4> public static final field value
 <5> any constant value
 
-== Custom Logo
+== Custom Logo/Icon
 
-A special context setting `context.appLogo` can be used to dynamically change
-header logo per user. For example:
+Special context settings `context.appLogo` and `context.appIcon` can be used to dynamically change
+header logo and website icon per user. For example:
 
 [source,properties]
 ----
-context.appLogo = com.axelor.custom.LogoService:getLogo
+context.appLogo = com.axelor.custom.AppService:getLogo
+context.appIcon = com.axelor.custom.AppService:getIcon
 ----
 
-The `getLogo` method should return either:
+The `appLogo`/`appIcon` methods should return either:
 
-* a string, link to logo image (`img/my-logo.png`)
-* an instance of `MetaFile` pointing to the logo file
+* a string, link to logo/icon file (eg. `img/my-logo.png`, `ico/my-icon.ico`)
+* an instance of `MetaFile` pointing to the logo/icon file
 
 Here is an example in case it returns a `MetaFile`:
 
 [source,java]
 ----
-public class LogoService {
+public class AppService {
 
   public MetaFile getLogo() {
     final User user = AuthUtils.getUser();
@@ -483,8 +485,8 @@ public class LogoService {
 }
 ----
 
-If return value is null, it will show default logo specified
-with `application.logo` in configuration file.
+If return value is null, it will show default logo/icon specified
+with `application.logo` and `application.icon` in configuration file.
 
 == Custom Style
 
