@@ -77,7 +77,7 @@ export function createWidgetAtom(props: {
         ...restById
       } = get(attrsByIdAtom);
 
-      return (prevState = {
+      const nextState = {
         ...restByName,
         ...restById,
         columns: getStateByName("columns", {
@@ -95,7 +95,11 @@ export function createWidgetAtom(props: {
         },
         name,
         parent,
-      });
+      };
+
+      return isEqual(prevState, nextState)
+        ? prevState
+        : (prevState = nextState);
     },
     (get, set, state) => {
       set(attrsByIdAtom, (prevState) => {
