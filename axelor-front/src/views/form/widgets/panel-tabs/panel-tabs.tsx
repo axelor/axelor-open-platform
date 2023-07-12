@@ -3,7 +3,7 @@ import { selectAtom } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { NavTabItem, NavTabs } from "@axelor/ui";
+import { Fade, NavTabItem, NavTabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
@@ -143,26 +143,19 @@ function TabContent({
   parentAtom: WidgetProps["parentAtom"];
   readonly?: boolean;
 }) {
-  const [mount, setMount] = useState(false);
   const display = active ? "block" : "none";
 
-  useEffect(() => {
-    active && setMount(true);
-  }, [active]);
-
   return (
-    <>
-      {mount && (
-        <div className={styles.tabContent} style={{ display }}>
-          <FormWidget
-            readonly={readonly}
-            schema={schema}
-            formAtom={formAtom}
-            parentAtom={parentAtom}
-          />
-        </div>
-      )}
-    </>
+    <Fade in={active} mountOnEnter>
+      <div className={styles.tabContent} style={{ display }}>
+        <FormWidget
+          readonly={readonly}
+          schema={schema}
+          formAtom={formAtom}
+          parentAtom={parentAtom}
+        />
+      </div>
+    </Fade>
   );
 }
 
