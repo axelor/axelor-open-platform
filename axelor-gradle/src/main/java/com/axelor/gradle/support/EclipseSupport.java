@@ -43,14 +43,20 @@ public class EclipseSupport extends AbstractSupport {
     project.getPlugins().apply(EclipsePlugin.class);
     project.getPlugins().apply(EclipseWtpPlugin.class);
 
+    // Allow circular classpath (behavior aligned with IntelliJ IDEA)
+    eclipse
+        .getJdt()
+        .getFile()
+        .withProperties(
+            props -> props.setProperty("org.eclipse.jdt.core.circularClasspath", "warning"));
+
     project.afterEvaluate(
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
-          }
-          if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
+            // Also run eclipseJdt in included builds
             AxelorUtils.findIncludedBuildProjects(project).stream()
                 .filter(included -> included.getPlugins().hasPlugin(EclipseWtpPlugin.class))
                 .forEach(
@@ -58,7 +64,9 @@ public class EclipseSupport extends AbstractSupport {
                         project
                             .getTasks()
                             .getByName("eclipseWtp")
-                            .dependsOn(included.getTasks().getByName("eclipseWtp")));
+                            .dependsOn(
+                                included.getTasks().getByName("eclipseWtp"),
+                                included.getTasks().getByName("eclipseJdt")));
           }
         });
 
