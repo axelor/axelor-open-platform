@@ -1,14 +1,11 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { createEvalContext } from "@/hooks/use-parser/eval-context";
-import {
-  parseAngularExp,
-  parseExpression,
-} from "@/hooks/use-parser/utils";
+import { parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
@@ -202,7 +199,6 @@ function useExpressions({
   valueAtom?: ValueAtom<any>;
   readonly?: boolean;
 }) {
-  const setWidgetAttrs = useSetAtom(widgetAtom);
   const { formAtom, recordHandler } = useFormScope();
   const actionView = useViewAction();
   const popup = !!actionView.params?.popup;
@@ -259,36 +255,45 @@ function useExpressions({
     )
   );
 
-  const handleCondition = useCallback(
-    (context: DataContext, attr: string, expr: string, negate = false) => {
-      const value = Boolean(parseExpression(expr)(context));
-      setWidgetAttrs((state) => {
+  const handleCondition = useAtomCallback(
+    useCallback(
+      (
+        get,
+        set,
+        context: DataContext,
+        attr: string,
+        expr: string,
+        negate: boolean = false
+      ) => {
+        const value = Boolean(parseExpression(expr)(context));
+        const state = get(widgetAtom);
         const attrs = state.attrs ?? {};
         const prev = attrs[attr as keyof typeof attrs];
         const next = negate ? !value : value;
         if (next !== prev) {
-          return { ...state, attrs: { ...attrs, [attr]: next } };
+          set(widgetAtom, { ...state, attrs: { ...attrs, [attr]: next } });
         }
-        return state;
-      });
-    },
-    [setWidgetAttrs]
+      },
+      [widgetAtom]
+    )
   );
 
-  const handleValidation = useCallback(
-    (context: DataContext, expr: string) => {
-      const value = parseExpression(expr)(context);
-      setWidgetAttrs((state) => {
+  const handleValidation = useAtomCallback(
+    useCallback(
+      (get, set, context: DataContext, expr: string) => {
+        const value = parseExpression(expr)(context);
+        const state = get(widgetAtom);
         const errors = {
           ...state.errors,
           invalid: i18n.get("{0} is invalid", state.attrs.title),
         };
         if (value) Reflect.deleteProperty(errors, "invalid");
-        if (isEqual(state.errors, errors)) return state;
-        return { ...state, errors };
-      });
-    },
-    [setWidgetAttrs]
+        if (!isEqual(state.errors, errors)) {
+          set(widgetAtom, { ...state, errors });
+        }
+      },
+      [widgetAtom]
+    )
   );
 
   useEffect(() => {
@@ -353,7 +358,6 @@ function useExpressions({
   }, [
     schema,
     recordHandler,
-    setWidgetAttrs,
     handleBind,
     handleCondition,
     handleValidation,
