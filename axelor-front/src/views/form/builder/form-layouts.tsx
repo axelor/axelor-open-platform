@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";
 
@@ -82,60 +82,52 @@ function layoutClassName(item: Schema) {
   return legacyClassNames(names);
 }
 
-export const StackLayout: FormLayout = ({
-  schema,
-  formAtom,
-  parentAtom,
-  className,
-  readonly,
-}) => {
-  const { items = [], gap } = schema;
-  return (items && (
-    <div
-      className={legacyClassNames(styles.stack, className, schema.css)}
-      {...(gap && { style: { gap } })}
-    >
-      {items.map((item) => (
-        <FormWidget
-          key={item.uid}
-          schema={item}
-          formAtom={formAtom}
-          parentAtom={parentAtom}
-          readonly={readonly}
-        />
-      ))}
-    </div>
-  )) as JSX.Element;
-};
+export const StackLayout: FormLayout = memo(
+  ({ schema, formAtom, parentAtom, className, readonly }) => {
+    const { items = [], gap } = schema;
+    return (items && (
+      <div
+        className={legacyClassNames(styles.stack, className, schema.css)}
+        {...(gap && { style: { gap } })}
+      >
+        {items.map((item) => (
+          <FormWidget
+            key={item.uid}
+            schema={item}
+            formAtom={formAtom}
+            parentAtom={parentAtom}
+            readonly={readonly}
+          />
+        ))}
+      </div>
+    )) as JSX.Element;
+  }
+);
 
-export const GridLayout: FormLayout = ({
-  schema,
-  formAtom,
-  parentAtom,
-  className,
-  readonly,
-}) => {
-  const { style, contents } = useMemo(() => computeLayout(schema), [schema]);
-  return (
-    <div
-      style={style}
-      className={clsx(className, styles.grid, {
-        [styles.table]: schema.layout === "table",
-      })}
-    >
-      {contents.map(({ style, content }) => (
-        <GridItem
-          key={content.uid}
-          style={style}
-          schema={content}
-          formAtom={formAtom}
-          parentAtom={parentAtom}
-          readonly={readonly}
-        />
-      ))}
-    </div>
-  );
-};
+export const GridLayout: FormLayout = memo(
+  ({ schema, formAtom, parentAtom, className, readonly }) => {
+    const { style, contents } = useMemo(() => computeLayout(schema), [schema]);
+    return (
+      <div
+        style={style}
+        className={clsx(className, styles.grid, {
+          [styles.table]: schema.layout === "table",
+        })}
+      >
+        {contents.map(({ style, content }) => (
+          <GridItem
+            key={content.uid}
+            style={style}
+            schema={content}
+            formAtom={formAtom}
+            parentAtom={parentAtom}
+            readonly={readonly}
+          />
+        ))}
+      </div>
+    );
+  }
+);
 
 function GridItem(
   props: Omit<WidgetProps, "widgetAtom"> & {

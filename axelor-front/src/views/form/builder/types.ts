@@ -102,7 +102,7 @@ export type FormLayout = (
   props: Omit<WidgetProps, "widgetAtom"> & {
     className?: string;
   }
-) => JSX.Element;
+) => React.ReactNode;
 
 export type RecordListener = (data: FormState["record"]) => void;
 
