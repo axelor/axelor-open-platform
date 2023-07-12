@@ -236,7 +236,7 @@ public class CSVImporter implements Importer {
   }
 
   /**
-   * Lauch the import for the input and reader.
+   * Launches the import for the input and reader.
    *
    * @param csvInput
    * @param reader
