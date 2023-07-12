@@ -4,10 +4,10 @@ import { Navigate, useLocation } from "react-router-dom";
 import { Alert, Box, Button, Image } from "@axelor/ui";
 
 import { LoginForm } from "@/components/login-form";
-import { ClientInfo, useLoginInfo } from "@/components/login-form/login-info";
-import { useAppTitle } from "@/hooks/use-app-title";
+import { useAppHead } from "@/hooks/use-app-head";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
+import { ClientInfo } from "@/services/client/session";
 
 import logo from "@/assets/axelor.svg";
 import styles from "./login.module.scss";
@@ -60,7 +60,7 @@ export function requestLogin(client?: string) {
 
 export function Login() {
   const location = useLocation();
-  const { state, data, redirectUrl } = useSession();
+  const { state, data, redirectUrl, appData } = useSession();
   const queryParams = useMemo(
     () => new URLSearchParams(window.location.search),
     []
@@ -69,9 +69,7 @@ export function Login() {
   const clientName =
     CLIENT_NAME_ALIASES[clientNameParam || ""] ?? clientNameParam;
 
-  const publicInfo = useLoginInfo();
-
-  useAppTitle();
+  useAppHead();
 
   const errorMessage = useMemo(() => {
     const error = queryParams.get(ERROR_PARAM);
@@ -83,7 +81,7 @@ export function Login() {
     }
   }, [queryParams]);
 
-  if (publicInfo.state === "loading" || state === "loading") return null;
+  if (state === "loading") return null;
 
   if (redirectUrl != null) {
     if (redirectUrl) {
@@ -94,7 +92,7 @@ export function Login() {
     return null;
   }
 
-  const { exclusive, clients = [], defaultClient } = publicInfo.data || {};
+  const { clients = [], defaultClient, exclusive } = appData?.auth ?? {};
   const client = clientName || defaultClient;
   const notFormClient = client && client !== FORM_CLIENT_NAME;
 
@@ -176,9 +174,8 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 }
 
 function ServerError({ error }: { error: string }) {
-  const publicInfo = useLoginInfo();
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
-    publicInfo.data?.application || {};
+  const { appData } = useSession();
+  const { logo: appLogo = logo, name: appName = "Axelor" } = appData?.app || {};
 
   return (
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>

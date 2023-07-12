@@ -2,7 +2,36 @@ import { set } from "lodash";
 import { request } from "./client";
 import { SelectorType } from "./meta.types";
 
-export interface SessionInfo {
+export interface ClientInfo {
+  name: string;
+  icon?: string;
+  title?: string;
+}
+
+interface CommonAppInfo {
+  type: "public" | "session";
+  app: {
+    name?: string;
+    description?: string;
+    copyright?: string;
+    theme?: string;
+    logo?: string;
+    icon?: string;
+    lang?: string;
+    version?: string;
+    author?: string;
+    sdk?: string;
+    help?: string;
+    home?: string;
+    mode?: string;
+  };
+  auth?: {
+    callbackUrl?: string;
+    clients?: ClientInfo[];
+    defaultClient?: string;
+    exclusive?: boolean;
+    currentClient?: string;
+  };
   api?: {
     pagination?: {
       defaultPerPage: number;
@@ -11,35 +40,6 @@ export interface SessionInfo {
     upload?: {
       maxSize: number;
     };
-  };
-  app: {
-    name: string;
-    version: string;
-    author: string;
-    copyright: string;
-    description: string;
-    sdk: string | null;
-    theme: string | null;
-    logo: string | null;
-    icon: string | null;
-    help: string | null;
-    home: string | null;
-    mode: string | null;
-  };
-  user: {
-    id: number;
-    name: string;
-    nameField?: string;
-    login: string;
-    lang?: string | null;
-    image?: string | null;
-    group?: string | null;
-    action?: string | null;
-    navigator?: string | null;
-    theme?: string | null;
-    noHelp: boolean;
-    singleTab: boolean;
-    technical: boolean;
   };
   view?: {
     customizationPermission: number;
@@ -59,16 +59,38 @@ export interface SessionInfo {
     collaboration?: {
       enabled: boolean;
       canView: boolean;
-    }
-  };
-  auth?: {
-    client: string;
+    };
   };
 }
 
+export interface PublicInfo extends CommonAppInfo {
+  type: "public";
+}
+
+export interface SessionInfo extends CommonAppInfo {
+  type: "session";
+  user: {
+    id: number;
+    login: string;
+    name: string;
+    nameField?: string;
+    lang?: string | null;
+    image?: string | null;
+    group?: string | null;
+    action?: string | null;
+    navigator?: string | null;
+    theme?: string | null;
+    noHelp: boolean;
+    singleTab: boolean;
+    technical: boolean;
+  };
+}
+
+export type AppInfo = PublicInfo | SessionInfo;
+
 const INFO_MAPPINGS = {
-  "api.pagination.default-per-page": "api.pagination.defaultPerPage",
-  "api.pagination.max-per-page": "api.pagination.maxPerPage",
+  application: "app",
+  authentication: "auth",
   "application.author": "app.author",
   "application.copyright": "app.copyright",
   "application.description": "app.description",
@@ -76,11 +98,12 @@ const INFO_MAPPINGS = {
   "application.home": "app.home",
   "application.theme": "app.theme",
   "application.logo": "app.logo",
+  "application.icon": "app.icon",
   "application.mode": "app.mode",
   "application.name": "app.name",
   "application.sdk": "app.sdk",
   "application.version": "app.version",
-  "data.upload.max-size": "api.upload.maxSize",
+  "auth.central.client": "auth.currentClient",
   "user.action": "user.action",
   "user.group": "user.group",
   "user.id": "user.id",
@@ -96,6 +119,9 @@ const INFO_MAPPINGS = {
   "user.technical": "user.technical",
   "user.viewCustomizationPermission": "view.customizationPermission",
   "user.canViewCollaboration": "view.collaboration.canView",
+  "api.pagination.default-per-page": "api.pagination.defaultPerPage",
+  "api.pagination.max-per-page": "api.pagination.maxPerPage",
+  "data.upload.max-size": "api.upload.maxSize",
   "view.allow-customization": "view.customization",
   "view.grid.selection": "view.grid.selection",
   "view.menubar.location": "view.menubar.location",
@@ -104,13 +130,12 @@ const INFO_MAPPINGS = {
   "view.single-tab": "view.singleTab",
   "view.max-tabs": "view.maxTabs",
   "view.collaboration.enabled": "view.collaboration.enabled",
-  "auth.central.client": "auth.client",
 };
 
-export type SessionListener = (info: SessionInfo | null) => void;
+export type AppInfoListener = (info: AppInfo | null) => void;
 
 async function init() {
-  const url = "ws/app/info";
+  const url = "ws/public/app/info";
   const resp = await request({ url });
 
   if (!resp.ok) {
@@ -134,19 +159,21 @@ async function init() {
     }
   }
 
-  return info as SessionInfo;
+  info.type = info.user ? "session" : "public";
+
+  return info as AppInfo;
 }
 
 export class Session {
-  #info: SessionInfo | null = null;
-  #infoPromise: Promise<SessionInfo> | null = null;
-  #listeners = new Set<SessionListener>();
+  #info: AppInfo | null = null;
+  #infoPromise: Promise<AppInfo> | null = null;
+  #listeners = new Set<AppInfoListener>();
 
   #notify() {
     this.#listeners.forEach((fn) => fn(this.#info));
   }
 
-  subscribe(listener: SessionListener) {
+  subscribe(listener: AppInfoListener) {
     this.#listeners.add(listener);
     return () => {
       this.#listeners.delete(listener);
@@ -154,15 +181,19 @@ export class Session {
   }
 
   get info() {
+    return this.#info?.type === "session" ? this.#info : null;
+  }
+
+  get appInfo() {
     return this.#info;
   }
 
   async init() {
-    return this.#info || (await this.#load());
+    return this.#info ?? (await this.#load());
   }
 
   async #load() {
-    this.#infoPromise = this.#infoPromise || init();
+    this.#infoPromise = this.#infoPromise ?? init();
     this.#info = await this.#infoPromise;
     this.#notify();
     return this.#info;
@@ -184,7 +215,10 @@ export class Session {
 
     if (ok) {
       this.#infoPromise = init();
-      return this.#load();
+      const info = await this.#load();
+      if (info.type === "session") {
+        return info;
+      }
     }
 
     return Promise.reject(status);

@@ -7,7 +7,7 @@ import { AlertsProvider } from "@/components/alerts";
 import { DialogsProvider } from "@/components/dialogs";
 import { HttpWatch } from "@/components/http-watch";
 import { Loader } from "@/components/loader/loader";
-import { useAppTitle } from "@/hooks/use-app-title";
+import { useAppHead } from "@/hooks/use-app-head";
 import { useMenu } from "@/hooks/use-menu";
 import { PopupsProvider } from "@/view-containers/view-popup";
 
@@ -19,11 +19,11 @@ import { NavTags } from "./nav-tags";
 // import global utils for external apps
 import "../utils/globals";
 
+import { useDevice, useResponsive } from "@/hooks/use-responsive";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useState } from "react";
 import styles from "./layout.module.scss";
 import { useSidebar } from "./nav-drawer/hook";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { useDevice, useResponsive } from "@/hooks/use-responsive";
 
 export function Layout() {
   const { loading } = useMenu();
@@ -33,7 +33,7 @@ export function Layout() {
 
   const [tabContainer, tabContainerRef] = useState<HTMLDivElement | null>(null);
 
-  useAppTitle();
+  useAppHead();
 
   if (loading) {
     return (

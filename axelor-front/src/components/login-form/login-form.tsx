@@ -1,18 +1,18 @@
-import { useSession } from "@/hooks/use-session";
-import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
 import { FormEventHandler, useCallback, useState } from "react";
 
-import logo from "@/assets/axelor.svg";
+import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
+
+import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { SessionInfo } from "@/services/client/session";
-
-import { useLoginInfo } from "./login-info";
 
 import {
   CLIENT_NAME_PARAM,
   FORM_CLIENT_NAME,
   requestLogin,
 } from "@/routes/login";
+
+import logo from "@/assets/axelor.svg";
 import styles from "./login-form.module.scss";
 
 const YEAR = new Date().getFullYear();
@@ -34,10 +34,10 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
 
-  const appInfo = useLoginInfo();
   const session = useSession();
+  const appInfo = session.appData;
 
-  const defaultClient = appInfo.data?.defaultClient;
+  const defaultClient = appInfo?.auth?.defaultClient;
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -65,20 +65,19 @@ export function LoginForm({
     [session, username, password, onSuccess, defaultClient]
   );
 
-  if (appInfo.state === "loading" || appInfo.state === "hasError") {
+  if (session.state === "loading" || session.state === "hasError") {
     return null;
   }
 
-  const authClient = session.data?.auth?.client;
+  const currentClient = session.data?.auth?.currentClient;
 
-  if (authClient) {
-    requestLogin(authClient);
+  if (currentClient) {
+    requestLogin(currentClient);
     return <Reconnecting />;
   }
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
-    appInfo.data?.application || {};
-  const appLegal = appInfo.data?.application.copyright?.replace("&copy;", "©");
+  const { logo: appLogo = logo, name: appName = "Axelor" } = appInfo?.app || {};
+  const appLegal = appInfo?.app.copyright?.replace("&copy;", "©");
   const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
     "All Rights Reserved"
   )}.`;
