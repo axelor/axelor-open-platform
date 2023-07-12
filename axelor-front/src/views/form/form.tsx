@@ -143,6 +143,7 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
 };
 
 const timeSymbol = Symbol("$$time");
+const defaultSymbol = Symbol("$$default");
 
 export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
@@ -209,9 +210,10 @@ const FormContainer = memo(function FormContainer({
     onSave: onSaveAction,
   } = schema;
 
+  const defaultRecord = useRef({ [defaultSymbol]: true }).current;
   const { id: tabId, popup, popupOptions } = useViewTab();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
-    useFormHandlers(meta, record);
+    useFormHandlers(meta, defaultRecord);
 
   const { hasButton } = usePerms(meta.view, meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
@@ -559,9 +561,20 @@ const FormContainer = memo(function FormContainer({
 
   const doOnLoad = useAtomCallback(
     useCallback(
-      async (get) => {
+      async (get, set) => {
         if (isLoading) return;
-        const rec = get(formAtom).record;
+        let rec = get(formAtom).record;
+        if ((rec as any)[defaultSymbol] || rec.id !== record.id) {
+          const state = get(formAtom);
+          setDirty(false);
+          set(formAtom, {
+            ...state,
+            record,
+            dirty: false,
+            original: { ...record },
+          });
+          rec = record;
+        }
         const recId = rec.id ?? 0;
         const action = recId > 0 ? onLoadAction : onNewAction;
 
@@ -569,7 +582,15 @@ const FormContainer = memo(function FormContainer({
           await actionExecutor.execute(action);
         }
       },
-      [actionExecutor, formAtom, isLoading, onLoadAction, onNewAction]
+      [
+        actionExecutor,
+        formAtom,
+        isLoading,
+        setDirty,
+        onLoadAction,
+        onNewAction,
+        record,
+      ]
     )
   );
 
