@@ -6,6 +6,7 @@ dependencies {
 
   api libs.junit
   api libs.junit_jupiter
+  api project(":axelor-core")
 
   implementation libs.guice
   implementation libs.guice_servlet

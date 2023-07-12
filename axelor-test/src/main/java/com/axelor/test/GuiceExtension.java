@@ -18,6 +18,7 @@
  */
 package com.axelor.test;
 
+import com.axelor.db.JPA;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -74,17 +75,18 @@ public class GuiceExtension
 
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
+    injector = null;
+
     // Close the entity manager factory else when tests ends, the connection
     // aren't resealed. After many tests there is too many clients
     try {
-      EntityManagerFactory managerFactory = injector.getInstance(EntityManagerFactory.class);
+      EntityManagerFactory managerFactory = JPA.em().getEntityManagerFactory();
       if (managerFactory != null) {
         managerFactory.close();
       }
     } catch (Exception ex) {
       // ignore
     }
-    injector = null;
   }
 
   protected List<Module> getModules(Class<?> klass) throws TestInstantiationException {
