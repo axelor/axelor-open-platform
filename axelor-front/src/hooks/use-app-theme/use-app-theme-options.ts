@@ -9,7 +9,7 @@ import { useAppTheme } from "./use-app-theme";
 const cache = new LoadingCache<Promise<ThemeOptions>>();
 
 const load = async (theme: "light" | "dark") => {
-  const url = theme === "dark" ? `theme/dark.json` : `theme/light.json`;
+  const url = theme === "dark" ? `js/theme/dark.json` : `js/theme/light.json`;
   return request({ url }).then((resp) => resp.json());
 };
 
