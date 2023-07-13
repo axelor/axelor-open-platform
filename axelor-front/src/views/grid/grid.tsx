@@ -25,6 +25,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  useViewContext,
   useViewDirtyAtom,
   useViewProps,
   useViewRoute,
@@ -41,8 +42,6 @@ import { useShortcuts } from "@/hooks/use-shortcut";
 import { findView } from "@/services/client/meta-cache";
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { usePrepareContext } from "../form/builder";
-import { useFormScope } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { request } from "@/services/client/client";
 import { ViewProps } from "../types";
@@ -126,8 +125,7 @@ function GridInner(props: ViewProps<GridView>) {
     });
   }, [setState]);
 
-  const { formAtom } = useFormScope();
-  const getFormContext = usePrepareContext(formAtom);
+  const getFormContext = useViewContext();
 
   const getSearchOptions = useAtomCallback(
     useCallback(

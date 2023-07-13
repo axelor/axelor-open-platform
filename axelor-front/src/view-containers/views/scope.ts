@@ -72,15 +72,20 @@ export function useViewContext() {
   const { action, dashlet } = useViewTab();
   const { formAtom } = useFormScope();
   const getFormContext = usePrepareContext(formAtom);
+
+  const recordId = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
+  );
+
   return useCallback(
     () =>
-      (dashlet
+      (dashlet || recordId
         ? {
             ...getFormContext(),
             ...action.context,
           }
         : action.context) as DataContext,
-    [dashlet, action.context, getFormContext]
+    [dashlet, recordId, action.context, getFormContext]
   );
 }
 

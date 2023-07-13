@@ -22,9 +22,11 @@ import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
 import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
-import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
-import { usePrepareContext } from "../form/builder";
-import { useFormScope } from "../form/builder/scope";
+import {
+  useViewContext,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 
@@ -74,8 +76,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
   const { hasButton } = usePerms(metaView, metaPerms);
-  const { formAtom } = useFormScope();
-  const getFormContext = usePrepareContext(formAtom);
+  const getFormContext = useViewContext();
 
   const showEditor = useEditor();
   const viewTab = useViewTab();
@@ -99,22 +100,22 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const convertDate = useMemo(() => {
     return isDateCalendar
       ? {
-        toDate: toDateOnly,
-        toString: toDateOnlyString,
-      }
+          toDate: toDateOnly,
+          toString: toDateOnlyString,
+        }
       : {
-        toDate: toDatetime,
-        toString: toDatetimeString,
-      };
+          toDate: toDatetime,
+          toString: toDatetimeString,
+        };
   }, [isDateCalendar]);
 
   const components = useMemo(() => {
     const timeComponents = isDateCalendar
       ? {
-        dayColumnWrapper: () => null,
-        timeSlotWrapper: () => null,
-        timeGutterWrapper: () => null,
-      }
+          dayColumnWrapper: () => null,
+          timeSlotWrapper: () => null,
+          timeGutterWrapper: () => null,
+        }
       : {};
     return {
       week: {
@@ -160,26 +161,26 @@ export function Calendar(props: ViewProps<CalendarView>) {
     };
     const stopCriteria: Criteria | null = eventStop
       ? ({
-        operator: "and",
-        criteria: [
-          {
-            fieldName: eventStop,
-            operator: ">=",
-            value: calendarStart,
-          },
-          {
-            fieldName: eventStart, // include intermediate events: RM-31366
-            operator: "<",
-            value: calendarEnd,
-          },
-        ],
-      } as Criteria)
+          operator: "and",
+          criteria: [
+            {
+              fieldName: eventStop,
+              operator: ">=",
+              value: calendarStart,
+            },
+            {
+              fieldName: eventStart, // include intermediate events: RM-31366
+              operator: "<",
+              value: calendarEnd,
+            },
+          ],
+        } as Criteria)
       : null;
     let filter: SearchOptions["filter"] = stopCriteria
       ? ({
-        operator: "or",
-        criteria: [startCriteria, stopCriteria],
-      } as Criteria)
+          operator: "or",
+          criteria: [startCriteria, stopCriteria],
+        } as Criteria)
       : startCriteria;
 
     if (advancedSearch.query) {
@@ -293,12 +294,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
         );
         return filter || showAll
           ? [
-            ...list,
-            {
-              ...event,
-              $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
-            },
-          ]
+              ...list,
+              {
+                ...event,
+                $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
+              },
+            ]
           : list;
       },
       []
@@ -331,22 +332,22 @@ export function Calendar(props: ViewProps<CalendarView>) {
       text: string;
       iconProps: MaterialIconProps;
     }[] = [
-        {
-          view: "month",
-          text: _t("Month"),
-          iconProps: { icon: "calendar_view_month" },
-        },
-        {
-          view: "week",
-          text: _t("Week"),
-          iconProps: { icon: "calendar_view_week" },
-        },
-        {
-          view: "day",
-          text: _t("Day"),
-          iconProps: { icon: "calendar_view_day" },
-        },
-      ];
+      {
+        view: "month",
+        text: _t("Month"),
+        iconProps: { icon: "calendar_view_month" },
+      },
+      {
+        view: "week",
+        text: _t("Week"),
+        iconProps: { icon: "calendar_view_week" },
+      },
+      {
+        view: "day",
+        text: _t("Day"),
+        iconProps: { icon: "calendar_view_day" },
+      },
+    ];
 
     const today = new Date();
     const inToday = today >= calendarStart && today <= calendarEnd;
@@ -535,7 +536,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   );
 
   const _handleViewEvent = useCallback(
-    (event: SchedulerEvent) => handleOpenEvent(event, true, () => { }),
+    (event: SchedulerEvent) => handleOpenEvent(event, true, () => {}),
     [handleOpenEvent]
   );
 

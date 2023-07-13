@@ -20,15 +20,17 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewSwitch, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
-
-import { usePrepareContext } from "../form/builder";
-import { useFormScope } from "../form/builder/scope";
-import { useGridActionExecutor } from "../grid/builder/utils";
-import { ViewProps } from "../types";
-import { Card } from "./card";
-
+import {
+  useViewContext,
+  useViewSwitch,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 import { legacyClassNames } from "@/styles/legacy";
+
+import { Card } from "./card";
+import { ViewProps } from "../types";
+import { useGridActionExecutor } from "../grid/builder/utils";
 import styles from "./cards.module.scss";
 
 export function Cards(props: ViewProps<CardsView>) {
@@ -39,8 +41,7 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const switchTo = useViewSwitch();
   const { hasButton } = usePerms(meta.view, meta.perms);
-  const { formAtom } = useFormScope();
-  const getFormContext = usePrepareContext(formAtom);
+  const getFormContext = useViewContext();
   const hasEditPopup = dashlet || view.editWindow === "popup";
   const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
 
@@ -123,7 +124,7 @@ export function Cards(props: ViewProps<CardsView>) {
           await dataStore.delete([
             { id: record.id!, version: record.version! },
           ]);
-        } catch { }
+        } catch {}
       }
     },
     [dataStore]
@@ -218,7 +219,9 @@ export function Cards(props: ViewProps<CardsView>) {
   useViewTabRefresh("cards", onSearch);
 
   return (
-    <Box className={legacyClassNames(styles.container, "cards-view", "row-fluid")}>
+    <Box
+      className={legacyClassNames(styles.container, "cards-view", "row-fluid")}
+    >
       {showToolbar && (
         <ViewToolBar
           meta={meta}
