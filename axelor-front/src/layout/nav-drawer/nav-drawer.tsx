@@ -10,6 +10,7 @@ import { MenuItem, Tag } from "@/services/client/meta.types";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { unaccent } from "@/utils/sanitize";
 import { useSidebar } from "./hook";
 
 import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
@@ -106,6 +107,11 @@ export function NavDrawer() {
 
   const handleSearchShow = useCallback(() => setShowSearch(true), []);
   const handleSearchHide = useCallback(() => setShowSearch(false), []);
+  const handleSearchFilter = useCallback(
+    (item: NavMenuItem, text: string) =>
+      unaccent(item.title.toLowerCase()).includes(unaccent(text.toLowerCase())),
+    []
+  );
 
   const tags = useTagsList();
 
@@ -124,6 +130,7 @@ export function NavDrawer() {
         title: i18n.get("Search menu..."),
         onShow: handleSearchShow,
         onHide: handleSearchHide,
+        filter: handleSearchFilter,
       }}
       header={<Header />}
       headerSmall={<HeaderSmall />}
