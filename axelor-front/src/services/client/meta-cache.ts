@@ -1,5 +1,7 @@
 import { LoadingCache } from "@/utils/cache";
 
+import { request } from "./client";
+import { DataContext } from "./data.types";
 import {
   actionView as fetchAction,
   fields as fetchFields,
@@ -8,18 +10,18 @@ import {
   type ViewData,
 } from "./meta";
 import { findViewFields, processView, processWidgets } from "./meta-utils";
-import { type ActionView, type ViewType, FormView } from "./meta.types";
-import { request } from "./client";
+import { FormView, type ActionView, type ViewType } from "./meta.types";
 import { reject } from "./reject";
 
 const cache = new LoadingCache<Promise<any>>();
 
 const makeKey = (...args: any[]) => args.map((x) => x || "").join(":");
 
-export async function findActionView(name: string): Promise<ActionView> {
-  return cache.get(makeKey("action", name), () =>
-    fetchAction(name).then((view) => ({ ...view, name }))
-  );
+export async function findActionView(
+  name: string,
+  context?: DataContext
+): Promise<ActionView> {
+  return fetchAction(name, context).then((view) => ({ ...view, name }));
 }
 
 export async function findView<T extends ViewType>({

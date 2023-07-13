@@ -27,12 +27,17 @@ export async function menus(type: MenuType): Promise<MenuItem[]> {
   return Promise.reject(resp.status);
 }
 
-export async function actionView(name: string): Promise<ActionView> {
+export async function actionView(
+  name: string,
+  context?: DataContext
+): Promise<ActionView> {
   const url = `ws/action/${name}`;
+  const data = context ? { context } : undefined;
   const resp = await request({
     url,
     method: "POST",
     body: {
+      data,
       model: "com.axelor.meta.db.MetaAction",
     },
   });
