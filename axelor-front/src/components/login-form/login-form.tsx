@@ -1,5 +1,5 @@
 import { useSession } from "@/hooks/use-session";
-import { Alert, Box, Button, Image, Input, InputLabel } from "@axelor/ui";
+import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
 import { FormEventHandler, useCallback, useState } from "react";
 
 import logo from "@/assets/axelor.svg";
@@ -103,7 +103,14 @@ export function LoginForm({
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={appLogo} alt={appName} />
+        <img
+          className={styles.logo}
+          src={appLogo}
+          alt={appName}
+          onError={(e) => {
+            e.currentTarget.src = logo;
+          }}
+        />
         <Box as="form" w={100} onSubmit={handleSubmit}>
           <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
           <Input
