@@ -45,10 +45,11 @@ export function DashletComponent({
   const { title, action, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
   const { data: tab, state } = useAsync<Tab | null>(async () => {
-    const actionView = await findActionView(action);
+    const context = getContext?.();
+    const actionView = await findActionView(action, context);
     const ctx = {
       ...actionView.context,
-      ...getContext?.(),
+      ...context,
     };
     return await initTab({
       ...actionView,
@@ -159,11 +160,12 @@ export function Dashlet(props: WidgetProps) {
       (get) => {
         const ctx = formAtom ? get(formAtom).record : {};
         return {
+          _model: tab.action.model,
           ...tab.action.context,
           ...ctx,
         } as DataContext;
       },
-      [formAtom, tab.action.context]
+      [formAtom, tab.action.context, tab.action.model]
     )
   );
 
