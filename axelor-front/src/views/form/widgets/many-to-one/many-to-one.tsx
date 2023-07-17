@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useRef } from "react";
+import uniqueId from "lodash/uniqueId";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -13,6 +14,7 @@ import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
@@ -22,6 +24,8 @@ import {
   CreatableSelect,
   CreatableSelectProps,
 } from "../tag-select/creatable-select";
+import { findView } from "@/services/client/meta-cache";
+import { FormView } from "@/services/client/meta.types";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
@@ -69,6 +73,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canEdit = value && hasButton("edit") && attrs.canEdit;
   const canNew = hasButton("new") && attrs.canNew;
   const canSelect = hasButton("select");
+  const isRefLink = schema.widget === "ref-link";
 
   const ensureRelated = useAtomCallback(
     useCallback(
@@ -114,11 +119,32 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const handleView = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
+      if (isRefLink && value?.id) {
+        const model = target;
+        const { view } = await findView<FormView>({
+          type: "form",
+          name: formView,
+          model,
+        });
+        return openTab({
+          title: view?.title || "",
+          name: uniqueId("$act"),
+          model,
+          viewType: "form",
+          views: [{ name: formView, type: "form" }],
+          params: {
+            forceEdit: false,
+          },
+          context: {
+            _showRecord: value.id,
+          },
+        });
+      }
       return handleEdit(true);
     },
-    [handleEdit]
+    [isRefLink, formView, target, value, handleEdit]
   );
 
   const handleCreate = useCallback(

@@ -14,7 +14,7 @@ import { ManyToOne } from "../many-to-one";
 import { Selection } from "../selection";
 
 export function RefSelect(props: FieldProps<any>) {
-  const { schema, valueAtom } = props;
+  const { schema, valueAtom, readonly } = props;
 
   const selection = useMemo(() => {
     const items: SelectionType[] = schema.selectionList || [];
@@ -29,6 +29,7 @@ export function RefSelect(props: FieldProps<any>) {
     [schema]
   );
 
+  const isRefLink = schema.widget === "ref-link";
   const target = useAtomValue(valueAtom);
   const options = selection[target] ?? {};
 
@@ -51,9 +52,11 @@ export function RefSelect(props: FieldProps<any>) {
   return (
     <FieldControl {...props}>
       <Box d="flex" g={3}>
+        {(!isRefLink || !readonly) && (
           <Box style={{ width: 200 }}>
             <Selection {...props} schema={selectSchema} valueAtom={valueAtom} />
           </Box>
+        )}
         <Box flex="1">
           {target && <RefItem {...props} schema={refSchema} />}
         </Box>
