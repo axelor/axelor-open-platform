@@ -171,7 +171,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [beforeSelect, domain, getContext, search]
   );
 
-  const valueRef = useRef(value);
+  const valueRef = useRef<DataRecord>();
 
   const ensureRelatedValues = useAtomCallback(
     useCallback(
