@@ -68,6 +68,7 @@ function FavoriteItem(props: CommandItemProps) {
   const location = useLocation();
 
   // favorites state
+  const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState<DataRecord[]>([]);
 
   const pathname = location?.pathname;
@@ -85,6 +86,17 @@ function FavoriteItem(props: CommandItemProps) {
       }),
     []
   );
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const { records } = await favoriteDataStore.search({
+      offset: 0,
+      limit: 40,
+      sortBy: ["-priority"],
+    });
+    setFavorites(records);
+    setLoading(false);
+  }, [favoriteDataStore]);
 
   const handleFavoriteClick = useCallback(
     (data: DataRecord) => {
@@ -132,39 +144,43 @@ function FavoriteItem(props: CommandItemProps) {
     openTab("menus.fav");
   }, [openTab]);
 
-  useAsyncEffect(async () => {
-    const { records } = await favoriteDataStore.search({
-      offset: 0,
-      limit: 40,
-      sortBy: ["-priority"],
-    });
-    setFavorites(records);
-  }, [favoriteDataStore]);
-
   return (
-    <CommandItem
-      {...props}
-      items={[
-        {
-          key: "fav-add",
-          text: "Add to favorites...",
-          disabled: !tabTitle,
-          onClick: handleFavoriteAdd,
-        },
-        { key: "fav-d1", divider: true, hidden: favorites.length === 0 },
-        ...favorites.map((fav, ind) => ({
-          key: String(fav.id ?? `fav_${ind}`),
-          text: fav.title,
-          onClick: () => handleFavoriteClick(fav),
-        })),
-        { key: "fav-d2", divider: true },
-        {
-          key: "fav-organise",
-          text: i18n.get("Organize favorites..."),
-          onClick: handleOrganizeFavorites,
-        },
-      ]}
-    />
+    <Box d="flex" onClick={fetchData}>
+      <CommandItem
+        {...props}
+        items={[
+          {
+            key: "fav-add",
+            text: i18n.get("Add to favorites..."),
+            disabled: !tabTitle,
+            onClick: handleFavoriteAdd,
+          },
+          {
+            key: "fav-d1",
+            divider: true,
+            hidden: favorites.length === 0 && !loading,
+          },
+          ...(loading
+            ? [
+                {
+                  key: "loading",
+                  text: i18n.get("Loading..."),
+                },
+              ]
+            : favorites.map((fav, ind) => ({
+                key: String(fav.id ?? `fav_${ind}`),
+                text: fav.title,
+                onClick: () => handleFavoriteClick(fav),
+              }))),
+          { key: "fav-d2", divider: true },
+          {
+            key: "fav-organise",
+            text: i18n.get("Organize favorites..."),
+            onClick: handleOrganizeFavorites,
+          },
+        ]}
+      />
+    </Box>
   );
 }
 
