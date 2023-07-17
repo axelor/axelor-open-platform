@@ -157,12 +157,31 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, domain } = attrs;
+  const { title, domain, canEdit, canView = true, canSelect = true } = attrs;
 
   const model = schema.target!;
 
   const showEditor = useEditor();
   const showSelector = useSelector();
+
+  const hasValue = useAtomValue(
+    useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom])
+  );
+
+  const icons: boolean | string[] = useMemo(() => {
+    const showIcons = String(schema.showIcons || "");
+    if (!showIcons || showIcons === "true") return true;
+    if (showIcons === "false") return false;
+    return showIcons.split(",");
+  }, [schema]);
+
+  const canShowIcon = useCallback(
+    (icon: string) => {
+      if (!icons) return false;
+      return icons === true || icons?.includes?.(icon);
+    },
+    [icons]
+  );
 
   const handleSelect = useAtomCallback(
     useCallback(
@@ -183,7 +202,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   const handleEdit = useAtomCallback(
     useCallback(
-      (get, set) => {
+      (get, set, readonly: boolean = false) => {
         showEditor({
           model,
           title: title ?? "",
@@ -194,7 +213,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           readonly,
         });
       },
-      [model, readonly, showEditor, title, valueAtom]
+      [model, showEditor, title, valueAtom]
     )
   );
 
@@ -215,15 +234,20 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     [setInvalid, widgetAtom]
   );
 
-  const titleActions = readonly ? (
+  const titleActions = !readonly && (
     <div className={styles.actions}>
-      <MaterialIcon icon="edit" onClick={handleEdit} />
-    </div>
-  ) : (
-    <div className={styles.actions}>
-      <MaterialIcon icon="edit" onClick={handleEdit} />
-      <MaterialIcon icon="search" onClick={handleSelect} />
-      <MaterialIcon icon="delete" onClick={handleDelete} />
+      {canEdit && hasValue && canShowIcon("edit") && (
+        <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
+      )}
+      {canView && !canEdit && hasValue && canShowIcon("view") && (
+        <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
+      )}
+      {canSelect && canShowIcon("select") && (
+        <MaterialIcon icon="search" onClick={handleSelect} />
+      )}
+      {hasValue && canShowIcon("clear") && (
+        <MaterialIcon icon="delete" onClick={handleDelete} />
+      )}
     </div>
   );
 
