@@ -48,21 +48,12 @@ export function RefSelect(props: FieldProps<any>) {
     [domain, formView, gridView, schema, target]
   );
 
-  const selectAtom: ValueAtom<string | number> = useMemo(() => {
-    return atom(
-      (get) => get(valueAtom),
-      (get, set, value, fireOnChange) => {
-        set(valueAtom, value, fireOnChange);
-      }
-    );
-  }, [valueAtom]);
-
   return (
     <FieldControl {...props}>
       <Box d="flex" g={3}>
-        <Box style={{ width: 200 }}>
-          <Selection {...props} schema={selectSchema} valueAtom={selectAtom} />
-        </Box>
+          <Box style={{ width: 200 }}>
+            <Selection {...props} schema={selectSchema} valueAtom={valueAtom} />
+          </Box>
         <Box flex="1">
           {target && <RefItem {...props} schema={refSchema} />}
         </Box>
@@ -116,14 +107,15 @@ function RefItemInner(props: FieldProps<any> & { targetName: string }) {
         }
         return { id };
       },
-      (get, set, value, fireOnChange) => {
+      (get, set, value, fireOnChange, markDirty) => {
         const id = value && value.id && value.id > 0 ? value.id : null;
         valRef.current = value;
+        set(relatedAtom, null);
         set(relatedAtom, id);
         // trigger onchange
         const prev = get(valueAtom);
-        set(valueAtom, null);
-        set(valueAtom, prev, fireOnChange);
+        set(valueAtom, null, false, false);
+        set(valueAtom, prev, fireOnChange, markDirty);
       }
     );
   }, [relatedAtom, valueAtom]);
