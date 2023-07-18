@@ -145,7 +145,7 @@ function Header() {
   const { open: openTab } = useTabs();
 
   const appHome = data?.user.action;
-  const appLogo = data?.app.logo;
+  const { logo: appLogo, name: appName = "logo" } = data?.app ?? {};
 
   const onLogoClick = useCallback(() => {
     if (appHome) {
@@ -159,7 +159,7 @@ function Header() {
         <MaterialIcon className={styles.toggleIcon} icon="menu" />
       </div>
       <div className={styles.appLogo} onClick={onLogoClick}>
-        {appLogo ? <img src={appLogo} alt="logo" /> : <AppLogo />}
+        {appLogo ? <img src={appLogo} alt={appName} /> : <AppLogo />}
       </div>
     </div>
   );
@@ -167,12 +167,12 @@ function Header() {
 
 function HeaderSmall() {
   const { data } = useSession();
-  const appIcon = data?.app.icon;
+  const { icon: appIcon, name: appName = "icon" } = data?.app ?? {};
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
         {appIcon ? (
-          <img src={appIcon} alt="icon" />
+          <img src={appIcon} alt={appName} />
         ) : (
           <AppIcon viewBox="0 0 241 228" />
         )}
