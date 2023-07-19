@@ -12,6 +12,7 @@ import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
   GridColumn,
+  GridLabel,
   GridProps,
   GridRow,
   GridRowProps,
@@ -24,6 +25,7 @@ import { useAsync } from "@/hooks/use-async";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
+import { i18n } from "@/services/client/i18n";
 import format from "@/utils/format";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
@@ -47,6 +49,24 @@ function formatter(column: Field, value: any, record: any) {
     context: record,
   });
 }
+
+const labels: Record<GridLabel, string> = {
+  Sum: i18n.get("Sum"),
+  Min: i18n.get("Min"),
+  Max: i18n.get("Max"),
+  Avg: i18n.get("Avg"),
+  Count: i18n.get("Count"),
+  items: i18n.get("items"),
+  Ungroup: i18n.get("Ungroup"),
+  Hide: i18n.get("Hide"),
+  Show: i18n.get("Show"),
+  Groups: i18n.get("Groups"),
+  "Sort Ascending": i18n.get("Sort Ascending"),
+  "Sort Descending": i18n.get("Sort Descending"),
+  "Group by": i18n.get("Group by"),
+  "Customize...": i18n.get("Customize..."),
+  "No records found.": i18n.get("No records found."),
+};
 
 export type GridHandler = {
   onAdd?: () => void;
@@ -291,7 +311,7 @@ export const Grid = forwardRef<
           view={view}
         />
       ),
-    []
+    [view, actionExecutor]
   );
 
   const CustomFormRenderer = useMemo(() => {
@@ -329,6 +349,7 @@ export const Grid = forwardRef<
     <AxGridProvider>
       <ScopeProvider scope={GridScope} value={{ readonly }}>
         <AxGrid
+          labels={labels}
           cellRenderer={CustomCellRenderer}
           rowRenderer={CustomRowRenderer}
           allowColumnResize
