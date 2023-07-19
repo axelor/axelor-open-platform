@@ -2,7 +2,7 @@ import { produce } from "immer";
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual, set as setDeep } from "lodash";
+import { isEqual, isNumber, set as setDeep } from "lodash";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -104,6 +104,24 @@ export class FormActionHandler extends DefaultActionHandler {
     this.notify({
       type: "focus",
       target,
+    });
+  }
+
+  addValue(target: string, value: any): void {
+    this.notify({
+      op: "add",
+      type: "value",
+      target,
+      value: isNumber(value) ? { id: value } : processActionValue(value),
+    });
+  }
+
+  delValue(target: string, value: any): void {
+    this.notify({
+      op: "del",
+      type: "value",
+      target,
+      value: isNumber(value) ? { id: value } : processActionValue(value),
     });
   }
 
