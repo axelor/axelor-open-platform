@@ -1,8 +1,35 @@
 import { isEqual } from "lodash";
 import { DataRecord } from "./data.types";
 
-export function isDummy(name: string) {
-  return name.startsWith("$");
+/**
+ * Checks if the given name is the name of a dummy field.
+ * A dummy field is a field that exists in the view, but not in the model.
+ *
+ */
+export function isDummy(name: string, fieldNames: string[]) {
+  return !fieldNames.includes(name) && !["id", "version"].includes(name);
+}
+
+export function extractDummy(
+  record: DataRecord,
+  fieldNames: string[]
+): Record<string, any> {
+  return Object.entries(record)
+    .filter(([k]) => isDummy(k, fieldNames))
+    .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {});
+}
+
+/**
+ * Checks if the given name is the name of a clean dummy field.
+ * A clean dummy field is a dummy field that cannot dirty the view.
+ *
+ */
+export function isCleanDummy(name: string) {
+  return name.startsWith("$") || name.startsWith("__");
+}
+
+export function getBaseDummy(name: string) {
+  return name.replace(/^\$+/, "");
 }
 
 export function isNil(value: any): value is null | undefined {
@@ -13,24 +40,24 @@ export function isPlainObject(value: any): value is Record<string, any> {
   return value?.constructor === Object;
 }
 
-export function extractDummy(record: DataRecord): Record<string, any> {
+export function extractCleanDummy(record: DataRecord): Record<string, any> {
   return Object.entries(record)
-    .filter(([k]) => isDummy(k))
+    .filter(([k]) => isCleanDummy(k))
     .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {});
 }
 
-export function excludeDummy(record: DataRecord): DataRecord {
+export function excludeCleanDummy(record: DataRecord): DataRecord {
   return Object.entries(record)
-    .filter(([k]) => !isDummy(k))
+    .filter(([k]) => !isCleanDummy(k))
     .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {});
 }
 
-export function mergeDummy(record: DataRecord): DataRecord {
-  const data = excludeDummy(record);
-  const dummy = extractDummy(record);
+export function mergeCleanDummy(record: DataRecord): DataRecord {
+  const data = excludeCleanDummy(record);
+  const dummy = extractCleanDummy(record);
 
   Object.entries(dummy).forEach(([k, v]) => {
-    const n = k.substring(1);
+    const n = getBaseDummy(k);
     data[n] = data[n] ?? v;
   });
 
@@ -44,7 +71,7 @@ function compact<T>(value: T): T {
     const result = Object.entries(value)
       .filter(([k, v]) => !isNil(v) && k !== "selected") // ignore null, undefined and selected
       .map(([k, v]) => [k, compact(v)]) // compact children
-      .map(([k, v]) => [k, isPlainObject(v) ? excludeDummy(v) : v]) // exclude dummy fields
+      .map(([k, v]) => [k, isPlainObject(v) ? excludeCleanDummy(v) : v]) // exclude clean dummy fields
       .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {}) as any;
     if (value.$id) result.id = result.id || value.$id; // make sure to use dummy id
     return result;

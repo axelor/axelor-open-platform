@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
-import { ScopeProvider } from "jotai-molecules";
 import {
   MutableRefObject,
   RefObject,
@@ -64,8 +64,8 @@ import { Collaboration } from "./widgets/collaboration";
 
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
-import { getDefaultValues } from "./builder/utils";
 import { FormValidityHandler, FormValidityScope } from "./builder/scope";
+import { getDefaultValues } from "./builder/utils";
 
 import styles from "./form.module.scss";
 
@@ -395,7 +395,8 @@ const FormContainer = memo(function FormContainer({
         }
 
         const { record } = formState;
-        const dummy = extractDummy(record);
+        const fieldNames = Object.keys(meta.fields ?? {});
+        const dummy = extractDummy(record, fieldNames);
 
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
@@ -427,6 +428,7 @@ const FormContainer = memo(function FormContainer({
         getErrors,
         onSaveAction,
         readonly,
+        meta.fields,
       ]
     )
   );

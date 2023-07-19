@@ -3,7 +3,7 @@ import { focusAtom } from "jotai-optics";
 import { isEqual } from "lodash";
 import { SetStateAction } from "react";
 
-import { isDummy, mergeDummy } from "@/services/client/data-utils";
+import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { FormView, Schema } from "@/services/client/meta.types";
 import { ActionExecutor } from "@/view-containers/action";
@@ -155,7 +155,7 @@ export function createValueAtom({
       const next =
         typeof value === "string" && value.trim() === "" ? null : value;
       if (prev !== next) {
-        const dirty = markDirty && Boolean(name && !isDummy(name));
+        const dirty = markDirty && Boolean(name && !isCleanDummy(name));
         set(lensAtom, next);
         set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
         if (dirty) {
@@ -231,7 +231,7 @@ export const contextAtom = atom(
       if (parent) {
         context._parent = prepare(parent, context);
       }
-      return mergeDummy(context);
+      return mergeCleanDummy(context);
     };
 
     return prepare(formAtom, options);
