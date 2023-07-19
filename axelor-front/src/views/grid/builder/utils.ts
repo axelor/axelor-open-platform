@@ -6,7 +6,12 @@ import { useAtom } from "jotai";
 import { DataContext } from "@/services/client/data.types";
 import { GridView, View } from "@/services/client/meta.types";
 import { DefaultActionExecutor } from "@/view-containers/action";
-import { GridActionHandler } from "./scope";
+import {
+  FormActionHandler,
+  useActionAttrs,
+  useActionValue,
+  useFormScope,
+} from "@/views/form/builder/scope";
 
 export function useGridState(
   initialState?: Partial<GridState> & { view?: GridView },
@@ -53,18 +58,27 @@ export function useGridActionExecutor(
     getContext?: () => DataContext;
   }
 ) {
+  const { formAtom } = useFormScope();
   const { onRefresh, getContext } = options || {};
-  return useMemo(() => {
-    const actionHandler = new GridActionHandler(() => ({
+
+  const actionHandler = useMemo(() => {
+    const actionHandler = new FormActionHandler(() => ({
       ...getContext?.(),
       _viewName: view.name,
       _model: view.model,
     }));
 
-    actionHandler.refresh = async () => {
-      await onRefresh?.();
-    };
+    onRefresh && actionHandler.setRefreshHandler(onRefresh);
 
-    return new DefaultActionExecutor(actionHandler);
+    return actionHandler;
   }, [getContext, onRefresh, view.model, view.name]);
+
+  const actionExecutor = useMemo(() => {
+    return new DefaultActionExecutor(actionHandler);
+  }, [actionHandler]);
+
+  useActionAttrs({ formAtom, actionHandler });
+  useActionValue({ formAtom, actionHandler });
+
+  return actionExecutor;
 }
