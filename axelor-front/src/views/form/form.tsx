@@ -65,7 +65,7 @@ import { Collaboration } from "./widgets/collaboration";
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
 import { getDefaultValues } from "./builder/utils";
-import { FormValiditityHandler, FormValidityScope } from "./builder/scope";
+import { FormValidityHandler, FormValidityScope } from "./builder/scope";
 
 import styles from "./form.module.scss";
 
@@ -240,7 +240,7 @@ const FormContainer = memo(function FormContainer({
     useCallback((state) => state.prevType, [])
   );
 
-  const widgetsRef = useRef(new Set<FormValiditityHandler>());
+  const widgetsRef = useRef(new Set<FormValidityHandler>());
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
@@ -630,7 +630,7 @@ const FormContainer = memo(function FormContainer({
     [actionExecutor, handleOnSave]
   );
 
-  const handleAddWidgetValidator = useCallback((fn: FormValiditityHandler) => {
+  const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
     widgetsRef.current.add(fn);
     return () => widgetsRef.current.delete(fn);
   }, []);

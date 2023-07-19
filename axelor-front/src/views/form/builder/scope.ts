@@ -165,10 +165,10 @@ export function useFormScope() {
   return useAtomValue(scopeAtom);
 }
 
-export type FormValiditityHandler = () => WidgetErrors[] | null;
+export type FormValidityHandler = () => WidgetErrors[] | null;
 
 export type FormValidityScopeState = {
-  add: (fn: FormValiditityHandler) => void;
+  add: (fn: FormValidityHandler) => void;
 };
 
 export const FormValidityScope = createScope<FormValidityScopeState>({
