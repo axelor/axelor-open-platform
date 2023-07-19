@@ -3,15 +3,7 @@ import { atomWithImmer } from "jotai-immer";
 import { useMemo } from "react";
 import { useAtom } from "jotai";
 
-import { DataContext } from "@/services/client/data.types";
-import { GridView, View } from "@/services/client/meta.types";
-import { DefaultActionExecutor } from "@/view-containers/action";
-import {
-  FormActionHandler,
-  useActionAttrs,
-  useActionValue,
-  useFormScope,
-} from "@/views/form/builder/scope";
+import { GridView } from "@/services/client/meta.types";
 
 export function useGridState(
   initialState?: Partial<GridState> & { view?: GridView },
@@ -42,43 +34,4 @@ export function useGridState(
   );
   const [state, setState] = useAtom(gridAtom);
   return [state, setState, gridAtom] as const;
-}
-
-/**
- * Hook to create grid action executor
- *
- * @param view the grid meta view
- * @param context predefined context if any
- * @returns action executor to execute action
- */
-export function useGridActionExecutor(
-  view: View,
-  options?: {
-    onRefresh?: () => Promise<any>;
-    getContext?: () => DataContext;
-  }
-) {
-  const { formAtom } = useFormScope();
-  const { onRefresh, getContext } = options || {};
-
-  const actionHandler = useMemo(() => {
-    const actionHandler = new FormActionHandler(() => ({
-      ...getContext?.(),
-      _viewName: view.name,
-      _model: view.model,
-    }));
-
-    onRefresh && actionHandler.setRefreshHandler(onRefresh);
-
-    return actionHandler;
-  }, [getContext, onRefresh, view.model, view.name]);
-
-  const actionExecutor = useMemo(() => {
-    return new DefaultActionExecutor(actionHandler);
-  }, [actionHandler]);
-
-  useActionAttrs({ formAtom, actionHandler });
-  useActionValue({ formAtom, actionHandler });
-
-  return actionExecutor;
 }

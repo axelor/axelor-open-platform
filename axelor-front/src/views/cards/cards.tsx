@@ -16,6 +16,7 @@ import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { CardsView } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -26,11 +27,11 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { legacyClassNames } from "@/styles/legacy";
 
-import { Card } from "./card";
+import { useActionExecutor } from "../form/builder/scope";
 import { ViewProps } from "../types";
-import { useGridActionExecutor } from "../grid/builder/utils";
+import { Card } from "./card";
+
 import styles from "./cards.module.scss";
 
 export function Cards(props: ViewProps<CardsView>) {
@@ -62,7 +63,7 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [action.name, action.viewType, action.views, getContext]);
 
-  const actionExecutor = useGridActionExecutor(view, {
+  const actionExecutor = useActionExecutor(view, {
     getContext: getActionContext,
     onRefresh: () => onSearch({}),
   });

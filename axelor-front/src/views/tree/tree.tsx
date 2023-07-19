@@ -24,7 +24,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 
-import { useGridActionExecutor } from "../grid/builder/utils";
+import { useActionExecutor } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Node as NodeComponent, NodeProps } from "./renderers/node";
 import {
@@ -49,7 +49,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     } as DataContext;
   }, [getViewContext, view]);
 
-  const actionExecutor = useGridActionExecutor(view, {
+  const actionExecutor = useActionExecutor(view, {
     getContext,
     onRefresh: () => onSearch({}),
   });

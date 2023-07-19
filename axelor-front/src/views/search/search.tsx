@@ -19,11 +19,12 @@ import { ViewProps } from "../types";
 import { ViewData } from "@/services/client/meta";
 import { alerts } from "@/components/alerts";
 import { Form, useFormHandlers } from "../form/builder";
+import { useActionExecutor } from "../form/builder/scope";
 import { SearchObjects, SearchObjectsState } from "./search-objects";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
-import { useGridActionExecutor, useGridState } from "../grid/builder/utils";
+import { useGridState } from "../grid/builder/utils";
 import { useViewDirtyAtom, useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
@@ -351,7 +352,7 @@ export function Search(props: ViewProps<SearchView>) {
     [onSearch]
   );
 
-  const gridActionExecutor = useGridActionExecutor(gridView, {
+  const gridActionExecutor = useActionExecutor(gridView, {
     getContext,
     onRefresh: onSearch,
   });

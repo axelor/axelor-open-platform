@@ -34,7 +34,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
-import { useGridActionExecutor } from "../grid/builder/utils";
+import { useActionExecutor } from "../form/builder/scope";
 import { ViewProps } from "../types";
 
 import { KanbanBoard } from "./kanban-board";
@@ -280,7 +280,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       : onEdit({ record: {} as KanbanRecord });
   }, [hasAddPopup, onEdit, onEditInPopup]);
 
-  const actionExecutor = useGridActionExecutor(view, {
+  const actionExecutor = useActionExecutor(view, {
     getContext,
     onRefresh,
   });

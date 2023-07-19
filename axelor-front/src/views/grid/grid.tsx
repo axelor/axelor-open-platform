@@ -1,23 +1,30 @@
 import clsx from "clsx";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isString from "lodash/isString";
 import uniqueId from "lodash/uniqueId";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box } from "@axelor/ui";
 import { GridProps, GridRow } from "@axelor/ui/grid";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
+import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
+import { useDevice } from "@/hooks/use-responsive";
+import { useSession } from "@/hooks/use-session";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
+import { request } from "@/services/client/client";
 import { SearchOptions } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
@@ -33,26 +40,21 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
+
+import { Dms } from "../dms";
+import { fetchRecord } from "../form";
+import { useActionExecutor } from "../form/builder/scope";
+import { nextId } from "../form/builder/utils";
+import { HelpComponent } from "../form/widgets";
+import { ViewProps } from "../types";
+import { Grid as GridComponent, GridHandler } from "./builder";
+import { useCustomizePopup } from "./builder/customize";
+import { Details } from "./builder/details";
+import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
+import { useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 
-import { useAsync } from "@/hooks/use-async";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useShortcuts } from "@/hooks/use-shortcut";
-import { findView } from "@/services/client/meta-cache";
-import { Dms } from "../dms";
-import { fetchRecord } from "../form";
-import { nextId } from "../form/builder/utils";
-import { request } from "@/services/client/client";
-import { ViewProps } from "../types";
-import { Grid as GridComponent, GridHandler } from "./builder";
-import { Details } from "./builder/details";
-import { HelpComponent } from "../form/widgets";
-import { useGridActionExecutor, useGridState } from "./builder/utils";
-import { useDevice } from "@/hooks/use-responsive";
-import { useSession } from "@/hooks/use-session";
-import { useCustomizePopup } from "./builder/customize";
-import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -477,7 +479,7 @@ function GridInner(props: ViewProps<GridView>) {
     }),
     [action]
   );
-  const actionExecutor = useGridActionExecutor(view, {
+  const actionExecutor = useActionExecutor(view, {
     getContext,
     onRefresh: onSearch,
   });

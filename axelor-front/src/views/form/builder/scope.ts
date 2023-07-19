@@ -11,6 +11,7 @@ import {
   createEvalContext,
 } from "@/hooks/use-parser/eval-context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { View } from "@/services/client/meta.types";
 import {
   ActionAttrData,
   ActionData,
@@ -233,9 +234,9 @@ function useActionData<T extends ActionData>(
     };
   }, []);
 
+  const $actionHandler = customActionHandler ?? actionHandler;
   useEffect(() => {
-    const _actionHandler = customActionHandler ?? actionHandler;
-    return _actionHandler.subscribe((data) => {
+    return $actionHandler.subscribe((data) => {
       if (doneRef.current) return;
       if (data) {
         if (check(data)) {
@@ -243,10 +244,10 @@ function useActionData<T extends ActionData>(
         }
       }
     });
-  }, [customActionHandler, actionHandler, check, handler]);
+  }, [$actionHandler, check, handler]);
 }
 
-export function useActionAttrs({
+function useActionAttrs({
   formAtom,
   actionHandler,
 }: {
@@ -322,7 +323,7 @@ export function useActionAttrs({
   );
 }
 
-export function useActionValue({
+function useActionValue({
   formAtom,
   actionHandler,
 }: {
@@ -380,6 +381,39 @@ export function useActionValue({
     ),
     actionHandler
   );
+}
+
+export function useActionExecutor(
+  view: View,
+  options?: {
+    onRefresh?: () => Promise<any>;
+    getContext?: () => DataContext;
+  }
+) {
+  const { formAtom } = useFormScope();
+  const { onRefresh, getContext } = options || {};
+
+  const actionHandler = useMemo(() => {
+    const actionHandler = new FormActionHandler(() => ({
+      ...getContext?.(),
+      _viewName: view.name,
+      _model: view.model,
+    }));
+
+    onRefresh && actionHandler.setRefreshHandler(onRefresh);
+
+    return actionHandler;
+  }, [getContext, onRefresh, view.model, view.name]);
+
+  const actionExecutor = useMemo(
+    () => new DefaultActionExecutor(actionHandler),
+    [actionHandler]
+  );
+
+  useActionAttrs({ formAtom, actionHandler });
+  useActionValue({ formAtom, actionHandler });
+
+  return actionExecutor;
 }
 
 export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
