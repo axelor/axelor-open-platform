@@ -268,12 +268,12 @@ const FormContainer = memo(function FormContainer({
         get,
         set,
         record: DataRecord | null,
-        options?: { readonly?: boolean; isNew?: boolean }
+        options?: { readonly?: boolean; dirty?: boolean; isNew?: boolean }
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
-        const { isNew, ...props } = { readonly, ...options };
+        const { isNew, dirty = false, ...props } = { readonly, ...options };
         const isNewFromUnsaved = isNew && record === null && !prev.record.id;
 
         record = record ?? {};
@@ -290,10 +290,10 @@ const FormContainer = memo(function FormContainer({
         }
 
         switchTo("form", { route: { id }, props });
-        setDirty(false);
+        setDirty(dirty);
         set(formAtom, {
           ...prev,
-          dirty: false,
+          dirty,
           states: {},
           statesByName: {},
           record,
@@ -509,7 +509,7 @@ const FormContainer = memo(function FormContainer({
   const onCopy = useCallback(async () => {
     if (record.id) {
       const rec = await dataStore.copy(record.id);
-      doEdit(rec, { readonly: false, isNew: true });
+      doEdit(rec, { dirty: true, readonly: false, isNew: true });
     }
   }, [dataStore, doEdit, record.id]);
 
