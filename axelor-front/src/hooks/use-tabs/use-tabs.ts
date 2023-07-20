@@ -59,6 +59,12 @@ export type TabState = {
   type: string;
 
   /**
+   * The current view name
+   *
+   */
+  name?: string;
+
+  /**
    * Previous view type.
    *
    */

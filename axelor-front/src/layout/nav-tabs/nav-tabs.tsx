@@ -358,8 +358,7 @@ function Popover({
 function PopoverContent({ tab }: { tab: Tab }) {
   const action = tab.action.name;
   const object = tab.action.model;
-  const tabState = useAtomValue(tab.state);
-  const view = tab.action?.views?.find((v) => v.type === tabState.type)?.name;
+  const { name: view } = useAtomValue(tab.state);
 
   return (
     <Box className={styles.tooltip}>

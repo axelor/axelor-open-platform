@@ -1,7 +1,8 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom } from "jotai/utils";
-import { memo, useMemo } from "react";
+import { focusAtom } from "jotai-optics";
+import { memo, useEffect, useMemo } from "react";
 
 import { Box, Fade } from "@axelor/ui";
 
@@ -60,6 +61,29 @@ function ViewContainer({
     async () => loadView({ model, ...view }),
     [model, view]
   );
+
+  const viewData = data?.meta?.view;
+  const viewTitle = (view.type === "form" && viewData?.title) || tab.title;
+  const viewName = viewData?.name;
+
+  const setTabTitle = useSetAtom(
+    useMemo(
+      () => focusAtom(tab.state, (state) => state.prop("title")),
+      [tab.state]
+    )
+  );
+
+  const setTabName = useSetAtom(
+    useMemo(
+      () => focusAtom(tab.state, (state) => state.prop("name")),
+      [tab.state]
+    )
+  );
+
+  useEffect(() => {
+    viewTitle && setTabTitle(viewTitle);
+    setTabName(viewName);
+  }, [viewTitle, viewName, setTabTitle, setTabName]);
 
   if (state === "loading" || data?.type !== view.type) {
     return <Loader />;
