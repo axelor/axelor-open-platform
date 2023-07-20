@@ -107,11 +107,12 @@ export function NavDrawer() {
 
   const handleSearchShow = useCallback(() => setShowSearch(true), []);
   const handleSearchHide = useCallback(() => setShowSearch(false), []);
-  const handleSearchFilter = useCallback(
-    (item: NavMenuItem, text: string) =>
-      unaccent(item.title.toLowerCase()).includes(unaccent(text.toLowerCase())),
-    []
-  );
+  const handleSearchFilter = useCallback((item: NavMenuItem, text: string) => {
+    const title = unaccent(item.title.toLocaleLowerCase());
+    const search = unaccent(text.toLocaleLowerCase());
+    const parts = search.split(/\s+/);
+    return title.includes(search) || parts.every((p) => title.includes(p));
+  }, []);
 
   const tags = useTagsList();
 
