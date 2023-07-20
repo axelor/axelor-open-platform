@@ -4,6 +4,6 @@ import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 export function Icon({ value }: GridColumnProps) {
   return (
-    <Box textAlign="center">{value && <IconComp icon={value as string} />}</Box>
+    <Box d="inline-flex" textAlign="center">{value && <IconComp icon={value as string} />}</Box>
   );
 }
