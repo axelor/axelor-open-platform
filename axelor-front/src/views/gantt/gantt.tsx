@@ -6,8 +6,7 @@ import {
   GanttRecord,
   ConnectProps,
 } from "@axelor/ui/gantt";
-import { Box, Button } from "@axelor/ui";
-import { GridProvider as DNDProvider } from "@axelor/ui/grid";
+import { Box, Button, DndProvider } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field, GanttView, Widget } from "@/services/client/meta.types";
@@ -418,7 +417,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         </Box>
       </ViewToolBar>
       <Box d="flex" flex={1} overflow="auto" px={1}>
-        <DNDProvider>
+        <DndProvider>
           <GanttComponent
             className={styles.gantt}
             view={type}
@@ -429,7 +428,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
             onRecordDisconnect={handleRecordDisconnect}
             onRecordUpdate={handleRecordUpdate}
           />
-        </DNDProvider>
+        </DndProvider>
       </Box>
     </Box>
   );

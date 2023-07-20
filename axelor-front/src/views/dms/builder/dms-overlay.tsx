@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
-import { Box } from "@axelor/ui";
-import { useDrop } from "react-dnd";
-import { NativeTypes } from "react-dnd-html5-backend";
+import { Box, DndNativeTypes, useDrop } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
@@ -18,7 +16,7 @@ export function DmsOverlay({
 }) {
   // file drag/drop upload
   const [{ canDrop, isOver }, drop] = useDrop({
-    accept: [NativeTypes.FILE],
+    accept: [DndNativeTypes.FILE],
     drop(item, monitor: any) {
       const files = monitor.getItem().files;
       onUpload?.(files);

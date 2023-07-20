@@ -3,8 +3,8 @@ import {
   Tree as TreeComponent,
   TreeNode as TreeRecord,
   TreeSortColumn,
+  DndProvider as TreeProvider,
 } from "@axelor/ui";
-import { GridProvider as TreeProvider } from "@axelor/ui/grid";
 import { useSetAtom } from "jotai";
 import { uniq } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -6,13 +6,11 @@ import {
   useMemo,
   useEffect,
 } from "react";
-import { Box, Input, Link } from "@axelor/ui";
+import { Box, DndProvider, Input, Link } from "@axelor/ui";
 import { GridRow, GridColumn } from "@axelor/ui/grid";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import clsx from "clsx";
 
@@ -536,7 +534,7 @@ export function Dms(props: ViewProps<GridView>) {
   const canShowTree = showTree ?? (size.xs || size.sm ? false : true);
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider>
       <DmsOverlay
         className={clsx(styles.container, {
           [styles.popup]: popup,
