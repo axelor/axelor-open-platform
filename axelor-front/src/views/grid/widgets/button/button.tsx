@@ -53,11 +53,14 @@ export function Button(props: GridCellProps) {
 
   function renderIcon() {
     return (
-      <a className={className} href=" " onClick={handleClick} title={help}>
-        <Box me={2} className={legacyClassNames(css)}>
-          {icon && <Icon icon={icon} />}
-        </Box>
-      </a>
+      <Box
+        d="inline-flex"
+        className={legacyClassNames(className, css)}
+        onClick={handleClick}
+        title={help}
+      >
+        {icon && <Icon icon={icon} />}
+      </Box>
     );
   }
 
