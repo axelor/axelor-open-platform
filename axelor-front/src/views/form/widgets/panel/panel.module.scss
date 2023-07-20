@@ -20,6 +20,9 @@
       padding: 0;
       background-color: transparent;
     }
+    > div:nth-child(2) > div > div {
+      padding-top: 0.5rem;
+    }
     > div:first-child > div > div {
       padding-left: 0;
       padding-right: 0;
