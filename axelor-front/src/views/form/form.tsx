@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
   MutableRefObject,
   RefObject,
@@ -217,6 +217,12 @@ const FormContainer = memo(function FormContainer({
 
   const { hasButton } = usePerms(meta.view, meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
+  const archived = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (form) => form.record?.archived),
+      [formAtom]
+    )
+  );
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
@@ -507,19 +513,24 @@ const FormContainer = memo(function FormContainer({
     }
   }, [dataStore, doEdit, record.id]);
 
-  const onArchive = useCallback(async () => {
-    if (record.id) {
-      const confirmed = await dialogs.confirm({
-        content: i18n.get("Do you really want to archive the selected record?"),
-      });
-      if (confirmed) {
-        const id = record.id!;
-        const version = record.version!;
-        await dataStore.save({ id, version, archived: true });
-        switchTo("grid");
+  const onArchive = useCallback(
+    async (archived = true) => {
+      if (record.id) {
+        const confirmed = await dialogs.confirm({
+          content: archived
+            ? i18n.get("Do you really want to archive the selected record?")
+            : i18n.get("Do you really want to unarchive the selected record?"),
+        });
+        if (confirmed) {
+          const id = record.id!;
+          const version = record.version!;
+          await dataStore.save({ id, version, archived });
+          switchTo("grid");
+        }
       }
-    }
-  }, [dataStore, record.id, record.version, switchTo]);
+    },
+    [dataStore, record.id, record.version, switchTo]
+  );
 
   const onAudit = useAtomCallback(
     useCallback(
@@ -808,8 +819,8 @@ const FormContainer = memo(function FormContainer({
                 },
                 {
                   key: "archive",
-                  text: i18n.get("Archive"),
-                  onClick: onArchive,
+                  text: archived ? i18n.get("Unarchive") : i18n.get("Archive"),
+                  onClick: () => onArchive(!archived),
                   hidden: !canArchive,
                 },
                 {
