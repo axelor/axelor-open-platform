@@ -1,12 +1,20 @@
 import clsx from "clsx";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Menu as AxMenu,
   MenuDivider as AxMenuDivider,
   MenuItem as AxMenuItem,
+  Box,
   NavTabItem,
   Portal,
   NavTabs as Tabs,
@@ -18,11 +26,13 @@ import { useResponsiveContainer } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { Tab, useTabs } from "@/hooks/use-tabs";
+import { Tooltip } from "@/components/tooltip";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem } from "@/services/client/meta.types";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { session } from "@/services/client/session";
 
 import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
@@ -305,19 +315,73 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
   });
 
   return (
-    <div
-      data-tab={tab.id}
-      className={clsx(styles.tabTitle, {
-        [styles.dirty]: dirty,
-      })}
-    >
-      <div className={styles.tabText}>{title}</div>
-      {showClose && (
-        <div className={styles.tabClose} onClick={handleClose}>
-          <MaterialIcon icon="close" fontSize={20} />
-        </div>
-      )}
-    </div>
+    <Popover title={title} tab={tab}>
+      <div
+        data-tab={tab.id}
+        className={clsx(styles.tabTitle, {
+          [styles.dirty]: dirty,
+        })}
+      >
+        <div className={styles.tabText}>{title}</div>
+        {showClose && (
+          <div className={styles.tabClose} onClick={handleClose}>
+            <MaterialIcon icon="close" fontSize={20} />
+          </div>
+        )}
+      </div>
+    </Popover>
+  );
+}
+
+function Popover({
+  children,
+  title,
+  tab,
+}: {
+  title: string;
+  tab: Tab;
+  children: ReactElement;
+}) {
+  const technical = session.info?.user.technical;
+
+  if (technical) {
+    return (
+      <Tooltip title={title} content={() => <PopoverContent tab={tab} />}>
+        {children}
+      </Tooltip>
+    );
+  }
+
+  return children;
+}
+
+function PopoverContent({ tab }: { tab: Tab }) {
+  const action = tab.action.name;
+  const object = tab.action.model;
+  const tabState = useAtomValue(tab.state);
+  const view = tab.action?.views?.find((v) => v.type === tabState.type)?.name;
+
+  return (
+    <Box className={styles.tooltip}>
+      <dl>
+        <dt>{i18n.get("Action")}</dt>
+        <dd>
+          <code>{action}</code>
+        </dd>
+        <dt>{i18n.get("Object")}</dt>
+        <dd>
+          <code>{object}</code>
+        </dd>
+        {view && (
+          <>
+            <dt>{i18n.get("View")}</dt>
+            <dd>
+              <code>{view}</code>
+            </dd>
+          </>
+        )}
+      </dl>
+    </Box>
   );
 }
 

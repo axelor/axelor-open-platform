@@ -65,3 +65,21 @@
     font-weight: 600;
   }
 }
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  font-size: 0.9rem;
+}
+
+.tooltip dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
