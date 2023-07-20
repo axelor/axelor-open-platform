@@ -35,7 +35,7 @@ export function LoginForm({
   const [showError, setShowError] = useState(false);
 
   const session = useSession();
-  const appInfo = session.appData;
+  const appInfo = session.data;
 
   const defaultClient = appInfo?.auth?.defaultClient;
 

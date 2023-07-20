@@ -151,7 +151,7 @@ export function HelpPopover({
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
-  const technical = session.info?.user.technical && name;
+  const technical = session.info?.user?.technical && name;
   const canShowHelp = help || technical;
 
   if (canShowHelp) {
@@ -184,7 +184,7 @@ function HelpContent(props: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
 
-  const technical = session.info?.user.technical && name;
+  const technical = session.info?.user?.technical && name;
 
   const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });

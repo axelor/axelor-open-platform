@@ -76,10 +76,10 @@ function HttpIndicator({ count }: { count: number }) {
 }
 
 function HttpAuth({ resume }: { resume?: () => void }) {
-  const prev = session.info?.user.login;
+  const prev = session.info?.user?.login;
   const handleSuccess = useCallback(
     (info: SessionInfo) => {
-      const curr = info.user.login;
+      const curr = info.user?.login;
       if (prev !== curr) {
         window.location.reload();
       } else {

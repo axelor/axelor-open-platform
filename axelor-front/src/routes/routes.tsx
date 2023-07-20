@@ -15,7 +15,7 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { state, data } = useSession();
   const location = useLocation();
   if (state === "loading") return <div>Loading</div>;
-  if (data) {
+  if (data?.user) {
     return children;
   }
   return <Navigate to="/login" state={{ from: location }} />;

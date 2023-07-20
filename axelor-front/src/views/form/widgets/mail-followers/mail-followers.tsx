@@ -76,7 +76,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const isLoginUserFollowing = React.useMemo(
     () =>
       followers?.some(
-        ({ $author }) => String($author?.code) === String(session?.user.login)
+        ({ $author }) => String($author?.code) === String(session?.user?.login)
       ),
     [followers, session]
   );

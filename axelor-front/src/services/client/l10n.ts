@@ -124,7 +124,7 @@ function findDateFormat(data: any) {
 }
 
 function findLocale() {
-  const userLang = session.info?.user.lang;
+  const userLang = session.info?.user?.lang;
   if (userLang?.includes("-")) {
     return userLang;
   }

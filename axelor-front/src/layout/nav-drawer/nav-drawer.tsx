@@ -144,7 +144,7 @@ function Header() {
   const { sidebar, setSidebar } = useSidebar();
   const { open: openTab } = useTabs();
 
-  const appHome = data?.user.action;
+  const appHome = data?.user?.action;
   const { logo: appLogo, name: appName = "logo" } = data?.app ?? {};
 
   const onLogoClick = useCallback(() => {

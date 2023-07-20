@@ -1,13 +1,13 @@
 import { atom, useAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 
-import { AppInfo, SessionInfo, session } from "@/services/client/session";
+import { SessionInfo, session } from "@/services/client/session";
 import { useAsync } from "../use-async";
 
 const redirectUrlAtom = atom<string | null>(null);
 
 async function init() {
-  let info = session.appInfo;
+  let info = session.info;
   if (info) {
     return info;
   }
@@ -16,25 +16,14 @@ async function init() {
 
 const login = session.login.bind(session);
 
-interface MultiInfo {
-  sessionInfo: SessionInfo | null;
-  appInfo: AppInfo | null;
-}
-
 export function useSession() {
   const { state, error } = useAsync(init, []);
-  const [data, setData] = useState<MultiInfo>({
-    sessionInfo: session.info,
-    appInfo: session.appInfo,
-  });
+  const [data, setData] = useState<SessionInfo | null>(session.info);
   const [redirectUrl, setRedirectUrl] = useAtom(redirectUrlAtom);
 
   useEffect(() => {
     return session.subscribe((info) => {
-      setData({
-        sessionInfo: info?.type === "session" ? info : null,
-        appInfo: info,
-      });
+      setData(info);
     });
   }, []);
 
@@ -49,8 +38,7 @@ export function useSession() {
 
   return {
     state,
-    data: data.sessionInfo,
-    appData: data.appInfo,
+    data,
     error,
     login,
     logout,

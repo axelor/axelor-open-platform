@@ -15,7 +15,7 @@ export function About() {
   const { app, user } = info || { app: {}, user: {} };
 
   const year = new Date().getFullYear();
-  const technical = user.technical;
+  const technical = user?.technical;
 
   const showSystemInfo = useCallback(() => {
     dialogs.info({

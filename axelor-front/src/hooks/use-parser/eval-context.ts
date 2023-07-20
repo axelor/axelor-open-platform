@@ -38,13 +38,13 @@ export function createEvalContext(
 
   const helpers = {
     get $user() {
-      return session.info?.user.login;
+      return session.info?.user?.login;
     },
     get $group() {
-      return session.info?.user.group;
+      return session.info?.user?.group;
     },
     get $userId() {
-      return session.info?.user.id;
+      return session.info?.user?.id;
     },
     $component(name: string) {
       return components[name];

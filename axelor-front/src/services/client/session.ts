@@ -8,8 +8,7 @@ export interface ClientInfo {
   title?: string;
 }
 
-interface CommonAppInfo {
-  type: "public" | "session";
+export interface SessionInfo {
   app: {
     name?: string;
     description?: string;
@@ -31,6 +30,21 @@ interface CommonAppInfo {
     defaultClient?: string;
     exclusive?: boolean;
     currentClient?: string;
+  };
+  user?: {
+    id: number;
+    login: string;
+    name: string;
+    nameField?: string;
+    lang?: string | null;
+    image?: string | null;
+    group?: string | null;
+    action?: string | null;
+    navigator?: string | null;
+    theme?: string | null;
+    noHelp: boolean;
+    singleTab: boolean;
+    technical: boolean;
   };
   api?: {
     pagination?: {
@@ -62,31 +76,6 @@ interface CommonAppInfo {
     };
   };
 }
-
-export interface PublicInfo extends CommonAppInfo {
-  type: "public";
-}
-
-export interface SessionInfo extends CommonAppInfo {
-  type: "session";
-  user: {
-    id: number;
-    login: string;
-    name: string;
-    nameField?: string;
-    lang?: string | null;
-    image?: string | null;
-    group?: string | null;
-    action?: string | null;
-    navigator?: string | null;
-    theme?: string | null;
-    noHelp: boolean;
-    singleTab: boolean;
-    technical: boolean;
-  };
-}
-
-export type AppInfo = PublicInfo | SessionInfo;
 
 const INFO_MAPPINGS = {
   application: "app",
@@ -132,7 +121,7 @@ const INFO_MAPPINGS = {
   "view.collaboration.enabled": "view.collaboration.enabled",
 };
 
-export type AppInfoListener = (info: AppInfo | null) => void;
+export type SessionListener = (info: SessionInfo | null) => void;
 
 async function init() {
   const url = "ws/public/app/info";
@@ -159,21 +148,19 @@ async function init() {
     }
   }
 
-  info.type = info.user ? "session" : "public";
-
-  return info as AppInfo;
+  return info as SessionInfo;
 }
 
 export class Session {
-  #info: AppInfo | null = null;
-  #infoPromise: Promise<AppInfo> | null = null;
-  #listeners = new Set<AppInfoListener>();
+  #info: SessionInfo | null = null;
+  #infoPromise: Promise<SessionInfo> | null = null;
+  #listeners = new Set<SessionListener>();
 
   #notify() {
     this.#listeners.forEach((fn) => fn(this.#info));
   }
 
-  subscribe(listener: AppInfoListener) {
+  subscribe(listener: SessionListener) {
     this.#listeners.add(listener);
     return () => {
       this.#listeners.delete(listener);
@@ -181,10 +168,6 @@ export class Session {
   }
 
   get info() {
-    return this.#info?.type === "session" ? this.#info : null;
-  }
-
-  get appInfo() {
     return this.#info;
   }
 
@@ -215,10 +198,7 @@ export class Session {
 
     if (ok) {
       this.#infoPromise = init();
-      const info = await this.#load();
-      if (info.type === "session") {
-        return info;
-      }
+      return this.#load();
     }
 
     return Promise.reject(status);

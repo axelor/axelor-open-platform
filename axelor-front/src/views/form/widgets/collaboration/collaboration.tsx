@@ -392,7 +392,7 @@ function useSessionUser() {
 function useUserName(user: User) {
   const session = useSession();
   const nameField = useMemo(
-    () => session.data?.user.nameField ?? "name",
+    () => session.data?.user?.nameField ?? "name",
     [session]
   );
 

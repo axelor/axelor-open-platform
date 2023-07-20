@@ -69,7 +69,7 @@ export function View() {
         tab: true,
       });
     } else {
-      const homeAction = session.info?.user.action;
+      const homeAction = session.info?.user?.action;
       if (homeAction) {
         await open(homeAction, { tab: true });
       }

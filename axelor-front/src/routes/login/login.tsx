@@ -60,7 +60,7 @@ export function requestLogin(client?: string) {
 
 export function Login() {
   const location = useLocation();
-  const { state, data, redirectUrl, appData } = useSession();
+  const { state, data, redirectUrl } = useSession();
   const queryParams = useMemo(
     () => new URLSearchParams(window.location.search),
     []
@@ -92,7 +92,7 @@ export function Login() {
     return null;
   }
 
-  const { clients = [], defaultClient, exclusive } = appData?.auth ?? {};
+  const { clients = [], defaultClient, exclusive } = data?.auth ?? {};
   const client = clientName || defaultClient;
   const notFormClient = client && client !== FORM_CLIENT_NAME;
 
@@ -111,7 +111,7 @@ export function Login() {
     return null;
   }
 
-  if (data) {
+  if (data?.user) {
     removeErrorParam();
     let { from } = location.state || { from: { pathname: "/" } };
     if (from === "/login") from = "/";
@@ -174,8 +174,8 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 }
 
 function ServerError({ error }: { error: string }) {
-  const { appData } = useSession();
-  const { logo: appLogo = logo, name: appName = "Axelor" } = appData?.app || {};
+  const { data } = useSession();
+  const { logo: appLogo = logo, name: appName = "Axelor" } = data?.app ?? {};
 
   return (
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>

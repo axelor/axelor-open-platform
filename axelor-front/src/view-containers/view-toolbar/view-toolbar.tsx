@@ -363,7 +363,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
       {switchActions && (
         <CommandBar items={switchActions} className={styles.viewSwitch} />
       )}
-      {sessionInfo?.user.technical && (
+      {sessionInfo?.user?.technical && (
         <CommandBar items={farItems} className={styles.farItems} />
       )}
     </Box>

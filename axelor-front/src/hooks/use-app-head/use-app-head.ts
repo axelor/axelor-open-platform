@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
-import { AppInfo } from "@/services/client/session";
+import { SessionInfo } from "@/services/client/session";
 import { useSession } from "../use-session";
 
 const NAME = "Axelor";
 const DESC = "Axelor Entreprise Application";
 
 export function useAppHead() {
-  const { appData: info } = useSession();
+  const { data: info } = useSession();
   useEffect(() => {
     if (info) {
       setTitle(info);
@@ -16,12 +16,12 @@ export function useAppHead() {
   }, [info]);
 }
 
-function setTitle(info: AppInfo) {
+function setTitle(info: SessionInfo) {
   const { name = NAME, description = DESC } = info.app ?? {};
   document.title = `${name} – ${description}`;
 }
 
-function setIcon(info: AppInfo) {
+function setIcon(info: SessionInfo) {
   const icon = info.app.icon;
   const elem = document.querySelector("head > link[rel='shortcut icon']") as HTMLLinkElement;
 

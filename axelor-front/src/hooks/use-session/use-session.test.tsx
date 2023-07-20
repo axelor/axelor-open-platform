@@ -54,7 +54,7 @@ const App = () => {
   if (data) {
     return (
       <div data-testid="logged-in">
-        <h4>{data.user.name}</h4>
+        <h4>{data.user?.name}</h4>
         <LogoutButton />
       </div>
     );

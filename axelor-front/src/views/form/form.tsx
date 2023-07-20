@@ -546,7 +546,7 @@ const FormContainer = memo(function FormContainer({
           const res = await dataStore.read(id, {
             fields: ["createdBy", "createdOn", "updatedBy", "updatedOn"],
           });
-          const name = session.info?.user.nameField ?? "name";
+          const name = session.info?.user?.nameField ?? "name";
           dialogs.info({
             content: (
               <dl className={styles.dlist}>

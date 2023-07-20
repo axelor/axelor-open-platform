@@ -284,7 +284,7 @@ function FarItems() {
       title: i18n.get("Preferences"),
       viewName: "user-preferences-form",
       record: {
-        id: session.info?.user.id,
+        id: session.info?.user?.id,
       },
       onSelect() {
         window.location.reload();
@@ -366,7 +366,7 @@ function FarItems() {
           items: [
             {
               key: "profile",
-              text: data?.user.name,
+              text: data?.user?.name,
               subtext: i18n.get("Preferences"),
               onClick: showPreferences,
             },
