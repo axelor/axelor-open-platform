@@ -320,7 +320,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
   return (
     <Box className={styles.toolbar}>
       <CommandBar className={styles.actions} iconOnly items={actions} />
-      {toolbar?.length > 0 && (
+      {(toolbar?.length > 0 || menubar?.length > 0) && (
         <ToolbarActions
           buttons={toolbar}
           menus={menubar}
