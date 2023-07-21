@@ -1,9 +1,12 @@
-import { useHilites } from "@/hooks/use-parser";
-import { Hilite } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
+import { memo } from "react";
+
 import { Box } from "@axelor/ui";
 import { GridRowProps } from "@axelor/ui/grid";
-import { memo } from "react";
+
+import { Hilite } from "@/services/client/meta.types";
+import { useHilites } from "@/hooks/use-parser";
+import { legacyClassNames } from "@/styles/legacy";
+import styles from './row.module.css';
 
 export const Row = memo(function Row(
   props: GridRowProps & {
@@ -11,6 +14,7 @@ export const Row = memo(function Row(
   }
 ) {
   const {
+    selected,
     hilites,
     data: { record },
   } = props;
@@ -21,7 +25,9 @@ export const Row = memo(function Row(
     <Box
       {...{
         style,
-        className: legacyClassNames(className, $className),
+        className: legacyClassNames(className, $className, styles.row, {
+          [styles.selected]: selected,
+        }),
         onDoubleClick,
         children,
       }}

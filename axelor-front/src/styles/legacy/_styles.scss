@@ -150,21 +150,10 @@ $label_backgrounds_text: (
     color: $value !important;
   }
 
-  .slick-row[class*="hilite-"] .slick-cell.hilite-#{$name}-text {
-    color: $value !important;
-  }
-
   .hilite-#{$name},
-  .hilite-#{$name} input:first-of-type,
-  .hilite-#{$name} textarea:first-of-type,
   .hilite-#{$name} .slick-cell {
-    color: map.get($text, $name);
-    background-color: $value;
-  }
-
-  .slick-row[class*="hilite-"] .slick-cell.hilite-#{$name} {
-    color: map.get($text, $name);
-    background-color: $value;
+    color: map.get($text, $name) !important;
+    background-color: $value !important;
   }
 }
 
