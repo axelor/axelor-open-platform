@@ -222,9 +222,8 @@ export function useFormRefresh(refresh?: () => Promise<any> | void) {
 function useActionData<T extends ActionData>(
   check: (data: ActionData) => boolean,
   handler: (data: T) => void,
-  customActionHandler?: ActionHandler
+  actionHandler: ActionHandler
 ) {
-  const { actionHandler } = useFormScope();
   const doneRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -234,9 +233,8 @@ function useActionData<T extends ActionData>(
     };
   }, []);
 
-  const $actionHandler = customActionHandler ?? actionHandler;
   useEffect(() => {
-    return $actionHandler.subscribe((data) => {
+    return actionHandler.subscribe((data) => {
       if (doneRef.current) return;
       if (data) {
         if (check(data)) {
@@ -244,7 +242,7 @@ function useActionData<T extends ActionData>(
         }
       }
     });
-  }, [$actionHandler, check, handler]);
+  }, [actionHandler, check, handler]);
 }
 
 function useActionAttrs({
@@ -252,7 +250,7 @@ function useActionAttrs({
   actionHandler,
 }: {
   formAtom: FormAtom;
-  actionHandler?: ActionHandler;
+  actionHandler: ActionHandler;
 }) {
   useActionData<ActionAttrData>(
     useCallback((x) => x.type === "attr", []),
@@ -328,7 +326,7 @@ function useActionValue({
   actionHandler,
 }: {
   formAtom: FormAtom;
-  actionHandler?: ActionHandler;
+  actionHandler: ActionHandler;
 }) {
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "value", []),
@@ -417,8 +415,9 @@ export function useActionExecutor(
 }
 
 export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
-  useActionAttrs({ formAtom });
-  useActionValue({ formAtom });
+  const { actionHandler } = useFormScope();
+  useActionAttrs({ formAtom, actionHandler });
+  useActionValue({ formAtom, actionHandler });
   return null;
 }
 
