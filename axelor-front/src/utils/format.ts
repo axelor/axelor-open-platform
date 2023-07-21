@@ -107,7 +107,7 @@ function addCurrency(value: string, symbol: string) {
 
 const formatNumber: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
-  let { scale, currency } = props ?? {};
+  let { scale, currency, serverType } = props ?? {};
 
   if (
     (value === null || value === undefined) &&
@@ -119,6 +119,10 @@ const formatNumber: Formatter = (value, opts = {}) => {
   // referencing another field in the context?
   if (typeof scale === "string") {
     scale = (_.get(context, scale) as number) ?? scale;
+  }
+
+  if (serverType === "DECIMAL") {
+    scale = scale ?? 2;
   }
 
   // referencing another field in the context?

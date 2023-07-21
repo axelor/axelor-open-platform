@@ -39,6 +39,7 @@ import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
 import { GridScope } from "./scope";
+import { legacyClassNames } from "@/styles/legacy";
 
 import styles from "../grid.module.scss";
 import clsx from "clsx";
@@ -159,8 +160,12 @@ export const Grid = forwardRef<
         columnProps.action = true;
       }
 
-      if (field?.type === "BOOLEAN" && !item.widget) {
+      if (serverType === "BOOLEAN" && !item.widget) {
         (columnProps as Field).widget = "boolean";
+      }
+
+      if (["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "")) {
+        columnProps.$css = legacyClassNames("text-right");
       }
 
       if (item.hidden || extraAttrs?.hidden) {
