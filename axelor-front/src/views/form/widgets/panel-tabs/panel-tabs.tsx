@@ -1,7 +1,7 @@
+import produce from "immer";
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import isEqual from "lodash/isEqual";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Fade, NavTabItem, NavTabs } from "@axelor/ui";
 
@@ -33,38 +33,30 @@ export function PanelTabs(props: WidgetProps) {
     [schema]
   );
 
-  const hiddenStateAtom = useMemo(() => {
-    return selectAtom(
-      formAtom,
-      (formState) => {
-        const { states = {}, statesByName = {} } = formState;
-        return tabs.reduce((acc, item) => {
-          const attrs = {
-            hidden: item.hidden,
-            ...statesByName[item.name ?? ""]?.attrs,
-            ...states[item.uid]?.attrs,
-          };
-          if (attrs.hidden) {
-            acc[item.uid] = true;
-          }
-          return acc;
-        }, {} as Record<string, boolean>);
-      },
-      isEqual
-    );
-  }, [formAtom, tabs]);
+  const [hiddenTabs, setHiddenTabs] = useState<Record<string, boolean>>(() =>
+    tabs
+      .filter((x) => x.hidden)
+      .reduce((acc, item) => ({ ...acc, [item.uid]: true }), {})
+  );
 
-  const hiddenState = useAtomValue(hiddenStateAtom);
+  const setHidden = useCallback((id: string, hidden: boolean) => {
+    setHiddenTabs((prev) => {
+      return produce(prev, (draft) => {
+        draft[id] = hidden;
+      });
+    });
+  }, []);
+
   const visibleTabs = useMemo(
     () =>
       tabs
-        .filter((item) => !hiddenState[item.uid])
+        .filter((item) => !hiddenTabs[item.uid])
         .map((item) => {
           // remove showIf/hideIf to avoid double evaluation
           const { showIf, hideIf, ...rest } = item;
           return rest as Schema;
         }),
-    [hiddenState, tabs]
+    [hiddenTabs, tabs]
   );
 
   const { actionHandler } = useFormScope();
@@ -92,7 +84,7 @@ export function PanelTabs(props: WidgetProps) {
       let prevIndex = index - 1;
       while (prevIndex >= 0) {
         let prev = tabs[prevIndex];
-        if (!hiddenState[prev.uid]) {
+        if (!hiddenTabs[prev.uid]) {
           setActiveTab(prev.uid);
           return;
         }
@@ -103,7 +95,7 @@ export function PanelTabs(props: WidgetProps) {
     if (first) {
       setActiveTab(first.uid ?? null);
     }
-  }, [activeTab, hiddenState, tabs, visibleTabs]);
+  }, [activeTab, hiddenTabs, tabs, visibleTabs]);
 
   return (
     <div className={styles.tabs}>
@@ -112,7 +104,12 @@ export function PanelTabs(props: WidgetProps) {
         active={activeTab ?? undefined}
         onItemClick={handleChange}
       />
-      <DummyTabs tabs={tabs} formAtom={formAtom} parentAtom={widgetAtom} />
+      <DummyTabs
+        tabs={tabs}
+        formAtom={formAtom}
+        parentAtom={widgetAtom}
+        setHidden={setHidden}
+      />
       {visibleTabs.map((item) => {
         const active = activeTab === item.uid;
         return (
@@ -159,15 +156,17 @@ function TabContent({
   );
 }
 
-// required for showIf/hideIf
-function DummyTabs({
+// used to handle hidden state
+const DummyTabs = memo(function DummyTabs({
   tabs,
   formAtom,
   parentAtom,
+  setHidden,
 }: {
+  tabs: Schema[];
   formAtom: FormAtom;
   parentAtom: WidgetAtom;
-  tabs: Schema[];
+  setHidden: (id: string, hidden: boolean) => void;
 }) {
   const items = useMemo(() => {
     return tabs.map((item) => {
@@ -191,8 +190,24 @@ function DummyTabs({
           schema={item}
           formAtom={formAtom}
           parentAtom={parentAtom}
+          render={(props) => <DummyTab {...props} setHidden={setHidden} />}
         />
       ))}
     </div>
   );
-}
+});
+
+const DummyTab = memo(function DummyTab(
+  props: WidgetProps & { setHidden: (id: string, hidden: boolean) => void }
+) {
+  const { schema, widgetAtom, setHidden } = props;
+  const hidden = useAtomValue(
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
+  );
+
+  useEffect(() => {
+    setHidden(schema.uid, !!hidden);
+  }, [hidden, schema.uid, setHidden]);
+
+  return null;
+});
