@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { createEvalContext } from "@/hooks/use-parser/eval-context";
@@ -19,8 +19,12 @@ import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
 import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
-export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
-  const { schema, formAtom, parentAtom } = props;
+type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
+  render?: (props: WidgetProps) => React.ReactNode;
+};
+
+export function FormWidget(props: FormWidgetProps) {
+  const { schema, formAtom, parentAtom, render: Comp } = props;
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom, parentAtom }),
@@ -76,6 +80,10 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
     valueAtom,
     readonly,
   });
+
+  if (Comp) {
+    return <Comp {...props} widgetAtom={widgetAtom} />;
+  }
 
   if (hidden) {
     return null;
