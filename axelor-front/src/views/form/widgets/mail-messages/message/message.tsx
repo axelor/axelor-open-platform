@@ -289,7 +289,7 @@ export function MessageBox({
       })}
     >
       {!isMail && (
-        <Box d="flex" flexDirection="column" g={2}>
+        <Box d="flex" flexDirection="column" g={2} mb={3}>
           <Box d="flex" flexDirection={{ base: "column", md: "row" }} g={2}>
             {FILTERS.map(({ title, value }, ind) => (
               <Button
@@ -303,11 +303,13 @@ export function MessageBox({
               </Button>
             ))}
           </Box>
-          <MessageInput
-            focus={false}
-            onSave={onComment}
-            {...MessageInputProps}
-          />
+          {filter === "comment" && (
+            <MessageInput
+              focus={false}
+              onSave={onComment}
+              {...MessageInputProps}
+            />
+          )}
         </Box>
       )}
       <Box ms={3} mt={1} borderStart>

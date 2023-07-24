@@ -1,11 +1,11 @@
+import { Box, Button, Input } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { Message, MessageFile, MessageInputProps } from "../message/types";
-import { Box, Input, Button } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { MessageFiles } from "./message-files";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
+import { MessageFiles } from "./message-files";
 import { useMessagePopup } from "./message-form";
 
 function TextareaAutoSizeInput(props: any) {
@@ -102,7 +102,7 @@ export function MessageInput({
   }
 
   return (
-    <Box mb={3}>
+    <Box>
       <TextareaAutoSizeInput
         value={value}
         autoFocus={focus}
@@ -118,40 +118,40 @@ export function MessageInput({
           onRemove={handleFileRemove}
         />
       )}
-      {hasValue && (
-        <Box mt={2}>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handlePost}
-            {...(!focus && {
-              onMouseDown: (e) => e.preventDefault(),
-            })}
-          >
-            {i18n.get("Post")}
-          </Button>
-          <Button
-            size="sm"
-            ms={2}
-            variant="primary"
-            outline
-            onClick={handleAttachment}
-            d="inline-flex"
-          >
-            <MaterialIcon icon="attach_file" fontSize={20} />
-          </Button>
-          <Button
-            size="sm"
-            ms={2}
-            variant="primary"
-            outline
-            onClick={handleEdit}
-            d="inline-flex"
-          >
-            <MaterialIcon icon="edit" fontSize={20} />
-          </Button>
-        </Box>
-      )}
+
+      <Box mt={2}>
+        <Button
+          variant="primary"
+          size="sm"
+          disabled={!hasValue}
+          onClick={handlePost}
+          {...(!focus && {
+            onMouseDown: (e) => e.preventDefault(),
+          })}
+        >
+          {i18n.get("Post")}
+        </Button>
+        <Button
+          size="sm"
+          ms={2}
+          variant="primary"
+          outline
+          onClick={handleAttachment}
+          d="inline-flex"
+        >
+          <MaterialIcon icon="attach_file" fontSize={20} />
+        </Button>
+        <Button
+          size="sm"
+          ms={2}
+          variant="primary"
+          outline
+          onClick={handleEdit}
+          d="inline-flex"
+        >
+          <MaterialIcon icon="edit" fontSize={20} />
+        </Button>
+      </Box>
     </Box>
   );
 }
