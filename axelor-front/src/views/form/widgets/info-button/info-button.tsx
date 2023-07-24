@@ -6,14 +6,14 @@ import { useCallback, useMemo, useState } from "react";
 import { Box, Button } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Icon } from "@/components/icon";
 import { Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
 
 import { WidgetControl, WidgetProps } from "../../builder";
-import { useFormScope } from "../../builder/scope";
+import { useFormScope, useWidgetState } from "../../builder/scope";
 import { useReadonly } from "../button/hooks";
 
-import { Icon } from "@/components/icon";
 import styles from "./info-button.module.scss";
 
 export function InfoButton(props: WidgetProps) {
@@ -31,12 +31,8 @@ export function InfoButton(props: WidgetProps) {
       [formAtom, field]
     )
   );
-  const fieldSchema = useAtomValue(
-    useMemo(
-      () => selectAtom(formAtom, (form) => form.fields[field!]),
-      [formAtom, field]
-    )
-  );
+
+  const { attrs: fieldSchema = {} } = useWidgetState(formAtom, field);
 
   const [wait, setWait] = useState(false);
 
