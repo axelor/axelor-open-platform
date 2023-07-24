@@ -203,6 +203,31 @@ export function useFormValidityScope() {
   return useAtomValue(scopeAtom);
 }
 
+export function useWidgetState(formAtom: FormAtom, widgetName: string) {
+  const findAtom = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { widgetAtoms } = get(formAtom);
+        const { widgetAtom } =
+          Object.values(widgetAtoms).find((x) => x.name === widgetName) ?? {};
+        return widgetAtom;
+      },
+      [formAtom, widgetName]
+    )
+  );
+
+  const widgetAtom = useMemo(findAtom, [findAtom]);
+
+  const getState = useAtomCallback(
+    useCallback(
+      (get) => (widgetAtom ? get(widgetAtom) : { attrs: {}, name: widgetName }),
+      [widgetName, widgetAtom]
+    )
+  );
+
+  return getState();
+}
+
 export function useFormRefresh(refresh?: () => Promise<any> | void) {
   const tab = useViewTab();
   const handleRefresh = useCallback(

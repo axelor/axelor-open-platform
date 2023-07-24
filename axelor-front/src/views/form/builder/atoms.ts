@@ -28,6 +28,7 @@ export function createFormAtom(props: {
     original: { ...record },
     states,
     statesByName,
+    widgetAtoms: {},
     fields,
     parent,
   });

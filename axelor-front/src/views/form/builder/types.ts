@@ -59,6 +59,13 @@ export interface FormState {
   original?: DataRecord;
   states: Record<string, WidgetState>;
   statesByName: Record<string, WidgetState>;
+  widgetAtoms: Record<
+    string,
+    {
+      name?: string;
+      widgetAtom: WidgetAtom;
+    }
+  >;
   readonly meta: ViewData<FormView>;
   readonly model: string;
   readonly fields: Record<string, Property>;
