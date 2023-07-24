@@ -1,4 +1,4 @@
-import produce from "immer";
+import { produce } from "immer";
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
