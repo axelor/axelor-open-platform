@@ -20,13 +20,22 @@ type SelectItem = {
   selection: Selection;
 };
 
-type ItemProps = OverflowListItemProps<SelectItem>;
+type ItemProps = OverflowListItemProps<SelectItem> & {
+  readonly?: boolean;
+};
 
 function Item(props: ItemProps) {
-  const { item, active } = props;
+  const { item, active, readonly } = props;
   const { selection } = item;
   return (
-    <div className={clsx(styles.item, [{ [styles.active]: active }])}>
+    <div
+      className={clsx(styles.item, [
+        {
+          [styles.active]: active,
+          [styles.readonly]: readonly,
+        },
+      ])}
+    >
       <div className={styles.text}>{selection.title}</div>
     </div>
   );
@@ -93,7 +102,7 @@ export function NavSelect(
         items={items}
         isItemActive={isItemActive}
         onItemClick={onItemClick}
-        renderItem={Item}
+        renderItem={(props) => <Item {...props} readonly={readonly} />}
         renderMenuTrigger={MenuTrigger}
         renderMenuItem={MenuItem}
       />

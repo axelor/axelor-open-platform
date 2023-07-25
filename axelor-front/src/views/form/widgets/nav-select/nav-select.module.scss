@@ -52,7 +52,7 @@
   right: calc(-0.75rem - 2px);
 }
 
-.item:hover {
+.item:not(.readonly):hover {
   &::before,
   &::after,
   .text {
@@ -66,14 +66,22 @@
   &::after,
   .text {
     font-weight: 600;
-    color: var(--ax-nav-select-active-color);
-    border-color: var(--ax-nav-select-active-border-color);
+    color: var(--ax-nav-select-active-color) !important;
+    border-color: var(--ax-nav-select-active-border-color) !important;
   }
 }
 
 .text,
 .item::after {
   cursor: pointer;
+}
+
+.item.readonly {
+  &,
+  &::after,
+  .text {
+    cursor: unset;
+  }
 }
 
 .item::after {
