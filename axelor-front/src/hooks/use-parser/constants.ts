@@ -9,6 +9,7 @@ export const ATTRIBUTES = {
   href: "ng-href",
   src: "ng-src",
   readonly: "ng-readonly",
+  style: "ng-style",
   class: "ng-class",
   bindHTML: "ng-bind-html",
   translate: "x-translate",

@@ -151,6 +151,12 @@ export const ATTR_EVALUATOR = {
       return context.__t(`${value}`);
     };
   },
+  [ATTRIBUTES.style]: (val) => {
+    const parser = parseExpression(`const __res = ${val}; __res;`);
+    return (context) => {
+      return parser(context);
+    };
+  },
 };
 
 function process(root) {
@@ -269,6 +275,8 @@ function process(root) {
               props.title = result;
             } else if (attr === HTML_ATTRIBUTES.style) {
               props.style = getStyleObject(result);
+            } else if (attr === ATTRIBUTES.style) {
+              props.style = result || undefined;
             } else if (attr === ATTRIBUTES.readonly) {
               props.readOnly = result;
             } else if (attr === ATTRIBUTES.class) {
