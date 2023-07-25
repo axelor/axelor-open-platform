@@ -119,7 +119,6 @@ export function LoginForm({
             autoComplete="username"
             autoFocus
             mb={3}
-            required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -130,7 +129,6 @@ export function LoginForm({
             id="password"
             autoComplete="current-password"
             mb={3}
-            required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
