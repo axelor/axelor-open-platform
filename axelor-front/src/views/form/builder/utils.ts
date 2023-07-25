@@ -1,11 +1,17 @@
 import { uniqueId } from "lodash";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Property, Schema } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
+import {
+  Field,
+  Panel,
+  Property,
+  Schema,
+  Widget,
+} from "@/services/client/meta.types";
+import { toKebabCase, toSnakeCase } from "@/utils/names";
 
-import { Attrs, DEFAULT_ATTRS } from "./types";
 import { MetaData } from "@/services/client/meta";
+import { Attrs, DEFAULT_ATTRS } from "./types";
 
 export const nextId = (() => {
   let id = 0;
@@ -199,7 +205,16 @@ export function parseDecimal(value: any, { scale }: Property) {
   return value;
 }
 
-export function getDefaultValues(fields?: MetaData["fields"]) {
+export function getDefaultValues(
+  fields?: MetaData["fields"],
+  widgets?: Widget[]
+) {
+  const defaultJsonFieldValues = getDefaultJsonFieldValues(widgets);
+  const defaultFieldValues = getDefaultFieldValues(fields);
+  return { ...defaultJsonFieldValues, ...defaultFieldValues };
+}
+
+function getDefaultFieldValues(fields?: MetaData["fields"]) {
   const result: DataRecord = Object.entries(fields ?? {}).reduce(
     (acc, [key, field]) => {
       const { type, defaultValue } = field;
@@ -212,5 +227,37 @@ export function getDefaultValues(fields?: MetaData["fields"]) {
     },
     {}
   );
+  return result;
+}
+
+function getDefaultJsonFieldValues(widgets?: Widget[]) {
+  const result: DataRecord = {};
+
+  for (const widget of widgets ?? []) {
+    const { type } = widget;
+
+    if (type === "panel") {
+      const defaultValues = getDefaultJsonFieldValues((widget as Panel).items);
+      Object.assign(result, defaultValues);
+    } else if (type === "field") {
+      const { jsonFields, name } = widget as Field;
+
+      if (jsonFields) {
+        const fields = Object.fromEntries(
+          jsonFields.map(({ name, type, sequence, ...rest }) => [
+            name,
+            {
+              name,
+              type: toSnakeCase(type).toUpperCase(),
+              ...rest,
+            } as Property,
+          ])
+        );
+        const defaultValues = getDefaultFieldValues(fields);
+        result[name] = JSON.stringify(defaultValues);
+      }
+    }
+  }
+
   return result;
 }

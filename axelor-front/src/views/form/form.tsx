@@ -79,7 +79,7 @@ export const fetchRecord = async (
     const related = meta.related;
     return dataStore.read(+id, { fields, related });
   }
-  return getDefaultValues(meta.fields);
+  return getDefaultValues(meta.fields, meta.view.items);
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {
@@ -297,7 +297,10 @@ const FormContainer = memo(function FormContainer({
         record =
           record.id && record.id > 0
             ? record
-            : { ...getDefaultValues(prev.meta.fields), ...record };
+            : {
+                ...getDefaultValues(prev.meta.fields, prev.meta.view.items),
+                ...record,
+              };
 
         // this is required to trigger expression re-evaluation
         record = { ...record, [timeSymbol]: Date.now() };
