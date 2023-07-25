@@ -145,11 +145,6 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
 const timeSymbol = Symbol("$$time");
 const defaultSymbol = Symbol("$$default");
 
-export function isDefaultRecord(record: DataRecord) {
-  const symbols = Object.getOwnPropertySymbols(record);
-  return symbols.length === 1 && symbols[0] === defaultSymbol;
-}
-
 export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
 

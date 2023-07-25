@@ -1,6 +1,6 @@
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -21,12 +21,12 @@ import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { FieldProps, FormState, WidgetAtom } from "./types";
-import { getDefaultValues, nextId, processView } from "./utils";
+import { nextId, processView } from "./utils";
 
 import { DataStore } from "@/services/client/data-store";
 import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { isEqual } from "lodash";
-import { isDefaultRecord, useGetErrors } from "../form";
+import { useGetErrors } from "../form";
 import styles from "./form-editors.module.scss";
 
 export type FieldEditorProps = FieldProps<any>;
@@ -532,26 +532,6 @@ const RecordEditor = memo(function RecordEditor({
 
   useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
   useAsyncEffect(async () => load(), [load]);
-
-  const parentState = useAtomValue(parent);
-  const parentRecord = parentState.record;
-
-  const setJsonDefaults = useAtomCallback(
-    useCallback(
-      (get, set) => {
-        if (
-          editor.json &&
-          !isDefaultRecord(parentRecord) &&
-          (parentRecord.id ?? 0) <= 0
-        ) {
-          set(valueAtom, { ...getDefaultValues(fields), ...get(valueAtom) });
-        }
-      },
-      [editor.json, parentRecord, fields, valueAtom]
-    )
-  );
-
-  useEffect(setJsonDefaults, [setJsonDefaults]);
 
   return (
     <Form
