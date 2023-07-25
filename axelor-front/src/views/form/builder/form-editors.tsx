@@ -157,7 +157,14 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, domain, canEdit, canView = true, canSelect = true } = attrs;
+  const {
+    title,
+    domain,
+    required,
+    canEdit,
+    canView = true,
+    canSelect = true,
+  } = attrs;
 
   const model = schema.target!;
 
@@ -229,9 +236,11 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
     (value: any, invalid: boolean) => {
-      setInvalid(widgetAtom, invalid);
+      if (required || value) {
+        setInvalid(widgetAtom, invalid);
+      }
     },
-    [setInvalid, widgetAtom]
+    [required, setInvalid, widgetAtom]
   );
 
   const titleActions = !readonly && (
@@ -425,6 +434,8 @@ const setInvalidAtom = atom(
   }
 );
 
+const EMPTY_RECORD = Object.freeze({});
+
 const RecordEditor = memo(function RecordEditor({
   model,
   editor,
@@ -447,16 +458,15 @@ const RecordEditor = memo(function RecordEditor({
     [editor, fields, model]
   );
 
-  const record = useMemo(() => ({}), []);
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, record, parent);
+    useFormHandlers(meta, EMPTY_RECORD, parent);
 
   const [loaded, setLoaded] = useState<DataRecord>({});
 
   const editorAtom = useMemo(() => {
     return atom(
       (get) => {
-        const value = get(valueAtom) || {};
+        const value = get(valueAtom) || EMPTY_RECORD;
         const state = get(formAtom);
         const dirty = get(parent).dirty;
         const record = loaded.id && loaded.id === value.id ? loaded : value;
@@ -476,7 +486,7 @@ const RecordEditor = memo(function RecordEditor({
 
         set(formAtom, state);
         if (state.dirty) {
-          set(valueAtom, record);
+          set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
         }
       }
     );
