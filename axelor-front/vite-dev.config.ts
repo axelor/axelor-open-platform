@@ -22,20 +22,20 @@ plugins[0] = react({
 const proxyAll: ProxyOptions = {
   target: env.VITE_PROXY_TARGET,
   changeOrigin: true,
-};
-
-const proxyWs: ProxyOptions = {
-  ...proxyAll,
-  ws: true,
-};
-
-const proxyJs: ProxyOptions = {
-  ...proxyAll,
   bypass(req, res, options) {
-    if (/\/theme\/([^.]+)\.json/.test(req.url)) {
+    if (req.url === base || req.url.startsWith(base + "src/")
+      || req.url.startsWith(base + "@fs/") || req.url === base + "@react-refresh"
+      || req.url.startsWith(base + "@id/") || req.url.startsWith(base + "@vite/")
+      || req.url.startsWith(base + "node_modules/") || /\/theme\/([^.]+)\.json/.test(req.url)) {
       return req.url;
     }
   },
+};
+
+const proxyWs: ProxyOptions = {
+  target: env.VITE_PROXY_TARGET,
+  changeOrigin: true,
+  ws: true,
 };
 
 export default mergeConfig(
@@ -45,16 +45,8 @@ export default mergeConfig(
     base,
     server: {
       proxy: {
-        [`${base}callback`]: proxyAll,
-        [`${base}login`]: proxyAll,
-        [`${base}logout`]: proxyAll,
-        [`${base}img`]: proxyAll,
-        [`${base}ws`]: proxyWs,
-        [`${base}js`]: proxyJs,
-        [`${base}websocket`]: proxyAll,
-        [`${base}wkf-editor`]: proxyAll,
-        [`${base}studio`]: proxyAll,
-        [`${base}baml-editor`]: proxyAll,
+        [`${base}websocket`]: proxyWs,
+        [`${base}`]: proxyAll,
       },
       fs: {
         // Allow serving files from one level up to the project root
