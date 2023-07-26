@@ -49,6 +49,11 @@
   display: flex;
 }
 
+.tabText {
+  // XXX: Fix overlapped tab text rendering in Chrome
+  z-index: 1;
+}
+
 .dirty {
   .tabText::after {
     content: "*";
