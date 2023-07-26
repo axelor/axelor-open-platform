@@ -567,7 +567,9 @@ function JsonEditor({
     return atom(
       (get) => {
         const value = get(valueAtom) || "{}";
-        return JSON.parse(value);
+        const json = JSON.parse(value);
+        const $record = get(formAtom).record;
+        return { ...json, $record };
       },
       (get, set, update: SetStateAction<any>) => {
         const state =
