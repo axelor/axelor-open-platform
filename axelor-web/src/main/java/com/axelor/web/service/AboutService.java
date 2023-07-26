@@ -22,10 +22,15 @@ import static java.lang.Boolean.TRUE;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.tenants.TenantResolver;
+import com.axelor.script.CompositeScriptHelper;
+import com.axelor.script.ScriptBindings;
+import com.axelor.script.ScriptHelper;
 import com.axelor.web.AppSessionListener;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
@@ -124,7 +129,22 @@ public class AboutService extends AbstractService {
   @Produces("text/css")
   @Path("custom.css")
   public String css() {
-    final String style = info.getStyle();
+    final String style = getStyle();
     return StringUtils.notBlank(style) ? style : "";
+  }
+
+  public String getStyle() {
+    if (AppSettings.get().get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
+      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
+      final ScriptHelper helper = new CompositeScriptHelper(bindings);
+      try {
+        Object style = helper.eval("__config__.appStyle");
+        if (style instanceof String) {
+          return style.toString();
+        }
+      } catch (Exception e) {
+      }
+    }
+    return null;
   }
 }

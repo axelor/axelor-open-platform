@@ -27,15 +27,11 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorSecurityLogic;
-import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaFile;
-import com.axelor.script.CompositeScriptHelper;
-import com.axelor.script.ScriptBindings;
-import com.axelor.script.ScriptHelper;
+import com.axelor.web.service.InfoService;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,13 +46,11 @@ import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
 @Singleton
+@Deprecated(since = "7.0.0")
 public class AppInfo {
 
   private static final AppSettings SETTINGS = AppSettings.get();
-  private static final String APP_THEME =
-      SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
 
-  @Deprecated(forRemoval = true)
   public Map<String, Object> info(final ServletContext context) {
     return info();
   }
@@ -69,6 +63,7 @@ public class AppInfo {
   public Map<String, Object> info(User user) {
     final Map<String, Object> map = new HashMap<>();
     final Group group = user.getGroup();
+    final InfoService infoService = Beans.get(InfoService.class);
 
     // if name field is overridden
     final Property nameField = Mapper.of(User.class).getNameField();
@@ -78,14 +73,14 @@ public class AppInfo {
     map.put("user.name", nameValue);
     map.put("user.login", user.getCode());
     map.put("user.nameField", nameField.getName());
-    map.put("user.lang", getPageLang());
+    map.put("user.lang", AppFilter.getLocale().getLanguage());
     map.put("user.action", user.getHomeAction());
     map.put("user.singleTab", user.getSingleTab());
     map.put("user.noHelp", Boolean.TRUE.equals(user.getNoHelp()));
     map.put("user.theme", user.getTheme());
 
     if (user.getImage() != null) {
-      map.put("user.image", getLink(user, null));
+      map.put("user.image", infoService.getLink(user, null));
     }
 
     if (group != null) {
@@ -107,9 +102,9 @@ public class AppInfo {
     map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
     map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
     map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
-    map.put("application.theme", getTheme());
-    map.put("application.logo", getLogo());
-    map.put("application.icon", getIcon());
+    map.put("application.theme", infoService.getTheme());
+    map.put("application.logo", infoService.getLogo());
+    map.put("application.icon", infoService.getIcon());
     map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
@@ -150,96 +145,5 @@ public class AppInfo {
         .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
 
     return map;
-  }
-
-  public String getStyle() {
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        Object style = helper.eval("__config__.appStyle");
-        if (style instanceof String) {
-          return style.toString();
-        }
-      } catch (Exception e) {
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Gets user specific application logo, or falls back to default application logo.
-   *
-   * @return user specific logo link
-   */
-  public String getLogo() {
-    final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        return getLink(helper.eval("__config__.appLogo"), logo);
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-    return logo;
-  }
-
-  /**
-   * Gets user specific application icon, or falls back to default application icon.
-   *
-   * @return
-   */
-  public String getIcon() {
-    final String icon = SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico");
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_ICON) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        return getLink(helper.eval("__config__.appIcon"), icon);
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-    return icon;
-  }
-
-  public String getPageLang() {
-    return AppFilter.getLocale().getLanguage();
-  }
-
-  public String getTheme() {
-    final User user = AuthUtils.getUser();
-    if (user == null || StringUtils.isBlank(user.getTheme()) || "default".equals(user.getTheme())) {
-      return APP_THEME;
-    }
-    return user.getTheme();
-  }
-
-  private String getLink(Object value, String defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
-    if (value instanceof String) {
-      return (String) value;
-    }
-    if (value instanceof MetaFile) {
-      return "ws/rest/"
-          + MetaFile.class.getName()
-          + "/"
-          + ((MetaFile) value).getId()
-          + "/content/download?v="
-          + ((MetaFile) value).getVersion();
-    }
-    if (value instanceof User) {
-      return "ws/rest/"
-          + User.class.getName()
-          + "/"
-          + ((User) value).getId()
-          + "/image/download?image=true&v="
-          + ((User) value).getVersion();
-    }
-    return defaultValue;
   }
 }
