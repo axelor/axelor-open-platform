@@ -359,6 +359,7 @@ function Popover({
 function PopoverContent({ tab }: { tab: Tab }) {
   const action = tab.action.name;
   const object = tab.action.model;
+  const domain = tab.action.domain;
   const { name: view } = useAtomValue(tab.state);
 
   return (
@@ -372,6 +373,14 @@ function PopoverContent({ tab }: { tab: Tab }) {
         <dd>
           <code>{object}</code>
         </dd>
+        {domain && (
+          <>
+            <dt>{i18n.get("Domain")}</dt>
+            <dd>
+              <code>{domain}</code>
+            </dd>
+          </>
+        )}
         {view && (
           <>
             <dt>{i18n.get("View")}</dt>
