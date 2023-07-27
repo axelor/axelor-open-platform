@@ -179,7 +179,7 @@ export function HelpPopover({
 
 function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
-  const { name, serverType, target, help } = schema;
+  const { name, serverType, type, target, help, widget } = schema;
   const { model, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
@@ -188,9 +188,25 @@ function HelpContent(props: WidgetProps) {
 
   const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });
+  let shouldDisplayValue = serverType && !["TEXT", "BINARY"].includes(serverType) && widget !== 'password';
 
   if (serverType && serverType.endsWith("_ONE") && value) {
     text = `(${value.id}, ${text})`;
+  }
+  if (serverType === "STRING" && text) {
+    if (text.length > 50) {
+      text = text.slice(0, 50) + "...";
+    }
+  }
+  if (value && ["ONE_TO_MANY", "MANY_TO_MANY"].includes(serverType)) {
+    length = value.length;
+    let items = value.slice(0, value.length > 5 ? 5 : length).map(function(v){
+      return v.id;
+    });
+    if (length > 5) {
+      items.push('...');
+    }
+    text = items.join(', ');
   }
 
   return (
@@ -213,7 +229,7 @@ function HelpContent(props: WidgetProps) {
           </dd>
           <dt>{i18n.get("Field type")}</dt>
           <dd>
-            <code>{serverType}</code>
+            <code>{serverType || type}</code>
           </dd>
           {target && (
             <>
@@ -231,10 +247,14 @@ function HelpContent(props: WidgetProps) {
               </dd>
             </>
           )}
-          <dt>{i18n.get("Orig. value")}</dt>
-          <dd>
-            <code>{text}</code>
-          </dd>
+          {shouldDisplayValue && (
+            <>
+              <dt>{i18n.get("Orig. value")}</dt>
+              <dd>
+                <code>{text}</code>
+              </dd>
+            </>
+          )}
         </dl>
       )}
     </Box>
