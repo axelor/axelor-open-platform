@@ -343,7 +343,7 @@ function Popover({
   tab: Tab;
   children: ReactElement;
 }) {
-  const technical = session.info?.user.technical;
+  const technical = session.info?.user?.technical;
 
   if (technical) {
     return (

@@ -92,7 +92,7 @@ export function Login() {
     return null;
   }
 
-  const { clients = [], defaultClient, exclusive } = data?.auth ?? {};
+  const { clients = [], defaultClient, exclusive } = data?.authentication ?? {};
   const client = clientName || defaultClient;
   const notFormClient = client && client !== FORM_CLIENT_NAME;
 
@@ -175,7 +175,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 
 function ServerError({ error }: { error: string }) {
   const { data } = useSession();
-  const { logo: appLogo = logo, name: appName = "Axelor" } = data?.app ?? {};
+  const { logo: appLogo = logo, name: appName = "Axelor" } = data?.application ?? {};
 
   return (
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>

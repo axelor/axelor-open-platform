@@ -105,7 +105,7 @@ export function Dms(props: ViewProps<GridView>) {
   const [showTree, setShowTree] = useState<boolean | undefined>(undefined);
 
   const { orderBy, rows, selectedRows } = state;
-  const uploadSize = session?.api?.upload?.maxSize ?? 0;
+  const uploadSize = session?.data?.upload?.maxSize ?? 0;
   const uploader = useMemo(() => new Uploader(), []);
   const { relatedId, relatedModel } = popupRecord || {};
 

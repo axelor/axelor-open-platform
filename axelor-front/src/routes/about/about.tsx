@@ -12,7 +12,7 @@ import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 
 export function About() {
   const { info } = session;
-  const { app, user } = info || { app: {}, user: {} };
+  const { application: app, user } = info || { application: {}, user: {} };
 
   const year = new Date().getFullYear();
   const technical = user?.technical;
@@ -50,12 +50,12 @@ export function About() {
       </Box>
       <div>
         <p>
-          {i18n.get("Version")}: {app.sdk}
+          {i18n.get("Version")}: {app.aopVersion}
         </p>
         <p>Copyright (c) 2005-{year} Axelor. All Rights Reserved.</p>
         <Box d="flex" g={1} flexDirection="column">
           <Link href="http://www.axelor.com">http://www.axelor.com</Link>
-          <Link href={`http://docs.axelor.com/adk/${app.sdk}`}>
+          <Link href={`http://docs.axelor.com/adk/${app.aopVersion}`}>
             {i18n.get("Documentation")}
           </Link>
           <Link href="http://www.gnu.org/licenses/agpl.html">

@@ -216,7 +216,7 @@ export function useCustomizePopup({
       async (get, set, { title }: { title?: string }) => {
         const gridState = get(stateAtom);
         const canShare =
-          (session?.info?.view?.customizationPermission ?? 0) > 1;
+          (session?.info?.user?.viewCustomizationPermission ?? 0) > 1;
         const canReset =
           view.customViewId && (!view.customViewShared || canShare);
 

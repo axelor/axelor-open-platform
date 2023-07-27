@@ -17,12 +17,12 @@ export function useAppHead() {
 }
 
 function setTitle(info: SessionInfo) {
-  const { name = NAME, description = DESC } = info.app ?? {};
+  const { name = NAME, description = DESC } = info.application ?? {};
   document.title = `${name} – ${description}`;
 }
 
 function setIcon(info: SessionInfo) {
-  const icon = info.app.icon;
+  const icon = info.application.icon;
   const elem = document.querySelector("head > link[rel='shortcut icon']") as HTMLLinkElement;
 
   if (icon && elem) {

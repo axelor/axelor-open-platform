@@ -37,7 +37,7 @@ export function LoginForm({
   const session = useSession();
   const appInfo = session.data;
 
-  const defaultClient = appInfo?.auth?.defaultClient;
+  const defaultClient = appInfo?.authentication?.defaultClient;
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -69,15 +69,15 @@ export function LoginForm({
     return null;
   }
 
-  const currentClient = session.data?.auth?.currentClient;
+  const currentClient = session.data?.authentication?.currentClient;
 
   if (currentClient) {
     requestLogin(currentClient);
     return <Reconnecting />;
   }
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } = appInfo?.app || {};
-  const appLegal = appInfo?.app.copyright?.replace("&copy;", "©");
+  const { logo: appLogo = logo, name: appName = "Axelor" } = appInfo?.application || {};
+  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
   const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
     "All Rights Reserved"
   )}.`;

@@ -6,7 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useState
+  useState,
 } from "react";
 
 import { Block, Box, Menu, MenuItem, useClassNames } from "@axelor/ui";
@@ -18,20 +18,16 @@ import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { FormAtom } from "../../builder";
 import Avatar from "../mail-messages/avatar/avatar";
 
-import {
-  State,
-  User,
-  getCollaborationService
-} from "./collaboration.service";
+import { State, User, getCollaborationService } from "./collaboration.service";
 
 import styles from "./collaboration.module.scss";
 
 const _t = i18n.get;
 
 export const Collaboration = memo(({ formAtom }: { formAtom: FormAtom }) => {
-  const session = useSession();
-  const viewCollaboration = session.data?.view?.collaboration;
-  const { enabled = true, canView = true } = viewCollaboration ?? {};
+  const { data: sessionData } = useSession();
+  const { enabled = true } = sessionData?.view?.collaboration ?? {};
+  const { canViewCollaboration: canView = true } = sessionData?.user ?? {};
 
   const { model, record } = useAtomValue(formAtom);
   const { id: recordId, version: recordVersion } = record;

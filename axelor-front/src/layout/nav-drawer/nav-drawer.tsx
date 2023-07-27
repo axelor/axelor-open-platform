@@ -145,7 +145,7 @@ function Header() {
   const { open: openTab } = useTabs();
 
   const appHome = data?.user?.action;
-  const { logo: appLogo, name: appName = "logo" } = data?.app ?? {};
+  const { logo: appLogo, name: appName = "logo" } = data?.application ?? {};
 
   const onLogoClick = useCallback(() => {
     if (appHome) {
@@ -167,7 +167,7 @@ function Header() {
 
 function HeaderSmall() {
   const { data } = useSession();
-  const { icon: appIcon, name: appName = "icon" } = data?.app ?? {};
+  const { icon: appIcon, name: appName = "icon" } = data?.application ?? {};
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>

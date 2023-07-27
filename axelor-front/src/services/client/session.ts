@@ -9,8 +9,9 @@ export interface ClientInfo {
 }
 
 export interface SessionInfo {
-  app: {
+  application: {
     name?: string;
+    author?: string;
     description?: string;
     copyright?: string;
     theme?: string;
@@ -18,13 +19,12 @@ export interface SessionInfo {
     icon?: string;
     lang?: string;
     version?: string;
-    author?: string;
-    sdk?: string;
-    help?: string;
     home?: string;
+    help?: string;
     mode?: string;
+    aopVersion?: string;
   };
-  auth?: {
+  authentication?: {
     callbackUrl?: string;
     clients?: ClientInfo[];
     defaultClient?: string;
@@ -38,88 +38,52 @@ export interface SessionInfo {
     nameField?: string;
     lang?: string | null;
     image?: string | null;
-    group?: string | null;
     action?: string | null;
-    navigator?: string | null;
+    singleTab?: boolean;
+    noHelp?: boolean;
     theme?: string | null;
-    noHelp: boolean;
-    singleTab: boolean;
-    technical: boolean;
-  };
-  api?: {
-    pagination?: {
-      defaultPerPage: number;
-      maxPerPage: number;
-    };
-    upload?: {
-      maxSize: number;
-    };
+    group?: string | null;
+    navigator?: string | null;
+    technical?: boolean;
+    viewCustomizationPermission?: number;
+    canViewCollaboration?: boolean;
   };
   view?: {
-    customizationPermission: number;
-    customization: boolean;
-    advanceSearch?: {
-      share?: boolean;
-      exportFull?: boolean;
+    singleTab?: boolean;
+    maxTabs?: number;
+    menubar?: {
+      location?: string;
+    };
+    toolbar?: {
+      showTitles?: boolean;
+    };
+    form?: {
+      checkVersion?: boolean;
     };
     grid?: {
       selection?: SelectorType;
     };
-    menubar?: {
-      location: string;
+    advancedSearch?: {
+      exportFull?: boolean;
+      share?: boolean;
     };
-    singleTab?: boolean;
-    maxTabs?: number;
+    allowCustomization?: boolean;
     collaboration?: {
-      enabled: boolean;
-      canView: boolean;
+      enabled?: boolean;
+    };
+  };
+  api?: {
+    pagination?: {
+      maxPerPage?: number;
+      defaultPerPage?: number;
+    };
+  };
+  data?: {
+    upload?: {
+      maxSize?: number;
     };
   };
 }
-
-const INFO_MAPPINGS = {
-  application: "app",
-  authentication: "auth",
-  "application.author": "app.author",
-  "application.copyright": "app.copyright",
-  "application.description": "app.description",
-  "application.help": "app.help",
-  "application.home": "app.home",
-  "application.theme": "app.theme",
-  "application.logo": "app.logo",
-  "application.icon": "app.icon",
-  "application.mode": "app.mode",
-  "application.name": "app.name",
-  "application.sdk": "app.sdk",
-  "application.version": "app.version",
-  "auth.central.client": "auth.currentClient",
-  "user.action": "user.action",
-  "user.group": "user.group",
-  "user.id": "user.id",
-  "user.theme": "user.theme",
-  "user.lang": "user.lang",
-  "user.login": "user.login",
-  "user.image": "user.image",
-  "user.name": "user.name",
-  "user.nameField": "user.nameField",
-  "user.navigator": "user.navigator",
-  "user.noHelp": "user.noHelp",
-  "user.singleTab": "user.singleTab",
-  "user.technical": "user.technical",
-  "user.viewCustomizationPermission": "view.customizationPermission",
-  "user.canViewCollaboration": "view.collaboration.canView",
-  "api.pagination.default-per-page": "api.pagination.defaultPerPage",
-  "api.pagination.max-per-page": "api.pagination.maxPerPage",
-  "data.upload.max-size": "api.upload.maxSize",
-  "view.allow-customization": "view.customization",
-  "view.grid.selection": "view.grid.selection",
-  "view.menubar.location": "view.menubar.location",
-  "view.adv-search.share": "view.advanceSearch.share",
-  "view.adv-search.export-full": "view.advanceSearch.exportFull",
-  "view.single-tab": "view.singleTab",
-  "view.max-tabs": "view.maxTabs",
-  "view.collaboration.enabled": "view.collaboration.enabled",
-};
 
 export type SessionListener = (info: SessionInfo | null) => void;
 
@@ -132,23 +96,8 @@ async function init() {
   }
 
   const data = await resp.json();
-  const info: any = {};
 
-  if (data["data.upload.max-size"]) {
-    data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
-  }
-
-  if (data["view.max-tabs"]) {
-    data["view.max-tabs"] = parseInt(data["view.max-tabs"]);
-  }
-
-  for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
-    if (key in data) {
-      set(info, target, data[key]);
-    }
-  }
-
-  return info as SessionInfo;
+  return data as SessionInfo;
 }
 
 export class Session {

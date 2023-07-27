@@ -80,7 +80,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const getContext = useViewContext();
 
   const hasViewCustomize = Boolean(
-    data?.view?.customization !== false && data?.view?.customizationPermission
+    data?.view?.allowCustomization !== false && data?.user?.viewCustomizationPermission
   );
 
   const updateLayout = useCallback(

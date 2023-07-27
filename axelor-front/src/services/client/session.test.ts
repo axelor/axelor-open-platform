@@ -4,8 +4,8 @@ describe("session tests", async () => {
   it("should load app info", async () => {
     const res = await session.init();
     expect(res).toBeDefined();
-    expect(res.app).toBeDefined();
-    expect(res.app?.author).toBe("Axelor");
+    expect(res.application).toBeDefined();
+    expect(res.application?.author).toBe("Axelor");
   });
 
   it("should login", async () => {
@@ -14,8 +14,8 @@ describe("session tests", async () => {
       password: "admin",
     });
     expect(res).toBeDefined();
-    expect(res.app).toBeDefined();
-    expect(res.app?.author).toBe("Axelor");
+    expect(res.application).toBeDefined();
+    expect(res.application?.author).toBe("Axelor");
   });
 
   it("should logout", async () => {

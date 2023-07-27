@@ -38,7 +38,7 @@ export function makeImageURL(
 
 export function validateFileSize(file: File): boolean {
   if (!file) return false;
-  const maxSize = session.info?.api?.upload?.maxSize ?? 0;
+  const maxSize = session.info?.data?.upload?.maxSize ?? 0;
   const uploadMaxSize = 1048576 * maxSize;
 
   if (maxSize > 0 && file.size > uploadMaxSize) {

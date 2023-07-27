@@ -86,7 +86,11 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
   const { isMobile } = useDevice();
-  const userViewConfig = useSession().data?.view;
+  const { data: sessionData } = useSession();
+  const userViewConfig = {
+    allowCustomization: sessionData?.view?.allowCustomization,
+    customizationPermission: sessionData?.user?.viewCustomizationPermission,
+  };
 
   const gridSearchAtom = useMemo(
     () => focusAtom(searchAtom!, (o) => o.prop("search")),
@@ -691,7 +695,7 @@ function GridInner(props: ViewProps<GridView>) {
   const canCustomize =
     view.name &&
     userViewConfig?.customizationPermission &&
-    userViewConfig?.customization !== false;
+    userViewConfig?.allowCustomization !== false;
 
   const gridViewStyles =
     detailsMeta && !detailsViewOverlay && gridWidth
