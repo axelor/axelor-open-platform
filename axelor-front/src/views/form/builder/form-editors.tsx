@@ -47,8 +47,11 @@ function processEditor(schema: Schema) {
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
     result.title = item.title ?? field?.title ?? field?.autoTitle ?? item.name;
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
-    if (item.items) {
-      item.items = item.items.map(applyTitle);
+
+    if (result.items) {
+      result.items = result.items.map((item: Schema) =>
+        applyTitle({ ...item })
+      );
     }
     return result;
   };
@@ -63,15 +66,13 @@ function processEditor(schema: Schema) {
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
     }
-
-    if (item.items) {
-      item.items = item.items.map(applyTitle);
-    }
-
+    
     return result as Schema;
   };
 
-  const items = editor.items?.map(applyAttrs) as Panel["items"];
+  const items = editor.items?.map((item) =>
+    applyAttrs({ ...item })
+  ) as Panel["items"];
   const hasColSpan = flexbox || items?.some((x) => x.colSpan);
   const cols = hasColSpan ? 12 : items?.length;
   const colWidths = hasColSpan
