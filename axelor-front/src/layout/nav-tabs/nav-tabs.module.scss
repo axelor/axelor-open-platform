@@ -88,3 +88,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.tooltip dd code {
+  white-space: pre-wrap;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  display: block;
+  padding: 2px 4px;
+}
