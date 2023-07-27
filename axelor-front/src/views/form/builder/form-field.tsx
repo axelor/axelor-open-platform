@@ -199,9 +199,9 @@ function HelpContent(props: WidgetProps) {
     }
   }
   if (value && ["ONE_TO_MANY", "MANY_TO_MANY"].includes(serverType)) {
-    length = value.length;
-    let items = value.slice(0, value.length > 5 ? 5 : length).map(function(v){
-      return v.id;
+    const length = value.length;
+    let items = value.slice(0, length > 5 ? 5 : length).map((item: any) => {
+      return item.id;
     });
     if (length > 5) {
       items.push('...');
