@@ -369,10 +369,14 @@ function PopoverContent({ tab }: { tab: Tab }) {
         <dd>
           <code>{action}</code>
         </dd>
-        <dt>{i18n.get("Object")}</dt>
-        <dd>
-          <code>{object}</code>
-        </dd>
+        {object && (
+          <>
+            <dt>{i18n.get("Object")}</dt>
+            <dd>
+              <code>{object}</code>
+            </dd>
+          </>
+        )}
         {domain && (
           <>
             <dt>{i18n.get("Domain")}</dt>
