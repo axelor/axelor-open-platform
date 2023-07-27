@@ -147,10 +147,14 @@ function GridInner(props: ViewProps<GridView>) {
           filter.operator = "and";
           filter.criteria = [
             searchQuery,
-            {
-              operator: query.operator || "and",
-              criteria: query.criteria,
-            },
+            ...(query.criteria?.length
+              ? [
+                  {
+                    operator: query.operator || "and",
+                    criteria: query.criteria,
+                  },
+                ]
+              : []),
           ];
         }
 
@@ -580,6 +584,11 @@ function GridInner(props: ViewProps<GridView>) {
   const showEditIcon = popupOptions?.showEditIcon !== false;
   const showCheckbox = popupOptions?.multiSelect !== false;
 
+  const searchProps: any = {
+    allowSearch: true,
+    searchRowRenderer: Box,
+    searchColumnRenderer: searchColumnRenderer,
+  };
   const popupProps: any =
     !dashlet && popup
       ? {
@@ -591,14 +600,11 @@ function GridInner(props: ViewProps<GridView>) {
       : {};
   const dashletProps: any = dashlet
     ? {
+        ...(action.params?.["dashlet.canSearch"] === true ? searchProps : {}),
         readonly: viewProps?.readonly,
         onView: viewProps?.readonly === false ? onEdit : onView,
       }
-    : {
-        allowSearch: true,
-        searchRowRenderer: Box,
-        searchColumnRenderer: searchColumnRenderer,
-      };
+    : {};
   const detailsProps: Partial<GridProps> = hasDetailsView
     ? {
         ...(detailsViewOverlay && { onView: undefined }),
@@ -812,6 +818,7 @@ function GridInner(props: ViewProps<GridView>) {
             {...(canCustomize && {
               onColumnCustomize: showCustomizeDialog,
             })}
+            {...(dashlet ? {} : searchProps)}
             {...dashletProps}
             {...popupProps}
             {...detailsProps}

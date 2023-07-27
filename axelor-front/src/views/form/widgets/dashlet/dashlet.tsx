@@ -42,7 +42,7 @@ export function DashletComponent({
   onViewLoad,
   getContext,
 }: DashletProps): any {
-  const { title, action, widgetAttrs } = schema;
+  const { title, action, canSearch, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
   const { data: tab, state } = useAsync<Tab | null>(async () => {
     const context = getContext?.();
@@ -57,6 +57,7 @@ export function DashletComponent({
       params: {
         dashlet: true,
         "show-toolbar": false,
+        "dashlet.canSearch": canSearch,
         ...actionView.params,
       },
       context: {
@@ -66,7 +67,7 @@ export function DashletComponent({
         _domainAction: action,
       },
     });
-  }, [action, getContext]);
+  }, [action, canSearch, getContext]);
 
   const setGridViewProps = useAtomCallback(
     useCallback((get, set, tab: Tab, readonly: boolean = false) => {
