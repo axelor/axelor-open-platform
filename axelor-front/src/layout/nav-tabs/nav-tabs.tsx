@@ -145,7 +145,8 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const handleAuxClick = useCallback<React.MouseEventHandler<HTMLDivElement>>(
     (e) => {
       const id = e.currentTarget.getAttribute("data-tab-id");
-      if (id) {
+      // check middle scroll button click
+      if (id && e.button === 1) {
         doClose(id);
       }
     },
