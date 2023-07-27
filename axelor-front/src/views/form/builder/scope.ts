@@ -358,12 +358,22 @@ function useActionValue({
     useAtomCallback(
       useCallback(
         (get, set, data) => {
-          const { record } = get(formAtom);
+          const { record, fields } = get(formAtom);
           const { target, value, op } = data;
           let newRecord = record;
 
           if (op === "set") {
             newRecord = produce(record, (draft) => {
+              if (target.includes(".")) {
+                const fieldName = target.split(".")[0];
+                const field = fields?.[fieldName];
+                if (field?.type.endsWith("TO_MANY")) {
+                  draft[fieldName]?.forEach?.((item: DataRecord) => {
+                    setDeep(item, target.slice(fieldName.length + 1), value);
+                  });
+                  return draft;
+                }
+              }
               setDeep(draft, target, value);
             });
           }
