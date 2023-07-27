@@ -10,7 +10,13 @@ import {
 
 import { MenuItem } from "@/services/client/meta.types";
 
-import { FieldLabel, FormLayout, GridLayout, StackLayout, WidgetProps } from "../../builder";
+import {
+  FieldLabel,
+  FormLayout,
+  GridLayout,
+  StackLayout,
+  WidgetProps,
+} from "../../builder";
 import { useFormScope } from "../../builder/scope";
 
 import styles from "./panel.module.scss";
@@ -65,6 +71,17 @@ export function Panel(props: WidgetProps) {
 
     return res;
   }, [actionExecutor, schema.menu?.items]);
+
+  const isEmptyPanel =
+    schema.items?.length === 1 &&
+    schema.items?.every(
+      (item) =>
+        item.jsonFields &&
+        Object.keys(item.jsonFields).length === 0 &&
+        item.widget !== "json-raw"
+    );
+
+  if (isEmptyPanel) return null;
 
   const header = hasHeader ? (
     <div className={styles.title}>
