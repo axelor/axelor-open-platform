@@ -51,7 +51,7 @@ export type ViewToolBarProps = {
 };
 
 const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
-  grid: "table",
+  grid: "list",
   form: "article",
   cards: "grid_view",
   tree: "account_tree",
