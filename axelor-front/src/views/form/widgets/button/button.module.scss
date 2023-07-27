@@ -32,6 +32,10 @@
   gap: 0.5rem;
 }
 
+.help .title {
+  display: inline-flex;
+}
+
 .help::after {
   position: absolute;
   content: "?";
