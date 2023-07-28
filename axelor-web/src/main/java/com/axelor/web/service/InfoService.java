@@ -268,7 +268,7 @@ public class InfoService extends AbstractService {
         "exportFull", SETTINGS.getBoolean(AvailableAppSettings.VIEW_ADV_SEARCH_EXPORT_FULL, true));
     advancedSearch.put(
         "share", SETTINGS.getBoolean(AvailableAppSettings.VIEW_ADV_SEARCH_SHARE, true));
-    map.put("advandedSearch", advancedSearch);
+    map.put("advancedSearch", advancedSearch);
 
     map.put(
         "allowCustomization", SETTINGS.getBoolean(AvailableAppSettings.VIEW_CUSTOMIZATION, true));
