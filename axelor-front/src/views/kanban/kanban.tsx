@@ -33,7 +33,11 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewSwitch, useViewTab } from "@/view-containers/views/scope";
+import {
+  useViewSwitch,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 import { useActionExecutor } from "../form/builder/scope";
 import { ViewProps } from "../types";
 
@@ -491,6 +495,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
   useAsyncEffect(async () => {
     await onRefresh();
   }, [onRefresh]);
+
+  // register tab:refresh
+  useViewTabRefresh("kanban", onRefresh);
 
   const showToolbar = popupOptions?.showToolbar !== false;
   const small = useMediaQuery("(max-width: 768px)");
