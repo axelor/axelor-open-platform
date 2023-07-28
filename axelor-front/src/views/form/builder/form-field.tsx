@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { useMemo } from "react";
-import { selectAtom } from "jotai/utils";
 import { useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
+import { useMemo } from "react";
 
 import { Box, InputLabel } from "@axelor/ui";
 
@@ -11,12 +11,12 @@ import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
 import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import { Tooltip } from "@/components/tooltip";
+import { useAsync } from "@/hooks/use-async";
+import { useTemplate } from "@/hooks/use-parser";
 import { i18n } from "@/services/client/i18n";
 import { session } from "@/services/client/session";
-import { useTemplate } from "@/hooks/use-parser";
-import { useAsync } from "@/hooks/use-async";
-import { useFormScope } from "./scope";
 import format from "@/utils/format";
+import { useFormScope } from "./scope";
 
 import styles from "./form-field.module.css";
 
@@ -188,9 +188,12 @@ function HelpContent(props: WidgetProps) {
 
   const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });
-  let shouldDisplayValue = serverType && !["TEXT", "BINARY"].includes(serverType) && widget !== 'password';
+  const shouldDisplayValue =
+    serverType &&
+    !["TEXT", "BINARY"].includes(serverType) &&
+    widget !== "password";
 
-  if (serverType && serverType.endsWith("_ONE") && value) {
+  if (serverType.endsWith("_ONE") && value) {
     text = `(${value.id}, ${text})`;
   }
   if (serverType === "STRING" && text) {
@@ -200,13 +203,13 @@ function HelpContent(props: WidgetProps) {
   }
   if (value && ["ONE_TO_MANY", "MANY_TO_MANY"].includes(serverType)) {
     const length = value.length;
-    let items = value.slice(0, length > 5 ? 5 : length).map((item: any) => {
-      return item.id;
-    });
+    const items = value
+      .slice(0, length > 5 ? 5 : length)
+      .map((item: any) => item.id);
     if (length > 5) {
-      items.push('...');
+      items.push("...");
     }
-    text = items.join(', ');
+    text = items.join(", ");
   }
 
   return (
