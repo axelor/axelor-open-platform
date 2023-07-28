@@ -125,6 +125,7 @@ export function ToolbarActions({
         divider: item.type === "menu-item-devider",
         description: help,
         iconOnly: !text && icon,
+        showDownArrow: item.type === "menu",
         ...(icon && {
           icon: ({ className }: { className: string }) => (
             <Icon icon={icon} className={className} />
