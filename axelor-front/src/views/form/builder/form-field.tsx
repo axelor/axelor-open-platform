@@ -193,7 +193,7 @@ function HelpContent(props: WidgetProps) {
     !["TEXT", "BINARY"].includes(serverType) &&
     widget !== "password";
 
-  if (serverType.endsWith("_ONE") && value) {
+  if (serverType?.endsWith("_ONE") && value) {
     text = `(${value.id}, ${text})`;
   }
   if (serverType === "STRING" && text) {
