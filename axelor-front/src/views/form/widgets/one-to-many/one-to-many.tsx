@@ -481,7 +481,6 @@ export function OneToMany({
   const canView = hasButton("view");
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
-  const canRefresh = !readonly && hasButton("refresh") && isManyToMany;
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
   return (
@@ -549,15 +548,6 @@ export function OneToMany({
             onClick: () => {
               onDelete(selectedRows!.map((ind) => rows[ind]?.record));
             },
-          },
-          {
-            key: "refresh",
-            text: i18n.get("Refresh"),
-            iconProps: {
-              icon: "refresh",
-            },
-            onClick: () => onSearch(),
-            hidden: !canRefresh,
           },
           {
             key: "more",
