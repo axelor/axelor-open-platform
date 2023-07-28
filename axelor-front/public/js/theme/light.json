@@ -60,6 +60,9 @@
       },
       "icon_hover": {
         "bg": "transparent"
+      },
+      "icon_active": {
+        "color": "white"
       }
     },
     "NavTabs": {
