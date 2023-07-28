@@ -343,7 +343,7 @@ function useExpressions({
       canAttach,
       canSelect,
       bind,
-    } = schema;
+    } = processSchema(schema);
 
     const hasExpression =
       showIf ||
@@ -392,6 +392,52 @@ function useExpressions({
     handleValidation,
     createContext,
   ]);
+}
+
+function processSchema(schema: Schema) {
+  const {
+    jsonField,
+    contextField,
+    contextFieldValue,
+    hidden,
+    required,
+    showIf,
+    hideIf,
+    requiredIf,
+  } = schema;
+
+  if (
+    !jsonField ||
+    !contextField ||
+    !contextFieldValue ||
+    (hidden && !showIf && !hideIf)
+  ) {
+    return schema;
+  }
+
+  let contextFieldShowIf = `($record.${contextField}.id === ${contextFieldValue})`;
+  let contextFieldRequiredIf = requiredIf;
+
+  if (required || requiredIf) {
+    contextFieldRequiredIf = requiredIf
+      ? `${contextFieldShowIf} && (${requiredIf})`
+      : contextFieldShowIf;
+  }
+
+  if (showIf) {
+    contextFieldShowIf += ` && (${showIf})`;
+  }
+
+  if (hideIf) {
+    contextFieldShowIf += ` && !(${hideIf})`;
+  }
+
+  return {
+    ...schema,
+    showIf: contextFieldShowIf,
+    hideIf: undefined,
+    requiredIf: contextFieldRequiredIf,
+  };
 }
 
 function Unknown(props: WidgetProps) {
