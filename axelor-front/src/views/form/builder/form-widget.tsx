@@ -2,6 +2,7 @@ import { produce } from "immer";
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
+import isUndefined from "lodash/isUndefined";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -272,8 +273,11 @@ function useExpressions({
     useCallback(
       (get, set, context: DataContext, bind: string) => {
         if (valueAtom) {
+          const prevValue = get(valueAtom);
           const value = parseAngularExp(bind)(context) ?? null;
-          set(valueAtom, value, false, false);
+          // skip dirty for initial value set
+          const isDirty = isUndefined(prevValue) ? false : prevValue !== value;
+          set(valueAtom, value, false, isDirty);
         }
       },
       [valueAtom]
