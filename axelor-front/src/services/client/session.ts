@@ -1,4 +1,3 @@
-import { set } from "lodash";
 import { request } from "./client";
 import { SelectorType } from "./meta.types";
 
