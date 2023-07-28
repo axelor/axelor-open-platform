@@ -178,14 +178,20 @@ const DataViews = memo(function DataViews({
   const filterName = params?.["search-filters"];
   const defaultSearchFilter = params?.["default-search-filters"];
   const dashlet = actionName?.startsWith("$dashlet");
+  const dashletSearch = params?.["dashlet.canSearch"];
+  const hasAdvanceSearch = dashlet ? dashletSearch : true;
 
   useAsyncEffect(async () => {
-    if (dashlet) return;
+    if (!hasAdvanceSearch) return;
     const { fields = {}, jsonFields = {} } = await findFields(
       model,
       context?.jsonModel
     );
-    const filters = await fetchFilters(filterName || `act:${actionName}`);
+    const dashletActionName =
+      dashlet && context?._domainAction ? `act:${context._domainAction}` : "";
+    const filters = await fetchFilters(
+      filterName || dashletActionName || `act:${actionName}`
+    );
 
     setSearchState((state) => ({
       ...state,
@@ -193,10 +199,10 @@ const DataViews = memo(function DataViews({
       fields,
       jsonFields,
     }));
-  }, []);
+  }, [filterName, actionName, hasAdvanceSearch]);
 
   useAsyncEffect(async () => {
-    if (dashlet) return;
+    if (!hasAdvanceSearch) return;
     const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
     let domains: SearchFilter[] = [];
     let items: Property[] = [];
@@ -226,7 +232,13 @@ const DataViews = memo(function DataViews({
       const state = { ..._state, domains, items };
       return { ...state, ...prepareAdvanceSearchQuery(state) };
     });
-  }, [model, defaultSearchFilter, filterName, setSearchState]);
+  }, [
+    model,
+    hasAdvanceSearch,
+    defaultSearchFilter,
+    filterName,
+    setSearchState,
+  ]);
 
   return <ViewPane tab={tab} dataStore={dataStore} searchAtom={searchAtom} />;
 });

@@ -151,7 +151,7 @@ function DashletMenu({
             {
               key: "refresh",
               text: i18n.get("Refresh"),
-              onClick: onRefresh,
+              onClick: () => onRefresh?.(),
             },
             ...getViewOptions(),
             {

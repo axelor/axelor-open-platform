@@ -1,19 +1,21 @@
-import { Box } from "@axelor/ui";
-import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
-import uniqueId from "lodash/uniqueId";
+import { useAtomValue } from "jotai";
 import { useCallback, useEffect } from "react";
+import uniqueId from "lodash/uniqueId";
 
-import { useAsync } from "@/hooks/use-async";
+import { Box, clsx } from "@axelor/ui";
+
 import { Tab, initTab } from "@/hooks/use-tabs";
 import { DataContext } from "@/services/client/data.types";
-import { findActionView } from "@/services/client/meta-cache";
-import { Schema } from "@/services/client/meta.types";
+import { CardsView, Schema } from "@/services/client/meta.types";
 import { DashletView } from "@/view-containers/view-dashlet";
-import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { Views } from "@/view-containers/views";
+import { AdvanceSearch } from "@/view-containers/advance-search";
+import { useAsync } from "@/hooks/use-async";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useViewTab } from "@/view-containers/views/scope";
-import { useAtomValue } from "jotai";
+import { findActionView } from "@/services/client/meta-cache";
+
 import { WidgetProps } from "../../builder";
 import { DashletActions } from "./dashlet-actions";
 import classes from "./dashlet.module.scss";
@@ -97,6 +99,7 @@ export function DashletComponent({
   if (state === "loading") return null;
 
   const { viewType = "" } = tab?.action ?? {};
+  const hasSearch = canSearch && ["cards"].includes(viewType);
 
   return (
     tab && (
@@ -109,8 +112,13 @@ export function DashletComponent({
           roundedTop
           style={{ height }}
         >
-          <Box className={classes.header}>
+          <Box
+            className={clsx(classes.header, {
+              [classes.search]: hasSearch,
+            })}
+          >
             <DashletTitle title={title || tab?.title} />
+            {hasSearch && <DashletSearch />}
             <DashletActions
               dashboard={dashboard}
               viewType={viewType}
@@ -128,6 +136,30 @@ export function DashletComponent({
           <Box className={classes.content}>{tab && <Views tab={tab} />}</Box>
         </Box>
       </DashletView>
+    )
+  );
+}
+
+function DashletSearch() {
+  const { view, dataStore, onRefresh, searchAtom } = useAtomValue(
+    useDashletHandlerAtom()
+  );
+  if (!view) return null;
+  const { items, customSearch, freeSearch } = view as CardsView;
+  return (
+    searchAtom &&
+    dataStore &&
+    onRefresh && (
+      <Box d="flex">
+        <AdvanceSearch
+          stateAtom={searchAtom}
+          dataStore={dataStore!}
+          items={items}
+          customSearch={customSearch}
+          freeSearch={freeSearch}
+          onSearch={onRefresh}
+        />
+      </Box>
     )
   );
 }

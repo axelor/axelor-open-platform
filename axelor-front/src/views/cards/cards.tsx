@@ -186,12 +186,13 @@ export function Cards(props: ViewProps<CardsView>) {
   useEffect(() => {
     if (dashlet) {
       setDashletHandlers({
+        searchAtom,
         dataStore,
         view,
-        onRefresh: () => onSearch({}),
+        onRefresh: onSearch,
       });
     }
-  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
+  }, [dashlet, view, searchAtom, dataStore, onSearch, setDashletHandlers]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 

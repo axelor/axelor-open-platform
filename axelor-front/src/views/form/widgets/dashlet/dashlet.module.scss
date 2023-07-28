@@ -12,6 +12,10 @@
   border-bottom: var(--ax-panel-header-border, none);
 }
 
+.header.search {
+  --ax-panel-header-border: 1px solid var(--bs-border-color);
+}
+
 .title {
   font-weight: 600;
   flex: 1;
