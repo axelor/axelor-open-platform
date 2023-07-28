@@ -116,14 +116,14 @@ export function ToolbarActions({
     ): CommandItemProps => {
       const action = (item as Button).onClick || (item as MenuItem).action;
       const text = item.showTitle !== false ? item.title : "";
-      const icon = (item as Button).icon;
-      const prompt = (item as Button).prompt;
+      const { icon, prompt, help } = (item as Button);
       const key = `action_${++ind}`;
       const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
       return {
         key,
         text,
         divider: item.type === "menu-item-devider",
+        description: help,
         iconOnly: !text && icon,
         ...(icon && {
           icon: ({ className }: { className: string }) => (
