@@ -184,7 +184,6 @@ export interface MenuItem extends Widget {
   prompt?: string;
   order?: number;
   groups?: string;
-  top?: boolean;
   left?: boolean;
   mobile?: boolean;
   category?: string;

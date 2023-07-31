@@ -414,7 +414,6 @@ export function NavHeader() {
   return (
     <div className={styles.header}>
       <div className={styles.menus}>
-        <div className={commonClassNames("hide-sm", styles.topMenu)}></div>
         <div className={commonClassNames("hide-sm", styles.quickMenu)}>
           <QuickMenuBar />
         </div>

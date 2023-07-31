@@ -8,7 +8,6 @@
       "icon": "fa-users",
       "iconBackground": "blue",
       "order": -110,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -20,7 +19,6 @@
       "parent": "menu-team-teams",
       "action": "teams.all",
       "order": -110,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -32,7 +30,6 @@
       "parent": "menu-team",
       "icon": "fa-envelope",
       "order": -110,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -44,7 +41,6 @@
       "icon": "fa-archive",
       "iconBackground": "brown",
       "order": -109,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -56,7 +52,6 @@
       "icon": "fa-dashboard",
       "iconBackground": "blue",
       "order": -101,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -68,7 +63,6 @@
       "parent": "menu-team-teams",
       "action": "teams.my",
       "order": -100,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -80,7 +74,6 @@
       "icon": "fa-book",
       "iconBackground": "green",
       "order": -100,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -92,7 +85,6 @@
       "parent": "menu-dms",
       "action": "dms.all",
       "order": -90,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -104,7 +96,6 @@
       "parent": "menu-mail",
       "action": "mail.inbox",
       "order": -90,
-      "top": false,
       "left": true,
       "mobile": false,
       "tagStyle": "warning",
@@ -118,7 +109,6 @@
       "icon": "fa-shopping-cart",
       "iconBackground": "orange",
       "order": -90,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -130,7 +120,6 @@
       "parent": "menu-mail",
       "action": "mail.important",
       "order": -85,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -142,7 +131,6 @@
       "parent": "menu-dms",
       "action": "dms.my",
       "order": -80,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -154,7 +142,6 @@
       "parent": "menu-team",
       "icon": "fa-tasks",
       "order": -80,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -166,7 +153,6 @@
       "parent": "menu-team-tasks",
       "action": "team.tasks.due",
       "order": -80,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -178,7 +164,6 @@
       "parent": "menu-mail",
       "action": "mail.archive",
       "order": -80,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -190,7 +175,6 @@
       "icon": "fa-tasks",
       "iconBackground": "violet",
       "order": -80,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -201,7 +185,6 @@
       "hidden": false,
       "parent": "menu-dms",
       "order": -70,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -213,7 +196,6 @@
       "parent": "menu-team-tasks",
       "action": "team.tasks.todo",
       "order": -70,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -225,7 +207,6 @@
       "parent": "menu-team",
       "icon": "fa-group",
       "order": -70,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -237,7 +218,6 @@
       "parent": "menu-team-tasks",
       "action": "team.tasks.open",
       "order": -60,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -249,7 +229,6 @@
       "parent": "menu-team-tasks",
       "action": "team.tasks.assigned",
       "order": -55,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -261,7 +240,6 @@
       "parent": "menu-team-tasks",
       "action": "team.tasks.created",
       "order": -50,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -272,7 +250,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -284,7 +261,6 @@
       "parent": "menu-auth",
       "action": "action-auth-users",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -296,7 +272,6 @@
       "parent": "menu-auth",
       "action": "action-auth-groups",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -308,7 +283,6 @@
       "parent": "menu-auth",
       "action": "action-auth-roles",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -320,7 +294,6 @@
       "parent": "menu-auth",
       "action": "action-auth-permissions",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -331,7 +304,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -343,7 +315,6 @@
       "parent": "menu-model",
       "action": "action-meta-model-views",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -355,7 +326,6 @@
       "parent": "menu-model",
       "action": "custom.models.all",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -367,7 +337,6 @@
       "parent": "menu-model",
       "action": "custom.fields.all",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -378,7 +347,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -390,7 +358,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-views",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -402,7 +369,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-views-my",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -414,7 +380,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-menus",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -426,7 +391,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-actions",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -438,7 +402,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-select",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -450,7 +413,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-action-menus",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -462,7 +424,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-translations",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -474,7 +435,6 @@
       "parent": "menu-view-management",
       "action": "action-meta-attrs",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -486,7 +446,6 @@
       "parent": "menu-view-management",
       "action": "meta.charts",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -497,7 +456,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -509,7 +467,6 @@
       "parent": "menu-help-management",
       "action": "action-meta-help-views",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -521,7 +478,6 @@
       "parent": "menu-help-management",
       "action": "action-meta-help-menus",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -532,7 +488,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -544,7 +499,6 @@
       "parent": "menu-module-management",
       "action": "meta.modules",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -555,7 +509,6 @@
       "hidden": false,
       "parent": "menu-admin",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -567,7 +520,6 @@
       "parent": "menu-job-management",
       "action": "meta.jobs",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -579,7 +531,6 @@
       "parent": "menu-dms-config",
       "action": "dms.tags",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -591,7 +542,6 @@
       "parent": "menu-contact-book",
       "action": "contact.all",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -603,7 +553,6 @@
       "parent": "menu-contact-book",
       "action": "contact.friends",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": true,
@@ -616,7 +565,6 @@
       "parent": "menu-contact-book",
       "action": "contact.family",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": true,
@@ -629,7 +577,6 @@
       "parent": "menu-contact-book",
       "action": "contact.business",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": true,
@@ -641,7 +588,6 @@
       "hidden": false,
       "parent": "menu-contact-book",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -653,7 +599,6 @@
       "parent": "menu-contact-config",
       "action": "contact.country",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -665,7 +610,6 @@
       "parent": "menu-contact-config",
       "action": "contact.circles",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -677,7 +621,6 @@
       "parent": "menu-contact-config",
       "action": "contact.title",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -689,7 +632,6 @@
       "parent": "menu-contact-config",
       "action": "contact.company",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -701,7 +643,6 @@
       "parent": "menu-sales",
       "action": "sale.products",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "tagStyle": "info",
@@ -715,7 +656,6 @@
       "parent": "menu-sales",
       "action": "sale.orders.draft",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": true,
@@ -728,7 +668,6 @@
       "parent": "menu-sales",
       "action": "sale.orders",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": true,
@@ -741,7 +680,6 @@
       "parent": "menu-sales",
       "action": "sale.search",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -752,7 +690,6 @@
       "hidden": false,
       "parent": "menu-sales",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -764,7 +701,6 @@
       "parent": "menu-sales-config",
       "action": "sale.product.categories",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -776,7 +712,6 @@
       "parent": "menu-sales-config",
       "action": "sale.taxes",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -788,7 +723,6 @@
       "parent": "menu-sales-config",
       "action": "sale.currencies",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -800,7 +734,6 @@
       "parent": "menu-project",
       "action": "project.all",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -812,7 +745,6 @@
       "parent": "menu-project",
       "action": "project.task.all",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -824,7 +756,6 @@
       "parent": "menu-project",
       "action": "project.task.my",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -836,7 +767,6 @@
       "parent": "menu-project",
       "action": "project.tasks.tree",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -848,7 +778,6 @@
       "parent": "menu-project",
       "action": "project.tasks.gantt",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -858,7 +787,6 @@
       "title": "Custom Menu",
       "hidden": false,
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -870,7 +798,6 @@
       "parent": "menu-custom",
       "action": "custom.products",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -882,7 +809,6 @@
       "parent": "menu-dashboards",
       "action": "welcome",
       "order": 0,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false
@@ -894,7 +820,6 @@
       "icon": "fa-wrench",
       "iconBackground": "red",
       "order": 100,
-      "top": false,
       "left": true,
       "mobile": false,
       "hasTag": false

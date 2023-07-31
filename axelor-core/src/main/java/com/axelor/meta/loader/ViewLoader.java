@@ -622,7 +622,6 @@ public class ViewLoader extends AbstractParallelLoader {
     entity.setTagGet(menuItem.getTagGet());
     entity.setTagCount(menuItem.getTagCount());
     entity.setTagStyle(menuItem.getTagStyle());
-    entity.setTop(menuItem.getTop());
     entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
     entity.setMobile(menuItem.getMobile());
     entity.setHidden(menuItem.getHidden());

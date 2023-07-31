@@ -165,7 +165,6 @@
       <field name="menuIcon" title="Icon"/>
       <field name="menuBackground" title="Icon background"/>
       <field name="menuOrder" title="aop.meta.order"/>
-      <field name="menuTop" title="Show in top menu"/>
     </panel>
     <panel-tabs>
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">

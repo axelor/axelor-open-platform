@@ -131,7 +131,10 @@
           <xsd:annotation>
             <xsd:documentation>
               Whether to show the menu item in top navigation menu.
+              REMOVED: Top menu support has been removed since 7.0. To ensure compatibility,
+              attribute is still present but will be removed in a future version.
             </xsd:documentation>
+            <xsd:documentation>deprecated</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="left" type="xsd:boolean">

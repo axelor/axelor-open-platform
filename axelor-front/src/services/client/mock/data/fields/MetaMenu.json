@@ -67,13 +67,6 @@
         "title": "Archived"
       },
       {
-        "nullable": true,
-        "defaultValue": false,
-        "name": "top",
-        "type": "BOOLEAN",
-        "title": "Top menu"
-      },
-      {
         "targetName": "name",
         "targetSearch": ["name"],
         "name": "action",

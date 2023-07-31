@@ -88,7 +88,6 @@
     <string name="tagGet" title="Tag method"/>
     <boolean name="tagCount" title="Tag count"/>
     <string name="tagStyle" selection="label.style.selection" title="Tag style"/>
-    <boolean name="top" column="top_menu" title="Top menu"/>
     <boolean name="left" column="left_menu" default="true" title="Left menu"/>
     <boolean name="mobile" column="mobile_menu" title="Mobile menu"/>
     <boolean name="hidden" title="Hidden menu"/>

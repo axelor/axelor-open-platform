@@ -213,7 +213,6 @@
     <field name="parent"/>
     <field name="action"/>
     <field name="module"/>
-    <field name="top"/>
     <field name="left"/>
     <field name="mobile"/>
     <field name="hidden"/>
@@ -255,7 +254,6 @@
     <panel title="Visibility" sidebar="true" itemSpan="6">
       <field name="order"/>
       <field name="priority"/>
-      <field name="top" widget="inline-checkbox"/>
       <field name="left" widget="inline-checkbox"/>
       <field name="mobile" widget="inline-checkbox"/>
       <field name="hidden" widget="inline-checkbox"/>

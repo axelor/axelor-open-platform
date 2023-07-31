@@ -128,7 +128,6 @@ public class MenuService {
     item.setIconBackground(menu.getIconBackground());
     item.setHasTag(menu.getTagCount() || StringUtils.notEmpty(menu.getTagGet()));
     item.setTagStyle(menu.getTagStyle());
-    item.setTop(menu.getTop());
     item.setLeft(menu.getLeft());
     item.setMobile(menu.getMobile());
     item.setHidden(menu.getHidden());
