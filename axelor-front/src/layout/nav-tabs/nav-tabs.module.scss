@@ -49,8 +49,10 @@
   display: flex;
 }
 
-.tabText {
-  // XXX: Fix overlapped tab text rendering in Chrome
+// XXX: Chrome overlapped rendering
+.tabTitle,
+.tabText,
+.tabIcon {
   z-index: 1;
 }
 

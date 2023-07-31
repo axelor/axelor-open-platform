@@ -406,5 +406,5 @@ function PopoverContent({ tab }: { tab: Tab }) {
 }
 
 function TabIcon({ icon }: { icon: string }) {
-  return <Icon icon={icon} />;
+  return <Icon icon={icon} className={clsx(styles.tabIcon)} />;
 }
