@@ -1,15 +1,16 @@
 import { Box } from "@axelor/ui";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAtomValue } from "jotai";
 
 import { FieldProps } from "../../builder";
 import { TagSelect } from "./tag-select";
 import { DataRecord } from "@/services/client/data.types";
+import { useEditablePopup } from "../text";
 import styles from "./tag-select.edit.module.scss";
 
 export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
   const { widgetAtom, schema } = props;
-  const [popup, setPopup] = useState<any>(null);
+  const [popup, setPopup] = useEditablePopup();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -23,19 +24,19 @@ export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
       setPopup({
         style: {
           position: "fixed",
-          minHeight: 100,
+          minHeight: 38,
           width,
           top,
-          left: left - 8,
+          left,
           zIndex: 1,
         },
       });
     }
-  }, []);
+  }, [setPopup]);
 
   const handleBlur = useCallback(() => {
     setPopup(null);
-  }, []);
+  }, [setPopup]);
 
   useEffect(() => {
     focus && handleFocus();
@@ -64,7 +65,7 @@ export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
           shadow
           data-column-index={schema.editIndex}
         >
-          <Box>
+          <Box w={100}>
             <TagSelect
               {...props}
               selectProps={{

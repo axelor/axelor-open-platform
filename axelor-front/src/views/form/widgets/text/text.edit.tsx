@@ -6,9 +6,32 @@ import { FieldProps } from "../../builder";
 import { String } from "../string";
 import { Text } from "./text";
 
+export function useEditablePopup() {
+  const [popup, setPopup] = useState<any>(null);
+
+  const hasPopup = Boolean(popup);
+
+  useEffect(() => {
+    if (hasPopup) {
+      const handler = () => setPopup(null);
+      const wheelEvent =
+        "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
+      window.addEventListener("DOMMouseScroll", handler, false); // older FF
+      window.addEventListener(wheelEvent, handler, { passive: false }); // modern desktop
+
+      return () => {
+        window.removeEventListener("DOMMouseScroll", handler);
+        window.removeEventListener(wheelEvent, handler);
+      };
+    }
+  }, [hasPopup]);
+
+  return [popup, setPopup] as const;
+}
+
 export function TextEdit(props: FieldProps<string>) {
   const { widgetAtom, schema } = props;
-  const [popup, setPopup] = useState<any>(null);
+  const [popup, setPopup] = useEditablePopup();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -24,17 +47,17 @@ export function TextEdit(props: FieldProps<string>) {
           position: "fixed",
           minHeight: 100,
           width,
-          top: top - 10,
-          left: left - 8,
+          top: top,
+          left: left,
           zIndex: 1,
         },
       });
     }
-  }, []);
+  }, [setPopup]);
 
   const handleBlur = useCallback((e: FocusEvent<HTMLTextAreaElement>) => {
     setPopup(null);
-  }, []);
+  }, [setPopup]);
 
   useEffect(() => {
     focus && handleFocus();

@@ -2,6 +2,10 @@
 .container {
   max-height: 38px;
   overflow: hidden;
+  width: 100%;
+  & > * {
+    flex: 1;
+  }
 }
 
 .select > div > div {
