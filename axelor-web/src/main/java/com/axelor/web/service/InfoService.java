@@ -246,10 +246,6 @@ public class InfoService extends AbstractService {
     map.put("singleTab", SETTINGS.getBoolean(AvailableAppSettings.VIEW_SINGLE_TAB, false));
     map.put("maxTabs", SETTINGS.getInt(AvailableAppSettings.VIEW_TABS_MAX, -1));
 
-    final Map<String, Object> menubar = new HashMap<>();
-    menubar.put("location", SETTINGS.get(AvailableAppSettings.VIEW_MENUBAR_LOCATION));
-    map.put("menubar", menubar);
-
     final Map<String, Object> toolbar = new HashMap<>();
     toolbar.put("showTitles", SETTINGS.getBoolean(AvailableAppSettings.VIEW_TOOLBAR_TITLES, false));
     map.put("toolbar", toolbar);

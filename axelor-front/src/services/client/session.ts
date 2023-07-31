@@ -50,9 +50,6 @@ export interface SessionInfo {
   view?: {
     singleTab?: boolean;
     maxTabs?: number;
-    menubar?: {
-      location?: string;
-    };
     toolbar?: {
       showTitles?: boolean;
     };

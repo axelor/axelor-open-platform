@@ -219,7 +219,6 @@ db.default.password = secret
 | `application.permission.disable-relational-field` | whether to not check relational fields permissions | false
 | `view.single-tab` | whether to use single tab layout | false
 | `view.max-tabs` | define the maximum opened tabs allowed |
-| `view.menubar.location` | set menu style. Can be `left`, `top` or `both` | both
 | `view.toolbar.show-titles` | whether to show button titles in toolbar | false
 | `view.confirm-yes-no` | whether show confirm dialog with yes/no buttons (else is Cancel/OK) | false
 | `view.grid.selection` | set grid widget selection: `checkbox` or `none` | `checkbox`

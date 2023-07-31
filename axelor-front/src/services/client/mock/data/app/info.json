@@ -25,7 +25,6 @@
   "user.nameField": "name",
   "user.lang": "en",
   "application.copyright": "Copyright (c) 2023 Axelor. All Rights Reserved.",
-  "view.menubar.location": "both",
   "application.themes": ["blue-max", "blue-simple", "modern"],
   "user.noHelp": false,
   "application.name": "Axelor DEMO"
