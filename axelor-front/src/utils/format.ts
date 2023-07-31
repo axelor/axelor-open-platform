@@ -30,7 +30,7 @@ export function getDateTimeFormat(opts: FormatOptions = {}) {
   return dateFormat + " " + getTimeFormat(opts);
 }
 
-function getJSON(jsonStr: string) {
+export function getJSON(jsonStr: string) {
   let value = {};
   try {
     value = JSON.parse(jsonStr);

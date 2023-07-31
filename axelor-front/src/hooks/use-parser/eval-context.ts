@@ -1,15 +1,15 @@
-import { MouseEvent } from "react";
 import get from "lodash/get";
 import set from "lodash/set";
+import { MouseEvent } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
+import format, { getJSON } from "@/utils/format";
 import { unaccent } from "@/utils/sanitize";
-import { i18n } from "@/services/client/i18n";
 import { ActionOptions } from "@/view-containers/action";
-import { moment } from "@/services/client/l10n";
-import format from "@/utils/format";
 
 export type EvalContextOptions = {
   valid?: (name?: string) => boolean;
@@ -50,7 +50,18 @@ export function createEvalContext(
       return components[name];
     },
     $get(path: string) {
-      return get(context, path);
+      const value = get(context, path);
+      if (value === undefined) {
+        const dotIndex = path.indexOf(".");
+        const key = path.substring(0, dotIndex);
+        const subPath = path.substring(dotIndex + 1);
+        const jsonText = context[key];
+        if (typeof jsonText === "string") {
+          const json = getJSON(jsonText);
+          return get(json, subPath);
+        }
+      }
+      return value;
     },
     $moment(date: any) {
       return moment(date);
@@ -216,6 +227,16 @@ export function createEvalContext(
       const value = Reflect.get(target, p, receiver) ?? get(target, p);
       if (p === "id" && value && value <= 0) {
         return null;
+      }
+      if (value === undefined && typeof p === "string" && p.startsWith("$")) {
+        const key = p.substring(1);
+        const jsonText = target[key];
+        if (typeof jsonText === "string") {
+          const json = getJSON(jsonText);
+          if (json) {
+            return json;
+          }
+        }
       }
       return value;
     },
