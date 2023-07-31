@@ -51,7 +51,6 @@ public interface AvailableAppSettings {
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
-  String VIEW_CONFIRM_YES_NO = "view.confirm-yes-no";
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";

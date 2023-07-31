@@ -1,0 +1,6 @@
+---
+title: Remove `view.confirm-yes-no` setting
+type: remove
+description: |
+  The setting `view.confirm-yes-no` has been removed. It was used 
+  to show confirm dialog with yes/no buttons (else is Cancel/OK).
