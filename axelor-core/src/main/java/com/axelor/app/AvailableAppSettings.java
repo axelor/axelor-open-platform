@@ -56,8 +56,6 @@ public interface AvailableAppSettings {
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";
 
-  String VIEW_TOOLBAR_TITLES = "view.toolbar.show-titles";
-
   String VIEW_FORM_CHECK_VERSION = "view.form.check-version";
 
   String VIEW_ADV_SEARCH_EXPORT_FULL = "view.adv-search.export-full";

@@ -50,9 +50,6 @@ export interface SessionInfo {
   view?: {
     singleTab?: boolean;
     maxTabs?: number;
-    toolbar?: {
-      showTitles?: boolean;
-    };
     form?: {
       checkVersion?: boolean;
     };
