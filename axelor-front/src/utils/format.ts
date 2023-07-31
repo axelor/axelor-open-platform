@@ -163,6 +163,11 @@ const formatNumber: Formatter = (value, opts = {}) => {
   return value;
 };
 
+const formatInteger: Formatter = (value, opts = {}) => {
+  const { props: { scale, ...props } = {} as Field } = opts;
+  return formatNumber(value, { ...opts, props });
+};
+
 const formatPercent: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
   let { scale } = props ?? {};
@@ -215,8 +220,8 @@ const formatMany: Formatter = (value, opts = {}) => {
 
 export const Formatters = {
   string: formatString,
-  integer: formatNumber,
-  long: formatNumber,
+  integer: formatInteger,
+  long: formatInteger,
   decimal: formatNumber,
   percent: formatPercent,
   boolean: formatBoolean,
