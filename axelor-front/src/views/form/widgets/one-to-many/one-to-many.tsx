@@ -84,7 +84,7 @@ export function OneToMany({
   const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
   const widgetState = useMemo(
     () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
-    [formAtom, name]
+    [formAtom, name],
   );
 
   const setSelection = useSetAtom(
@@ -94,8 +94,8 @@ export function OneToMany({
           const state = get(widgetState);
           set(widgetState, { ...state, selected: selectedIds });
         }),
-      [widgetState]
-    )
+      [widgetState],
+    ),
   );
 
   const [value, setValue] = useAtom(
@@ -108,7 +108,7 @@ export function OneToMany({
             set,
             setter: SetStateAction<DataRecord[]>,
             callOnChange: boolean = true,
-            resetRecords: boolean = false
+            resetRecords: boolean = false,
           ) => {
             shouldSearch.current = false;
             const values =
@@ -126,7 +126,7 @@ export function OneToMany({
               const recIds = records.map((r) => r.id);
               const deleteIds = recIds.filter((id) => !valIds.includes(id));
               const newRecords = (values || []).filter(
-                (v) => !recIds.includes(v.id)
+                (v) => !recIds.includes(v.id),
               );
 
               return records
@@ -139,16 +139,16 @@ export function OneToMany({
                 })
                 .concat(newRecords);
             });
-          }
+          },
         ),
-      [valueAtom]
-    )
+      [valueAtom],
+    ),
   );
 
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const parentId = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
@@ -182,13 +182,15 @@ export function OneToMany({
             ...obj,
             [key]: schema[key] ?? view[key as keyof GridView],
           }),
-          {}
+          {},
         ),
       },
     };
   }, [schema, model]);
 
-  const editable = (schema.editable || viewData?.view?.editable) && !readonly;
+  const editable =
+    (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
+    !readonly;
   const getContext = usePrepareContext(formAtom);
 
   const showEditor = useEditor();
@@ -215,7 +217,7 @@ export function OneToMany({
         .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
         .map((v) => v.id);
       const changedRecords = (value || []).filter(
-        ({ id }) => !ids.includes(id)
+        ({ id }) => !ids.includes(id),
       );
 
       let records: DataRecord[] = [];
@@ -250,14 +252,14 @@ export function OneToMany({
         records,
       } as SearchResult;
     },
-    [value, sortBy, name, model, parentId, dataStore]
+    [value, sortBy, name, model, parentId, dataStore],
   );
 
   const onExport = useCallback(async () => {
     const { fileName } = await dataStore.export({
       ...(state.orderBy && {
         sortBy: state.orderBy?.map(
-          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         ),
       }),
       fields: state.columns
@@ -266,7 +268,7 @@ export function OneToMany({
     });
     download(
       `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
-      fileName
+      fileName,
     );
   }, [dataStore, state.columns, state.orderBy]);
 
@@ -291,8 +293,8 @@ export function OneToMany({
           ];
         });
       },
-      [isManyToMany, setValue]
-    )
+      [isManyToMany, setValue],
+    ),
   );
 
   const getActionContext = useCallback(
@@ -301,7 +303,7 @@ export function OneToMany({
       _views: [{ type: "grid", name: gridView }],
       _parent: getContext(),
     }),
-    [getContext, gridView]
+    [getContext, gridView],
   );
 
   const actionView = useMemo(
@@ -311,7 +313,7 @@ export function OneToMany({
         name: gridView,
         model: model,
       } as View),
-    [viewData?.view, gridView, model]
+    [viewData?.view, gridView, model],
   );
 
   const actionExecutor = useActionExecutor(actionView, {
@@ -350,7 +352,7 @@ export function OneToMany({
     (
       options?: Partial<EditorOptions>,
       onSelect?: (record: DataRecord) => void,
-      onSave?: (record: DataRecord) => void
+      onSave?: (record: DataRecord) => void,
     ) => {
       const { record } = options || {};
       if (showEditorInTab && (record?.id ?? 0) > 0) {
@@ -377,7 +379,7 @@ export function OneToMany({
       formView,
       getContext,
       isManyToMany,
-    ]
+    ],
   );
 
   const onSave = useCallback(
@@ -386,7 +388,7 @@ export function OneToMany({
       handleSelect([record]);
       return record;
     },
-    [handleSelect]
+    [handleSelect],
   );
 
   const onAdd = useCallback(() => {
@@ -409,51 +411,57 @@ export function OneToMany({
       openEditor(
         { record, readonly },
         (record) => handleSelect([record]),
-        onSave
+        onSave,
       );
     },
-    [openEditor, onSave, handleSelect]
+    [openEditor, onSave, handleSelect],
   );
 
   const onView = useCallback(
     (record: DataRecord) => {
       onEdit(record, true);
     },
-    [onEdit]
+    [onEdit],
   );
 
   const onDelete = useCallback(
     async (records: GridRow["record"][]) => {
       const confirmed = await dialogs.confirm({
         content: i18n.get(
-          "Do you really want to delete the selected record(s)?"
+          "Do you really want to delete the selected record(s)?",
         ),
         yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         const ids = records.map((r) => r.id);
         setValue((value) =>
-          (value || []).filter(({ id }) => !ids.includes(id))
+          (value || []).filter(({ id }) => !ids.includes(id)),
         );
         clearSelection();
       }
     },
-    [setValue, clearSelection]
+    [setValue, clearSelection],
   );
 
   const onCloseInDetail = useCallback(() => {
     setDetailRecord(null);
+    gridRef.current?.form?.current?.onCancel?.();
   }, []);
 
   const onRowReorder = useCallback(() => {
     reorderRef.current = true;
   }, []);
 
-  const { selectedRows, rows } = state;
+  const { editRow, selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
   const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
+  const editRecord =
+    editable && hasMasterDetails && editRow && rows?.[editRow?.[0]]?.record;
   const selected =
-    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedRows?.[0]!]?.record : null;
+    editRecord ||
+    ((selectedRows?.length ?? 0) > 0
+      ? rows?.[selectedRows?.[0]!]?.record
+      : null);
   const recordId = detailRecord?.id;
 
   const detailFormName = summaryView || formView;
@@ -481,7 +489,7 @@ export function OneToMany({
 
   useEffect(() => {
     const selectedIds = (selectedRows ?? []).map(
-      (ind) => rows[ind]?.record?.id
+      (ind) => rows[ind]?.record?.id,
     );
     if (isEqual(selectedIdsRef.current, selectedIds)) return;
 
@@ -504,7 +512,7 @@ export function OneToMany({
             })) as DataRecord[];
         },
         false,
-        true
+        true,
       );
     }
     reorderRef.current = false;
@@ -518,14 +526,14 @@ export function OneToMany({
       }
       setDetailRecord(record);
     },
-    [detailMeta, dataStore]
+    [detailMeta, dataStore],
   );
 
   const onRowClick = useCallback(
     (e: SyntheticEvent, row: GridRow, rowIndex: number) => {
       selected?.id === row?.record?.id && fetchAndSetDetailRecord(row.record);
     },
-    [selected, fetchAndSetDetailRecord]
+    [selected, fetchAndSetDetailRecord],
   );
 
   const onDuplicate = useCallback(async () => {
@@ -676,8 +684,9 @@ export function OneToMany({
           <Box d="flex" flexDirection="column" p={2}>
             <DetailsForm
               meta={detailMeta}
-              readonly={readonly}
+              readonly={readonly || editable}
               record={detailRecord}
+              formAtom={gridRef.current?.form?.current?.formAtom}
               onNew={onAddInDetail}
               onClose={onCloseInDetail}
               onSave={onSave}

@@ -1,4 +1,4 @@
-import { ReactElement, useCallback } from "react";
+import { ReactElement, useCallback, useEffect } from "react";
 import { Box, Button } from "@axelor/ui";
 import { useAtomCallback } from "jotai/utils";
 
@@ -7,7 +7,7 @@ import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { Form, useFormHandlers } from "../../builder";
+import { Form, FormAtom, useFormHandlers } from "../../builder";
 import { Layout, showErrors, useGetErrors } from "../../form";
 import styles from "./one-to-many.details.module.scss";
 
@@ -15,6 +15,7 @@ interface DetailsFormProps {
   meta: ViewData<FormView>;
   record: DataRecord | null;
   readonly?: boolean;
+  formAtom?: FormAtom;
   onSave: (data: DataRecord) => void;
   onNew?: () => void;
   onClose?: () => void;
@@ -24,15 +25,21 @@ const defaultRecord: DataRecord = {};
 
 export function DetailsForm({
   meta,
+  formAtom: detailFormAtom,
   readonly,
   record,
   onNew,
   onClose,
   onSave,
 }: DetailsFormProps) {
-  const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, record ?? defaultRecord);
+  const {
+    formAtom: _formAtom,
+    actionHandler,
+    actionExecutor,
+    recordHandler,
+  } = useFormHandlers(meta, record ?? defaultRecord);
 
+  const formAtom = detailFormAtom ?? _formAtom;
   const getErrors = useGetErrors();
   const isNew = (record?.id ?? 0) < 0 && !record?._dirty;
 
@@ -53,6 +60,21 @@ export function DetailsForm({
     )
   );
 
+  const resetFormAtom = useAtomCallback(
+    useCallback(
+      (get, set, formAtom: FormAtom) => {
+        const { record } = get(formAtom);
+        const state = get(_formAtom);
+        state.record?.id === record.id &&
+          set(_formAtom, {
+            ...get(_formAtom),
+            record: { ...state.record, ...record },
+          });
+      },
+      [_formAtom]
+    )
+  );
+
   useAsyncEffect(async () => {
     const { onLoad, onNew } = meta.view;
     if (record) {
@@ -60,6 +82,12 @@ export function DetailsForm({
       action && (await actionExecutor.execute(action));
     }
   }, [record, meta.view, actionExecutor]);
+
+  useEffect(() => {
+    if (detailFormAtom) {
+      return () => resetFormAtom(detailFormAtom);
+    }
+  }, [resetFormAtom, detailFormAtom]);
 
   return (
     record ? (

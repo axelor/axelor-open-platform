@@ -21,6 +21,7 @@ import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
+  FormAtom,
   Form as FormComponent,
   FormLayout,
   FormProps,
@@ -70,6 +71,7 @@ const findColumnIndexByNode = (ele: HTMLElement) => {
 };
 
 export type GridFormHandler = {
+  formAtom?: FormAtom;
   invalid?: () => null | WidgetErrors[];
   onSave?: (saveFromEdit?: boolean) => void;
   onCancel?: () => void;
@@ -345,12 +347,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       ref,
       () => {
         return {
+          formAtom,
           invalid: checkInvalid,
           onSave: handleSave,
           onCancel: handleCancel,
         };
       },
-      [checkInvalid, handleSave, handleCancel]
+      [checkInvalid, formAtom, handleSave, handleCancel]
     );
 
     useEffect(() => {

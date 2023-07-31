@@ -4,6 +4,7 @@ import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import uniq from "lodash/uniq";
 import {
+  RefObject,
   forwardRef,
   useCallback,
   useImperativeHandle,
@@ -79,6 +80,7 @@ const labels: Record<GridLabel, string> = {
 };
 
 export type GridHandler = {
+  form?: RefObject<GridFormHandler>;
   onAdd?: () => void;
   onSave?: () => void;
 };
@@ -393,9 +395,10 @@ export const Grid = forwardRef<
   useImperativeHandle(
     ref,
     () => ({
+      form: formRef,
       onAdd: handleRecordAdd,
     }),
-    [handleRecordAdd]
+    [formRef, handleRecordAdd]
   );
 
   useAsyncEffect(
