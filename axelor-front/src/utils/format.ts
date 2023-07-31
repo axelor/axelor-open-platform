@@ -34,9 +34,10 @@ function getJSON(jsonStr: string) {
   let value = {};
   try {
     value = JSON.parse(jsonStr);
-  } finally {
-    return value;
+  } catch (e) {
+    // Ignore
   }
+  return value;
 }
 
 const formatDuration: Formatter = (value, opts = {}) => {
@@ -56,7 +57,7 @@ const formatDuration: Formatter = (value, opts = {}) => {
   m = _.padStart(m, 2, "0");
   s = _.padStart(s, 2, "0");
 
-  var text = h + ":" + m;
+  let text = h + ":" + m;
 
   if (props?.seconds) {
     text = text + ":" + s;
