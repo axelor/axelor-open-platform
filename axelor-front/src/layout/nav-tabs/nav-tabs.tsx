@@ -21,18 +21,18 @@ import {
 } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Tooltip } from "@/components/tooltip";
 import { useMenu } from "@/hooks/use-menu";
 import { useResponsiveContainer } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { Tab, useTabs } from "@/hooks/use-tabs";
-import { Tooltip } from "@/components/tooltip";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem } from "@/services/client/meta.types";
+import { session } from "@/services/client/session";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { session } from "@/services/client/session";
 
 import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
@@ -138,7 +138,14 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   }, []);
 
   const handleItemClick = useCallback(
-    (item: NavTabItem) => open(item.id),
+    (item: NavTabItem) => {
+      open(item.id);
+      document.dispatchEvent(
+        new CustomEvent("tab:click", {
+          detail: item.id,
+        })
+      );
+    },
     [open]
   );
 

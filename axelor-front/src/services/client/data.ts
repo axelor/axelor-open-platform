@@ -186,6 +186,22 @@ export class DataSource {
     return Promise.reject(resp.status);
   }
 
+  async verify(values: DataRecord) {
+    const url = `ws/rest/${this.model}/verify`;
+    const resp = await request({
+      url,
+      method: "POST",
+      body: {
+        data: values,
+      },
+    });
+    if (resp.ok) {
+      const { status } = await resp.json();
+      return status === 0;
+    }
+    return false;
+  }
+
   async upload(
     data: DataRecord,
     field: string | Blob,

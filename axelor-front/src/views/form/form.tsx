@@ -33,6 +33,8 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
+import { session } from "@/services/client/session";
+import { Formatters } from "@/utils/format";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -60,12 +62,9 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { Collaboration } from "./widgets/collaboration";
-
-import { session } from "@/services/client/session";
-import { Formatters } from "@/utils/format";
 import { FormValidityHandler, FormValidityScope } from "./builder/scope";
 import { getDefaultValues } from "./builder/utils";
+import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
 
@@ -733,6 +732,9 @@ const FormContainer = memo(function FormContainer({
   // register tab:refresh
   useViewTabRefresh("form", onRefresh);
 
+  // check version
+  useCheckVersion(formAtom, dataStore, onRefresh);
+
   return (
     <div className={styles.formViewContainer}>
       {showToolbar && (
@@ -1072,4 +1074,71 @@ export function useFormAttachment(formAtom: FormAtom) {
     },
     onClick: handleClick,
   } as CommandItemProps;
+}
+
+const compact = (rec: any) => {
+  const res: DataRecord = {
+    id: rec.id,
+    version: rec.version,
+  };
+  if (res.version === undefined) {
+    res.version = rec.$version;
+  }
+  Object.entries(rec).forEach(([k, v]) => {
+    if (!v) return;
+    if ((v as any).id > 0) res[k] = compact(v);
+    if (Array.isArray(v)) res[k] = v.map(compact);
+  });
+  return res;
+};
+
+function useCheckVersion(
+  formAtom: FormAtom,
+  dataStore: DataStore,
+  onConfirm: () => void
+) {
+  const tab = useViewTab();
+  const info = session.info;
+
+  const check = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const { context = {} } = tab.action;
+        const { record } = get(formAtom);
+        const { __check_version = info?.view?.form?.checkVersion } = context;
+        if (__check_version && record?.id && record.id > 0) {
+          const res = await dataStore.verify(compact(record));
+          if (res) return;
+          const confirmed = await dialogs.confirm({
+            content:
+              i18n.get(
+                "The record has been updated or delete by another action."
+              ) +
+              "<br>" +
+              i18n.get("Would you like to reload the current record?"),
+          });
+          if (confirmed) {
+            onConfirm();
+          }
+        }
+      },
+      [dataStore, formAtom, info, onConfirm, tab]
+    )
+  );
+
+  const handleTabClick = useCallback(
+    (e: Event) => {
+      if (e instanceof CustomEvent && e.detail === tab.id) {
+        check();
+      }
+    },
+    [check, tab.id]
+  );
+
+  useEffect(() => {
+    document.addEventListener("tab:click", handleTabClick);
+    return () => {
+      document.removeEventListener("tab:click", handleTabClick);
+    };
+  }, [handleTabClick]);
 }
