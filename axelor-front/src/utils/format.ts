@@ -221,6 +221,7 @@ export const Formatters = {
   datetime: formatDateTime,
   duration: formatDuration,
   selection: formatSelection,
+  enumeration: formatSelection,
   "one-to-one": formatOne,
   "one-to-many": formatMany,
   "many-to-one": formatOne,
