@@ -15,6 +15,7 @@ import { session } from "@/services/client/session";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { AdvancedSearchState } from "./types";
+import { GridColumn } from "@axelor/ui/grid";
 
 const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
 
@@ -276,7 +277,9 @@ export function getFreeSearchCriteria(
       const field = fields?.[item?.name || ""] || item;
       const { name, targetName, jsonField } = field as Field;
 
-      const type = toKebabCase(field.type);
+      if (item.hidden || (item as GridColumn).visible === false) return;
+
+      const type = toKebabCase((item as Field).serverType || field.type);
       switch (type) {
         case "integer":
         case "long":
