@@ -128,7 +128,57 @@ export function createValueAtom({
   dirtyAtom: PrimitiveAtom<boolean>;
   actionExecutor: ActionExecutor;
 }) {
-  const { name, onChange } = schema;
+  const { name, jsonField, jsonPath, onChange, $json } = schema;
+
+  const triggerOnChange = () => {
+    onChange &&
+      actionExecutor.execute(
+        onChange,
+        name ? { context: { _source: name } } : {}
+      );
+  };
+
+  if (!$json && jsonPath && jsonField) {
+    const lensAtom = focusAtom(formAtom, (o) => {
+      return o.prop("record").prop(jsonField);
+    });
+    const getJSON = (attrs: any) => {
+      if (attrs && typeof attrs === "string") {
+        try {
+          return JSON.parse(attrs);
+        } catch {}
+      }
+      return {};
+    };
+    return atom(
+      (get) => {
+        const attrs = getJSON(get(lensAtom));
+        return attrs?.[jsonPath] ?? schema.defaultValue ?? "";
+      },
+      (
+        get,
+        set,
+        value: any,
+        fireOnChange: boolean = false,
+        markDirty: boolean = true
+      ) => {
+        const prev = get(lensAtom);
+        const next = JSON.stringify({
+          ...getJSON(prev),
+          [jsonPath]: value,
+        });
+        if (prev !== next) {
+          const dirty = Boolean(markDirty && name);
+
+          set(lensAtom, next);
+          set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
+          dirty && set(dirtyAtom, true);
+          fireOnChange && triggerOnChange();
+        }
+      }
+    );
+  }
+
   const lensAtom = focusAtom(formAtom, (o) => {
     let lens = o.prop("record");
     if (name) {
@@ -163,12 +213,7 @@ export function createValueAtom({
           set(dirtyAtom, true);
         }
       }
-      if (onChange && fireOnChange) {
-        actionExecutor.execute(
-          onChange,
-          name ? { context: { _source: name } } : {}
-        );
-      }
+      fireOnChange && triggerOnChange();
     }
   );
 }

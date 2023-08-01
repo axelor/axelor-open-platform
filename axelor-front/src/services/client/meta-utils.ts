@@ -1,4 +1,6 @@
 import _ from "lodash";
+
+import { i18n } from "./i18n";
 import { ViewData } from "./meta";
 import { ActionView, Property, Schema } from "./meta.types";
 
@@ -31,7 +33,7 @@ function processFields(fields: Property[] | Record<string, Property>) {
       if (field.name) {
         result[field.name] = field;
         // if nested field then make it readonly
-        if (field.name.indexOf(".") > -1) {
+        if (!field.jsonField && field.name.indexOf(".") > -1) {
           field.readonly = true;
           field.required = false;
         }
@@ -319,18 +321,22 @@ export function processView(
       })(view.items);
     }
     if (view.type === "form") {
-      view.items.push({
-        type: "panel",
-        title: "Attributes",
-        itemSpan: 12,
-        items: [
-          {
-            type: "field",
-            name: "attrs",
-            jsonFields: meta.jsonAttrs,
-          },
-        ],
-      });
+      const hasCustomAttrsField = Object.values(meta.fields ?? {}).some(
+        (f) => f.jsonField === "attrs"
+      );
+      !hasCustomAttrsField &&
+        view.items.push({
+          type: "panel",
+          title: i18n.get("Attributes"),
+          itemSpan: 12,
+          items: [
+            {
+              type: "field",
+              name: "attrs",
+              jsonFields: meta.jsonAttrs,
+            },
+          ],
+        });
     }
   }
 

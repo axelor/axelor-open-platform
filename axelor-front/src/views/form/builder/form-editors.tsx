@@ -635,7 +635,8 @@ function JsonEditor({
 }
 
 function processJsonView(schema: Schema) {
-  const result = { ...schema };
+  const result = { ...schema, $json: true } as Schema;
+
   if (schema.serverType) {
     result.type = "field";
     result.widget = toKebabCase(schema.serverType);
