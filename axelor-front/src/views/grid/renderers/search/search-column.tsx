@@ -1,5 +1,4 @@
 import { Field } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
 import { Box, Input, Select } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 import {
@@ -48,7 +47,16 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (["Enter", "Tab", "ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)) {
+    if (
+      [
+        "Enter",
+        "Tab",
+        "ArrowRight",
+        "ArrowLeft",
+        "ArrowUp",
+        "ArrowDown",
+      ].includes(e.key)
+    ) {
       e.stopPropagation();
     }
     if (e.key === "Enter") {
@@ -77,14 +85,14 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
           icons={
             selected
               ? [
-                {
-                  icon: "close",
-                  onClick: () => {
-                    setValue("");
-                    applySearch();
+                  {
+                    icon: "close",
+                    onClick: () => {
+                      setValue("");
+                      applySearch();
+                    },
                   },
-                },
-              ]
+                ]
               : []
           }
           onKeyDown={handleKeyDown as (e: SyntheticEvent) => void}
@@ -110,14 +118,7 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
 
 export function SearchColumn(props: SearchColumnProps) {
   const { column } = props;
-  const field = column as Field;
-  if (
-    column.searchable === false ||
-    field.transient ||
-    field.json ||
-    field.encrypted ||
-    ["one-to-many", "many-to-many"].includes(toKebabCase(field.type))
-  ) {
+  if (column.searchable === false) {
     return <Box h={100} w={100} />;
   }
 

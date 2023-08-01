@@ -26,6 +26,7 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import { i18n } from "@/services/client/i18n";
+import { toKebabCase } from "@/utils/names";
 import format from "@/utils/format";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
@@ -147,17 +148,33 @@ export const Grid = forwardRef<
       const columnProps: Partial<GridColumn> = {};
       const extraAttrs = columnAttrs?.[item.name!];
 
+      if (view.sortable === false) {
+        columnProps.sortable = (item as Field).sortable === true;
+      }
+
       if (item.width) {
         columnProps.width = parseInt(item.width as string);
         columnProps.computed = true;
       }
 
       if (item.type === "button" || attrs?.type === "icon") {
+        columnProps.sortable = false;
         columnProps.searchable = false;
         columnProps.computed = true;
         columnProps.width = columnProps.width || 40;
         columnProps.title = " ";
         columnProps.action = true;
+      }
+
+      if (
+        !field || // check dummy
+        field.transient ||
+        field.json ||
+        field.encrypted ||
+        ["one-to-many", "many-to-many"].includes(toKebabCase(field.type))
+      ) {
+        columnProps.sortable = false;
+        columnProps.searchable = false;
       }
 
       if (serverType === "BOOLEAN" && !item.widget) {
@@ -197,6 +214,7 @@ export const Grid = forwardRef<
 
     return columns;
   }, [
+    view.sortable,
     view.items,
     view.editIcon,
     showEditIcon,
