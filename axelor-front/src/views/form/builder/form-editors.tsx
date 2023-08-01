@@ -45,7 +45,7 @@ function processEditor(schema: Schema) {
     const field = fields?.[item.name!];
     const result = { ...field, ...item };
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
-    result.title = item.title ?? field?.title ?? field?.autoTitle ?? item.name;
+    result.title = item.title ?? field?.title ?? field?.autoTitle;
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
 
     if (result.items) {
@@ -66,7 +66,7 @@ function processEditor(schema: Schema) {
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
     }
-    
+
     return result as Schema;
   };
 
