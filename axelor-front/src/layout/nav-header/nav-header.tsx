@@ -357,7 +357,6 @@ function FarItems() {
             <Avatar
               user={data?.user as any}
               image={data?.user?.image ?? ""}
-              color={" "}
             />
           ),
           iconProps: {

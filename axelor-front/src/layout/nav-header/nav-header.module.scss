@@ -31,6 +31,8 @@
 .user {
   img {
     background: transparent;
+  }
+  img, button > * > * {
     height: 1.5rem;
     width: 1.5rem;
     padding: 0;

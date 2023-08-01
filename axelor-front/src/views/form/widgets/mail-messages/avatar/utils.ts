@@ -18,7 +18,7 @@ export function getAvatarText(user: MessageAuthor) {
     .toLocaleUpperCase(l10n.getLocale() || undefined);
 }
 
-const userColors: Record<string, string> = {};
+const userColors: Record<number, string> = {};
 const usedColors: string[] = [];
 const colorNames = [
   "blue",
@@ -48,8 +48,8 @@ const colorNames = [
 
 export function getColor(user: MessageAuthor) {
   if (!user) return null;
-  if (userColors[user.code]) {
-    return userColors[user.code];
+  if (userColors[user.id]) {
+    return userColors[user.id];
   }
   if (usedColors.length === colorNames.length) {
     usedColors.length = 0;
@@ -57,7 +57,7 @@ export function getColor(user: MessageAuthor) {
   const color = colorNames.find((n) => !usedColors.includes(n));
   usedColors.push(color!);
   const bgColor = `bg-${color}`;
-  userColors[user.code] = bgColor;
+  userColors[user.id] = bgColor;
   return bgColor;
 }
 
