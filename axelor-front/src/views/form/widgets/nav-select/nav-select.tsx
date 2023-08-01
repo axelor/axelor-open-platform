@@ -56,7 +56,7 @@ function MenuItem({ item }: ItemProps) {
 
 function isSelected(selection: Selection, value: any) {
   const selected = selection.value;
-  const val = typeof value === "object" ? value.id : value;
+  const val = typeof value === "object" && value ? value.id : value;
   return selected === val || String(selected) === String(val);
 }
 
