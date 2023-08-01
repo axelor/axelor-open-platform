@@ -168,13 +168,12 @@ export class DataSource {
 
   async export(options: SearchOptions): Promise<ExportResult> {
     const url = `ws/rest/${this.model}/export`;
-    const { filter: data, limit, ...rest } = options;
+    const { filter: data, ...rest } = options;
     const resp = await request({
       url,
       method: "POST",
       body: {
         ...rest,
-        limit,
         data,
       },
     });

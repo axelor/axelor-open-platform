@@ -155,7 +155,7 @@ export class DataStore extends DataSource {
   }
 
   async export(options: SearchOptions): Promise<ExportResult> {
-    const opts = this.#prepareOption({
+    const { limit, offset, ...opts } = this.#prepareOption({
       ...this.#options,
       ...options,
     });
