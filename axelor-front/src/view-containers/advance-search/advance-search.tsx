@@ -39,6 +39,7 @@ import {
   View,
 } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
+import { alerts } from "@/components/alerts";
 import { useViewAction, useViewTab } from "../views/scope";
 
 import { focusAndSelectInput } from "@/views/form";
@@ -301,7 +302,14 @@ export function AdvanceSearch({
               }
             : {}
         )
-        .then(({ fileName }) => {
+        .then(({ exportSize, fileName }) => {
+          if ((dataStore.page?.totalCount ?? 0) > exportSize) {
+            alerts.warn({
+              title: i18n.get("Warning!"),
+              message: i18n.get("{0} records exported.", exportSize),
+            });
+          }
+
           download(
             `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
             fileName
@@ -355,7 +363,11 @@ export function AdvanceSearch({
         placement={`bottom-${rtl ? "end" : "start"}`}
       >
         <ClickAwayListener onClickAway={handleClose}>
-          <Box {...(rtl ? { dir: "rtl" } : {})} className={styles.popperContent} p={2}>
+          <Box
+            {...(rtl ? { dir: "rtl" } : {})}
+            className={styles.popperContent}
+            p={2}
+          >
             <FocusTrap initialFocus={false} enabled={open}>
               <Box d="flex" flexDirection="column">
                 <Box d="flex" alignItems="center">
@@ -367,7 +379,12 @@ export function AdvanceSearch({
                   </Box>
                 </Box>
                 <Divider />
-                <Box d="flex" className={styles.filterList} alignItems="flex-start" mb={customSearch ? 0 : 1}>
+                <Box
+                  d="flex"
+                  className={styles.filterList}
+                  alignItems="flex-start"
+                  mb={customSearch ? 0 : 1}
+                >
                   {(domains || []).length > 0 && (
                     <FilterList
                       title={i18n.get("Filters")}
