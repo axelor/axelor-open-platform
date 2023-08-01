@@ -15,6 +15,10 @@ export function Tooltip({ children, title, content: Content }: TooltipProps) {
     usePopperTrigger({
       trigger: "hover",
       interactive: true,
+      delay: {
+        open: 1000,
+        close: 100
+      }
     });
   return (
     <>
