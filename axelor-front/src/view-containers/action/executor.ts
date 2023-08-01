@@ -327,6 +327,7 @@ export class DefaultActionExecutor implements ActionExecutor {
     if (!tab.views) {
       tab.views = [{ type: viewType } as View];
       if (tab.viewType === "html") {
+        Object.assign(tab, { model: undefined });
         Object.assign(tab.views[0], {
           resource: tab.resource,
           title: tab.title,
