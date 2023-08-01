@@ -129,16 +129,14 @@ export function Selection({
           optionLabel="title"
           optionValue="value"
           placeholder={placeholder}
-          icons={
-            hasValue
-              ? [
-                  {
-                    icon: "close",
-                    onClick: handleClear,
-                  },
-                ]
-              : []
-          }
+          icons={[
+            {
+              icon: "close",
+              hidden: !hasValue,
+              onClick: handleClear,
+            },
+            { icon: "arrow_drop_down" },
+          ]}
           {...selectProps}
           components={components}
         />

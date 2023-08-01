@@ -1,6 +1,11 @@
-import { Field } from "@/services/client/meta.types";
+import { PrimitiveAtom, useAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
+
 import { Box, Input, Select } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
+
+import { i18n } from "@/services/client/i18n";
+import { Field } from "@/services/client/meta.types";
 import {
   ChangeEvent,
   KeyboardEvent,
@@ -8,10 +13,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import { i18n } from "@/services/client/i18n";
+
 import { SearchState } from "./types";
-import { PrimitiveAtom, useAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
+
 import styles from "./search-column.module.scss";
 
 export interface SearchColumnProps {
@@ -82,19 +86,17 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
           optionValue="value"
           onFocus={handleFocus}
           onBlur={() => setFocus(false)}
-          icons={
-            selected
-              ? [
-                  {
-                    icon: "close",
-                    onClick: () => {
-                      setValue("");
-                      applySearch();
-                    },
-                  },
-                ]
-              : []
-          }
+          icons={[
+            {
+              icon: "close",
+              hidden: !selected,
+              onClick: () => {
+                setValue("");
+                applySearch();
+              },
+            },
+            { icon: "arrow_drop_down" },
+          ]}
           onKeyDown={handleKeyDown as (e: SyntheticEvent) => void}
         />
       </Box>

@@ -53,6 +53,7 @@ export function ThemeSelect(props: FieldProps<string>) {
           options={themes}
           optionValue="name"
           optionLabel="title"
+          icons={[{ icon: "arrow_drop_down" }]}
         />
       )}
     </FieldControl>
