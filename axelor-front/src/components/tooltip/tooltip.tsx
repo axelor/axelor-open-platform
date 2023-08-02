@@ -14,7 +14,7 @@ export function Tooltip({ children, title, content: Content }: TooltipProps) {
   const { open, targetEl, setTargetEl, setContentEl, onClickAway } =
     usePopperTrigger({
       trigger: "hover",
-      interactive: false,
+      interactive: true,
       delay: {
         open: 1000,
         close: 100
