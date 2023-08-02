@@ -74,7 +74,7 @@ uppercase equivalent of the configuration key. For example
 
 [source,sh]
 ----
-$ export AXELOR_CONFIG_DB_DEFAULT_PASSWORD=secret"
+$ export AXELOR_CONFIG_DB_DEFAULT_PASSWORD="secret"
 ----
 
 === System properties
