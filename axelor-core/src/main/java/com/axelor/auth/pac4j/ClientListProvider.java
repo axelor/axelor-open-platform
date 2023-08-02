@@ -300,7 +300,19 @@ public class ClientListProvider implements Provider<List<Client>> {
                     (oldValue, newValue) -> oldValue,
                     LinkedHashMap::new));
 
-    clients.addAll(configuredClients.values());
+    final String authDefault =
+        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
+    final Client defaultClient =
+        StringUtils.notBlank(authDefault)
+            ? Optional.ofNullable(configuredClients.get(authDefault))
+                .orElseThrow(() -> new NoSuchElementException(authDefault))
+            : configuredClients.values().iterator().next();
+
+    defaultClientName = defaultClient.getName();
+    clients.add(defaultClient);
+    configuredClients.values().stream()
+        .filter(client -> client != defaultClient)
+        .forEach(clients::add);
 
     settings
         .getList(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH)
@@ -336,17 +348,6 @@ public class ClientListProvider implements Provider<List<Client>> {
         info.put("icon", icon);
       }
       authPac4jInfo.setClientInfo(name, info);
-    }
-
-    final String authDefault =
-        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
-    if (StringUtils.notBlank(authDefault)) {
-      defaultClientName =
-          Optional.ofNullable(configuredClients.get(authDefault))
-              .map(Client::getName)
-              .orElseThrow(() -> new NoSuchElementException(authDefault));
-    } else {
-      defaultClientName = configuredClients.values().iterator().next().getName();
     }
 
     logger.info("Default client: {}", defaultClientName);
