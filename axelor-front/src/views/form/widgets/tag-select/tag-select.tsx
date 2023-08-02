@@ -1,19 +1,15 @@
 import { useAtom, useAtomValue } from "jotai";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { Box, SelectProps } from "@axelor/ui";
-import uniqueId from "lodash/uniqueId";
 
 import {
   EditorOptions,
   useBeforeSelect,
   useCompletion,
   useEditor,
+  useEditorInTab,
 } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
-import { FormView } from "@/services/client/meta.types";
-import { findView } from "@/services/client/meta-cache";
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
-import { useViewTab } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
 import { Chip } from "../selection";
@@ -71,22 +67,13 @@ export function TagSelect(
 ) {
   const { schema, valueAtom, formAtom, widgetAtom, readonly, selectProps } =
     props;
-  const {
-    target,
-    targetName,
-    targetSearch,
-    placeholder,
-    widgetAttrs,
-    formView,
-    gridView,
-    editWindow = widgetAttrs.editWindow || "popup",
-  } = schema;
+  const { target, targetName, targetSearch, placeholder, formView } = schema;
   const { attrs } = useAtomValue(widgetAtom);
 
   const [value, setValue] = useAtom(valueAtom);
   const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
   const getContext = usePrepareContext(formAtom);
-  const tab = useViewTab();
 
   const { title, focus, domain } = attrs;
   const canNew = schema.canNew !== false;
@@ -96,46 +83,14 @@ export function TagSelect(
     targetSearch,
   });
 
-  const handleEditInTab = useCallback(
-    async (record: DataRecord, readonly = false) => {
-      const model = target;
-      const { view } = await findView<FormView>({
-        type: "form",
-        name: formView,
-        model,
-      });
-      return openTab({
-        title: view?.title || "",
-        name: uniqueId("$act"),
-        model,
-        viewType: "form",
-        views: [
-          { name: formView, type: "form" },
-          {
-            type: "grid",
-            name: gridView,
-          },
-        ],
-        params: {
-          forceEdit: !readonly,
-        },
-        context: {
-          _showRecord: record.id,
-          __check_version: tab.action?.context?.__check_version,
-        },
-      });
-    },
-    [formView, gridView, target, tab.action]
-  );
-
   const handleEdit = useCallback(
     async (
       value: DataRecord,
       readonly = false,
       onSelect?: EditorOptions["onSelect"]
     ) => {
-      if (!tab.popup && editWindow === "blank" && (value?.id ?? 0) > 0) {
-        return handleEditInTab(value!, readonly);
+      if (showEditorInTab && (value?.id ?? 0) > 0) {
+        return showEditorInTab(value!, readonly);
       }
       return showEditor({
         title: title ?? "",
@@ -146,15 +101,7 @@ export function TagSelect(
         onSelect,
       });
     },
-    [
-      formView,
-      target,
-      title,
-      tab.popup,
-      editWindow,
-      showEditor,
-      handleEditInTab,
-    ]
+    [formView, target, title, showEditor, showEditorInTab]
   );
 
   const handleView = useCallback(

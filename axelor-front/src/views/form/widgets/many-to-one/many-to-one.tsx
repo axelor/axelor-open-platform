@@ -1,20 +1,19 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useRef } from "react";
-import uniqueId from "lodash/uniqueId";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
   useCompletion,
   useEditor,
+  useEditorInTab,
   useSelector,
 } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
@@ -24,9 +23,6 @@ import {
   CreatableSelect,
   CreatableSelectProps,
 } from "../tag-select/creatable-select";
-import { findView } from "@/services/client/meta-cache";
-import { FormView } from "@/services/client/meta.types";
-import { useViewTab } from "@/view-containers/views/scope";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
@@ -38,10 +34,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     placeholder,
     formView,
     gridView,
-    widgetAttrs,
-    editWindow = widgetAttrs.editWindow || "popup",
   } = schema;
-  const tab = useViewTab();
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
@@ -53,6 +46,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const getContext = usePrepareContext(formAtom);
   const showSelector = useSelector();
   const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
 
   const search = useCompletion({
     target,
@@ -104,43 +98,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
-  const handleEditInTab = useCallback(
-    async (record: DataRecord, readonly = false) => {
-      const model = target;
-      const { view } = await findView<FormView>({
-        type: "form",
-        name: formView,
-        model,
-      });
-      return openTab({
-        title: view?.title || "",
-        name: uniqueId("$act"),
-        model,
-        viewType: "form",
-        views: [
-          { name: formView, type: "form" },
-          {
-            type: "grid",
-            name: gridView,
-          },
-        ],
-        params: {
-          forceEdit: !readonly,
-        },
-        context: {
-          _showRecord: record.id,
-          __check_version: tab.action?.context?.__check_version,
-        },
-      });
-    },
-    [formView, gridView, target, tab.action]
-  );
-
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
       const $record = record ?? value;
-      if (!tab.popup && editWindow === "blank" && ($record?.id ?? 0) > 0) {
-        return handleEditInTab($record!, readonly);
+      if (showEditorInTab && ($record?.id ?? 0) > 0) {
+        return showEditorInTab($record!, readonly);
       }
       showEditor({
         title: title ?? "",
@@ -159,24 +121,22 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       target,
       formView,
       value,
-      tab.popup,
-      editWindow,
       getContext,
       showEditor,
       handleChange,
-      handleEditInTab,
+      showEditorInTab,
     ]
   );
 
   const handleView = useCallback(
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      if (isRefLink && value?.id) {
-        return handleEditInTab(value, true);
+      if (isRefLink && showEditorInTab && value?.id) {
+        return showEditorInTab(value, true);
       }
       return handleEdit(true);
     },
-    [isRefLink, value, handleEdit, handleEditInTab]
+    [isRefLink, value, handleEdit, showEditorInTab]
   );
 
   const handleCreate = useCallback(

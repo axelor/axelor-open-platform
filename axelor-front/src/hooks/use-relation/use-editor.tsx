@@ -4,14 +4,17 @@ import { useCallback } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
-import { dialogs } from "@/components/dialogs";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { FormView, Schema } from "@/services/client/meta.types";
+import { dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-
-import { FormView } from "@/services/client/meta.types";
+import { useViewTab } from "@/view-containers/views/scope";
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
+import { findView } from "@/services/client/meta-cache";
 import { showErrors, useGetErrors } from "@/views/form";
+
 import { initTab } from "../use-tabs";
 
 export type EditorOptions = {
@@ -27,6 +30,56 @@ export type EditorOptions = {
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
 };
+
+export function useEditorInTab(schema: Schema) {
+  const {
+    target,
+    formView,
+    gridView,
+    widgetAttrs,
+    widget,
+    editWindow = widgetAttrs.editWindow || "popup",
+  } = schema;
+  const tab = useViewTab();
+
+  const handleEdit = useCallback(
+    async (record: DataRecord, readonly = false) => {
+      const model = target;
+      const { view } = await findView<FormView>({
+        type: "form",
+        name: formView,
+        model,
+      });
+      return openTab({
+        title: view?.title || "",
+        name: uniqueId("$act"),
+        model,
+        viewType: "form",
+        views: [
+          { name: formView, type: "form" },
+          {
+            type: "grid",
+            name: gridView,
+          },
+        ],
+        params: {
+          forceEdit: !readonly,
+        },
+        context: {
+          _showRecord: record.id,
+          __check_version: tab.action?.context?.__check_version,
+        },
+      });
+    },
+    [formView, gridView, target, tab.action]
+  );
+
+  if (!tab.popup && (editWindow === "blank" || widget === "ref-link")) {
+    return handleEdit;
+  }
+
+  return null;
+}
 
 export function useEditor() {
   return useCallback(async (options: EditorOptions) => {
