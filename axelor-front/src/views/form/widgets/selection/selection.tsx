@@ -38,6 +38,7 @@ export function Chip({
           onClick={onRemove}
           onMouseDown={(e) => {
             e.preventDefault();
+            e.stopPropagation();
           }}
         >
           <MaterialIcon icon="close" fontSize={20} />

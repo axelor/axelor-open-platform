@@ -15,7 +15,12 @@ import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
-export function TagSelectComponent(props: CreatableSelectProps) {
+export function TagSelectComponent({
+  onView,
+  ...props
+}: CreatableSelectProps & {
+  onView?: (e: any, value: DataRecord) => void;
+}) {
   const { targetName } = props.schema;
 
   const getOptionLabel = useCallback(
@@ -31,7 +36,7 @@ export function TagSelectComponent(props: CreatableSelectProps) {
       MultiValue: (props: any) => {
         const { data, removeProps } = props;
         return (
-          <Box me={1}>
+          <Box me={1} onMouseDown={(e) => onView?.(e, data)}>
             <Chip
               color={"indigo"}
               title={getOptionLabel(data)}
@@ -41,7 +46,7 @@ export function TagSelectComponent(props: CreatableSelectProps) {
         );
       },
     }),
-    [getOptionLabel]
+    [getOptionLabel, onView]
   );
 
   return (
@@ -149,7 +154,7 @@ export function TagSelect(
               key={val?.id}
               as="a"
               href="#"
-              onClick={(e) => handleView(e, val)}
+              onClick={(e: any) => handleView(e, val)}
             >
               <Chip title={getOptionLabel(val)} color={"indigo"} />
             </Box>
@@ -166,6 +171,7 @@ export function TagSelect(
           fetchOptions={handleCompletion}
           {...beforeSelectProps}
           {...selectProps}
+          onView={handleView}
           onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
           optionLabel={getOptionLabel}
