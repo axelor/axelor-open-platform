@@ -206,8 +206,9 @@ export class DefaultActionExecutor implements ActionExecutor {
     if (data.errors) {
       let hasErrors = false;
       for (const [name, value] of Object.entries(data.errors)) {
-        if (value.trim().length === 0) continue;
-        hasErrors = true;
+        if (value.trim().length > 0) {
+          hasErrors = true;
+        }
         this.#handler.setAttr(name, "error", value);
       }
       if (hasErrors) {

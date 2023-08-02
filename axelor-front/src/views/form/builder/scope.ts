@@ -331,10 +331,14 @@ function useActionAttrs({
           const state = statesByName[data.target] ?? {};
           const newState = {
             ...state,
-            attrs: {
-              ...state.attrs,
-              [data.name]: data.value,
-            },
+            ...(name === "error"
+              ? { errors: { ...state.errors, error: value } }
+              : {
+                  attrs: {
+                    ...state.attrs,
+                    [data.name]: data.value,
+                  },
+                }),
           };
 
           const newStates = updateStates(data.target, newState);
