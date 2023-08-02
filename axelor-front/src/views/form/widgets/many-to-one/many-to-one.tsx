@@ -26,6 +26,7 @@ import {
 } from "../tag-select/creatable-select";
 import { findView } from "@/services/client/meta-cache";
 import { FormView } from "@/services/client/meta.types";
+import { useViewTab } from "@/view-containers/views/scope";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
@@ -37,8 +38,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     placeholder,
     formView,
     gridView,
+    widgetAttrs,
+    editWindow = widgetAttrs.editWindow || "popup",
   } = schema;
-
+  const tab = useViewTab();
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
@@ -101,13 +104,49 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
+  const handleEditInTab = useCallback(
+    async (record: DataRecord, readonly = false) => {
+      const model = target;
+      const { view } = await findView<FormView>({
+        type: "form",
+        name: formView,
+        model,
+      });
+      return openTab({
+        title: view?.title || "",
+        name: uniqueId("$act"),
+        model,
+        viewType: "form",
+        views: [
+          { name: formView, type: "form" },
+          {
+            type: "grid",
+            name: gridView,
+          },
+        ],
+        params: {
+          forceEdit: !readonly,
+        },
+        context: {
+          _showRecord: record.id,
+          __check_version: tab.action?.context?.__check_version,
+        },
+      });
+    },
+    [formView, gridView, target, tab.action]
+  );
+
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
+      const $record = record ?? value;
+      if (!tab.popup && editWindow === "blank" && ($record?.id ?? 0) > 0) {
+        return handleEditInTab($record!, readonly);
+      }
       showEditor({
         title: title ?? "",
         model: target,
         viewName: formView,
-        record: record ?? value,
+        record: $record,
         readonly,
         context: {
           _parent: getContext(),
@@ -115,36 +154,29 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         onSelect: handleChange,
       });
     },
-    [showEditor, title, target, formView, value, handleChange, getContext]
+    [
+      title,
+      target,
+      formView,
+      value,
+      tab.popup,
+      editWindow,
+      getContext,
+      showEditor,
+      handleChange,
+      handleEditInTab,
+    ]
   );
 
   const handleView = useCallback(
     async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       if (isRefLink && value?.id) {
-        const model = target;
-        const { view } = await findView<FormView>({
-          type: "form",
-          name: formView,
-          model,
-        });
-        return openTab({
-          title: view?.title || "",
-          name: uniqueId("$act"),
-          model,
-          viewType: "form",
-          views: [{ name: formView, type: "form" }],
-          params: {
-            forceEdit: false,
-          },
-          context: {
-            _showRecord: value.id,
-          },
-        });
+        return handleEditInTab(value, true);
       }
       return handleEdit(true);
     },
-    [isRefLink, formView, target, value, handleEdit]
+    [isRefLink, value, handleEdit, handleEditInTab]
   );
 
   const handleCreate = useCallback(
