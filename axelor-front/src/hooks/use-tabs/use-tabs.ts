@@ -15,6 +15,7 @@ import { ActionView, SavedFilter } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import { device } from "@/utils/device";
 import { useRoute } from "../use-route";
+import { useViewTab } from "@/view-containers/views/scope";
 
 /**
  * The route state of a specific view type.
@@ -414,8 +415,9 @@ const openTabAtom = atom(
 
     if (singleTab && activeTab) {
       // close current one
+      const canConfirm = activeTab.action.params?.["show-confirm"] !== false;
       const closed = await dialogs.confirmDirty(
-        async () => get(activeTab.state).dirty ?? false,
+        async () => (canConfirm && get(activeTab.state).dirty) ?? false,
         async () => set(closeTabAtom, activeTab.action)
       );
       if (!closed) return activeTab;

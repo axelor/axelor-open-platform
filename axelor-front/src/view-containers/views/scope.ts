@@ -15,6 +15,7 @@ import {
 } from "@/hooks/use-tabs";
 import { useFormScope } from "@/views/form/builder/scope";
 import { usePrepareContext } from "@/views/form/builder";
+import { dialogs } from "@/components/dialogs";
 import { DataContext } from "@/services/client/data.types";
 
 const fallbackAtom: TabAtom = atom(
@@ -237,4 +238,25 @@ export function useViewTabRefresh(viewType: string, refresh: () => void) {
       document.removeEventListener("tab:refresh", handleRefresh);
     };
   }, [handleRefresh]);
+}
+
+export function useViewConfirmDirty() {
+  const tab = useViewTab();
+  const canConfirm = tab.action.params?.["show-confirm"] !== false;
+  return useCallback(
+    (
+      check: () => Promise<boolean>,
+      callback: () => Promise<any>,
+      options?: {
+        title?: string;
+        content?: React.ReactNode;
+      }
+    ) =>
+      dialogs.confirmDirty(
+        async () => canConfirm && (await check()),
+        callback,
+        options
+      ),
+    [canConfirm]
+  );
 }

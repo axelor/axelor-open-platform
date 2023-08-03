@@ -41,6 +41,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
   useViewAction,
+  useViewConfirmDirty,
   useViewDirtyAtom,
   useViewProps,
   useViewRoute,
@@ -219,6 +220,7 @@ const FormContainer = memo(function FormContainer({
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord);
 
+  const showConfirmDirty = useViewConfirmDirty();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
   const archived = useAtomValue(
@@ -347,13 +349,13 @@ const FormContainer = memo(function FormContainer({
   );
 
   const onNew = useCallback(async () => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => isDirty,
       async () => {
         doEdit(null, { readonly: false, isNew: true });
       }
     );
-  }, [doEdit, isDirty]);
+  }, [doEdit, isDirty, showConfirmDirty]);
 
   const onEdit = useCallback(async () => {
     setAttrs((prev) => ({
@@ -458,7 +460,7 @@ const FormContainer = memo(function FormContainer({
         if (id <= 0) {
           return onNew();
         }
-        dialogs.confirmDirty(
+        showConfirmDirty(
           async () => isDirty,
           async () => {
             const rec = await doRead(id);
@@ -466,7 +468,7 @@ const FormContainer = memo(function FormContainer({
           }
         );
       },
-      [doEdit, doRead, formAtom, isDirty, onNew]
+      [doEdit, doRead, formAtom, isDirty, onNew, showConfirmDirty]
     )
   );
 
@@ -720,7 +722,7 @@ const FormContainer = memo(function FormContainer({
     ),
     action: useCallback(() => {
       void (async () => {
-        await dialogs.confirmDirty(
+        await showConfirmDirty(
           async () => isDirty,
           async () => {
             setSearchFocusTabId(tab.id);
@@ -728,7 +730,14 @@ const FormContainer = memo(function FormContainer({
           }
         );
       })();
-    }, [isDirty, searchViewType, setSearchFocusTabId, tab.id, switchTo]),
+    }, [
+      isDirty,
+      searchViewType,
+      setSearchFocusTabId,
+      tab.id,
+      switchTo,
+      showConfirmDirty,
+    ]),
   });
 
   // register tab:refresh

@@ -32,6 +32,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  useViewConfirmDirty,
   useViewContext,
   useViewDirtyAtom,
   useViewProps,
@@ -83,6 +84,7 @@ function GridInner(props: ViewProps<GridView>) {
   const [dirty, setDirty] = useAtom(useViewDirtyAtom());
   const [detailsRecord, setDetailsRecord] = useState<DataRecord | null>(null);
 
+  const showConfirmDirty = useViewConfirmDirty();
   const switchTo = useViewSwitch();
   const showEditor = useEditor();
   const { isMobile } = useDevice();
@@ -406,7 +408,7 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onNewInDetails = useCallback(() => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => dirty,
       async () => {
         initDetailsRef.current = false;
@@ -414,21 +416,21 @@ function GridInner(props: ViewProps<GridView>) {
         fetchAndSetDetailsRecord({ id: nextId() });
       }
     );
-  }, [dirty, clearSelection, fetchAndSetDetailsRecord]);
+  }, [dirty, clearSelection, fetchAndSetDetailsRecord, showConfirmDirty]);
 
   const onRefreshInDetails = useCallback(() => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => dirty,
       async () => fetchAndSetDetailsRecord(detailsRecord)
     );
-  }, [fetchAndSetDetailsRecord, dirty, detailsRecord]);
+  }, [fetchAndSetDetailsRecord, dirty, detailsRecord, showConfirmDirty]);
 
   const onCancelInDetails = useCallback(() => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => dirty,
       async () => fetchAndSetDetailsRecord(null)
     );
-  }, [dirty, fetchAndSetDetailsRecord]);
+  }, [dirty, fetchAndSetDetailsRecord, showConfirmDirty]);
 
   const selectedRow =
     (selectedRows?.length ?? 0) > 0 ? rows?.[selectedCell?.[0]!] : null;

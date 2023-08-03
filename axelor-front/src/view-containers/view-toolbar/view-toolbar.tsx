@@ -12,6 +12,7 @@ import { toTitleCase } from "@/utils/names";
 import {
   useSelectViewState,
   useViewAction,
+  useViewConfirmDirty,
   useViewDirtyAtom,
   useViewSwitch,
   useViewTab,
@@ -116,7 +117,7 @@ export function ToolbarActions({
     ): CommandItemProps => {
       const action = (item as Button).onClick || (item as MenuItem).action;
       const text = item.showTitle !== false ? item.title : "";
-      const { icon, prompt, help } = (item as Button);
+      const { icon, prompt, help } = item as Button;
       const key = `action_${++ind}`;
       const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
       return {
@@ -194,6 +195,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const { toolbar, menubar } = view;
   const pageActions = onPrev || onNext || paginationActions;
 
+  const showConfirmDirty = useViewConfirmDirty();
   const dirtyAtom = useViewDirtyAtom();
   const dirty = useAtomValue(dirtyAtom) ?? false;
 
@@ -207,7 +209,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const switchToView = useAtomCallback(
     useCallback(
       (get, set, type: string) => {
-        dialogs.confirmDirty(
+        showConfirmDirty(
           async () => dirty,
           async () => {
             const { props = {} } = get(viewTab.state);
@@ -222,23 +224,23 @@ export function ViewToolBar(props: ViewToolBarProps) {
           }
         );
       },
-      [dirty, switchTo, viewTab.state, viewType]
+      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty]
     )
   );
 
   const handlePrev = useCallback(() => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => dirty,
       async () => onPrev?.()
     );
-  }, [dirty, onPrev]);
+  }, [dirty, onPrev, showConfirmDirty]);
 
   const handleNext = useCallback(() => {
-    dialogs.confirmDirty(
+    showConfirmDirty(
       async () => dirty,
       async () => onNext?.()
     );
-  }, [dirty, onNext]);
+  }, [dirty, onNext, showConfirmDirty]);
 
   useNavShortcuts({
     viewType: view.type,

@@ -66,10 +66,13 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
       (get, set, tab: string) => {
         const found = tabs.find((x) => x.id === tab);
         if (found) {
-          const { state } = found;
+          const {
+            state,
+            action: { params },
+          } = found;
           const dirty = get(state).dirty ?? false;
           return dialogs.confirmDirty(
-            async () => dirty,
+            async () => params?.["show-confirm"] !== false && dirty,
             async () => close(tab)
           );
         }
@@ -296,13 +299,14 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
 
   const { data } = useSession();
   const showClose = tab.id !== data?.user?.action;
+  const canConfirm = tab.action.params?.["show-confirm"] !== false;
 
   const handleCloseConfirm = useCallback(async () => {
     await dialogs.confirmDirty(
-      async () => dirty,
+      async () => canConfirm && dirty,
       async () => close(tab.id)
     );
-  }, [close, dirty, tab.id]);
+  }, [close, dirty, canConfirm, tab.id]);
 
   const handleClose = useCallback<React.MouseEventHandler<HTMLDivElement>>(
     async (e) => {
