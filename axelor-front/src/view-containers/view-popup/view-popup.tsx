@@ -221,7 +221,7 @@ function Footer({
     if (handler.getState === undefined) return close(true);
     const state = handler.getState();
     const record = state.record;
-    const canSave = popupCanSave && (state.dirty || !record.id);
+    const canSave = state.dirty || !record.id;
     const onSave = handler.onSave;
 
     try {
@@ -235,7 +235,7 @@ function Footer({
     } catch (e) {
       // TODO: show error
     }
-  }, [close, handler, popupCanReload, popupCanSave, triggerReload]);
+  }, [close, handler, popupCanReload, triggerReload]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe((data) => {
@@ -250,9 +250,11 @@ function Footer({
       <Button variant="secondary" onClick={handleCancel}>
         {i18n.get("Cancel")}
       </Button>
-      <Button variant="primary" onClick={handleConfirm}>
-        {i18n.get("OK")}
-      </Button>
+      {popupCanSave && (
+        <Button variant="primary" onClick={handleConfirm}>
+          {i18n.get("OK")}
+        </Button>
+      )}
     </Box>
   );
 }
