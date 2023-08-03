@@ -179,6 +179,7 @@ const DataViews = memo(function DataViews({
   const defaultSearchFilter = params?.["default-search-filters"];
   const dashlet = actionName?.startsWith("$dashlet");
   const dashletSearch = params?.["dashlet.canSearch"];
+  const showArchived = params?.['showArchived'];
   const hasAdvanceSearch = dashlet ? dashletSearch : true;
 
   useAsyncEffect(async () => {
@@ -229,11 +230,12 @@ const DataViews = memo(function DataViews({
     }
 
     setSearchState((_state) => {
-      const state = { ..._state, domains, items };
+      const state = { ..._state, domains, items, archived: showArchived };
       return { ...state, ...prepareAdvanceSearchQuery(state) };
     });
   }, [
     model,
+    showArchived,
     hasAdvanceSearch,
     defaultSearchFilter,
     filterName,
