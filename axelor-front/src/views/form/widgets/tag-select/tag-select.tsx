@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useMemo } from "react";
 import { Box, SelectProps } from "@axelor/ui";
 
@@ -19,7 +20,7 @@ export function TagSelectComponent({
   onView,
   ...props
 }: CreatableSelectProps & {
-  onView?: (e: any, value: DataRecord) => void;
+  onView?: (e: any, value: DataRecord, readonly?: boolean) => void;
 }) {
   const { targetName } = props.schema;
 
@@ -36,7 +37,7 @@ export function TagSelectComponent({
       MultiValue: (props: any) => {
         const { data, removeProps } = props;
         return (
-          <Box me={1} onMouseDown={(e) => onView?.(e, data)}>
+          <Box me={1} onMouseDown={(e) => onView?.(e, data, false)}>
             <Chip
               color={"indigo"}
               title={getOptionLabel(data)}
@@ -83,6 +84,23 @@ export function TagSelect(
     targetSearch,
   });
 
+  const handleSelect = useAtomCallback(
+    useCallback(
+      (get, set, record: DataRecord) => {
+        if ((record?.id ?? 0) > 0) {
+          const values = get(valueAtom) || [];
+          set(
+            valueAtom,
+            values.map?.((v) =>
+              v.id === record.id ? { ...v, ...record, version: undefined } : v
+            )
+          );
+        }
+      },
+      [valueAtom]
+    )
+  );
+
   const handleEdit = useCallback(
     async (
       value: DataRecord,
@@ -98,16 +116,16 @@ export function TagSelect(
         viewName: formView,
         record: value,
         readonly,
-        onSelect,
+        onSelect: onSelect ?? handleSelect,
       });
     },
-    [formView, target, title, showEditor, showEditorInTab]
+    [formView, target, title, showEditor, showEditorInTab, handleSelect]
   );
 
   const handleView = useCallback(
-    (e: MouseEvent<HTMLAnchorElement>, value: DataRecord) => {
+    (e: MouseEvent<HTMLAnchorElement>, value: DataRecord, readonly = true) => {
       e.preventDefault();
-      return handleEdit(value, true);
+      return handleEdit(value, readonly);
     },
     [handleEdit]
   );
