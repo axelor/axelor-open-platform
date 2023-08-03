@@ -1,12 +1,18 @@
-import { useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer } from "react";
+import { useSetAtom } from "jotai";
 
 import { Box } from "@axelor/ui";
 
-import { useExpression } from "@/hooks/use-parser";
-import { useViewContext, useViewTabRefresh } from "@/view-containers/views/scope";
 import { HtmlView } from "@/services/client/meta.types";
-import { ViewProps } from "../types";
+import { useExpression } from "@/hooks/use-parser";
+import {
+  useViewContext,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 
+import { ViewProps } from "../types";
 import styles from "./html.module.scss";
 
 export function Html(props: ViewProps<HtmlView>) {
@@ -16,7 +22,10 @@ export function Html(props: ViewProps<HtmlView>) {
   const name = view.name || view.resource;
   const parseURL = useExpression(name!);
   const getContext = useViewContext();
-  const [updateCount, onRefresh] = useReducer((x => x + 1), 0);
+  const [updateCount, onRefresh] = useReducer((x) => x + 1, 0);
+
+  const { dashlet } = useViewTab();
+  const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   const url = useMemo(() => {
     let url = `${name}`;
@@ -27,23 +36,31 @@ export function Html(props: ViewProps<HtmlView>) {
       url = parseURL(getContext() ?? {});
     }
 
-    const stamp = new Date().getTime();
+    return url;
+  }, [name, getContext, parseURL]);
 
-    return `${url}${url.includes("?") ? "&" : "?"}${stamp}${updateCount}`;
-  }, [name, updateCount, getContext, parseURL]);
+  useEffect(() => {
+    if (dashlet) {
+      setDashletHandlers({
+        view,
+        onRefresh: onRefresh as any,
+      });
+    }
+  }, [dashlet, view, onRefresh, setDashletHandlers]);
 
   // register tab:refresh
   useViewTabRefresh("html", onRefresh);
+
+  const key = `${url}_${updateCount}`;
 
   return (
     <Box flexGrow={1} position="relative" className={styles.container}>
       <Box d="flex" position="absolute" className={styles.frame}>
         {url && (
           <Box
+            key={key}
             as="iframe"
             title="HTML View"
-            frameBorder="0"
-            scrolling="auto"
             src={url}
             w={100}
             h={100}
