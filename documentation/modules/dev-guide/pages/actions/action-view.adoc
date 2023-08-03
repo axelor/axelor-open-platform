@@ -51,14 +51,14 @@ The `<view-param>` parameter name accepts the following options:
 * `download` - `true` to mark view as pointing to a downloadable link
 * `kanban-hide-columns` - hide specific columns in kanban (comma separated list of names)
 * `kanban-column-width` - desired kanban column width
+* `auto-reload` - enable view auto-reloading with value specified in seconds
 
 Special context variable names
 
 * `_showRecord` - show the record by given id in form view
 * `_showSingle` - `true` to show the only record in form view
 
-
-example:
+Examples:
 
 [source,xml]
 ----
