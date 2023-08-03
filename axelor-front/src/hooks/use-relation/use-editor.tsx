@@ -38,7 +38,7 @@ export function useEditorInTab(schema: Schema) {
     gridView,
     widgetAttrs,
     widget,
-    editWindow = widgetAttrs.editWindow || "popup",
+    editWindow = widgetAttrs?.editWindow || "popup",
   } = schema;
   const tab = useViewTab();
 
