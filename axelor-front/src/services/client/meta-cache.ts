@@ -21,7 +21,9 @@ export async function findActionView(
   name: string,
   context?: DataContext
 ): Promise<ActionView> {
-  return fetchAction(name, context).then((view) => ({ ...view, name }));
+  return fetchAction(name, context).then((view) =>
+    view ? { ...view, name } : view
+  );
 }
 
 export async function findView<T extends ViewType>({

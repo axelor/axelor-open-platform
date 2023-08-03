@@ -1,3 +1,6 @@
+import { dialogs } from "@/components/dialogs";
+import { alerts } from "@/components/alerts";
+
 import { request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 import {
@@ -27,6 +30,25 @@ export async function menus(type: MenuType): Promise<MenuItem[]> {
   return Promise.reject(resp.status);
 }
 
+async function processActionResult(data: ActionResult) {
+  if (data.info) {
+    await dialogs.box({
+      title: data.info.title,
+      content: data.info.message,
+      yesNo: false,
+      yesTitle: data.info.confirmBtnTitle,
+    });
+  }
+
+  if (data.notify) {
+    if (Array.isArray(data.notify)) {
+      data.notify.forEach((x) => alerts.info(x));
+    } else {
+      alerts.info(data.notify);
+    }
+  }
+}
+
 export async function actionView(
   name: string,
   context?: DataContext
@@ -46,7 +68,8 @@ export async function actionView(
     const { status, data } = await resp.json();
     if (status === 0) {
       const [{ view }] = data || [{ view: null }];
-      return view;
+      !view && data?.map?.(processActionResult);
+      return view ?? null;
     }
     return reject(data);
   }
