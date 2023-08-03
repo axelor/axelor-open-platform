@@ -37,6 +37,7 @@ export type TabProps = {
   selectedCell?: null | number[];
   selectedRows?: null | number[];
   selectedId?: number;
+  name?: string;
   readonly?: boolean;
   recordId?: boolean;
 };

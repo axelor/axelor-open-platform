@@ -20,6 +20,7 @@ export const DEFAULT_ATTRS = {
   title: undefined as unknown as string,
   css: undefined as unknown as string,
   icon: undefined as unknown as string,
+  url: undefined as unknown as string,
   selectionIn: undefined as unknown as string,
   canNew: undefined as unknown as boolean,
   canView: undefined as unknown as boolean,

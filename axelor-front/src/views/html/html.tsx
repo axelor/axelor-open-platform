@@ -7,6 +7,7 @@ import { HtmlView } from "@/services/client/meta.types";
 import { useExpression } from "@/hooks/use-parser";
 import {
   useViewContext,
+  useViewProps,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
@@ -19,13 +20,15 @@ export function Html(props: ViewProps<HtmlView>) {
   const {
     meta: { view },
   } = props;
-  const name = view.name || view.resource;
-  const parseURL = useExpression(name!);
   const getContext = useViewContext();
+  const [viewProps] = useViewProps();
   const [updateCount, onRefresh] = useReducer((x) => x + 1, 0);
 
   const { dashlet } = useViewTab();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
+
+  const name = viewProps?.name || view.name || view.resource;
+  const parseURL = useExpression(name!);
 
   const url = useMemo(() => {
     let url = `${name}`;

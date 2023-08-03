@@ -5,7 +5,7 @@ import uniqueId from "lodash/uniqueId";
 
 import { Box, clsx } from "@axelor/ui";
 
-import { Tab, initTab } from "@/hooks/use-tabs";
+import { Tab, TabProps, initTab } from "@/hooks/use-tabs";
 import { DataContext } from "@/services/client/data.types";
 import { CardsView, Schema } from "@/services/client/meta.types";
 import { DashletView } from "@/view-containers/view-dashlet";
@@ -16,7 +16,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 
-import { WidgetProps } from "../../builder";
+import { Attrs, WidgetProps } from "../../builder";
 import { DashletActions } from "./dashlet-actions";
 import classes from "./dashlet.module.scss";
 
@@ -25,6 +25,7 @@ interface DashletProps {
   className?: string;
   readonly?: boolean;
   dashboard?: boolean;
+  attrs?: Attrs;
   getContext?: () => DataContext;
   viewId?: number;
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
@@ -37,6 +38,7 @@ function DashletTitle({ title }: { title?: string }) {
 
 export function DashletComponent({
   schema,
+  attrs,
   className,
   readonly,
   viewId,
@@ -71,30 +73,47 @@ export function DashletComponent({
     });
   }, [action, canSearch, getContext]);
 
-  const setGridViewProps = useAtomCallback(
-    useCallback((get, set, tab: Tab, readonly: boolean = false) => {
-      const props = get(tab.state).props;
-      const gridProps = props?.grid;
-      if (gridProps?.readonly !== readonly) {
-        set(tab.state, {
-          props: {
-            ...props,
-            grid: {
-              ...gridProps,
-              readonly,
+  const setTabViewProps = useAtomCallback(
+    useCallback(
+      (
+        get,
+        set,
+        tab: Tab,
+        viewType: string,
+        param: keyof TabProps,
+        value: any
+      ) => {
+        const props = get(tab.state).props;
+        const viewProps = props?.[viewType];
+        if (viewProps?.[param] !== value) {
+          set(tab.state, {
+            props: {
+              ...props,
+              [viewType]: {
+                ...viewProps,
+                [param]: value,
+              },
             },
-          },
-        });
-      }
-    }, [])
+          });
+        }
+      },
+      []
+    )
   );
 
   useEffect(() => {
     // for grid view to update readonly to show edit icon
     if (tab && tab?.action?.viewType === "grid") {
-      setGridViewProps(tab, readonly);
+      setTabViewProps(tab, "grid", "readonly", readonly);
     }
-  }, [tab, readonly, setGridViewProps]);
+  }, [tab, readonly, setTabViewProps]);
+
+  useEffect(() => {
+    // for html view to update url
+    if (tab && tab?.action?.viewType === "html") {
+      setTabViewProps(tab, "html", "name", attrs?.url);
+    }
+  }, [tab, attrs?.url, setTabViewProps]);
 
   if (state === "loading") return null;
 
@@ -185,8 +204,9 @@ function DashletViewLoad({
 }
 
 export function Dashlet(props: WidgetProps) {
-  const { schema, readonly, formAtom } = props;
+  const { schema, readonly, widgetAtom, formAtom } = props;
   const tab = useViewTab();
+  const { attrs } = useAtomValue(widgetAtom);
 
   const getContext = useAtomCallback(
     useCallback(
@@ -205,6 +225,7 @@ export function Dashlet(props: WidgetProps) {
   return (
     <DashletComponent
       schema={schema}
+      attrs={attrs}
       readonly={readonly}
       getContext={getContext}
     />

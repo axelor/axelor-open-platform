@@ -61,6 +61,10 @@ interface SaveHandler {
 
 type RefreshHandler = () => Promise<void>;
 
+const ATTR_MAPPER: Record<string, string> = {
+  "url:set": "url",
+};
+
 export class FormActionHandler extends DefaultActionHandler {
   #prepareContext: ContextCreator;
   #saveHandler?: SaveHandler;
@@ -96,7 +100,7 @@ export class FormActionHandler extends DefaultActionHandler {
     this.notify({
       type: "attr",
       target,
-      name,
+      name: ATTR_MAPPER[name] ?? name,
       value,
     });
   }
