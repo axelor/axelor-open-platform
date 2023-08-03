@@ -35,6 +35,7 @@ import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 
 import {
+  FieldError,
   FieldLabel,
   FieldProps,
   usePermission,
@@ -501,135 +502,138 @@ export function OneToMany({
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
   return (
-    <Panel
-      className={styles.container}
-      header={
-        showTitle && (
-          <div className={styles.title}>
-            <FieldLabel
-              className={styles.titleText}
-              schema={schema}
-              formAtom={formAtom}
-              widgetAtom={widgetAtom}
-            />
-          </div>
-        )
-      }
-      toolbar={{
-        iconOnly: true,
-        items: [
-          ...(isManyToMany
-            ? [
+    <>
+      <Panel
+        className={styles.container}
+        header={
+          showTitle && (
+            <div className={styles.title}>
+              <FieldLabel
+                className={styles.titleText}
+                schema={schema}
+                formAtom={formAtom}
+                widgetAtom={widgetAtom}
+              />
+            </div>
+          )
+        }
+        toolbar={{
+          iconOnly: true,
+          items: [
+            ...(isManyToMany
+              ? [
+                  {
+                    key: "select",
+                    text: i18n.get("Select"),
+                    iconProps: {
+                      icon: "search",
+                    },
+                    onClick: onSelect,
+                    hidden: !canSelect,
+                  } as CommandItemProps,
+                ]
+              : []),
+            {
+              key: "new",
+              text: i18n.get("New"),
+              iconProps: {
+                icon: "add",
+              },
+              onClick: editable && canEdit ? onAddInGrid : onAdd,
+              hidden: !canNew,
+            },
+            {
+              key: "edit",
+              text: i18n.get("Edit"),
+              iconProps: {
+                icon: "edit",
+              },
+              disabled: !hasRowSelected,
+              hidden: !canEdit || !hasRowSelected,
+              onClick: () => {
+                const [rowIndex] = selectedRows || [];
+                const record = rows[rowIndex]?.record;
+                record && onEdit(record);
+              },
+            },
+            {
+              key: "delete",
+              text: i18n.get("Delete"),
+              iconProps: {
+                icon: "delete",
+              },
+              disabled: !hasRowSelected,
+              hidden: !canDelete || !hasRowSelected,
+              onClick: () => {
+                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+              },
+            },
+            {
+              key: "more",
+              iconOnly: true,
+              hidden: !canCopy && !canExport,
+              iconProps: {
+                icon: "arrow_drop_down",
+              },
+              items: [
                 {
-                  key: "select",
-                  text: i18n.get("Select"),
-                  iconProps: {
-                    icon: "search",
-                  },
-                  onClick: onSelect,
-                  hidden: !canSelect,
-                } as CommandItemProps,
-              ]
-            : []),
-          {
-            key: "new",
-            text: i18n.get("New"),
-            iconProps: {
-              icon: "add",
+                  key: "duplicate",
+                  text: i18n.get("Duplicate"),
+                  hidden: !canDuplicate,
+                  onClick: onDuplicate,
+                },
+                {
+                  key: "export",
+                  text: i18n.get("Export"),
+                  hidden: !canExport,
+                  onClick: onExport,
+                },
+              ],
             },
-            onClick: editable && canEdit ? onAddInGrid : onAdd,
-            hidden: !canNew,
-          },
-          {
-            key: "edit",
-            text: i18n.get("Edit"),
-            iconProps: {
-              icon: "edit",
-            },
-            disabled: !hasRowSelected,
-            hidden: !canEdit || !hasRowSelected,
-            onClick: () => {
-              const [rowIndex] = selectedRows || [];
-              const record = rows[rowIndex]?.record;
-              record && onEdit(record);
-            },
-          },
-          {
-            key: "delete",
-            text: i18n.get("Delete"),
-            iconProps: {
-              icon: "delete",
-            },
-            disabled: !hasRowSelected,
-            hidden: !canDelete || !hasRowSelected,
-            onClick: () => {
-              onDelete(selectedRows!.map((ind) => rows[ind]?.record));
-            },
-          },
-          {
-            key: "more",
-            iconOnly: true,
-            hidden: !canCopy && !canExport,
-            iconProps: {
-              icon: "arrow_drop_down",
-            },
-            items: [
-              {
-                key: "duplicate",
-                text: i18n.get("Duplicate"),
-                hidden: !canDuplicate,
-                onClick: onDuplicate,
-              },
-              {
-                key: "export",
-                text: i18n.get("Export"),
-                hidden: !canExport,
-                onClick: onExport,
-              },
-            ],
-          },
-        ],
-      }}
-    >
-      <GridComponent
-        className={styles["grid"]}
-        ref={gridRef}
-        showEditIcon={canEdit || canView}
-        readonly={readonly || !canEdit}
-        editable={editable && canEdit}
-        records={records}
-        view={(viewData?.view || schema) as GridView}
-        fields={viewData?.fields || fields}
-        columnAttrs={columnAttrs}
-        state={state}
-        setState={setState}
-        onEdit={canEdit ? onEdit : canView ? onView : noop}
-        onView={canView ? (canEdit ? onEdit : onView) : noop}
-        onSave={onSave}
-        onSearch={onSearch}
-        onRowReorder={onRowReorder}
-        {...(!canNew &&
-          editable && {
-            onRecordAdd: undefined,
-          })}
-        {...(hasMasterDetails &&
-          selected &&
-          !detailRecord && {
-            onRowClick,
-          })}
-      />
-      {hasMasterDetails && detailMeta ? (
-        <Box d="flex" flexDirection="column" p={2}>
-          <DetailsForm
-            meta={detailMeta}
-            readonly={readonly}
-            record={detailRecord}
-            onNew={onAddInDetail}
-            onClose={onCloseInDetail}
-            onSave={onSave}
-          />
-        </Box>
-      ) : null}
-    </Panel>
+          ],
+        }}
+      >
+        <GridComponent
+          className={styles["grid"]}
+          ref={gridRef}
+          showEditIcon={canEdit || canView}
+          readonly={readonly || !canEdit}
+          editable={editable && canEdit}
+          records={records}
+          view={(viewData?.view || schema) as GridView}
+          fields={viewData?.fields || fields}
+          columnAttrs={columnAttrs}
+          state={state}
+          setState={setState}
+          onEdit={canEdit ? onEdit : canView ? onView : noop}
+          onView={canView ? (canEdit ? onEdit : onView) : noop}
+          onSave={onSave}
+          onSearch={onSearch}
+          onRowReorder={onRowReorder}
+          {...(!canNew &&
+            editable && {
+              onRecordAdd: undefined,
+            })}
+          {...(hasMasterDetails &&
+            selected &&
+            !detailRecord && {
+              onRowClick,
+            })}
+        />
+        {hasMasterDetails && detailMeta ? (
+          <Box d="flex" flexDirection="column" p={2}>
+            <DetailsForm
+              meta={detailMeta}
+              readonly={readonly}
+              record={detailRecord}
+              onNew={onAddInDetail}
+              onClose={onCloseInDetail}
+              onSave={onSave}
+            />
+          </Box>
+        ) : null}
+      </Panel>
+      <FieldError widgetAtom={widgetAtom} />
+    </>
   );
 }

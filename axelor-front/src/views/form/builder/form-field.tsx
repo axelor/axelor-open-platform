@@ -3,7 +3,7 @@ import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 
-import { Box, InputLabel } from "@axelor/ui";
+import { Box, InputFeedback, InputLabel } from "@axelor/ui";
 
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -77,8 +77,19 @@ export function FieldControl({
       ) : (
         render()
       )}
+      <FieldError widgetAtom={widgetAtom} />
     </Box>
   );
+}
+
+export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
+  const error = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetAtom, (state) => state.errors?.error),
+      [widgetAtom]
+    )
+  );
+  return error && <InputFeedback invalid>{error}</InputFeedback>;
 }
 
 export function FieldLabel({
