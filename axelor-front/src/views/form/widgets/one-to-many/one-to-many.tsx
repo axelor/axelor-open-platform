@@ -21,6 +21,7 @@ import {
   EditorOptions,
   useBeforeSelect,
   useEditor,
+  useEditorInTab,
   useSelector,
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
@@ -167,6 +168,7 @@ export function OneToMany({
   const getContext = usePrepareContext(formAtom);
 
   const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
   const [state, setState] = useGridState();
   const dataStore = useMemo(() => new DataStore(model), [model]);
@@ -295,6 +297,10 @@ export function OneToMany({
       onSelect?: (record: DataRecord) => void,
       onSave?: (record: DataRecord) => void
     ) => {
+      const { record } = options || {};
+      if (showEditorInTab && (record?.id ?? 0) > 0) {
+        return showEditorInTab(record!, options?.readonly ?? false);
+      }
       showEditor({
         title: title ?? "",
         model,
@@ -308,7 +314,15 @@ export function OneToMany({
         ...options,
       });
     },
-    [showEditor, title, model, formView, getContext, isManyToMany]
+    [
+      showEditor,
+      showEditorInTab,
+      title,
+      model,
+      formView,
+      getContext,
+      isManyToMany,
+    ]
   );
 
   const onSave = useCallback(
