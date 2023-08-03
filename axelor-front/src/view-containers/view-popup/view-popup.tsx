@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
 import { ScopeProvider } from "jotai-molecules";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -79,7 +80,9 @@ export const PopupDialog = memo(function PopupDialog({
   handler,
   buttons,
 }: PopupProps) {
-  const { title } = tab;
+  const title = useAtomValue(
+    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state])
+  );
   const [maximized, setMaximized] = useState<boolean>(maximize ?? false);
   const [expanded, setExpanded] = useState<boolean>(true);
 
@@ -87,7 +90,7 @@ export const PopupDialog = memo(function PopupDialog({
     <ScopeProvider scope={PopupScope} value={{}}>
       <ModalDialog
         open={open}
-        title={title}
+        title={title || tab.title}
         size="xl"
         classes={{
           root: clsx({
