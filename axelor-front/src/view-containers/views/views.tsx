@@ -56,14 +56,20 @@ function ViewContainer({
   searchAtom?: AdvancedSearchAtom;
   dataStore?: DataStore;
 }) {
-  const { model } = tab.action;
+  const { model, params } = tab.action;
   const { state, data } = useAsync(
     async () => loadView({ model, ...view }),
     [model, view]
   );
 
+  const forceTitle = params?.["forceTitle"];
   const viewData = data?.meta?.view;
-  const viewTitle = (view.type === "form" && viewData?.title) || tab.title;
+  const viewTitle =
+    (!forceTitle &&
+      view.type === "form" &&
+      view.type === viewData?.type &&
+      viewData?.title) ||
+    tab.title;
   const viewName = viewData?.name;
 
   const setTabTitle = useSetAtom(
@@ -179,7 +185,7 @@ const DataViews = memo(function DataViews({
   const defaultSearchFilter = params?.["default-search-filters"];
   const dashlet = actionName?.startsWith("$dashlet");
   const dashletSearch = params?.["dashlet.canSearch"];
-  const showArchived = params?.['showArchived'];
+  const showArchived = params?.["showArchived"];
   const hasAdvanceSearch = dashlet ? dashletSearch : true;
 
   useAsyncEffect(async () => {
