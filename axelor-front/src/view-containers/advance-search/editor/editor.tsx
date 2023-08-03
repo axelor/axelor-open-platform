@@ -26,13 +26,13 @@ import { toKebabCase } from "@/utils/names";
 import styles from "./editor.module.scss";
 
 export const getEditorDefaultState = () =>
-({
-  title: "",
-  operator: "and",
-  shared: false,
-  selected: false,
-  criteria: [],
-} as AdvancedSearchState["editor"]);
+  ({
+    title: "",
+    operator: "and",
+    shared: false,
+    selected: false,
+    criteria: [],
+  } as AdvancedSearchState["editor"]);
 
 function FormControl({
   title,
@@ -257,25 +257,30 @@ export function Editor({
     const fieldList = Object.values(fields || {}).reduce(
       (list: Property[], field: Property) => {
         const { type, large } = field as any;
-        const item = items?.find(item => item.name === field.name);
+        const item = items?.find((item) => item.name === field.name);
         if (
           type === "binary" ||
           large ||
           field.json ||
           field.encrypted ||
           ["id", "version", "archived", "selected"].includes(field.name!) ||
-          (item?.hidden)
+          item?.hidden
         ) {
           return list;
         }
-        return [...list, item ? { ...field, title: item.title ?? field.title } : field];
-      }, [] as Property[]);
+        return [
+          ...list,
+          item ? { ...field, title: item.title ?? field.title } : field,
+        ];
+      },
+      [] as Property[]
+    );
 
     items?.forEach((item) => {
       if (!fields?.[item.name] && !item.hidden) {
         fieldList.push(item);
       }
-    })
+    });
 
     Object.keys(jsonFields || {}).forEach((prefix) => {
       const { title } = fields?.[prefix as any] || {};
@@ -294,8 +299,9 @@ export function Editor({
         fieldList.push({
           ...(field as any),
           name: key,
-          title: `${field.title || field.autoTitle} ${title ? `(${title})` : ""
-            }`,
+          title: `${field.title || field.autoTitle} ${
+            title ? `(${title})` : ""
+          }`,
         } as Property);
       });
     });
@@ -361,16 +367,17 @@ export function Editor({
     id && title && filters?.find((f) => f.id === id)?.title !== title;
 
   return (
-    <Box d="flex" flexDirection="column" alignItems="start" g={2}>
+    <Box d="flex" flexDirection="column" alignItems="start" pt={2} g={2}>
       {contextFields.length > 0 && (
-        <Box d="flex" alignItems="center" gap={8}>
-          <Box
-            aria-label="close"
-            onClick={() =>
-              setContextField((data) => ({ ...data, value: null }))
-            }
-          >
-            <MaterialIcon icon="close" />
+        <Box d="flex" alignItems="center" g={2}>
+          <Box d="flex" alignItems="center">
+            <MaterialIcon
+              icon="close"
+              className={styles.icon}
+              onClick={() =>
+                setContextField((data) => ({ ...data, value: null }))
+              }
+            />
           </Box>
           <Select
             name={"ctxField"}
@@ -413,7 +420,13 @@ export function Editor({
           />
         </FormControl>
       </Box>
-      <Box d="flex" flexDirection="column" alignItems="flex-start" g={2} w={100}>
+      <Box
+        d="flex"
+        flexDirection="column"
+        alignItems="flex-start"
+        g={2}
+        w={100}
+      >
         {criteria.map((item: any, index: number) => (
           <Criteria
             key={index}
