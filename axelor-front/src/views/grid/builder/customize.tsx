@@ -247,7 +247,7 @@ export function useCustomizePopup({
         ).concat([
           {
             name: "cancel",
-            title: i18n.get("Cancel"),
+            title: i18n.get("Close"),
             variant: "secondary",
             onClick(fn) {
               fn(false);

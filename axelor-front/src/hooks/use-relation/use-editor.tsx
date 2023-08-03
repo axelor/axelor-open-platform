@@ -190,7 +190,7 @@ function Footer({
   return (
     <Box d="flex" g={2}>
       <Button variant="secondary" onClick={handleClose}>
-        {i18n.get("Cancel")}
+        {i18n.get("Close")}
       </Button>
       <Button variant="primary" onClick={handleConfirm}>
         {i18n.get("OK")}

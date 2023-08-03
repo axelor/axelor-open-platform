@@ -248,7 +248,7 @@ function Footer({
   return (
     <Box d="flex" g={2}>
       <Button variant="secondary" onClick={handleCancel}>
-        {i18n.get("Cancel")}
+        {i18n.get("Close")}
       </Button>
       {popupCanSave && (
         <Button variant="primary" onClick={handleConfirm}>
