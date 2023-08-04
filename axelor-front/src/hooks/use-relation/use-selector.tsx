@@ -18,7 +18,7 @@ import { initTab } from "../use-tabs";
 
 export type SelectorOptions = {
   model: string;
-  title: string;
+  title?: string;
   multiple?: boolean;
   viewName?: string;
   domain?: string;
@@ -50,7 +50,7 @@ export function useSelector() {
 
     const tab = await initTab({
       name: uniqueId("$selector"),
-      title: view?.title || title,
+      title: title || view?.title || "",
       model,
       viewType: "grid",
       views: [{ type: "grid", name: viewName }],

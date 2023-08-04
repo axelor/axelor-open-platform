@@ -202,7 +202,6 @@ export function OneToManyEdit({
   const onAdd = useCallback(() => {
     const onClose = onPopupViewInit();
     showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
       model,
       multiple: true,
       viewName: gridView,
@@ -229,7 +228,6 @@ export function OneToManyEdit({
   }, [
     onPopupViewInit,
     showSelector,
-    title,
     model,
     gridView,
     domain,

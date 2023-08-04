@@ -272,7 +272,6 @@ export function OneToMany({
     const _domain = (await beforeSelect()) ?? domain;
     const _domainContext = _domain ? getContext() : {};
     showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
       model,
       multiple: true,
       viewName: gridView,
@@ -282,7 +281,6 @@ export function OneToMany({
     });
   }, [
     showSelector,
-    title,
     model,
     gridView,
     domain,

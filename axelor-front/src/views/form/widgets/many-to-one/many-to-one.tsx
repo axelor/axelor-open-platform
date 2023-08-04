@@ -152,7 +152,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     const _domain = (await beforeSelect(true)) ?? domain;
     const _domainContext = _domain ? getContext() : {};
     showSelector({
-      title: i18n.get("Select {0}", title ?? ""),
       model: target,
       viewName: gridView,
       multiple: false,
@@ -168,7 +167,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     domain,
     getContext,
     showSelector,
-    title,
     target,
     gridView,
     ensureRelated,
