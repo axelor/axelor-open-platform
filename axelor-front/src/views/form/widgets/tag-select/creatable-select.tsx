@@ -11,11 +11,14 @@ const ADD_ON_OPTIONS: Record<string, number> = {
   Create: -1,
   CreateInput: -2,
   CreateAndSelectInput: -3,
+  Search: -4,
 };
 
 export type CreatableSelectProps = SelectProps & {
   schema: Schema;
   canCreate?: boolean;
+  canSearch?: boolean;
+  onSearch?: () => void;
   onCreate?: (
     value: DataRecord,
     readonly?: boolean,
@@ -26,6 +29,8 @@ export type CreatableSelectProps = SelectProps & {
 export function CreatableSelect({
   schema,
   canCreate,
+  canSearch,
+  onSearch,
   onCreate,
   onChange,
   ...selectProps
@@ -47,6 +52,9 @@ export function CreatableSelect({
           Object.values(ADD_ON_OPTIONS).includes(v?.id!)
         );
       if (value && addOnOption) {
+        if (addOnOption.id === ADD_ON_OPTIONS.Search) {
+          return onSearch?.();
+        }
         const record: DataRecord = {};
         const updateValue = (record: DataRecord) =>
           onChange(
@@ -76,13 +84,23 @@ export function CreatableSelect({
         onChange(value);
       }
     },
-    [onCreate, onChange, createNames, target]
+    [onCreate, onSearch, onChange, createNames, target]
   );
 
   const addOnOptions = useMemo(() => {
-    if (!canCreate) return [];
+    const options: any[] =
+      canSearch && onSearch
+        ? [
+            {
+              id: ADD_ON_OPTIONS.Search,
+              [optionLabel]: i18n.get("Search more..."),
+            },
+          ]
+        : [];
+    if (!canCreate) return options;
     if (inputText && createNames.length) {
       return [
+        ...options,
         {
           id: ADD_ON_OPTIONS.CreateInput,
           _text: inputText,
@@ -96,15 +114,16 @@ export function CreatableSelect({
       ];
     }
     return [
+      ...options,
       { id: ADD_ON_OPTIONS.Create, [optionLabel]: i18n.get("Create...") },
     ];
-  }, [canCreate, optionLabel, createNames, inputText]);
+  }, [canCreate, canSearch, onSearch, optionLabel, createNames, inputText]);
 
   return (
     <Select
       {...selectProps}
       onChange={handleChange}
-      {...(canCreate && {
+      {...(addOnOptions.length > 0 && {
         addOnOptions,
       })}
       {...(createNames.length > 0 && {

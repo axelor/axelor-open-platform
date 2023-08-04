@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { MouseEvent, useCallback, useRef } from "react";
+import { MouseEvent, useCallback, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
@@ -38,6 +37,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
+  const [hasMore, setHasMore] = useState(false);
 
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, domain } = attrs;
@@ -185,7 +185,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         _domain,
         _domainContext,
       };
-      const { records } = await search(value, options);
+      const { records, page } = await search(value, options);
+      setHasMore((page.totalCount ?? 0) > records.length);
       return records;
     },
     [beforeSelect, domain, getContext, search]
@@ -277,6 +278,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           fetchOptions={handleCompletion}
           optionLabel={getOptionLabel}
           optionValue={"id"}
+          {...(canSelect && { canSearch: hasMore, onSearch: handleSelect })}
           {...beforeSelectProps}
         />
       )}
