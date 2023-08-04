@@ -3639,9 +3639,11 @@ const findBootstrapIcon = (icon: string) => {
   let name = findName(icon);
   let found: BootstrapIconName | undefined;
 
-  if (icon in fa) found = fa[icon];
-  if (icon in bootstrap) found = icon as BootstrapIconName;
-  if (name in bootstrap) found = name as BootstrapIconName;
+  if (icon && icon.includes("fa-")) found = fa[icon];
+  if(!found) {
+    if (icon in bootstrap) found = icon as BootstrapIconName;
+    if (name in bootstrap) found = name as BootstrapIconName;
+  }
 
   return found;
 };
