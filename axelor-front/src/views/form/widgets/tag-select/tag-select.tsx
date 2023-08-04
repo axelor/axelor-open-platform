@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { MouseEvent, useCallback, useMemo } from "react";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { Box, SelectProps } from "@axelor/ui";
 
 import {
@@ -9,10 +9,17 @@ import {
   useCompletion,
   useEditor,
   useEditorInTab,
+  useSelector,
 } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 
-import { FieldControl, FieldProps, usePrepareContext } from "../../builder";
+import {
+  FieldControl,
+  FieldProps,
+  usePermission,
+  usePrepareContext,
+} from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
@@ -73,19 +80,25 @@ export function TagSelect(
     targetName,
     targetSearch,
     placeholder,
+    gridView,
     formView,
     orderBy: sortBy,
     limit,
+    searchLimit,
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
+  const [hasMore, setHasMore] = useState(false);
 
   const [value, setValue] = useAtom(valueAtom);
   const showEditor = useEditor();
+  const showSelector = useSelector();
   const showEditorInTab = useEditorInTab(schema);
   const getContext = usePrepareContext(formAtom);
+  const { hasButton } = usePermission(schema, widgetAtom);
 
   const { title, focus, domain } = attrs;
-  const canNew = schema.canNew !== false;
+  const canNew = hasButton("new");
+
   const search = useCompletion({
     sortBy,
     limit,
@@ -96,16 +109,20 @@ export function TagSelect(
 
   const handleSelect = useAtomCallback(
     useCallback(
-      (get, set, record: DataRecord) => {
-        if ((record?.id ?? 0) > 0) {
-          const values = get(valueAtom) || [];
-          set(
-            valueAtom,
-            values.map?.((v) =>
-              v.id === record.id ? { ...v, ...record, version: undefined } : v
-            )
-          );
-        }
+      (get, set, records: DataRecord[]) => {
+        const values = get(valueAtom) || [];
+        const ids = values.map((x) => x.id);
+        const newValues = records.filter(({ id }) => !ids.includes(id));
+
+        set(valueAtom, [
+          ...values.map?.((v) => {
+            const record = records.find(
+              (record) => v.id === record.id && (record?.id ?? 0) > 0
+            );
+            return record ? { ...v, ...record, version: undefined } : v;
+          }),
+          ...newValues.map((value) => ({ ...value, version: undefined })),
+        ]);
       },
       [valueAtom]
     )
@@ -126,7 +143,7 @@ export function TagSelect(
         viewName: formView,
         record: value,
         readonly,
-        onSelect: onSelect ?? handleSelect,
+        onSelect: onSelect ?? ((record: DataRecord) => handleSelect([record])),
       });
     },
     [formView, target, title, showEditor, showEditorInTab, handleSelect]
@@ -150,11 +167,34 @@ export function TagSelect(
         _domain,
         _domainContext,
       };
-      const { records } = await search(value, options);
+      const { records, page } = await search(value, options);
+      setHasMore((page.totalCount ?? 0) > records.length);
       return records;
     },
     [search, domain, beforeSelect, getContext]
   );
+
+  const handleSearch = useCallback(async () => {
+    const _domain = (await beforeSelect(true)) ?? domain;
+    const _domainContext = _domain ? getContext() : {};
+    showSelector({
+      model: target,
+      viewName: gridView,
+      domain: _domain,
+      context: _domainContext,
+      limit: searchLimit,
+      onSelect: handleSelect,
+    });
+  }, [
+    beforeSelect,
+    domain,
+    getContext,
+    showSelector,
+    target,
+    gridView,
+    searchLimit,
+    handleSelect,
+  ]);
 
   const handleChange = useCallback(
     (value: any[]) =>
@@ -203,6 +243,8 @@ export function TagSelect(
           fetchOptions={handleCompletion}
           {...beforeSelectProps}
           {...selectProps}
+          canSearch={hasMore}
+          onSearch={handleSearch}
           onView={handleView}
           onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
