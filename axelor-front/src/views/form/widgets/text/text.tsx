@@ -15,7 +15,7 @@ export function Text({
     "onFocus" | "onBlur" | "autoFocus"
   >;
 }) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, height, placeholder } = schema;
   const { onBlur } = inputProps || {};
   const theme = useAppTheme();
@@ -59,6 +59,7 @@ export function Text({
           as="textarea"
           rows={height || 5}
           id={uid}
+          invalid={invalid}
           placeholder={placeholder}
           value={value || ""}
           required={required}

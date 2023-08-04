@@ -9,7 +9,7 @@ import { FieldControl, FieldProps } from "../../builder";
 import styles from "./boolean.module.scss";
 
 export function Boolean(props: FieldProps<boolean>) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, name, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const {
@@ -27,6 +27,7 @@ export function Boolean(props: FieldProps<boolean>) {
         autoFocus={focus}
         m={0}
         id={uid}
+        invalid={invalid}
         type="checkbox"
         className={styles.input}
         checked={!!value}
