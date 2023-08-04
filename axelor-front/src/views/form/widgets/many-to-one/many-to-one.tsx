@@ -32,6 +32,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     targetSearch,
     widget,
     placeholder,
+    orderBy: sortBy,
     formView,
     gridView,
   } = schema;
@@ -49,6 +50,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const showEditorInTab = useEditorInTab(schema);
 
   const search = useCompletion({
+    sortBy,
     target,
     targetName,
     targetSearch,

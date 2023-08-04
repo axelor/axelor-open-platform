@@ -9,8 +9,9 @@ export function useCompletion(options: {
   targetName?: string;
   targetSearch?: string[];
   limit?: number;
+  sortBy?: string;
 }) {
-  const { target, targetName, targetSearch, limit = 20 } = options;
+  const { target, targetName, targetSearch, sortBy, limit = 20 } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
     () => [[targetName], targetSearch].flat().filter(Boolean) as string[],
@@ -27,6 +28,7 @@ export function useCompletion(options: {
     ) => {
       const { _domain, _domainContext } = options || {};
       return dataSource.search({
+        sortBy: sortBy?.split?.(","),
         limit,
         fields: uniq([
           "id",
@@ -49,7 +51,7 @@ export function useCompletion(options: {
         },
       });
     },
-    [dataSource, limit, names, targetName, targetSearch]
+    [dataSource, sortBy, limit, names, targetName, targetSearch]
   );
 
   return search;

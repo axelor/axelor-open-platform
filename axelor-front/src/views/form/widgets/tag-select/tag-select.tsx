@@ -68,7 +68,14 @@ export function TagSelect(
 ) {
   const { schema, valueAtom, formAtom, widgetAtom, readonly, selectProps } =
     props;
-  const { target, targetName, targetSearch, placeholder, formView } = schema;
+  const {
+    target,
+    targetName,
+    targetSearch,
+    placeholder,
+    formView,
+    orderBy: sortBy,
+  } = schema;
   const { attrs } = useAtomValue(widgetAtom);
 
   const [value, setValue] = useAtom(valueAtom);
@@ -79,6 +86,7 @@ export function TagSelect(
   const { title, focus, domain } = attrs;
   const canNew = schema.canNew !== false;
   const search = useCompletion({
+    sortBy,
     target,
     targetName,
     targetSearch,
