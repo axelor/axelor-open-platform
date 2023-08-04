@@ -184,9 +184,10 @@ const DataViews = memo(function DataViews({
   const filterName = params?.["search-filters"];
   const defaultSearchFilter = params?.["default-search-filters"];
   const dashlet = actionName?.startsWith("$dashlet");
+  const selector = actionName?.startsWith("$selector");
   const dashletSearch = params?.["dashlet.canSearch"];
   const showArchived = params?.["showArchived"];
-  const hasAdvanceSearch = dashlet ? dashletSearch : true;
+  const hasAdvanceSearch = !selector && (dashlet ? dashletSearch : true);
 
   useAsyncEffect(async () => {
     if (!hasAdvanceSearch) return;
