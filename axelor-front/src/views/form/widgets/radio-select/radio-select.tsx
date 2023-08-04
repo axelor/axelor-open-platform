@@ -14,7 +14,7 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
   const { schema, readonly, valueAtom } = props;
   const { direction, nullable, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const selectionList = schema.selectionList as TSelection[];
+  const selectionList = (schema.selectionList as TSelection[]) ?? [];
 
   const isRadio = toKebabCase(widget) === "radio-select";
   const values = value

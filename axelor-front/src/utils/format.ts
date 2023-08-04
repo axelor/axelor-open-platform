@@ -188,8 +188,10 @@ const formatBoolean: Formatter = (value, opts = {}) => {
 };
 
 const formatSelection: Formatter = (value, opts = {}) => {
-  const { props: { selectionList = [] } = {} } = opts;
-  const item = selectionList.find((x) => String(x.value) === String(value));
+  const { props: { selectionList } = {} } = opts;
+  const item = (selectionList ?? []).find(
+    (x) => String(x.value) === String(value)
+  );
   return item?.title ?? "";
 };
 

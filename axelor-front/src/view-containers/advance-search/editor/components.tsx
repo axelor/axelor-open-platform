@@ -283,7 +283,7 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
     case "decimal":
       return <SimpleWidget {...props} {...{ component: NumberField, type }} />;
     case "enum":
-      const options = rest.field.selectionList.map(
+      const options = (rest.field.selectionList ?? []).map(
         ({ title, value, data }: any) => ({
           name: (data && data.value) || value,
           title: title,
