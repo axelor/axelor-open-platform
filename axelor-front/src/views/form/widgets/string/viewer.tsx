@@ -3,11 +3,17 @@ import { useMemo } from "react";
 
 const noop = () => {};
 
-export function ViewerInput({ value }: { value: string | number }) {
+export function ViewerInput({
+  value,
+  type,
+}: {
+  type?: string;
+  value: string | number;
+}) {
   return (
     <Input
       px={0}
-      type="text"
+      type={type || "text"}
       value={value}
       disabled
       readOnly

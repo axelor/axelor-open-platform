@@ -38,7 +38,10 @@ export function String({
   return (
     <FieldControl {...props} className={styles.container}>
       {readonly || trValue ? (
-        <ViewerInput value={trValue ?? value} />
+        <ViewerInput
+          {...(inputProps?.type === "password" && { type: "password" })}
+          value={trValue ?? value}
+        />
       ) : (
         <Input
           {...(focus && { key: "focused" })}
