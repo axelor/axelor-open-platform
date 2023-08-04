@@ -1,6 +1,8 @@
 import get from "lodash/get";
 import isNumber from "lodash/isNumber";
 
+import { GridColumn } from "@axelor/ui/grid";
+
 import {
   Criteria,
   DataRecord,
@@ -15,7 +17,6 @@ import { session } from "@/services/client/session";
 import { getNextOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { AdvancedSearchState } from "./types";
-import { GridColumn } from "@axelor/ui/grid";
 
 const ADVANCED_SEARCH_VIEWS = new Set(["grid", "cards", "kanban"]);
 
@@ -331,6 +332,20 @@ export function getFreeSearchCriteria(
   return [];
 }
 
+export function getContextFieldFilter(
+  contextField: AdvancedSearchState["contextField"],
+  contextFields: AdvancedSearchState["contextFields"]
+): (Filter & { title?: string }) | null {
+  const { name, value } = contextField ?? {};
+  const { id } = value ?? {};
+  const field = contextFields?.find((field) => field.name === name);
+  const targetName = field?.targetName;
+  const title = value?.[targetName ?? ""];
+  return name && id >= 0
+    ? { fieldName: `${name}.id`, operator: "=", value: id, title }
+    : null;
+}
+
 export function prepareAdvanceSearchQuery(
   state: AdvancedSearchState,
   hasEditorApply?: boolean
@@ -340,6 +355,8 @@ export function prepareAdvanceSearchQuery(
     filters,
     archived: _archived,
     editor,
+    contextField,
+    contextFields,
     fields = {},
     jsonFields = {},
   } = state;
@@ -365,12 +382,27 @@ export function prepareAdvanceSearchQuery(
     return editor;
   };
 
-  let { id, title, operator = "and" } = editor || {};
+  const {
+    id,
+    title,
+    operator: editorOperator,
+    criteria: editorCriteria,
+  } = editor ?? {};
+  let operator = editorOperator ?? "and";
+  let criteria: Criteria["criteria"] = getEditorCriteria(editorCriteria);
+
+  const contextFieldFilter = getContextFieldFilter(contextField, contextFields);
+  if (contextFieldFilter) {
+    criteria = [
+      contextFieldFilter,
+      ...(criteria?.length ? [{ operator, criteria }] : []),
+    ];
+    operator = "and";
+  }
 
   const $filters = filters?.filter(
     (f) => f.id !== id && f.checked && f.filterCustom
   );
-  let criteria: Criteria["criteria"] = getEditorCriteria(editor?.criteria);
 
   if (!hasEditorApply) {
     if ($filters?.length) {

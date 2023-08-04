@@ -1,3 +1,15 @@
+import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useAtomCallback } from "jotai/utils";
+import {
+  KeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import {
   Box,
   ClickAwayListener,
@@ -12,24 +24,15 @@ import {
   MaterialIcon,
   MaterialIconProps,
 } from "@axelor/ui/icons/material-icon";
-import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
-import { useAtomCallback } from "jotai/utils";
-import {
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
 
+import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
+import { Criteria, Filter } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { removeFilter, saveFilter } from "@/services/client/meta";
 import {
@@ -39,13 +42,15 @@ import {
   View,
 } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
-import { alerts } from "@/components/alerts";
 import { useViewAction, useViewTab } from "../views/scope";
 
 import { focusAndSelectInput } from "@/views/form";
 import { Chip } from "@/views/form/widgets";
 import { Editor } from "./editor";
-import { getEditorDefaultState } from "./editor/editor";
+import {
+  getContextFieldDefaultState,
+  getEditorDefaultState,
+} from "./editor/editor";
 import { FilterList } from "./filter-list";
 import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
 
@@ -72,6 +77,18 @@ export function AdvanceSearch({
   const { data: sessionInfo } = useSession();
   const setEditor = useSetAtom(
     useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom])
+  );
+  const setContextField = useSetAtom(
+    useMemo(
+      () => focusAtom(stateAtom, (o) => o.prop("contextField")),
+      [stateAtom]
+    )
+  );
+  const contextFields = useAtomValue(
+    useMemo(
+      () => focusAtom(stateAtom, (o) => o.prop("contextFields")),
+      [stateAtom]
+    )
   );
   const [filters, setFilters] = useAtom(
     useMemo(() => focusAtom(stateAtom, (o) => o.prop("filters")), [stateAtom])
@@ -139,11 +156,12 @@ export function AdvanceSearch({
           searchTextLabel: "",
           filterType: "all",
           editor: getEditorDefaultState(),
+          contextField: getContextFieldDefaultState(contextFields),
         });
         shouldApply && handleApply();
         handleClose();
       },
-      [stateAtom, handleApply, handleClose]
+      [stateAtom, handleApply, handleClose, contextFields]
     )
   );
 
@@ -222,19 +240,61 @@ export function AdvanceSearch({
           domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
         );
         try {
+          let filterCustom = JSON.parse(
+            (filter as SavedFilter).filterCustom || "{}"
+          ) as Criteria;
+
+          // Context field
+          if (contextFields?.length) {
+            let contextField = getContextFieldDefaultState(contextFields);
+            const { operator, criteria } = filterCustom;
+            if (
+              !filter.checked &&
+              operator === "and" &&
+              criteria?.length &&
+              criteria.length < 3
+            ) {
+              const {
+                fieldName,
+                operator,
+                value: id,
+                title,
+              } = criteria[0] as Filter & { title?: string };
+              const baseFieldName = fieldName?.replace(/.id$/, "");
+              const field = contextFields.find(
+                (field) => field.name === baseFieldName
+              );
+              if (field && operator === "=" && id) {
+                const { name, targetName = "name" } = field;
+                const value = { id, [targetName]: title };
+                contextField = { name, value };
+                filterCustom = criteria[1] as Criteria;
+              }
+            }
+            setContextField(contextField);
+          }
+
           setEditor(() =>
             filter.checked
               ? getEditorDefaultState()
               : {
                   ...filter,
-                  ...JSON.parse((filter as SavedFilter).filterCustom || "{}"),
+                  ...filterCustom,
                 }
           );
           handleApply(true);
         } catch {}
       }
     },
-    [setFilters, setFilterType, setDomains, setEditor, handleApply]
+    [
+      setFilters,
+      setFilterType,
+      setDomains,
+      setEditor,
+      setContextField,
+      handleApply,
+      contextFields,
+    ]
   );
 
   const handleFilterSave = useCallback(

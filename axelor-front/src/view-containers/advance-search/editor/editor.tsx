@@ -1,18 +1,16 @@
-import { ReactElement, useCallback, useEffect, useMemo } from "react";
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
 import { sortBy } from "lodash";
+import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
 import { Box, Button, Divider, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { moment, Moment } from "@/services/client/l10n";
-import { i18n } from "@/services/client/i18n";
-import { BooleanRadio, RelationalWidget, Select } from "./components";
-import { Criteria } from "./criteria";
 import { Filter } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { moment, Moment } from "@/services/client/l10n";
 import {
   AdvancedSearchAtom,
   Field,
@@ -21,8 +19,12 @@ import {
   SavedFilter,
   View,
 } from "@/services/client/meta.types";
-import { AdvancedSearchState } from "../types";
 import { toKebabCase } from "@/utils/names";
+import { AdvancedSearchState } from "../types";
+import { getContextFieldFilter } from "../utils";
+import { BooleanRadio, RelationalWidget, Select } from "./components";
+import { Criteria } from "./criteria";
+
 import styles from "./editor.module.scss";
 
 export const getEditorDefaultState = () =>
@@ -33,6 +35,11 @@ export const getEditorDefaultState = () =>
     selected: false,
     criteria: [],
   } as AdvancedSearchState["editor"]);
+
+export const getContextFieldDefaultState = (
+  contextFields: AdvancedSearchState["contextFields"]
+) =>
+  ({ name: contextFields?.[0]?.name } as AdvancedSearchState["contextField"]);
 
 function FormControl({
   title,
@@ -97,6 +104,12 @@ export function Editor({
   const [contextField, setContextField] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("contextField")),
+      [stateAtom]
+    )
+  );
+  const [contextFields, setContextFields] = useAtom(
+    useMemo(
+      () => focusAtom(stateAtom, (o) => o.prop("contextFields")),
       [stateAtom]
     )
   );
@@ -221,7 +234,27 @@ export function Editor({
 
   const handleFilterSave = useCallback(
     function handleFilterSave(savedAs?: boolean) {
-      const { id, version, title, shared, operator, criteria } = editor!;
+      const {
+        id,
+        version,
+        title,
+        shared,
+        operator: editorOperator,
+        criteria: editorCriteria,
+      } = editor!;
+      let operator = editorOperator ?? "and";
+      let criteria = editorCriteria;
+      const contextFieldFilter = getContextFieldFilter(
+        contextField,
+        contextFields
+      );
+      if (contextFieldFilter) {
+        criteria = [
+          contextFieldFilter,
+          ...(criteria?.length ? [{ operator, criteria }] : []),
+        ];
+        operator = "and";
+      }
       let savedFilter: Partial<SavedFilter> = {
         shared: shared || false,
         title: title,
@@ -243,7 +276,7 @@ export function Editor({
       }
       onSave?.(savedFilter as SavedFilter);
     },
-    [editor, onSave]
+    [editor, contextField, contextFields, onSave]
   );
 
   const handleFilterRemove = useCallback(
@@ -323,8 +356,8 @@ export function Editor({
     [$fields, contextField]
   );
 
-  const contextFields = useMemo(
-    () =>
+  useEffect(() => {
+    setContextFields(
       $fields.reduce((ctxFields, field) => {
         const {
           contextField,
@@ -346,9 +379,9 @@ export function Editor({
           } as unknown as Field);
         }
         return ctxFields;
-      }, [] as Field[]) as Field[],
-    [$fields]
-  );
+      }, [] as Field[])
+    );
+  }, [$fields, setContextFields]);
 
   const defaultContextFieldName = contextFields?.[0]?.name;
 
@@ -362,13 +395,13 @@ export function Editor({
 
   const selectedContextField =
     contextField?.name &&
-    contextFields.find((x) => x.name === contextField.name);
+    contextFields?.find((x) => x.name === contextField.name);
   const canSaveAs =
     id && title && filters?.find((f) => f.id === id)?.title !== title;
 
   return (
     <Box d="flex" flexDirection="column" alignItems="start" pt={2} g={2}>
-      {contextFields.length > 0 && (
+      {(contextFields?.length ?? 0) > 0 && (
         <Box d="flex" alignItems="center" g={2}>
           <Box d="flex" alignItems="center">
             <MaterialIcon
