@@ -9,6 +9,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { findView } from "@/services/client/meta-cache";
 
 import { i18n } from "@/services/client/i18n";
 import { useAtomValue } from "jotai";
@@ -40,9 +41,16 @@ export function useSelector() {
       onCreate,
       onSelect,
     } = options;
+
+    const { view } = await findView({
+      type: "grid",
+      name: viewName,
+      model,
+    });
+
     const tab = await initTab({
       name: uniqueId("$selector"),
-      title,
+      title: view?.title || title,
       model,
       viewType: "grid",
       views: [{ type: "grid", name: viewName }],
