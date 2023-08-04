@@ -206,6 +206,7 @@ export function OneToManyEdit({
       multiple: true,
       viewName: gridView,
       domain: domain,
+      orderBy: sortBy,
       context: getContext(),
       onClose,
       onSelect: (records) => {
@@ -228,6 +229,7 @@ export function OneToManyEdit({
   }, [
     onPopupViewInit,
     showSelector,
+    sortBy,
     model,
     gridView,
     domain,

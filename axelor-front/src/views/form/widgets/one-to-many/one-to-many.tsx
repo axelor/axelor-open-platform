@@ -275,12 +275,14 @@ export function OneToMany({
       model,
       multiple: true,
       viewName: gridView,
+      orderBy: sortBy,
       domain: _domain,
       context: _domainContext,
       onSelect: handleSelect,
     });
   }, [
     showSelector,
+    sortBy,
     model,
     gridView,
     domain,

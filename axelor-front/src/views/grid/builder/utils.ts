@@ -6,20 +6,26 @@ import { useAtom } from "jotai";
 import { GridView } from "@/services/client/meta.types";
 
 export function useGridState(
-  initialState?: Partial<GridState> & { view?: GridView },
+  initialState?: Partial<GridState> & {
+    view?: GridView;
+    params?: Record<string, any>;
+  },
   deps = []
 ) {
-  const { view, ...gridState } = initialState || {};
+  const { view, params, ...gridState } = initialState || {};
+  const groupBy: string = params?.groupBy || view?.groupBy;
+  const orderBy: string = params?.orderBy || view?.orderBy;
+
   const gridAtom = useMemo(
     () =>
       atomWithImmer<GridState>({
         rows: [],
         columns: [],
-        ...(view?.groupBy && {
-          groupBy: view.groupBy.split(",").map((name) => ({ name })),
+        ...(groupBy && {
+          groupBy: groupBy.split(",").map((name) => ({ name })),
         }),
-        ...(view?.orderBy && {
-          orderBy: view.orderBy
+        ...(orderBy && {
+          orderBy: orderBy
             .split(",")
             .map((name) =>
               name.startsWith("-")

@@ -157,6 +157,7 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
+  const { orderBy } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const {
     title,
@@ -197,13 +198,14 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         showSelector({
           model,
           domain,
+          orderBy,
           context: get(formAtom).record,
           onSelect: (records) => {
             set(valueAtom, records[0], true);
           },
         });
       },
-      [domain, formAtom, model, showSelector, valueAtom]
+      [domain, formAtom, model, orderBy, showSelector, valueAtom]
     )
   );
 

@@ -21,6 +21,7 @@ export type SelectorOptions = {
   title?: string;
   multiple?: boolean;
   viewName?: string;
+  orderBy?: string;
   domain?: string;
   context?: DataContext;
   onClose?: () => void;
@@ -34,6 +35,7 @@ export function useSelector() {
       title,
       model,
       viewName,
+      orderBy,
       multiple,
       domain,
       context,
@@ -56,6 +58,7 @@ export function useSelector() {
       views: [{ type: "grid", name: viewName }],
       params: {
         popup: true,
+        orderBy,
         "show-toolbar": false,
         "_popup-edit-icon": false,
         "_popup-multi-select": multiple,

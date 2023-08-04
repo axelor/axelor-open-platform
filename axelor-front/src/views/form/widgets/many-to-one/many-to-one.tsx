@@ -156,6 +156,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     showSelector({
       model: target,
       viewName: gridView,
+      orderBy: sortBy,
       multiple: false,
       domain: _domain,
       context: _domainContext,
@@ -171,6 +172,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     showSelector,
     target,
     gridView,
+    sortBy,
     ensureRelated,
     handleChange,
   ]);
