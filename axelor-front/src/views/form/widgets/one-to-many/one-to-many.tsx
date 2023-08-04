@@ -66,6 +66,7 @@ export function OneToMany({
     summaryView,
     gridView,
     orderBy: sortBy,
+    searchLimit,
     widgetAttrs,
     canExport = widgetAttrs.canExport,
     canCopy = widgetAttrs.canCopy,
@@ -278,6 +279,7 @@ export function OneToMany({
       orderBy: sortBy,
       domain: _domain,
       context: _domainContext,
+      limit: searchLimit,
       onSelect: handleSelect,
     });
   }, [
@@ -286,6 +288,7 @@ export function OneToMany({
     model,
     gridView,
     domain,
+    searchLimit,
     getContext,
     beforeSelect,
     handleSelect,

@@ -85,6 +85,7 @@ export function OneToManyEdit({
     gridView,
     views,
     orderBy: sortBy,
+    searchLimit,
   } = schema;
   const {
     attrs: { focus, domain },
@@ -208,6 +209,7 @@ export function OneToManyEdit({
       domain: domain,
       orderBy: sortBy,
       context: getContext(),
+      limit: searchLimit,
       onClose,
       onSelect: (records) => {
         setValue((value) => {
@@ -233,6 +235,7 @@ export function OneToManyEdit({
     model,
     gridView,
     domain,
+    searchLimit,
     isManyToMany,
     setValue,
     getContext,

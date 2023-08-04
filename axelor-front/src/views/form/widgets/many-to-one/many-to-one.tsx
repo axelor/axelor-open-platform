@@ -34,6 +34,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     orderBy: sortBy,
     formView,
     gridView,
+    searchLimit,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
@@ -160,6 +161,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       multiple: false,
       domain: _domain,
       context: _domainContext,
+      limit: searchLimit,
       onSelect: async (records) => {
         const value = await ensureRelated(records[0]);
         handleChange(value);
@@ -173,6 +175,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     target,
     gridView,
     sortBy,
+    searchLimit,
     ensureRelated,
     handleChange,
   ]);

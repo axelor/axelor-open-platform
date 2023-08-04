@@ -24,6 +24,7 @@ export type SelectorOptions = {
   orderBy?: string;
   domain?: string;
   context?: DataContext;
+  limit?: number;
   onClose?: () => void;
   onCreate?: () => void;
   onSelect?: (records: DataRecord[]) => void;
@@ -39,6 +40,7 @@ export function useSelector() {
       multiple,
       domain,
       context,
+      limit,
       onClose,
       onCreate,
       onSelect,
@@ -57,6 +59,7 @@ export function useSelector() {
       viewType: "grid",
       views: [{ type: "grid", name: viewName }],
       params: {
+        limit,
         popup: true,
         orderBy,
         "show-toolbar": false,
