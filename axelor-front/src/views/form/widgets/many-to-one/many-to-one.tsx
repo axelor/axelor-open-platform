@@ -241,7 +241,14 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           placeholder={placeholder}
           icons={
             isSuggestBox
-              ? [{ icon: "arrow_drop_down" }]
+              ? [
+                  {
+                    hidden: !canEdit || !canView,
+                    icon: "edit",
+                    onClick: () => handleEdit(),
+                  },
+                  { icon: "arrow_drop_down" },
+                ]
               : [
                   {
                     hidden: !canEdit || !canView,
