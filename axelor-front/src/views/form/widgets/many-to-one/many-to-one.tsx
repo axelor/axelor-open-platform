@@ -34,6 +34,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     orderBy: sortBy,
     formView,
     gridView,
+    limit,
     searchLimit,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
@@ -52,6 +53,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const search = useCompletion({
     sortBy,
+    limit,
     target,
     targetName,
     targetSearch,

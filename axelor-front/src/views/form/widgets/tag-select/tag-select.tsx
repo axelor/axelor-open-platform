@@ -75,6 +75,7 @@ export function TagSelect(
     placeholder,
     formView,
     orderBy: sortBy,
+    limit,
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
 
@@ -87,6 +88,7 @@ export function TagSelect(
   const canNew = schema.canNew !== false;
   const search = useCompletion({
     sortBy,
+    limit,
     target,
     targetName,
     targetSearch,
