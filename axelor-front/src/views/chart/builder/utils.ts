@@ -296,7 +296,7 @@ const FIELD_FORMATTERS: Record<string, (d: any, config?: any) => any> = {
       d = parseInt(d);
     }
     if (isNumber(d)) {
-      return moment(`${moment().year()}-${d - 1}-1`).format(f || "MMM");
+      return moment(`${moment().year()}-${d}-1`).format(f || "MMM");
     }
     if (isString(d) && d.indexOf("-") > 0) {
       return moment(d).format(f || "MMM, YYYY");
@@ -304,7 +304,7 @@ const FIELD_FORMATTERS: Record<string, (d: any, config?: any) => any> = {
     return d;
   },
   year: function (d: any) {
-    return moment(`${moment().year()}-${d - 1}-1`).format("YYYY");
+    return moment(`${moment().year()}-${d}-1`).format("YYYY");
   },
   number: (d: any) => Math.round(parseInt(d)),
   decimal: (d: any, config: any) => Formatters.decimal(d, { props: config }),
