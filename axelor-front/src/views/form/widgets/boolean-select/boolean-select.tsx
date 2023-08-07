@@ -20,7 +20,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
     falseText = i18n.get("No"),
     trueText = i18n.get("Yes"),
   } = widgetAttrs || {};
-  const [value = false, setValue] = useAtom(valueAtom);
+  const [value = nullable ? null : false, setValue] = useAtom(valueAtom);
   const {
     attrs: { focus },
   } = useAtomValue(widgetAtom);
