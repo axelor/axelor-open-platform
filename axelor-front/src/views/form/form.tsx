@@ -520,23 +520,33 @@ const FormContainer = memo(function FormContainer({
     }
   }, [dataStore, doEdit, record.id]);
 
-  const onArchive = useCallback(
-    async (archived = true) => {
-      if (record.id) {
-        const confirmed = await dialogs.confirm({
-          content: archived
-            ? i18n.get("Do you really want to archive the selected record?")
-            : i18n.get("Do you really want to unarchive the selected record?"),
-        });
-        if (confirmed) {
-          const id = record.id!;
-          const version = record.version!;
-          await dataStore.save({ id, version, archived });
-          switchTo("grid");
+  const onArchive = useAtomCallback(
+    useCallback(
+      async (get, set, archived: boolean = true) => {
+        if (record.id) {
+          const state = get(formAtom);
+          const confirmed = await dialogs.confirm({
+            content: archived
+              ? i18n.get("Do you really want to archive the selected record?")
+              : i18n.get(
+                  "Do you really want to unarchive the selected record?"
+                ),
+          });
+          if (confirmed) {
+            const id = record.id!;
+            const version = state.record.version!;
+            const res = await dataStore.save({ id, version, archived });
+            if (!res) return;
+            if (prevType) {
+              switchTo(prevType);
+            } else {
+              onRefresh();
+            }
+          }
         }
-      }
-    },
-    [dataStore, record.id, record.version, switchTo]
+      },
+      [dataStore, record.id, prevType, formAtom, switchTo, onRefresh]
+    )
   );
 
   const onAudit = useAtomCallback(
@@ -838,13 +848,13 @@ const FormContainer = memo(function FormContainer({
                 {
                   key: "s1",
                   divider: true,
-                  hidden: !canArchive,
+                  hidden: !canArchive || isDirty,
                 },
                 {
                   key: "archive",
                   text: archived ? i18n.get("Unarchive") : i18n.get("Archive"),
                   onClick: () => onArchive(!archived),
-                  hidden: !canArchive,
+                  hidden: !canArchive || isDirty,
                 },
                 {
                   key: "s2",
