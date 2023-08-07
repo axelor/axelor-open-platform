@@ -217,6 +217,7 @@ const FormContainer = memo(function FormContainer({
 
   const defaultRecord = useRef({ [defaultSymbol]: true }).current;
   const { id: tabId, popup, popupOptions } = useViewTab();
+  const [, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord);
 
@@ -628,6 +629,10 @@ const FormContainer = memo(function FormContainer({
       });
     }
   }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers, actionHandler]);
+
+  useEffect(() => {
+    setViewProps((props) => ({ ...props, readonly }));
+  }, [readonly, setViewProps]);
 
   const tab = useViewTab();
   const { active, close: closeTab } = useTabs();

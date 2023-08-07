@@ -168,6 +168,8 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const showInPortal = items.length > 0 && !!container;
   const showInplace = items.length > 0 && !showInPortal;
 
+  useTabAutoReload(active, doRefresh);
+
   return (
     <div
       ref={ref}
@@ -278,6 +280,61 @@ function useItems(
       return item;
     });
   }, [findIcon, onAuxClick, closeTab, onContextMenu, tabs]);
+}
+
+function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
+  const [documentVisible, setDocumentVisible] = useState(true);
+
+  const autoReload = tab?.action?.params?.["auto-reload"];
+
+  const doReload = useAtomCallback(
+    useCallback(
+      (get) => {
+        const activeTabId = tab?.id;
+        if (activeTabId && tab?.state) {
+          const state = get(tab.state);
+          const isEditable =
+            state.type === "form" &&
+            Boolean(state.props?.form?.readonly) === false;
+          const canAutoReload = !document.hidden && !isEditable;
+          canAutoReload && onRefresh(activeTabId);
+        }
+      },
+      [tab?.id, tab?.state, onRefresh]
+    )
+  );
+
+  useEffect(() => {
+    if (tab?.id && documentVisible && autoReload) {
+      const interval = Number(autoReload) * 1000;
+      if (isNaN(interval) || interval <= 0) {
+        return console.warn(
+          `${tab.id} auto-reload value must be a positive number in seconds: ${interval}`
+        );
+      }
+
+      const timer = setInterval(() => doReload(), interval);
+
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [tab?.id, autoReload, documentVisible, doReload]);
+
+  useEffect(() => {
+    if (!autoReload) return;
+    const updateDocumentVisibility = () =>
+      setDocumentVisible(document.visibilityState === "visible");
+
+    document.addEventListener("visibilitychange", updateDocumentVisibility);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        updateDocumentVisibility
+      );
+    };
+  }, [autoReload]);
 }
 
 function SingleTab({ items }: { items: NavTabItem[] }) {
