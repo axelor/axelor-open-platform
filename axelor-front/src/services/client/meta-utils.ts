@@ -47,7 +47,7 @@ function processFields(fields: Property[] | Record<string, Property>) {
 }
 
 export function processSelection(field: Schema) {
-  if (field.selectionList && !field.widget) {
+  if ((field.selection || field.selectionList) && !field.widget) {
     field.widget = "selection";
   }
   _.each(field.selectionList, (item) => {
