@@ -280,7 +280,11 @@ const FormContainer = memo(function FormContainer({
         get,
         set,
         record: DataRecord | null,
-        options?: { readonly?: boolean; dirty?: boolean; isNew?: boolean }
+        options?: {
+          readonly?: boolean;
+          dirty?: boolean;
+          isNew?: boolean;
+        }
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
@@ -405,7 +409,8 @@ const FormContainer = memo(function FormContainer({
         get,
         set,
         callOnSave: boolean = true,
-        shouldSave: boolean = true
+        shouldSave: boolean = true,
+        callOnLoad: boolean = true
       ) => {
         const formState = get(formAtom);
         const errors = getErrors(formState);
@@ -432,9 +437,10 @@ const FormContainer = memo(function FormContainer({
 
         res = { ...dummy, ...res }; // restore dummy values
 
-        const isNew = vals.id !== res.id;
-
-        doEdit(res, { readonly, isNew });
+        if (callOnLoad) {
+          const isNew = vals.id !== res.id;
+          doEdit(res, { readonly, isNew });
+        }
 
         return res;
       },

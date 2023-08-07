@@ -229,7 +229,7 @@ function Footer({
 
     try {
       if (onSave) {
-        await onSave(true, canSave);
+        await onSave(true, canSave, false);
       }
       if (popupCanReload) {
         triggerReload();
