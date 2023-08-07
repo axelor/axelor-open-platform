@@ -16,9 +16,9 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { widgetAttrs, nullable } = schema;
   const {
-    nullText = " ",
-    falseText = i18n.get("No"),
-    trueText = i18n.get("Yes"),
+    nullText = "\u00A0",
+    falseText = "No",
+    trueText = "Yes",
   } = widgetAttrs || {};
   const [value = nullable ? null : false, setValue] = useAtom(valueAtom);
   const {
