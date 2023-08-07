@@ -2,7 +2,7 @@ import { Box, Select, SelectComponents } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import { Icon } from "@/components/icon";
+import { Icon, findBootstrapIcon, findMaterialIcon } from "@/components/icon";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { FieldControl, FieldProps } from "../../builder";
 import { useSelectionList } from "../selection/hooks";
@@ -15,22 +15,26 @@ function Image({
   showLabel?: boolean;
   option: TSelection;
 }) {
-  const image = option?.icon || option?.value;
+  const icon = option?.icon || option?.value;
   const text = option?.title;
 
   return (
-    <>
-      {image && image.includes("fa-") ? (
-        <Icon icon={image} />
+    <Box d="flex" gap={6} alignItems="center">
+      {icon && (findMaterialIcon(icon) || findBootstrapIcon(icon)) ? (
+        <Icon icon={icon} />
       ) : (
         <img
-          style={showLabel === false ? { maxHeight: 18 } : { maxWidth: 18 }}
-          src={image}
+          style={
+            showLabel === false
+              ? { maxHeight: 18 }
+              : { maxWidth: 18, height: "fit-content" }
+          }
+          src={icon}
           alt={text}
         />
       )}
       {showLabel !== false && text}
-    </>
+    </Box>
   );
 }
 
@@ -69,12 +73,8 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
     ? selectionList.find((item) => String(item.value) === String(value))
     : null;
 
-  const handleClear = useCallback(() => {
-    setValue(null);
-  }, [setValue]);
-
   const handleChange = useCallback(
-    (e: any) => setValue(e.value, true),
+    (e: any) => setValue(e?.value, true),
     [setValue]
   );
 
@@ -83,7 +83,7 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
       SingleValue: (props: any) => {
         const { data } = props;
         return (
-          <SelectComponents.SingleValue {...props}>
+          <SelectComponents.SingleValue {...props} className={styles.value}>
             <Image option={data} showLabel={showLabel} />
           </SelectComponents.SingleValue>
         );
@@ -120,16 +120,7 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
           optionValue="value"
           placeholder={placeholder}
           isSearchable={false}
-          icons={
-            hasValue
-              ? [
-                  {
-                    icon: "close",
-                    onClick: handleClear,
-                  },
-                ]
-              : []
-          }
+          icons={hasValue && selectValue ? [{ icon: "arrow_drop_down" }] : []}
           components={components}
         />
       )}
