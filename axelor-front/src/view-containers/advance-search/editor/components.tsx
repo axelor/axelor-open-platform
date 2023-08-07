@@ -1,13 +1,15 @@
 import clsx from "clsx";
-import React, { useEffect, useRef } from "react";
 import isNumber from "lodash/isNumber";
+import React, { useEffect, useRef } from "react";
+
 import { Select as AxSelect, Box, Input } from "@axelor/ui";
 
+import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
-import { useDataStore } from "@/hooks/use-data-store";
 import { DateComponent } from "@/views/form/widgets";
+
 import styles from "./components.module.css";
 
 function TextField(props: any) {
@@ -175,11 +177,14 @@ export function RelationalWidget({ operator, onChange, ...rest }: any) {
             : id
         )
       : value;
+    const trTargetName = `$t:${targetName}`;
     return (
       <AxSelect
         placeholder={operator === "=" ? rest.placeholder : ""}
         className={clsx(styles.select, className)}
-        optionLabel={targetName}
+        optionLabel={(option: any) =>
+          option[trTargetName] ?? option[targetName]
+        }
         optionValue="id"
         value={$value}
         isMulti={isMulti}
@@ -189,8 +194,16 @@ export function RelationalWidget({ operator, onChange, ...rest }: any) {
           onChange({
             name: "value",
             value: Array.isArray(value)
-              ? value.map((x) => ({ id: x.id, [targetName]: x[targetName] }))
-              : value && { id: value.id, [targetName]: value[targetName] },
+              ? value.map((x) => ({
+                  id: x.id,
+                  [targetName]: x[targetName],
+                  [trTargetName]: x[trTargetName],
+                }))
+              : value && {
+                  id: value.id,
+                  [targetName]: value[targetName],
+                  [trTargetName]: value[trTargetName],
+                },
           })
         }
       />
