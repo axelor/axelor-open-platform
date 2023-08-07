@@ -339,8 +339,9 @@ export function getContextFieldFilter(
   const { name, value } = contextField ?? {};
   const { id } = value ?? {};
   const field = contextFields?.find((field) => field.name === name);
-  const targetName = field?.targetName;
-  const title = value?.[targetName ?? ""];
+  const targetName = field?.targetName ?? "";
+  const trTargetName = `$t:${targetName}`;
+  const title = value?.[trTargetName] ?? value?.[targetName];
   return name && id >= 0
     ? { fieldName: `${name}.id`, operator: "=", value: id, title }
     : null;

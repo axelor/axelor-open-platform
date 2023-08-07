@@ -19,7 +19,7 @@ import {
   SavedFilter,
   View,
 } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
+import { toKebabCase, toTitleCase } from "@/utils/names";
 import { AdvancedSearchState } from "../types";
 import { getContextFieldFilter } from "../utils";
 import { BooleanRadio, RelationalWidget, Select } from "./components";
@@ -367,9 +367,11 @@ export function Editor({
           contextFieldTargetName,
         } = field as any;
         if (contextField && !ctxFields.find((x) => x.name === contextField)) {
+          const field = $fields.find((field) => field.name === contextField);
+          const title = field?.title ?? toTitleCase(contextField);
           ctxFields.push({
             name: contextField,
-            title: `${contextField[0].toUpperCase()}${contextField.substr(1)}`,
+            title,
             value: {
               id: contextFieldValue,
               [contextFieldTargetName]: contextFieldTitle,
