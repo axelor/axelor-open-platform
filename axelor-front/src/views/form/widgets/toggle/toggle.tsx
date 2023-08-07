@@ -18,7 +18,7 @@ export function Toggle(props: FieldProps<boolean>) {
     [setValue, value]
   );
 
-  const ico = value ? iconActive ?? icon : icon;
+  const ico = value ? (iconActive ?? icon ?? "square-fill") : (icon ?? "square");
 
   return (
     <FieldControl {...props} className={styles.container}>
