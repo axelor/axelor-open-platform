@@ -7,7 +7,7 @@ import { i18n } from "@/services/client/i18n";
 import { FieldControl, FieldProps } from "../../builder";
 
 export function BooleanRadio(props: FieldProps<boolean | null>) {
-  const { schema, valueAtom } = props;
+  const { schema, readonly, valueAtom } = props;
   const { name, widgetAttrs, nullable, direction } = schema;
   const { falseText = /*$$(*/ "No" /*)*/, trueText = /*$$(*/ "Yes" /*)*/ } =
     widgetAttrs || {};
@@ -24,6 +24,7 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
           type="radio"
           value={`${$value}`}
           checked={checked}
+          disabled={readonly}
           onChange={() => {}}
           onClick={() => setValue(nullable && checked ? null : $value, true)}
         />
@@ -39,7 +40,7 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
       <Box
         d="flex"
         flexDirection={direction === "vertical" ? "column" : "row"}
-        className="input"
+        className={"input"}
       >
         {renderRadio(true, trueText)}
         {renderRadio(false, falseText)}
