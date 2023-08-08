@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import isNumber from "lodash/isNumber";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 
 import { Select as AxSelect, Box, Input } from "@axelor/ui";
 
@@ -123,7 +123,11 @@ export function SimpleWidget({
 
 export function RelationalWidget({ operator, onChange, ...rest }: any) {
   const { field, value } = rest;
-  const dataStore = useRef(new DataStore(field.target, {})).current;
+  const dataStore = useMemo(
+    () => new DataStore(field.target, {}),
+    [field.target]
+  );
+
   const options = useDataStore(dataStore, (res) => res.records);
 
   const fetchData = React.useCallback(
