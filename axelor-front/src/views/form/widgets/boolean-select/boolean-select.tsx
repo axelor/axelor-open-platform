@@ -48,6 +48,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
     <FieldControl {...props}>
       {readonly ? (
         <Input
+          px={0}
           type="text"
           defaultValue={(selected?.value === null ? "" : selected?.title) || ""}
           disabled
@@ -68,6 +69,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
           isSearchable={false}
           isClearable={false}
           isClearOnDelete={false}
+          icons={[{ icon: "arrow_drop_down" }]}
         />
       )}
     </FieldControl>
