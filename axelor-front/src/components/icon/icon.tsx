@@ -3625,7 +3625,7 @@ const findName = (icon: string) => {
   return name.replace(/^fa-/, "").replace(/-o$/, "");
 };
 
-export const findMaterialIcon = (icon: string) => {
+const findMaterialIcon = (icon: string) => {
   let name = icon.replace(/-/g, "_");
   let found: MaterialIconName | undefined;
   
@@ -3635,7 +3635,7 @@ export const findMaterialIcon = (icon: string) => {
   return found;
 };
 
-export const findBootstrapIcon = (icon: string) => {
+const findBootstrapIcon = (icon: string) => {
   let name = findName(icon);
   let found: BootstrapIconName | undefined;
 

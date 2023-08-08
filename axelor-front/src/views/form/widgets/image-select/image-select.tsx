@@ -2,7 +2,7 @@ import { Box, Select, SelectComponents } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import { Icon, findBootstrapIcon, findMaterialIcon } from "@/components/icon";
+import {Icon} from "@/components/icon";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 import { FieldControl, FieldProps } from "../../builder";
 import { useSelectionList } from "../selection/hooks";
@@ -20,7 +20,7 @@ function Image({
 
   return (
     <Box d="flex" gap={6} alignItems="center">
-      {icon && (findMaterialIcon(icon) || findBootstrapIcon(icon)) ? (
+      {icon && !icon.includes(".") ? (
         <Icon icon={icon} />
       ) : (
         <img

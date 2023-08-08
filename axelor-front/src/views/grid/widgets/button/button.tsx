@@ -79,5 +79,5 @@ export function Button(props: GridCellProps) {
     );
   }
 
-  return icon.includes("fa-") ? renderIcon() : renderImage();
+  return !icon.includes(".") ? renderIcon() : renderImage();
 }
