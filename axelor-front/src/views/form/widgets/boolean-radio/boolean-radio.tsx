@@ -11,7 +11,7 @@ export function BooleanRadio(props: FieldProps<boolean | null>) {
   const { name, widgetAttrs, nullable, direction } = schema;
   const { falseText = /*$$(*/ "No" /*)*/, trueText = /*$$(*/ "Yes" /*)*/ } =
     widgetAttrs || {};
-  const [value = nullable ? null : false, setValue] = useAtom(valueAtom);
+  const [value = nullable ? null : undefined, setValue] = useAtom(valueAtom);
 
   function renderRadio($value: boolean, label: string) {
     const checked = value === $value;
