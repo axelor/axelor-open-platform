@@ -120,7 +120,7 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
           optionValue="value"
           placeholder={placeholder}
           isSearchable={false}
-          icons={hasValue && selectValue ? [{ icon: "arrow_drop_down" }] : []}
+          icons={[{ icon: "arrow_drop_down" }]}
           components={components}
         />
       )}
