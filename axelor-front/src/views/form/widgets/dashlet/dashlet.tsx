@@ -14,6 +14,7 @@ import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useAsync } from "@/hooks/use-async";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { useViewTab } from "@/view-containers/views/scope";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { findActionView } from "@/services/client/meta-cache";
 
 import { Attrs, WidgetProps } from "../../builder";
@@ -138,6 +139,7 @@ export function DashletComponent({
           >
             <DashletTitle title={title || tab?.title} />
             {hasSearch && <DashletSearch />}
+            {attrs?.refresh && <DashletRefresh count={attrs.refresh} />}
             <DashletActions
               dashboard={dashboard}
               viewType={viewType}
@@ -157,6 +159,16 @@ export function DashletComponent({
       </DashletView>
     )
   );
+}
+
+function DashletRefresh({ count }: { count: number }) {
+  const { onRefresh } = useAtomValue(useDashletHandlerAtom());
+
+  useAsyncEffect(async () => {
+    count && onRefresh?.();
+  }, [count, onRefresh]);
+
+  return null;
 }
 
 function DashletSearch() {

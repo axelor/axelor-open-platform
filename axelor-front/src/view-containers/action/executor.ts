@@ -369,7 +369,9 @@ export class DefaultActionExecutor implements ActionExecutor {
             await this.#handler.delValue(target, value);
             break;
           case "refresh":
-            await this.#handler.refresh(target);
+            target
+              ? await this.#handler.setAttr(target, name, value)
+              : await this.#handler.refresh(target);
             break;
           default:
             await this.#handler.setAttr(target, name, value);

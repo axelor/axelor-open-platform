@@ -328,7 +328,7 @@ function useActionAttrs({
             }
           }
 
-          const state = statesByName[data.target] ?? {};
+          const state = statesByName[target] ?? {};
           const newState = {
             ...state,
             ...(name === "error"
@@ -336,7 +336,12 @@ function useActionAttrs({
               : {
                   attrs: {
                     ...state.attrs,
-                    [data.name]: data.value,
+                    [name]: (() => {
+                      if (name === "refresh") {
+                        return value ? (state.attrs?.refresh ?? 0) + 1 : 0;
+                      }
+                      return value;
+                    })(),
                   },
                 }),
           };
