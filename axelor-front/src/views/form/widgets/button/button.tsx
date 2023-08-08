@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useCallback, useState } from "react";
 
-import { Button as Btn, Image } from "@axelor/ui";
+import { Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Tooltip } from "@/components/tooltip";
@@ -64,7 +64,7 @@ function findVariant(schema: Schema) {
 
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
-  const { showTitle = true, icon, help } = schema;
+  const { showTitle = true, editable, icon, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const { title } = attrs;
@@ -96,13 +96,18 @@ export function Button(props: WidgetProps) {
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
-  const hasHelp = !!help;
+  const hasHelp = !editable && !!help;
 
+  const BtnComponent: any = editable ? Box : Btn;
   const button = (
-    <Btn
-      variant={variant}
-      onClick={handleClick}
+    <BtnComponent
+      {...(BtnComponent === Btn
+        ? { variant }
+        : {
+            title: help,
+          })}
       disabled={disabled}
+      onClick={handleClick}
       className={clsx(styles.button, {
         [styles.help]: hasHelp,
       })}
@@ -111,7 +116,7 @@ export function Button(props: WidgetProps) {
         {icon && <ButtonIcon {...props} />}
         {showTitle && title}
       </div>
-    </Btn>
+    </BtnComponent>
   );
 
   function render() {

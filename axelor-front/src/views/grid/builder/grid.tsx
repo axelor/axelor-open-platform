@@ -295,7 +295,11 @@ export const Grid = forwardRef<
       colIndex?: number
     ) => {
       // skip edit row for edit icon
-      if (column?.name === "$$edit") return null;
+      if (
+        ["icon", "button"].includes(column?.type ?? "") ||
+        column?.name === "$$edit"
+      )
+        return null;
       await commitForm();
     },
     [commitForm]
