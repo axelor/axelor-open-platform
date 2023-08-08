@@ -9,7 +9,7 @@ import { FieldControl, FieldProps } from "../../builder";
 export function BooleanRadio(props: FieldProps<boolean | null>) {
   const { schema, valueAtom } = props;
   const { name, widgetAttrs, nullable, direction } = schema;
-  const { falseText = i18n.get("No"), trueText = i18n.get("Yes") } =
+  const { falseText = /*$$(*/ "No" /*)*/, trueText = /*$$(*/ "Yes" /*)*/ } =
     widgetAttrs || {};
   const [value = nullable ? null : false, setValue] = useAtom(valueAtom);
 
