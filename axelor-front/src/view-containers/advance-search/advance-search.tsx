@@ -32,7 +32,7 @@ import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { Criteria, Filter } from "@/services/client/data.types";
+import { Criteria } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { removeFilter, saveFilter } from "@/services/client/meta";
 import {
@@ -52,7 +52,11 @@ import {
   getEditorDefaultState,
 } from "./editor/editor";
 import { FilterList } from "./filter-list";
-import { getFreeSearchCriteria, prepareAdvanceSearchQuery } from "./utils";
+import {
+  findContextField,
+  getFreeSearchCriteria,
+  prepareAdvanceSearchQuery,
+} from "./utils";
 
 import styles from "./advance-search.module.scss";
 
@@ -242,33 +246,18 @@ export function AdvanceSearch({
         try {
           let filterCustom = JSON.parse(
             (filter as SavedFilter).filterCustom || "{}"
-          ) as Criteria;
+          ) as Criteria | null;
 
           // Context field
           if (contextFields?.length) {
             let contextField = getContextFieldDefaultState(contextFields);
-            const { operator, criteria } = filterCustom;
-            if (
-              !filter.checked &&
-              operator === "and" &&
-              criteria?.length &&
-              criteria.length < 3
-            ) {
-              const {
-                fieldName,
-                operator,
-                value: id,
-                title,
-              } = criteria[0] as Filter & { title?: string };
-              const baseFieldName = fieldName?.replace(/.id$/, "");
-              const field = contextFields.find(
-                (field) => field.name === baseFieldName
-              );
-              if (field && operator === "=" && id) {
-                const { name, targetName = "name" } = field;
-                const value = { id, [targetName]: title };
-                contextField = { name, value };
-                filterCustom = criteria[1] as Criteria;
+            if (!filter.checked) {
+              const found = findContextField(filterCustom ?? {}, contextFields);
+              if (found) {
+                contextField = found;
+                const { criteria = [] } = filterCustom ?? {};
+                filterCustom =
+                  criteria.length > 1 ? (criteria[1] as Criteria) : null;
               }
             }
             setContextField(contextField);

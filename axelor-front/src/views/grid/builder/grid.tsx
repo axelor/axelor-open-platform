@@ -1,3 +1,5 @@
+import clsx from "clsx";
+import { ScopeProvider } from "jotai-molecules";
 import uniq from "lodash/uniq";
 import {
   forwardRef,
@@ -20,31 +22,30 @@ import {
   getRows,
 } from "@axelor/ui/grid";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
-import { ScopeProvider } from "jotai-molecules";
 
 import { useAsync } from "@/hooks/use-async";
-import { SearchOptions, SearchResult } from "@/services/client/data";
-import { MetaData } from "@/services/client/meta";
-import { Field, GridView, JsonField } from "@/services/client/meta.types";
-import { i18n } from "@/services/client/i18n";
-import { toKebabCase } from "@/utils/names";
-import format from "@/utils/format";
-import { getDefaultValues, nextId } from "@/views/form/builder/utils";
-
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
+import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { MetaData } from "@/services/client/meta";
+import { Field, GridView, JsonField } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
+import format from "@/utils/format";
+import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
+import { AdvancedSearchState } from "@/view-containers/advance-search/types";
 import { Attrs } from "@/views/form/builder";
+import { getDefaultValues, nextId } from "@/views/form/builder/utils";
+
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
 import { GridScope } from "./scope";
-import { legacyClassNames } from "@/styles/legacy";
 
 import styles from "../grid.module.scss";
-import clsx from "clsx";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -82,6 +83,7 @@ export const Grid = forwardRef<
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
+    contextField?: AdvancedSearchState["contextField"];
     editable?: boolean;
     readonly?: boolean;
     showEditIcon?: boolean;
@@ -99,6 +101,7 @@ export const Grid = forwardRef<
     view,
     fields,
     searchOptions,
+    contextField,
     actionExecutor,
     showEditIcon = true,
     editable = false,
@@ -150,6 +153,10 @@ export const Grid = forwardRef<
   );
 
   const columns = useMemo(() => {
+    const { name = "", value = {} } = contextField ?? {};
+    const { id } = value ?? {};
+    const activeContextField = id ? { name, id: String(id) } : null;
+
     const columns: GridColumn[] = viewItems.map((item) => {
       const field = fields?.[item.name!];
       const title = item.title ?? item.autoTitle;
@@ -200,6 +207,18 @@ export const Grid = forwardRef<
         columnProps.visible = false;
       }
 
+      const { contextField, contextFieldValue } = item as Record<string, any>;
+
+      if (
+        contextField &&
+        (!activeContextField ||
+          contextField !== activeContextField.name ||
+          String(contextFieldValue) !== activeContextField.id)
+      ) {
+        columnProps.visible = false;
+        columnProps.hidden = true;
+      }
+
       return {
         ...field,
         ...item,
@@ -233,6 +252,7 @@ export const Grid = forwardRef<
     fields,
     columnFormatter,
     columnAttrs,
+    contextField,
   ]);
 
   const init = useAsync(async () => {

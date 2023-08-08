@@ -347,6 +347,27 @@ export function getContextFieldFilter(
     : null;
 }
 
+export function findContextField(filter: Criteria, contextFields: Field[]) {
+  const { operator, criteria } = filter;
+  if (operator === "and" && criteria?.length) {
+    const {
+      fieldName,
+      operator,
+      value: id,
+      title,
+    } = criteria[0] as Filter & { title?: string };
+    const baseFieldName = fieldName?.replace(/.id$/, "");
+    const field = contextFields.find((field) => field.name === baseFieldName);
+    if (field && operator === "=" && id) {
+      const { name, targetName = "name" } = field;
+      const value = { id, [targetName]: title };
+      return { name, value };
+    }
+  }
+
+  return null;
+}
+
 export function prepareAdvanceSearchQuery(
   state: AdvancedSearchState,
   hasEditorApply?: boolean
@@ -393,6 +414,7 @@ export function prepareAdvanceSearchQuery(
   let criteria: Criteria["criteria"] = getEditorCriteria(editorCriteria);
 
   const contextFieldFilter = getContextFieldFilter(contextField, contextFields);
+
   if (contextFieldFilter) {
     criteria = [
       contextFieldFilter,
