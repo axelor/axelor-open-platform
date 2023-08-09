@@ -813,7 +813,7 @@ function GridInner(props: ViewProps<GridView>) {
             state={state}
             setState={setState}
             sortType={"live"}
-            editable={editable}
+            editable={dashlet ? false : editable}
             searchOptions={searchOptions}
             actionExecutor={actionExecutor}
             onEdit={readonly === true ? onView : onEdit}
