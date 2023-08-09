@@ -36,11 +36,6 @@ export const getEditorDefaultState = () =>
     criteria: [],
   } as AdvancedSearchState["editor"]);
 
-export const getContextFieldDefaultState = (
-  contextFields: AdvancedSearchState["contextFields"]
-) =>
-  ({ name: contextFields?.[0]?.name } as AdvancedSearchState["contextField"]);
-
 function FormControl({
   title,
   children,
@@ -244,10 +239,7 @@ export function Editor({
       } = editor!;
       let operator = editorOperator ?? "and";
       let criteria = editorCriteria;
-      const contextFieldFilter = getContextFieldFilter(
-        contextField,
-        contextFields
-      );
+      const contextFieldFilter = getContextFieldFilter(contextField);
       if (contextFieldFilter) {
         criteria = [
           contextFieldFilter,
@@ -276,7 +268,7 @@ export function Editor({
       }
       onSave?.(savedFilter as SavedFilter);
     },
-    [editor, contextField, contextFields, onSave]
+    [editor, contextField, onSave]
   );
 
   const handleFilterRemove = useCallback(
@@ -349,7 +341,7 @@ export function Editor({
           field as any;
         return (
           !contextFieldName ||
-          (contextField?.name === contextFieldName &&
+          (contextField?.field?.name === contextFieldName &&
             String(contextField?.value?.id) === String(contextFieldValue))
         );
       }),
@@ -385,19 +377,21 @@ export function Editor({
     );
   }, [$fields, setContextFields]);
 
-  const defaultContextFieldName = contextFields?.[0]?.name;
+  const hasContextField = Boolean(contextField?.field?.name);
+  const defaultContextField = contextFields?.[0];
 
   useEffect(() => {
-    defaultContextFieldName &&
-      setContextField((field) => ({
-        ...field,
-        name: field?.name || defaultContextFieldName,
+    !hasContextField &&
+      defaultContextField &&
+      setContextField((state) => ({
+        ...state,
+        field: defaultContextField,
       }));
-  }, [defaultContextFieldName, setContextField]);
+  }, [hasContextField, defaultContextField, setContextField]);
 
   const selectedContextField =
-    contextField?.name &&
-    contextFields?.find((x) => x.name === contextField.name);
+    contextField?.field?.name &&
+    contextFields?.find((x) => x.name === contextField.field?.name);
   const canSaveAs =
     id && title && filters?.find((f) => f.id === id)?.title !== title;
 
@@ -416,10 +410,15 @@ export function Editor({
           </Box>
           <Select
             name={"ctxField"}
-            onChange={(value: any) =>
-              setContextField((data) => ({ ...data, name: value }))
+            onChange={(name: any) =>
+              setContextField((data) => ({
+                ...data,
+                field: contextFields?.find((f) => f.name === name),
+                name,
+                value: null,
+              }))
             }
-            value={contextField?.name ?? null}
+            value={contextField?.field?.name ?? null}
             options={contextFields}
           />
           {selectedContextField && (

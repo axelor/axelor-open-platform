@@ -169,7 +169,8 @@ export const Grid = forwardRef<
   );
 
   const columns = useMemo(() => {
-    const { name = "", value = {} } = contextField ?? {};
+    const { field, value } = contextField ?? {};
+    const { name } = field ?? {};
     const { id } = value ?? {};
     const activeContextField = id ? { name, id: String(id) } : null;
 

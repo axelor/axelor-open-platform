@@ -8,6 +8,11 @@ import {
   SearchFilter,
 } from "@/services/client/meta.types";
 
+type ContextField = {
+  field?: Field;
+  value?: any;
+} | null;
+
 export type AdvancedSearchState = {
   query?: SearchOptions["filter"];
   search?: Record<string, string>; // grid search column state
@@ -19,15 +24,9 @@ export type AdvancedSearchState = {
     shared?: boolean;
     selected?: boolean;
   };
-  contextField?: {
-    name?: string;
-    value?: any;
-  };
-  appliedContextField?: {
-    name?: string;
-    value?: any;
-  };
   contextFields?: Field[];
+  contextField?: ContextField;
+  appliedContextField?: ContextField;
   archived?: boolean;
   searchText?: string;
   searchTextLabel?: string;

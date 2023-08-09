@@ -333,21 +333,22 @@ export function getFreeSearchCriteria(
 }
 
 export function getContextFieldFilter(
-  contextField: AdvancedSearchState["contextField"],
-  contextFields: AdvancedSearchState["contextFields"]
+  contextField: AdvancedSearchState["contextField"]
 ): (Filter & { title?: string }) | null {
-  const { name, value } = contextField ?? {};
+  if (!contextField?.field?.name) return null;
+  const { field, value } = contextField;
+  const { name, targetName = "" } = field;
   const { id } = value ?? {};
-  const field = contextFields?.find((field) => field.name === name);
-  const targetName = field?.targetName ?? "";
   const trTargetName = `$t:${targetName}`;
   const title = value?.[trTargetName] ?? value?.[targetName];
-  return name && id >= 0
-    ? { fieldName: `${name}.id`, operator: "=", value: id, title }
-    : null;
+  const fieldName = `${name}.id`;
+  return id > 0 ? { fieldName, operator: "=", value: id, title } : null;
 }
 
-export function findContextField(filter: Criteria, contextFields: Field[]) {
+export function findContextField(
+  filter: Criteria,
+  contextFields: AdvancedSearchState["contextFields"]
+): AdvancedSearchState["contextField"] {
   const { operator, criteria } = filter;
   if (operator === "and" && criteria?.length) {
     const {
@@ -356,12 +357,12 @@ export function findContextField(filter: Criteria, contextFields: Field[]) {
       value: id,
       title,
     } = criteria[0] as Filter & { title?: string };
-    const baseFieldName = fieldName?.replace(/.id$/, "");
-    const field = contextFields.find((field) => field.name === baseFieldName);
-    if (field && operator === "=" && id) {
-      const { name, targetName = "name" } = field;
+    const baseFieldName = fieldName?.replace(/\.id$/, "");
+    const field = contextFields?.find((field) => field.name === baseFieldName);
+    if (field && operator === "=" && id > 0) {
+      const { targetName = "name" } = field;
       const value = { id, [targetName]: title };
-      return { name, value };
+      return { field, value };
     }
   }
 
@@ -378,7 +379,6 @@ export function prepareAdvanceSearchQuery(
     archived: _archived,
     editor,
     contextField,
-    contextFields,
     fields = {},
     jsonFields = {},
   } = state;
@@ -413,7 +413,7 @@ export function prepareAdvanceSearchQuery(
   let operator = editorOperator ?? "and";
   let criteria: Criteria["criteria"] = getEditorCriteria(editorCriteria);
 
-  const contextFieldFilter = getContextFieldFilter(contextField, contextFields);
+  const contextFieldFilter = getContextFieldFilter(contextField);
 
   if (contextFieldFilter) {
     criteria = [

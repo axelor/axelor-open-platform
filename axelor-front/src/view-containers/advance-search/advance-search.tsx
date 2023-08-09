@@ -47,11 +47,9 @@ import { useViewAction, useViewTab } from "../views/scope";
 import { focusAndSelectInput } from "@/views/form";
 import { Chip } from "@/views/form/widgets";
 import { Editor } from "./editor";
-import {
-  getContextFieldDefaultState,
-  getEditorDefaultState,
-} from "./editor/editor";
+import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
+import { AdvancedSearchState } from "./types";
 import {
   findContextField,
   getFreeSearchCriteria,
@@ -85,12 +83,6 @@ export function AdvanceSearch({
   const setContextField = useSetAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("contextField")),
-      [stateAtom]
-    )
-  );
-  const contextFields = useAtomValue(
-    useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("contextFields")),
       [stateAtom]
     )
   );
@@ -160,12 +152,12 @@ export function AdvanceSearch({
           searchTextLabel: "",
           filterType: "all",
           editor: getEditorDefaultState(),
-          contextField: getContextFieldDefaultState(contextFields),
+          contextField: null,
         });
         shouldApply && handleApply();
         handleClose();
       },
-      [stateAtom, handleApply, handleClose, contextFields]
+      [stateAtom, handleApply, handleClose]
     )
   );
 
@@ -226,64 +218,75 @@ export function AdvanceSearch({
     [setDomains, handleApply]
   );
 
-  const handleFilterCheck = useCallback(
-    (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
-      const isSingle = type === "click" && !filter.checked;
-      setFilterType(isSingle ? "single" : "all");
-      setFilters((filters) =>
-        filters?.map((f) =>
-          f === (filter as SavedFilter)
-            ? { ...f, checked: !f.checked }
-            : type === "click"
-            ? { ...f, checked: false }
-            : f
-        )
-      );
-      if (type === "click") {
-        setDomains((domains) =>
-          domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
+  const handleFilterCheck = useAtomCallback(
+    useCallback(
+      (
+        get,
+        set,
+        filter: SearchFilter | SavedFilter,
+        type?: "click" | "change"
+      ) => {
+        const isSingle = type === "click" && !filter.checked;
+        setFilterType(isSingle ? "single" : "all");
+        setFilters((filters) =>
+          filters?.map((f) =>
+            f === (filter as SavedFilter)
+              ? { ...f, checked: !f.checked }
+              : type === "click"
+              ? { ...f, checked: false }
+              : f
+          )
         );
-        try {
-          let filterCustom = JSON.parse(
-            (filter as SavedFilter).filterCustom || "{}"
-          ) as Criteria | null;
-
-          // Context field
-          if (contextFields?.length) {
-            let contextField = getContextFieldDefaultState(contextFields);
-            if (!filter.checked) {
-              const found = findContextField(filterCustom ?? {}, contextFields);
-              if (found) {
-                contextField = found;
-                const { criteria = [] } = filterCustom ?? {};
-                filterCustom =
-                  criteria.length > 1 ? (criteria[1] as Criteria) : null;
-              }
-            }
-            setContextField(contextField);
-          }
-
-          setEditor(() =>
-            filter.checked
-              ? getEditorDefaultState()
-              : {
-                  ...filter,
-                  ...filterCustom,
-                }
+        if (type === "click") {
+          setDomains((domains) =>
+            domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
           );
-          handleApply(true);
-        } catch {}
-      }
-    },
-    [
-      setFilters,
-      setFilterType,
-      setDomains,
-      setEditor,
-      setContextField,
-      handleApply,
-      contextFields,
-    ]
+          try {
+            let filterCustom = JSON.parse(
+              (filter as SavedFilter).filterCustom || "{}"
+            ) as Criteria | null;
+
+            // Context field
+            const { contextFields } = get(stateAtom);
+            if (contextFields?.length) {
+              let contextField: AdvancedSearchState["contextField"] = null;
+              if (!filter.checked) {
+                const found = findContextField(
+                  filterCustom ?? {},
+                  contextFields
+                );
+                if (found) {
+                  contextField = found;
+                  const { criteria = [] } = filterCustom ?? {};
+                  filterCustom =
+                    criteria.length > 1 ? (criteria[1] as Criteria) : null;
+                }
+              }
+              setContextField(contextField);
+            }
+
+            setEditor(() =>
+              filter.checked
+                ? getEditorDefaultState()
+                : {
+                    ...filter,
+                    ...filterCustom,
+                  }
+            );
+            handleApply(true);
+          } catch {}
+        }
+      },
+      [
+        setFilters,
+        setFilterType,
+        setDomains,
+        setEditor,
+        setContextField,
+        handleApply,
+        stateAtom,
+      ]
+    )
   );
 
   const handleFilterSave = useCallback(

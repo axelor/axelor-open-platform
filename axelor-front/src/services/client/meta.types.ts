@@ -410,6 +410,12 @@ export interface JsonField extends Omit<Field, "type"> {
   jsonField?: string;
   jsonPath?: string;
   jsonType?: string;
+
+  contextField?: string;
+  contextFieldTarget?: string;
+  contextFieldTargetName?: string;
+  contextFieldValue?: string;
+  contextFieldTitle?: string;
 }
 
 export interface Selection {
