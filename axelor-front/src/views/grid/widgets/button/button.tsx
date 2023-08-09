@@ -12,7 +12,7 @@ import { GridCellProps } from "../../builder/types";
 import styles from "./button.module.scss";
 
 export function Button(props: GridCellProps) {
-  const { record, data: field, onAction } = props;
+  const { record, data: field, actionExecutor } = props;
   const { onClick } = field as ButtonField;
   const { name, icon, css, help } = field as Field;
   const { context } = useViewAction();
@@ -39,14 +39,16 @@ export function Button(props: GridCellProps) {
     [styles.readonly]: readonly,
   });
 
-  function handleClick(e: React.MouseEvent<HTMLElement>) {
-    e.preventDefault();
-    if (!readonly && onClick && onAction) {
-      onAction(onClick, {
-        ...record,
-        id: record.$$id ?? record.id,
-        selected: true,
-        _signal: name,
+  async function handleClick() {
+    if (!readonly && onClick && actionExecutor) {
+      await actionExecutor.waitFor();
+      await actionExecutor.execute(onClick, {
+        context: {
+          ...record,
+          id: record.$$id ?? record.id,
+          selected: true,
+          _signal: name,
+        },
       });
     }
   }

@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { Box } from "@axelor/ui";
 
-import { Field, Tooltip as TooltipType } from "@/services/client/meta.types";
+import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { sanitize } from "@/utils/sanitize";
 import { Tooltip } from "@/components/tooltip";

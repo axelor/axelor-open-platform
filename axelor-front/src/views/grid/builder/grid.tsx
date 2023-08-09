@@ -33,7 +33,7 @@ import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataRecord } from "@/services/client/data.types";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
 import { Cell as CellRenderer } from "../renderers/cell";
@@ -330,16 +330,7 @@ export const Grid = forwardRef<
 
   const CustomCellRenderer = useMemo(
     () => (props: GridColumnProps) =>
-      (
-        <CellRenderer
-          {...props}
-          {...(actionExecutor && {
-            onAction: (action: string, context?: DataContext) =>
-              actionExecutor.execute(action, { context }),
-          })}
-          view={view}
-        />
-      ),
+      <CellRenderer {...props} view={view} actionExecutor={actionExecutor} />,
     [view, actionExecutor]
   );
 
