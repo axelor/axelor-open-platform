@@ -32,7 +32,6 @@ import {
 
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useFormScope, useFormValidityScope } from "@/views/form/builder/scope";
-import { useViewAction } from "@/view-containers/views/scope";
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
@@ -153,7 +152,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       }),
       [view, fields]
     );
-    const { context } = useViewAction();
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
       const name =
@@ -170,16 +168,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       }
     }, [editColumnName, view.items]);
 
-    const formRecord = useMemo(
-      () => ({ ...context, ...record }),
-      [context, record]
-    );
     const { add: addWidgetValidator } = useFormValidityScope();
     const { formAtom: parent } = useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
       useFormHandlers(
         meta as unknown as ViewData<FormView>,
-        formRecord,
+        record,
         parent,
         initFormFieldsStates
       );
