@@ -220,7 +220,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     const res = await dataStore.search({
       filter,
       fields: searchFieldNames,
-      limit: maxPerPage,
+      limit: -1,
     });
     setRecords(res.records);
   }, [dataStore, filter, searchFieldNames, maxPerPage]);
