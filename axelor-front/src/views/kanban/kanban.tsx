@@ -133,12 +133,16 @@ export function Kanban(props: ViewProps<KanbanView>) {
           operator: "and",
         };
 
-        if (query) {
+        const { criteria, operator, ...filterQuery } = query || {};
+
+        if (criteria?.length) {
           filter = {
-            ...query,
+            ...filterQuery,
             operator: "and",
-            criteria: [query, filter],
+            criteria: [{ criteria, operator }, filter],
           };
+        } else {
+          filter = { ...filter, ...filterQuery };
         }
 
         if (dashlet) {

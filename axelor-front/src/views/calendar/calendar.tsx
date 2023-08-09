@@ -183,13 +183,18 @@ export function Calendar(props: ViewProps<CalendarView>) {
         } as Criteria)
       : startCriteria;
 
-    if (advancedSearch.query) {
+    const { criteria, operator, ...filterQuery } = advancedSearch?.query || {};
+
+    if (criteria?.length) {
       filter = {
-        ...advancedSearch.query,
+        ...filterQuery,
         operator: "and",
-        criteria: [advancedSearch.query, filter],
+        criteria: [{ criteria, operator }, filter],
       };
+    } else {
+      filter = { ...filter, ...filterQuery };
     }
+
     if (viewTab.dashlet) {
       const { _domainAction, ...formContext } = getFormContext() ?? {};
       const { _domainContext } = filter;
