@@ -358,6 +358,9 @@ export function prepareAdvanceSearchQuery(
     const editor: Criteria = JSON.parse(filter.filterCustom);
     if (editor.criteria) {
       editor.criteria = getEditorCriteria(editor.criteria);
+      if (!editor.operator) {
+        editor.operator = "and";
+      }
     }
     return editor;
   };
