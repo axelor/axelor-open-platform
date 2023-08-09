@@ -34,6 +34,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  useViewContext,
   useViewSwitch,
   useViewTab,
   useViewTabRefresh,
@@ -95,6 +96,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       } as DataContext),
     [action]
   );
+  const getFormContext = useViewContext();
 
   const getColumnByValue = useCallback(
     (value: any) => {
@@ -139,6 +141,15 @@ export function Kanban(props: ViewProps<KanbanView>) {
           };
         }
 
+        if (dashlet) {
+          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          filter._domainContext = {
+            ...filter?._domainContext,
+            ...formContext,
+          };
+          filter._domainAction = _domainAction;
+        }
+
         return dataStore.search({
           ...(sequenceBy && { sortBy: [sequenceBy] }),
           filter,
@@ -150,12 +161,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
         });
       },
       [
+        dashlet,
         dataStore,
         fields,
         searchAtom,
         limit,
         columnBy,
         sequenceBy,
+        getFormContext,
         getColumnByValue,
       ]
     )
