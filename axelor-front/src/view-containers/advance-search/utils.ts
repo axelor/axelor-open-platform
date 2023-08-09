@@ -455,6 +455,7 @@ export function prepareAdvanceSearchQuery(
 
   return {
     ...state,
+    appliedContextField: contextField,
     searchTextLabel,
     searchText: "",
     query: {

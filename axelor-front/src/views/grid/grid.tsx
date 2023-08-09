@@ -28,7 +28,6 @@ import { findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
-import { AdvancedSearchState } from "@/view-containers/advance-search/types";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -185,19 +184,10 @@ function GridInner(props: ViewProps<GridView>) {
     )
   );
 
-  const [contextField, setContextField] =
-    useState<AdvancedSearchState["contextField"]>(undefined);
-
-  const getSearch = useAtomCallback(
-    useCallback((get) => searchAtom && get(searchAtom), [searchAtom])
-  );
-
   const onSearch = useCallback(
-    (options: SearchOptions = {}) => {
-      setContextField(getSearch()?.contextField);
-      return dataStore.search(getSearchOptions(options));
-    },
-    [dataStore, getSearch, getSearchOptions]
+    (options: SearchOptions = {}) =>
+      dataStore.search(getSearchOptions(options)),
+    [dataStore, getSearchOptions]
   );
 
   const onMassUpdate = useCallback(
@@ -825,7 +815,7 @@ function GridInner(props: ViewProps<GridView>) {
             sortType={"live"}
             editable={dashlet ? false : editable}
             searchOptions={searchOptions}
-            contextField={contextField}
+            searchAtom={searchAtom}
             actionExecutor={actionExecutor}
             onEdit={readonly === true ? onView : onEdit}
             onView={onView}

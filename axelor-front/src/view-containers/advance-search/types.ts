@@ -23,6 +23,10 @@ export type AdvancedSearchState = {
     name?: string;
     value?: any;
   };
+  appliedContextField?: {
+    name?: string;
+    value?: any;
+  };
   contextFields?: Field[];
   archived?: boolean;
   searchText?: string;

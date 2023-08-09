@@ -1,5 +1,7 @@
 import clsx from "clsx";
+import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
+import { focusAtom } from "jotai-optics";
 import uniq from "lodash/uniq";
 import {
   forwardRef,
@@ -31,12 +33,16 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData } from "@/services/client/meta";
-import { Field, GridView, JsonField } from "@/services/client/meta.types";
+import {
+  AdvancedSearchAtom,
+  Field,
+  GridView,
+  JsonField,
+} from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
-import { AdvancedSearchState } from "@/view-containers/advance-search/types";
 import { Attrs } from "@/views/form/builder";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
@@ -83,7 +89,7 @@ export const Grid = forwardRef<
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
-    contextField?: AdvancedSearchState["contextField"];
+    searchAtom?: AdvancedSearchAtom;
     editable?: boolean;
     readonly?: boolean;
     showEditIcon?: boolean;
@@ -101,7 +107,7 @@ export const Grid = forwardRef<
     view,
     fields,
     searchOptions,
-    contextField,
+    searchAtom,
     actionExecutor,
     showEditIcon = true,
     editable = false,
@@ -150,6 +156,16 @@ export const Grid = forwardRef<
         id: uniqueId(view.name || "grid-column"),
       })),
     [view.name, view.items]
+  );
+
+  const contextField = useAtomValue(
+    useMemo(
+      () =>
+        searchAtom
+          ? focusAtom(searchAtom, (o) => o.prop("appliedContextField"))
+          : atom(undefined),
+      [searchAtom]
+    )
   );
 
   const columns = useMemo(() => {
