@@ -210,12 +210,11 @@ const DataViews = memo(function DataViews({
   }, [filterName, actionName, hasAdvanceSearch]);
 
   useAsyncEffect(async () => {
-    if (!hasAdvanceSearch) return;
-    const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
     let domains: SearchFilter[] = [];
     let items: Property[] = [];
 
-    if (filterName) {
+    if (hasAdvanceSearch && filterName) {
+      const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
       const res = await findView<SearchFilters>({
         name: filterName,
         type: "search-filters",
