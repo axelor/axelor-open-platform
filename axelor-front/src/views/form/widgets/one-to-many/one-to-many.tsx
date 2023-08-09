@@ -29,7 +29,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
-import { FormView, GridView } from "@/services/client/meta.types";
+import { FormView, GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
@@ -41,6 +41,7 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
+import { useActionExecutor } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -267,6 +268,30 @@ export function OneToMany({
       [isManyToMany, setValue]
     )
   );
+
+  const getActionContext = useCallback(
+    () => ({
+      _viewType: "grid",
+      _views: [{ type: "grid", name: gridView }],
+      _parent: getContext(),
+    }),
+    [getContext, gridView]
+  );
+
+  const actionView = useMemo(
+    () =>
+      viewData?.view ??
+      ({
+        name: gridView,
+        model: model,
+      } as View),
+    [viewData?.view, gridView, model]
+  );
+
+  const actionExecutor = useActionExecutor(actionView, {
+    getContext: getActionContext,
+    onRefresh: onSearch,
+  });
 
   const [beforeSelect] = useBeforeSelect(schema);
 
@@ -605,6 +630,7 @@ export function OneToMany({
           columnAttrs={columnAttrs}
           state={state}
           setState={setState}
+          actionExecutor={actionExecutor}
           onEdit={canEdit ? onEdit : canView ? onView : noop}
           onView={canView ? (canEdit ? onEdit : onView) : noop}
           onSave={onSave}
