@@ -48,6 +48,7 @@ export function Button(props: GridCellProps) {
           id: record.$$id ?? record.id,
           selected: true,
           _signal: name,
+          _ids: undefined,
         },
       });
     }
