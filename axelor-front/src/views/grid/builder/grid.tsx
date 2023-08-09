@@ -160,6 +160,7 @@ export const Grid = forwardRef<
       if (item.type === "button" || attrs?.type === "icon") {
         columnProps.sortable = false;
         columnProps.searchable = false;
+        columnProps.editable = false;
         columnProps.computed = true;
         columnProps.width = columnProps.width || 40;
         columnProps.title = " ";
@@ -206,6 +207,7 @@ export const Grid = forwardRef<
         name: "$$edit",
         widget: "edit-icon",
         computed: true,
+        editable: false,
         sortable: false,
         searchable: false,
         width: 40,
