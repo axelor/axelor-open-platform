@@ -224,6 +224,11 @@ const FormContainer = memo(function FormContainer({
   const showConfirmDirty = useViewConfirmDirty();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
+
+  const setReady = useSetAtom(
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom])
+  );
+
   const archived = useAtomValue(
     useMemo(
       () => selectAtom(formAtom, (form) => form.record?.archived),
@@ -328,6 +333,7 @@ const FormContainer = memo(function FormContainer({
           if (changed) {
             set(formAtom, { ...prev, record: res });
           }
+          setReady(true);
         }
 
         if (!isNew) {
@@ -344,6 +350,7 @@ const FormContainer = memo(function FormContainer({
         readonly,
         recordRef,
         setDirty,
+        setReady,
         switchTo,
       ]
     )
@@ -612,16 +619,18 @@ const FormContainer = memo(function FormContainer({
 
         if (action) {
           await actionExecutor.execute(action);
+          setReady(true);
         }
       },
       [
         actionExecutor,
         formAtom,
         isLoading,
-        setDirty,
         onLoadAction,
         onNewAction,
         record,
+        setDirty,
+        setReady,
       ]
     )
   );

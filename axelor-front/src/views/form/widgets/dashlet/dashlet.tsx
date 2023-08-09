@@ -1,6 +1,6 @@
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useAtomValue } from "jotai";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import uniqueId from "lodash/uniqueId";
 
 import { Box, clsx } from "@axelor/ui";
@@ -220,6 +220,10 @@ export function Dashlet(props: WidgetProps) {
   const tab = useViewTab();
   const { attrs } = useAtomValue(widgetAtom);
 
+  const ready = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom])
+  );
+
   const getContext = useAtomCallback(
     useCallback(
       (get) => {
@@ -235,11 +239,13 @@ export function Dashlet(props: WidgetProps) {
   );
 
   return (
-    <DashletComponent
-      schema={schema}
-      attrs={attrs}
-      readonly={readonly}
-      getContext={getContext}
-    />
+    ready && (
+      <DashletComponent
+        schema={schema}
+        attrs={attrs}
+        readonly={readonly}
+        getContext={getContext}
+      />
+    )
   );
 }

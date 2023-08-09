@@ -57,6 +57,7 @@ export interface WidgetState {
 
 export interface FormState {
   dirty?: boolean;
+  ready?: boolean;
   record: DataRecord;
   original?: DataRecord;
   states: Record<string, WidgetState>;
