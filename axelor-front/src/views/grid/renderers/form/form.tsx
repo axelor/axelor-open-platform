@@ -78,6 +78,7 @@ export const FormLayoutComponent = ({
   schema,
   formAtom,
   readonly,
+  onSave,
   onCancel,
   columns = [],
 }: LayoutProps) => {
@@ -85,6 +86,7 @@ export const FormLayoutComponent = ({
     () =>
       (schema.items || []).map((item) => ({
         ...item,
+        editOnSave: onSave,
         editable: true,
         editIndex: columns.findIndex((c) => c.name === item.name),
         showTitle: false,
