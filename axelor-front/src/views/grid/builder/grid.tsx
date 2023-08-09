@@ -184,13 +184,16 @@ export const Grid = forwardRef<
         columnProps.action = true;
       }
 
-      if (
-        !field || // check dummy
-        field.transient ||
-        field.json ||
-        field.encrypted ||
-        ["one-to-many", "many-to-many"].includes(toKebabCase(field.type))
-      ) {
+      const jsonField = (item as unknown as JsonField).jsonField;
+      const searchable =
+        jsonField ||
+        (field && // check dummy
+          !field.transient &&
+          !field.json &&
+          !field.encrypted &&
+          !["one-to-many", "many-to-many"].includes(toKebabCase(field.type)));
+
+      if (!searchable) {
         columnProps.sortable = false;
         columnProps.searchable = false;
       }
