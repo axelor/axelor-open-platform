@@ -1,14 +1,15 @@
-import { legacyClassNames } from "@/styles/legacy";
 import get from "lodash/get";
 import isEmpty from "lodash/isEmpty";
 import { parseFragment } from "parse5";
 import React from "react";
+
+import { legacyClassNames } from "@/styles/legacy";
+
 import {
   ATTRIBUTES,
   HTML_ATTRIBUTES,
   HTML_REACT_ATTRIBUTES,
 } from "./constants";
-import { parseSafe } from "./parser";
 import {
   getStyleObject,
   isArray,
@@ -407,23 +408,7 @@ function replaceTag(str) {
   return tag + closingTag;
 }
 
-function isReactTemplate(template) {
-  const tmpl = template && template.trim();
-  return tmpl && tmpl.startsWith("<>") && tmpl.endsWith("</>");
-}
-
-function processReact(template) {
-  const render = parseSafe(template);
-  const ReactComponent = ({ context }) => {
-    return render(context);
-  };
-  return ReactComponent;
-}
-
-export function processTemplate(template) {
-  if (isReactTemplate(template)) {
-    return processReact(template);
-  }
+export function processLegacyTemplate(template) {
   const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag).trim();
   const { childNodes = [] } = parseFragment(newTemplate);
   const hasSingleChild = childNodes.length === 1;

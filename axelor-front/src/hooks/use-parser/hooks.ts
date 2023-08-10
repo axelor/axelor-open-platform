@@ -2,13 +2,20 @@ import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
 import { Hilite } from "@/services/client/meta.types";
+
 import { EvalContextOptions, createEvalContext } from "./eval-context";
-import { processTemplate } from "./template-utils";
+import { processLegacyTemplate } from "./template-legacy";
+import { processReactTemplate } from "./template-react";
 import { parseAngularExp, parseExpression } from "./utils";
 
 const isSimple = (expression: string) => {
   return !expression.includes("{{") && !expression.includes("}}");
 };
+
+function isReact(template: string | undefined | null) {
+  const tmpl = template?.trim();
+  return tmpl?.startsWith("<>") && tmpl?.endsWith("</>");
+}
 
 export function useExpression(expression: string) {
   return useCallback(
@@ -25,7 +32,9 @@ export function useExpression(expression: string) {
 
 export function useTemplate(template: string) {
   return useMemo(() => {
-    const Comp = processTemplate(template);
+    const Comp = isReact(template)
+      ? processReactTemplate(template)
+      : processLegacyTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
       const context = createEvalContext(props.context, props.options, true);
       return createElement(Comp, { context });
