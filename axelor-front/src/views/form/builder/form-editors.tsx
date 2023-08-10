@@ -641,7 +641,7 @@ function processJsonView(schema: Schema) {
 
   if (schema.serverType) {
     result.type = "field";
-    result.widget = toKebabCase(schema.serverType);
+    result.widget = toKebabCase(schema.widget || schema.serverType);
     result.serverType = toSnakeCase(schema.serverType).toUpperCase();
   }
 
