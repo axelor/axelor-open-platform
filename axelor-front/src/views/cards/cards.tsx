@@ -188,11 +188,20 @@ export function Cards(props: ViewProps<CardsView>) {
       setDashletHandlers({
         searchAtom,
         dataStore,
+        actionExecutor,
         view,
         onRefresh: onSearch,
       });
     }
-  }, [dashlet, view, searchAtom, dataStore, onSearch, setDashletHandlers]);
+  }, [
+    dashlet,
+    view,
+    searchAtom,
+    dataStore,
+    actionExecutor,
+    onSearch,
+    setDashletHandlers,
+  ]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 

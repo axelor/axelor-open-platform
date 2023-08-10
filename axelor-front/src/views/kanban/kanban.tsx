@@ -504,10 +504,11 @@ export function Kanban(props: ViewProps<KanbanView>) {
       setDashletHandlers({
         dataStore,
         view,
+        actionExecutor,
         onRefresh: () => onRefresh(),
       });
     }
-  }, [dashlet, view, dataStore, onRefresh, setDashletHandlers]);
+  }, [dashlet, view, dataStore, actionExecutor, onRefresh, setDashletHandlers]);
 
   useAsyncEffect(async () => {
     await onRefresh();
