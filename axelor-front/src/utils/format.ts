@@ -40,9 +40,11 @@ function getJSON(jsonStr: string) {
 }
 
 const formatDuration: Formatter = (value, opts = {}) => {
-  if (!value || !_.isNumber(value)) {
+  if ((!value && value !== 0) || isNaN(value)) {
     return value;
   }
+
+  value = Number(value);
 
   const props = opts?.props;
 
@@ -50,9 +52,9 @@ const formatDuration: Formatter = (value, opts = {}) => {
   let m = "" + Math.floor((value % 3600) / 60);
   let s = "" + Math.floor((value % 3600) % 60);
 
-  h = _.pad(h, props?.big ? 3 : 2, "0");
-  m = _.pad(m, 2, "0");
-  s = _.pad(s, 2, "0");
+  h = _.padStart(h, props?.big ? 3 : 2, "0");
+  m = _.padStart(m, 2, "0");
+  s = _.padStart(s, 2, "0");
 
   var text = h + ":" + m;
 
@@ -236,6 +238,7 @@ const format: Formatter = (value, opts = {}) => {
   if (type) type = toKebabCase(type);
 
   if (type === "enum") type = "enumeration";
+  if (props?.widget === "duration") type = "duration";
   if (props?.selection) type = "selection";
 
   let val = value;
