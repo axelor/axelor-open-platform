@@ -151,7 +151,7 @@ export function AdvanceSearch({
     useCallback(
       (get, set) => {
         const state = get(stateAtom);
-        const { fields, searchText } = state;
+        const { fields, searchText, archived: _archived } = state;
 
         if (!searchText) return handleApply();
 
@@ -170,7 +170,7 @@ export function AdvanceSearch({
         set(stateAtom, {
           ...state,
           query: {
-            _archived: false,
+            _archived,
             _searchText: searchText,
             operator: "or",
             criteria: getFreeSearchCriteria(searchText, viewItems, fields),
