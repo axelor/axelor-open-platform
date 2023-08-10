@@ -2,7 +2,6 @@ import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
-import { sortBy } from "lodash";
 import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
 import { Box, Button, Divider, Input } from "@axelor/ui";
@@ -14,12 +13,8 @@ import { moment, Moment } from "@/services/client/l10n";
 import {
   AdvancedSearchAtom,
   Field,
-  JsonField,
-  Property,
   SavedFilter,
-  View,
 } from "@/services/client/meta.types";
-import { toKebabCase, toTitleCase } from "@/utils/names";
 import { AdvancedSearchState } from "../types";
 import { getContextFieldFilter } from "../utils";
 import { BooleanRadio, RelationalWidget, Select } from "./components";
@@ -58,9 +53,10 @@ const getFilterName = (title?: string) =>
 
 export interface EditorProps {
   stateAtom: AdvancedSearchAtom;
+  fields: Field[];
+  contextFields: Field[];
   canExportFull?: boolean;
   canShare?: boolean;
-  items?: View["items"];
   onClear?: () => void;
   onApply?: () => void;
   onExport?: (exportFull?: boolean) => void;
@@ -72,21 +68,14 @@ export function Editor({
   canExportFull = true,
   canShare = true,
   stateAtom,
+  fields,
+  contextFields,
   onClear,
   onApply,
   onSave,
   onExport,
   onDelete,
 }: EditorProps) {
-  const items = useAtomValue(
-    useMemo(() => selectAtom(stateAtom, (s) => s.items), [stateAtom])
-  );
-  const fields = useAtomValue(
-    useMemo(() => selectAtom(stateAtom, (s) => s.fields), [stateAtom])
-  );
-  const jsonFields = useAtomValue(
-    useMemo(() => selectAtom(stateAtom, (s) => s.jsonFields), [stateAtom])
-  );
   const filters = useAtomValue(
     useMemo(() => selectAtom(stateAtom, (s) => s.filters), [stateAtom])
   );
@@ -99,12 +88,6 @@ export function Editor({
   const [contextField, setContextField] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("contextField")),
-      [stateAtom]
-    )
-  );
-  const [contextFields, setContextFields] = useAtom(
-    useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("contextFields")),
       [stateAtom]
     )
   );
@@ -158,7 +141,7 @@ export function Editor({
       index: number
     ) {
       function getDefaultValue(fieldName: string) {
-        const field = fields?.[fieldName];
+        const field = fields?.find((f) => f.name === fieldName);
         const type = field?.type.toLowerCase();
         if (!type) return "";
         if (
@@ -278,65 +261,9 @@ export function Editor({
     [editor, onDelete]
   );
 
-  const $fields = useMemo(() => {
-    const fieldList = Object.values(fields || {}).reduce(
-      (list: Property[], field: Property) => {
-        const { type, large } = field as any;
-        const item = items?.find((item) => item.name === field.name);
-        if (
-          type === "binary" ||
-          large ||
-          field.json ||
-          field.encrypted ||
-          ["id", "version", "archived", "selected"].includes(field.name!) ||
-          item?.hidden
-        ) {
-          return list;
-        }
-        return [
-          ...list,
-          item ? { ...field, title: item.title ?? field.title } : field,
-        ];
-      },
-      [] as Property[]
-    );
-
-    items?.forEach((item) => {
-      if (!fields?.[item.name] && !item.hidden) {
-        fieldList.push(item);
-      }
-    });
-
-    Object.keys(jsonFields || {}).forEach((prefix) => {
-      const { title } = fields?.[prefix as any] || {};
-      const keys = Object.keys(jsonFields?.[prefix] || {});
-
-      keys?.forEach?.((name: string) => {
-        const field = (jsonFields?.[prefix]?.[name] || {}) as JsonField;
-        const type = toKebabCase(field.type);
-        if (["button", "panel", "separator", "many-to-many"].includes(type))
-          return;
-
-        let key = prefix + "." + name;
-        if (type !== "many-to-one") {
-          key += "::" + (field.jsonType || "text");
-        }
-        fieldList.push({
-          ...(field as any),
-          name: key,
-          title: `${field.title || field.autoTitle} ${
-            title ? `(${title})` : ""
-          }`,
-        } as Property);
-      });
-    });
-
-    return sortBy(fieldList, "title") as unknown as Field[];
-  }, [fields, jsonFields, items]);
-
   const criteriaFields = useMemo(
     () =>
-      $fields.filter((field) => {
+      fields.filter((field) => {
         const { contextField: contextFieldName, contextFieldValue } =
           field as any;
         return (
@@ -345,37 +272,8 @@ export function Editor({
             String(contextField?.value?.id) === String(contextFieldValue))
         );
       }),
-    [$fields, contextField]
+    [fields, contextField]
   );
-
-  useEffect(() => {
-    setContextFields(
-      $fields.reduce((ctxFields, field) => {
-        const {
-          contextField,
-          contextFieldTitle,
-          contextFieldValue,
-          contextFieldTarget,
-          contextFieldTargetName,
-        } = field as any;
-        if (contextField && !ctxFields.find((x) => x.name === contextField)) {
-          const field = $fields.find((field) => field.name === contextField);
-          const title = field?.title ?? toTitleCase(contextField);
-          ctxFields.push({
-            name: contextField,
-            title,
-            value: {
-              id: contextFieldValue,
-              [contextFieldTargetName]: contextFieldTitle,
-            },
-            target: contextFieldTarget,
-            targetName: contextFieldTargetName,
-          } as unknown as Field);
-        }
-        return ctxFields;
-      }, [] as Field[])
-    );
-  }, [$fields, setContextFields]);
 
   const hasContextField = Boolean(contextField?.field?.name);
   const defaultContextField = contextFields?.[0];

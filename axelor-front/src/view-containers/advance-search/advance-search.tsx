@@ -55,6 +55,7 @@ import {
   getFreeSearchCriteria,
   prepareAdvanceSearchQuery,
 } from "./utils";
+import { useFields } from "./editor/utils";
 
 import styles from "./advance-search.module.scss";
 
@@ -86,6 +87,7 @@ export function AdvanceSearch({
       [stateAtom]
     )
   );
+  const { fields, contextFields } = useFields(stateAtom);
   const [filters, setFilters] = useAtom(
     useMemo(() => focusAtom(stateAtom, (o) => o.prop("filters")), [stateAtom])
   );
@@ -218,75 +220,64 @@ export function AdvanceSearch({
     [setDomains, handleApply]
   );
 
-  const handleFilterCheck = useAtomCallback(
-    useCallback(
-      (
-        get,
-        set,
-        filter: SearchFilter | SavedFilter,
-        type?: "click" | "change"
-      ) => {
-        const isSingle = type === "click" && !filter.checked;
-        setFilterType(isSingle ? "single" : "all");
-        setFilters((filters) =>
-          filters?.map((f) =>
-            f === (filter as SavedFilter)
-              ? { ...f, checked: !f.checked }
-              : type === "click"
-              ? { ...f, checked: false }
-              : f
-          )
+  const handleFilterCheck = useCallback(
+    (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
+      const isSingle = type === "click" && !filter.checked;
+      setFilterType(isSingle ? "single" : "all");
+      setFilters((filters) =>
+        filters?.map((f) =>
+          f === (filter as SavedFilter)
+            ? { ...f, checked: !f.checked }
+            : type === "click"
+            ? { ...f, checked: false }
+            : f
+        )
+      );
+      if (type === "click") {
+        setDomains((domains) =>
+          domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
         );
-        if (type === "click") {
-          setDomains((domains) =>
-            domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
-          );
-          try {
-            let filterCustom = JSON.parse(
-              (filter as SavedFilter).filterCustom || "{}"
-            ) as Criteria | null;
+        try {
+          let filterCustom = JSON.parse(
+            (filter as SavedFilter).filterCustom || "{}"
+          ) as Criteria | null;
 
-            // Context field
-            const { contextFields } = get(stateAtom);
-            if (contextFields?.length) {
-              let contextField: AdvancedSearchState["contextField"] = null;
-              if (!filter.checked) {
-                const found = findContextField(
-                  filterCustom ?? {},
-                  contextFields
-                );
-                if (found) {
-                  contextField = found;
-                  const { criteria = [] } = filterCustom ?? {};
-                  filterCustom =
-                    criteria.length > 1 ? (criteria[1] as Criteria) : null;
-                }
+          // Context field
+          if (contextFields?.length) {
+            let contextField: AdvancedSearchState["contextField"] = null;
+            if (!filter.checked) {
+              const found = findContextField(filterCustom ?? {}, contextFields);
+              if (found) {
+                contextField = found;
+                const { criteria = [] } = filterCustom ?? {};
+                filterCustom =
+                  criteria.length > 1 ? (criteria[1] as Criteria) : null;
               }
-              setContextField(contextField);
             }
+            setContextField(contextField);
+          }
 
-            setEditor(() =>
-              filter.checked
-                ? getEditorDefaultState()
-                : {
-                    ...filter,
-                    ...filterCustom,
-                  }
-            );
-            handleApply(true);
-          } catch {}
-        }
-      },
-      [
-        setFilters,
-        setFilterType,
-        setDomains,
-        setEditor,
-        setContextField,
-        handleApply,
-        stateAtom,
-      ]
-    )
+          setEditor(() =>
+            filter.checked
+              ? getEditorDefaultState()
+              : {
+                  ...filter,
+                  ...filterCustom,
+                }
+          );
+          handleApply(true);
+        } catch {}
+      }
+    },
+    [
+      setFilters,
+      setFilterType,
+      setDomains,
+      setEditor,
+      setContextField,
+      handleApply,
+      contextFields,
+    ]
   );
 
   const handleFilterSave = useCallback(
@@ -467,9 +458,10 @@ export function AdvanceSearch({
                 {customSearch && (
                   <Editor
                     stateAtom={stateAtom}
+                    fields={fields}
+                    contextFields={contextFields}
                     canShare={advanceSearchConfig?.share}
                     canExportFull={advanceSearchConfig?.exportFull}
-                    items={items}
                     onApply={handleEditorApply}
                     onClear={handleClear}
                     onExport={handleExport}

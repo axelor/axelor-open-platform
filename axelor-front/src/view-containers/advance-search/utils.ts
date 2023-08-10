@@ -347,7 +347,7 @@ export function getContextFieldFilter(
 
 export function findContextField(
   filter: Criteria,
-  contextFields: AdvancedSearchState["contextFields"]
+  contextFields: Field[]
 ): AdvancedSearchState["contextField"] {
   const { operator, criteria } = filter;
   if (operator === "and" && criteria?.length) {

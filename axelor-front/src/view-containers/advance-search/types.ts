@@ -24,7 +24,6 @@ export type AdvancedSearchState = {
     shared?: boolean;
     selected?: boolean;
   };
-  contextFields?: Field[];
   contextField?: ContextField;
   appliedContextField?: ContextField;
   archived?: boolean;

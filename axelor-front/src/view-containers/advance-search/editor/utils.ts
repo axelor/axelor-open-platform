@@ -1,7 +1,16 @@
 import { useMemo } from "react";
+import { useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
+import sortBy from "lodash/sortBy";
+
 import { i18n } from "@/services/client/i18n";
-import { toKebabCase } from "@/utils/names";
-import { Field } from "@/services/client/meta.types";
+import { toKebabCase, toTitleCase } from "@/utils/names";
+import {
+  AdvancedSearchAtom,
+  Field,
+  JsonField,
+  Property,
+} from "@/services/client/meta.types";
 
 type Config = {
   types: string[];
@@ -111,7 +120,7 @@ const EXTRA_OPERATORS_BY_TARGET = {
 export function useField(fields?: Field[], name?: string) {
   return useMemo(() => {
     const field = fields?.find((item) => item.name === name);
-    
+
     let type = toKebabCase(field?.type!);
 
     if (field && field.selectionList) {
@@ -136,4 +145,106 @@ export function useField(fields?: Field[], name?: string) {
       options: operators.filter((item) => typeOperators.includes(item.name)),
     };
   }, [name, fields]);
+}
+
+export function useFields(stateAtom: AdvancedSearchAtom) {
+  const items = useAtomValue(
+    useMemo(() => selectAtom(stateAtom, (s) => s.items), [stateAtom])
+  );
+  const fields = useAtomValue(
+    useMemo(() => selectAtom(stateAtom, (s) => s.fields), [stateAtom])
+  );
+  const jsonFields = useAtomValue(
+    useMemo(() => selectAtom(stateAtom, (s) => s.jsonFields), [stateAtom])
+  );
+
+  const $fields = useMemo(() => {
+    const fieldList = Object.values(fields || {}).reduce(
+      (list: Property[], field: Property) => {
+        const { type, large } = field as any;
+        const item = items?.find((item) => item.name === field.name);
+        if (
+          type === "binary" ||
+          large ||
+          field.json ||
+          field.encrypted ||
+          ["id", "version", "archived", "selected"].includes(field.name!) ||
+          item?.hidden
+        ) {
+          return list;
+        }
+        return [
+          ...list,
+          item ? { ...field, title: item.title ?? field.title } : field,
+        ];
+      },
+      [] as Property[]
+    );
+
+    items?.forEach((item) => {
+      if (!fields?.[item.name] && !item.hidden) {
+        fieldList.push(item);
+      }
+    });
+
+    Object.keys(jsonFields || {}).forEach((prefix) => {
+      const { title } = fields?.[prefix as any] || {};
+      const keys = Object.keys(jsonFields?.[prefix] || {});
+
+      keys?.forEach?.((name: string) => {
+        const field = (jsonFields?.[prefix]?.[name] || {}) as JsonField;
+        const type = toKebabCase(field.type);
+        if (["button", "panel", "separator", "many-to-many"].includes(type))
+          return;
+
+        let key = prefix + "." + name;
+        if (type !== "many-to-one") {
+          key += "::" + (field.jsonType || "text");
+        }
+        fieldList.push({
+          ...(field as any),
+          name: key,
+          title: `${field.title || field.autoTitle} ${
+            title ? `(${title})` : ""
+          }`,
+        } as Property);
+      });
+    });
+
+    return sortBy(fieldList, "title") as unknown as Field[];
+  }, [fields, jsonFields, items]);
+
+  const contextFields = useMemo(
+    () =>
+      $fields.reduce((ctxFields, field) => {
+        const {
+          contextField,
+          contextFieldTitle,
+          contextFieldValue,
+          contextFieldTarget,
+          contextFieldTargetName,
+        } = field as any;
+        if (contextField && !ctxFields.find((x) => x.name === contextField)) {
+          const field = $fields.find((field) => field.name === contextField);
+          const title = field?.title ?? toTitleCase(contextField);
+          ctxFields.push({
+            name: contextField,
+            title,
+            value: {
+              id: contextFieldValue,
+              [contextFieldTargetName]: contextFieldTitle,
+            },
+            target: contextFieldTarget,
+            targetName: contextFieldTargetName,
+          } as unknown as Field);
+        }
+        return ctxFields;
+      }, [] as Field[]),
+    [$fields]
+  );
+
+  return {
+    fields: $fields,
+    contextFields,
+  };
 }
