@@ -31,8 +31,10 @@ function getValue(
     }
   } catch {}
 
-  return timestamp > 0
-    ? `${padStart(`${hrs}`, big ? 3 : 2, "0")}:${padStart(`${mins}`, 2, "0")}${seconds ? `:${padStart(`${secs}`, 2, "0")}` : ""}`
+  return timestamp >= 0
+    ? `${padStart(`${hrs}`, big ? 3 : 2, "0")}:${padStart(`${mins}`, 2, "0")}${
+        seconds ? `:${padStart(`${secs}`, 2, "0")}` : ""
+      }`
     : "";
 }
 
