@@ -282,7 +282,7 @@ export function OneToManyEdit({
         ref={inputRef}
         readOnly
         autoFocus={focus}
-        value={value?.length ? `(${value.length})` : ""}
+        value={`(${value?.length || 0})`}
         onChange={() => {}}
         icons={[
           {
