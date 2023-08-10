@@ -285,14 +285,10 @@ export function OneToManyEdit({
         value={value?.length ? `(${value.length})` : ""}
         onChange={() => {}}
         icons={[
-          ...(popup
-            ? [
-                {
-                  icon: "add",
-                  onClick: onAdd,
-                } as MaterialIconProps,
-              ]
-            : []),
+          {
+            icon: "add",
+            onClick: onAdd,
+          } as MaterialIconProps,
           ...(popup && selectedRows?.length
             ? [
                 {
