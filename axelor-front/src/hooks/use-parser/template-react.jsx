@@ -23,6 +23,8 @@ import {
   TableRow,
 } from "@axelor/ui";
 
+import { BootstrapIcon as Icon } from "@axelor/ui/icons/bootstrap-icon";
+
 import { useMemo } from "react";
 import { parseSafe } from "./parser";
 
@@ -49,6 +51,7 @@ const COMPONENTS = {
   TableRow,
   TableCell,
   TableCaption,
+  Icon,
 };
 
 function createContext(context) {
