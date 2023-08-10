@@ -19,7 +19,7 @@ import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useHilites, useTemplate } from "@/hooks/use-parser";
-import { EvalContextOptions } from "@/hooks/use-parser/eval-context";
+import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";

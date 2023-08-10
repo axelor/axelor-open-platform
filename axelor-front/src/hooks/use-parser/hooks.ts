@@ -3,7 +3,11 @@ import { createElement, useCallback, useMemo } from "react";
 import { DataContext } from "@/services/client/data.types";
 import { Hilite } from "@/services/client/meta.types";
 
-import { EvalContextOptions, createEvalContext } from "./eval-context";
+import {
+  EvalContextOptions,
+  createEvalContext,
+  createScriptContext,
+} from "./context";
 import { processLegacyTemplate } from "./template-legacy";
 import { processReactTemplate } from "./template-react";
 import { parseAngularExp, parseExpression } from "./utils";
@@ -36,7 +40,9 @@ export function useTemplate(template: string) {
       ? processReactTemplate(template)
       : processLegacyTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
-      const context = createEvalContext(props.context, props.options, true);
+      const context = isReact(template)
+        ? createScriptContext(props.context, props.options)
+        : createEvalContext(props.context, props.options, true);
       return createElement(Comp, { context });
     };
   }, [template]);

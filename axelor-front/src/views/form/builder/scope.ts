@@ -9,7 +9,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   EvalContextOptions,
   createEvalContext,
-} from "@/hooks/use-parser/eval-context";
+} from "@/hooks/use-parser/context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { View } from "@/services/client/meta.types";
 import {

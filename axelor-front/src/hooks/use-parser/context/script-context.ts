@@ -1,30 +1,26 @@
-import get from "lodash/get";
-import set from "lodash/set";
 import { MouseEvent } from "react";
+import get from "lodash/get";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format, { getJSON } from "@/utils/format";
-import { unaccent } from "@/utils/sanitize";
 import { ActionOptions } from "@/view-containers/action";
 
-export type EvalContextOptions = {
+export type ScriptContextOptions = {
   valid?: (name?: string) => boolean;
   execute?: (name: string, options?: ActionOptions) => Promise<any>;
   readonly?: boolean;
   required?: boolean;
   popup?: boolean;
   fields?: Record<string, Field>;
-  components?: Record<string, (props: any) => JSX.Element | null>;
+  helpers?: Record<string, any>;
 };
 
-export function createEvalContext(
+export function createScriptContext(
   context: DataContext,
-  options?: EvalContextOptions,
-  template?: boolean
+  options?: ScriptContextOptions
 ) {
   const {
     execute = () => Promise.resolve(),
@@ -33,7 +29,7 @@ export function createEvalContext(
     required = false,
     popup = false,
     fields = {},
-    components = {}, // custom components
+    helpers: moreHelpers = {},
   } = options ?? {};
 
   const helpers = {
@@ -45,9 +41,6 @@ export function createEvalContext(
     },
     get $userId() {
       return session.info?.user?.id;
-    },
-    $component(name: string) {
-      return components[name];
     },
     $get(path: string) {
       const value = get(context, path);
@@ -170,60 +163,14 @@ export function createEvalContext(
         });
       };
     },
+    ...moreHelpers,
   };
 
-  const filters = {
-    __date(value: any, formatText: string) {
-      if (value && formatText) {
-        return moment(value).format(formatText);
-      }
-      return format(value, { props: { type: "date" } as any });
-    },
-    __currency(value: any, currency: string, scale = 2) {
-      return format(value, {
-        props: { scale, currency, type: "decimal" } as any,
-      });
-    },
-    __percent(value: any, scale?: string | number) {
-      return format(value, { props: { scale, type: "percent" } as any });
-    },
-    __number(value: any, scale?: string | number) {
-      return format(value, { props: { scale, type: "integer" } as any });
-    },
-    __unaccent(value: any) {
-      return unaccent(value);
-    },
-    __t(key: string, ...args: any[]) {
-      return i18n.get(key, ...args);
-    },
-    __lowercase(value: any) {
-      return typeof value === "string" ? value.toLowerCase() : value;
-    },
-    __uppercase(value: any) {
-      return typeof value === "string" ? value.toUpperCase() : value;
-    },
-  };
+  type Context = DataContext & typeof helpers;
 
-  type EvalContext = DataContext & typeof helpers & typeof filters;
-
-  const $context = template
-    ? Object.keys(context).reduce((ctx, key) => {
-        const value = context[key];
-        return set(
-          ctx,
-          key,
-          value && typeof value === "object"
-            ? Array.isArray(value)
-              ? [...value]
-              : { ...value }
-            : value
-        );
-      }, {} as any)
-    : context;
-  const proxy = new Proxy<EvalContext>($context as any, {
+  return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
       if (p in helpers) return helpers[p as keyof typeof helpers];
-      if (p in filters) return filters[p as keyof typeof filters];
       const value = Reflect.get(target, p, receiver) ?? get(target, p);
       if (p === "id" && value && value <= 0) {
         return null;
@@ -241,9 +188,7 @@ export function createEvalContext(
       return value;
     },
     set(target, p, newValue, receiver) {
-      throw new Error("Cannot update eval context");
+      throw new Error("Cannot update context");
     },
   });
-
-  return proxy;
 }

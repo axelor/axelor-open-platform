@@ -6,7 +6,7 @@ import isUndefined from "lodash/isUndefined";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { createEvalContext } from "@/hooks/use-parser/eval-context";
+import { createEvalContext } from "@/hooks/use-parser/context";
 import { parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
