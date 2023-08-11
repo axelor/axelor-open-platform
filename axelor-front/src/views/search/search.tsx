@@ -1,7 +1,7 @@
 import { Box } from "@axelor/ui";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useAtomCallback } from "jotai/utils";
-import { atom, useAtom, useSetAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { useLocation } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
@@ -25,7 +25,7 @@ import { Grid as GridComponent } from "@/views/grid/builder";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { useGridState } from "../grid/builder/utils";
-import { useViewDirtyAtom, useViewTab } from "@/view-containers/views/scope";
+import { useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
 import { parseAngularExp } from "@/hooks/use-parser/utils";
@@ -95,7 +95,7 @@ export function Search(props: ViewProps<SearchView>) {
     const fields = prepareFields(searchFields);
 
     function process(item: SearchField) {
-      const $item = { ...item, type: "field" } as Schema;
+      const $item = { ...item, type: "field", canDirty: false } as Schema;
       switch (toKebabCase($item.widget ?? "")) {
         case "many-to-one":
         case "one-to-one":
@@ -163,7 +163,6 @@ export function Search(props: ViewProps<SearchView>) {
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(formMeta, record);
-  const setDirty = useSetAtom(useViewDirtyAtom());
 
   const onEdit = useAtomCallback(
     useCallback(
@@ -221,7 +220,6 @@ export function Search(props: ViewProps<SearchView>) {
         const { selectValue } = get(searchObjectsAtom);
 
         if (!Object.values(record).some((x) => x)) {
-          setDirty(false);
           setRecords((records) => (records.length ? [] : records));
           return;
         }
@@ -260,7 +258,6 @@ export function Search(props: ViewProps<SearchView>) {
           };
         });
         setRecords(records);
-        setDirty(false);
 
         if (records.length === 0) {
           alerts.info({
@@ -278,7 +275,6 @@ export function Search(props: ViewProps<SearchView>) {
         selects,
         name,
         limit,
-        setDirty,
         onEdit,
       ]
     )
