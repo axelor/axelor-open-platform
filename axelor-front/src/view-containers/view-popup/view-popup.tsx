@@ -240,10 +240,13 @@ function Footer({
   useEffect(() => {
     return handler.actionHandler?.subscribe((data) => {
       if (data.type === "close") {
-        close(false);
+        if (popupCanReload) {
+          triggerReload();
+        }
+        close(true);
       }
     });
-  }, [close, handleCancel, handleConfirm, handler]);
+  }, [close, handleCancel, handleConfirm, handler, popupCanReload, triggerReload]);
 
   return (
     <Box d="flex" g={2}>
