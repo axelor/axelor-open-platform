@@ -284,12 +284,18 @@ const FormContainer = memo(function FormContainer({
           readonly?: boolean;
           dirty?: boolean;
           isNew?: boolean;
+          keepStates?: boolean;
         }
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
         const action = record ? onLoadAction : onNewAction;
-        const { isNew, dirty = false, ...props } = { readonly, ...options };
+        const {
+          isNew,
+          dirty = false,
+          keepStates,
+          ...props
+        } = { readonly, ...options };
         const isNewFromUnsaved = isNew && record === null && !prev.record.id;
 
         record = record ?? {};
@@ -310,8 +316,7 @@ const FormContainer = memo(function FormContainer({
         set(formAtom, {
           ...prev,
           dirty,
-          states: {},
-          statesByName: {},
+          ...(keepStates ? null : { states: {}, statesByName: {} }),
           record,
           original: { ...record },
         });
@@ -439,7 +444,7 @@ const FormContainer = memo(function FormContainer({
 
         if (callOnLoad) {
           const isNew = vals.id !== res.id;
-          doEdit(res, { readonly, isNew });
+          doEdit(res, { readonly, isNew, keepStates: true });
         }
 
         return res;
