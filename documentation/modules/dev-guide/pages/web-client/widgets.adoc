@@ -362,6 +362,10 @@ The `MultiSelect` widget can be used with a selection field to select multiple v
 
 The `SingleSelect` widget can be used with a selection field to select a single value displayed as a tag. Tag colors can be defined in the selection options via the `color` attribute.
 
+== SuggestBox
+
+The `SuggestBox` widget can be used with a many-to-one or one-to-one field to show suggestion list of matching records (similar to selection fields).
+
 == TagSelect
 
 The `TagSelect` widget can be used with a many-to-many field to select multiple values displayed as tags. Use `x-color-field` to specify the tag color field that should use selection `color.name.selection`.
