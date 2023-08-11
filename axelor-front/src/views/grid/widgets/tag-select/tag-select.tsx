@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from "react";
 import {
   Box,
   Menu,
@@ -5,6 +6,7 @@ import {
   Overflow,
   OverflowItem,
   OverflowItemProps,
+  clsx,
   useIsOverflowItemVisible,
   useOverflowMenu,
   useRefs,
@@ -14,8 +16,8 @@ import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 import { Field } from "@/services/client/meta.types";
 import { Chip } from "@/views/form/widgets";
 import { DataRecord } from "@/services/client/data.types";
-import { useCallback, useMemo, useState } from "react";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import styles from "./tag-select.module.scss";
 
 const OverflowMenuItem: React.FC<OverflowItemProps> = (props) => {
   const { id, children } = props;
@@ -56,14 +58,20 @@ const OverflowMenu: React.FC<{
   }
 
   return (
-    <Box>
-      <Box ref={iconRef} onClick={showMenu}>
+    <Box onMouseLeave={hideMenu}>
+      <Box ref={iconRef} onMouseEnter={showMenu}>
         <Chip
           title={`+${overflowCount ?? ""}`}
           color={theme === "dark" ? "gray" : "white"}
+          className={clsx(styles.count, styles[theme])}
         />
       </Box>
-      <Menu target={target} show={show} onHide={hideMenu} navigation>
+      <Menu
+        className={styles.menu}
+        target={target}
+        show={show}
+        onHide={hideMenu}
+      >
         {items.map((item, i) => {
           return (
             <OverflowMenuItem key={i} id={String(item.id!)}>
@@ -95,7 +103,7 @@ export function TagSelect(props: GridColumnProps) {
 
   return (
     <Overflow>
-      <Box d="flex" flexWrap="nowrap" gap={4}>
+      <Box d="flex" flexWrap="nowrap" gap={4} w={100}>
         {list.map((item) => (
           <OverflowItem key={item.id} id={String(item.id!)}>
             <Box>{renderItem(item)}</Box>

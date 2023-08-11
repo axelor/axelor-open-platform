@@ -2,7 +2,14 @@ import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import { Badge, Box, Select, SelectComponents, SelectProps } from "@axelor/ui";
+import {
+  Badge,
+  Box,
+  Select,
+  SelectComponents,
+  SelectProps,
+  useClassNames,
+} from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
@@ -17,16 +24,22 @@ import styles from "./selection.module.scss";
 export function Chip({
   title,
   color,
+  className,
   onRemove,
 }: {
   title?: string;
   color?: string;
+  className?: string;
   onRemove?: () => void;
 }) {
   return (title && (
     <Badge
       px={2}
-      className={clsx(styles["tag"], legacyClassNames(`hilite-${color}`))}
+      className={clsx(
+        styles["tag"],
+        className,
+        legacyClassNames(`hilite-${color}`)
+      )}
     >
       <Box as="span" className={styles["tag-text"]}>
         {title}
