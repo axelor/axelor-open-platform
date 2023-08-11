@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import uniqueId from "lodash/uniqueId";
 
 import {
   Grid as AxGrid,
@@ -139,8 +140,17 @@ export const Grid = forwardRef<
     [fields, view.items]
   );
 
+  const viewItems = useMemo(
+    () =>
+      (view.items || []).map((item) => ({
+        ...item,
+        id: uniqueId(view.name || "grid-column"),
+      })),
+    [view.name, view.items]
+  );
+
   const columns = useMemo(() => {
-    const columns: GridColumn[] = view.items!.map((item) => {
+    const columns: GridColumn[] = viewItems.map((item) => {
       const field = fields?.[item.name!];
       const title = item.title ?? item.autoTitle;
       const attrs = item.widgetAttrs;
@@ -216,8 +226,8 @@ export const Grid = forwardRef<
 
     return columns;
   }, [
+    viewItems,
     view.sortable,
-    view.items,
     view.editIcon,
     showEditIcon,
     fields,
