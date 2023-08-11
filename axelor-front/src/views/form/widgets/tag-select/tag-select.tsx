@@ -12,7 +12,6 @@ import {
   useSelector,
 } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
 
 import {
   FieldControl,
@@ -64,6 +63,7 @@ export function TagSelectComponent({
       optionValue={"id"}
       components={components}
       {...props}
+      icons={[{ icon: "arrow_drop_down" }]}
     />
   );
 }
