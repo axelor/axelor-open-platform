@@ -17,7 +17,7 @@ import { useViewTab } from "@/view-containers/views/scope";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { findActionView } from "@/services/client/meta-cache";
 
-import { Attrs, WidgetProps } from "../../builder";
+import { Attrs, WidgetProps, usePrepareContext } from "../../builder";
 import { DashletActions } from "./dashlet-actions";
 import classes from "./dashlet.module.scss";
 
@@ -224,19 +224,14 @@ export function Dashlet(props: WidgetProps) {
     useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom])
   );
 
-  const getContext = useAtomCallback(
-    useCallback(
-      (get) => {
-        const ctx = formAtom ? get(formAtom).record : {};
-        return {
-          _model: tab.action.model,
-          ...tab.action.context,
-          ...ctx,
-        } as DataContext;
-      },
-      [formAtom, tab.action.context, tab.action.model]
-    )
-  );
+  const getFormContext = usePrepareContext(formAtom);
+
+  const getContext = useCallback(() => {
+    return {
+      _model: tab.action.model,
+      ...getFormContext(),
+    } as DataContext;
+  }, [tab.action.model, getFormContext]);
 
   return (
     ready && (
