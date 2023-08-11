@@ -10,7 +10,7 @@ import styles from "./tag-select.edit.module.scss";
 
 export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
   const { widgetAtom, schema } = props;
-  const [popup, setPopup] = useEditablePopup();
+  const [popup, setPopup, popupRef] = useEditablePopup();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -59,6 +59,7 @@ export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
       </Box>
       {popup && (
         <Box
+          ref={popupRef}
           d="flex"
           bgColor="body"
           style={{ ...popup?.style }}
@@ -69,6 +70,7 @@ export function TagSelectEdit(props: FieldProps<DataRecord[]>) {
             <TagSelect
               {...props}
               selectProps={{
+                disablePortal: true,
                 autoFocus: true,
                 onBlur: handleBlur,
               }}

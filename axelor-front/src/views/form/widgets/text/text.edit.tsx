@@ -8,12 +8,22 @@ import { Text } from "./text";
 
 export function useEditablePopup() {
   const [popup, setPopup] = useState<any>(null);
+  const popupRef = useRef<any>(null);
 
   const hasPopup = Boolean(popup);
 
   useEffect(() => {
     if (hasPopup) {
-      const handler = () => setPopup(null);
+      const handler = (e: any) => {
+        const popupEl = popupRef.current;
+        if (
+          popupEl &&
+          (e?.target === popupEl || popupEl?.contains?.(e?.target))
+        ) {
+          return;
+        }
+        setPopup(null);
+      };
       const wheelEvent =
         "onwheel" in document.createElement("div") ? "wheel" : "mousewheel";
       window.addEventListener("DOMMouseScroll", handler, false); // older FF
@@ -26,12 +36,12 @@ export function useEditablePopup() {
     }
   }, [hasPopup]);
 
-  return [popup, setPopup] as const;
+  return [popup, setPopup, popupRef] as const;
 }
 
 export function TextEdit(props: FieldProps<string>) {
   const { widgetAtom, schema } = props;
-  const [popup, setPopup] = useEditablePopup();
+  const [popup, setPopup, popupRef] = useEditablePopup();
   const targetRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -55,9 +65,12 @@ export function TextEdit(props: FieldProps<string>) {
     }
   }, [setPopup]);
 
-  const handleBlur = useCallback((e: FocusEvent<HTMLTextAreaElement>) => {
-    setPopup(null);
-  }, [setPopup]);
+  const handleBlur = useCallback(
+    (e: FocusEvent<HTMLTextAreaElement>) => {
+      setPopup(null);
+    },
+    [setPopup]
+  );
 
   useEffect(() => {
     focus && handleFocus();
@@ -75,6 +88,7 @@ export function TextEdit(props: FieldProps<string>) {
       </Box>
       {popup && (
         <Box
+          ref={popupRef}
           d="flex"
           bgColor="body"
           style={{ ...popup?.style }}
