@@ -222,14 +222,11 @@ function Footer({
 
   const handleConfirm = useCallback(async () => {
     if (handler.getState === undefined) return close(true);
-    const state = handler.getState();
-    const record = state.record;
-    const canSave = state.dirty || !record.id;
     const onSave = handler.onSave;
 
     try {
       if (onSave) {
-        await onSave(true, canSave, false);
+        await onSave(true, true, false);
       }
       if (popupCanReload) {
         triggerReload();
