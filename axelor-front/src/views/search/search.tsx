@@ -414,6 +414,7 @@ export function Search(props: ViewProps<SearchView>) {
       <Box d="flex" flex={1}>
         <GridComponent
           showEditIcon
+          allowCheckboxSelection={false}
           readonly={false}
           records={records}
           view={gridView}
