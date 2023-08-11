@@ -39,23 +39,42 @@ export function processActionValue(value: any) {
 }
 
 export function processContextValues(context: DataContext) {
-  function setDummyIdToNull(value: any): any {
-    if (value && typeof value === "object") {
-      if (Array.isArray(value)) {
-        return value.map(setDummyIdToNull);
+  const IGNORE = [
+    "$attachments",
+    "$processInstanceId",
+    "_dirty",
+    "_showRecord",
+    "_showSingle",
+  ];
+
+  function process(_value: DataContext) {
+    const value = { ..._value };
+    for (let k in value) {
+      const v = value[k];
+
+      // ignore values
+      if (IGNORE.includes(k) || k.startsWith("$t:")) {
+        delete value[k];
       }
-      if (value.id < 0) {
-        return { ...value, id: null };
+
+      if (v && typeof v === "object") {
+        if (Array.isArray(v)) {
+          value[k] = v.map(process);
+        } else {
+          value[k] = process(v);
+        }
       }
     }
+
+    // set dummy id to null
+    if ((value?.id ?? 0) < 0) {
+      return { ...value, id: null };
+    }
+
     return value;
   }
 
-  for (let k in context) {
-    context[k] = setDummyIdToNull(context[k]);
-  }
-
-  return context;
+  return process(context);
 }
 
 const NUMBER_ATTRS = [
@@ -124,7 +143,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   if (
     res.widget !== "panel" &&
     res.widget !== "separator" &&
-    res.widget !== "button" && 
+    res.widget !== "button" &&
     res.widget !== "label"
   ) {
     res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;

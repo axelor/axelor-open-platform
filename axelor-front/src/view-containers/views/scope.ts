@@ -15,6 +15,7 @@ import {
 } from "@/hooks/use-tabs";
 import { useFormScope } from "@/views/form/builder/scope";
 import { usePrepareContext } from "@/views/form/builder";
+import { processContextValues } from "@/views/form/builder/utils";
 import { dialogs } from "@/components/dialogs";
 import { DataContext } from "@/services/client/data.types";
 
@@ -80,12 +81,14 @@ export function useViewContext() {
 
   return useCallback(
     () =>
-      (dashlet || recordId
-        ? {
-            ...getFormContext(),
-            ...action.context,
-          }
-        : action.context) as DataContext,
+      processContextValues(
+        (dashlet || recordId
+          ? {
+              ...getFormContext(),
+              ...action.context,
+            }
+          : action.context) ?? {}
+      ) as DataContext,
     [dashlet, recordId, action.context, getFormContext]
   );
 }

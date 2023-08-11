@@ -248,20 +248,12 @@ export const contextAtom = atom(
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
       const { model, record, parent, statesByName } = get(formAtom);
-      const IGNORE = ["$attachments", "$processInstanceId", "_dirty"];
 
       let context: DataContext = {
         ...options,
         ...record,
         _model: model,
       };
-
-      // ignore values
-      IGNORE.forEach((key) => {
-        if (context[key] !== undefined) {
-          delete context[key];
-        }
-      });
 
       // set selected flag for o2m/m2m fields
       for (let name in statesByName) {
