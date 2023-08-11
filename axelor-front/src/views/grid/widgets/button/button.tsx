@@ -45,10 +45,13 @@ export function Button(props: GridCellProps) {
       await actionExecutor.execute(onClick, {
         context: {
           ...record,
-          id: record.$$id ?? record.id,
           selected: true,
           _signal: name,
           _ids: undefined,
+          ...(record.$$id && {
+            id: record.$$id,
+            $$id: undefined,
+          }),
         },
       });
     }
