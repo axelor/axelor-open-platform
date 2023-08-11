@@ -221,8 +221,19 @@ function getDefaultFieldValues(fields?: MetaData["fields"]) {
       if (defaultValue === undefined || key.includes(".")) {
         return acc;
       }
-      const value =
-        type === "DECIMAL" ? parseDecimal(defaultValue, field) : defaultValue;
+      let value;
+      switch (type) {
+        case "DECIMAL":
+          value = parseDecimal(defaultValue, field);
+          break;
+        case "INTEGER":
+        case "LONG":
+          value = parseInt(defaultValue);
+          break;
+        default:
+          value = defaultValue;
+      }
+
       return { ...acc, [key]: value };
     },
     {}
