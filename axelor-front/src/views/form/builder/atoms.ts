@@ -168,7 +168,7 @@ export function createValueAtom({
           [jsonPath]: value,
         });
         if (prev !== next) {
-          const dirty = Boolean(markDirty && name);
+          const dirty = Boolean(markDirty && name) && schema.canDirty !== false;
 
           set(lensAtom, next);
           set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
@@ -206,7 +206,10 @@ export function createValueAtom({
       const next =
         typeof value === "string" && value.trim() === "" ? null : value;
       if (prev !== next) {
-        const dirty = markDirty && Boolean(name && !isCleanDummy(name));
+        const dirty =
+          markDirty &&
+          schema.canDirty !== false &&
+          Boolean(name && !isCleanDummy(name));
         set(lensAtom, next);
         set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
         if (dirty) {
