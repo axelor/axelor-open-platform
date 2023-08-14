@@ -32,6 +32,7 @@ import {
 
 import { useShortcut } from "@/hooks/use-shortcut";
 import { useFormScope, useFormValidityScope } from "@/views/form/builder/scope";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
@@ -184,6 +185,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         parent,
         initFormFieldsStates
       );
+    const onNewAction =
+      (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
 
     const getParent = useCallback(() => {
       if (parentRef.current) return parentRef.current;
@@ -353,6 +356,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     useEffect(() => {
       return addWidgetValidator(checkInvalid);
     }, [addWidgetValidator, checkInvalid]);
+
+    useAsyncEffect(async () => {
+      if (onNewAction) {
+        await actionExecutor.execute(onNewAction, {
+          context: {
+            id: undefined,
+          },
+        });
+      }
+    }, [onNewAction, actionExecutor]);
 
     return (
       <FocusTrap initialFocus={false}>
