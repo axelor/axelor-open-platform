@@ -11,7 +11,7 @@ export function useCompletion(options: {
   limit?: number;
   sortBy?: string;
 }) {
-  const { target, targetName, targetSearch, sortBy, limit = 20 } = options;
+  const { target, targetName, targetSearch, sortBy, limit = 10 } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
     () => [[targetName], targetSearch].flat().filter(Boolean) as string[],
