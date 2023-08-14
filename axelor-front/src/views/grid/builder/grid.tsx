@@ -154,7 +154,7 @@ export const Grid = forwardRef<
       const field = fields?.[item.name!];
       const title = item.title ?? item.autoTitle;
       const attrs = item.widgetAttrs;
-      const serverType = field?.type;
+      const serverType = (item as Field).serverType || field?.type;
       const columnProps: Partial<GridColumn> = {};
       const extraAttrs = columnAttrs?.[item.name!];
 

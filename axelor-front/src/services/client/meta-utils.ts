@@ -2,7 +2,7 @@ import _ from "lodash";
 
 import { i18n } from "./i18n";
 import { ViewData } from "./meta";
-import { ActionView, Property, Schema } from "./meta.types";
+import { ActionView, Field, Property, Schema } from "./meta.types";
 
 function processJsonForm(view: Schema) {
   if (view.type !== "form") return view;
@@ -585,6 +585,16 @@ export function processView(
       name: "$wkfStatus",
       showTitle: false,
       widget: "wkf-status",
+    });
+  }
+
+  if (meta.view.type !== "form") {
+    view.items?.forEach((item) => {
+      const serverType = (meta?.fields?.[item.name ?? ""] as unknown as Field)
+        ?.type;
+      if (item.type === "field" && serverType) {
+        item.serverType = item.serverType || serverType;
+      }
     });
   }
 }
