@@ -359,11 +359,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     useAsyncEffect(async () => {
       if (onNewAction) {
-        await actionExecutor.execute(onNewAction, {
-          context: {
-            id: undefined,
-          },
-        });
+        await actionExecutor.execute(onNewAction);
       }
     }, [onNewAction, actionExecutor]);
 
