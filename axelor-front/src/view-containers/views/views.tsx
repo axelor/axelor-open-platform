@@ -25,6 +25,7 @@ import { findFields } from "@/services/client/meta-cache";
 import { ViewScope } from "./scope";
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
+import { processContextValues } from "@/views/form/builder/utils";
 
 async function loadComp(viewType: string) {
   const type = toKebabCase(viewType);
@@ -166,7 +167,7 @@ const DataViews = memo(function DataViews({
     ...(limit && { limit }),
     filter: {
       _domain: domain,
-      _domainContext: context,
+      ...(context && { _domainContext: processContextValues(context) }),
     },
   });
 
