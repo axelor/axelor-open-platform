@@ -42,16 +42,16 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const switchTo = useViewSwitch();
   const { hasButton } = usePerms(meta.view, meta.perms);
-  const getFormContext = useViewContext();
+  const getViewContext = useViewContext();
   const hasEditPopup = dashlet || view.editWindow === "popup";
   const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
 
   const getContext = useCallback(
     () => ({
-      ...action.context,
+      ...getViewContext(true),
       _model: action.model,
     }),
-    [action.context, action.model]
+    [action.model, getViewContext]
   );
 
   const getActionContext = useCallback(() => {
@@ -87,7 +87,7 @@ export function Cards(props: ViewProps<CardsView>) {
         const names = Object.keys(fields ?? {});
 
         if (dashlet) {
-          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
           const { _domainContext } = filter;
           filter._domainContext = {
             ..._domainContext,
@@ -101,7 +101,7 @@ export function Cards(props: ViewProps<CardsView>) {
           ...options,
         });
       },
-      [dataStore, fields, dashlet, searchAtom, getFormContext]
+      [dataStore, fields, dashlet, searchAtom, getViewContext]
     )
   );
 

@@ -66,13 +66,12 @@ export function DashletComponent({
         ...actionView.params,
       },
       context: {
-        ...ctx,
-        _id: (ctx?._id ?? ctx?.id)!,
+        ...(dashboard ? ctx : actionView.context),
         _model: ctx.model ?? ctx._model,
         _domainAction: action,
       },
     });
-  }, [action, canSearch, getContext]);
+  }, [action, dashboard, canSearch, getContext]);
 
   const setTabViewProps = useAtomCallback(
     useCallback(

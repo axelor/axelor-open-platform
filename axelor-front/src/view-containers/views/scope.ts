@@ -17,7 +17,6 @@ import { useFormScope } from "@/views/form/builder/scope";
 import { usePrepareContext } from "@/views/form/builder";
 import { processContextValues } from "@/views/form/builder/utils";
 import { dialogs } from "@/components/dialogs";
-import { DataContext } from "@/services/client/data.types";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -80,15 +79,20 @@ export function useViewContext() {
   );
 
   return useCallback(
-    () =>
-      processContextValues(
-        (dashlet || recordId
+    (actionContext?: boolean) => {
+      const _parent = dashlet || recordId ? getFormContext() : undefined;
+      return processContextValues(
+        actionContext
           ? {
-              ...getFormContext(),
+              ...action.context,
+              _parent,
+            }
+          : {
+              ..._parent,
               ...action.context,
             }
-          : action.context) ?? {}
-      ) as DataContext,
+      );
+    },
     [dashlet, recordId, action.context, getFormContext]
   );
 }

@@ -134,7 +134,7 @@ function GridInner(props: ViewProps<GridView>) {
     });
   }, [setState]);
 
-  const getFormContext = useViewContext();
+  const getViewContext = useViewContext();
 
   const getSearchOptions = useAtomCallback(
     useCallback(
@@ -166,7 +166,7 @@ function GridInner(props: ViewProps<GridView>) {
         }
 
         if (dashlet) {
-          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
           filter._domainContext = {
             ...filter?._domainContext,
             ...formContext,
@@ -180,7 +180,7 @@ function GridInner(props: ViewProps<GridView>) {
           filter,
         };
       },
-      [orderBy, searchAtom, fields, view.items, dashlet, getFormContext]
+      [orderBy, searchAtom, fields, view.items, dashlet, getViewContext]
     )
   );
 
@@ -481,14 +481,14 @@ function GridInner(props: ViewProps<GridView>) {
 
   const getContext = useCallback<() => DataContext>(
     () => ({
-      ...action.context,
+      ...getViewContext(true),
       _ids: selectedIdsRef.current,
       _model: action.model,
       _viewName: action.name,
       _viewType: action.viewType,
       _views: action.views,
     }),
-    [action]
+    [action, getViewContext]
   );
   const actionExecutor = useActionExecutor(view, {
     getContext,

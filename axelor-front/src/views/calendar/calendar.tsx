@@ -76,7 +76,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
 
   const { hasButton } = usePerms(metaView, metaPerms);
-  const getFormContext = useViewContext();
+  const getViewContext = useViewContext();
 
   const showEditor = useEditor();
   const viewTab = useViewTab();
@@ -196,7 +196,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }
 
     if (viewTab.dashlet) {
-      const { _domainAction, ...formContext } = getFormContext() ?? {};
+      const { _domainAction, ...formContext } = getViewContext() ?? {};
       const { _domainContext } = filter;
       filter._domainContext = {
         ..._domainContext,
@@ -213,7 +213,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     eventStop,
     viewTab.dashlet,
     advancedSearch.query,
-    getFormContext,
+    getViewContext,
   ]);
 
   const handleRefresh = useCallback(async () => {

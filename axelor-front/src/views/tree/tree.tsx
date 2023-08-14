@@ -41,16 +41,21 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
   const getViewContext = useViewContext();
 
-  const getContext = useCallback(() => {
-    const ctx = getViewContext();
-    return {
-      ...ctx,
-      _model: ctx?._model || view.nodes?.[0]?.model,
-    } as DataContext;
-  }, [getViewContext, view]);
+  const getContext = useCallback(
+    (actions?: boolean) => {
+      const ctx = getViewContext(actions);
+      return {
+        ...ctx,
+        _model: ctx?._model || view.nodes?.[0]?.model,
+      } as DataContext;
+    },
+    [getViewContext, view]
+  );
+
+  const getActionContext = useCallback(() => getContext(true), [getContext]);
 
   const actionExecutor = useActionExecutor(view, {
-    getContext,
+    getContext: getActionContext,
     onRefresh: () => onSearch({}),
   });
 

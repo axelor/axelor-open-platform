@@ -85,18 +85,18 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const hideCols = params?.["kanban-hide-columns"] || "";
   const colWidth = params?.["kanban-column-width"];
 
+  const getViewContext = useViewContext();
   const getContext = useCallback(
     () =>
       ({
-        ...action.context,
+        ...getViewContext(true),
         _model: action.model,
         _viewName: action.name,
         _viewType: action.viewType,
         _views: action.views,
       } as DataContext),
-    [action]
+    [action, getViewContext]
   );
-  const getFormContext = useViewContext();
 
   const getColumnByValue = useCallback(
     (value: any) => {
@@ -146,7 +146,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         }
 
         if (dashlet) {
-          const { _domainAction, ...formContext } = getFormContext() ?? {};
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
           filter._domainContext = {
             ...filter?._domainContext,
             ...formContext,
@@ -172,7 +172,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         limit,
         columnBy,
         sequenceBy,
-        getFormContext,
+        getViewContext,
         getColumnByValue,
       ]
     )
