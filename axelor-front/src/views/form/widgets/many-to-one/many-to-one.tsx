@@ -184,6 +184,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const handleCompletion = useCallback(
     async (value: string) => {
+      if (!canSelect) return [];
       const _domain = (await beforeSelect()) ?? domain;
       const _domainContext = _domain ? getContext() : {};
       const options = {
@@ -194,7 +195,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       setHasMore((page.totalCount ?? 0) > records.length);
       return records;
     },
-    [beforeSelect, domain, getContext, search]
+    [canSelect, beforeSelect, domain, getContext, search]
   );
 
   const valueRef = useRef<DataRecord>();
@@ -241,8 +242,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           {...(focus && { key: "focused" })}
           autoFocus={focus}
           schema={schema}
-          canCreate={canNew}
-          onCreate={handleCreate as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
           invalid={invalid}
           value={value ?? null}
@@ -283,7 +282,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           fetchOptions={handleCompletion}
           optionLabel={getOptionLabel}
           optionValue={"id"}
-          {...(canSelect && { canSearch: hasMore, onSearch: handleSelect })}
+          {...(canSelect && {
+            canCreate: canNew,
+            canSearch: hasMore,
+            onCreate: handleCreate as CreatableSelectProps["onCreate"],
+            onSearch: handleSelect,
+          })}
           {...beforeSelectProps}
         />
       )}
