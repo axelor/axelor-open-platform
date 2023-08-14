@@ -270,7 +270,7 @@ export const contextAtom = atom(
       context = processContextValues(context);
 
       if (parent) {
-        context._parent = prepare(parent, context);
+        context._parent = prepare(parent);
       }
       return mergeCleanDummy(context);
     };
