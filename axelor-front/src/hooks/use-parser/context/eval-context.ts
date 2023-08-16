@@ -1,5 +1,3 @@
-import set from "lodash/set";
-
 import { DataContext } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
@@ -14,8 +12,7 @@ export type EvalContextOptions = ScriptContextOptions & {
 
 export function createEvalContext(
   context: DataContext,
-  options: EvalContextOptions = {},
-  template?: boolean
+  options: EvalContextOptions = {}
 ) {
   const { components = {}, helpers = {} } = options;
 
@@ -57,22 +54,7 @@ export function createEvalContext(
     },
   };
 
-  const $context = template
-    ? Object.keys(context).reduce((ctx, key) => {
-        const value = context[key];
-        return set(
-          ctx,
-          key,
-          value && typeof value === "object"
-            ? Array.isArray(value)
-              ? [...value]
-              : { ...value }
-            : value
-        );
-      }, {} as any)
-    : context;
-
-  return createScriptContext($context, {
+  return createScriptContext(context, {
     ...options,
     helpers: {
       ...helpers,

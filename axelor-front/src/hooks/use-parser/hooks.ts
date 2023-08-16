@@ -1,4 +1,5 @@
 import { createElement, useCallback, useMemo } from "react";
+import set from "lodash/set";
 
 import { DataContext } from "@/services/client/data.types";
 import { Hilite } from "@/services/client/meta.types";
@@ -40,9 +41,23 @@ export function useTemplate(template: string) {
       ? processReactTemplate(template)
       : processLegacyTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
+      const _context = Object.keys(props.context).reduce((ctx, key) => {
+        const value = props.context[key];
+        return set(
+          ctx,
+          key,
+          value && typeof value === "object"
+            ? Array.isArray(value)
+              ? [...value]
+              : { ...value }
+            : value
+        );
+      }, {} as any);
+
       const context = isReact(template)
-        ? createScriptContext(props.context, props.options)
-        : createEvalContext(props.context, props.options, true);
+        ? createScriptContext(_context, props.options)
+        : createEvalContext(_context, props.options);
+
       return createElement(Comp, { context });
     };
   }, [template]);
