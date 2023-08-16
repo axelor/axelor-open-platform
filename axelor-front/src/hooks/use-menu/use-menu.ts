@@ -15,7 +15,7 @@ export function useMenu() {
     setLoading(true);
     try {
       const res = await meta.menus("all");
-      setMenus(res);
+      setMenus(res ?? []);
     } finally {
       setLoading(false);
     }

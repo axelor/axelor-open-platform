@@ -79,7 +79,7 @@ function load(res: MenuItem[], tags: Tag[]) {
 
 export function NavDrawer() {
   const { open: openTab } = useTabs();
-  const { loading, menus = [] } = useMenu();
+  const { loading, menus } = useMenu();
   const { mode, show, small, sidebar, setSidebar } = useSidebar();
   const [showSearch, setShowSearch] = useState(false);
 
