@@ -3,6 +3,7 @@ import get from "lodash/get";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { moment } from "@/services/client/l10n";
+import { i18n } from "@/services/client/i18n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format, { getJSON } from "@/utils/format";
@@ -41,6 +42,9 @@ export function createScriptContext(
     },
     get $userId() {
       return session.info?.user?.id;
+    },
+    _t(key: string, ...args: any[]) {
+      return i18n.get(key, ...args);
     },
     $get(path: string) {
       const value = get(context, path);
