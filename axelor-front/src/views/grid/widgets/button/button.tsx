@@ -8,6 +8,7 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { Button as ButtonField, Field } from "@/services/client/meta.types";
 import { useViewAction } from "@/view-containers/views/scope";
 import { GridCellProps } from "../../builder/types";
+import { processContextValues } from "@/views/form/builder/utils";
 
 import styles from "./button.module.scss";
 
@@ -44,7 +45,7 @@ export function Button(props: GridCellProps) {
       await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
-          ...record,
+          ...processContextValues(record),
           selected: true,
           _signal: name,
           _ids: undefined,
