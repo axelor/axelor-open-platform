@@ -1,3 +1,15 @@
+## 6.1.5 (2023-08-16)
+
+#### Changes
+
+* Meta json field precision for decimal field is now 20 by default
+
+#### Fixed
+
+* Fix label field title reset
+* Fix static widgets causing editor dirty
+* Fix setting/resetting widgets title
+
 ## 6.1.4 (2023-06-23)
 
 #### Features
