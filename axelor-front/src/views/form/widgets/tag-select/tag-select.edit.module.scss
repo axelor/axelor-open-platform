@@ -3,6 +3,7 @@
   max-height: 38px;
   overflow: hidden;
   width: 100%;
+  justify-content: flex-end;
   & > * {
     flex: 1;
   }
@@ -10,4 +11,5 @@
 
 .select > div > div {
   flex-wrap: nowrap;
+  justify-content: flex-end;
 }
