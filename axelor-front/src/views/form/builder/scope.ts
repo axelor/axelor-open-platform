@@ -140,8 +140,9 @@ export class FormActionHandler extends DefaultActionHandler {
   }
 
   async setValues(values: DataRecord) {
-    Object.entries(values).forEach(([name, value]) => {
-      this.setValue(name, value);
+    this.notify({
+      type: "record",
+      value: values,
     });
   }
 
@@ -429,6 +430,40 @@ function useActionValue({
   );
 }
 
+function useActionRecord({
+  formAtom,
+  actionHandler,
+}: {
+  formAtom: FormAtom;
+  actionHandler: ActionHandler;
+}) {
+  useActionData<ActionValueData>(
+    useCallback((x) => x.type === "record" && Boolean(x.value), []),
+    useAtomCallback(
+      useCallback(
+        (get, set, data) => {
+          const record = get(formAtom).record;
+          if (data.value) {
+            const values = Object.entries(data.value).reduce(
+              (acc, [k, v]) => ({
+                ...acc,
+                [k]: processActionValue(v),
+              }),
+              {}
+            );
+            set(formAtom, (prev) => ({
+              ...prev,
+              record: { ...record, ...values },
+            }));
+          }
+        },
+        [formAtom]
+      )
+    ),
+    actionHandler
+  );
+}
+
 export function useActionExecutor(
   view: View,
   options?: {
@@ -458,6 +493,7 @@ export function useActionExecutor(
 
   useActionAttrs({ formAtom, actionHandler });
   useActionValue({ formAtom, actionHandler });
+  useActionRecord({ formAtom, actionHandler });
 
   return actionExecutor;
 }
@@ -466,6 +502,7 @@ export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
   const { actionHandler } = useFormScope();
   useActionAttrs({ formAtom, actionHandler });
   useActionValue({ formAtom, actionHandler });
+  useActionRecord({ formAtom, actionHandler });
   return null;
 }
 

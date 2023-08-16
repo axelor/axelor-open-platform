@@ -23,6 +23,11 @@ export interface ActionValueData extends IActionData {
   op: "set" | "add" | "del";
 }
 
+export interface ActionRecordData extends IActionData {
+  type: "record";
+  value: DataRecord;
+}
+
 export interface ActionFocusData extends IActionData {
   type: "focus";
   target: string;
@@ -36,7 +41,8 @@ export type ActionData =
   | ActionAttrData
   | ActionValueData
   | ActionFocusData
-  | ActionCloseData;
+  | ActionCloseData
+  | ActionRecordData;
 
 export type ActionListener = (data: ActionData) => void;
 
