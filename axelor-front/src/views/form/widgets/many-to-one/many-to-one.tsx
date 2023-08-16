@@ -282,6 +282,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           fetchOptions={handleCompletion}
           optionLabel={getOptionLabel}
           optionValue={"id"}
+          isSelectable={canSelect}
           {...(canSelect && {
             canCreate: canNew,
             canSearch: hasMore,
