@@ -115,8 +115,7 @@ The boolean widget is used for `boolean` data fields.
 
 [source,xml]
 ----
-<field name="confirmed" widget="boolean" /> <!-- title on top -->
-<field name="confirmed" widget="boolean" css="inline-checkbox" /> <!-- title on right -->
+<field name="confirmed" widget="boolean" />
 ----
 
 NOTE: if field type is boolean, no need to specify `widget="boolean"`
@@ -127,6 +126,7 @@ Additionally, the following variants of boolean widgets are provided:
 * `boolean-select` - a combo box with yes/no selection
 * `boolean-radio` - a group of two radio boxes with yes/no text
 * `boolean-switch` - a switch like sliding widget for boolean fields
+* `inline-checkbox` -  same as default boolean widget but with the title on right
 
 The yes/no text can be configured with `x-true-text` and `x-false-text`
 attributes:
@@ -342,12 +342,16 @@ as radio selection list.
 <field name="language" selection="language-selection" widget="RadioSelect" />
 ----
 
-The radio list is rendered horizontally but can be change to vertical with
+The radio list is rendered horizontally but can be changed to vertical with
 `x-direction="vertical"` attribute.
 
 == CheckboxSelect
 
 The `CheckboxSelect` is same as `RadioSelect` but uses checkbox list.
+
+== InlineCheckbox
+
+The `InlineCheckbox` is same as the default boolean widget but with title on right.
 
 == ImageSelect
 
