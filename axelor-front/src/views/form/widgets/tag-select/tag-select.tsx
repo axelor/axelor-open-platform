@@ -23,9 +23,11 @@ import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 
 export function TagSelectComponent({
+  canRemove,
   onView,
   ...props
 }: CreatableSelectProps & {
+  canRemove?: boolean;
   onView?: (e: any, value: DataRecord, readonly?: boolean) => void;
 }) {
   const { targetName } = props.schema;
@@ -47,13 +49,15 @@ export function TagSelectComponent({
             <Chip
               color={"indigo"}
               title={getOptionLabel(data)}
-              onRemove={removeProps.onClick}
+              {...(canRemove && {
+                onRemove: removeProps.onClick,
+              })}
             />
           </Box>
         );
       },
     }),
-    [getOptionLabel, onView]
+    [getOptionLabel, canRemove, onView]
   );
 
   return (
@@ -98,6 +102,10 @@ export function TagSelect(
 
   const { title, focus, domain } = attrs;
   const canNew = hasButton("new");
+  const canView = hasButton("view");
+  const canEdit = hasButton("edit");
+  const canSelect = hasButton("select");
+  const canRemove = hasButton("remove");
 
   const search = useCompletion({
     sortBy,
@@ -134,6 +142,9 @@ export function TagSelect(
       readonly = false,
       onSelect?: EditorOptions["onSelect"]
     ) => {
+      if (!canEdit) {
+        readonly = true;
+      }
       if (showEditorInTab && (value?.id ?? 0) > 0) {
         return showEditorInTab(value!, readonly);
       }
@@ -146,7 +157,15 @@ export function TagSelect(
         onSelect: onSelect ?? ((record: DataRecord) => handleSelect([record])),
       });
     },
-    [formView, target, title, showEditor, showEditorInTab, handleSelect]
+    [
+      formView,
+      target,
+      title,
+      canEdit,
+      showEditor,
+      showEditorInTab,
+      handleSelect,
+    ]
   );
 
   const shouldPreventDefault = selectProps?.disablePortal || !schema.editable;
@@ -162,6 +181,7 @@ export function TagSelect(
 
   const handleCompletion = useCallback(
     async (value: string) => {
+      if (!canSelect) return [];
       const _domain = (await beforeSelect(true)) ?? domain;
       const _domainContext = _domain ? getContext() : {};
       const options = {
@@ -172,7 +192,7 @@ export function TagSelect(
       setHasMore((page.totalCount ?? 0) > records.length);
       return records;
     },
-    [search, domain, beforeSelect, getContext]
+    [search, domain, canSelect, beforeSelect, getContext]
   );
 
   const handleSearch = useCallback(async () => {
@@ -227,7 +247,7 @@ export function TagSelect(
               key={val?.id}
               as="a"
               href="#"
-              onClick={(e: any) => handleView(e, val)}
+              onClick={(e: any) => canView && handleView(e, val)}
             >
               <Chip title={getOptionLabel(val)} color={"indigo"} />
             </Box>
@@ -240,16 +260,23 @@ export function TagSelect(
           schema={schema}
           placeholder={placeholder}
           value={value}
-          canCreate={canNew}
           fetchOptions={handleCompletion}
           {...beforeSelectProps}
           {...selectProps}
-          canSearch={hasMore}
-          onSearch={handleSearch}
-          onView={handleView}
-          onCreate={handleEdit as CreatableSelectProps["onCreate"]}
           onChange={handleChange}
           optionLabel={getOptionLabel}
+          canRemove={canRemove}
+          isSelectable={canSelect}
+          {...(canSelect &&
+            ({
+              canCreate: canNew,
+              canSearch: hasMore,
+              onSearch: handleSearch,
+              onCreate: handleEdit as CreatableSelectProps["onCreate"],
+            } as any))}
+          {...(canView && {
+            onView: handleView,
+          })}
         />
       )}
     </FieldControl>
