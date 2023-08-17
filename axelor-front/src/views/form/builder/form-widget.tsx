@@ -358,6 +358,7 @@ function useExpressions({
       collapseIf,
       canNew,
       canEdit,
+      canView,
       canSave,
       canCopy,
       canRemove,
@@ -379,6 +380,7 @@ function useExpressions({
       canEdit ||
       canSave ||
       canCopy ||
+      canView ||
       canRemove ||
       canDelete ||
       canArchive ||
@@ -398,6 +400,7 @@ function useExpressions({
 
         if (canNew) handleCondition(ctx, "canNew", canNew);
         if (canEdit) handleCondition(ctx, "canEdit", canEdit);
+        if (canView) handleCondition(ctx, "canView", canView);
         if (canSave) handleCondition(ctx, "canSave", canSave);
         if (canCopy) handleCondition(ctx, "canCopy", canCopy);
         if (canRemove) handleCondition(ctx, "canRemove", canRemove);
