@@ -1,8 +1,8 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { MouseEvent, useCallback, useRef, useState } from "react";
-import isEqual from "lodash/isEqual";
 import getObjValue from "lodash/get";
+import isEqual from "lodash/isEqual";
+import { MouseEvent, useCallback, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
@@ -24,6 +25,25 @@ import {
   CreatableSelect,
   CreatableSelectProps,
 } from "../tag-select/creatable-select";
+
+export function useOptionLabel({ targetName }: Schema) {
+  return useCallback(
+    (option: any) => {
+      const trKey = `$t:${targetName}`;
+      const dottedTrKey = targetName?.includes(".")
+        ? (() => {
+            const ind = targetName.lastIndexOf(".") + 1;
+            return `${targetName.slice(0, ind)}$t:${targetName.slice(ind)}`;
+          })()
+        : "";
+      return (
+        option[trKey] ??
+        (getObjValue(option, dottedTrKey) || getObjValue(option, targetName))
+      );
+    },
+    [targetName]
+  );
+}
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
@@ -224,13 +244,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     )
   );
 
-  const getOptionLabel = useCallback(
-    (option: any) => {
-      const trKey = `$t:${targetName}`;
-      return option[trKey] ?? option[targetName];
-    },
-    [targetName]
-  );
+  const getOptionLabel = useOptionLabel(schema);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 

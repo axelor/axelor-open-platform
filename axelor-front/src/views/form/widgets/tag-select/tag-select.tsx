@@ -21,6 +21,7 @@ import {
 } from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
+import { useOptionLabel } from "../many-to-one";
 
 export function TagSelectComponent({
   canRemove,
@@ -30,15 +31,7 @@ export function TagSelectComponent({
   canRemove?: boolean;
   onView?: (e: any, value: DataRecord, readonly?: boolean) => void;
 }) {
-  const { targetName } = props.schema;
-
-  const getOptionLabel = useCallback(
-    (option: any) => {
-      const trKey = `$t:${targetName}`;
-      return option[trKey] ?? option[targetName];
-    },
-    [targetName]
-  );
+  const getOptionLabel = useOptionLabel(props.schema);
 
   const components = useMemo(
     () => ({
@@ -229,13 +222,7 @@ export function TagSelect(
     [setValue, targetName]
   );
 
-  const getOptionLabel = useCallback(
-    (option: any) => {
-      const trKey = `$t:${targetName}`;
-      return option[trKey] ?? option[targetName];
-    },
-    [targetName]
-  );
+  const getOptionLabel = useOptionLabel(schema);
 
   return (
     <FieldControl {...props}>
