@@ -6,11 +6,10 @@ interface TimeInputProps {
   format?: string;
   value?: string;
   onChange?: (value: string) => void;
-  onClose: (shouldClose?: boolean) => void;
 }
 
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
-  ({ format, value, onChange, onClose }, ref) => {
+  ({ format, value, onChange }, ref) => {
     const [hr, mm, ss] = `${value}`.split(":");
     const hasSeconds = format?.includes("ss");
 
@@ -20,17 +19,14 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
 
     function handleHourChange(value: string) {
       setValue(value, mm, ss);
-      onClose(true);
     }
 
     function handleMinuteChange(value: string) {
       setValue(hr, value, ss);
-      onClose(true);
     }
 
     function handleSecondChange(value: string) {
       setValue(hr, mm, value);
-      onClose(true);
     }
 
     function renderSelect(
@@ -42,8 +38,8 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
         <Box
           mx={1}
           as="select"
-          value={value}
-          onChange={(e) => onChange(e.target.value!)}
+          value={`${parseInt(value)}`}
+          onChange={(e: any) => onChange(e.target.value!)}
           className={"form-control-sm"}
         >
           {new Array(size).fill(0).map((_, ind) => {

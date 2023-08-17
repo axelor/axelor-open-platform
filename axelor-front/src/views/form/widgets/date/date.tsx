@@ -151,7 +151,7 @@ export function DateComponent({
 
   const handleChange = useCallback(
     (value: Date | null, event: SyntheticEvent) => {
-      const callOnChange = event.type === "click" ? true : false;
+      const callOnChange = event?.type === "click" ? true : false;
       onChange(
         value && moment(value).isValid()
           ? moment(value).format(valueFormat)
@@ -208,7 +208,7 @@ export function DateComponent({
             ) as any
           }
           showTimeInput={type?.toLowerCase() !== "date"}
-          customTimeInput={<TimeInput format={format} onClose={handleClose} />}
+          customTimeInput={<TimeInput format={format} />}
           onSelect={handleSelect}
           onChange={handleChange}
           onBlur={handleBlur}
