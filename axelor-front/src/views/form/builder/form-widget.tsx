@@ -1,4 +1,3 @@
-import { produce } from "immer";
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
@@ -32,22 +31,6 @@ export function FormWidget(props: FormWidgetProps) {
     () => createWidgetAtom({ schema, formAtom, parentAtom }),
     [formAtom, parentAtom, schema]
   );
-
-  const register = useAtomCallback(
-    useCallback(
-      (get, set) => {
-        set(formAtom, (prev) => {
-          return produce(prev, (draft) => {
-            const { uid, name } = schema;
-            draft.widgetAtoms[uid] = { name, widgetAtom };
-          });
-        });
-      },
-      [formAtom, schema, widgetAtom]
-    )
-  );
-
-  useEffect(register, [register]);
 
   const dirtyAtom = useViewDirtyAtom();
   const { actionExecutor } = useFormScope();

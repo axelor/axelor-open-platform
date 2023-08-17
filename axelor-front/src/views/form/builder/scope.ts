@@ -11,7 +11,7 @@ import {
   createEvalContext,
 } from "@/hooks/use-parser/context";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { View } from "@/services/client/meta.types";
+import { Schema, View } from "@/services/client/meta.types";
 import {
   ActionAttrData,
   ActionData,
@@ -32,7 +32,7 @@ import {
   WidgetErrors,
   WidgetState,
 } from "./types";
-import { processActionValue } from "./utils";
+import { defaultAttrs, processActionValue } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -208,29 +208,51 @@ export function useFormValidityScope() {
   return useAtomValue(scopeAtom);
 }
 
+function findSchema(schema: Schema, widgetName: string): Schema | undefined {
+  if (schema.name === widgetName) return schema;
+  if (schema.items && schema.type !== "panel-related") {
+    for (const item of schema.items) {
+      const found = findSchema(item, widgetName);
+      if (found) {
+        return found;
+      }
+    }
+  }
+}
+
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
-  const findAtom = useAtomCallback(
+  const findAttrs = useAtomCallback(
     useCallback(
       (get) => {
-        const { widgetAtoms } = get(formAtom);
-        const { widgetAtom } =
-          Object.values(widgetAtoms).find((x) => x.name === widgetName) ?? {};
-        return widgetAtom;
+        const { meta, fields } = get(formAtom);
+        const field = fields[widgetName] ?? {};
+        const schema = findSchema(meta.view, widgetName);
+        return { ...field, ...schema, ...schema?.widgetAttrs };
       },
       [formAtom, widgetName]
     )
   );
 
-  const widgetAtom = useMemo(findAtom, [findAtom]);
-
-  const getState = useAtomCallback(
+  const findState = useAtomCallback(
     useCallback(
-      (get) => (widgetAtom ? get(widgetAtom) : { attrs: {}, name: widgetName }),
-      [widgetName, widgetAtom]
+      (get) => {
+        const { states, statesByName } = get(formAtom);
+        return (
+          Object.values(states).find((x) => x.name === widgetName) ??
+          statesByName[widgetName]
+        );
+      },
+      [formAtom, widgetName]
     )
   );
 
-  return getState();
+  const state = findState();
+  const defaults = useMemo(
+    () => ({ name: widgetName, attrs: defaultAttrs(findAttrs()) }),
+    [findAttrs, widgetName]
+  );
+
+  return state ?? defaults ?? {};
 }
 
 export function useFormRefresh(refresh?: () => Promise<any> | void) {
