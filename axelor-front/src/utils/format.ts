@@ -108,9 +108,11 @@ function addCurrency(value: string, symbol: string) {
   return value;
 }
 
+export const DEFAULT_SCALE = 2;
+
 const formatNumber: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
-  let { scale, currency, serverType } = props ?? {};
+  let { scale, currency, serverType, type } = props ?? {};
 
   if (
     (value === null || value === undefined) &&
@@ -119,13 +121,17 @@ const formatNumber: Formatter = (value, opts = {}) => {
     return value;
   }
 
-  // referencing another field in the context?
-  if (typeof scale === "string") {
-    scale = (_.get(context, scale) as number) ?? 2;
-  }
+  if ((serverType ?? type?.toUpperCase()) === "DECIMAL") {
+    // referencing another field in the context?
+    if (typeof scale === "string") {
+      scale = +((_.get(context, scale) as number) ?? scale);
+    }
 
-  if (serverType === "DECIMAL") {
-    scale = scale ?? 2;
+    if (typeof scale !== "number" || isNaN(scale)) {
+      scale = DEFAULT_SCALE;
+    }
+  } else {
+    scale = 0;
   }
 
   // referencing another field in the context?
@@ -136,10 +142,8 @@ const formatNumber: Formatter = (value, opts = {}) => {
   let num = +value;
   if (num === 0 || num) {
     const opts: Intl.NumberFormatOptions = {};
-    if (scale || scale === 0) {
-      opts.minimumFractionDigits = +(scale ?? 2);
-      opts.maximumFractionDigits = +(scale ?? 2);
-    }
+    opts.minimumFractionDigits = scale;
+    opts.maximumFractionDigits = scale;
     if (currency) {
       opts.style = "currency";
       opts.currency = currency;
@@ -150,8 +154,8 @@ const formatNumber: Formatter = (value, opts = {}) => {
       // Fall back to adding currency symbol
       if (currency) {
         const result = l10n.formatNumber(num, {
-          minimumFractionDigits: opts.minimumFractionDigits ?? 2,
-          maximumFractionDigits: opts.maximumFractionDigits ?? 2,
+          minimumFractionDigits: opts.minimumFractionDigits,
+          maximumFractionDigits: opts.maximumFractionDigits,
         });
         return addCurrency(result, currency);
       }

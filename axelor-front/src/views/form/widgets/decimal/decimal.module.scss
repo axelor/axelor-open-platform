@@ -21,6 +21,16 @@ $input-padding-x: 0.75rem;
   background-image: none !important;
 }
 
+.numberInput::-webkit-inner-spin-button,
+.numberInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numberInput[type="number"] {
+  -moz-appearance: textfield;
+}
+
 [dir="rtl"] {
   .numberInput {
     padding-right: $input-padding-x;
@@ -44,10 +54,10 @@ $input-padding-x: 0.75rem;
   overflow: hidden;
 
   &:first-child {
-  border-top-right-radius: var(
-    --bs-input-border-radius,
-    var(--bs-border-radius)
-  );
+    border-top-right-radius: var(
+      --bs-input-border-radius,
+      var(--bs-border-radius)
+    );
   }
 
   &:last-child {

@@ -1,15 +1,15 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field, Property } from "@/services/client/meta.types";
-import format from "@/utils/format";
+import format, { DEFAULT_SCALE } from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { parseDecimal } from "../../builder/utils";
 import { useInput } from "../../builder/hooks";
+import { parseDecimal } from "../../builder/utils";
 import { ViewerInput } from "../string/viewer";
 
 import styles from "./decimal.module.scss";
@@ -24,7 +24,7 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
-  const scale = isDecimal ? scaleAttr : 0;
+  const scale = isDecimal ? scaleAttr ?? DEFAULT_SCALE : 0;
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "",
@@ -36,10 +36,12 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const parse = useCallback(
     (value: string | number, scale?: number) => {
-      if (scale) {
-        return parseDecimal(value, { scale } as Property);
+      if (value == null || value === "") {
+        return "";
       }
-      return isDecimal ? value : parseInt(String(value));
+      return isDecimal
+        ? parseDecimal(value, { scale } as Property)
+        : parseInt(String(value));
     },
     [isDecimal]
   );
@@ -123,6 +125,8 @@ export function Decimal(props: FieldProps<string | number>) {
     [scale, schema, value]
   );
 
+  const step = scale != null ? 1 / Math.pow(10, scale) : 1;
+
   return (
     <FieldControl {...props}>
       {readonly && <ViewerInput value={text} />}
@@ -133,7 +137,8 @@ export function Decimal(props: FieldProps<string | number>) {
             data-input
             className={styles.numberInput}
             autoFocus={focus}
-            type="text"
+            type="number"
+            step={step}
             id={uid}
             ref={inputRef}
             placeholder={placeholder}

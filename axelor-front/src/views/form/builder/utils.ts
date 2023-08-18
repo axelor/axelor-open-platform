@@ -195,7 +195,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 }
 
 export function parseDecimal(value: any, { scale }: Property) {
-  if (scale) {
+  if (scale != null) {
     const nums = String(value).split(".");
     // scale the decimal part
     const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(+scale);
