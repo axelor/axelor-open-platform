@@ -149,12 +149,13 @@ export function TagSelect(
     [formView, target, title, showEditor, showEditorInTab, handleSelect]
   );
 
+  const shouldPreventDefault = selectProps?.disablePortal || !schema.editable;
   const handleView = useCallback(
     (e: MouseEvent<HTMLAnchorElement>, value: DataRecord, readonly = true) => {
-      e.preventDefault();
+      shouldPreventDefault && e.preventDefault();
       return handleEdit(value, readonly);
     },
-    [handleEdit]
+    [handleEdit, shouldPreventDefault]
   );
 
   const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
