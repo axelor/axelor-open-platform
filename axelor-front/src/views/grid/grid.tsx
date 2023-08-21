@@ -4,6 +4,7 @@ import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isString from "lodash/isString";
 import uniqueId from "lodash/uniqueId";
+import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box } from "@axelor/ui";
@@ -21,7 +22,7 @@ import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { request } from "@/services/client/client";
-import { SearchOptions } from "@/services/client/data";
+import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
@@ -125,6 +126,8 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopup = action.params?.["popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
   const hasPopupReload = hasPopup === "reload";
+  const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
+
   const { editable, inlineHelp } = view;
 
   const clearSelection = useCallback(() => {
@@ -185,8 +188,16 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onSearch = useCallback(
-    (options: SearchOptions = {}) =>
-      dataStore.search(getSearchOptions(options)),
+    (options: SearchOptions = {}) => {
+      if (cacheDataRef.current) {
+        cacheDataRef.current = false;
+        const { records, page } = dataStore;
+        if (isEqual(dataStore.options?.fields, options.fields)) {
+          return Promise.resolve({ records, page } as SearchResult);
+        }
+      }
+      return dataStore.search(getSearchOptions(options));
+    },
     [dataStore, getSearchOptions]
   );
 
