@@ -1,5 +1,6 @@
 import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import { focusAtom } from "jotai-optics";
 import isEqual from "lodash/isEqual";
 import isUndefined from "lodash/isUndefined";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
@@ -18,7 +19,14 @@ import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
-import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
+import {
+  FieldProps,
+  ValueAtom,
+  WidgetAtom,
+  WidgetErrors,
+  WidgetProps,
+  WidgetState,
+} from "./types";
 
 type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
   render?: (props: WidgetProps) => React.ReactNode;
@@ -152,6 +160,31 @@ function FormField({
 }: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {
   const { schema, formAtom, widgetAtom, valueAtom } = props;
 
+  const serverErrorAtom = useMemo(
+    () =>
+      focusAtom(formAtom, (o) =>
+        o
+          .prop("statesByName")
+          .prop(schema.name ?? "")
+          .valueOr({ errors: {} } as WidgetState)
+          .prop("errors")
+          .valueOr({ error: "" } as WidgetErrors)
+          .prop("error")
+      ),
+    [formAtom, schema.name]
+  );
+
+  const clearError = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        if (get(serverErrorAtom)) {
+          set(serverErrorAtom, "");
+        }
+      },
+      [serverErrorAtom]
+    )
+  );
+
   const valueCheck = useAtomCallback(
     useCallback(
       (get, set) => {
@@ -179,10 +212,17 @@ function FormField({
   );
 
   // trigger validation on value change
-  useAtomValue(valueAtom);
+  const value = useAtomValue(valueAtom);
   useAsyncEffect(async (signal) => {
     signal.aborted || valueCheck();
   });
+
+  useAsyncEffect(
+    async (signal) => {
+      signal.aborted || clearError();
+    },
+    [value, clearError]
+  );
 
   const invalidAtom = useMemo(
     () =>
