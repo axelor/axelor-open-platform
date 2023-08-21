@@ -613,7 +613,7 @@ function JsonEditor({
       widgetAtom={widgetAtom}
       valueAtom={jsonAtom}
       setInvalid={handleInvalid}
-      readonly={readonly}
+      readonly={readonly || schema.readonly}
     />
   );
 }
