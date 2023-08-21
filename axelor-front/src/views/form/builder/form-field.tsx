@@ -46,7 +46,8 @@ export function FieldControl({
   titleActions,
   children,
 }: FieldControlProps<any>) {
-  const canShowTitle = showTitle ?? schema.showTitle ?? true;
+  const canShowTitle =
+    showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
 
   function render() {
     return <Box className={styles.content}>{children}</Box>;
