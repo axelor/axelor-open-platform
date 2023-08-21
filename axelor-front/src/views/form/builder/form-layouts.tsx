@@ -36,8 +36,12 @@ function computeLayout(schema: Schema) {
 
   const numCols = widths.length > cols ? widths.length : cols;
 
+  let hasLabel = false;
   const template = widths.join(" ");
   const contents = items.map((item) => {
+    const showTitle = item.showTitle ?? item.widgetAttrs?.showTitle ?? true;
+    const hasField = item.type === "field";
+
     let colSpan = parseInt(item.colSpan) || itemSpan;
     let colStart = last > numCols ? 1 : last;
     let colEnd = colStart + colSpan;
@@ -48,13 +52,24 @@ function computeLayout(schema: Schema) {
       colEnd = Math.min(numCols, colSpan) + 1;
     }
 
+    // reset label on next row
+    if (colStart === 1) {
+      hasLabel = false;
+    }
+
+    if (item.title && showTitle) {
+      hasLabel = true;
+    }
+
     last = colEnd;
+
     return {
       style: schema.$json
         ? { gridColumn: `span ${colSpan}` }
         : {
             gridColumnStart: colStart,
             gridColumnEnd: colEnd,
+            ...(hasLabel && !hasField && { alignSelf: "end" }),
           },
       content: item,
     };
