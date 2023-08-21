@@ -126,21 +126,23 @@ export function Dms(props: ViewProps<GridView>) {
     return getSelectedDocument() || getSelectedNode();
   }, [getSelectedDocument, getSelectedNode]);
 
+  const supportsSpreadsheet = session?.features?.dmsSpreadsheet;
+
   const openDMSFile = useCallback(
     (record: TreeRecord) => {
       if (popup) return;
-      if (
-        [CONTENT_TYPE.SPREADSHEET, CONTENT_TYPE.HTML].includes(
-          record.contentType
-        )
-      ) {
+      const customViewTypes = [
+        ...(supportsSpreadsheet ? [CONTENT_TYPE.SPREADSHEET] : []),
+        CONTENT_TYPE.HTML,
+      ];
+      if (customViewTypes.includes(record.contentType)) {
         // open HTML/spreadsheet view
         openTab(prepareCustomView(view, record));
       } else {
         navigate(`/ds/dms.file/edit/${record.id}`);
       }
     },
-    [navigate, view, popup, openTab]
+    [navigate, view, popup, openTab, supportsSpreadsheet]
   );
 
   const setRootIfNeeded = useCallback(
@@ -576,6 +578,7 @@ export function Dms(props: ViewProps<GridView>) {
                     key: "spreadsheet",
                     text: i18n.get("Spreadsheet"),
                     onClick: onSpreadsheetNew,
+                    hidden: !supportsSpreadsheet,
                   },
                   { key: "d2", divider: true },
                   {

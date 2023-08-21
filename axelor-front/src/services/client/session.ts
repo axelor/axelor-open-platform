@@ -76,6 +76,9 @@ export interface SessionInfo {
       maxSize?: number;
     };
   };
+  features?: {
+    dmsSpreadsheet?: boolean;
+  };
 }
 
 export type SessionListener = (info: SessionInfo | null) => void;

@@ -1,0 +1,5 @@
+---
+title: Remove DMS spreadsheet
+type: remove
+description: |
+  DMS spreadsheet is not implemented in community version of new frontend.
