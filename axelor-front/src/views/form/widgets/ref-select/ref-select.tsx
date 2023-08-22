@@ -9,6 +9,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { findFields } from "@/services/client/meta-cache";
 import { Selection as SelectionType } from "@/services/client/meta.types";
 
+import { createWidgetAtom } from "../../builder/atoms";
 import { FieldControl, FieldProps, ValueAtom } from "../../builder";
 import { ManyToOne } from "../many-to-one";
 import { Selection } from "../selection";
@@ -123,5 +124,17 @@ function RefItemInner(props: FieldProps<any> & { targetName: string }) {
     );
   }, [relatedAtom, valueAtom]);
 
-  return <ManyToOne {...props} schema={schema} valueAtom={refAtom} />;
+  const widgetAtom = useMemo(
+    () => createWidgetAtom({ schema, formAtom }),
+    [formAtom, schema]
+  );
+  
+  return (
+    <ManyToOne
+      {...props}
+      schema={schema}
+      valueAtom={refAtom}
+      widgetAtom={widgetAtom}
+    />
+  );
 }
