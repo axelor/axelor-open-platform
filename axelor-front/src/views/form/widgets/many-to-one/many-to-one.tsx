@@ -102,11 +102,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
             (x) => getObjValue(value, x) === undefined,
           );
           if (missing.length > 0) {
-            const ds = new DataSource(target);
-            const rec = await ds.read(value.id, {
-              fields: missing,
-            });
-            return { ...value, ...rec, version: undefined };
+            try {
+              const ds = new DataSource(target);
+              const rec = await ds.read(value.id, { fields: missing }, true);
+              return { ...value, ...rec, version: undefined };
+            } catch (er) {
+              return { ...value, [targetName]: value.id };
+            }
           }
         }
         return value;

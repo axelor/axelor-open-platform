@@ -94,7 +94,11 @@ export class DataSource {
     return Promise.reject(resp.status);
   }
 
-  async read(id: number, options?: ReadOptions): Promise<DataRecord> {
+  async read(
+    id: number,
+    options?: ReadOptions,
+    silent?: boolean
+  ): Promise<DataRecord> {
     const url = `ws/rest/${this.model}/${id}/fetch`;
     const resp = await request({
       url,
@@ -104,7 +108,7 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? data[0] : reject(data);
+      return status === 0 ? data[0] : reject(silent ? null : data);
     }
 
     return Promise.reject(resp.status);
