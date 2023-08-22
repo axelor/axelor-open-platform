@@ -50,10 +50,12 @@ function computeLayout(schema: Schema) {
 
     last = colEnd;
     return {
-      style: {
-        gridColumnStart: colStart,
-        gridColumnEnd: colEnd,
-      },
+      style: schema.$json
+        ? { gridColumn: `span ${colSpan}` }
+        : {
+            gridColumnStart: colStart,
+            gridColumnEnd: colEnd,
+          },
       content: item,
     };
   });
