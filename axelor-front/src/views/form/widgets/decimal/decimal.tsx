@@ -18,7 +18,7 @@ const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom } = props;
-  const { uid, min, max, placeholder } = schema;
+  const { uid, min, max, placeholder, nullable } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale: scaleAttr } = attrs;
 
@@ -35,15 +35,15 @@ export function Decimal(props: FieldProps<string | number>) {
   const [changed, setChanged] = useState(false);
 
   const parse = useCallback(
-    (value: string | number) => {
+    (value: string | number): string | number => {
       if (value == null || value === "") {
-        return "";
+        return nullable ? "" : parse("0");
       }
       return isDecimal
         ? parseDecimal(value, { scale } as Property)
         : parseInt(String(value));
     },
-    [isDecimal, scale]
+    [isDecimal, scale, nullable]
   );
 
   const parsedValue = useMemo(() => parse(value), [parse, value]);
@@ -123,8 +123,11 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const text = useMemo(
-    () => format(value, { props: { ...schema, scale } as Field }),
-    [scale, schema, value]
+    () =>
+      nullable && !value
+        ? value
+        : format(value, { props: { ...schema, scale } as Field }),
+    [nullable, scale, schema, value]
   );
 
   const step = scale != null ? 1 / Math.pow(10, scale) : 1;
