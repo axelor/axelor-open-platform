@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -46,6 +46,8 @@ export function Decimal(props: FieldProps<string | number>) {
     [isDecimal, scale]
   );
 
+  const parsedValue = useMemo(() => parse(value), [parse, value]);
+
   const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       const text = e.target.value.trim();
@@ -61,10 +63,10 @@ export function Decimal(props: FieldProps<string | number>) {
     (e) => {
       if (changed) {
         setChanged(false);
-        setValue(value ? parse(value) : value, true);
+        setValue(parsedValue, true);
       }
     },
-    [changed, parse, setValue, value]
+    [changed, parsedValue, setValue]
   );
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
@@ -142,7 +144,7 @@ export function Decimal(props: FieldProps<string | number>) {
             id={uid}
             ref={inputRef}
             placeholder={placeholder}
-            value={value}
+            value={changed ? value : parsedValue}
             invalid={invalid}
             required={required}
             onChange={handleChange}

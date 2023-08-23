@@ -204,7 +204,7 @@ export function parseDecimal(value: any, { scale }: Property) {
     // append the decimal part
     return num + dec.substring(1);
   }
-  return value;
+  return String(value);
 }
 
 export function getDefaultValues(
