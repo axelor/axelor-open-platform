@@ -158,7 +158,10 @@ export function Decimal(props: FieldProps<string | number>) {
     [nullable, scale, schema, value]
   );
 
-  const step = scale != null ? 1 / Math.pow(10, scale) : 1;
+  const step = useMemo(
+    () => (scale > 0 ? Math.pow(10, -Math.floor(scale)) : 1),
+    [scale]
+  );
 
   return (
     <FieldControl {...props}>

@@ -12,6 +12,7 @@ import { toKebabCase, toSnakeCase } from "@/utils/names";
 
 import { MetaData } from "@/services/client/meta";
 import { Attrs, DEFAULT_ATTRS } from "./types";
+import { DEFAULT_SCALE, limitScale } from "@/utils/format";
 
 export const nextId = (() => {
   let id = 0;
@@ -198,7 +199,8 @@ export function parseDecimal(value: any, { scale }: Property) {
   if (scale != null) {
     const nums = String(value).split(".");
     // scale the decimal part
-    const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(+scale);
+    const limitedScale = limitScale(+scale);
+    const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(limitedScale);
     // increment the integer part if decimal part is greater than 0 (due to rounding)
     const num = BigInt(nums[0]) + BigInt(parseInt(dec));
     // append the decimal part

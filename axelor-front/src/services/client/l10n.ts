@@ -1,10 +1,11 @@
 import dayjs, { Dayjs, PluginFunc } from "dayjs";
 import dayjsLocale from "dayjs/locale.json";
-import localizedFormat from "dayjs/plugin/localizedFormat";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 
+import { limitScale } from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { session } from "./session";
 
@@ -155,17 +156,13 @@ export namespace l10n {
     value: number,
     options?: Intl.NumberFormatOptions
   ) {
-    return new Intl.NumberFormat(getLocale(), options).format(value);
-  }
-
-  export function formatDecimal(
-    value: number,
-    options?: Intl.NumberFormatOptions
-  ) {
+    let { minimumFractionDigits, maximumFractionDigits } = options ?? {};
+    minimumFractionDigits = limitScale(minimumFractionDigits);
+    maximumFractionDigits = limitScale(maximumFractionDigits);
     return new Intl.NumberFormat(getLocale(), {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
       ...options,
+      minimumFractionDigits,
+      maximumFractionDigits,
     }).format(value);
   }
 

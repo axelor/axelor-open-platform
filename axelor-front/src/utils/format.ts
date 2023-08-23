@@ -110,6 +110,25 @@ function addCurrency(value: string, symbol: string) {
 
 export const DEFAULT_SCALE = 2;
 
+const MIN_SCALE = 0;
+const MAX_SCALE = 20;
+
+export function limitScale(value?: number) {
+  if (value == null) {
+    return value;
+  }
+
+  if (value < MIN_SCALE) {
+    return MIN_SCALE;
+  }
+
+  if (value > MAX_SCALE) {
+    return MAX_SCALE;
+  }
+
+  return value;
+}
+
 const formatNumber: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
   let { scale, currency, serverType, type } = props ?? {};
