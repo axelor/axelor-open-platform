@@ -1,5 +1,7 @@
 import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { selectAtom } from "jotai/utils";
+import { get } from "lodash";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -17,14 +19,40 @@ import styles from "./decimal.module.scss";
 const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal(props: FieldProps<string | number>) {
-  const { schema, readonly, invalid, widgetAtom, valueAtom } = props;
+  const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
   const { uid, min, max, placeholder, nullable } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale: scaleAttr } = attrs;
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
-  const scale = isDecimal ? scaleAttr ?? DEFAULT_SCALE : 0;
+
+  const scaleNum = useMemo(() => {
+    if (!isDecimal) {
+      return 0;
+    }
+    if (typeof scaleAttr === "number") {
+      return Math.floor(scaleAttr);
+    }
+    if (scaleAttr == null || scaleAttr === "") {
+      return DEFAULT_SCALE;
+    }
+    return parseInt(scaleAttr);
+  }, [isDecimal, scaleAttr]);
+
+  const scale = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(formAtom, (form) => {
+          if (!isNaN(scaleNum)) {
+            return scaleNum;
+          }
+          const value = parseInt(get(form.record, scaleAttr ?? ""));
+          return isNaN(value) ? DEFAULT_SCALE : value;
+        }),
+      [formAtom, scaleAttr, scaleNum]
+    )
+  );
 
   const { value, setValue } = useInput(valueAtom, {
     defaultValue: "",

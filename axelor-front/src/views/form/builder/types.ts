@@ -16,7 +16,7 @@ export const DEFAULT_ATTRS = {
   domain: undefined as unknown as string,
   context: undefined as unknown as DataContext,
   precision: undefined as unknown as number,
-  scale: undefined as unknown as number,
+  scale: undefined as unknown as number | string,
   refresh: undefined as unknown as number,
   prompt: undefined as unknown as string,
   title: undefined as unknown as string,
