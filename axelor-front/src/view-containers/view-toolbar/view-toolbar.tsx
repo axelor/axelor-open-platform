@@ -1,5 +1,5 @@
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
@@ -24,6 +24,7 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { createScriptContext } from "@/hooks/use-parser/context";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
+import { useResizeDetector } from "@/hooks/use-resize-detector";
 import {
   Button,
   Menu,
@@ -117,6 +118,9 @@ export function ToolbarActions({
   buttons?: Button[];
   menus?: Menu[];
 }) {
+  const { ref, width } = useResizeDetector();
+  const innerRef = useRef<HTMLDivElement | null>(null);
+
   const items = useMemo(() => {
     let ind = 0;
     const mapItem = (
@@ -175,9 +179,40 @@ export function ToolbarActions({
     return [...(buttons || []), ...(menus || [])].map(mapItem);
   }, [buttons, menus, actionExecutor, recordHandler]);
 
+  const responsive = useMemo(() => {
+    const content = innerRef.current;
+    const $width = Math.ceil(width ?? 0);
+    const $innerWidth = Math.ceil((content?.offsetWidth ?? 0));
+    return $width < $innerWidth;
+  }, [width]);
+
   return (
-    <Box d={{ base: "none", md: "block" }} textWrap={false}>
-      <CommandBar items={items} />
+    <Box ref={ref} d="flex" textWrap={false} overflow="hidden">
+      {responsive && (
+        <CommandBar
+          items={[
+            {
+              key: "more",
+              iconOnly: true,
+              iconProps: {
+                icon: "settings",
+              },
+              items,
+              showDownArrow: true,
+            } as CommandItemProps,
+          ]}
+        />
+      )}
+      <Box
+        ref={innerRef}
+        {...(responsive && {
+          style: {
+            visibility: "hidden",
+          },
+        })}
+      >
+        <CommandBar items={items} />
+      </Box>
     </Box>
   );
 }
@@ -330,15 +365,17 @@ export function ViewToolBar(props: ViewToolBarProps) {
   return (
     <Box className={styles.toolbar}>
       <CommandBar className={styles.actions} iconOnly items={actions} />
-      {(toolbar?.length > 0 || menubar?.length > 0) && (
-        <ToolbarActions
-          buttons={toolbar}
-          menus={menubar}
-          actionExecutor={actionExecutor}
-          recordHandler={recordHandler}
-        />
-      )}
-      <Box className={styles.extra}>{children}</Box>
+      <Box d="flex" className={styles.extra}>
+        {(toolbar?.length > 0 || menubar?.length > 0) && (
+          <ToolbarActions
+            buttons={toolbar}
+            menus={menubar}
+            actionExecutor={actionExecutor}
+            recordHandler={recordHandler}
+          />
+        )}
+        {children}
+      </Box>
       {pageText && <Box className={styles.pageInfo}>{pageText}</Box>}
       {PageComp && (
         <Box className={styles.pageInfo}>
