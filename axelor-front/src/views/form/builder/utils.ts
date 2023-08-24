@@ -54,6 +54,8 @@ export function processContextValues(context: DataContext) {
   ];
 
   function process(_value: DataContext) {
+    if (typeof _value !== "object") return _value;
+
     const value = { ..._value };
     for (let k in value) {
       const v = value[k];

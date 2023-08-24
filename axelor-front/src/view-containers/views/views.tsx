@@ -167,7 +167,9 @@ const DataViews = memo(function DataViews({
     ...(limit && { limit }),
     filter: {
       _domain: domain,
-      ...(context && { _domainContext: processContextValues(context) }),
+      ...(context && {
+        _domainContext: processContextValues({ _model: model, ...context }),
+      }),
     },
   });
 
