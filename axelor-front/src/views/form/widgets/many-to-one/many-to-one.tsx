@@ -1,6 +1,8 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { MouseEvent, useCallback, useRef, useState } from "react";
+import isEqual from "lodash/isEqual";
+import getObjValue from "lodash/get";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -87,8 +89,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           const related = Object.keys(fields)
             .filter((x) => x.startsWith(prefix))
             .map((x) => x.substring(prefix.length));
+
           const names = [targetName, ...related];
-          const missing = names.filter((x) => value[x] === undefined);
+          const missing = names.filter(
+            (x) => getObjValue(value, x) === undefined
+          );
           if (missing.length > 0) {
             const ds = new DataSource(target);
             const rec = await ds.read(value.id, {
@@ -206,7 +211,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         if (valueRef.current === value) return;
         if (value) {
           const newValue = await ensureRelated(value);
-          if (newValue !== value) {
+          if (!isEqual(newValue, value)) {
             valueRef.current = newValue;
             if (signal.aborted) return;
             setValue(newValue, false, false);
