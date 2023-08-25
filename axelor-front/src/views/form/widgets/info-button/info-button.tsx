@@ -5,10 +5,10 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
+import format from "@/utils/format";
 import { dialogs } from "@/components/dialogs";
 import { Icon } from "@/components/icon";
 import { Field } from "@/services/client/meta.types";
-import { Formatters } from "@/utils/format";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormScope, useWidgetState } from "../../builder/scope";
@@ -25,12 +25,10 @@ export function InfoButton(props: WidgetProps) {
     attrs: { title },
   } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
-  const value = useAtomValue(
-    useMemo(
-      () => selectAtom(formAtom, (form) => form.record[field!]),
-      [formAtom, field]
-    )
+  const record = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
   );
+  const value = record[field];
 
   const { attrs: fieldSchema = {} } = useWidgetState(formAtom, field);
 
@@ -85,7 +83,8 @@ export function InfoButton(props: WidgetProps) {
         <Box className={styles.data}>
           {value && (
             <div className={styles.value}>
-              {Formatters.decimal(value, {
+              {format(value, {
+                context: record,
                 props: fieldSchema as unknown as Field,
               })}
             </div>

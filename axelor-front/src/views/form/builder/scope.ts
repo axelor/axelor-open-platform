@@ -32,7 +32,7 @@ import {
   WidgetErrors,
   WidgetState,
 } from "./types";
-import { defaultAttrs, processActionValue } from "./utils";
+import { processActionValue } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -221,38 +221,44 @@ function findSchema(schema: Schema, widgetName: string): Schema | undefined {
 }
 
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
-  const findAttrs = useAtomCallback(
+  const findField = useAtomCallback(
     useCallback(
       (get) => {
         const { meta, fields } = get(formAtom);
         const field = fields[widgetName] ?? {};
         const schema = findSchema(meta.view, widgetName);
-        return { ...field, ...schema, ...schema?.widgetAttrs };
+        return {
+          ...field,
+          ...schema,
+          serverType: schema?.serverType || field.type,
+          ...schema?.widgetAttrs,
+        };
       },
       [formAtom, widgetName]
     )
   );
+
+  const field = useMemo(() => findField(), [findField]);
 
   const findState = useAtomCallback(
     useCallback(
       (get) => {
         const { states, statesByName } = get(formAtom);
-        return (
+        const state =
           Object.values(states).find((x) => x.name === widgetName) ??
-          statesByName[widgetName]
-        );
+          statesByName[widgetName];
+        return {
+          name: widgetName,
+          ...state,
+          attrs: { ...field, ...state?.attrs },
+        };
       },
-      [formAtom, widgetName]
+      [formAtom, widgetName, field]
     )
   );
 
   const state = findState();
-  const defaults = useMemo(
-    () => ({ name: widgetName, attrs: defaultAttrs(findAttrs()) }),
-    [findAttrs, widgetName]
-  );
-
-  return state ?? defaults ?? {};
+  return state ?? {};
 }
 
 export function useFormRefresh(refresh?: () => Promise<any> | void) {
