@@ -11,6 +11,7 @@ export const DEFAULT_ATTRS = {
   required: undefined as unknown as boolean,
   focus: undefined as unknown as boolean,
   hidden: undefined as unknown as boolean,
+  active: undefined as unknown as boolean,
   collapse: undefined as unknown as boolean,
   domain: undefined as unknown as string,
   context: undefined as unknown as DataContext,

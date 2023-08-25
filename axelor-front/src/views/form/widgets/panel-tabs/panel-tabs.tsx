@@ -8,7 +8,6 @@ import { Fade, NavTabItem, NavTabs } from "@axelor/ui";
 import { Schema } from "@/services/client/meta.types";
 
 import { FormAtom, FormWidget, WidgetAtom, WidgetProps } from "../../builder";
-import { useFormScope } from "../../builder/scope";
 
 import styles from "./panel-tabs.module.scss";
 
@@ -59,24 +58,6 @@ export function PanelTabs(props: WidgetProps) {
     [hiddenTabs, tabs]
   );
 
-  const { actionHandler } = useFormScope();
-
-  useEffect(() => {
-    return actionHandler.subscribe((data) => {
-      if (
-        data.type === "attr" &&
-        data.name === "active" &&
-        data.value &&
-        tabs.some((item) => item.name === data.target)
-      ) {
-        let item = tabs.find((item) => item.name === data.target);
-        if (item) {
-          setActiveTab(item.uid);
-        }
-      }
-    });
-  }, [actionHandler, tabs]);
-
   useEffect(() => {
     if (visibleTabs.some((item) => item.uid === activeTab)) return;
     if (activeTab) {
@@ -109,6 +90,7 @@ export function PanelTabs(props: WidgetProps) {
         formAtom={formAtom}
         parentAtom={widgetAtom}
         setHidden={setHidden}
+        setActive={setActiveTab}
       />
       {visibleTabs.map((item) => {
         const active = activeTab === item.uid;
@@ -162,19 +144,22 @@ const DummyTabs = memo(function DummyTabs({
   formAtom,
   parentAtom,
   setHidden,
+  setActive,
 }: {
   tabs: Schema[];
   formAtom: FormAtom;
   parentAtom: WidgetAtom;
   setHidden: (id: string, hidden: boolean) => void;
+  setActive: (id: string) => void;
 }) {
   const items = useMemo(() => {
     return tabs.map((item) => {
-      const { id, uid, name, showIf, hideIf } = item;
+      const { id, uid, name, hidden, showIf, hideIf } = item;
       return {
         id,
         uid,
         name,
+        hidden,
         showIf,
         hideIf,
         widget: "spacer",
@@ -190,7 +175,9 @@ const DummyTabs = memo(function DummyTabs({
           schema={item}
           formAtom={formAtom}
           parentAtom={parentAtom}
-          render={(props) => <DummyTab {...props} setHidden={setHidden} />}
+          render={(props) => (
+            <DummyTab {...props} setHidden={setHidden} setActive={setActive} />
+          )}
         />
       ))}
     </div>
@@ -198,16 +185,26 @@ const DummyTabs = memo(function DummyTabs({
 });
 
 const DummyTab = memo(function DummyTab(
-  props: WidgetProps & { setHidden: (id: string, hidden: boolean) => void }
+  props: WidgetProps & {
+    setHidden: (id: string, hidden: boolean) => void;
+    setActive: (id: string) => void;
+  }
 ) {
-  const { schema, widgetAtom, setHidden } = props;
+  const { schema, widgetAtom, setHidden, setActive } = props;
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
+  );
+  const active = useAtomValue(
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.active), [widgetAtom])
   );
 
   useEffect(() => {
     setHidden(schema.uid, !!hidden);
   }, [hidden, schema.uid, setHidden]);
+
+  useEffect(() => {
+    active && setActive(schema.uid);
+  }, [active, schema.uid, setActive]);
 
   return null;
 });
