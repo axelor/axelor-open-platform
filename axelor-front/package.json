@@ -19,7 +19,7 @@
     "@monaco-editor/react": "^4.5.2",
     "bootstrap-icons": "^1.10.5",
     "bootstrap-sass": "2.3.2",
-    "clsx": "^1.2.1",
+    "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.9",
     "dompurify": "^3.0.5",
