@@ -121,7 +121,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
 
   // referencing another field in the context?
   if (typeof scale === "string") {
-    scale = (_.get(context, scale) as number) ?? scale;
+    scale = (_.get(context, scale) as number) ?? 2;
   }
 
   if (serverType === "DECIMAL") {
@@ -136,9 +136,9 @@ const formatNumber: Formatter = (value, opts = {}) => {
   let num = +value;
   if (num === 0 || num) {
     const opts: Intl.NumberFormatOptions = {};
-    if (scale || currency) {
-      opts.minimumFractionDigits = +(scale ?? 2) || 2;
-      opts.maximumFractionDigits = +(scale ?? 2) || 2;
+    if (scale || scale === 0) {
+      opts.minimumFractionDigits = +(scale ?? 2);
+      opts.maximumFractionDigits = +(scale ?? 2);
     }
     if (currency) {
       opts.style = "currency";
@@ -150,8 +150,8 @@ const formatNumber: Formatter = (value, opts = {}) => {
       // Fall back to adding currency symbol
       if (currency) {
         const result = l10n.formatNumber(num, {
-          minimumFractionDigits: opts.minimumFractionDigits,
-          maximumFractionDigits: opts.maximumFractionDigits,
+          minimumFractionDigits: opts.minimumFractionDigits ?? 2,
+          maximumFractionDigits: opts.maximumFractionDigits ?? 2,
         });
         return addCurrency(result, currency);
       }
