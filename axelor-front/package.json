@@ -32,7 +32,7 @@
     "jotai-optics": "^0.3.1",
     "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
-    "monaco-editor": "^0.39.0",
+    "monaco-editor": "^0.41.0",
     "optics-ts": "^2.4.1",
     "parse5": "^7.1.2",
     "react": "^18.2.0",
