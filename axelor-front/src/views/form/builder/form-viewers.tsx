@@ -3,6 +3,7 @@ import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 
 import { useTemplate } from "@/hooks/use-parser";
+import { useFormField, useFormScope } from "./scope";
 import { DataRecord } from "@/services/client/data.types";
 import { Property } from "@/services/client/meta.types";
 
@@ -102,12 +103,24 @@ function RecordViewer({
   fields,
   record,
 }: FormViewerProps & { record: DataRecord }) {
+  const { formAtom } = useFormScope();
+
   const Template = useTemplate(template);
+  const $getField = useFormField(formAtom);
+
   // legacy templates may be using `record.` prefix
   const rec = useMemo(() => ({ ...record, record }), [record]);
   return (
     <div className={styles.content}>
-      <Template context={rec} options={{ fields } as any} />
+      <Template
+        context={rec}
+        options={
+          {
+            fields,
+            helpers: { $getField },
+          } as any
+        }
+      />
     </div>
   );
 }

@@ -33,6 +33,8 @@ export function createScriptContext(
     helpers: moreHelpers = {},
   } = options ?? {};
 
+  const { $getField } = moreHelpers;
+
   const helpers = {
     get $user() {
       return session.info?.user?.login;
@@ -136,7 +138,7 @@ export function createScriptContext(
       const value = helpers.$get(name);
       return format(value, {
         context,
-        props: fields[name],
+        props: $getField?.(name) || fields[name],
       });
     },
     $image(fieldName: string, imageName: string) {

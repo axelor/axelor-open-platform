@@ -220,25 +220,29 @@ function findSchema(schema: Schema, widgetName: string): Schema | undefined {
   }
 }
 
-export function useWidgetState(formAtom: FormAtom, widgetName: string) {
-  const findField = useAtomCallback(
+export function useFormField(formAtom: FormAtom) {
+  return useAtomCallback(
     useCallback(
-      (get) => {
+      (get, set, fieldName: string) => {
         const { meta, fields } = get(formAtom);
-        const field = fields[widgetName] ?? {};
-        const schema = findSchema(meta.view, widgetName);
+        const field = fields[fieldName] ?? {};
+        const schema = findSchema(meta.view, fieldName);
         return {
           ...field,
           ...schema,
           serverType: schema?.serverType || field.type,
           ...schema?.widgetAttrs,
-        };
+        } as Schema;
       },
-      [formAtom, widgetName]
+      [formAtom]
     )
   );
+}
 
-  const field = useMemo(() => findField(), [findField]);
+export function useWidgetState(formAtom: FormAtom, widgetName: string) {
+  const findField = useFormField(formAtom);
+
+  const field = useMemo(() => findField(widgetName), [findField, widgetName]);
 
   const findState = useAtomCallback(
     useCallback(
