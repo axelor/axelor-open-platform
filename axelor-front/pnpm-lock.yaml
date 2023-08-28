@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -11,12 +11,6 @@ patchedDependencies:
   font-awesome@4.7.0:
     hash: b36n7p33c4ewtt5v6is5moc24u
     path: patches/font-awesome@4.7.0.patch
-  jotai-optics@0.3.0:
-    hash: nc42tsqrelbobqdc4skzu3byb4
-    path: patches/jotai-optics@0.3.0.patch
-  optics-ts@2.4.0:
-    hash: koes4b24nwceoodg4aaxu6pdvi
-    path: patches/optics-ts@2.4.0.patch
 
 dependencies:
   '@axelor/ui':
@@ -65,8 +59,8 @@ dependencies:
     specifier: ^1.1.1
     version: 1.1.1(jotai@2.1.1)(react@18.2.0)
   jotai-optics:
-    specifier: ^0.3.0
-    version: 0.3.0(patch_hash=nc42tsqrelbobqdc4skzu3byb4)(jotai@2.1.1)(optics-ts@2.4.0)
+    specifier: ^0.3.1
+    version: 0.3.1(jotai@2.1.1)(optics-ts@2.4.1)
   jsdom:
     specifier: ^22.1.0
     version: 22.1.0
@@ -77,8 +71,8 @@ dependencies:
     specifier: ^0.39.0
     version: 0.39.0
   optics-ts:
-    specifier: ^2.4.0
-    version: 2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi)
+    specifier: ^2.4.1
+    version: 2.4.1
   parse5:
     specifier: ^7.1.2
     version: 7.1.2
@@ -4966,16 +4960,15 @@ packages:
       react: 18.2.0
     dev: false
 
-  /jotai-optics@0.3.0(patch_hash=nc42tsqrelbobqdc4skzu3byb4)(jotai@2.1.1)(optics-ts@2.4.0):
-    resolution: {integrity: sha512-5ttpCRREIBu6DJix0wlyBP6y1QDPlePnoMZSXNDi/FOkXZrhk9uIXKjwvw34/yBCHT5mYpFUD4sFDvRUU2vkvQ==}
+  /jotai-optics@0.3.1(jotai@2.1.1)(optics-ts@2.4.1):
+    resolution: {integrity: sha512-KibUx9IneM2hGWGIYGs/v0KCxU985lg7W2c6dt5RodJCB2XPbmok8rkkLmdVk9+fKsn2shkPMi+AG8XzHgB3+w==}
     peerDependencies:
       jotai: '>=1.11.0'
       optics-ts: '*'
     dependencies:
       jotai: 2.1.1(react@18.2.0)
-      optics-ts: 2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi)
+      optics-ts: 2.4.1
     dev: false
-    patched: true
 
   /jotai@2.1.1(react@18.2.0):
     resolution: {integrity: sha512-LaaiuSaq+6XkwkrCtCkczyFVZOXe0dfjAFN4DVMsSZSRv/A/4xuLHnlpHMEDqvngjWYBotTIrnQ7OogMkUE6wA==}
@@ -5375,10 +5368,9 @@ packages:
       wrappy: 1.0.2
     dev: true
 
-  /optics-ts@2.4.0(patch_hash=koes4b24nwceoodg4aaxu6pdvi):
-    resolution: {integrity: sha512-BIYgnqOTEf+WiXuxuBFXeoCtyIDOwnUwCMybdQh8qdHyWXunwVVt7iD9XwNq8SCd5vUo9vqgYxF5ati/6inIuQ==}
+  /optics-ts@2.4.1:
+    resolution: {integrity: sha512-HaYzMHvC80r7U/LqAd4hQyopDezC60PO2qF5GuIwALut2cl5rK1VWHsqTp0oqoJJWjiv6uXKqsO+Q2OO0C3MmQ==}
     dev: false
-    patched: true
 
   /optionator@0.9.1:
     resolution: {integrity: sha512-74RlY5FCnhq4jRxVUPKDaRwrVNXMqsGsiW6AJw4XK8hmtm10wC0ypZBLw5IIp85NZMr91+qd1RvvENwg7jjRFw==}

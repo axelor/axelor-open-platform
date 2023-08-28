@@ -29,11 +29,11 @@
     "jotai": "^2.1.1",
     "jotai-immer": "^0.2.0",
     "jotai-molecules": "^1.1.1",
-    "jotai-optics": "^0.3.0",
+    "jotai-optics": "^0.3.1",
     "jsdom": "^22.1.0",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.39.0",
-    "optics-ts": "^2.4.0",
+    "optics-ts": "^2.4.1",
     "parse5": "^7.1.2",
     "react": "^18.2.0",
     "react-datepicker": "^4.12.0",
@@ -73,9 +73,7 @@
   "pnpm": {
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
-      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch",
-      "optics-ts@2.4.0": "patches/optics-ts@2.4.0.patch",
-      "jotai-optics@0.3.0": "patches/jotai-optics@0.3.0.patch"
+      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
