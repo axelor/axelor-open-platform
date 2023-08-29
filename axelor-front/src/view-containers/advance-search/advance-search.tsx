@@ -348,7 +348,7 @@ export function AdvanceSearch({
         .then(({ exportSize, fileName }) => {
           if ((dataStore.page?.totalCount ?? 0) > exportSize) {
             alerts.warn({
-              title: i18n.get("Warning!"),
+              title: i18n.get("Warning"),
               message: i18n.get("{0} records exported.", exportSize),
             });
           }
