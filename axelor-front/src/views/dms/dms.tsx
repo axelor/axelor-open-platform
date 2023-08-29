@@ -50,7 +50,7 @@ import {
 import styles from "./dms.module.scss";
 import { useResponsive } from "@/hooks/use-responsive";
 
-const ROOT: TreeRecord = { id: null, fileName: i18n.get("Home") };
+const ROOT: TreeRecord = { id: null, fileName: i18n.get("DMS.Home") };
 const UNDEFINED_ID = -1;
 
 const promptInput = async (
