@@ -270,6 +270,23 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, clearSelection]
   );
 
+  const parentId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (parentId.current) return;
+    const elems = [
+      document.querySelector(`[data-tab-content][data-tab-active='true']`),
+      ...document.querySelectorAll("body > [data-dialog='true']"),
+    ];
+
+    const elem = elems[elems.length - 1] as HTMLElement;
+    const parent =
+      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
+    if (parent) {
+      parentId.current = parent.getAttribute("data-view-id");
+    }
+  }, []);
+
   const onViewInPopup = useCallback(
     (record: DataRecord, readonly = false) => {
       showEditor({
@@ -279,9 +296,22 @@ function GridInner(props: ViewProps<GridView>) {
         maximize: hasPopupMaximize,
         record,
         readonly,
-        ...(!readonly && {
-          onSelect: () => hasPopupReload && onSearch({}),
-        }),
+        ...(hasPopupReload
+          ? {
+              onSelect: () => {},
+              onClose: (result) => {
+                const detail = parentId.current;
+                if (result && detail) {
+                  const event = new CustomEvent("tab:refresh", { detail });
+                  document.dispatchEvent(event);
+                }
+              },
+            }
+          : !readonly && {
+              onSelect: () => {
+                onSearch({});
+              },
+            }),
       });
     },
     [view, action, hasPopupMaximize, hasPopupReload, showEditor, onSearch]

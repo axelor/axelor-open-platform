@@ -26,7 +26,7 @@ export type EditorOptions = {
   view?: FormView;
   viewName?: string;
   context?: DataContext;
-  onClose?: () => void;
+  onClose?: (result?: boolean) => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
 };
@@ -120,15 +120,15 @@ export function useEditor() {
       tab,
       open: true,
       maximize,
-      onClose: () => {
-        onClose?.();
+      onClose: (result) => {
+        onClose?.(result);
       },
       footer: (close) => (
         <Footer
           onSave={onSave}
-          onClose={(result: boolean) => {
+          onClose={(result) => {
             close(result);
-            onClose?.();
+            onClose?.(true);
           }}
           onSelect={onSelect}
         />
