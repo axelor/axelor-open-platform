@@ -375,7 +375,7 @@ export function AdvanceSearch({
           key: "clear",
           icon: "clear",
           className: styles.icon,
-          onClick: () => handleClear(false),
+          onClick: () => handleClear(),
         },
         {
           key: "search",
