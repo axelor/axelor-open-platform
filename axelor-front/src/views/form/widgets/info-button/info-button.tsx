@@ -19,7 +19,7 @@ import styles from "./info-button.module.scss";
 export function InfoButton(props: WidgetProps) {
   const { schema, widgetAtom, formAtom } = props;
   const { showTitle = true, icon, iconHover, widgetAttrs } = schema;
-  const { field } = widgetAttrs || {};
+  const { field = schema.name } = widgetAttrs || {};
 
   const {
     attrs: { title },
@@ -30,7 +30,7 @@ export function InfoButton(props: WidgetProps) {
   );
   const value = record[field];
 
-  const { attrs: fieldSchema = {} } = useWidgetState(formAtom, field);
+  const { attrs: fieldSchema = {} } = useWidgetState(formAtom, field ?? "");
 
   const [wait, setWait] = useState(false);
 
