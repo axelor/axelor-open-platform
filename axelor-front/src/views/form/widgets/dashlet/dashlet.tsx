@@ -104,9 +104,9 @@ export function DashletComponent({
   useEffect(() => {
     // for grid view to update readonly to show edit icon
     if (tab && tab?.action?.viewType === "grid") {
-      setTabViewProps(tab, "grid", "readonly", readonly);
+      setTabViewProps(tab, "grid", "readonly", readonly || schema.readonly);
     }
-  }, [tab, readonly, setTabViewProps]);
+  }, [tab, schema.readonly, readonly, setTabViewProps]);
 
   useEffect(() => {
     // for html view to update url
