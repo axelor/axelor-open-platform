@@ -578,7 +578,7 @@ the button attributes without impact on the bound field.
 [source,xml]
 ----
 <panel>
-  <button name="amountBtn" title="Amount" widget="info-button" x-field="totalAmount" onClick="my-action"/>
+  <button name="amountBtn" title="Amount" widget="info-button" x-field="amount" onClick="my-action"/>
   <field name="amount" hidden="true"/>
 </panel>
 ----
