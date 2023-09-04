@@ -4,9 +4,13 @@
   align-items: center;
 }
 
+.icon,
+.iconHover {
+  font-size: 2rem;
+}
+
 .icon {
   display: inline-flex;
-  font-size: 2rem;
 }
 
 .iconHover {
