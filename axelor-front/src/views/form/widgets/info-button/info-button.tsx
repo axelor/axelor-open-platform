@@ -68,12 +68,14 @@ export function InfoButton(props: WidgetProps) {
         disabled={disabled}
         onClick={handleClick}
       >
-        <Icon
-          icon={icon}
-          className={clsx(styles.icon, {
-            [styles.hideOnHover]: iconHover,
-          })}
-        />
+        {icon && (
+          <Icon
+            icon={icon}
+            className={clsx(styles.icon, {
+              [styles.hideOnHover]: iconHover,
+            })}
+          />
+        )}
         {iconHover && (
           <Icon
             icon={iconHover}
