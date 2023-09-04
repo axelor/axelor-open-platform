@@ -357,7 +357,7 @@
       <field name="tableName"/>
       <field name="packageName"/>
     </panel>
-    <panel-related field="metaFields" orderBy="id" />
+    <panel-related field="metaFields" orderBy="id" x-can-export="true" />
   </form>
 
   <selection name="relationship.field.selection">
