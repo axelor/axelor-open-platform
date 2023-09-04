@@ -1,10 +1,12 @@
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useMemo } from "react";
+import { ScopeProvider } from "jotai-molecules";
 import uniqueId from "lodash/uniqueId";
 
 import { Box, clsx } from "@axelor/ui";
 
+import { PopupScope } from "@/view-containers/view-popup/handler";
 import { Tab, TabProps, initTab } from "@/hooks/use-tabs";
 import { DataContext } from "@/services/client/data.types";
 import { CardsView, Schema } from "@/services/client/meta.types";
@@ -153,7 +155,11 @@ export function DashletComponent({
               />
             )}
           </Box>
-          <Box className={classes.content}>{tab && <Views tab={tab} />}</Box>
+          <Box className={classes.content}>
+            <ScopeProvider scope={PopupScope} value={{}}>
+              {tab && <Views tab={tab} />}
+            </ScopeProvider>
+          </Box>
         </Box>
       </DashletView>
     )
