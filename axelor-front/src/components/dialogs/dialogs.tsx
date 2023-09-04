@@ -30,7 +30,9 @@ export type DialogButton = {
 export type DialogOptions = {
   title?: string;
   content: React.ReactNode;
-  header?: React.ReactNode;
+  header?:
+    | ((close: (result: boolean) => void) => React.ReactNode)
+    | React.ReactNode;
   footer?: (close: (result: boolean) => void) => React.ReactNode;
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
@@ -42,6 +44,7 @@ export type DialogOptions = {
   };
   open: boolean;
   maximize?: boolean;
+  closeable?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   onClose: (result: boolean) => void;
 };
@@ -234,6 +237,7 @@ export function ModalDialog(props: DialogOptions) {
     footer,
     buttons = defaultButtons,
     classes = {},
+    closeable = true,
     onClose,
     maximize,
   } = props;
@@ -271,11 +275,13 @@ export function ModalDialog(props: DialogOptions) {
         data-dialog="true"
       >
         <DialogHeader
-          onCloseClick={(e) => close(false)}
+          {...(closeable && {
+            onCloseClick: () => close(false),
+          })}
           className={classes.header}
         >
           <DialogTitle className={styles.title}>{title}</DialogTitle>
-          {header}
+          {typeof header === "function" ? header(close) : header}
         </DialogHeader>
         <DialogContent className={clsx(classes.content, styles.content)}>
           {content}

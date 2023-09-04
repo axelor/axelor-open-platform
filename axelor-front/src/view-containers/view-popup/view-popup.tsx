@@ -3,7 +3,7 @@ import { selectAtom } from "jotai/utils";
 import { ScopeProvider } from "jotai-molecules";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Box, Button } from "@axelor/ui";
+import { Box, Button, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
@@ -92,6 +92,7 @@ export const PopupDialog = memo(function PopupDialog({
         open={open}
         title={title || tab.title}
         size="xl"
+        closeable={false}
         classes={{
           root: clsx({
             [styles.collapsed]: !expanded,
@@ -105,15 +106,17 @@ export const PopupDialog = memo(function PopupDialog({
             {handler?.()}
           </>
         }
-        header={
+        header={(close) => (
           <Header
             header={header}
             maximized={maximized}
             expanded={expanded}
+            params={tab.action?.params}
+            close={close}
             setMaximized={setMaximized}
             setExpanded={setExpanded}
           />
-        }
+        )}
         footer={footer}
         buttons={buttons}
         onClose={onClose}
@@ -122,38 +125,6 @@ export const PopupDialog = memo(function PopupDialog({
     </ScopeProvider>
   );
 });
-
-function Header({
-  header: HeaderComp,
-  maximized,
-  expanded,
-  setMaximized,
-  setExpanded,
-}: {
-  header?: () => JSX.Element | null;
-  maximized: boolean;
-  expanded: boolean;
-  setMaximized: React.Dispatch<React.SetStateAction<boolean>>;
-  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
-  return (
-    <Box d="flex" g={2}>
-      {HeaderComp && <HeaderComp />}
-      <Box d="flex" alignItems="center">
-        <MaterialIcon
-          icon={expanded ? "expand_less" : "expand_more"}
-          className={styles.icon}
-          onClick={() => setExpanded((prev) => !prev)}
-        />
-        <MaterialIcon
-          icon={maximized ? "fullscreen_exit" : "fullscreen"}
-          className={styles.icon}
-          onClick={() => setMaximized((prev) => !prev)}
-        />
-      </Box>
-    </Box>
-  );
-}
 
 export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   const { id, action } = tab;
@@ -171,6 +142,59 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
     />
   );
 });
+
+function Header({
+  header: HeaderComp,
+  maximized,
+  expanded,
+  params,
+  close,
+  setMaximized,
+  setExpanded,
+}: {
+  header?: () => JSX.Element | null;
+  params?: DataRecord;
+  maximized: boolean;
+  expanded: boolean;
+  close: (result: boolean) => void;
+  setMaximized: React.Dispatch<React.SetStateAction<boolean>>;
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const classNames = useClassNames();
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+  const popupCanConfirm = params?.["show-confirm"] !== false;
+  const handleClose = useCallback(() => {
+    dialogs.confirmDirty(
+      async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
+      async () => close(false)
+    );
+  }, [close, handler, popupCanConfirm]);
+
+  return (
+    <Box d="flex" g={2}>
+      {HeaderComp && <HeaderComp />}
+      <Box d="flex" alignItems="center">
+        <MaterialIcon
+          icon={expanded ? "expand_less" : "expand_more"}
+          className={styles.icon}
+          onClick={() => setExpanded((prev) => !prev)}
+        />
+        <MaterialIcon
+          icon={maximized ? "fullscreen_exit" : "fullscreen"}
+          className={styles.icon}
+          onClick={() => setMaximized((prev) => !prev)}
+        />
+        <Box
+          as="button"
+          tabIndex={0}
+          className={classNames("btn-close")}
+          onClick={handleClose}
+        />
+      </Box>
+    </Box>
+  );
+}
 
 function Footer({
   close,
@@ -246,7 +270,14 @@ function Footer({
         close(true);
       }
     });
-  }, [close, handleCancel, handleConfirm, handler, popupCanReload, triggerReload]);
+  }, [
+    close,
+    handleCancel,
+    handleConfirm,
+    handler,
+    popupCanReload,
+    triggerReload,
+  ]);
 
   return (
     <Box d="flex" g={2}>
