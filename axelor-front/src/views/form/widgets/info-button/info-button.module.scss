@@ -1,3 +1,9 @@
+.button,
+.button:hover {
+  color: var(--bs-btn-bg);
+  background-color: var(--ax-panel-bg);
+}
+
 .button {
   display: flex;
   gap: 0.75rem;
