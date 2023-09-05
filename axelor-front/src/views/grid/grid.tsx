@@ -45,7 +45,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { useActionExecutor } from "../form/builder/scope";
+import { useActionExecutor, useFormScope } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
@@ -287,34 +287,67 @@ function GridInner(props: ViewProps<GridView>) {
     }
   }, []);
 
-  const onViewInPopup = useCallback(
-    (record: DataRecord, readonly = false) => {
-      showEditor({
-        model: view.model!,
-        title: view.title ?? "",
-        viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
-        maximize: hasPopupMaximize,
-        record,
-        readonly,
-        ...(hasPopupReload
-          ? {
-              onSelect: () => {},
-              onClose: (result) => {
-                const detail = parentId.current;
-                if (result && detail) {
-                  const event = new CustomEvent("tab:refresh", { detail });
-                  document.dispatchEvent(event);
-                }
-              },
+  const { formAtom, actionHandler } = useFormScope();
+
+  const onViewInPopup = useAtomCallback(
+    useCallback(
+      async (get, set, record: DataRecord, readonly: boolean = false) => {
+        if (hasPopupReload) {
+          const { dirty: formDirty = false, record: formRecord } =
+            get(formAtom);
+
+          const confirm = await dialogs.confirmDirty(
+            async () => formDirty,
+            async () => actionHandler.save(formRecord),
+            {
+              content: i18n.get(
+                "Current changes will be saved. Do you want to proceed?"
+              ),
             }
-          : !readonly && {
-              onSelect: () => {
-                onSearch({});
-              },
-            }),
-      });
-    },
-    [view, action, hasPopupMaximize, hasPopupReload, showEditor, onSearch]
+          );
+
+          if (!confirm) {
+            return;
+          }
+        }
+
+        showEditor({
+          model: view.model!,
+          title: view.title ?? "",
+          viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
+          maximize: hasPopupMaximize,
+          record,
+          readonly,
+          ...(hasPopupReload
+            ? {
+                onSelect: () => {},
+                onClose: (result) => {
+                  const detail = parentId.current;
+                  if (result && detail) {
+                    const event = new CustomEvent("tab:refresh", { detail });
+                    document.dispatchEvent(event);
+                  }
+                },
+              }
+            : !readonly && {
+                onSelect: () => {
+                  onSearch({});
+                },
+              }),
+        });
+      },
+      [
+        hasPopupReload,
+        showEditor,
+        view.model,
+        view.title,
+        action.views,
+        hasPopupMaximize,
+        formAtom,
+        actionHandler,
+        onSearch,
+      ]
+    )
   );
 
   const onEditInTab = useCallback(
