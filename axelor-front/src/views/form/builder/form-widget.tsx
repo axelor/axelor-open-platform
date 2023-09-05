@@ -63,6 +63,13 @@ export function FormWidget(props: FormWidgetProps) {
       )
     ) || props.readonly;
 
+  const required = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetAtom, (a) => a.attrs.required),
+      [widgetAtom],
+    ),
+  );
+
   const canEdit = useAtomValue(
     useMemo(
       () => selectAtom(widgetAtom, (a) => a.attrs.canEdit ?? true),
@@ -88,6 +95,7 @@ export function FormWidget(props: FormWidgetProps) {
     widgetAtom,
     valueAtom,
     readonly,
+    required,
   });
 
   if (Comp) {
@@ -242,11 +250,13 @@ function useExpressions({
   widgetAtom,
   valueAtom,
   readonly = false,
+  required = false,
 }: {
   schema: Schema;
   widgetAtom: WidgetAtom;
   valueAtom?: ValueAtom<any>;
   readonly?: boolean;
+  required?: boolean;
 }) {
   const { formAtom, recordHandler } = useFormScope();
   const actionView = useViewAction();
@@ -266,7 +276,7 @@ function useExpressions({
     )
   );
 
-  const modeRef = useRef(readonly);
+  const modeRef = useRef({ readonly, required });
   const recordRef = useRef<DataRecord>();
   const contextRef = useRef<DataContext>();
 
@@ -276,20 +286,22 @@ function useExpressions({
       if (
         ctx === undefined ||
         recordRef.current !== record ||
-        modeRef.current !== readonly
+        modeRef.current.readonly !== readonly ||
+        modeRef.current.required !== required
       ) {
         ctx = createEvalContext(record, {
           valid,
           readonly,
+          required,
           popup,
         });
-        modeRef.current = readonly;
+        modeRef.current = { readonly, required };
         recordRef.current = record;
         contextRef.current = ctx;
       }
       return ctx;
     },
-    [popup, readonly, valid]
+    [popup, readonly, required, valid],
   );
 
   const handleBind = useAtomCallback(
