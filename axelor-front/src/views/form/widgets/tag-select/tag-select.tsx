@@ -21,7 +21,7 @@ import {
 } from "../../builder";
 import { Chip } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
-import { useOptionLabel } from "../many-to-one";
+import { useOptionLabel } from "../many-to-one/utils";
 
 export function TagSelectComponent({
   canRemove,
