@@ -234,6 +234,9 @@ export function OneToMany({
 
   const onExport = useCallback(async () => {
     const { fileName } = await dataStore.export({
+      ...(state.orderBy && {sortBy: state.orderBy?.map(
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+        )}),
       fields: state.columns
         .filter((c) => c.type === "field" && c.visible !== false)
         .map((c) => c.name),
@@ -242,7 +245,7 @@ export function OneToMany({
       `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
       fileName
     );
-  }, [dataStore, state.columns]);
+  }, [dataStore, state.columns, state.orderBy]);
 
   const handleSelect = useAtomCallback(
     useCallback(
