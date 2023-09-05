@@ -28,6 +28,7 @@ import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorSecurityLogic;
 import com.axelor.auth.pac4j.ClientListProvider;
+import com.axelor.common.Inflector;
 import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -48,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -79,6 +81,8 @@ public class InfoService extends AbstractService {
 
   private static final AppSettings SETTINGS = AppSettings.get();
 
+  private static final Inflector inflector = Inflector.getInstance();
+
   @Inject
   public InfoService(AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
     this.pac4jInfo = pac4jInfo;
@@ -101,6 +105,7 @@ public class InfoService extends AbstractService {
       map.put("view", viewInfo());
       map.put("api", apiInfo());
       map.put("data", dataInfo());
+      map.put("features", featuresInfo());
     }
     return map;
   }
@@ -297,6 +302,16 @@ public class InfoService extends AbstractService {
     map.put("upload", upload);
 
     return map;
+  }
+
+  private Object featuresInfo() {
+    return SETTINGS.getPropertiesKeysStartingWith(AvailableAppSettings.FEATURE_PREFIX).stream()
+        .collect(
+            Collectors.toMap(
+                key ->
+                    inflector.camelize(
+                        key.substring(AvailableAppSettings.FEATURE_PREFIX.length()), true),
+                key -> SETTINGS.getBoolean(key, false)));
   }
 
   @GET

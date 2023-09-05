@@ -203,4 +203,6 @@ public interface AvailableAppSettings {
   String AUTH_LDAP_SERVER_SSL_CERT_TRUST_PATH = "auth.ldap.server.ssl.cert.trust-path";
   String AUTH_LDAP_SERVER_SSL_CERT_AUTH_PATH = "auth.ldap.server.ssl.cert.auth-path";
   String AUTH_LDAP_SERVER_SSL_CERT_KEY_PATH = "auth.ldap.server.ssl.cert.key-path";
+
+  String FEATURE_PREFIX = "features.";
 }
