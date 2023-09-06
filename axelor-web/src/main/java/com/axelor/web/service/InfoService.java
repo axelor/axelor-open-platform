@@ -311,7 +311,7 @@ public class InfoService extends AbstractService {
                 key ->
                     inflector.camelize(
                         key.substring(AvailableAppSettings.FEATURE_PREFIX.length()), true),
-                key -> SETTINGS.getBoolean(key, false)));
+                value -> SETTINGS.getBoolean(value, false)));
   }
 
   @GET

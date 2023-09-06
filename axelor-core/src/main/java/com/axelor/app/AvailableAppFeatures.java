@@ -21,4 +21,5 @@ package com.axelor.app;
 public interface AvailableAppFeatures {
 
   String DMS_SPREADSHEET = "dms-spreadsheet";
+  String STUDIO = "studio";
 }

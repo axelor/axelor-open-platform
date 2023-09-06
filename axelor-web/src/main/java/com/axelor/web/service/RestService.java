@@ -21,6 +21,7 @@ package com.axelor.web.service;
 import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppFeatures;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
@@ -47,9 +48,7 @@ import com.axelor.mail.service.MailService;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
-import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaFileRepository;
-import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
@@ -117,6 +116,34 @@ public class RestService extends ResourceService {
   @Inject private MailFollowerRepository followers;
 
   @Inject private HttpServletRequest httpRequest;
+
+  private static final Charset CSV_CHARSET;
+  private static final Locale CSV_LOCALE;
+  private static final Character CSV_SEPARATOR;
+
+  static final AppSettings settings = AppSettings.get();
+
+  static {
+    final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, "UTF-8");
+    CSV_CHARSET = Charset.forName(encoding);
+
+    final String locale = settings.get(AvailableAppSettings.DATA_EXPORT_LOCALE, null);
+    if (locale != null) {
+      CSV_LOCALE = Locale.forLanguageTag(locale.replace("_", "-"));
+    } else {
+      CSV_LOCALE = null;
+    }
+
+    final String separator =
+        Optional.ofNullable(settings.get(AvailableAppSettings.DATA_EXPORT_SEPARATOR))
+            .filter(StringUtils::notEmpty)
+            .orElse(";");
+    if (separator.length() != 1) {
+      throw new IllegalArgumentException(
+          String.format("Illegal data export separator: %s", separator));
+    }
+    CSV_SEPARATOR = separator.charAt(0);
+  }
 
   private Response fail() {
     final Response response = new Response();
@@ -200,11 +227,15 @@ public class RestService extends ResourceService {
         Optional.ofNullable(response.getItem(0)).map(Map.class::cast);
 
     if (values.isPresent()) {
-      final long attachments = getAttachmentCount(id);
-      final Object processInstanceId = findProcessInstanceId(request.getBeanClass(), id);
       final Map<String, Object> item = values.get();
-      item.put("$attachments", attachments);
-      item.put("$processInstanceId", processInstanceId);
+
+      item.put("$attachments", getAttachmentCount(id));
+      if (settings.hasFeature(AvailableAppFeatures.STUDIO)) {
+        item.put(
+            "$processInstanceId",
+            Mapper.of(request.getBeanClass())
+                .get(JPA.em().find(request.getBeanClass(), id), "processInstanceId"));
+      }
     }
 
     return response;
@@ -224,15 +255,6 @@ public class RestService extends ResourceService {
         .bind("relatedId", relatedId)
         .cacheable()
         .count();
-  }
-
-  private Object findProcessInstanceId(Class<?> klass, long id) {
-    final MetaModule bpm = Beans.get(MetaModuleRepository.class).findByName("axelor-studio");
-    if (bpm != null) {
-      Object bean = JPA.em().find(klass, id);
-      return Mapper.of(klass).get(bean, "processInstanceId");
-    }
-    return null;
   }
 
   @POST
@@ -698,34 +720,6 @@ public class RestService extends ResourceService {
       return getResource().perms(id);
     }
     return getResource().perms();
-  }
-
-  private static final Charset CSV_CHARSET;
-  private static final Locale CSV_LOCALE;
-  private static final Character CSV_SEPARATOR;
-
-  static {
-    final AppSettings settings = AppSettings.get();
-
-    final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, "UTF-8");
-    CSV_CHARSET = Charset.forName(encoding);
-
-    final String locale = settings.get(AvailableAppSettings.DATA_EXPORT_LOCALE, null);
-    if (locale != null) {
-      CSV_LOCALE = Locale.forLanguageTag(locale.replace("_", "-"));
-    } else {
-      CSV_LOCALE = null;
-    }
-
-    final String separator =
-        Optional.ofNullable(settings.get(AvailableAppSettings.DATA_EXPORT_SEPARATOR))
-            .filter(StringUtils::notEmpty)
-            .orElse(";");
-    if (separator.length() != 1) {
-      throw new IllegalArgumentException(
-          String.format("Illegal data export separator: %s", separator));
-    }
-    CSV_SEPARATOR = separator.charAt(0);
   }
 
   @HEAD
