@@ -202,6 +202,6 @@ public final class AppSettings {
    * @return true if feature is enabled false otherwise
    */
   public boolean hasFeature(String name) {
-    return properties.get(AvailableAppSettings.FEATURE_PREFIX + name).equals("true");
+    return get(AvailableAppSettings.FEATURE_PREFIX + name, "false").equals("true");
   }
 }
