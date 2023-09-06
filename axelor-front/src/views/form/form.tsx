@@ -68,6 +68,7 @@ import { getDefaultValues } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
+import { useSession } from "@/hooks/use-session";
 
 export const fetchRecord = async (
   meta: ViewData<FormView>,
@@ -212,6 +213,7 @@ const FormContainer = memo(function FormContainer({
 
   const defaultRecord = useRef({ [defaultSymbol]: true }).current;
   const { id: tabId, popup, popupOptions } = useViewTab();
+  const { data: session } = useSession();
   const [, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord);
@@ -536,6 +538,12 @@ const FormContainer = memo(function FormContainer({
     }
   }, [dataStore, doEdit, record.id]);
 
+  const openProcess = useCallback(async () => {
+    if (record.id && record.$processInstanceId) {
+      await actionExecutor.execute("wkf-instance-view-from-record")
+    }
+  }, [actionExecutor, record.id, record.$processInstanceId]);
+
   const onArchive = useAtomCallback(
     useCallback(
       async (get, set, archived: boolean = true) => {
@@ -683,6 +691,7 @@ const FormContainer = memo(function FormContainer({
   const canArchive = hasButton("archive") && record.id;
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
+  const canOpenProcess = session?.features?.studio && record.id && record.$processInstanceId;
 
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {
@@ -866,6 +875,17 @@ const FormContainer = memo(function FormContainer({
                 {
                   key: "s1",
                   divider: true,
+                  hidden: !canOpenProcess,
+                },
+                {
+                  key: "openProcess",
+                  text: i18n.get("Display process"),
+                  onClick: openProcess,
+                  hidden: !canOpenProcess,
+                },
+                {
+                  key: "s2",
+                  divider: true,
                   hidden: !canArchive || isDirty,
                 },
                 {
@@ -875,7 +895,7 @@ const FormContainer = memo(function FormContainer({
                   hidden: !canArchive || isDirty,
                 },
                 {
-                  key: "s2",
+                  key: "s3",
                   divider: true,
                   hidden: !canAudit,
                 },

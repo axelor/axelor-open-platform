@@ -78,6 +78,7 @@ export interface SessionInfo {
   };
   features?: {
     dmsSpreadsheet?: boolean;
+    studio?: boolean;
   };
 }
 
