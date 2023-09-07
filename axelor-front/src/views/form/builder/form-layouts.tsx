@@ -64,13 +64,12 @@ function computeLayout(schema: Schema) {
     last = colEnd;
 
     return {
-      style: schema.$json
-        ? { gridColumn: `span ${colSpan}` }
-        : {
-            gridColumnStart: colStart,
-            gridColumnEnd: colEnd,
-            ...(hasLabel && !hasField && { alignSelf: "end" }),
-          },
+      style: {
+        gridColumnStart: colStart,
+        gridColumnEnd: colEnd,
+        ...(hasLabel && !hasField && { alignSelf: "end" }),
+        ...(schema.$json && { gridColumn: `span ${colSpan}` })
+      },
       content: item,
     };
   });
