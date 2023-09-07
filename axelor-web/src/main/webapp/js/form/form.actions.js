@@ -818,6 +818,10 @@ ActionHandler.prototype = {
 
     if(data.notify) {
       axelor.notify.info(data.notify);
+      if (data.pending) {
+        deferred.resolve(data.pending);
+        return deferred.promise;
+      }
     }
 
     if(data.error) {
