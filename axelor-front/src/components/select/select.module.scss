@@ -1,0 +1,9 @@
+.readonly {
+  border: none !important;
+  padding-left: 0;
+  padding-right: 0;
+  // hide icons
+  > div:last-child {
+    display: none;
+  }
+}
