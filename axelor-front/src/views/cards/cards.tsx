@@ -10,7 +10,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
-import { useEditor } from "@/hooks/use-relation";
+import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
@@ -38,13 +38,14 @@ export function Cards(props: ViewProps<CardsView>) {
   const { meta, dataStore, searchAtom } = props;
   const { view, fields } = meta;
   const { action, dashlet, popup, popupOptions } = useViewTab();
-  const showEditor = useEditor();
 
   const switchTo = useViewSwitch();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const getViewContext = useViewContext();
   const hasEditPopup = dashlet || view.editWindow === "popup";
   const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
+
+  const showEditor = useManyEditor(action, dashlet);
 
   const getContext = useCallback(
     () => ({
@@ -156,7 +157,7 @@ export function Cards(props: ViewProps<CardsView>) {
           viewName,
           record,
           readonly,
-          onSelect: () => onSearch({}),
+          onSearch: () => onSearch({}),
         });
     },
     [showEditor, view, action, onSearch]
