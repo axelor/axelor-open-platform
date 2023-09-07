@@ -2,9 +2,9 @@ import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, CommandItemProps } from "@axelor/ui/core";
+import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 import { Event } from "@axelor/ui/scheduler/types";
-import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { SearchOptions } from "@/services/client/data";
 import { Criteria, DataRecord } from "@/services/client/data.types";
@@ -20,7 +20,6 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useAsync } from "@/hooks/use-async";
 import { usePerms } from "@/hooks/use-perms";
 import { useEditor } from "@/hooks/use-relation";
-import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import {
   useViewContext,
@@ -78,18 +77,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const { hasButton } = usePerms(metaView, metaPerms);
   const getViewContext = useViewContext();
 
+  const { action, dashlet } = useViewTab();
   const showEditor = useEditor();
-  const viewTab = useViewTab();
 
   const editableAndButton = useCallback(
     (name: string) => metaView.editable !== false && hasButton(name),
     [hasButton, metaView.editable]
-  );
-
-  const session = useSession();
-  const maxPerPage = useMemo(
-    () => session.data?.api?.pagination?.maxPerPage || -1,
-    [session]
   );
 
   const isDateCalendar = useMemo(
@@ -195,7 +188,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       filter = { ...filter, ...filterQuery };
     }
 
-    if (viewTab.dashlet) {
+    if (dashlet) {
       const { _domainAction, ...formContext } = getViewContext() ?? {};
       const { _domainContext } = filter;
       filter._domainContext = {
@@ -211,7 +204,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     calendarStart,
     calendarEnd,
     eventStop,
-    viewTab.dashlet,
+    dashlet,
     advancedSearch.query,
     getViewContext,
   ]);
@@ -223,7 +216,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       limit: -1,
     });
     setRecords(res.records);
-  }, [dataStore, filter, searchFieldNames, maxPerPage]);
+  }, [dataStore, filter, searchFieldNames]);
 
   useAsync(handleRefresh, [dataStore, filter]);
 
@@ -492,7 +485,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
       readonly: boolean,
       onSelect: (data: DataRecord) => void
     ) => {
-      const action = viewTab.action;
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
@@ -512,7 +504,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         onSelect,
       });
     },
-    [showEditor, viewTab.action]
+    [showEditor, action]
   );
 
   const handleOpenEvent = useCallback(
