@@ -834,6 +834,10 @@ ActionHandler.prototype = {
           title: data.notify.title
         });
       }
+      if (data.pending) {
+        deferred.resolve(data.pending);
+        return deferred.promise;
+      }
     }
 
     if(data.error) {
