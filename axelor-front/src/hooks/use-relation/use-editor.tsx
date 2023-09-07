@@ -1,19 +1,21 @@
 import { useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { uniqueId } from "lodash";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { Box, Button } from "@axelor/ui";
 
-import { DataContext, DataRecord } from "@/services/client/data.types";
-import { FormView, Schema } from "@/services/client/meta.types";
 import { dialogs } from "@/components/dialogs";
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { findView } from "@/services/client/meta-cache";
+import { ActionView, FormView, Schema } from "@/services/client/meta.types";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
-import { findView } from "@/services/client/meta-cache";
 import { showErrors, useGetErrors } from "@/views/form";
+import { useFormScope } from "@/views/form/builder/scope";
 
 import { initTab } from "../use-tabs";
 
@@ -187,5 +189,83 @@ function Footer({
         {i18n.get("OK")}
       </Button>
     </Box>
+  );
+}
+
+export function useManyEditor(action: ActionView, dashlet?: boolean) {
+  const { formAtom, actionHandler } = useFormScope();
+
+  const confirmSave = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const { dirty = false, record } = get(formAtom);
+        try {
+          const confirmed = await dialogs.confirmSave(
+            async () => dirty,
+            async () => actionHandler.save(record)
+          );
+
+          return confirmed;
+        } catch (e) {
+          return false;
+        }
+      },
+      [formAtom, actionHandler]
+    )
+  );
+
+  const parentId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (parentId.current) {
+      return;
+    }
+
+    const elems = [
+      document.querySelector(`[data-tab-content][data-tab-active='true']`),
+      ...document.querySelectorAll("body > [data-dialog='true']"),
+    ];
+    const elem = elems[elems.length - 1] as HTMLElement;
+    const parent =
+      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
+
+    if (parent) {
+      parentId.current = parent.getAttribute("data-view-id");
+    }
+  }, []);
+
+  const showEditor = useEditor();
+
+  const popup = action.params?.popup;
+
+  return useCallback(
+    async (options: EditorOptions & { onSearch?: () => void }) => {
+      const { readonly, onSelect, onSearch, ...rest } = options;
+      const hasPopupReload = dashlet && popup === "reload";
+
+      if (hasPopupReload && !readonly && !(await confirmSave())) {
+        return;
+      }
+
+      return showEditor({
+        ...rest,
+        readonly,
+        ...(hasPopupReload
+          ? {
+              onSelect: (record: DataRecord) => onSelect?.(record),
+              onClose: (result) => {
+                const detail = parentId.current;
+                if (result && detail) {
+                  const event = new CustomEvent("tab:refresh", { detail });
+                  document.dispatchEvent(event);
+                }
+              },
+            }
+          : !readonly && {
+              onSelect: onSelect ?? onSearch,
+            }),
+      });
+    },
+    [confirmSave, showEditor, popup, dashlet]
   );
 }

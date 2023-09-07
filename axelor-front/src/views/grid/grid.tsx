@@ -2,9 +2,9 @@ import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import isEqual from "lodash/isEqual";
 import isString from "lodash/isString";
 import uniqueId from "lodash/uniqueId";
-import isEqual from "lodash/isEqual";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box } from "@axelor/ui";
@@ -16,7 +16,7 @@ import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { usePerms } from "@/hooks/use-perms";
-import { useEditor } from "@/hooks/use-relation";
+import { useManyEditor } from "@/hooks/use-relation";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -45,7 +45,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { useActionExecutor, useFormScope } from "../form/builder/scope";
+import { useActionExecutor } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
@@ -87,7 +87,6 @@ function GridInner(props: ViewProps<GridView>) {
 
   const showConfirmDirty = useViewConfirmDirty();
   const switchTo = useViewSwitch();
-  const showEditor = useEditor();
   const { isMobile } = useDevice();
   const { data: sessionData } = useSession();
   const userViewConfig = {
@@ -125,10 +124,11 @@ function GridInner(props: ViewProps<GridView>) {
   const gridWidth = action.params?.["grid-width"];
   const hasPopup = action.params?.["popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
-  const hasPopupReload = hasPopup === "reload";
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
   const { editable, inlineHelp } = view;
+
+  const showEditor = useManyEditor(action, dashlet);
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -270,84 +270,19 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, clearSelection]
   );
 
-  const parentId = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (parentId.current) return;
-    const elems = [
-      document.querySelector(`[data-tab-content][data-tab-active='true']`),
-      ...document.querySelectorAll("body > [data-dialog='true']"),
-    ];
-
-    const elem = elems[elems.length - 1] as HTMLElement;
-    const parent =
-      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
-    if (parent) {
-      parentId.current = parent.getAttribute("data-view-id");
-    }
-  }, []);
-
-  const { formAtom, actionHandler } = useFormScope();
-
-  const onViewInPopup = useAtomCallback(
-    useCallback(
-      async (get, set, record: DataRecord, readonly: boolean = false) => {
-        if (hasPopupReload) {
-          const { dirty: formDirty = false, record: formRecord } =
-            get(formAtom);
-
-          const confirm = await dialogs.confirmDirty(
-            async () => formDirty,
-            async () => actionHandler.save(formRecord),
-            {
-              content: i18n.get(
-                "Current changes will be saved. Do you want to proceed?"
-              ),
-            }
-          );
-
-          if (!confirm) {
-            return;
-          }
-        }
-
-        showEditor({
-          model: view.model!,
-          title: view.title ?? "",
-          viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
-          maximize: hasPopupMaximize,
-          record,
-          readonly,
-          ...(hasPopupReload
-            ? {
-                onSelect: () => {},
-                onClose: (result) => {
-                  const detail = parentId.current;
-                  if (result && detail) {
-                    const event = new CustomEvent("tab:refresh", { detail });
-                    document.dispatchEvent(event);
-                  }
-                },
-              }
-            : !readonly && {
-                onSelect: () => {
-                  onSearch({});
-                },
-              }),
-        });
-      },
-      [
-        hasPopupReload,
-        showEditor,
-        view.model,
-        view.title,
-        action.views,
-        hasPopupMaximize,
-        formAtom,
-        actionHandler,
-        onSearch,
-      ]
-    )
+  const onViewInPopup = useCallback(
+    (record: DataRecord, readonly = false) => {
+      showEditor({
+        model: view.model!,
+        title: view.title ?? "",
+        viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
+        maximize: hasPopupMaximize,
+        record,
+        readonly,
+        onSearch: () => onSearch({}),
+      });
+    },
+    [view, action, hasPopupMaximize, showEditor, onSearch]
   );
 
   const onEditInTab = useCallback(

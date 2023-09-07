@@ -69,6 +69,7 @@ export function dialogsActive() {
   return dialogsStore.get(dialogsAtom).length > 0;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace dialogs {
   export async function modal(options: DialogOptions) {
     const { onClose, open = true, ...rest } = options;
@@ -185,6 +186,23 @@ export namespace dialogs {
       await callback();
     }
     return confirmed;
+  }
+
+  export async function confirmSave(
+    check: () => Promise<boolean>,
+    callback: () => Promise<any>,
+    options?: {
+      title?: string;
+      content?: React.ReactNode;
+    }
+  ) {
+    const {
+      content = i18n.get(
+        "Current changes will be saved. Do you want to proceed?"
+      ),
+      ...rest
+    } = options ?? {};
+    return await confirmDirty(check, callback, { content, ...rest });
   }
 }
 
