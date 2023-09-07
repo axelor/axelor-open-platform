@@ -68,7 +68,6 @@ import { getDefaultValues } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
-import { useSession } from "@/hooks/use-session";
 
 export const fetchRecord = async (
   meta: ViewData<FormView>,
@@ -213,7 +212,6 @@ const FormContainer = memo(function FormContainer({
 
   const defaultRecord = useRef({ [defaultSymbol]: true }).current;
   const { id: tabId, popup, popupOptions } = useViewTab();
-  const { data: session } = useSession();
   const [, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord);
@@ -691,7 +689,7 @@ const FormContainer = memo(function FormContainer({
   const canArchive = hasButton("archive") && record.id;
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
-  const canOpenProcess = session?.features?.studio && record.id && record.$processInstanceId;
+  const canOpenProcess = session.info?.features?.studio && record.id && record.$processInstanceId;
 
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {
