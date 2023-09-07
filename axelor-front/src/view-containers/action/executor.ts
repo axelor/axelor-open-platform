@@ -169,6 +169,9 @@ export class DefaultActionExecutor implements ActionExecutor {
       } else {
         alerts.info(data.notify);
       }
+      if (data.pending) {
+        return this.#execute(data.pending, options);
+      }
     }
 
     if (data.error) {
