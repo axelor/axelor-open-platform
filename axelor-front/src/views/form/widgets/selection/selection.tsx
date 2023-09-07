@@ -1,83 +1,14 @@
-import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { FunctionComponent, useCallback, useMemo } from "react";
 
-import {
-  Badge,
-  Box,
-  Select,
-  SelectComponents,
-  SelectProps,
-  useClassNames,
-} from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { Box, Select, SelectComponents, SelectProps } from "@axelor/ui";
 
-import { Schema, Selection as TSelection } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
+import { Schema } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { ViewerInput } from "../string/viewer";
 import { useSelectionList } from "./hooks";
-
-import styles from "./selection.module.scss";
-
-export function Chip({
-  title,
-  color,
-  className,
-  onRemove,
-}: {
-  title?: string;
-  color?: string;
-  className?: string;
-  onRemove?: () => void;
-}) {
-  return (title && (
-    <Badge
-      px={2}
-      className={clsx(
-        styles["tag"],
-        className,
-        legacyClassNames(`hilite-${color}`)
-      )}
-    >
-      <Box as="span" className={styles["tag-text"]}>
-        {title}
-      </Box>
-      {onRemove && (
-        <Box
-          as="span"
-          className={styles["tag-remove"]}
-          onClick={onRemove}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <MaterialIcon icon="close" fontSize={20} />
-        </Box>
-      )}
-    </Badge>
-  )) as React.ReactElement;
-}
-
-export function SelectText({
-  schema,
-  value,
-}: {
-  schema: Schema;
-  value?: string | number | null;
-}) {
-  const selectionList = (schema.selectionList ?? []) as TSelection[];
-  const selected = selectionList.find(
-    (item) => String(item.value) === String(value)
-  );
-  return (
-    <Box d="flex">
-      <ViewerInput value={selected?.title ?? ""} />
-    </Box>
-  );
-}
+import { SelectionTag } from "./selection-tag";
+import { SelectionText } from "./selection-text";
 
 export function Selection({
   selectComponents = [],
@@ -102,11 +33,11 @@ export function Selection({
         if (isMulti) {
           const values = String(value ?? "").split(",");
           return selectionList.filter((item) =>
-            values.includes(String(item.value))
+            values.includes(String(item.value)),
           );
         }
         return selectionList.find(
-          (item) => String(item.value) === String(value)
+          (item) => String(item.value) === String(value),
         );
       })()
     : null;
@@ -124,14 +55,14 @@ export function Selection({
         : e && e.value;
       setValue(value, true);
     },
-    [isMulti, setValue]
+    [isMulti, setValue],
   );
 
   const components = useComponents(schema, ["Option", ...selectComponents]);
 
   return (
     <FieldControl {...props}>
-      {readonly && <SelectText schema={schema} value={value} />}
+      {readonly && <SelectionText schema={schema} value={value} />}
       {readonly || (
         <Select
           {...(focus && { key: "focused" })}
@@ -171,7 +102,7 @@ function useComponents(schema: Schema, componentList: SelectComponent[]) {
         const { data, removeProps } = props;
         return (
           <Box me={1}>
-            <Chip
+            <SelectionTag
               color={data?.[colorField]}
               title={data?.title}
               onRemove={removeProps.onClick}
@@ -183,7 +114,7 @@ function useComponents(schema: Schema, componentList: SelectComponent[]) {
         const { data } = props;
         return (
           <SelectComponents.SingleValue {...props}>
-            <Chip color={data?.[colorField]} title={data?.title} />
+            <SelectionTag color={data?.[colorField]} title={data?.title} />
           </SelectComponents.SingleValue>
         );
       },
@@ -195,7 +126,7 @@ function useComponents(schema: Schema, componentList: SelectComponent[]) {
         }
         return (
           <SelectComponents.Option {...props}>
-            <Chip color={color} title={data?.title} />
+            <SelectionTag color={color} title={data?.title} />
           </SelectComponents.Option>
         );
       },
@@ -205,7 +136,7 @@ function useComponents(schema: Schema, componentList: SelectComponent[]) {
         ...obj,
         [key]: components[key as SelectComponent],
       }),
-      {}
+      {},
     );
   }, [colorField, componentListAsStr]);
 }

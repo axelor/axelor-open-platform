@@ -14,7 +14,7 @@ import {
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 import { Field } from "@/services/client/meta.types";
-import { Chip } from "@/views/form/widgets";
+import { SelectionTag } from "@/views/form/widgets";
 import { DataRecord } from "@/services/client/data.types";
 import { useAppTheme } from "@/hooks/use-app-theme";
 import styles from "./tag-select.module.scss";
@@ -58,7 +58,7 @@ const OverflowMenu: React.FC<{
   return (
     <Box onMouseLeave={hideMenu}>
       <Box ref={iconRef} onMouseEnter={showMenu}>
-        <Chip
+        <SelectionTag
           title={`+${overflowCount ?? ""}`}
           color={theme === "dark" ? "gray" : "white"}
           className={clsx(styles.count, styles[theme])}
@@ -95,7 +95,7 @@ export function TagSelect(props: GridColumnProps) {
   );
 
   const renderItem = useCallback(
-    (item: DataRecord) => <Chip title={item[targetName]} color={"indigo"} />,
+    (item: DataRecord) => <SelectionTag title={item[targetName]} color={"indigo"} />,
     [targetName]
   );
 

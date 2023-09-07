@@ -45,7 +45,7 @@ import { download } from "@/utils/download";
 import { useViewAction, useViewTab } from "../views/scope";
 
 import { focusAndSelectInput } from "@/views/form";
-import { Chip } from "@/views/form/widgets";
+import { SelectionTag } from "@/views/form/widgets";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
 import { FilterList } from "./filter-list";
@@ -531,7 +531,7 @@ function SearchInput({
     return (
       <Box rounded border d="flex" p={1} pe={2}>
         <Box className={styles.chipList} d="flex" flex={1}>
-          <Chip title={label} color="indigo" onRemove={() => onClear?.()} />
+          <SelectionTag title={label} color="indigo" onRemove={() => onClear?.()} />
         </Box>
         <Box
           d="flex"

@@ -6,7 +6,7 @@ import { Box } from "@axelor/ui";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { Chip, Selection } from "../selection";
+import { SelectionTag, Selection } from "../selection";
 
 export function SingleSelectText({
   schema,
@@ -20,7 +20,7 @@ export function SingleSelectText({
   const selected = selectionList.find((item) => String(item.value) === String(value));
   return (selected && (
     <Box d="flex">
-      <Chip
+      <SelectionTag
         title={selected.title}
         color={(selected as any)[colorField] || "blue"}
       />

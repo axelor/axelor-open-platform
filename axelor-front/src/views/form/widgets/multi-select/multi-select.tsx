@@ -6,7 +6,7 @@ import { Box } from "@axelor/ui";
 import { Schema, Selection as TSelection } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { Chip, Selection } from "../selection";
+import { SelectionTag, Selection } from "../selection";
 
 export function MultiSelectText({
   schema,
@@ -25,7 +25,7 @@ export function MultiSelectText({
     <Box d="flex">
       {selected.map((item, ind) => (
         <Box me={1} key={ind}>
-          <Chip title={item.title} color={(item as any)[colorField]} />
+          <SelectionTag title={item.title} color={(item as any)[colorField]} />
         </Box>
       ))}
     </Box>

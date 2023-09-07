@@ -19,7 +19,7 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { Chip } from "../selection";
+import { SelectionTag } from "../selection";
 import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
 import { useOptionLabel } from "../many-to-one/utils";
 
@@ -39,7 +39,7 @@ export function TagSelectComponent({
         const { data, removeProps } = props;
         return (
           <Box me={1} onMouseDown={(e) => onView?.(e, data, false)}>
-            <Chip
+            <SelectionTag
               color={"indigo"}
               title={getOptionLabel(data)}
               {...(canRemove && {
@@ -236,7 +236,7 @@ export function TagSelect(
               href="#"
               onClick={(e: any) => canView && handleView(e, val)}
             >
-              <Chip title={getOptionLabel(val)} color={"indigo"} />
+              <SelectionTag title={getOptionLabel(val)} color={"indigo"} />
             </Box>
           ))}
         </Box>
