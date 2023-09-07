@@ -42,7 +42,7 @@ The `<view-param>` parameter name accepts the following options:
 * `search-filters` - name of custom xref:views/grid.adoc#advanced-search[search filters]
 * `default-search-filters` - comma-separated list of search filter names to apply by default (used in conjunction with `search-filters`) - _new in version 5.4.2_
 * `limit` - maximum number of records per page (grid/cards view) or per column (kanban view)
-* `popup` - `true` to open view as popup, `reload` to reload parent upon closing the popup
+* `popup` - `true` to open view as popup, `reload` to reload parent upon closing the popup (<<popup-reload,details>>)
 * `popup-save` - `false` to hide OK button used to save record upon closing the popup
 * `popup.maximized` - `true` to open as maximized popup
 * `show-toolbar` - `false` to hide form toolbar
@@ -52,6 +52,14 @@ The `<view-param>` parameter name accepts the following options:
 * `kanban-hide-columns` - hide specific columns in kanban (comma separated list of names)
 * `kanban-column-width` - desired kanban column width
 * `auto-reload` - enable view auto-reloading with value specified in seconds
+
+[[popup-reload]]
+[NOTE]
+====
+When `<view-param>` `popup` is set to `reload` on a xref:views/form.adoc#panel-dashlet[dashlet],
+there is a save confirmation dialog before opening the popup.
+The parent record is then reloaded if the popup is closed via the OK button or close action.
+====
 
 Special context variable names
 
