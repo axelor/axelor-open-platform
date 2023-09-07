@@ -80,7 +80,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     limit = +params?.limit || 20,
     sequenceBy,
   } = view;
-  const hasEditPopup = editWindow === "popup";
+  const hasEditPopup = dashlet || editWindow === "popup";
   const hasAddPopup = hasEditPopup || editWindow === "popup-new";
   const hideCols = params?.["kanban-hide-columns"] || "";
   const colWidth = params?.["kanban-column-width"];
