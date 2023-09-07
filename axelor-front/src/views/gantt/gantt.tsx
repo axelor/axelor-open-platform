@@ -1,29 +1,32 @@
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Box, Button, DndProvider } from "@axelor/ui";
 import {
-  Gantt as GanttComponent,
+  ConnectProps,
   GANTT_TYPES,
-  GanttType,
+  Gantt as GanttComponent,
   GanttField,
   GanttRecord,
-  ConnectProps,
+  GanttType,
 } from "@axelor/ui/gantt";
-import { Box, Button, DndProvider } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Field, GanttView, Widget } from "@/services/client/meta.types";
-import { ViewProps } from "../types";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { DataRecord } from "@/services/client/data.types";
-import { formatRecord, transformRecord } from "./utils";
-import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
-import { i18n } from "@/services/client/i18n";
-import { PageText } from "@/components/page-text";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { SearchOptions } from "@/services/client/data";
-import { useEditor } from "@/hooks/use-relation";
 import { dialogs } from "@/components/dialogs";
-import format from "@/utils/format";
-import styles from "./gantt.module.scss";
+import { PageText } from "@/components/page-text";
+import { useManyEditor } from "@/hooks/use-relation";
+import { SearchOptions } from "@/services/client/data";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
+import { Field, GanttView, Widget } from "@/services/client/meta.types";
+import format from "@/utils/format";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+
+import { ViewProps } from "../types";
+import { formatRecord, transformRecord } from "./utils";
+
+import styles from "./gantt.module.scss";
 
 const FILTERS: { key: GanttType; title: string }[] = [
   { key: GANTT_TYPES.YEAR, title: i18n.get("Year") },
@@ -127,8 +130,8 @@ function fieldFormatter(column: Field, value: any, record: any) {
 export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const [type, setType] = useState<GanttType>(GANTT_TYPES.WEEK);
   const [records, setRecords] = useState<DataRecord[]>([]);
-  const { action } = useViewTab();
-  const showEditor = useEditor();
+  const { action, dashlet } = useViewTab();
+  const showEditor = useManyEditor(action, dashlet);
 
   const { fields, view } = meta;
   const { items } = view;
