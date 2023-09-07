@@ -21,7 +21,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { useHilites, useTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { usePerms } from "@/hooks/use-perms";
-import { useEditor } from "@/hooks/use-relation";
+import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchPage } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -70,7 +70,6 @@ export function Kanban(props: ViewProps<KanbanView>) {
   );
 
   const { hasButton } = usePerms(meta.view, meta.perms);
-  const showEditor = useEditor();
   const switchTo = useViewSwitch();
 
   const { params } = action;
@@ -85,6 +84,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const hideCols = params?.["kanban-hide-columns"] || "";
   const colWidth = params?.["kanban-column-width"];
 
+  const showEditor = useManyEditor(action, dashlet);
+
   const getViewContext = useViewContext();
   const getContext = useCallback(
     () =>
@@ -94,7 +95,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         _viewName: action.name,
         _viewType: action.viewType,
         _views: action.views,
-      } as DataContext),
+      }) as DataContext,
     [action, getViewContext]
   );
 
@@ -291,7 +292,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           viewName,
           record: record as DataRecord,
           readonly,
-          onSelect: () => onRefresh(),
+          onSearch: () => onRefresh(),
         });
     },
     [showEditor, view, action, onRefresh]
