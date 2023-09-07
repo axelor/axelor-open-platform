@@ -264,7 +264,9 @@ function GridInner(props: ViewProps<GridView>) {
             records.map(({ id, version }) => ({ id, version }))
           );
           clearSelection();
-        } catch {}
+        } catch {
+          // Ignore
+        }
       }
     },
     [dataStore, clearSelection]
@@ -376,7 +378,9 @@ function GridInner(props: ViewProps<GridView>) {
         await dataStore.save(records);
         onSearch();
         clearSelection();
-      } catch {}
+      } catch {
+        // Ignore
+      }
     },
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
@@ -443,7 +447,9 @@ function GridInner(props: ViewProps<GridView>) {
   }, [dirty, fetchAndSetDetailsRecord, showConfirmDirty]);
 
   const selectedRow =
-    (selectedRows?.length ?? 0) > 0 ? rows?.[selectedCell?.[0]!] : null;
+    (selectedRows?.length ?? 0) > 0 && selectedCell != null
+      ? rows?.[selectedCell[0]]
+      : null;
   const selectedDetail =
     selectedRow?.type !== "row" ? null : selectedRow?.record;
 

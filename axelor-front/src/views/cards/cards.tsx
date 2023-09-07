@@ -125,7 +125,9 @@ export function Cards(props: ViewProps<CardsView>) {
           await dataStore.delete([
             { id: record.id!, version: record.version! },
           ]);
-        } catch {}
+        } catch {
+          // Ignore
+        }
       }
     },
     [dataStore]

@@ -260,7 +260,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
               state &&
                 (state.records = state.records?.filter((r) => r.id !== id));
             });
-        } catch {}
+        } catch {
+          // Ignore
+        }
       }
     },
     [dataStore, setColumns]
