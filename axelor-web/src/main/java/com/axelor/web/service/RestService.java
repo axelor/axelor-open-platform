@@ -227,8 +227,8 @@ public class RestService extends ResourceService {
   }
 
   private Object findProcessInstanceId(Class<?> klass, long id) {
-    final MetaModule bpm = Beans.get(MetaModuleRepository.class).findByName("axelor-bpm");
-    if (bpm != null) {
+    final MetaModule module = Beans.get(MetaModuleRepository.class).findByName("axelor-studio");
+    if (module != null) {
       Object bean = JPA.em().find(klass, id);
       return Mapper.of(klass).get(bean, "processInstanceId");
     }
