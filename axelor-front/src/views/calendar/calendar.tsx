@@ -19,7 +19,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 
 import { useAsync } from "@/hooks/use-async";
 import { usePerms } from "@/hooks/use-perms";
-import { useEditor } from "@/hooks/use-relation";
+import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import {
   useViewContext,
@@ -78,7 +78,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const getViewContext = useViewContext();
 
   const { action, dashlet } = useViewTab();
-  const showEditor = useEditor();
+  const showEditor = useManyEditor(action, dashlet);
 
   const editableAndButton = useCallback(
     (name: string) => metaView.editable !== false && hasButton(name),
