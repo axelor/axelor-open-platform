@@ -200,9 +200,15 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
     useCallback(
       async (get) => {
         const { dirty = false, record } = get(formAtom);
+        const saveNeeded = dirty || !record.id;
+
+        if (!saveNeeded) {
+          return true;
+        }
+
         try {
           const confirmed = await dialogs.confirmSave(
-            async () => dirty,
+            async () => saveNeeded,
             async () => actionHandler.save(record)
           );
 
