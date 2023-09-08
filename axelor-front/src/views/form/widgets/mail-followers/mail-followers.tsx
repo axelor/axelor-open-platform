@@ -119,7 +119,15 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       }}
     >
       {followers.map(({ id, $author, $authorModel }) => {
-        const title = $author?.fullName || $author?.name;
+        const keys = [
+          session?.user?.nameField ?? "",
+          "fullName",
+          "displayName",
+          "personal",
+          "name",
+        ];
+        const key = keys.find((key) => $author?.[key]);
+        const title = $author?.[key ?? ""];
         return (
           <ListItem key={id} className={classes.follower} py={1} border={false}>
             <div
