@@ -68,8 +68,9 @@ function load(res: MenuItem[], tags: Tag[]) {
       props.icon = () => <MenuIcon icon={icon} color={iconColor} />;
     }
 
-    if (tag) {
-      props.tag = () => <MenuTag item={item} tag={tag} color={tagColor} />;
+    const updatedTag = tags.filter((x) => item.name === x.name)[0];
+    if (tag || updatedTag) {
+      props.tag = () => <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} />;
     }
 
     return props;
