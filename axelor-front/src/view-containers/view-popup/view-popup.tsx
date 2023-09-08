@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
-import { selectAtom } from "jotai/utils";
 import { ScopeProvider } from "jotai-molecules";
+import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, Button, useClassNames } from "@axelor/ui";
@@ -8,6 +8,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
+import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
@@ -209,19 +210,8 @@ function Footer({
   const parentId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (parentId.current) return;
-    const elems = [
-      document.querySelector(`[data-tab-content][data-tab-active='true']`),
-      ...document.querySelectorAll("body > [data-dialog='true']"),
-    ];
-
-    elems.pop();
-
-    const elem = elems[elems.length - 1] as HTMLElement;
-    const parent =
-      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
-    if (parent) {
-      parentId.current = parent.getAttribute("data-view-id");
+    if (!parentId.current) {
+      parentId.current = getActiveTabId(1);
     }
   }, []);
 

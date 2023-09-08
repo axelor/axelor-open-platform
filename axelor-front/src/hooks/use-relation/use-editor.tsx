@@ -7,6 +7,7 @@ import { Box, Button } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
+import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
@@ -217,20 +218,8 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
   const parentId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (parentId.current) {
-      return;
-    }
-
-    const elems = [
-      document.querySelector(`[data-tab-content][data-tab-active='true']`),
-      ...document.querySelectorAll("body > [data-dialog='true']"),
-    ];
-    const elem = elems[elems.length - 1] as HTMLElement;
-    const parent =
-      elem && (elem.querySelector("[data-view-id]") as HTMLElement);
-
-    if (parent) {
-      parentId.current = parent.getAttribute("data-view-id");
+    if (!parentId.current) {
+      parentId.current = getActiveTabId();
     }
   }, []);
 
