@@ -355,7 +355,11 @@ function FarItems() {
           showDownArrow: true,
           icon: () => (
             <Avatar
-              user={data?.user as any}
+              user={{
+                id: data?.user?.id,
+                code: data?.user?.login,
+                [data?.user?.nameField ?? "name"]: data?.user?.name,
+              } as any}
               image={data?.user?.image ?? ""}
             />
           ),

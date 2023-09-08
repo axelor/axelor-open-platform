@@ -9,7 +9,7 @@ export function getName(user: MessageAuthor) {
 }
 
 export function getAvatarText(user: MessageAuthor) {
-  const name = (user && user.name) || "";
+  const name = getName(user) || "";
   return name
     .split(" ")
     .slice(0, 2)
