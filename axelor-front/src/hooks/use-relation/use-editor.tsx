@@ -199,8 +199,8 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
   const confirmSave = useAtomCallback(
     useCallback(
       async (get) => {
-        const { dirty = false, record } = get(formAtom);
-        const saveNeeded = dirty || !record.id;
+        const { dirty = false, record, model } = get(formAtom);
+        const saveNeeded = Boolean(model) && (dirty || !record.id);
 
         if (!saveNeeded) {
           return true;
