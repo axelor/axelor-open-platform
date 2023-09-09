@@ -1,54 +1,37 @@
-import { useAtomValue } from "jotai";
-import { ReactElement } from "react";
+import { useCallback } from "react";
 
-import { Box } from "@axelor/ui";
+import { SelectOptionProps } from "@/components/select";
+import { Selection as SelectionType } from "@/services/client/meta.types";
 
-import { Schema, Selection as TSelection } from "@/services/client/meta.types";
+import { FieldProps } from "../../builder";
+import { Selection, SelectionTag } from "../selection";
 
-import { FieldControl, FieldProps } from "../../builder";
-import { SelectionTag, Selection } from "../selection";
-
-export function MultiSelectText({
-  schema,
-  value,
-}: {
-  schema: Schema;
-  value?: string | number | null;
-}) {
+export function MultiSelect(
+  props: FieldProps<string | number | null> & {
+    multiple?: boolean;
+  },
+) {
+  const { schema, multiple = true } = props;
   const { colorField = "color" } = schema;
-  const selectionList = (schema.selectionList ?? []) as TSelection[];
-  const values: string[] = `${value || ""}`.split(/\s*,\s*/);
-  const selected = selectionList.filter((item) =>
-    values.includes(String(item.value))
+
+  const renderChip = useCallback(
+    ({ option }: SelectOptionProps<SelectionType>) => {
+      return (
+        <SelectionTag
+          title={option.title}
+          color={option[colorField as keyof typeof option]}
+        />
+      );
+    },
+    [colorField],
   );
-  return (selected.length > 0 && (
-    <Box d="flex">
-      {selected.map((item, ind) => (
-        <Box me={1} key={ind}>
-          <SelectionTag title={item.title} color={(item as any)[colorField]} />
-        </Box>
-      ))}
-    </Box>
-  )) as ReactElement;
-}
-
-export function MultiSelect(props: FieldProps<string | number | null>) {
-  const { readonly, schema, valueAtom } = props;
-  const value = useAtomValue(valueAtom);
-
-  if (readonly) {
-    return (
-      <FieldControl {...props}>
-        <MultiSelectText schema={schema} value={value} />
-      </FieldControl>
-    );
-  }
 
   return (
     <Selection
       {...props}
-      selectComponents={["SingleValue", "MultiValue"]}
-      selectProps={{ isMulti: true }}
+      multiple={multiple}
+      renderValue={renderChip}
+      renderOption={renderChip}
     />
   );
 }
