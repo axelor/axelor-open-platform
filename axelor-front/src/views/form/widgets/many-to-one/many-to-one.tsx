@@ -1,9 +1,11 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useAtomCallback } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
-import { MouseEvent, useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+
+import { Select, SelectIcon, SelectOptionType } from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
@@ -21,10 +23,6 @@ import { FieldControl } from "../../builder/form-field";
 import { useFormItems, useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string/viewer";
-import {
-  CreatableSelect,
-  CreatableSelectProps,
-} from "../tag-select/creatable-select";
 import { useOptionLabel } from "./utils";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
@@ -43,10 +41,9 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
-  const [hasMore, setHasMore] = useState(false);
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, focus, domain } = attrs;
+  const { title, focus, required, domain } = attrs;
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
 
@@ -64,7 +61,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   });
 
   const handleChange = useCallback(
-    (value: DataRecord | null) => {
+    (value: SelectOptionType<DataRecord, false>) => {
       if (value && value.id && value.id > 0) {
         const { version, ...rec } = value;
         setValue(rec, true);
@@ -146,7 +143,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const handleView = useCallback(
-    async (e: MouseEvent<HTMLButtonElement>) => {
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       if (isRefLink && showEditorInTab && value?.id) {
         return showEditorInTab(value, true);
@@ -156,16 +153,19 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [isRefLink, value, handleEdit, showEditorInTab],
   );
 
-  const handleCreate = useCallback(
-    (record?: DataContext, readonly?: boolean) => {
-      return handleEdit(readonly ?? false, record);
+  const showCreate = useCallback(
+    (inputValue: string) => {
+      const record: DataRecord = {
+        [targetName]: inputValue,
+      };
+      return handleEdit(false, record);
     },
-    [handleEdit],
+    [handleEdit, targetName],
   );
 
   const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
 
-  const handleSelect = useCallback(async () => {
+  const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
     const _domainContext = _domain ? getContext() : {};
     showSelector({
@@ -194,21 +194,27 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     handleChange,
   ]);
 
-  const handleCompletion = useCallback(
-    async (value: string) => {
-      if (!canSelect) return [];
+  const fetchOptions = useCallback(
+    async (text: string) => {
       const _domain = (await beforeSelect()) ?? domain;
       const _domainContext = _domain ? getContext() : {};
       const options = {
         _domain,
         _domainContext,
       };
-      const { records, page } = await search(value, options);
-      setHasMore((page.totalCount ?? 0) > records.length);
+      const { records } = await search(text, options);
       return records;
     },
-    [canSelect, beforeSelect, domain, getContext, search],
+    [beforeSelect, domain, getContext, search],
   );
+
+  const handleOpen = useCallback(async () => {
+    beforeSelectProps?.onMenuOpen?.();
+  }, [beforeSelectProps]);
+
+  const handleClose = useCallback(() => {
+    beforeSelectProps?.onMenuClose?.();
+  }, [beforeSelectProps]);
 
   const valueRef = useRef<DataRecord>();
 
@@ -236,7 +242,51 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     }
   }, [schema, ensureRelatedValues]);
 
+  const getOptionKey = useCallback((option: DataRecord) => option.id!, []);
   const getOptionLabel = useOptionLabel(schema);
+  const getOptionEqual = useCallback(
+    (a: DataRecord, b: DataRecord) => a.id === b.id,
+    [],
+  );
+
+  const getOptionMatch = useCallback(() => true, []);
+
+  const icons: SelectIcon[] = useMemo(() => {
+    const edit: SelectIcon = {
+      icon: <MaterialIcon icon="edit" />,
+      onClick: () => handleEdit(),
+    };
+    const view: SelectIcon = {
+      icon: <MaterialIcon icon="description" />,
+      onClick: () => handleEdit(true),
+    };
+    const add: SelectIcon = {
+      icon: <MaterialIcon icon="add" />,
+      onClick: () => handleEdit(false, { id: null }),
+    };
+    const find: SelectIcon = {
+      icon: <MaterialIcon icon="search" />,
+      onClick: showSelect,
+    };
+
+    const result: SelectIcon[] = [];
+
+    if (canEdit && canView) result.push(edit);
+    if (isSuggestBox) return result;
+    if (canEdit || canView) result.push(view);
+    if (canNew) result.push(add);
+    if (canSelect) result.push(find);
+
+    return result;
+  }, [
+    canEdit,
+    canNew,
+    canSelect,
+    canView,
+    handleEdit,
+    showSelect,
+    isSuggestBox,
+  ]);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
@@ -245,65 +295,34 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   return (
     <FieldControl {...props}>
-      {readonly ? (
-        value && hasButton("view") ? (
+      {readonly &&
+        (value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>{getOptionLabel(value)}</ViewerLink>
         ) : (
           <ViewerInput value={value?.[targetName] || ""} />
-        )
-      ) : (
-        <CreatableSelect
-          {...(focus && { key: "focused" })}
+        ))}
+      {readonly || (
+        <Select
+          key={focus ? "focused" : undefined}
           autoFocus={focus}
-          schema={schema}
-          onChange={handleChange}
+          required={required}
           invalid={invalid}
-          value={value ?? null}
-          placeholder={placeholder}
-          icons={
-            isSuggestBox
-              ? [
-                  {
-                    hidden: !canEdit || !canView,
-                    icon: "edit",
-                    onClick: () => handleEdit(),
-                  },
-                  { icon: "arrow_drop_down" },
-                ]
-              : [
-                  {
-                    hidden: !canEdit || !canView,
-                    icon: "edit",
-                    onClick: () => handleEdit(),
-                  },
-                  {
-                    hidden: canEdit || !canView,
-                    icon: "description",
-                    onClick: () => handleEdit(true),
-                  },
-                  {
-                    hidden: !canNew,
-                    icon: "add",
-                    onClick: () => handleEdit(false, { id: null }),
-                  },
-                  {
-                    hidden: !canSelect,
-                    icon: "search",
-                    onClick: handleSelect,
-                  },
-                ]
-          }
-          fetchOptions={handleCompletion}
+          fetchOptions={fetchOptions}
+          options={[] as DataRecord[]}
+          optionKey={getOptionKey}
           optionLabel={getOptionLabel}
-          optionValue={"id"}
-          isSelectable={canSelect}
-          {...(canSelect && {
-            canCreate: canNew,
-            canSearch: hasMore,
-            onCreate: handleCreate as CreatableSelectProps["onCreate"],
-            onSearch: handleSelect,
-          })}
-          {...beforeSelectProps}
+          optionEqual={getOptionEqual}
+          optionMatch={getOptionMatch}
+          value={value}
+          placeholder={placeholder}
+          onChange={handleChange}
+          onOpen={handleOpen}
+          onClose={handleClose}
+          onCreate={canNew ? showCreate : undefined}
+          onSelect={canSelect && !isSuggestBox ? showSelect : undefined}
+          icons={icons}
+          clearIcon={false}
+          toggleIcon={isSuggestBox ? undefined : false}
         />
       )}
     </FieldControl>
