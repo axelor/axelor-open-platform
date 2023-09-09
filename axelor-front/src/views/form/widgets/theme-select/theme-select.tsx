@@ -1,6 +1,8 @@
-import { i18n } from "@/services/client/i18n";
-import { Select } from "@axelor/ui";
 import { useCallback, useMemo } from "react";
+
+import { Select, SelectOptionType } from "@/components/select";
+import { i18n } from "@/services/client/i18n";
+
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "../string/viewer";
@@ -34,38 +36,27 @@ export function ThemeSelect(props: FieldProps<string>) {
   const { value, setValue } = useInput(valueAtom, { defaultValue: "" });
   const text = themes.find((x) => x.name === value)?.title ?? "";
   const selected = themes.find((x) => x.name === value) ?? null;
-  const hasValue = value !== null && value !== "";
 
   const handleChange = useCallback(
-    (value: ThemeOption) => {
+    (value: SelectOptionType<ThemeOption, false>) => {
       setValue(value?.name ?? null, true);
     },
-    [setValue]
+    [setValue],
   );
-
-  const handleClear = useCallback(() => {
-    setValue(null, true);
-  }, [setValue]);
 
   return (
     <FieldControl {...props}>
       {readonly && <ViewerInput value={text} />}
       {readonly || (
         <Select
+          autoComplete={false}
           placeholder={placeholder}
           onChange={handleChange}
           value={selected}
           options={themes}
-          optionValue="name"
-          optionLabel="title"
-          icons={[
-            {
-              icon: "close",
-              hidden: !hasValue,
-              onClick: handleClear,
-            },
-            { icon: "arrow_drop_down" }
-          ]}
+          optionKey={(x) => x.name}
+          optionLabel={(x) => x.title}
+          optionEqual={(x, y) => x.name === y.name}
         />
       )}
     </FieldControl>
