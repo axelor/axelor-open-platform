@@ -318,8 +318,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           onChange={handleChange}
           onOpen={handleOpen}
           onClose={handleClose}
-          onCreate={canNew ? showCreate : undefined}
-          onSelect={canSelect && !isSuggestBox ? showSelect : undefined}
+          onShowCreate={canNew ? showCreate : undefined}
+          onShowSelect={canSelect && !isSuggestBox ? showSelect : undefined}
           icons={icons}
           clearIcon={false}
           toggleIcon={isSuggestBox ? undefined : false}

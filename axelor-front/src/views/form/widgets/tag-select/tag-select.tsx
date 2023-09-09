@@ -237,8 +237,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         onChange={handleChange}
         onOpen={handleOpen}
         onClose={handleClose}
-        onCreate={canNew ? showCreate : undefined}
-        onSelect={canSelect ? showSelect : undefined}
+        onShowCreate={canNew ? showCreate : undefined}
+        onShowSelect={canSelect ? showSelect : undefined}
         clearIcon={false}
         renderValue={renderValue}
       />

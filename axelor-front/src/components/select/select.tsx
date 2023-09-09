@@ -9,36 +9,43 @@ import {
   useState,
 } from "react";
 
-import { Select as AxSelect, SelectProps } from "@axelor/ui/core/select2";
+import {
+  Select as AxSelect,
+  SelectProps as AxSelectProps,
+  SelectCustomOption,
+} from "@axelor/ui/core/select2";
 
 import { i18n } from "@/services/client/i18n";
-
 import styles from "./select.module.scss";
 
 export type {
   SelectIcon,
   SelectOptionProps,
   SelectOptionType,
-  SelectProps,
 } from "@axelor/ui/core/select2";
+
+export interface SelectProps<Type, Multiple extends boolean>
+  extends AxSelectProps<Type, Multiple> {
+  fetchOptions?: (inputValue: string) => Promise<Type[]>;
+  onShowCreate?: (inputValue: string) => void;
+  onShowSelect?: (inputValue: string) => void;
+}
 
 export const Select = forwardRef(function Select<
   Type,
   Multiple extends boolean,
->(
-  props: SelectProps<Type, Multiple> & {
-    fetchOptions?: (inputValue: string) => Promise<Type[]>;
-  },
-  ref: ForwardedRef<HTMLDivElement>,
-) {
+>(props: SelectProps<Type, Multiple>, ref: ForwardedRef<HTMLDivElement>) {
   const {
     autoFocus,
     readOnly,
     className,
     options,
     fetchOptions,
+    onShowCreate,
+    onShowSelect,
     onInputChange,
     onOpen,
+    ...selectProps
   } = props;
 
   const [items, setItems] = useState<Type[]>([]);
@@ -93,24 +100,49 @@ export const Select = forwardRef(function Select<
     }
   }, [autoFocus]);
 
+  const customOptions = useMemo(() => {
+    const options: SelectCustomOption[] = [];
+    if (onShowCreate) {
+      options.push({
+        key: "create",
+        title: (
+          <span>
+            {i18n.get("Create")}
+            {inputValue && <em> {inputValue}</em>}...
+          </span>
+        ),
+        onClick: () => onShowCreate(inputValue),
+      });
+    }
+    if (onShowSelect) {
+      options.push({
+        key: "select",
+        title: (
+          <span>
+            {i18n.get("Select")}
+            {inputValue && <em> {inputValue}</em>}...
+          </span>
+        ),
+        onClick: () => onShowSelect(inputValue),
+      });
+    }
+    return options;
+  }, [inputValue, onShowCreate, onShowSelect]);
+
   return (
     <AxSelect
-      {...props}
+      {...selectProps}
       {...focusProps}
       ref={ref}
+      readOnly={readOnly}
       options={fetchOptions ? items : options}
+      customOptions={customOptions}
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       className={clsx(className, { [styles.readonly]: readOnly })}
-      translations={{
-        create: i18n.get("Create"),
-        select: i18n.get("Select"),
-      }}
     />
   );
 }) as unknown as <Type, Multiple extends boolean>(
-  props: SelectProps<Type, Multiple> & {
-    fetchOptions?: (inputValue: string) => Promise<Type[]>;
-  },
+  props: SelectProps<Type, Multiple>,
   ref: ForwardedRef<HTMLDivElement>,
 ) => React.ReactNode;
