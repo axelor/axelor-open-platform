@@ -1,17 +1,22 @@
 import { useAtom, useAtomValue } from "jotai";
-import { useAtomCallback } from "jotai/utils";
-import { MouseEvent, useCallback, useMemo, useState } from "react";
-import { Box, SelectProps } from "@axelor/ui";
+import { useCallback } from "react";
+
+import { Badge } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import {
-  EditorOptions,
+  Select,
+  SelectOptionProps,
+  SelectOptionType,
+} from "@/components/select";
+import {
   useBeforeSelect,
   useCompletion,
   useEditor,
   useEditorInTab,
   useSelector,
 } from "@/hooks/use-relation";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 
 import {
   FieldControl,
@@ -19,86 +24,32 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { SelectionTag } from "../selection";
-import { CreatableSelect, CreatableSelectProps } from "./creatable-select";
-import { useOptionLabel } from "../many-to-one/utils";
 
-export function TagSelectComponent({
-  canRemove,
-  onView,
-  ...props
-}: CreatableSelectProps & {
-  canRemove?: boolean;
-  onView?: (e: any, value: DataRecord, readonly?: boolean) => void;
-}) {
-  const getOptionLabel = useOptionLabel(props.schema);
+import styles from "./tag-select.module.scss";
 
-  const components = useMemo(
-    () => ({
-      MultiValue: (props: any) => {
-        const { data, removeProps } = props;
-        return (
-          <Box me={1} onMouseDown={(e) => onView?.(e, data, false)}>
-            <SelectionTag
-              color={"indigo"}
-              title={getOptionLabel(data)}
-              {...(canRemove && {
-                onRemove: removeProps.onClick,
-              })}
-            />
-          </Box>
-        );
-      },
-    }),
-    [getOptionLabel, canRemove, onView]
-  );
-
-  return (
-    <CreatableSelect
-      isMulti
-      optionLabel={getOptionLabel}
-      optionValue={"id"}
-      components={components}
-      {...props}
-      icons={[{ icon: "arrow_drop_down" }]}
-    />
-  );
-}
-
-export function TagSelect(
-  props: FieldProps<DataRecord[]> & {
-    selectProps?: Partial<SelectProps>;
-  }
-) {
-  const { schema, valueAtom, formAtom, widgetAtom, readonly, selectProps } =
-    props;
+export function TagSelect(props: FieldProps<DataRecord[]>) {
+  const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
     target,
     targetName,
     targetSearch,
     placeholder,
-    gridView,
-    formView,
     orderBy: sortBy,
+    formView,
+    gridView,
     limit,
     searchLimit,
   } = schema;
-  const { attrs } = useAtomValue(widgetAtom);
-  const [hasMore, setHasMore] = useState(false);
-
   const [value, setValue] = useAtom(valueAtom);
-  const showEditor = useEditor();
-  const showSelector = useSelector();
-  const showEditorInTab = useEditorInTab(schema);
-  const getContext = usePrepareContext(formAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
-  const { title, focus, domain } = attrs;
-  const canNew = hasButton("new");
-  const canView = hasButton("view");
-  const canEdit = hasButton("edit");
-  const canSelect = hasButton("select");
-  const canRemove = hasButton("remove");
+  const { attrs } = useAtomValue(widgetAtom);
+  const { title, focus, required, domain } = attrs;
+
+  const getContext = usePrepareContext(formAtom);
+  const showSelector = useSelector();
+  const showEditor = useEditor();
+  const showEditorInTab = useEditorInTab(schema);
 
   const search = useCompletion({
     sortBy,
@@ -108,96 +59,89 @@ export function TagSelect(
     targetSearch,
   });
 
-  const handleSelect = useAtomCallback(
-    useCallback(
-      (get, set, records: DataRecord[]) => {
-        const values = get(valueAtom) || [];
-        const ids = values.map((x) => x.id);
-        const newValues = records.filter(({ id }) => !ids.includes(id));
-
-        set(valueAtom, [
-          ...values.map?.((v) => {
-            const record = records.find(
-              (record) => v.id === record.id && (record?.id ?? 0) > 0
-            );
-            return record ? { ...v, ...record, version: undefined } : v;
-          }),
-          ...newValues.map((value) => ({ ...value, version: undefined })),
-        ]);
-      },
-      [valueAtom]
-    )
+  const handleChange = useCallback(
+    (value: SelectOptionType<DataRecord, true>) => {
+      if (Array.isArray(value)) {
+        const items = value.map(({ version, ...rest }) => rest);
+        setValue(items.length === 0 ? null : items, true);
+      } else {
+        setValue(value, true);
+      }
+    },
+    [setValue],
   );
 
+  const handleSelect = useCallback(
+    (record: DataRecord) => {
+      const all = Array.isArray(value) ? value : [];
+      const next = all.find((x) => x.id === record.id) ? all : [...all, record];
+      handleChange(next);
+    },
+    [handleChange, value],
+  );
+
+  const canNew = hasButton("new") && attrs.canNew;
+  const canView = readonly && hasButton("view");
+  const canEdit = !readonly && hasButton("edit") && attrs.canEdit;
+  const canSelect = hasButton("select");
+  const canRemove = !readonly && hasButton("delete") && attrs.canRemove;
+
   const handleEdit = useCallback(
-    async (
-      value: DataRecord,
-      readonly = false,
-      onSelect?: EditorOptions["onSelect"]
-    ) => {
-      if (!canEdit) {
-        readonly = true;
+    async (record?: DataContext) => {
+      if (showEditorInTab && (record?.id ?? 0) > 0) {
+        return showEditorInTab(record!, readonly);
       }
-      if (showEditorInTab && (value?.id ?? 0) > 0) {
-        return showEditorInTab(value!, readonly);
-      }
-      return showEditor({
+      showEditor({
         title: title ?? "",
         model: target,
         viewName: formView,
-        record: value,
+        record,
         readonly,
-        onSelect: onSelect ?? ((record: DataRecord) => handleSelect([record])),
+        context: {
+          _parent: getContext(),
+        },
+        onSelect: handleSelect,
       });
     },
     [
-      formView,
-      target,
-      title,
-      canEdit,
-      showEditor,
       showEditorInTab,
+      showEditor,
+      title,
+      target,
+      formView,
+      readonly,
+      getContext,
       handleSelect,
-    ]
+    ],
   );
 
-  const shouldPreventDefault = selectProps?.disablePortal || !schema.editable;
-  const handleView = useCallback(
-    (e: MouseEvent<HTMLAnchorElement>, value: DataRecord, readonly = true) => {
-      shouldPreventDefault && e.preventDefault();
-      return handleEdit(value, readonly);
+  const handleRemove = useCallback(
+    (record: DataRecord) => {
+      if (Array.isArray(value)) {
+        handleChange(value.filter((x) => x.id !== record.id));
+      }
     },
-    [handleEdit, shouldPreventDefault]
+    [handleChange, value],
   );
 
   const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
 
-  const handleCompletion = useCallback(
-    async (value: string) => {
-      if (!canSelect) return [];
-      const _domain = (await beforeSelect(true)) ?? domain;
-      const _domainContext = _domain ? getContext() : {};
-      const options = {
-        _domain,
-        _domainContext,
-      };
-      const { records, page } = await search(value, options);
-      setHasMore((page.totalCount ?? 0) > records.length);
-      return records;
-    },
-    [search, domain, canSelect, beforeSelect, getContext]
-  );
-
-  const handleSearch = useCallback(async () => {
+  const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
     const _domainContext = _domain ? getContext() : {};
     showSelector({
       model: target,
       viewName: gridView,
+      orderBy: sortBy,
+      multiple: true,
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
-      onSelect: handleSelect,
+      onSelect: async (records = []) => {
+        const all = Array.isArray(value) ? value : [];
+        const add = records.filter((x) => !all.some((a) => a.id === x.id));
+        handleChange([...all, ...add]);
+      },
     });
   }, [
     beforeSelect,
@@ -206,66 +150,147 @@ export function TagSelect(
     showSelector,
     target,
     gridView,
+    sortBy,
     searchLimit,
-    handleSelect,
+    value,
+    handleChange,
   ]);
 
-  const handleChange = useCallback(
-    (value: any[]) =>
-      setValue(
-        value?.map?.((v) => ({
-          id: v.id,
-          [targetName]: v[targetName],
-        })),
-        true
-      ),
-    [setValue, targetName]
+  const showCreate = useCallback(
+    (inputValue: string) => {
+      const record: DataRecord = {
+        [targetName]: inputValue,
+      };
+      return handleEdit(record);
+    },
+    [handleEdit, targetName],
   );
 
-  const getOptionLabel = useOptionLabel(schema);
+  const fetchOptions = useCallback(
+    async (text: string) => {
+      const _domain = (await beforeSelect()) ?? domain;
+      const _domainContext = _domain ? getContext() : {};
+      const options = {
+        _domain,
+        _domainContext,
+      };
+      const { records } = await search(text, options);
+      return records;
+    },
+    [beforeSelect, domain, getContext, search],
+  );
+
+  const handleOpen = useCallback(async () => {
+    beforeSelectProps?.onMenuOpen?.();
+  }, [beforeSelectProps]);
+
+  const handleClose = useCallback(() => {
+    beforeSelectProps?.onMenuClose?.();
+  }, [beforeSelectProps]);
+
+  const getOptionKey = useCallback((option: DataRecord) => option.id!, []);
+  const getOptionLabel = useCallback(
+    (option: DataRecord) => {
+      const trKey = `$t:${targetName}`;
+      return option[trKey] ?? option[targetName];
+    },
+    [targetName],
+  );
+  const getOptionEqual = useCallback(
+    (a: DataRecord, b: DataRecord) => a.id === b.id,
+    [],
+  );
+
+  const getOptionMatch = useCallback(() => true, []);
+
+  const renderValue = useCallback(
+    ({ option }: SelectOptionProps<DataRecord>) => {
+      return (
+        <Tag
+          record={option}
+          targetName={targetName}
+          onClick={canView || canEdit ? handleEdit : undefined}
+          onRemove={canRemove ? handleRemove : undefined}
+        />
+      );
+    },
+    [canEdit, canRemove, canView, handleEdit, handleRemove, targetName],
+  );
 
   return (
     <FieldControl {...props}>
-      {readonly ? (
-        <Box d="flex" flexWrap="wrap">
-          {(value || []).map((val) => (
-            <Box
-              m={1}
-              key={val?.id}
-              as="a"
-              href="#"
-              onClick={(e: any) => canView && handleView(e, val)}
-            >
-              <SelectionTag title={getOptionLabel(val)} color={"indigo"} />
-            </Box>
-          ))}
-        </Box>
-      ) : (
-        <TagSelectComponent
-          {...(focus && { key: "focused" })}
-          autoFocus={focus}
-          schema={schema}
-          placeholder={placeholder}
-          value={value}
-          fetchOptions={handleCompletion}
-          {...beforeSelectProps}
-          {...selectProps}
-          onChange={handleChange}
-          optionLabel={getOptionLabel}
-          canRemove={canRemove}
-          isSelectable={canSelect}
-          {...(canSelect &&
-            ({
-              canCreate: canNew,
-              canSearch: hasMore,
-              onSearch: handleSearch,
-              onCreate: handleEdit as CreatableSelectProps["onCreate"],
-            } as any))}
-          {...(canView && {
-            onView: handleView,
-          })}
+      <Select
+        className={styles.select}
+        autoFocus={focus}
+        multiple={true}
+        readOnly={readonly}
+        required={required}
+        invalid={invalid}
+        fetchOptions={fetchOptions}
+        options={[] as DataRecord[]}
+        optionKey={getOptionKey}
+        optionLabel={getOptionLabel}
+        optionEqual={getOptionEqual}
+        optionMatch={getOptionMatch}
+        value={value}
+        placeholder={placeholder}
+        onChange={handleChange}
+        onOpen={handleOpen}
+        onClose={handleClose}
+        onCreate={canNew ? showCreate : undefined}
+        onSelect={canSelect ? showSelect : undefined}
+        clearIcon={false}
+        renderValue={renderValue}
+      />
+    </FieldControl>
+  );
+}
+
+type TagProps = {
+  record: DataRecord;
+  targetName: string;
+  onRemove?: (record: DataRecord) => void;
+  onClick?: (record: DataRecord) => void;
+};
+
+function Tag(props: TagProps) {
+  const { record, targetName, onClick, onRemove } = props;
+
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      onClick?.(record);
+    },
+    [onClick, record],
+  );
+
+  const handleRemove = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      onRemove?.(record);
+    },
+    [onRemove, record],
+  );
+
+  const canOpen = Boolean(onClick);
+  const canRemove = Boolean(onRemove);
+
+  return (
+    <Badge className={styles.tag} bg="primary">
+      {canOpen && (
+        <span className={styles.tagLink} onClick={handleClick}>
+          {record[targetName]}
+        </span>
+      )}
+      {canOpen || <span className={styles.tagText}>{record[targetName]}</span>}
+      {canRemove && (
+        <MaterialIcon
+          className={styles.tagRemove}
+          icon="close"
+          fontSize="1rem"
+          onClick={handleRemove}
         />
       )}
-    </FieldControl>
+    </Badge>
   );
 }

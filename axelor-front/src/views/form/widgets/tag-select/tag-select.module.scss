@@ -1,0 +1,25 @@
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.tagLink {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tagText {
+  cursor: default;
+}
+
+.tagClose {
+  cursor: pointer;
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
+}
