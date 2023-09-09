@@ -5,13 +5,13 @@ import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
+import { Select } from "@/components/select";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
 
 import HtmlEditor from "../../html/editor";
-import { TagSelectComponent } from "../../tag-select";
-import { Message, MessageFile } from "../message/types";
+import { Message, MessageFile, MessageRecipient } from "../message/types";
 import { MessageFiles } from "./message-files";
 
 export function useMessagePopup() {
@@ -31,8 +31,8 @@ export function useMessagePopup() {
     }) => {
       let formData = { ...record };
       const formAtom = atom<Message>(formData);
-      const isOk = await new Promise<boolean>(async (resolve) => {
-        await dialogs.modal({
+      const isOk = await new Promise<boolean>((resolve) => {
+        dialogs.modal({
           open: true,
           title,
           content: (
@@ -54,7 +54,7 @@ export function useMessagePopup() {
                   result ||
                   (await dialogs.confirmDirty(
                     async () => (formData as any)._dirty,
-                    async () => close(result)
+                    async () => close(result),
                   ))
                 ) {
                   close(result);
@@ -72,11 +72,11 @@ export function useMessagePopup() {
         onSave?.({ ...formData, _dirty: undefined } as Message);
       }
     },
-    []
+    [],
   );
 }
 
-async function searchEmails(term?: string) {
+async function searchEmails(term?: string): Promise<MessageRecipient[]> {
   const resp = await request({
     url: "ws/search/emails",
     method: "POST",
@@ -115,15 +115,12 @@ function Form({
           ...form,
           [name]: value,
           _dirty: true,
-        } as Message)
+        }) as Message,
     );
   }
 
   function handleFileRemove(file: MessageFile) {
-    onChange(
-      "files",
-      files?.filter((f) => f !== file)
-    );
+    onChange("files", files?.filter((f) => f !== file));
   }
 
   useEffect(() => {
@@ -133,11 +130,14 @@ function Form({
   return (
     <Box flex={1} d="flex" flexDirection="column" p={2}>
       <Box flex={1} mb={2}>
-        <TagSelectComponent
+        <Select
           value={recipients}
+          multiple={true}
           onChange={(vals) => onChange("recipients", vals)}
-          schema={recipientField}
-          optionValue="address"
+          options={[] as MessageRecipient[]}
+          optionKey={(x) => x.address}
+          optionLabel={(x) => x.address}
+          optionEqual={(x, y) => x.address === y.address}
           placeholder={i18n.get("Recipients")}
           fetchOptions={searchEmails}
         />
@@ -198,10 +198,10 @@ function FormFooter({
                   ...dmsFiles.filter(
                     (f) =>
                       !form.files?.find?.((_f) => _f.id === f.id) &&
-                      f.isDirectory !== true
+                      f.isDirectory !== true,
                   ),
                 ],
-              } as Message)
+              }) as Message,
           );
       },
     });
