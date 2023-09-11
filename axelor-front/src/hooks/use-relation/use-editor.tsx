@@ -235,22 +235,41 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
 
   return useCallback(
     async (options: EditorOptions & { onSearch?: () => void }) => {
-      const { readonly, onSelect, onSearch, ...rest } = options;
+      const {
+        readonly,
+        onSave: optOnSave,
+        onSelect,
+        onSearch,
+        ...rest
+      } = options;
       const hasPopupReload = dashlet && popup === "reload";
 
       if (hasPopupReload && !readonly && !(await confirmSave())) {
         return;
       }
 
+      let refreshNeeded = false;
+
+      const onSave =
+        optOnSave &&
+        ((record: DataRecord) => {
+          refreshNeeded = true;
+          return optOnSave(record);
+        });
+
       return showEditor({
         ...rest,
         readonly,
+        onSave,
         ...(hasPopupReload
           ? {
-              onSelect: (record: DataRecord) => onSelect?.(record),
+              onSelect: (record: DataRecord) => {
+                refreshNeeded = true;
+                onSelect?.(record);
+              },
               onClose: (result) => {
                 const detail = parentId.current;
-                if (result && detail) {
+                if (result && detail && refreshNeeded) {
                   const event = new CustomEvent("tab:refresh", { detail });
                   document.dispatchEvent(event);
                 }
