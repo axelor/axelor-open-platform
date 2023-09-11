@@ -75,7 +75,7 @@ export type TabState = {
   /**
    * Whether the tab is dirty
    *
-   * Can be used to show confirmation dialong before closing the tab.
+   * Can be used to show confirmation dialog before closing the tab.
    */
   dirty?: boolean;
 
@@ -206,7 +206,7 @@ const getDefaultViewType = (action: ActionView) => {
   const type = action.viewType;
   const isPopup = !!action.params?.["popup"];
   if (isPopup) return type;
-  // on mobile try to use cards view by defau;t
+  // on mobile try to use cards view by default
   if (type === "grid" && device.isMobile) {
     return action.views?.find((x) => x.type === "cards")?.type ?? type;
   }
@@ -267,7 +267,7 @@ const updateTabState = (
  *
  * @param view the action-view or name
  * @param options the options for the view type
- * @returns a Tab or null if no tab was opened (due to non-existance of the action-view)
+ * @returns a Tab or null if no tab was opened (due to non-existence of the action-view)
  */
 export type OpenTab = (
   view: ActionView | string,
@@ -283,7 +283,7 @@ export type OpenTab = (
  * Close the given view.
  *
  * @param view the action-view or name
- * @param type the intial view type
+ * @param type the initial view type
  */
 export type CloseTab = (view: ActionView | string) => void;
 
