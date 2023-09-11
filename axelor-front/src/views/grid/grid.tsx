@@ -824,7 +824,7 @@ function GridInner(props: ViewProps<GridView>) {
             state={state}
             setState={setState}
             sortType={"live"}
-            editable={dashlet ? false : editable}
+            editable={dashlet || action?.name?.startsWith("$selector") ? false : editable}
             searchOptions={searchOptions}
             searchAtom={searchAtom}
             actionExecutor={actionExecutor}
