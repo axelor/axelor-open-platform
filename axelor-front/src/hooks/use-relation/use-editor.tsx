@@ -209,7 +209,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
         try {
           const confirmed = await dialogs.confirmSave(
             async () => saveNeeded,
-            async () => actionHandler.save(record)
+            async () => actionHandler.save()
           );
 
           return confirmed;
