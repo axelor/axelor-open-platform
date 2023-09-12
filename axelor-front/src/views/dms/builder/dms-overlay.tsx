@@ -17,11 +17,11 @@ export function DmsOverlay({
   // file drag/drop upload
   const [{ canDrop, isOver }, drop] = useDrop({
     accept: [DndNativeTypes.FILE],
-    drop(item, monitor: any) {
+    drop(item: any, monitor: any) {
       const files = monitor.getItem().files;
       onUpload?.(files);
     },
-    collect: (monitor) => ({
+    collect: (monitor: any) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
     }),
