@@ -2,15 +2,19 @@
 :toc:
 :toc-title:
 
-- kbd:[Ctrl+Insert] - create new record
-- kbd:[Ctrl+E] - edit selected record
-- kbd:[Ctrl+S] - save current record
-- kbd:[Ctrl+D] - delete current/selected record(s)
-- kbd:[Ctrl+R] - refresh current view
-- kbd:[Ctrl+Q] - close the current view tab
-- kbd:[Alt+F] - search for records - _changed in version 5.4_
-- kbd:[Alt+G] - focus first or selected item in view - _changed in version 5.4_
-- kbd:[Ctrl+J] - navigate to previous page/record
-- kbd:[Ctrl+K] - navigate to next page/record
-- kbd:[Ctrl+M] - focus left menu search box
-- kbd:[F9] - toggle left menu
+[cols="3"]
+|===
+| Description | Windows/Linux | macOS
+| create new record | kbd:[Ctrl+Insert] | kbd:[⌘Сmd+Insert]
+| edit selected record | kbd:[Ctrl+E] | kbd:[⌘Сmd+E]
+| save current record | kbd:[Ctrl+S] | kbd:[⌘Сmd+S]
+| duplicate current record | kbd:[Ctrl+D] | kbd:[⌘Сmd+D]
+| delete current/selected record(s) | kbd:[Ctrl+Delete] | kbd:[⌘Сmd+Delete]
+| refresh current view  | kbd:[Ctrl+R] | kbd:[⌘Сmd+R]
+| close the current view tab | kbd:[Ctrl+Q] | kbd:[⌘Сmd+Q]
+| search for records | kbd:[Alt+F] | kbd:[⌘Сmd+⌥Opt+F]
+| focus first or selected item in view | kbd:[Alt+G] | kbd:[⌘Сmd+⌥Opt+G]
+| navigate to previous page/record | kbd:[Alt+Page Up]  |  kbd:[⌥Opt+Page Up]
+| navigate to next page/record |  kbd:[Alt+Page Down] |  kbd:[⌥Opt+Page Down]
+| focus left menu search box | kbd:[Ctrl+M]  |  kbd:[⌘Сmd+M]
+| toggle left menu | kbd:[F9] | kbd:[F9]

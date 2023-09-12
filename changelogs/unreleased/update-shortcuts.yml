@@ -1,0 +1,13 @@
+---
+title: Update shortcuts
+type: change
+description: |
+  Here are the changes of the shortcuts : 
+  
+  Changed :
+  - delete current/selected record(s) : `Ctrl+Delete` instead of `Ctrl+D`
+  - navigate to previous page/record : `Alt+Page Up` instead of `Ctrl+J`
+  - navigate to next page/record : `Alt+Page Down` instead of `Ctrl+K`
+  
+  Added : 
+  - duplicate current record : `Ctrl+D`
