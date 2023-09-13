@@ -1,40 +1,6 @@
-import { Box } from "@axelor/ui";
-
-import { Icon } from "@/components/icon";
-import { Selection as SelectionType } from "@/services/client/meta.types";
-
 import { FieldProps } from "../../builder";
 import { Selection } from "../selection";
-
-function Image({
-  showLabel,
-  option,
-}: {
-  showLabel?: boolean;
-  option: SelectionType;
-}) {
-  const icon = option?.icon || option?.value;
-  const text = option?.title;
-
-  return (
-    <Box d="flex" gap={6} alignItems="center">
-      {icon && !icon.includes(".") ? (
-        <Icon icon={icon} />
-      ) : (
-        <img
-          style={
-            showLabel === false
-              ? { maxHeight: 18 }
-              : { maxWidth: 18, height: "fit-content" }
-          }
-          src={icon}
-          alt={text}
-        />
-      )}
-      {showLabel !== false && text}
-    </Box>
-  );
-}
+import { ImageSelectValue } from "./image-select-value";
 
 export function ImageSelect(props: FieldProps<string | number | null>) {
   const { schema } = props;
@@ -42,9 +8,11 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
   return (
     <Selection
       {...props}
-      renderValue={({ option }) => <Image option={option} showLabel={labels} />}
+      renderValue={({ option }) => (
+        <ImageSelectValue option={option} showLabel={labels} />
+      )}
       renderOption={({ option }) => (
-        <Image option={option} showLabel={labels} />
+        <ImageSelectValue option={option} showLabel={labels} />
       )}
     />
   );
