@@ -29,6 +29,7 @@ export * from "./mail-followers";
 export * from "./mail-messages";
 export * from "./many-to-many";
 export * from "./many-to-one";
+export * from "./master-detail";
 export * from "./multi-select";
 export * from "./nav-select";
 export * from "./one-to-many";
