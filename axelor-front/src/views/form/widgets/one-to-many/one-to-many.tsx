@@ -1,7 +1,8 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
+import isBoolean from "lodash/isBoolean";
 import {
   SetStateAction,
   SyntheticEvent,
@@ -191,6 +192,7 @@ export function OneToMany({
   const editable =
     (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
     !readonly;
+
   const getContext = usePrepareContext(formAtom);
 
   const showEditor = useEditor();
@@ -464,7 +466,9 @@ export function OneToMany({
       : null);
   const recordId = detailRecord?.id;
 
-  const detailFormName = summaryView || formView;
+  const detailFormName =
+    (summaryView === "true" ? null : summaryView) || formView;
+
   const { data: detailMeta } = useAsync(async () => {
     if (!hasMasterDetails) return;
     return await findView<FormView>({
