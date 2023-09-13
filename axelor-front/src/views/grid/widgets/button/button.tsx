@@ -9,6 +9,7 @@ import { Button as ButtonField, Field } from "@/services/client/meta.types";
 import { useViewAction } from "@/view-containers/views/scope";
 import { GridCellProps } from "../../builder/types";
 import { processContextValues } from "@/views/form/builder/utils";
+import { createScriptContext } from "@/hooks/use-parser/context";
 
 import styles from "./button.module.scss";
 
@@ -20,7 +21,7 @@ export function Button(props: GridCellProps) {
 
   const { hidden, readonly } = useMemo(() => {
     const { showIf, hideIf, readonlyIf } = field as Field;
-    const ctx = { ...context, ...record };
+    const ctx = createScriptContext({ ...context, ...record });
     let hidden: boolean | undefined;
     let readonly: boolean | undefined;
     if (showIf) {
