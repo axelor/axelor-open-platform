@@ -156,18 +156,39 @@ export function OneToMany({
 
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
-  const editable = schema.editable && !readonly;
 
   const { state: viewState, data: viewData } = useAsync(async () => {
     const { items, gridView } = schema;
     if ((items || []).length > 0) return;
-    return findView({
+    const { view, ...res } = await findView<GridView>({
       type: "grid",
       name: gridView,
       model,
     });
+    return {
+      ...res,
+      view: view && {
+        ...view,
+        ...[
+          "canMove",
+          "editable",
+          "selector",
+          "rowHeight",
+          "onNew",
+          "orderBy",
+          "groupBy",
+        ].reduce(
+          (obj, key) => ({
+            ...obj,
+            [key]: schema[key] ?? view[key as keyof GridView],
+          }),
+          {}
+        ),
+      },
+    };
   }, [schema, model]);
 
+  const editable = (schema.editable || viewData?.view?.editable) && !readonly;
   const getContext = usePrepareContext(formAtom);
 
   const showEditor = useEditor();
@@ -234,9 +255,11 @@ export function OneToMany({
 
   const onExport = useCallback(async () => {
     const { fileName } = await dataStore.export({
-      ...(state.orderBy && {sortBy: state.orderBy?.map(
+      ...(state.orderBy && {
+        sortBy: state.orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
-        )}),
+        ),
+      }),
       fields: state.columns
         .filter((c) => c.type === "field" && c.visible !== false)
         .map((c) => c.name),
