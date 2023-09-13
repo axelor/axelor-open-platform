@@ -10,6 +10,7 @@ import { FieldDetails } from "@/views/form/builder";
 
 import { GridCellProps } from "../../builder/types";
 import { useWidgetComp } from "../../hooks";
+import { Image } from "../../widgets/image";
 
 function CellRenderer(props: GridCellProps) {
   const { type, widget } = props.data as Field;
@@ -20,7 +21,7 @@ function CellRenderer(props: GridCellProps) {
 
 export function Cell(props: GridCellProps) {
   const { view, data, value, record } = props;
-  const { type, tooltip, widget, serverType, hilites } = data as Field;
+  const { name, type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const $className = useHilites(hilites ?? [])(record)?.[0]?.css;
@@ -29,6 +30,9 @@ export function Cell(props: GridCellProps) {
     function renderContent() {
       if (widget || type !== "field") {
         return <CellRenderer {...props} />;
+      }
+      if (serverType === "BINARY" && name === "image") {
+        return <Image {...props} />;
       }
       if (
         typeof value === "string" &&
