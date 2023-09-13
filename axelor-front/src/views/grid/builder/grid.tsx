@@ -98,6 +98,7 @@ export const Grid = forwardRef<
     columnAttrs?: Record<string, Partial<Attrs>>;
     columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
+    onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
@@ -119,6 +120,7 @@ export const Grid = forwardRef<
     records,
     state,
     setState,
+    onFormInit,
     onSearch,
     onEdit,
     onView,
@@ -388,9 +390,15 @@ export const Grid = forwardRef<
 
   const CustomFormRenderer = useMemo(() => {
     return (props: GridRowProps) => (
-      <FormRenderer ref={formRef} {...props} view={view} fields={fields} />
+      <FormRenderer
+        ref={formRef}
+        {...props}
+        view={view}
+        fields={fields}
+        onInit={onFormInit}
+      />
     );
-  }, [view, fields]);
+  }, [onFormInit, view, fields]);
 
   useImperativeHandle(
     ref,

@@ -39,6 +39,7 @@ import styles from "./form.module.scss";
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
   fields?: MetaData["fields"];
+  onInit?: () => void;
 }
 
 type LayoutProps = Omit<WidgetProps, "widgetAtom"> &
@@ -143,6 +144,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       data: { record },
       index: rowIndex,
       editCell: cellIndex,
+      onInit,
       onSave,
       onCancel,
     } = props;
@@ -365,6 +367,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         await actionExecutor.execute(onNewAction);
       }
     }, [onNewAction, actionExecutor]);
+
+    useEffect(() => {
+      onInit?.();
+    }, [onInit]);
 
     return (
       <FocusTrap initialFocus={false}>

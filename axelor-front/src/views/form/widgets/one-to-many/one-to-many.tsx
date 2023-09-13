@@ -2,13 +2,13 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
-import isBoolean from "lodash/isBoolean";
 import {
   SetStateAction,
   SyntheticEvent,
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from "react";
@@ -83,6 +83,8 @@ export function OneToMany({
 
   const [records, setRecords] = useState<DataRecord[]>([]);
   const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
+  const [, forceUpdate] = useReducer(() => ({}), {});
+
   const widgetState = useMemo(
     () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
     [formAtom, name],
@@ -669,6 +671,7 @@ export function OneToMany({
           state={state}
           setState={setState}
           actionExecutor={actionExecutor}
+          onFormInit={forceUpdate}
           onEdit={canEdit ? onEdit : canView ? onView : noop}
           onView={canView ? (canEdit ? onEdit : onView) : noop}
           onSave={onSave}
