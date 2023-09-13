@@ -1,6 +1,8 @@
-import { ReactElement, useCallback, useEffect } from "react";
+import { ReactElement, useCallback, useEffect, useMemo } from "react";
 import { Box, Button } from "@axelor/ui";
 import { useAtomCallback } from "jotai/utils";
+import { useSetAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
 
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -42,6 +44,10 @@ export function DetailsForm({
   const formAtom = detailFormAtom ?? _formAtom;
   const getErrors = useGetErrors();
   const isNew = (record?.id ?? 0) < 0 && !record?._dirty;
+
+  const setReady = useSetAtom(
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom])
+  );
 
   const handleSave = useAtomCallback(
     useCallback(
@@ -88,6 +94,10 @@ export function DetailsForm({
       return () => resetFormAtom(detailFormAtom);
     }
   }, [resetFormAtom, detailFormAtom]);
+
+  useEffect(() => {
+    setReady(true);
+  }, [setReady]);
 
   return (
     record ? (
