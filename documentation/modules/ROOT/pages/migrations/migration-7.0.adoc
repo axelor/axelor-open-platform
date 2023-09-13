@@ -29,7 +29,7 @@ Please be aware that some Font Awesome icons don't have any equivalent in Bootst
 instead. Missing icons will be log in console in non production mode.
 
 
-=== Plain user passwords are non longer hashed upon startup
+=== Plain user passwords are no longer hashed upon startup
 
 For historical reasons, user passwords that were stored in plain text within the database were hashed upon startup. On
 databases with a large number of users, this could result in unnecessary time consumption during startup.
