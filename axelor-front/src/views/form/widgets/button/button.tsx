@@ -82,7 +82,7 @@ export function Button(props: WidgetProps) {
     }
     try {
       setWait(true);
-      editable && editOnSave && await editOnSave?.();
+      editable && editOnSave && (await editOnSave?.());
       await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
@@ -107,8 +107,10 @@ export function Button(props: WidgetProps) {
         : {
             title: help,
           })}
+      {...(!disabled && {
+        onClick: handleClick,
+      })}
       disabled={disabled}
-      onClick={handleClick}
       className={clsx(styles.button, {
         [styles.help]: hasHelp,
       })}
