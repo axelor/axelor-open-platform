@@ -35,8 +35,9 @@ export type PopupProps = {
    * This callback is called when the popup is closed
    *
    * @param result confirm or cancel
+   * @param record
    */
-  onClose: (result: boolean) => void;
+  onClose: (result: boolean, record?: DataRecord) => void;
 
   /**
    * Additional header component
@@ -45,7 +46,7 @@ export type PopupProps = {
   header?: () => JSX.Element | null;
 
   /**
-   * Additioanl footer component
+   * Additional footer component
    *
    */
   footer?: (close: (result: boolean) => void) => JSX.Element | null;

@@ -15,8 +15,10 @@ import {
   Portal,
 } from "@axelor/ui";
 
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { SanitizedContent } from "@/utils/sanitize";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import styles from "./dialogs.module.css";
 
@@ -46,7 +48,7 @@ export type DialogOptions = {
   maximize?: boolean;
   closeable?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-  onClose: (result: boolean) => void;
+  onClose: (result: boolean, record?: DataRecord) => void;
 };
 
 type DialogProps = {
@@ -272,9 +274,13 @@ export function ModalDialog(props: DialogOptions) {
     [setOpen]
   );
 
+  const handlerAtom = usePopupHandlerAtom();
+  const handler = useAtomValue(handlerAtom);
+
   const onHide = useCallback(() => {
-    onClose?.(result);
-  }, [onClose, result]);
+    const record = handler.getState?.().record;
+    onClose?.(result, record);
+  }, [onClose, result, handler]);
 
   const canShow = setOpen ? open : show;
 

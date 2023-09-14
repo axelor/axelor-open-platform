@@ -30,7 +30,7 @@ export type EditorOptions = {
   viewName?: string;
   context?: DataContext;
   canSave?: boolean;
-  onClose?: (result: boolean) => void;
+  onClose?: (result: boolean, record?: DataRecord) => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
 };
@@ -125,7 +125,7 @@ export function useEditor() {
       tab,
       open: true,
       maximize,
-      onClose: (result) => onClose?.(result),
+      onClose: (result, record) => onClose?.(result, record),
       footer: (close) => (
         <Footer
           hasOk={canSave}
@@ -254,49 +254,54 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
 
   return useCallback(
     async (options: EditorOptions & { onSearch?: () => void }) => {
-      const {
-        readonly,
-        onSave: optOnSave,
-        onSelect,
-        onSearch,
-        ...rest
-      } = options;
-      const hasPopupReload = dashlet && popup === "reload";
+      const { record, readonly, onSelect, onSearch, ...rest } = options;
+      const popupCanReload = dashlet && popup === "reload";
 
-      if (hasPopupReload && !readonly && !(await confirmSave())) {
+      if (popupCanReload && !readonly && !(await confirmSave())) {
         return;
       }
 
-      let refreshNeeded = false;
+      const originalVersion = record?.version;
 
-      const onSave =
-        optOnSave &&
-        ((record: DataRecord) => {
-          refreshNeeded = true;
-          return optOnSave(record);
-        });
+      const isChanged = (result: boolean, record?: DataRecord) =>
+        record ? record.version !== originalVersion : result;
+
+      const reloadOptions: Partial<EditorOptions> = {};
+      let selected = false;
+
+      if (popupCanReload) {
+        reloadOptions.onSelect = (record) => {
+          selected = true;
+          onSelect?.(record);
+        };
+
+        reloadOptions.onClose = (result, record) => {
+          const detail = parentId.current;
+          if (detail && (selected || isChanged(result, record))) {
+            const event = new CustomEvent("tab:refresh", { detail });
+            document.dispatchEvent(event);
+          }
+        };
+      } else {
+        if (!readonly) {
+          reloadOptions.onSelect = (record) => {
+            selected = true;
+            onSelect && record ? onSelect(record) : onSearch?.();
+          };
+        }
+
+        reloadOptions.onClose = (result, record) => {
+          if (!selected && isChanged(result, record)) {
+            onSelect && record ? onSelect(record) : onSearch?.();
+          }
+        };
+      }
 
       return showEditor({
         ...rest,
+        record,
         readonly,
-        onSave,
-        ...(hasPopupReload
-          ? {
-              onSelect: (record: DataRecord) => {
-                refreshNeeded = true;
-                onSelect?.(record);
-              },
-              onClose: (result) => {
-                const detail = parentId.current;
-                if (result && detail && refreshNeeded) {
-                  const event = new CustomEvent("tab:refresh", { detail });
-                  document.dispatchEvent(event);
-                }
-              },
-            }
-          : !readonly && {
-              onSelect: onSelect ?? onSearch,
-            }),
+        ...reloadOptions,
       });
     },
     [confirmSave, showEditor, popup, dashlet],
