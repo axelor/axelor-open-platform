@@ -1,4 +1,4 @@
-import { Box, Popper } from "@axelor/ui";
+import { Box, Panel, Popper } from "@axelor/ui";
 import { useAtom, useSetAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useAtomCallback } from "jotai/utils";
@@ -716,25 +716,20 @@ function KanbanCard({
         offset={[0, 4]}
       >
         <Box
-          className={legacyClassNames("card")}
-          p={2}
           style={{
             maxWidth: 400,
             minWidth: 200,
           }}
         >
-          {popoverData.title && (
-            <Box className={legacyClassNames("card-header")}>
-              {popoverData.title}
+          <Panel header={popoverData.title}>
+            <Box>
+              {popoverData.body && (
+                <div
+                  dangerouslySetInnerHTML={{ __html: popoverData.body } as any}
+                />
+              )}
             </Box>
-          )}
-          <Box className={legacyClassNames("card-body")} rounded>
-            {popoverData.body && (
-              <div
-                dangerouslySetInnerHTML={{ __html: popoverData.body } as any}
-              />
-            )}
-          </Box>
+          </Panel>
         </Box>
       </Popper>
     </>

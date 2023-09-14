@@ -117,6 +117,10 @@
   text-overflow: ellipsis;
 }
 
+.card-summary.popover {
+  display: none;
+}
+
 .tag-select .label {
   &.red {
     background: #f44336;
