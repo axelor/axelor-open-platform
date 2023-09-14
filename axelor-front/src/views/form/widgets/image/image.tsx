@@ -2,7 +2,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { ChangeEvent, useMemo, useRef } from "react";
 
-import { Box, Input } from "@axelor/ui";
+import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataStore } from "@/services/client/data-store";
@@ -101,12 +101,14 @@ export function Image(
         position="relative"
         maxW={100}
         maxH={100}
-        className={styles.image}
+        className={clsx(styles.image, {
+          [styles.editable]: schema.editable,
+        })}
       >
         <Box
           ref={imageRef}
           as="img"
-          p={1}
+          p={schema.editable ? 0 : 1}
           d="inline-block"
           src={
             isBinary && value === null
@@ -132,7 +134,6 @@ export function Image(
         </form>
         <Box
           className={styles.actions}
-          bgColor="body"
           d={readonly ? "none" : "flex"}
           alignItems={"center"}
           justifyContent={"center"}

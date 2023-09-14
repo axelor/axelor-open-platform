@@ -2,6 +2,11 @@
   width: 140px;
   min-height: auto;
 
+  &.editable {
+    width: fit-content;
+    height: calc(4rem + 2px);
+  }
+
   img {
     width: inherit;
     height: 100%;
@@ -22,6 +27,7 @@
   padding: 2px;
   transition: all 0.25s ease-in-out;
   cursor: pointer;
+  background: var(--bs-body-bg);
   [dir="rtl"] & {
     left: unset;
     right: calc(50% - 32px);
