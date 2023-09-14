@@ -1,0 +1,14 @@
+.container {
+  position: relative;
+}
+.translatable input {
+  padding-right: 1.75rem !important;
+  overflow: hidden;
+  &[readonly] {
+    text-overflow: ellipsis;
+  }
+  [dir="rtl"] & {
+    padding-right: unset !important;
+    padding-left: 1.75rem !important;
+  }
+}

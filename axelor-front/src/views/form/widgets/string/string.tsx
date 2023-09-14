@@ -1,13 +1,13 @@
 import { focusAtom } from "jotai-optics";
 import { useAtom, useAtomValue } from "jotai";
 import { useMemo } from "react";
-import { Input } from "@axelor/ui";
+import { Input, clsx } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "./viewer";
 import { Translatable } from "./translatable";
-import styles from "./string.module.css";
+import styles from "./string.module.scss";
 
 export function String({
   inputProps,
@@ -36,7 +36,12 @@ export function String({
   );
 
   return (
-    <FieldControl {...props} className={styles.container}>
+    <FieldControl
+      {...props}
+      className={clsx(styles.container, {
+        [styles.translatable]: translatable && !readonly,
+      })}
+    >
       {readonly || trValue ? (
         <ViewerInput
           {...(inputProps?.type === "password" && { type: "password" })}
