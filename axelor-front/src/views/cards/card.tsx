@@ -78,13 +78,13 @@ export const Card = memo(function Card({
         {
           key: "edit",
           text: i18n.get("Edit"),
-          hidden: !Boolean(onEdit),
+          hidden: !onEdit,
           onClick: () => onEdit?.(record),
         },
         {
           key: "delete",
           text: i18n.get("Delete"),
-          hidden: !Boolean(onDelete),
+          hidden: !onDelete,
           onClick: () => onDelete?.(record),
         },
       ],
