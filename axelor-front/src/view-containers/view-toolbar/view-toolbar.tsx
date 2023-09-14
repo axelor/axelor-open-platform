@@ -8,6 +8,7 @@ import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
+import { DataRecord } from "@/services/client/data.types";
 
 import {
   useSelectViewState,
@@ -20,6 +21,7 @@ import {
 
 import { Icon } from "@/components/icon";
 import { parseExpression } from "@/hooks/use-parser/utils";
+import { createScriptContext } from "@/hooks/use-parser/context";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
 import {
@@ -74,23 +76,28 @@ function ActionCommandItem({
   Pick<Widget, "showIf" | "hideIf" | "readonlyIf">) {
   const [hidden, setHidden] = useState<boolean | undefined>(props.hidden);
   const [readonly, setReadonly] = useState<boolean>(false);
+  const { action } = useViewTab();
 
   useEffect(() => {
+    const updateAttrs = (record: DataRecord) => {
+      (showIf || hideIf) &&
+        setHidden((hidden) => {
+          if (showIf) {
+            hidden = !parseExpression(showIf)(record);
+          } else if (hideIf) {
+            hidden = parseExpression(hideIf)(record);
+          }
+          return hidden;
+        });
+      readonlyIf && setReadonly(parseExpression(readonlyIf)(record));
+    };
+
     if (recordHandler) {
-      return recordHandler.subscribe((record) => {
-        (showIf || hideIf) &&
-          setHidden((hidden) => {
-            if (showIf) {
-              hidden = !parseExpression(showIf)(record);
-            } else if (hideIf) {
-              hidden = parseExpression(hideIf)(record);
-            }
-            return hidden;
-          });
-        readonlyIf && setReadonly(parseExpression(readonlyIf)(record));
-      });
+      return recordHandler.subscribe(updateAttrs);
+    } else {
+      updateAttrs(createScriptContext(action.context ?? {}));
     }
-  }, [showIf, hideIf, readonlyIf, recordHandler]);
+  }, [showIf, hideIf, readonlyIf, recordHandler, action.context]);
 
   return (
     <CommandItem
