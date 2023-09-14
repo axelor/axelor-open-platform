@@ -553,17 +553,24 @@ export function FormRecordUpdates({
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
   );
+  const { action } = useViewTab();
 
   useAsyncEffect(async () => {
     if (isEqual(recordRef.current, record)) return;
     recordRef.current = record;
     recordHandler.notify(
-      createEvalContext(record, {
-        fields: fields as unknown as EvalContextOptions["fields"],
-        readonly,
-      })
+      createEvalContext(
+        {
+          ...action.context,
+          ...record,
+        },
+        {
+          fields: fields as unknown as EvalContextOptions["fields"],
+          readonly,
+        }
+      )
     );
-  }, [record, recordHandler, fields, readonly]);
+  }, [record, recordHandler, fields, readonly, action.context]);
 
   return null;
 }
