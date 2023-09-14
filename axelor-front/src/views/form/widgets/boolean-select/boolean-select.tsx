@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 
-import { Select, SelectOptionType } from "@/components/select";
+import { Select, SelectValue } from "@/components/select";
 import { i18n } from "@/services/client/i18n";
 
 import { FieldControl, FieldProps } from "../../builder";
@@ -27,7 +27,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
   } = useAtomValue(widgetAtom);
 
   const handleOnChange = useCallback(
-    (option: SelectOptionType<SelectOption, false>) => {
+    (option: SelectValue<SelectOption, false>) => {
       setValue(nullable && option?.value === null ? null : option?.value, true);
     },
     [nullable, setValue],

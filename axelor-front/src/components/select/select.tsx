@@ -21,7 +21,7 @@ import styles from "./select.module.scss";
 export type {
   SelectIcon,
   SelectOptionProps,
-  SelectOptionType,
+  SelectValue,
 } from "@axelor/ui/core/select2";
 
 export interface SelectProps<Type, Multiple extends boolean>

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import { Select, SelectOptionType } from "@/components/select";
+import { Select, SelectValue } from "@/components/select";
 import { i18n } from "@/services/client/i18n";
 
 import { FieldControl, FieldProps } from "../../builder";
@@ -38,7 +38,7 @@ export function ThemeSelect(props: FieldProps<string>) {
   const selected = themes.find((x) => x.name === value) ?? null;
 
   const handleChange = useCallback(
-    (value: SelectOptionType<ThemeOption, false>) => {
+    (value: SelectValue<ThemeOption, false>) => {
       setValue(value?.name ?? null, true);
     },
     [setValue],

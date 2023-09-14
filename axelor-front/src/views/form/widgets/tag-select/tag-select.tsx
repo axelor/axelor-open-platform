@@ -7,7 +7,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import {
   Select,
   SelectOptionProps,
-  SelectOptionType,
+  SelectValue,
 } from "@/components/select";
 import {
   useBeforeSelect,
@@ -60,7 +60,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   });
 
   const handleChange = useCallback(
-    (value: SelectOptionType<DataRecord, true>) => {
+    (value: SelectValue<DataRecord, true>) => {
       if (Array.isArray(value)) {
         const items = value.map(({ version, ...rest }) => rest);
         setValue(items.length === 0 ? null : items, true);

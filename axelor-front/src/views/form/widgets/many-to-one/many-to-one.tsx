@@ -5,7 +5,7 @@ import { useCallback, useMemo, useRef } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Select, SelectIcon, SelectOptionType } from "@/components/select";
+import { Select, SelectIcon, SelectValue } from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
@@ -61,7 +61,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   });
 
   const handleChange = useCallback(
-    (value: SelectOptionType<DataRecord, false>) => {
+    (value: SelectValue<DataRecord, false>) => {
       if (value && value.id && value.id > 0) {
         const { version, ...rec } = value;
         setValue(rec, true);

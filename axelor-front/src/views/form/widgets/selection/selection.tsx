@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 
-import { Select, SelectOptionType, SelectProps } from "@/components/select";
+import { Select, SelectProps, SelectValue } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
@@ -51,13 +51,10 @@ export function Selection<Multiple extends boolean>(
       );
     }
     return selectionList.find((item) => String(item.value) === String(value));
-  }, [multiple, selectionList, value]) as SelectOptionType<
-    SelectionType,
-    Multiple
-  >;
+  }, [multiple, selectionList, value]) as SelectValue<SelectionType, Multiple>;
 
   const handleChange = useCallback(
-    (value: SelectOptionType<SelectionType, Multiple>) => {
+    (value: SelectValue<SelectionType, Multiple>) => {
       let next: string | null = null;
       if (value) {
         next = Array.isArray(value)
