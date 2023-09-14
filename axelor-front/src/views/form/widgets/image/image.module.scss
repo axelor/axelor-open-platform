@@ -1,0 +1,29 @@
+.image {
+  width: 140px;
+  min-height: auto;
+
+  img {
+    width: inherit;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  &:hover .actions {
+    opacity: 1;
+  }
+}
+
+.actions {
+  position: absolute;
+  left: calc(50% - 32px);
+  bottom: 12px;
+  opacity: 0;
+  padding: 2px;
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+  [dir="rtl"] & {
+    left: unset;
+    right: calc(50% - 32px);
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "view": {
+        "domain": null,
+        "icon": null,
+        "viewType": "grid",
+        "context": { "_id": null },
+        "actionId": 67,
+        "model": "com.axelor.sale.db.Product",
+        "title": "Products",
+        "params": {},
+        "views": [
+          { "name": null, "type": "grid" },
+          { "name": null, "type": "form" }
+        ]
+      }
+    }
+  ]
+}

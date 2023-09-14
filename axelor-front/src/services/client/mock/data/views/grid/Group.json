@@ -1,0 +1,89 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 27,
+      "modelId": 19,
+      "name": "group-grid",
+      "title": "Groups",
+      "model": "com.axelor.auth.db.Group",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "code",
+          "autoTitle": "Code"
+        },
+        {
+          "type": "field",
+          "name": "navigation",
+          "autoTitle": "Navigation"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "selection": "select.user.navigation",
+        "name": "navigation",
+        "selectionList": [
+          {
+            "value": "visible",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Visible"
+          },
+          {
+            "value": "hidden",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Hidden"
+          },
+          {
+            "value": "collapse",
+            "icon": null,
+            "color": null,
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Collapse"
+          }
+        ],
+        "type": "STRING",
+        "title": "Navigation"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

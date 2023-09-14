@@ -38,6 +38,8 @@ import org.pac4j.http.client.indirect.FormClient;
 
 public class AxelorFormClient extends FormClient {
 
+  public static final String LOGIN_URL = "/index.html";
+
   private CredentialsHandler credentialsHandler;
 
   @Override
@@ -45,7 +47,7 @@ public class AxelorFormClient extends FormClient {
     if (credentialsHandler == null || forceReinit) {
       credentialsHandler = Beans.get(CredentialsHandler.class);
       final AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
-      setLoginUrl("/login.jsp");
+      setLoginUrl(LOGIN_URL);
       defaultAuthenticator(authPac4jInfo.getAuthenticator());
       setCredentialsExtractor(Beans.get(FormExtractor.class));
       setAjaxRequestResolver(Beans.get(AjaxRequestResolver.class));

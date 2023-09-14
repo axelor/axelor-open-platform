@@ -1,0 +1,24 @@
+.radio-button {
+  cursor: pointer;
+}
+
+.radio {
+  height: 0.8rem;
+  width: 0.8rem;
+  border: 2px solid var(--bs-body-color);
+  margin-top: 1px;
+
+  &-active {
+    background-color: var(--bs-body-color);
+  }
+}
+
+.actions {
+  top: 3%;
+  z-index: 1;
+  left: 16%;
+  [dir="rtl"] & {
+    left: unset;
+    right: 16%;
+  }
+}

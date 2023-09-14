@@ -1,0 +1,50 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 87,
+      "modelId": 42,
+      "name": "title-grid",
+      "title": "Titles",
+      "model": "com.axelor.contact.db.Title",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "code",
+          "autoTitle": "Code"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "translatable": true,
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

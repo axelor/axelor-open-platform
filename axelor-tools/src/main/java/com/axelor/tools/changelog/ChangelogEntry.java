@@ -18,11 +18,14 @@
  */
 package com.axelor.tools.changelog;
 
+import java.nio.file.Path;
+
 public class ChangelogEntry {
 
   private String title;
   private String description;
-  private EntryType type;
+  private String type;
+  private Path path;
 
   public void setTitle(String title) {
     this.title = title;
@@ -40,12 +43,20 @@ public class ChangelogEntry {
     return description;
   }
 
-  public void setType(EntryType type) {
+  public void setType(String type) {
     this.type = type;
   }
 
-  public EntryType getType() {
+  public String getType() {
     return type;
+  }
+
+  public void setPath(Path path) {
+    this.path = path;
+  }
+
+  public Path getPath() {
+    return path;
   }
 
   @Override

@@ -21,7 +21,7 @@
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="6.1">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="7.0">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -69,7 +69,8 @@
         <xsd:attribute name="id" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            If overriding some existing one, provide an unique id to identify this one.
+              If overriding some existing one, provide an unique id to identify
+              this one.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -103,7 +104,8 @@
         </xsd:attribute>
         <xsd:attribute name="icon-background" type="tns:ColorStyle">
           <xsd:annotation>
-            <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+            <xsd:documentation>Specify icon background color (predefined or html hex color)
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="action" type="xsd:string">
@@ -129,7 +131,10 @@
           <xsd:annotation>
             <xsd:documentation>
               Whether to show the menu item in top navigation menu.
+              REMOVED: Top menu support has been removed since 7.0. To ensure compatibility,
+              attribute is still present but will be removed in a future version.
             </xsd:documentation>
+            <xsd:documentation>deprecated</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="left" type="xsd:boolean">
@@ -155,7 +160,8 @@
           <xsd:annotation>
             <xsd:documentation>
               Specify a tag to show on menu item as a fixed label.
-              This attribute gets preference over 'tag-count' and 'tag-get' attributes.
+              This attribute
+              gets preference over 'tag-count' and 'tag-get' attributes.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -199,7 +205,8 @@
           <xsd:annotation>
             <xsd:documentation>
               Category name to group the action menus.
-              Can be used to filter the toplevel action menus.
+              Can be used to filter the
+              toplevel action menus.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -233,7 +240,8 @@
         </xsd:attribute>
         <xsd:attribute name="action" type="xsd:string" use="required">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
+            <xsd:documentation>Comma separate list of actions to execute on click event.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="name" type="xsd:string">
@@ -251,7 +259,8 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Specify comma separated list of field names on which this widget depends.
+              Specify comma separated list of field names on which this widget
+              depends.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -267,7 +276,8 @@
         </xsd:attribute>
         <xsd:attribute name="readonlyIf" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Readonly if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -281,7 +291,8 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Specify comma separated list of field names on which this widget depends.
+              Specify comma separated list of field names on which this widget
+              depends.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -337,7 +348,8 @@
     <xsd:attribute name="id" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        If overriding some existing view, provide an unique id to identify current view.
+          If overriding some existing view, provide an unique id to identify
+          current view.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -369,12 +381,12 @@
           &lt;br&gt;&lt;pre&gt;
           width="mini"
           width="mid"
-          width="large"&lt;/pre&gt;
-        </xsd:documentation>
+          width="large"&lt;/pre&gt; </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:pattern value="((\*|mini|mid|large)|(\d+)(%|px|em)?)((:(\d+)(px|em)?){1,2})?"></xsd:pattern>
+          <xsd:pattern
+            value="((\*|mini|mid|large)|(\d+)(%|px|em)?)((:(\d+)(px|em)?){1,2})?"></xsd:pattern>
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
@@ -416,6 +428,44 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:simpleType name="ResponsiveNumber">
+    <xsd:annotation>
+      <xsd:documentation>
+        A number or comma separated list of numbers for responsive layout. The list
+        values are for large, medium and small sizes in that order.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:int" />
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="(\d+)(,(\d+))*"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="ResponsiveSize">
+    <xsd:annotation>
+      <xsd:documentation>
+        A number or comma separated list of sizes for responsive layout. The list
+        values are for large, medium and small sizes in that order.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:union>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:int" />
+      </xsd:simpleType>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="(\d+(px|em|rem|fr|%)?)(,(\d+(px|em|rem|fr|%)?))*"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
+  </xsd:simpleType>
+
   <xsd:complexType name="SimpleWidget" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
@@ -441,18 +491,8 @@
         </xsd:attribute>
         <xsd:attribute name="readonly" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether the widget should be considered readonly.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="colSpan" type="xsd:int">
-          <xsd:annotation>
-            <xsd:documentation>Specify the number of columns taken by the widget.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="colOffset" type="xsd:int">
-          <xsd:annotation>
-            <xsd:documentation>Specify the column offset. The widget is moved to the right
-            by skipping the specified number of columns.
+            <xsd:documentation>
+              Specify whether the widget should be considered readonly.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -466,10 +506,12 @@
             <xsd:documentation>
               Specify the widget height.&lt;br&gt;&lt;br&gt;
 
-              The height can be specified as percentage
+              The height can be
+              specified as percentage
               or fixed value.&lt;br&gt;&lt;br&gt;
 
-              The fix height can be either in 'px'
+              The fix height can be either
+              in 'px'
               or 'em', 'px' is assumed if not specified.
             </xsd:documentation>
           </xsd:annotation>
@@ -484,10 +526,12 @@
             <xsd:documentation>
               Specify the widget width.&lt;br&gt;&lt;br&gt;
 
-              The width can be specified as percentage
+              The width can be
+              specified as percentage
               or fixed value.&lt;br&gt;&lt;br&gt;
 
-              The fix width can be either in 'px'
+              The fix width can be either
+              in 'px'
               or 'em', 'px' is assumed if not specified.
             </xsd:documentation>
           </xsd:annotation>
@@ -521,14 +565,86 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Specify comma separated list of field names on which this widget depends.
+              Specify comma separated list of field names on which this widget
+              depends.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attributeGroup ref="tns:LayoutItemAttrs" />
         <xsd:anyAttribute processContents="skip" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
+  <xsd:attributeGroup name="LayoutContainerAttrs">
+    <xsd:attribute name="cols" type="xsd:int" default="12">
+      <xsd:annotation>
+        <xsd:documentation>Number of layout columns</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="colWidths">
+      <xsd:annotation>
+        <xsd:documentation>Comma separated list of column widths</xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="(\d+(px|em|rem|fr|%)?)(,(\d+(px|em|rem|fr|%)?))*"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="gap">
+      <xsd:annotation>
+        <xsd:documentation>
+          Gap between the layout items.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="(\d+(px|em|rem)?)"></xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="itemSpan" type="xsd:int" default="6">
+      <xsd:annotation>
+        <xsd:documentation>Specify the default span for child items.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:attributeGroup>
+
+  <xsd:attributeGroup name="LayoutItemAttrs">
+    <xsd:attribute name="colSpan" type="tns:ResponsiveNumber">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the number of columns taken by the widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="colOffset" type="tns:ResponsiveNumber">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the column offset. The widget is moved to the right by
+          skipping
+          the specified number of columns.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="rowSpan" type="tns:ResponsiveNumber">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the number of rows taken by the widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="rowOffset" type="tns:ResponsiveNumber">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the row offset. The widget is moved to the bottom by skipping
+          the
+          specified number of rows.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:attributeGroup>
 
   <xsd:complexType name="AbstractContainer" abstract="true">
     <xsd:complexContent>
@@ -538,7 +654,6 @@
             <xsd:documentation>Container name.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="rowSpan" type="xsd:int" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -585,12 +700,12 @@
     <xsd:union memberTypes="tns:ColorNameStyle">
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="default"/>
-          <xsd:enumeration value="primary"/>
-          <xsd:enumeration value="warning"/>
-          <xsd:enumeration value="success"/>
-          <xsd:enumeration value="danger"/>
-          <xsd:enumeration value="info"/>
+          <xsd:enumeration value="default" />
+          <xsd:enumeration value="primary" />
+          <xsd:enumeration value="warning" />
+          <xsd:enumeration value="success" />
+          <xsd:enumeration value="danger" />
+          <xsd:enumeration value="info" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:union>
@@ -598,12 +713,12 @@
 
   <xsd:simpleType name="LabelStyle">
     <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="default"/>
-      <xsd:enumeration value="important"/>
-      <xsd:enumeration value="success"/>
-      <xsd:enumeration value="warning"/>
-      <xsd:enumeration value="inverse"/>
-      <xsd:enumeration value="info"/>
+      <xsd:enumeration value="default" />
+      <xsd:enumeration value="important" />
+      <xsd:enumeration value="success" />
+      <xsd:enumeration value="warning" />
+      <xsd:enumeration value="inverse" />
+      <xsd:enumeration value="info" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -654,14 +769,14 @@
               <xsd:attribute name="order" type="xsd:int">
                 <xsd:annotation>
                   <xsd:documentation>
-                  Specify the sequence number to order the option.
+                    Specify the sequence number to order the option.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
               <xsd:attribute name="hidden" type="xsd:boolean">
                 <xsd:annotation>
                   <xsd:documentation>
-                  Specify whether to hide this option from selection.
+                    Specify whether to hide this option from selection.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
@@ -679,7 +794,8 @@
     <xsd:attribute name="id" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If overriding some existing one, provide an unique id to identify this one.
+          If overriding some existing one, provide an unique id to identify this
+          one.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -688,7 +804,8 @@
   <xsd:attributeGroup name="ExtraAttributes">
     <xsd:attribute name="x-bind" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify an angular.js expression to bind to the field.</xsd:documentation>
+        <xsd:documentation>Specify an angular.js expression to bind to the field.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-enum-type">
@@ -698,14 +815,16 @@
     </xsd:attribute>
     <xsd:attribute name="x-related" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify the name of the related field (for RefSelect widget).</xsd:documentation>
+        <xsd:documentation>Specify the name of the related field (for RefSelect widget).
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-create" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the names of required fields to be used for
-        quick record creation from select widget.
+          Specify the names of required fields to be used for
+          quick record creation
+          from select widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -727,8 +846,10 @@
     <xsd:attribute name="x-exclusive" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether the boolean field used inside the
-        repeat editor should be exclusive.</xsd:documentation>
+          Specify whether the boolean field used inside the
+          repeat editor should be
+          exclusive.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-show-icons" type="xsd:string">
@@ -754,7 +875,8 @@
     <xsd:attribute name="x-direction">
       <xsd:annotation>
         <xsd:documentation>
-          Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)
+          Specify the layout direction (horizontal, vertical) of some widgets(e.g.
+          RadioSelect)
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
@@ -791,7 +913,8 @@
     </xsd:attribute>
     <xsd:attribute name="x-limit" type="xsd:int">
       <xsd:annotation>
-        <xsd:documentation>Specify the maximum number of items in suggest box list.</xsd:documentation>
+        <xsd:documentation>Specify the maximum number of items in suggest box list.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-precision" type="xsd:integer">
@@ -815,28 +938,30 @@
     <xsd:attribute name="x-currency" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the field name for currency symbol.
+          Specify the field name for currency symbol.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-true-text" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the display value for "true" state of a boolean widget.
+          Specify the display value for "true" state of a boolean widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-false-text" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the display value for "false" state of a boolean widget.
+          Specify the display value for "false" state of a boolean widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-big" type="xsd:boolean">
       <xsd:annotation>
-        <xsd:documentation>Allow duration of more than 100 hours in a duration widget</xsd:documentation>
-      </xsd:annotation></xsd:attribute>
+        <xsd:documentation>Allow duration of more than 100 hours in a duration widget
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-seconds" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Show seconds in a duration widget</xsd:documentation>
@@ -845,7 +970,7 @@
     <xsd:attribute name="x-accept" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the file types the file input should accept.
+          Specify the file types the file input should accept.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -857,8 +982,8 @@
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="tab"/>
-          <xsd:enumeration value="vertical"/>
+          <xsd:enumeration value="tab" />
+          <xsd:enumeration value="vertical" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
@@ -870,8 +995,8 @@
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="markdown"/>
-          <xsd:enumeration value="wysiwyg"/>
+          <xsd:enumeration value="markdown" />
+          <xsd:enumeration value="wysiwyg" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
@@ -887,7 +1012,9 @@
   <xsd:attributeGroup name="RelationalAttributes">
     <xsd:attribute name="target">
       <xsd:annotation>
-        <xsd:documentation>Specify fully qualified name of the target class, can be used for dummy fields.</xsd:documentation>
+        <xsd:documentation>Specify fully qualified name of the target class, can be used for dummy
+          fields.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="target-name">
@@ -946,7 +1073,8 @@
       <xsd:annotation>
         <xsd:documentation>
           For relational fields only. The actions will be executed
-          just before the selection window
+          just before the
+          selection window
           appears.
         </xsd:documentation>
       </xsd:annotation>
@@ -954,8 +1082,8 @@
     <xsd:attribute name="canSuggest" type="xsd:boolean" default="true">
       <xsd:annotation>
         <xsd:documentation>
-        If this is relational field, specify whether to show auto suggestions
-        (default is true).
+          If this is relational field, specify whether to show auto suggestions
+          (default is true).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -983,7 +1111,7 @@
     <xsd:attribute name="canEdit" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether to allow editing selected items (boolean expression).
+          Specify whether to allow editing selected items (boolean expression).
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -997,14 +1125,15 @@
     <xsd:attribute name="x-can-reload" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether the popup editor can reload the parent form on close.
+          Specify whether the popup editor can reload the parent form on close.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-call-onSave" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether to call onSave event when saving parent record if x-can-reload is true.
+          Specify whether to call onSave event when saving parent record if
+          x-can-reload is true.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1016,14 +1145,14 @@
     <xsd:attribute name="x-color-field" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the color field to use with tag-select widget.
+          Specify the color field to use with tag-select widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-popup-maximized">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether to open the popup as maximized.
+          Specify whether to open the popup as maximized.
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
@@ -1067,7 +1196,8 @@
     <xsd:attribute name="freeSearch" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the free-search mode: 'all' (default), 'none', or comma-separated list of field names.
+          Specify the free-search mode: 'all' (default), 'none', or comma-separated
+          list of field names.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1084,7 +1214,8 @@
             <xsd:element name="help" type="tns:Help" minOccurs="0" />
             <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
             <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-            <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="hilite" type="tns:Hilite" minOccurs="0"
+              maxOccurs="unbounded" />
             <xsd:choice maxOccurs="unbounded">
               <xsd:group ref="tns:GridWidgets" />
             </xsd:choice>
@@ -1096,7 +1227,8 @@
           <xsd:annotation>
             <xsd:documentation>
               List of comma separated field names optionally
-              prefix with `-` to order by DESC.
+              prefix with `-` to
+              order by DESC.
 
               For example:
 
@@ -1126,15 +1258,10 @@
             <xsd:documentation>Whether to fetch initial records.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="x-selector">
+        <xsd:attribute name="x-selector" type="tns:SelectorType">
           <xsd:annotation>
             <xsd:documentation>Specify the row selection control</xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="checkbox" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
@@ -1143,7 +1270,8 @@
         </xsd:attribute>
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
+            <xsd:documentation>Comma separate list of actions to execute on new event.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canNew" type="xsd:string">
@@ -1173,7 +1301,8 @@
         </xsd:attribute>
         <xsd:attribute name="canMove" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
+            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -1205,11 +1334,6 @@
   <xsd:complexType name="AbstractPanel" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractContainer">
-        <xsd:attribute name="itemSpan" type="xsd:int" default="6">
-          <xsd:annotation>
-            <xsd:documentation>Specify the default span for child items.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="showFrame" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show frame around the panel.</xsd:documentation>
@@ -1227,24 +1351,26 @@
         </xsd:attribute>
         <xsd:attribute name="attached" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to attach the panel with previous one.</xsd:documentation>
+            <xsd:documentation>Specify whether to attach the panel with previous one.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onTabSelect" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Specify an action to execute when the panel tab is selected (if it's top-level in panel-tabs).
+              Specify an action to execute when the panel tab is selected (if it's
+              top-level in panel-tabs).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="rowSpan" use="prohibited"/>
-        <xsd:attribute name="width" use="prohibited"/>
+        <xsd:attributeGroup ref="tns:LayoutContainerAttrs" />
+        <xsd:attribute name="width" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:group name="PanelItems">
-   <xsd:sequence>
-     <xsd:choice minOccurs="0">
+    <xsd:sequence>
+      <xsd:choice minOccurs="0">
         <xsd:element name="field" type="tns:PanelField" />
         <xsd:element name="label" type="tns:Label" />
         <xsd:element name="help" type="tns:Help" />
@@ -1257,7 +1383,7 @@
             <xsd:complexContent>
               <xsd:extension base="tns:AbstractContainer">
                 <xsd:sequence>
-                  <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
+                  <xsd:element name="button" type="tns:Button" maxOccurs="unbounded" />
                 </xsd:sequence>
               </xsd:extension>
             </xsd:complexContent>
@@ -1267,14 +1393,14 @@
           <xsd:complexType>
             <xsd:complexContent>
               <xsd:extension base="tns:AbstractPanel">
-                <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+                <xsd:group ref="tns:PanelItems" maxOccurs="unbounded" />
               </xsd:extension>
             </xsd:complexContent>
           </xsd:complexType>
         </xsd:element>
-        <xsd:element name="panel-related" type="tns:PanelRelated"/>
-        <xsd:element name="panel-dashlet" type="tns:PanelDashlet"/>
-        <xsd:element name="panel-include" type="tns:FormInclude"/>
+        <xsd:element name="panel-related" type="tns:PanelRelated" />
+        <xsd:element name="panel-dashlet" type="tns:PanelDashlet" />
+        <xsd:element name="panel-include" type="tns:FormInclude" />
       </xsd:choice>
     </xsd:sequence>
   </xsd:group>
@@ -1285,11 +1411,12 @@
           <xsd:element name="menu" minOccurs="0">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="item" type="tns:MenubarMenuItem" maxOccurs="unbounded"/>
+                <xsd:element name="item" type="tns:MenubarMenuItem"
+                  maxOccurs="unbounded" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
-          <xsd:group ref="tns:PanelItems" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:group ref="tns:PanelItems" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="canCollapse" type="xsd:boolean">
           <xsd:annotation>
@@ -1298,7 +1425,8 @@
         </xsd:attribute>
         <xsd:attribute name="collapseIf" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Specify a boolean expression to collapse/expend this panel.</xsd:documentation>
+            <xsd:documentation>Specify a boolean expression to collapse/expend this panel.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="icon" type="xsd:string">
@@ -1308,7 +1436,8 @@
         </xsd:attribute>
         <xsd:attribute name="icon-background" type="tns:ColorStyle">
           <xsd:annotation>
-            <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+            <xsd:documentation>Specify icon background color (predefined or html hex color)
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -1318,11 +1447,15 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
         <xsd:sequence>
-          <xsd:element name="field" type="tns:PanelField" minOccurs="0" maxOccurs="unbounded" />
-          <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="field" type="tns:PanelField" minOccurs="0"
+            maxOccurs="unbounded" />
+          <xsd:element name="button" type="tns:Button" minOccurs="0"
+            maxOccurs="unbounded" />
         </xsd:sequence>
-        <xsd:attribute name="itemSpan" use="prohibited"/>
-        <xsd:attribute name="stacked" use="prohibited"/>
+        <xsd:attribute name="cols" use="prohibited" />
+        <xsd:attribute name="colWidths" use="prohibited" />
+        <xsd:attribute name="itemSpan" use="prohibited" />
+        <xsd:attribute name="stacked" use="prohibited" />
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="editable" type="xsd:boolean" />
         <xsd:attribute name="required" type="xsd:boolean" />
@@ -1331,21 +1464,17 @@
         <xsd:attribute name="orderBy" type="xsd:string" />
         <xsd:attribute name="groupBy" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />
-        <xsd:attribute name="onChange" type="xsd:string"/>
+        <xsd:attribute name="onChange" type="xsd:string" />
         <xsd:attribute name="canMove" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
+            <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="x-selector">
+        <xsd:attribute name="x-selector" type="tns:SelectorType">
           <xsd:annotation>
             <xsd:documentation>Specify the row selection control</xsd:documentation>
           </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="checkbox" />
-            </xsd:restriction>
-          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
@@ -1358,18 +1487,20 @@
       <xsd:extension base="tns:AbstractPanel">
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="panel" type="tns:Panel" />
-          <xsd:element name="panel-related" type="tns:PanelRelated"/>
+          <xsd:element name="panel-related" type="tns:PanelRelated" />
           <xsd:element name="panel-dashlet" type="tns:PanelDashlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
-        <xsd:attribute name="stacked" use="prohibited"/>
-        <xsd:attribute name="itemSpan" use="prohibited"/>
-        <xsd:attribute name="showFrame" use="prohibited"/>
-        <xsd:attribute name="showTitle" use="prohibited"/>
-        <xsd:attribute name="title" use="prohibited"/>
-        <xsd:attribute name="help" use="prohibited"/>
-        <xsd:attribute name="onTabSelect" use="prohibited"/>
-        <xsd:attribute name="x-row-height" type="xsd:int"/>
+        <xsd:attribute name="stacked" use="prohibited" />
+        <xsd:attribute name="cols" use="prohibited" />
+        <xsd:attribute name="colWidths" use="prohibited" />
+        <xsd:attribute name="itemSpan" use="prohibited" />
+        <xsd:attribute name="showFrame" use="prohibited" />
+        <xsd:attribute name="showTitle" use="prohibited" />
+        <xsd:attribute name="title" use="prohibited" />
+        <xsd:attribute name="help" use="prohibited" />
+        <xsd:attribute name="onTabSelect" use="prohibited" />
+        <xsd:attribute name="x-row-height" type="xsd:int" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1406,8 +1537,8 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
-          <xsd:element name="field" type="tns:BaseField"/>
-          <xsd:element name="button" type="tns:Button"/>
+          <xsd:element name="field" type="tns:BaseField" />
+          <xsd:element name="button" type="tns:Button" />
           <xsd:element name="spacer" type="tns:Spacer" />
           <xsd:element name="separator" type="tns:Separator" />
           <xsd:element name="label" type="tns:Label" />
@@ -1440,14 +1571,15 @@
             <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-         <xsd:attribute name="x-show-titles" type="xsd:boolean">
+        <xsd:attribute name="x-show-titles" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show item titles by default</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-show-on-new" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)</xsd:documentation>
+            <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="depends" use="prohibited" />
@@ -1456,13 +1588,33 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-    <xsd:complexType name="PanelMail">
+  <xsd:complexType name="PanelMail">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractPanel">
         <xsd:sequence>
           <xsd:element name="mail-messages">
             <xsd:complexType>
-              <xsd:attribute name="limit" type="xsd:int"></xsd:attribute>
+              <xsd:attribute name="filter">
+                <xsd:annotation>
+                  <xsd:documentation>
+                  Specify the messages type to show: `all` (default), `comment`, `notification`.
+                  </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                  <xsd:restriction base="xsd:string">
+                    <xsd:enumeration value="comment" />
+                    <xsd:enumeration value="notification" />
+                    <xsd:enumeration value="all" />
+                  </xsd:restriction>
+                </xsd:simpleType>
+              </xsd:attribute>
+              <xsd:attribute name="limit" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:documentation>
+                    Specify the maximum number of messages to display.
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="mail-followers" minOccurs="0"></xsd:element>
@@ -1487,7 +1639,6 @@
             <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="rowSpan" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1508,12 +1659,12 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
-        <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
-          <xsd:annotation>
-            <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:element>
-      </xsd:sequence>
+          <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1536,59 +1687,72 @@
         </xsd:choice>
         <xsd:attribute name="onLoad" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on load event.</xsd:documentation>
+            <xsd:documentation>Comma separate list of actions to execute on load event.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onSave" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on save event.</xsd:documentation>
+            <xsd:documentation>Comma separate list of actions to execute on save event.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on new event.</xsd:documentation>
+            <xsd:documentation>Comma separate list of actions to execute on new event.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="readonlyIf" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Readonly if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canNew" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'New' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'New' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canEdit" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Edit' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Edit' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canSave" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Save' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Save' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Delete' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Delete' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Archive' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Archive' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canCopy" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Copy' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Copy' button if the given JavaScript expression is true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canAttach" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Attachment' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Attachment' button if the given JavaScript expression is
+              true.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attributeGroup ref="tns:LayoutContainerAttrs" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1627,7 +1791,8 @@
                 <xsd:element name="field" maxOccurs="unbounded">
                   <xsd:annotation>
                     <xsd:documentation>
-                      Specify a model field name to read. Can be mapped to a column.
+                      Specify a model field name to read. Can be mapped to a
+                      column.
                     </xsd:documentation>
                   </xsd:annotation>
                   <xsd:complexType>
@@ -1648,7 +1813,8 @@
                     <xsd:attribute name="selection" type="xsd:string" />
                   </xsd:complexType>
                 </xsd:element>
-                <xsd:element name="button" type="tns:Button" minOccurs="0" maxOccurs="unbounded" />
+                <xsd:element name="button" type="tns:Button" minOccurs="0"
+                  maxOccurs="unbounded" />
               </xsd:sequence>
               <xsd:attribute name="model" type="xsd:string" use="required">
                 <xsd:annotation>
@@ -1678,9 +1844,11 @@
                   <xsd:documentation>
                     Whether the node can be draggable.
                     &lt;br&gt;&lt;br&gt;
-                    If draggable and parent field
+                    If
+                    draggable and parent field
                     is given then node's parent can be
-                    changed with drag and drop feature.
+                    changed with drag
+                    and drop feature.
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
@@ -1722,6 +1890,9 @@
                 <xsd:extension base="tns:SimpleWidget">
                   <xsd:attribute name="name" type="xsd:string" use="required" />
                   <xsd:attribute name="colSpan" use="prohibited" />
+                  <xsd:attribute name="colOffset" use="prohibited" />
+                  <xsd:attribute name="rowSpan" use="prohibited" />
+                  <xsd:attribute name="rowOffset" use="prohibited" />
                   <xsd:attribute name="showTitle" use="prohibited" />
                   <xsd:attribute name="hidden" use="prohibited" />
                   <xsd:attribute name="readonly" use="prohibited" />
@@ -1734,21 +1905,24 @@
         <xsd:attribute name="eventStart" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the field of type date/datetime to be used as event start time.
+              Name of the field of type date/datetime to be used as event start
+              time.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="eventStop" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the field of type date/datetime to be used as event stop time.
+              Name of the field of type date/datetime to be used as event stop
+              time.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="eventLength" default="1">
           <xsd:annotation>
             <xsd:documentation>
-              If eventStop is not given, the length of an event in hour (default is 1).
+              If eventStop is not given, the length of an event in hour (default is
+              1).
             </xsd:documentation>
           </xsd:annotation>
           <xsd:simpleType>
@@ -1761,7 +1935,8 @@
         <xsd:attribute name="onChange" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              The onchange action is called when event is moved or resized in the calendar view.
+              The onchange action is called when event is moved or resized in the
+              calendar view.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1863,32 +2038,36 @@
         <xsd:attribute name="x-finish-to-start" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field containing tasks to finish before starting current task.
+              Name of the M2M field containing tasks to finish before starting
+              current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-start-to-start" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field containing tasks to start before starting current task.
+              Name of the M2M field containing tasks to start before starting
+              current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-finish-to-finish" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field containing tasks to finish before finishing current task.
+              Name of the M2M field containing tasks to finish before finishing
+              current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-start-to-finish" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field containing tasks to start before finishing current task.
+              Name of the M2M field containing tasks to start before finishing
+              current task.
             </xsd:documentation>
           </xsd:annotation>
-       </xsd:attribute>
-     </xsd:extension>
+        </xsd:attribute>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
 
@@ -1945,7 +2124,8 @@
               <xsd:documentation>Specify a field to show as card content.</xsd:documentation>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element name="hilite" type="tns:CardStyle" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="hilite" type="tns:CardStyle" minOccurs="0"
+            maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Define a highlight condition.</xsd:documentation>
             </xsd:annotation>
@@ -1965,12 +2145,13 @@
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            List of comma separated field names optionally
-            prefix with `-` to order by DESC.
+              List of comma separated field names optionally
+              prefix with `-` to
+              order by DESC.
 
-            For example:
+              For example:
 
-            orderBy="name,-age"
+              orderBy="name,-age"
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2006,8 +2187,8 @@
             <xsd:documentation>Specify a selection field to create columns.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="cardWidth" use="prohibited"/>
-        <xsd:attribute name="orderBy" use="prohibited"/>
+        <xsd:attribute name="cardWidth" use="prohibited" />
+        <xsd:attribute name="orderBy" use="prohibited" />
         <xsd:attribute name="draggable" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Whether to enable drag &amp;&amp; drop feature.</xsd:documentation>
@@ -2021,13 +2202,17 @@
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify an action (action-record or action-method)
-            that returns required values to create a new record.</xsd:documentation>
+              that returns
+              required values to create a new record.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onMove" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify an action (action-record or action-method)
-            that returns values to update kanban record being moved.</xsd:documentation>
+              that returns values
+              to update kanban record being moved.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="limit" type="xsd:integer">
@@ -2038,7 +2223,7 @@
         <xsd:attribute name="x-limit-columns" type="xsd:integer">
           <xsd:annotation>
             <xsd:documentation>
-            Specify maximum number of columns when columnBy is a reference field.
+              Specify maximum number of columns when columnBy is a reference field.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2049,7 +2234,8 @@
   <xsd:complexType name="DataSet">
     <xsd:annotation>
       <xsd:documentation>Specify JPQL or SQL (with aliased select) or a
-        method call to return statistics data.
+        method call to return
+        statistics data.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2103,11 +2289,11 @@
           <xsd:element name="search-fields" minOccurs="0">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="field" type="tns:ChartSearchField" maxOccurs="2"/>
+                <xsd:element name="field" type="tns:ChartSearchField" maxOccurs="2" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
-          <xsd:element name="dataset" type="tns:DataSet"/>
+          <xsd:element name="dataset" type="tns:DataSet" />
           <xsd:element name="category">
             <xsd:complexType>
               <xsd:attribute name="key" type="xsd:string" use="required" />
@@ -2130,7 +2316,8 @@
           <xsd:element name="series" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
-                A chart data series. You must provide either `key` or `expr` or both.
+                A chart data series. You must provide either `key` or `expr` or
+                both.
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
@@ -2177,8 +2364,10 @@
               </xsd:attribute>
               <xsd:attribute name="scale" type="xsd:int">
                 <xsd:annotation>
-                  <xsd:documentation>Scale of the values (number of digits in decimal part)</xsd:documentation>
-                </xsd:annotation></xsd:attribute>
+                  <xsd:documentation>Scale of the values (number of digits in decimal part)
+                  </xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="config" maxOccurs="unbounded" minOccurs="0">
@@ -2202,9 +2391,9 @@
                         Define a chart action.
                       </xsd:documentation>
                     </xsd:annotation>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
-                    <xsd:attribute name="title" type="xsd:string"/>
-                    <xsd:attribute name="action" type="xsd:string" use="required"/>
+                    <xsd:attribute name="name" type="xsd:string" use="required" />
+                    <xsd:attribute name="title" type="xsd:string" />
+                    <xsd:attribute name="action" type="xsd:string" use="required" />
                   </xsd:complexType>
                 </xsd:element>
               </xsd:sequence>
@@ -2215,7 +2404,7 @@
         <xsd:attribute name="onInit" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Call an action when chart is initialized.
+              Call an action when chart is initialized.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2229,14 +2418,15 @@
         <xsd:sequence>
           <xsd:element name="field" minOccurs="0" maxOccurs="unbounded">
             <xsd:complexType>
-              <xsd:attribute name="name" type="xsd:string" use="required"/>
-              <xsd:attribute name="title" type="xsd:string"/>
-              <xsd:attribute name="hidden" type="xsd:boolean"/>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="title" type="xsd:string" />
+              <xsd:attribute name="hidden" type="xsd:boolean" />
               <xsd:attribute name="if" type="xsd:string" />
               <xsd:attribute name="selection" type="xsd:string" />
             </xsd:complexType>
           </xsd:element>
-          <xsd:element name="filter" type="tns:SearchFilter" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="filter" type="tns:SearchFilter" minOccurs="0"
+            maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Define a search filter.
@@ -2320,7 +2510,8 @@
             </xsd:annotation>
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="field" type="tns:BaseSearchField" maxOccurs="unbounded"/>
+                <xsd:element name="field" type="tns:BaseSearchField"
+                  maxOccurs="unbounded" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2328,24 +2519,30 @@
             <xsd:annotation>
               <xsd:documentation>
                 Defines the fields displayed in the grid view. They will
-                be mapped with the fields define in each &lt;search&gt;.
+                be mapped
+                with the fields define in each &lt;search&gt;.
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="hilite" type="tns:Hilite" minOccurs="0"
+                  maxOccurs="unbounded">
                   <xsd:annotation>
                     <xsd:documentation>
-                      Hilite the field with given color/background-color/strong combination.
+                      Hilite the field with given color/background-color/strong
+                      combination.
                     </xsd:documentation>
                   </xsd:annotation>
                 </xsd:element>
-                <xsd:element name="field" type="tns:SearchResultField" maxOccurs="unbounded"/>
-                <xsd:element name="button" type="tns:GridButton" minOccurs="0" maxOccurs="unbounded"/>
+                <xsd:element name="field" type="tns:SearchResultField"
+                  maxOccurs="unbounded" />
+                <xsd:element name="button" type="tns:GridButton" minOccurs="0"
+                  maxOccurs="unbounded" />
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="select" type="tns:SearchSelect" maxOccurs="unbounded" />
+          <xsd:element name="action-menu" type="tns:ActionMenuItem" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="limit" type="xsd:int" use="required">
           <xsd:annotation>
@@ -2357,7 +2554,8 @@
         <xsd:attribute name="search-form" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              The form view to be used as search form using the given search fields.
+              The form view to be used as search form using the given search
+              fields.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2368,7 +2566,8 @@
   <xsd:complexType name="SearchSelect">
     <xsd:annotation>
       <xsd:documentation>
-        Defines search criteria per object and maps the object fields to the result fields.
+        Defines search criteria per object and maps the object fields to the result
+        fields.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2391,7 +2590,8 @@
           <xsd:attribute name="enum-type">
             <xsd:annotation>
               <xsd:documentation>
-                If this is a enum field, specify the fully qualified enum type name.
+                If this is a enum field, specify the fully qualified enum type
+                name.
               </xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
@@ -2464,7 +2664,8 @@
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If the result of the expression is false, evaluates against the input values,
+          If the result of the expression is false, evaluates against the input
+          values,
           then these elements are skipped.
         </xsd:documentation>
       </xsd:annotation>
@@ -2487,14 +2688,16 @@
       <xsd:annotation>
         <xsd:documentation>
           Specify query result limit for the select. This attribute gets
-          preference over 'limit' attribute of 'search'.
+          preference
+          over 'limit' attribute of 'search'.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="distinct" type="xsd:boolean" default="false">
       <xsd:annotation>
         <xsd:documentation>
-          Whether to return only distinct records (based on `id`). Useful when searching
+          Whether to return only distinct records (based on `id`). Useful when
+          searching
           on relational fields (O2M/M2M).
         </xsd:documentation>
       </xsd:annotation>
@@ -2509,7 +2712,8 @@
             <xsd:annotation>
               <xsd:documentation>
                 Link to search field in order to provide
-                the value used in where condition.
+                the value used in where
+                condition.
                 Can be anything else if `expr` is used.
               </xsd:documentation>
             </xsd:annotation>
@@ -2556,7 +2760,8 @@
           <xsd:attribute name="if" type="xsd:string">
             <xsd:annotation>
               <xsd:documentation>
-                If the result of the expression is false, evaluates against the input values,
+                If the result of the expression is false, evaluates against the
+                input values,
                 then these elements are skipped.
               </xsd:documentation>
             </xsd:annotation>
@@ -2614,7 +2819,8 @@
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          If the result of the expression is false, evaluates against the input values,
+          If the result of the expression is false, evaluates against the input
+          values,
           then these elements are skipped.
         </xsd:documentation>
       </xsd:annotation>
@@ -2699,7 +2905,8 @@
           <xsd:annotation>
             <xsd:documentation>
               If specified then the button is rendered as a link.
-              Use empty value if you only need a
+              Use empty value if
+              you only need a
               link effect and
               perform actual action with `onClick`.
             </xsd:documentation>
@@ -2740,7 +2947,7 @@
         <xsd:attribute name="call" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Specify a controller method to fetch tooltip data.
+              Specify a controller method to fetch tooltip data.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2752,7 +2959,8 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
         <xsd:sequence>
-          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0"
+            maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Hilite the field with given color/background-color combination.
@@ -2762,7 +2970,7 @@
           <xsd:element name="tooltip" type="tns:ToolTip" minOccurs="0">
             <xsd:annotation>
               <xsd:documentation>
-              Template to display the tooltip popup for the field.
+                Template to display the tooltip popup for the field.
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
@@ -2797,7 +3005,8 @@
         <xsd:attribute name="selection-in" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              The filter on the selection, for example: selection-in="[preferredColor, 'red', 'blue']"
+              The filter on the selection, for example:
+              selection-in="[preferredColor, 'red', 'blue']"
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2865,8 +3074,8 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attributeGroup ref="tns:RelationalAttributes"/>
-         <xsd:attributeGroup ref="tns:ExtraAttributes"/>
+        <xsd:attributeGroup ref="tns:RelationalAttributes" />
+        <xsd:attributeGroup ref="tns:ExtraAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -2922,9 +3131,11 @@
         <xsd:attribute name="summary-view" use="prohibited" />
         <xsd:attribute name="colSpan" use="prohibited" />
         <xsd:attribute name="colOffset" use="prohibited" />
+        <xsd:attribute name="rowSpan" use="prohibited" />
+        <xsd:attribute name="rowOffset" use="prohibited" />
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attribute name="height" use="prohibited" />
-        <xsd:attribute name="depends" use="prohibited"/>
+        <xsd:attribute name="depends" use="prohibited" />
         <xsd:attribute name="x-call-onSave" use="prohibited" />
         <xsd:attribute name="x-can-copy" use="prohibited" />
         <xsd:attribute name="x-can-reload" use="prohibited" />
@@ -2941,6 +3152,8 @@
       <xsd:extension base="tns:Button">
         <xsd:attribute name="colSpan" use="prohibited" />
         <xsd:attribute name="colOffset" use="prohibited" />
+        <xsd:attribute name="rowSpan" use="prohibited" />
+        <xsd:attribute name="rowOffset" use="prohibited" />
         <xsd:attribute name="height" use="prohibited" />
         <xsd:attribute name="link" use="prohibited" />
       </xsd:extension>
@@ -2979,7 +3192,7 @@
       <xsd:element name="menu" type="tns:MenubarMenu" />
       <xsd:element name="item" type="tns:MenubarMenuItem" />
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
-      <xsd:element name="tooltip" type="tns:ToolTip"/>
+      <xsd:element name="tooltip" type="tns:ToolTip" />
       <xsd:element name="viewer" type="tns:PanelViewer" />
       <xsd:element name="editor" type="tns:PanelEditor" />
       <xsd:element name="panel-stack" type="tns:PanelTabs" />
@@ -2996,7 +3209,7 @@
           <xsd:choice maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendFormItems" />
           </xsd:choice>
-          <xsd:attribute name="position" type="tns:Position" use="required"/>
+          <xsd:attribute name="position" type="tns:Position" use="required" />
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="replace">
@@ -3039,7 +3252,7 @@
           <xsd:choice maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendGridItems" />
           </xsd:choice>
-          <xsd:attribute name="position" type="tns:Position" use="required"/>
+          <xsd:attribute name="position" type="tns:Position" use="required" />
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="replace">
@@ -3073,7 +3286,8 @@
     <xsd:attribute name="id" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        If overriding some existing one, provide an unique id to identify this one.
+          If overriding some existing one, provide an unique id to identify this
+          one.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -3133,8 +3347,9 @@
         <xsd:attribute name="action" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            An action to be executed on error or alert message to make corrective measures, when
-            error dialog is closed or alert dialog is canceled.
+              An action to be executed on error or alert message to make corrective
+              measures, when
+              error dialog is closed or alert dialog is canceled.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3222,7 +3437,8 @@
             <xsd:documentation>
               Name of the attribute.&lt;br&gt;&lt;br&gt;
 
-              Example : hidden, readonly, ...
+              Example : hidden, readonly,
+              ...
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3316,7 +3532,8 @@
           <xsd:annotation>
             <xsd:documentation>
               Reference to the existing record from context.
-              This attribute gets preference over
+              This attribute gets
+              preference over
               'search' attribute
               if used along with 'search'.
             </xsd:documentation>
@@ -3326,15 +3543,17 @@
           <xsd:annotation>
             <xsd:documentation>
               Whether to create a copy of the searched/referenced record
-              instead of referencing it.
+              instead of
+              referencing it.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="saveIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Save the record if the given boolean expression is true
-            and  "id" is null or "version" field is provided.
+              Save the record if the given boolean expression is true
+              and "id" is
+              null or "version" field is provided.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3380,12 +3599,14 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
-          <xsd:element name="view" type="tns:ActView" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="view" type="tns:ActView" minOccurs="0"
+            maxOccurs="unbounded" />
           <xsd:element name="view-param" minOccurs="0" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Additional view parameters (anything).
-                The client view implementation utilizes these
+                The client view
+                implementation utilizes these
                 params.
               </xsd:documentation>
             </xsd:annotation>
@@ -3409,7 +3630,8 @@
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element name="context" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded" />
+          <xsd:element name="context" type="tns:ActContext" minOccurs="0"
+            maxOccurs="unbounded" />
         </xsd:sequence>
         <xsd:attribute name="title" type="xsd:string" use="required" />
         <xsd:attribute name="icon" type="xsd:string">
@@ -3439,21 +3661,22 @@
                   <xsd:attribute name="language" use="required">
                     <xsd:annotation>
                       <xsd:documentation>
-                      Specify the scripting language.
+                        Specify the scripting language.
                       </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
                       <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="js"/>
-                        <xsd:enumeration value="groovy"/>
+                        <xsd:enumeration value="js" />
+                        <xsd:enumeration value="groovy" />
                       </xsd:restriction>
                     </xsd:simpleType>
                   </xsd:attribute>
                   <xsd:attribute name="transactional" type="xsd:boolean">
                     <xsd:annotation>
                       <xsd:documentation>
-                      Specify whether the action is transactional.
-                      In that case, EntityManager will be available as $em variable.
+                        Specify whether the action is transactional.
+                        In that case,
+                        EntityManager will be available as $em variable.
                       </xsd:documentation>
                     </xsd:annotation>
                   </xsd:attribute>
@@ -3470,10 +3693,12 @@
     <xsd:annotation>
       <xsd:documentation>
         The action-ws can be used to call any soap web service.
-        Multiple actions can be called in
+        Multiple actions can
+        be called in
         sequence. The result
         is returned as a collection string values returned by
-        each actions respectively.
+        each
+        actions respectively.
       </xsd:documentation>
     </xsd:annotation>
     <xsd:complexContent>
@@ -3491,8 +3716,8 @@
                   <xsd:attribute name="engine">
                     <xsd:simpleType>
                       <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="ST"/>
-                        <xsd:enumeration value="groovy"/>
+                        <xsd:enumeration value="ST" />
+                        <xsd:enumeration value="groovy" />
                       </xsd:restriction>
                     </xsd:simpleType>
                   </xsd:attribute>
@@ -3504,7 +3729,8 @@
         <xsd:attribute name="service" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Service URL or reference to another action-ws with service is set to some url.
+              Service URL or reference to another action-ws with service is set to
+              some url.
               In that
               case, the referenced action is called prior to this one. This allows
               to perform some intial actions like
@@ -3543,14 +3769,16 @@
             <xsd:complexType>
               <xsd:attribute name="file" type="xsd:string" use="required">
                 <xsd:annotation>
-                  <xsd:documentation>XML input file name as configured in config file.</xsd:documentation>
+                  <xsd:documentation>XML input file name as configured in config file.
+                  </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
               <xsd:attribute name="provider" type="xsd:string" use="required">
                 <xsd:annotation>
                   <xsd:documentation>
                     The data stream provider. The value should be a reference
-                    to another action that
+                    to
+                    another action that
                     returns the stream. Generally,
                     an `action-ws` reference.
                   </xsd:documentation>
@@ -3593,14 +3821,15 @@
                   </xsd:attribute>
                   <xsd:attribute name="template" type="xsd:string" use="required">
                     <xsd:annotation>
-                      <xsd:documentation>The template to be used to generate output file.</xsd:documentation>
+                      <xsd:documentation>The template to be used to generate output file.
+                      </xsd:documentation>
                     </xsd:annotation>
                   </xsd:attribute>
                   <xsd:attribute name="engine">
                     <xsd:simpleType>
                       <xsd:restriction base="xsd:string">
-                        <xsd:enumeration value="ST"/>
-                        <xsd:enumeration value="groovy"/>
+                        <xsd:enumeration value="ST" />
+                        <xsd:enumeration value="groovy" />
                       </xsd:restriction>
                     </xsd:simpleType>
                   </xsd:attribute>
@@ -3613,7 +3842,8 @@
           <xsd:annotation>
             <xsd:documentation>
               Override the default output directory structure.
-              Special keywords ${name}, ${date}, ${datetime} can
+              Special keywords
+              ${name}, ${date}, ${datetime} can
               be used to organize the output directory.
             </xsd:documentation>
           </xsd:annotation>
@@ -3640,7 +3870,8 @@
             <xsd:annotation>
               <xsd:documentation>
                 Define a check condition. The condition expression can be
-                specified as a string value or
+                specified
+                as a string value or
                 required field condition
                 can be defined with `field` attribute.
               </xsd:documentation>
@@ -3652,7 +3883,8 @@
                     <xsd:annotation>
                       <xsd:documentation>
                         Check whether the field value exists.
-                        If not the field is marked as required.
+                        If not the field is
+                        marked as required.
                       </xsd:documentation>
                     </xsd:annotation>
                   </xsd:attribute>
@@ -3686,7 +3918,8 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
-          <xsd:element name="param" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="param" type="tns:ActContext" minOccurs="0"
+            maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Define a report parameter.</xsd:documentation>
             </xsd:annotation>
@@ -3717,7 +3950,8 @@
         </xsd:attribute>
         <xsd:attribute name="attachment" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to attach the generated report to current object</xsd:documentation>
+            <xsd:documentation>Specify whether to attach the generated report to current object
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -3726,19 +3960,19 @@
 
   <xsd:simpleType name="ViewType">
     <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="form"/>
-      <xsd:enumeration value="grid"/>
-      <xsd:enumeration value="tree"/>
-      <xsd:enumeration value="chart"/>
-      <xsd:enumeration value="dashboard"/>
-      <xsd:enumeration value="search"/>
-      <xsd:enumeration value="calendar"/>
-      <xsd:enumeration value="gantt"/>
-      <xsd:enumeration value="cards"/>
-      <xsd:enumeration value="kanban"/>
-      <xsd:enumeration value="custom"/>
-      <xsd:enumeration value="search-filters"/>
-      <xsd:enumeration value="html"/>
+      <xsd:enumeration value="form" />
+      <xsd:enumeration value="grid" />
+      <xsd:enumeration value="tree" />
+      <xsd:enumeration value="chart" />
+      <xsd:enumeration value="dashboard" />
+      <xsd:enumeration value="search" />
+      <xsd:enumeration value="calendar" />
+      <xsd:enumeration value="gantt" />
+      <xsd:enumeration value="cards" />
+      <xsd:enumeration value="kanban" />
+      <xsd:enumeration value="custom" />
+      <xsd:enumeration value="search-filters" />
+      <xsd:enumeration value="html" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -3746,10 +3980,12 @@
     <xsd:complexContent>
       <xsd:extension base="tns:BaseSearchField">
         <xsd:sequence>
-          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0"
+            maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
-                Hilite the field with given color/background-color/strong combination.
+                Hilite the field with given color/background-color/strong
+                combination.
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
@@ -3792,4 +4028,10 @@
     <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
+  <xsd:simpleType name="SelectorType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="checkbox"></xsd:enumeration>
+      <xsd:enumeration value="none"></xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
 </xsd:schema>

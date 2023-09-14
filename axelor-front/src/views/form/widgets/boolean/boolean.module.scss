@@ -1,0 +1,14 @@
+.input {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.inline {
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.checkbox {
+  flex-direction: column;
+}

@@ -1,0 +1,25 @@
+.avatar {
+  height: 100%;
+  width: 100%;
+}
+
+.image {
+  border-radius: 50%;
+}
+
+.letter {
+  color: var(--bs-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.25rem;
+  font-weight: var(--bs-body-font-weight);
+  border-radius: 100%;
+}
+
+.text {
+  color: var(--bs-body-color);
+  background-color: var(--bs-secondary-bg);
+  font-size: 1.25rem;
+  font-weight: var(--bs-body-font-weight);
+}

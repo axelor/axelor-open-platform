@@ -1,0 +1,16 @@
+.panel {
+  margin-bottom: 1rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+
+  input {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  label {
+    margin: 0;
+  }
+}

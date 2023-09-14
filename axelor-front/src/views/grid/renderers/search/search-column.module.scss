@@ -1,0 +1,16 @@
+.container {
+  flex: 1;
+}
+
+.select > * {
+  width: 100%;
+}
+
+.select > div > div {
+  font-weight: normal;
+}
+
+.container,
+.select {
+  margin: 0.25rem 0.125rem;
+}

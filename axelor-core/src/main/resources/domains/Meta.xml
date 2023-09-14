@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_6.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.0.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
 
@@ -88,7 +88,6 @@
     <string name="tagGet" title="Tag method"/>
     <boolean name="tagCount" title="Tag count"/>
     <string name="tagStyle" selection="label.style.selection" title="Tag style"/>
-    <boolean name="top" column="top_menu" title="Top menu"/>
     <boolean name="left" column="left_menu" default="true" title="Left menu"/>
     <boolean name="mobile" column="mobile_menu" title="Mobile menu"/>
     <boolean name="hidden" title="Hidden menu"/>

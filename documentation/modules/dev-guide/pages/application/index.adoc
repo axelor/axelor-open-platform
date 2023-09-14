@@ -172,6 +172,76 @@ plugin on the root project:
 apply plugin: com.axelor.gradle.support.DependenciesSupport
 ----
 
+=== Changelog plugin
+
+AOP provides a Gradle plugin to simplify changelog management.
+
+Each entry of the `CHANGELOG.md` file is generated from files in the `changelogs/unreleased/` folder.
+
+The file is expected to be a YAML file in the following format:
+
+[source,yaml]
+----
+---
+title: Some text
+type: feature
+description: |
+  some description here
+  with more details.
+
+  And some details about breaking changes
+  and migrations steps.
+
+  ```sql
+  UPDATE some_table SET foo = 'bar';
+  ```
+----
+
+Where:
+
+* `title`: describe the entry. (Mandatory)
+* `type`: type of the entry (feature, fix, ...). (Mandatory)
+* `description`: provide detail description about the changes including
+migration steps if any. (Optional)
+
+The plugin will parse all entries in the `changelogs/unreleased/` folder to generate the changelog
+of the version in `CHANGELOG.md`. The unreleased entries are also automatically removed.
+
+To use the plugin, in your `build.gradle`:
+[source,gradle]
+----
+apply plugin: com.axelor.gradle.support.ChangelogSupport
+
+changelog {
+  version = "${project.version}"
+  output.set(file("CHANGELOG.md"))
+  inputPath.set(file("changelogs/unreleased"))
+  types.set(["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"])
+  header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
+}
+----
+
+Plugin can be configured with the following properties set in the `changelog` extension:
+
+[cols="2,6,2"]
+|===
+| Property | Description | Default
+
+| `version` | Current version | current project version
+| `output` | Path to the changelog file | CHANGELOG.md
+| `inputPath` | Path of the unreleased entries |  changelogs/unreleased/
+| `types` | List of types | ["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"]
+| `header` | Header value when generating changelog for the current version | "${version.get()} (${new Date().format("yyyy-MM-dd")})"
+|===
+
+To generate the `CHANGELOG.md` with unreleased entries, run the following Gradle task:
+
+```
+./gradlew generateChangelog
+```
+
+NOTE: `--preview` argument can also be used to preview the generated changelog without deleting/updating files.
+
 == Module
 
 The application project generally doesn't provide any implementation logic.

@@ -1,0 +1,36 @@
+.grid {
+  align-items: start;
+}
+
+.gridItem:empty {
+  display: none;
+}
+
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
+  .grid {
+    grid-template-columns: 100% !important;
+    .gridItem {
+      grid-column: span 1 !important;
+    }
+  }
+}
+
+.stack {
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+//
+// Debug
+//
+
+// .grid {
+//   padding: 2px;
+//   border: 1px dotted blue;
+// }
+// .gridItem {
+//   padding: 2px;
+//   border: 1px dotted red;
+// }

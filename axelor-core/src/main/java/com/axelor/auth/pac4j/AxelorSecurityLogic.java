@@ -31,7 +31,6 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
-import org.pac4j.core.engine.SecurityGrantedAccessAdapter;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
@@ -45,11 +44,16 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   private final ErrorHandler errorHandler;
   private final AuthPac4jInfo authPac4jInfo;
 
+  private final String defaultClientName;
+
   static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   @Inject
   public AxelorSecurityLogic(
-      ErrorHandler errorHandler, AuthPac4jInfo authPac4jInfo, Config config) {
+      ErrorHandler errorHandler,
+      AuthPac4jInfo authPac4jInfo,
+      Config config,
+      ClientListProvider clientListProvider) {
     this.errorHandler = errorHandler;
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
@@ -66,29 +70,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     setMatchingChecker(
         (context, sessionStore, matcherNames, matchersMap, clients) ->
             matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
-  }
-
-  @Override
-  public Object perform(
-      WebContext context,
-      SessionStore sessionStore,
-      Config config,
-      SecurityGrantedAccessAdapter securityGrantedAccessAdapter,
-      HttpActionAdapter httpActionAdapter,
-      String clients,
-      String authorizers,
-      String matchers,
-      Object... parameters) {
-    return super.perform(
-        context,
-        sessionStore,
-        config,
-        securityGrantedAccessAdapter,
-        httpActionAdapter,
-        clients,
-        authorizers,
-        matchers,
-        parameters);
+    defaultClientName = clientListProvider.getDefaultClientName();
   }
 
   // Don't save requested URL if redirected to a non-default central client,
@@ -107,7 +89,9 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
     if (context.getRequestParameter(Pac4jConstants.DEFAULT_FORCE_CLIENT_PARAMETER).isEmpty()
         || currentClients.size() != 1
-        || !authPac4jInfo.getCentralClients().contains(currentClients.get(0).getName())) {
+        || !authPac4jInfo
+            .getCentralClients()
+            .contains(findClient(context, currentClients).getName())) {
       super.saveRequestedUrl(context, sessionStore, currentClients, ajaxRequestResolver);
     }
   }
@@ -116,7 +100,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   protected HttpAction redirectToIdentityProvider(
       WebContext context, SessionStore sessionStore, List<Client> currentClients) {
 
-    final var currentClient = (IndirectClient) currentClients.get(0);
+    final var currentClient = (IndirectClient) findClient(context, currentClients);
 
     if (currentClient.getRedirectionActionBuilder() == null) {
       currentClient.init(true);
@@ -131,5 +115,19 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   protected Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
     return errorHandler.handleException(e, httpActionAdapter, context);
+  }
+
+  protected String getDefaultClient(WebContext context) {
+    return context
+        .getRequestParameter(Pac4jConstants.DEFAULT_FORCE_CLIENT_PARAMETER)
+        .orElse(defaultClientName);
+  }
+
+  protected Client findClient(WebContext context, List<Client> clients) {
+    final String defaultClient = getDefaultClient(context);
+    return clients.stream()
+        .filter(client -> defaultClient.equals(client.getName()))
+        .findFirst()
+        .orElseGet(() -> clients.get(0));
   }
 }

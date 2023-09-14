@@ -1,0 +1,38 @@
+.panel {
+  --ax-panel-header-border: 0;
+  --ax-panel-body-padding: 1rem;
+}
+
+.title {
+  display: flex;
+  justify-content: start;
+}
+
+.noFrame {
+  border: 0;
+}
+
+.panel .panel:not(.hasFrame) {
+  border: 0;
+  &.hasHeader {
+    > div:first-child > div,
+    > div:nth-child(2) > div > div {
+      padding: 0;
+      background-color: transparent;
+    }
+    > div:nth-child(2) > div > div {
+      padding-top: 0.5rem;
+    }
+    > div:first-child > div > div {
+      padding-left: 0;
+      padding-right: 0;
+      border-bottom: 1px solid var(--bs-border-color);
+    }
+  }
+  &:not(.hasHeader) {
+    > div:first-child > div > div {
+      padding: 0;
+      background-color: transparent;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.select {
+  width: 180px !important;
+  min-width: 180px;
+}
+
+.button {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 400px;
+}

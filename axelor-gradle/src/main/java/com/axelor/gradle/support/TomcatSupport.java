@@ -107,6 +107,13 @@ public class TomcatSupport extends AbstractSupport {
         .findFirst()
         .ifPresent(webapps::add);
 
+    // try to use linked axelor-front's dist
+    project.getGradle().getIncludedBuilds().stream()
+        .map(it -> new File(it.getProjectDir(), "axelor-front/dist"))
+        .filter(it -> it.exists())
+        .findFirst()
+        .ifPresent(webapps::add);
+
     final File merged = new File(project.getBuildDir(), "webapp");
     if (merged.exists()) {
       webapps.add(merged);

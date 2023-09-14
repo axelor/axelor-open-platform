@@ -1,0 +1,36 @@
+.alerts {
+  position: absolute;
+  overflow: hidden;
+  width: 350px;
+  bottom: 0;
+  right: 0;
+}
+
+.alert {
+  margin: 1rem;
+}
+
+.item-enter {
+  opacity: 0;
+}
+.item-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+.item-exit {
+  opacity: 1;
+}
+.item-exit-active {
+  opacity: 0;
+  transition: transform 500ms ease-in, opacity 500ms ease-in;
+  transform: translateX(100%);
+}
+
+.rtl.alerts {
+  right: inherit;
+  left: 0;
+}
+
+.rtl .item-exit-active {
+  transform: translateX(-100%);
+}

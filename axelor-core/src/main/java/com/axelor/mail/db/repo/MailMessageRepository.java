@@ -82,12 +82,35 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
         .fetch(limit, offset);
   }
 
+  public List<MailMessage> findBy(String type, Model related, int limit, int offset) {
+    if (StringUtils.isBlank(type)) return findAll(related, limit, offset);
+    return all()
+        .filter(
+            "self.relatedModel = ? AND self.relatedId = ? AND self.type = ?",
+            EntityHelper.getEntityClass(related).getName(),
+            related.getId(),
+            type)
+        .order("-createdOn")
+        .fetch(limit, offset);
+  }
+
   public long count(Model related) {
     return all()
         .filter(
             "self.relatedModel = ? AND self.relatedId = ?",
             EntityHelper.getEntityClass(related).getName(),
             related.getId())
+        .count();
+  }
+
+  public long countBy(String type, Model related) {
+    if (StringUtils.isBlank(type)) return count(related);
+    return all()
+        .filter(
+            "self.relatedModel = ? AND self.relatedId = ? AND self.type = ?",
+            EntityHelper.getEntityClass(related).getName(),
+            related.getId(),
+            type)
         .count();
   }
 

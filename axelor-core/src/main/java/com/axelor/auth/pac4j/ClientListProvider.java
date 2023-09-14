@@ -26,21 +26,31 @@ import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,12 +58,14 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.jasig.cas.client.util.PrivateKeyUtils;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
-import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.pac4j.oidc.config.OidcConfiguration;
+import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +73,8 @@ import org.slf4j.LoggerFactory;
 public class ClientListProvider implements Provider<List<Client>> {
 
   private final List<Client> clients = new ArrayList<>();
+
+  private final String defaultClientName;
 
   private final Set<String> indirectClientNames;
 
@@ -71,6 +85,9 @@ public class ClientListProvider implements Provider<List<Client>> {
   // Default client configurations
   private static final Map<String, ClientConfig> CONFIGS =
       new ImmutableMap.Builder<String, ClientConfig>()
+          .put(
+              "form",
+              ClientConfig.builder().client("org.pac4j.http.client.indirect.FormClient").build())
           .put(
               "oidc",
               ClientConfig.builder()
@@ -163,6 +180,25 @@ public class ClientListProvider implements Provider<List<Client>> {
           .put(char.class, Character.class)
           .build();
 
+  private static final Map<Class<?>, UnaryOperator<Object>> CONVERTERS =
+      new ImmutableMap.Builder<Class<?>, UnaryOperator<Object>>()
+          .put(
+              PrivateKeyJWTClientAuthnMethodConfig.class,
+              value -> {
+                @SuppressWarnings("unchecked")
+                final Map<String, Object> map = getCamelizedMapKeys((Map<String, Object>) value);
+                final String privateKeyPath = (String) map.get("privateKey.path");
+                final String privateKeyAlgorithm =
+                    (String) map.getOrDefault("privateKey.algorithm", "RSA");
+                final JWSAlgorithm jwsAlgorithm =
+                    JWSAlgorithm.parse((String) map.getOrDefault("jwsAlgorithm", "RS256"));
+                final String keyId = (String) map.get("keyId");
+                final PrivateKey privateKey =
+                    PrivateKeyUtils.createKey(privateKeyPath, privateKeyAlgorithm);
+                return new PrivateKeyJWTClientAuthnMethodConfig(jwsAlgorithm, privateKey, keyId);
+              })
+          .build();
+
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -218,47 +254,65 @@ public class ClientListProvider implements Provider<List<Client>> {
                 return;
               }
               final Map<String, Object> props = entry.getValue();
-              props.computeIfAbsent("client", k -> config.getClient());
-              props.computeIfAbsent("configuration", k -> config.getConfiguration());
-              props.computeIfAbsent("title", k -> config.getTitle());
-              props.computeIfAbsent("icon", k -> config.getIcon());
-              props.computeIfAbsent("exclusive", k -> config.isExclusive());
+              config.toMap().forEach(props::putIfAbsent);
             });
 
-    // order of providers displayed on login form
-    final Map<String, Map<String, Object>> configs;
-    final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
-    if (ObjectUtils.isEmpty(authOrder)) {
-      configs = initConfigs;
-    } else {
-      configs = new LinkedHashMap<>();
-      authOrder.forEach(
-          name -> {
-            final Map<String, Object> config = initConfigs.remove(name);
-            if (config != null) {
-              configs.put(name, config);
-            }
-          });
-      configs.putAll(initConfigs);
-    }
-
-    final List<Client> configuredClients =
-        configs.entrySet().stream()
-            .map(e -> createClient(e.getKey(), e.getValue()))
-            .map(Client.class::cast)
-            .collect(Collectors.toList());
-
-    // check for exclusive clients
-    if (configs.isEmpty()
-        || configs.size() > 1
-        || !((boolean) configs.values().iterator().next().getOrDefault("exclusive", false))) {
-      clients.add(Beans.get(FormClient.class));
+    // add form as if no exclusive client
+    if (initConfigs.isEmpty()
+        || initConfigs.size() > 1
+        || !((boolean) initConfigs.values().iterator().next().getOrDefault("exclusive", false))) {
+      initConfigs.put("form", CONFIGS.get("form").toMap());
       exclusive = false;
     } else {
       exclusive = true;
     }
 
-    clients.addAll(configuredClients);
+    // order of providers
+    // first one is default, the rest is for display order on login form
+    final Map<String, Map<String, Object>> configs = new LinkedHashMap<>();
+
+    final Consumer<String> addConfig =
+        name -> {
+          Map<String, Object> config = initConfigs.remove(name);
+          if (config == null) {
+            config =
+                Optional.ofNullable(CONFIGS.get(name))
+                    .orElseThrow(() -> new NoSuchElementException(name))
+                    .toMap();
+          }
+          configs.put(name, config);
+        };
+
+    final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
+    if (ObjectUtils.notEmpty(authOrder)) {
+      authOrder.forEach(addConfig::accept);
+    }
+
+    configs.putAll(initConfigs);
+    initConfigs.clear();
+
+    final Map<String, Client> configuredClients =
+        configs.entrySet().stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> createClient(e.getKey(), e.getValue()),
+                    (oldValue, newValue) -> oldValue,
+                    LinkedHashMap::new));
+
+    final String authDefault =
+        settings.get(AvailableAppSettings.AUTH_DEFAULT, exclusive ? null : "form");
+    final Client defaultClient =
+        StringUtils.notBlank(authDefault)
+            ? Optional.ofNullable(configuredClients.get(authDefault))
+                .orElseThrow(() -> new NoSuchElementException(authDefault))
+            : configuredClients.values().iterator().next();
+
+    defaultClientName = defaultClient.getName();
+    clients.add(defaultClient);
+    configuredClients.values().stream()
+        .filter(client -> client != defaultClient)
+        .forEach(clients::add);
 
     settings
         .getList(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH)
@@ -278,7 +332,7 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     // set titles and icons
     final Iterator<Map<String, Object>> configIt = configs.values().iterator();
-    final Iterator<Client> clientIt = configuredClients.iterator();
+    final Iterator<Client> clientIt = configuredClients.values().iterator();
     while (configIt.hasNext() && clientIt.hasNext()) {
       final Map<String, Object> props = configIt.next();
       final Client client = clientIt.next();
@@ -295,6 +349,8 @@ public class ClientListProvider implements Provider<List<Client>> {
       }
       authPac4jInfo.setClientInfo(name, info);
     }
+
+    logger.info("Default client: {}", defaultClientName);
 
     final Map<Boolean, List<Client>> groupedClients =
         clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
@@ -323,6 +379,10 @@ public class ClientListProvider implements Provider<List<Client>> {
     return clients;
   }
 
+  public String getDefaultClientName() {
+    return defaultClientName;
+  }
+
   public Set<String> getIndirectClientNames() {
     return indirectClientNames;
   }
@@ -335,7 +395,7 @@ public class ClientListProvider implements Provider<List<Client>> {
     return exclusive;
   }
 
-  private Object createClient(String name, Map<String, Object> props) {
+  private Client createClient(String name, Map<String, Object> props) {
     final String clientClassName = (String) props.get("client");
 
     if (clientClassName == null) {
@@ -344,7 +404,7 @@ public class ClientListProvider implements Provider<List<Client>> {
     }
 
     final Class<?> clientClass = findClass(clientClassName);
-    final Object client = inject(clientClass);
+    final Client client = (Client) inject(clientClass);
 
     if (client instanceof IndirectClient) {
       final IndirectClient indirectClient = (IndirectClient) client;
@@ -377,7 +437,51 @@ public class ClientListProvider implements Provider<List<Client>> {
         .filter(item -> !EXTRA_CONFIGS.contains(item.getKey()))
         .forEach(configurer);
 
+    postprocessClient(client, config);
+
     return client;
+  }
+
+  private void postprocessClient(Client client, Object config) {
+
+    // Remove private_key_jwt from supported authentication methods
+    // if private key JWT config is missing.
+    if (config instanceof OidcConfiguration) {
+      final OidcConfiguration oidcConfig = (OidcConfiguration) config;
+      final PrivateKeyJWTClientAuthnMethodConfig privateKeyJwtConfig =
+          oidcConfig.getPrivateKeyJWTClientAuthnMethodConfig();
+      if (privateKeyJwtConfig != null) {
+        return;
+      }
+
+      final ClientAuthenticationMethod clientAuthenticationMethod =
+          oidcConfig.getClientAuthenticationMethod();
+      if (ClientAuthenticationMethod.PRIVATE_KEY_JWT.equals(clientAuthenticationMethod)) {
+        logger.error(
+            "{}: {} is specified as client authentication method, "
+                + "but privateKeyJWTClientAuthnMethodConfig is missing.",
+            client.getName(),
+            ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+      }
+
+      final Set<ClientAuthenticationMethod> supportedMethods =
+          oidcConfig.getSupportedClientAuthenticationMethods();
+      if (supportedMethods == null) {
+        final Set<ClientAuthenticationMethod> actualSupportedMethods =
+            new HashSet<>(
+                Arrays.asList(
+                    ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+                    ClientAuthenticationMethod.CLIENT_SECRET_POST,
+                    ClientAuthenticationMethod.NONE));
+        oidcConfig.setSupportedClientAuthenticationMethods(actualSupportedMethods);
+      } else if (supportedMethods.contains(ClientAuthenticationMethod.PRIVATE_KEY_JWT)) {
+        logger.error(
+            "{}: {} is specified as supported client authentication method, "
+                + "but privateKeyJWTClientAuthnMethodConfig is missing.",
+            client.getName(),
+            ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+      }
+    }
   }
 
   @Nullable
@@ -437,25 +541,68 @@ public class ClientListProvider implements Provider<List<Client>> {
     final Method setter = findSetter(obj.getClass(), property);
     Class<?> type = setter.getParameterTypes()[0];
     type = PRIMITIVE_TYPES.getOrDefault(type, type);
-    final Object converted = convert(type, value);
+    final Type genericType = setter.getGenericParameterTypes()[0];
+    final Object converted = convert(value, type, genericType);
     setter.invoke(obj, converted);
   }
 
-  private Object convert(Class<?> type, Object value) throws ReflectiveOperationException {
+  private Object convert(Object value, Class<?> type, Type genericType) {
+    final String valueStr = String.valueOf(value);
+
+    if (Collection.class.isAssignableFrom(type)) {
+      List<?> items = Arrays.asList(valueStr.split("\\s*,\\s*"));
+      if (genericType instanceof ParameterizedType) {
+        final Class<?> itemType =
+            (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        items =
+            items.stream().map(item -> convert(item, itemType, null)).collect(Collectors.toList());
+      }
+      if (type.isAssignableFrom(List.class)) {
+        return items;
+      }
+      if (type.isAssignableFrom(Set.class)) {
+        return new HashSet<>(items);
+      }
+      value = items;
+    }
+
     if (type.isAssignableFrom(value.getClass())) {
       return value;
     }
-    final String valueStr = String.valueOf(value);
-    if (type.isAssignableFrom(List.class)) {
-      return Arrays.asList(valueStr.split("\\s*,\\s*"));
+
+    final UnaryOperator<Object> converter = CONVERTERS.get(type);
+    if (converter != null) {
+      return converter.apply(value);
     }
+
+    for (final String name : List.of("valueOf", "parse")) {
+      try {
+        final Method converterMethod = type.getMethod(name, String.class);
+        return converterMethod.invoke(null, valueStr);
+      } catch (NoSuchMethodException e) {
+        // Ignore
+      } catch (ReflectiveOperationException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     try {
-      final Method valueOf = type.getMethod("valueOf", String.class);
-      return valueOf.invoke(null, valueStr);
-    } catch (NoSuchMethodException e) {
       final Class<?> cls = Class.forName(valueStr);
       return Beans.get(cls);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
     }
+  }
+
+  private static Map<String, Object> getCamelizedMapKeys(Map<String, Object> map) {
+    final Map<String, Object> result = new HashMap<>();
+    final Inflector inflector = Inflector.getInstance();
+    for (final Map.Entry<String, Object> entry : map.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      result.put(inflector.camelize(key, true), value);
+    }
+    return result;
   }
 
   private Method findGetter(Class<?> klass, String property) throws NoSuchMethodException {

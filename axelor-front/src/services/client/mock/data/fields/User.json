@@ -1,0 +1,230 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.auth.db.User",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Login",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "roles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Roles",
+        "target": "com.axelor.auth.db.Role"
+      },
+      {
+        "help": "Whether to use tabbed ui.",
+        "defaultValue": false,
+        "name": "singleTab",
+        "type": "BOOLEAN",
+        "title": "Single tab"
+      },
+      {
+        "selection": "select.language",
+        "name": "language",
+        "selectionList": [
+          {
+            "value": "en",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "English"
+          },
+          {
+            "value": "fr",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "French"
+          }
+        ],
+        "type": "STRING",
+        "title": "Language"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "help": "Whether to show help messages.",
+        "defaultValue": false,
+        "name": "noHelp",
+        "type": "BOOLEAN",
+        "title": "No help"
+      },
+      {
+        "password": true,
+        "name": "password",
+        "maxSize": 2147483647,
+        "minSize": 4,
+        "type": "STRING",
+        "title": "Password",
+        "required": true
+      },
+      {
+        "help": "Block the user for an indefinite period.",
+        "defaultValue": false,
+        "name": "blocked",
+        "type": "BOOLEAN",
+        "title": "Block the user"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "help": "Activate the user from the specified date.",
+        "name": "activateOn",
+        "type": "DATETIME",
+        "title": "Activate on"
+      },
+      {
+        "help": "Disable the user from the specified date.",
+        "name": "expiresOn",
+        "type": "DATETIME",
+        "title": "Expires on"
+      },
+      {
+        "name": "theme",
+        "type": "STRING",
+        "title": "Theme"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "defaultProject",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Project",
+        "target": "com.axelor.project.db.Project"
+      },
+      {
+        "name": "passwordUpdatedOn",
+        "type": "DATETIME",
+        "title": "Last password update date"
+      },
+      {
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "group",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Group",
+        "target": "com.axelor.auth.db.Group"
+      },
+      {
+        "help": "Max size 4MB.",
+        "image": true,
+        "name": "image",
+        "type": "BINARY",
+        "title": "Photo"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "help": "Force the user to change their password at next login.",
+        "defaultValue": false,
+        "name": "forcePasswordChange",
+        "type": "BOOLEAN",
+        "title": "Force password change"
+      },
+      {
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "name": "homeAction",
+        "type": "STRING",
+        "title": "Home action"
+      }
+    ]
+  }
+}

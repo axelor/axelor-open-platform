@@ -1,0 +1,43 @@
+.icon {
+  display: block;
+  opacity: 0.4;
+}
+
+.icon::before {
+  line-height: 1.5;
+}
+
+.active {
+  opacity: 1;
+}
+
+.hoverIcon {
+  display: none;
+  opacity: 1;
+}
+
+.container:hover {
+  .icon {
+    display: none;
+  }
+
+  .hoverIcon {
+    display: block;
+  }
+}
+
+.toggle {
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: var(--bs-tertiary-bg);
+  --bs-btn-border-color: transparent;
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-bg: var(--bs-secondary-bg);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: var(--bs-body-color);
+  --bs-btn-active-bg: var(--bs-secondary-bg);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+  --bs-btn-disabled-color: var(--bs-tertiary-color);
+  --bs-btn-disabled-bg: var(--bs-body-bg);
+  --bs-btn-disabled-border-color: transparent;
+}

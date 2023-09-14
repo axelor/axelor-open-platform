@@ -1,0 +1,116 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "shared": false,
+      "filterCustom": "{\"operator\":\"and\",\"criteria\":[{\"fieldName\":\"totalAmount\",\"operator\":\">=\",\"value\":\"10000\"}]}",
+      "updatedBy": null,
+      "filters": null,
+      "title": "Amount > 10000",
+      "version": 0,
+      "filterView": "filter-sales",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "name": "amount_>_10000",
+      "id": 1,
+      "user": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "shared": false,
+      "filterCustom": "{\"operator\":\"and\",\"criteria\":[{\"fieldName\":\"status\",\"operator\":\"=\",\"value\":\"DRAFT\"}]}",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "filters": "",
+      "title": "DRAFT",
+      "version": 1,
+      "filterView": "filter-sales",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "name": "draft",
+      "id": 15,
+      "user": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "shared": false,
+      "filterCustom": "{\"operator\":\"and\",\"criteria\":[{\"fieldName\":\"status\",\"operator\":\"=\",\"value\":\"OPEN\"}]}",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "filters": "",
+      "title": "OPEN",
+      "version": 1,
+      "filterView": "filter-sales",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "name": "open",
+      "id": 16,
+      "user": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "shared": false,
+      "filterCustom": "{\"operator\":\"or\",\"criteria\":[{\"fieldName\":\"confirmDate\",\"operator\":\"$inCurrent\",\"value\":null,\"timeUnit\":\"month\"}]}",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "filters": "",
+      "title": "This month",
+      "version": 2,
+      "filterView": "filter-sales",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "name": "this_month",
+      "id": 18,
+      "user": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 0
+      },
+      "selected": false
+    }
+  ]
+}

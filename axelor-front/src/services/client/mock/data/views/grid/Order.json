@@ -1,0 +1,200 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 98,
+      "modelId": 53,
+      "name": "order-grid",
+      "title": "Orders",
+      "model": "com.axelor.sale.db.Order",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "customer",
+          "target": "com.axelor.contact.db.Contact",
+          "targetName": "fullName",
+          "autoTitle": "Customer"
+        },
+        {
+          "type": "field",
+          "name": "orderDate",
+          "autoTitle": "Order date"
+        },
+        {
+          "type": "field",
+          "name": "status",
+          "widget": "single-select",
+          "selection": "order.status.selection",
+          "selectionList": [
+            {
+              "value": "DRAFT",
+              "icon": null,
+              "color": "blue",
+              "order": 0,
+              "hidden": false,
+              "data": null,
+              "title": "Draft"
+            },
+            {
+              "value": "OPEN",
+              "icon": null,
+              "color": "yellow",
+              "order": 1,
+              "hidden": false,
+              "data": null,
+              "title": "Open"
+            },
+            {
+              "value": "CANCELED",
+              "icon": null,
+              "color": "red",
+              "order": 2,
+              "hidden": false,
+              "data": null,
+              "title": "Canceled"
+            },
+            {
+              "value": "CLOSED",
+              "icon": null,
+              "color": "green",
+              "order": 3,
+              "hidden": false,
+              "data": null,
+              "title": "Closed"
+            }
+          ],
+          "autoTitle": "Status"
+        },
+        {
+          "type": "field",
+          "name": "totalAmount",
+          "aggregate": "sum",
+          "widgetAttrs": {
+            "scale": "currency.decimalPlaces"
+          },
+          "autoTitle": "Total amount"
+        },
+        {
+          "type": "field",
+          "name": "currency.symbol",
+          "title": "Cur.",
+          "width": "70px"
+        },
+        {
+          "type": "field",
+          "name": "currency.decimalPlaces",
+          "hidden": true,
+          "autoTitle": "Decimal places"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "totalAmount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Total amount"
+      },
+      {
+        "readonly": true,
+        "defaultValue": 2,
+        "name": "currency.decimalPlaces",
+        "minSize": 0,
+        "type": "INTEGER",
+        "title": "Decimal places"
+      },
+      {
+        "readonly": true,
+        "name": "currency.symbol",
+        "type": "STRING",
+        "title": "Symbol",
+        "required": true
+      },
+      {
+        "sequence": true,
+        "readonly": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name"
+      },
+      {
+        "name": "orderDate",
+        "type": "DATE",
+        "title": "Order date",
+        "required": true
+      },
+      {
+        "targetName": "fullName",
+        "targetSearch": ["fullName", "firstName", "lastName"],
+        "name": "customer",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Customer",
+        "required": true,
+        "target": "com.axelor.contact.db.Contact"
+      },
+      {
+        "name": "status",
+        "enumType": "com.axelor.sale.db.OrderStatus",
+        "selectionList": [
+          {
+            "value": "DRAFT",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "draft"
+            },
+            "title": "Draft"
+          },
+          {
+            "value": "OPEN",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "open"
+            },
+            "title": "Open"
+          },
+          {
+            "value": "CLOSED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "closed"
+            },
+            "title": "Closed"
+          },
+          {
+            "value": "CANCELED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "canceled"
+            },
+            "title": "Canceled"
+          }
+        ],
+        "type": "ENUM",
+        "title": "Status"
+      }
+    ]
+  }
+}

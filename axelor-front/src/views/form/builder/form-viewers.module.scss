@@ -1,0 +1,19 @@
+.viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.content {
+  display: block;
+}
+
+.viewer img {
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.viewer iframe {
+  width: 100%;
+}

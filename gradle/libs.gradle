@@ -3,34 +3,35 @@ def versions = ext.libsVersions = [:]
 
 // versions
 versions.guice = "5.1.0"
-versions.guava = "31.1-jre"
-versions.hibernate = "5.6.12.Final"
-versions.hibernate_validator = "6.2.4.Final"
-versions.hibernate_search = "5.11.10.Final"
+versions.guava = "32.0.1-jre"
+versions.hibernate = "5.6.15.Final"
+versions.hibernate_validator = "6.2.5.Final"
+versions.hibernate_search = "5.11.12.Final"
 
-versions.groovy = "3.0.13"
-versions.resteasy = "4.7.7.Final"
-versions.jackson = "2.13.4"
-versions.shiro = "1.9.1"
-versions.buji_pac4j = "7.0.0"
-versions.pac4j = "5.4.5"
-versions.ldaptive = "2.1.1"
+versions.groovy = "3.0.17"
+versions.resteasy = "4.7.9.Final"
+versions.jackson = "2.15.2"
+versions.shiro = "1.12.0"
+versions.buji_pac4j = "8.0.0"
+versions.javaee_pac4j = "7.1.0"
+versions.pac4j = "5.7.1"
+versions.ldaptive = "2.1.2"
 
 versions.junit4 = "4.13.2"
-versions.junit5 = "5.9.1"
+versions.junit5 = "5.9.3"
 
-versions.slf4j = "1.7.36"
+versions.slf4j = "2.0.7"
 
-versions.tomcat = "9.0.65"
+versions.tomcat = "9.0.76"
 versions.tomcat_embed = "${versions.tomcat}"
 
-versions.asm = "9.3"
+versions.asm = "9.5"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
 libs.junit_vintage = "org.junit.vintage:junit-vintage-engine:${versions.junit5}" // junit4 compatibility
-libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.9.1" // for IDE
+libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.9.3" // for IDE
 
 // logging
 libs.slf4j_base = [
@@ -41,8 +42,8 @@ libs.slf4j_base = [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-  "ch.qos.logback:logback-core:1.2.11",
-  "ch.qos.logback:logback-classic:1.2.11",
+  "ch.qos.logback:logback-core:1.3.8",
+  "ch.qos.logback:logback-classic:1.3.8",
   "org.fusesource.jansi:jansi:2.4.0"
 ]
 
@@ -53,7 +54,7 @@ libs.guava = [
 ]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:1.32"
+libs.snakeyaml = "org.yaml:snakeyaml:1.33"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
@@ -70,7 +71,7 @@ libs.asm = [
 ]
 
 // Byte Buddy
-libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.17"
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.14.5"
 
 // Graal JS
 libs.graal_js = "org.graalvm.js:js:22.0.0.2"
@@ -82,14 +83,14 @@ libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
 libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
-libs.greenmail = "com.icegreen:greenmail-junit5:1.6.10"
+libs.greenmail = "com.icegreen:greenmail-junit5:1.6.14"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
 // jdbc
-libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.0"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.5.0"
-libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.30"
+libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.2"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.6.0"
+libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.33"
 
 // Hibernate
 libs.hibernate = [
@@ -100,27 +101,29 @@ libs.hibernate = [
 ]
 
 // Caching libs
-libs.ehcache = "org.ehcache:ehcache:3.10.1"
-libs.redisson = "org.redisson:redisson-hibernate-53:3.17.6"
-libs.hazelcast = "com.hazelcast:hazelcast:5.1.3"
-libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.1"
+libs.ehcache = "org.ehcache:ehcache:3.10.8"
+libs.redisson = "org.redisson:redisson-hibernate-53:3.19.3"
+libs.hazelcast = "com.hazelcast:hazelcast:5.3.1"
+libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.6"
 libs.infinispan = [
-    "org.infinispan:infinispan-hibernate-cache-v53:13.0.11.Final",
-    "org.infinispan:infinispan-core:13.0.11.Final",
-    "org.infinispan:infinispan-jcache:13.0.11.Final"
+    "org.infinispan:infinispan-hibernate-cache-v53:13.0.18.Final",
+    "org.infinispan:infinispan-core:13.0.18.Final",
+    "org.infinispan:infinispan-jcache:13.0.18.Final"
 ]
 
 // Hibernate search
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
-libs.apache_tika_core = "org.apache.tika:tika-core:2.4.1"
+libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.8.0") {
+    exclude group: 'org.slf4j', module: 'slf4j-api'
+}
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:9.3.1"
+libs.flywaydb = "org.flywaydb:flyway-core:9.20.0"
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.11"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.12"
 
 // groovy
 libs.groovy = [
@@ -153,8 +156,8 @@ libs.resteasy_guice = resteasy_module("resteasy-guice")
 libs.resteasy_client = resteasy_module("resteasy-client");
 libs.resteasy_server = [
   "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
-  "io.undertow:undertow-core:2.2.19.Final",
-  "io.undertow:undertow-servlet:2.2.19.Final"
+  "io.undertow:undertow-core:2.2.25.Final",
+  "io.undertow:undertow-servlet:2.2.25.Final"
 ]
 
 // jackson
@@ -173,14 +176,13 @@ libs.jackson_libs = [
 libs.apache_shiro = [
   "org.apache.shiro:shiro-core:${versions.shiro}",
   "org.apache.shiro:shiro-web:${versions.shiro}",
-  dependencies.create("org.apache.shiro:shiro-guice:${versions.shiro}") {
-      // Shiro 1.8 still depends on guice-multibindings 4.2.2 (included as part of Guice core)
-      exclude group: 'com.google.inject.extensions', module: 'guice-multibindings'
-  }
+  "org.apache.shiro:shiro-guice:${versions.shiro}"
 ]
 
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
+  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+
   dependencies.create("org.pac4j:pac4j-oidc:${versions.pac4j}") {
     exclude group: 'org.mockito', module: 'mockito-core'
   },
@@ -196,17 +198,20 @@ libs.pac4j = [
   "org.ldaptive:ldaptive:${versions.ldaptive}"
 ]
 
-libs.buji_pac4j = "io.buji:buji-pac4j:${versions.buji_pac4j}"
+libs.buji_pac4j = [
+  "io.buji:buji-pac4j:${versions.buji_pac4j}",
+  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+]
 
 // UnboundID LDAP SDK (for testing only)
-libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.6'
+libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.9'
 
 // commons
 libs.commons_cli = "commons-cli:commons-cli:1.5.0"
 libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.3"
 libs.commons_csv = [
-  "org.apache.commons:commons-csv:1.9.0",
-  "commons-io:commons-io:2.11.0"
+  "org.apache.commons:commons-csv:1.10.0",
+  "commons-io:commons-io:2.13.0"
 ]
 
 // BIRT Runtime
@@ -241,19 +246,18 @@ libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.3.2") {
 
 // xstream
 libs.xstream = [
-  "com.thoughtworks.xstream:xstream:1.4.19",
-  "com.fasterxml.woodstox:woodstox-core:6.3.1"
+  "com.thoughtworks.xstream:xstream:1.4.20",
+  "com.fasterxml.woodstox:woodstox-core:6.5.1"
 ]
 
 // jsoup for html parsing & sanitize
-libs.jsoup = "org.jsoup:jsoup:1.15.3"
+libs.jsoup = "org.jsoup:jsoup:1.16.1"
 
 // StringTemplate
 libs.ST4 = "org.antlr:ST4:4.3.4"
 
 // gradle plugins
 libs.plugin_license = "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
-libs.plugin_node = "com.github.node-gradle:gradle-node-plugin:3.4.0"
 
 // embeded tomcat
 libs.tomcat_embed = [

@@ -1,0 +1,19 @@
+.r [role="progressbar"] {
+  background-color: #f44336;
+}
+.y [role="progressbar"] {
+  background-color: #ff9800;
+}
+.b [role="progressbar"] {
+  background-color: #2196f3;
+}
+.g [role="progressbar"] {
+  background-color: #4caf50;
+}
+
+.progress {
+  height: 1.5rem;
+  & > div {
+    height: 100%;
+  }
+}

@@ -1,0 +1,10 @@
+
+.container {
+  & > div {
+    flex: 1;
+  }
+}
+
+.icon {
+  cursor: pointer;
+}

@@ -1,0 +1,46 @@
+.header {
+  display: flex;
+  align-items: center;
+
+  .title {
+    flex: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  span {
+    opacity: 0.5;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.collection {
+  display: flex;
+  flex-direction: column;
+  .items {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    .item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      :first-child {
+        flex: 1;
+      }
+    }
+    .item:last-child {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

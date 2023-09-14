@@ -1,7 +1,7 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.11.0"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.19.0"
   }
 }
 
@@ -43,7 +43,7 @@ spotless {
 // Sub projects
 /////
 
-subprojects { p ->
+configure(subprojects - project(':axelor-front')) { p ->
 
   apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
@@ -83,7 +83,8 @@ subprojects { p ->
 // formatCode task
 /////
 
-allprojects {
+configure([rootProject] + (subprojects - project(':axelor-front'))) {
+
   tasks.register('formatCode') {
     description "Add license and format code."
     group "Axelor"

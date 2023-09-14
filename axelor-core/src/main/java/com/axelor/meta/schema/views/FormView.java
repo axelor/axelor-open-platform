@@ -57,6 +57,14 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
 
   @XmlAttribute private String canAttach;
 
+  @XmlAttribute private Integer cols;
+
+  @XmlAttribute private String colWidths;
+
+  @XmlAttribute private String gap;
+
+  @XmlAttribute private Integer itemSpan;
+
   @XmlElementWrapper
   @XmlElement(name = "button")
   private List<Button> toolbar;
@@ -166,6 +174,38 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
 
   public void setCanAttach(String canAttach) {
     this.canAttach = canAttach;
+  }
+
+  public Integer getCols() {
+    return cols;
+  }
+
+  public void setCols(Integer cols) {
+    this.cols = cols;
+  }
+
+  public String getColWidths() {
+    return colWidths;
+  }
+
+  public void setColWidths(String colWidths) {
+    this.colWidths = colWidths;
+  }
+
+  public String getGap() {
+    return gap;
+  }
+
+  public void setGap(String gap) {
+    this.gap = gap;
+  }
+
+  public Integer getItemSpan() {
+    return itemSpan;
+  }
+
+  public void setItemSpan(Integer itemSpan) {
+    this.itemSpan = itemSpan;
   }
 
   public List<Button> getToolbar() {

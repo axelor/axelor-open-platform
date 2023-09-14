@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_6.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.0.xsd">
 
   <selection name="json.field.type">
     <option value="string">String</option>
@@ -165,7 +165,6 @@
       <field name="menuIcon" title="Icon"/>
       <field name="menuBackground" title="Icon background"/>
       <field name="menuOrder" title="aop.meta.order"/>
-      <field name="menuTop" title="Show in top menu"/>
     </panel>
     <panel-tabs>
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">

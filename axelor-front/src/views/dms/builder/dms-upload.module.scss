@@ -1,0 +1,36 @@
+.container {
+  position: fixed;
+  z-index: 10000;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 480px;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.item {
+  position: relative;
+  overflow: hidden;
+
+  .name {
+    width: 50%;
+    text-align: right;
+  }
+
+  .progress {
+    width: 35%;
+  }
+
+  .actions {
+    width: 15%;
+    a {
+      cursor: pointer;
+    }
+  }
+}
+
+.close {
+  cursor: pointer;
+}

@@ -1,0 +1,8 @@
+.row {
+  --bs-table-cell-active-bg: rgba(0, 0, 0, 0.05) !important;
+}
+
+.selected {
+  background: var(--bs-table-active-bg) !important;
+  color: var(--bs-table-active-color) !important;
+}

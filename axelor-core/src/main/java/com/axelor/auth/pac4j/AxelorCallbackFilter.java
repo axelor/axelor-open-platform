@@ -18,30 +18,20 @@
  */
 package com.axelor.auth.pac4j;
 
-import io.buji.pac4j.filter.CallbackFilter;
-import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import org.pac4j.core.config.Config;
+import org.pac4j.jee.filter.CallbackFilter;
 
 @Singleton
 public class AxelorCallbackFilter extends CallbackFilter {
 
   @Inject
-  public AxelorCallbackFilter(Config config, AxelorCallbackLogic callbackLogic) {
+  public AxelorCallbackFilter(
+      Config config, AxelorCallbackLogic callbackLogic, ClientListProvider clientListProvider) {
     setConfig(config);
-    setDefaultClient(config.getClients().getClients().get(0).getName());
+    setDefaultClient(clientListProvider.getDefaultClientName());
     setCallbackLogic(callbackLogic);
-  }
-
-  @Override
-  public void doFilter(
-      ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-      throws IOException, ServletException {
-    super.doFilter(servletRequest, servletResponse, filterChain);
+    setRenewSession(false);
   }
 }

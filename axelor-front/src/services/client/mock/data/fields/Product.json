@@ -1,0 +1,388 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {
+      "attrs": {
+        "color": {
+          "model": "com.axelor.sale.db.Product",
+          "modelField": "attrs",
+          "jsonField": "attrs",
+          "widgetAttrs": "{\"readonly\": \"false\"}",
+          "jsonPath": "color",
+          "title": "Color",
+          "type": "string",
+          "name": "color",
+          "visibleInGrid": true
+        }
+      }
+    },
+    "model": "com.axelor.sale.db.Product",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "targetName": "fileName",
+        "targetSearch": ["fileName"],
+        "name": "image",
+        "perms": null,
+        "type": "ONE_TO_ONE",
+        "orphan": true,
+        "title": "Image",
+        "target": "com.axelor.meta.db.MetaFile"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "name": "notes",
+        "type": "TEXT",
+        "title": "Notes"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "selection": "product.color.selection",
+        "name": "color",
+        "selectionList": [
+          {
+            "value": "black",
+            "icon": null,
+            "color": "black ",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Black"
+          },
+          {
+            "value": "cyan",
+            "icon": null,
+            "color": "cyan",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Cyan"
+          },
+          {
+            "value": "white",
+            "icon": null,
+            "color": "white",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "White"
+          },
+          {
+            "value": "teal",
+            "icon": null,
+            "color": "teal",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Teal"
+          },
+          {
+            "value": "gray",
+            "icon": null,
+            "color": "grey",
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Gray"
+          },
+          {
+            "value": "red",
+            "icon": null,
+            "color": "red",
+            "order": 3,
+            "hidden": false,
+            "data": null,
+            "title": "Red"
+          },
+          {
+            "value": "green",
+            "icon": null,
+            "color": "green",
+            "order": 4,
+            "hidden": false,
+            "data": null,
+            "title": "Green"
+          },
+          {
+            "value": "blue",
+            "icon": null,
+            "color": "blue",
+            "order": 5,
+            "hidden": false,
+            "data": null,
+            "title": "Blue"
+          },
+          {
+            "value": "yellow",
+            "icon": null,
+            "color": "yellow",
+            "order": 6,
+            "hidden": false,
+            "data": null,
+            "title": "Yellow"
+          },
+          {
+            "value": "chocolate",
+            "icon": null,
+            "color": "brown",
+            "order": 7,
+            "hidden": false,
+            "data": null,
+            "title": "Brown"
+          },
+          {
+            "value": "orange",
+            "icon": null,
+            "color": "orange",
+            "order": 8,
+            "hidden": false,
+            "data": null,
+            "title": "Orange"
+          },
+          {
+            "value": "purple",
+            "icon": null,
+            "color": "purple",
+            "order": 9,
+            "hidden": false,
+            "data": null,
+            "title": "Purple"
+          },
+          {
+            "value": "pink",
+            "icon": null,
+            "color": "pink",
+            "order": 10,
+            "hidden": false,
+            "data": null,
+            "title": "Pink"
+          }
+        ],
+        "type": "STRING",
+        "title": "Color"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "name": "attrs",
+        "json": true,
+        "type": "STRING",
+        "title": "Attributes"
+      },
+      {
+        "selection": "product.color.selection",
+        "name": "colorVariants",
+        "selectionList": [
+          {
+            "value": "black",
+            "icon": null,
+            "color": "black ",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Black"
+          },
+          {
+            "value": "cyan",
+            "icon": null,
+            "color": "cyan",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Cyan"
+          },
+          {
+            "value": "white",
+            "icon": null,
+            "color": "white",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "White"
+          },
+          {
+            "value": "teal",
+            "icon": null,
+            "color": "teal",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Teal"
+          },
+          {
+            "value": "gray",
+            "icon": null,
+            "color": "grey",
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Gray"
+          },
+          {
+            "value": "red",
+            "icon": null,
+            "color": "red",
+            "order": 3,
+            "hidden": false,
+            "data": null,
+            "title": "Red"
+          },
+          {
+            "value": "green",
+            "icon": null,
+            "color": "green",
+            "order": 4,
+            "hidden": false,
+            "data": null,
+            "title": "Green"
+          },
+          {
+            "value": "blue",
+            "icon": null,
+            "color": "blue",
+            "order": 5,
+            "hidden": false,
+            "data": null,
+            "title": "Blue"
+          },
+          {
+            "value": "yellow",
+            "icon": null,
+            "color": "yellow",
+            "order": 6,
+            "hidden": false,
+            "data": null,
+            "title": "Yellow"
+          },
+          {
+            "value": "chocolate",
+            "icon": null,
+            "color": "brown",
+            "order": 7,
+            "hidden": false,
+            "data": null,
+            "title": "Brown"
+          },
+          {
+            "value": "orange",
+            "icon": null,
+            "color": "orange",
+            "order": 8,
+            "hidden": false,
+            "data": null,
+            "title": "Orange"
+          },
+          {
+            "value": "purple",
+            "icon": null,
+            "color": "purple",
+            "order": 9,
+            "hidden": false,
+            "data": null,
+            "title": "Purple"
+          },
+          {
+            "value": "pink",
+            "icon": null,
+            "color": "pink",
+            "order": 10,
+            "hidden": false,
+            "data": null,
+            "title": "Pink"
+          }
+        ],
+        "type": "STRING",
+        "title": "Color variants"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "nullable": true,
+        "precision": 20,
+        "name": "price",
+        "scale": 2,
+        "type": "DECIMAL",
+        "title": "Price"
+      },
+      {
+        "translatable": true,
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "category",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Category",
+        "target": "com.axelor.sale.db.ProductCategory"
+      }
+    ]
+  }
+}

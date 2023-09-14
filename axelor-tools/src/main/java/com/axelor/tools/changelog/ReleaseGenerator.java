@@ -25,8 +25,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,27 +45,21 @@ public class ReleaseGenerator {
     if (release.getEntries() == null) {
       return;
     }
-    SortedMap<String, EntryType> sortedTypes = new TreeMap<>();
-    for (EntryType type : EntryType.values()) {
-      sortedTypes.put(type.getValue(), type);
-    }
 
-    for (EntryType type : sortedTypes.values()) {
-      if (release.getEntries().containsKey(type)) {
-        appendEntriesPerType(content, type, release.getEntries().get(type));
-      }
+    for (String type : release.getEntries().keySet()) {
+      appendEntriesPerType(content, type, release.getEntries().get(type));
     }
   }
 
   private void appendEntriesPerType(
-      StringBuilder content, EntryType type, List<ChangelogEntry> entries) {
+      StringBuilder content, String type, List<ChangelogEntry> entries) {
     if (entries == null || entries.isEmpty()) {
       return;
     }
     if (!endWithEmptyLine(content.toString())) {
       content.append(NEW_LINE);
     }
-    content.append("#### ").append(type.getValue()).append(NEW_LINE).append(NEW_LINE);
+    content.append("#### ").append(type).append(NEW_LINE).append(NEW_LINE);
     for (ChangelogEntry entry : entries) {
       content.append(MessageFormat.format("* {0}", entry.getTitle()));
       if (!StringUtils.isEmpty(entry.getDescription())) {
@@ -87,7 +79,7 @@ public class ReleaseGenerator {
 
   private void appendHeader(StringBuilder content, Release release) {
     content
-        .append(MessageFormat.format("## {0} ({1})", release.getVersion(), release.getDate()))
+        .append(MessageFormat.format("## {0}", release.getHeader()))
         .append(NEW_LINE)
         .append(NEW_LINE);
   }

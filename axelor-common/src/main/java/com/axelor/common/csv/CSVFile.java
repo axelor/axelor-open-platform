@@ -81,7 +81,7 @@ public final class CSVFile {
   }
 
   public CSVParser parse(InputStream in, Charset charset) throws IOException {
-    return parse(new InputStreamReader(new BOMInputStream(in), charset));
+    return parse(new InputStreamReader(BOMInputStream.builder().setInputStream(in).get(), charset));
   }
 
   public CSVParser parse(Reader in) throws IOException {
@@ -114,7 +114,9 @@ public final class CSVFile {
 
   public void parse(File in, Consumer<CSVParser> task) throws IOException {
     parse(
-        new InputStreamReader(new BOMInputStream(new FileInputStream(in)), StandardCharsets.UTF_8),
+        new InputStreamReader(
+            BOMInputStream.builder().setInputStream(new FileInputStream(in)).get(),
+            StandardCharsets.UTF_8),
         task);
   }
 

@@ -1,0 +1,12 @@
+---
+title: Remove top menus support
+type: remove
+description: |
+  In this new version of the frontend, top menus aren't supported anymore.
+  
+  Run following SQL script to drop unnecessary columns :
+  
+  ```sql
+  ALTER TABLE meta_menu DROP COLUMN top_menu ;
+  ALTER TABLE meta_json_model DROP COLUMN menu_top;
+  ```

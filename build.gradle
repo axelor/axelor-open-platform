@@ -1,3 +1,5 @@
+import com.axelor.common.VersionUtils
+
 buildscript {
   apply from: "gradle/repos.gradle"
   dependencies {
@@ -7,10 +9,11 @@ buildscript {
 
 apply plugin: "eclipse"
 apply plugin: "idea"
+apply plugin: com.axelor.gradle.support.ChangelogSupport
 
 apply from: "version.gradle"
 
-subprojects {
+configure(subprojects - project(':axelor-front')) {
   apply from: "${rootDir}/gradle/libs.gradle"
   apply from: "${rootDir}/gradle/common.gradle"
   apply from: "${rootDir}/gradle/jacoco.gradle"
@@ -90,13 +93,12 @@ task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
   }
 }
 
-task generateChangelog(type: com.axelor.gradle.tasks.GenerateChangelog) {
-  description "Generate changelog from unreleased entries."
-  group "Axelor"
-  files = fileTree(projectDir) {
-    include 'changelogs/unreleased/*.yml'
-    include 'changelogs/unreleased/*.yaml'
-  }
+changelog {
+  version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "")
+  output.set(file("CHANGELOG.md"))
+  inputPath.set(file("changelogs/unreleased"))
+  types.set(["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"])
+  header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
 }
 
 apply from: "gradle/javadoc.gradle"

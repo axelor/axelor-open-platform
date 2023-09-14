@@ -1,0 +1,38 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menus {
+  display: flex;
+  flex: 1;
+}
+
+.farItems {
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+.badge {
+  position: absolute !important;
+  left: 0.75rem;
+  font-size: 0.65rem;
+  [dir="rtl"] & {
+    left: unset;
+    right: 0.75rem;
+  }
+}
+
+.user {
+  img {
+    background: transparent;
+  }
+  img, button > * > * {
+    height: 1.5rem;
+    width: 1.5rem;
+    padding: 0;
+    font-size: 0.75rem;
+  }
+  width: 57px;
+}

@@ -1,0 +1,16 @@
+.wkfStatus {
+  display: flex;
+  flex-flow: wrap;
+}
+
+.wkfStatus,
+.wkfStatus li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wkfStatus li {
+  margin: 0.125rem 0.125rem 0.5rem;
+  font-size: 14px;
+}

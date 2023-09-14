@@ -178,6 +178,8 @@ Unlike the object permission rules, view permission rules follows `Grant all -> 
 
 == Single Sign-On
 
+=== Common Configuration
+
 :direct-vs-indirect-clients: https://www.pac4j.org/docs/clients.html#1-direct-vs-indirect-clients
 
 Single sign-on in {page-component-title} relies on the various clients from the {pac4j}. There are two kinds of clients: {direct-vs-indirect-clients}[direct and indirect clients].
@@ -223,7 +225,7 @@ auth.logout.local = true
 auth.logout.central = false
 -----
 
-Reflection is used to configure authentication clients. The syntax for the property keys is `auth.provider.<provider-name>.<setting-name>`. There are a few built-in providers described below with default settings that are overridable. For special needs, you can manually configure {pac4j-clients}[any other clients supported by pac4j] using your own custom provider name. You may even create and use your own custom authentication clients.
+Reflection is used to configure authentication clients. The syntax for the property keys is `auth.provider.<provider-name>.<setting-name>`. Kebab case and camel case are both supported for setting names. There are a few built-in providers described below with default settings that are overridable. For special needs, you can manually configure {pac4j-clients}[any other clients supported by pac4j] using your own custom provider name. You may even create and use your own custom authentication clients.
 
 An authentication provider usually consists of a client and its configuration. There are a few base settings common to all the providers. All non-base settings are passed to the client configuration or the client itself.
 
@@ -256,7 +258,9 @@ auth.provider.my-provider.secret = qySuozNl72zzM5SKW-0kczwV
 Here, the client is `org.pac4j.oidc.client.GoogleOidcClient` and its configuration is `org.pac4j.oidc.config.OidcConfiguration` (automatically determined from the client).
 `client-id` and `secret` are set on the configuration if the properties exist. Otherwise, we try to set them on the client itself. That is done using Java reflection.
 
-Configuration via reflection supports setting strings, primitive/boxed types, class names, comma-separated lists of strings, and string-object maps:
+Configuration via reflection supports setting strings, primitive/boxed types, class names, comma-separated lists of strings, and string-object maps.
+
+If configuration properties have either a `valueOf` or a `parse` method, they will also be tried to set the settings.
 
 .axelor-config.properties
 [source,properties]
@@ -270,6 +274,12 @@ auth.provider.saml.supported-protocols = urn:oasis:names:tc:SAML:2.0:protocol, u
 # string-object map
 auth.provider.oidc.custom-params.display = popup
 auth.provider.oidc.custom-params.prompt = none
+
+# use ClientAuthenticationMethod#parse
+auth.provider.oidc.client-authentication-method = client_secret_basic
+
+# Set of ClientAuthenticationMethod objects using ClientAuthenticationMethod#parse
+auth.provider.oidc.supported-client-authentication-methods = client_secret_basic, private_key_jwt
 ----
 
 If you need more flexibility, you may define your own client and do the configuration in Java:
@@ -281,12 +291,19 @@ public class MyOidcClient extends OidcClient {
     OidcConfiguration config = new OidcConfiguration();
     config.setStateGenerator(new MyStateGenerator());
     config.setCustomParams(Map.of("display", "popup", "prompt", "none"));
+    config.setClientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+    config.setSupportedClientAuthenticationMethods(
+        Set.of(
+            ClientAuthenticationMethod.CLIENT_SECRET_BASIC,
+            ClientAuthenticationMethod.CLIENT_SECRET_JWT));
     // etc.
 
     setConfiguration(config);
   }
 }
 -----
+
+=== Provider Order
 
 Each client needs to have a unique name. The provider names in the property keys are only used to group settings.
 If you want to use the same client for multiple providers, you have to make sure they have different names.
@@ -311,6 +328,34 @@ auth.provider.my-oidc2.name = MyOidcClient2
 # comma-separated list of provider names
 auth.provider-order = my-oidc1, my-oidc2
 -----
+
+=== Default Provider
+
+Normally, form client is the default client used for authentication.
+When an authentication provider is defined as exclusive, form client is not loaded at all.
+
+However, with `auth.provider-default` configuration, you can specify another non-exclusive client as default.
+
+Example:
+
+.axelor-config.properties
+[source,properties]
+-----
+# google auth provider is used by default
+auth.provider-default = google
+-----
+
+You can specify another client via the `client_name` query parameter in login URL.
+
+Examples:
+[cols="7,3"]
+|===
+| URL                                                         | Description
+| \http://localhost:8080/open-platform-demo/                  | default client is used
+| \http://localhost:8080/open-platform-demo/?client_name=form | another client is specified
+|===
+
+NOTE: `auth.provider-default` is ignored if there is an exclusive provider configured.
 
 === OpenID Connect
 
@@ -388,6 +433,100 @@ auth.provider.oidc.discovery-uri = https://login.microsoftonline.com/38c46e5a-21
 #auth.provider.oidc.response-type = id_token
 #auth.provider.oidc.response-mode = form_post
 #auth.provider.oidc.scope = openid email profile phone
+-----
+
+==== Advanced OpenId Connect configuration
+
+Those advanced settings are available to all OpenID Connect providers.
+
+You can define how the client credentials (clientId and secret) are passed to the token endpoint:
+
+.axelor-config.properties
+[source,properties]
+-----
+# client_secret_basic / client_secret_post / private_key_jwt / none
+auth.provider.keycloak.client-authentication-method = client_secret_basic
+-----
+
+You can also use the `private_key_jwt` authentication method by providing the PrivateKeyJWTClientAuthnMethodConfig component:
+
+.axelor-config.properties
+[source,properties]
+-----
+# client authentication method
+auth.provider.keycloak.client-authentication-method = private_key_jwt
+
+# PrivateKeyJWTClientAuthnMethodConfig component
+auth.provider.keycloak.private-key-jwt-client-authn-method-config.jws-algorithm = RS256
+auth.provider.keycloak.private-key-jwt-client-authn-method-config.private-key.path = private-key.pem
+auth.provider.keycloak.private-key-jwt-client-authn-method-config.private-key.algorithm = RSA
+auth.provider.keycloak.private-key-jwt-client-authn-method-config.key-id = 12345
+-----
+
+NOTE: To set the `PrivateKeyJWTClientAuthnMethodConfig` component, a custom converter is used instead of reflection.
+You need to specify the setting names as mentioned in the example above.
+
+When validating the ID token in the login process, you can set a clock skew:
+
+.axelor-config.properties
+[source,properties]
+-----
+# 1 minute
+auth.provider.oidc.max-clock-skew = 60
+-----
+
+You can also choose your preferred algorithm to sign the JSON web tokens:
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider.oidc.preferred-jws-algorithm = RS256
+-----
+
+You can set additional parameters by setting custom params:
+
+.axelor-config.properties
+[source,properties]
+-----
+# select display mode: page, popup, touch, and wap
+auth.provider.oidc.custom-params.display = popup
+# select prompt mode: none, consent, select_account
+auth.provider.oidc.custom-params.prompt = none
+-----
+
+Custom state values may be defined:
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider.oidc.with-state = true
+
+# custom class that implements org.pac4j.core.util.generator.ValueGenerator
+auth.provider.oidc.state-generator = com.axelor.myapp.MyStateGenerator
+-----
+
+By default, the local session expires when the access token does, but this can be disabled using:
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider.oidc.expire-session-with-token = false
+-----
+
+The additional param TokenExpirationAdvance allows to set the time in seconds, previous to the token expiration, in which the expiration is advanced. By default, it is 0 seconds.
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider.oidc.token-expiration-advance = 10
+-----
+
+By default, ID tokens must be signed. The none algorithm for ID tokens (meaning no signature validation) can be explicitly accepted by using:
+
+.axelor-config.properties
+[source,properties]
+-----
+auth.provider.oidc.allow-unsigned-id-tokens = true
 -----
 
 === OAuth

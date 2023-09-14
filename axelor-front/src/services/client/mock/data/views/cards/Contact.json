@@ -1,0 +1,68 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 93,
+      "modelId": 47,
+      "name": "contact-cards",
+      "title": "Contacts",
+      "model": "com.axelor.contact.db.Contact",
+      "orderBy": "fullName",
+      "items": [
+        {
+          "type": "field",
+          "name": "fullName",
+          "autoTitle": "Full name"
+        },
+        {
+          "type": "field",
+          "name": "phone",
+          "autoTitle": "Phone"
+        },
+        {
+          "type": "field",
+          "name": "email",
+          "autoTitle": "Email"
+        },
+        {
+          "type": "field",
+          "name": "address",
+          "autoTitle": "Address"
+        },
+        {
+          "type": "field",
+          "name": "hasImage",
+          "autoTitle": "Has image"
+        }
+      ],
+      "template": "\n    <div class=\"span4 card-image\">\n      <img ng-if=\"hasImage\" ng-src=\"{{$image(null, 'image')}}\">\n      <img ng-if=\"!hasImage\" src=\"img/user.png\">\n      <strong>{{fullName}}</strong>\n    </div>\n    <div class=\"span8\">\n      <address>\n        <strong>{{address.street}} {{address.area}}</strong><br>\n        {{address.city}}<span ng-if=\"address.state\">, {{address.state}}</span><span ng-if=\"address.zip\"> - {{address.zip}}</span><br>\n        {{address.country.name}}<br>\n        <abbr ng-if=\"phone\" title=\"Phone\">P:</abbr> {{phone}}<br>\n        <abbr ng-if=\"email\" title=\"Email\">E:</abbr> {{email}}<br>\n      </address>\n    </div>\n  ",
+      "type": "cards"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "phone",
+        "type": "STRING",
+        "title": "Phone"
+      },
+      {
+        "virtual": true,
+        "nameSearch": ["firstName", "lastName"],
+        "readonly": true,
+        "nameColumn": true,
+        "name": "fullName",
+        "type": "STRING",
+        "title": "Full name"
+      },
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      }
+    ]
+  }
+}

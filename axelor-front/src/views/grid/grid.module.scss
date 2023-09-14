@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  > div:first-child {
+    border-bottom: 0 !important;
+  }
+}
+
+.views {
+  overflow: hidden;
+}
+.views,
+.grid-view,
+.details-view {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.details-view-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  height: 100%;
+  width: 50%;
+  transition: all 0.2s;
+  transform: scaleX(100%);
+  transform-origin: right;
+  &.hide {
+    transform: scaleX(0);
+    z-index: 0;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .details-view-overlay {
+    width: 100%;
+  }
+}
+
+[dir="rtl"] .details-view-overlay {
+  left: 0;
+  right: auto;
+  transform-origin: left;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0.25;
+  z-index: 1;
+}
+
+.mass-update {
+  &.active button {
+    color: var(--bs-btn-hover-color);
+    background-color: var(--bs-btn-hover-bg);
+    border-color: var(--bs-btn-hover-border-color);
+  }
+  button {
+    --bs-btn-padding-x: 0;
+  }
+}
+
+.help {
+  margin: 0.5rem;
+  & > div {
+    margin: 0 !important;
+  }
+}

@@ -1,0 +1,85 @@
+.board {
+  padding: 0.5rem 0;
+  gap: 0.5rem;
+  & > * {
+    max-width: 100%;
+  }
+  &.responsive {
+    flex-direction: column;
+  }
+  overflow: auto;
+}
+
+.column-wrapper {
+  display: flex;
+  width: 24em;
+  min-width: 250px;
+}
+
+.board.responsive .column-wrapper {
+  width: auto;
+  flex-grow: 1;
+}
+
+.column {
+  background-color: var(--bs-tertiary-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.column-title {
+  font-weight: 600;
+  user-select: none;
+}
+
+.record-list-wrapper {
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  &.overflow {
+    overflow: auto;
+  }
+  &.no-data {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+}
+
+.record-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.record {
+  &:hover .record-action button,
+  .record-action button[class*="open"] {
+    visibility: inherit;
+  }
+}
+
+.record-action {
+  position: absolute;
+
+  top: 0.25rem;
+  right: 0.5rem;
+
+  button {
+    visibility: hidden;
+    padding: 0;
+    background-color: transparent;
+    span > span {
+      line-height: 1;
+    }
+  }
+}
+
+[dir="rtl"] .record-action {
+  right: unset;
+  left: 0.25rem;
+}

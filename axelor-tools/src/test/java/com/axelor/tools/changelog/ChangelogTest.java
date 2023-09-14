@@ -21,6 +21,7 @@ package com.axelor.tools.changelog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.common.ResourceUtils;
+import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,8 +41,15 @@ public class ChangelogTest {
 
   @Test
   public void generateChangelogTest() throws URISyntaxException, IOException {
+    List<String> types =
+        Lists.newArrayList("Feature", "Change", "Deprecate", "Remove", "Fix", "Security");
+    String version = "1.0.0";
+    String header =
+        String.format(
+            "%s (%s)", version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(getEntries(), "1.0.0", LocalDate.of(2020, 1, 10));
+    Release release = processor.process(getEntries(), version, header, types);
 
     File outputFile =
         Paths.get(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
@@ -54,7 +63,7 @@ public class ChangelogTest {
     URL changelogsUrl = ResourceUtils.getResource("changelogs/entries/");
     ChangelogEntryParser parser = new ChangelogEntryParser();
 
-    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI()))) {
+    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI())).sorted()) {
       return stream
           .map(Path::toFile)
           .map(

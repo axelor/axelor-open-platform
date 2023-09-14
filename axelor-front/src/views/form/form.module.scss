@@ -1,0 +1,76 @@
+.formViewContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.formViewScroller {
+  flex: 1;
+  overflow: auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0.5rem;
+}
+
+.formView {
+  padding: 0.5rem;
+  flex: 1;
+}
+
+.formLayout {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.side {
+  width: 25%;
+  min-width: 300px;
+}
+
+.mid {
+  max-width: 992px;
+}
+.mini {
+  max-width: 576px;
+}
+.large {
+  max-width: 1500px;
+}
+
+.dlist {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  margin: 0;
+  dd {
+    padding: 0 1rem;
+  }
+  dt,
+  dd {
+    min-height: 1.5rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.collaboration {
+  display: flex;
+  justify-content: flex-end;
+}

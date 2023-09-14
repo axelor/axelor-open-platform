@@ -15,7 +15,7 @@ dashlets.
 -----
 
 Dashlets are nothing but embedded views. The following view types are supported:
-`grid`, `chart`, `custom`, `cards`, `kanban`, `calendar`, `tree`, `html`.
+`grid`, `chart`, `custom`, `cards`, `kanban`, `calendar`, `tree`, `gantt`, `html`.
 
 The dashlet `action` can be either:
 

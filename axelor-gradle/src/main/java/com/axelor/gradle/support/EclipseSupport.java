@@ -105,7 +105,8 @@ public class EclipseSupport extends AbstractSupport {
     // finally configure wtp resources
     project.afterEvaluate(
         p -> {
-          if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
+          if (AxelorUtils.isAxelorApplication(project)
+              && project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             configureWtp(project, eclipse);
           }
         });

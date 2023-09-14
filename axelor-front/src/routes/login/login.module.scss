@@ -1,0 +1,47 @@
+.main {
+  max-width: 400px;
+}
+
+.clients {
+  margin-bottom: 1rem;
+}
+
+.paper {
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  max-height: 96px;
+  max-width: 368px;
+  margin-bottom: 1rem;
+}
+
+.error {
+  background-color: #f2dede;
+  border: 1px solid #ebccd1;
+}
+
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 22px;
+}
+
+.socialButtons button {
+  display: flex;
+  flex: 1;
+  padding: 8px 10px;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.socialLogo {
+  height: 18px;
+  width: 18px;
+  margin-right: 0.25em;
+}
+
+.socialTitle {
+  padding-left: 8px;
+}

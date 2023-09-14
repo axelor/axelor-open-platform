@@ -1,0 +1,106 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.auth.db.Role",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "name": "description",
+        "type": "STRING",
+        "title": "Description"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "menus",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Menus",
+        "mappedBy": "roles",
+        "target": "com.axelor.meta.db.MetaMenu"
+      }
+    ]
+  }
+}

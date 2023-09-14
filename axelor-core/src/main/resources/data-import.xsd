@@ -21,7 +21,7 @@
 -->
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://axelor.com/xml/ns/data-import"
   xmlns:db="http://axelor.com/xml/ns/data-import"
-  elementFormDefault="qualified" version="6.1">
+  elementFormDefault="qualified" version="7.0">
 
   <annotation>
     <documentation>

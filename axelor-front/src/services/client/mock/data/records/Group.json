@@ -1,0 +1,119 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 2,
+  "data": [
+    {
+      "viewCustomizationPermission$value": 1,
+      "code": "admins",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "viewCustomizationPermission": "CAN_CUSTOMIZE",
+      "canViewCollaboration": true,
+      "metaPermissions": [],
+      "roles": [],
+      "updatedOn": "2023-02-20T12:08:16.532695Z",
+      "createdOn": "2023-02-20T12:08:12.470742Z",
+      "version": 2,
+      "navigation": null,
+      "technicalStaff": true,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [],
+      "name": "Administrator",
+      "id": 1,
+      "menus": [
+        {
+          "id": 7,
+          "$version": 0,
+          "title": "Administration"
+        }
+      ],
+      "homeAction": null,
+      "selected": false,
+      "views": []
+    },
+    {
+      "viewCustomizationPermission$value": 0,
+      "code": "users",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "viewCustomizationPermission": "NOT_ALLOWED",
+      "canViewCollaboration": true,
+      "metaPermissions": [],
+      "roles": [],
+      "updatedOn": "2023-02-20T12:08:19.986639Z",
+      "createdOn": "2023-02-20T12:08:16.820756Z",
+      "version": 1,
+      "navigation": null,
+      "technicalStaff": false,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [
+        {
+          "name": "perm.menu.read",
+          "id": 5,
+          "$version": 0
+        },
+        {
+          "name": "perm.user.read",
+          "id": 6,
+          "$version": 0
+        },
+        {
+          "name": "perm.user.my",
+          "id": 7,
+          "$version": 0
+        },
+        {
+          "name": "perm.contact.all",
+          "id": 8,
+          "$version": 0
+        },
+        {
+          "name": "perm.contact.my",
+          "id": 9,
+          "$version": 0
+        },
+        {
+          "name": "perm.project.all",
+          "id": 10,
+          "$version": 0
+        }
+      ],
+      "name": "Users",
+      "id": 2,
+      "menus": [
+        {
+          "id": 47,
+          "$version": 1,
+          "title": "Address Book"
+        },
+        {
+          "id": 66,
+          "$version": 1,
+          "title": "Project Management"
+        }
+      ],
+      "homeAction": null,
+      "selected": false,
+      "views": []
+    }
+  ]
+}

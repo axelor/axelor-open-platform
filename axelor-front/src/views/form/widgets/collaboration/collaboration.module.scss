@@ -1,0 +1,52 @@
+.viewCollaboration {
+  margin-right: 0.5em;
+  height: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.avatarContainer {
+  border-radius: 50%;
+  border: 0.25rem solid;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.avatarContainer > * {
+  font-size: 1rem;
+}
+
+.avatar {
+  padding: 0;
+}
+
+.menu {
+  height: 100%;
+}
+
+.joined {
+  border-color: var(--bs-success);
+}
+
+.dirty {
+  border-color: var(--bs-warning);
+}
+
+.saved {
+  border-color: var(--bs-danger);
+}
+
+.left {
+  border-color: var(--bs-danger);
+}
+
+.left .avatar {
+  opacity: 0.5;
+}
+
+.grouped {
+  cursor: pointer;
+  overflow-x: clip;
+}

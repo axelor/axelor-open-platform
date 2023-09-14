@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_6.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.0.xsd">
 
   <selection name="view.type.selection">
     <option value="grid">Grid</option>
@@ -213,7 +213,6 @@
     <field name="parent"/>
     <field name="action"/>
     <field name="module"/>
-    <field name="top"/>
     <field name="left"/>
     <field name="mobile"/>
     <field name="hidden"/>
@@ -255,7 +254,6 @@
     <panel title="Visibility" sidebar="true" itemSpan="6">
       <field name="order"/>
       <field name="priority"/>
-      <field name="top" widget="inline-checkbox"/>
       <field name="left" widget="inline-checkbox"/>
       <field name="mobile" widget="inline-checkbox"/>
       <field name="hidden" widget="inline-checkbox"/>
@@ -359,7 +357,7 @@
       <field name="tableName"/>
       <field name="packageName"/>
     </panel>
-    <panel-related field="metaFields" orderBy="id" />
+    <panel-related field="metaFields" orderBy="id" x-can-export="true" />
   </form>
 
   <selection name="relationship.field.selection">

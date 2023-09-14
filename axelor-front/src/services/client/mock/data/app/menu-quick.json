@@ -1,0 +1,54 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "title": "My projects",
+      "order": 0,
+      "showingSelected": true,
+      "items": [
+        {
+          "title": "Next Gala",
+          "action": "com.axelor.project.web.ProjectController:updateDefaultProject",
+          "context": { "id": 1 },
+          "selected": false,
+          "model": "com.axelor.project.db.Project"
+        },
+        {
+          "title": "Fast Ball",
+          "action": "com.axelor.project.web.ProjectController:updateDefaultProject",
+          "context": { "id": 2 },
+          "selected": false,
+          "model": "com.axelor.project.db.Project"
+        }
+      ]
+    },
+    {
+      "title": "Access",
+      "order": 10,
+      "showingSelected": false,
+      "items": [
+        {
+          "title": "Contacts",
+          "action": "contact.all",
+          "context": null,
+          "selected": false,
+          "model": null
+        },
+        {
+          "title": "Quotations",
+          "action": "sale.orders.draft",
+          "context": null,
+          "selected": false,
+          "model": null
+        },
+        {
+          "title": "Sale Orders",
+          "action": "sale.orders",
+          "context": null,
+          "selected": false,
+          "model": null
+        }
+      ]
+    }
+  ]
+}

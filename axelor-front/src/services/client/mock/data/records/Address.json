@@ -1,0 +1,255 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 8,
+  "data": [
+    {
+      "area": null,
+      "zip": "07341",
+      "country": {
+        "code": "FR",
+        "name": "France",
+        "id": 1,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "Bodin",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.985859Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "2, chemin Petitjean",
+      "contact": {
+        "fullName": "Mrs Vienna Robert",
+        "id": 13,
+        "$version": 0
+      },
+      "id": 8,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "215006",
+      "country": {
+        "code": "CN",
+        "name": "China",
+        "id": 6,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "CangLang",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.972174Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "Zhu Hui Lu 168hao",
+      "contact": {
+        "fullName": "Mr Olivier Martinez",
+        "id": 12,
+        "$version": 0
+      },
+      "id": 7,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "400068",
+      "country": {
+        "code": "IN",
+        "name": "India",
+        "id": 7,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "Maharashtra",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.963357Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "18, Ameya Apt, Lt Road, Dahisar",
+      "contact": {
+        "fullName": "Miss Disney Leonard",
+        "id": 11,
+        "$version": 0
+      },
+      "id": 6,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "230001",
+      "country": {
+        "code": "CN",
+        "name": "China",
+        "id": 6,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "YaoHai",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.953516Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "Minghan Electronics Co., Ltd.",
+      "contact": {
+        "fullName": "Mrs Daniele Garcia",
+        "id": 10,
+        "$version": 0
+      },
+      "id": 5,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "11340-040",
+      "country": {
+        "code": "BR",
+        "name": "Brazil",
+        "id": 8,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "São Vicente",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.944193Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "Rua Luís Lafraia 1541",
+      "contact": {
+        "fullName": "Mr Betty Russell",
+        "id": 9,
+        "$version": 0
+      },
+      "id": 4,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "AB45 5JZ",
+      "country": {
+        "code": "GB",
+        "name": "United Kingdom",
+        "id": 4,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "GORDONSTOWN",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.933984Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "116 Bridge Street",
+      "contact": {
+        "fullName": "Miss Lucille Gilbert",
+        "id": 8,
+        "$version": 0
+      },
+      "id": 3,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "92922",
+      "country": {
+        "code": "FR",
+        "name": "France",
+        "id": 1,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "Paris-la-Forêt",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.920707Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "8, boulevard Colas",
+      "contact": {
+        "fullName": "Mrs Sidrah Hobbs",
+        "id": 7,
+        "$version": 0
+      },
+      "id": 2,
+      "state": null,
+      "selected": false
+    },
+    {
+      "area": null,
+      "zip": "06729",
+      "country": {
+        "code": "FR",
+        "name": "France",
+        "id": 1,
+        "$version": 0
+      },
+      "updatedBy": null,
+      "city": "Guerin-sur-Coulon",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.839887Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "street": "29, chemin Bertrand Meyer",
+      "contact": {
+        "fullName": "Mr Fredrick Brandt",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 1,
+      "state": null,
+      "selected": false
+    }
+  ]
+}

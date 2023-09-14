@@ -1,0 +1,82 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 94,
+      "modelId": 51,
+      "name": "order-line-grid",
+      "title": "Ordered Items",
+      "model": "com.axelor.sale.db.OrderLine",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "order",
+          "target": "com.axelor.sale.db.Order",
+          "targetName": "name",
+          "autoTitle": "Order"
+        },
+        {
+          "type": "field",
+          "name": "product",
+          "onChange": "action-order-line-change-product",
+          "target": "com.axelor.sale.db.Product",
+          "targetName": "name",
+          "autoTitle": "Product"
+        },
+        {
+          "type": "field",
+          "name": "price",
+          "autoTitle": "Price"
+        },
+        {
+          "type": "field",
+          "name": "quantity",
+          "autoTitle": "Quantity"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "product",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Product",
+        "required": true,
+        "target": "com.axelor.sale.db.Product"
+      },
+      {
+        "defaultValue": 0,
+        "name": "quantity",
+        "minSize": 1,
+        "type": "INTEGER",
+        "title": "Quantity",
+        "required": true
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "price",
+        "scale": 4,
+        "minSize": "0.0",
+        "type": "DECIMAL",
+        "title": "Price",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "order",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Order",
+        "required": true,
+        "target": "com.axelor.sale.db.Order"
+      }
+    ]
+  }
+}

@@ -23,6 +23,7 @@ import com.axelor.auth.db.User;
 import java.io.IOException;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
+import org.apache.shiro.subject.Subject;
 
 public abstract class Channel {
 
@@ -47,8 +48,12 @@ public abstract class Channel {
   }
 
   protected User getUser(Session session) {
-    return session.getUserPrincipal() == null
-        ? null
-        : AuthUtils.getUser(session.getUserPrincipal().getName());
+    if (session.getUserPrincipal() == null) {
+      return null;
+    }
+
+    final Subject subject = (Subject) session.getUserProperties().get(Subject.class.getName());
+    final String code = subject.getPrincipal().toString();
+    return AuthUtils.getUser(code);
   }
 }

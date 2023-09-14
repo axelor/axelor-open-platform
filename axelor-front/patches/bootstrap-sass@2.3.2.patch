@@ -1,0 +1,286 @@
+diff --git a/lib/_button-groups.scss b/lib/_button-groups.scss
+index 1b08d50f5e916c0129f8f094bb16d87f2aee1b60..c955d2d6ee175fb13875bea0aec3df3b327e25cf 100644
+--- a/lib/_button-groups.scss
++++ b/lib/_button-groups.scss
+@@ -22,8 +22,8 @@
+ // Optional: Group multiple button groups together for a toolbar
+ .btn-toolbar {
+   font-size: 0; // Hack to remove whitespace that results from using inline-block
+-  margin-top: $baseLineHeight / 2;
+-  margin-bottom: $baseLineHeight / 2;
++  margin-top: $baseLineHeight * 0.5;
++  margin-bottom: $baseLineHeight * 0.5;
+   > .btn + .btn,
+   > .btn-group + .btn,
+   > .btn + .btn-group {
+diff --git a/lib/_code.scss b/lib/_code.scss
+index b9e2f6f224ef8eeeca5b1d590ab614b51e310612..897f32bd89a4741088a7d5c9dd01c9bbc2132023 100644
+--- a/lib/_code.scss
++++ b/lib/_code.scss
+@@ -25,8 +25,8 @@ code {
+ // Blocks of code
+ pre {
+   display: block;
+-  padding: ($baseLineHeight - 1) / 2;
+-  margin: 0 0 $baseLineHeight / 2;
++  padding: ($baseLineHeight - 1) * 0.5;
++  margin: 0 0 $baseLineHeight * 0.5;
+   font-size: $baseFontSize - 1; // 14px to 13px
+   line-height: $baseLineHeight;
+   word-break: break-all;
+diff --git a/lib/_forms.scss b/lib/_forms.scss
+index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416a65667ee 100644
+--- a/lib/_forms.scss
++++ b/lib/_forms.scss
+@@ -81,7 +81,7 @@ input[type="color"],
+   display: inline-block;
+   height: $baseLineHeight;
+   padding: 4px 6px;
+-  margin-bottom: $baseLineHeight / 2;;
++  margin-bottom: $baseLineHeight * 0.5;;
+   font-size: $baseFontSize;
+   line-height: $baseLineHeight;
+   color: $gray;
+@@ -403,7 +403,7 @@ select:focus:invalid {
+ 
+ .help-block {
+   display: block; // account for any element using help-block
+-  margin-bottom: $baseLineHeight / 2;
++  margin-bottom: $baseLineHeight * 0.5;
+ }
+ 
+ .help-inline {
+@@ -422,7 +422,7 @@ select:focus:invalid {
+ .input-append,
+ .input-prepend {
+   display: inline-block;
+-  margin-bottom: $baseLineHeight / 2;
++  margin-bottom: $baseLineHeight * 0.5;
+   vertical-align: middle;
+   font-size: 0; // white space collapse hack
+   white-space: nowrap; // Prevent span and input from separating
+@@ -630,7 +630,7 @@ input.search-query {
+ 
+ // Margin to space out fieldsets
+ .control-group {
+-  margin-bottom: $baseLineHeight / 2;
++  margin-bottom: $baseLineHeight * 0.5;
+ }
+ 
+ // Legend collapses margin, so next element is responsible for spacing
+@@ -679,7 +679,7 @@ legend + .control-group {
+   .input-prepend,
+   .input-append {
+     + .help-block {
+-      margin-top: $baseLineHeight / 2;
++      margin-top: $baseLineHeight * 0.5;
+     }
+   }
+   // Move over buttons in .form-actions to align with .controls
+diff --git a/lib/_mixins.scss b/lib/_mixins.scss
+index 53303aa0de928ca407a4613c3ac90913d343b69f..4ef20fd4d79435230f181ff055d3f97484317438 100644
+--- a/lib/_mixins.scss
++++ b/lib/_mixins.scss
+@@ -9,6 +9,8 @@
+ // Clearfix
+ // --------
+ // For clearing floats like a boss h5bp.com/q
++@use "sass:math";
++
+ @mixin clearfix {
+   *zoom: 1;
+   &:before,
+@@ -379,7 +381,7 @@
+ 
+ // Opacity
+ @mixin opacity($opacity) {
+-  opacity: $opacity / 100;
++  opacity: $opacity * 0.01;
+   filter: alpha(opacity=$opacity);
+ }
+ 
+@@ -494,7 +496,7 @@
+   // to negative-margin away, but so it goes.
+   *width: 100%;
+   height: 1px;
+-  margin: (($baseLineHeight / 2) - 1) 1px; // 8px 1px
++  margin: (($baseLineHeight * 0.5) - 1) 1px; // 8px 1px
+   *margin: -5px 0 5px;
+   overflow: hidden;
+   background-color: $top;
+@@ -528,7 +530,7 @@
+ // Vertically center elements in the navbar.
+ // Example: an element has a height of 30px, so write out `.navbarVerticalAlign(30px);` to calculate the appropriate top margin.
+ @mixin navbarVerticalAlign($elementHeight) {
+-  margin-top: ($navbarHeight - $elementHeight) / 2;
++  margin-top: ($navbarHeight - $elementHeight) * 0.5;
+ }
+ 
+ 
+@@ -618,7 +620,7 @@
+       @include input-block-level();
+       float: left;
+       margin-left: $fluidGridGutterWidth;
+-      *margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
++      *margin-left: $fluidGridGutterWidth - (math.div(.5, $gridRowWidth) * 100px * 1%);
+     }
+     [class*="span"]:first-child {
+       margin-left: 0;
+@@ -650,17 +652,17 @@
+ 
+ @mixin grid-fluid-span($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
+   width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1));
+-  *width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%);
++  *width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%);
+ }
+ 
+ @mixin grid-fluid-offset($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
+   margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth * 2);
+-  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + ($fluidGridGutterWidth * 2) - (.5 / $gridRowWidth * 100px * 1%);
++  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%) + ($fluidGridGutterWidth * 2) - (math.div(.5, $gridRowWidth) * 100px * 1%);
+ }
+ 
+ @mixin grid-fluid-offset-first-child($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
+   margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth);
+-  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
++  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%) + $fluidGridGutterWidth - (math.div(.5, $gridRowWidth) * 100px * 1%);
+ }
+ 
+ 
+diff --git a/lib/_navbar.scss b/lib/_navbar.scss
+index a65aa4abef59570bbdd7723459dc1060c490417f..4a856c395491ddb4774994b269bef349997ae4e5 100644
+--- a/lib/_navbar.scss
++++ b/lib/_navbar.scss
+@@ -50,7 +50,7 @@
+   float: left;
+   display: block;
+   // Vertically center the text given $navbarHeight
+-  padding: (($navbarHeight - $baseLineHeight) / 2) 20px (($navbarHeight - $baseLineHeight) / 2);
++  padding: (($navbarHeight - $baseLineHeight) * 0.5) 20px (($navbarHeight - $baseLineHeight) * 0.5);
+   margin-left: -20px; // negative indent to left-align the text down the page
+   font-size: 20px;
+   font-weight: 200;
+@@ -242,7 +242,7 @@
+ .navbar .nav > li > a {
+   float: none;
+   // Vertically center the text given $navbarHeight
+-  padding: (($navbarHeight - $baseLineHeight) / 2) 15px (($navbarHeight - $baseLineHeight) / 2);
++  padding: (($navbarHeight - $baseLineHeight) * 0.5) 15px (($navbarHeight - $baseLineHeight) * 0.5);
+   color: $navbarLinkColor;
+   text-decoration: none;
+   text-shadow: 0 1px 0 $navbarBackgroundHighlight;
+diff --git a/lib/_responsive-navbar.scss b/lib/_responsive-navbar.scss
+index 9898a16eb441bf46de60b41a87b18f4428496549..3d580c8b1c18d3dc1459b1a6f3efe1a458df3521 100644
+--- a/lib/_responsive-navbar.scss
++++ b/lib/_responsive-navbar.scss
+@@ -48,7 +48,7 @@
+   // Block-level the nav
+   .nav-collapse .nav {
+     float: none;
+-    margin: 0 0 ($baseLineHeight / 2);
++    margin: 0 0 ($baseLineHeight * 0.5);
+   }
+   .nav-collapse .nav > li {
+     float: none;
+@@ -137,8 +137,8 @@
+   .nav-collapse .navbar-form,
+   .nav-collapse .navbar-search {
+     float: none;
+-    padding: ($baseLineHeight / 2) 15px;
+-    margin: ($baseLineHeight / 2) 0;
++    padding: ($baseLineHeight * 0.5) 15px;
++    margin: ($baseLineHeight * 0.5) 0;
+     border-top: 1px solid $navbarBackground;
+     border-bottom: 1px solid $navbarBackground;
+     @include box-shadow(inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1));
+diff --git a/lib/_type.scss b/lib/_type.scss
+index f68e7ba2d05e9c8865e164544724dcadc72d5118..6a2fc101f3227e3bf80ed7c3b35d36a44551df2f 100644
+--- a/lib/_type.scss
++++ b/lib/_type.scss
+@@ -7,7 +7,7 @@
+ // -------------------------
+ 
+ p {
+-  margin: 0 0 $baseLineHeight / 2;
++  margin: 0 0 $baseLineHeight * 0.5;
+ }
+ .lead {
+   margin-bottom: $baseLineHeight;
+@@ -57,7 +57,7 @@ a.text-success:focus { color: darken($successText, 10%); }
+ // -------------------------
+ 
+ h1, h2, h3, h4, h5, h6 {
+-  margin: ($baseLineHeight / 2) 0;
++  margin: ($baseLineHeight * 0.5) 0;
+   font-family: $headingsFontFamily;
+   font-weight: $headingsFontWeight;
+   line-height: $baseLineHeight;
+@@ -91,7 +91,7 @@ h4 small { font-size: $baseFontSize; }
+ // -------------------------
+ 
+ .page-header {
+-  padding-bottom: ($baseLineHeight / 2) - 1;
++  padding-bottom: ($baseLineHeight * 0.5) - 1;
+   margin: $baseLineHeight 0 ($baseLineHeight * 1.5);
+   border-bottom: 1px solid $grayLighter;
+ }
+@@ -104,7 +104,7 @@ h4 small { font-size: $baseFontSize; }
+ // Unordered and Ordered lists
+ ul, ol {
+   padding: 0;
+-  margin: 0 0 $baseLineHeight / 2 25px;
++  margin: 0 0 $baseLineHeight * 0.5 25px;
+ }
+ ul ul,
+ ul ol,
+@@ -148,7 +148,7 @@ dt {
+   font-weight: bold;
+ }
+ dd {
+-  margin-left: $baseLineHeight / 2;
++  margin-left: $baseLineHeight * 0.5;
+ }
+ // Horizontal layout (like forms)
+ .dl-horizontal {
+diff --git a/lib/_variables.scss b/lib/_variables.scss
+index e3752023f00811867b4b58e9c87401c72a45cafe..42688cfd8881ea641ac9427ef878a5954e401461 100644
+--- a/lib/_variables.scss
++++ b/lib/_variables.scss
+@@ -9,6 +9,8 @@
+ 
+ // Grays
+ // -------------------------
++@use "sass:math";
++
+ $black:                 #000 !default;
+ $grayDarker:            #222 !default;
+ $grayDark:              #333 !default;
+@@ -89,7 +91,7 @@ $btnBackgroundHighlight:            darken($white, 10%) !default;
+ $btnBorder:                         #ccc !default;
+ 
+ $btnPrimaryBackground:              $linkColor !default;
+-$btnPrimaryBackgroundHighlight:     adjust-hue($btnPrimaryBackground, 20%) !default;
++$btnPrimaryBackgroundHighlight:     adjust-hue($btnPrimaryBackground, 20deg) !default;
+ 
+ $btnInfoBackground:                 #5bc0de !default;
+ $btnInfoBackgroundHighlight:        #2f96b4 !default;
+@@ -289,13 +291,13 @@ $gridRowWidth768:         ($gridColumns * $gridColumnWidth768) + ($gridGutterWid
+ 
+ // Fluid grid
+ // -------------------------
+-$fluidGridColumnWidth:    percentage($gridColumnWidth/$gridRowWidth) !default;
+-$fluidGridGutterWidth:    percentage($gridGutterWidth/$gridRowWidth) !default;
++$fluidGridColumnWidth:    percentage(math.div($gridColumnWidth, $gridRowWidth)) !default;
++$fluidGridGutterWidth:    percentage(math.div($gridGutterWidth, $gridRowWidth)) !default;
+ 
+ // 1200px min
+-$fluidGridColumnWidth1200:     percentage($gridColumnWidth1200/$gridRowWidth1200) !default;
+-$fluidGridGutterWidth1200:     percentage($gridGutterWidth1200/$gridRowWidth1200) !default;
++$fluidGridColumnWidth1200:     percentage(math.div($gridColumnWidth1200, $gridRowWidth1200)) !default;
++$fluidGridGutterWidth1200:     percentage(math.div($gridGutterWidth1200, $gridRowWidth1200)) !default;
+ 
+ // 768px-979px
+-$fluidGridColumnWidth768:      percentage($gridColumnWidth768/$gridRowWidth768) !default;
+-$fluidGridGutterWidth768:      percentage($gridGutterWidth768/$gridRowWidth768) !default;
++$fluidGridColumnWidth768:      percentage(math.div($gridColumnWidth768, $gridRowWidth768)) !default;
++$fluidGridGutterWidth768:      percentage(math.div($gridGutterWidth768, $gridRowWidth768)) !default;

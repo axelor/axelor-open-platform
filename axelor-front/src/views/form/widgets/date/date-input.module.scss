@@ -1,0 +1,18 @@
+.inputWrapper {
+  position: relative;
+}
+.inputIcon {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.5rem;
+  [dir="rtl"] & {
+    right: unset;
+    left: 0;
+  }
+}

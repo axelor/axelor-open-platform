@@ -1,0 +1,143 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 8,
+  "data": [
+    {
+      "code": "BR",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Brazil",
+      "id": 8,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.496283Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "CN",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "China",
+      "id": 6,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.491329Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "FR",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "France",
+      "id": 1,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.478305Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "DE",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Germany",
+      "id": 2,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.481871Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "IN",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "India",
+      "id": 7,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.494035Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "ES",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Spain",
+      "id": 3,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.484583Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "GB",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "United Kingdom",
+      "id": 4,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.487108Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "US",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "United States",
+      "id": 5,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.489369Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    }
+  ]
+}

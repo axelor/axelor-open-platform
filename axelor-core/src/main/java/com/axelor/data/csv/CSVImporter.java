@@ -230,12 +230,13 @@ public class CSVImporter implements Importer {
   }
 
   /** Creates a reader capable of handling BOMs. */
-  private InputStreamReader newReader(final InputStream inputStream) {
-    return new InputStreamReader(new BOMInputStream(inputStream), StandardCharsets.UTF_8);
+  private InputStreamReader newReader(final InputStream inputStream) throws IOException {
+    return new InputStreamReader(
+        BOMInputStream.builder().setInputStream(inputStream).get(), StandardCharsets.UTF_8);
   }
 
   /**
-   * Lauch the import for the input and reader.
+   * Launches the import for the input and reader.
    *
    * @param csvInput
    * @param reader

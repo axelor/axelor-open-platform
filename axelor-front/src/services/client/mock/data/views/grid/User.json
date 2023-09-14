@@ -1,0 +1,104 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 30,
+      "modelId": 8,
+      "name": "user-grid",
+      "title": "Users",
+      "model": "com.axelor.auth.db.User",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "code",
+          "autoTitle": "Code"
+        },
+        {
+          "type": "field",
+          "name": "email",
+          "autoTitle": "Email"
+        },
+        {
+          "type": "field",
+          "name": "language",
+          "autoTitle": "Language"
+        },
+        {
+          "type": "field",
+          "name": "group",
+          "target": "com.axelor.auth.db.Group",
+          "targetName": "name",
+          "autoTitle": "Group"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Login",
+        "required": true
+      },
+      {
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "selection": "select.language",
+        "name": "language",
+        "selectionList": [
+          {
+            "value": "en",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "English"
+          },
+          {
+            "value": "fr",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "French"
+          }
+        ],
+        "type": "STRING",
+        "title": "Language"
+      },
+      {
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "group",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Group",
+        "target": "com.axelor.auth.db.Group"
+      }
+    ]
+  }
+}

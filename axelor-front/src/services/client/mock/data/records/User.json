@@ -1,0 +1,91 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 2,
+  "data": [
+    {
+      "code": "admin",
+      "roles": [],
+      "singleTab": false,
+      "language": null,
+      "createdOn": "2023-02-20T12:08:12.480972Z",
+      "noHelp": false,
+      "blocked": false,
+      "permissions": [],
+      "activateOn": null,
+      "expiresOn": null,
+      "theme": null,
+      "id": 1,
+      "defaultProject": null,
+      "passwordUpdatedOn": null,
+      "email": null,
+      "selected": false,
+      "group": {
+        "code": "admins",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "metaPermissions": [],
+      "updatedOn": "2023-02-20T12:08:20.209799Z",
+      "version": 2,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "forcePasswordChange": false,
+      "name": "Administrator",
+      "homeAction": null
+    },
+    {
+      "code": "demo",
+      "roles": [],
+      "singleTab": false,
+      "language": null,
+      "createdOn": "2023-02-20T12:08:17.061462Z",
+      "noHelp": false,
+      "blocked": false,
+      "permissions": [],
+      "activateOn": null,
+      "expiresOn": null,
+      "theme": null,
+      "id": 2,
+      "defaultProject": null,
+      "passwordUpdatedOn": null,
+      "email": null,
+      "selected": false,
+      "group": {
+        "code": "users",
+        "name": "Users",
+        "id": 2,
+        "$version": 1
+      },
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "metaPermissions": [],
+      "updatedOn": "2023-02-20T12:08:20.405090Z",
+      "version": 1,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "forcePasswordChange": false,
+      "name": "Demo User",
+      "homeAction": null
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 3,
+  "data": [
+    {
+      "code": "miss",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Miss",
+      "id": 3,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.510827Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "mr",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Mr",
+      "id": 1,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.504146Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "mrs",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Mrs",
+      "id": 2,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.507042Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    }
+  ]
+}

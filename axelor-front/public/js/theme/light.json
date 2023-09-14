@@ -1,0 +1,125 @@
+{
+  "palette": {
+    "blue": "#6C67FA",
+    "green": "#3ECF8E",
+    "purple": "#C354F2",
+    "red": "#DD514C",
+    "yellow": "#FFBE4E",
+    "cyan": "#26C6F9",
+
+    "white": "#FFF",
+    "black": "#333",
+
+    "body_color": "#5A5A7C",
+    "emphasis_color": "#33325B"
+  },
+  "border": {
+    "color": "#EAEAFE"
+  },
+  "components": {
+    "Shell": {
+      "sidebar": {
+        "bg": "#F8F8FF"
+      }
+    },
+    "Panel": {
+      "header": {
+        "bg": "#FBFBFF"
+      }
+    },
+    "Dropdown": {
+      "border": {
+        "color": "#EAEAFE"
+      },
+      "item_hover": {
+        "bg": "#FBFBFF"
+      },
+      "item_active": {
+        "bg": "primary",
+        "color": "#fff"
+      },
+      "divider": {
+        "bg": "#EAEAFE"
+      }
+    },
+    "NavMenu": {
+      "item": {
+        "border": {
+          "radius": "1rem"
+        }
+      },
+      "item_hover": {
+        "bg": "var(--bs-primary-bg-subtle)"
+      },
+      "item_active": {
+        "bg": "rgba(var(--bs-primary-rgb), 0.8)",
+        "color": "white"
+      },
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
+      },
+      "icon_active": {
+        "color": "white"
+      }
+    },
+    "NavTabs": {
+      "text": {
+        "transform": "none"
+      },
+      "icon": {
+        "bg": "transparent"
+      },
+      "icon_hover": {
+        "bg": "transparent"
+      },
+      "icon_active": {
+        "bg": "transparent"
+      }
+    },
+    "CommandBar": {
+      "button_hover": {
+        "bg": "#F8F8FF"
+      },
+      "button_active": {
+        "bg": "#EAEAFE"
+      }
+    },
+    "Table": {
+      "bg": "#FFF",
+      "border": {
+        "color": "#EFEDFE"
+      },
+      "header": {
+        "bg": "#FBFBFF"
+      },
+      "row_odd": {
+        "bg": "#FFF"
+      },
+      "row_hover": {
+        "bg": "#FBFBFF"
+      },
+      "row_active": {
+        "bg": "#FBFBFF"
+      },
+      "cell_active": {
+        "bg": "#F2F2FF"
+      }
+    },
+    "Badge": {
+      "border": {
+        "radius": "1rem"
+      }
+    },
+    "Input": {
+      "focus": {
+        "shadow": "none"
+      },
+      "invalid_focus": {
+        "shadow": "none"
+      }
+    }
+  }
+}

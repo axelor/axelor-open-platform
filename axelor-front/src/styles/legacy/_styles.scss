@@ -1,0 +1,229 @@
+@use "sass:map";
+
+$colors: (
+  "primary": #0d6efd,
+  "secondary": #6c757d,
+  "success": #198754,
+  "info": #0dcaf0,
+  "warning": #ffc107,
+  "danger": #dc3545,
+  "error": #dc3545,
+
+  "blue": #0d6efd,
+  "indigo": #6610f2,
+  "purple": #6f42c1,
+  "pink": #d63384,
+  "red": #dc3545,
+  "orange": #fd7e14,
+  "yellow": #ffc107,
+  "green": #198754,
+  "teal": #20c997,
+  "cyan": #0dcaf0,
+  "black": #000,
+  "white": #fff,
+  "gray": #6c757d,
+  "grey": #9e9e9e,
+  "deeppurple": #673ab7,
+  "lightblue": #03a9f4,
+  "lightgreen": #8bc34a,
+  "lime": #cddc39,
+  "amber": #ffc107,
+  "deeporange": #ff5722,
+  "brown": #795548,
+  "bluegrey": #607d8b,
+  "olive": #cddc39,
+  "violet": #9c27b0,
+);
+
+$text: (
+  "primary": #fff,
+  "warning": #fff,
+  "success": #fff,
+  "danger": #fff,
+  "error": #fff,
+  "info": #fff,
+  "red": #fff,
+  "pink": #fff,
+  "purple": #fff,
+  "deeppurple": #fff,
+  "indigo": #fff,
+  "blue": #fff,
+  "lightblue": #fff,
+  "cyan": #fff,
+  "teal": #fff,
+  "green": #fff,
+  "lightgreen": #000,
+  "lime": #000,
+  "yellow": #000,
+  "amber": #000,
+  "orange": #000,
+  "deeporange": #fff,
+  "brown": #fff,
+  "grey": #000,
+  "bluegrey": #fff,
+  "black": white,
+  "white": black,
+  "olive": #000,
+  "violet": #fff,
+);
+
+$text_styles: (
+  "bold": (
+    font-weight: 600,
+  ),
+  "italic": (
+    font-style: italic,
+  ),
+  "underline": (
+    text-decoration: underline,
+  ),
+  "overline": (
+    text-decoration: overline,
+  ),
+  "line-through": (
+    text-decoration: line-through,
+  ),
+  "small": (
+    font-size: 10px,
+  ),
+  "big": (
+    font-size: 16px,
+  ),
+  "large": (
+    font-size: 18px,
+  ),
+  "left": (
+    text-align: left,
+  ),
+  "right": (
+    text-align: right,
+  ),
+  "center": (
+    text-align: center,
+  ),
+  "justify": (
+    text-align: justify,
+  ),
+);
+
+$label_colors: (
+  "red": red,
+  "blue": blue,
+  "green": green,
+  "muted": #777,
+  "primary": #428bca,
+  "success": #3c763d,
+  "info": #31708f,
+  "warning": #8a6d3b,
+  "danger": #a94442,
+);
+
+$label_backgrounds: (
+  "primary": #428bca,
+  "success": #dff0d8,
+  "info": #d9edf7,
+  "warning": #fcf8e3,
+  "danger": #f2dede,
+);
+
+$label_backgrounds_text: (
+  "primary": #fff,
+);
+
+[class*="hilite-"] > .display-text {
+  color: inherit;
+}
+
+[class*="hilite-"].strong {
+  &,
+  input:first-of-type,
+  textarea:first-of-type {
+    font-weight: 600 !important;
+  }
+}
+
+@each $name, $value in $colors {
+  .hilite-#{$name}-text,
+  .hilite-#{$name}-text input:first-of-type,
+  .hilite-#{$name}-text textarea:first-of-type,
+  .hilite-#{$name}-text .slick-cell {
+    color: $value !important;
+  }
+
+  .hilite-#{$name},
+  .hilite-#{$name} .slick-cell {
+    color: map.get($text, $name) !important;
+    background-color: $value !important;
+  }
+}
+
+@each $name, $properties in $text_styles {
+  @each $property, $value in $properties {
+    .form-item label.label-#{$name},
+    .form-item-container.#{$name},
+    .form-item-container.#{$name} input:first-of-type,
+    .form-item-container.#{$name} input:first-of-type {
+      #{$property}: $value !important;
+    }
+  }
+}
+
+@each $name, $value in $label_colors {
+  .form-item label.label-#{$name},
+  .form-item-container.#{$name},
+  .form-item-container.#{$name} input:first-of-type,
+  .form-item-container.#{$name} input:first-of-type {
+    color: $value !important;
+  }
+}
+
+@each $name, $value in $label_backgrounds {
+  .form-item label.label-bg-#{$name},
+  .form-item-container.bg-#{$name},
+  .form-item-container.bg-#{$name} input:first-of-type,
+  .form-item-container.bg-#{$name} textarea:first-of-type {
+    color: map.get($label_backgrounds_text, $name);
+    background-color: $value !important;
+  }
+}
+
+.font-bold {
+  font-weight: 600;
+}
+
+// Remove mispelled rule name in future versions
+.font-normal,
+.font-noraml {
+  font-weight: 400;
+}
+
+@each $name, $value in $colors {
+  .fg-#{$name} {
+    color: $value;
+  }
+}
+
+@each $name, $value in $colors {
+  .bg-#{$name} {
+    background-color: $value;
+  }
+}
+
+@each $name, $value in $colors {
+  .panel-#{$name} .panel .panel-header,
+  .panel-#{$name} .dashlet .dashlet-header {
+    border-top-color: $value;
+  }
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}

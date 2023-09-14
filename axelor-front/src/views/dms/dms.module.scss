@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.content {
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.content,
+.grid {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.grid {
+  position: relative;
+}
+
+.grid,
+.tree {
+  overflow: auto;
+}
+
+.tree {
+  display: flex;
+  width: 250px;
+  transition: all 0.25s;
+  background-color: var(--ax-theme-table-th-bg);
+  min-width: 0;
+  margin-right: 0.5rem;
+  > ul {
+    margin: 0.5rem;
+  }
+  &.hide {
+    width: 0px;
+    margin: 0;
+  }
+}
+
+[dir="rtl"] {
+  .tree {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+}
+
+.breadcrumbs {
+  min-width: 0;
+  ul {
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+  }
+  li {
+    display: flex;
+    & > * {
+      display: flex;
+      align-items: center;
+    }
+  }
+  a {
+    cursor: pointer;
+  }
+}
+
+// required for popup scrolling
+.container.popup {
+  .tree {
+    flex-direction: column;
+  }
+  .tree > ul {
+    flex: 1;
+    min-height: 400px;
+  }
+}

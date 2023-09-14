@@ -1,0 +1,102 @@
+.label,
+.badge {
+  display: inline;
+  font-size: 0.9rem;
+  font-weight: bold;
+  line-height: 1;
+  color: var(--bs-body-bg);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: var(--bs-secondary);
+}
+
+.label,
+.badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.badge {
+  border-radius: 0.5rem;
+}
+
+.label:empty,
+.badge:empty {
+  display: none;
+}
+
+a.label:hover,
+a.label:focus,
+a.badge:hover,
+a.badge:focus {
+  color: var(--bs-body-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.label-important,
+.badge-important {
+  background-color: var(--bs-danger);
+}
+
+.label-important[href],
+.badge-important[href] {
+  background-color: var(--bs-danger);
+}
+
+.label-warning,
+.badge-warning {
+  background-color: var(--bs-warning);
+}
+
+.label-warning[href],
+.badge-warning[href] {
+  background-color: var(--bs-warning);
+}
+
+.label-success,
+.badge-success {
+  background-color: var(--bs-success);
+}
+
+.label-success[href],
+.badge-success[href] {
+  background-color: var(--bs-success);
+}
+
+.label-info,
+.badge-info {
+  background-color: var(--bs-info);
+}
+
+.label-info[href],
+.badge-info[href] {
+  background-color: var(--bs-info);
+}
+
+.label-inverse,
+.badge-inverse {
+  background-color: var(--bs-secondary);
+}
+
+.label-inverse[href],
+.badge-inverse[href] {
+  background-color: var(--bs-secondary);
+}
+
+.btn .label,
+.btn .badge {
+  position: relative;
+  top: -1px;
+}
+
+.btn-mini .label,
+.btn-mini .badge {
+  top: 0;
+}
+
+.label,
+.badge {
+  text-decoration: none;
+}

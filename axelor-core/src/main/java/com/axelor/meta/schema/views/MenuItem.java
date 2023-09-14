@@ -45,8 +45,6 @@ public class MenuItem extends SimpleWidget {
 
   @XmlAttribute private String groups;
 
-  @XmlAttribute private Boolean top;
-
   @XmlAttribute private Boolean left;
 
   @XmlAttribute private Boolean mobile;
@@ -97,14 +95,6 @@ public class MenuItem extends SimpleWidget {
 
   public void setGroups(String groups) {
     this.groups = groups;
-  }
-
-  public Boolean getTop() {
-    return top;
-  }
-
-  public void setTop(Boolean top) {
-    this.top = top;
   }
 
   public Boolean getLeft() {

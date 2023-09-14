@@ -1,0 +1,10 @@
+---
+title: Add `application.icon` and `context.appIcon` settings
+type: feature
+description: |
+  These settings allow to define an application icon used
+  for website favicon and small logo.
+  They can be used similarly to the `application.logo`
+  and `context.appLogo` settings.
+  The icon must be a multiple of 48px square
+  for favicon compatibility with most browsers.

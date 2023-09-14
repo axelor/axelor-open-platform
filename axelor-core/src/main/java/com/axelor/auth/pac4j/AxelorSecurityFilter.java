@@ -18,12 +18,12 @@
  */
 package com.axelor.auth.pac4j;
 
-import io.buji.pac4j.filter.SecurityFilter;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
+import org.pac4j.jee.filter.SecurityFilter;
 
 @Singleton
 public class AxelorSecurityFilter extends SecurityFilter {

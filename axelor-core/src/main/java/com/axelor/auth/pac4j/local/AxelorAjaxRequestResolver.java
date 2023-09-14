@@ -20,6 +20,7 @@ package com.axelor.auth.pac4j.local;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import java.util.Optional;
+import javax.inject.Singleton;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.http.HttpAction;
@@ -28,6 +29,7 @@ import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
 import org.pac4j.core.redirect.RedirectionActionBuilder;
 
+@Singleton
 public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
 
   @Override
@@ -42,7 +44,7 @@ public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
       RedirectionActionBuilder redirectionActionBuilder) {
     if (isAjax(context, sessionStore)
         && getUrl(context, sessionStore, redirectionActionBuilder)
-            .filter("login.jsp"::equals)
+            .filter(url -> url.endsWith(AxelorFormClient.LOGIN_URL))
             .isPresent()) {
       return UnauthorizedAction.INSTANCE;
     }

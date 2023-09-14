@@ -1,0 +1,12 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "values": {
+        "totalAmount": "9451.1300",
+        "amount": "10365.7800",
+        "taxAmount": "914.6500"
+      }
+    }
+  ]
+}

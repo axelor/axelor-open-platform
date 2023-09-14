@@ -1,0 +1,21 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "view": {
+        "domain": null,
+        "icon": null,
+        "viewType": "cards",
+        "context": { "json-enhance": "true", "_id": null },
+        "actionId": 57,
+        "model": "com.axelor.contact.db.Contact",
+        "title": "Contacts",
+        "params": {},
+        "views": [
+          { "name": "contact-cards", "type": "cards" },
+          { "name": "contact-form", "type": "form" }
+        ]
+      }
+    }
+  ]
+}

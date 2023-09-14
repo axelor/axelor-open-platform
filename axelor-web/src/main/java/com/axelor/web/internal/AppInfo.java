@@ -26,45 +26,44 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
-import com.axelor.common.StringUtils;
+import com.axelor.auth.pac4j.AxelorSecurityLogic;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaFile;
-import com.axelor.script.CompositeScriptHelper;
-import com.axelor.script.ScriptBindings;
-import com.axelor.script.ScriptHelper;
-import io.buji.pac4j.profile.ShiroProfileManager;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
+import com.axelor.web.service.InfoService;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
+@Singleton
+@Deprecated(since = "7.0.0")
 public class AppInfo {
 
   private static final AppSettings SETTINGS = AppSettings.get();
-  private static final String APP_THEME =
-      SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
 
   public Map<String, Object> info(final ServletContext context) {
+    return info();
+  }
 
-    final Map<String, Object> map = new HashMap<>();
+  public Map<String, Object> info() {
     final User user = AuthUtils.getUser();
+    return user != null ? info(user) : Collections.emptyMap();
+  }
 
-    if (user == null) {
-      return map;
-    }
-
+  public Map<String, Object> info(User user) {
+    final Map<String, Object> map = new HashMap<>();
     final Group group = user.getGroup();
+    final InfoService infoService = Beans.get(InfoService.class);
 
     // if name field is overridden
     final Property nameField = Mapper.of(User.class).getNameField();
@@ -78,9 +77,10 @@ public class AppInfo {
     map.put("user.action", user.getHomeAction());
     map.put("user.singleTab", user.getSingleTab());
     map.put("user.noHelp", Boolean.TRUE.equals(user.getNoHelp()));
+    map.put("user.theme", user.getTheme());
 
     if (user.getImage() != null) {
-      map.put("user.image", getLink(user, null));
+      map.put("user.image", infoService.getLink(user, null));
     }
 
     if (group != null) {
@@ -102,7 +102,9 @@ public class AppInfo {
     map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
     map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
     map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
-    map.put("application.logo", getLogo());
+    map.put("application.theme", infoService.getTheme());
+    map.put("application.logo", infoService.getLogo());
+    map.put("application.icon", infoService.getIcon());
     map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
@@ -125,26 +127,13 @@ public class AppInfo {
       map.put(entry.getKey(), value);
     }
 
-    final List<String> themes = new ArrayList<>();
-    for (String path : context.getResourcePaths("/css")) {
-      try {
-        if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {
-          path = path.replace("/css/", "").replace("/", "");
-          themes.add(path);
-        }
-      } catch (MalformedURLException e) {
-      }
-    }
-
-    Collections.sort(themes);
-
-    map.put("application.themes", themes);
-
     // find central client name
     final JEEContext jeeContext =
         new JEEContext(Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class));
-    final ShiroProfileManager profileManager =
-        new ShiroProfileManager(jeeContext, JEESessionStore.INSTANCE);
+    final ProfileManagerFactory profileManagerFactory =
+        Beans.get(AxelorSecurityLogic.class).getProfileManagerFactory();
+    final ProfileManager profileManager =
+        profileManagerFactory.apply(jeeContext, JEESessionStore.INSTANCE);
 
     profileManager
         .getProfile()
@@ -156,78 +145,5 @@ public class AppInfo {
         .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
 
     return map;
-  }
-
-  public String getStyle() {
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        Object style = helper.eval("__config__.appStyle");
-        if (style instanceof String) {
-          return style.toString();
-        }
-      } catch (Exception e) {
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Gets user specific application logo, or falls back to default application logo.
-   *
-   * @return user specific logo link
-   */
-  public String getLogo() {
-    final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        return getLink(helper.eval("__config__.appLogo"), logo);
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-    return logo;
-  }
-
-  public String getPageLang() {
-    String lang = AppFilter.getLocale().getLanguage();
-    return lang == null ? "en" : lang.substring(0, 2).toLowerCase();
-  }
-
-  public String getTheme() {
-    final User user = AuthUtils.getUser();
-    if (user == null || StringUtils.isBlank(user.getTheme()) || "default".equals(user.getTheme())) {
-      return APP_THEME;
-    }
-    return user.getTheme();
-  }
-
-  private String getLink(Object value, String defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
-    if (value instanceof String) {
-      return (String) value;
-    }
-    if (value instanceof MetaFile) {
-      return "ws/rest/"
-          + MetaFile.class.getName()
-          + "/"
-          + ((MetaFile) value).getId()
-          + "/content/download?v="
-          + ((MetaFile) value).getVersion();
-    }
-    if (value instanceof User) {
-      return "ws/rest/"
-          + User.class.getName()
-          + "/"
-          + ((User) value).getId()
-          + "/image/download?image=true&v="
-          + ((User) value).getVersion();
-    }
-    return defaultValue;
   }
 }

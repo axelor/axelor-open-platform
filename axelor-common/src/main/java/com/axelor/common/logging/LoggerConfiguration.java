@@ -34,6 +34,7 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.LifeCycle;
+import ch.qos.logback.core.spi.ScanException;
 import ch.qos.logback.core.util.OptionHelper;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
@@ -247,7 +248,11 @@ public class LoggerConfiguration {
     final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     final String logPattern = config.getProperty(LOGGING_PATTERN_CONSOLE, ANSI_LOG_PATTERN);
 
-    encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    try {
+      encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    } catch (ScanException e) {
+      throw new RuntimeException(e);
+    }
     encoder.setCharset(UTF8);
 
     appender.setName("CONSOLE");
@@ -264,7 +269,11 @@ public class LoggerConfiguration {
     final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     final String logPattern = config.getProperty(LOGGING_PATTERN_FILE, FILE_LOG_PATTERN);
 
-    encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    try {
+      encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    } catch (ScanException e) {
+      throw new RuntimeException(e);
+    }
 
     appender.setName("FILE");
     appender.setFile(logFile);

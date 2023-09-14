@@ -19,8 +19,11 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.gradle.AxelorPlugin;
+import com.axelor.gradle.I18nExtension;
 import com.axelor.tools.i18n.I18nExtractor;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
@@ -41,6 +44,25 @@ public class I18nTask extends DefaultTask {
   @TaskAction
   public void extract() {
     final I18nExtractor extractor = new I18nExtractor();
-    extractor.extract(Paths.get(getProject().getProjectDir().getPath()), true, withContext);
+    final Path base = Paths.get(getProject().getProjectDir().getPath());
+    final Path src = base.resolve(Paths.get("src", "main"));
+    final Path dest = src.resolve("resources");
+    final boolean update = true;
+
+    extractor.extract(src, dest, update, withContext);
+
+    final I18nExtension extension = getProject().getExtensions().findByType(I18nExtension.class);
+
+    if (extension == null) {
+      return;
+    }
+
+    final List<Path> extraSources = extension.getExtraSources();
+
+    if (extraSources != null) {
+      for (final Path extraSource : extraSources) {
+        extractor.extract(base.resolve(extraSource), dest, update, withContext);
+      }
+    }
   }
 }

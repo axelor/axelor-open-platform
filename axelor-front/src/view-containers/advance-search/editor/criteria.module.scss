@@ -1,0 +1,18 @@
+.criteria {
+  width: 180px !important;
+  align-items: normal;
+}
+
+.icon {
+  cursor: pointer;
+}
+
+@media all and (max-width: 640px) {
+  .inputs {
+    flex-direction: column;
+    flex: 1;
+    & > * {
+      width: 100% !important;
+    }
+  }
+}

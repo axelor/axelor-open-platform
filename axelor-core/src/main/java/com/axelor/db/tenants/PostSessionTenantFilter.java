@@ -36,7 +36,7 @@ import org.apache.shiro.web.util.WebUtils;
 @Singleton
 public class PostSessionTenantFilter extends AbstractTenantFilter {
 
-  private static final String INDEX_PAGE = "/index.jsp";
+  private static final String INDEX_PAGE = "/index.html";
 
   @Override
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)

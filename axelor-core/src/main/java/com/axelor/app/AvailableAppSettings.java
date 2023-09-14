@@ -33,6 +33,7 @@ public interface AvailableAppSettings {
   String APPLICATION_HELP = "application.help";
   String APPLICATION_COPYRIGHT = "application.copyright";
   String APPLICATION_LOGO = "application.logo";
+  String APPLICATION_ICON = "application.icon";
   String APPLICATION_MODE = "application.mode";
   String APPLICATION_BASE_URL = "application.base-url";
   String APPLICATION_CONFIG_PROVIDER = "application.config-provider";
@@ -50,14 +51,9 @@ public interface AvailableAppSettings {
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
-  String VIEW_CONFIRM_YES_NO = "view.confirm-yes-no";
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";
-
-  String VIEW_MENUBAR_LOCATION = "view.menubar.location";
-
-  String VIEW_TOOLBAR_TITLES = "view.toolbar.show-titles";
 
   String VIEW_FORM_CHECK_VERSION = "view.form.check-version";
 
@@ -65,7 +61,6 @@ public interface AvailableAppSettings {
   String VIEW_ADV_SEARCH_SHARE = "view.adv-search.share";
 
   String VIEW_GRID_SELECTION = "view.grid.selection";
-  String VIEW_GRID_EDITOR_BUTTONS = "view.grid.editor-buttons";
 
   String VIEW_COLLABORATION_ENABLED = "view.collaboration.enabled";
 
@@ -74,6 +69,7 @@ public interface AvailableAppSettings {
 
   String CONTEXT_APP_STYLE = "context.appStyle";
   String CONTEXT_APP_LOGO = "context.appLogo";
+  String CONTEXT_APP_ICON = "context.appIcon";
 
   String DB_DEFAULT_DATASOURCE = "db.default.datasource";
   String DB_DEFAULT_DRIVER = "db.default.driver";
@@ -163,6 +159,7 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
   String AUTH_ORDER = "auth.provider-order";
+  String AUTH_DEFAULT = "auth.provider-default";
   String AUTH_CALLBACK_URL = "auth.callback-url";
 
   String AUTH_USER_PROVISIONING = "auth.user.provisioning";
@@ -206,4 +203,6 @@ public interface AvailableAppSettings {
   String AUTH_LDAP_SERVER_SSL_CERT_TRUST_PATH = "auth.ldap.server.ssl.cert.trust-path";
   String AUTH_LDAP_SERVER_SSL_CERT_AUTH_PATH = "auth.ldap.server.ssl.cert.auth-path";
   String AUTH_LDAP_SERVER_SSL_CERT_KEY_PATH = "auth.ldap.server.ssl.cert.key-path";
+
+  String FEATURE_PREFIX = "features.";
 }

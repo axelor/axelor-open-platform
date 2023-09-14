@@ -1,0 +1,7 @@
+.container {
+  min-width: 0;
+  min-height: 0;
+  & > *:first-child {
+    width: 100%;
+  }
+}

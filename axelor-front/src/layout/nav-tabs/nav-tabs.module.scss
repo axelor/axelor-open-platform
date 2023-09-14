@@ -1,0 +1,100 @@
+.tabs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-grow: 1;
+  z-index: 0;
+}
+
+.tabList {
+  --ax-nav-tabs-tab-padding: 0.5rem 0.75rem;
+  --ax-nav-tabs-icon-padding: 0.25rem;
+}
+
+.tabList {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.tabTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.tabClose {
+  display: flex;
+  line-height: 1;
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.tabContent {
+  display: none;
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  min-width: 0;
+  color: var(--ax-theme-shell-view-content-color);
+  background-color: var(--ax-theme-shell-view-content-bg);
+  padding: var(--ax-theme-shell-view-content-padding);
+  border: var(--ax-theme-shell-view-content-border);
+}
+
+.tabContent.active {
+  display: flex;
+}
+
+// XXX: Chrome overlapped rendering
+.tabTitle,
+.tabText,
+.tabIcon {
+  z-index: 1;
+}
+
+.dirty {
+  .tabText::after {
+    content: "*";
+  }
+}
+
+// single tab
+.singleTab {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  background-color: var(--ax-theme-panel-header-bg);
+  .tabText {
+    flex-grow: 1;
+    font-weight: 600;
+  }
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  font-size: 0.9rem;
+}
+
+.tooltip dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip dd code {
+  white-space: pre-wrap;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  display: block;
+  padding: 2px 4px;
+}

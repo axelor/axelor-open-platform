@@ -1,0 +1,43 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--ax-theme-shell-view-toolbar-gap);
+  background-color: var(--ax-theme-shell-view-toolbar-bg);
+  padding: var(--ax-theme-shell-view-toolbar-padding);
+  border-bottom: var(--ax-theme-shell-view-toolbar-border);
+  .extra {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+i.icon {
+  line-height: 1;
+  font-size: 24px;
+}
+
+.pageInfo {
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+[data-tab-container-size="xs"],
+[data-tab-container-size="sm"] {
+  .pageInfo {
+    display: none;
+  }
+}
+
+[data-tab-container-size="xs"] {
+  .farItems,
+  .viewSwitch,
+  .pageActions {
+    display: none;
+  }
+}

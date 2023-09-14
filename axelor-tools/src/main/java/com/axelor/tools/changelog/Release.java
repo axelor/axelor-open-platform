@@ -24,8 +24,8 @@ import java.util.Map;
 public class Release {
 
   private String version;
-  private String date;
-  private Map<EntryType, List<ChangelogEntry>> entries;
+  private String header;
+  private Map<String, List<ChangelogEntry>> entries;
 
   public String getVersion() {
     return version;
@@ -35,19 +35,19 @@ public class Release {
     this.version = version;
   }
 
-  public String getDate() {
-    return date;
+  public String getHeader() {
+    return header;
   }
 
-  public void setDate(String date) {
-    this.date = date;
+  public void setHeader(String header) {
+    this.header = header;
   }
 
-  public Map<EntryType, List<ChangelogEntry>> getEntries() {
+  public Map<String, List<ChangelogEntry>> getEntries() {
     return entries;
   }
 
-  public void setEntries(Map<EntryType, List<ChangelogEntry>> entries) {
+  public void setEntries(Map<String, List<ChangelogEntry>> entries) {
     this.entries = entries;
   }
 }

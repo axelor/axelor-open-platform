@@ -1,0 +1,183 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {
+      "attrs": {}
+    },
+    "model": "com.axelor.contact.db.Contact",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "help": "Max size 4MB.",
+        "image": true,
+        "name": "image",
+        "type": "BINARY",
+        "title": "Photo"
+      },
+      {
+        "name": "lastName",
+        "type": "STRING",
+        "title": "Last name",
+        "required": true
+      },
+      {
+        "targetName": null,
+        "targetSearch": [],
+        "name": "addresses",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Addresses",
+        "mappedBy": "contact",
+        "target": "com.axelor.contact.db.Address"
+      },
+      {
+        "name": "notes",
+        "type": "TEXT",
+        "title": "Notes"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "circles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Circles",
+        "target": "com.axelor.contact.db.Circle"
+      },
+      {
+        "virtual": true,
+        "nameSearch": ["firstName", "lastName"],
+        "readonly": true,
+        "nameColumn": true,
+        "name": "fullName",
+        "type": "STRING",
+        "title": "Full name"
+      },
+      {
+        "targetName": "phone",
+        "targetSearch": ["phone"],
+        "name": "phones",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Phones",
+        "mappedBy": "contact",
+        "target": "com.axelor.contact.db.Phone"
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "DATE",
+        "title": "Date of birth"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "title",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Title",
+        "target": "com.axelor.contact.db.Title"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "name": "attrs",
+        "json": true,
+        "type": "STRING",
+        "title": "Attributes"
+      },
+      {
+        "targetName": "email",
+        "targetSearch": ["email"],
+        "name": "emails",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Emails",
+        "mappedBy": "contact",
+        "target": "com.axelor.contact.db.Email"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "name": "firstName",
+        "type": "STRING",
+        "title": "First name",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "phone",
+        "type": "STRING",
+        "title": "Phone"
+      },
+      {
+        "massUpdate": true,
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "company",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Company",
+        "target": "com.axelor.contact.db.Company"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      }
+    ]
+  }
+}

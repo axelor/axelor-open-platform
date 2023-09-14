@@ -78,6 +78,9 @@ public class Search extends AbstractView {
   @XmlElement(name = "select")
   private List<SearchSelect> selects;
 
+  @XmlElement(name = "action-menu")
+  private List<MenuItem> actionMenus;
+
   public Integer getLimit() {
     return limit;
   }
@@ -116,6 +119,14 @@ public class Search extends AbstractView {
 
   public void setSelects(List<SearchSelect> selects) {
     this.selects = selects;
+  }
+
+  public List<MenuItem> getActionMenus() {
+    return actionMenus;
+  }
+
+  public void setActionMenus(List<MenuItem> actionMenus) {
+    this.actionMenus = actionMenus;
   }
 
   public List<Hilite> getHilites() {

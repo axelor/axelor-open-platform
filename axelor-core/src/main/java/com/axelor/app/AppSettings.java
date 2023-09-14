@@ -176,4 +176,34 @@ public final class AppSettings {
         .filter(e -> e.getKey().startsWith(prefix))
         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
+
+  /**
+   * Enable specified feature
+   *
+   * @param name name of the feature
+   */
+  public void enableFeature(String name) {
+    properties.put(AvailableAppSettings.FEATURE_PREFIX + name, "true");
+  }
+
+  /**
+   * Disable specified feature
+   *
+   * @param name name of the feature
+   */
+  public void disableFeature(String name) {
+    properties.put(AvailableAppSettings.FEATURE_PREFIX + name, "false");
+  }
+
+  /**
+   * Check whether specified feature is enabled
+   *
+   * @param name name of the feature
+   * @return true if feature is enabled false otherwise
+   */
+  public boolean hasFeature(String name) {
+    return properties
+        .getOrDefault(AvailableAppSettings.FEATURE_PREFIX + name, "false")
+        .equals("true");
+  }
 }

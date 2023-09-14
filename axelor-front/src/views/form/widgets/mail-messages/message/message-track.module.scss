@@ -1,0 +1,10 @@
+.track-field {
+  font-size: 0.9rem;
+  & span {
+    color: var(--bs-secondary);
+  }
+  .empty-value {
+    opacity: 0.6;
+    font-style: italic;
+  }
+}

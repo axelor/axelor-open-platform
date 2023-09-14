@@ -26,6 +26,7 @@ import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.util.HttpActionHelper;
+import org.pac4j.core.util.Pac4jConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +45,11 @@ public class ErrorHandler {
 
   public Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
-    logger.error(e.getMessage());
-    logger.debug(e.getMessage(), e);
+    if (logger.isDebugEnabled()) {
+      logger.debug(e.getMessage(), e);
+    } else {
+      logger.error(e.getMessage());
+    }
 
     if (httpActionAdapter == null || context == null) {
       throw runtimeException(e);
@@ -57,8 +61,14 @@ public class ErrorHandler {
       return httpActionAdapter.adapt(action, context);
     }
 
-    final String errorUrl =
-        UriBuilder.from(pac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString();
+    final var errorUriBulder = UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null);
+    context
+        .getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
+        .ifPresent(
+            client ->
+                errorUriBulder.addQueryParam(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER, client));
+    final String errorUrl = errorUriBulder.toUri().toString();
+
     final HttpAction action = HttpActionHelper.buildRedirectUrlAction(context, errorUrl);
     return httpActionAdapter.adapt(action, context);
   }

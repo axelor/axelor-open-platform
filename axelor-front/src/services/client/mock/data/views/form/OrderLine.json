@@ -1,0 +1,118 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 95,
+      "modelId": 51,
+      "name": "order-line-form",
+      "title": "Ordered Item",
+      "model": "com.axelor.sale.db.OrderLine",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "product",
+              "colSpan": 12,
+              "onChange": "action-order-line-change-product",
+              "target": "com.axelor.sale.db.Product",
+              "targetName": "name",
+              "autoTitle": "Product"
+            },
+            {
+              "type": "field",
+              "name": "price",
+              "autoTitle": "Price"
+            },
+            {
+              "type": "field",
+              "name": "quantity",
+              "autoTitle": "Quantity"
+            }
+          ]
+        },
+        {
+          "type": "panel-related",
+          "name": "taxes",
+          "serverType": "MANY_TO_MANY",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "rate",
+              "autoTitle": "Rate"
+            }
+          ],
+          "fields": [
+            {
+              "nullable": true,
+              "unique": true,
+              "name": "name",
+              "maxSize": 2147483647,
+              "minSize": 2,
+              "type": "STRING",
+              "title": "Name",
+              "required": true
+            },
+            {
+              "defaultValue": "0",
+              "precision": 6,
+              "name": "rate",
+              "scale": 4,
+              "minSize": "0.0",
+              "type": "DECIMAL",
+              "title": "Rate"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "product",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Product",
+        "required": true,
+        "target": "com.axelor.sale.db.Product"
+      },
+      {
+        "defaultValue": 0,
+        "name": "quantity",
+        "minSize": 1,
+        "type": "INTEGER",
+        "title": "Quantity",
+        "required": true
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "price",
+        "scale": 4,
+        "minSize": "0.0",
+        "type": "DECIMAL",
+        "title": "Price",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "taxes",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Taxes",
+        "target": "com.axelor.sale.db.Tax"
+      }
+    ]
+  }
+}

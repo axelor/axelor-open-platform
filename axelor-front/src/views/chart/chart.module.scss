@@ -1,0 +1,15 @@
+.chart {
+  display: flex;
+  flex-grow: 1;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.panel > div {
+  --ax-panel-body-padding: 0;
+}
+
+.noRecordsText {
+  font-size: 1.25rem;
+}

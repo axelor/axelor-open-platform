@@ -1,0 +1,111 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {
+      "attrs": {}
+    },
+    "model": "com.axelor.contact.db.Email",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "name": "attrs",
+        "json": true,
+        "type": "STRING",
+        "title": "Attributes"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "defaultValue": false,
+        "name": "optOut",
+        "type": "BOOLEAN",
+        "title": "Opted out"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "fullName",
+        "targetSearch": ["fullName", "firstName", "lastName"],
+        "name": "contact",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Contact",
+        "required": true,
+        "target": "com.axelor.contact.db.Contact"
+      },
+      {
+        "defaultValue": false,
+        "name": "invalid",
+        "type": "BOOLEAN",
+        "title": "Invalid"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "nullable": true,
+        "nameColumn": true,
+        "unique": true,
+        "name": "email",
+        "type": "STRING",
+        "title": "Email",
+        "required": true
+      },
+      {
+        "nullable": true,
+        "defaultValue": false,
+        "name": "primary",
+        "type": "BOOLEAN",
+        "title": "Primary"
+      }
+    ]
+  }
+}

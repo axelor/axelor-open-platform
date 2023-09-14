@@ -1,0 +1,391 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 154,
+      "modelId": 8,
+      "name": "user-form",
+      "title": "User",
+      "model": "com.axelor.auth.db.User",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "placeholder": "user name",
+              "onChange": "action-condition-user-validName",
+              "validIf": "name.length >= 2",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "code",
+              "readonlyIf": "id && code == 'admin'",
+              "placeholder": "login name",
+              "onChange": "action-condition-user-validCode",
+              "validIf": "code.length >= 2",
+              "autoTitle": "Code"
+            },
+            {
+              "type": "field",
+              "name": "group",
+              "placeholder": "user group",
+              "target": "com.axelor.auth.db.Group",
+              "targetName": "name",
+              "autoTitle": "Group"
+            },
+            {
+              "type": "field",
+              "name": "email",
+              "widget": "Email",
+              "autoTitle": "Email"
+            },
+            {
+              "type": "field",
+              "name": "language",
+              "autoTitle": "Language"
+            },
+            {
+              "type": "field",
+              "name": "theme",
+              "widget": "theme-select",
+              "autoTitle": "Theme"
+            },
+            {
+              "type": "panel",
+              "stacked": true,
+              "items": [
+                {
+                  "type": "field",
+                  "name": "homeAction",
+                  "hidden": true,
+                  "bind": "{{__actionSelect.name}}",
+                  "autoTitle": "Home action"
+                },
+                {
+                  "type": "field",
+                  "name": "__actionSelect",
+                  "title": "Action",
+                  "widget": "SuggestBox",
+                  "canNew": "false",
+                  "target": "com.axelor.meta.db.MetaAction",
+                  "targetName": "name",
+                  "domain": "self.home = true"
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "name": "singleTab",
+              "widget": "inline-checkbox",
+              "autoTitle": "Single tab"
+            },
+            {
+              "type": "field",
+              "name": "noHelp",
+              "widget": "inline-checkbox",
+              "autoTitle": "No help"
+            },
+            {
+              "type": "field",
+              "name": "defaultProject",
+              "target": "com.axelor.project.db.Project",
+              "targetName": "name",
+              "autoTitle": "Default project"
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "Authorization",
+          "items": [
+            {
+              "type": "field",
+              "name": "activateOn",
+              "validIf": "!activateOn || (activateOn && !expiresOn) || (activateOn && expiresOn && $moment(expiresOn) >= $moment(activateOn))",
+              "autoTitle": "Activate on"
+            },
+            {
+              "type": "field",
+              "name": "expiresOn",
+              "validIf": "!expiresOn || (!activateOn && expiresOn) || (activateOn && expiresOn && $moment(expiresOn) >= $moment(activateOn))",
+              "autoTitle": "Expires on"
+            },
+            {
+              "type": "field",
+              "name": "blocked",
+              "autoTitle": "Blocked"
+            },
+            {
+              "type": "field",
+              "name": "forcePasswordChange",
+              "autoTitle": "Force password change"
+            },
+            {
+              "type": "field",
+              "name": "change",
+              "title": "Change password?",
+              "showIf": "id && !$readonly()",
+              "widget": "boolean"
+            },
+            {
+              "type": "panel",
+              "showIf": "change || !id",
+              "colSpan": 12,
+              "itemSpan": 12,
+              "items": [
+                {
+                  "type": "field",
+                  "name": "oldPassword",
+                  "title": "Your current password",
+                  "help": "Current password of the logged in user",
+                  "placeholder": "your current password",
+                  "widget": "password",
+                  "requiredIf": "change || !id"
+                },
+                {
+                  "type": "panel",
+                  "showIf": "id",
+                  "itemSpan": 12,
+                  "items": [
+                    {
+                      "type": "field",
+                      "name": "newPassword",
+                      "title": "New password",
+                      "help": "New password of the user",
+                      "placeholder": "new password",
+                      "widget": "password",
+                      "onChange": "action-condition-user-password",
+                      "requiredIf": "change || !id",
+                      "validIf": "(!change && id) || newPassword.length >= 4"
+                    },
+                    {
+                      "type": "field",
+                      "name": "chkPassword",
+                      "title": "Confirm new password",
+                      "help": "Confirm new password of the user (must be identical to the new password)",
+                      "placeholder": "confirm new password",
+                      "widget": "password",
+                      "requiredIf": "change || !id",
+                      "validIf": "chkPassword === newPassword"
+                    }
+                  ]
+                },
+                {
+                  "type": "panel",
+                  "hideIf": "id",
+                  "itemSpan": 12,
+                  "items": [
+                    {
+                      "type": "field",
+                      "name": "newPassword",
+                      "title": "Password",
+                      "help": "Password of the new user",
+                      "placeholder": "password",
+                      "widget": "password",
+                      "onChange": "action-condition-user-password",
+                      "requiredIf": "change || !id",
+                      "validIf": "(!change && id) || newPassword.length >= 4"
+                    },
+                    {
+                      "type": "field",
+                      "name": "chkPassword",
+                      "title": "Confirm password",
+                      "help": "Confirm password of the new user (must be identical to the password)",
+                      "placeholder": "confirm password",
+                      "widget": "password",
+                      "requiredIf": "change || !id",
+                      "validIf": "chkPassword === newPassword"
+                    }
+                  ]
+                },
+                {
+                  "type": "help",
+                  "text": "Please use at least 4 characters."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel-tabs",
+          "items": [
+            {
+              "type": "panel-related",
+              "name": "roles",
+              "serverType": "MANY_TO_MANY",
+              "formView": "role-form",
+              "gridView": "role-grid",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "permissions",
+              "serverType": "MANY_TO_MANY",
+              "formView": "permission-form",
+              "gridView": "simple-permission-grid",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "metaPermissions",
+              "serverType": "MANY_TO_MANY",
+              "items": []
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Login",
+        "required": true
+      },
+      {
+        "help": "Whether to use tabbed ui.",
+        "defaultValue": false,
+        "name": "singleTab",
+        "type": "BOOLEAN",
+        "title": "Single tab"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "roles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Roles",
+        "target": "com.axelor.auth.db.Role"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "selection": "select.language",
+        "name": "language",
+        "selectionList": [
+          {
+            "value": "en",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "English"
+          },
+          {
+            "value": "fr",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "French"
+          }
+        ],
+        "type": "STRING",
+        "title": "Language"
+      },
+      {
+        "help": "Whether to show help messages.",
+        "defaultValue": false,
+        "name": "noHelp",
+        "type": "BOOLEAN",
+        "title": "No help"
+      },
+      {
+        "help": "Block the user for an indefinite period.",
+        "defaultValue": false,
+        "name": "blocked",
+        "type": "BOOLEAN",
+        "title": "Block the user"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "help": "Force the user to change their password at next login.",
+        "defaultValue": false,
+        "name": "forcePasswordChange",
+        "type": "BOOLEAN",
+        "title": "Force password change"
+      },
+      {
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "help": "Activate the user from the specified date.",
+        "name": "activateOn",
+        "type": "DATETIME",
+        "title": "Activate on"
+      },
+      {
+        "name": "theme",
+        "type": "STRING",
+        "title": "Theme"
+      },
+      {
+        "help": "Disable the user from the specified date.",
+        "name": "expiresOn",
+        "type": "DATETIME",
+        "title": "Expires on"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "defaultProject",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Project",
+        "target": "com.axelor.project.db.Project"
+      },
+      {
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      },
+      {
+        "name": "homeAction",
+        "type": "STRING",
+        "title": "Home action"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "group",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Group",
+        "target": "com.axelor.auth.db.Group"
+      }
+    ]
+  }
+}

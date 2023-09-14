@@ -1,0 +1,56 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 92,
+      "modelId": 41,
+      "name": "country-form",
+      "title": "Country",
+      "model": "com.axelor.contact.db.Country",
+      "width": "mini",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "itemSpan": 12,
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "code",
+              "autoTitle": "Code"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

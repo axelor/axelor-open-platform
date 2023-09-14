@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_6.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_7.0.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
 
@@ -76,7 +76,6 @@
     <string name="menuBackground" />
     <integer name="menuOrder" />
     <string name="menuTitle" />
-    <boolean name="menuTop" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />
     <many-to-one name="formView" ref="MetaView" copy="false" />

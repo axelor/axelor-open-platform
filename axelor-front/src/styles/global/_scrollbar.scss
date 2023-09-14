@@ -1,0 +1,21 @@
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bs-border-color);
+  background-clip: padding-box;
+  border: 0;
+  border-radius: calc((6px / 3) * 2);
+  box-shadow: none;
+  min-height: 50px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track:hover {
+  background: none;
+  border: none;
+}
+ 

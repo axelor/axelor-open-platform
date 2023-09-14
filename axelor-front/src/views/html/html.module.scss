@@ -1,0 +1,11 @@
+.container {
+  min-height: 500px;
+}
+
+.frame {
+  inset: 0;
+  & iframe {
+    border: 0;
+    overflow: auto;
+  }
+}

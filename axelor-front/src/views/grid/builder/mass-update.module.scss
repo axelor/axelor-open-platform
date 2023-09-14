@@ -1,0 +1,18 @@
+.container {
+  min-width: 400px;
+  & a,
+  .remove {
+    cursor: pointer;
+  }
+  .remove {
+    padding-top: 0.25rem;
+  }
+}
+
+.title {
+  font-size: 1.25rem;
+}
+
+.widget {
+  width: 220px !important;
+}

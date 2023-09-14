@@ -22,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
@@ -47,18 +48,17 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
         .filter(IndirectClient.class::isInstance)
         .map(IndirectClient.class::cast)
         .forEach(
-            indirectClient -> {
+            client -> {
               try {
-                indirectClient.init();
+                client.init(!isInitialized(client));
               } catch (Exception e) {
-                logger.error("{}: {}", indirectClient.getName(), e.getMessage());
-                return;
+                logger.error("{}: {}", client.getName(), e.getMessage());
               }
-              indirectClients.add(indirectClient);
-              if (indirectClient
-                  .getCallbackUrlResolver()
-                  .matches(indirectClient.getName(), context)) {
-                result.add(indirectClient);
+              if (isInitialized(client)) {
+                indirectClients.add(client);
+                if (client.getCallbackUrlResolver().matches(client.getName(), context)) {
+                  result.add(client);
+                }
               }
             });
 
@@ -66,12 +66,16 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
     // fallback: no client found and we have a default client, use it
     if (result.isEmpty() && CommonHelper.isNotBlank(clientNames)) {
-      final var defaultClient = clients.findClient(clientNames);
-      if (defaultClient.isPresent()) {
-        logger.debug("Defaulting to the configured client: {}", defaultClient);
-        result.add(defaultClient.get());
-      }
+      clients
+          .findClient(clientNames)
+          .filter(this::isInitialized)
+          .ifPresent(
+              client -> {
+                logger.debug("Defaulting to the configured client: {}", client);
+                result.add(client);
+              });
     }
+
     // fallback: no client found and we only have one indirect client, use it
     if (result.isEmpty() && indirectClients.size() == 1) {
       logger.debug("Defaulting to the only client: {}", indirectClients.get(0));
@@ -79,5 +83,13 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
     }
 
     return result;
+  }
+
+  private boolean isInitialized(Client client) {
+    if (client instanceof BaseClient) {
+      final BaseClient baseClient = ((BaseClient) client);
+      return baseClient.getCredentialsExtractor() != null && baseClient.getAuthenticator() != null;
+    }
+    return true;
   }
 }

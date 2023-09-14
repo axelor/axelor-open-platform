@@ -195,7 +195,6 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       menu.setIcon(jsonModel.getMenuIcon());
       menu.setIconBackground(jsonModel.getMenuBackground());
       menu.setOrder(jsonModel.getMenuOrder());
-      menu.setTop(jsonModel.getMenuTop());
 
       if (jsonModel.getRoles() != null) {
         jsonModel.getRoles().forEach(menu::addRole);

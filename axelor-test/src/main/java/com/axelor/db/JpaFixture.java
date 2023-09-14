@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Construct;
@@ -147,7 +148,7 @@ public class JpaFixture {
     }
 
     final Constructor ctor =
-        new Constructor() {
+        new Constructor(new LoaderOptions()) {
           {
             yamlClassConstructors.put(NodeId.scalar, new TimeStampConstruct());
           }

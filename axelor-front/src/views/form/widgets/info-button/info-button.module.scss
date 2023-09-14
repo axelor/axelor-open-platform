@@ -1,0 +1,50 @@
+.button,
+.button:hover {
+  color: var(--bs-btn-bg);
+  background-color: var(--ax-panel-bg);
+}
+
+.button {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.icon,
+.iconHover {
+  font-size: 2rem;
+}
+
+.icon {
+  display: inline-flex;
+}
+
+.iconHover {
+  display: none;
+}
+
+.button:hover {
+  .hideOnHover {
+    display: none;
+  }
+  .showOnHover {
+    display: inline-flex;
+  }
+}
+
+.data {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+.value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 400;
+}

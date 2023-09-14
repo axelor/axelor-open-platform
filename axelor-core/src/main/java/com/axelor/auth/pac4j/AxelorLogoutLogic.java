@@ -18,16 +18,71 @@
  */
 package com.axelor.auth.pac4j;
 
-import io.buji.pac4j.profile.ShiroProfileManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.context.HttpConstants;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultLogoutLogic;
+import org.pac4j.core.exception.http.NoContentAction;
+import org.pac4j.core.exception.http.OkAction;
+import org.pac4j.core.exception.http.WithLocationAction;
+import org.pac4j.core.http.adapter.HttpActionAdapter;
 
 @Singleton
 public class AxelorLogoutLogic extends DefaultLogoutLogic {
 
+  private final AuthPac4jInfo info;
+
   @Inject
-  public AxelorLogoutLogic() {
-    setProfileManagerFactory(ShiroProfileManager::new);
+  public AxelorLogoutLogic(AuthPac4jInfo info) {
+    this.info = info;
+  }
+
+  @Override
+  public Object perform(
+      WebContext context,
+      SessionStore sessionStore,
+      Config config,
+      HttpActionAdapter httpActionAdapter,
+      String defaultUrl,
+      String inputLogoutUrlPattern,
+      Boolean inputLocalLogout,
+      Boolean inputDestroySession,
+      Boolean inputCentralLogout) {
+
+    final HttpActionAdapter ajaxAwareAdapter =
+        (action, ctx) -> {
+          if (action instanceof WithLocationAction && AuthPac4jInfo.isXHR(context)) {
+            final WithLocationAction withLocationAction = (WithLocationAction) action;
+            final String url = withLocationAction.getLocation();
+            if (Objects.equals(url, info.getBaseUrl())) {
+              action = NoContentAction.INSTANCE;
+            } else {
+              ctx.setResponseHeader(
+                  HttpConstants.CONTENT_TYPE_HEADER, HttpConstants.APPLICATION_JSON);
+              final ObjectMapper mapper = new ObjectMapper();
+              final ObjectNode json = mapper.createObjectNode();
+              json.put("redirectUrl", url);
+              action = new OkAction(json.toString());
+            }
+          }
+          return httpActionAdapter.adapt(action, ctx);
+        };
+
+    return super.perform(
+        context,
+        sessionStore,
+        config,
+        ajaxAwareAdapter,
+        info.getLogoutUrl(),
+        inputLogoutUrlPattern,
+        inputLocalLogout,
+        inputDestroySession,
+        inputCentralLogout);
   }
 }

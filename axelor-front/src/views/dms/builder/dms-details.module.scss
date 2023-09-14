@@ -1,0 +1,29 @@
+$width: 250px;
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  margin: 0;
+  transition: all 0.25s;
+  height: 100%;
+
+  &.show {
+    z-index: 1;
+    width: $width;
+  }
+}
+
+.title {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.close,
+.link,
+.icon {
+  cursor: pointer;
+}

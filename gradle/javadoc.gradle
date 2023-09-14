@@ -2,7 +2,8 @@ def projectsToSkipJavadocs = ext.projectsToSkipJavadocs = [
   'axelor-gradle',
   'axelor-tomcat',
   'axelor-tools',
-  'axelor-web'
+  'axelor-web',
+  'axelor-front'
 ]
 
 def projectsIncludeInJavadocs = subprojects.findAll {

@@ -63,6 +63,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project.getPlugins().apply(JavaLibraryPlugin.class);
     project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
+    project.getExtensions().create(I18nExtension.EXTENSION_NAME, I18nExtension.class);
 
     project.getPlugins().apply(JavaSupport.class);
     project.getPlugins().apply(PublishSupport.class);
@@ -82,6 +83,10 @@ public class AxelorPlugin implements Plugin<Project> {
   }
 
   private void configureJarSupport(Project project) {
+    if (AxelorUtils.isCore(project)) {
+      return;
+    }
+
     if (!AxelorUtils.isAxelorApplication(project)) {
       // include webapp resources in jar
       project
@@ -90,11 +95,9 @@ public class AxelorPlugin implements Plugin<Project> {
     }
 
     // include core dependencies
-    if (!AxelorUtils.isCore(project)) {
-      project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
-      project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
-      project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
-    }
+    project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
+    project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
   }
 
   private void configureWarSupport(Project project) {
@@ -110,6 +113,17 @@ public class AxelorPlugin implements Plugin<Project> {
         .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
         .filter(Objects::nonNull)
         .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
+
+    // run processResources on included builds
+    AxelorUtils.findIncludedBuildProjects(project).stream()
+        .map(included -> included.getTasks().findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME))
+        .filter(Objects::nonNull)
+        .forEach(
+            task ->
+                project
+                    .getTasks()
+                    .getByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME)
+                    .dependsOn(task));
   }
 
   private void configureCodeGeneration(Project project) {

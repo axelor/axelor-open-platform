@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+}
+
+.title .label,
+.title label[for] {
+  color: rgba(var(--bs-body-color-rgb), 0.65);
+}
+
+.title .actions {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  margin: 0;
+  position: relative;
+  display: flex;
+}
+
+.label,
+.label .labelText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label.help::after {
+  content: "?";
+  font-size: 0.75rem;
+  color: var(--bs-green);
+  font-weight: 600;
+  margin: 0 2px;
+  vertical-align: super;
+  float: right;
+}
+
+[dir="rtl"] .label.help::after {
+  float: left;
+}
+
+.tooltip {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  font-size: 0.9rem;
+}
+
+.tooltip dd {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip dd code {
+  white-space: pre-wrap;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  display: block;
+  padding: 2px 4px;
+}

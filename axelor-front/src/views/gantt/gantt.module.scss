@@ -1,0 +1,15 @@
+.container {
+  min-width: 0;
+  min-height: 0;
+  & > div:first-child {
+    border-bottom: none !important;
+  }
+}
+
+.cell {
+  pointer-events: all;
+}
+
+.icon {
+  cursor: pointer;
+}

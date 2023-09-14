@@ -1,0 +1,48 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 101,
+      "modelId": 50,
+      "name": "tax-grid",
+      "title": "Taxes",
+      "model": "com.axelor.sale.db.Tax",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "rate",
+          "autoTitle": "Rate"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "defaultValue": "0",
+        "precision": 6,
+        "name": "rate",
+        "scale": 4,
+        "minSize": "0.0",
+        "type": "DECIMAL",
+        "title": "Rate"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

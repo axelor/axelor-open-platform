@@ -1,0 +1,50 @@
+.icon {
+  display: inline-flex;
+}
+
+.iconHover {
+  display: none;
+}
+
+.button:hover {
+  .hideOnHover {
+    display: none;
+  }
+  .showOnHover {
+    display: inline-flex;
+  }
+}
+
+.button {
+  position: relative;
+}
+
+div.button[disabled] {
+  opacity: 0.6;
+}
+
+.icons {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.help .title {
+  display: inline-flex;
+}
+
+.help::after {
+  position: absolute;
+  content: "?";
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 2px;
+  vertical-align: super;
+}

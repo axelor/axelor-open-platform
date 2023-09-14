@@ -1,0 +1,10 @@
+.editor {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.text {
+  display: flex;
+  white-space: nowrap;
+  cursor: pointer;
+}

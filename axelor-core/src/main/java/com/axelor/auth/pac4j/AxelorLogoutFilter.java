@@ -21,7 +21,6 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
-import io.buji.pac4j.filter.LogoutFilter;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -34,15 +33,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.config.Config;
+import org.pac4j.jee.filter.LogoutFilter;
 
 @Singleton
 public class AxelorLogoutFilter extends LogoutFilter {
 
-  private AuthPac4jInfo authPac4jInfo;
-
   @Inject
-  public AxelorLogoutFilter(
-      Config config, AxelorLogoutLogic logoutLogic, AuthPac4jInfo authPac4jInfo) {
+  public AxelorLogoutFilter(Config config, AxelorLogoutLogic logoutLogic) {
     final AppSettings settings = AppSettings.get();
     final String logoutUrlPattern =
         settings.get(AvailableAppSettings.AUTH_LOGOUT_URL_PATTERN, null);
@@ -50,7 +47,6 @@ public class AxelorLogoutFilter extends LogoutFilter {
     final boolean centralLogout =
         settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
 
-    this.authPac4jInfo = authPac4jInfo;
     setConfig(config);
     setLogoutUrlPattern(logoutUrlPattern);
     setLocalLogout(localLogout);
@@ -62,8 +58,6 @@ public class AxelorLogoutFilter extends LogoutFilter {
   public void doFilter(
       ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
       throws IOException, ServletException {
-
-    setDefaultUrl(authPac4jInfo.getLogoutUrl());
 
     super.doFilter(servletRequest, servletResponse, filterChain);
 
