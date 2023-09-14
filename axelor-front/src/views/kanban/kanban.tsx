@@ -95,7 +95,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         _viewName: action.name,
         _viewType: action.viewType,
         _views: action.views,
-      }) as DataContext,
+      } as DataContext),
     [action, getViewContext]
   );
 
@@ -655,9 +655,10 @@ function KanbanCard({
     const div = divRef.current;
     const summary =
       div &&
-      div.querySelector(
-        `.${legacyClassNames("card-summary")}.${legacyClassNames("popover")}`
-      );
+      (div.querySelector(".card-summary.popover") ||
+        div.querySelector(
+          `.${legacyClassNames("card-summary")}.${legacyClassNames("popover")}`
+        ));
     if (summary) {
       const text = (summary.textContent || "").trim();
       if (text) {
