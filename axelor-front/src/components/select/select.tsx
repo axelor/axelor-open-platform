@@ -75,11 +75,9 @@ export const Select = forwardRef(function Select<
   }, [fetchOptions, inputValue, items.length, loadOptions, onOpen]);
 
   const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const text = event.target.value.trim();
+    (text: string) => {
       setInputValue(text);
-      if (onInputChange) onInputChange(event);
-      if (event.isDefaultPrevented()) return;
+      if (onInputChange) onInputChange(text);
       if (fetchOptions) {
         loadOptions(text);
       }
