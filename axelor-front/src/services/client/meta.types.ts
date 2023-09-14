@@ -429,7 +429,7 @@ export interface Selection {
 }
 
 export interface HelpOverride {
-  type: "tooltip" | "placehoder" | "inline";
+  type: "tooltip" | "placeholder" | "inline";
   field: string;
   help: string;
   style?: string;
