@@ -139,6 +139,7 @@ export const moment = dayjs;
 
 export type Moment = Dayjs;
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace l10n {
   export function getLocale() {
     return locale;

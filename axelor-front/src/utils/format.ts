@@ -140,7 +140,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
     return value;
   }
 
-  if ((serverType ?? type?.toUpperCase()) === "DECIMAL") {
+  if ((serverType ?? type)?.toUpperCase() === "DECIMAL") {
     // referencing another field in the context?
     if (typeof scale === "string") {
       scale = +((_.get(context, scale) as number) ?? scale);
