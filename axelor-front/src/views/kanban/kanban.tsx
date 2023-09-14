@@ -18,7 +18,7 @@ import {
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useHilites, useTemplate } from "@/hooks/use-parser";
+import { useHilites, useViewTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
@@ -541,7 +541,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return true;
   }, [fields, sequenceBy]);
 
-  const Template = useTemplate(view.template || "");
+  const Template = useViewTemplate(view, fields);
 
   const components = useMemo(
     () => ({
