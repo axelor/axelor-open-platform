@@ -103,7 +103,7 @@ function ActionCommandItem({
     <CommandItem
       {...props}
       hidden={hidden}
-      {...(readonly && { onClick: undefined })}
+      {...(readonly && { onClick: undefined, disabled: true })}
     />
   );
 }
