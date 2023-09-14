@@ -102,10 +102,10 @@
         "bg": "#FBFBFF"
       },
       "row_active": {
-        "bg": "#FBFBFF"
+        "bg": "#F8F8FF"
       },
       "cell_active": {
-        "bg": "#F2F2FF"
+        "bg": "#F0F0FD"
       }
     },
     "Badge": {
