@@ -1,7 +1,8 @@
-import { ReactElement } from "react";
+import { ReactElement, useCallback, useMemo } from "react";
+
 import { Box } from "@axelor/ui";
 
-import { Field } from "@/services/client/meta.types";
+import { Field, Property, Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { sanitize } from "@/utils/sanitize";
 import { Tooltip } from "@/components/tooltip";
@@ -21,6 +22,7 @@ function CellRenderer(props: GridCellProps) {
 
 export function Cell(props: GridCellProps) {
   const { view, data, value, record } = props;
+  const { items: viewItems = [] } = view ?? {};
   const { name, type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
@@ -59,10 +61,35 @@ export function Cell(props: GridCellProps) {
     );
   }
 
+  const fields = useMemo(
+    () =>
+      viewItems.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.name ?? ""]: {
+            ...item,
+            ...item.widgetAttrs,
+          } as unknown as Property,
+        }),
+        {} as Record<string, Property>
+      ),
+    [viewItems]
+  );
+
+  const $getField = useCallback(
+    (fieldName: string) => fields[fieldName] as Schema,
+    [fields]
+  );
+
   return tooltip ? (
     <Tooltip
       content={() => (
-        <FieldDetails model={view?.model} data={tooltip} record={record} />
+        <FieldDetails
+          model={view?.model}
+          data={tooltip}
+          record={record}
+          $getField={$getField}
+        />
       )}
     >
       {render() as ReactElement}
