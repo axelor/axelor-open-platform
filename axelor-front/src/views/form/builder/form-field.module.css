@@ -73,8 +73,10 @@
 
 .tooltip dd code {
   white-space: pre-wrap;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
+  background-color: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
   display: block;
-  padding: 2px 4px;
+  padding: 2px 6px;
+  margin-left: 0.5rem;
 }
