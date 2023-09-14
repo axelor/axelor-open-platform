@@ -44,7 +44,7 @@ export const Card = memo(function Card({
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
-    const context = { ...getContext?.(), record: $record, ...$record };
+    const context = { ...getContext?.(), ...$record };
     const actionExecutor = new DefaultActionExecutor(
       new FormActionHandler((options?: DataContext) => context)
     );
