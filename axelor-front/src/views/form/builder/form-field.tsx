@@ -5,18 +5,18 @@ import { useMemo } from "react";
 
 import { Box, InputFeedback, InputLabel } from "@axelor/ui";
 
-import { DataStore } from "@/services/client/data-store";
-import { DataRecord } from "@/services/client/data.types";
-import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
-import { FieldProps, ValueAtom, WidgetProps } from "./types";
-
 import { Tooltip } from "@/components/tooltip";
 import { useAsync } from "@/hooks/use-async";
 import { useTemplate } from "@/hooks/use-parser";
+import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
-import { useFormScope } from "./scope";
+
+import { useFormField, useFormScope } from "./scope";
+import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
 
@@ -120,11 +120,13 @@ export function FieldDetails({
   model,
   record,
   data,
+  $getField,
 }: {
   fetch?: boolean;
   model?: string;
   record?: DataRecord;
   data: TooltipType;
+  $getField?: (fieldName: string) => Schema;
 }) {
   const { depends, template } = data;
   const Template = useTemplate(template!);
@@ -143,7 +145,14 @@ export function FieldDetails({
   return (
     context && (
       <Box>
-        <Template context={context} />
+        <Template
+          context={context}
+          options={{
+            helpers: {
+              $getField,
+            },
+          }}
+        />
       </Box>
     )
   );
@@ -285,6 +294,7 @@ function FieldTooltipContent({
 }) {
   const { formAtom } = useFormScope();
   const value = useAtomValue(valueAtom);
+  const $getField = useFormField(formAtom);
 
   const data = schema.tooltip as TooltipType;
   const { depends } = data;
@@ -307,6 +317,7 @@ function FieldTooltipContent({
       data={data}
       model={model}
       record={record}
+      $getField={$getField}
     />
   );
 }
