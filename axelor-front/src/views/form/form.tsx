@@ -441,11 +441,12 @@ const FormContainer = memo(function FormContainer({
         const vals = diff(rec, original);
 
         let res = await dataStore.save(vals);
-        if (res.id) res = await doRead(res.id);
-
-        res = { ...dummy, ...res }; // restore dummy values
 
         if (callOnLoad) {
+          if (res.id) res = await doRead(res.id);
+
+          res = { ...dummy, ...res }; // restore dummy values
+
           const isNew = vals.id !== res.id;
           doEdit(res, { readonly, isNew, keepStates: true });
         }
