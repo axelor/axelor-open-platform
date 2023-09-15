@@ -1,54 +1,57 @@
-import {
-  SyntheticEvent,
-  useCallback,
-  useState,
-  useRef,
-  useMemo,
-  useEffect,
-} from "react";
-import { Box, DndProvider, Input, Link } from "@axelor/ui";
-import { GridRow, GridColumn } from "@axelor/ui/grid";
+import clsx from "clsx";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import clsx from "clsx";
-
-import { GridView } from "@/services/client/meta.types";
-import { PageText } from "@/components/page-text";
-import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
-import { usePerms } from "@/hooks/use-perms";
-import { SearchOptions } from "@/services/client/data";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { AdvanceSearch } from "@/view-containers/advance-search";
-import { i18n } from "@/services/client/i18n";
-import { ViewProps } from "../types";
-import { DataRecord } from "@/services/client/data.types";
-import { dialogs } from "@/components/dialogs";
-import { useTabs } from "@/hooks/use-tabs";
-import { useSession } from "@/hooks/use-session";
-import { useDataStore } from "@/hooks/use-data-store";
-import { useGridState } from "../grid/builder/utils";
-import { useEditor } from "@/hooks/use-relation";
-import { useRoute } from "@/hooks/use-route";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-import { Grid as GridComponent } from "../grid/builder";
-import { Uploader } from "./builder/scope";
 import {
-  TreeRecord,
-  DmsOverlay,
-  DmsUpload,
-  DmsTree,
+  SyntheticEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { Box, DndProvider, Input, Link } from "@axelor/ui";
+import { GridColumn, GridRow } from "@axelor/ui/grid";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+
+import { dialogs } from "@/components/dialogs";
+import { PageText } from "@/components/page-text";
+import { useDataStore } from "@/hooks/use-data-store";
+import { usePerms } from "@/hooks/use-perms";
+import { useEditor } from "@/hooks/use-relation";
+import { useResponsive } from "@/hooks/use-responsive";
+import { useRoute } from "@/hooks/use-route";
+import { useSession } from "@/hooks/use-session";
+import { useTabs } from "@/hooks/use-tabs";
+import { SearchOptions } from "@/services/client/data";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { GridView } from "@/services/client/meta.types";
+import { AdvanceSearch } from "@/view-containers/advance-search";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+
+import { Grid as GridComponent } from "../grid/builder";
+import { useGridState } from "../grid/builder/utils";
+import { ViewProps } from "../types";
+import {
   DmsDetails,
+  DmsOverlay,
+  DmsTree,
+  DmsUpload,
+  TreeRecord,
 } from "./builder";
+import { Uploader } from "./builder/scope";
 import {
   CONTENT_TYPE,
   downloadAsBatch,
-  toStrongText,
   prepareCustomView,
+  toStrongText,
 } from "./builder/utils";
+
 import styles from "./dms.module.scss";
-import { useResponsive } from "@/hooks/use-responsive";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("DMS.Home") };
 const UNDEFINED_ID = -1;
@@ -56,7 +59,7 @@ const UNDEFINED_ID = -1;
 const promptInput = async (
   title: string,
   inputValue: string = "",
-  yesTitle?: string
+  yesTitle?: string,
 ) => {
   const confirmed = await dialogs.confirm({
     title,
@@ -109,7 +112,7 @@ export function Dms(props: ViewProps<GridView>) {
 
   const getSelectedNode = useCallback(
     () => treeRecords.find((r) => r.id === selected),
-    [treeRecords, selected]
+    [treeRecords, selected],
   );
 
   const getSelectedDocument = useCallback(() => {
@@ -142,7 +145,7 @@ export function Dms(props: ViewProps<GridView>) {
         navigate(`/ds/dms.file/edit/${record.id}`);
       }
     },
-    [navigate, view, popup, openTab, supportsSpreadsheet]
+    [navigate, view, popup, openTab, supportsSpreadsheet],
   );
 
   const setRootIfNeeded = useCallback(
@@ -154,17 +157,17 @@ export function Dms(props: ViewProps<GridView>) {
         }));
         setTreeRecords((records) =>
           records.map((rec) =>
-            rec.id === root.id ? { ...rec, ...parent } : rec
-          )
+            rec.id === root.id ? { ...rec, ...parent } : rec,
+          ),
         );
         setSelected((id) => (id === root.id ? parent.id : id));
         setExpanded((ids) =>
-          ids.map((id) => (id === root.id ? parent.id : id))
+          ids.map((id) => (id === root.id ? parent.id : id)),
         );
         return true;
       }
     },
-    [root]
+    [root],
   );
 
   const onSearch = useAtomCallback(
@@ -173,7 +176,7 @@ export function Dms(props: ViewProps<GridView>) {
         const { query = {} } = searchAtom ? get(searchAtom) : {};
 
         const sortBy = orderBy?.map(
-          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         );
 
         return dataStore
@@ -212,8 +215,8 @@ export function Dms(props: ViewProps<GridView>) {
             return result;
           });
       },
-      [searchAtom, action.domain, dataStore, selected, orderBy]
-    )
+      [searchAtom, action.domain, dataStore, selected, orderBy],
+    ),
   );
 
   const onNew = useCallback(
@@ -223,7 +226,7 @@ export function Dms(props: ViewProps<GridView>) {
       const exists = dataStore.records.filter(
         (rec) =>
           rec.fileName === inputValue &&
-          (!data?.isDirectory || rec.isDirectory === true)
+          (!data?.isDirectory || rec.isDirectory === true),
       );
 
       if (exists.length > 0) {
@@ -258,7 +261,7 @@ export function Dms(props: ViewProps<GridView>) {
       setRootIfNeeded,
       getSelectedNode,
       onSearch,
-    ]
+    ],
   );
 
   const onFolderNew = useCallback(async () => {
@@ -274,7 +277,7 @@ export function Dms(props: ViewProps<GridView>) {
       {
         isDirectory: false,
         contentType: CONTENT_TYPE.HTML,
-      }
+      },
     );
     record && openDMSFile(record);
   }, [onNew, openDMSFile]);
@@ -286,7 +289,7 @@ export function Dms(props: ViewProps<GridView>) {
       {
         isDirectory: false,
         contentType: CONTENT_TYPE.SPREADSHEET,
-      }
+      },
     );
     record && openDMSFile(record);
   }, [onNew, openDMSFile]);
@@ -301,7 +304,7 @@ export function Dms(props: ViewProps<GridView>) {
     let input = await promptInput(
       i18n.get("Information"),
       record.fileName,
-      i18n.get("Save")
+      i18n.get("Save"),
     );
 
     if (input) {
@@ -313,8 +316,8 @@ export function Dms(props: ViewProps<GridView>) {
       if (updated && !doc) {
         setTreeRecords((records) =>
           records.map((r) =>
-            r.id === updated.id ? { ...r, fileName: updated.fileName } : r
-          )
+            r.id === updated.id ? { ...r, fileName: updated.fileName } : r,
+          ),
         );
       }
     }
@@ -322,7 +325,7 @@ export function Dms(props: ViewProps<GridView>) {
 
   const onDocumentSave = useCallback(
     (record: TreeRecord) => dataStore.save(record),
-    [dataStore]
+    [dataStore],
   );
 
   const onDocumentDownload = useCallback(async () => {
@@ -359,14 +362,14 @@ export function Dms(props: ViewProps<GridView>) {
         records.length > 1 ? (
           i18n.get(
             "Are you sure you want to delete the {0} selected documents?",
-            records.length
+            records.length,
           )
         ) : (
           <Box
             dangerouslySetInnerHTML={{
               __html: i18n.get(
                 "Are you sure you want to delete {0}?",
-                toStrongText(record.fileName)
+                toStrongText(record.fileName),
               ),
             }}
           />
@@ -381,12 +384,12 @@ export function Dms(props: ViewProps<GridView>) {
         // remove directories from tree
         dirIds.length > 0 &&
           setTreeRecords((records) =>
-            records.filter((r) => !dirIds.includes(r.id))
+            records.filter((r) => !dirIds.includes(r.id)),
           );
 
         // set to root when selected node is deleted
         setSelected((selected) =>
-          dirIds.includes(selected) ? root.id : selected
+          dirIds.includes(selected) ? root.id : selected,
         );
       }
     }
@@ -402,7 +405,7 @@ export function Dms(props: ViewProps<GridView>) {
           return dialogs.info({
             content: i18n.get(
               "You are not allowed to upload a file bigger than {0} MB.",
-              uploadSize
+              uploadSize,
             ),
           });
         }
@@ -416,18 +419,20 @@ export function Dms(props: ViewProps<GridView>) {
 
       await uploader.process();
     },
-    [uploadSize, uploader]
+    [uploadSize, uploader],
   );
 
   const handleNodeSelect = useCallback((record: TreeRecord) => {
     setSelected(record.id);
+    setDetailsPopup(false);
+    setDetailsId(null);
   }, []);
 
   const handleNodeExpand = useCallback((record: TreeRecord) => {
     setExpanded((list) =>
       list.includes(record.id)
         ? list.filter((id) => id !== record.id)
-        : [...list, record.id]
+        : [...list, record.id],
     );
   }, []);
 
@@ -439,7 +444,7 @@ export function Dms(props: ViewProps<GridView>) {
         openDMSFile(row?.record);
       }
     },
-    [handleNodeSelect, openDMSFile]
+    [handleNodeSelect, openDMSFile],
   );
 
   const handleDetailsPopupClose = useCallback(() => {
@@ -452,7 +457,7 @@ export function Dms(props: ViewProps<GridView>) {
       col: GridColumn,
       colIndex: number,
       row: GridRow,
-      rowIndex: number
+      rowIndex: number,
     ) => {
       const record = row?.record;
       const cellValue = record?.[col?.name];
@@ -466,8 +471,13 @@ export function Dms(props: ViewProps<GridView>) {
       } else if (cellValue?.includes("fa")) {
         handleDocumentOpen(e, row);
       }
+
+      if (cellValue !== "fa fa-info-circle") {
+        setDetailsPopup(false);
+        setDetailsId(null);
+      }
     },
-    [handleDocumentOpen]
+    [handleDocumentOpen],
   );
 
   const showToolbar = popupOptions?.showToolbar !== false;
@@ -485,7 +495,7 @@ export function Dms(props: ViewProps<GridView>) {
   }, [treeRecords, selected]);
   const detailRecord = useMemo(
     () => (detailsId ? records.find((r) => r.id === detailsId) : null),
-    [records, detailsId]
+    [records, detailsId],
   );
 
   useEffect(() => {

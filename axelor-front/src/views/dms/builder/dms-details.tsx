@@ -1,22 +1,25 @@
+import clsx from "clsx";
+import { useSetAtom } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { ReactElement, memo, useCallback, useEffect, useState } from "react";
+
 import { Box, Button, Link } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { useAtomCallback } from "jotai/utils";
-import { useSetAtom } from "jotai";
-import clsx from "clsx";
 
-import { TreeRecord } from "./types";
-import { i18n } from "@/services/client/i18n";
-import { Formatters } from "@/utils/format";
-import { ViewerInput } from "../../form/widgets/string/viewer";
-import { DataRecord } from "@/services/client/data.types";
-import { legacyClassNames } from "@/styles/legacy";
 import { useAsync } from "@/hooks/use-async";
-import { findView } from "@/services/client/meta-cache";
-import { Form, useFormHandlers } from "../../form/builder";
-import { FormView } from "@/services/client/meta.types";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
+import { findView } from "@/services/client/meta-cache";
+import { FormView } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
+import { Formatters } from "@/utils/format";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
+
+import { Form, useFormHandlers } from "../../form/builder";
+import { ViewerInput } from "../../form/widgets/string/viewer";
+import { TreeRecord } from "./types";
+
 import styles from "./dms-details.module.scss";
 
 const tagsFormName = "dms-file-tags-form";
@@ -54,7 +57,7 @@ export const DmsDetails = memo(function DmsDetails({
       setEdit(false);
       onSave?.(data);
     },
-    [onSave]
+    [onSave],
   );
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export const DmsDetails = memo(function DmsDetails({
   return (
     <Box
       className={clsx(styles.drawer, {
-        [styles.show]: open,
+        [styles.show]: open && data,
       })}
       shadow
       borderTop
@@ -98,7 +101,7 @@ export const DmsDetails = memo(function DmsDetails({
           <Box p={2}>
             {renderField(
               i18n.get("Type"),
-              isDirectory ? i18n.get("Directory") : i18n.get("File")
+              isDirectory ? i18n.get("Directory") : i18n.get("File"),
             )}
             {renderField(i18n.get("Owner"), createdBy?.name)}
             {renderField(i18n.get("Created"), Formatters.datetime(createdOn))}
@@ -106,7 +109,7 @@ export const DmsDetails = memo(function DmsDetails({
           </Box>
           <Box d="flex" mt={2} px={1}>
             {edit ? (
-              <Box>
+              <Box flex={1} className={styles.tagsForm}>
                 <TagsFormView model={model} record={data} onSave={handleSave} />
               </Box>
             ) : tags?.length > 0 ? (
@@ -168,7 +171,7 @@ function TagsFormView({
         name: tagsFormName,
         model,
       }),
-    [model]
+    [model],
   );
   return (meta && (
     <TagsForm meta={meta} record={record} onSave={onSave} />
@@ -193,8 +196,8 @@ function TagsForm({ meta, record, onSave }: TagFormProps) {
         });
         setDirty(false);
       },
-      [formAtom, onSave, setDirty]
-    )
+      [formAtom, onSave, setDirty],
+    ),
   );
 
   useEffect(() => {
@@ -215,7 +218,7 @@ function TagsForm({ meta, record, onSave }: TagFormProps) {
         recordHandler={recordHandler}
         {...({} as any)}
       />
-      <Box>
+      <Box px={1} d="flex" alignItems="center">
         <MaterialIcon
           icon="done"
           fill
