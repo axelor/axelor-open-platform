@@ -23,7 +23,11 @@ import styles from "./panel.module.scss";
 
 export function Panel(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
-  const { showTitle = true, showFrame, canCollapse } = schema;
+  const {
+    showTitle = true,
+    showFrame,
+    canCollapse = Boolean(schema.collapseIf),
+  } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, collapse } = attrs;
   const [collapsed, setCollapsed] = useState(collapse);
