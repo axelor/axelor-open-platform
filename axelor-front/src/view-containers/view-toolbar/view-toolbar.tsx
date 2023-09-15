@@ -131,12 +131,15 @@ export function ToolbarActions({
   const { ref, width } = useResizeDetector();
   const innerRef = useRef<HTMLDivElement | null>(null);
 
-  const responsive = useMemo(() => {
-    const content = innerRef.current;
-    const $width = Math.ceil(width ?? 0);
-    const $innerWidth = Math.ceil(content?.offsetWidth ?? 0);
-    return $width < $innerWidth;
-  }, [width]);
+  const isResponsive = useCallback(
+    (width?: number) =>
+      Math.ceil(width ?? ref.current?.offsetWidth ?? 0) <
+      Math.ceil(innerRef.current?.offsetWidth ?? 0),
+    [ref, innerRef]
+  );
+
+  const $responsive = useMemo(() => isResponsive(width), [isResponsive, width]);
+  const responsive = width !== undefined ? $responsive : isResponsive();
 
   const items = useMemo(() => {
     let ind = 0;
