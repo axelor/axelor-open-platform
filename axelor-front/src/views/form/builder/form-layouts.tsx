@@ -38,7 +38,7 @@ function computeLayout(schema: Schema) {
 
   const template = widths.join(" ");
   const contents = items.map((item) => {
-    const hasField = item.type !== "panel";
+    const hasField = !["panel", "mail-messages", "mail-followers"].includes(item.type!);
 
     let colSpan = parseInt(item.colSpan) || itemSpan;
     let colStart = last > numCols ? 1 : last;
