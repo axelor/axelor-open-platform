@@ -8,15 +8,15 @@ function processJsonForm(view: Schema) {
   if (view.type !== "form") return view;
   if (view.model !== "com.axelor.meta.db.MetaJsonRecord") return view;
 
-  var panel = view.items?.[0];
-  var jsonField = panel?.items?.[0];
-  var jsonFields = jsonField?.jsonFields ?? [];
+  const panel = view.items?.[0];
+  const jsonField = panel?.items?.[0];
+  const jsonFields = jsonField?.jsonFields ?? [];
 
-  var first = jsonFields?.[0];
+  const first = jsonFields?.[0];
   if (first?.type === "panel" && panel) {
     panel.type = "panel-json";
     if (first.widgetAttrs) {
-      var attrs = JSON.parse(first.widgetAttrs);
+      const attrs = JSON.parse(first.widgetAttrs);
       view.width = view.width || attrs.width;
     }
   }
@@ -58,9 +58,9 @@ export function processSelection(field: Schema) {
 }
 
 export function processWidget(field: Schema) {
-  var attrs: Record<string, any> = {};
+  const attrs: Record<string, any> = {};
   _.each(field.widgetAttrs || {}, (value, name) => {
-    var val = value;
+    let val = value;
     if (value === "null") val = null;
     if (name === "widget" && value) val = _.kebabCase(value);
     else if (
@@ -132,7 +132,7 @@ function UseIncluded(view: Schema) {
   }
   function UseToolbar(toolbar: Schema[]) {
     if (!toolbar) return;
-    var my = view.toolbar || toolbar;
+    let my = view.toolbar || toolbar;
     if (my !== toolbar) {
       my = my.concat(toolbar);
     }
@@ -142,7 +142,7 @@ function UseIncluded(view: Schema) {
     return UseIncluded(view);
   }
 
-  var items: Schema[] = [];
+  let items: Schema[] = [];
 
   _.each(view.items, (item) => {
     if (item.type === "include") {
@@ -161,14 +161,14 @@ function UseIncluded(view: Schema) {
 
 export function findViewFields(
   view: Schema,
-  res?: { fields: string[]; related: Record<string, string[]> }
+  res?: { fields: string[]; related: Record<string, string[]> },
 ) {
-  var result = res || {
+  const result = res || {
     fields: [],
     related: {},
   };
-  var items = result.fields;
-  var fields = view.items;
+  const items = result.fields;
+  let fields = view.items;
 
   if (!fields) return result;
   if (view.items && !view._included) {
@@ -177,15 +177,15 @@ export function findViewFields(
   }
 
   function acceptEditor(item: Schema) {
-    var collect = items;
-    var editor = item.editor;
+    let collect = items;
+    const editor = item.editor;
     if (item.name && item.target) {
       collect = result.related[item.name] || (result.related[item.name] = []);
     }
     if (editor.fields) {
       editor.fields = processFields(editor.fields);
     }
-    var acceptItems = (items: Schema[] = []) => {
+    const acceptItems = (items: Schema[] = []) => {
       _.each(items, (child) => {
         if (
           child.name &&
@@ -211,8 +211,8 @@ export function findViewFields(
   }
 
   function acceptViewer(item: Schema) {
-    var collect = items;
-    var viewer = item.viewer;
+    let collect = items;
+    const viewer = item.viewer;
     if (item.name && item.target) {
       collect = result.related[item.name] || (result.related[item.name] = []);
     }
@@ -241,13 +241,13 @@ export function findViewFields(
       // fetch colors
       if (item.name && item.colorField) {
         (result.related[item.name] || (result.related[item.name] = [])).push(
-          item.colorField
+          item.colorField,
         );
       }
       // fetch target names
       if (item.name && item.targetName) {
         (result.related[item.name] || (result.related[item.name] = [])).push(
-          item.targetName
+          item.targetName,
         );
       }
     }
@@ -281,34 +281,34 @@ export function accept(params: ActionView) {
 export function processView(
   meta: ViewData<any>,
   view: Schema,
-  parent?: Schema
+  parent?: Schema,
 ) {
   meta = meta || {};
   view = view || {};
 
   if (meta.jsonAttrs && view && view.items) {
     if (view.type === "grid") {
-      function findLast(
+      const findLast = (
         array: any[],
-        callback: (element: Schema, index?: number, array?: any[]) => boolean
-      ) {
-        for (var index = (array || []).length - 1; index >= 0; --index) {
-          var element = array[index];
+        callback: (element: Schema, index?: number, array?: any[]) => boolean,
+      ) => {
+        for (let index = (array || []).length - 1; index >= 0; --index) {
+          const element = array[index];
           if (callback(element, index, array)) {
             return element;
           }
         }
-      }
+      };
 
-      function lastShownIsButton(itemList: Schema[]) {
-        var found = findLast(itemList, (item) => {
+      const lastShownIsButton = (itemList: Schema[]) => {
+        const found = findLast(itemList, (item) => {
           return item && !item.hidden;
         });
         return found && found.type === "button";
-      }
+      };
 
       view.items = ((items) => {
-        var index = items.findIndex((x) => x.type === "button");
+        let index = items.findIndex((x) => x.type === "button");
         if (index < 0 || !lastShownIsButton(items)) {
           index = items.length;
         }
@@ -322,7 +322,7 @@ export function processView(
     }
     if (view.type === "form") {
       const hasCustomAttrsField = Object.values(meta.fields ?? {}).some(
-        (f) => f.jsonField === "attrs"
+        (f) => f.jsonField === "attrs",
       );
       !hasCustomAttrsField &&
         view.items.push({
@@ -346,29 +346,32 @@ export function processView(
   }
 
   (() => {
-    var helps = (meta.helps = meta.helps || {});
-    var items: Schema[] = [];
+    let helps = (meta.helps = meta.helps || {});
+    const items: Schema[] = [];
 
     if (Array.isArray(view.helpOverride) && view.helpOverride.length) {
-      helps = meta.helps = view.helpOverride.reduce((all, help) => {
-        const { type, field } = help;
-        return {
-          ...all,
-          [type]: {
-            ...all[type],
-            [field]: help,
-          },
-        };
-      }, {} as typeof helps);
+      helps = meta.helps = view.helpOverride.reduce(
+        (all, help) => {
+          const { type, field } = help;
+          return {
+            ...all,
+            [type]: {
+              ...all[type],
+              [field]: help,
+            },
+          };
+        },
+        {} as typeof helps,
+      );
 
       if (helps?.tooltip?.__top__) {
         view.help = helps.tooltip.__top__.help;
       }
     }
 
-    var help: Schema = helps.tooltip ?? {};
-    var placeholder: Schema = helps.placeholder ?? {};
-    var inline: Schema = helps.inline ?? {};
+    const help: Schema = helps.tooltip ?? {};
+    const placeholder: Schema = helps.placeholder ?? {};
+    const inline: Schema = helps.inline ?? {};
 
     _.forEach(view.items, (item) => {
       if (item.name && help[item.name]) {
@@ -415,7 +418,7 @@ export function processView(
 
     if (item.name) {
       _.forEach(fields[item.name], (value, key) => {
-        if (!item.hasOwnProperty(key)) {
+        if (!Object.hasOwn(item, key)) {
           item[key] = value;
         }
       });
@@ -426,7 +429,7 @@ export function processView(
         if (item[name] === "false" || item[name] === "true") {
           item[name] = item[name] === "true";
         }
-      }
+      },
     );
 
     if (item.items) {
@@ -438,13 +441,13 @@ export function processView(
     }
 
     if (item.jsonFields && item.widget !== "json-raw") {
-      var editor: Schema = {
+      const editor: Schema = {
         layout: view.type === "panel-json" ? "table" : undefined,
         flexbox: true,
         items: [],
       };
-      var panel: Schema | null = null;
-      var panelTab: Schema | null = null;
+      let panel: Schema | null = null;
+      let panelTab: Schema | null = null;
       item.jsonFields.sort((x: Schema, y: Schema) => {
         return x.sequence - y.sequence;
       });
@@ -462,7 +465,7 @@ export function processView(
           }
 
           // remove x- prefix from all widget attributes
-          for (var key in field.widgetAttrs) {
+          for (const key in field.widgetAttrs) {
             if (_.startsWith(key, "x-")) {
               field.widgetAttrs[key.substring(2)] = field.widgetAttrs[key];
               delete field.widgetAttrs[key];
@@ -496,7 +499,7 @@ export function processView(
         if (field.type !== "separator") {
           field.title = field.title || field.autoTitle;
         }
-        var colSpan = (field.widgetAttrs || {}).colSpan || field.colSpan;
+        const colSpan = (field.widgetAttrs || {}).colSpan || field.colSpan;
         if (field.type === "one-to-many") {
           field.type = "many-to-many";
           field.canSelect = false;
@@ -536,11 +539,11 @@ export function processView(
 
   // include json fields in grid
   if (view.type === "grid") {
-    var items: Schema[] = [];
+    let items: Schema[] = [];
     _.forEach(view.items, (item) => {
       if (item.jsonFields) {
         _.forEach(item.jsonFields, (field) => {
-          var type = field.type || "text";
+          const type = field.type || "text";
           if (type.indexOf("-to-many") === -1 && field.visibleInGrid) {
             items.push({ ...field, name: item.name + "." + field.name });
           }
@@ -552,7 +555,7 @@ export function processView(
           !Array.isArray(meta.fields) &&
           meta.fields[item.name]?.jsonField
         ) {
-          var field = meta.fields[item.name];
+          const field = meta.fields[item.name];
           if (typeof field.widgetAttrs === "string") {
             field.widgetAttrs = JSON.parse(field.widgetAttrs);
           }
@@ -575,7 +578,7 @@ export function processView(
 
   if (view.type === "form") {
     // more attrs action
-    var moreAttrs = "com.axelor.meta.web.MetaController:moreAttrs";
+    const moreAttrs = "com.axelor.meta.web.MetaController:moreAttrs";
     view.onNew = view.onNew ? view.onNew + "," + moreAttrs : moreAttrs;
     view.onLoad = view.onLoad ? view.onLoad + "," + moreAttrs : moreAttrs;
     // wkf status
