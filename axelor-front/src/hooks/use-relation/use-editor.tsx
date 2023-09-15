@@ -190,6 +190,18 @@ function Footer({
     }
   }, [getErrors, handler, onClose, onSave, onSelect]);
 
+  useEffect(() => {
+    return handler.actionHandler?.subscribe((data) => {
+      if (data.type === "close") {
+        onClose(true);
+      }
+    });
+  }, [
+    close,
+    handleConfirm,
+    handler,
+  ]);
+
   return (
     <Box d="flex" g={2}>
       <Button variant="secondary" onClick={handleClose}>
