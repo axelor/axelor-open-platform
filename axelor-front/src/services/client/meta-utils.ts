@@ -581,6 +581,12 @@ export function processView(
     const moreAttrs = "com.axelor.meta.web.MetaController:moreAttrs";
     view.onNew = view.onNew ? view.onNew + "," + moreAttrs : moreAttrs;
     view.onLoad = view.onLoad ? view.onLoad + "," + moreAttrs : moreAttrs;
+
+    // all top-level items should span to 12 cols by default
+    view.items?.forEach((item) => {
+      item.colSpan = item.colSpan ?? 12;
+    });
+
     // wkf status
     view.items?.unshift({
       colSpan: 12,
