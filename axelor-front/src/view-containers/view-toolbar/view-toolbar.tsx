@@ -111,7 +111,7 @@ function ActionCommandItem({
 
 type ToolbarItem = Menu | MenuItem | MenuDivider | Button;
 
-function getTextNormal(item: ToolbarItem) {
+function getTextFull(item: ToolbarItem) {
   return item.showTitle !== false ? item.title ?? "" : "";
 }
 
@@ -124,84 +124,105 @@ export function ToolbarActions({
   menus,
   recordHandler,
   actionExecutor,
+  parentRef,
+  parentWidth,
 }: Pick<ViewToolBarProps, "actionExecutor" | "recordHandler"> & {
   buttons?: Button[];
   menus?: Menu[];
+  parentRef?: React.RefObject<HTMLDivElement>;
+  parentWidth?: number;
 }) {
-  const { ref, width } = useResizeDetector();
   const innerRef = useRef<HTMLDivElement | null>(null);
 
   const isResponsive = useCallback(
-    (width?: number) =>
-      Math.ceil(width ?? ref.current?.offsetWidth ?? 0) <
-      Math.ceil(innerRef.current?.offsetWidth ?? 0),
-    [ref, innerRef]
+    (parentWidth?: number) => {
+      // Compute total width of children, excluding responsive dropdown menu.
+      let width = innerRef.current?.offsetWidth ?? 0;
+      const children = (parentRef?.current?.children ?? []) as HTMLElement[];
+      for (let i = 1; i < children.length; ++i) {
+        width += children[i].offsetWidth;
+      }
+      return (
+        Math.ceil(parentWidth ?? parentRef?.current?.offsetWidth ?? 0) <
+        Math.ceil(width ?? 0)
+      );
+    },
+    [parentRef, innerRef]
   );
 
-  const $responsive = useMemo(() => isResponsive(width), [isResponsive, width]);
-  const responsive = width !== undefined ? $responsive : isResponsive();
+  const $responsive = useMemo(
+    () => isResponsive(parentWidth),
+    [isResponsive, parentWidth]
+  );
+  const responsive = parentWidth !== undefined ? $responsive : isResponsive();
 
-  const items = useMemo(() => {
-    let ind = 0;
+  const getItems = useCallback(
+    (getText: (item: ToolbarItem) => string = getTextFull) => {
+      let ind = 0;
 
-    const getText = responsive ? getTextResponsive : getTextNormal;
-
-    const mapItem = (item: ToolbarItem): CommandItemProps => {
-      const action = (item as Button).onClick || (item as MenuItem).action;
-      const text = getText(item);
-      const { icon, prompt, help } = item as Button;
-      const key = `action_${++ind}`;
-      const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
-      return {
-        key,
-        text,
-        divider: item.type === "menu-item-devider",
-        description: help,
-        iconOnly: !text && icon,
-        showDownArrow: item.type === "menu",
-        ...(icon && {
-          icon: ({ className }: { className: string }) => (
-            <Icon icon={icon} className={className} />
-          ),
-        }),
-        ...(action && {
-          onClick: async () => {
-            if (prompt) {
-              const confirmed = await dialogs.confirm({
-                content: prompt,
+      const mapItem = (item: ToolbarItem): CommandItemProps => {
+        const action = (item as Button).onClick || (item as MenuItem).action;
+        const text = getText(item);
+        const { icon, prompt, help } = item as Button;
+        const key = `action_${++ind}`;
+        const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
+        return {
+          key,
+          text,
+          divider: item.type === "menu-item-devider",
+          description: help,
+          iconOnly: !text && icon,
+          showDownArrow: item.type === "menu",
+          ...(icon && {
+            icon: ({ className }: { className: string }) => (
+              <Icon icon={icon} className={className} />
+            ),
+          }),
+          ...(action && {
+            onClick: async () => {
+              if (prompt) {
+                const confirmed = await dialogs.confirm({
+                  content: prompt,
+                });
+                if (!confirmed) return;
+              }
+              actionExecutor?.execute(action, {
+                context: {
+                  _signal: item.name,
+                  _source: item.name,
+                },
               });
-              if (!confirmed) return;
-            }
-            actionExecutor?.execute(action, {
-              context: {
-                _signal: item.name,
-                _source: item.name,
-              },
-            });
-          },
-        }),
-        ...((item as Menu).items && {
-          items: (item as Menu).items?.map(mapItem),
-        }),
-        ...(hasExpr && {
-          render: (props) => (
-            <ActionCommandItem
-              {...props}
-              showIf={item.showIf}
-              hideIf={item.hideIf}
-              readonlyIf={item.readonlyIf}
-              recordHandler={recordHandler}
-            />
-          ),
-        }),
-      } as CommandItemProps;
-    };
+            },
+          }),
+          ...((item as Menu).items && {
+            items: (item as Menu).items?.map(mapItem),
+          }),
+          ...(hasExpr && {
+            render: (props) => (
+              <ActionCommandItem
+                {...props}
+                showIf={item.showIf}
+                hideIf={item.hideIf}
+                readonlyIf={item.readonlyIf}
+                recordHandler={recordHandler}
+              />
+            ),
+          }),
+        } as CommandItemProps;
+      };
 
-    return [...(buttons || []), ...(menus || [])].map(mapItem);
-  }, [responsive, buttons, menus, actionExecutor, recordHandler]);
+      return [...(buttons || []), ...(menus || [])].map(mapItem);
+    },
+    [buttons, menus, actionExecutor, recordHandler]
+  );
+
+  const [items, responsiveItems] = useMemo(
+    () => [getItems(), getItems(getTextResponsive)],
+    [getItems]
+  );
 
   return (
-    <Box ref={ref} d="flex" textWrap={false} overflow="hidden">
+    <Box d="flex" textWrap={false} overflow="hidden">
       {responsive && (
         <CommandBar
           items={[
@@ -211,7 +232,7 @@ export function ToolbarActions({
               iconProps: {
                 icon: "settings",
               },
-              items,
+              items: responsiveItems,
               showDownArrow: true,
             } as CommandItemProps,
           ]}
@@ -376,16 +397,20 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const PageComp =
     typeof pageTextOrComp === "function" ? pageTextOrComp : undefined;
 
+  const { ref, width } = useResizeDetector();
+
   return (
     <Box className={styles.toolbar}>
       <CommandBar className={styles.actions} iconOnly items={actions} />
-      <Box d="flex" className={styles.extra}>
+      <Box ref={ref} d="flex" className={styles.extra}>
         {(toolbar?.length > 0 || menubar?.length > 0) && (
           <ToolbarActions
             buttons={toolbar}
             menus={menubar}
             actionExecutor={actionExecutor}
             recordHandler={recordHandler}
+            parentRef={ref}
+            parentWidth={width}
           />
         )}
         {children}
