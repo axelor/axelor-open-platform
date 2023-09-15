@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   overflow: hidden;
+  min-height: 50px;
   gap: var(--ax-theme-shell-view-toolbar-gap);
   background-color: var(--ax-theme-shell-view-toolbar-bg);
   padding: var(--ax-theme-shell-view-toolbar-padding);
