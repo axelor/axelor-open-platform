@@ -1,9 +1,8 @@
-import { MouseEvent } from "react";
 import get from "lodash/get";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { moment } from "@/services/client/l10n";
 import { i18n } from "@/services/client/i18n";
+import { moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format, { getJSON } from "@/utils/format";
@@ -21,7 +20,7 @@ export type ScriptContextOptions = {
 
 export function createScriptContext(
   context: DataContext,
-  options?: ScriptContextOptions
+  options?: ScriptContextOptions,
 ) {
   const {
     execute = () => Promise.resolve(),
@@ -94,7 +93,7 @@ export function createScriptContext(
       items: DataRecord[],
       field: string,
       operation?: string,
-      field2?: string
+      field2?: string,
     ) {
       let total = 0;
       if (items && items.length) {
@@ -161,7 +160,7 @@ export function createScriptContext(
         : "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     },
     $action(name: string) {
-      return (e: MouseEvent<HTMLElement>) => {
+      return (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault();
         e.stopPropagation();
         execute(name, {
@@ -174,6 +173,14 @@ export function createScriptContext(
 
   type Context = DataContext & typeof helpers;
 
+  function isJsonValue(value: unknown): value is string {
+    if (typeof value === "string") {
+      const text = value.trim();
+      return text.startsWith("{") && text.endsWith("}");
+    }
+    return false;
+  }
+
   return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
       if (p in helpers) return helpers[p as keyof typeof helpers];
@@ -184,7 +191,7 @@ export function createScriptContext(
       if (value === undefined && typeof p === "string" && p.startsWith("$")) {
         const key = p.substring(1);
         const jsonText = target[key];
-        if (typeof jsonText === "string") {
+        if (isJsonValue(jsonText)) {
           const json = getJSON(jsonText);
           if (json) {
             return json;
