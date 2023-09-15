@@ -6,9 +6,9 @@ import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
+import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
-import { DataRecord } from "@/services/client/data.types";
 
 import {
   useSelectViewState,
@@ -20,11 +20,11 @@ import {
 } from "../views/scope";
 
 import { Icon } from "@/components/icon";
-import { parseExpression } from "@/hooks/use-parser/utils";
 import { createScriptContext } from "@/hooks/use-parser/context";
+import { parseExpression } from "@/hooks/use-parser/utils";
+import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
-import { useResizeDetector } from "@/hooks/use-resize-detector";
 import {
   Button,
   Menu,
@@ -109,6 +109,16 @@ function ActionCommandItem({
   );
 }
 
+type ToolbarItem = Menu | MenuItem | MenuDivider | Button;
+
+function getTextNormal(item: ToolbarItem) {
+  return item.showTitle !== false ? item.title ?? "" : "";
+}
+
+function getTextResponsive(item: ToolbarItem) {
+  return item.title ?? toTitleCase(item.name ?? "");
+}
+
 export function ToolbarActions({
   buttons,
   menus,
@@ -121,13 +131,21 @@ export function ToolbarActions({
   const { ref, width } = useResizeDetector();
   const innerRef = useRef<HTMLDivElement | null>(null);
 
+  const responsive = useMemo(() => {
+    const content = innerRef.current;
+    const $width = Math.ceil(width ?? 0);
+    const $innerWidth = Math.ceil(content?.offsetWidth ?? 0);
+    return $width < $innerWidth;
+  }, [width]);
+
   const items = useMemo(() => {
     let ind = 0;
-    const mapItem = (
-      item: Menu | MenuItem | MenuDivider | Button
-    ): CommandItemProps => {
+
+    const getText = responsive ? getTextResponsive : getTextNormal;
+
+    const mapItem = (item: ToolbarItem): CommandItemProps => {
       const action = (item as Button).onClick || (item as MenuItem).action;
-      const text = item.showTitle !== false ? item.title : "";
+      const text = getText(item);
       const { icon, prompt, help } = item as Button;
       const key = `action_${++ind}`;
       const hasExpr = item.showIf || item.hideIf || item.readonlyIf;
@@ -177,14 +195,7 @@ export function ToolbarActions({
     };
 
     return [...(buttons || []), ...(menus || [])].map(mapItem);
-  }, [buttons, menus, actionExecutor, recordHandler]);
-
-  const responsive = useMemo(() => {
-    const content = innerRef.current;
-    const $width = Math.ceil(width ?? 0);
-    const $innerWidth = Math.ceil((content?.offsetWidth ?? 0));
-    return $width < $innerWidth;
-  }, [width]);
+  }, [responsive, buttons, menus, actionExecutor, recordHandler]);
 
   return (
     <Box ref={ref} d="flex" textWrap={false} overflow="hidden">
