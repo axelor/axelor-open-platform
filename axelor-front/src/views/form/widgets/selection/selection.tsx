@@ -50,7 +50,9 @@ export function Selection<Multiple extends boolean>(
         values.includes(String(item.value)),
       );
     }
-    return selectionList.find((item) => String(item.value) === String(value));
+    return (
+      selectionList.find((item) => String(item.value) === String(value)) ?? null
+    );
   }, [multiple, selectionList, value]) as SelectValue<SelectionType, Multiple>;
 
   const handleChange = useCallback(
