@@ -1,11 +1,14 @@
-import React, { memo } from "react";
 import { Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { memo } from "react";
 
-import { Select, Widget } from "./components";
-import { useField } from "./utils";
+import { Select } from "@/components/select";
 import { Filter } from "@/services/client/data.types";
 import { Field } from "@/services/client/meta.types";
+
+import { Widget } from "./components";
+import { useField } from "./utils";
+
 import styles from "./criteria.module.scss";
 
 export const Criteria = memo(function Criteria({
@@ -32,21 +35,6 @@ export const Criteria = memo(function Criteria({
     onChange?.(e, index);
   }
 
-  function renderSelect(
-    name: keyof Filter,
-    options: { name: string; title: string }[]
-  ) {
-    const $value = value?.[name];    
-    return (
-      <Select
-        name={name}
-        onChange={(value: string) => handleChange({ name, value })}
-        value={$value}
-        options={options}
-      />
-    );
-  }
-
   return (
     <Box d="flex" alignItems="center" g={2} w={100}>
       <Box d="flex" onClick={handleRemove}>
@@ -54,14 +42,34 @@ export const Criteria = memo(function Criteria({
       </Box>
 
       <Box d="flex" g={2} className={styles.inputs}>
-        {fields &&
-          renderSelect(
-            "fieldName",
-            fields as { name: string; title: string }[]
-          )}
-
-        {renderSelect("operator", options)}
-
+        {fields && (
+          <Select
+            className={styles.select}
+            multiple={false}
+            options={fields}
+            optionKey={(x) => x.name}
+            optionLabel={(x) => x.title ?? x.autoTitle ?? x.name}
+            optionEqual={(x, y) => x.name === y.name}
+            onChange={(value) =>
+              handleChange({ name: "fieldName", value: value?.name })
+            }
+            value={fields.find((x) => x.name === value?.fieldName) ?? null}
+          />
+        )}
+        {Boolean(options?.length) && (
+          <Select
+            className={styles.select}
+            multiple={false}
+            options={options}
+            optionKey={(x) => x.name}
+            optionLabel={(x) => x.title}
+            optionEqual={(x, y) => x.name === y.name}
+            onChange={(value) =>
+              handleChange({ name: "operator", value: value?.name })
+            }
+            value={options.find((x) => x.name === value?.operator) ?? null}
+          />
+        )}
         {operator && (
           <Widget
             {...{

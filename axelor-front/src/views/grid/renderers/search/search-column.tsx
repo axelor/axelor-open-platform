@@ -1,21 +1,16 @@
 import { PrimitiveAtom, useAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 
-import { Box, Input, Select } from "@axelor/ui";
+import { Box, Input } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 
 import { i18n } from "@/services/client/i18n";
 import { Field } from "@/services/client/meta.types";
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  SyntheticEvent,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, KeyboardEvent, useMemo } from "react";
 
 import { SearchState } from "./types";
 
+import { Select } from "@/components/select";
 import styles from "./search-column.module.scss";
 
 export interface SearchColumnProps {
@@ -29,10 +24,9 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   const [value, setValue] = useAtom(
     useMemo(
       () => focusAtom(dataAtom, (o) => o.prop(column.name).valueOr("")),
-      [column.name, dataAtom]
-    )
+      [column.name, dataAtom],
+    ),
   );
-  const [focus, setFocus] = useState(false);
 
   function applySearch() {
     onSearch?.();
@@ -40,14 +34,6 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
-  }
-
-  function handleFocus() {
-    setFocus(true);
-  }
-
-  function handleBlur(e: ChangeEvent<HTMLInputElement>) {
-    setFocus(false);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -74,30 +60,17 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
     return (
       <Box w={100} className={styles.select} d="flex">
         <Select
+          multiple={false}
           value={selected ?? null}
-          placeholder={focus ? i18n.get("Search...") : ""}
-          onChange={(e) => {
-            const value = e?.value ?? null;
-            setValue(value);
+          placeholder={i18n.get("Search...")}
+          onChange={(value) => {
+            setValue(value?.value ?? "");
             applySearch();
           }}
           options={field.selectionList}
-          optionLabel="title"
-          optionValue="value"
-          onFocus={handleFocus}
-          onBlur={() => setFocus(false)}
-          icons={[
-            {
-              icon: "close",
-              hidden: !selected,
-              onClick: () => {
-                setValue("");
-                applySearch();
-              },
-            },
-            { icon: "arrow_drop_down" },
-          ]}
-          onKeyDown={handleKeyDown as (e: SyntheticEvent) => void}
+          optionKey={(x) => x.value!}
+          optionLabel={(x) => x.title!}
+          optionEqual={(x, y) => x.value === y.value}
         />
       </Box>
     );
@@ -109,10 +82,8 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
         type="text"
         value={value || ""}
         onChange={handleChange}
-        placeholder={focus ? i18n.get("Search...") : ""}
+        placeholder={i18n.get("Search...")}
         onKeyDown={handleKeyDown}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
       />
     </Box>
   );

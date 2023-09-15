@@ -1,31 +1,31 @@
 import { useMemo, useState } from "react";
+
 import {
   Box,
   Button,
   ClickAwayListener,
   Divider,
   Input,
-  Popper,
   Link,
+  Popper,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Property } from "@/services/client/meta.types";
-import {
-  Select,
-  Widget,
-} from "@/view-containers/advance-search/editor/components";
-import { i18n } from "@/services/client/i18n";
-import styles from "./mass-update.module.scss";
-import { toKebabCase } from "@/utils/names";
+import { Select } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { Property } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
+import { Widget } from "@/view-containers/advance-search/editor/components";
+
+import styles from "./mass-update.module.scss";
 
 type MassUpdateItem = {
   field?: null | Property;
   value?: any;
 };
 
-const getNewItem = () => ({ field: null, value: null } as MassUpdateItem);
+const getNewItem = () => ({ field: null, value: null }) as MassUpdateItem;
 
 export function useMassUpdateFields(fields?: Record<string, Property>) {
   return useMemo(
@@ -36,7 +36,7 @@ export function useMassUpdateFields(fields?: Record<string, Property>) {
         if (
           !field?.massUpdate ||
           /^(id|version|selected|archived|((updated|created)(On|By)))$/.test(
-            name
+            name,
           ) ||
           (field as any).large ||
           field.unique ||
@@ -46,7 +46,7 @@ export function useMassUpdateFields(fields?: Record<string, Property>) {
         }
         return [...$fields, field];
       }, [] as Property[]),
-    [fields]
+    [fields],
   );
 }
 
@@ -81,8 +81,8 @@ export function MassUpdater({
   function onChange(name: string, value: any, index: number) {
     setItems((items) =>
       items.map((item, ind) =>
-        ind === index ? { ...item, [name]: value } : item
-      )
+        ind === index ? { ...item, [name]: value } : item,
+      ),
     );
   }
 
@@ -97,11 +97,9 @@ export function MassUpdater({
     const values = items
       .filter((x) => x.field)
       .reduce(
-        (obj, item) => ({
-          ...obj,
-          [item.field?.name!]: item.value,
-        }),
-        {}
+        (obj, item) =>
+          item.field ? { ...obj, [item.field.name]: item.value } : obj,
+        {},
       );
     onUpdate?.(values, isUpdateAll);
   }
@@ -130,7 +128,7 @@ export function MassUpdater({
                 {items.map((item, index) => {
                   const { field } = item;
                   const options = fields.filter(
-                    (f) => !selectedItems.includes(f) || f === field
+                    (f) => !selectedItems.includes(f) || f === field,
                   );
                   return (
                     <tr key={index}>
@@ -143,18 +141,20 @@ export function MassUpdater({
                       </td>
                       <td>
                         <Select
+                          multiple={false}
                           placeholder={i18n.get("Select")}
-                          onChange={(e: any) => {
+                          options={options}
+                          optionKey={(x) => x.name}
+                          optionLabel={(x) => x.title ?? x.autoTitle ?? x.name}
+                          optionEqual={(x, y) => x.name === y.name}
+                          onChange={(value) => {
                             onChange(
                               "field",
-                              fields.find((f) => f.name === e) ?? null,
-                              index
+                              fields.find((x) => x.name === value?.name),
+                              index,
                             );
                           }}
-                          value={field?.name}
-                          options={options}
-                          optionLabel={"title"}
-                          optionValue={"name"}
+                          value={field}
                         />
                       </td>
                       <td>

@@ -33,7 +33,7 @@ export function isAdvancedSearchView(view?: string) {
 export function getCriteria(
   criteria: Filter,
   fields?: MetaData["fields"],
-  jsonFields?: MetaData["jsonFields"]
+  jsonFields?: MetaData["jsonFields"],
 ) {
   let { fieldName, timeUnit = "d", value, value2 } = criteria;
   let operator = criteria.operator as any;
@@ -97,7 +97,7 @@ export function getCriteria(
           fieldName,
           operator: ">=",
           value: getValue(
-            now.clone().subtract(value, timeUnit).startOf(timeUnit)
+            now.clone().subtract(value, timeUnit).startOf(timeUnit),
           ),
         },
         {
@@ -123,7 +123,7 @@ export function getCriteria(
           fieldName,
           operator: "<",
           value: getValue(
-            getNextOf(now.clone().add(value, timeUnit), timeUnit)
+            getNextOf(now.clone().add(value, timeUnit), timeUnit),
           ),
         },
       ],
@@ -199,12 +199,12 @@ export function getCriteria(
       case "date":
       case "datetime":
         if (value) {
+          let v1 = value;
           switch (operator) {
             case "=":
             case "!=":
             case "between":
-            case "notBetween":
-              let v1 = value;
+            case "notBetween": {
               let v2 = ["=", "!="].includes(operator) ? v1 : value2 || v1;
 
               v1 = getValue(moment(v1).startOf("day"));
@@ -227,6 +227,7 @@ export function getCriteria(
                   },
                 ],
               };
+            }
             case "<":
             case ">=":
               value = getValue(moment(value).startOf("day"));
@@ -264,7 +265,7 @@ export function getCriteria(
 export function getFreeSearchCriteria(
   text?: string,
   items?: Widget[],
-  fields?: MetaData["fields"]
+  fields?: MetaData["fields"],
 ) {
   if (text) {
     const filters: Filter[] = [];
@@ -333,7 +334,7 @@ export function getFreeSearchCriteria(
 }
 
 export function getContextFieldFilter(
-  contextField: AdvancedSearchState["contextField"]
+  contextField: AdvancedSearchState["contextField"],
 ): (Filter & { title?: string }) | null {
   if (!contextField?.field?.name) return null;
   const { field, value } = contextField;
@@ -347,7 +348,7 @@ export function getContextFieldFilter(
 
 export function findContextField(
   filter: Criteria,
-  contextFields: Field[]
+  contextFields: Field[],
 ): AdvancedSearchState["contextField"] {
   const { operator, criteria } = filter;
   if (operator === "and" && criteria?.length) {
@@ -371,7 +372,7 @@ export function findContextField(
 
 export function prepareAdvanceSearchQuery(
   state: AdvancedSearchState,
-  hasEditorApply?: boolean
+  hasEditorApply?: boolean,
 ) {
   const {
     domains,
@@ -424,7 +425,7 @@ export function prepareAdvanceSearchQuery(
   }
 
   const $filters = filters?.filter(
-    (f) => f.id !== id && f.checked && f.filterCustom
+    (f) => f.id !== id && f.checked && f.filterCustom,
   );
 
   if (!hasEditorApply) {

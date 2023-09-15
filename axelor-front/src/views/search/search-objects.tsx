@@ -3,11 +3,13 @@ import { focusAtom } from "jotai-optics";
 import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { Box, Button, Select, SelectProps } from "@axelor/ui";
+import { Box, Button } from "@axelor/ui";
 
+import { Select, SelectProps } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { SearchView } from "@/services/client/meta.types";
+
 import { fetchMenus } from "./utils";
 
 import styles from "./search-objects.module.scss";
@@ -17,10 +19,13 @@ function ActionM2O({
   parent,
   actionMenus,
   ...props
-}: SelectProps & {
+}: {
   actionMenus: SearchView["actionMenus"];
   parent?: DataRecord | null;
-}) {
+} & Pick<
+  SelectProps<DataRecord, false>,
+  "placeholder" | "value" | "onChange"
+>) {
   const parentName = parent?.name;
   const fetchOptions = useCallback(async () => {
     const menus =
@@ -31,9 +36,11 @@ function ActionM2O({
   return (
     <Select
       {...props}
+      options={[]}
       value={value ?? null}
-      optionLabel="title"
-      optionValue="name"
+      optionKey={(x) => x.id!}
+      optionLabel={(x) => x.title}
+      optionEqual={(x, y) => x.id === y.id}
       fetchOptions={fetchOptions}
       icons={
         value
@@ -53,7 +60,7 @@ export type SearchObjectsState = {
 
 export function SearchObjects({
   stateAtom,
-  selects,
+  selects = [],
   actionMenus,
   hasActions = true,
   onSearch,
@@ -71,23 +78,23 @@ export function SearchObjects({
   const [selectValue, onSelectChange] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("selectValue")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const [actionCategory, setActionCategory] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("actionCategory")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const [actionSubCategory, setActionSubCategory] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("actionSubCategory")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const [action, setAction] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("action")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("action")), [stateAtom]),
   );
   const [searchParams] = useSearchParams();
 
@@ -97,7 +104,7 @@ export function SearchObjects({
       setActionSubCategory(null);
       setAction(null);
     },
-    [setActionCategory, setActionSubCategory, setAction]
+    [setActionCategory, setActionSubCategory, setAction],
   );
 
   const handleActionSubCategory = useCallback(
@@ -105,14 +112,14 @@ export function SearchObjects({
       setActionSubCategory(value);
       setAction(null);
     },
-    [setActionSubCategory, setAction]
+    [setActionSubCategory, setAction],
   );
 
   const handleAction = useCallback(
     (value: DataRecord | null) => {
       setAction(value);
     },
-    [setAction]
+    [setAction],
   );
 
   function handleClear() {
@@ -130,7 +137,7 @@ export function SearchObjects({
       onSelectChange(
         list
           .map((v) => selects?.find((item) => item.model === v))
-          .filter((v) => v) as DataRecord[]
+          .filter((v) => v) as DataRecord[],
       );
     } else {
       onSelectChange((selects || []).filter((item) => item.selected));
@@ -150,13 +157,16 @@ export function SearchObjects({
         <Box className={styles["search-section"]}>
           <Box d="flex" className={styles.select} w={100}>
             <Select
-              value={selectValue}
-              onChange={onSelectChange}
-              isMulti
-              options={selects}
-              optionLabel="title"
-              optionValue="model"
+              multiple={true}
               placeholder={i18n.get("Search Objects")}
+              options={selects}
+              optionLabel={(x) => x.title!}
+              optionKey={(x) => x.model!}
+              optionEqual={(x, y) => x.model === y.model}
+              value={selectValue}
+              onChange={(value) => {
+                onSelectChange(value as DataRecord[]);
+              }}
               icons={[
                 {
                   icon: "arrow_drop_down",
@@ -184,7 +194,7 @@ export function SearchObjects({
                 actionMenus={actionMenus}
                 placeholder={i18n.get("Action Category")}
                 value={actionCategory}
-                onChange={handleActionCategory}
+                onChange={(value) => handleActionCategory(value as DataRecord)}
               />
             </Box>
             <Box d="flex" className={styles.select}>
@@ -194,7 +204,9 @@ export function SearchObjects({
                   placeholder={i18n.get("Action Sub-Category")}
                   parent={actionCategory}
                   value={actionSubCategory}
-                  onChange={handleActionSubCategory}
+                  onChange={(value) =>
+                    handleActionSubCategory(value as DataRecord)
+                  }
                 />
               )}
             </Box>
@@ -205,7 +217,7 @@ export function SearchObjects({
                   placeholder={i18n.get("Action")}
                   parent={actionSubCategory}
                   value={action}
-                  onChange={handleAction}
+                  onChange={(value) => handleAction(value as DataRecord)}
                 />
               )}
             </Box>

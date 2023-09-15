@@ -79,40 +79,40 @@ export function AdvanceSearch({
   const [open, setOpen] = useState(false);
   const { data: sessionInfo } = useSession();
   const setEditor = useSetAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom]),
   );
   const setContextField = useSetAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("contextField")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const { fields, contextFields } = useFields(stateAtom);
   const [filters, setFilters] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("filters")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("filters")), [stateAtom]),
   );
   const [domains, setDomains] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("domains")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("domains")), [stateAtom]),
   );
   const freeSearchTextAtom = useMemo(
     () => focusAtom(stateAtom, (o) => o.prop("searchText")),
-    [stateAtom]
+    [stateAtom],
   );
   const focusTabIdAtom = useMemo(
     () => focusAtom(stateAtom, (o) => o.prop("focusTabId")),
-    [stateAtom]
+    [stateAtom],
   );
   const searchTextLabel = useAtomValue(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("searchTextLabel")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const [filterType, setFilterType] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("filterType")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,8 +132,8 @@ export function AdvanceSearch({
         set(stateAtom, prepareAdvanceSearchQuery(state, hasEditorApply));
         onSearch?.();
       },
-      [stateAtom, onSearch]
-    )
+      [stateAtom, onSearch],
+    ),
   );
 
   const handleClear = useAtomCallback(
@@ -145,10 +145,10 @@ export function AdvanceSearch({
           ...state,
           search: {},
           domains: domains?.map((d) =>
-            d.checked ? { ...d, checked: false } : d
+            d.checked ? { ...d, checked: false } : d,
           ),
           filters: filters?.map((f) =>
-            f.checked ? { ...f, checked: false } : f
+            f.checked ? { ...f, checked: false } : f,
           ),
           searchText: "",
           searchTextLabel: "",
@@ -159,8 +159,8 @@ export function AdvanceSearch({
         shouldApply && handleApply();
         handleClose();
       },
-      [stateAtom, handleApply, handleClose]
-    )
+      [stateAtom, handleApply, handleClose],
+    ),
   );
 
   const handleFreeSearch = useAtomCallback(
@@ -195,8 +195,8 @@ export function AdvanceSearch({
 
         onSearch?.();
       },
-      [stateAtom, handleApply, onSearch, freeSearch, items]
-    )
+      [stateAtom, handleApply, onSearch, freeSearch, items],
+    ),
   );
 
   const handleEditorApply = useCallback(() => {
@@ -206,40 +206,43 @@ export function AdvanceSearch({
 
   const handleDomainCheck = useCallback(
     (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
-      setDomains((domains) =>
-        domains?.map((d) =>
-          d === (filter as SearchFilter)
-            ? { ...d, checked: !d.checked }
-            : type === "click"
-            ? { ...d, checked: false }
-            : d
-        )
+      setDomains(
+        (domains) =>
+          domains?.map((d) =>
+            d === (filter as SearchFilter)
+              ? { ...d, checked: !d.checked }
+              : type === "click"
+              ? { ...d, checked: false }
+              : d,
+          ),
       );
       type === "click" && handleApply();
     },
-    [setDomains, handleApply]
+    [setDomains, handleApply],
   );
 
   const handleFilterCheck = useCallback(
     (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
       const isSingle = type === "click" && !filter.checked;
       setFilterType(isSingle ? "single" : "all");
-      setFilters((filters) =>
-        filters?.map((f) =>
-          f === (filter as SavedFilter)
-            ? { ...f, checked: !f.checked }
-            : type === "click"
-            ? { ...f, checked: false }
-            : f
-        )
+      setFilters(
+        (filters) =>
+          filters?.map((f) =>
+            f === (filter as SavedFilter)
+              ? { ...f, checked: !f.checked }
+              : type === "click"
+              ? { ...f, checked: false }
+              : f,
+          ),
       );
       if (type === "click") {
-        setDomains((domains) =>
-          domains?.map((d) => (d.checked ? { ...d, checked: false } : d))
+        setDomains(
+          (domains) =>
+            domains?.map((d) => (d.checked ? { ...d, checked: false } : d)),
         );
         try {
           let filterCustom = JSON.parse(
-            (filter as SavedFilter).filterCustom || "{}"
+            (filter as SavedFilter).filterCustom || "{}",
           ) as Criteria | null;
 
           // Context field
@@ -263,10 +266,12 @@ export function AdvanceSearch({
               : {
                   ...filter,
                   ...filterCustom,
-                }
+                },
           );
           handleApply(true);
-        } catch {}
+        } catch {
+          /* empty */
+        }
       }
     },
     [
@@ -277,7 +282,7 @@ export function AdvanceSearch({
       setContextField,
       handleApply,
       contextFields,
-    ]
+    ],
   );
 
   const handleFilterSave = useCallback(
@@ -295,7 +300,7 @@ export function AdvanceSearch({
             : {
                 ...f,
                 checked: false,
-              }
+              },
         );
       });
       if (isNew) {
@@ -304,7 +309,7 @@ export function AdvanceSearch({
       }
       handleApply(true);
     },
-    [filterView, setFilters, setFilterType, setEditor, handleApply]
+    [filterView, setFilters, setFilterType, setEditor, handleApply],
   );
 
   const handleFilterRemove = useCallback(
@@ -323,7 +328,7 @@ export function AdvanceSearch({
       setEditor(getEditorDefaultState());
       handleApply();
     },
-    [setFilters, setEditor, setFilterType, handleApply]
+    [setFilters, setEditor, setFilterType, handleApply],
   );
 
   const handleExport = useCallback(
@@ -339,11 +344,11 @@ export function AdvanceSearch({
                     (item) =>
                       item.name &&
                       (item as GridColumn).visible !== false &&
-                      (item as GridColumn).searchable !== false
+                      (item as GridColumn).searchable !== false,
                   )
                   .map((item) => item.name) as string[],
               }
-            : {}
+            : {},
         )
         .then(({ exportSize, fileName }) => {
           if ((dataStore.page?.totalCount ?? 0) > exportSize) {
@@ -355,11 +360,11 @@ export function AdvanceSearch({
 
           download(
             `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
-            fileName
+            fileName,
           );
         });
     },
-    [dataStore, items]
+    [dataStore, items],
   );
 
   const inputIcons = useMemo(
@@ -384,7 +389,7 @@ export function AdvanceSearch({
           onClick: () => handleFreeSearch(),
         },
       ] as SearchInputIconProps[],
-    [handleOpen, handleClear, handleFreeSearch]
+    [handleOpen, handleClear, handleFreeSearch],
   );
 
   return (
@@ -531,7 +536,11 @@ function SearchInput({
     return (
       <Box rounded border d="flex" p={1} pe={2}>
         <Box className={styles.chipList} d="flex" flex={1}>
-          <SelectionTag title={label} color="indigo" onRemove={() => onClear?.()} />
+          <SelectionTag
+            title={label}
+            color="indigo"
+            onRemove={() => onClear?.()}
+          />
         </Box>
         <Box
           d="flex"

@@ -7,6 +7,7 @@ import { ReactElement, useCallback, useEffect, useMemo } from "react";
 import { Box, Button, Divider, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { Select } from "@/components/select";
 import { Filter } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment, Moment } from "@/services/client/l10n";
@@ -15,9 +16,10 @@ import {
   Field,
   SavedFilter,
 } from "@/services/client/meta.types";
+
 import { AdvancedSearchState } from "../types";
 import { getContextFieldFilter } from "../utils";
-import { BooleanRadio, RelationalWidget, Select } from "./components";
+import { BooleanRadio, RelationalWidget } from "./components";
 import { Criteria } from "./criteria";
 
 import styles from "./editor.module.scss";
@@ -29,7 +31,7 @@ export const getEditorDefaultState = () =>
     shared: false,
     selected: false,
     criteria: [],
-  } as AdvancedSearchState["editor"]);
+  }) as AdvancedSearchState["editor"];
 
 function FormControl({
   title,
@@ -77,19 +79,19 @@ export function Editor({
   onDelete,
 }: EditorProps) {
   const filters = useAtomValue(
-    useMemo(() => selectAtom(stateAtom, (s) => s.filters), [stateAtom])
+    useMemo(() => selectAtom(stateAtom, (s) => s.filters), [stateAtom]),
   );
   const [editor, setEditor] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom]),
   );
   const [archived, setArchived] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("archived")), [stateAtom])
+    useMemo(() => focusAtom(stateAtom, (o) => o.prop("archived")), [stateAtom]),
   );
   const [contextField, setContextField] = useAtom(
     useMemo(
       () => focusAtom(stateAtom, (o) => o.prop("contextField")),
-      [stateAtom]
-    )
+      [stateAtom],
+    ),
   );
   const { id, title = "", operator = "and", shared } = editor || {};
   const criteria = editor?.criteria?.length ? editor.criteria : [{}];
@@ -101,7 +103,7 @@ export function Editor({
         [name]: value,
       }));
     },
-    [setEditor]
+    [setEditor],
   );
 
   const handleCriteriaAdd = useCallback(
@@ -116,7 +118,7 @@ export function Editor({
         return editor;
       });
     },
-    [setEditor]
+    [setEditor],
   );
 
   const handleCriteriaRemove = useCallback(
@@ -126,7 +128,7 @@ export function Editor({
         criteria: editor?.criteria?.filter((c, ind) => ind !== index),
       }));
     },
-    [setEditor]
+    [setEditor],
   );
 
   const handleCriteriaChange = useCallback(
@@ -138,7 +140,7 @@ export function Editor({
         name: string;
         value: any;
       },
-      index: number
+      index: number,
     ) {
       function getDefaultValue(fieldName: string) {
         const field = fields?.find((f) => f.name === fieldName);
@@ -146,7 +148,7 @@ export function Editor({
         if (!type) return "";
         if (
           ["one_to_one", "many_to_one", "many_to_many", "one_to_many"].includes(
-            type
+            type,
           )
         ) {
           return null;
@@ -170,7 +172,7 @@ export function Editor({
           ["in", "notIn"],
         ];
         return !pairs.some(
-          (pair) => pair.includes(prevOp) && pair.includes(currentOp)
+          (pair) => pair.includes(prevOp) && pair.includes(currentOp),
         );
       }
 
@@ -198,16 +200,16 @@ export function Editor({
               filter.value = null;
               filter.value2 = null;
               filter.timeUnit = ["$inPast", "$inNext", "$inCurrent"].includes(
-                value
+                value,
               )
                 ? "day"
                 : "";
             }
           }
-        })
+        }),
       );
     },
-    [setEditor, fields]
+    [setEditor, fields],
   );
 
   const handleFilterSave = useCallback(
@@ -230,7 +232,7 @@ export function Editor({
         ];
         operator = "and";
       }
-      let savedFilter: Partial<SavedFilter> = {
+      const savedFilter: Partial<SavedFilter> = {
         shared: shared || false,
         title: title,
         filterCustom: JSON.stringify({
@@ -251,14 +253,14 @@ export function Editor({
       }
       onSave?.(savedFilter as SavedFilter);
     },
-    [editor, contextField, onSave]
+    [editor, contextField, onSave],
   );
 
   const handleFilterRemove = useCallback(
     function handleFilterRemove() {
       onDelete?.(editor as SavedFilter);
     },
-    [editor, onDelete]
+    [editor, onDelete],
   );
 
   const criteriaFields = useMemo(
@@ -272,7 +274,7 @@ export function Editor({
             String(contextField?.value?.id) === String(contextFieldValue))
         );
       }),
-    [fields, contextField]
+    [fields, contextField],
   );
 
   const hasContextField = Boolean(contextField?.field?.name);
@@ -307,17 +309,23 @@ export function Editor({
             />
           </Box>
           <Select
-            name={"ctxField"}
-            onChange={(name: any) =>
-              setContextField((data) => ({
-                ...data,
-                field: contextFields?.find((f) => f.name === name),
-                name,
-                value: null,
-              }))
-            }
-            value={contextField?.field?.name ?? null}
+            className={styles.select}
+            multiple={false}
             options={contextFields}
+            optionKey={(x) => x.name}
+            optionLabel={(x) => x.title ?? x.autoTitle ?? x.name}
+            optionEqual={(x, y) => x.name === y.name}
+            onChange={(field) => {
+              setContextField((prev) => {
+                return {
+                  ...prev,
+                  field: field as Field,
+                  value: null,
+                  name: field?.name,
+                };
+              });
+            }}
+            value={contextField?.field ?? null}
           />
           {selectedContextField && (
             <RelationalWidget
