@@ -1,8 +1,6 @@
 import getObjValue from "lodash/get";
 import { useCallback } from "react";
 
-import { SelectOption } from "@axelor/ui";
-
 import { Schema } from "@/services/client/meta.types";
 
 const TR_PREFIX = "$t:";
@@ -15,13 +13,13 @@ function getTrKey(targetName: string) {
   return `${TR_PREFIX}${targetName}`;
 }
 
-function getLabel(option: SelectOption, key: string) {
+function getLabel(option: unknown, key: string) {
   return getObjValue(option, getTrKey(key)) ?? getObjValue(option, key);
 }
 
 export function useOptionLabel({ targetName = "id", targetSearch }: Schema) {
   return useCallback(
-    (option: SelectOption) => {
+    (option: unknown) => {
       let label = getLabel(option, targetName);
 
       if (typeof label === "object") {

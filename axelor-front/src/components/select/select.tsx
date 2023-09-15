@@ -13,16 +13,13 @@ import {
   Select as AxSelect,
   SelectProps as AxSelectProps,
   SelectCustomOption,
-} from "@axelor/ui/core/select2";
+} from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
+
 import styles from "./select.module.scss";
 
-export type {
-  SelectIcon,
-  SelectOptionProps,
-  SelectValue,
-} from "@axelor/ui/core/select2";
+export type { SelectIcon, SelectOptionProps, SelectValue } from "@axelor/ui";
 
 export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
