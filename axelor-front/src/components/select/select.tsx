@@ -14,6 +14,7 @@ import {
   SelectProps as AxSelectProps,
   SelectCustomOption,
   SelectValue,
+  useRefs,
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
@@ -56,7 +57,9 @@ export const Select = forwardRef(function Select<
   const [items, setItems] = useState<Type[]>([]);
   const [inputValue, setInputValue] = useState("");
 
+  const selectRef = useRefs(ref);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
   const loadOptions = useCallback(
     (inputValue: string) => {
       if (loadTimerRef.current) {
@@ -101,14 +104,11 @@ export const Select = forwardRef(function Select<
     clearTimeout(loadTimerRef.current);
   }, []);
 
-  const focusProps = useMemo(() => {
-    if (autoFocus) {
-      return {
-        key: "focused",
-        autoFocus,
-      };
+  useEffect(() => {
+    if (autoFocus && selectRef.current) {
+      selectRef.current.focus();
     }
-  }, [autoFocus]);
+  }, [autoFocus, selectRef]);
 
   const customOptions = useMemo(() => {
     const options: SelectCustomOption[] = [];
@@ -142,9 +142,9 @@ export const Select = forwardRef(function Select<
   return (
     <AxSelect
       {...selectProps}
-      {...focusProps}
-      ref={ref}
+      ref={selectRef}
       value={value}
+      autoFocus={autoFocus}
       readOnly={readOnly}
       options={fetchOptions ? items : options}
       customOptions={customOptions}

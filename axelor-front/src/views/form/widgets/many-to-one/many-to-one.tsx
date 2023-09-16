@@ -303,7 +303,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         ))}
       {readonly || (
         <Select
-          key={focus ? "focused" : undefined}
           autoFocus={focus}
           required={required}
           invalid={invalid}
