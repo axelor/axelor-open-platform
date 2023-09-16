@@ -1,14 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback } from "react";
 
-import { Badge } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
-import {
-  Select,
-  SelectOptionProps,
-  SelectValue,
-} from "@/components/select";
+import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import {
   useBeforeSelect,
   useCompletion,
@@ -24,6 +17,7 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
+import { SelectionTag } from "../selection";
 
 import styles from "./tag-select.module.scss";
 
@@ -62,7 +56,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const handleChange = useCallback(
     (value: SelectValue<DataRecord, true>) => {
       if (Array.isArray(value)) {
-        const items = value.map(({ version, ...rest }) => rest);
+        const items = value.map(({ version: _, ...rest }) => rest);
         setValue(items.length === 0 ? null : items, true);
       } else {
         setValue(value, true);
@@ -84,7 +78,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const canView = readonly && hasButton("view");
   const canEdit = !readonly && hasButton("edit") && attrs.canEdit;
   const canSelect = hasButton("select");
-  const canRemove = !readonly && hasButton("delete") && attrs.canRemove;
+  const canRemove = !readonly && attrs.canRemove !== false;
 
   const handleEdit = useCallback(
     async (record?: DataContext) => {
@@ -264,33 +258,26 @@ function Tag(props: TagProps) {
     [onClick, record],
   );
 
-  const handleRemove = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      onRemove?.(record);
-    },
-    [onRemove, record],
-  );
+  const handleRemove = useCallback(() => {
+    onRemove?.(record);
+  }, [onRemove, record]);
 
   const canOpen = Boolean(onClick);
   const canRemove = Boolean(onRemove);
 
   return (
-    <Badge className={styles.tag} bg="primary">
-      {canOpen && (
-        <span className={styles.tagLink} onClick={handleClick}>
-          {record[targetName]}
-        </span>
-      )}
-      {canOpen || <span className={styles.tagText}>{record[targetName]}</span>}
-      {canRemove && (
-        <MaterialIcon
-          className={styles.tagRemove}
-          icon="close"
-          fontSize="1rem"
-          onClick={handleRemove}
-        />
-      )}
-    </Badge>
+    <SelectionTag
+      title={
+        canOpen ? (
+          <span className={styles.tagLink} onClick={handleClick}>
+            {record[targetName]}
+          </span>
+        ) : (
+          <span>{record[targetName]}</span>
+        )
+      }
+      color="primary"
+      onRemove={canRemove ? handleRemove : undefined}
+    />
   );
 }

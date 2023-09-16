@@ -4,6 +4,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { legacyClassNames } from "@/styles/legacy";
 
 import styles from "./selection.module.scss";
+import React from "react";
 
 export function SelectionTag({
   title,
@@ -11,7 +12,7 @@ export function SelectionTag({
   className,
   onRemove,
 }: {
-  title?: string;
+  title?: React.ReactNode;
   color?: string;
   className?: string;
   onRemove?: () => void;
@@ -32,13 +33,15 @@ export function SelectionTag({
         <Box
           as="span"
           className={styles["tag-remove"]}
-          onClick={onRemove}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          onClick={(e) => {
+            if (onRemove) {
+              e.preventDefault();
+              e.stopPropagation();
+              onRemove();
+            }
           }}
         >
-          <MaterialIcon icon="close" fontSize={20} />
+          <MaterialIcon icon="close" fontSize="1rem" />
         </Box>
       )}
     </Badge>
