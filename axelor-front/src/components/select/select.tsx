@@ -13,13 +13,19 @@ import {
   Select as AxSelect,
   SelectProps as AxSelectProps,
   SelectCustomOption,
+  SelectValue,
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
 
 import styles from "./select.module.scss";
 
-export type { SelectIcon, SelectOptionProps, SelectValue } from "@axelor/ui";
+export type {
+  SelectCustomOption,
+  SelectIcon,
+  SelectOptionProps,
+  SelectValue,
+} from "@axelor/ui";
 
 export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
@@ -42,6 +48,8 @@ export const Select = forwardRef(function Select<
     onShowSelect,
     onInputChange,
     onOpen,
+    value = null,
+    onChange,
     ...selectProps
   } = props;
 
@@ -80,6 +88,13 @@ export const Select = forwardRef(function Select<
       }
     },
     [fetchOptions, loadOptions, onInputChange],
+  );
+
+  const handleChange = useCallback(
+    (value: SelectValue<Type, Multiple>) => {
+      onChange?.(value);
+    },
+    [onChange],
   );
 
   useEffect(() => {
@@ -129,11 +144,13 @@ export const Select = forwardRef(function Select<
       {...selectProps}
       {...focusProps}
       ref={ref}
+      value={value}
       readOnly={readOnly}
       options={fetchOptions ? items : options}
       customOptions={customOptions}
       onInputChange={handleInputChange}
       onOpen={handleOpen}
+      onChange={handleChange}
       className={clsx(className, { [styles.readonly]: readOnly })}
     />
   );
