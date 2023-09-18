@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function useResizeDetector() {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [height, setHeight] = useState<number>();
-  const [width, setWidth] = useState<number>();
+  const [size, setSize] = useState<{ height: number; width: number }>();
 
   useEffect(() => {
     const { current } = ref;
@@ -19,8 +18,7 @@ export function useResizeDetector() {
         for (const entry of entries) {
           if (entry.target === current) {
             const { height, width } = entry.contentRect;
-            setHeight(height);
-            setWidth(width);
+            setSize({ height, width });
           }
         }
       }, 500);
@@ -35,6 +33,11 @@ export function useResizeDetector() {
       observer.disconnect();
     };
   }, [ref]);
+
+  const { height, width } = size ?? {
+    height: ref.current?.offsetHeight,
+    width: ref.current?.offsetWidth,
+  };
 
   return { ref, height, width };
 }

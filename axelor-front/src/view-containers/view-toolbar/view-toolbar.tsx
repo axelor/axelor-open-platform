@@ -134,27 +134,18 @@ export function ToolbarActions({
 }) {
   const innerRef = useRef<HTMLDivElement | null>(null);
 
-  const isResponsive = useCallback(
-    (parentWidth?: number) => {
-      // Compute total width of children, excluding responsive dropdown menu.
-      let width = innerRef.current?.offsetWidth ?? 0;
-      const children = (parentRef?.current?.children ?? []) as HTMLElement[];
-      for (let i = 1; i < children.length; ++i) {
-        width += children[i].offsetWidth;
-      }
-      return (
-        Math.ceil(parentWidth ?? parentRef?.current?.offsetWidth ?? 0) <
-        Math.ceil(width ?? 0)
-      );
-    },
-    [parentRef, innerRef]
-  );
-
-  const $responsive = useMemo(
-    () => isResponsive(parentWidth),
-    [isResponsive, parentWidth]
-  );
-  const responsive = parentWidth !== undefined ? $responsive : isResponsive();
+  const responsive = useMemo(() => {
+    // Compute total width of children, excluding responsive dropdown menu.
+    let width = innerRef.current?.offsetWidth ?? 0;
+    const children = (parentRef?.current?.children ?? []) as HTMLElement[];
+    for (let i = 1; i < children.length; ++i) {
+      width += children[i].offsetWidth;
+    }
+    return (
+      Math.ceil(parentWidth ?? parentRef?.current?.offsetWidth ?? 0) <
+      Math.ceil(width ?? 0)
+    );
+  }, [parentRef, innerRef, parentWidth]);
 
   const getItems = useCallback(
     (getText: (item: ToolbarItem) => string = getTextFull) => {
