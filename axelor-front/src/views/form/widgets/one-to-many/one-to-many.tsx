@@ -697,9 +697,9 @@ export function OneToMany({
               readonly={readonly || editable}
               record={detailRecord}
               formAtom={gridRef.current?.form?.current?.formAtom}
-              onNew={onAddInDetail}
               onClose={onCloseInDetail}
               onSave={onSave}
+              {...(canNew && { onNew: onAddInDetail })}
             />
           </Box>
         ) : null}

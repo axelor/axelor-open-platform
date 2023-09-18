@@ -46,7 +46,7 @@ export function DetailsForm({
   const isNew = (record?.id ?? 0) < 0 && !record?._dirty;
 
   const setReady = useSetAtom(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom])
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom]),
   );
 
   const handleSave = useAtomCallback(
@@ -60,10 +60,10 @@ export function DetailsForm({
           return;
         }
         onSave(record);
-        saveAndNew ? onNew?.() : onClose?.();
+        saveAndNew && onNew ? onNew() : onClose?.();
       },
-      [formAtom, onSave, getErrors, onNew, onClose]
-    )
+      [formAtom, onSave, getErrors, onNew, onClose],
+    ),
   );
 
   const resetFormAtom = useAtomCallback(
@@ -77,8 +77,8 @@ export function DetailsForm({
             record: { ...state.record, ...record },
           });
       },
-      [_formAtom]
-    )
+      [_formAtom],
+    ),
   );
 
   useAsyncEffect(async () => {
@@ -128,7 +128,7 @@ export function DetailsForm({
               <Button size="sm" variant="primary" onClick={() => handleSave()}>
                 {isNew ? i18n.get("Add") : i18n.get("Update")}
               </Button>
-              {isNew && (
+              {isNew && onNew && (
                 <Button
                   size="sm"
                   variant="primary"
@@ -142,9 +142,10 @@ export function DetailsForm({
         </Box>
       </>
     ) : (
+      onNew &&
       !readonly && (
         <Box d="flex" justifyContent="flex-end">
-          <Button size="sm" variant="primary" onClick={() => onNew?.()}>
+          <Button size="sm" variant="primary" onClick={() => onNew()}>
             {i18n.get("New")}
           </Button>
         </Box>
