@@ -29,6 +29,7 @@ export type EditorOptions = {
   view?: FormView;
   viewName?: string;
   context?: DataContext;
+  canSave?: boolean;
   onClose?: (result: boolean) => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
@@ -74,7 +75,7 @@ export function useEditorInTab(schema: Schema) {
         },
       });
     },
-    [formView, gridView, target, tab.action]
+    [formView, gridView, target, tab.action],
   );
 
   if (!tab.popup && (editWindow === "blank" || widget === "ref-link")) {
@@ -95,6 +96,7 @@ export function useEditor() {
       context,
       readonly,
       maximize,
+      canSave = true,
       onClose,
       onSave,
       onSelect,
@@ -125,7 +127,12 @@ export function useEditor() {
       maximize,
       onClose: (result) => onClose?.(result),
       footer: (close) => (
-        <Footer onClose={close} onSave={onSave} onSelect={onSelect} />
+        <Footer
+          hasOk={canSave}
+          onClose={close}
+          onSave={onSave}
+          onSelect={onSelect}
+        />
       ),
       buttons: [],
     });
@@ -133,10 +140,12 @@ export function useEditor() {
 }
 
 function Footer({
+  hasOk = true,
   onClose,
   onSave,
   onSelect,
 }: {
+  hasOk?: boolean;
   onClose: (result: boolean) => void;
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
@@ -149,7 +158,7 @@ function Footer({
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => handler.getState?.().dirty ?? false,
-      async () => onClose(false)
+      async () => onClose(false),
     );
   }, [handler, onClose]);
 
@@ -186,9 +195,11 @@ function Footer({
       <Button variant="secondary" onClick={handleClose}>
         {i18n.get("Close")}
       </Button>
-      <Button variant="primary" onClick={handleConfirm}>
-        {i18n.get("OK")}
-      </Button>
+      {hasOk && (
+        <Button variant="primary" onClick={handleConfirm}>
+          {i18n.get("OK")}
+        </Button>
+      )}
     </Box>
   );
 }
@@ -209,7 +220,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
         try {
           const confirmed = await dialogs.confirmSave(
             async () => saveNeeded,
-            async () => actionHandler.save()
+            async () => actionHandler.save(),
           );
 
           return confirmed;
@@ -217,8 +228,8 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
           return false;
         }
       },
-      [formAtom, actionHandler]
-    )
+      [formAtom, actionHandler],
+    ),
   );
 
   const parentId = useRef<string | null>(null);
@@ -280,6 +291,6 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
             }),
       });
     },
-    [confirmSave, showEditor, popup, dashlet]
+    [confirmSave, showEditor, popup, dashlet],
   );
 }
