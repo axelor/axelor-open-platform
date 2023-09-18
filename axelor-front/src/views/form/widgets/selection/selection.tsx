@@ -45,9 +45,13 @@ export function Selection<Multiple extends boolean>(
   const selectionList = useSelectionList({ schema, widgetAtom, value });
   const selectionValue = useMemo(() => {
     if (multiple) {
-      const values = String(value ?? "").split(",");
-      return selectionList.filter((item) =>
-        values.includes(String(item.value)),
+      const values = value == null ? [] : String(value ?? "").split(",");
+      return values.map(
+        (x) =>
+          selectionList.find((item) => String(item.value) === String(x)) ?? {
+            title: x,
+            value: x,
+          },
       );
     }
     return (
