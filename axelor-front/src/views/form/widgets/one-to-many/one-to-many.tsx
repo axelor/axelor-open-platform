@@ -692,15 +692,17 @@ export function OneToMany({
         />
         {hasMasterDetails && detailMeta ? (
           <Box d="flex" flexDirection="column" p={2}>
-            <DetailsForm
-              meta={detailMeta}
-              readonly={readonly || editable}
-              record={detailRecord}
-              formAtom={gridRef.current?.form?.current?.formAtom}
-              onClose={onCloseInDetail}
-              onSave={onSave}
-              {...(canNew && { onNew: onAddInDetail })}
-            />
+            {(!editable || selected) && (
+              <DetailsForm
+                meta={detailMeta}
+                readonly={readonly || editable}
+                record={detailRecord}
+                formAtom={gridRef.current?.form?.current?.formAtom}
+                onClose={onCloseInDetail}
+                onSave={onSave}
+                {...(canNew && { onNew: onAddInDetail })}
+              />
+            )}
           </Box>
         ) : null}
       </Panel>
