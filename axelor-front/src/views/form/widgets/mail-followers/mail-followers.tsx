@@ -1,4 +1,4 @@
-import { Link, ListItem, Panel } from "@axelor/ui";
+import { ListItem, Panel } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomCallback } from "jotai/utils";
 import React, { useCallback, useState } from "react";
@@ -11,8 +11,9 @@ import { WidgetProps } from "../../builder";
 import { useFormRefresh } from "../../builder/scope";
 import { useMessagePopup } from "../mail-messages/message/message-form";
 import { Message } from "../mail-messages/message/types";
-import classes from "./mail-followers.module.scss";
+import { MessageUser } from "../mail-messages/message";
 import { Follower, follow, getFollowers, unfollow } from "./utils";
+import classes from "./mail-followers.module.scss";
 
 export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const [followers, setFollowers] = useState<Follower[]>([]);
@@ -25,12 +26,12 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       (get) => {
         const { record, fields } = get(formAtom);
         const nameColumn = Object.keys(fields ?? {}).find(
-          (k: string) => fields[k]?.nameColumn === true
+          (k: string) => fields[k]?.nameColumn === true,
         );
         return record[nameColumn!] || record.name || record.code || "";
       },
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const onRefresh = useCallback(async () => {
@@ -47,7 +48,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
       const list = await follow(model, modelId, data);
       setFollowers(list);
     },
-    [model, modelId]
+    [model, modelId],
   );
 
   const handleUnfollow = useCallback(
@@ -61,7 +62,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
         setFollowers(list);
       }
     },
-    [model, modelId]
+    [model, modelId],
   );
 
   const handleAddFollower = useCallback(async () => {
@@ -76,9 +77,9 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const isLoginUserFollowing = React.useMemo(
     () =>
       followers?.some(
-        ({ $author }) => String($author?.code) === String(session?.user?.login)
+        ({ $author }) => String($author?.code) === String(session?.user?.login),
       ),
-    [followers, session]
+    [followers, session],
   );
 
   // register form:refresh
@@ -137,12 +138,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
             >
               <MaterialIcon icon="close" fontSize={20} />
             </div>
-            <Link
-              title={title!}
-              href={`#/ds/form::${$authorModel}/edit/${$author?.id || ""}`}
-            >
-              {title!}
-            </Link>
+            <MessageUser title={title!} id={$author?.id} model={$authorModel} />
           </ListItem>
         );
       })}

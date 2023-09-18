@@ -1,18 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { MouseEvent, useMemo, useState } from "react";
 import clsx from "clsx";
 import { Box, Button, Badge, TBackground, useTheme, Panel } from "@axelor/ui";
 
-import Avatar from "../avatar";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+
+import { useEditor } from "@/hooks/use-relation";
+import { findView } from "@/services/client/meta-cache";
+import { i18n } from "@/services/client/i18n";
+import { moment } from "@/services/client/l10n";
+import { FormProps } from "@/views/form/builder";
+
+import Avatar from "../avatar";
+import * as TYPES from "./types";
 import { MessageMenu } from "./message-menu";
 import { MessageFiles } from "./message-files";
 import { MessageTracks } from "./message-track";
 import { MessageInput } from "./message-input";
 import { getUser, getUserName } from "./utils";
-import { i18n } from "@/services/client/i18n";
-import { moment } from "@/services/client/l10n";
-import { FormProps } from "@/views/form/builder";
-import * as TYPES from "./types";
 import { MessageInputProps, MessageProps } from "./types";
 import styles from "./message.module.scss";
 
@@ -38,6 +42,47 @@ function MessageEvent({ data }: { data: TYPES.Message }) {
         {moment($eventTime).fromNow()}
       </Box>
     </>
+  );
+}
+
+export function MessageUser({
+  id,
+  model = "com.axelor.auth.db.User",
+  title,
+}: {
+  title: string;
+  id?: number;
+  model?: string;
+}) {
+  const showEditor = useEditor();
+
+  async function handleClick(e: MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    try {
+      const { view } = await findView({
+        type: "form",
+        name: "user-info-form",
+        model,
+      });
+      if (view && id) {
+        showEditor({
+          title: view.title ?? i18n.get("User"),
+          model,
+          viewName: view.name,
+          record: { id },
+          readonly: true,
+          canSave: false,
+        });
+      }
+    } catch (err) {
+      // console.log(err);
+    }
+  }
+
+  return (
+    <Box as="a" href="" onClick={handleClick}>
+      {title}
+    </Box>
   );
 }
 
@@ -84,7 +129,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
       onAction(
         { ...data, parent: { id: parentId } as TYPES.Message },
         attrs,
-        reload
+        reload,
       );
   }
 
@@ -215,14 +260,11 @@ export const Message = React.memo(function Message(props: MessageProps) {
               </span>
             )}
             <span>
-              <Box
-                as="a"
-                {...($author?.id && $authorModel
-                  ? { href: `#/ds/form::${$authorModel}/edit/${$author.id}` }
-                  : {})}
-              >
-                {getUserName(data)}
-              </Box>
+              <MessageUser
+                title={getUserName(data)}
+                id={$author?.id}
+                model={$authorModel}
+              />
               <MessageEvent data={data} />
             </span>
           </Box>
@@ -331,7 +373,7 @@ export function MessageBox({
             size="sm"
             variant="primary"
             outline
-            onClick={(e) => onLoad()}
+            onClick={() => onLoad()}
             className="load-more"
             mt={2}
             ms={1}
