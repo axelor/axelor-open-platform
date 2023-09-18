@@ -31,7 +31,11 @@ import { GridView } from "@/services/client/meta.types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+import {
+  useViewAction,
+  useViewTab,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 
 import { Grid as GridComponent } from "../grid/builder";
 import { useGridState } from "../grid/builder/utils";
@@ -90,6 +94,7 @@ export function Dms(props: ViewProps<GridView>) {
   const { navigate } = useRoute();
   const showEditor = useEditor();
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const viewAction = useViewAction();
 
   const popupRecord = action.params?.["_popup-record"];
 
@@ -347,6 +352,13 @@ export function Dms(props: ViewProps<GridView>) {
       });
     }
   }, [view, showEditor, getSelectedDocument]);
+
+  const onDocumentAttachedTo = useCallback(() => {
+    const doc = getSelectedDocument();
+    if (doc && doc.relatedId > 0 && doc.relatedModel) {
+      navigate(`/ds/form::${doc.relatedModel}/edit/${doc.relatedId}`);
+    }
+  }, [navigate, getSelectedDocument]);
 
   const onDocumentDelete = useCallback(async () => {
     const docs = getSelectedDocuments();
@@ -616,6 +628,17 @@ export function Dms(props: ViewProps<GridView>) {
                     text: i18n.get("Permissions..."),
                     onClick: onDocumentPermissions,
                     hidden: !selectedRows?.length,
+                  },
+                  {
+                    key: "attached",
+                    text: i18n.get("Attached to..."),
+                    onClick: onDocumentAttachedTo,
+                    hidden:
+                      Boolean(viewAction.params?.popup) ||
+                      !(
+                        getSelectedDocument()?.relatedId > 0 &&
+                        getSelectedDocument()?.relatedModel
+                      ),
                   },
                   { key: "d1", divider: true },
                   {
