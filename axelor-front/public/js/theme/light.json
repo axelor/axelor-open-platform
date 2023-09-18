@@ -32,7 +32,7 @@
         "color": "#EAEAFE"
       },
       "item_hover": {
-        "bg": "#FBFBFF"
+        "bg": "#F8F8FF"
       },
       "item_active": {
         "bg": "primary",
