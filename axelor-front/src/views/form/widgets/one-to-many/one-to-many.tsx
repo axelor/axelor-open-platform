@@ -78,6 +78,7 @@ export function OneToMany({
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridHandler>(null);
   const saveIdRef = useRef<number | null>();
 
@@ -450,6 +451,7 @@ export function OneToMany({
   const onCloseInDetail = useCallback(() => {
     setDetailRecord(null);
     gridRef.current?.form?.current?.onCancel?.();
+    panelRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, []);
 
   const onRowReorder = useCallback(() => {
@@ -464,7 +466,7 @@ export function OneToMany({
   const selected =
     editRecord ||
     ((selectedRows?.length ?? 0) > 0
-      ? rows?.[selectedRows?.[0]!]?.record
+      ? rows?.[selectedRows?.[0] ?? -1]?.record
       : null);
   const recordId = detailRecord?.id;
 
@@ -569,6 +571,7 @@ export function OneToMany({
   return (
     <>
       <Panel
+        ref={panelRef}
         className={styles.container}
         header={
           showTitle && (

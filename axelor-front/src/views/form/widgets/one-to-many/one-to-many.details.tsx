@@ -117,7 +117,7 @@ export function DetailsForm({
         </Box>
         <Box d="flex" gap={4} justifyContent="flex-end" mt={3}>
           {readonly ? (
-            <Button size="sm" variant="danger" onClick={() => onClose?.()}>
+            <Button size="sm" variant="light" onClick={() => onClose?.()}>
               {i18n.get("Close")}
             </Button>
           ) : (
