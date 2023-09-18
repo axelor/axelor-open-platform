@@ -1,10 +1,11 @@
 import { useCallback, useEffect } from "react";
 
 import { dialogsActive } from "@/components/dialogs";
+import { device } from "@/utils/device";
 import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
 import { useTabs } from "../use-tabs";
 
-export const isMac = /Mac OS/i.test(navigator.userAgent);
+const { isMac } = device;
 
 export type Options = {
   key: string;
@@ -17,7 +18,12 @@ export type Options = {
 
 const alwaysTrue = () => true;
 
-let getKeys: (
+// Command (Meta) is used instead of Control.
+// Option (Alt) cannot be combined alone with alpha keys for shortcuts,
+// as it might be used to type special characters on some layouts.
+// Ctrl -> ⌘
+// Alt -> ⌘ + ⌥ (if alpha key)
+const getKeys: (
   ctrlKey: boolean,
   altKey: boolean,
   shiftKey: boolean,
@@ -27,32 +33,23 @@ let getKeys: (
   altKey: boolean;
   shiftKey: boolean;
   metaKey: boolean;
-};
-
-if (isMac) {
-  // Command (Meta) is used instead of Control.
-  // Option (Alt) cannot be combined alone with alpha keys for shortcuts,
-  // as it might be used to type special characters on some layouts.
-  // Ctrl -> ⌘
-  // Alt -> ⌘ + ⌥ (if alpha key)
-  getKeys = (ctrlKey, altKey, shiftKey, key) => {
-    return {
-      ctrlKey: false,
-      altKey,
-      shiftKey,
-      metaKey: ctrlKey ?? (altKey && /^[a-z]$/i.test(key)),
+} = isMac
+  ? (ctrlKey, altKey, shiftKey, key) => {
+      return {
+        ctrlKey: false,
+        altKey,
+        shiftKey,
+        metaKey: ctrlKey ?? (altKey && /^[a-z]$/i.test(key)),
+      };
+    }
+  : (ctrlKey, altKey, shiftKey) => {
+      return {
+        ctrlKey,
+        altKey,
+        shiftKey,
+        metaKey: false,
+      };
     };
-  };
-} else {
-  getKeys = (ctrlKey, altKey, shiftKey) => {
-    return {
-      ctrlKey,
-      altKey,
-      shiftKey,
-      metaKey: false,
-    };
-  };
-}
 
 const compareKey = new Intl.Collator(undefined, { sensitivity: "base" })
   .compare;

@@ -1,24 +1,30 @@
 import { Fragment } from "react";
 
-import { isMac } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
+import { device } from "@/utils/device";
 
 import styles from "./shortcuts.module.scss";
 
-export function Shortcuts() {
-  let ctrlKey: string;
-  let altKey: string;
-  let commandOptionKey: string[];
+const { isMac } = device;
 
-  if (isMac) {
-    ctrlKey = "⌘";
-    altKey = "⌥";
-    commandOptionKey = ["⌘", "⌥"];
-  } else {
-    ctrlKey = i18n.get("Ctrl.Key");
-    altKey = i18n.get("Alt.Key");
-    commandOptionKey = [altKey];
-  }
+const getKeys = isMac
+  ? () => {
+      return {
+        ctrlKey: "⌘",
+        altKey: "⌥",
+        commandOptionKey: ["⌘", "⌥"],
+      };
+    }
+  : () => {
+      const ctrlKey = i18n.get("Ctrl.Key");
+      const altKey = i18n.get("Alt.Key");
+      const commandOptionKey = [altKey];
+
+      return { ctrlKey, altKey, commandOptionKey };
+    };
+
+export function Shortcuts() {
+  const { ctrlKey, altKey, commandOptionKey } = getKeys();
 
   // Conflicts are noted below for information:
   const shortcuts = [
@@ -89,14 +95,13 @@ export function Shortcuts() {
     },
   ];
 
-
   return (
     <table className={styles.shortcuts}>
       <tbody>
         {shortcuts.map((shortcut) => (
           <ShortcutRow key={`shortcut-row-${shortcut.keys}`} {...shortcut} />
         ))}
-       </tbody>
+      </tbody>
     </table>
   );
 }
