@@ -7,6 +7,7 @@ import {
 
 import { useSession } from "@/hooks/use-session";
 
+import { ErrorPage } from "./error";
 import { Login } from "./login";
 import { Root } from "./root";
 import { View } from "./view";
@@ -33,6 +34,7 @@ const router = createHashRouter([
         <Root />
       </ProtectedRoute>
     ),
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "/",

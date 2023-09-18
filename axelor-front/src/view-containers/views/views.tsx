@@ -2,13 +2,16 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
-import { memo, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 import { Box, Fade } from "@axelor/ui";
 
+import { ErrorBox } from "@/components/error-box";
 import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useSession } from "@/hooks/use-session";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { filters as fetchFilters } from "@/services/client/meta";
@@ -117,6 +120,21 @@ function ViewContainer({
   return null;
 }
 
+function ViewError({ error, resetErrorBoundary }: FallbackProps) {
+  const session = useSession();
+  const handleReset = useCallback(
+    () => resetErrorBoundary(),
+    [resetErrorBoundary],
+  );
+  return (
+    <ErrorBox
+      status={500}
+      error={session.data?.user?.technical ? error : undefined}
+      onReset={handleReset}
+    />
+  );
+}
+
 function ViewPane({
   tab,
   dataStore,
@@ -139,12 +157,14 @@ function ViewPane({
   if (view) {
     return (
       <ScopeProvider scope={ViewScope} value={tab}>
-        <ViewContainer
-          view={view}
-          tab={tab}
-          dataStore={dataStore}
-          searchAtom={searchAtom}
-        />
+        <ErrorBoundary FallbackComponent={ViewError}>
+          <ViewContainer
+            view={view}
+            tab={tab}
+            dataStore={dataStore}
+            searchAtom={searchAtom}
+          />
+        </ErrorBoundary>
       </ScopeProvider>
     );
   }
