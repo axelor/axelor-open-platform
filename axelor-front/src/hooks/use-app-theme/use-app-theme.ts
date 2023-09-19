@@ -7,7 +7,7 @@ export function useAppTheme() {
 
   const preferred = dark ? "dark" : "light";
   const userTheme = info?.user?.theme ?? info?.application.theme;
-  const appTheme = userTheme === "auto" ? preferred : userTheme ?? preferred;
+  const appTheme = userTheme === "auto" ? preferred : userTheme ?? "light";
 
   return appTheme as "light" | "dark";
 }
