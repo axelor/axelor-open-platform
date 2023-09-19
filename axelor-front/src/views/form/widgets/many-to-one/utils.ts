@@ -5,7 +5,7 @@ import { SelectOption } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
-const TR_PREFIX = "$tr:";
+const TR_PREFIX = "$t:";
 
 function getTrKey(targetName: string) {
   if (targetName?.includes(".")) {
