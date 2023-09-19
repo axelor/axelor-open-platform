@@ -245,7 +245,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
             {body?.files && <MessageFiles data={body.files} />}
             {$files && <MessageFiles data={$files} />}
           </Box>
-          <Box p={1} ps={4} pe={4}>
+          <Box p={1} ps={4} pe={4} style={{ fontSize: "smaller" }}>
             {$numReplies > 0 && (
               <span className={styles["pull-right"]}>
                 <Box
