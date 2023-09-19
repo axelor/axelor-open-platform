@@ -25,7 +25,8 @@
   }
   cursor: pointer;
   border-radius: var(--ax-theme-nav-menu-item-radius);
-  &:hover {
+  &:hover,
+  &.hovered {
     background: var(--ax-theme-nav-menu-item-hover-bg, var(--bs-secondary-bg));
   }
   &.active {

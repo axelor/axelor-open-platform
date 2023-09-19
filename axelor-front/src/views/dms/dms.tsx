@@ -1,18 +1,19 @@
 import clsx from "clsx";
-import { useSetAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import {
   SyntheticEvent,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-
-import { Box, DndProvider, Input, Link } from "@axelor/ui";
-import { GridColumn, GridRow } from "@axelor/ui/grid";
+import { Badge, Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
+import { GridRow, GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
@@ -41,6 +42,7 @@ import { Grid as GridComponent } from "../grid/builder";
 import { useGridState } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import {
+  DMS_NODE_TYPE,
   DmsDetails,
   DmsOverlay,
   DmsTree,
@@ -54,7 +56,9 @@ import {
   prepareCustomView,
   toStrongText,
 } from "./builder/utils";
-
+import { legacyClassNames } from "@/styles/legacy";
+import { DMSGridScope, useDMSGridHandlerAtom } from "./builder/handler";
+import gridRowStyles from "../grid/renderers/row/row.module.css";
 import styles from "./dms.module.scss";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("DMS.Home") };
@@ -250,7 +254,7 @@ export function Dms(props: ViewProps<GridView>) {
       if (exists.length > 0) {
         inputValue = `${inputValue} (${exists.length + 1})`;
       }
-      let input = await promptInput(title, inputValue);
+      const input = await promptInput(title, inputValue);
 
       if (input) {
         const record = await dataStore.save({
@@ -319,7 +323,7 @@ export function Dms(props: ViewProps<GridView>) {
 
     if (!record) return;
 
-    let input = await promptInput(
+    const input = await promptInput(
       i18n.get("Information"),
       record.fileName,
       i18n.get("Save"),
@@ -447,6 +451,39 @@ export function Dms(props: ViewProps<GridView>) {
     [uploadSize, uploader],
   );
 
+  const handleNodeDrop = useCallback(
+    async (node: TreeRecord, _records: DataRecord[]) => {
+      const records = await dataStore.save(
+        _records.map(({ id, version }) => ({
+          id,
+          version,
+          parent: node.id ? { id: node.id } : null,
+        })),
+      );
+      if (records) {
+        (records as DataRecord[]).forEach((record) => {
+          record.isDirectory &&
+            setTreeRecords((records) => {
+              const exist = records.some((r) => r.id === record.id);
+              if (exist) {
+                return records.map((r) =>
+                  r.id === record.id
+                    ? {
+                        ...r,
+                        "parent.id": node.id,
+                      }
+                    : r,
+                );
+              }
+              return [...records, { ...record, "parent.id": node.id }];
+            });
+        });
+        onSearch({});
+      }
+    },
+    [dataStore, onSearch],
+  );
+
   const handleNodeSelect = useCallback((record: TreeRecord) => {
     setSelected(record.id);
     setDetailsPopup(false);
@@ -482,7 +519,6 @@ export function Dms(props: ViewProps<GridView>) {
       col: GridColumn,
       colIndex: number,
       row: GridRow,
-      rowIndex: number,
     ) => {
       const record = row?.record;
       const cellValue = record?.[col?.name];
@@ -703,52 +739,123 @@ export function Dms(props: ViewProps<GridView>) {
             </Box>
           </ViewToolBar>
         )}
-        <Box className={styles.content}>
-          <Input
-            type="file"
-            multiple={true}
-            ref={fileInputRef}
-            d="none"
-            onChange={(e) => handleUpload(e.target.files)}
-          />
-          <Box
-            className={clsx(styles.tree, {
-              [styles.hide]: !canShowTree,
-            })}
-          >
-            <DmsTree
-              root={root}
-              data={treeRecords}
-              expanded={expanded}
-              selected={selected}
-              onSelect={handleNodeSelect}
-              onExpand={handleNodeExpand}
+        <ScopeProvider scope={DMSGridScope} value={{ getSelectedDocuments }}>
+          <Box className={styles.content}>
+            <Input
+              type="file"
+              multiple={true}
+              ref={fileInputRef}
+              d="none"
+              onChange={(e) => handleUpload(e.target.files)}
             />
+            <Box
+              className={clsx(styles.tree, {
+                [styles.hide]: !canShowTree,
+              })}
+            >
+              <DmsTree
+                root={root}
+                data={treeRecords}
+                expanded={expanded}
+                selected={selected}
+                onDrop={handleNodeDrop}
+                onSelect={handleNodeSelect}
+                onExpand={handleNodeExpand}
+              />
+            </Box>
+            <Box className={styles.grid} ref={contentRef}>
+              <GridComponent
+                records={records}
+                view={view}
+                fields={fields}
+                state={state}
+                setState={setState}
+                sortType={"live"}
+                rowRenderer={DMSGridRow}
+                onSearch={onSearch}
+                onCellClick={handleGridCellClick}
+                onRowDoubleClick={handleDocumentOpen}
+              />
+              <DmsDetails
+                open={showDetails}
+                data={detailRecord}
+                onView={openDMSFile}
+                onSave={onDocumentSave}
+                onClose={handleDetailsPopupClose}
+              />
+            </Box>
           </Box>
-          <Box className={styles.grid} ref={contentRef}>
-            <GridComponent
-              records={records}
-              view={view}
-              fields={fields}
-              state={state}
-              setState={setState}
-              sortType={"live"}
-              onSearch={onSearch}
-              onCellClick={handleGridCellClick}
-              onRowDoubleClick={handleDocumentOpen}
-            />
-            <DmsDetails
-              open={showDetails}
-              data={detailRecord}
-              onView={openDMSFile}
-              onSave={onDocumentSave}
-              onClose={handleDetailsPopupClose}
-            />
-          </Box>
-        </Box>
+        </ScopeProvider>
         <DmsUpload uploader={uploader} />
       </DmsOverlay>
     </DndProvider>
+  );
+}
+
+const DMSGridRowPreview = forwardRef<
+  HTMLDivElement,
+  {
+    record?: DataRecord;
+  }
+>(function DMSGridRowPreview({ record }, ref) {
+  const { getSelectedDocuments } = useAtomValue(useDMSGridHandlerAtom());
+  const docs = useMemo(() => {
+    const docs = getSelectedDocuments?.();
+    return docs?.some((d) => d.id === record?.id)
+      ? docs
+      : [...(docs ?? []), record];
+  }, [getSelectedDocuments, record]);
+  const total = docs?.length;
+  return (
+    <Box ref={ref} className={styles.preview} bgColor="body" shadow="sm">
+      {record?.fileName}
+      {total > 1 && (
+        <Badge as="span" className={styles.badge} rounded bg="danger">
+          {total}
+        </Badge>
+      )}
+    </Box>
+  );
+});
+
+function DMSGridRow(props: GridRowProps) {
+  const { selected, data, index } = props;
+  const { children, style, className, onDoubleClick } =
+    props as React.HTMLAttributes<HTMLDivElement>;
+  const ref = useRef<HTMLDivElement>(null);
+  const [{ dragging }, dragRef, dragPreviewRef] = useDrag({
+    type: DMS_NODE_TYPE,
+    item: { data: data, index, type: DMS_NODE_TYPE },
+    previewOptions: {
+      offsetX: 5,
+      offsetY: 5,
+    },
+    collect: (monitor: any) => ({
+      dragging: monitor.isDragging(),
+    }),
+  });
+  dragRef(ref);
+  return (
+    <>
+      <Box
+        ref={ref}
+        position="relative"
+        {...{
+          style,
+          className: legacyClassNames(className, gridRowStyles.row, {
+            [gridRowStyles.selected]: selected,
+          }),
+          onDoubleClick,
+        }}
+      >
+        {children}
+      </Box>
+      <DMSGridRowPreview
+        key={dragging ? "dragging" : (selected ? "selected" : "row")}
+        ref={dragPreviewRef}
+        record={data.record}
+      />
+    </>
   );
 }
 

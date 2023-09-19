@@ -6,3 +6,5 @@ export type TreeRecord = DataRecord & {
   _expand?: boolean;
   _children?: TreeRecord[];
 };
+
+export const DMS_NODE_TYPE = "DMS_NODE_TYPE";
