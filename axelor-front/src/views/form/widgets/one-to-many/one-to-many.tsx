@@ -391,6 +391,9 @@ export function OneToMany({
     (record: DataRecord) => {
       record = { ...record, _dirty: true, id: record.id ?? nextId() };
       handleSelect([record]);
+      setDetailRecord((details) =>
+        details?.id === record.id ? record : details,
+      );
       return record;
     },
     [handleSelect],
