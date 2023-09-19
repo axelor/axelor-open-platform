@@ -220,9 +220,11 @@ const FormContainer = memo(function FormContainer({
   const { hasButton } = usePerms(meta.view, meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
 
-  const setReady = useSetAtom(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom])
+  const readyAtom = useMemo(
+    () => focusAtom(formAtom, (o) => o.prop("ready")),
+    [formAtom]
   );
+  const setReady = useSetAtom(readyAtom);
 
   const archived = useAtomValue(
     useMemo(
@@ -671,9 +673,19 @@ const FormContainer = memo(function FormContainer({
         onEdit: doEdit,
         onRead: doRead,
         actionHandler,
+        readyAtom,
       });
     }
-  }, [getState, doEdit, doRead, onSave, popup, setPopupHandlers, actionHandler]);
+  }, [
+    getState,
+    doEdit,
+    doRead,
+    onSave,
+    popup,
+    setPopupHandlers,
+    actionHandler,
+    readyAtom,
+  ]);
 
   useEffect(() => {
     setViewProps((props) => ({ ...props, readonly }));

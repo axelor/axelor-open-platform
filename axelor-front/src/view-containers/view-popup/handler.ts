@@ -2,7 +2,7 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { FormState } from "@/views/form/builder";
-import { atom } from "jotai";
+import { WritableAtom, atom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { ActionHandler } from "../action";
 
@@ -21,6 +21,7 @@ export type PopupHandler = {
   ) => Promise<DataRecord>;
   onSearch?: (options?: SearchOptions) => Promise<SearchResult>;
   onRefresh?: () => Promise<void>;
+  readyAtom?: WritableAtom<boolean | undefined, [boolean | undefined], void>;
 };
 
 export const PopupScope = createScope<PopupHandler>({});

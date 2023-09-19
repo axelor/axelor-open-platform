@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
-import { PopupScope, usePopupHandlerAtom } from "./handler";
+import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
 import { DataRecord } from "@/services/client/data.types";
 import clsx from "clsx";
@@ -165,13 +165,16 @@ function Header({
   const classNames = useClassNames();
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
+  const handleClose = useClose(handler, close, params);
+
   const popupCanConfirm = params?.["show-confirm"] !== false;
-  const handleClose = useCallback(() => {
+
+  const onClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => close(false)
+      async () => handleClose(false)
     );
-  }, [close, handler, popupCanConfirm]);
+  }, [handleClose, handler, popupCanConfirm]);
 
   return (
     <Box d="flex" g={2}>
@@ -191,7 +194,7 @@ function Header({
           as="button"
           tabIndex={0}
           className={classNames("btn-close")}
-          onClick={handleClose}
+          onClick={onClose}
         />
       </Box>
     </Box>
@@ -207,68 +210,38 @@ function Footer({
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
-
-  const parentId = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!parentId.current) {
-      parentId.current = getActiveTabId(1);
-    }
-  }, []);
-
-  const triggerReload = useCallback(() => {
-    if (parentId.current) {
-      const detail = parentId.current;
-      const event = new CustomEvent("tab:refresh", { detail });
-      document.dispatchEvent(event);
-    }
-  }, []);
+  const handleClose = useClose(handler, close, params);
 
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
-  const popupCanReload = params?.popup === "reload";
 
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => close(false)
+      async () => handleClose(false)
     );
-  }, [close, handler, popupCanConfirm]);
+  }, [handleClose, handler, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
-    if (handler.getState === undefined) return close(true);
-    const onSave = handler.onSave;
+    const { getState, onSave } = handler;
 
     try {
-      if (onSave) {
+      if (getState && onSave) {
         await onSave(true, true, false);
       }
-      if (popupCanReload) {
-        triggerReload();
-      }
-      close(true);
+      handleClose(true);
     } catch (e) {
       // TODO: show error
     }
-  }, [close, handler, popupCanReload, triggerReload]);
+  }, [handleClose, handler]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe((data) => {
       if (data.type === "close") {
-        if (popupCanReload) {
-          triggerReload();
-        }
-        close(true);
+        handleClose(true);
       }
     });
-  }, [
-    close,
-    handleCancel,
-    handleConfirm,
-    handler,
-    popupCanReload,
-    triggerReload,
-  ]);
+  }, [handleClose, handler.actionHandler]);
 
   return (
     <Box d="flex" g={2}>
@@ -282,4 +255,60 @@ function Footer({
       )}
     </Box>
   );
+}
+
+function useClose(
+  handler: PopupHandler,
+  close: (result: boolean) => void,
+  params?: DataRecord
+) {
+  const readyAtom = useMemo(
+    () => handler.readyAtom ?? atom<boolean | undefined>(undefined),
+    [handler.readyAtom]
+  );
+  const ready = useAtomValue(readyAtom);
+
+  const originalVersion = useRef<number | null>();
+
+  useEffect(() => {
+    if (ready && originalVersion.current == null) {
+      originalVersion.current = handler.getState?.().record.version;
+    }
+  }, [handler, ready]);
+
+  const parentId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!parentId.current) {
+      parentId.current = getActiveTabId(1);
+    }
+  }, []);
+
+  const shouldReload = useCallback(() => {
+    const popupCanReload = params?.popup === "reload";
+    return (
+      popupCanReload &&
+      handler.getState?.().record.version !== originalVersion.current
+    );
+  }, [handler, params?.popup]);
+
+  const triggerReload = useCallback(() => {
+    if (parentId.current) {
+      const detail = parentId.current;
+      const event = new CustomEvent("tab:refresh", { detail });
+      document.dispatchEvent(event);
+    }
+  }, []);
+
+  const handleClose = useCallback(
+    (result: boolean) => {
+      if (shouldReload()) {
+        triggerReload();
+      }
+      close(result);
+    },
+    [close, shouldReload, triggerReload]
+  );
+
+  return handleClose;
 }
