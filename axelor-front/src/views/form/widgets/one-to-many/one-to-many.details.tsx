@@ -84,10 +84,15 @@ export function DetailsForm({
   useAsyncEffect(async () => {
     const { onLoad, onNew } = meta.view;
     if (record) {
-      const action = (record?.id ?? 0) > 0 ? onLoad : onNew;
+      const action =
+        (record?.id ?? 0) > 0 || record?._dirty
+          ? onLoad
+          : readonly
+          ? ""
+          : onNew;
       action && (await actionExecutor.execute(action));
     }
-  }, [record, meta.view, actionExecutor]);
+  }, [record, meta.view, readonly, actionExecutor]);
 
   useEffect(() => {
     if (detailFormAtom) {
