@@ -34,10 +34,18 @@ export function ThemeSelect(props: FieldProps<string>) {
   const { value, setValue } = useInput(valueAtom, { defaultValue: "" });
   const text = themes.find((x) => x.name === value)?.title ?? "";
   const selected = themes.find((x) => x.name === value) ?? null;
+  const hasValue = value !== null && value !== "";
 
   const handleChange = useCallback(
     (value: ThemeOption) => {
       setValue(value.name, true);
+    },
+    [setValue]
+  );
+
+  const handleClear = useCallback(
+    (value: ThemeOption) => {
+      setValue(null, true);
     },
     [setValue]
   );
@@ -53,7 +61,14 @@ export function ThemeSelect(props: FieldProps<string>) {
           options={themes}
           optionValue="name"
           optionLabel="title"
-          icons={[{ icon: "arrow_drop_down" }]}
+          icons={[
+            {
+              icon: "close",
+              hidden: !hasValue,
+              onClick: handleClear,
+            },
+            { icon: "arrow_drop_down" }
+          ]}
         />
       )}
     </FieldControl>
