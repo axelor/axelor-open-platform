@@ -196,11 +196,7 @@ function Footer({
         onClose(true);
       }
     });
-  }, [
-    close,
-    handleConfirm,
-    handler,
-  ]);
+  }, [handler, onClose]);
 
   return (
     <Box d="flex" g={2}>
