@@ -106,7 +106,10 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       const result = await DataSource.add(
         relatedModel || model,
         relatedId || recordId!,
-        data
+        {
+          ...data,
+          body: data.body?.replace(/\n/g, "<br>"),
+        }
       );
       if (result) {
         const [msg] = result;
