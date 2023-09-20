@@ -219,10 +219,6 @@ export const Grid = forwardRef<
         columnProps.searchable = false;
       }
 
-      if (serverType === "BOOLEAN" && !item.widget) {
-        (columnProps as Field).widget = "boolean";
-      }
-
       if (["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "")) {
         columnProps.$css = legacyClassNames("text-right");
       }

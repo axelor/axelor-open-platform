@@ -8,17 +8,14 @@ import { sanitize } from "@/utils/sanitize";
 import { Tooltip } from "@/components/tooltip";
 import { useHilites } from "@/hooks/use-parser";
 import { FieldDetails } from "@/views/form/builder";
+import { toCamelCase } from "@/utils/names";
 
+import * as WIDGETS from "../../widgets";
 import { GridCellProps } from "../../builder/types";
-import { useWidgetComp } from "../../hooks";
 import { Image } from "../../widgets/image";
 
-function CellRenderer(props: GridCellProps) {
-  const { type, widget } = props.data as Field;
-  const { state, data: Comp } = useWidgetComp((widget || type)!);
-  if (state === "loading") return null;
-  return (Comp ? <Comp {...props} /> : props.children) as React.ReactElement;
-}
+const getWidget = (name?: string) =>
+  WIDGETS[toCamelCase(name ?? "") as keyof typeof WIDGETS];
 
 export function Cell(props: GridCellProps) {
   const { view, data, value, record } = props;
@@ -30,8 +27,9 @@ export function Cell(props: GridCellProps) {
 
   function render() {
     function renderContent() {
-      if (widget || type !== "field") {
-        return <CellRenderer {...props} />;
+      const Comp = getWidget(widget) || getWidget(type) || getWidget(serverType);
+      if (Comp) {
+        return <Comp {...props} />;
       }
       if (serverType === "BINARY" && name === "image") {
         return <Image {...props} />;
@@ -71,14 +69,14 @@ export function Cell(props: GridCellProps) {
             ...item.widgetAttrs,
           } as unknown as Property,
         }),
-        {} as Record<string, Property>
+        {} as Record<string, Property>,
       ),
-    [viewItems]
+    [viewItems],
   );
 
   const $getField = useCallback(
     (fieldName: string) => fields[fieldName] as Schema,
-    [fields]
+    [fields],
   );
 
   return tooltip ? (
