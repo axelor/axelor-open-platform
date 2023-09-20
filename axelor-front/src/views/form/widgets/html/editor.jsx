@@ -61,6 +61,7 @@ function Toolbar({ toggle, emitChange, actions, onAction }) {
 
 function HTMLEditor({
   lite,
+  height,
   placeholder,
   hijackMenu,
   value,
@@ -402,7 +403,11 @@ function HTMLEditor({
 
   return (
     <div className={clsx(className, "relative")}>
-      <div ref={containerRef} className="custom-html-editor-container">
+      <div 
+        ref={containerRef}
+        className="custom-html-editor-container"
+        {...(height && { style: { height }})}
+      >
         {actions.length > 0 && (
           <Toolbar
             toggle={toggle}

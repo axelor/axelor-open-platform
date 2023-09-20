@@ -41,6 +41,7 @@ export function Html(props: FieldProps<string>) {
         <EditorComponent
           t={i18n.get}
           lite={Boolean(lite)}
+          height={schema.height}
           value={value || ""}
           onChange={handleChange}
           onBlur={handleBlur}
