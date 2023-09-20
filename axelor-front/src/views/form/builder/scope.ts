@@ -234,9 +234,48 @@ export function useFormField(formAtom: FormAtom) {
           ...schema?.widgetAttrs,
         } as Schema;
       },
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
+}
+
+export function useFormItems(formAtom: FormAtom) {
+  const findItems = useCallback((schema: Schema): Schema[] => {
+    const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
+    const nested = items.flatMap((item) => findItems(item));
+    return [...items, ...nested];
+  }, []);
+
+  const findFields = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { meta, fields } = get(formAtom);
+        const items = findItems(meta.view);
+        const result = items.map((item) => {
+          const field = fields[item.name!] ?? {};
+          const serverType = item?.serverType || field?.type;
+          const moreAttrs = item?.widgetAttrs;
+          return {
+            ...field,
+            ...item,
+            ...moreAttrs,
+            serverType,
+          };
+        });
+        return result;
+      },
+      [findItems, formAtom],
+    ),
+  );
+
+  const finder = useMemo(() => {
+    return (() => {
+      let items: Schema[] | null = null;
+      return (): Schema[] => (items === null ? (items = findFields()) : items);
+    })();
+  }, [findFields]);
+
+  return finder;
 }
 
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
@@ -257,8 +296,8 @@ export function useWidgetState(formAtom: FormAtom, widgetName: string) {
           attrs: { ...field, ...state?.attrs },
         };
       },
-      [formAtom, widgetName, field]
-    )
+      [formAtom, widgetName, field],
+    ),
   );
 
   const state = findState();
@@ -270,7 +309,7 @@ export function useFormRefresh(refresh?: () => Promise<any> | void) {
   const handleRefresh = useCallback(
     (e: Event) =>
       e instanceof CustomEvent && e.detail === tab.id && refresh?.(),
-    [refresh, tab.id]
+    [refresh, tab.id],
   );
 
   useEffect(() => {
@@ -284,7 +323,7 @@ export function useFormRefresh(refresh?: () => Promise<any> | void) {
 function useActionData<T extends ActionData>(
   check: (data: ActionData) => boolean,
   handler: (data: T) => void,
-  actionHandler: ActionHandler
+  actionHandler: ActionHandler,
 ) {
   const doneRef = useRef<boolean>(false);
 
@@ -385,10 +424,10 @@ function useActionAttrs({
             ...newStates,
           }));
         },
-        [formAtom]
-      )
+        [formAtom],
+      ),
     ),
-    actionHandler
+    actionHandler,
   );
 }
 
@@ -432,8 +471,8 @@ function useActionValue({
                   draft,
                   target,
                   items.map((x) =>
-                    x.id === value.id ? { ...found, ...value } : x
-                  )
+                    x.id === value.id ? { ...found, ...value } : x,
+                  ),
                 );
               });
             } else {
@@ -447,7 +486,7 @@ function useActionValue({
             newRecord = setDeep(
               record,
               target,
-              items.filter((x) => x.id !== value.id)
+              items.filter((x) => x.id !== value.id),
             );
           }
 
@@ -455,10 +494,10 @@ function useActionValue({
             set(formAtom, (prev) => ({ ...prev, record: newRecord }));
           }
         },
-        [formAtom]
-      )
+        [formAtom],
+      ),
     ),
-    actionHandler
+    actionHandler,
   );
 }
 
@@ -481,7 +520,7 @@ function useActionRecord({
                 ...acc,
                 [k]: processActionValue(v),
               }),
-              {}
+              {},
             );
             set(formAtom, (prev) => ({
               ...prev,
@@ -489,10 +528,10 @@ function useActionRecord({
             }));
           }
         },
-        [formAtom]
-      )
+        [formAtom],
+      ),
     ),
-    actionHandler
+    actionHandler,
   );
 }
 
@@ -501,7 +540,7 @@ export function useActionExecutor(
   options?: {
     onRefresh?: () => Promise<any>;
     getContext?: () => DataContext;
-  }
+  },
 ) {
   const { formAtom } = useFormScope();
   const { onRefresh, getContext } = options || {};
@@ -520,7 +559,7 @@ export function useActionExecutor(
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(actionHandler),
-    [actionHandler]
+    [actionHandler],
   );
 
   useActionAttrs({ formAtom, actionHandler });
@@ -551,7 +590,7 @@ export function FormRecordUpdates({
 }) {
   const recordRef = useRef<DataRecord | undefined | null>();
   const record = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
   const { action } = useViewTab();
 
@@ -567,8 +606,8 @@ export function FormRecordUpdates({
         {
           fields: fields as unknown as EvalContextOptions["fields"],
           readonly,
-        }
-      )
+        },
+      ),
     );
   }, [record, recordHandler, fields, readonly, action.context]);
 
