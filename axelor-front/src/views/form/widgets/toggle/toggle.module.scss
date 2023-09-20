@@ -1,10 +1,6 @@
 .icon {
-  display: block;
+  display: inline-flex;
   opacity: 0.4;
-}
-
-.icon::before {
-  line-height: 1.5;
 }
 
 .active {
@@ -20,9 +16,8 @@
   .icon {
     display: none;
   }
-
   .hoverIcon {
-    display: block;
+    display: inline-flex;
   }
 }
 
@@ -40,4 +35,16 @@
   --bs-btn-disabled-color: var(--bs-tertiary-color);
   --bs-btn-disabled-bg: var(--bs-body-bg);
   --bs-btn-disabled-border-color: transparent;
+}
+
+.toggle,
+.toggle:active,
+.toggle:focus,
+.toggle:focus-visible {
+  box-shadow: none !important;
+}
+
+.toggle {
+  display: inline-flex;
+  align-self: center;
 }
