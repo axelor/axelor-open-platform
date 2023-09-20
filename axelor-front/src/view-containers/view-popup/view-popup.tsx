@@ -224,9 +224,10 @@ function Footer({
 
   const handleConfirm = useCallback(async () => {
     const { getState, onSave } = handler;
+    const { dirty } = getState?.() ?? {};
 
     try {
-      if (getState && onSave) {
+      if (dirty && onSave) {
         await onSave(true, true, false);
       }
       handleClose(true);
