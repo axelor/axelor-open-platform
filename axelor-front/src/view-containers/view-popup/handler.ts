@@ -4,12 +4,13 @@ import { DataRecord } from "@/services/client/data.types";
 import { FormState } from "@/views/form/builder";
 import { WritableAtom, atom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { ActionHandler } from "../action";
+import { ActionExecutor, ActionHandler } from "../action";
 
 export type PopupHandler = {
   data?: any;
   dataStore?: DataStore;
   actionHandler?: ActionHandler;
+  actionExecutor?: ActionExecutor;
   getState?: () => FormState;
   onNew?: () => Promise<void>;
   onRead?: (id: string | number) => Promise<DataRecord>;

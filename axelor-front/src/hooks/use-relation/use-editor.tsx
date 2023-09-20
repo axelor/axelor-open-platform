@@ -191,7 +191,9 @@ function Footer({
   }, [getErrors, handler, onClose, onSave, onSelect]);
 
   useEffect(() => {
-    return handler.actionHandler?.subscribe((data) => {
+    return handler.actionHandler?.subscribe(async (data) => {
+      const { actionExecutor } = handler;
+      await actionExecutor?.wait();
       if (data.type === "close") {
         onClose(true);
       }

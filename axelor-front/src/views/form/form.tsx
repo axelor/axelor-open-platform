@@ -673,6 +673,7 @@ const FormContainer = memo(function FormContainer({
         onEdit: doEdit,
         onRead: doRead,
         actionHandler,
+        actionExecutor,
         readyAtom,
       });
     }
@@ -684,6 +685,7 @@ const FormContainer = memo(function FormContainer({
     popup,
     setPopupHandlers,
     actionHandler,
+    actionExecutor,
     readyAtom,
   ]);
 

@@ -237,12 +237,14 @@ function Footer({
   }, [handleClose, handler]);
 
   useEffect(() => {
-    return handler.actionHandler?.subscribe((data) => {
+    return handler.actionHandler?.subscribe(async (data) => {
+      const { actionExecutor } = handler;
+      await actionExecutor?.wait();
       if (data.type === "close") {
         handleClose(true);
       }
     });
-  }, [handleClose, handler.actionHandler]);
+  }, [handleClose, handler]);
 
   return (
     <Box d="flex" g={2}>
