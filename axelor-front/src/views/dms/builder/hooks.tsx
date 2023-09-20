@@ -111,12 +111,7 @@ export function useDMSPopup() {
       tab,
       open: true,
       onClose,
-      footer: (close) => (
-        <Footer
-          onSelect={onSelect}
-          onClose={close}
-        />
-      ),
+      footer: (close) => <Footer onSelect={onSelect} onClose={close} />,
       buttons: [],
     });
   }, []);
@@ -136,7 +131,11 @@ function Footer({
           }}
         />
       )}
-      <Button variant="secondary" onClick={() => onClose(false)}>
+      <Button
+        data-popup-close="true"
+        variant="secondary"
+        onClick={() => onClose(false)}
+      >
         {i18n.get("Close")}
       </Button>
     </>

@@ -102,7 +102,9 @@ export function Dms(props: ViewProps<GridView>) {
   const [root, setRoot] = useState<TreeRecord>(popupRecord ?? ROOT);
   const [detailsId, setDetailsId] = useState<TreeRecord["id"]>(null);
   const [showDetails, setDetailsPopup] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   // tree state
   const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([root]);
@@ -138,7 +140,6 @@ export function Dms(props: ViewProps<GridView>) {
 
   const openDMSFile = useCallback(
     (record: TreeRecord) => {
-      if (popup) return;
       const customViewTypes = [
         ...(supportsSpreadsheet ? [CONTENT_TYPE.SPREADSHEET] : []),
         CONTENT_TYPE.HTML,
@@ -149,8 +150,20 @@ export function Dms(props: ViewProps<GridView>) {
       } else {
         navigate(`/ds/dms.file/edit/${record.id}`);
       }
+      if (popup) {
+        // find top most parent
+        let parent = contentRef?.current?.parentElement;
+        while (parent && parent?.parentElement !== document.body) {
+          parent = parent?.parentElement;
+        }
+        // close the popup
+        const closeBtn = parent?.querySelector?.(
+          "[data-popup-close]",
+        ) as HTMLButtonElement;
+        closeBtn?.click?.();
+      }
     },
-    [navigate, view, popup, openTab, supportsSpreadsheet],
+    [supportsSpreadsheet, popup, openTab, view, navigate],
   );
 
   const setRootIfNeeded = useCallback(
@@ -712,7 +725,7 @@ export function Dms(props: ViewProps<GridView>) {
               onExpand={handleNodeExpand}
             />
           </Box>
-          <Box className={styles.grid}>
+          <Box className={styles.grid} ref={contentRef}>
             <GridComponent
               records={records}
               view={view}
