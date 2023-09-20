@@ -60,7 +60,6 @@ function Toolbar({ toggle, emitChange, actions, onAction }) {
 }
 
 function HTMLEditor({
-  t: _t,
   lite,
   placeholder,
   hijackMenu,
