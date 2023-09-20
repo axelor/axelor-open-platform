@@ -250,7 +250,11 @@ const FormContainer = memo(function FormContainer({
     });
   }, [recordHandler, schema.readonlyIf]);
 
-  const readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
+  const readonly = useMemo(() => {
+    const readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
+    return !readonly && !hasButton("edit") ? true : readonly;
+  }, [readonlyExclusive, attrs.readonly, props.readonly, hasButton]);
+
   const prevType = useSelectViewState(
     useCallback((state) => state.prevType, [])
   );
