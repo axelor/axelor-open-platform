@@ -38,7 +38,7 @@ export function ThemeSelect(props: FieldProps<string>) {
 
   const handleChange = useCallback(
     (value: ThemeOption) => {
-      setValue(value.name, true);
+      setValue(value?.name ?? null, true);
     },
     [setValue]
   );
