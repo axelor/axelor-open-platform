@@ -18,6 +18,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
+import { useFormItems } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import {
@@ -71,7 +72,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         setValue(value, true);
       }
     },
-    [setValue]
+    [setValue],
   );
 
   const canView = value && hasButton("view");
@@ -80,20 +81,25 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canSelect = hasButton("select");
   const isRefLink = schema.widget === "ref-link";
 
+  const findFormItems = useFormItems(formAtom);
+
   const ensureRelated = useAtomCallback(
     useCallback(
       async (get, set, value: DataRecord) => {
         if (value && value.id && value.id > 0) {
           const name = schema.name;
           const prefix = name + ".";
-          const { fields } = get(formAtom);
-          const related = Object.keys(fields)
-            .filter((x) => x.startsWith(prefix))
-            .map((x) => x.substring(prefix.length));
+          const items = findFormItems();
+          const related = items
+            .flatMap((item) => [item.name, item.depends?.split(",")])
+            .flat()
+            .filter(Boolean)
+            .filter((name) => name.startsWith(prefix))
+            .map((name) => name.substring(prefix.length));
 
           const names = [targetName, ...related];
           const missing = names.filter(
-            (x) => getObjValue(value, x) === undefined
+            (x) => getObjValue(value, x) === undefined,
           );
           if (missing.length > 0) {
             const ds = new DataSource(target);
@@ -105,8 +111,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         }
         return value;
       },
-      [formAtom, schema.name, target, targetName]
-    )
+      [findFormItems, schema.name, target, targetName],
+    ),
   );
 
   const handleEdit = useCallback(
@@ -136,7 +142,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       showEditor,
       handleChange,
       showEditorInTab,
-    ]
+    ],
   );
 
   const handleView = useCallback(
@@ -147,14 +153,14 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       }
       return handleEdit(true);
     },
-    [isRefLink, value, handleEdit, showEditorInTab]
+    [isRefLink, value, handleEdit, showEditorInTab],
   );
 
   const handleCreate = useCallback(
     (record?: DataContext, readonly?: boolean) => {
       return handleEdit(readonly ?? false, record);
     },
-    [handleEdit]
+    [handleEdit],
   );
 
   const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
@@ -201,7 +207,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       setHasMore((page.totalCount ?? 0) > records.length);
       return records;
     },
-    [canSelect, beforeSelect, domain, getContext, search]
+    [canSelect, beforeSelect, domain, getContext, search],
   );
 
   const valueRef = useRef<DataRecord>();
@@ -221,8 +227,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           }
         }
       },
-      [ensureRelated, setValue, value]
-    )
+      [ensureRelated, setValue, value],
+    ),
   );
 
   const getOptionLabel = useOptionLabel(schema);
