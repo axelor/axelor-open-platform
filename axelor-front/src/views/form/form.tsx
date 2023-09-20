@@ -512,9 +512,11 @@ const FormContainer = memo(function FormContainer({
         if (record) {
           await dataStore.save(record);
         }
-        await onSave(false);
+        if (isDirty) {
+          await onSave(false);
+        }
       },
-      [dataStore, onSave],
+      [dataStore, isDirty, onSave],
     ),
   );
   actionHandler.setValidateHandler(
