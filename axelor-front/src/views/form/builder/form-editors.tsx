@@ -51,7 +51,7 @@ function processEditor(schema: Schema) {
 
     if (result.items) {
       result.items = result.items.map((item: Schema) =>
-        applyTitle({ ...item })
+        applyTitle({ ...item }),
       );
     }
     return result;
@@ -72,7 +72,7 @@ function processEditor(schema: Schema) {
   };
 
   const items = editor.items?.map((item) =>
-    applyAttrs({ ...item })
+    applyAttrs({ ...item }),
   ) as Panel["items"];
   const hasColSpan = flexbox || items?.some((x) => x.colSpan);
   const cols = hasColSpan ? 12 : items?.length;
@@ -113,14 +113,14 @@ export function FieldEditor(props: FieldEditorProps) {
       schema.json
         ? atom(schema.jsonFields)
         : selectAtom(props.formAtom, (o) => o.fields),
-    [props.formAtom, schema.json, schema.jsonFields]
+    [props.formAtom, schema.json, schema.jsonFields],
   );
 
   const formFields = useAtomValue(fieldsAtom);
 
   const { form, fields } = useMemo(
     () => processEditor({ ...schema, fields: schema.fields ?? formFields }),
-    [formFields, schema]
+    [formFields, schema],
   );
 
   // json field?
@@ -158,7 +158,12 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
-  const { orderBy, searchLimit } = schema;
+  const {
+    orderBy,
+    searchLimit,
+    formView: formViewName,
+    gridView: gridViewName,
+  } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const {
     title,
@@ -175,7 +180,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const showSelector = useSelector();
 
   const hasValue = useAtomValue(
-    useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom])
+    useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom]),
   );
 
   const icons: boolean | string[] = useMemo(() => {
@@ -190,7 +195,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
       if (!icons) return false;
       return icons === true || icons?.includes?.(icon);
     },
-    [icons]
+    [icons],
   );
 
   const handleSelect = useAtomCallback(
@@ -202,13 +207,23 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           orderBy,
           context: get(formAtom).record,
           limit: searchLimit,
+          viewName: gridViewName,
           onSelect: (records) => {
             set(valueAtom, records[0], true);
           },
         });
       },
-      [domain, formAtom, model, orderBy, searchLimit, showSelector, valueAtom]
-    )
+      [
+        domain,
+        formAtom,
+        gridViewName,
+        model,
+        orderBy,
+        searchLimit,
+        showSelector,
+        valueAtom,
+      ],
+    ),
   );
 
   const handleEdit = useAtomCallback(
@@ -222,10 +237,11 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           },
           record: get(valueAtom),
           readonly,
+          viewName: formViewName,
         });
       },
-      [model, showEditor, title, valueAtom]
-    )
+      [model, formViewName, showEditor, title, valueAtom],
+    ),
   );
 
   const handleDelete = useAtomCallback(
@@ -233,8 +249,8 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
       (get, set) => {
         set(valueAtom, null, true);
       },
-      [valueAtom]
-    )
+      [valueAtom],
+    ),
   );
 
   const setInvalid = useSetAtom(setInvalidAtom);
@@ -244,7 +260,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         setInvalid(widgetAtom, invalid);
       }
     },
-    [required, setInvalid, widgetAtom]
+    [required, setInvalid, widgetAtom],
   );
 
   const titleActions = !readonly && (
@@ -296,7 +312,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
       (get) => (get(valueAtom) ?? []) as DataRecord[],
       (get, set, update: SetStateAction<DataRecord[]>) => {
         set(valueAtom, update);
-      }
+      },
     );
   }, [valueAtom]);
 
@@ -323,9 +339,9 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
               }
               return result;
             });
-          }
+          },
         ),
-      (a, b) => a.id === b.id
+      (a, b) => a.id === b.id,
     );
   }, [valueAtom, exclusive]);
 
@@ -338,8 +354,8 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
         itemsFamily(record);
         set(itemsAtom, (items = []) => [...items, record]);
       },
-      [itemsAtom, itemsFamily]
-    )
+      [itemsAtom, itemsFamily],
+    ),
   );
 
   const remove = useAtomCallback(
@@ -348,8 +364,8 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
         itemsFamily.remove(record);
         set(itemsAtom, (items) => items.filter((x) => x.id !== record.id));
       },
-      [itemsAtom, itemsFamily]
-    )
+      [itemsAtom, itemsFamily],
+    ),
   );
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -409,8 +425,8 @@ const ItemEditor = memo(function ItemEditor({
       (get) => {
         remove(get(valueAtom));
       },
-      [remove, valueAtom]
-    )
+      [remove, valueAtom],
+    ),
   );
   return (
     <div className={styles.item}>
@@ -435,7 +451,7 @@ const setInvalidAtom = atom(
       : {};
     if (isEqual(errors, prev.errors ?? {})) return;
     set(widgetAtom, { ...prev, errors });
-  }
+  },
 );
 
 const EMPTY_RECORD = Object.freeze({});
@@ -459,7 +475,7 @@ const RecordEditor = memo(function RecordEditor({
       fields,
       view: editor,
     }),
-    [editor, fields, model]
+    [editor, fields, model],
   );
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
@@ -492,7 +508,7 @@ const RecordEditor = memo(function RecordEditor({
         if (state.dirty) {
           set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
         }
-      }
+      },
     );
   }, [formAtom, loaded, parent, valueAtom]);
 
@@ -500,7 +516,7 @@ const RecordEditor = memo(function RecordEditor({
 
   const invalidAtom = useMemo(
     () => selectAtom(editorAtom, (state) => getErrors(state) !== null),
-    [editorAtom, getErrors]
+    [editorAtom, getErrors],
   );
 
   const invalid = useAtomValue(invalidAtom);
@@ -509,8 +525,8 @@ const RecordEditor = memo(function RecordEditor({
       (get, set) => {
         setInvalid(get(valueAtom), invalid);
       },
-      [invalid, setInvalid, valueAtom]
-    )
+      [invalid, setInvalid, valueAtom],
+    ),
   );
 
   const ds = useMemo(() => new DataStore(model), [model]);
@@ -527,8 +543,8 @@ const RecordEditor = memo(function RecordEditor({
           setLoaded(rec);
         }
       },
-      [ds, fields, value]
-    )
+      [ds, fields, value],
+    ),
   );
 
   useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
@@ -559,7 +575,7 @@ function JsonEditor({
 }: FormEditorProps) {
   const modelAtom = useMemo(
     () => selectAtom(formAtom, (x) => x.model),
-    [formAtom]
+    [formAtom],
   );
   const model = useAtomValue(modelAtom);
   const jsonModel = schema.jsonModel;
@@ -587,13 +603,13 @@ function JsonEditor({
             });
           }
         }
-      }
+      },
     );
   }, [formAtom, jsonModel, valueAtom]);
 
   const jsonEditor = useMemo(
-    () => ({ ...processJsonView(editor), json: true } as FormView),
-    [editor]
+    () => ({ ...processJsonView(editor), json: true }) as FormView,
+    [editor],
   );
 
   const setInvalid = useSetAtom(setInvalidAtom);
@@ -601,7 +617,7 @@ function JsonEditor({
     (value: any, invalid: boolean) => {
       setInvalid(widgetAtom, invalid);
     },
-    [setInvalid, widgetAtom]
+    [setInvalid, widgetAtom],
   );
 
   return (
