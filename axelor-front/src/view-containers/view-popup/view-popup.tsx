@@ -172,7 +172,7 @@ function Header({
   const onClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => handleClose(false)
+      async () => handleClose()
     );
   }, [handleClose, handler, popupCanConfirm]);
 
@@ -218,7 +218,7 @@ function Footer({
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => handleClose(false)
+      async () => handleClose()
     );
   }, [handleClose, handler, popupCanConfirm]);
 
@@ -227,10 +227,11 @@ function Footer({
     const { dirty } = getState?.() ?? {};
 
     try {
+      let rec: DataRecord | undefined = undefined;
       if (dirty && onSave) {
-        await onSave(true, true, false);
+        rec = await onSave(true, true, false);
       }
-      handleClose(true);
+      handleClose(rec);
     } catch (e) {
       // TODO: show error
     }
@@ -241,7 +242,7 @@ function Footer({
       const { actionExecutor } = handler;
       await actionExecutor?.wait();
       if (data.type === "close") {
-        handleClose(true);
+        handleClose();
       }
     });
   }, [handleClose, handler]);
@@ -271,11 +272,12 @@ function useClose(
   );
   const ready = useAtomValue(readyAtom);
 
-  const originalVersion = useRef<number | null>();
+  const originalRef = useRef<DataRecord>();
 
   useEffect(() => {
-    if (ready && originalVersion.current == null) {
-      originalVersion.current = handler.getState?.().record.version;
+    const record = handler.getState?.().record;
+    if (originalRef.current == null && ready && record) {
+      originalRef.current = { ...record };
     }
   }, [handler, ready]);
 
@@ -287,13 +289,16 @@ function useClose(
     }
   }, []);
 
-  const shouldReload = useCallback(() => {
-    const popupCanReload = params?.popup === "reload";
-    return (
-      popupCanReload &&
-      handler.getState?.().record.version !== originalVersion.current
-    );
-  }, [handler, params?.popup]);
+  const isChanged = useCallback(
+    (record?: DataRecord) => {
+      const current = record ?? handler.getState?.().record;
+      const original = originalRef.current;
+      return (
+        current?.id !== original?.id || current?.version !== original?.version
+      );
+    },
+    [handler]
+  );
 
   const triggerReload = useCallback(() => {
     if (parentId.current) {
@@ -304,13 +309,15 @@ function useClose(
   }, []);
 
   const handleClose = useCallback(
-    (result: boolean) => {
-      if (shouldReload()) {
+    (record?: DataRecord) => {
+      const popupCanReload = params?.popup === "reload";
+      const changed = isChanged(record);
+      if (popupCanReload && changed) {
         triggerReload();
       }
-      close(result);
+      close(changed);
     },
-    [close, shouldReload, triggerReload]
+    [close, isChanged, triggerReload, params?.popup]
   );
 
   return handleClose;
