@@ -517,6 +517,24 @@ const FormContainer = memo(function FormContainer({
       [dataStore, onSave],
     ),
   );
+  actionHandler.setValidateHandler(
+    useAtomCallback(
+      useCallback(
+        async (get) => {
+          const { record } = get(formAtom);
+          const { id = 0, version = 0 } = record;
+          if (id === null || version === null || id <= 0) return;
+          if (await dataStore.verify({ id, version })) return;
+          throw new Error(
+            i18n.get(
+              "The record has been updated or delete by another action.",
+            ),
+          );
+        },
+        [dataStore, formAtom],
+      ),
+    ),
+  );
 
   const onDelete = useAtomCallback(
     useCallback(

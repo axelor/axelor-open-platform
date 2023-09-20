@@ -60,7 +60,7 @@ interface SaveHandler {
   (record?: DataRecord): Promise<void>;
 }
 
-type RefreshHandler = () => Promise<void>;
+type AsyncHandler = () => Promise<void>;
 
 const ATTR_MAPPER: Record<string, string> = {
   "url:set": "url",
@@ -69,7 +69,8 @@ const ATTR_MAPPER: Record<string, string> = {
 export class FormActionHandler extends DefaultActionHandler {
   #prepareContext: ContextCreator;
   #saveHandler?: SaveHandler;
-  #refreshHandler?: RefreshHandler;
+  #refreshHandler?: AsyncHandler;
+  #validateHandler?: AsyncHandler;
 
   constructor(prepareContext: ContextCreator) {
     super();
@@ -80,8 +81,12 @@ export class FormActionHandler extends DefaultActionHandler {
     this.#saveHandler = handler;
   }
 
-  setRefreshHandler(handler: RefreshHandler) {
+  setRefreshHandler(handler: AsyncHandler) {
     this.#refreshHandler = handler;
+  }
+
+  setValidateHandler(handler: AsyncHandler) {
+    this.#validateHandler = handler;
   }
 
   getContext() {
@@ -147,8 +152,12 @@ export class FormActionHandler extends DefaultActionHandler {
     });
   }
 
+  async validate() {
+    await this.#validateHandler?.();
+  }
+
   async save(record?: DataRecord) {
-    return await this.#saveHandler?.(record);
+    await this.validate().then(() => this.#saveHandler?.(record));
   }
 
   async refresh() {
