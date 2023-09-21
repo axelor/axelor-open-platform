@@ -21,7 +21,7 @@
     "bootstrap-sass": "2.3.2",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
-    "dayjs": "^1.11.9",
+    "dayjs": "^1.11.10",
     "dompurify": "^3.0.5",
     "echarts": "^5.4.3",
     "font-awesome": "^4.7.0",

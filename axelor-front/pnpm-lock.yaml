@@ -35,8 +35,8 @@ dependencies:
     specifier: ^2.30.0
     version: 2.30.0
   dayjs:
-    specifier: ^1.11.9
-    version: 1.11.9
+    specifier: ^1.11.10
+    version: 1.11.10
   dompurify:
     specifier: ^3.0.5
     version: 3.0.5
@@ -212,7 +212,7 @@ packages:
       bootstrap-icons: 1.10.5
       color: 4.2.3
       csstype: 3.1.2
-      dayjs: 1.11.9
+      dayjs: 1.11.10
       focus-trap: 7.5.2
       immer: 10.0.2
       react: 18.2.0
@@ -1999,8 +1999,8 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.11
 
-  /dayjs@1.11.9:
-    resolution: {integrity: sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA==}
+  /dayjs@1.11.10:
+    resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
     dev: false
 
   /debug@4.3.4:
@@ -3470,7 +3470,7 @@ packages:
       '@babel/runtime': 7.22.11
       clsx: 1.2.1
       date-arithmetic: 4.1.0
-      dayjs: 1.11.9
+      dayjs: 1.11.10
       dom-helpers: 5.2.1
       globalize: 0.1.1
       invariant: 2.2.4
