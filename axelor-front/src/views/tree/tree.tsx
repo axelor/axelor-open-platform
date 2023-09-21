@@ -1,13 +1,14 @@
-import {
-  Box,
-  Tree as TreeComponent,
-  TreeNode as TreeRecord,
-  TreeSortColumn,
-  DndProvider as TreeProvider,
-} from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { uniq } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import {
+  Box,
+  Tree as TreeComponent,
+  DndProvider as TreeProvider,
+  TreeNode as TreeRecord,
+  TreeSortColumn,
+} from "@axelor/ui";
 
 import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -24,7 +25,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 
-import { useActionExecutor } from "../form/builder/scope";
+import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Node as NodeComponent, NodeProps } from "./renderers/node";
 import {
@@ -49,7 +50,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         _model: ctx?._model || view.nodes?.[0]?.model,
       } as DataContext;
     },
-    [getViewContext, view]
+    [getViewContext, view],
   );
 
   const getActionContext = useCallback(() => getContext(true), [getContext]);
@@ -80,7 +81,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           .filter((c) => c) as string[],
       };
     },
-    [sortColumns]
+    [sortColumns],
   );
 
   const toTreeData = useCallback(
@@ -92,15 +93,15 @@ export function Tree({ meta }: ViewProps<TreeView>) {
             ...(items as TreeField[]).reduce(
               (node, item) =>
                 item.as ? { ...node, [item.as]: node[item.name] } : node,
-              record
+              record,
             ),
             _draggable: draggable || isSameModelTree,
             _droppable: node === view.nodes?.[0] || isSameModelTree,
             $key: `${model}:${record.id}`,
-          } as unknown as TreeRecord)
+          }) as unknown as TreeRecord,
       );
     },
-    [view, isSameModelTree]
+    [view, isSameModelTree],
   );
 
   const dataStore = useMemo<DataStore | null>(() => {
@@ -130,7 +131,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     });
   }, [view]);
 
-  const onSearch = useCallback(
+  const doSearch = useCallback(
     async (options: Partial<SearchOptions> = {}) => {
       if (dataStore) {
         const { nodes } = view;
@@ -159,7 +160,18 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         });
       }
     },
-    [dataStore, view, isSameModelTree, getSearchOptions, getContext]
+    [dataStore, view, isSameModelTree, getSearchOptions, getContext],
+  );
+
+  const waitForActions = useWaitForActions();
+
+  const onSearch = useCallback(
+    async (options: Partial<SearchOptions> = {}) => {
+      return dashlet
+        ? waitForActions(() => doSearch(options))
+        : doSearch(options);
+    },
+    [dashlet, doSearch, waitForActions],
   );
 
   const onSearchNode = useCallback(
@@ -191,10 +203,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
       return toTreeData(
         node,
-        (await ds.search(getSearchOptions(node))).records
+        (await ds.search(getSearchOptions(node))).records,
       );
     },
-    [view, isSameModelTree, toTreeData, getContext, getSearchOptions]
+    [view, isSameModelTree, toTreeData, getContext, getSearchOptions],
   );
 
   const handleNodeMove = useCallback(
@@ -228,13 +240,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           data: (items as TreeField[]).reduce(
             (data, item) =>
               item.as ? { ...data, [item.as]: data[item.name] } : data,
-            { ...data, ...result }
+            { ...data, ...result },
           ),
         };
       }
       return record;
     },
-    [view, isSameModelTree]
+    [view, isSameModelTree],
   );
 
   const handleSort = useCallback((cols?: TreeSortColumn[]) => {
@@ -250,8 +262,8 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     dataStore!,
     useCallback(
       (ds) => toTreeData(rootNode!, ds.records),
-      [rootNode, toTreeData]
-    )
+      [rootNode, toTreeData],
+    ),
   );
 
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
@@ -262,7 +274,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       setPopupHandlers({
         dataStore: dataStore,
         onSearch: onSearch as (
-          options?: SearchOptions
+          options?: SearchOptions,
         ) => Promise<SearchResult>,
       });
     }
@@ -285,21 +297,21 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const canNext = offset + limit < totalCount;
 
   const nodeRenderer = useMemo(
-    () => (props: NodeProps) =>
-      <NodeComponent {...props} view={view} actionExecutor={actionExecutor} />,
-    [view, actionExecutor]
+    () => (props: NodeProps) => (
+      <NodeComponent {...props} view={view} actionExecutor={actionExecutor} />
+    ),
+    [view, actionExecutor],
   );
 
   const nodeTextRenderer = useMemo(
-    () => (props: NodeTextProps) =>
-      (
-        <NodeTextComponent
-          {...props}
-          view={view}
-          actionExecutor={actionExecutor}
-        />
-      ),
-    [view, actionExecutor]
+    () => (props: NodeTextProps) => (
+      <NodeTextComponent
+        {...props}
+        view={view}
+        actionExecutor={actionExecutor}
+      />
+    ),
+    [view, actionExecutor],
   );
 
   const handleRefresh = useCallback(async () => {
@@ -308,12 +320,12 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
-    [limit, offset, onSearch]
+    [limit, offset, onSearch],
   );
 
   const handleNext = useCallback(
     () => onSearch({ offset: offset + limit }),
-    [limit, offset, onSearch]
+    [limit, offset, onSearch],
   );
 
   useShortcuts({

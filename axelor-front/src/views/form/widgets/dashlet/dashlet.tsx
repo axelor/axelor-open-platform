@@ -1,26 +1,28 @@
-import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useAtomValue } from "jotai";
-import { useCallback, useEffect, useMemo } from "react";
 import { ScopeProvider } from "jotai-molecules";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { Box, clsx } from "@axelor/ui";
 
-import { PopupScope } from "@/view-containers/view-popup/handler";
+import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Tab, TabProps, initTab } from "@/hooks/use-tabs";
 import { DataContext } from "@/services/client/data.types";
-import { CardsView, Schema } from "@/services/client/meta.types";
-import { DashletView } from "@/view-containers/view-dashlet";
-import { Views } from "@/view-containers/views";
-import { AdvanceSearch } from "@/view-containers/advance-search";
-import { useAsync } from "@/hooks/use-async";
-import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { useViewTab } from "@/view-containers/views/scope";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { findActionView } from "@/services/client/meta-cache";
+import { CardsView, Schema } from "@/services/client/meta.types";
+import { AdvanceSearch } from "@/view-containers/advance-search";
+import { DashletView } from "@/view-containers/view-dashlet";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
+import { PopupScope } from "@/view-containers/view-popup/handler";
+import { Views } from "@/view-containers/views";
+import { useViewTab } from "@/view-containers/views/scope";
 
 import { Attrs, WidgetProps, usePrepareContext } from "../../builder";
+import { useWaitForActions } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
+
 import classes from "./dashlet.module.scss";
 
 interface DashletProps {
@@ -51,27 +53,31 @@ export function DashletComponent({
 }: DashletProps): any {
   const { title, action, canSearch, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
+  const waitForActions = useWaitForActions();
+
   const { data: tab, state } = useAsync<Tab | null>(async () => {
-    const context = getContext?.();
-    const actionView = await findActionView(action, context);
-    const ctx = {
-      ...actionView.context,
-      ...context,
-    };
-    return await initTab({
-      ...actionView,
-      name: uniqueId("$dashlet"),
-      params: {
-        dashlet: true,
-        "show-toolbar": false,
-        "dashlet.canSearch": canSearch,
-        ...actionView.params,
-      },
-      context: {
-        ...(dashboard ? ctx : actionView.context),
-        _model: ctx.model ?? ctx._model,
-        _domainAction: action,
-      },
+    return waitForActions(async () => {
+      const context = getContext?.();
+      const actionView = await findActionView(action, context);
+      const ctx = {
+        ...actionView.context,
+        ...context,
+      };
+      return await initTab({
+        ...actionView,
+        name: uniqueId("$dashlet"),
+        params: {
+          dashlet: true,
+          "show-toolbar": false,
+          "dashlet.canSearch": canSearch,
+          ...actionView.params,
+        },
+        context: {
+          ...(dashboard ? ctx : actionView.context),
+          _model: ctx.model ?? ctx._model,
+          _domainAction: action,
+        },
+      });
     });
   }, [action, dashboard, canSearch, getContext]);
 
@@ -83,7 +89,7 @@ export function DashletComponent({
         tab: Tab,
         viewType: string,
         param: keyof TabProps,
-        value: any
+        value: any,
       ) => {
         const props = get(tab.state).props;
         const viewProps = props?.[viewType];
@@ -99,8 +105,8 @@ export function DashletComponent({
           });
         }
       },
-      []
-    )
+      [],
+    ),
   );
 
   useEffect(() => {
@@ -168,9 +174,12 @@ export function DashletComponent({
 
 function DashletRefresh({ count }: { count: number }) {
   const { onRefresh } = useAtomValue(useDashletHandlerAtom());
+  const waitForActions = useWaitForActions();
 
   useAsyncEffect(async () => {
-    count && onRefresh?.();
+    if (count && onRefresh) {
+      waitForActions(onRefresh);
+    }
   }, [count, onRefresh]);
 
   return null;
@@ -178,7 +187,7 @@ function DashletRefresh({ count }: { count: number }) {
 
 function DashletSearch() {
   const { view, dataStore, onRefresh, searchAtom } = useAtomValue(
-    useDashletHandlerAtom()
+    useDashletHandlerAtom(),
   );
   if (!view) return null;
   const { items, customSearch, freeSearch } = view as CardsView;
@@ -226,7 +235,7 @@ export function Dashlet(props: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
 
   const ready = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom]),
   );
 
   const getFormContext = usePrepareContext(formAtom);

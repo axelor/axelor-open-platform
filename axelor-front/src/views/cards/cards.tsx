@@ -28,7 +28,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
-import { useActionExecutor } from "../form/builder/scope";
+import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -52,7 +52,7 @@ export function Cards(props: ViewProps<CardsView>) {
       ...getViewContext(true),
       _model: action.model,
     }),
-    [action.model, getViewContext]
+    [action.model, getViewContext],
   );
 
   const getActionContext = useCallback(() => {
@@ -81,7 +81,7 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [view.width]);
 
-  const onSearch = useAtomCallback(
+  const doSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
         const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
@@ -102,8 +102,19 @@ export function Cards(props: ViewProps<CardsView>) {
           ...options,
         });
       },
-      [dataStore, fields, dashlet, searchAtom, getViewContext]
-    )
+      [dataStore, fields, dashlet, searchAtom, getViewContext],
+    ),
+  );
+
+  const waitForActions = useWaitForActions();
+
+  const onSearch = useCallback(
+    async (options: Partial<SearchOptions> = {}) => {
+      return dashlet
+        ? waitForActions(() => doSearch(options))
+        : doSearch(options);
+    },
+    [dashlet, doSearch, waitForActions],
   );
 
   const getActionData = useAtomCallback(useCallback((get) => {
@@ -125,7 +136,7 @@ export function Cards(props: ViewProps<CardsView>) {
     async (record: DataRecord) => {
       const confirmed = await dialogs.confirm({
         content: i18n.get(
-          "Do you really want to delete the selected record(s)?"
+          "Do you really want to delete the selected record(s)?",
         ),
         yesTitle: i18n.get("Delete"),
       });
@@ -139,7 +150,7 @@ export function Cards(props: ViewProps<CardsView>) {
         }
       }
     },
-    [dataStore]
+    [dataStore],
   );
 
   const onEdit = useCallback(
@@ -151,7 +162,7 @@ export function Cards(props: ViewProps<CardsView>) {
         props: { readonly },
       });
     },
-    [switchTo]
+    [switchTo],
   );
 
   const onEditInPopup = useCallback(
@@ -168,7 +179,7 @@ export function Cards(props: ViewProps<CardsView>) {
           onSearch: () => onSearch({}),
         });
     },
-    [showEditor, view, action, onSearch]
+    [showEditor, view, action, onSearch],
   );
 
   const onNew = useCallback(() => {
@@ -179,7 +190,7 @@ export function Cards(props: ViewProps<CardsView>) {
     (record: DataRecord) => {
       hasEditPopup ? onEditInPopup(record, true) : onEdit(record, true);
     },
-    [hasEditPopup, onEdit, onEditInPopup]
+    [hasEditPopup, onEdit, onEditInPopup],
   );
 
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
@@ -224,11 +235,11 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
-    [limit, offset, onSearch]
+    [limit, offset, onSearch],
   );
   const handleNext = useCallback(
     () => onSearch({ offset: offset + limit }),
-    [limit, offset, onSearch]
+    [limit, offset, onSearch],
   );
 
   useShortcuts({

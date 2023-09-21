@@ -45,7 +45,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { useActionExecutor } from "../form/builder/scope";
+import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
@@ -96,13 +96,13 @@ function GridInner(props: ViewProps<GridView>) {
 
   const gridSearchAtom = useMemo(
     () => focusAtom(searchAtom!, (o) => o.prop("search")),
-    [searchAtom]
+    [searchAtom],
   );
   const allFields = useAtomValue(
     useMemo(
       () => selectAtom(searchAtom!, (state) => state.fields),
-      [searchAtom]
-    )
+      [searchAtom],
+    ),
   );
 
   const [state, setState, gridStateAtom] = useGridState({
@@ -143,7 +143,7 @@ function GridInner(props: ViewProps<GridView>) {
     useCallback(
       (get, set, options: SearchOptions = {}) => {
         const sortBy = orderBy?.map(
-          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         );
         const { query = {}, search } = get(searchAtom!);
 
@@ -183,8 +183,8 @@ function GridInner(props: ViewProps<GridView>) {
           filter,
         };
       },
-      [orderBy, searchAtom, fields, view.items, dashlet, getViewContext]
-    )
+      [orderBy, searchAtom, fields, view.items, dashlet, getViewContext],
+    ),
   );
 
   const getActionData = useCallback(() => {
@@ -192,10 +192,10 @@ function GridInner(props: ViewProps<GridView>) {
     return {
       ...dataStore.options?.filter,
       ...getSearchOptions().filter,
-    }; 
+    };
   }, [dataStore, getSearchOptions]);
 
-  const onSearch = useCallback(
+  const doSearch = useCallback(
     (options: SearchOptions = {}) => {
       if (cacheDataRef.current) {
         cacheDataRef.current = false;
@@ -206,7 +206,18 @@ function GridInner(props: ViewProps<GridView>) {
       }
       return dataStore.search(getSearchOptions(options));
     },
-    [dataStore, getSearchOptions]
+    [dataStore, getSearchOptions],
+  );
+
+  const waitForActions = useWaitForActions();
+
+  const onSearch = useCallback(
+    async (options: SearchOptions = {}) => {
+      return dashlet
+        ? waitForActions(() => doSearch(options))
+        : doSearch(options);
+    },
+    [dashlet, doSearch, waitForActions],
   );
 
   const onMassUpdate = useCallback(
@@ -221,7 +232,7 @@ function GridInner(props: ViewProps<GridView>) {
       const confirmed = await dialogs.confirm({
         content: i18n.get(
           "Do you really want to update all {0} record(s)?",
-          ids.length
+          ids.length,
         ),
       });
       if (confirmed) {
@@ -255,21 +266,21 @@ function GridInner(props: ViewProps<GridView>) {
         onSearch();
       }
     },
-    [onSearch, getSearchOptions, selectedRows, rows, records, view]
+    [onSearch, getSearchOptions, selectedRows, rows, records, view],
   );
 
   const onDelete = useCallback(
     async (records: GridRow["record"][]) => {
       const confirmed = await dialogs.confirm({
         content: i18n.get(
-          "Do you really want to delete the selected record(s)?"
+          "Do you really want to delete the selected record(s)?",
         ),
         yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
         try {
           await dataStore.delete(
-            records.map(({ id, version }) => ({ id, version }))
+            records.map(({ id, version }) => ({ id, version })),
           );
           clearSelection();
         } catch {
@@ -277,7 +288,7 @@ function GridInner(props: ViewProps<GridView>) {
         }
       }
     },
-    [dataStore, clearSelection]
+    [dataStore, clearSelection],
   );
 
   const onViewInPopup = useCallback(
@@ -292,7 +303,7 @@ function GridInner(props: ViewProps<GridView>) {
         onSearch: () => onSearch({}),
       });
     },
-    [view, action, hasPopupMaximize, showEditor, onSearch]
+    [view, action, hasPopupMaximize, showEditor, onSearch],
   );
 
   const onEditInTab = useCallback(
@@ -309,7 +320,7 @@ function GridInner(props: ViewProps<GridView>) {
         },
       });
     },
-    [action]
+    [action],
   );
 
   const hasEditInPopup =
@@ -332,7 +343,7 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, hasPopup, hasEditInPopup, switchTo, onEditInTab, onViewInPopup]
+    [dashlet, hasPopup, hasEditInPopup, switchTo, onEditInTab, onViewInPopup],
   );
 
   const onNew = useCallback(() => {
@@ -347,7 +358,7 @@ function GridInner(props: ViewProps<GridView>) {
     (record: DataRecord) => {
       onEdit(record, true);
     },
-    [onEdit]
+    [onEdit],
   );
 
   const onSave = useCallback(
@@ -359,7 +370,7 @@ function GridInner(props: ViewProps<GridView>) {
       saved && setDirty(false);
       return saved;
     },
-    [dataStore, setDirty]
+    [dataStore, setDirty],
   );
 
   const onDiscard = useCallback(() => {
@@ -390,7 +401,7 @@ function GridInner(props: ViewProps<GridView>) {
         // Ignore
       }
     },
-    [rows, selectedRows, dataStore, clearSelection, onSearch]
+    [rows, selectedRows, dataStore, clearSelection, onSearch],
   );
 
   const { data: detailsMeta } = useAsync(async () => {
@@ -413,7 +424,7 @@ function GridInner(props: ViewProps<GridView>) {
       setDirty(false);
       setDetailsRecord(record);
     },
-    [setDirty, detailsMeta, dataStore]
+    [setDirty, detailsMeta, dataStore],
   );
 
   const onSaveInDetails = useCallback(
@@ -426,7 +437,7 @@ function GridInner(props: ViewProps<GridView>) {
         }
       }
     },
-    [onSave, fetchAndSetDetailsRecord]
+    [onSave, fetchAndSetDetailsRecord],
   );
 
   const onNewInDetails = useCallback(() => {
@@ -436,21 +447,21 @@ function GridInner(props: ViewProps<GridView>) {
         initDetailsRef.current = false;
         clearSelection();
         fetchAndSetDetailsRecord({ id: nextId() });
-      }
+      },
     );
   }, [dirty, clearSelection, fetchAndSetDetailsRecord, showConfirmDirty]);
 
   const onRefreshInDetails = useCallback(() => {
     showConfirmDirty(
       async () => dirty,
-      async () => fetchAndSetDetailsRecord(detailsRecord)
+      async () => fetchAndSetDetailsRecord(detailsRecord),
     );
   }, [fetchAndSetDetailsRecord, dirty, detailsRecord, showConfirmDirty]);
 
   const onCancelInDetails = useCallback(() => {
     showConfirmDirty(
       async () => dirty,
-      async () => fetchAndSetDetailsRecord(null)
+      async () => fetchAndSetDetailsRecord(null),
     );
   }, [dirty, fetchAndSetDetailsRecord, showConfirmDirty]);
 
@@ -466,7 +477,7 @@ function GridInner(props: ViewProps<GridView>) {
       selectedDetail?.id === row?.record?.id &&
         fetchAndSetDetailsRecord(row.record);
     },
-    [selectedDetail, fetchAndSetDetailsRecord]
+    [selectedDetail, fetchAndSetDetailsRecord],
   );
 
   const onShowDetails = useCallback(
@@ -475,7 +486,7 @@ function GridInner(props: ViewProps<GridView>) {
         row.record === selectedDetail &&
         fetchAndSetDetailsRecord(row.record);
     },
-    [selectedDetail, fetchAndSetDetailsRecord]
+    [selectedDetail, fetchAndSetDetailsRecord],
   );
 
   useAsyncEffect(async () => {
@@ -522,7 +533,7 @@ function GridInner(props: ViewProps<GridView>) {
       _viewType: action.viewType,
       _views: action.views,
     }),
-    [action, getViewContext]
+    [action, getViewContext],
   );
   const actionExecutor = useActionExecutor(view, {
     getContext,
@@ -595,7 +606,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   useEffect(() => {
     selectedIdsRef.current = (state.selectedRows || []).map(
-      (ind) => state.rows[ind]?.record?.id
+      (ind) => state.rows[ind]?.record?.id,
     );
     const savedId = saveIdRef.current;
     if (savedId) {
@@ -693,14 +704,14 @@ function GridInner(props: ViewProps<GridView>) {
       switchTo("grid", {
         route: { id: String(Math.max(minPage, currentPage - 1)) },
       }),
-    [currentPage, minPage, switchTo]
+    [currentPage, minPage, switchTo],
   );
   const handleNext = useCallback(
     () =>
       switchTo("grid", {
         route: { id: String(Math.min(maxPage, currentPage + 1)) },
       }),
-    [currentPage, maxPage, switchTo]
+    [currentPage, maxPage, switchTo],
   );
 
   useShortcuts({
@@ -848,7 +859,11 @@ function GridInner(props: ViewProps<GridView>) {
             state={state}
             setState={setState}
             sortType={"live"}
-            editable={dashlet || action?.name?.startsWith("$selector") ? false : editable}
+            editable={
+              dashlet || action?.name?.startsWith("$selector")
+                ? false
+                : editable
+            }
             searchOptions={searchOptions}
             searchAtom={searchAtom}
             actionExecutor={actionExecutor}
