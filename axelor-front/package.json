@@ -17,7 +17,7 @@
     "@axelor/ui": "^0.0.15",
     "@babel/standalone": "^7.22.15",
     "@monaco-editor/react": "^4.5.2",
-    "bootstrap-icons": "^1.10.5",
+    "bootstrap-icons": "^1.11.1",
     "bootstrap-sass": "2.3.2",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",

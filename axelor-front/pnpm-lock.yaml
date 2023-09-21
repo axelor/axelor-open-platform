@@ -23,8 +23,8 @@ dependencies:
     specifier: ^4.5.2
     version: 4.5.2(monaco-editor@0.41.0)(react-dom@18.2.0)(react@18.2.0)
   bootstrap-icons:
-    specifier: ^1.10.5
-    version: 1.10.5
+    specifier: ^1.11.1
+    version: 1.11.1
   bootstrap-sass:
     specifier: 2.3.2
     version: 2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm)
@@ -209,7 +209,7 @@ packages:
       '@material-symbols/font-400': 0.11.0
       '@popperjs/core': 2.11.8
       bootstrap: 5.3.1(@popperjs/core@2.11.8)
-      bootstrap-icons: 1.10.5
+      bootstrap-icons: 1.11.1
       color: 4.2.3
       csstype: 3.1.2
       dayjs: 1.11.10
@@ -1739,8 +1739,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /bootstrap-icons@1.10.5:
-    resolution: {integrity: sha512-oSX26F37V7QV7NCE53PPEL45d7EGXmBgHG3pDpZvcRaKVzWMqIRL9wcqJUyEha1esFtM3NJzvmxFXDxjJYD0jQ==}
+  /bootstrap-icons@1.11.1:
+    resolution: {integrity: sha512-F0DDp7nKUX+x/QtpfRZ+XHFya60ng9nfdpdS59vDDfs4Uhuxp7zym/QavMsu/xx51txkoM9eVmpE7D08N35blw==}
     dev: false
 
   /bootstrap-sass@2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm):
