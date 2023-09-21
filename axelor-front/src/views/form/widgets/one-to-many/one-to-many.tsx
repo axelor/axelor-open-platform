@@ -360,7 +360,8 @@ export function OneToMany({
       onSave?: (record: DataRecord) => void,
     ) => {
       const { record } = options || {};
-      if (showEditorInTab && (record?.id ?? 0) > 0) {
+      const { id } = record ?? {};
+      if (showEditorInTab && (id ?? 0) > 0) {
         return showEditorInTab(record!, options?.readonly ?? false);
       }
       showEditor({
@@ -372,7 +373,9 @@ export function OneToMany({
         context: {
           _parent: getContext(),
         },
-        ...(isManyToMany ? { onSelect } : { onSave }),
+        ...(isManyToMany
+          ? { onSelect }
+          : { onSave: (record) => onSave?.({ ...record, $id: id }) }),
         ...options,
       });
     },
@@ -389,7 +392,8 @@ export function OneToMany({
 
   const onSave = useCallback(
     (record: DataRecord) => {
-      record = { ...record, _dirty: true, id: record.id ?? nextId() };
+      const { id, $id, ...rest } = record;
+      record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
       handleSelect([record]);
       setDetailRecord((details) =>
         details?.id === record.id ? record : details,
