@@ -491,7 +491,7 @@ function useActionValue({
           }
 
           if (record !== newRecord) {
-            set(formAtom, (prev) => ({ ...prev, record: newRecord }));
+            set(formAtom, (prev) => ({ ...prev, record: newRecord, dirty: true }));
           }
         },
         [formAtom],
@@ -524,6 +524,7 @@ function useActionRecord({
             );
             set(formAtom, (prev) => ({
               ...prev,
+              dirty: true,
               record: { ...record, ...values },
             }));
           }

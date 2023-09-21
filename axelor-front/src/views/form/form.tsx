@@ -225,6 +225,10 @@ const FormContainer = memo(function FormContainer({
     [formAtom]
   );
   const setReady = useSetAtom(readyAtom);
+  
+  const [formDirty, setFormDirty] = useAtom(
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("dirty")), [formAtom]),
+  );
 
   const archived = useAtomValue(
     useMemo(
@@ -266,8 +270,7 @@ const FormContainer = memo(function FormContainer({
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
-  const isDirty = useAtomValue(dirtyAtom);
-  const setDirty = useSetAtom(dirtyAtom);
+  const [isDirty, setDirty] = useAtom(dirtyAtom);
 
   const doRead = useCallback(
     async (id: number | string) => {
@@ -291,7 +294,8 @@ const FormContainer = memo(function FormContainer({
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
-        const action = record ? onLoadAction : onNewAction;
+        const isNewAction = !record;
+        const action = isNewAction ? onNewAction : onLoadAction;
         const {
           isNew,
           dirty = false,
@@ -317,7 +321,6 @@ const FormContainer = memo(function FormContainer({
         }
 
         switchTo("form", { route: { id }, props });
-        setDirty(dirty);
         set(formAtom, {
           ...prev,
           dirty,
@@ -347,6 +350,8 @@ const FormContainer = memo(function FormContainer({
           if (changed) {
             set(formAtom, { ...prev, record: res });
           }
+
+          isNewAction && setFormDirty(false);
           setReady(true);
         }
 
@@ -363,7 +368,7 @@ const FormContainer = memo(function FormContainer({
         onNewAction,
         readonly,
         recordRef,
-        setDirty,
+        setFormDirty,
         setReady,
         switchTo,
       ],
@@ -627,7 +632,6 @@ const FormContainer = memo(function FormContainer({
         let rec = get(formAtom).record;
         if ((rec as any)[defaultSymbol] || rec.id !== record.id) {
           const state = get(formAtom);
-          setDirty(false);
           set(formAtom, {
             ...state,
             states: {},
@@ -639,7 +643,8 @@ const FormContainer = memo(function FormContainer({
           rec = record;
         }
         const recId = rec.id ?? 0;
-        const action = recId > 0 ? onLoadAction : onNewAction;
+        const isNew = !(recId > 0);
+        const action = isNew ? onNewAction : onLoadAction;
 
         if (copyRecordRef.current) {
           copyRecordRef.current = false;
@@ -647,6 +652,8 @@ const FormContainer = memo(function FormContainer({
         }
         if (action) {
           await actionExecutor.execute(action);
+          // skip form dirty for onNew
+          isNew && setFormDirty(false);
           setReady(true);
         }
       },
@@ -657,13 +664,17 @@ const FormContainer = memo(function FormContainer({
         onLoadAction,
         onNewAction,
         record,
-        setDirty,
+        setFormDirty,
         setReady,
       ],
     ),
   );
 
   useAsyncEffect(doOnLoad, [doOnLoad]);
+
+  useEffect(() => {
+    formDirty !== undefined && setDirty(formDirty);
+  }, [formDirty, setDirty]);
 
   useEffect(() => {
     if (popup) {
