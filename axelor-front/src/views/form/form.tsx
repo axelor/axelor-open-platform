@@ -293,18 +293,21 @@ const FormContainer = memo(function FormContainer({
           dirty?: boolean;
           isNew?: boolean;
           keepStates?: boolean;
+          callAction?: boolean;
         },
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
-        const isNewAction = !record;
-        const action = isNewAction ? onNewAction : onLoadAction;
         const {
           isNew,
           dirty = false,
+          callAction = true,
           keepStates,
           ...props
         } = { readonly, ...options };
+
+        const isNewAction = !record;
+        const action = isNewAction ? onNewAction : onLoadAction;
         const isNewFromUnsaved = isNew && record === null && !prev.record.id;
 
         record = record ?? {};
@@ -333,25 +336,29 @@ const FormContainer = memo(function FormContainer({
         });
 
         if (action && (!isNew || isNewFromUnsaved)) {
-          // execute action
-          await actionExecutor.execute(action, { enqueue: false });
+          if (callAction) {
+            // execute action
+            await actionExecutor.execute(action, { enqueue: false });
 
-          // fix undefined values set by action
-          let { record: current, original = {} } = get(formAtom);
-          let changed = false;
-          let res = Object.entries(current).reduce(
-            (acc, [key, value]) => {
-              if (value === undefined && original[key] === null) {
-                changed = true;
-                acc[key] = null;
-              }
-              return acc;
-            },
-            { ...current },
-          );
+            // fix undefined values set by action
+            let { record: current, original = {} } = get(formAtom);
+            let changed = false;
+            let res = Object.entries(current).reduce(
+              (acc, [key, value]) => {
+                if (value === undefined && original[key] === null) {
+                  changed = true;
+                  acc[key] = null;
+                }
+                return acc;
+              },
+              { ...current },
+            );
 
-          if (changed) {
-            set(formAtom, { ...prev, record: res });
+            if (changed) {
+              set(formAtom, { ...prev, record: res });
+            }
+          } else {
+            actionExecutor.execute(action, { enqueue: true });
           }
 
           isNewAction && setFormDirty(false);
@@ -488,13 +495,13 @@ const FormContainer = memo(function FormContainer({
 
   const reload = useAtomCallback(
     useCallback(
-      async (get) => {
+      async (get, set, options?: { callAction?: boolean }) => {
         const id = get(formAtom).record.id ?? 0;
         if (id <= 0) {
           return onNew();
         }
         const rec = await doRead(id);
-        await doEdit(rec);
+        await doEdit(rec, options);
       },
       [doEdit, doRead, formAtom, onNew],
     ),
@@ -507,7 +514,12 @@ const FormContainer = memo(function FormContainer({
     );
   }, [isDirty, reload, showConfirmDirty]);
 
-  actionHandler.setRefreshHandler(reload);
+  const actionReload = useCallback(
+    () => reload({ callAction: false }),
+    [reload],
+  );
+
+  actionHandler.setRefreshHandler(actionReload);
   actionHandler.setSaveHandler(
     useCallback(
       async (record?: DataRecord) => {
