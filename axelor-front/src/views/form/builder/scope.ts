@@ -643,22 +643,28 @@ export function FormRecordUpdates({
   );
   const { action } = useViewTab();
 
-  useAsyncEffect(async () => {
-    if (isEqual(recordRef.current, record)) return;
-    recordRef.current = record;
-    recordHandler.notify(
-      createEvalContext(
-        {
-          ...action.context,
-          ...record,
-        },
-        {
-          fields: fields as unknown as EvalContextOptions["fields"],
-          readonly,
-        },
-      ),
-    );
-  }, [record, recordHandler, fields, readonly, action.context]);
+  const waitForActions = useWaitForActions();
+
+  useAsyncEffect(
+    () =>
+      waitForActions(async () => {
+        if (isEqual(recordRef.current, record)) return;
+        recordRef.current = record;
+        recordHandler.notify(
+          createEvalContext(
+            {
+              ...action.context,
+              ...record,
+            },
+            {
+              fields: fields as unknown as EvalContextOptions["fields"],
+              readonly,
+            },
+          ),
+        );
+      }),
+    [record, recordHandler, fields, readonly, action.context],
+  );
 
   return null;
 }
