@@ -33,7 +33,7 @@ import {
   Widget,
 } from "@/services/client/meta.types";
 import { RecordHandler } from "@/views/form/builder";
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { ActionExecutor } from "../action";
 
 import styles from "./view-toolbar.module.scss";
@@ -265,7 +265,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   const showConfirmDirty = useViewConfirmDirty();
   const dirtyAtom = useViewDirtyAtom();
-  const dirty = useAtomValue(dirtyAtom) ?? false;
+  const [dirty = false, setDirty] = useAtom(dirtyAtom);
 
   const { data: sessionInfo } = useSession();
   const { actionId, views = [] } = useViewAction();
@@ -289,10 +289,11 @@ export function ViewToolBar(props: ViewToolBarProps) {
             } else {
               switchTo(type);
             }
+            dirty && setDirty(false);
           },
         );
       },
-      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty],
+      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty, setDirty],
     ),
   );
 
