@@ -204,12 +204,12 @@ export function ToolbarActions({
 
       return [...(buttons || []), ...(menus || [])].map(mapItem);
     },
-    [buttons, menus, actionExecutor, recordHandler]
+    [buttons, menus, actionExecutor, recordHandler],
   );
 
   const [items, responsiveItems] = useMemo(
     () => [getItems(), getItems(getTextResponsive)],
-    [getItems]
+    [getItems],
   );
 
   return (
@@ -289,24 +289,24 @@ export function ViewToolBar(props: ViewToolBarProps) {
             } else {
               switchTo(type);
             }
-          }
+          },
         );
       },
-      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty]
-    )
+      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty],
+    ),
   );
 
   const handlePrev = useCallback(() => {
     showConfirmDirty(
       async () => dirty,
-      async () => onPrev?.()
+      async () => onPrev?.(),
     );
   }, [dirty, onPrev, showConfirmDirty]);
 
   const handleNext = useCallback(() => {
     showConfirmDirty(
       async () => dirty,
-      async () => onNext?.()
+      async () => onNext?.(),
     );
   }, [dirty, onNext, showConfirmDirty]);
 
@@ -355,7 +355,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
         text: "Model...",
         onClick: () => {
           navigate(
-            `/ds/form::com.axelor.meta.db.MetaModel/edit/${view.modelId}`
+            `/ds/form::com.axelor.meta.db.MetaModel/edit/${view.modelId}`,
           );
         },
       });

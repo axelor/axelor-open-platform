@@ -72,7 +72,7 @@ import styles from "./form.module.scss";
 export const fetchRecord = async (
   meta: ViewData<FormView>,
   dataStore: DataStore,
-  id?: string | number
+  id?: string | number,
 ) => {
   if (id && +id > 0) {
     const fields = Object.keys(meta.fields ?? {});
@@ -104,7 +104,7 @@ export const useGetErrors = () => {
         return Boolean(
           s.attrs.hidden ||
             (s.name && statesByName[s.name]?.attrs?.hidden) ||
-            (s.parent && isHidden(store.get(s.parent)))
+            (s.parent && isHidden(store.get(s.parent))),
         );
       };
       const errors = Object.values(states)
@@ -114,7 +114,7 @@ export const useGetErrors = () => {
         .map((s) => s.errors ?? {});
       return errors.length ? errors : null;
     },
-    [store]
+    [store],
   );
 };
 
@@ -125,7 +125,7 @@ export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
       const selector = ["input", "select", "textarea"]
         .map(
           (name) =>
-            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly]), ${name}[tabindex]:not([readonly])`
+            `${name}[data-input]:not([readonly]), [data-input] ${name}:not([readonly]), ${name}[tabindex]:not([readonly])`,
         )
         .join(", ");
       const input = elem.querySelector(selector) as HTMLInputElement;
@@ -229,13 +229,13 @@ const FormContainer = memo(function FormContainer({
   const archived = useAtomValue(
     useMemo(
       () => selectAtom(formAtom, (form) => form.record?.archived),
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
-    [formAtom, schema]
+    [formAtom, schema],
   );
 
   const { attrs } = useAtomValue(widgetAtom);
@@ -258,7 +258,7 @@ const FormContainer = memo(function FormContainer({
   }, [readonlyExclusive, attrs.readonly, props.readonly, hasButton]);
 
   const prevType = useSelectViewState(
-    useCallback((state) => state.prevType, [])
+    useCallback((state) => state.prevType, []),
   );
 
   const copyRecordRef = useRef(false);
@@ -273,7 +273,7 @@ const FormContainer = memo(function FormContainer({
     async (id: number | string) => {
       return await fetchRecord(meta, dataStore, id);
     },
-    [dataStore, meta]
+    [dataStore, meta],
   );
 
   const doEdit = useAtomCallback(
@@ -287,7 +287,7 @@ const FormContainer = memo(function FormContainer({
           dirty?: boolean;
           isNew?: boolean;
           keepStates?: boolean;
-        }
+        },
       ) => {
         const id = String(record?.id ?? "");
         const prev = get(formAtom);
@@ -341,7 +341,7 @@ const FormContainer = memo(function FormContainer({
               }
               return acc;
             },
-            { ...current }
+            { ...current },
           );
 
           if (changed) {
@@ -366,8 +366,8 @@ const FormContainer = memo(function FormContainer({
         setDirty,
         setReady,
         switchTo,
-      ]
-    )
+      ],
+    ),
   );
 
   const onNew = useCallback(async () => {
@@ -375,7 +375,7 @@ const FormContainer = memo(function FormContainer({
       async () => isDirty,
       async () => {
         doEdit(null, { readonly: false, isNew: true });
-      }
+      },
     );
   }, [doEdit, isDirty, showConfirmDirty]);
 
@@ -402,14 +402,14 @@ const FormContainer = memo(function FormContainer({
           }));
         }
       },
-      [formAtom, prevType, readonly, setAttrs, switchTo]
-    )
+      [formAtom, prevType, readonly, setAttrs, switchTo],
+    ),
   );
 
   const getErrors = useGetErrors();
   const getWidgetErrors = useCallback(() => {
     return Array.from(widgetsRef.current).some((checkWidgetInvalid) =>
-      checkWidgetInvalid()
+      checkWidgetInvalid(),
     );
   }, []);
 
@@ -420,7 +420,7 @@ const FormContainer = memo(function FormContainer({
         set,
         callOnSave: boolean = true,
         shouldSave: boolean = true,
-        callOnLoad: boolean = true
+        callOnLoad: boolean = true,
       ) => {
         const formState = get(formAtom);
         const errors = getErrors(formState);
@@ -466,8 +466,8 @@ const FormContainer = memo(function FormContainer({
         onSaveAction,
         readonly,
         meta.fields,
-      ]
-    )
+      ],
+    ),
   );
 
   const handleOnSave = useCallback(async () => {
@@ -490,11 +490,11 @@ const FormContainer = memo(function FormContainer({
           async () => {
             const rec = await doRead(id);
             await doEdit(rec);
-          }
+          },
         );
       },
-      [doEdit, doRead, formAtom, isDirty, onNew, showConfirmDirty]
-    )
+      [doEdit, doRead, formAtom, isDirty, onNew, showConfirmDirty],
+    ),
   );
 
   actionHandler.setRefreshHandler(onRefresh);
@@ -506,8 +506,8 @@ const FormContainer = memo(function FormContainer({
         }
         await onSave(false);
       },
-      [dataStore, onSave]
-    )
+      [dataStore, onSave],
+    ),
   );
 
   const onDelete = useAtomCallback(
@@ -519,7 +519,7 @@ const FormContainer = memo(function FormContainer({
         if (id > 0 && version >= 0) {
           const confirmed = await dialogs.confirm({
             content: i18n.get(
-              "Do you really want to delete the selected record?"
+              "Do you really want to delete the selected record?",
             ),
             yesTitle: i18n.get("Delete"),
           });
@@ -533,8 +533,8 @@ const FormContainer = memo(function FormContainer({
           }
         }
       },
-      [dataStore, formAtom, onNew, prevType, switchTo]
-    )
+      [dataStore, formAtom, onNew, prevType, switchTo],
+    ),
   );
 
   const onCopy = useCallback(async () => {
@@ -547,7 +547,7 @@ const FormContainer = memo(function FormContainer({
 
   const openProcess = useCallback(async () => {
     if (record.id && record.$processInstanceId) {
-      await actionExecutor.execute("wkf-instance-view-from-record")
+      await actionExecutor.execute("wkf-instance-view-from-record");
     }
   }, [actionExecutor, record.id, record.$processInstanceId]);
 
@@ -560,7 +560,7 @@ const FormContainer = memo(function FormContainer({
             content: archived
               ? i18n.get("Do you really want to archive the selected record?")
               : i18n.get(
-                  "Do you really want to unarchive the selected record?"
+                  "Do you really want to unarchive the selected record?",
                 ),
           });
           if (confirmed) {
@@ -576,8 +576,8 @@ const FormContainer = memo(function FormContainer({
           }
         }
       },
-      [dataStore, record.id, prevType, formAtom, switchTo, onRefresh]
-    )
+      [dataStore, record.id, prevType, formAtom, switchTo, onRefresh],
+    ),
   );
 
   const onAudit = useAtomCallback(
@@ -606,8 +606,8 @@ const FormContainer = memo(function FormContainer({
           });
         }
       },
-      [dataStore, formAtom]
-    )
+      [dataStore, formAtom],
+    ),
   );
 
   const pagination = usePagination(dataStore, record, readonly);
@@ -617,7 +617,7 @@ const FormContainer = memo(function FormContainer({
   const showToolbar = popupOptions?.showToolbar !== false;
 
   const getState = useAtomCallback(
-    useCallback((get) => get(formAtom), [formAtom])
+    useCallback((get) => get(formAtom), [formAtom]),
   );
 
   const doOnLoad = useAtomCallback(
@@ -659,8 +659,8 @@ const FormContainer = memo(function FormContainer({
         record,
         setDirty,
         setReady,
-      ]
-    )
+      ],
+    ),
   );
 
   useAsyncEffect(doOnLoad, [doOnLoad]);
@@ -714,7 +714,8 @@ const FormContainer = memo(function FormContainer({
   const canArchive = hasButton("archive") && record.id;
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
-  const canOpenProcess = session.info?.features?.studio && record.id && record.$processInstanceId;
+  const canOpenProcess =
+    session.info?.features?.studio && record.id && record.$processInstanceId;
 
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {
@@ -734,7 +735,7 @@ const FormContainer = memo(function FormContainer({
       await actionExecutor.waitFor();
       actionExecutor.wait().then(handleOnSave);
     },
-    [actionExecutor, handleOnSave]
+    [actionExecutor, handleOnSave],
   );
 
   const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
@@ -765,14 +766,14 @@ const FormContainer = memo(function FormContainer({
       prevType != null && isAdvancedSearchView(prevType)
         ? prevType
         : views.find((view) => isAdvancedSearchView(view.type))?.type,
-    [prevType, views]
+    [prevType, views],
   );
 
   const setSearchFocusTabId = useSetAtom(
     useMemo(
       () => focusAtom(searchAtom!, (o) => o.prop("focusTabId")),
-      [searchAtom]
-    )
+      [searchAtom],
+    ),
   );
 
   useShortcut({
@@ -783,7 +784,7 @@ const FormContainer = memo(function FormContainer({
         active === tab &&
         currentViewType === schema.type &&
         searchViewType != null,
-      [searchViewType, active, tab, currentViewType, schema.type]
+      [searchViewType, active, tab, currentViewType, schema.type],
     ),
     action: useCallback(() => {
       void (async () => {
@@ -792,7 +793,7 @@ const FormContainer = memo(function FormContainer({
           async () => {
             setSearchFocusTabId(tab.id);
             switchTo(searchViewType!);
-          }
+          },
         );
       })();
     }, [
@@ -966,7 +967,7 @@ const FormContainer = memo(function FormContainer({
 function usePagination(
   dataStore: DataStore,
   record: DataRecord,
-  readonly?: boolean
+  readonly?: boolean,
 ) {
   const { offset = 0, limit = 0, totalCount = 0 } = dataStore.page;
   const index = dataStore.records.findIndex((x) => x.id === record.id);
@@ -1017,13 +1018,13 @@ function usePagination(
 function useFormWidth(
   schema: Schema,
   hasSide: boolean,
-  isPopup: boolean = false
+  isPopup: boolean = false,
 ) {
   const { width, minWidth, maxWidth } = schema;
 
   const className = useMemo(
     () => styles[width] ?? (hasSide ? undefined : styles.mid),
-    [hasSide, width]
+    [hasSide, width],
   );
 
   const style: React.CSSProperties = useMemo(() => {
@@ -1034,7 +1035,7 @@ function useFormWidth(
 
   const result = useMemo(
     () => (isPopup ? {} : { className, style }),
-    [className, isPopup, style]
+    [className, isPopup, style],
   );
 
   return result;
@@ -1056,7 +1057,7 @@ export const Layout: FormLayout = ({
     const side = items.filter((x) => x.sidebar);
     const mail = items.filter((x) => x.type === "panel-mail" && !side.includes(x));
     const rest = items.filter(
-      (x) => !head.includes(x) && !side.includes(x) && !mail.includes(x)
+      (x) => !head.includes(x) && !side.includes(x) && !mail.includes(x),
     );
 
     const sideTop = side.slice(0, 1);
@@ -1079,7 +1080,7 @@ export const Layout: FormLayout = ({
   const { style, className: clsName } = useFormWidth(
     schema,
     side.length > 0,
-    popup
+    popup,
   );
 
   return (
@@ -1124,8 +1125,8 @@ export function useFormAttachment(formAtom: FormAtom) {
     useMemo(
       () =>
         focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const handleClick = useAtomCallback(
@@ -1139,8 +1140,8 @@ export function useFormAttachment(formAtom: FormAtom) {
           onCountChanged: (totalCount) => setAttachmentCount(totalCount),
         });
       },
-      [formAtom, showDMSPopup, setAttachmentCount]
-    )
+      [formAtom, showDMSPopup, setAttachmentCount],
+    ),
   );
 
   return {
@@ -1182,7 +1183,7 @@ const compact = (rec: any) => {
 function useCheckVersion(
   formAtom: FormAtom,
   dataStore: DataStore,
-  onConfirm: () => void
+  onConfirm: () => void,
 ) {
   const tab = useViewTab();
   const info = session.info;
@@ -1199,7 +1200,7 @@ function useCheckVersion(
           const confirmed = await dialogs.confirm({
             content:
               i18n.get(
-                "The record has been updated or delete by another action."
+                "The record has been updated or delete by another action.",
               ) +
               "<br>" +
               i18n.get("Would you like to reload the current record?"),
@@ -1209,8 +1210,8 @@ function useCheckVersion(
           }
         }
       },
-      [dataStore, formAtom, info, onConfirm, tab]
-    )
+      [dataStore, formAtom, info, onConfirm, tab],
+    ),
   );
 
   const handleTabClick = useCallback(
@@ -1219,7 +1220,7 @@ function useCheckVersion(
         check();
       }
     },
-    [check, tab.id]
+    [check, tab.id],
   );
 
   useEffect(() => {
