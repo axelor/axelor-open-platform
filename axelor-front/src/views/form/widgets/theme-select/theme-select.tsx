@@ -43,12 +43,9 @@ export function ThemeSelect(props: FieldProps<string>) {
     [setValue]
   );
 
-  const handleClear = useCallback(
-    (value: ThemeOption) => {
-      setValue(null, true);
-    },
-    [setValue]
-  );
+  const handleClear = useCallback(() => {
+    setValue(null, true);
+  }, [setValue]);
 
   return (
     <FieldControl {...props}>
