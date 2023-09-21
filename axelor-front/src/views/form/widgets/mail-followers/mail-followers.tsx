@@ -1,18 +1,21 @@
-import { ListItem, Panel } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtomCallback } from "jotai/utils";
 import React, { useCallback, useState } from "react";
+
+import { ListItem, Panel } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
+
 import { WidgetProps } from "../../builder";
-import { useFormRefresh } from "../../builder/scope";
+import { useWaitForActions, useFormRefresh } from "../../builder/scope";
+import { MessageUser } from "../mail-messages/message";
 import { useMessagePopup } from "../mail-messages/message/message-form";
 import { Message } from "../mail-messages/message/types";
-import { MessageUser } from "../mail-messages/message";
 import { Follower, follow, getFollowers, unfollow } from "./utils";
+
 import classes from "./mail-followers.module.scss";
 
 export function MailFollowers({ schema, formAtom }: WidgetProps) {
@@ -20,6 +23,8 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const { data: session } = useSession();
   const { model, modelId } = schema;
   const showMessagePopup = useMessagePopup();
+
+  const waitForActions = useWaitForActions();
 
   const getRecordTitle = useAtomCallback(
     useCallback(
@@ -35,9 +40,9 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   );
 
   const onRefresh = useCallback(async () => {
-    const list = await getFollowers(model, modelId);
+    const list = await waitForActions(() => getFollowers(model, modelId));
     setFollowers(list);
-  }, [model, modelId]);
+  }, [model, modelId, waitForActions]);
 
   useAsyncEffect(async () => {
     onRefresh();

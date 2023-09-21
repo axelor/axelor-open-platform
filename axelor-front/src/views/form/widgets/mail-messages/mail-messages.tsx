@@ -1,19 +1,21 @@
-import { WidgetProps } from "../../builder";
 import { useAtomValue, useSetAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { DataSource } from "./utils";
 import { focusAtom } from "jotai-optics";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useTags } from "@/hooks/use-tags";
+import { useViewAction } from "@/view-containers/views/scope";
+
+import { WidgetProps } from "../../builder";
+import { useWaitForActions, useFormRefresh } from "../../builder/scope";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
-import { useViewAction } from "@/view-containers/views/scope";
-import { useTags } from "@/hooks/use-tags";
-import { useFormRefresh } from "../../builder/scope";
+import { DataSource } from "./utils";
 
 async function findMessages(
   id: number,
   model: string,
-  { parent, folder, type, offset = 0, limit = 4 }: MessageFetchOptions
+  { parent, folder, type, offset = 0, limit = 4 }: MessageFetchOptions,
 ) {
   const { total = 0, data = [] } = await (parent
     ? DataSource.replies(parent)
@@ -43,34 +45,39 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const { fetchTags } = useTags();
 
   const [filter, setFilter] = useState<string | undefined>(
-    schema.filter || "comment"
+    schema.filter || "comment",
   );
 
   const setEmpty = useSetAtom(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
   const fields = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("fields")), [formAtom])
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("fields")), [formAtom]),
   );
   const isMessageBox = model === "com.axelor.mail.db.MailMessage";
   const folder = isMessageBox ? name.split(".").pop() : "";
   const hasMessages = isMessageBox || (recordId ?? 0) > 0;
 
+  const waitForActions = useWaitForActions();
+
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
       if (!hasMessages) return;
       const { parent } = options || {};
+
       const {
         data,
         pageInfo: { totalRecords, hasNextPage },
-      } = await findMessages(recordId as number, model, {
-        folder,
-        type: filter,
-        ...options,
-      });
+      } = await waitForActions(() =>
+        findMessages(recordId as number, model, {
+          folder,
+          type: filter,
+          ...options,
+        }),
+      );
 
       if (parent) {
         setMessages((msgs) => {
@@ -87,7 +94,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
                 ...(msgs.find((x) => x.id === msg.id) || {}),
                 ...msg,
               }))
-            : [...msgs, ...data]
+            : [...msgs, ...data],
         );
         setPagination((pagination) => ({
           ...pagination,
@@ -97,7 +104,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }));
       }
     },
-    [hasMessages, recordId, model, filter, folder]
+    [hasMessages, recordId, model, filter, folder],
   );
 
   const postComment = useCallback(
@@ -109,7 +116,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         {
           ...data,
           body: data.body?.replace(/\n/g, "<br>"),
-        }
+        },
       );
       if (result) {
         const [msg] = result;
@@ -124,14 +131,14 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         return msg;
       }
     },
-    [recordId, model]
+    [recordId, model],
   );
 
   const removeComment = useCallback(
     async (record: Message) => {
       const isRemoved = await DataSource.remove(record.id);
       const msgIndex = messages.findIndex(
-        (x) => `${x.id}` === `${record?.parent?.id || record.id}`
+        (x) => `${x.id}` === `${record?.parent?.id || record.id}`,
       );
       if (isRemoved && msgIndex > -1) {
         if (record?.parent?.id) {
@@ -153,7 +160,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       }
       fetchTags();
     },
-    [messages, fetchTags]
+    [messages, fetchTags],
   );
 
   const handleFlagsAction = useCallback(
@@ -185,7 +192,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       } else {
         setMessages((messages) => {
           const msgIndex = messages.findIndex(
-            (x) => `${x.id}` === `${msg?.parent?.id || msg.id}`
+            (x) => `${x.id}` === `${msg?.parent?.id || msg.id}`,
           );
           messages[msgIndex] = {
             ...messages[msgIndex],
@@ -197,7 +204,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
                           ...$msg,
                           $flags: Object.assign({}, $msg.$flags, flag),
                         }
-                      : $msg
+                      : $msg,
                   ),
                 }
               : {
@@ -210,7 +217,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
       return flag as MessageFlag;
     },
-    [fetchAll, fetchTags, limit]
+    [fetchAll, fetchTags, limit],
   );
 
   const onRefresh = useCallback(() => {
