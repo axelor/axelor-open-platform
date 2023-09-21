@@ -1039,7 +1039,7 @@ export const Layout: FormLayout = ({
     const items = schema.items ?? [];
     const head = items.filter((x) => x.widget === "wkf-status");
     const side = items.filter((x) => x.sidebar);
-    const mail = items.filter((x) => x.type === "panel-mail");
+    const mail = items.filter((x) => x.type === "panel-mail" && !side.includes(x));
     const rest = items.filter(
       (x) => !head.includes(x) && !side.includes(x) && !mail.includes(x)
     );
