@@ -255,6 +255,7 @@ const FormContainer = memo(function FormContainer({
     useCallback((state) => state.prevType, [])
   );
 
+  const copyRecordRef = useRef(false);
   const widgetsRef = useRef(new Set<FormValidityHandler>());
   const switchTo = useViewSwitch();
 
@@ -532,6 +533,7 @@ const FormContainer = memo(function FormContainer({
   const onCopy = useCallback(async () => {
     if (record.id) {
       const rec = await dataStore.copy(record.id);
+      rec && (copyRecordRef.current = true);
       doEdit(rec, { dirty: true, readonly: false, isNew: true });
     }
   }, [dataStore, doEdit, record.id]);
@@ -632,6 +634,9 @@ const FormContainer = memo(function FormContainer({
         const recId = rec.id ?? 0;
         const action = recId > 0 ? onLoadAction : onNewAction;
 
+        if (copyRecordRef.current) {
+          return (copyRecordRef.current = false);
+        }
         if (action) {
           await actionExecutor.execute(action);
           setReady(true);
