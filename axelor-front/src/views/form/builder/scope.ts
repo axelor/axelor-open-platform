@@ -593,12 +593,22 @@ export function useActionExecutor(
 export function useWaitForActions() {
   const { actionExecutor } = useFormScope();
   const waiting = useRef<Promise<unknown> | null>(null);
+  const taskRef = useRef<(() => Promise<unknown>) | null>(null);
+
   const waitForActions = useCallback(
     async function waitForActions<T>(task: () => Promise<T>): Promise<T> {
+      taskRef.current = task;
       if (waiting.current) return waiting.current as Promise<T>;
-      const promise = actionExecutor.wait().then(task);
-      promise.finally(() => {
-        waiting.current = null;
+      const promise = new Promise<T>((resolve, reject) => {
+        actionExecutor
+          .wait()
+          .then(() => taskRef.current?.() as Promise<T>)
+          .then(resolve)
+          .catch(reject)
+          .finally(() => {
+            taskRef.current = null;
+            waiting.current = null;
+          });
       });
       waiting.current = promise;
       return promise;
