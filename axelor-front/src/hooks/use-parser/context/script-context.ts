@@ -33,9 +33,9 @@ export function createScriptContext(
     helpers: moreHelpers = {},
   } = options ?? {};
 
-  const noFields = isEmpty(fields);
-
   const { $getField } = moreHelpers;
+  const getField = (name: string) => $getField?.(name) ?? fields[name];
+  const noFields = isEmpty(fields) && !$getField;
 
   const helpers = {
     get $user() {
@@ -142,7 +142,7 @@ export function createScriptContext(
       const value = helpers.$get(name);
       return format(value, {
         context,
-        props: $getField?.(name) || fields[name],
+        props: getField(name),
       });
     },
     $image(fieldName: string, imageName: string) {
@@ -150,7 +150,7 @@ export function createScriptContext(
       let model = context._model;
 
       if (fieldName) {
-        let field = fields[fieldName];
+        let field = getField(fieldName);
         if (field && field.target) {
           record = record[fieldName] || {};
           model = field.target;
@@ -179,7 +179,7 @@ export function createScriptContext(
   type Context = DataContext & typeof helpers;
 
   function isJsonField(name: string) {
-    return noFields || (fields[name]?.json ?? false);
+    return noFields || (getField(name)?.json ?? false);
   }
 
   function isJsonValue(value: unknown): value is string {
