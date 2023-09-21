@@ -635,7 +635,8 @@ const FormContainer = memo(function FormContainer({
         const action = recId > 0 ? onLoadAction : onNewAction;
 
         if (copyRecordRef.current) {
-          return (copyRecordRef.current = false);
+          copyRecordRef.current = false;
+          return;
         }
         if (action) {
           await actionExecutor.execute(action);
