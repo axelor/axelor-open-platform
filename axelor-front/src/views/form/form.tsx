@@ -63,7 +63,11 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
-import { FormValidityHandler, FormValidityScope } from "./builder/scope";
+import {
+  FormValidityHandler,
+  FormValidityScope,
+  useWaitForActions,
+} from "./builder/scope";
 import {
   getDefaultValues,
   processContextValues as processDataRecord,
@@ -282,6 +286,8 @@ const FormContainer = memo(function FormContainer({
     [dataStore, meta],
   );
 
+  const waitForActions = useWaitForActions();
+
   const doEdit = useAtomCallback(
     useCallback(
       async (
@@ -358,7 +364,9 @@ const FormContainer = memo(function FormContainer({
               set(formAtom, { ...prev, record: res });
             }
           } else {
-            actionExecutor.execute(action, { enqueue: true });
+            waitForActions(() =>
+              actionExecutor.execute(action, { enqueue: true }),
+            );
           }
 
           isNewAction && setFormDirty(false);
@@ -371,16 +379,18 @@ const FormContainer = memo(function FormContainer({
         }
       },
       [
-        actionExecutor,
         formAtom,
-        tabId,
+        readonly,
         onLoadAction,
         onNewAction,
-        readonly,
-        recordRef,
-        setFormDirty,
-        setReady,
         switchTo,
+        setDirty,
+        recordRef,
+        setReady,
+        setFormDirty,
+        actionExecutor,
+        waitForActions,
+        tabId,
       ],
     ),
   );
