@@ -26,7 +26,7 @@
     "echarts": "^5.4.3",
     "font-awesome": "^4.7.0",
     "immer": "^10.0.2",
-    "jotai": "^2.4.1",
+    "jotai": "^2.4.2",
     "jotai-immer": "^0.2.0",
     "jotai-molecules": "^1.1.1",
     "jotai-optics": "^0.3.1",

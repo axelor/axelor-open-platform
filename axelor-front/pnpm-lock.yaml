@@ -50,17 +50,17 @@ dependencies:
     specifier: ^10.0.2
     version: 10.0.2
   jotai:
-    specifier: ^2.4.1
-    version: 2.4.1(@types/react@18.2.21)(react@18.2.0)
+    specifier: ^2.4.2
+    version: 2.4.2(@types/react@18.2.21)(react@18.2.0)
   jotai-immer:
     specifier: ^0.2.0
-    version: 0.2.0(immer@10.0.2)(jotai@2.4.1)(react@18.2.0)
+    version: 0.2.0(immer@10.0.2)(jotai@2.4.2)(react@18.2.0)
   jotai-molecules:
     specifier: ^1.1.1
-    version: 1.1.1(jotai@2.4.1)(react@18.2.0)
+    version: 1.1.1(jotai@2.4.2)(react@18.2.0)
   jotai-optics:
     specifier: ^0.3.1
-    version: 0.3.1(jotai@2.4.1)(optics-ts@2.4.1)
+    version: 0.3.1(jotai@2.4.2)(optics-ts@2.4.1)
   jsdom:
     specifier: ^22.1.0
     version: 22.1.0
@@ -2907,7 +2907,7 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /jotai-immer@0.2.0(immer@10.0.2)(jotai@2.4.1)(react@18.2.0):
+  /jotai-immer@0.2.0(immer@10.0.2)(jotai@2.4.2)(react@18.2.0):
     resolution: {integrity: sha512-hahK8EPiROS9RoNWmX/Z8rY9WkAijspX4BZ1O7umpcwI4kPNkbcCpu/PhiQ8FMcpEcF6KmbpbMpSSj/GFmo8NA==}
     peerDependencies:
       immer: '*'
@@ -2915,33 +2915,33 @@ packages:
       react: '>=17.0.0'
     dependencies:
       immer: 10.0.2
-      jotai: 2.4.1(@types/react@18.2.21)(react@18.2.0)
+      jotai: 2.4.2(@types/react@18.2.21)(react@18.2.0)
       react: 18.2.0
     dev: false
 
-  /jotai-molecules@1.1.1(jotai@2.4.1)(react@18.2.0):
+  /jotai-molecules@1.1.1(jotai@2.4.2)(react@18.2.0):
     resolution: {integrity: sha512-Z57pYXbZumT/Ix/nAFZdSF6ur4V2bTRO6Trh/iNwUwzUnw446UsxdObJ9+eWrhd/WUjAqq9TyIei/txKRNtSvw==}
     engines: {node: '>=10'}
     peerDependencies:
       jotai: '>=1'
       react: '>=16'
     dependencies:
-      jotai: 2.4.1(@types/react@18.2.21)(react@18.2.0)
+      jotai: 2.4.2(@types/react@18.2.21)(react@18.2.0)
       react: 18.2.0
     dev: false
 
-  /jotai-optics@0.3.1(jotai@2.4.1)(optics-ts@2.4.1):
+  /jotai-optics@0.3.1(jotai@2.4.2)(optics-ts@2.4.1):
     resolution: {integrity: sha512-KibUx9IneM2hGWGIYGs/v0KCxU985lg7W2c6dt5RodJCB2XPbmok8rkkLmdVk9+fKsn2shkPMi+AG8XzHgB3+w==}
     peerDependencies:
       jotai: '>=1.11.0'
       optics-ts: '*'
     dependencies:
-      jotai: 2.4.1(@types/react@18.2.21)(react@18.2.0)
+      jotai: 2.4.2(@types/react@18.2.21)(react@18.2.0)
       optics-ts: 2.4.1
     dev: false
 
-  /jotai@2.4.1(@types/react@18.2.21)(react@18.2.0):
-    resolution: {integrity: sha512-S4CTLpsZV+LABBXL5PgkMl+5jK3ljfbWmcLqtN7CQ2vio/Hrg3T6IKk/vf2/9hnp1imTPDsaFv7D54de/7Sa+w==}
+  /jotai@2.4.2(@types/react@18.2.21)(react@18.2.0):
+    resolution: {integrity: sha512-90jXVOd9h6gi5JXk558M+wnJfaaVN2WegcNOCfiFbWboNaDl6DkRgiY/K1oeqTfYJmq8yM7XPsL99LAvcOPqhw==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=17.0.0'
