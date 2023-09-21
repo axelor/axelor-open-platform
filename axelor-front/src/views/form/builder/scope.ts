@@ -590,6 +590,24 @@ export function useActionExecutor(
   return actionExecutor;
 }
 
+export function useWaitForActions() {
+  const { actionExecutor } = useFormScope();
+  const waiting = useRef<Promise<unknown> | null>(null);
+  const waitForActions = useCallback(
+    async function waitForActions<T>(task: () => Promise<T>): Promise<T> {
+      if (waiting.current) return waiting.current as Promise<T>;
+      const promise = actionExecutor.wait().then(task);
+      promise.finally(() => {
+        waiting.current = null;
+      });
+      waiting.current = promise;
+      return promise;
+    },
+    [actionExecutor],
+  );
+  return waitForActions;
+}
+
 export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
   const { actionHandler } = useFormScope();
   useActionAttrs({ formAtom, actionHandler });
