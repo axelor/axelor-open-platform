@@ -18,6 +18,7 @@ import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   EditorOptions,
   useBeforeSelect,
@@ -42,13 +43,13 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { useActionExecutor } from "../../builder/scope";
+import { useActionExecutor, useWaitForActions } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { download } from "@/utils/download";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
+
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
@@ -212,7 +213,7 @@ export function OneToMany({
     });
   }, [setState]);
 
-  const onSearch = useCallback(
+  const doSearch = useCallback(
     async (options?: SearchOptions) => {
       // avoid search for internal value changes
       if (!shouldSearch.current) {
@@ -259,6 +260,13 @@ export function OneToMany({
       } as SearchResult;
     },
     [value, sortBy, name, model, parentId, dataStore],
+  );
+
+  const waitForActions = useWaitForActions();
+
+  const onSearch = useCallback(
+    async (options?: SearchOptions) => waitForActions(() => doSearch(options)),
+    [doSearch, waitForActions],
   );
 
   const onExport = useCallback(async () => {
