@@ -81,6 +81,7 @@ export type ActionOptions = {
     _archived?: boolean;
   };
   context?: DataContext;
+  enqueue?: boolean;
 };
 
 export interface ActionExecutor {

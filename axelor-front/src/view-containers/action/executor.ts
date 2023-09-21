@@ -27,7 +27,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
     if (index > -1 && index !== length - 1) {
       throw new Error(
-        i18n.get('Invalid use of "{0}" action, must be the last action.', name)
+        i18n.get('Invalid use of "{0}" action, must be the last action.', name),
       );
     }
 
@@ -49,8 +49,11 @@ export class DefaultActionExecutor implements ActionExecutor {
   }
 
   async execute(action: string, options?: ActionOptions) {
+    const { enqueue = true, ...opts } = options ?? {};
     try {
-      return this.#enqueue(action, options);
+      return enqueue
+        ? this.#enqueue(action, opts)
+        : this.#execute(action, opts);
     } catch (e) {
       if (typeof e === "string") {
         dialogs.error({
@@ -69,7 +72,7 @@ export class DefaultActionExecutor implements ActionExecutor {
         // we may not need `sync` now
         if (x === "sync") {
           console.warn(
-            `We don't need "sync" action now, remove it from: ${action}`
+            `We don't need "sync" action now, remove it from: ${action}`,
           );
           return false;
         }
@@ -275,12 +278,12 @@ export class DefaultActionExecutor implements ActionExecutor {
         const confirmed = await dialogs.confirm({
           title: i18n.get("Download"),
           content: i18n.get(
-            "Report attached to current object. Would you like to download?"
+            "Report attached to current object. Would you like to download?",
           ),
         });
 
         if (confirmed) {
-          var url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
+          const url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
           return download(url, data.attached.fileName);
         }
         return;

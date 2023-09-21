@@ -334,7 +334,7 @@ const FormContainer = memo(function FormContainer({
 
         if (action && (!isNew || isNewFromUnsaved)) {
           // execute action
-          await actionExecutor.execute(action);
+          await actionExecutor.execute(action, { enqueue: false });
 
           // fix undefined values set by action
           let { record: current, original = {} } = get(formAtom);
@@ -486,26 +486,28 @@ const FormContainer = memo(function FormContainer({
     }
   }, [onSave]);
 
-  const onRefresh = useAtomCallback(
+  const reload = useAtomCallback(
     useCallback(
       async (get) => {
         const id = get(formAtom).record.id ?? 0;
         if (id <= 0) {
           return onNew();
         }
-        showConfirmDirty(
-          async () => isDirty,
-          async () => {
-            const rec = await doRead(id);
-            await doEdit(rec);
-          },
-        );
+        const rec = await doRead(id);
+        await doEdit(rec);
       },
-      [doEdit, doRead, formAtom, isDirty, onNew, showConfirmDirty],
+      [doEdit, doRead, formAtom, onNew],
     ),
   );
 
-  actionHandler.setRefreshHandler(onRefresh);
+  const onRefresh = useCallback(async () => {
+    await showConfirmDirty(
+      async () => isDirty,
+      async () => reload(),
+    );
+  }, [isDirty, reload, showConfirmDirty]);
+
+  actionHandler.setRefreshHandler(reload);
   actionHandler.setSaveHandler(
     useCallback(
       async (record?: DataRecord) => {
