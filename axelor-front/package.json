@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@axelor/ui": "^0.0.15",
-    "@babel/standalone": "^7.22.15",
+    "@babel/standalone": "^7.22.20",
     "@monaco-editor/react": "^4.5.2",
     "bootstrap-icons": "^1.11.1",
     "bootstrap-sass": "2.3.2",

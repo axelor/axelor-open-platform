@@ -17,8 +17,8 @@ dependencies:
     specifier: ^0.0.15
     version: 0.0.15(@types/node@20.5.9)(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
   '@babel/standalone':
-    specifier: ^7.22.15
-    version: 7.22.15
+    specifier: ^7.22.20
+    version: 7.22.20
   '@monaco-editor/react':
     specifier: ^4.5.2
     version: 4.5.2(monaco-editor@0.43.0)(react-dom@18.2.0)(react@18.2.0)
@@ -422,8 +422,8 @@ packages:
     dependencies:
       regenerator-runtime: 0.14.0
 
-  /@babel/standalone@7.22.15:
-    resolution: {integrity: sha512-8qE83Gths6g29KOpYF9uaFPOXa3oaFF1/88ejKwgkGAZRIkdmoR/jPIzVviAsWNSaZdIdMLWwKSoXpuk9iNGmw==}
+  /@babel/standalone@7.22.20:
+    resolution: {integrity: sha512-1W+v64N5c4yEQH1WZDGTzChpxfJ23QjmeH6qPT8CSqLV1kwKkpajMSK/xpD2aQkvy+Hfw4WaMMOhSMQtMC+PNw==}
     engines: {node: '>=6.9.0'}
     dev: false
 
