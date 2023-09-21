@@ -1,11 +1,12 @@
 import get from "lodash/get";
+import isEmpty from "lodash/isEmpty";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
-import format, { getJSON } from "@/utils/format";
+import format from "@/utils/format";
 import { ActionOptions } from "@/view-containers/action";
 
 export type ScriptContextOptions = {
@@ -32,6 +33,8 @@ export function createScriptContext(
     helpers: moreHelpers = {},
   } = options ?? {};
 
+  const noFields = isEmpty(fields);
+
   const { $getField } = moreHelpers;
 
   const helpers = {
@@ -52,11 +55,13 @@ export function createScriptContext(
       if (value === undefined) {
         const dotIndex = path.indexOf(".");
         const key = path.substring(0, dotIndex);
-        const subPath = path.substring(dotIndex + 1);
-        const jsonText = context[key];
-        if (typeof jsonText === "string") {
-          const json = getJSON(jsonText);
-          return get(json, subPath);
+        if (isJsonField(key)) {
+          const subPath = path.substring(dotIndex + 1);
+          const jsonText = context[key];
+          const json = tryJson(jsonText);
+          if (json) {
+            return get(json, subPath);
+          }
         }
       }
       return value;
@@ -173,12 +178,26 @@ export function createScriptContext(
 
   type Context = DataContext & typeof helpers;
 
+  function isJsonField(name: string) {
+    return noFields || (fields[name]?.json ?? false);
+  }
+
   function isJsonValue(value: unknown): value is string {
     if (typeof value === "string") {
       const text = value.trim();
       return text.startsWith("{") && text.endsWith("}");
     }
     return false;
+  }
+
+  function tryJson(value: unknown) {
+    if (isJsonValue(value)) {
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        // Ignore
+      }
+    }
   }
 
   return new Proxy<Context>(context as any, {
@@ -190,9 +209,9 @@ export function createScriptContext(
       }
       if (value === undefined && typeof p === "string" && p.startsWith("$")) {
         const key = p.substring(1);
-        const jsonText = target[key];
-        if (isJsonValue(jsonText)) {
-          const json = getJSON(jsonText);
+        if (isJsonField(key)) {
+          const jsonText = target[key];
+          const json = tryJson(jsonText);
           if (json) {
             return json;
           }
