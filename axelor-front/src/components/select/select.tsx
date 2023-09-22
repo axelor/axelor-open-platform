@@ -49,6 +49,7 @@ export const Select = forwardRef(function Select<
     onShowSelect,
     onInputChange,
     onOpen,
+    openOnFocus = true,
     value = null,
     onChange,
     ...selectProps
@@ -146,6 +147,7 @@ export const Select = forwardRef(function Select<
       value={value}
       autoFocus={autoFocus}
       readOnly={readOnly}
+      openOnFocus={openOnFocus}
       options={fetchOptions ? items : options}
       customOptions={customOptions}
       onInputChange={handleInputChange}
