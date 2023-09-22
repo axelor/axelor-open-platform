@@ -50,7 +50,7 @@ export function Text({
   return (
     <FieldControl {...props}>
       {readonly ? (
-        <Input as="pre" bg={theme === "dark" ? "body" : "light"}>
+        <Input as="pre" bg={theme === "dark" ? "body" : "light"} mb={0}>
           {value}
         </Input>
       ) : (
