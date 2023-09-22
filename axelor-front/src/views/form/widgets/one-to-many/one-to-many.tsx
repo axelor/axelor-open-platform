@@ -587,6 +587,12 @@ export function OneToMany({
     }
   }, [dataStore, selected, setValue]);
 
+  const onSaveRecord = useCallback(async (record: DataRecord) => {
+    const fieldList = Object.keys(viewData?.fields ?? fields);
+    const res = await dataStore.save(record, { fields: fieldList });
+    return res && onSave(res)
+  }, [viewData?.fields, fields, dataStore, onSave]);
+
   useAsyncEffect(async () => {
     if (!detailMeta || recordId === selected?.id) return;
     fetchAndSetDetailRecord(selected);
@@ -705,7 +711,7 @@ export function OneToMany({
             onEdit={canEdit ? onEdit : canView ? onView : noop}
             onView={canView ? (canEdit ? onEdit : onView) : noop}
             onUpdate={onSave}
-            onSave={onSave}
+            onSave={isManyToMany ? onSaveRecord : onSave}
             onSearch={onSearch}
             onRowReorder={onRowReorder}
             {...(!canNew &&
@@ -730,7 +736,7 @@ export function OneToMany({
                   record={detailRecord}
                   formAtom={gridRef.current?.form?.current?.formAtom}
                   onClose={onCloseInDetail}
-                  onSave={onSave}
+                  onSave={isManyToMany ? onSaveRecord : onSave}
                   {...(canNew && { onNew: onAddInDetail })}
                 />
               </ScopeProvider>
