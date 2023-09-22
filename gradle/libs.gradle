@@ -22,7 +22,7 @@ versions.junit5 = "5.9.3"
 
 versions.slf4j = "2.0.9"
 
-versions.tomcat = "9.0.76"
+versions.tomcat = "9.0.80"
 versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.5"
