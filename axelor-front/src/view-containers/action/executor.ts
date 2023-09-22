@@ -52,12 +52,14 @@ export class DefaultActionExecutor implements ActionExecutor {
     const { enqueue = true, ...opts } = options ?? {};
     try {
       return enqueue
-        ? this.#enqueue(action, opts)
-        : this.#execute(action, opts);
+        ? await this.#enqueue(action, opts)
+        : await this.#execute(action, opts);
     } catch (e) {
-      if (typeof e === "string") {
+      const message =
+        typeof e === "string" ? e : e instanceof Error ? e.message : null;
+      if (message) {
         dialogs.error({
-          content: e,
+          content: message,
         });
       }
       return Promise.reject(e);
