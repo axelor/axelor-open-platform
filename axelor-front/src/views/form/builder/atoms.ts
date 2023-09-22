@@ -5,10 +5,10 @@ import { SetStateAction } from "react";
 
 import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
 import { ActionExecutor } from "@/view-containers/action";
 
-import { ViewData } from "@/services/client/meta";
 import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
 import { defaultAttrs, processContextValues } from "./utils";
 
@@ -127,7 +127,8 @@ export function createValueAtom({
   dirtyAtom: PrimitiveAtom<boolean>;
   actionExecutor: ActionExecutor;
 }) {
-  const { name, jsonField, jsonPath, onChange, $json } = schema;
+  const { name, editable, jsonField, jsonPath, readonly, onChange, $json } =
+    schema;
 
   const triggerOnChange = () => {
     onChange &&
@@ -145,7 +146,9 @@ export function createValueAtom({
       if (attrs && typeof attrs === "string") {
         try {
           return JSON.parse(attrs);
-        } catch {}
+        } catch {
+          return {};
+        }
       }
       return {};
     };
@@ -174,14 +177,21 @@ export function createValueAtom({
           dirty && set(dirtyAtom, true);
           fireOnChange && triggerOnChange();
         }
-      }
+      },
     );
   }
+
+  // special case for editable grid form
+  const lensDottedAtom =
+    editable && readonly && name?.includes(".")
+      ? focusAtom(formAtom, (o) => o.prop("record").prop(name))
+      : null;
 
   const lensAtom = focusAtom(formAtom, (o) => {
     let lens = o.prop("record");
     if (name) {
-      let path = name.split(".");
+      const path = name.split(".");
+
       let next = path.shift();
       while (next) {
         lens = lens.reread((v) => v || {});
@@ -192,8 +202,12 @@ export function createValueAtom({
     }
     return lens;
   });
+
   return atom(
-    (get) => get(lensAtom) as any,
+    (get) => {
+      const value = get(lensAtom);
+      return (value ?? (lensDottedAtom ? get(lensDottedAtom) : value)) as any
+    },
     (
       get,
       set,
