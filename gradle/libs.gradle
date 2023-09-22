@@ -115,7 +115,7 @@ libs.infinispan = [
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
-libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.8.0") {
+libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.9.0") {
     exclude group: 'org.slf4j', module: 'slf4j-api'
 }
 
