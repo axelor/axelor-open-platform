@@ -477,6 +477,17 @@ function GridInner(props: ViewProps<GridView>) {
     initDetailsRef.current = true;
   }, [selectedDetail?.id, detailsMeta, dataStore]);
 
+  useAsyncEffect(async () => {
+    if (
+      action.context?._showSingle &&
+      !viewProps?.showSingle &&
+      records.length === 1
+    ) {
+      setViewProps((props) => ({ ...props, showSingle: true }));
+      onEdit(records[0], true);
+    }
+  }, [records, onEdit, action]);
+
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
 

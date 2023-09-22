@@ -41,6 +41,7 @@ export type TabProps = {
   name?: string;
   readonly?: boolean;
   recordId?: boolean;
+  showSingle?: boolean;
 };
 
 /**
@@ -303,7 +304,7 @@ export async function initTab(
     tab?: boolean;
   }
 ) {
-  const { route, props, tab: initAsTab } = options ?? {};
+  const { route: initRoute, props, tab: initAsTab } = options ?? {};
   const actionName = viewName(view);
   const actionView =
     typeof view === "object" && view.views?.length
@@ -311,10 +312,17 @@ export async function initTab(
       : await findActionView(actionName);
 
   if (actionView) {
-    const { name: id, title } = actionView;
+    const { name: id, title, context } = actionView;
 
     const defaultType = getDefaultViewType(actionView);
     const type = getViewType(options?.type ?? defaultType);
+    const route = context?._showRecord
+      ? {
+          ...initRoute,
+          mode: "edit",
+          id: context?._showRecord,
+        }
+      : initRoute;
     const initState = updateTabState(id, { type, title }, { route, props });
 
     const tabAtom = atom<TabState>(initState);
