@@ -99,28 +99,34 @@ export function DateComponent({
     }
   }, []);
 
-  const handleClose = useCallback(
-    (focus?: boolean) => {
-      setOpen(false);
-      focus === true && focusInput(getInput());
-    },
-    [getInput]
-  );
-
   const handleBlur = useCallback(
-    (e: FocusEvent<HTMLInputElement>) => {
+    (e?: FocusEvent<HTMLInputElement>) => {
       if (changed) {
-        const value = e?.target?.value || null;
-        onChange(
-          value && moment(value, format).isValid()
-            ? moment(value, format).format(valueFormat)
-            : null,
-          true
-        );
+        let val = value ?? null;
+        if (e) {
+          const targetValue = e.target?.value ?? null;
+          val =
+            targetValue && moment(targetValue, format).isValid()
+              ? moment(targetValue, format).format(valueFormat)
+              : null;
+        }
+        onChange(val, true);
         setChanged(false);
       }
     },
-    [changed, format, valueFormat, onChange]
+    [changed, value, onChange, format, valueFormat]
+  );
+
+  const handleClose = useCallback(
+    (focus?: boolean) => {
+      setOpen(false);
+      if (focus) {
+        focusInput(getInput());
+      } else {
+        handleBlur();
+      }
+    },
+    [getInput, handleBlur]
   );
 
   const handleClickOutSide = useCallback(
