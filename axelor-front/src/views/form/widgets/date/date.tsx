@@ -26,7 +26,7 @@ import { TimeInput } from "./time-input";
 
 function focusInput(inputEl?: HTMLElement) {
   let input = inputEl && inputEl.querySelector("input,textarea");
-  if (!input && ["INPUT", "TEXTAREA"].includes(inputEl?.tagName!)) {
+  if (!input && ["INPUT", "TEXTAREA"].includes(inputEl?.tagName ?? "")) {
     input = inputEl;
   }
   input && (input as HTMLInputElement).focus();
@@ -65,7 +65,9 @@ export function DateComponent({
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
 
-  const type = (schema.widget || schema.serverType || schema.type)!;
+  const type =
+    (schema.widget || schema.serverType || schema.type)?.toLowerCase() ?? "";
+  const isDateTime = type !== "date";
   const dateFormats = useMemo<Record<string, string[]>>(
     () => ({
       datetime: [
@@ -77,8 +79,7 @@ export function DateComponent({
     }),
     [schema]
   );
-  const [valueFormat, format] =
-    dateFormats[type?.toLowerCase()] || dateFormats.date;
+  const [valueFormat, format] = dateFormats[type] || dateFormats.date;
 
   const getInput = useCallback(() => {
     const calendar = pickerRef.current;
@@ -150,17 +151,26 @@ export function DateComponent({
   }, [handleClose]);
 
   const handleChange = useCallback(
-    (value: Date | null, event: SyntheticEvent) => {
+    (newValue: Date | string | null, event: SyntheticEvent) => {
+      if (
+        (event?.target as HTMLElement)?.className ===
+        "react-datepicker__now-button"
+      ) {
+        newValue = moment().format(valueFormat);
+        if (newValue === value) return;
+      }
+
       const callOnChange = event?.type === "click" ? true : false;
+
       onChange(
-        value && moment(value).isValid()
-          ? moment(value).format(valueFormat)
+        newValue && moment(newValue).isValid()
+          ? moment(newValue).format(valueFormat)
           : null,
         callOnChange
       );
       setChanged(!callOnChange);
     },
-    [valueFormat, onChange]
+    [onChange, valueFormat, value]
   );
 
   const dateValue = useMemo(
@@ -179,7 +189,15 @@ export function DateComponent({
           id={uid}
           showMonthDropdown
           showYearDropdown
-          todayButton={i18n.get("Today")}
+          todayButton={
+            isDateTime ? (
+              <Box className={classNames("react-datepicker__now-button")}>
+                {i18n.get("Now")}
+              </Box>
+            ) : (
+              i18n.get("Today")
+            )
+          }
           className={classNames("form-control")}
           placeholderText={placeholder}
           showPopperArrow={false}
@@ -207,7 +225,7 @@ export function DateComponent({
               </Box>
             ) as any
           }
-          showTimeInput={type?.toLowerCase() !== "date"}
+          showTimeInput={isDateTime}
           customTimeInput={<TimeInput format={format} />}
           onSelect={handleSelect}
           onChange={handleChange}
