@@ -43,13 +43,14 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { useActionExecutor, useWaitForActions } from "../../builder/scope";
+import {
+  useActionExecutor,
+  useAfterActions
+} from "../../builder/scope";
 import { nextId } from "../../builder/utils";
-
 import { download } from "@/utils/download";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
-
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
@@ -213,60 +214,55 @@ export function OneToMany({
     });
   }, [setState]);
 
-  const doSearch = useCallback(
-    async (options?: SearchOptions) => {
-      // avoid search for internal value changes
-      if (!shouldSearch.current) {
-        shouldSearch.current = true;
-        return;
-      }
-      const ids = (value || [])
-        .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
-        .map((v) => v.id);
-      const changedRecords = (value || []).filter(
-        ({ id }) => !ids.includes(id),
-      );
+  const onSearch = useAfterActions(
+    useCallback(
+      async (options?: SearchOptions) => {
+        // avoid search for internal value changes
+        if (!shouldSearch.current) {
+          shouldSearch.current = true;
+          return;
+        }
+        const ids = (value || [])
+          .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
+          .map((v) => v.id);
+        const changedRecords = (value || []).filter(
+          ({ id }) => !ids.includes(id),
+        );
 
-      let records: DataRecord[] = [];
-      let page = dataStore.page;
+        let records: DataRecord[] = [];
+        let page = dataStore.page;
 
-      if (ids.length > 0) {
-        const res = await dataStore.search({
-          ...options,
-          limit: -1,
-          offset: 0,
-          sortBy: sortBy?.split?.(","),
-          filter: {
-            ...options?.filter,
-            _archived: true,
-            _domain: "self.id in (:_ids)",
-            _domainContext: {
-              id: parentId,
-              _field: name,
-              _model: model,
-              _ids: ids as number[],
+        if (ids.length > 0) {
+          const res = await dataStore.search({
+            ...options,
+            limit: -1,
+            offset: 0,
+            sortBy: sortBy?.split?.(","),
+            filter: {
+              ...options?.filter,
+              _archived: true,
+              _domain: "self.id in (:_ids)",
+              _domainContext: {
+                id: parentId,
+                _field: name,
+                _model: model,
+                _ids: ids as number[],
+              },
             },
-          },
-        });
-        page = res.page;
-        records = res.records;
-      }
+          });
+          page = res.page;
+          records = res.records;
+        }
 
-      setRecords([...records, ...changedRecords]);
+        setRecords([...records, ...changedRecords]);
 
-      return {
-        page,
-        records,
-      } as SearchResult;
-    },
-    [value, sortBy, name, model, parentId, dataStore],
-  );
-
-  const waitForActions = useWaitForActions();
-
-  const onSearch = useCallback(
-    async (options?: SearchOptions) => waitForActions(() => doSearch(options)),
-    [doSearch, waitForActions],
+        return {
+          page,
+          records,
+        } as SearchResult;
+      },
+      [value, sortBy, name, model, parentId, dataStore],
+    ),
   );
 
   const onExport = useCallback(async () => {

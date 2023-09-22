@@ -590,32 +590,41 @@ export function useActionExecutor(
   return actionExecutor;
 }
 
-export function useWaitForActions() {
+/**
+ * A hook to execute the callback after all the actions are executed.
+ *
+ * @param callback a stable callback (prefer using `useCallback`)
+ * @returns a debounced callback that only executes after all the actions are completed
+ */
+export function useAfterActions<Type, Args extends Array<unknown>>(
+  callback: (...args: Args) => Promise<Type>,
+) {
   const { actionExecutor } = useFormScope();
-  const waiting = useRef<Promise<unknown> | null>(null);
-  const taskRef = useRef<(() => Promise<unknown>) | null>(null);
 
-  const waitForActions = useCallback(
-    async function waitForActions<T>(task: () => Promise<T>): Promise<T> {
-      taskRef.current = task;
-      if (waiting.current) return waiting.current as Promise<T>;
-      const promise = new Promise<T>((resolve, reject) => {
+  const waiting = useRef<Promise<Type> | null>(null);
+  const callbackRef = useRef<((...args: Args) => Promise<Type>) | null>(null);
+
+  return useCallback(
+    async (...params: Args): Promise<Type> => {
+      callbackRef.current = callback;
+      if (waiting.current) return waiting.current;
+      const promise = new Promise<Type>((resolve, reject) => {
         actionExecutor
           .wait()
-          .then(() => taskRef.current?.() as Promise<T>)
+          .then(() => callbackRef.current!(...params))
           .then(resolve)
           .catch(reject)
           .finally(() => {
-            taskRef.current = null;
+            callbackRef.current = null;
             waiting.current = null;
           });
       });
       waiting.current = promise;
+      callbackRef.current = callback;
       return promise;
     },
-    [actionExecutor],
+    [actionExecutor, callback],
   );
-  return waitForActions;
 }
 
 export function ActionDataHandler({ formAtom }: { formAtom: FormAtom }) {
@@ -643,28 +652,26 @@ export function FormRecordUpdates({
   );
   const { action } = useViewTab();
 
-  const waitForActions = useWaitForActions();
-
-  useAsyncEffect(
-    () =>
-      waitForActions(async () => {
-        if (isEqual(recordRef.current, record)) return;
-        recordRef.current = record;
-        recordHandler.notify(
-          createEvalContext(
-            {
-              ...action.context,
-              ...record,
-            },
-            {
-              fields: fields as unknown as EvalContextOptions["fields"],
-              readonly,
-            },
-          ),
-        );
-      }),
-    [record, recordHandler, fields, readonly, action.context],
+  const notify = useAfterActions(
+    useCallback(async () => {
+      if (isEqual(recordRef.current, record)) return;
+      recordRef.current = record;
+      recordHandler.notify(
+        createEvalContext(
+          {
+            ...action.context,
+            ...record,
+          },
+          {
+            fields: fields as unknown as EvalContextOptions["fields"],
+            readonly,
+          },
+        ),
+      );
+    }, [action.context, fields, readonly, record, recordHandler]),
   );
+
+  useAsyncEffect(notify);
 
   return null;
 }

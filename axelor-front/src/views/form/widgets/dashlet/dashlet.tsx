@@ -20,7 +20,7 @@ import { Views } from "@/view-containers/views";
 import { useViewTab } from "@/view-containers/views/scope";
 
 import { Attrs, WidgetProps, usePrepareContext } from "../../builder";
-import { useWaitForActions } from "../../builder/scope";
+import { useAfterActions } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 
 import classes from "./dashlet.module.scss";
@@ -53,10 +53,9 @@ export function DashletComponent({
 }: DashletProps): any {
   const { title, action, canSearch, widgetAttrs } = schema;
   const height = schema.height ?? widgetAttrs?.height;
-  const waitForActions = useWaitForActions();
 
-  const { data: tab, state } = useAsync<Tab | null>(async () => {
-    return waitForActions(async () => {
+  const load = useAfterActions(
+    useCallback(async () => {
       const context = getContext?.();
       const actionView = await findActionView(action, context);
       const ctx = {
@@ -78,8 +77,10 @@ export function DashletComponent({
           _domainAction: action,
         },
       });
-    });
-  }, [action, dashboard, canSearch, getContext]);
+    }, [action, canSearch, dashboard, getContext]),
+  );
+
+  const { data: tab, state } = useAsync(load, [load]);
 
   const setTabViewProps = useAtomCallback(
     useCallback(
@@ -174,11 +175,11 @@ export function DashletComponent({
 
 function DashletRefresh({ count }: { count: number }) {
   const { onRefresh } = useAtomValue(useDashletHandlerAtom());
-  const waitForActions = useWaitForActions();
+  const doRefresh = useAfterActions(async () => onRefresh?.());
 
   useAsyncEffect(async () => {
-    if (count && onRefresh) {
-      waitForActions(onRefresh);
+    if (count) {
+      doRefresh();
     }
   }, [count, onRefresh]);
 

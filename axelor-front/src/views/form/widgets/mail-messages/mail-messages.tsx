@@ -7,7 +7,7 @@ import { useTags } from "@/hooks/use-tags";
 import { useViewAction } from "@/view-containers/views/scope";
 
 import { WidgetProps } from "../../builder";
-import { useWaitForActions, useFormRefresh } from "../../builder/scope";
+import { useAfterActions, useFormRefresh } from "../../builder/scope";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
 import { DataSource } from "./utils";
@@ -61,8 +61,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const folder = isMessageBox ? name.split(".").pop() : "";
   const hasMessages = isMessageBox || (recordId ?? 0) > 0;
 
-  const waitForActions = useWaitForActions();
-
+  const fetchMessages = useAfterActions(findMessages);
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
       if (!hasMessages) return;
@@ -71,13 +70,11 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       const {
         data,
         pageInfo: { totalRecords, hasNextPage },
-      } = await waitForActions(() =>
-        findMessages(recordId as number, model, {
-          folder,
-          type: filter,
-          ...options,
-        }),
-      );
+      } = await fetchMessages(recordId as number, model, {
+        folder,
+        type: filter,
+        ...options,
+      });
 
       if (parent) {
         setMessages((msgs) => {

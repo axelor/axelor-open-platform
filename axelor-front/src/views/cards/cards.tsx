@@ -28,7 +28,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
-import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
+import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -81,49 +81,45 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [view.width]);
 
-  const doSearch = useAtomCallback(
-    useCallback(
-      (get, set, options: Partial<SearchOptions> = {}) => {
-        const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
-        const names = Object.keys(fields ?? {});
+  const onSearch = useAfterActions(
+    useAtomCallback(
+      useCallback(
+        (get, set, options: Partial<SearchOptions> = {}) => {
+          const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
+          const names = Object.keys(fields ?? {});
 
-        if (dashlet) {
-          const { _domainAction, ...formContext } = getViewContext() ?? {};
-          const { _domainContext } = filter;
-          filter._domainContext = {
-            ..._domainContext,
-            ...formContext,
-          };
-          filter._domainAction = _domainAction;
-        }
-        return dataStore.search({
-          filter,
-          fields: names,
-          ...options,
-        });
-      },
-      [dataStore, fields, dashlet, searchAtom, getViewContext],
+          if (dashlet) {
+            const { _domainAction, ...formContext } = getViewContext() ?? {};
+            const { _domainContext } = filter;
+            filter._domainContext = {
+              ..._domainContext,
+              ...formContext,
+            };
+            filter._domainAction = _domainAction;
+          }
+          return dataStore.search({
+            filter,
+            fields: names,
+            ...options,
+          });
+        },
+        [dataStore, fields, dashlet, searchAtom, getViewContext],
+      ),
     ),
   );
 
-  const waitForActions = useWaitForActions();
-
-  const onSearch = useCallback(
-    async (options: Partial<SearchOptions> = {}) => {
-      return dashlet
-        ? waitForActions(() => doSearch(options))
-        : doSearch(options);
-    },
-    [dashlet, doSearch, waitForActions],
+  const getActionData = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
+        return {
+          ...dataStore.options?.filter,
+          ...filter,
+        };
+      },
+      [dataStore, searchAtom],
+    ),
   );
-
-  const getActionData = useAtomCallback(useCallback((get) => {
-    const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
-    return {
-      ...dataStore.options?.filter,
-      ...filter,
-    }; 
-  }, [dataStore, searchAtom]));
 
   const records = useDataStore(dataStore, (ds) => ds.records);
   const Template = useViewTemplate(view, fields);

@@ -25,7 +25,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewContext, useViewTab } from "@/view-containers/views/scope";
 
-import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
+import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 import { Node as NodeComponent, NodeProps } from "./renderers/node";
 import {
@@ -131,7 +131,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     });
   }, [view]);
 
-  const doSearch = useCallback(
+  const onSearch = useAfterActions(useCallback(
     async (options: Partial<SearchOptions> = {}) => {
       if (dataStore) {
         const { nodes } = view;
@@ -161,18 +161,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       }
     },
     [dataStore, view, isSameModelTree, getSearchOptions, getContext],
-  );
-
-  const waitForActions = useWaitForActions();
-
-  const onSearch = useCallback(
-    async (options: Partial<SearchOptions> = {}) => {
-      return dashlet
-        ? waitForActions(() => doSearch(options))
-        : doSearch(options);
-    },
-    [dashlet, doSearch, waitForActions],
-  );
+  ));
 
   const onSearchNode = useCallback(
     async (treeNode: TreeRecord) => {

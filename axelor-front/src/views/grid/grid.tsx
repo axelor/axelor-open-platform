@@ -45,7 +45,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { useActionExecutor, useWaitForActions } from "../form/builder/scope";
+import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
@@ -195,29 +195,20 @@ function GridInner(props: ViewProps<GridView>) {
     };
   }, [dataStore, getSearchOptions]);
 
-  const doSearch = useCallback(
-    (options: SearchOptions = {}) => {
-      if (cacheDataRef.current) {
-        cacheDataRef.current = false;
-        const { records, page } = dataStore;
-        if (isEqual(dataStore.options?.fields, options.fields)) {
-          return Promise.resolve({ records, page } as SearchResult);
+  const onSearch = useAfterActions(
+    useCallback(
+      (options: SearchOptions = {}) => {
+        if (cacheDataRef.current) {
+          cacheDataRef.current = false;
+          const { records, page } = dataStore;
+          if (isEqual(dataStore.options?.fields, options.fields)) {
+            return Promise.resolve({ records, page } as SearchResult);
+          }
         }
-      }
-      return dataStore.search(getSearchOptions(options));
-    },
-    [dataStore, getSearchOptions],
-  );
-
-  const waitForActions = useWaitForActions();
-
-  const onSearch = useCallback(
-    async (options: SearchOptions = {}) => {
-      return dashlet
-        ? waitForActions(() => doSearch(options))
-        : doSearch(options);
-    },
-    [dashlet, doSearch, waitForActions],
+        return dataStore.search(getSearchOptions(options));
+      },
+      [dataStore, getSearchOptions],
+    ),
   );
 
   const onMassUpdate = useCallback(

@@ -10,7 +10,7 @@ import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 
 import { WidgetProps } from "../../builder";
-import { useWaitForActions, useFormRefresh } from "../../builder/scope";
+import { useAfterActions, useFormRefresh } from "../../builder/scope";
 import { MessageUser } from "../mail-messages/message";
 import { useMessagePopup } from "../mail-messages/message/message-form";
 import { Message } from "../mail-messages/message/types";
@@ -22,10 +22,9 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   const [followers, setFollowers] = useState<Follower[]>([]);
   const { data: session } = useSession();
   const { model, modelId } = schema;
+
+  const loadFollowers = useAfterActions(getFollowers);
   const showMessagePopup = useMessagePopup();
-
-  const waitForActions = useWaitForActions();
-
   const getRecordTitle = useAtomCallback(
     useCallback(
       (get) => {
@@ -40,9 +39,9 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
   );
 
   const onRefresh = useCallback(async () => {
-    const list = await waitForActions(() => getFollowers(model, modelId));
+    const list = await loadFollowers(model, modelId);
     setFollowers(list);
-  }, [model, modelId, waitForActions]);
+  }, [loadFollowers, model, modelId]);
 
   useAsyncEffect(async () => {
     onRefresh();
