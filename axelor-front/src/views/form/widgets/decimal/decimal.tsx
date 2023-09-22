@@ -20,7 +20,7 @@ const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
-  const { uid, min, max, placeholder, nullable } = schema;
+  const { uid, minSize: min, maxSize: max, placeholder, nullable } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale: scaleAttr } = attrs;
 
@@ -98,8 +98,8 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
-    if (min && value < min) return min;
-    if (max && value > max) return max;
+    if (min && Number(value) < Number(min)) return min;
+    if (max && Number(value) > Number(max)) return max;
     return value;
   }, []);
 
