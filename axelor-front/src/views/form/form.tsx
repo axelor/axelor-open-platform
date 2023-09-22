@@ -643,7 +643,7 @@ const FormContainer = memo(function FormContainer({
           rec = record;
         }
         const recId = rec.id ?? 0;
-        const isNew = !(recId > 0);
+        const isNew = !(recId > 0 || record._dirty);
         const action = isNew ? onNewAction : onLoadAction;
 
         if (copyRecordRef.current) {
