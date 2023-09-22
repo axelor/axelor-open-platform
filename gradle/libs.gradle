@@ -156,8 +156,8 @@ libs.resteasy_guice = resteasy_module("resteasy-guice")
 libs.resteasy_client = resteasy_module("resteasy-client");
 libs.resteasy_server = [
   "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
-  "io.undertow:undertow-core:2.2.25.Final",
-  "io.undertow:undertow-servlet:2.2.25.Final"
+  "io.undertow:undertow-core:2.2.26.Final",
+  "io.undertow:undertow-servlet:2.2.26.Final"
 ]
 
 // jackson
