@@ -828,6 +828,7 @@ const FormContainer = memo(function FormContainer({
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          formAtom={formAtom}
           actionExecutor={actionExecutor}
           recordHandler={recordHandler}
           actions={[

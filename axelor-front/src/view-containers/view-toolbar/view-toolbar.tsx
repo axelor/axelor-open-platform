@@ -1,5 +1,7 @@
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { focusAtom } from "jotai-optics";
+import { useAtom, useAtomValue } from "jotai";
 
 import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
@@ -32,14 +34,15 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { RecordHandler } from "@/views/form/builder";
-import { useAtom } from "jotai";
+import { FormAtom, RecordHandler, WidgetState } from "@/views/form/builder";
+import { fallbackFormAtom } from "@/views/form/builder/atoms";
 import { ActionExecutor } from "../action";
 
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
+  formAtom?: FormAtom;
   actionExecutor?: ActionExecutor;
   recordHandler?: RecordHandler;
   children?: React.ReactNode;
@@ -67,19 +70,37 @@ const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
 };
 
 function ActionCommandItem({
+  formAtom = fallbackFormAtom,
   recordHandler,
+  name,
   showIf,
   hideIf,
   readonlyIf,
   ...props
 }: CommandItemProps &
-  Pick<ViewToolBarProps, "recordHandler"> &
-  Pick<Widget, "showIf" | "hideIf" | "readonlyIf">) {
+  Pick<ViewToolBarProps, "formAtom" | "recordHandler"> &
+  Pick<Widget, "name" | "showIf" | "hideIf" | "readonlyIf">) {
   const [hidden, setHidden] = useState<boolean | undefined>(props.hidden);
   const [readonly, setReadonly] = useState<boolean>(false);
   const { action } = useViewTab();
+  
+  const attrs = useAtomValue(
+    useMemo(
+      () =>
+        focusAtom(formAtom, (o) =>
+          o
+            .prop("statesByName")
+            .prop(name ?? "__")
+            .valueOr({ name, attrs: {} } as WidgetState)
+            .prop("attrs"),
+        ),
+      [name, formAtom],
+    ),
+  )
 
   useEffect(() => {
+    const hasExpr = showIf || hideIf || readonlyIf;
+    if (!hasExpr) return;
     const updateAttrs = (record: DataRecord) => {
       (showIf || hideIf) &&
         setHidden((hidden) => {
@@ -103,8 +124,11 @@ function ActionCommandItem({
   return (
     <CommandItem
       {...props}
-      hidden={hidden}
-      {...(readonly && { onClick: undefined, disabled: true })}
+      hidden={hidden || attrs?.hidden}
+      {...((readonly || attrs?.readonly) && {
+        onClick: undefined,
+        disabled: true,
+      })}
     />
   );
 }
@@ -122,11 +146,12 @@ function getTextResponsive(item: ToolbarItem) {
 export function ToolbarActions({
   buttons,
   menus,
+  formAtom,
   recordHandler,
   actionExecutor,
   parentRef,
   parentWidth,
-}: Pick<ViewToolBarProps, "actionExecutor" | "recordHandler"> & {
+}: Pick<ViewToolBarProps, "formAtom" | "actionExecutor" | "recordHandler"> & {
   buttons?: Button[];
   menus?: Menu[];
   parentRef?: React.RefObject<HTMLDivElement>;
@@ -188,10 +213,12 @@ export function ToolbarActions({
           ...((item as Menu).items && {
             items: (item as Menu).items?.map(mapItem),
           }),
-          ...(hasExpr && {
+          ...((hasExpr || formAtom) && {
             render: (props) => (
               <ActionCommandItem
                 {...props}
+                formAtom={formAtom}
+                name={item.name}
                 showIf={item.showIf}
                 hideIf={item.hideIf}
                 readonlyIf={item.readonlyIf}
@@ -204,7 +231,7 @@ export function ToolbarActions({
 
       return [...(buttons || []), ...(menus || [])].map(mapItem);
     },
-    [buttons, menus, actionExecutor, recordHandler],
+    [buttons, menus, formAtom, actionExecutor, recordHandler]
   );
 
   const [items, responsiveItems] = useMemo(
@@ -246,6 +273,7 @@ export function ToolbarActions({
 export function ViewToolBar(props: ViewToolBarProps) {
   const {
     meta,
+    formAtom,
     actions = [],
     actionExecutor,
     recordHandler,
@@ -399,6 +427,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
           <ToolbarActions
             buttons={toolbar}
             menus={menubar}
+            formAtom={formAtom}
             actionExecutor={actionExecutor}
             recordHandler={recordHandler}
             parentRef={ref}
