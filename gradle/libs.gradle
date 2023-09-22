@@ -18,7 +18,7 @@ versions.pac4j = "5.7.1"
 versions.ldaptive = "2.1.2"
 
 versions.junit4 = "4.13.2"
-versions.junit5 = "5.9.3"
+versions.junit5 = "5.10.0"
 
 versions.slf4j = "2.0.9"
 
@@ -31,7 +31,7 @@ versions.asm = "9.5"
 libs.junit = "junit:junit:${versions.junit4}"
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
 libs.junit_vintage = "org.junit.vintage:junit-vintage-engine:${versions.junit5}" // junit4 compatibility
-libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.9.3" // for IDE
+libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.10.0" // for IDE
 
 // logging
 libs.slf4j_base = [
