@@ -556,7 +556,7 @@ export function OneToMany({
       const rec =
         selected.id < 0 ? { ...selected } : await dataStore.copy(selected.id);
       const newId = nextId();
-      setValue((values) => [...values, { ...rec, id: newId }]);
+      setValue((values) => [...values, { ...rec, _dirty: true, id: newId }]);
       saveIdRef.current = newId;
     }
   }, [dataStore, selected, setValue]);
