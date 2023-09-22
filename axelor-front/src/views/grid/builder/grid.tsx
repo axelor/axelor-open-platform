@@ -220,7 +220,7 @@ export const Grid = forwardRef<
       }
 
       if (["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "")) {
-        columnProps.$css = legacyClassNames("text-right");
+        columnProps.$css = clsx(styles.number);
       }
 
       if (item.hidden || extraAttrs?.hidden) {
