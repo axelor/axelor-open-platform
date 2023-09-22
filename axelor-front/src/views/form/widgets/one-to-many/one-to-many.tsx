@@ -683,6 +683,7 @@ export function OneToMany({
           onFormInit={forceUpdate}
           onEdit={canEdit ? onEdit : canView ? onView : noop}
           onView={canView ? (canEdit ? onEdit : onView) : noop}
+          onUpdate={onSave}
           onSave={onSave}
           onSearch={onSearch}
           onRowReorder={onRowReorder}

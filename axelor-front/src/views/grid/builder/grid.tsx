@@ -102,6 +102,7 @@ export const Grid = forwardRef<
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
+    onUpdate?: (record: GridRow["record"]) => void;
     onSave?: (record: GridRow["record"]) => void;
     onDiscard?: (record: GridRow["record"]) => void;
   }
@@ -123,6 +124,7 @@ export const Grid = forwardRef<
     onFormInit,
     onSearch,
     onEdit,
+    onUpdate,
     onView,
     onSave,
     onDiscard,
@@ -379,9 +381,15 @@ export const Grid = forwardRef<
   }, [view]);
 
   const CustomCellRenderer = useMemo(
-    () => (props: GridColumnProps) =>
-      <CellRenderer {...props} view={view} actionExecutor={actionExecutor} />,
-    [view, actionExecutor]
+    () => (props: GridColumnProps) => (
+      <CellRenderer
+        {...props}
+        onUpdate={onUpdate}
+        view={view}
+        actionExecutor={actionExecutor}
+      />
+    ),
+    [view, actionExecutor, onUpdate],
   );
 
   const CustomFormRenderer = useMemo(() => {

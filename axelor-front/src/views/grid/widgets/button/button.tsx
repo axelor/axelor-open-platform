@@ -14,7 +14,7 @@ import { createScriptContext } from "@/hooks/use-parser/context";
 import styles from "./button.module.scss";
 
 export function Button(props: GridCellProps) {
-  const { record, data: field, actionExecutor } = props;
+  const { record, data: field, actionExecutor, onUpdate } = props;
   const { onClick } = field as ButtonField;
   const { name, icon, css, help } = field as Field;
   const { context } = useViewAction();
@@ -44,7 +44,7 @@ export function Button(props: GridCellProps) {
   async function handleClick() {
     if (!readonly && onClick && actionExecutor) {
       await actionExecutor.waitFor();
-      await actionExecutor.execute(onClick, {
+      const res = await actionExecutor.execute(onClick, {
         context: {
           ...processContextValues(record),
           selected: true,
@@ -56,6 +56,14 @@ export function Button(props: GridCellProps) {
           }),
         },
       });
+      const values = res?.reduce?.(
+        (obj, { values }) => ({
+          ...obj,
+          ...values,
+        }),
+        {},
+      );
+      Object.keys(values || {}).length && onUpdate?.({ ...record, ...values });
     }
   }
 
