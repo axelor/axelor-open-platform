@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 
 import {
@@ -61,10 +61,13 @@ function isSelected(selection: Selection, value: any) {
 }
 
 export function NavSelect(
-  props: FieldProps<string | number | Record<string, number>>
+  props: FieldProps<string | number | Record<string, number>>,
 ) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, widgetAtom, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
+
+  const { attrs } = useAtomValue(widgetAtom);
+  const { readonly } = attrs;
 
   const selection = useSelectionList({ value, widgetAtom, schema });
   const items: SelectItem[] = useMemo(() => {
@@ -87,12 +90,12 @@ export function NavSelect(
         setValue(selection.value, true);
       }
     },
-    [readonly, schema.serverType, setValue]
+    [readonly, schema.serverType, setValue],
   );
 
   const isItemActive = useCallback(
     ({ selection }: SelectItem) => isSelected(selection, value),
-    [value]
+    [value],
   );
 
   return (
