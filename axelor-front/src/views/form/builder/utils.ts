@@ -11,8 +11,8 @@ import {
 import { toKebabCase, toSnakeCase } from "@/utils/names";
 
 import { MetaData } from "@/services/client/meta";
+import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS } from "./types";
-import { DEFAULT_SCALE, limitScale } from "@/utils/format";
 
 export const nextId = (() => {
   let id = 0;
@@ -181,37 +181,23 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 
   if (res.items) {
     res.items = res.items.map((item) =>
-      processView(item, res.fields ?? fields)
+      processView(item, res.fields ?? fields),
     );
   }
 
   if (Array.isArray(res.jsonFields)) {
     res.jsonFields = res.jsonFields.reduce(
       (prev, field) => ({ ...prev, [field.name!]: field }),
-      {}
+      {},
     );
   }
 
   return res;
 }
 
-export function parseDecimal(value: any, { scale }: Property) {
-  if (scale != null) {
-    const nums = String(value).split(".");
-    // scale the decimal part
-    const limitedScale = limitScale(+scale);
-    const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(limitedScale);
-    // increment the integer part if decimal part is greater than 0 (due to rounding)
-    const num = BigInt(nums[0]) + BigInt(parseInt(dec));
-    // append the decimal part
-    return num + dec.substring(1);
-  }
-  return String(value);
-}
-
 export function getDefaultValues(
   fields?: MetaData["fields"],
-  widgets?: Widget[]
+  widgets?: Widget[],
 ) {
   const defaultJsonFieldValues = getDefaultJsonFieldValues(widgets);
   const defaultFieldValues = getDefaultFieldValues(fields);
@@ -221,26 +207,14 @@ export function getDefaultValues(
 function getDefaultFieldValues(fields?: MetaData["fields"]) {
   const result: DataRecord = Object.entries(fields ?? {}).reduce(
     (acc, [key, field]) => {
-      const { type, defaultValue } = field;
+      const { defaultValue } = field;
       if (defaultValue === undefined || key.includes(".")) {
         return acc;
       }
-      let value;
-      switch (type) {
-        case "DECIMAL":
-          value = parseDecimal(defaultValue, field);
-          break;
-        case "INTEGER":
-        case "LONG":
-          value = parseInt(defaultValue);
-          break;
-        default:
-          value = defaultValue;
-      }
-
+      const value = convert(defaultValue, { props: field });
       return { ...acc, [key]: value };
     },
-    {}
+    {},
   );
   return result;
 }
@@ -266,7 +240,7 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
               type: toSnakeCase(type).toUpperCase(),
               ...rest,
             } as Property,
-          ])
+          ]),
         );
         const defaultValues = getDefaultFieldValues(fields);
         result[name] = JSON.stringify(defaultValues);

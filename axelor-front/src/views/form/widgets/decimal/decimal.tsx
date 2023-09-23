@@ -6,12 +6,12 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Field, Property } from "@/services/client/meta.types";
+import { Field } from "@/services/client/meta.types";
+import convert from "@/utils/convert";
 import format, { DEFAULT_SCALE } from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { parseDecimal } from "../../builder/utils";
 import { ViewerInput } from "../string/viewer";
 
 import styles from "./decimal.module.scss";
@@ -63,15 +63,8 @@ export function Decimal(props: FieldProps<string | number>) {
   const [changed, setChanged] = useState(false);
 
   const parse = useCallback(
-    (value: string | number): string | number => {
-      if (value == null || value === "") {
-        return nullable ? "" : parse("0");
-      }
-      return isDecimal
-        ? parseDecimal(value, { scale } as Property)
-        : parseInt(String(value));
-    },
-    [isDecimal, scale, nullable],
+    (value: string | number) => convert(value, { props: schema }),
+    [schema],
   );
 
   const parsedValue = useMemo(() => parse(value), [parse, value]);
@@ -118,7 +111,7 @@ export function Decimal(props: FieldProps<string | number>) {
       setChanged(true);
       setValue(parse(res));
     },
-    [checkRange, min, max, parse, setValue, value],
+    [checkRange, max, min, parse, setValue, value],
   );
 
   const handleKeyDown = useCallback<
