@@ -4,6 +4,7 @@ import { useCallback, useMemo } from "react";
 
 import { Select, SelectProps, SelectValue } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
+import convert from "@/utils/convert";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useSelectionList } from "./hooks";
@@ -65,11 +66,11 @@ export function Selection<Multiple extends boolean>(
       if (value) {
         next = Array.isArray(value)
           ? value.map((x) => String(x.value)).join(",")
-          : value.value ?? null;
+          : convert(value.value, { props: schema }) ?? null;
       }
       setValue(next, true);
     },
-    [setValue],
+    [schema, setValue],
   );
 
   return (
