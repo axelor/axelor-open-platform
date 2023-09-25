@@ -376,14 +376,18 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onSave = useCallback(
     async (record: DataRecord) => {
-      const saved = await dataStore.save({
-        ...record,
-        ...((record.id || -1) < 0 && { id: undefined }),
-      });
+      const fields = Object.keys(meta.fields ?? {});
+      const saved = await dataStore.save(
+        {
+          ...record,
+          ...((record.id || -1) < 0 && { id: undefined }),
+        },
+        fields.length ? { fields } : {},
+      );
       saved && setDirty(false);
       return saved;
     },
-    [dataStore, setDirty],
+    [dataStore, meta, setDirty],
   );
 
   const onDiscard = useCallback(() => {

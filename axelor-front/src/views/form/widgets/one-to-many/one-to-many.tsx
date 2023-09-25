@@ -589,7 +589,9 @@ export function OneToMany({
 
   const onSaveRecord = useCallback(async (record: DataRecord) => {
     const fieldList = Object.keys(viewData?.fields ?? fields);
-    const res = await dataStore.save(record, { fields: fieldList });
+    const res = await dataStore.save(record, {
+      fields: fieldList,
+    });
     return res && onSave(res)
   }, [viewData?.fields, fields, dataStore, onSave]);
 
