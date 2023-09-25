@@ -24,6 +24,7 @@ import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 import { FieldProps, usePrepareContext } from "../../builder";
+import { nextId } from "../../builder/utils";
 import styles from "./one-to-many.edit.module.scss";
 
 export function OneToManyEdit({
@@ -43,7 +44,7 @@ export function OneToManyEdit({
             get,
             set,
             setter: SetStateAction<DataRecord[]>,
-            callOnChange: boolean = true
+            callOnChange: boolean = true,
           ) => {
             const values =
               typeof setter === "function"
@@ -58,12 +59,12 @@ export function OneToManyEdit({
                   : null;
                 if (rec) return { ...rec, ...val };
                 return val;
-              })
+              }),
             );
-          }
+          },
         ),
-      [valueAtom]
-    )
+      [valueAtom],
+    ),
   );
 
   const showSelector = useSelector();
@@ -92,7 +93,7 @@ export function OneToManyEdit({
   } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
   const getContext = usePrepareContext(formAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
@@ -116,6 +117,8 @@ export function OneToManyEdit({
   const onSearch = useCallback(
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
+      const unsaved = (value || []).filter((x) => !ids.includes(x.id));
+
       if (ids.length > 0) {
         const { records } = await dataStore.search({
           ...options,
@@ -134,13 +137,13 @@ export function OneToManyEdit({
           },
         });
         setRecords(
-          (
-            ids.map((id) => records.find((r) => r.id === id)) as DataRecord[]
-          ).filter((r) => r)
+          (ids.map((id) => records.find((r) => r.id === id)) as DataRecord[])
+            .filter((r) => r)
+            .concat(unsaved),
         );
       }
     },
-    [value, sortBy, name, model, parentId, dataStore]
+    [value, sortBy, name, model, parentId, dataStore],
   );
 
   const focusInput = useCallback(() => {
@@ -161,10 +164,13 @@ export function OneToManyEdit({
     async (record: DataRecord) => {
       const onClose = onPopupViewInit();
       const save = (record: DataRecord) => {
+        if (!record.id) {
+          record = { ...record, _dirty: true, id: nextId() };
+        }
         setValue((value) => {
           if (value?.some((v) => v.id === record.id)) {
             return value?.map((val) =>
-              val.id === record.id ? { ...val, ...record } : val
+              val.id === record.id ? { ...val, ...record } : val,
             );
           }
           return [...(value || []), record];
@@ -197,10 +203,13 @@ export function OneToManyEdit({
       showEditor,
       isManyToMany,
       onPopupViewInit,
-    ]
+    ],
   );
 
   const onAdd = useCallback(() => {
+    if (!isManyToMany) {
+      return onEdit({});
+    }
     const onClose = onPopupViewInit();
     showSelector({
       model,
@@ -220,13 +229,11 @@ export function OneToManyEdit({
           ];
         });
       },
-      ...(!isManyToMany && {
-        onCreate: () => {
-          setTimeout(() => {
-            onEdit({});
-          });
-        },
-      }),
+      onCreate: () => {
+        setTimeout(() => {
+          onEdit({});
+        });
+      },
     });
   }, [
     onPopupViewInit,
@@ -248,7 +255,7 @@ export function OneToManyEdit({
       popup && (await onSearch({}));
       setPopup(popup);
     },
-    [focusInput, onSearch]
+    [focusInput, onSearch],
   );
 
   const onDelete = useCallback(async () => {
