@@ -10,6 +10,7 @@ import {
   EvalContextOptions,
   createEvalContext,
 } from "@/hooks/use-parser/context";
+import { isCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Schema, View } from "@/services/client/meta.types";
 import {
@@ -22,7 +23,6 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 import { useViewTab } from "@/view-containers/views/scope";
-import { isCleanDummy } from "@/services/client/data-utils";
 
 import { fallbackFormAtom } from "./atoms";
 import {
@@ -157,7 +157,7 @@ export class FormActionHandler extends DefaultActionHandler {
   }
 
   async save(record?: DataRecord) {
-    await this.validate().then(() => this.#saveHandler?.(record));
+    await this.#saveHandler?.(record);
   }
 
   async refresh() {
