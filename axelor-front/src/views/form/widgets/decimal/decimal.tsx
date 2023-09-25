@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { get } from "lodash";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -11,7 +11,6 @@ import convert from "@/utils/convert";
 import format, { DEFAULT_SCALE } from "@/utils/format";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "../string/viewer";
 
 import styles from "./decimal.module.scss";
@@ -20,7 +19,7 @@ const NUM_PATTERN = /^(-)?\d*(\.(\d+)?)?$/;
 
 export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
-  const { uid, minSize: min, maxSize: max, placeholder, nullable } = schema;
+  const { uid, minSize: min, maxSize: max, placeholder } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale: scaleAttr } = attrs;
 
@@ -54,16 +53,14 @@ export function Decimal(props: FieldProps<string | number>) {
     ),
   );
 
-  const { value, setValue } = useInput(valueAtom, {
-    defaultValue: "",
-  });
-
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [value = null, setValue] = useAtom(valueAtom);
   const [changed, setChanged] = useState(false);
 
   const parse = useCallback(
-    (value: string | number) => convert(value, { props: { ...schema, scale } }),
+    (value: string | number | null) =>
+      convert(value, { props: { ...schema, scale } }),
     [schema, scale],
   );
 
@@ -145,10 +142,8 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const text = useMemo(
     () =>
-      nullable && !value
-        ? value
-        : format(value, { props: { ...schema, scale } as Field }),
-    [nullable, scale, schema, value],
+      value ? format(value, { props: { ...schema, scale } as Field }) : "",
+    [scale, schema, value],
   );
 
   const step = useMemo(

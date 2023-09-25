@@ -1,10 +1,11 @@
 import Editor from "@monaco-editor/react";
 import clsx from "clsx";
+import { useAtom } from "jotai";
 import { useCallback } from "react";
 
 import { useAppTheme } from "@/hooks/use-app-theme";
+
 import { FieldControl, FieldProps } from "../../builder";
-import { useInput } from "../../builder/hooks";
 
 import styles from "./code-editor.module.scss";
 
@@ -17,15 +18,13 @@ export function CodeEditor(props: FieldProps<string>) {
 
   const theme = appTheme === "dark" ? "vs-dark" : "light";
 
-  const { value, setValue } = useInput(valueAtom, {
-    defaultValue: "",
-  });
+  const [value, setValue] = useAtom(valueAtom);
 
   const handleChange = useCallback(
-    (value: string = "") => {
+    (value = "") => {
       setValue(value, true);
     },
-    [setValue]
+    [setValue],
   );
 
   const h = height && /^(\d+)$/.test(height) ? `${height}px` : height;
@@ -42,7 +41,7 @@ export function CodeEditor(props: FieldProps<string>) {
       <Editor
         theme={theme}
         language={language}
-        value={value}
+        value={value ?? ""}
         width={w}
         height={h}
         onChange={handleChange}
