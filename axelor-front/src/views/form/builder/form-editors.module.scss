@@ -35,7 +35,7 @@
       align-items: center;
       gap: 0.5rem;
 
-      :first-child {
+      & > *:first-child {
         flex: 1;
       }
     }

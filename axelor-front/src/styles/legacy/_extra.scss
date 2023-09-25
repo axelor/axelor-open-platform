@@ -7,6 +7,9 @@
   align-items: center !important;
   flex-direction: row !important;
   gap: 0.25rem !important;
+  :first-child {
+    flex: 1;
+  }
 }
 
 .kanban-card {
