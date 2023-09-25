@@ -141,7 +141,7 @@ export class DataSource {
     const resp = await request({
       url,
       method: "POST",
-      body: isRecords ? { records: data } : { data },
+      body: isRecords ? { records: data, ...options } : { data, ...options },
     });
 
     if (resp.ok) {
