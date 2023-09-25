@@ -49,7 +49,10 @@ export function Decimal(props: FieldProps<string | number>) {
           if (!isNaN(scaleNum)) {
             return scaleNum;
           }
-          const value = parseInt(get(form.record, scaleAttr ?? ""));
+          const scaleValue =
+            get(form.record, ((scaleAttr ?? "") as string).split(".")) ??
+            get(form.record, scaleAttr ?? "");
+          const value = parseInt(scaleValue);
           return isNaN(value) ? DEFAULT_SCALE : value;
         }),
       [formAtom, scaleAttr, scaleNum],
