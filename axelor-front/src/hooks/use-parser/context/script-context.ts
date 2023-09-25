@@ -59,7 +59,9 @@ export function createScriptContext(
       return i18n.get(key, ...args);
     },
     $get(path: string) {
-      const value = get(context, path);
+      const value = path.includes(".")
+        ? get(context, path.split(".")) ?? get(context, path)
+        : get(context, path);
       if (value === undefined) {
         const dotIndex = path.indexOf(".");
         const key = path.substring(0, dotIndex);
