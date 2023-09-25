@@ -55,7 +55,6 @@ const noop = () => {};
 
 export function OneToMany({
   schema,
-  readonly,
   valueAtom,
   widgetAtom,
   formAtom,
@@ -156,7 +155,7 @@ export function OneToMany({
   );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
-  const { title, domain } = attrs;
+  const { title, domain, readonly } = attrs;
 
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";

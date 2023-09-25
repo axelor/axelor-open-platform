@@ -23,7 +23,7 @@ import { GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
-import { FieldProps, usePrepareContext } from "../../builder";
+import { FieldProps, usePermission, usePrepareContext } from "../../builder";
 import { nextId } from "../../builder/utils";
 import styles from "./one-to-many.edit.module.scss";
 
@@ -69,6 +69,7 @@ export function OneToManyEdit({
 
   const showSelector = useSelector();
   const showEditor = useEditor();
+  const { hasButton } = usePermission(schema, widgetAtom);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +90,7 @@ export function OneToManyEdit({
     searchLimit,
   } = schema;
   const {
-    attrs: { focus, domain },
+    attrs: { focus, domain, readonly },
   } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
@@ -97,6 +98,12 @@ export function OneToManyEdit({
   );
   const getContext = usePrepareContext(formAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
+
+  const canNew = !readonly && hasButton("new");
+  const canEdit = !readonly && hasButton("edit");
+  const canView = hasButton("view");
+  const canDelete = !readonly && hasButton("delete");
+  const canSelect = !readonly && hasButton("select");
 
   const { data: meta } = useAsync(async () => {
     const view = views?.find?.((v: View) => v.type === "grid");
@@ -161,7 +168,7 @@ export function OneToManyEdit({
   }, []);
 
   const onEdit = useCallback(
-    async (record: DataRecord) => {
+    async (record: DataRecord, readonly: boolean = false) => {
       const onClose = onPopupViewInit();
       const save = (record: DataRecord) => {
         if (!record.id) {
@@ -185,7 +192,7 @@ export function OneToManyEdit({
         title: title ?? "",
         model,
         record,
-        readonly: false,
+        readonly,
         viewName: formView,
         ...(form && {
           view: { ...form },
@@ -204,6 +211,11 @@ export function OneToManyEdit({
       isManyToMany,
       onPopupViewInit,
     ],
+  );
+
+  const onView = useCallback(
+    (record: DataRecord) => onEdit(record, true),
+    [onEdit],
   );
 
   const onAdd = useCallback(() => {
@@ -229,11 +241,13 @@ export function OneToManyEdit({
           ];
         });
       },
-      onCreate: () => {
-        setTimeout(() => {
-          onEdit({});
-        });
-      },
+      ...(canNew && {
+        onCreate: () => {
+          setTimeout(() => {
+            onEdit({});
+          });
+        },
+      }),
     });
   }, [
     onPopupViewInit,
@@ -243,6 +257,7 @@ export function OneToManyEdit({
     gridView,
     domain,
     searchLimit,
+    canNew,
     isManyToMany,
     setValue,
     getContext,
@@ -292,11 +307,15 @@ export function OneToManyEdit({
         value={`(${value?.length || 0})`}
         onChange={() => {}}
         icons={[
-          {
-            icon: "add",
-            onClick: onAdd,
-          } as MaterialIconProps,
-          ...(popup && selectedRows?.length
+          ...(!readonly && (isManyToMany ? canSelect : canNew)
+            ? [
+                {
+                  icon: "add",
+                  onClick: onAdd,
+                } as MaterialIconProps,
+              ]
+            : []),
+          ...(popup && selectedRows?.length && canDelete
             ? [
                 {
                   icon: "remove",
@@ -320,13 +339,14 @@ export function OneToManyEdit({
                   {popup && meta && (
                     <GridComponent
                       showEditIcon
+                      readonly={readonly || !canEdit}
                       records={records}
                       view={meta.view}
                       fields={meta.fields}
                       state={state}
                       setState={setState}
-                      onView={onEdit}
-                      onEdit={onEdit}
+                      onView={onView}
+                      onEdit={canEdit ? onEdit : onView}
                     />
                   )}
                 </Box>
