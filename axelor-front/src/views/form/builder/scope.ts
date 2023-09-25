@@ -22,6 +22,7 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 import { useViewTab } from "@/view-containers/views/scope";
+import { isCleanDummy } from "@/services/client/data-utils";
 
 import { fallbackFormAtom } from "./atoms";
 import {
@@ -491,7 +492,11 @@ function useActionValue({
           }
 
           if (record !== newRecord) {
-            set(formAtom, (prev) => ({ ...prev, record: newRecord, dirty: true }));
+            set(formAtom, (prev) => ({
+              ...prev,
+              record: newRecord,
+              ...(!isCleanDummy(target) && { dirty: true }),
+            }));
           }
         },
         [formAtom],
@@ -522,9 +527,13 @@ function useActionRecord({
               }),
               {},
             );
+            const hasChanged = Object.keys(values).some(
+              (k) =>
+                !isCleanDummy(k) && record[k] !== (values as DataRecord)[k],
+            );
             set(formAtom, (prev) => ({
               ...prev,
-              dirty: true,
+              ...(hasChanged && { dirty: true }),
               record: { ...record, ...values },
             }));
           }
