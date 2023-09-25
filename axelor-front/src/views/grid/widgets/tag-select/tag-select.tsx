@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Box,
   Menu,
@@ -39,11 +39,9 @@ const OverflowMenu: React.FC<{
     useOverflowMenu<HTMLDivElement>();
 
   const [show, setShow] = useState(false);
-  const [target, setTarget] = useState<HTMLDivElement | null>(null);
+  const targetRef = useRef<HTMLDivElement | null>(null);
 
-  const iconRef = useRefs(ref, (el: HTMLDivElement | null) => {
-    setTarget(el);
-  });
+  const iconRef = useRefs(ref, targetRef);
 
   function showMenu() {
     setShow(true);
@@ -68,7 +66,7 @@ const OverflowMenu: React.FC<{
       </Box>
       <Menu
         className={styles.menu}
-        target={target}
+        target={targetRef.current}
         show={show}
         onHide={hideMenu}
       >
