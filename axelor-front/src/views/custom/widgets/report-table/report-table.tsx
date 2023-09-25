@@ -71,7 +71,8 @@ export const ReportTable = forwardRef(function ReportTable(
         const col = Object.assign({}, item, item.widgetAttrs, {
           name: name,
           title: item.title || item.autoTitle || toTitleCase(name),
-          type: (item as Field).serverType || "STRING",
+          type: toKebabCase((item as Field).serverType || "STRING").toUpperCase(),
+          serverType: toKebabCase((item as Field).serverType || "STRING").toUpperCase(),
           ...(sumCols.includes(name) && { aggregate: "sum" }),
         });
         fields[name] = col as Property;
