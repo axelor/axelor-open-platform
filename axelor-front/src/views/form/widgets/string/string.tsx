@@ -1,13 +1,13 @@
-import { focusAtom } from "jotai-optics";
-import { useAtom, useAtomValue } from "jotai";
-import { useMemo } from "react";
 import { Input, clsx } from "@axelor/ui";
+import { useAtom, useAtomValue } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useMemo } from "react";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { ViewerInput } from "./viewer";
-import { Translatable } from "./translatable";
 import styles from "./string.module.scss";
+import { Translatable } from "./translatable";
+import { ViewerInput } from "./viewer";
 
 export function String({
   inputProps,
@@ -24,15 +24,13 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { value, onChange, onBlur } = useInput(valueAtom, {
-    defaultValue: "",
-  });
+  const { text, onChange, onBlur } = useInput(valueAtom);
 
   const [trValue, setTranslateValue] = useAtom(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop(`$t:${name}`)),
-      [name, formAtom]
-    )
+      [name, formAtom],
+    ),
   );
 
   return (
@@ -45,7 +43,7 @@ export function String({
       {readonly || trValue ? (
         <ViewerInput
           {...(inputProps?.type === "password" && { type: "password" })}
-          value={trValue ?? value}
+          value={trValue ?? text}
         />
       ) : (
         <Input
@@ -55,7 +53,7 @@ export function String({
           id={uid}
           autoFocus={focus}
           placeholder={placeholder}
-          value={value}
+          value={text}
           invalid={invalid}
           required={required}
           onChange={onChange}
@@ -64,7 +62,7 @@ export function String({
         />
       )}
       {translatable && !readonly && (
-        <Translatable value={value} onUpdate={setTranslateValue} />
+        <Translatable value={text} onUpdate={setTranslateValue} />
       )}
     </FieldControl>
   );

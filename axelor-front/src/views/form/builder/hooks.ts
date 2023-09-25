@@ -1,5 +1,5 @@
-import { useAtomValue, useSetAtom } from "jotai";
-import React, { useCallback, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
@@ -29,59 +29,105 @@ export function useWidget(schema: Schema) {
   return compRef.current;
 }
 
+const defaultFormatter = <T>(value?: T | null) =>
+  value === null || value === undefined ? "" : String(value);
+
+const defaultConverter = <T>(text: string) => (text ? (text as T) : null);
+
+const defaultValidator = (text: string) => true;
+
 /**
  * This hook can be used with input fields to handle value updates.
  *
  * @param valueAtom the field value atom
  * @param options additional options
- * @returns
  */
 export function useInput<T>(
   valueAtom: ValueAtom<T>,
-  options: {
+  options?: {
     /**
      * The default value to use when the atom value is null or undefined.
      */
-    defaultValue: T;
+    defaultValue?: T | null;
 
     /**
      * When to fire the onChange event.
      */
     onChangeTrigger?: "blur" | "change";
-  }
+
+    /**
+     * Validate the input text.
+     *
+     * Only validated input text will be propagated to valueAtom.
+     *
+     * @param text the input text to validate
+     * @returns true if valid false otherwise
+     */
+    validate?: (text: string) => boolean;
+
+    /**
+     * Format the value to string.
+     */
+    format?: (value?: T | null) => string;
+
+    /**
+     * Convert the input text to target value.
+     */
+    parse?: (text: string) => T | null;
+  },
 ) {
-  const { onChangeTrigger = "blur", defaultValue } = options;
-  const value = useAtomValue(valueAtom) ?? defaultValue;
-  const setValue = useSetAtom(valueAtom);
+  const {
+    defaultValue,
+    onChangeTrigger = "change",
+    validate = defaultValidator,
+    format = defaultFormatter,
+    parse = defaultConverter,
+  } = options ?? {};
+  const [value = defaultValue, setValue] = useAtom(valueAtom);
+
   const [changed, setChanged] = useState(false);
+  const [text, setText] = useState(() => format(value) ?? "");
+
+  useEffect(() => {
+    if (changed) return;
+    setText(() => format(value));
+  }, [changed, format, value]);
 
   const update = useCallback(
-    (text: string, fireOnChange = false) => {
-      const value = text as T;
-      setValue(value, fireOnChange);
+    (text: string) => {
+      if (validate(text)) {
+        setValue(parse(text), true);
+      }
     },
-    [setValue]
+    [parse, setValue, validate],
   );
 
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      update(e.target.value, onChangeTrigger === "change");
+    (event) => {
       setChanged(true);
+      setText(event.target.value);
+      if (onChangeTrigger === "change") {
+        update(event.target.value);
+      }
     },
-    [onChangeTrigger, update]
+    [onChangeTrigger, update],
   );
 
   const onBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
-    (e) => {
-      if (changed && onChangeTrigger === "blur") {
+    (event) => {
+      if (changed) {
         setChanged(false);
-        update(e.target.value, true);
+        if (onChangeTrigger === "blur") {
+          update(event.target.value);
+        }
       }
     },
-    [changed, onChangeTrigger, update]
+    [changed, onChangeTrigger, update],
   );
 
   return {
+    text,
+    setText,
     value,
     setValue,
     onChange,
