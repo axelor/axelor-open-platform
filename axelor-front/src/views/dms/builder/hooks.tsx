@@ -81,9 +81,6 @@ export function useDMSPopup() {
         "_popup-record": popupRecord,
         "ui-template:grid": "dms-file-list",
       },
-      context: {
-        _showRecord: record?.id,
-      },
     });
 
     if (!tab) return;
