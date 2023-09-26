@@ -1,58 +1,63 @@
-import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 
+import { Box, Button } from "@axelor/ui";
 import { i18n } from "./i18n";
-import { Box } from "@axelor/ui";
+import { session } from "./session";
 
-export function reject(report: any) {
-  let message;
-  let exception;
-  let stacktrace;
+export type ErrorReport = {
+  title?: string;
+  message?: string;
+  causeClass?: string;
+  causeMessage?: string;
+  causeStack?: string;
+  entityId?: number;
+  entityName?: string;
+  constraints?: Record<string, string>;
+};
 
-  if (report.popup) {
-    message =
-      report.message ||
-      i18n.get("A server error occurred. Please contact the administrator.");
-    dialogs.error({
-      title: report.title,
-      content: message,
-    });
-    return Promise.reject(500);
+export function reject(data: number | string | ErrorReport) {
+  if (typeof data === "number") {
+    return Promise.reject(data);
   }
 
-  if (report.stacktrace) {
-    message = report.message || report.string;
-    exception = report["class"] || "";
+  const report = typeof data === "string" ? { message: data } : data;
 
-    if (
-      exception.match(/(OptimisticLockException|StaleObjectStateException)/)
-    ) {
-      message =
-        "<b>" + i18n.get("Concurrent updates error") + "</b><br>" + message;
-    }
+  const title = report.title || i18n.get("Internal Server Error");
+  const message = (report.message ?? report.causeMessage)?.replace(
+    "\n",
+    "<br>",
+  );
+  const stacktrace =
+    report.causeStack ??
+    (typeof data === "string" ? data.replace(/.*<body>|<\/body>.*/g, "") : "");
 
-    stacktrace = report.stacktrace;
-  } else if (report.message) {
-    message = "<p>" + report.message.replace("\n", "<br>") + "</p>";
-    alerts.error({ message });
-    return Promise.reject(500);
-  } else if (typeof report === "string") {
-    stacktrace = report.replace(/.*<body>|<\/body>.*/g, "");
-  } else {
-    return Promise.reject(500); // no error report, so ignore
-  }
+  const canShowStack = !!session.info?.user?.technical;
 
-  // TODO: show error dialog with stacktrace
-  dialogs.error({
-    title: report.title || i18n.get("Error"),
-    size: "lg",
-    content: (
-      <Box d="flex" flexDirection="column" style={{ minWidth: 0 }}>
-        <p>{message}</p>
-        {stacktrace && (
-          <Box flex={1} overflow="auto">
-            <pre>{stacktrace}</pre>
-          </Box>
+  dialogs.box({
+    title,
+    content: message,
+    yesNo: false,
+    footer: () => (
+      <Box flex={1}>
+        {stacktrace && canShowStack && (
+          <Button
+            variant="secondary"
+            onClick={() =>
+              dialogs.box({
+                title,
+                content: (
+                  <Box as="pre" p={2} m={0}>
+                    {stacktrace}
+                  </Box>
+                ),
+                size: "xl",
+                yesNo: false,
+                padding: "0",
+              })
+            }
+          >
+            {i18n.get("Details...")}
+          </Button>
         )}
       </Box>
     ),
