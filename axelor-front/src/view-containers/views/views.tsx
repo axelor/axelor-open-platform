@@ -207,14 +207,15 @@ const DataViews = memo(function DataViews({
     setSearchState((state) => ({
       ...state,
       filters,
-      fields,
-      jsonFields,
+      fields: { ...state.fields, ...fields },
+      jsonFields: { ...state.jsonFields, ...jsonFields },
     }));
   }, [filterName, actionName, hasAdvanceSearch]);
 
   useAsyncEffect(async () => {
     let domains: SearchFilter[] = [];
     let items: Property[] = [];
+    let fields: Record<string, Property> = {};
 
     if (hasAdvanceSearch && filterName) {
       const selectedDomains: string[] = (defaultSearchFilter || "")?.split(",");
@@ -223,7 +224,7 @@ const DataViews = memo(function DataViews({
         type: "search-filters",
         model,
       });
-      const fields = res?.fields || {};
+      fields = res?.fields || {};
       items = (res?.view?.items || []).map((item) => {
         const field = fields[item.name || ""] || {};
         return {
@@ -239,7 +240,16 @@ const DataViews = memo(function DataViews({
     }
 
     setSearchState((_state) => {
-      const state = { ..._state, domains, items, archived: showArchived };
+      const state = {
+        ..._state,
+        domains,
+        items,
+        archived: showArchived,
+        fields: {
+          ..._state.fields,
+          ...fields,
+        },
+      };
       return { ...state, ...prepareAdvanceSearchQuery(state) };
     });
   }, [
