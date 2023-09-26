@@ -21,24 +21,19 @@ package com.axelor.rpc;
 import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.common.ObjectUtils;
 import com.axelor.common.crypto.EncryptorException;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
-import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Throwables;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import javax.crypto.BadPaddingException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -142,7 +137,12 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     } else {
       log.error("Authorization Error: {}", e.getMessage());
     }
-    return buildResponse(response, title, message, null, status);
+
+    ResponseException error = new ResponseException(message, title, e);
+    response.setException(error);
+    response.setStatus(status);
+
+    return response;
   }
 
   private Response onAuthSecurityException(AuthSecurityException e, Response response) {
@@ -160,36 +160,23 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
   private Response onOptimisticLockException(OptimisticLockException e, Response response) {
     String title = I18n.get("Concurrent updates error");
-    String message = I18n.get("Record was updated or deleted by another transaction");
-
-    Object entity = e.getEntity();
-    if (entity instanceof Model) {
-      message =
-          message
-              + " : ["
-              + entity.getClass().getSimpleName()
-              + "{id:"
-              + ((Model) entity).getId()
-              + "}]";
-    }
-
+    String message = I18n.get("Record was updated or deleted by another transaction.");
+    ResponseException error = new ResponseException(message, title, e);
+    response.setException(error);
     log.error("Concurrency Error: {}", e.getMessage());
-    return buildResponse(response, title, message, null);
+    return response;
   }
 
   private Response onConstraintViolationException(
       ConstraintViolationException e, Response response) {
-    final StringBuilder sb = new StringBuilder();
-    for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
-      sb.append("    &#8226; [").append(cv.getPropertyPath()).append("] - ");
-      sb.append(cv.getMessage()).append("\n");
-    }
-
     final String title = I18n.get("Validation error");
-    final String message = sb.toString();
+    final String message = e.getMessage();
+    final ResponseException error = new ResponseException(message, title, e);
 
     log.error("Constraint Error: {}", e.getMessage());
-    return buildResponse(response, title, message, null);
+
+    response.setException(error);
+    return response;
   }
 
   private Response onEncryptorException(EncryptorException e, Response response) {
@@ -201,8 +188,12 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
       message = I18n.get("Encryption key might be wrong.");
     }
 
+    ResponseException error = new ResponseException(message, title, e);
+    response.setException(error);
+
     log.error("Encryption Error: {}", e.getMessage(), e);
-    return buildResponse(response, title, message, null);
+
+    return response;
   }
 
   static final String REFERENCE_ERROR_TTILE = /*$$(*/ "Reference error" /*)*/;
@@ -243,7 +234,11 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     }
 
     log.error("MySQL Error: {}", e.getMessage());
-    return buildResponse(response, title, message, "<p>" + e.getMessage() + "</p>");
+
+    ResponseException error = new ResponseException(message, title, e);
+    response.setException(error);
+
+    return response;
   }
 
   private Response onSQLException(SQLException e, Response response) {
@@ -257,8 +252,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     if (state == null) {
       state = "";
     }
-
-    PSQLException pe = (PSQLException) e;
 
     String title = null;
     String message = null;
@@ -280,29 +273,9 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     }
 
     log.error("PostgreSQL Error: {}", e.getMessage());
-    return buildResponse(response, title, message, "<p>" + e.getMessage() + "</p>");
-  }
 
-  private Response buildResponse(
-      Response response, String title, String message, String adminMessage) {
-    return buildResponse(response, title, message, adminMessage, Response.STATUS_FAILURE);
-  }
-
-  private Response buildResponse(
-      Response response, String title, String message, String adminMessage, int status) {
-
-    if (ObjectUtils.notEmpty(adminMessage)
-        && (AuthUtils.isAdmin(AuthUtils.getUser())
-            || AuthUtils.isTechnicalStaff(AuthUtils.getUser()))) {
-      message += adminMessage;
-    }
-
-    Map<String, Object> report = new HashMap<>();
-    report.put("title", title);
-    report.put("message", message);
-
-    response.setData(report);
-    response.setStatus(status);
+    ResponseException error = new ResponseException(message, title, e);
+    response.setException(error);
 
     return response;
   }

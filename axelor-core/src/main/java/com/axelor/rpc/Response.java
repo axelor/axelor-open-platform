@@ -18,8 +18,6 @@
  */
 package com.axelor.rpc;
 
-import com.axelor.app.AppSettings;
-import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -130,16 +128,18 @@ public class Response {
   }
 
   public Response fail(String message) {
-    final Map<String, Object> report = new HashMap<>();
-    report.put("message", message);
-    this.setData(report);
-    this.setStatus(STATUS_FAILURE);
+    final ResponseException error = new ResponseException(message);
+    this.setException(error);
     return this;
   }
 
   public void setException(Throwable throwable) {
-
-    final Map<String, Object> report = new HashMap<>();
+    if (throwable instanceof ResponseException) {
+      ResponseException error = (ResponseException) throwable;
+      this.setData(error.toReport());
+      this.setStatus(STATUS_FAILURE);
+      return;
+    }
 
     Throwable cause = Throwables.getRootCause(throwable);
     if (cause instanceof BatchUpdateException) {
@@ -151,19 +151,9 @@ public class Response {
       message = cause.getMessage();
     }
 
-    if (AppSettings.get().isProduction()) {
-      report.put("title", I18n.get("Internal Server Error"));
-      report.put("message", message);
-      report.put("popup", true);
-    } else {
-      report.put("class", throwable.getClass());
-      report.put("message", message);
-      report.put("string", cause.toString());
-      report.put("stacktrace", Throwables.getStackTraceAsString(throwable));
-      report.put("cause", Throwables.getStackTraceAsString(cause));
-    }
+    ResponseException error = new ResponseException(message, cause);
 
-    this.setData(report);
+    this.setData(error.toReport());
     this.setStatus(STATUS_FAILURE);
   }
 
