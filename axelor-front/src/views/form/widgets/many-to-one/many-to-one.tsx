@@ -18,7 +18,7 @@ import { toKebabCase } from "@/utils/names";
 
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
-import { useFormItems } from "../../builder/scope";
+import { useFormItems, useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import {
@@ -83,38 +83,36 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const findFormItems = useFormItems(formAtom);
 
-  const ensureRelated = useAtomCallback(
-    useCallback(
-      async (get, set, value: DataRecord) => {
-        if (value && value.id && value.id > 0) {
-          const name = schema.name;
-          const prefix = name + ".";
-          const items = findFormItems();
-          const related = items
-            .flatMap((item) => [item.name, item.depends?.split(",")])
-            .flat()
-            .filter(Boolean)
-            .filter((name) => name.startsWith(prefix))
-            .map((name) => name.substring(prefix.length));
+  const ensureRelated = useCallback(
+    async (value: DataRecord, refetch?: boolean) => {
+      if (value && value.id && value.id > 0) {
+        const name = schema.name;
+        const prefix = name + ".";
+        const items = findFormItems();
+        const related = items
+          .flatMap((item) => [item.name, item.depends?.split(",")])
+          .flat()
+          .filter(Boolean)
+          .filter((name) => name.startsWith(prefix))
+          .map((name) => name.substring(prefix.length));
 
-          const names = [targetName, ...related];
-          const missing = names.filter(
-            (x) => getObjValue(value, x) === undefined,
-          );
-          if (missing.length > 0) {
-            try {
-              const ds = new DataSource(target);
-              const rec = await ds.read(value.id, { fields: missing }, true);
-              return { ...value, ...rec, version: undefined };
-            } catch (er) {
-              return { ...value, [targetName]: value.id };
-            }
+        const names = [targetName, ...related];
+        const missing = refetch
+          ? names
+          : names.filter((x) => getObjValue(value, x) === undefined);
+        if (missing.length > 0) {
+          try {
+            const ds = new DataSource(target);
+            const rec = await ds.read(value.id, { fields: missing }, true);
+            return { ...value, ...rec, version: undefined };
+          } catch (er) {
+            return { ...value, [targetName]: value.id };
           }
         }
-        return value;
-      },
-      [findFormItems, schema.name, target, targetName],
-    ),
+      }
+      return value;
+    },
+    [findFormItems, schema.name, target, targetName],
   );
 
   const handleEdit = useCallback(
@@ -214,28 +212,36 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const valueRef = useRef<DataRecord>();
 
-  const ensureRelatedValues = useAtomCallback(
-    useCallback(
-      async (get, set, signal: AbortSignal) => {
-        if (valueRef.current === value) return;
-        if (value) {
-          const newValue = await ensureRelated(value);
-          if (!isEqual(newValue, value)) {
-            valueRef.current = newValue;
-            if (signal.aborted) return;
-            setValue(newValue, false, false);
-          } else {
-            valueRef.current = value;
-          }
+  const ensureRelatedValues = useCallback(
+    async (signal?: AbortSignal, refetch?: boolean) => {
+      if (valueRef.current === value && !refetch) return;
+      if (value) {
+        const newValue = await ensureRelated(value, refetch);
+        if (!isEqual(newValue, value)) {
+          valueRef.current = newValue;
+          if (signal?.aborted) return;
+          setValue(newValue, false, false);
+        } else {
+          valueRef.current = value;
         }
-      },
-      [ensureRelated, setValue, value],
-    ),
+      }
+    },
+    [ensureRelated, setValue, value],
   );
+
+  const onRefSelectRefresh = useCallback(() => {
+    if (["ref-select", "ref-link"].includes(toKebabCase(schema.widget))) {
+      valueRef.current = undefined;
+      ensureRelatedValues(undefined, true);
+    }
+  }, [schema, ensureRelatedValues]);
 
   const getOptionLabel = useOptionLabel(schema);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
+
+  // register form:refresh
+  useFormRefresh(onRefSelectRefresh);
 
   return (
     <FieldControl {...props}>
