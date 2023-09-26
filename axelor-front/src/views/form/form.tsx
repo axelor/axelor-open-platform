@@ -64,7 +64,10 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 import { FormValidityHandler, FormValidityScope } from "./builder/scope";
-import { getDefaultValues } from "./builder/utils";
+import {
+  getDefaultValues,
+  processContextValues as processDataRecord,
+} from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
@@ -222,10 +225,10 @@ const FormContainer = memo(function FormContainer({
 
   const readyAtom = useMemo(
     () => focusAtom(formAtom, (o) => o.prop("ready")),
-    [formAtom]
+    [formAtom],
   );
   const setReady = useSetAtom(readyAtom);
-  
+
   const [formDirty, setFormDirty] = useAtom(
     useMemo(() => focusAtom(formAtom, (o) => o.prop("dirty")), [formAtom]),
   );
@@ -447,7 +450,7 @@ const FormContainer = memo(function FormContainer({
         const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
         const vals = diff(rec, original);
 
-        let res = await dataStore.save(vals);
+        let res = await dataStore.save(processDataRecord(vals));
 
         if (callOnLoad) {
           if (res.id) res = await doRead(res.id);
@@ -1067,7 +1070,9 @@ export const Layout: FormLayout = ({
     const items = schema.items ?? [];
     const head = items.filter((x) => x.widget === "wkf-status");
     const side = items.filter((x) => x.sidebar);
-    const mail = items.filter((x) => x.type === "panel-mail" && !side.includes(x));
+    const mail = items.filter(
+      (x) => x.type === "panel-mail" && !side.includes(x),
+    );
     const rest = items.filter(
       (x) => !head.includes(x) && !side.includes(x) && !mail.includes(x),
     );
