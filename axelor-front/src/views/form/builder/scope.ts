@@ -548,12 +548,14 @@ function useActionRecord({
 export function useActionExecutor(
   view: View,
   options?: {
-    onRefresh?: () => Promise<any>;
+    formActions?: boolean; // flag to handle form actions
     getContext?: () => DataContext;
+    onRefresh?: () => Promise<any>;
   },
 ) {
-  const { formAtom } = useFormScope();
-  const { onRefresh, getContext } = options || {};
+  const { formActions = true, onRefresh, getContext } = options || {};
+  const formScope = useFormScope();
+  const formAtom = formActions ? formScope.formAtom : fallbackFormAtom;
 
   const actionHandler = useMemo(() => {
     const actionHandler = new FormActionHandler(() => ({

@@ -321,6 +321,7 @@ export function OneToMany({
   );
 
   const actionExecutor = useActionExecutor(actionView, {
+    formActions: false,
     getContext: getActionContext,
     onRefresh: onSearch,
   });
