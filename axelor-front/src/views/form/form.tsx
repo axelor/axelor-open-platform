@@ -388,7 +388,6 @@ const FormContainer = memo(function FormContainer({
         onLoadAction,
         onNewAction,
         switchTo,
-        setDirty,
         recordRef,
         setReady,
         setFormDirty,
@@ -447,10 +446,17 @@ const FormContainer = memo(function FormContainer({
       async (
         get,
         set,
-        callOnSave: boolean = true,
-        shouldSave: boolean = true,
-        callOnLoad: boolean = true,
+        options?: {
+          shouldSave?: boolean;
+          callOnSave?: boolean;
+          callOnLoad?: boolean;
+        },
       ) => {
+        const {
+          shouldSave = true,
+          callOnSave = true,
+          callOnLoad = true,
+        } = options ?? {};
         const formState = get(formAtom);
         const errors = getErrors(formState);
         if (errors || getWidgetErrors()) {
@@ -541,7 +547,9 @@ const FormContainer = memo(function FormContainer({
           await dataStore.save(record);
         }
         if (isDirty) {
-          await onSave(false);
+          await onSave({
+            callOnSave: false,
+          });
         }
       },
       [dataStore, isDirty, onSave],

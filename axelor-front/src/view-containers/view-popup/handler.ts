@@ -15,11 +15,11 @@ export type PopupHandler = {
   onNew?: () => Promise<void>;
   onRead?: (id: string | number) => Promise<DataRecord>;
   onEdit?: (record: DataRecord | null) => Promise<void>;
-  onSave?: (
-    callOnSave?: boolean,
-    shouldSave?: boolean,
-    callOnLoad?: boolean
-  ) => Promise<DataRecord>;
+  onSave?: (options?: {
+    shouldSave?: boolean;
+    callOnSave?: boolean;
+    callOnLoad?: boolean;
+  }) => Promise<DataRecord>;
   onSearch?: (options?: SearchOptions) => Promise<SearchResult>;
   onRefresh?: () => Promise<void>;
   readyAtom?: WritableAtom<boolean | undefined, [boolean | undefined], void>;

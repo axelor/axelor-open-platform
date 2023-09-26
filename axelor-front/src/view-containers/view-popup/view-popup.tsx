@@ -83,7 +83,7 @@ export const PopupDialog = memo(function PopupDialog({
   buttons,
 }: PopupProps) {
   const title = useAtomValue(
-    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state])
+    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state]),
   );
   const [maximized, setMaximized] = useState<boolean>(maximize ?? false);
   const [expanded, setExpanded] = useState<boolean>(true);
@@ -172,7 +172,7 @@ function Header({
   const onClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => handleClose()
+      async () => handleClose(),
     );
   }, [handleClose, handler, popupCanConfirm]);
 
@@ -218,7 +218,7 @@ function Footer({
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
-      async () => handleClose()
+      async () => handleClose(),
     );
   }, [handleClose, handler, popupCanConfirm]);
 
@@ -229,7 +229,11 @@ function Footer({
     try {
       let rec: DataRecord | undefined = undefined;
       if (dirty && onSave) {
-        rec = await onSave(true, true, false);
+        rec = await onSave({
+          shouldSave: true,
+          callOnSave: true,
+          callOnLoad: false,
+        });
       }
       handleClose(rec);
     } catch (e) {
@@ -264,11 +268,11 @@ function Footer({
 function useClose(
   handler: PopupHandler,
   close: (result: boolean) => void,
-  params?: DataRecord
+  params?: DataRecord,
 ) {
   const readyAtom = useMemo(
     () => handler.readyAtom ?? atom<boolean | undefined>(undefined),
-    [handler.readyAtom]
+    [handler.readyAtom],
   );
   const ready = useAtomValue(readyAtom);
 
@@ -297,7 +301,7 @@ function useClose(
         current?.id !== original?.id || current?.version !== original?.version
       );
     },
-    [handler]
+    [handler],
   );
 
   const triggerReload = useCallback(() => {
@@ -317,7 +321,7 @@ function useClose(
       }
       close(changed);
     },
-    [close, isChanged, triggerReload, params?.popup]
+    [close, isChanged, triggerReload, params?.popup],
   );
 
   return handleClose;
