@@ -38,6 +38,7 @@ export type DialogOptions = {
   footer?: (close: (result: boolean) => void) => React.ReactNode;
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
+  padding?: string;
   classes?: {
     root?: string;
     content?: string;
@@ -98,14 +99,15 @@ export namespace dialogs {
     yesNo = true,
     yesTitle,
     noTitle,
+    padding,
+    footer,
   }: {
-    size?: DialogOptions["size"];
     title?: string;
     content: React.ReactNode;
     yesNo?: boolean;
     yesTitle?: string;
     noTitle?: string;
-  }) {
+  } & Pick<DialogOptions, "size" | "padding" | "footer">) {
     const [cancelButton, confirmButton] = defaultButtons;
     const buttons = yesNo
       ? [
@@ -126,8 +128,10 @@ export namespace dialogs {
           title,
           content,
           buttons,
+          padding,
           classes: { content: styles.box },
           onClose: (result) => resolve(result),
+          footer,
         });
       })();
     });
@@ -174,12 +178,12 @@ export namespace dialogs {
     options?: {
       title?: string;
       content?: React.ReactNode;
-    }
+    },
   ) {
     const {
       title,
       content = i18n.get(
-        "Current changes will be lost. Do you really want to proceed?"
+        "Current changes will be lost. Do you really want to proceed?",
       ),
     } = options ?? {};
     const dirty = await check();
@@ -196,11 +200,11 @@ export namespace dialogs {
     options?: {
       title?: string;
       content?: React.ReactNode;
-    }
+    },
   ) {
     const {
       content = i18n.get(
-        "Current changes will be saved. Do you want to proceed?"
+        "Current changes will be saved. Do you want to proceed?",
       ),
       ...rest
     } = options ?? {};
@@ -255,6 +259,7 @@ export function ModalDialog(props: DialogOptions) {
     content,
     header,
     footer,
+    padding,
     buttons = defaultButtons,
     classes = {},
     closeable = true,
@@ -271,7 +276,7 @@ export function ModalDialog(props: DialogOptions) {
       setShow(false);
       setResult(result);
     },
-    [setOpen]
+    [setOpen],
   );
 
   const handlerAtom = usePopupHandlerAtom();
@@ -307,7 +312,10 @@ export function ModalDialog(props: DialogOptions) {
           <DialogTitle className={styles.title}>{title}</DialogTitle>
           {typeof header === "function" ? header(close) : header}
         </DialogHeader>
-        <DialogContent className={clsx(classes.content, styles.content)}>
+        <DialogContent
+          className={clsx(classes.content, styles.content)}
+          style={{ padding }}
+        >
           {content}
         </DialogContent>
         <DialogFooter className={classes.footer}>
