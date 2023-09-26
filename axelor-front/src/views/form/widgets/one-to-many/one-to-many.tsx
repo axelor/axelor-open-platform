@@ -58,6 +58,7 @@ export function OneToMany({
   valueAtom,
   widgetAtom,
   formAtom,
+  ...props
 }: FieldProps<DataRecord[]>) {
   const {
     name,
@@ -155,7 +156,8 @@ export function OneToMany({
   );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
-  const { title, domain, readonly } = attrs;
+  const { title, domain } = attrs;
+  const readonly = props.readonly || attrs.readonly;
 
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";

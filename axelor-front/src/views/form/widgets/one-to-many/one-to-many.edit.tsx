@@ -32,6 +32,7 @@ export function OneToManyEdit({
   formAtom,
   widgetAtom,
   valueAtom,
+  ...props
 }: FieldProps<DataRecord[] | undefined>) {
   const [popup, setPopup] = useState(false);
   const [state, setState] = useGridState();
@@ -89,9 +90,7 @@ export function OneToManyEdit({
     orderBy: sortBy,
     searchLimit,
   } = schema;
-  const {
-    attrs: { focus, domain, readonly },
-  } = useAtomValue(widgetAtom);
+  const { attrs } = useAtomValue(widgetAtom);
 
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
@@ -99,9 +98,10 @@ export function OneToManyEdit({
   const getContext = usePrepareContext(formAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
+  const { focus, domain } = attrs;
+  const readonly = props.readonly || attrs.readonly;
   const canNew = !readonly && hasButton("new");
   const canEdit = !readonly && hasButton("edit");
-  const canView = hasButton("view");
   const canDelete = !readonly && hasButton("delete");
   const canSelect = !readonly && hasButton("select");
 
