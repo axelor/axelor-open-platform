@@ -81,21 +81,3 @@
     min-height: 400px;
   }
 }
-
-.preview {
-  position: absolute;
-  min-width: 200px;
-  top: 0;
-  left: 100%;
-  z-index: 0;
-  padding: 0.75rem;
-  .badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    [dir="rtl"] & {
-      right: unset;
-      left: 0;
-    }
-  }
-}

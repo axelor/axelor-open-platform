@@ -1,15 +1,16 @@
 import { Fragment, memo, useMemo, useRef } from "react";
+import { useAtomValue } from "jotai";
+import { isEqual } from "lodash";
+import clsx from "clsx";
+
 import { Box, useDrop } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { GridRowProps } from "@axelor/ui/grid";
-import clsx from "clsx";
 
 import { DMS_NODE_TYPE, TreeRecord } from "./types";
 import { DataRecord } from "@/services/client/data.types";
-import { isEqual } from "lodash";
-import styles from "./dms-tree.module.scss";
-import { useAtomValue } from "jotai";
 import { useDMSGridHandlerAtom } from "./handler";
+import styles from "./dms-tree.module.scss";
 
 interface TreeProps {
   root: TreeRecord;

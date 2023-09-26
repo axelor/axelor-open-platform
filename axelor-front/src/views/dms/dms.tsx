@@ -12,7 +12,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { Badge, Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
+import {
+  Badge,
+  Box,
+  DndProvider,
+  Input,
+  Link,
+  useDrag,
+  useDragLayer,
+} from "@axelor/ui";
 import { GridRow, GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -60,6 +68,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { DMSGridScope, useDMSGridHandlerAtom } from "./builder/handler";
 import gridRowStyles from "../grid/renderers/row/row.module.css";
 import styles from "./dms.module.scss";
+import { DMSCustomDragLayer } from "./builder/dms-drag-layer";
 
 const ROOT: TreeRecord = { id: null, fileName: i18n.get("DMS.Home") };
 const UNDEFINED_ID = -1;
@@ -453,6 +462,9 @@ export function Dms(props: ViewProps<GridView>) {
 
   const handleNodeDrop = useCallback(
     async (node: TreeRecord, _records: DataRecord[]) => {
+      // skip drop if node is included in selected grid row
+      if (_records.find((r) => r.id === node.id)) return;
+      
       const records = await dataStore.save(
         _records.map(({ id, version }) => ({
           id,
@@ -784,6 +796,7 @@ export function Dms(props: ViewProps<GridView>) {
                 onClose={handleDetailsPopupClose}
               />
             </Box>
+            <DMSCustomDragLayer />
           </Box>
         </ScopeProvider>
         <DmsUpload uploader={uploader} />
@@ -792,49 +805,25 @@ export function Dms(props: ViewProps<GridView>) {
   );
 }
 
-const DMSGridRowPreview = forwardRef<
-  HTMLDivElement,
-  {
-    record?: DataRecord;
-  }
->(function DMSGridRowPreview({ record }, ref) {
-  const { getSelectedDocuments } = useAtomValue(useDMSGridHandlerAtom());
-  const docs = useMemo(() => {
-    const docs = getSelectedDocuments?.();
-    return docs?.some((d) => d.id === record?.id)
-      ? docs
-      : [...(docs ?? []), record];
-  }, [getSelectedDocuments, record]);
-  const total = docs?.length;
-  return (
-    <Box ref={ref} className={styles.preview} bgColor="body" shadow="sm">
-      {record?.fileName}
-      {total > 1 && (
-        <Badge as="span" className={styles.badge} rounded bg="danger">
-          {total}
-        </Badge>
-      )}
-    </Box>
-  );
-});
+const emptyImage = new Image();
+emptyImage.src =
+  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 function DMSGridRow(props: GridRowProps) {
   const { selected, data, index } = props;
   const { children, style, className, onDoubleClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const ref = useRef<HTMLDivElement>(null);
-  const [{ dragging }, dragRef, dragPreviewRef] = useDrag({
+  const [, dragRef, dragPreviewRef] = useDrag({
     type: DMS_NODE_TYPE,
     item: { data: data, index, type: DMS_NODE_TYPE },
-    previewOptions: {
-      offsetX: 5,
-      offsetY: 5,
-    },
-    collect: (monitor: any) => ({
-      dragging: monitor.isDragging(),
-    }),
   });
   dragRef(ref);
+
+  useEffect(() => {
+    dragPreviewRef(emptyImage, { captureDraggingState: true });
+  }, [dragPreviewRef]);
+
   return (
     <>
       <Box
@@ -850,11 +839,6 @@ function DMSGridRow(props: GridRowProps) {
       >
         {children}
       </Box>
-      <DMSGridRowPreview
-        key={dragging ? "dragging" : (selected ? "selected" : "row")}
-        ref={dragPreviewRef}
-        record={data.record}
-      />
     </>
   );
 }
