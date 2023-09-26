@@ -33,6 +33,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
+import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
@@ -441,6 +442,29 @@ const FormContainer = memo(function FormContainer({
     );
   }, []);
 
+  const handleOnSaveErrors = useCallback(async function onError(
+    error: ErrorReport,
+  ): Promise<DataRecord> {
+    const { entityId, entityName, title, message } = error;
+    if (entityId && entityName) {
+      const confirmed = await dialogs.confirm({
+        title: title!,
+        content: (
+          <div>
+            <p>{message}</p>
+            <p>{i18n.get("Would you like to reload the record?")}</p>
+          </div>
+        ),
+      });
+
+      if (confirmed) {
+        return { id: entityId };
+      }
+      throw 500;
+    }
+    throw error;
+  }, []);
+
   const onSave = useAtomCallback(
     useCallback(
       async (
@@ -450,12 +474,14 @@ const FormContainer = memo(function FormContainer({
           shouldSave?: boolean;
           callOnSave?: boolean;
           callOnLoad?: boolean;
+          handleErrors?: boolean;
         },
       ) => {
         const {
           shouldSave = true,
           callOnSave = true,
           callOnLoad = true,
+          handleErrors = false,
         } = options ?? {};
         const formState = get(formAtom);
         const errors = getErrors(formState);
@@ -476,40 +502,45 @@ const FormContainer = memo(function FormContainer({
 
         const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
         const vals = diff(rec, original);
+        const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
 
-        let res = await dataStore.save(processDataRecord(vals));
+        let res = await dataStore.save(processDataRecord(vals), opts);
 
         if (callOnLoad) {
-          if (res.id) res = await doRead(res.id);
-
+          res = res.id ? await doRead(res.id) : res;
           res = { ...dummy, ...res }; // restore dummy values
-
-          const isNew = vals.id !== res.id;
-          doEdit(res, { readonly, isNew, keepStates: true });
+          doEdit(res, {
+            readonly,
+            isNew: vals.id !== res.id,
+            keepStates: true,
+          });
         }
 
         return res;
       },
       [
-        actionExecutor,
-        dataStore,
-        doEdit,
-        doRead,
         formAtom,
-        getWidgetErrors,
         getErrors,
-        onSaveAction,
-        readonly,
+        getWidgetErrors,
         meta.fields,
+        onSaveAction,
+        handleOnSaveErrors,
+        dataStore,
+        actionExecutor,
+        doRead,
+        doEdit,
+        readonly,
       ],
     ),
   );
 
   const handleOnSave = useCallback(async () => {
     try {
-      await onSave();
+      await onSave({
+        handleErrors: true,
+      });
     } catch (error) {
-      // TODO: show error notification
+      // default handler will show the errors
     }
   }, [onSave]);
 
