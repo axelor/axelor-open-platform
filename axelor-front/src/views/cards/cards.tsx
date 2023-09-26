@@ -106,6 +106,14 @@ export function Cards(props: ViewProps<CardsView>) {
     )
   );
 
+  const getActionData = useAtomCallback(useCallback((get) => {
+    const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
+    return {
+      ...dataStore.options?.filter,
+      ...filter,
+    }; 
+  }, [dataStore, searchAtom]));
+
   const records = useDataStore(dataStore, (ds) => ds.records);
   const Template = useViewTemplate(view, fields);
 
@@ -239,6 +247,7 @@ export function Cards(props: ViewProps<CardsView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          getActionData={getActionData}
           actionExecutor={actionExecutor}
           actions={[
             {

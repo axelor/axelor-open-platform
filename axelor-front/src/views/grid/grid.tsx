@@ -187,6 +187,14 @@ function GridInner(props: ViewProps<GridView>) {
     )
   );
 
+  const getActionData = useCallback(() => {
+    if (selectedIdsRef.current?.length) return;
+    return {
+      ...dataStore.options?.filter,
+      ...getSearchOptions().filter,
+    }; 
+  }, [dataStore, getSearchOptions]);
+
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
       if (cacheDataRef.current) {
@@ -802,6 +810,7 @@ function GridInner(props: ViewProps<GridView>) {
               onClick: () => onSearch(),
             },
           ]}
+          getActionData={getActionData}
           actionExecutor={actionExecutor}
           pagination={{
             canPrev,

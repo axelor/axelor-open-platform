@@ -36,7 +36,7 @@ import {
 } from "@/services/client/meta.types";
 import { FormAtom, RecordHandler, WidgetState } from "@/views/form/builder";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
-import { ActionExecutor } from "../action";
+import { ActionExecutor, ActionOptions } from "../action";
 
 import styles from "./view-toolbar.module.scss";
 
@@ -45,6 +45,7 @@ export type ViewToolBarProps = {
   formAtom?: FormAtom;
   actionExecutor?: ActionExecutor;
   recordHandler?: RecordHandler;
+  getActionData?: () => ActionOptions["data"];
   children?: React.ReactNode;
   pagination?: {
     text?: string | (() => JSX.Element);
@@ -83,7 +84,7 @@ function ActionCommandItem({
   const [hidden, setHidden] = useState<boolean | undefined>(props.hidden);
   const [readonly, setReadonly] = useState<boolean>(false);
   const { action } = useViewTab();
-  
+
   const attrs = useAtomValue(
     useMemo(
       () =>
@@ -96,7 +97,7 @@ function ActionCommandItem({
         ),
       [name, formAtom],
     ),
-  )
+  );
 
   useEffect(() => {
     const hasExpr = showIf || hideIf || readonlyIf;
@@ -147,11 +148,15 @@ export function ToolbarActions({
   buttons,
   menus,
   formAtom,
+  getActionData,
   recordHandler,
   actionExecutor,
   parentRef,
   parentWidth,
-}: Pick<ViewToolBarProps, "formAtom" | "actionExecutor" | "recordHandler"> & {
+}: Pick<
+  ViewToolBarProps,
+  "formAtom" | "getActionData" | "actionExecutor" | "recordHandler"
+> & {
   buttons?: Button[];
   menus?: Menu[];
   parentRef?: React.RefObject<HTMLDivElement>;
@@ -203,6 +208,7 @@ export function ToolbarActions({
                 if (!confirmed) return;
               }
               actionExecutor?.execute(action, {
+                data: getActionData?.(),
                 context: {
                   _signal: item.name,
                   _source: item.name,
@@ -231,7 +237,7 @@ export function ToolbarActions({
 
       return [...(buttons || []), ...(menus || [])].map(mapItem);
     },
-    [buttons, menus, formAtom, actionExecutor, recordHandler]
+    [buttons, menus, formAtom, getActionData, actionExecutor, recordHandler],
   );
 
   const [items, responsiveItems] = useMemo(
@@ -277,6 +283,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     actions = [],
     actionExecutor,
     recordHandler,
+    getActionData,
     children,
     pagination: {
       text: pageTextOrComp,
@@ -428,6 +435,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             buttons={toolbar}
             menus={menubar}
             formAtom={formAtom}
+            getActionData={getActionData}
             actionExecutor={actionExecutor}
             recordHandler={recordHandler}
             parentRef={ref}
