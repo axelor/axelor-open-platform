@@ -1,5 +1,5 @@
 import { uniqueId } from "lodash";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridState } from "@axelor/ui/grid";
@@ -82,10 +82,8 @@ export function useSelector() {
       footer: (close) => (
         <Footer
           multiple={multiple}
-          onClose={(result: boolean) => {
-            close(result);
-            onClose?.();
-          }}
+          close={close}
+          onClose={onClose}
           onCreate={onCreate}
           onSelect={onSelect}
         />
@@ -113,7 +111,7 @@ function Handler({
       onSelect?.(records);
       onClose(true);
     },
-    [multiple, onClose, onSelect]
+    [multiple, onClose, onSelect],
   );
 
   useEffect(() => {
@@ -186,17 +184,27 @@ function SelectorHeader({ dataStore }: { dataStore: DataStore }) {
 
 function Footer({
   multiple = false,
-  onClose,
+  close,
+  onClose: _onClose,
   onCreate,
   onSelect,
 }: {
   multiple?: boolean;
-  onClose: (result: boolean) => void;
+  close: (result: boolean) => void;
+  onClose?: () => void;
   onCreate?: () => void;
   onSelect?: (records: DataRecord[]) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
+
+  const onClose = useCallback(
+    (result: boolean) => {
+      close(result);
+      _onClose?.();
+    },
+    [close, _onClose],
+  );
 
   const handleCancel = useCallback(() => {
     onClose(false);
