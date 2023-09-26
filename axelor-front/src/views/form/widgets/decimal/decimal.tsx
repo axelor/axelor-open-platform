@@ -50,8 +50,8 @@ export function Decimal(props: FieldProps<string | number>) {
           const value = parseInt(get(form.record, scaleAttr ?? ""));
           return isNaN(value) ? DEFAULT_SCALE : value;
         }),
-      [formAtom, scaleAttr, scaleNum]
-    )
+      [formAtom, scaleAttr, scaleNum],
+    ),
   );
 
   const { value, setValue } = useInput(valueAtom, {
@@ -71,7 +71,7 @@ export function Decimal(props: FieldProps<string | number>) {
         ? parseDecimal(value, { scale } as Property)
         : parseInt(String(value));
     },
-    [isDecimal, scale, nullable]
+    [isDecimal, scale, nullable],
   );
 
   const parsedValue = useMemo(() => parse(value), [parse, value]);
@@ -84,7 +84,7 @@ export function Decimal(props: FieldProps<string | number>) {
         setChanged(true);
       }
     },
-    [setValue]
+    [setValue],
   );
 
   const handleBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
@@ -94,12 +94,12 @@ export function Decimal(props: FieldProps<string | number>) {
         setValue(parsedValue, true);
       }
     },
-    [changed, parsedValue, setValue]
+    [changed, parsedValue, setValue],
   );
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
-    if (min && Number(value) < Number(min)) return min;
-    if (max && Number(value) > Number(max)) return max;
+    if (min != null && Number(value) < Number(min)) return min;
+    if (max != null && Number(value) > Number(max)) return max;
     return value;
   }, []);
 
@@ -118,7 +118,7 @@ export function Decimal(props: FieldProps<string | number>) {
       setChanged(true);
       setValue(parse(res));
     },
-    [checkRange, max, min, parse, setValue, value]
+    [checkRange, min, max, parse, setValue, value],
   );
 
   const handleKeyDown = useCallback<
@@ -129,7 +129,7 @@ export function Decimal(props: FieldProps<string | number>) {
       if (e.key === "ArrowUp") increment(1n);
       if (e.key === "ArrowDown") increment(-1n);
     },
-    [increment]
+    [increment],
   );
 
   const handleUp = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
@@ -138,7 +138,7 @@ export function Decimal(props: FieldProps<string | number>) {
       if (inputRef.current) inputRef.current.focus();
       increment(1n);
     },
-    [increment]
+    [increment],
   );
 
   const handleDown = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
@@ -147,7 +147,7 @@ export function Decimal(props: FieldProps<string | number>) {
       if (inputRef.current) inputRef.current.focus();
       increment(-1n);
     },
-    [increment]
+    [increment],
   );
 
   const text = useMemo(
@@ -155,12 +155,12 @@ export function Decimal(props: FieldProps<string | number>) {
       nullable && !value
         ? value
         : format(value, { props: { ...schema, scale } as Field }),
-    [nullable, scale, schema, value]
+    [nullable, scale, schema, value],
   );
 
   const step = useMemo(
     () => (scale > 0 ? Math.pow(10, -Math.floor(scale)) : 1),
-    [scale]
+    [scale],
   );
 
   return (

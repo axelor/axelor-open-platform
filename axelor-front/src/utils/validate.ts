@@ -12,7 +12,7 @@ export type ValiationOptions = {
 
 export type Validate = (
   value: any,
-  options: ValiationOptions
+  options: ValiationOptions,
 ) => WidgetErrors | undefined;
 
 const isEmpty = (value: any) =>
@@ -38,13 +38,11 @@ const validatePattern: Validate = (value, { props }) => {
 };
 
 const validateRange: Validate = (value, { props }) => {
-  const { title, minSize = 0, maxSize = 0 } = props;
-  const min = +minSize;
-  const max = +maxSize;
-  if (min && value < min) {
+  const { title, minSize, maxSize } = props;
+  if (minSize != null && value < +(minSize ?? 0)) {
     return { min: i18n.get("{0} is too small", title) };
   }
-  if (max && value > max) {
+  if (maxSize != null && value > +(maxSize ?? 0)) {
     return { max: i18n.get("{0} is too big", title) };
   }
 };
