@@ -43,7 +43,9 @@ export function DmsOverlay({
             <Box>
               <MaterialIcon fontSize={"2.5rem"} icon="upload" />
             </Box>
-            <Box>{i18n.get("Drop your files to start upload.")}</Box>
+            <Box textAlign="center">
+              {i18n.get("Drop your files to start upload.")}
+            </Box>
           </Box>
         </Box>
       )}
