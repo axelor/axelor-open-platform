@@ -102,7 +102,7 @@ export function OneToManyEdit({
   const readonly = props.readonly || attrs.readonly;
   const canNew = !readonly && hasButton("new");
   const canEdit = !readonly && hasButton("edit");
-  const canDelete = !readonly && hasButton("delete");
+  const canDelete = !readonly && hasButton("remove");
   const canSelect = !readonly && hasButton("select");
 
   const { data: meta } = useAsync(async () => {

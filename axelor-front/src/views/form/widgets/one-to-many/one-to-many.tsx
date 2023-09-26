@@ -573,7 +573,7 @@ export function OneToMany({
   const canNew = !readonly && hasButton("new");
   const canEdit = !readonly && hasButton("edit");
   const canView = hasButton("view");
-  const canDelete = !readonly && hasButton("delete");
+  const canDelete = !readonly && hasButton("remove");
   const canSelect = !readonly && hasButton("select");
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
