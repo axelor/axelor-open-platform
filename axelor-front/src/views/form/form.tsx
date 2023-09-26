@@ -504,8 +504,10 @@ const FormContainer = memo(function FormContainer({
         const vals = diff(rec, original);
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
 
-        let res = await dataStore.save(processDataRecord(vals), opts);
+        // pass original values to check for concurrent updates
+        vals._original = original;
 
+        let res = await dataStore.save(processDataRecord(vals), opts);
         if (callOnLoad) {
           res = res.id ? await doRead(res.id) : res;
           res = { ...dummy, ...res }; // restore dummy values
