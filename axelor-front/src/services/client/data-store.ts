@@ -4,6 +4,7 @@ import {
   DataSource,
   DeleteOption,
   ExportResult,
+  SaveOptions,
   SearchOptions,
   SearchPage,
   SearchResult,
@@ -127,17 +128,22 @@ export class DataStore extends DataSource {
     return res;
   }
 
-  async save(data: DataRecord | DataRecord[]): Promise<DataRecord> {
-    const res = await super.save(data);
+  async save<T extends DataRecord | DataRecord[]>(
+    data: T,
+    options?: SaveOptions<T>,
+  ): Promise<T> {
+    const res = await super.save(data, options);
 
-    if (Array.isArray(data) || !res) return res;
+    if (Array.isArray(data) || Array.isArray(res) || !res) {
+      return res;
+    }
 
     let records = this.#records.slice();
     let page = this.#page;
 
     if (data.id) {
       records = records.map((record) =>
-        record.id === (data as DataRecord).id ? { ...record, ...res } : record
+        record.id === (data as DataRecord).id ? { ...record, ...res } : record,
       );
     } else if (res.id && res.id !== data.id) {
       const totalCount = page.totalCount ?? this.records.length;

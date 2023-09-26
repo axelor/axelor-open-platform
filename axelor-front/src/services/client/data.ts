@@ -1,7 +1,7 @@
 import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 import { SearchFilter } from "./meta.types";
-import { reject } from "./reject";
+import { ErrorReport, reject } from "./reject";
 
 export type SearchOptions = {
   limit?: number;
@@ -35,6 +35,10 @@ export type ReadOptions = {
   related?: {
     [K: string]: string[];
   };
+};
+
+export type SaveOptions<T extends DataRecord | DataRecord[]> = ReadOptions & {
+  onError?: (error: ErrorReport) => Promise<T>;
 };
 
 export type DeleteOption = {
@@ -114,10 +118,15 @@ export class DataSource {
     return Promise.reject(resp.status);
   }
 
-  async save(data: DataRecord | DataRecord[]): Promise<DataRecord> {
-    if ((data as DataRecord)?.$upload) {
-      const upload = (data as DataRecord).$upload;
-      return this.upload(data, upload.field, upload.file);
+  async save<T extends DataRecord | DataRecord[]>(
+    data: T,
+    options?: SaveOptions<T>,
+  ): Promise<T> {
+    const { onError } = options ?? {};
+
+    if (!Array.isArray(data) && data?.$upload) {
+      const upload = data.$upload;
+      return this.upload(data, upload.field, upload.file) as Promise<T>;
     }
 
     const isRecords = Array.isArray(data);
@@ -130,7 +139,10 @@ export class DataSource {
 
     if (resp.ok) {
       const { status, data } = await resp.json();
-      return status === 0 ? (isRecords ? data : data[0]) : reject(data);
+      if (status === 0) {
+        return isRecords ? data : data[0];
+      }
+      return onError ? onError(data).catch(reject) : reject(data);
     }
 
     return Promise.reject(resp.status);
@@ -210,7 +222,7 @@ export class DataSource {
     data: DataRecord,
     field: string | Blob,
     file: File,
-    onProgress?: (complete?: number) => void
+    onProgress?: (complete?: number) => void,
   ): Promise<DataRecord> {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
@@ -228,7 +240,7 @@ export class DataSource {
             const complete = Math.round((e.loaded * 100) / e.total);
             onProgress(complete);
           },
-          false
+          false,
         );
       }
 
@@ -239,7 +251,9 @@ export class DataSource {
         let data: any = {};
         try {
           data = JSON.parse(xhr.response || xhr.responseText);
-        } catch {}
+        } catch {
+          // ignore
+        }
 
         const response = {
           data,
