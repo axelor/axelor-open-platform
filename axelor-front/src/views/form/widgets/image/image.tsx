@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { ChangeEvent, useMemo, useRef } from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
@@ -17,7 +17,7 @@ export function Image(
   props: FieldProps<string | DataRecord | undefined | null>,
 ) {
   const { schema, readonly, formAtom, widgetAtom, valueAtom } = props;
-  const { type, serverType } = schema;
+  const { type, serverType, $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -26,22 +26,25 @@ export function Image(
     attrs: { title },
   } = useAtomValue(widgetAtom);
 
+  const recordAtom = useMemo(
+    () =>
+      selectAtom(formAtom, (x) => {
+        const { record } = x;
+        return $json ? record?.$record : record;
+      }),
+    [formAtom, $json],
+  );
+
   const parentId = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
-      [formAtom],
-    ),
+    useMemo(() => selectAtom(recordAtom, (x) => x.id), [recordAtom]),
   );
 
   const parentVersion = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("version")),
-      [formAtom],
-    ),
+    useMemo(() => selectAtom(recordAtom, (x) => x.version), [recordAtom]),
   );
 
   const parentModel = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom]),
+    useMemo(() => selectAtom(formAtom, (x) => x.model), [formAtom]),
   );
 
   const parent = {

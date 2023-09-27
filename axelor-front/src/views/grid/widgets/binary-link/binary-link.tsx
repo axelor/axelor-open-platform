@@ -6,12 +6,13 @@ import {
   makeImageURL,
 } from "@/views/form/widgets/image/utils";
 import { GridCellProps } from "../../builder/types";
+import { getCellValue } from "../image/utils";
 
 export function BinaryLink(props: GridCellProps) {
   const { value: cellValue, view, data, record } = props;
   const { target, name } = data as Schema;
   const isMetaFile = target === META_FILE_MODEL;
-  const value = isMetaFile ? record?.[data?.name] : record;
+  const value = isMetaFile ? getCellValue(record, data) : record;
   const parent =
     isMetaFile && !record
       ? null

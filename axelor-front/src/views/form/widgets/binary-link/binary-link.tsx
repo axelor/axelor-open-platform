@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { ChangeEvent, useMemo, useRef } from "react";
 
 import { Box, Button } from "@axelor/ui";
@@ -21,26 +21,31 @@ import styles from "./binary-link.module.scss";
 
 export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   const { schema, readonly, invalid, formAtom, valueAtom } = props;
-  const { name, accept } = schema;
+  const { name, accept, $json } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const recordAtom = useMemo(
+    () =>
+      selectAtom(formAtom, (x) => {
+        const { record } = x;
+        return $json ? record?.$record : record;
+      }),
+    [formAtom, $json],
+  );
+
   const parentId = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
-      [formAtom]
-    )
+    useMemo(() => selectAtom(recordAtom, (x) => x.id), [recordAtom]),
   );
+
   const parentVersion = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("version")),
-      [formAtom]
-    )
+    useMemo(() => selectAtom(recordAtom, (x) => x.version), [recordAtom]),
   );
+
   const parentModel = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom])
+    useMemo(() => selectAtom(formAtom, (x) => x.model), [formAtom]),
   );
 
   const parent = {
