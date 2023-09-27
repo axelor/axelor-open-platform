@@ -190,7 +190,7 @@ function process(root) {
     });
 
     const remainingAttr = attrs.filter(
-      ({ name, value }) => !ATTR_EVALUATOR[name]
+      ({ name, value }) => !ATTR_EVALUATOR[name],
     );
     remainingAttr.forEach(({ name, value }) => {
       if (name === HTML_ATTRIBUTES.class) {
@@ -230,7 +230,7 @@ function process(root) {
     const ReactComponent = (() => {
       const HTMLComponent = React.forwardRef(function HTMLComponent(
         { context },
-        ref
+        ref,
       ) {
         try {
           let ngClasses = [];
@@ -254,7 +254,7 @@ function process(root) {
                 result(
                   e,
                   props[ATTRIBUTES.actionContext] &&
-                    get(context, props[ATTRIBUTES.actionContext])
+                    get(context, props[ATTRIBUTES.actionContext]),
                 );
               };
             } else if (attr === ATTRIBUTES.bind) {
@@ -294,7 +294,7 @@ function process(root) {
           let allClasses = classes.concat(ngClasses);
           if (allClasses.length > 0) {
             props.className = legacyClassNames(
-              allClasses.filter((c) => c !== "")
+              allClasses.filter((c) => c !== ""),
             );
           }
           return showIf
@@ -304,7 +304,7 @@ function process(root) {
                 (REACT_COMPONENTS.includes(tagName) || !tagName) &&
                   React.Fragment,
                 context,
-                ref
+                ref,
               )
             : null;
         } catch (err) {
@@ -325,11 +325,11 @@ function process(root) {
       // check key-value for-each
       // ng-repeat="(key, value) in list"
       const objectLoop = statement.match(
-        /\(([^\s]+),\s([^\s]+)\)\s+in\s+([^\s]+)/
+        /\(([^\s]+),\s([^\s]+)\)\s+in\s+([^\s]+)/,
       );
       if (objectLoop) {
         const [, itemKey, itemValue, objKey] = objectLoop;
-        function List({ context }) {
+        const List = function List({ context }) {
           const obj = get(context, objKey) || {};
           return (
             <React.Fragment>
@@ -346,16 +346,16 @@ function process(root) {
               ))}
             </React.Fragment>
           );
-        }
+        };
         return List;
       }
 
       // for-each loop
       // ng-repeat="item in list track by id"
       const [, itemKey, itemsKey, , key] = attrs[index].value.match(
-        /([^\s]+)\s+in\s+([^\s]+)(\s+track\s+by\s+([^\s]+))?/
+        /([^\s]+)\s+in\s+([^\s]+)(\s+track\s+by\s+([^\s]+))?/,
       );
-      function List({ context }) {
+      const List = function List({ context }) {
         const data = get(context, itemsKey) || [];
         return (
           <React.Fragment>
@@ -371,7 +371,7 @@ function process(root) {
             ))}
           </React.Fragment>
         );
-      }
+      };
       return List;
     }
     return ReactComponent;
@@ -382,7 +382,7 @@ function process(root) {
 function generateTree(root) {
   function processElement(
     { value, tagName, attrs, childNodes = [] },
-    isTranslate
+    isTranslate,
   ) {
     if (value === "\n") return;
     if (value) return { value };
@@ -421,7 +421,7 @@ export function processLegacyTemplate(template) {
           tagName: hasSingleChild ? "" : "span",
           attrs: [],
           childNodes,
-        }
+        },
   );
   return process(tree);
 }
