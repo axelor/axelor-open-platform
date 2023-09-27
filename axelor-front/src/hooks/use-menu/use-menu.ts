@@ -8,6 +8,7 @@ import { useAsyncEffect } from "../use-async-effect";
 
 const menusAtom = atom<MenuItem[]>([]);
 const loadingAtom = atom<boolean | null>(null);
+const errorAtom = atom<boolean>(false);
 
 export function useMenu() {
   const menus = useAtomValue(menusAtom);
@@ -17,16 +18,19 @@ export function useMenu() {
     useCallback(async (get, set) => {
       const loading = get(loadingAtom);
       const menus = get(menusAtom);
-      if (loading || menus.length) return;
+      const error = get(errorAtom);
+      if (loading || error || menus.length) return;
 
       set(loadingAtom, true);
       try {
         const res = await meta.menus("all");
         set(menusAtom, res ?? []);
+      } catch {
+        set(errorAtom, true);
       } finally {
         set(loadingAtom, false);
       }
-    }, [])
+    }, []),
   );
 
   useAsyncEffect(async () => {
