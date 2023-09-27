@@ -283,7 +283,7 @@ function GridInner(props: ViewProps<GridView>) {
     [dataStore, clearSelection],
   );
 
-  const onViewInPopup = useCallback(
+  const onEditInPopup = useCallback(
     (record: DataRecord, readonly = false) => {
       showEditor({
         model: view.model!,
@@ -315,18 +315,16 @@ function GridInner(props: ViewProps<GridView>) {
     [action],
   );
 
-  const hasEditInPopup =
-    (isMobile && editable) || (hasPopup && dashlet && !viewProps?.readonly);
+  const hasEditInMobile = (isMobile && editable);
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
-      if (dashlet || hasEditInPopup) {
-        if (hasEditInPopup) {
-          return onViewInPopup(record, false);
-        }
-        return readonly || hasPopup
-          ? onViewInPopup(record, readonly)
-          : onEditInTab(record, readonly);
+      if (dashlet || hasEditInMobile) {
+        const forceEdit = action.params?.["forceEdit"];
+        if (hasPopup || hasEditInMobile || viewProps?.readonly === true) {
+          return onEditInPopup(record, readonly);
+        } 
+        return onEditInTab(record, forceEdit ? false : true);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
@@ -335,7 +333,16 @@ function GridInner(props: ViewProps<GridView>) {
         props: { readonly },
       });
     },
-    [dashlet, hasPopup, hasEditInPopup, switchTo, onEditInTab, onViewInPopup],
+    [
+      dashlet,
+      hasPopup,
+      hasEditInMobile,
+      action.params,
+      viewProps?.readonly,
+      switchTo,
+      onEditInTab,
+      onEditInPopup,
+    ],
   );
 
   const onNew = useCallback(() => {
@@ -668,7 +675,10 @@ function GridInner(props: ViewProps<GridView>) {
     ? {
         ...(action.params?.["dashlet.canSearch"] === true ? searchProps : {}),
         readonly: viewProps?.readonly,
-        onView: viewProps?.readonly === false ? onEdit : onView,
+        ...(hasPopup &&
+          viewProps?.readonly === false && {
+            onView: onEdit,
+          }),
       }
     : {};
   const detailsProps: Partial<GridProps> = hasDetailsView

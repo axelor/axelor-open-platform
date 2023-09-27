@@ -19,7 +19,12 @@ import { PopupScope } from "@/view-containers/view-popup/handler";
 import { Views } from "@/view-containers/views";
 import { useViewTab } from "@/view-containers/views/scope";
 
-import { Attrs, WidgetProps, usePrepareContext } from "../../builder";
+import {
+  Attrs,
+  WidgetProps,
+  usePermission,
+  usePrepareContext,
+} from "../../builder";
 import { useAfterActions } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 
@@ -113,7 +118,12 @@ export function DashletComponent({
   useEffect(() => {
     // for grid view to update readonly to show edit icon
     if (tab && tab?.action?.viewType === "grid") {
-      setTabViewProps(tab, "grid", "readonly", readonly || schema.readonly);
+      setTabViewProps(
+        tab,
+        "grid",
+        "readonly",
+        Boolean(readonly || schema.readonly),
+      );
     }
   }, [tab, schema.readonly, readonly, setTabViewProps]);
 
@@ -234,6 +244,7 @@ export function Dashlet(props: WidgetProps) {
   const { schema, readonly, widgetAtom, formAtom } = props;
   const tab = useViewTab();
   const { attrs } = useAtomValue(widgetAtom);
+  const { hasButton } = usePermission(schema, widgetAtom);
 
   const ready = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom]),
@@ -248,12 +259,14 @@ export function Dashlet(props: WidgetProps) {
     } as DataContext;
   }, [tab.action.model, getFormContext]);
 
+  const canEdit = hasButton("edit") && schema.canEdit;
+
   return (
     ready && (
       <DashletComponent
         schema={schema}
         attrs={attrs}
-        readonly={readonly}
+        readonly={canEdit ? false : readonly}
         getContext={getContext}
       />
     )
