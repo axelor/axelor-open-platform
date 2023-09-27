@@ -18,9 +18,10 @@ import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
 
+import { useViewMeta } from "@/view-containers/views/scope";
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
-import { useFormItems, useFormRefresh } from "../../builder/scope";
+import { useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
@@ -78,7 +79,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canSelect = hasButton("select");
   const isRefLink = schema.widget === "ref-link";
 
-  const findFormItems = useFormItems(formAtom);
+  const { findItems: findFormItems } = useViewMeta();
 
   const ensureRelated = useCallback(
     async (value: DataRecord, refetch?: boolean) => {

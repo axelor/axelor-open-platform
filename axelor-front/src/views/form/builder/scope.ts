@@ -12,7 +12,7 @@ import {
 } from "@/hooks/use-parser/context";
 import { isCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Schema, View } from "@/services/client/meta.types";
+import { View } from "@/services/client/meta.types";
 import {
   ActionAttrData,
   ActionData,
@@ -22,7 +22,7 @@ import {
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewMeta, useViewTab } from "@/view-containers/views/scope";
 
 import { fallbackFormAtom } from "./atoms";
 import {
@@ -218,80 +218,10 @@ export function useFormValidityScope() {
   return useAtomValue(scopeAtom);
 }
 
-function findSchema(schema: Schema, widgetName: string): Schema | undefined {
-  if (schema.name === widgetName) return schema;
-  if (schema.items && schema.type !== "panel-related") {
-    for (const item of schema.items) {
-      const found = findSchema(item, widgetName);
-      if (found) {
-        return found;
-      }
-    }
-  }
-}
-
-export function useFormField(formAtom: FormAtom) {
-  return useAtomCallback(
-    useCallback(
-      (get, set, fieldName: string) => {
-        const { meta, fields } = get(formAtom);
-        const field = fields[fieldName] ?? {};
-        const schema = findSchema(meta.view, fieldName);
-        return {
-          ...field,
-          ...schema,
-          serverType: schema?.serverType || field.type,
-          ...schema?.widgetAttrs,
-        } as Schema;
-      },
-      [formAtom],
-    ),
-  );
-}
-
-export function useFormItems(formAtom: FormAtom) {
-  const findItems = useCallback((schema: Schema): Schema[] => {
-    const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
-    const nested = items.flatMap((item) => findItems(item));
-    return [...items, ...nested];
-  }, []);
-
-  const findFields = useAtomCallback(
-    useCallback(
-      (get) => {
-        const { meta, fields } = get(formAtom);
-        const items = findItems(meta.view);
-        const result = items.map((item) => {
-          const field = fields[item.name!] ?? {};
-          const serverType = item?.serverType || field?.type;
-          const moreAttrs = item?.widgetAttrs;
-          return {
-            ...field,
-            ...item,
-            ...moreAttrs,
-            serverType,
-          };
-        });
-        return result;
-      },
-      [findItems, formAtom],
-    ),
-  );
-
-  const finder = useMemo(() => {
-    return (() => {
-      let items: Schema[] | null = null;
-      return (): Schema[] => (items === null ? (items = findFields()) : items);
-    })();
-  }, [findFields]);
-
-  return finder;
-}
-
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
-  const findField = useFormField(formAtom);
+  const { findItem } = useViewMeta();
 
-  const field = useMemo(() => findField(widgetName), [findField, widgetName]);
+  const field = useMemo(() => findItem(widgetName), [findItem, widgetName]);
 
   const findState = useAtomCallback(
     useCallback(
