@@ -1,10 +1,11 @@
-import { SetStateAction, useCallback, useEffect, useMemo } from "react";
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
+import { SetStateAction, useCallback, useEffect, useMemo } from "react";
 
+import { dialogs } from "@/components/dialogs";
 import {
   Tab,
   TabAtom,
@@ -13,17 +14,18 @@ import {
   TabState,
   useTabs,
 } from "@/hooks/use-tabs";
-import { useFormScope } from "@/views/form/builder/scope";
+import { ViewData } from "@/services/client/meta";
+import { Schema, ViewType } from "@/services/client/meta.types";
 import { usePrepareContext } from "@/views/form/builder";
+import { useFormScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
-import { dialogs } from "@/components/dialogs";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
     title: "",
     type: "",
   }),
-  () => {}
+  () => {},
 );
 
 const fallbackTab: Tab = {
@@ -42,6 +44,16 @@ export const ViewScope = createScope<Tab>(fallbackTab);
 const viewMolecule = molecule((getMol, getScope) => {
   const initialView = getScope(ViewScope);
   return atom(initialView);
+});
+
+export const MetaScope = createScope<ViewData<ViewType>>({
+  view: { type: "form" },
+  fields: {},
+});
+
+const metaMolegule = molecule((getMol, getScope) => {
+  const meta = getScope(MetaScope);
+  return atom(meta);
 });
 
 /**
@@ -75,7 +87,7 @@ export function useViewContext() {
   const getFormContext = usePrepareContext(formAtom);
 
   const recordId = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
 
   return useCallback(
@@ -90,10 +102,10 @@ export function useViewContext() {
           : {
               ..._parent,
               ...action.context,
-            }
+            },
       );
     },
-    [dashlet, recordId, action.context, getFormContext]
+    [dashlet, recordId, action.context, getFormContext],
   );
 }
 
@@ -107,8 +119,8 @@ export function useSelectViewState<T>(selector: (state: TabState) => T) {
   return useAtomValue(
     useMemo(
       () => selectAtom(tab.state, selector, isEqual),
-      [tab.state, selector]
-    )
+      [tab.state, selector],
+    ),
   );
 }
 
@@ -131,7 +143,7 @@ interface SwitchTo {
        * The additional state for the given view type
        */
       props?: Record<string, any>;
-    }
+    },
   ): void;
 }
 
@@ -159,8 +171,8 @@ export function useViewSwitch() {
           open(action, { type, ...options });
         }
       },
-      [action, open, tab.state, tab.action]
-    )
+      [action, open, tab.state, tab.action],
+    ),
   );
 
   return switchTo;
@@ -173,7 +185,7 @@ export function useViewSwitch() {
 export function useViewProps() {
   const tab = useViewTab();
   const { type, props } = useSelectViewState(
-    useCallback(({ type, props }) => ({ type, props }), [])
+    useCallback(({ type, props }) => ({ type, props }), []),
   );
 
   const state = props?.[type];
@@ -196,8 +208,8 @@ export function useViewProps() {
 
         set(tab.state, { ...state, props: newProps });
       },
-      [tab.state]
-    )
+      [tab.state],
+    ),
   );
 
   return [state, setState] as const;
@@ -207,7 +219,7 @@ export function useViewDirtyAtom() {
   const tab = useViewTab();
   return useMemo(
     () => focusAtom(tab.state, (o) => o.prop("dirty").valueOr(false)),
-    [tab.state]
+    [tab.state],
   );
 }
 
@@ -219,7 +231,7 @@ export function useViewDirtyAtom() {
  */
 export function useViewRoute() {
   const { type, routes } = useSelectViewState(
-    useCallback(({ type, routes }) => ({ type, routes }), [])
+    useCallback(({ type, routes }) => ({ type, routes }), []),
   );
   const options = routes?.[type] ?? {};
   return options as TabRoute;
@@ -238,7 +250,7 @@ export function useViewTabRefresh(viewType: string, refresh: () => void) {
         refresh();
       }
     },
-    [refresh, tab.id, type, viewType]
+    [refresh, tab.id, type, viewType],
   );
 
   useEffect(() => {
@@ -259,13 +271,77 @@ export function useViewConfirmDirty() {
       options?: {
         title?: string;
         content?: React.ReactNode;
-      }
+      },
     ) =>
       dialogs.confirmDirty(
         async () => canConfirm && (await check()),
         callback,
-        options
+        options,
       ),
-    [canConfirm]
+    [canConfirm],
   );
+}
+
+/**
+ * This hook can be used to access the current view's meta data
+ *
+ */
+export function useViewMeta() {
+  const metaAtom = useMolecule(metaMolegule);
+  const meta = useAtomValue(metaAtom);
+
+  const findField = useCallback((name: string) => meta.fields?.[name], [meta]);
+  const findItem = useCallback(
+    (fieldName: string) => {
+      const { view, fields = {} } = meta;
+      const field = fields[fieldName] ?? {};
+      const schema = findSchema(view, fieldName);
+      return {
+        ...field,
+        ...schema,
+        serverType: schema?.serverType || field.type,
+        ...schema?.widgetAttrs,
+      } as Schema;
+    },
+    [meta],
+  );
+
+  const findItems = useMemo(() => {
+    return (() => {
+      let items: Schema[] | null = null;
+      return (): Schema[] => {
+        if (items === null) {
+          items = findSchemaItems(meta.view).map((item) =>
+            item.name ? findItem(item.name) ?? { ...item } : { ...item },
+          );
+        }
+        return items;
+      };
+    })();
+  }, [findItem, meta.view]);
+
+  return {
+    meta,
+    findField,
+    findItem,
+    findItems,
+  } as const;
+}
+
+function findSchema(schema: Schema, name: string): Schema | undefined {
+  if (schema.name === name) return schema;
+  if (schema.items && schema.type !== "panel-related") {
+    for (const item of schema.items) {
+      const found = findSchema(item, name);
+      if (found) {
+        return found;
+      }
+    }
+  }
+}
+
+function findSchemaItems(schema: Schema): Schema[] {
+  const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
+  const nested = items.flatMap((item) => findSchemaItems(item));
+  return [...items, ...nested];
 }

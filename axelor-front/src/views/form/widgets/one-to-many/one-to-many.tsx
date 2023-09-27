@@ -49,6 +49,8 @@ import {
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 import { download } from "@/utils/download";
+import { MetaScope } from "@/view-containers/views/scope";
+import { ScopeProvider } from "jotai-molecules";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
 import styles from "./one-to-many.module.scss";
@@ -674,48 +676,52 @@ export function OneToMany({
           ],
         }}
       >
-        <GridComponent
-          className={styles["grid"]}
-          ref={gridRef}
-          showEditIcon={canEdit || canView}
-          readonly={readonly || !canEdit}
-          editable={editable && canEdit}
-          records={records}
-          view={(viewData?.view || schema) as GridView}
-          fields={viewData?.fields || fields}
-          columnAttrs={columnAttrs}
-          state={state}
-          setState={setState}
-          actionExecutor={actionExecutor}
-          onFormInit={forceUpdate}
-          onEdit={canEdit ? onEdit : canView ? onView : noop}
-          onView={canView ? (canEdit ? onEdit : onView) : noop}
-          onUpdate={onSave}
-          onSave={onSave}
-          onSearch={onSearch}
-          onRowReorder={onRowReorder}
-          {...(!canNew &&
-            editable && {
-              onRecordAdd: undefined,
-            })}
-          {...(hasMasterDetails &&
-            selected &&
-            !detailRecord && {
-              onRowClick,
-            })}
-        />
+        <ScopeProvider scope={MetaScope} value={viewData}>
+          <GridComponent
+            className={styles["grid"]}
+            ref={gridRef}
+            showEditIcon={canEdit || canView}
+            readonly={readonly || !canEdit}
+            editable={editable && canEdit}
+            records={records}
+            view={(viewData?.view || schema) as GridView}
+            fields={viewData?.fields || fields}
+            columnAttrs={columnAttrs}
+            state={state}
+            setState={setState}
+            actionExecutor={actionExecutor}
+            onFormInit={forceUpdate}
+            onEdit={canEdit ? onEdit : canView ? onView : noop}
+            onView={canView ? (canEdit ? onEdit : onView) : noop}
+            onUpdate={onSave}
+            onSave={onSave}
+            onSearch={onSearch}
+            onRowReorder={onRowReorder}
+            {...(!canNew &&
+              editable && {
+                onRecordAdd: undefined,
+              })}
+            {...(hasMasterDetails &&
+              selected &&
+              !detailRecord && {
+                onRowClick,
+              })}
+          />
+        </ScopeProvider>
         {hasMasterDetails && detailMeta ? (
           <Box d="flex" flexDirection="column" p={2}>
             {(!editable || selected) && (
-              <DetailsForm
-                meta={detailMeta}
-                readonly={readonly || editable}
-                record={detailRecord}
-                formAtom={gridRef.current?.form?.current?.formAtom}
-                onClose={onCloseInDetail}
-                onSave={onSave}
-                {...(canNew && { onNew: onAddInDetail })}
-              />
+              <ScopeProvider scope={MetaScope} value={detailMeta}>
+                <DetailsForm
+                  meta={detailMeta}
+                  readonly={readonly || editable}
+                  record={detailRecord}
+                  formAtom={gridRef.current?.form?.current?.formAtom}
+                  onClose={onCloseInDetail}
+                  onSave={onSave}
+                  {...(canNew && { onNew: onAddInDetail })}
+                />
+              </ScopeProvider>
             )}
           </Box>
         ) : null}

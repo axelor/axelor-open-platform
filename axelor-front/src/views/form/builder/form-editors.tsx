@@ -25,6 +25,8 @@ import { nextId, processView } from "./utils";
 
 import { DataStore } from "@/services/client/data-store";
 import { toKebabCase, toSnakeCase } from "@/utils/names";
+import { MetaScope } from "@/view-containers/views/scope";
+import { ScopeProvider } from "jotai-molecules";
 import { isEqual } from "lodash";
 import { useGetErrors } from "../form";
 import styles from "./form-editors.module.scss";
@@ -465,11 +467,12 @@ const RecordEditor = memo(function RecordEditor({
   valueAtom,
   readonly,
   setInvalid,
+  schema,
 }: FormEditorProps & {
   model: string;
   setInvalid: (value: DataRecord, invalid: boolean) => void;
 }) {
-  const meta: ViewData<any> = useMemo(
+  const meta: ViewData<FormView> = useMemo(
     () => ({
       model,
       fields,
@@ -551,16 +554,18 @@ const RecordEditor = memo(function RecordEditor({
   useAsyncEffect(async () => load(), [load]);
 
   return (
-    <Form
-      schema={editor}
-      recordHandler={recordHandler}
-      actionExecutor={actionExecutor}
-      actionHandler={actionHandler}
-      fields={fields}
-      formAtom={editorAtom}
-      widgetAtom={widgetAtom}
-      readonly={readonly}
-    />
+    <ScopeProvider scope={MetaScope} value={meta}>
+      <Form
+        schema={editor}
+        recordHandler={recordHandler}
+        actionExecutor={actionExecutor}
+        actionHandler={actionHandler}
+        fields={fields}
+        formAtom={editorAtom}
+        widgetAtom={widgetAtom}
+        readonly={readonly}
+      />
+    </ScopeProvider>
   );
 });
 

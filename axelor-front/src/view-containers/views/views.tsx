@@ -1,7 +1,7 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { selectAtom } from "jotai/utils";
 import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { memo, useEffect, useMemo } from "react";
 
 import { Box, Fade } from "@axelor/ui";
@@ -12,7 +12,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { filters as fetchFilters } from "@/services/client/meta";
-import { findView } from "@/services/client/meta-cache";
+import { findFields, findView } from "@/services/client/meta-cache";
 import {
   AdvancedSearchAtom,
   Property,
@@ -20,12 +20,11 @@ import {
   SearchFilters,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
-import { findFields } from "@/services/client/meta-cache";
 
-import { ViewScope } from "./scope";
+import { processContextValues } from "@/views/form/builder/utils";
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
-import { processContextValues } from "@/views/form/builder/utils";
+import { MetaScope, ViewScope } from "./scope";
 
 async function loadComp(viewType: string) {
   const type = toKebabCase(viewType);
@@ -60,7 +59,7 @@ function ViewContainer({
   const { model, params } = tab.action;
   const { state, data } = useAsync(
     async () => loadView({ model, ...view }),
-    [model, view]
+    [model, view],
   );
 
   const forceTitle = params?.["forceTitle"];
@@ -76,15 +75,15 @@ function ViewContainer({
   const setTabTitle = useSetAtom(
     useMemo(
       () => focusAtom(tab.state, (state) => state.prop("title")),
-      [tab.state]
-    )
+      [tab.state],
+    ),
   );
 
   const setTabName = useSetAtom(
     useMemo(
       () => focusAtom(tab.state, (state) => state.prop("name")),
-      [tab.state]
-    )
+      [tab.state],
+    ),
   );
 
   useEffect(() => {
@@ -107,7 +106,9 @@ function ViewContainer({
           flex={1}
           style={{ minWidth: 0, minHeight: 0 }}
         >
-          <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
+          <ScopeProvider scope={MetaScope} value={meta}>
+            <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
+          </ScopeProvider>
         </Box>
       </Fade>
     );
@@ -180,7 +181,7 @@ const DataViews = memo(function DataViews({
         search: {},
         editor: { criteria: [] },
       }),
-    []
+    [],
   );
   const setSearchState = useSetAtom(searchAtom);
 
@@ -196,12 +197,12 @@ const DataViews = memo(function DataViews({
     if (!hasAdvanceSearch) return;
     const { fields = {}, jsonFields = {} } = await findFields(
       model,
-      context?.jsonModel
+      context?.jsonModel,
     );
     const dashletActionName =
       dashlet && context?._domainAction ? `act:${context._domainAction}` : "";
     const filters = await fetchFilters(
-      filterName || dashletActionName || `act:${actionName}`
+      filterName || dashletActionName || `act:${actionName}`,
     );
 
     setSearchState((state) => ({
