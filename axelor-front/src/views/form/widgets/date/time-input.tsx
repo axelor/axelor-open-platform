@@ -1,5 +1,6 @@
-import { forwardRef } from "react";
 import padStart from "lodash/padStart";
+import { forwardRef } from "react";
+
 import { Box } from "@axelor/ui";
 
 interface TimeInputProps {
@@ -15,7 +16,8 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
 
     const toText = (val: number) => padStart(`${val}`, 2, "0");
     const setValue = (hr: string, mm: string, ss: string) =>
-      onChange && onChange(`${hr}:${mm}${hasSeconds ? `${ss}` : ""}`);
+      onChange &&
+      onChange(`${hr ?? 0}:${mm ?? 0}${hasSeconds ? `${ss ?? 0}` : ""}`);
 
     function handleHourChange(value: string) {
       setValue(value, mm, ss);
@@ -32,7 +34,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
     function renderSelect(
       size: number,
       value: string,
-      onChange: (value: string) => void
+      onChange: (value: string) => void,
     ) {
       return (
         <Box
@@ -61,5 +63,5 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
         {hasSeconds && renderSelect(24, ss, handleSecondChange)}
       </div>
     );
-  }
+  },
 );
