@@ -72,7 +72,8 @@ export function Binary(
   }
 
   function handleDownload() {
-    const imageURL = makeImageURL(record, record, schema);
+    const { target, name } = schema;
+    const imageURL = makeImageURL(record, target, name, record);
     download(imageURL, record?.fileName || name);
   }
 

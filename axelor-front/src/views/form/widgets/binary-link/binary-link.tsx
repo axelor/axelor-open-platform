@@ -55,7 +55,8 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   }
 
   function handleDownload() {
-    const fileURL = makeImageURL(value, parent, schema);
+    const { target, name } = schema;
+    const fileURL = makeImageURL(value, target, name, parent);
     download(fileURL, value?.fileName || name);
   }
 

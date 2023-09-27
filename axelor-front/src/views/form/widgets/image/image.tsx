@@ -14,7 +14,7 @@ import { META_FILE_MODEL, makeImageURL, validateFileSize } from "./utils";
 import styles from "./image.module.scss";
 
 export function Image(
-  props: FieldProps<string | DataRecord | undefined | null>
+  props: FieldProps<string | DataRecord | undefined | null>,
 ) {
   const { schema, readonly, formAtom, widgetAtom, valueAtom } = props;
   const { type, serverType } = schema;
@@ -29,19 +29,19 @@ export function Image(
   const parentId = useAtomValue(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const parentVersion = useAtomValue(
     useMemo(
       () => focusAtom(formAtom, (o) => o.prop("record").prop("version")),
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const parentModel = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom])
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom]),
   );
 
   const parent = {
@@ -92,6 +92,10 @@ export function Image(
     }
   }
 
+  const { target, name } = isBinary
+    ? { target: parentModel, name: schema.name }
+    : schema;
+
   return (
     <FieldControl {...props}>
       <Box
@@ -115,11 +119,7 @@ export function Image(
               ? makeImageURL(null)
               : isBinary && value
               ? (value as string)
-              : makeImageURL(
-                  record,
-                  parent,
-                  isBinary ? { ...schema, target: parentModel } : schema
-                )
+              : makeImageURL(record, target, name, parent)
           }
           alt={title}
         />
