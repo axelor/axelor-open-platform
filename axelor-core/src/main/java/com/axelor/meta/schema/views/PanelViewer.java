@@ -19,6 +19,8 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -72,17 +73,27 @@ public class PanelViewer {
 
     final Set<String> names = new HashSet<>();
     if (StringUtils.notBlank(depends)) {
-      Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+      for (String name : depends.split("\\s*,\\s*")) {
+        if (StringUtils.notBlank(name)) {
+          names.add(name);
+        }
+      }
     }
-    if (names.isEmpty()) {
-      return null;
-    }
+
     final Class<?> target;
     try {
       target = Class.forName(forField.getTarget());
     } catch (ClassNotFoundException e) {
       return null;
     }
+
+    if (names.isEmpty()) {
+      Property nameField = Mapper.of(target).getNameField();
+      if (nameField != null) {
+        names.add(nameField.getName());
+      }
+    }
+
     return (Collection<?>) MetaStore.findFields(target, names).get("fields");
   }
 }
