@@ -7,6 +7,7 @@ import { moment } from "@/services/client/l10n";
 import { Field } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
+import { axelor } from "@/utils/globals";
 import { ActionOptions } from "@/view-containers/action";
 
 export type ScriptContextOptions = {
@@ -36,6 +37,12 @@ export function createScriptContext(
   const { $getField } = moreHelpers;
   const getField = (name: string) => $getField?.(name) ?? fields[name];
   const noFields = isEmpty(fields) && !$getField;
+
+  const globalHelpers = {
+    $alerts: axelor.alerts,
+    $dialogs: axelor.dialogs,
+    $openView: axelor.openView,
+  };
 
   const helpers = {
     get $user() {
@@ -174,6 +181,7 @@ export function createScriptContext(
       };
     },
     ...moreHelpers,
+    ...globalHelpers,
   };
 
   type Context = DataContext & typeof helpers;
