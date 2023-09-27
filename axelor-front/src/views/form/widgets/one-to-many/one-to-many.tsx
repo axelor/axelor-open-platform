@@ -34,6 +34,7 @@ import { DataStore } from "@/services/client/data-store";
 import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import { FormView, GridView, View } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
@@ -62,13 +63,57 @@ import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
 
-export function OneToMany({
+export function OneToMany(props: FieldProps<DataRecord[]>) {
+  const { schema } = props;
+  const { target: model, gridView } = schema;
+
+  const { state, data } = useAsync(async () => {
+    const { items } = schema;
+    if ((items || []).length > 0) return;
+    const { view, ...res } = await findView<GridView>({
+      type: "grid",
+      name: gridView,
+      model,
+    });
+    return {
+      ...res,
+      view: view && {
+        ...view,
+        ...[
+          "canMove",
+          "editable",
+          "selector",
+          "rowHeight",
+          "onNew",
+          "orderBy",
+          "groupBy",
+          "editable",
+        ].reduce(
+          (obj, key) => ({
+            ...obj,
+            [key]: schema[key] ?? view[key as keyof GridView],
+          }),
+          {},
+        ),
+      },
+    };
+  }, [schema, model]);
+
+  if (state !== "hasData") return null;
+
+  return <OneToManyInner {...props} viewData={data} />;
+}
+
+function OneToManyInner({
   schema,
   valueAtom,
   widgetAtom,
   formAtom,
+  viewData,
   ...props
-}: FieldProps<DataRecord[]>) {
+}: FieldProps<DataRecord[]> & {
+  viewData?: ViewData<GridView>;
+}) {
   const {
     name,
     target: model,
@@ -77,13 +122,13 @@ export function OneToMany({
     formView,
     summaryView,
     gridView,
-    orderBy: sortBy,
     searchLimit,
     widgetAttrs,
     canExport = widgetAttrs.canExport,
     canCopy = widgetAttrs.canCopy,
     perms,
   } = schema;
+
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
@@ -185,37 +230,6 @@ export function OneToMany({
   const isManyToMany =
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
 
-  const { state: viewState, data: viewData } = useAsync(async () => {
-    const { items, gridView } = schema;
-    if ((items || []).length > 0) return;
-    const { view, ...res } = await findView<GridView>({
-      type: "grid",
-      name: gridView,
-      model,
-    });
-    return {
-      ...res,
-      view: view && {
-        ...view,
-        ...[
-          "canMove",
-          "editable",
-          "selector",
-          "rowHeight",
-          "onNew",
-          "orderBy",
-          "groupBy",
-        ].reduce(
-          (obj, key) => ({
-            ...obj,
-            [key]: schema[key] ?? view[key as keyof GridView],
-          }),
-          {},
-        ),
-      },
-    };
-  }, [schema, model]);
-
   const viewMeta = useMemo(() => {
     return (
       viewData ?? {
@@ -243,10 +257,11 @@ export function OneToMany({
   const canSelect = !readonly && hasButton("select");
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
+  const orderBy = schema.orderBy ?? viewData?.view?.orderBy;
   const editable =
-    (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
     !readonly &&
-    canEdit;
+    canEdit &&
+    (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable);
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -347,7 +362,7 @@ export function OneToMany({
             ...options,
             limit: -1,
             offset: 0,
-            sortBy: sortBy?.split?.(","),
+            sortBy: orderBy?.split?.(","),
             filter: {
               ...options?.filter,
               _archived: true,
@@ -376,7 +391,7 @@ export function OneToMany({
           records,
         } as SearchResult;
       },
-      [dataStore, getItems, model, name, parentId, sortBy, valueAtom],
+      [dataStore, getItems, model, name, parentId, orderBy, valueAtom],
     ),
   );
 
@@ -479,7 +494,7 @@ export function OneToMany({
       model,
       multiple: true,
       viewName: gridView,
-      orderBy: sortBy,
+      orderBy: orderBy,
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
@@ -487,7 +502,7 @@ export function OneToMany({
     });
   }, [
     showSelector,
-    sortBy,
+    orderBy,
     model,
     gridView,
     domain,
@@ -661,7 +676,7 @@ export function OneToMany({
   }, [selectedRows, rows, setSelection]);
 
   useEffect(() => {
-    if (sortBy && reorderRef.current) {
+    if (orderBy && reorderRef.current) {
       setValue(
         (values) => {
           const valIds = values.map((v) => v.id);
@@ -670,7 +685,7 @@ export function OneToMany({
             .map((r) => values.find((v) => v.id === r.record?.id))
             .map((r, ind) => ({
               ...r,
-              [sortBy]: ind + 1,
+              [orderBy]: ind + 1,
               version: r?.version ?? r?.$version,
             })) as DataRecord[];
         },
@@ -679,7 +694,7 @@ export function OneToMany({
       );
     }
     reorderRef.current = false;
-  }, [rows, sortBy, setValue]);
+  }, [rows, orderBy, setValue]);
 
   const fetchAndSetDetailRecord = useCallback(
     async (selected: DataRecord) => {
@@ -726,8 +741,6 @@ export function OneToMany({
   }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
 
   useFormRefresh(onSearch);
-
-  if (viewState === "loading") return null;
 
   return (
     <>
