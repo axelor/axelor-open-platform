@@ -18,7 +18,7 @@ import {
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useHilites, useViewTemplate } from "@/hooks/use-parser";
+import { useHilites, useTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
@@ -66,7 +66,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const { view, fields } = meta;
   const { action, dashlet, popup, popupOptions } = useViewTab();
   const [columns, setColumns] = useAtom(
-    useMemo(() => atomWithImmer<KanbanColumn[]>([]), [])
+    useMemo(() => atomWithImmer<KanbanColumn[]>([]), []),
   );
 
   const { hasButton } = usePerms(meta.view, meta.perms);
@@ -92,8 +92,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
       ({
         ...getViewContext(true),
         _model: action.model,
-      } as DataContext),
-    [action, getViewContext]
+      }) as DataContext,
+    [action, getViewContext],
   );
 
   const getActionContext = useCallback(() => {
@@ -110,7 +110,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       const field = fields?.[columnBy ?? ""];
       return isObject(value) ? value : field?.target ? { id: value } : value;
     },
-    [fields, columnBy]
+    [fields, columnBy],
   );
 
   const $columns = useMemo(() => {
@@ -166,7 +166,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           filter,
           limit,
           fields: uniq(
-            [...names, columnBy, sequenceBy].filter((name) => name)
+            [...names, columnBy, sequenceBy].filter((name) => name),
           ) as string[],
           ...options,
         });
@@ -181,8 +181,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
         sequenceBy,
         getViewContext,
         getColumnByValue,
-      ]
-    )
+      ],
+    ),
   );
 
   const onSearch = useCallback(
@@ -212,10 +212,10 @@ export function Kanban(props: ViewProps<KanbanView>) {
               column.hasMore = hasMorePage(page);
             }
           });
-        })
+        }),
       );
     },
-    [hideCols, setColumns, $columns, fetchRecords]
+    [hideCols, setColumns, $columns, fetchRecords],
   );
 
   const onRefresh = useCallback(() => {
@@ -230,15 +230,15 @@ export function Kanban(props: ViewProps<KanbanView>) {
             const columnIndex = columns.findIndex((c) => c.name === name);
             if (columns[columnIndex]) {
               columns[columnIndex].records?.push(
-                ...(records as KanbanRecord[])
+                ...(records as KanbanRecord[]),
               );
               columns[columnIndex].hasMore = hasMorePage(page);
             }
           });
-        }
+        },
       );
     },
-    [fetchRecords, setColumns]
+    [fetchRecords, setColumns],
   );
 
   const onDelete = useCallback(
@@ -251,7 +251,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     }) => {
       const confirmed = await dialogs.confirm({
         content: i18n.get(
-          "Do you really want to delete the selected record(s)?"
+          "Do you really want to delete the selected record(s)?",
         ),
         yesTitle: i18n.get("Delete"),
       });
@@ -272,7 +272,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         }
       }
     },
-    [dataStore, setColumns]
+    [dataStore, setColumns],
   );
 
   const onEdit = useCallback(
@@ -284,7 +284,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         props: { readonly },
       });
     },
-    [switchTo]
+    [switchTo],
   );
 
   const onEditInPopup = useCallback(
@@ -301,7 +301,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           onSearch: () => onRefresh(),
         });
     },
-    [showEditor, view, action, onRefresh]
+    [showEditor, view, action, onRefresh],
   );
 
   const onNew = useCallback(() => {
@@ -337,7 +337,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
             ...obj,
             ...values,
           }),
-          {}
+          {},
         );
         if (values) {
           const record = {
@@ -365,14 +365,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
       dataStore,
       columnBy,
       view,
-    ]
+    ],
   );
 
   const onView = useCallback(
     ({ record }: { record: KanbanRecord }) => {
       hasEditPopup ? onEditInPopup({ record }, true) : onEdit({ record }, true);
     },
-    [hasEditPopup, onEdit, onEditInPopup]
+    [hasEditPopup, onEdit, onEditInPopup],
   );
 
   const onMove = useCallback(
@@ -390,7 +390,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       function getRecord(
         _record: DataRecord,
         columnByValue: any,
-        sequenceByValue: any
+        sequenceByValue: any,
       ) {
         const { id, version } = _record;
         const record: any = { id, version };
@@ -417,7 +417,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         sourceColumn: source,
         sourceIndex: getRecordIndex(
           record.id,
-          getColumnRecords(columns, source.name)
+          getColumnRecords(columns, source.name),
         ),
       }).slice();
 
@@ -434,8 +434,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
         Number(
           previousRecord
             ? parseInt(getValue(previousRecord, sequenceBy!) + 1)
-            : 0
-        )
+            : 0,
+        ),
       );
 
       if (view.onMove) {
@@ -457,7 +457,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           return getRecord(
             record as DataRecord,
             getValue(record, columnBy!),
-            $sequenceBy === null ? null : parseInt($sequenceBy) + i + 1
+            $sequenceBy === null ? null : parseInt($sequenceBy) + i + 1,
           );
         }),
       ];
@@ -474,8 +474,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
          */
         setColumns(
           updatedColumns.map((col, ind) =>
-            ind === colInd ? { ...col, records: [...records] } : col
-          )
+            ind === colInd ? { ...col, records: [...records] } : col,
+          ),
         );
       } catch {
         onRefresh();
@@ -493,7 +493,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       getContext,
       setColumns,
       onRefresh,
-    ]
+    ],
   );
 
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
@@ -541,7 +541,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return true;
   }, [fields, sequenceBy]);
 
-  const Template = useViewTemplate(view, fields);
+  const Template = useTemplate(view.template!);
 
   const components = useMemo(
     () => ({
@@ -555,7 +555,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         />
       ),
     }),
-    [view, fields, getContext, Template]
+    [view, fields, getContext, Template],
   );
 
   const canNew = hasButton("new");
@@ -652,8 +652,8 @@ function KanbanCard({
   const { template: templateString, hilites } = view;
   const divRef = useRef<any>(null);
   const context = useMemo(
-    () => ({ ...record, ...getContext?.() } as DataContext),
-    [getContext, record]
+    () => ({ ...record, ...getContext?.() }) as DataContext,
+    [getContext, record],
   );
   const className = useHilites(hilites ?? [])(context)?.[0]?.color;
   const timer = useRef<any>();
@@ -669,7 +669,7 @@ function KanbanCard({
       div &&
       (div.querySelector(".card-summary.popover") ||
         div.querySelector(
-          `.${legacyClassNames("card-summary")}.${legacyClassNames("popover")}`
+          `.${legacyClassNames("card-summary")}.${legacyClassNames("popover")}`,
         ));
     if (summary) {
       const text = (summary.textContent || "").trim();
@@ -710,7 +710,7 @@ function KanbanCard({
         className={legacyClassNames(
           "kanban-card",
           styles["kanban-card"],
-          className
+          className,
         )}
       >
         <Template context={context} options={{ fields: fields as any }} />

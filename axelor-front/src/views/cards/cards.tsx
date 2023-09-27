@@ -8,7 +8,7 @@ import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
-import { useViewTemplate } from "@/hooks/use-parser";
+import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -122,7 +122,7 @@ export function Cards(props: ViewProps<CardsView>) {
   );
 
   const records = useDataStore(dataStore, (ds) => ds.records);
-  const Template = useViewTemplate(view, fields);
+  const Template = useTemplate(view.template!);
 
   useAsyncEffect(async () => {
     await onSearch();

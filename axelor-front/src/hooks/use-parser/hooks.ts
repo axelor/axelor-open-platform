@@ -2,7 +2,7 @@ import set from "lodash/set";
 import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
-import { Hilite, Property, Schema, Widget } from "@/services/client/meta.types";
+import { Hilite } from "@/services/client/meta.types";
 
 import { useViewMeta } from "@/view-containers/views/scope";
 import { useFormScope } from "@/views/form/builder/scope";
@@ -82,45 +82,6 @@ export function useTemplate(template: string) {
       return createElement(Comp, { context });
     };
   }, [actionExecutor, findField, template]);
-}
-
-export function useViewTemplate(
-  view: { template?: string; items?: Widget[] },
-  fields: Record<string, Property> = {},
-) {
-  const { template = "", items = [] } = view;
-  const Template = useTemplate(template);
-  const $getField = useViewField(items, fields);
-
-  return useCallback(
-    (props: { context: DataContext; options?: EvalContextOptions }) => {
-      const { context, options } = props;
-      return Template({
-        context,
-        options: {
-          helpers: {
-            $getField,
-          },
-          ...options,
-        },
-      });
-    },
-    [Template, $getField],
-  );
-}
-
-function useViewField(items: Widget[], fields: Record<string, Property>) {
-  return useCallback(
-    (fieldName: string) => {
-      const field = fields[fieldName];
-      const widgetAttrs = items.find((x) => x.name === fieldName)?.widgetAttrs;
-      return {
-        ...field,
-        ...widgetAttrs,
-      } as Schema;
-    },
-    [fields, items],
-  );
 }
 
 export function useHilites(hilites: Hilite[]) {
