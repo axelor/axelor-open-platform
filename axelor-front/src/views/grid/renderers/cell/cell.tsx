@@ -1,17 +1,17 @@
-import { ReactElement, useCallback, useMemo } from "react";
+import { ReactElement } from "react";
 
 import { Box } from "@axelor/ui";
 
-import { Field, Property, Schema } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
-import { sanitize } from "@/utils/sanitize";
 import { Tooltip } from "@/components/tooltip";
 import { useHilites } from "@/hooks/use-parser";
-import { FieldDetails } from "@/views/form/builder";
+import { Field } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
 import { toCamelCase } from "@/utils/names";
+import { sanitize } from "@/utils/sanitize";
+import { FieldDetails } from "@/views/form/builder";
 
-import * as WIDGETS from "../../widgets";
 import { GridCellProps } from "../../builder/types";
+import * as WIDGETS from "../../widgets";
 import { Image } from "../../widgets/image";
 
 const getWidget = (name?: string) =>
@@ -19,7 +19,6 @@ const getWidget = (name?: string) =>
 
 export function Cell(props: GridCellProps) {
   const { view, data, value, record } = props;
-  const { items: viewItems = [] } = view ?? {};
   const { name, type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
@@ -27,7 +26,8 @@ export function Cell(props: GridCellProps) {
 
   function render() {
     function renderContent() {
-      const Comp = getWidget(widget) || getWidget(type) || getWidget(serverType);
+      const Comp =
+        getWidget(widget) || getWidget(type) || getWidget(serverType);
       if (Comp) {
         return <Comp {...props} />;
       }
@@ -59,35 +59,10 @@ export function Cell(props: GridCellProps) {
     );
   }
 
-  const fields = useMemo(
-    () =>
-      viewItems.reduce(
-        (acc, item) => ({
-          ...acc,
-          [item.name ?? ""]: {
-            ...item,
-            ...item.widgetAttrs,
-          } as unknown as Property,
-        }),
-        {} as Record<string, Property>,
-      ),
-    [viewItems],
-  );
-
-  const $getField = useCallback(
-    (fieldName: string) => fields[fieldName] as Schema,
-    [fields],
-  );
-
   return tooltip ? (
     <Tooltip
       content={() => (
-        <FieldDetails
-          model={view?.model}
-          data={tooltip}
-          record={record}
-          $getField={$getField}
-        />
+        <FieldDetails model={view?.model} data={tooltip} record={record} />
       )}
     >
       {render() as ReactElement}

@@ -15,7 +15,7 @@ import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 
-import { useFormField, useFormScope } from "./scope";
+import { useFormScope } from "./scope";
 import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
@@ -87,8 +87,8 @@ export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
   const error = useAtomValue(
     useMemo(
       () => selectAtom(widgetAtom, (state) => state.errors?.error),
-      [widgetAtom]
-    )
+      [widgetAtom],
+    ),
   );
   return error && <InputFeedback invalid>{error}</InputFeedback>;
 }
@@ -120,13 +120,11 @@ export function FieldDetails({
   model,
   record,
   data,
-  $getField,
 }: {
   fetch?: boolean;
   model?: string;
   record?: DataRecord;
   data: TooltipType;
-  $getField?: (fieldName: string) => Schema;
 }) {
   const { depends, template } = data;
   const Template = useTemplate(template!);
@@ -145,14 +143,7 @@ export function FieldDetails({
   return (
     context && (
       <Box>
-        <Template
-          context={context}
-          options={{
-            helpers: {
-              $getField,
-            },
-          }}
-        />
+        <Template context={context} />
       </Box>
     )
   );
@@ -294,16 +285,15 @@ function FieldTooltipContent({
 }) {
   const { formAtom } = useFormScope();
   const value = useAtomValue(valueAtom);
-  const $getField = useFormField(formAtom);
 
   const data = schema.tooltip as TooltipType;
   const { depends } = data;
 
   const formModel = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
   const formRecord = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
 
   const isRelational = Boolean(schema.target);
@@ -317,7 +307,6 @@ function FieldTooltipContent({
       data={data}
       model={model}
       record={record}
-      $getField={$getField}
     />
   );
 }

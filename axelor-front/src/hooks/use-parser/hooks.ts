@@ -4,6 +4,8 @@ import { createElement, useCallback, useMemo } from "react";
 import { DataContext } from "@/services/client/data.types";
 import { Hilite, Property, Schema, Widget } from "@/services/client/meta.types";
 
+import { useViewMeta } from "@/view-containers/views/scope";
+import { useFormScope } from "@/views/form/builder/scope";
 import {
   EvalContextOptions,
   createEvalContext,
@@ -31,11 +33,14 @@ export function useExpression(expression: string) {
       const evalContext = createEvalContext(context, options);
       return func(evalContext);
     },
-    [expression]
+    [expression],
   );
 }
 
 export function useTemplate(template: string) {
+  const { findField } = useViewMeta();
+  const { actionExecutor } = useFormScope();
+
   return useMemo(() => {
     const Comp = isReact(template)
       ? processReactTemplate(template)
@@ -50,22 +55,38 @@ export function useTemplate(template: string) {
             ? Array.isArray(value)
               ? [...value]
               : { ...value }
-            : value
+            : value,
         );
       }, {} as any);
+
+      const {
+        helpers,
+        execute = actionExecutor.execute.bind(actionExecutor),
+        ...options
+      } = props.options ?? {};
+
+      const opts = {
+        ...options,
+        execute,
+        helpers: {
+          $getField: findField,
+          ...helpers,
+        },
+      };
+
       const contextWithRecord = { ..._context, record: _context };
       const context = isReact(template)
-        ? createScriptContext(contextWithRecord, props.options)
-        : createEvalContext(contextWithRecord, props.options);
+        ? createScriptContext(contextWithRecord, opts)
+        : createEvalContext(contextWithRecord, opts);
 
       return createElement(Comp, { context });
     };
-  }, [template]);
+  }, [actionExecutor, findField, template]);
 }
 
 export function useViewTemplate(
   view: { template?: string; items?: Widget[] },
-  fields: Record<string, Property> = {}
+  fields: Record<string, Property> = {},
 ) {
   const { template = "", items = [] } = view;
   const Template = useTemplate(template);
@@ -84,7 +105,7 @@ export function useViewTemplate(
         },
       });
     },
-    [Template, $getField]
+    [Template, $getField],
   );
 }
 
@@ -98,7 +119,7 @@ function useViewField(items: Widget[], fields: Record<string, Property>) {
         ...widgetAttrs,
       } as Schema;
     },
-    [fields, items]
+    [fields, items],
   );
 }
 
@@ -107,9 +128,9 @@ export function useHilites(hilites: Hilite[]) {
     (context: DataContext, options?: EvalContextOptions) => {
       const evalContext = createEvalContext(context, options);
       return hilites.filter((x) =>
-        parseExpression(x.condition ?? "")(evalContext)
+        parseExpression(x.condition ?? "")(evalContext),
       );
     },
-    [hilites]
+    [hilites],
   );
 }

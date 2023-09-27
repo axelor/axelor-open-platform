@@ -5,7 +5,6 @@ import { useMemo } from "react";
 import { useTemplate } from "@/hooks/use-parser";
 import { DataRecord } from "@/services/client/data.types";
 import { FormView, GridView, Property } from "@/services/client/meta.types";
-import { useFormField, useFormScope } from "./scope";
 
 import { FieldControl } from "./form-field";
 import { FieldProps } from "./types";
@@ -127,29 +126,16 @@ function CollectionViewer({ template, fields, ...props }: FormViewerProps) {
 
 function RecordViewer({
   template,
-  fields,
   record,
 }: FormViewerProps & { record: DataRecord }) {
-  const { formAtom } = useFormScope();
-
   const Template = useTemplate(template);
-  const $getField = useFormField(formAtom);
-  const { actionExecutor } = useFormScope();
-
-  const execute = actionExecutor.execute.bind(actionExecutor);
 
   // legacy templates may be using `record.` prefix
   const rec = useMemo(() => ({ ...record, record }), [record]);
+
   return (
     <div className={styles.content}>
-      <Template
-        context={rec}
-        options={{
-          execute,
-          fields: fields as any,
-          helpers: { $getField },
-        }}
-      />
+      <Template context={rec} />
     </div>
   );
 }
