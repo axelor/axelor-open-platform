@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import {
   Alert,
   AlertHeader,
@@ -6,8 +8,10 @@ import {
   Box,
   Button,
   ButtonGroup,
+  CircularProgress,
   Divider,
   Image,
+  LinearProgress,
   Link,
   List,
   ListItem,
@@ -22,22 +26,22 @@ import {
   TableHead,
   TableRow,
 } from "@axelor/ui";
-
 import { BootstrapIcon as Icon } from "@axelor/ui/icons/bootstrap-icon";
 
-import { useMemo } from "react";
 import { parseSafe } from "./parser";
 
 const COMPONENTS = {
-  Box,
-  Badge,
   Alert,
   AlertHeader,
   AlertLink,
+  Badge,
+  Box,
   Button,
   ButtonGroup,
+  CircularProgress,
   Divider,
   Image,
+  LinearProgress,
   Link,
   List,
   ListItem,
@@ -46,11 +50,11 @@ const COMPONENTS = {
   Scrollable,
   Table,
   TableBody,
-  TableHead,
-  TableFoot,
-  TableRow,
-  TableCell,
   TableCaption,
+  TableCell,
+  TableFoot,
+  TableHead,
+  TableRow,
   Icon,
 };
 
