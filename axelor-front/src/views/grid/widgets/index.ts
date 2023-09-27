@@ -1,4 +1,5 @@
 export * from "./boolean";
+export * from "./binary-link";
 export * from "./button";
 export * from "./edit-icon";
 export * from "./html";
