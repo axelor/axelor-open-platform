@@ -8,11 +8,60 @@ import {
   Schema,
   Widget,
 } from "@/services/client/meta.types";
-import { toKebabCase, toSnakeCase } from "@/utils/names";
+import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
-import { MetaData } from "@/services/client/meta";
 import convert from "@/utils/convert";
+import { MetaData } from "@/services/client/meta";
 import { Attrs, DEFAULT_ATTRS } from "./types";
+
+const SERVER_TYPES: string[] = [
+  "string",
+  "boolean",
+  "integer",
+  "long",
+  "decimal",
+  "date",
+  "time",
+  "datetime",
+  "text",
+  "binary",
+  "enum",
+  "one-to-one",
+  "many-to-one",
+  "one-to-many",
+  "many-to-many",
+];
+
+const FIELD_WIDGETS: Record<string, string[]> = {
+  boolean: [
+    "BooleanSelect",
+    "BooleanRadio",
+    "BooleanSwitch",
+    "InlineCheckbox",
+    "Toggle",
+  ],
+  integer: ["Duration", "Progress"],
+  datetime: ["RelativeTime"],
+  text: ["CodeEditor", "Html"],
+  "many-to-one": ["BinaryLink", "Image"],
+};
+
+function getDefaultServerType(schema: Schema): string {
+  const widget = toKebabCase(schema.widget ?? "");
+
+  let serverType = "string";
+
+  if (SERVER_TYPES.includes(widget)) {
+    serverType = widget;
+  } else {
+    const fieldType = Object.keys(FIELD_WIDGETS).find((k) =>
+      FIELD_WIDGETS[k].includes(toCamelCase(widget)),
+    );
+    serverType = fieldType || serverType;
+  }
+
+  return toSnakeCase(serverType).toUpperCase();
+}
 
 export const nextId = (() => {
   let id = 0;
@@ -127,7 +176,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   const res: Schema = { ...attrs, serverType: field?.type, ...schema };
 
   if (res.type === "field") {
-    res.serverType = res.serverType ?? "STRING";
+    res.serverType = res.serverType ?? getDefaultServerType(res);
   }
   if (res.type === "panel-related") {
     res.serverType = res.serverType ?? "ONE_TO_MANY";
