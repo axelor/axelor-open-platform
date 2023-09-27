@@ -3,9 +3,9 @@ import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
 
 import { useTemplate } from "@/hooks/use-parser";
-import { useFormField, useFormScope } from "./scope";
 import { DataRecord } from "@/services/client/data.types";
 import { Property } from "@/services/client/meta.types";
+import { useFormField, useFormScope } from "./scope";
 
 import { FieldControl } from "./form-field";
 import { FieldProps } from "./types";
@@ -22,13 +22,13 @@ export function FieldViewer(props: FieldViewerProps) {
   const { schema, formAtom } = props;
   const fieldsAtom = useMemo(
     () => selectAtom(formAtom, (o) => o.fields),
-    [formAtom]
+    [formAtom],
   );
 
   const formFields = useAtomValue(fieldsAtom);
   const fields = useMemo(
     () => schema.fields ?? formFields,
-    [formFields, schema.fields]
+    [formFields, schema.fields],
   );
 
   const { template } = schema.viewer!;
@@ -48,7 +48,7 @@ export function FieldViewer(props: FieldViewerProps) {
 function SimpleViewer({ template, fields, ...props }: FormViewerProps) {
   const { formAtom } = props;
   const record = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
   return (
     <FieldControl {...props} className={styles.viewer}>
@@ -107,6 +107,9 @@ function RecordViewer({
 
   const Template = useTemplate(template);
   const $getField = useFormField(formAtom);
+  const { actionExecutor } = useFormScope();
+
+  const execute = actionExecutor.execute.bind(actionExecutor);
 
   // legacy templates may be using `record.` prefix
   const rec = useMemo(() => ({ ...record, record }), [record]);
@@ -116,6 +119,7 @@ function RecordViewer({
         context={rec}
         options={
           {
+            execute,
             fields,
             helpers: { $getField },
           } as any
