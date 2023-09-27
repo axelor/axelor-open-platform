@@ -40,7 +40,6 @@ import {
   GridView,
   JsonField,
 } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
 import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
@@ -150,9 +149,9 @@ export const Grid = forwardRef<
             return [...names, field.name];
           }
           return names;
-        }, [] as string[])
+        }, [] as string[]),
       ),
-    [fields, view.items]
+    [fields, view.items],
   );
 
   const viewItems = useMemo(
@@ -161,7 +160,7 @@ export const Grid = forwardRef<
         ...item,
         id: uniqueId(view.name || "grid-column"),
       })),
-    [view.name, view.items]
+    [view.name, view.items],
   );
 
   const contextField = useAtomValue(
@@ -170,8 +169,8 @@ export const Grid = forwardRef<
         searchAtom
           ? focusAtom(searchAtom, (o) => o.prop("appliedContextField"))
           : atom(undefined),
-      [searchAtom]
-    )
+      [searchAtom],
+    ),
   );
 
   const columns = useMemo(() => {
@@ -287,7 +286,7 @@ export const Grid = forwardRef<
       col: GridColumn,
       colIndex: number,
       row: GridRow,
-      rowIndex: number
+      rowIndex: number,
     ) => {
       if (col.name === "$$edit") {
         onEdit?.(row.record);
@@ -295,14 +294,14 @@ export const Grid = forwardRef<
         onView?.(row.record);
       }
     },
-    [isMobile, onEdit, onView]
+    [isMobile, onEdit, onView],
   );
 
   const handleRowDoubleClick = useCallback(
     (e: React.SyntheticEvent, row: GridRow, rowIndex: number) => {
       onView?.(row.record);
     },
-    [onView]
+    [onView],
   );
 
   const commitForm = useCallback(async () => {
@@ -346,7 +345,7 @@ export const Grid = forwardRef<
       row: GridRow,
       rowIndex?: number,
       column?: GridColumn,
-      colIndex?: number
+      colIndex?: number,
     ) => {
       // skip edit row for edit icon
       if (
@@ -356,7 +355,7 @@ export const Grid = forwardRef<
         return null;
       await commitForm();
     },
-    [commitForm]
+    [commitForm],
   );
 
   const handleRecordDiscard = useCallback(
@@ -369,7 +368,7 @@ export const Grid = forwardRef<
       }
       onDiscard?.(record);
     },
-    [onDiscard, setState]
+    [onDiscard, setState],
   );
 
   const CustomRowRenderer = useMemo(() => {
@@ -410,7 +409,7 @@ export const Grid = forwardRef<
       form: formRef,
       onAdd: handleRecordAdd,
     }),
-    [formRef, handleRecordAdd]
+    [formRef, handleRecordAdd],
   );
 
   useAsyncEffect(
@@ -425,7 +424,7 @@ export const Grid = forwardRef<
       }
       setEvent("");
     },
-    [doAdd, event]
+    [doAdd, event],
   );
 
   if (init.state === "loading") return null;
