@@ -38,8 +38,11 @@ export type ReadOptions = {
 };
 
 export type SaveOptions<T extends DataRecord | DataRecord[]> = ReadOptions & {
-  onError?: (error: ErrorReport) => Promise<T>;
+  onError?: (error: ErrorReport) => Promise<SaveResult<T>>;
 };
+
+export type SaveResult<T extends DataRecord | DataRecord[]> =
+  T extends DataRecord[] ? DataRecord[] : DataRecord;
 
 export type DeleteOption = {
   id: number;
@@ -101,7 +104,7 @@ export class DataSource {
   async read(
     id: number,
     options?: ReadOptions,
-    silent?: boolean
+    silent?: boolean,
   ): Promise<DataRecord> {
     const url = `ws/rest/${this.model}/${id}/fetch`;
     const resp = await request({
@@ -121,12 +124,16 @@ export class DataSource {
   async save<T extends DataRecord | DataRecord[]>(
     data: T,
     options?: SaveOptions<T>,
-  ): Promise<T> {
+  ): Promise<SaveResult<T>> {
     const { onError } = options ?? {};
 
     if (!Array.isArray(data) && data?.$upload) {
       const upload = data.$upload;
-      return this.upload(data, upload.field, upload.file) as Promise<T>;
+      return this.upload(
+        data,
+        upload.field,
+        upload.file,
+      ) as Promise<SaveResult<T>>;
     }
 
     const isRecords = Array.isArray(data);

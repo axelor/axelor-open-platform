@@ -5,6 +5,7 @@ import {
   DeleteOption,
   ExportResult,
   SaveOptions,
+  SaveResult,
   SearchOptions,
   SearchPage,
   SearchResult,
@@ -131,7 +132,7 @@ export class DataStore extends DataSource {
   async save<T extends DataRecord | DataRecord[]>(
     data: T,
     options?: SaveOptions<T>,
-  ): Promise<T> {
+  ): Promise<SaveResult<T>> {
     const res = await super.save(data, options);
 
     if (Array.isArray(data) || Array.isArray(res) || !res) {
