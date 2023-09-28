@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
-import { SingleSelectValue } from "../single-select";
+import { SingleSelectValue } from "../single-select/single-select-value";
 
 export function MultiSelect(props: GridColumnProps) {
   const { data, record } = props;
