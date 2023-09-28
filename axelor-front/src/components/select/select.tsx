@@ -140,6 +140,9 @@ export const Select = forwardRef(function Select<
     return options;
   }, [inputValue, onShowCreate, onShowSelect]);
 
+  const currOptions = fetchOptions ? items : options;
+  const moreOptions = currOptions.length || inputValue ? customOptions : [];
+
   return (
     <AxSelect
       {...selectProps}
@@ -148,8 +151,8 @@ export const Select = forwardRef(function Select<
       autoFocus={autoFocus}
       readOnly={readOnly}
       openOnFocus={openOnFocus}
-      options={fetchOptions ? items : options}
-      customOptions={customOptions}
+      options={currOptions}
+      customOptions={moreOptions}
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       onChange={handleChange}
