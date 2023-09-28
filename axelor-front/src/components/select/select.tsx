@@ -69,6 +69,7 @@ export const Select = forwardRef(function Select<
       loadTimerRef.current = setTimeout(async () => {
         if (fetchOptions) {
           const items = await fetchOptions(inputValue);
+          loadTimerRef.current = undefined;
           setItems(items);
         }
       }, 300);
@@ -78,7 +79,12 @@ export const Select = forwardRef(function Select<
 
   const handleOpen = useCallback(() => {
     if (onOpen) onOpen();
-    if (fetchOptions && items.length === 0 && !inputValue) {
+    if (
+      fetchOptions &&
+      items.length === 0 &&
+      !inputValue &&
+      !loadTimerRef.current
+    ) {
       loadOptions("");
     }
   }, [fetchOptions, inputValue, items.length, loadOptions, onOpen]);
@@ -87,7 +93,7 @@ export const Select = forwardRef(function Select<
     (text: string) => {
       setInputValue(text);
       if (onInputChange) onInputChange(text);
-      if (fetchOptions) {
+      if (fetchOptions && text) {
         loadOptions(text);
       }
     },
