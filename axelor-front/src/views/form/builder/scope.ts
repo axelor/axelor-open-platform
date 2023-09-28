@@ -601,29 +601,37 @@ export function useAfterActions<Type, Args extends Array<unknown>>(
 ) {
   const { actionExecutor } = useFormScope();
 
-  const waiting = useRef<Promise<Type> | null>(null);
-  const callbackRef = useRef<((...args: Args) => Promise<Type>) | null>(null);
+  const waitRef = useRef<Promise<Type>>();
+  const argsRef = useRef<Args>();
+  const funcRef = useRef<(...args: Args) => Promise<Type>>();
+
+  const reset = useCallback(() => {
+    const func = funcRef.current!;
+    const args = argsRef.current!;
+    funcRef.current = undefined;
+    argsRef.current = undefined;
+    waitRef.current = undefined;
+    return () => func?.(...args);
+  }, []);
 
   return useCallback(
     async (...params: Args): Promise<Type> => {
-      callbackRef.current = callback;
-      if (waiting.current) return waiting.current;
+      funcRef.current = callback;
+      argsRef.current = params;
+      if (waitRef.current) return waitRef.current;
       const promise = new Promise<Type>((resolve, reject) => {
         actionExecutor
           .wait()
-          .then(() => callbackRef.current!(...params))
+          .then(reset)
+          .then((func) => func())
           .then(resolve)
           .catch(reject)
-          .finally(() => {
-            callbackRef.current = null;
-            waiting.current = null;
-          });
+          .finally(reset);
       });
-      waiting.current = promise;
-      callbackRef.current = callback;
+      waitRef.current = promise;
       return promise;
     },
-    [actionExecutor, callback],
+    [actionExecutor, callback, reset],
   );
 }
 
