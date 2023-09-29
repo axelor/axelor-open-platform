@@ -5,6 +5,7 @@ const bundle = await request({
   url: "js/messages.js",
 }).then((res) => res.json());
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace i18n {
   export function get(text: string, ...args: any[]): string {
     let message = bundle[text] || bundle[(text || "").trim()] || text;
