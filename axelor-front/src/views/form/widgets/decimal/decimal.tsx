@@ -63,8 +63,8 @@ export function Decimal(props: FieldProps<string | number>) {
   const [changed, setChanged] = useState(false);
 
   const parse = useCallback(
-    (value: string | number) => convert(value, { props: schema }),
-    [schema],
+    (value: string | number) => convert(value, { props: { ...schema, scale } }),
+    [schema, scale],
   );
 
   const parsedValue = useMemo(() => parse(value), [parse, value]);
