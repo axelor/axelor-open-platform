@@ -78,6 +78,7 @@ function GridInner(props: ViewProps<GridView>) {
   const selectedIdsRef = useRef<number[]>([]);
   const saveIdRef = useRef<number | null>();
   const initDetailsRef = useRef(false);
+  const reorderRef = useRef(false);
   const [massUpdatePopperEl, setMassUpdatePopperEl] =
     useState<HTMLElement | null>();
   const [viewProps, setViewProps] = useViewProps();
@@ -368,6 +369,10 @@ function GridInner(props: ViewProps<GridView>) {
     setDirty(false);
   }, [setDirty]);
 
+  const onRowReorder = useCallback(() => {
+    reorderRef.current = true;
+  }, []);
+
   const onArchiveOrUnArchive = useCallback(
     async (archived: boolean) => {
       const confirmed = await dialogs.confirm({
@@ -610,6 +615,24 @@ function GridInner(props: ViewProps<GridView>) {
     }
     saveIdRef.current = null;
   }, [state.selectedRows, state.rows, setState]);
+
+  useAsyncEffect(async () => {
+    const { orderBy } = view;
+    if (orderBy && reorderRef.current) {
+      const recIds = records.map((r) => r.id);
+      const updateRecords = rows
+        .filter((r) => recIds.includes(r.record?.id ?? 0))
+        .map((r) => records.find((v) => v.id === r.record?.id))
+        .map((r, ind) => ({
+          id: r?.id,
+          [orderBy]: ind + 1,
+          version: r?.version ?? r?.$version,
+        })) as DataRecord[];
+      const res = await dataStore.save(updateRecords);
+      res && onSearch();
+    }
+    reorderRef.current = false;
+  }, [view, rows, records, dataStore]);
 
   const searchOptions = useMemo(() => {
     if (currentPage) {
@@ -863,6 +886,7 @@ function GridInner(props: ViewProps<GridView>) {
             onSearch={onSearch}
             onSave={onSave}
             onDiscard={onDiscard}
+            onRowReorder={onRowReorder}
             noRecordsText={i18n.get("No records found.")}
             {...(canCustomize && {
               onColumnCustomize: showCustomizeDialog,
