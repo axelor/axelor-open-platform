@@ -38,7 +38,7 @@ export function useExpression(expression: string) {
 }
 
 export function useTemplate(template: string) {
-  const { findField } = useViewMeta();
+  const { findItem } = useViewMeta();
   const { actionExecutor } = useFormScope();
 
   return useMemo(() => {
@@ -69,7 +69,7 @@ export function useTemplate(template: string) {
         ...options,
         execute,
         helpers: {
-          $getField: findField,
+          $getField: findItem,
           ...helpers,
         },
       };
@@ -81,7 +81,7 @@ export function useTemplate(template: string) {
 
       return createElement(Comp, { context });
     };
-  }, [actionExecutor, findField, template]);
+  }, [actionExecutor, findItem, template]);
 }
 
 export function useHilites(hilites: Hilite[]) {
