@@ -51,7 +51,7 @@ export const MetaScope = createScope<ViewData<ViewType>>({
   fields: {},
 });
 
-const metaMolegule = molecule((getMol, getScope) => {
+const metaMolecule = molecule((getMol, getScope) => {
   const meta = getScope(MetaScope);
   return atom(meta);
 });
@@ -287,7 +287,7 @@ export function useViewConfirmDirty() {
  *
  */
 export function useViewMeta() {
-  const metaAtom = useMolecule(metaMolegule);
+  const metaAtom = useMolecule(metaMolecule);
   const meta = useAtomValue(metaAtom);
 
   const findField = useCallback((name: string) => meta.fields?.[name], [meta]);
