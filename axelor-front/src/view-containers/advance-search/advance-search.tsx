@@ -316,7 +316,7 @@ export function AdvanceSearch({
     async (filter: SavedFilter) => {
       const confirmed = await dialogs.confirm({
         title: i18n.get("Question"),
-        content: i18n.get(`Would you like to remove the filter?`),
+        content: i18n.get("Would you like to remove the filter?"),
       });
       if (!confirmed) return;
 

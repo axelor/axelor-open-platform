@@ -373,8 +373,8 @@ function GridInner(props: ViewProps<GridView>) {
       const confirmed = await dialogs.confirm({
         title: i18n.get("Question"),
         content: archived
-          ? i18n.get(`Do you really want to archive the selected record(s)?`)
-          : i18n.get(`Do you really want to unarchive the selected record(s)?`),
+          ? i18n.get("Do you really want to archive the selected record(s)?")
+          : i18n.get("Do you really want to unarchive the selected record(s)?"),
       });
       if (!confirmed) return;
       const records = selectedRows!
