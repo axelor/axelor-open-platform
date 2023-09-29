@@ -1,3 +1,4 @@
+import get from "lodash/get";
 import set from "lodash/set";
 import { createElement, useCallback, useMemo } from "react";
 
@@ -48,13 +49,14 @@ export function useTemplate(template: string) {
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
       const _context = Object.keys(props.context).reduce((ctx, key) => {
         const value = props.context[key];
+        const prev = get(ctx, key);
         return set(
           ctx,
           key,
           value && typeof value === "object"
             ? Array.isArray(value)
               ? [...value]
-              : { ...value }
+              : { ...prev, ...value }
             : value,
         );
       }, {} as any);
