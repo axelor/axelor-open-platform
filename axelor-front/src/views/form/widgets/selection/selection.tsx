@@ -43,22 +43,30 @@ export function Selection<Multiple extends boolean>(
     attrs: { required, focus },
   } = useAtomValue(widgetAtom);
 
-  const selectionList = useSelectionList({ schema, widgetAtom, value });
+  const selectionList = useSelectionList({ schema, widgetAtom });
+
   const selectionValue = useMemo(() => {
+    const selectionAll: SelectionType[] = schema.selectionList ?? [];
     if (multiple) {
       const values = value == null ? [] : String(value ?? "").split(",");
       return values.map(
         (x) =>
-          selectionList.find((item) => String(item.value) === String(x)) ?? {
+          selectionAll.find((item) => String(item.value) === String(x)) ?? {
             title: x,
             value: x,
           },
       );
     }
     return (
-      selectionList.find((item) => String(item.value) === String(value)) ?? null
+      selectionAll.find((item) => String(item.value) === String(value)) ?? {
+        title: value,
+        value: value,
+      }
     );
-  }, [multiple, selectionList, value]) as SelectValue<SelectionType, Multiple>;
+  }, [multiple, schema.selectionList, value]) as SelectValue<
+    SelectionType,
+    Multiple
+  >;
 
   const handleChange = useCallback(
     (value: SelectValue<SelectionType, Multiple>) => {

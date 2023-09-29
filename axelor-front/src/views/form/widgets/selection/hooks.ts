@@ -1,56 +1,49 @@
-import isNumber from "lodash/isNumber";
-import isEmpty from "lodash/isEmpty";
-import isString from "lodash/isString";
-import map from "lodash/map";
-import filter from "lodash/filter";
 import { useAtomValue } from "jotai";
+import isEqual from "lodash/isEqual";
+import { useEffect, useMemo, useState } from "react";
 
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { Schema, Selection } from "@/services/client/meta.types";
-import { useFormScope } from "../../builder/scope";
-import { WidgetAtom } from "../../builder";
-import { useEffect, useMemo, useState } from "react";
-import { isEqual } from "lodash";
 
-function acceptNumber(value?: null | string | number) {
-  if (value === null || value === undefined) {
-    return value;
-  }
-  if (isNumber(value)) {
-    return +value;
-  }
-  if (/^(-)?\d+(\.\d+)?$/.test(value)) {
+import { WidgetAtom } from "../../builder";
+import { useFormScope } from "../../builder/scope";
+
+function acceptNumber(value?: unknown) {
+  if (value === null || value === undefined) return value;
+  if (typeof value === "number") return +value;
+  if (typeof value === "string" && /^(-)?\d+(\.\d+)?$/.test(value)) {
     return +value;
   }
   return value;
 }
 
-const getSelectionIn = (obj: Schema) =>
-  obj?.["selection-in"] || obj.selectionIn;
+function getSelectionIn(schema: Schema) {
+  return schema["selection-in"] || schema.selectionIn;
+}
 
 export function useSelectionList({
   value,
   schema,
   widgetAtom,
 }: {
-  value: any;
+  value?: unknown;
   schema: Schema;
   widgetAtom: WidgetAtom;
 }) {
+  const [filterList, setFilterList] = useState<null | unknown[]>([]);
+
   const { recordHandler } = useFormScope();
-  const [filterList, setFilterList] = useState<null | any[]>([]);
   const { attrs } = useAtomValue(widgetAtom);
-  const selectionIn = (getSelectionIn(attrs) ||
-    getSelectionIn(schema)) as string;
+
+  const selectionIn = getSelectionIn(attrs) || getSelectionIn(schema);
 
   useEffect(() => {
     const { selectionList = [] } = schema;
 
     if (selectionIn && selectionList?.length > 0) {
-      let list: any = selectionIn ?? null;
-
       return recordHandler.subscribe((record) => {
-        if (isString(selectionIn)) {
+        let list = selectionIn ?? null;
+        if (typeof selectionIn === "string") {
           let expr = selectionIn.trim();
           if (!expr.startsWith("[")) {
             expr = "[" + expr + "]";
@@ -58,26 +51,27 @@ export function useSelectionList({
           list = parseExpression(expr)(record);
         }
 
-        if (isEmpty(list) || !Array.isArray(list)) {
-          list = null;
+        if (Array.isArray(list) && list.length > 0) {
+          list = list.map(acceptNumber);
         } else {
-          list = map(list, acceptNumber);
+          list = null;
         }
-        setFilterList((_list) => (isEqual(_list, list) ? _list : list));
+
+        setFilterList((prev) => (isEqual(prev, list) ? prev : list));
       });
     }
 
     setFilterList(null);
   }, [recordHandler, schema, selectionIn]);
 
-  return useMemo<Selection[]>(() => {
-    const { selectionList = [] } = schema;
-    if (!filterList) return selectionList || [];
-    const currentValue = acceptNumber(value);
-
-    return filter(selectionList || [], function (item) {
-      const val = acceptNumber(item.value);
-      return val === currentValue || filterList.indexOf(val) > -1;
-    });
-  }, [schema, filterList, value]);
+  return useMemo(() => {
+    const selectionList: Selection[] = schema.selectionList ?? [];
+    return filterList
+      ? selectionList.filter(
+          (item) =>
+            (value !== undefined && String(value) === String(item.value)) ||
+            filterList.some((x) => String(x) === String(item.value)),
+        )
+      : selectionList;
+  }, [schema.selectionList, filterList, value]);
 }
