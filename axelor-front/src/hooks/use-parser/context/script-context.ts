@@ -210,6 +210,7 @@ export function createScriptContext(
 
   return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
+      if (p === "record") return target;
       if (p in helpers) return helpers[p as keyof typeof helpers];
       const value = Reflect.get(target, p, receiver) ?? get(target, p);
       if (p === "id" && value && value <= 0) {

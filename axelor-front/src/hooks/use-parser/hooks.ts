@@ -74,10 +74,9 @@ export function useTemplate(template: string) {
         },
       };
 
-      const contextWithRecord = { ..._context, record: _context };
       const context = isReact(template)
-        ? createScriptContext(contextWithRecord, opts)
-        : createEvalContext(contextWithRecord, opts);
+        ? createScriptContext(_context, opts)
+        : createEvalContext(_context, opts);
 
       return createElement(Comp, { context });
     };

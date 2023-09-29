@@ -137,7 +137,7 @@ export function FieldDetails({
       });
       values = { ...values, ...newValues };
     }
-    return { ...values, record: values };
+    return { ...values };
   }, [fetch, model, record]);
 
   return (

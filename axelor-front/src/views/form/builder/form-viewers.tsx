@@ -130,12 +130,10 @@ function RecordViewer({
 }: FormViewerProps & { record: DataRecord }) {
   const Template = useTemplate(template);
 
-  // legacy templates may be using `record.` prefix
-  const rec = useMemo(() => ({ ...record, record }), [record]);
 
   return (
     <div className={styles.content}>
-      <Template context={rec} />
+      <Template context={record} />
     </div>
   );
 }
