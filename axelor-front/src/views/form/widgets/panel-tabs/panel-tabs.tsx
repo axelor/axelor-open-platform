@@ -60,22 +60,25 @@ export function PanelTabs(props: WidgetProps) {
 
   useEffect(() => {
     if (visibleTabs.some((item) => item.uid === activeTab)) return;
-    if (activeTab) {
-      let index = tabs.findIndex((item) => item.uid === activeTab);
-      let prevIndex = index - 1;
-      while (prevIndex >= 0) {
-        let prev = tabs[prevIndex];
-        if (!hiddenTabs[prev.uid]) {
-          setActiveTab(prev.uid);
-          return;
+    const timer = setTimeout(() => {
+      if (activeTab) {
+        let index = tabs.findIndex((item) => item.uid === activeTab);
+        let prevIndex = index - 1;
+        while (prevIndex >= 0) {
+          let prev = tabs[prevIndex];
+          if (!hiddenTabs[prev.uid]) {
+            setActiveTab(prev.uid);
+            return;
+          }
+          prevIndex--;
         }
-        prevIndex--;
       }
-    }
-    let first = visibleTabs[0];
-    if (first) {
-      setActiveTab(first.uid ?? null);
-    }
+      let first = visibleTabs[0];
+      if (first) {
+        setActiveTab(first.uid ?? null);
+      }
+    }, 50);
+    return () => clearTimeout(timer);
   }, [activeTab, hiddenTabs, tabs, visibleTabs]);
 
   return (
