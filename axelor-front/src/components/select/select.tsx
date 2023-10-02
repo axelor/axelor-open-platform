@@ -18,6 +18,7 @@ import {
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
+import { SanitizedContent } from "@/utils/sanitize";
 
 import styles from "./select.module.scss";
 
@@ -124,8 +125,13 @@ export const Select = forwardRef(function Select<
         key: "create",
         title: (
           <span>
-            {i18n.get("Create")}
-            {inputValue && <em> {inputValue}</em>}...
+            {inputValue ? (
+              <SanitizedContent
+                content={i18n.get("Create {0}...", `<em>${inputValue}</em>`)}
+              />
+            ) : (
+              i18n.get("Create...")
+            )}
           </span>
         ),
         onClick: () => onShowCreate(inputValue),
@@ -136,8 +142,13 @@ export const Select = forwardRef(function Select<
         key: "select",
         title: (
           <span>
-            {i18n.get("Select")}
-            {inputValue && <em> {inputValue}</em>}...
+            {inputValue ? (
+              <SanitizedContent
+                content={i18n.get("Select {0}...", `<em>${inputValue}</em>`)}
+              />
+            ) : (
+              i18n.get("Select...")
+            )}
           </span>
         ),
         onClick: () => onShowSelect(inputValue),
