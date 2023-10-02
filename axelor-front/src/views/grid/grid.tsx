@@ -324,7 +324,7 @@ function GridInner(props: ViewProps<GridView>) {
         if (hasPopup || hasEditInMobile || viewProps?.readonly === true) {
           return onEditInPopup(record, readonly);
         } 
-        return onEditInTab(record, forceEdit ? false : true);
+        return onEditInTab(record, forceEdit ? false : readonly);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
