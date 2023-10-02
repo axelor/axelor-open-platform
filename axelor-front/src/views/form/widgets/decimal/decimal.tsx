@@ -77,15 +77,14 @@ export function Decimal(props: FieldProps<string | number>) {
     [setValue],
   );
 
-  const handleBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
-    (e) => {
-      if (changed) {
-        setChanged(false);
-        setValue(parsedValue, true);
-      }
-    },
-    [changed, parsedValue, setValue],
-  );
+  const handleBlur = useCallback<
+    React.FocusEventHandler<HTMLInputElement>
+  >(() => {
+    if (changed) {
+      setChanged(false);
+      setValue(parsedValue, true);
+    }
+  }, [changed, parsedValue, setValue]);
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
     if (min != null && Number(value) < Number(min)) return min;
@@ -95,7 +94,7 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const increment = useCallback(
     (step: bigint) => {
-      const text = String(value).trim();
+      const text = String(value ?? 0).trim();
       const nums = text.split(".");
 
       const int = nums[0];
@@ -166,7 +165,7 @@ export function Decimal(props: FieldProps<string | number>) {
             id={uid}
             ref={inputRef}
             placeholder={placeholder}
-            value={changed ? value : parsedValue}
+            value={changed ? value ?? "" : parsedValue ?? ""}
             invalid={invalid}
             required={required}
             onChange={handleChange}
