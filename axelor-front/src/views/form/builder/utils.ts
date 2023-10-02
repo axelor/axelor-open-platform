@@ -145,6 +145,11 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   res.uid = uniqueId("w");
   res.widget = toKebabCase(type);
 
+  if (res.widget === "progress") {
+    res.minSize = res.minSize ?? 0;
+    res.maxSize = res.maxSize ?? 100;
+  }
+
   // process attrs
   processAttrs(res, parseNumber, ...NUMBER_ATTRS);
   processAttrs(res.widgetAttrs ?? {}, parseNumber, ...NUMBER_ATTRS);
