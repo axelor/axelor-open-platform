@@ -4,6 +4,7 @@ import {
   DataSource,
   DeleteOption,
   ExportResult,
+  ReadOptions,
   SaveOptions,
   SaveResult,
   SearchOptions,
@@ -95,6 +96,35 @@ export class DataStore extends DataSource {
     this.#page = _page;
 
     if (changed) this.#notify();
+  }
+
+  async read(
+    id: number,
+    options?: ReadOptions,
+    silent?: boolean,
+  ): Promise<DataRecord> {
+    const res = await super.read(id, options, silent);
+    if (res) {
+      const records = this.records.slice();
+      const recInd = records.findIndex((r) => r.id === res.id);
+      const { fields = [] } = this.#options;
+      if (recInd > -1 && fields.length) {
+        const record = records[recInd];
+        const changes = fields.reduce(
+          (rec, key) => ({
+            ...rec,
+            [key]: res[key] ?? record[key],
+          }),
+          {},
+        );
+        records[recInd] = {
+          ...record,
+          ...changes,
+        };
+        this.#accept(this.#options, this.#page, records);
+      }
+    }
+    return res;
   }
 
   async search(options: SearchOptions): Promise<SearchResult> {
