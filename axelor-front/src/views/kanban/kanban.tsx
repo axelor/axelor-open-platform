@@ -439,17 +439,28 @@ export function Kanban(props: ViewProps<KanbanView>) {
       );
 
       if (view.onMove) {
-        const ctx = {
-          ...getContext(),
-          ...updatedRecord,
-        };
-        await actionExecutor.execute(view.onMove, {
-          context: ctx,
-          data: {
-            _domainContext: ctx,
-          },
-        });
+        try {
+          const ctx = {
+            ...getContext(),
+            ...updatedRecord,
+          };
+          await actionExecutor.execute(view.onMove, {
+            context: ctx,
+            data: {
+              _domainContext: ctx,
+            },
+          });
+        } catch {
+          // reset columns to last state
+          return setColumns(
+            columns.map((col) => ({
+              ...col,
+              records: [...(col.records || [])],
+            })),
+          );
+        }
       }
+
       const updatedRecords = [
         updatedRecord,
         ...records.slice(index + 1, records.length).map((record, i) => {
