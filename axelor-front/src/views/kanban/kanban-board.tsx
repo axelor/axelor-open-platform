@@ -51,7 +51,6 @@ interface KanbanBoardProps {
 function RecordRenderer({
   record,
   column,
-  disabled,
   onCardEdit,
   onCardDelete,
   onCardClick,
@@ -59,13 +58,13 @@ function RecordRenderer({
 }: {
   record: KanbanRecord;
   column: KanbanColumn;
-  disabled?: boolean;
   onCardEdit: KanbanBoardProps["onCardEdit"];
   onCardDelete: KanbanBoardProps["onCardDelete"];
   onCardClick: KanbanBoardProps["onCardClick"];
   Card: KanbanBoardProps["components"]["Card"];
 }) {
-  const { canDelete = true, canEdit = true } = column;
+  const canEdit = Boolean(onCardEdit);
+  const canDelete = Boolean(onCardDelete);
 
   const commandItems: CommandItemProps[] = [
     {
@@ -96,7 +95,7 @@ function RecordRenderer({
         onCardClick({ record });
       }
     },
-    [canEdit, onCardClick, record]
+    [canEdit, onCardClick, record],
   );
 
   return (
@@ -159,11 +158,7 @@ function ColumnRenderer({
       {canCreate && onCardAdd && (
         <Box d="flex" g={2}>
           <Input value={text} onChange={(e) => setText(e.target.value)} />
-          <Button
-            disabled={!text.trim()}
-            variant="primary"
-            onClick={handleAdd}
-          >
+          <Button disabled={!text.trim()} variant="primary" onClick={handleAdd}>
             {i18n.get("Add")}
           </Button>
         </Box>
@@ -287,7 +282,7 @@ export function KanbanBoard({
       onCardDelete,
       onCardEdit,
       Card,
-    ]
+    ],
   );
 
   const ColumnProps = useMemo(
@@ -295,7 +290,7 @@ export function KanbanBoard({
       className: styles["column-wrapper"],
       style: { width: columnWidth },
     }),
-    [columnWidth]
+    [columnWidth],
   );
 
   const className = clsx(styles.board, {
