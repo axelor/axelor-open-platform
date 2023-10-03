@@ -12,7 +12,8 @@ import styles from "./form-layouts.module.scss";
 function computeLayout(schema: Schema) {
   const gap = schema.gap ?? "1rem";
   const cols = parseInt(schema.cols) || 12;
-  const itemSpan = parseInt(schema.itemSpan) || 6;
+  const itemSpan =
+    parseInt(schema.itemSpan ?? schema.widgetAttrs?.itemSpan) || 6;
   const colWidths: string = schema.colWidths ?? "";
   const items = schema.items || [];
   const widths = colWidths
@@ -59,7 +60,7 @@ function computeLayout(schema: Schema) {
         gridColumnStart: colStart,
         gridColumnEnd: colEnd,
         ...(hasField && { alignSelf: "end" }),
-        ...(schema.$json && { gridColumn: `span ${colSpan}` })
+        ...(schema.$json && { gridColumn: `span ${colSpan}` }),
       },
       content: item,
     };
@@ -108,7 +109,7 @@ export const StackLayout: FormLayout = memo(
         ))}
       </div>
     )) as JSX.Element;
-  }
+  },
 );
 
 export const GridLayout: FormLayout = memo(
@@ -133,14 +134,14 @@ export const GridLayout: FormLayout = memo(
         ))}
       </div>
     );
-  }
+  },
 );
 
 function GridItem(
   props: Omit<WidgetProps, "widgetAtom"> & {
     schema: Schema;
     style?: React.CSSProperties;
-  }
+  },
 ) {
   const { schema, formAtom, parentAtom, readonly, style } = props;
   const className = useMemo(() => layoutClassName(schema), [schema]);
