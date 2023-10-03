@@ -31,6 +31,7 @@ export type {
 
 export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
+  canSelect?: boolean;
   fetchOptions?: (inputValue: string) => Promise<Type[]>;
   onShowCreate?: (inputValue: string) => void;
   onShowSelect?: (inputValue: string) => void;
@@ -50,6 +51,7 @@ export const Select = forwardRef(function Select<
     onShowSelect,
     onInputChange,
     onOpen,
+    canSelect = true,
     openOnFocus = true,
     value = null,
     onChange,
@@ -166,7 +168,7 @@ export const Select = forwardRef(function Select<
       ref={selectRef}
       value={value}
       autoFocus={autoFocus}
-      readOnly={readOnly}
+      readOnly={readOnly || !canSelect}
       openOnFocus={openOnFocus}
       options={currOptions}
       customOptions={moreOptions}

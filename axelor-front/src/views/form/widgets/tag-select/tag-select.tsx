@@ -27,6 +27,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     target,
     targetName,
     targetSearch,
+    canSuggest = true,
     placeholder,
     orderBy: sortBy,
     formView,
@@ -220,6 +221,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         readOnly={readonly}
         required={required}
         invalid={invalid}
+        canSelect={canSelect}
+        autoComplete={canSuggest}
         fetchOptions={fetchOptions}
         options={[] as DataRecord[]}
         optionKey={getOptionKey}

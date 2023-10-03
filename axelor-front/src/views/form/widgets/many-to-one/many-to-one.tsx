@@ -32,6 +32,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     target,
     targetName,
     targetSearch,
+    canSuggest = true,
     widget,
     placeholder,
     orderBy: sortBy,
@@ -307,6 +308,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           autoFocus={focus}
           required={required}
           invalid={invalid}
+          canSelect={canSelect}
+          autoComplete={canSuggest}
           fetchOptions={fetchOptions}
           options={[] as DataRecord[]}
           optionKey={getOptionKey}
