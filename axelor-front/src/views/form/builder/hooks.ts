@@ -78,7 +78,7 @@ export function useInput<T>(
 ) {
   const {
     defaultValue,
-    onChangeTrigger = "change",
+    onChangeTrigger = "blur",
     validate = defaultValidator,
     format = defaultFormatter,
     parse = defaultConverter,
