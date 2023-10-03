@@ -610,6 +610,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
               stateAtom={searchAtom}
               dataStore={dataStore}
               items={view.items}
+              canExport={false}
               customSearch={view.customSearch}
               freeSearch={view.freeSearch}
               onSearch={onRefresh}

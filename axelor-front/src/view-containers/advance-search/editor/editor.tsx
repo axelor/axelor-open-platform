@@ -58,6 +58,7 @@ export interface EditorProps {
   fields: Field[];
   contextFields: Field[];
   canExportFull?: boolean;
+  canExport?: boolean;
   canShare?: boolean;
   onClear?: () => void;
   onApply?: () => void;
@@ -67,8 +68,9 @@ export interface EditorProps {
 }
 
 export function Editor({
-  canExportFull = true,
+  canExport = true,
   canShare = true,
+  canExportFull = true,
   stateAtom,
   fields,
   contextFields,
@@ -391,13 +393,15 @@ export function Editor({
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
-        <Button variant="link" size="sm" onClick={() => onExport?.()}>
-          {i18n.get("Export")}
-        </Button>
+        {canExport && (
+          <Button variant="link" size="sm" onClick={() => onExport?.()}>
+            {i18n.get("Export")}
+          </Button>
+        )}
         <Box className={styles.divider}>
           <Divider vertical />
         </Box>
-        {canExportFull && (
+        {canExportFull && canExport && (
           <>
             <Button variant="link" size="sm" onClick={() => onExport?.(true)}>
               {i18n.get("Export full")}

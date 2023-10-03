@@ -62,6 +62,7 @@ import styles from "./advance-search.module.scss";
 export interface AdvanceSearchProps {
   dataStore: DataStore;
   stateAtom: AdvancedSearchAtom;
+  canExport?: boolean;
   customSearch?: boolean;
   freeSearch?: string;
   items?: View["items"];
@@ -73,6 +74,7 @@ export function AdvanceSearch({
   stateAtom,
   items,
   freeSearch = "all",
+  canExport = true,
   customSearch = true,
   onSearch,
 }: AdvanceSearchProps) {
@@ -465,6 +467,7 @@ export function AdvanceSearch({
                     stateAtom={stateAtom}
                     fields={fields}
                     contextFields={contextFields}
+                    canExport={canExport}
                     canShare={advanceSearchConfig?.share}
                     canExportFull={advanceSearchConfig?.exportFull}
                     onApply={handleEditorApply}
