@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, CommandItemProps } from "@axelor/ui/core";
+import { Box, clsx, CommandItemProps } from "@axelor/ui/core";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 import { Event } from "@axelor/ui/scheduler/types";
@@ -82,12 +82,12 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const editableAndButton = useCallback(
     (name: string) => metaView.editable !== false && hasButton(name),
-    [hasButton, metaView.editable]
+    [hasButton, metaView.editable],
   );
 
   const isDateCalendar = useMemo(
     () => metaFields?.[eventStart]?.type === "DATE",
-    [metaFields, eventStart]
+    [metaFields, eventStart],
   );
 
   const convertDate = useMemo(() => {
@@ -102,29 +102,22 @@ export function Calendar(props: ViewProps<CalendarView>) {
         };
   }, [isDateCalendar]);
 
-  const components = useMemo(() => {
-    const timeComponents = isDateCalendar
-      ? {
-          dayColumnWrapper: () => null,
-          timeSlotWrapper: () => null,
-          timeGutterWrapper: () => null,
-        }
-      : {};
-    return {
+  const components = useMemo(
+    () => ({
       week: {
         header: ({ date, localizer }: any) => {
           return localizer.format(date, "ddd D");
         },
       },
       toolbar: () => null,
-      ...timeComponents,
-    };
-  }, [isDateCalendar]);
+    }),
+    [],
+  );
 
   const searchFieldNames = useMemo(() => {
     const schemaFieldNames = Object.keys(metaFields || {});
     const viewFieldNames = [eventStart, eventStop, colorBy].filter(
-      (field) => field
+      (field) => field,
     ) as string[];
     return [...new Set([...schemaFieldNames, ...viewFieldNames])];
   }, [metaFields, eventStart, eventStop, colorBy]);
@@ -229,7 +222,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const start = convertDate.toDate(record[eventStart] as string);
       const recordStop = eventStop && (record[eventStop] as string);
       let end = convertDate.toDate(
-        recordStop ? recordStop : addDate(start, eventLength, "hours")
+        recordStop ? recordStop : addDate(start, eventLength, "hours"),
       );
       if (end && isDateCalendar) {
         end = convertDate.toDate(getNextOf(end, "days"));
@@ -276,8 +269,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     if (ind > -1) {
       setFilters((filters) =>
         filters.map((filter, index) =>
-          index === ind ? { ...filter, checked: !filter.checked } : filter
-        )
+          index === ind ? { ...filter, checked: !filter.checked } : filter,
+        ),
       );
     }
   }, []);
@@ -288,7 +281,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return unfilteredCalendarEvents.reduce(
       (list: object[], event: SchedulerEvent) => {
         const filter = (showAll ? filters : checkedFilters).find(
-          (filter: Filter) => filter.match!(event)
+          (filter: Filter) => filter.match!(event),
         );
         return filter || showAll
           ? [
@@ -300,7 +293,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             ]
           : list;
       },
-      []
+      [],
     ) as SchedulerEvent[];
   }, [unfilteredCalendarEvents, filters]);
 
@@ -310,7 +303,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     (amount: 1 | -1) => {
       setCalendarDate((date) => addDate(date, amount, calendarMode));
     },
-    [calendarMode]
+    [calendarMode],
   );
 
   const handleNext = useCallback(() => handleNav(1), [handleNav]);
@@ -405,7 +398,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       setCalendarDate(date);
       handleNavigationChange(date);
     },
-    [handleNavigationChange]
+    [handleNavigationChange],
   );
 
   // Update
@@ -439,8 +432,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
       setRecords((records) =>
         records.map((record) =>
-          record.id === eventData.id ? { ...record, ...eventData } : record
-        )
+          record.id === eventData.id ? { ...record, ...eventData } : record,
+        ),
       );
 
       const updatedRecord = await dataStore.save(eventData);
@@ -449,11 +442,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
         records.map((record) =>
           record.id === updatedRecord.id
             ? { ...record, ...updatedRecord }
-            : record
-        )
+            : record,
+        ),
       );
     },
-    [eventStart, convertDate, eventStop, dataStore, metaFields, isDateCalendar]
+    [eventStart, convertDate, eventStop, dataStore, metaFields, isDateCalendar],
   );
 
   const handleEventUpdate = editableAndButton("edit")
@@ -462,7 +455,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<SchedulerEvent | null>(
-    null
+    null,
   );
 
   const closePopover = useCallback(() => {
@@ -476,14 +469,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
       setSelectedEvent(event);
       setAnchorEl(e.currentTarget);
     },
-    []
+    [],
   );
 
   const showRecord = useCallback(
     async (
       record: DataRecord,
       readonly: boolean,
-      onSelect: (data: DataRecord) => void
+      onSelect: (data: DataRecord) => void,
     ) => {
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
@@ -504,20 +497,20 @@ export function Calendar(props: ViewProps<CalendarView>) {
         onSelect,
       });
     },
-    [showEditor, action]
+    [showEditor, action],
   );
 
   const handleOpenEvent = useCallback(
     (
       event: SchedulerEvent,
       readonly: boolean,
-      onSelect: (data: DataRecord) => void
+      onSelect: (data: DataRecord) => void,
     ) => {
       setAnchorEl(null);
       const record = (event as Record<string, any>).record as DataRecord;
       showRecord(record, readonly, onSelect);
     },
-    [showRecord]
+    [showRecord],
   );
 
   const _handleEditEvent = useCallback(
@@ -525,16 +518,16 @@ export function Calendar(props: ViewProps<CalendarView>) {
       handleOpenEvent(event, false, (data: DataRecord) => {
         setRecords((records) =>
           records.map((record) =>
-            record.id === data.id ? { ...record, ...data } : record
-          )
+            record.id === data.id ? { ...record, ...data } : record,
+          ),
         );
       }),
-    [handleOpenEvent]
+    [handleOpenEvent],
   );
 
   const _handleViewEvent = useCallback(
     (event: SchedulerEvent) => handleOpenEvent(event, true, () => {}),
-    [handleOpenEvent]
+    [handleOpenEvent],
   );
 
   const handleEditEvent = editableAndButton("edit")
@@ -557,7 +550,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         setRecords((records) => [...records, data]);
       });
     },
-    [convertDate, eventStart, eventStop, isDateCalendar, showRecord]
+    [convertDate, eventStart, eventStop, isDateCalendar, showRecord],
   );
 
   const handleEventCreate = editableAndButton("new")
@@ -582,7 +575,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       await dataStore.delete({ id, version });
       setRecords((records) => records.filter((record) => record.id !== id));
     },
-    [closePopover, dataStore]
+    [closePopover, dataStore],
   );
 
   const handleDeleteEvent = editableAndButton("delete")
@@ -593,7 +586,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
   useViewTabRefresh("calendar", handleRefresh);
 
   return (
-    <div className={styles.calendar}>
+    <div
+      className={clsx(styles.calendar, {
+        "calendar-hide-times": isDateCalendar,
+      })}
+    >
       <ViewToolBar
         meta={meta}
         actions={actions}

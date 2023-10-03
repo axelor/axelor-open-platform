@@ -40,5 +40,17 @@
   width: 90%;
 }
 
-.calendar-panel {
+:global {
+  .calendar-hide-times {
+    .rbc-row-segment {
+      padding: 0.25rem 0.25rem 0 0.25rem;
+    }
+    .rbc-time-header {
+      flex-grow: 1;
+    }
+    .rbc-time-header-gutter,
+    .rbc-time-content {
+      display: none;
+    }
+  }
 }
