@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import padStart from "lodash/padStart";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
 import { toKebabCase } from "@/utils/names";
@@ -34,11 +34,16 @@ function toText(
     // ignore
   }
 
-  return timestamp >= 0
-    ? `${padStart(`${hrs}`, big ? 3 : 2, "0")}:${padStart(`${mins}`, 2, "0")}${
-        seconds ? `:${padStart(`${secs}`, 2, "0")}` : ""
-      }`
-    : "";
+  const result: string[] = [];
+  if (timestamp >= 0) {
+    result.push(padStart(String(hrs), big ? 3 : 2, "0"));
+    result.push(padStart(String(mins), 2, "0"));
+    if (seconds) {
+      result.push(padStart(String(secs), 2, "0"));
+    }
+  }
+
+  return result.join(":");
 }
 
 const toNumber = (val: string | number) =>
@@ -64,9 +69,14 @@ export function Duration(props: FieldProps<string | number>) {
 
   const isTime = toKebabCase(schema.widget!) === "time";
 
+  const format = useCallback(
+    (value?: string | number | null) => toText(value, { big, seconds }),
+    [big, seconds],
+  );
+
   const { value, text, onChange, onBlur } = useInput(valueAtom, {
     validate: isValid,
-    format: toText,
+    format: format,
     parse: toValue,
   });
 
