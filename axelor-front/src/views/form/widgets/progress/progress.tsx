@@ -10,7 +10,9 @@ import { Integer as IntegerWidget } from "../integer";
 
 import styles from "./progress.module.scss";
 
-// colors "r:24,y:49,b:74,g:100" -> [{code:'r', max:24}...]
+// "r:24,y:49,b:74,g:100" -> [{code:'r', max:24}...]
+const COLORS = "r:24,y:49,b:74,g:100";
+
 type TransformColor = {
   code: string;
   max: number;
@@ -34,7 +36,9 @@ export function ProgressComponent({
   schema: Schema;
 }) {
   const props = useMemo(() => {
-    const { min = 0, max = 100, colors = "r:24,y:49,b:74,g:100" } = schema;
+    const min = schema.minSize ?? 0;
+    const max = schema.maxSize ?? 100;
+    const colors = schema.colors ?? schema.widgetAttrs?.colors ?? COLORS;
     const num = Math.min(Math.round((+value * 100) / (max - min)), 100);
     const code = transformColors(colors).find((c) => num <= c.max)?.code ?? "";
     return { value: num, className: styles[code] };
