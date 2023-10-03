@@ -219,6 +219,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const handleSave = useAtomCallback(
       useCallback(
         async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
+          const input = document.activeElement as HTMLInputElement;
+          const elem = containerRef.current;
+          if (input && elem?.contains(input)) {
+            input.blur?.();
+            input.focus?.();
+          }
+
+          await actionExecutor.waitFor();
+          await actionExecutor.wait();
+
           const formState = get(formAtom);
 
           // check record changes
@@ -238,15 +248,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             showErrors(errors);
             return Promise.reject();
           }
-
-          const input = document.activeElement as HTMLInputElement;
-          const elem = containerRef.current;
-          if (input && elem?.contains(input)) {
-            input.blur?.();
-            input.focus?.();
-          }
-
-          await actionExecutor.wait();
 
           return await onSave?.(
             formState.record,
