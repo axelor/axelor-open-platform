@@ -16,10 +16,10 @@ import {
 } from "@/hooks/use-tabs";
 import { ViewData } from "@/services/client/meta";
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
+import { SearchOptions } from "@/services/client/data";
 import { usePrepareContext } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
-
 const fallbackAtom: TabAtom = atom(
   () => ({
     title: "",
@@ -237,17 +237,24 @@ export function useViewRoute() {
   return options as TabRoute;
 }
 
-export function useViewTabRefresh(viewType: string, refresh: () => void) {
+export function useViewTabRefresh(
+  viewType: string,
+  refresh: (
+    options?: Partial<SearchOptions> & {
+      forceReload?: boolean;
+    },
+  ) => void,
+) {
   const tab = useViewTab();
   const type = useSelectViewState(useCallback(({ type }) => type, []));
   const handleRefresh = useCallback(
     (e: Event) => {
       if (
         e instanceof CustomEvent &&
-        e.detail === tab.id &&
+        (e.detail?.id === tab.id) &&
         type === viewType
       ) {
-        refresh();
+        refresh({ forceReload: e.detail?.forceReload });
       }
     },
     [refresh, tab.id, type, viewType],

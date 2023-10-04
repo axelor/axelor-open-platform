@@ -588,12 +588,20 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
-  const onRefresh = useCallback(async () => {
-    await showConfirmDirty(
-      async () => isDirty,
-      async () => reload({ confirmDirty: false }),
-    );
-  }, [isDirty, reload, showConfirmDirty]);
+  const onTabRefresh = useCallback(
+    async (options?: { forceReload?: boolean }) => {
+      if (options?.forceReload) {
+        return reload();
+      }
+      await showConfirmDirty(
+        async () => isDirty,
+        async () => reload({ confirmDirty: false }),
+      );
+    },
+    [isDirty, reload, showConfirmDirty],
+  );
+
+  const onRefresh = useCallback(() => onTabRefresh(), [onTabRefresh]);
 
   const actionReload = useCallback(
     () => reload({ callAction: false }),
@@ -942,7 +950,7 @@ const FormContainer = memo(function FormContainer({
   });
 
   // register tab:refresh
-  useViewTabRefresh("form", onRefresh);
+  useViewTabRefresh("form", onTabRefresh);
 
   // check version
   useCheckVersion(formAtom, dataStore, onRefresh);

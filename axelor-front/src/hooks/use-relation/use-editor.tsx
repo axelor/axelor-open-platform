@@ -287,9 +287,14 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
         };
 
         reloadOptions.onClose = (result, record) => {
-          const detail = parentId.current;
-          if (detail && (selected || isChanged(result, record))) {
-            const event = new CustomEvent("tab:refresh", { detail });
+          const tabId = parentId.current;
+          if (tabId && (selected || isChanged(result, record))) {
+            const event = new CustomEvent("tab:refresh", {
+              detail: {
+                id: tabId,
+                forceReload: true,
+              },
+            });
             document.dispatchEvent(event);
           }
         };

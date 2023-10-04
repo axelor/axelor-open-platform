@@ -95,7 +95,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
 
   const doRefresh = useCallback((tab: string) => {
     const event = new CustomEvent("tab:refresh", {
-      detail: tab,
+      detail: { id: tab },
     });
     document.dispatchEvent(event);
   }, []);

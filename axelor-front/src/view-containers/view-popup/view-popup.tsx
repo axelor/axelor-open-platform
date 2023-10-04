@@ -306,8 +306,12 @@ function useClose(
 
   const triggerReload = useCallback(() => {
     if (parentId.current) {
-      const detail = parentId.current;
-      const event = new CustomEvent("tab:refresh", { detail });
+      const event = new CustomEvent("tab:refresh", {
+        detail: {
+          id: parentId.current,
+          forceReload: true,
+        },
+      });
       document.dispatchEvent(event);
     }
   }, []);
