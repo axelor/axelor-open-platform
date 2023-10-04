@@ -1,6 +1,7 @@
 import get from "lodash/get";
 import isEmpty from "lodash/isEmpty";
 
+import { isPlainObject } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
@@ -170,6 +171,12 @@ export function createScriptContext(
       return id > 0
         ? `ws/rest/${model}/${id}/${imageName}/download?image=true&v=${version}&parentId=${id}&parentModel=${model}`
         : "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+    },
+    $execute(action: string, actionContext?: DataContext) {
+      const ctx = isPlainObject(actionContext) ? actionContext : {};
+      return execute(action, {
+        context: { ...context, ...ctx },
+      });
     },
     $action(name: string) {
       return (e: React.MouseEvent<HTMLElement>) => {
