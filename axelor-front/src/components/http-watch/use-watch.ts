@@ -22,8 +22,10 @@ export function useHttpWatch() {
 
   useEffect(() => {
     return $use(async (args, next) => {
-      // don't intercept login request
-      if (isLogin(args.input)) return next();
+      // Don't intercept:
+      // - Request with silent option
+      // - Login request
+      if (args.options?.silent || isLogin(args.input)) return next();
 
       setCount((count) => count + 1);
       try {

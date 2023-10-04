@@ -3,7 +3,7 @@ import { $request, $use } from "../http";
 
 export const readCookie = (name: string) => {
   const match = document.cookie.match(
-    new RegExp("(^|;\\s*)(" + name + ")=([^;]*)")
+    new RegExp("(^|;\\s*)(" + name + ")=([^;]*)"),
   );
   return match ? decodeURIComponent(match[3]) : null;
 };
@@ -46,12 +46,17 @@ $use(async (args, next) => {
   return next();
 });
 
+export type RequestOptions = {
+  silent?: boolean;
+};
+
 export type RequestArgs = {
   url: string;
   method?: "GET" | "PUT" | "POST" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
   headers?: HeadersInit;
   signal?: AbortSignal;
   body?: any;
+  options?: RequestOptions;
 };
 
 const baseURL = "./";
@@ -66,12 +71,12 @@ export function makeURL(path: string | string[]) {
 }
 
 export async function request(args: RequestArgs): Promise<Response> {
-  const { url, method, headers, body } = args;
+  const { url, method, headers, body, options } = args;
   const input = makeURL(url);
   const init = {
     method,
     headers,
     body,
   };
-  return $request(input, init);
+  return $request(input, init, options);
 }

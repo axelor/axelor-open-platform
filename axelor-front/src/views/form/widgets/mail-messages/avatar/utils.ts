@@ -77,7 +77,7 @@ function trimMap(map: Map<String, Boolean>, maxSize: number) {
 export function checkUrl(
   url: string,
   onAllowed: (url: string) => void,
-  onForbidden: (url: string) => void
+  onForbidden: (url: string) => void,
 ) {
   trimMap(allowedUrls, allowedUrlsMaxSize);
 
@@ -114,6 +114,9 @@ export function checkUrl(
   fetchingUrls[url] = request({
     url,
     method: "HEAD",
+    options: {
+      silent: true,
+    },
   })
     .then((data) => {
       if (data.status < 400) {

@@ -1,20 +1,22 @@
+import { RequestOptions } from "../client/client";
 import fetch from "./http-fetch";
 
 export type HttpInterceptorArgs = {
   input: RequestInfo | URL;
   init?: RequestInit;
+  options?: RequestOptions;
 };
 
 export type HttpInterceptor = (
   args: HttpInterceptorArgs,
-  next: () => Promise<any>
+  next: () => Promise<any>,
 ) => Promise<any>;
 
 const interceptors: HttpInterceptor[] = [];
 
 async function intercept(
   args: HttpInterceptorArgs,
-  cb: () => Promise<Response>
+  cb: () => Promise<Response>,
 ) {
   let stack: HttpInterceptor[] = [...interceptors];
   let index = -1;
@@ -28,8 +30,12 @@ async function intercept(
   return await next();
 }
 
-export async function $request(input: RequestInfo | URL, init?: RequestInit) {
-  const args: HttpInterceptorArgs = { input, init };
+export async function $request(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  options?: RequestOptions,
+) {
+  const args: HttpInterceptorArgs = { input, init, options };
   return intercept(args, () => fetch(args.input, args.init));
 }
 
