@@ -1,6 +1,13 @@
 import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Message, MessageFile, MessageInputProps } from "../message/types";
 
 import { i18n } from "@/services/client/i18n";
@@ -84,8 +91,8 @@ export function MessageInput({
             const ids = _files.map((f) => f.id);
             return _files.concat(
               dmsFiles.filter(
-                (f) => !ids.includes(f.id!) && f.isDirectory !== true
-              ) as MessageFile[]
+                (f) => !ids.includes(f.id!) && f.isDirectory !== true,
+              ) as MessageFile[],
             );
           });
       },
@@ -101,6 +108,17 @@ export function MessageInput({
     });
   }
 
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      // Post message on Ctrl+Enter
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        handlePost();
+      }
+    },
+    [handlePost],
+  );
+
   return (
     <Box>
       <TextareaAutoSizeInput
@@ -109,6 +127,7 @@ export function MessageInput({
         placeholder={i18n.get("Write your comment here")}
         onChange={handleInputChange}
         onBlur={() => onBlur && onBlur(value)}
+        onKeyPress={handleKeyPress}
       />
       {files && (
         <MessageFiles
