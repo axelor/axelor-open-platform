@@ -292,9 +292,9 @@ export const Message = React.memo(function Message(props: MessageProps) {
 });
 
 const FILTERS = [
+  { title: i18n.get("All"), value: undefined },
   { title: i18n.get("Comments"), value: "comment" },
   { title: i18n.get("Notifications"), value: "notification" },
-  { title: i18n.get("All"), value: undefined },
 ] as const;
 
 export function MessageBox({
@@ -345,7 +345,7 @@ export function MessageBox({
               </Button>
             ))}
           </Box>
-          {filter === "comment" && (
+          {filter !== "notification" && (
             <MessageInput
               focus={false}
               onSave={onComment}

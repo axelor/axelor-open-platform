@@ -44,9 +44,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const { offset, limit } = pagination;
   const { fetchTags } = useTags();
 
-  const [filter, setFilter] = useState<string | undefined>(
-    schema.filter || "comment",
-  );
+  const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
   const setEmpty = useSetAtom(
     useMemo(
@@ -101,7 +99,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }));
       }
     },
-    [hasMessages, recordId, model, filter, folder],
+    [hasMessages, fetchMessages, recordId, model, folder, filter],
   );
 
   const postComment = useCallback(
