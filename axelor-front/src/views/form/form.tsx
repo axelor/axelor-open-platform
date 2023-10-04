@@ -746,8 +746,8 @@ const FormContainer = memo(function FormContainer({
           await actionExecutor.execute(action);
           // skip form dirty for onNew
           isNew && setFormDirty(false);
-          setReady(true);
         }
+        setReady(true);
       },
       [
         actionExecutor,

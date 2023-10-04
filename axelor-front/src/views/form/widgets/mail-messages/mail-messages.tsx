@@ -1,10 +1,14 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
+import noop from "lodash/noop";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTags } from "@/hooks/use-tags";
-import { useViewAction } from "@/view-containers/views/scope";
+import {
+  useViewAction,
+  useViewTabRefresh,
+} from "@/view-containers/views/scope";
 
 import { WidgetProps } from "../../builder";
 import { useAfterActions, useFormRefresh } from "../../builder/scope";
@@ -229,6 +233,9 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
   // register form:refresh
   useFormRefresh(onRefresh);
+
+  // register tab:refresh
+  useViewTabRefresh("form", isMessageBox ? onRefresh : noop);
 
   const { total } = pagination;
   useEffect(() => {

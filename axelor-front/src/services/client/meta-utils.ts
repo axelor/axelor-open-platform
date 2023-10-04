@@ -577,10 +577,12 @@ export function processView(
   }
 
   if (view.type === "form") {
-    // more attrs action
-    const moreAttrs = "com.axelor.meta.web.MetaController:moreAttrs";
-    view.onNew = view.onNew ? view.onNew + "," + moreAttrs : moreAttrs;
-    view.onLoad = view.onLoad ? view.onLoad + "," + moreAttrs : moreAttrs;
+    // more attrs action, except for mail
+    if (view.model !== "com.axelor.mail.db.MailMessage") {
+      const moreAttrs = "com.axelor.meta.web.MetaController:moreAttrs";
+      view.onNew = view.onNew ? view.onNew + "," + moreAttrs : moreAttrs;
+      view.onLoad = view.onLoad ? view.onLoad + "," + moreAttrs : moreAttrs;
+    }
 
     // all top-level items should span to 12 cols by default
     view.items?.forEach((item) => {
