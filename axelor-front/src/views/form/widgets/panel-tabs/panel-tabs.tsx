@@ -1,6 +1,7 @@
 import { produce } from "immer";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
+import { focusAtom } from "jotai-optics";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Fade, NavTabItem, NavTabs } from "@axelor/ui";
@@ -215,8 +216,14 @@ const DummyTab = memo(function DummyTab(
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom]),
   );
-  const active = useAtomValue(
-    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.active), [widgetAtom]),
+  const [active, setActiveAttr] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(widgetAtom, (o) =>
+          o.prop("attrs").valueOr({ active: false }).prop("active"),
+        ),
+      [widgetAtom],
+    ),
   );
 
   useEffect(() => {
@@ -224,8 +231,11 @@ const DummyTab = memo(function DummyTab(
   }, [hidden, schema.uid, setHidden]);
 
   useEffect(() => {
-    active && setActive(schema.uid);
-  }, [active, schema.uid, setActive]);
+    if (active) {
+      !hidden && setActive(schema.uid);
+      setActiveAttr(false);
+    }
+  }, [active, schema.uid, hidden, setActive, setActiveAttr]);
 
   return null;
 });
