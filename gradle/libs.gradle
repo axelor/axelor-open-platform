@@ -316,4 +316,8 @@ libs.tomcat_embed_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomca
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
 
-libs.minio = "io.minio:minio:8.5.2"
+libs.minio = dependencies.create("io.minio:minio:8.5.13") {
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
+    exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+}
