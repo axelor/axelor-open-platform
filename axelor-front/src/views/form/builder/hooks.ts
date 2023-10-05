@@ -94,9 +94,9 @@ export function useInput<T>(
   }, [changed, format, value]);
 
   const update = useCallback(
-    (text: string) => {
+    (text: string, fireOnChange: boolean) => {
       if (validate(text)) {
-        setValue(parse(text), true);
+        setValue(parse(text), fireOnChange);
       }
     },
     [parse, setValue, validate],
@@ -106,9 +106,7 @@ export function useInput<T>(
     (event) => {
       setChanged(true);
       setText(event.target.value);
-      if (onChangeTrigger === "change") {
-        update(event.target.value);
-      }
+      update(event.target.value, onChangeTrigger === "change");
     },
     [onChangeTrigger, update],
   );
@@ -118,7 +116,7 @@ export function useInput<T>(
       if (changed) {
         setChanged(false);
         if (onChangeTrigger === "blur") {
-          update(event.target.value);
+          update(event.target.value, true);
         }
       }
     },
