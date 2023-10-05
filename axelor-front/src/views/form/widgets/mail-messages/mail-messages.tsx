@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import noop from "lodash/noop";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,7 +10,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
-import { WidgetProps } from "../../builder";
+import { FormAtom, WidgetProps } from "../../builder";
 import { useAfterActions, useFormRefresh } from "../../builder/scope";
 import { MessageBox } from "./message";
 import { Message, MessageFetchOptions, MessageFlag } from "./message/types";
@@ -50,12 +50,6 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
   const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
-  const setEmpty = useSetAtom(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
-      [formAtom],
-    ),
-  );
   const fields = useAtomValue(
     useMemo(() => focusAtom(formAtom, (o) => o.prop("fields")), [formAtom]),
   );
@@ -238,24 +232,46 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   useViewTabRefresh("form", isMessageBox ? onRefresh : noop);
 
   const { total } = pagination;
-  useEffect(() => {
-    if (isMessageBox) {
-      setEmpty(total === 0);
-    }
-  }, [isMessageBox, total, setEmpty]);
 
   return (
-    <MessageBox
-      fields={fields}
-      data={messages}
-      isMail={isMessageBox}
-      filter={filter}
-      onFilterChange={setFilter}
-      onFetch={fetchAll}
-      onComment={postComment}
-      onCommentRemove={removeComment}
-      onAction={handleFlagsAction}
-      {...(pagination.hasNext ? { onLoad: loadMore } : {})}
-    />
+    <>
+      {isMessageBox && <MessageBoxUpdates count={total} formAtom={formAtom} />}
+      {(!isMessageBox || total > 0) && (
+        <MessageBox
+          fields={fields}
+          data={messages}
+          isMail={isMessageBox}
+          filter={filter}
+          onFilterChange={setFilter}
+          onFetch={fetchAll}
+          onComment={postComment}
+          onCommentRemove={removeComment}
+          onAction={handleFlagsAction}
+          {...(pagination.hasNext ? { onLoad: loadMore } : {})}
+        />
+      )}
+    </>
   );
+}
+
+function MessageBoxUpdates({
+  count,
+  formAtom,
+}: {
+  count: number;
+  formAtom: FormAtom;
+}) {
+  const [__empty, setEmpty] = useAtom(
+    useMemo(
+      () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
+      [formAtom],
+    ),
+  );
+  const empty = count === 0;
+  const shouldMarkEmpty = empty !== __empty;
+  useEffect(() => {
+    shouldMarkEmpty && setEmpty(empty);
+  }, [shouldMarkEmpty, empty, setEmpty]);
+
+  return null;
 }
