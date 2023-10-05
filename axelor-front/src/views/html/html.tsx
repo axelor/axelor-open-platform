@@ -1,19 +1,20 @@
-import { useEffect, useMemo, useReducer } from "react";
 import { useSetAtom } from "jotai";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { Box } from "@axelor/ui";
 
-import { HtmlView } from "@/services/client/meta.types";
 import { useExpression } from "@/hooks/use-parser";
+import { HtmlView } from "@/services/client/meta.types";
+import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import {
   useViewContext,
   useViewProps,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 
 import { ViewProps } from "../types";
+
 import styles from "./html.module.scss";
 
 export function Html(props: ViewProps<HtmlView>) {
@@ -30,17 +31,19 @@ export function Html(props: ViewProps<HtmlView>) {
   const name = viewProps?.name || view.name || view.resource;
   const parseURL = useExpression(name!);
 
-  const url = useMemo(() => {
+  const getURL = useCallback(() => {
     let url = `${name}`;
-
-    if (!url) return "";
-
-    if (url && url.indexOf("{{") > -1) {
-      url = parseURL(getContext() ?? {});
+    if (url && url.includes("{{")) {
+      url = parseURL(getContext());
     }
+    return url ?? "";
+  }, [getContext, name, parseURL]);
 
-    return url;
-  }, [name, getContext, parseURL]);
+  const [url, setUrl] = useState<string>();
+
+  useEffect(() => {
+    setUrl(() => getURL());
+  }, [getURL, updateCount]);
 
   useEffect(() => {
     if (dashlet) {
