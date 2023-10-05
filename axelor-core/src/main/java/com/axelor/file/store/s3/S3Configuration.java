@@ -39,6 +39,8 @@ public class S3Configuration {
 
   public String kmsKeyId;
 
+  public String storageClass;
+
   public S3Configuration(
       String endpoint,
       boolean pathStyle,
@@ -48,7 +50,8 @@ public class S3Configuration {
       String bucket,
       String region,
       S3EncryptionType encryption,
-      String kmsKeyId) {
+      String kmsKeyId,
+      String storageClass) {
     this.endpoint = endpoint;
     this.pathStyle = pathStyle;
     this.secure = secure;
@@ -58,6 +61,7 @@ public class S3Configuration {
     this.region = region;
     this.encryption = encryption;
     this.kmsKeyId = kmsKeyId;
+    this.storageClass = storageClass;
   }
 
   public String getEndpoint() {
@@ -132,6 +136,14 @@ public class S3Configuration {
     this.kmsKeyId = kmsKeyId;
   }
 
+  public String getStorageClass() {
+    return storageClass;
+  }
+
+  public void setStorageClass(String storageClass) {
+    this.storageClass = storageClass;
+  }
+
   @Override
   public String toString() {
     MoreObjects.ToStringHelper helper =
@@ -149,6 +161,10 @@ public class S3Configuration {
     if (StringUtils.notEmpty(secretKey)) {
       helper.add("secretKey", "******");
     }
+    if (StringUtils.notEmpty(storageClass)) {
+      helper.add("storageClass", storageClass);
+    }
     return helper.toString();
   }
+
 }

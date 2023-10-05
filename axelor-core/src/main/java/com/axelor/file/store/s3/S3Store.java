@@ -20,6 +20,7 @@ package com.axelor.file.store.s3;
 
 import com.axelor.common.FileUtils;
 import com.axelor.common.MimeTypesUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.file.store.Store;
 import com.axelor.file.store.StoreType;
 import com.axelor.file.store.UploadedFile;
@@ -51,6 +52,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class S3Store implements Store {
 
@@ -151,12 +154,17 @@ public class S3Store implements Store {
     }
     try {
       String contentType = MimeTypesUtils.getContentType(path);
+      Map<String, String> headers = new HashMap<>();
+      if (StringUtils.notBlank(_s3ClientManager.getStorageClass())) {
+        headers.put("X-Amz-Storage-Class", _s3ClientManager.getStorageClass());
+      }
       UploadObjectArgs.Builder builder =
           UploadObjectArgs.builder()
               .bucket(getBucketName())
               .object(fileName)
               .contentType(contentType)
               .filename(path.toString())
+              .headers(headers)
               .sse(getEncryption());
       getClient().uploadObject(builder.build());
       return new UploadedFile(

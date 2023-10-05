@@ -31,4 +31,6 @@ public interface S3ClientManager {
   String getEncryptionKmsKeyId();
 
   void shutdown();
+
+  String getStorageClass();
 }

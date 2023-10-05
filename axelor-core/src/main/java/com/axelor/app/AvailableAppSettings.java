@@ -126,6 +126,7 @@ public interface AvailableAppSettings {
   String DATA_OBJECT_STORAGE_REGION = "data.object-storage.region";
   String DATA_OBJECT_STORAGE_ENCRYPTION = "data.object-storage.encryption";
   String DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID = "data.object-storage.encryption-kms-key-id";
+  String DATA_OBJECT_STORAGE_STORAGE_CLASS = "data.object-storage.storage-class";
 
   String DATA_OBJECT_STORAGE_CACHE_ENABLED = "data.object-storage.cache.enabled";
   String DATA_OBJECT_STORAGE_CACHE_MAX_ENTRIES = "data.object-storage.cache.max-entries";

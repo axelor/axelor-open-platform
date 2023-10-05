@@ -38,6 +38,7 @@ data.object-storage.bucket = files
 data.object-storage.region =
 data.object-storage.encryption =
 data.object-storage.encryption-kms-key-id =
+data.object-storage.storage-class =
 
 data.object-storage.cache.enabled =
 data.object-storage.cache.max-entries =

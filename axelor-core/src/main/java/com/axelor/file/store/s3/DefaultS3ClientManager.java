@@ -59,7 +59,8 @@ public class DefaultS3ClientManager implements S3ClientManager {
         settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_BUCKET),
         settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_REGION),
         getEncryption(settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION)),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID));
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_STORAGE_CLASS));
   }
 
   private S3EncryptionType getEncryption(String encryptionName) {
@@ -111,5 +112,10 @@ public class DefaultS3ClientManager implements S3ClientManager {
   @Override
   public String getEncryptionKmsKeyId() {
     return s3Configuration.getKmsKeyId();
+  }
+
+  @Override
+  public String getStorageClass() {
+    return s3Configuration.getStorageClass();
   }
 }
