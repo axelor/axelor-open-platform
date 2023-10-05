@@ -296,11 +296,13 @@ export function useViewMeta() {
       const { view, fields = {} } = meta;
       const field = fields[fieldName] ?? {};
       const schema = findSchema(view, fieldName);
+      const serverType = schema?.serverType || field.type;
+      const more = serverType ? { serverType } : {};
       return {
         ...field,
         ...schema,
-        serverType: schema?.serverType || field.type,
         ...schema?.widgetAttrs,
+        ...more,
       } as Schema;
     },
     [meta],
