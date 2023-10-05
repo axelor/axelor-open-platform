@@ -14,6 +14,8 @@ import styles from "./selection.module.scss";
 const optionKey = (item: SelectionType) => item.value!;
 const optionLabel = (item: SelectionType) => item.title!;
 const optionEqual = (a: SelectionType, b: SelectionType) => a.value === b.value;
+const optionMatch = (option: SelectionType, text: string) =>
+  optionLabel(option).toLowerCase().includes(text.toLowerCase());
 
 export type SelectionProps<Multiple extends boolean> = FieldProps<
   string | number | null
@@ -31,7 +33,7 @@ export function Selection<Multiple extends boolean>(
     readonly,
     invalid,
     multiple,
-    autoComplete = false,
+    autoComplete = true,
     renderOption,
     renderValue,
     widgetAtom,
@@ -97,6 +99,7 @@ export function Selection<Multiple extends boolean>(
         optionKey={optionKey}
         optionLabel={optionLabel}
         optionEqual={optionEqual}
+        optionMatch={optionMatch}
         value={selectionValue}
         onChange={handleChange}
         renderOption={renderOption}
