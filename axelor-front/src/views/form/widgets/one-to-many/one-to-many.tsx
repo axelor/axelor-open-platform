@@ -1,4 +1,5 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
@@ -32,7 +33,9 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
 import { FormView, GridView, View } from "@/services/client/meta.types";
+import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
+import { MetaScope } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
 
@@ -43,16 +46,11 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import {
-  useActionExecutor,
-  useAfterActions
-} from "../../builder/scope";
+import { useActionExecutor, useAfterActions } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
-import { download } from "@/utils/download";
-import { MetaScope } from "@/view-containers/views/scope";
-import { ScopeProvider } from "jotai-molecules";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
+
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
@@ -196,6 +194,16 @@ export function OneToMany({
       },
     };
   }, [schema, model]);
+
+  const viewMeta = useMemo(() => {
+    return (
+      viewData ?? {
+        view: schema as unknown as GridView,
+        fields,
+        model,
+      }
+    );
+  }, [fields, model, schema, viewData]);
 
   const editable =
     (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
@@ -676,7 +684,7 @@ export function OneToMany({
           ],
         }}
       >
-        <ScopeProvider scope={MetaScope} value={viewData}>
+        <ScopeProvider scope={MetaScope} value={viewMeta}>
           <GridComponent
             className={styles["grid"]}
             ref={gridRef}
