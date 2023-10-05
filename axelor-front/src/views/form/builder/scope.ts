@@ -10,7 +10,7 @@ import {
   EvalContextOptions,
   createEvalContext,
 } from "@/hooks/use-parser/context";
-import { isCleanDummy } from "@/services/client/data-utils";
+import { isCleanDummy, updateRecord } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
@@ -494,7 +494,7 @@ function useActionRecord({
             }),
             {} as DataRecord,
           );
-          const result = { ...record, ...values };
+          const result = updateRecord(record, values);
           const isDirty = () =>
             Object.entries(values).some(
               ([k, v]) => record[k] !== v && canDirty(k),

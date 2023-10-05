@@ -10,6 +10,7 @@ import {
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
+import { isPlainObject } from "@/services/client/data-utils";
 import { MetaData } from "@/services/client/meta";
 import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS } from "./types";
@@ -94,19 +95,12 @@ export function defaultAttrs(schema: Schema): Attrs {
   return attrs;
 }
 
-export function processActionValue(value: any) {
-  function updateNullIdObject(value: any): any {
-    if (value && typeof value === "object") {
-      if (Array.isArray(value)) {
-        return value.map(updateNullIdObject);
-      }
-      if (value.id === null) {
-        return { ...value, id: nextId(), _dirty: true };
-      }
-    }
-    return value;
+export function processActionValue(value: any): any {
+  if (Array.isArray(value)) return value.map(processActionValue);
+  if (isPlainObject(value) && value.id === null) {
+    return { ...value, id: nextId(), _dirty: true };
   }
-  return updateNullIdObject(value);
+  return value;
 }
 
 export function processContextValues(context: DataContext) {

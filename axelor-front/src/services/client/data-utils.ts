@@ -75,7 +75,9 @@ export function mergeCleanDummy(record: DataRecord): DataRecord {
 }
 
 function compact<T>(value: T): T {
-  if (Array.isArray(value)) return value.filter((x) => !isNil(x)) as any;
+  if (Array.isArray(value)) {
+    return value.filter((x) => !isNil(x)).map((x) => compact(x)) as any;
+  }
   if (isPlainObject(value)) {
     if (value.id > 0 && value.version === undefined) return value.id;
     const result = Object.entries(value)
@@ -109,4 +111,68 @@ export function diff(a: DataRecord, b: DataRecord): DataRecord {
   }, {});
 
   return result;
+}
+
+function toCompact(value: DataRecord | null | undefined) {
+  if (!value) return value;
+  if (value.version === undefined) return value;
+  if (!value.id) return value;
+  const { version: $version, ...rest } = value;
+  return { ...rest, $version };
+}
+
+export function updateRecord(target: DataRecord, source: DataRecord) {
+  if (equals(target, source)) {
+    return target;
+  }
+
+  let result = target;
+
+  for (const [key, value] of Object.entries(source)) {
+    let newValue = value;
+    if (newValue === result[key]) {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      const curr: DataRecord[] = result[key] ?? [];
+      newValue = value.map((item) => {
+        const found = curr.find((x) =>
+          item.id > 0 ? x.id === item.id : equals(x, item),
+        );
+        if (found) {
+          let newItem = updateRecord(found, item);
+          if (newItem.selected !== item.selected) {
+            newItem = { ...newItem, selected: item.selected };
+          }
+          return newItem;
+        }
+        return item;
+      });
+    }
+
+    if (isPlainObject(value)) {
+      const curr: DataRecord = result[key] ?? {};
+      if (curr.id === value.id) {
+        if (curr.version! >= 0) {
+          newValue = updateRecord(curr, value);
+        } else {
+          newValue = { ...curr, ...value };
+        }
+      } else {
+        newValue = toCompact(value);
+      }
+    }
+
+    if (
+      equals(result[key], newValue) &&
+      equals(result[key]?.selected, newValue?.selected)
+    ) {
+      continue;
+    }
+
+    result = { ...result, [key]: newValue };
+  }
+
+  return target === result ? target : { ...result, _dirty: true };
 }
