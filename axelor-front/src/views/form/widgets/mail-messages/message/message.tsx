@@ -186,7 +186,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
         <Box w={100} border rounded bgColor="body">
           <Box
             as="span"
-            className={styles["arrow-right"]}
+            className={styles["arrow-left"]}
             position="absolute"
             border
             borderEnd={false}

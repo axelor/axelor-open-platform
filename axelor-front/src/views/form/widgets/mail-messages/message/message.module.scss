@@ -1,21 +1,21 @@
 .message-container {
   width: calc(100% + 2rem);
-  margin: 0 1rem 1rem -2rem;
+  margin: 0 1rem 1rem -31px;
   .rtl & {
-    margin: 0 -2rem 1rem 1rem;
+    margin: 0 -31px 1rem 1rem;
   }
 }
 
-.arrow-right {
+.arrow-left {
   width: 0.75rem;
   height: 0.75rem;
-  left: 3.5rem;
+  left: 3.45rem;
   top: 0.75rem;
   transform: rotate(-45deg);
   background: var(--bs-body-bg);
   .rtl & {
     left: unset;
-    right: 3.5rem;
+    right: 3.45rem;
     transform: rotate(45deg);
   }
 }
@@ -54,6 +54,7 @@
   border-radius: 50%;
   justify-content: center;
   color: var(--bs-body-color);
+  background-color: var(--ax-panel-bg);
 }
 
 .pull-right {
