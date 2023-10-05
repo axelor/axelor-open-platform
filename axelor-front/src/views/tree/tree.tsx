@@ -57,7 +57,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const actionExecutor = useActionExecutor(view, {
     getContext: getActionContext,
-    onRefresh: () => onSearch({}),
+    onRefresh: () => doSearch({}),
   });
 
   // check parent/child is of same model
@@ -131,7 +131,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     });
   }, [view]);
 
-  const onSearch = useAfterActions(useCallback(
+  const doSearch = useCallback(
     async (options: Partial<SearchOptions> = {}) => {
       if (dataStore) {
         const { nodes } = view;
@@ -161,7 +161,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       }
     },
     [dataStore, view, isSameModelTree, getSearchOptions, getContext],
-  ));
+  );
+
+  const onSearch = useAfterActions(doSearch);
 
   const onSearchNode = useCallback(
     async (treeNode: TreeRecord) => {
@@ -274,10 +276,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       setDashletHandlers({
         dataStore,
         view,
-        onRefresh: () => onSearch({}),
+        onRefresh: () => doSearch({}),
       });
     }
-  }, [dashlet, view, dataStore, onSearch, setDashletHandlers]);
+  }, [dashlet, view, dataStore, doSearch, setDashletHandlers]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 

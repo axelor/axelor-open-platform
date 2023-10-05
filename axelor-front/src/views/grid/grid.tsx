@@ -196,21 +196,21 @@ function GridInner(props: ViewProps<GridView>) {
     };
   }, [dataStore, getSearchOptions]);
 
-  const onSearch = useAfterActions(
-    useCallback(
-      (options: SearchOptions = {}) => {
-        if (cacheDataRef.current) {
-          cacheDataRef.current = false;
-          const { records, page } = dataStore;
-          if (isEqual(dataStore.options?.fields, options.fields)) {
-            return Promise.resolve({ records, page } as SearchResult);
-          }
+  const doSearch = useCallback(
+    (options: SearchOptions = {}) => {
+      if (cacheDataRef.current) {
+        cacheDataRef.current = false;
+        const { records, page } = dataStore;
+        if (isEqual(dataStore.options?.fields, options.fields)) {
+          return Promise.resolve({ records, page } as SearchResult);
         }
-        return dataStore.search(getSearchOptions(options));
-      },
-      [dataStore, getSearchOptions],
-    ),
+      }
+      return dataStore.search(getSearchOptions(options));
+    },
+    [dataStore, getSearchOptions],
   );
+
+  const onSearch = useAfterActions(doSearch);
 
   const onMassUpdate = useCallback(
     async (values: Partial<DataRecord>, hasAll?: boolean) => {
@@ -315,7 +315,7 @@ function GridInner(props: ViewProps<GridView>) {
     [action],
   );
 
-  const hasEditInMobile = (isMobile && editable);
+  const hasEditInMobile = isMobile && editable;
 
   const onEdit = useCallback(
     (record: DataRecord, readonly = false) => {
@@ -323,7 +323,7 @@ function GridInner(props: ViewProps<GridView>) {
         const forceEdit = action.params?.["forceEdit"];
         if (hasPopup || hasEditInMobile || viewProps?.readonly === true) {
           return onEditInPopup(record, readonly);
-        } 
+        }
         return onEditInTab(record, forceEdit ? false : readonly);
       }
       const recordId = record.id || 0;
@@ -540,7 +540,7 @@ function GridInner(props: ViewProps<GridView>) {
   );
   const actionExecutor = useActionExecutor(view, {
     getContext,
-    onRefresh: onSearch,
+    onRefresh: doSearch,
   });
 
   const popupHandlerAtom = usePopupHandlerAtom();
@@ -564,7 +564,7 @@ function GridInner(props: ViewProps<GridView>) {
         view,
         actionExecutor,
         gridStateAtom,
-        onRefresh: () => onSearch({}),
+        onRefresh: () => doSearch({}),
       });
     }
   }, [
@@ -573,7 +573,7 @@ function GridInner(props: ViewProps<GridView>) {
     gridStateAtom,
     dataStore,
     actionExecutor,
-    onSearch,
+    doSearch,
     setDashletHandlers,
   ]);
 

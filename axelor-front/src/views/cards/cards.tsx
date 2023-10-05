@@ -66,7 +66,7 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const actionExecutor = useActionExecutor(view, {
     getContext: getActionContext,
-    onRefresh: () => onSearch({}),
+    onRefresh: () => doSearch({}),
   });
 
   const { width, minWidth } = useMemo(() => {
@@ -81,32 +81,32 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [view.width]);
 
-  const onSearch = useAfterActions(
-    useAtomCallback(
-      useCallback(
-        (get, set, options: Partial<SearchOptions> = {}) => {
-          const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
-          const names = Object.keys(fields ?? {});
+  const doSearch = useAtomCallback(
+    useCallback(
+      (get, set, options: Partial<SearchOptions> = {}) => {
+        const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
+        const names = Object.keys(fields ?? {});
 
-          if (dashlet) {
-            const { _domainAction, ...formContext } = getViewContext() ?? {};
-            const { _domainContext } = filter;
-            filter._domainContext = {
-              ..._domainContext,
-              ...formContext,
-            };
-            filter._domainAction = _domainAction;
-          }
-          return dataStore.search({
-            filter,
-            fields: names,
-            ...options,
-          });
-        },
-        [dataStore, fields, dashlet, searchAtom, getViewContext],
-      ),
+        if (dashlet) {
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
+          const { _domainContext } = filter;
+          filter._domainContext = {
+            ..._domainContext,
+            ...formContext,
+          };
+          filter._domainAction = _domainAction;
+        }
+        return dataStore.search({
+          filter,
+          fields: names,
+          ...options,
+        });
+      },
+      [dataStore, fields, dashlet, searchAtom, getViewContext],
     ),
   );
+
+  const onSearch = useAfterActions(doSearch);
 
   const getActionData = useAtomCallback(
     useCallback(
@@ -208,7 +208,7 @@ export function Cards(props: ViewProps<CardsView>) {
         dataStore,
         actionExecutor,
         view,
-        onRefresh: onSearch,
+        onRefresh: doSearch,
       });
     }
   }, [
@@ -217,7 +217,7 @@ export function Cards(props: ViewProps<CardsView>) {
     searchAtom,
     dataStore,
     actionExecutor,
-    onSearch,
+    doSearch,
     setDashletHandlers,
   ]);
 
