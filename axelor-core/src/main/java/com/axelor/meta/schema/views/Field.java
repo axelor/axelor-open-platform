@@ -181,6 +181,9 @@ public class Field extends SimpleWidget {
   @XmlAttribute(name = "x-json-model")
   private String jsonModel;
 
+  @XmlAttribute(name = "x-dirty")
+  private Boolean canDirty;
+
   @XmlElement(name = "hilite")
   private List<Hilite> hilites;
 
@@ -578,7 +581,15 @@ public class Field extends SimpleWidget {
   public void setJsonModel(String jsonModel) {
     this.jsonModel = jsonModel;
   }
-
+  
+  public Boolean getCanDirty() {
+    return canDirty;
+  }
+  
+  public void setCanDirty(Boolean canDirty) {
+    this.canDirty = canDirty;
+  }
+  
   public List<Hilite> getHilites() {
     return hilites;
   }

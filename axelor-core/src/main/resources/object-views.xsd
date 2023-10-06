@@ -1007,6 +1007,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-dirty" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether the field contributes to the record dirty check.
+        If set to false, the UI will not mark the current record dirty.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">

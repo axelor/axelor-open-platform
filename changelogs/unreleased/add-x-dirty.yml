@@ -1,0 +1,10 @@
+---
+title: Add `x-dirty` attribute to view fields
+type: feature
+description: |
+  If the view field is marked as `x-dirty="false"`, the
+  field value change will not mark current record dirty.
+  
+  The old dirty checking behavior of the `$` prefixed
+  fields is now deprecated and will be removed during
+  next major release.
