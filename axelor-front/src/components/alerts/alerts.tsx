@@ -47,6 +47,7 @@ const showAlert = (alert: {
   alertsStore.set(alertsAtom, (prev) => [{ id, nodeRef, ...alert }, ...prev]);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export module alerts {
   export function info(options: { title?: string; message: React.ReactNode }) {
     showAlert({
