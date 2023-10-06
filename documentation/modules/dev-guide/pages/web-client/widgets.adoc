@@ -683,7 +683,6 @@ special variables can be used:
 - `$invalid([name])` - whether the widget is invalid
 - `$get(path)` - get the value with dotted path
 - `$popup()` - whether the form is a popup
-- `$context` - current context
 - `$user` - login of current user
 - `$group` - group code of current user
 

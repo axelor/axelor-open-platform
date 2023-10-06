@@ -1,0 +1,6 @@
+---
+title: Remove `$context` variable in frontend eval expressions
+type: remove
+description: |
+  This was never intended to be used.
+  Stick to direct field access: `myField`, not `$context.myField`.
