@@ -40,7 +40,10 @@ $use(async (args, next) => {
       ...init.headers,
       "Content-Type": "application/json",
     };
-    init.body = JSON.stringify(body);
+    init.body = JSON.stringify(body, (key, value) => {
+      //XXX: exclude dymmy fields, should be removed in next major release
+      return key.startsWith("$") ? undefined : value;
+    });
   }
 
   return next();

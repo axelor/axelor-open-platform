@@ -12,7 +12,7 @@ export function isDummy(name: string, fieldNames: string[]) {
 
 export function extractDummy(
   record: DataRecord,
-  fieldNames: string[]
+  fieldNames: string[],
 ): Record<string, any> {
   return Object.entries(record)
     .filter(([k]) => isDummy(k, fieldNames))
@@ -53,9 +53,10 @@ export function excludeCleanDummy(record: DataRecord): DataRecord {
 }
 
 export function mergeCleanDummy(record: DataRecord): DataRecord {
-  const data = excludeCleanDummy(record);
+  const data = { ...record };
   const dummy = extractCleanDummy(record);
 
+  //XXX: merge dummy fields by removing `$`, should be removed in next major release
   Object.entries(dummy).forEach(([k, v]) => {
     const n = getBaseDummy(k);
     data[n] = data[n] ?? v;
