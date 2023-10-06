@@ -127,7 +127,7 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
-  const { editable, inlineHelp } = view;
+  const { editable: _editable, inlineHelp } = view;
 
   const showEditor = useManyEditor(action, dashlet);
 
@@ -315,6 +315,8 @@ function GridInner(props: ViewProps<GridView>) {
     [action],
   );
 
+  const canEdit = hasButton("edit");
+  const editable = _editable && canEdit;
   const hasEditInMobile = isMobile && editable;
 
   const onEdit = useCallback(
@@ -654,7 +656,7 @@ function GridInner(props: ViewProps<GridView>) {
   }, [gridSearchAtom, onSearch]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
-  const showEditIcon = popupOptions?.showEditIcon !== false;
+  const showEditIcon = popupOptions?.showEditIcon !== false && canEdit;
   const showCheckbox = popupOptions?.multiSelect !== false;
 
   const searchProps: any = {
@@ -707,7 +709,6 @@ function GridInner(props: ViewProps<GridView>) {
     return onNew;
   }, [hasDetailsView, editable, onNewInDetails, onNewInGrid, onNew]);
 
-  const canEdit = hasButton("edit");
   const editEnabled = hasRowSelected && (!hasDetailsView || !dirty);
   const handleEdit = useCallback(() => {
     const [rowIndex] = selectedRows ?? [];
@@ -888,6 +889,7 @@ function GridInner(props: ViewProps<GridView>) {
                 ? false
                 : editable
             }
+            showEditIcon={canEdit}
             searchOptions={searchOptions}
             searchAtom={searchAtom}
             actionExecutor={actionExecutor}
