@@ -25,7 +25,7 @@ const COLOR_MAPS: Record<string, TVariant> = {
 
 export function SelectionTag({
   title,
-  color,
+  color: _color,
   className,
   onRemove,
 }: {
@@ -34,6 +34,7 @@ export function SelectionTag({
   className?: string;
   onRemove?: () => void;
 }) {
+  const color = _color ?? "primary";
   const variant = COLOR_MAPS[color!] ?? (color as TVariant);
   const isVariant = variant && VARIANTS.includes(variant);
   const colorProps = isVariant ? { variant } : undefined;
