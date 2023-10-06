@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { Badge, NavMenu, NavMenuItem } from "@axelor/ui";
+import { Badge, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 
 import { useMenu } from "@/hooks/use-menu";
 import { useTabs } from "@/hooks/use-tabs";
@@ -29,8 +29,11 @@ function MenuTag({
   tag: string;
   color?: string;
 }) {
+  const bg = (
+    !color || color === "default" ? "secondary" : color
+  ) as TBackground;
   return (
-    <Badge data-tag-name={item.name} bg={(color || "secondary") as any}>
+    <Badge data-tag-name={item.name} bg={bg}>
       {`${tag}`.toUpperCase()}
     </Badge>
   );
@@ -70,7 +73,9 @@ function load(res: MenuItem[], tags: Tag[]) {
 
     const updatedTag = tags.filter((x) => item.name === x.name)[0];
     if (tag || updatedTag) {
-      props.tag = () => <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} />;
+      props.tag = () => (
+        <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} />
+      );
     }
 
     return props;
@@ -103,7 +108,7 @@ export function NavDrawer() {
         await openTab(menu.action, { tab: true });
       }
     },
-    [menus, small, setSidebar, openTab]
+    [menus, small, setSidebar, openTab],
   );
 
   const handleSearchShow = useCallback(() => setShowSearch(true), []);
