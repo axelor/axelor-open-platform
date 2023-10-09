@@ -7,6 +7,7 @@ import { Schema } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { Integer as IntegerWidget } from "../integer";
+import { Selection } from "../selection";
 
 import styles from "./progress.module.scss";
 
@@ -59,4 +60,9 @@ export function Progress(props: FieldProps<number | string>) {
     );
   }
   return <IntegerWidget {...props} />;
+}
+
+export function SelectProgress(props: FieldProps<number | string>) {
+  const { readonly } = props;
+  return readonly ? <Progress {...props} /> : <Selection {...props} />;
 }
