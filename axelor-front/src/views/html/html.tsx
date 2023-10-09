@@ -13,6 +13,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
+import { useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
 
 import styles from "./html.module.scss";
@@ -41,9 +42,15 @@ export function Html(props: ViewProps<HtmlView>) {
 
   const [url, setUrl] = useState<string>();
 
+  const doLoad = useAfterActions(
+    useCallback(async () => {
+      setUrl(() => getURL());
+    }, [getURL]),
+  );
+
   useEffect(() => {
-    setUrl(() => getURL());
-  }, [getURL, updateCount]);
+    doLoad();
+  }, [doLoad, updateCount]);
 
   useEffect(() => {
     if (dashlet) {
