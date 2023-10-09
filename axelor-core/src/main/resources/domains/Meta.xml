@@ -220,6 +220,7 @@
     <string name="message" column="message_value" max="1024" multiline="true" />
     <string name="language" required="true" />
     <index columns="message_key,language" unique="true"/>
+    <index columns="message_value"/>
     <finder-method name="findByKey" using="key,language" cacheable="true" />
   </entity>
 
