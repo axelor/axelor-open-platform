@@ -18,7 +18,6 @@ import {
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
-import { SanitizedContent } from "@/utils/sanitize";
 
 import styles from "./select.module.scss";
 
@@ -33,6 +32,7 @@ export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
   canSelect?: boolean;
   fetchOptions?: (inputValue: string) => Promise<Type[]>;
+  onShowCreateAndSelect?: (inputValue: string) => void;
   onShowCreate?: (inputValue: string) => void;
   onShowSelect?: (inputValue: string) => void;
 }
@@ -49,6 +49,7 @@ export const Select = forwardRef(function Select<
     fetchOptions,
     onShowCreate,
     onShowSelect,
+    onShowCreateAndSelect,
     onInputChange,
     onOpen,
     canSelect = true,
@@ -122,42 +123,54 @@ export const Select = forwardRef(function Select<
 
   const customOptions = useMemo(() => {
     const options: SelectCustomOption[] = [];
+
+    if (onShowCreateAndSelect && inputValue) {
+      options.push({
+        key: "create-and-select",
+        title: (
+          <span>
+            <em> {i18n.get(`Create "{0}" and select...`, inputValue)}</em>
+          </span>
+        ),
+        onClick: () => onShowCreateAndSelect(inputValue),
+      });
+    }
+
     if (onShowCreate) {
       options.push({
         key: "create",
         title: (
           <span>
-            {inputValue ? (
-              <SanitizedContent
-                content={i18n.get("Create {0}...", `<em>${inputValue}</em>`)}
-              />
-            ) : (
-              i18n.get("Create...")
-            )}
+            <em>
+              {inputValue && selectProps.multiple
+                ? i18n.get(`Create "{0}"...`, inputValue)
+                : i18n.get("Create...")}
+            </em>
           </span>
         ),
         onClick: () => onShowCreate(inputValue),
       });
     }
+
     if (onShowSelect) {
       options.push({
         key: "select",
         title: (
           <span>
-            {inputValue ? (
-              <SanitizedContent
-                content={i18n.get("Select {0}...", `<em>${inputValue}</em>`)}
-              />
-            ) : (
-              i18n.get("Select...")
-            )}
+            <em>{i18n.get("Search more...")}</em>
           </span>
         ),
         onClick: () => onShowSelect(inputValue),
       });
     }
     return options;
-  }, [inputValue, onShowCreate, onShowSelect]);
+  }, [
+    inputValue,
+    selectProps.multiple,
+    onShowCreate,
+    onShowCreateAndSelect,
+    onShowSelect,
+  ]);
 
   const currOptions = fetchOptions ? items : options;
   const moreOptions = currOptions.length || inputValue ? customOptions : [];
