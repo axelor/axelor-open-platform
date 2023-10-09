@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTheme } from "@axelor/ui";
 import * as echarts from "echarts";
 
 import { ChartProps, ChartType } from "./types";
@@ -26,6 +27,7 @@ export function ECharts({
   const divRef = useRef<HTMLDivElement>(null);
   const chart = useRef<echarts.ECharts | null>(null);
   const theme = useAppTheme();
+  const isRTL = useTheme().dir === "rtl";
 
   useEffect(() => {
     echarts.registerTheme(theme, prepareTheme(type));
@@ -61,19 +63,28 @@ export function ECharts({
 
   useEffect(() => {
     if (chart.current) {
+      const $options = { ...options };
+      if (isRTL) {
+        if ($options.yAxis) {
+          $options.yAxis = {
+            ...$options.yAxis,
+            position: "right",
+          };
+        }
+      }
       chart.current.setOption(
         {
-          ...options,
+          ...$options,
           ...(!legend && {
             legend: undefined,
           }),
           color: getColor(type),
         } as echarts.EChartOption,
         !isMerge,
-        lazyUpdate
+        lazyUpdate,
       );
     }
-  }, [type, legend, options, isMerge, lazyUpdate]);
+  }, [isRTL, type, legend, options, isMerge, lazyUpdate]);
 
   return <div className={classes.echarts} ref={divRef} />;
 }

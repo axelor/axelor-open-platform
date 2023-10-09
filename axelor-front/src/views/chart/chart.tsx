@@ -1,4 +1,4 @@
-import { Box } from "@axelor/ui";
+import { Box, useTheme } from "@axelor/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
@@ -70,6 +70,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const [records, setRecords] = useState<ChartDataRecord[]>([]);
   const [legend, showLegend] = useState(true);
   const fetched = useRef(false);
+  const isRTL = useTheme().dir === "rtl";
 
   const formMeta = useMemo(() => {
     const model = "com.axelor.script.ScriptBindings";
@@ -255,7 +256,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
 
   const onClickAction = useCallback(
     async (record?: ChartDataRecord) => {
-      return onAction(view?.config?.onClick!, {
+      return onAction(view?.config?.onClick || "", {
         context: { ...record, _signal: "onClick" },
       });
     },
@@ -288,16 +289,20 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           data: {
             ...view,
             scale,
-            dataset: getChartData(view, records, {
-              ...config,
-              scale,
-            }),
+            dataset: getChartData(
+              view,
+              isRTL ? [...records].reverse() : records,
+              {
+                ...config,
+                scale,
+              },
+            ),
           },
         };
       }
     }
     return null;
-  }, [view, records]);
+  }, [isRTL, view, records]);
 
   useEffect(() => {
     if (view && dashlet) {

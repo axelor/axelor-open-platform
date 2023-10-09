@@ -1,5 +1,6 @@
 import { produce } from "immer";
 import { useEffect, useState } from "react";
+import { useTheme } from "@axelor/ui";
 
 import { Field } from "@/services/client/meta.types";
 import { Formatters } from "@/utils/format";
@@ -20,7 +21,6 @@ const defaultOption = {
     {
       name: "",
       type: "funnel",
-      left: "10%",
       top: 10,
       bottom: 60,
       width: "80%",
@@ -57,6 +57,7 @@ const defaultOption = {
 
 export function Funnel({ data, ...rest }: ChartProps) {
   const [options, setOptions] = useState(defaultOption);
+  const isRTL = useTheme().dir === "rtl";
 
   useEffect(() => {
     const { xAxis, dataset, series: [{ key }] = [] } = data;
@@ -72,11 +73,12 @@ export function Funnel({ data, ...rest }: ChartProps) {
             value: x[key],
           }));
         }
+        draft.series[0][isRTL ? "right" : "left"] = "10%";
         draft.tooltip.valueFormatter = (v: any) =>
           Formatters.decimal(v, { props: data as unknown as Field });
-      })
+      }),
     );
-  }, [data]);
+  }, [isRTL, data]);
 
   return <ECharts options={options} {...(rest as any)} />;
 }

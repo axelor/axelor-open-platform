@@ -4,17 +4,17 @@ import { i18n } from "@/services/client/i18n";
 import { ChartProps } from "../../builder";
 
 export function Text({ data }: ChartProps) {
-  var values: any = first(data.dataset) || {};
-  var series: any = first(data.series) || {};
+  const values: any = first(data.dataset) || {};
+  const series: any = first(data.series) || {};
 
-  var value = values[series.key];
-
-  var config: any = {
+  const config: any = {
     strong: true,
     shadow: false,
     fontSize: 22,
     ...data?.config,
   };
+
+  let value = values[series.key];
 
   if (config.format) {
     value = i18n.get(config.format, value);
