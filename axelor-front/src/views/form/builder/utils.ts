@@ -63,7 +63,7 @@ function getDefaultServerType(schema: Schema): string {
     serverType = fieldType || serverType;
   }
 
-  return toSnakeCase(serverType).toUpperCase();
+  return serverType;
 }
 
 function getWidget(schema: Schema, field: any): string {
@@ -87,6 +87,18 @@ function getWidget(schema: Schema, field: any): string {
   }
   
   return toKebabCase(widget);
+}
+
+function getFieldServerType(schema: Schema, field: any): string | undefined {
+  let serverType = field?.type;
+  
+  if (!serverType && schema.type === "field") {
+    serverType = getDefaultServerType(schema);
+  } else if (!serverType && schema.type === "panel-related") {
+    serverType = "ONE_TO_MANY";
+  }
+  
+  return !serverType ? undefined : toSnakeCase(serverType).toUpperCase();
 }
 
 export function isField(schema: Schema) {
@@ -256,15 +268,9 @@ export function processView(
   const attrs = defaultAttrs(field);
 
   // merge default attrs
-  const res: Schema = { ...attrs, serverType: field?.type, ...schema };
+  const res: Schema = { ...attrs, ...schema };
 
-  if (res.type === "field") {
-    res.serverType = res.serverType ?? getDefaultServerType(res);
-  }
-  if (res.type === "panel-related") {
-    res.serverType = res.serverType ?? "ONE_TO_MANY";
-  }
-
+  res.serverType = getFieldServerType(res, field);
   res.uid = uniqueId("w");
   res.widget = getWidget(res, field);
 
