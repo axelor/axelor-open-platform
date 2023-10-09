@@ -5,6 +5,7 @@ import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import {
   useBeforeSelect,
   useCompletion,
+  useCreateOnTheFly,
   useEditor,
   useEditorInTab,
   useSelector,
@@ -45,6 +46,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const showSelector = useSelector();
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
+  const showCreator = useCreateOnTheFly(schema);
 
   const search = useCompletion({
     sortBy,
@@ -75,7 +77,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [handleChange, value],
   );
 
-  const canNew = hasButton("new") && attrs.canNew;
+  const canNew = hasButton("new");
   const canView = readonly && hasButton("view");
   const canEdit = !readonly && hasButton("edit") && attrs.canEdit;
   const canSelect = hasButton("select");
@@ -152,13 +154,19 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   ]);
 
   const showCreate = useCallback(
-    (inputValue: string) => {
-      const record: DataRecord = {
-        [targetName]: inputValue,
-      };
-      return handleEdit(record);
-    },
-    [handleEdit, targetName],
+    (input: string, popup = true) =>
+      showCreator({
+        input,
+        popup,
+        onEdit: handleEdit,
+        onSelect: handleSelect,
+      }),
+    [handleEdit, handleSelect, showCreator],
+  );
+
+  const showCreateAndSelect = useCallback(
+    (input: string) => showCreate(input, false),
+    [showCreate],
   );
 
   const fetchOptions = useCallback(
@@ -235,6 +243,9 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         onOpen={handleOpen}
         onClose={handleClose}
         onShowCreate={canNew ? showCreate : undefined}
+        onShowCreateAndSelect={
+          canNew && schema.create ? showCreateAndSelect : undefined
+        }
         onShowSelect={canSelect ? showSelect : undefined}
         clearIcon={false}
         renderValue={renderValue}

@@ -10,6 +10,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
   useCompletion,
+  useCreateOnTheFly,
   useEditor,
   useEditorInTab,
   useSelector,
@@ -53,6 +54,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const showSelector = useSelector();
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
+  const showCreator = useCreateOnTheFly(schema);
 
   const search = useCompletion({
     sortBy,
@@ -65,7 +67,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const handleChange = useCallback(
     (value: SelectValue<DataRecord, false>) => {
       if (value && value.id && value.id > 0) {
-        const { version, ...rec } = value;
+        const { version: _, ...rec } = value;
         setValue(rec, true);
       } else {
         setValue(value, true);
@@ -156,13 +158,19 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const showCreate = useCallback(
-    (inputValue: string) => {
-      const record: DataRecord = {
-        [targetName]: inputValue,
-      };
-      return handleEdit(false, record);
-    },
-    [handleEdit, targetName],
+    (input: string, popup = true) =>
+      showCreator({
+        input,
+        popup,
+        onEdit: (record) => handleEdit(false, record),
+        onSelect: handleChange,
+      }),
+    [handleEdit, handleChange, showCreator],
+  );
+
+  const showCreateAndSelect = useCallback(
+    (input: string) => showCreate(input, false),
+    [showCreate],
   );
 
   const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
@@ -327,6 +335,9 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           onClose={handleClose}
           onShowCreate={canNew ? showCreate : undefined}
           onShowSelect={canSelect && !isSuggestBox ? showSelect : undefined}
+          onShowCreateAndSelect={
+            canNew && schema.create ? showCreateAndSelect : undefined
+          }
           icons={icons}
           clearIcon={false}
           toggleIcon={isSuggestBox ? undefined : false}
