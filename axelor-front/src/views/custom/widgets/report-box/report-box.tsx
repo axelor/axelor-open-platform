@@ -75,6 +75,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
         <small>{i18n.get(label)}</small>
         <div
           className={legacyClassNames(
+            "report-percent",
             "font-bold",
             "pull-right",
             percentStyle()

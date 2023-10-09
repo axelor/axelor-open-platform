@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 
-import { Box, clsx } from "@axelor/ui";
+import { Box, clsx, useTheme } from "@axelor/ui";
 
 import { useSession } from "@/hooks/use-session";
 import { saveView } from "@/services/client/meta-cache";
@@ -65,7 +65,7 @@ const getAttrs = (item: PanelDashlet, type: MEDIA_TYPE) => {
         h: H[ind],
       },
     }),
-    {}
+    {},
   );
   return obj[type];
 };
@@ -79,8 +79,11 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const saved = useRef(false);
   const getContext = useViewContext();
 
+  const isRTL = useTheme().dir === "rtl";
+
   const hasViewCustomize = Boolean(
-    data?.view?.allowCustomization !== false && data?.user?.viewCustomizationPermission
+    data?.view?.allowCustomization !== false &&
+      data?.user?.viewCustomizationPermission,
   );
 
   const updateLayout = useCallback(
@@ -91,11 +94,11 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             ...obj,
             [k]: updater(k as MEDIA_TYPE, layouts?.[k]),
           }),
-          []
+          [],
         ) as unknown as Layouts;
       });
     },
-    []
+    [],
   );
 
   const handleDragStart = useCallback(() => {
@@ -114,7 +117,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
     async (layout: Layout[], allLayout: Layouts) => {
       setLayouts(allLayout);
     },
-    []
+    [],
   );
 
   const handleResize = useCallback(
@@ -123,7 +126,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         saved.current = true;
       }
     },
-    []
+    [],
   );
 
   const handleDashletViewLoad = useCallback(
@@ -133,26 +136,26 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
         return (items || []).map((item) =>
           String(item.i) === String(viewId)
             ? (() => {
-              const custom = viewType === "custom";
-              const bounded = ["chart", "grid"].includes(viewType!);
-              const attrs = getAttrs(
-                viewItems[
-                item.i as unknown as number
-                ] as unknown as PanelDashlet,
-                type
-              );
-              return {
-                ...item,
-                h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
-                minH: item?.minH || (bounded ? getHeight(2) : getHeight(1)),
-                minW: item?.minW || (bounded ? 4 : 1),
-              };
-            })()
-            : item
+                const custom = viewType === "custom";
+                const bounded = ["chart", "grid"].includes(viewType!);
+                const attrs = getAttrs(
+                  viewItems[
+                    item.i as unknown as number
+                  ] as unknown as PanelDashlet,
+                  type,
+                );
+                return {
+                  ...item,
+                  h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
+                  minH: item?.minH || (bounded ? getHeight(2) : getHeight(1)),
+                  minW: item?.minW || (bounded ? 4 : 1),
+                };
+              })()
+            : item,
         );
       });
     },
-    [updateLayout, items]
+    [updateLayout, items],
   );
 
   useEffect(() => {
@@ -183,7 +186,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
 
             return acc;
           },
-          { layout: [], x: 0, y: 0 }
+          { layout: [], x: 0, y: 0 },
         );
       return layout;
     });
@@ -203,7 +206,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           if (layouts) {
             ["lg", "md", "sm", "xs", "xxs"].forEach((m) => {
               const $item = layouts[m as MEDIA_TYPE]?.find?.(
-                (x) => String(x.i) === String(index)
+                (x) => String(x.i) === String(index),
               );
               if ($item) {
                 colOffset.push($item.x);
@@ -223,10 +226,11 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           };
         }
 
-        items && await saveView({
-          ...view,
-          items: items.map((item, index) => getItem(item, index)),
-        });
+        items &&
+          (await saveView({
+            ...view,
+            items: items.map((item, index) => getItem(item, index)),
+          }));
       })();
     }
   }, [hasViewCustomize, items, view, layouts]);
@@ -240,12 +244,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const children = useMemo(
     () =>
       items.map((item, index) => (
-        <Box
-          key={index}
-          d="flex"
-          className={styles.container}
-          rounded
-        >
+        <Box key={index} d="flex" className={styles.container} rounded>
           <DashletComponent
             dashboard
             className={clsx(styles.dashlet, {
@@ -258,17 +257,25 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
           />
         </Box>
       )),
-    [items, hasViewCustomize, handleDashletViewLoad, getContext]
+    [items, hasViewCustomize, handleDashletViewLoad, getContext],
   );
 
   return (
-    <Box ref={ref} d="flex" overflow="auto" flexGrow={1}>
+    <Box
+      ref={ref}
+      className={clsx({
+        [styles.rtl]: isRTL,
+      })}
+      d="flex"
+      overflow="auto"
+      flexGrow={1}
+    >
       <Box w={100}>
         {layouts && (
           <GridLayout
             isBounded={true}
             isDraggable={hasViewCustomize}
-            className="layout"
+            className={styles.layout}
             layouts={layouts}
             rowHeight={CARD_HEIGHT}
             resizeHandles={["se"]}

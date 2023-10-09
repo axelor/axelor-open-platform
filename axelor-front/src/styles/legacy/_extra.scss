@@ -260,6 +260,9 @@
 }
 
 [dir="rtl"] {
+  .report-percent {
+    float: left;
+  }
   .order-subtotal {
     dl {
       float: left;
@@ -275,7 +278,11 @@
 .report-box .report-tags {
   position: absolute;
   top: 0.75rem;
-  right: 48px;
+  right: 3rem;
+  [dir="rtl"] & {
+    right: unset;
+    left: 3rem;
+  }
 }
 
 .report-box h1 {
@@ -288,6 +295,10 @@
   font-size: 30px;
   & + div {
     margin-left: 42px;
+    [dir="rtl"] & {
+      margin-left: unset;
+      margin-right: 42px;
+    }
   }
 }
 

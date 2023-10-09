@@ -1,5 +1,12 @@
+.layout {
+  direction: ltr;
+}
+
 .container {
   box-shadow: var(--bs-box-shadow-sm);
+  .rtl & {
+    direction: rtl;
+  }
 }
 
 .dashlet {
