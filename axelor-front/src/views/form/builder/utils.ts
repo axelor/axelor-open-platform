@@ -15,6 +15,8 @@ import { MetaData } from "@/services/client/meta";
 import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
+import * as WIDGETS from "../widgets";
+
 const SERVER_TYPES: string[] = [
   "string",
   "boolean",
@@ -62,6 +64,29 @@ function getDefaultServerType(schema: Schema): string {
   }
 
   return toSnakeCase(serverType).toUpperCase();
+}
+
+function getWidget(schema: Schema, field: any): string {
+  let widget = schema.widget ?? schema.type;
+  
+  // default widget depending on field server type
+  if (!schema.widget && (schema.type === "field" || schema.type === "panel-related")) {
+    widget = schema.serverType;
+  }
+
+  // default image fields
+  if (!schema.widget && field?.image) {
+    widget = "image";
+  }
+
+  // adapt widget naming, ie boolean-select to BooleanSelect
+  if (schema.type === "field" || schema.type === "panel-related") {
+    widget = Object.keys(WIDGETS).find(
+      (name) => 
+        toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase()) ?? widget;
+  }
+  
+  return toKebabCase(widget);
 }
 
 export function isField(schema: Schema) {
@@ -240,17 +265,8 @@ export function processView(
     res.serverType = res.serverType ?? "ONE_TO_MANY";
   }
 
-  let type = res.widget ?? res.type;
-  if (type === "field") {
-    type = res.serverType;
-  }
-
-  if (!res.widget && field.image) {
-    type = "image";
-  }
-
   res.uid = uniqueId("w");
-  res.widget = toKebabCase(type);
+  res.widget = getWidget(res, field);
 
   if (res.widget === "progress") {
     res.minSize = res.minSize ?? 0;
