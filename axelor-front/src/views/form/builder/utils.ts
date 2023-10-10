@@ -46,11 +46,11 @@ const FIELD_WIDGETS: Record<string, string[]> = {
   integer: ["Duration", "Progress"],
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
-  "many-to-one": ["BinaryLink", "Image"],
+  "many-to-one": ["BinaryLink", "Image", "SuggestBox"],
 };
 
 function getDefaultServerType(schema: Schema): string {
-  const widget = toKebabCase(schema.widget ?? "");
+  const widget = toKebabCase(normalizeWidget(schema.widget) ?? "");
 
   let serverType = "string";
 
@@ -66,11 +66,21 @@ function getDefaultServerType(schema: Schema): string {
   return serverType;
 }
 
-function getWidget(schema: Schema, field: any): string {
+function isValidWidget(widget: string): boolean {
+  return !!normalizeWidget(widget);
+}
+
+function normalizeWidget(widget: string): string | undefined {
+  return Object.keys(WIDGETS).find(
+    (name) =>
+      toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase());
+}
+
+export function getWidget(schema: Schema, field: any): string {
   let widget = schema.widget ?? schema.type;
   
   // default widget depending on field server type
-  if (!schema.widget && (schema.type === "field" || schema.type === "panel-related")) {
+  if (!isValidWidget(schema.widget) && (schema.type === "field" || schema.type === "panel-related")) {
     widget = schema.serverType;
   }
 
@@ -80,16 +90,12 @@ function getWidget(schema: Schema, field: any): string {
   }
 
   // adapt widget naming, ie boolean-select to BooleanSelect
-  if (schema.type === "field" || schema.type === "panel-related") {
-    widget = Object.keys(WIDGETS).find(
-      (name) => 
-        toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase()) ?? widget;
-  }
+  widget = normalizeWidget(widget) ?? widget;
   
   return toKebabCase(widget);
 }
 
-function getFieldServerType(schema: Schema, field: any): string | undefined {
+export function getFieldServerType(schema: Schema, field: any): string | undefined {
   let serverType = field?.type;
   
   if (!serverType && schema.type === "field") {

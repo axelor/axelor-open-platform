@@ -37,7 +37,7 @@ import {
   WidgetAtom,
   WidgetState,
 } from "./types";
-import { nextId, processView } from "./utils";
+import { getFieldServerType, getWidget, nextId, processView } from "./utils";
 
 import styles from "./form-editors.module.scss";
 
@@ -91,7 +91,7 @@ function processEditor(schema: Schema) {
     const field = fields?.[item.name!];
 
     result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
-    result.serverType = item.serverType ?? field?.type;
+    result.serverType = getFieldServerType(item, field);
 
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
@@ -1050,8 +1050,8 @@ function processJsonView(schema: Schema) {
 
   if (schema.serverType) {
     result.type = "field";
-    result.widget = toKebabCase(schema.widget || schema.serverType);
-    result.serverType = toSnakeCase(schema.serverType).toUpperCase();
+    result.serverType = getFieldServerType(result, null);
+    result.widget = getWidget(result, null);
   }
 
   if (Array.isArray(result.items)) {
