@@ -13,14 +13,15 @@ export type FormatOptions = {
 
 export type Formatter = (value: any, opts?: FormatOptions) => string;
 
-export function getTimeFormat(opts: FormatOptions = {}) {
-  let props = opts?.props;
+export function getTimeFormat({ props }: FormatOptions = {}) {
+  const seconds = props?.seconds || props?.widgetAttrs?.seconds;
   let format = "HH:mm";
-  if (props?.seconds) {
+  if (seconds) {
     format += ":ss";
   }
   return format;
 }
+
 export function getDateFormat(opts: FormatOptions = {}) {
   return l10n.getDateFormat();
 }
@@ -59,7 +60,7 @@ const formatDuration: Formatter = (value, opts = {}) => {
 
   let text = h + ":" + m;
 
-  if (props?.seconds) {
+  if (props?.seconds || props?.widgetAttrs?.seconds) {
     text = text + ":" + s;
   }
 
@@ -221,7 +222,7 @@ const formatBoolean: Formatter = (value, opts = {}) => {
 const formatSelection: Formatter = (value, opts = {}) => {
   const { props: { selectionList } = {} } = opts;
   const item = (selectionList ?? []).find(
-    (x) => String(x.value) === String(value)
+    (x) => String(x.value) === String(value),
   );
   return item?.title ?? "";
 };
@@ -278,7 +279,7 @@ const format: Formatter = (value, opts = {}) => {
       const { jsonField, jsonPath } = props as JsonField;
       val = _.get(
         getJSON(_.get(context, jsonField as string)),
-        jsonPath as string
+        jsonPath as string,
       );
     } else if (name?.includes(".") && value === undefined) {
       val = _.get(context, name);

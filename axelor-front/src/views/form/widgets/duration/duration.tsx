@@ -81,8 +81,8 @@ export function Duration(props: FieldProps<string | number>) {
   });
 
   const displayText = useMemo(
-    () => (isTime ? value : toText(value, { big, seconds })) ?? "",
-    [big, isTime, seconds, value],
+    () => toText(value, { big, seconds }) ?? "",
+    [big, seconds, value],
   );
 
   return (

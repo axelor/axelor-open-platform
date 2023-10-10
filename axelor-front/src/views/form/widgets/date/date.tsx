@@ -17,6 +17,7 @@ import { i18n } from "@/services/client/i18n";
 import { l10n, moment } from "@/services/client/l10n";
 import { Field, Schema } from "@/services/client/meta.types";
 import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
+import { toCamelCase } from "@/utils/names";
 
 import { FieldControl, FieldProps, WidgetState } from "../../builder";
 import { ViewerInput } from "../string/viewer";
@@ -66,18 +67,21 @@ export function DateComponent({
   const [changed, setChanged] = useState(false);
 
   const type =
-    (schema.widget || schema.serverType || schema.type)?.toLowerCase() ?? "";
+    toCamelCase(
+      schema.widget || schema.serverType || schema.type || "",
+    )?.toLowerCase() ?? "";
   const isDateTime = type !== "date";
+  const hasSeconds = schema.seconds || schema.widgetAttrs?.seconds;
   const dateFormats = useMemo<Record<string, string[]>>(
     () => ({
       datetime: [
-        "YYYY-MM-DDTHH:mm",
+        `YYYY-MM-DDTHH:mm${hasSeconds ? ":ss" : ""}`,
         getDateTimeFormat({ props: schema as Field }),
       ],
       date: ["YYYY-MM-DD", l10n.getDateFormat()],
-      time: ["HH:mm", getTimeFormat({ props: schema as Field })],
+      time: [`HH:mm${hasSeconds ? ":ss": ""}`, getTimeFormat({ props: schema as Field })],
     }),
-    [schema]
+    [schema, hasSeconds],
   );
   const [valueFormat, format] = dateFormats[type] || dateFormats.date;
 
@@ -92,7 +96,7 @@ export function DateComponent({
       setTimeout(() => {
         const calendar = pickerRef.current;
         const selectedDay = calendar?.calendar?.componentNode.querySelector(
-          '.react-datepicker__day[tabindex="0"]'
+          '.react-datepicker__day[tabindex="0"]',
         );
         selectedDay && selectedDay.focus({ preventScroll: true });
       }, 100);
@@ -114,7 +118,7 @@ export function DateComponent({
         setChanged(false);
       }
     },
-    [changed, value, onChange, format, valueFormat]
+    [changed, value, onChange, format, valueFormat],
   );
 
   const handleClose = useCallback(
@@ -126,7 +130,7 @@ export function DateComponent({
         handleBlur();
       }
     },
-    [getInput, handleBlur]
+    [getInput, handleBlur],
   );
 
   const handleClickOutSide = useCallback(
@@ -137,7 +141,7 @@ export function DateComponent({
       }
       handleClose();
     },
-    [handleClose]
+    [handleClose],
   );
 
   const handleKeyDown = useCallback(
@@ -149,7 +153,7 @@ export function DateComponent({
         e.preventDefault();
       }
     },
-    [open, handleClose]
+    [open, handleClose],
   );
 
   const handleSelect = useCallback(() => {
@@ -172,20 +176,20 @@ export function DateComponent({
         newValue && moment(newValue).isValid()
           ? moment(newValue).format(valueFormat)
           : null,
-        callOnChange
+        callOnChange,
       );
       setChanged(!callOnChange);
     },
-    [onChange, valueFormat, value]
+    [onChange, valueFormat, value],
   );
 
   const dateValue = useMemo(
     () => (value ? moment(value).toDate() : null),
-    [value]
+    [value],
   );
   const textValue = useMemo(
     () => (value ? moment(value).format(format) : ""),
-    [format, value]
+    [format, value],
   );
 
   function render() {
