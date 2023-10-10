@@ -11,11 +11,15 @@ import { useCallback } from "react";
 
 import { dialogs } from "@/components/dialogs";
 import { findActionView } from "@/services/client/meta-cache";
-import { ActionView, SavedFilter } from "@/services/client/meta.types";
+import {
+  ActionView,
+  HtmlView,
+  SavedFilter,
+} from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import { device } from "@/utils/device";
+
 import { useRoute } from "../use-route";
-import { useViewTab } from "@/view-containers/views/scope";
 
 /**
  * The route state of a specific view type.
@@ -185,7 +189,7 @@ const tabsAtom = atom<{ active?: string; tabs: Tab[]; popups: Tab[] }>({
 });
 
 const activeAtom = selectAtom(tabsAtom, (state) =>
-  state.tabs.find((x) => x.id === state.active)
+  state.tabs.find((x) => x.id === state.active),
 );
 
 const viewName = (view: ActionView | string) =>
@@ -232,7 +236,7 @@ const updateTabState = (
     type?: string;
     route?: Partial<TabRoute>;
     props?: Record<string, any>;
-  }
+  },
 ) => {
   const { route, props } = options;
   const type = getViewType(options.type ?? route?.mode ?? state.type);
@@ -277,7 +281,7 @@ export type OpenTab = (
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
     tab?: boolean;
-  }
+  },
 ) => Promise<Tab | null>;
 
 /**
@@ -302,7 +306,7 @@ export async function initTab(
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
     tab?: boolean;
-  }
+  },
 ) {
   const { route: initRoute, props, tab: initAsTab } = options ?? {};
   const actionName = viewName(view);
@@ -340,7 +344,7 @@ export async function initTab(
             return updateTabState(id, { ...state, ...arg }, { route, props });
           });
         }
-      }
+      },
     );
 
     const popup = !initAsTab && Boolean(actionView.params?.popup);
@@ -390,7 +394,7 @@ const openTabAtom = atom(
       route?: Omit<TabRoute, "action">;
       props?: Record<string, any>;
       tab?: boolean;
-    } = {}
+    } = {},
   ): Promise<Tab | null> => {
     const { active, tabs, popups } = get(tabsAtom);
 
@@ -426,12 +430,25 @@ const openTabAtom = atom(
       const canConfirm = activeTab.action.params?.["show-confirm"] !== false;
       const closed = await dialogs.confirmDirty(
         async () => (canConfirm && get(activeTab.state).dirty) ?? false,
-        async () => set(closeTabAtom, activeTab.action)
+        async () => set(closeTabAtom, activeTab.action),
       );
       if (!closed) return activeTab;
     }
 
     const tab = await initTab(view, options);
+
+    // html view with target="_blank"
+    if (
+      tab?.action.viewType === "html" &&
+      tab?.action.params?.target === "_blank"
+    ) {
+      const html = tab.action.views?.find((x) => x.type === "html") as HtmlView;
+      const url = html?.name || html?.resource;
+      if (url) {
+        window.open(url);
+      }
+      return tab;
+    }
 
     if (tab) {
       set(tabsAtom, (state) => {
@@ -449,7 +466,7 @@ const openTabAtom = atom(
     }
 
     return tab;
-  }
+  },
 );
 
 const closeTabAtom = atom(null, async (get, set, view: ActionView | string) => {
@@ -501,8 +518,8 @@ export function useTabs() {
         set(closeTabAtom, view);
         get(tabsAtom).tabs.length === 0 && navigate("/");
       },
-      [navigate]
-    )
+      [navigate],
+    ),
   );
 
   return {
@@ -521,7 +538,7 @@ export function openTab_internal(
     type?: string;
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
-  } = {}
+  } = {},
 ) {
   getDefaultStore().set(openTabAtom, view, options);
 }
