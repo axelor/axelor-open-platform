@@ -164,6 +164,8 @@ export const Select = forwardRef(function Select<
 
   return (
     <AxSelect
+      clearOnBlur
+      clearOnEscape
       {...selectProps}
       ref={selectRef}
       value={value}
