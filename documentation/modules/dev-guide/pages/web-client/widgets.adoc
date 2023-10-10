@@ -465,6 +465,10 @@ Example usage from `TeamTask`:
   x-related="relatedId" />
 ----
 
+== ImageLink
+
+In edit mode, this widget is used as string field input and we can enter interpolate string value. But in readonly mode, it displayed as Image widget with src link to that input value.
+
 == EvalRefSelect
 
 This widget can be used to select reference value depending

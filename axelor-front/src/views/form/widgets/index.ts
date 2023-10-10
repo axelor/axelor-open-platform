@@ -18,6 +18,7 @@ export * from "./eval-ref-select";
 export * from "./help";
 export * from "./html";
 export * from "./image";
+export * from "./image-link";
 export * from "./image-select";
 export * from "./info-button";
 export * from "./inline-checkbox";
