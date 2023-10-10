@@ -18,6 +18,7 @@ import { useDataStore } from "@/hooks/use-data-store";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useDevice } from "@/hooks/use-responsive";
+import { useSearchTranslate } from "@/hooks/use-search-translate";
 import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
@@ -140,6 +141,8 @@ function GridInner(props: ViewProps<GridView>) {
 
   const getViewContext = useViewContext();
 
+  const getSearchTranslate = useSearchTranslate(orderBy, fields);
+
   const getSearchOptions = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
@@ -150,7 +153,7 @@ function GridInner(props: ViewProps<GridView>) {
 
         const searchQuery = getSearchFilter(fields as any, view.items, search);
 
-        let filter: SearchOptions["filter"] = {
+        const filter: SearchOptions["filter"] = {
           ...query,
         };
 
@@ -178,13 +181,24 @@ function GridInner(props: ViewProps<GridView>) {
           filter._domainAction = _domainAction;
         }
 
+        const translate = getSearchTranslate(filter);
+
         return {
+          translate,
           sortBy,
           ...options,
           filter,
         };
       },
-      [orderBy, searchAtom, fields, view.items, dashlet, getViewContext],
+      [
+        orderBy,
+        searchAtom,
+        fields,
+        view.items,
+        dashlet,
+        getViewContext,
+        getSearchTranslate,
+      ],
     ),
   );
 
