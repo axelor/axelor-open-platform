@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Box } from "@axelor/ui";
 
@@ -22,12 +22,13 @@ export function Html(props: ViewProps<HtmlView>) {
   const {
     meta: { view },
   } = props;
-  const getContext = useViewContext();
   const [viewProps] = useViewProps();
-  const [updateCount, onRefresh] = useReducer((x) => x + 1, 0);
-
   const { dashlet } = useViewTab();
+  const getContext = useViewContext();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
+
+  const [url, setUrl] = useState<string>();
+  const [updateCount, setUpdateCount] = useState(0);
 
   const name = viewProps?.name || view.name || view.resource;
   const parseURL = useExpression(name!);
@@ -40,17 +41,16 @@ export function Html(props: ViewProps<HtmlView>) {
     return url ?? "";
   }, [getContext, name, parseURL]);
 
-  const [url, setUrl] = useState<string>();
+  const onRefresh = useCallback(async () => {
+    setUpdateCount((prev) => prev + 1);
+    setUrl(() => getURL());
+  }, [getURL]);
 
-  const doLoad = useAfterActions(
-    useCallback(async () => {
-      setUrl(() => getURL());
-    }, [getURL]),
-  );
+  const doLoad = useAfterActions(onRefresh);
 
   useEffect(() => {
     doLoad();
-  }, [doLoad, updateCount]);
+  }, [doLoad]);
 
   useEffect(() => {
     if (dashlet) {
