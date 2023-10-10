@@ -328,6 +328,35 @@ Use empty value if you only need a link effect and perform actual action with on
   icon="fa-check-square-o" />
 ----
 
+== Progress
+
+The `Progress` widget is used to show a progress bar.
+
+Progress widget supports following attributes:
+
+* `min`: number value to specify minimum range for progress (default to `0`)
+* `max`: number value to specify maximum range for progress (default to `100`)
+* `x-colors`: color options to configure the bar color (default to `r:24,y:49,b:74,g:100`)
+
+[source,xml]
+----
+<field name="progress" title="Progress" widget="Progress"
+  x-colors="r:24,y:49,b:74,g:100" />
+----
+
+Using the `x-colors` options, you can configure the bar color. Four colors can be configured. With `r:24,y:49,b:74,g:100`,
+following colors will be used depending on the percentage value :
+
+* red (r) - if percentage value in range [0, 24]
+* yellow (y) - if percentage value in range [25, 49]
+* blue (b) - if percentage value in range [50, 74]
+* green (g) - if percentage value in range [75, 100]
+
+== SelectProgress
+
+Similar to the `Progress` widget, the `SelectProgress` widget can be used with a selection field to show selection in
+editable mode and for readonly mode it will display as progress widget.
+
 == NavSelect
 
 The `NavSelect` widget is a breadcrumb like widget and can be used with selection fields.
