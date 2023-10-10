@@ -1,16 +1,16 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef } from "react";
+import { atom, useAtomValue } from "jotai";
+import { useEffect, useMemo, useRef } from "react";
 import { generatePath, useParams } from "react-router-dom";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useRoute } from "@/hooks/use-route";
-import { Tab, useTabs } from "@/hooks/use-tabs";
+import { TabAtom, useTabs } from "@/hooks/use-tabs";
 import { session } from "@/services/client/session";
+import { TaskQueue } from "@/view-containers/action/queue";
 
 const getURL = (
   action: string | null = null,
   mode: string | null = null,
-  id: string | null = null
+  id: string | null = null,
 ) => {
   if (!action || action.startsWith("$")) return null;
 
@@ -22,59 +22,71 @@ const getURL = (
   return generatePath("/ds/:action/:mode/:id", { action, mode, id });
 };
 
-const activeTabAtom = atom<Tab | null>(null);
-const activeTabStateAtom = atom((get) => {
-  const tab = get(activeTabAtom);
-  const tabState = tab ? get(tab.state) : null;
-  return tabState;
-});
+const noTabAtom: TabAtom = atom({}) as unknown as TabAtom;
 
-export function View() {
+const queue = new TaskQueue();
+
+function HandleTab() {
+  const tabs = useTabs();
+  const tabAtom = useMemo(
+    () => tabs.active?.state ?? noTabAtom,
+    [tabs.active?.state],
+  );
+  const tabState = useAtomValue(tabAtom);
+  const params = useMemo(() => {
+    const { action, mode, id } = tabState?.routes?.[tabState.type] ?? {};
+    return { action, mode, id };
+  }, [tabState]);
+
   const { redirect } = useRoute();
-
-  const { action: viewAction, mode: viewMode, id: viewId } = useParams();
-  const { active, open } = useTabs();
-
-  const setActiveTabAtom = useSetAtom(activeTabAtom);
-  const viewState = useAtomValue(activeTabStateAtom);
-
-  const pathRef = useRef<string | null>(null);
+  const actionRef = useRef<string>();
 
   useEffect(() => {
-    setActiveTabAtom(active ?? null);
-    if (active === null) pathRef.current = null;
-  }, [active, setActiveTabAtom]);
-
-  useAsyncEffect(async () => {
-    if (viewState) {
-      const { type } = viewState;
-      const { action, mode, id } = viewState?.routes?.[type] ?? {};
+    const { action, mode, id } = params;
+    if (action && actionRef.current !== action) {
       const path = getURL(action, mode, id);
-      if (path && path !== pathRef.current) {
-        pathRef.current = path;
+      if (path) {
         redirect(path);
       }
     }
-  }, [viewState, redirect]);
-
-  useAsyncEffect(async () => {
-    if (viewAction) {
-      const path = getURL(viewAction, viewMode, viewId);
-      pathRef.current = path;
-      await open(viewAction, {
-        route: {
-          mode: viewMode,
-          id: viewId,
-        },
-        tab: true,
-      });
-    } else {
-      const homeAction = session.info?.user?.action;
-      if (homeAction) {
-        await open(homeAction, { tab: true });
-      }
-    }
-  }, [open, viewAction, viewMode, viewId]);
+  }, [redirect, params]);
 
   return null;
+}
+
+function HandlePath() {
+  const tabs = useTabs();
+  const params = useParams();
+  const pathRef = useRef<string | null>(null);
+  const homeAction = session.info?.user?.action;
+
+  useEffect(() => {
+    const { action = homeAction, mode, id } = params;
+    const path = getURL(action, mode, id);
+    if (pathRef.current !== path) {
+      pathRef.current = path;
+      if (action && path) {
+        const found = tabs.items.find((x) => x.action.name === action);
+        if (!found) {
+          queue.add(() =>
+            tabs.open(action, {
+              route: { mode, id },
+              tab: true,
+            }),
+          );
+        }
+      }
+    }
+  }, [homeAction, params, tabs]);
+
+  return null;
+}
+
+export function View() {
+  return (
+    <>
+      <HandleTab />
+      <HandlePath />
+    </>
+  );
 }
