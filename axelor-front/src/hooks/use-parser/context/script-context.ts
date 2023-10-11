@@ -157,9 +157,9 @@ export function createScriptContext(
       let model = context._model;
 
       if (fieldName) {
-        let field = getField(fieldName);
+        const field = getField(fieldName);
         if (field && field.target) {
-          record = record[fieldName] || {};
+          record = get(record, fieldName) || {};
           model = field.target;
         }
       }
