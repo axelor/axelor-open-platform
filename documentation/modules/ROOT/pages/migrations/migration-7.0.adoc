@@ -76,3 +76,19 @@ DROP INDEX mail_flags_user_id_idx;
 CREATE INDEX mail_flags_user_id_message_idx ON mail_flags (user_id, message);
 ----
 
+=== Fields that prevent dirty record
+
+Current way to prevent making record dirty when changing a field value, is to prefix the field name with `$`. The rules
+are :
+
+* in server side, setting the dummy field value, use `$` prefix but when accessing the dummy field value,
+don't use `$` prefix.
+* in client side, always accessing the dummy field value with the `$` prefix.
+
+This is causing confusion and misunderstood.
+
+To improve the usage, we introduce `x-dirty` attribute. This can be used on any fields, dummy or object fields.
+If the view field is marked as `x-dirty="false"`, the field value change will not mark current record dirty.
+
+The old dirty checking behavior of the `$` prefixed fields is now deprecated and will be removed during next major
+release.
