@@ -57,6 +57,81 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const folder = isMessageBox ? name.split(".").pop() : "";
   const hasMessages = isMessageBox || (recordId ?? 0) > 0;
 
+  const flagAsRead = useCallback(
+    async (messages: Message[]) => {
+      const unreadFlags: MessageFlag[] = [];
+
+      const pushUnread = (messages: Message[]) => {
+        for (const message of messages) {
+          const { $flags, $children } = message;
+          const { isRead, version: _version, ...rest } = $flags ?? {};
+          if (!isRead) {
+            unreadFlags.push({
+              ...rest,
+              isRead: true,
+              messageId: message.id,
+            } as MessageFlag);
+          }
+          if ($children?.length) {
+            pushUnread($children);
+          }
+        }
+      };
+
+      pushUnread(messages);
+
+      if (unreadFlags.length === 0) {
+        return;
+      }
+
+      const isUpdated = await DataSource.flags(unreadFlags);
+
+      if (!isUpdated) {
+        console.error(
+          `Failed to flag ${unreadFlags.length} message(s) as read`,
+        );
+        return;
+      }
+
+      fetchTags();
+
+      const findMessage = (
+        messages: Message[],
+        id?: number,
+      ): Message | null => {
+        for (const message of messages) {
+          if (message.id === id) {
+            return message;
+          } else if (message.$children?.length) {
+            const found = findMessage(message.$children, id);
+            if (found) {
+              return found;
+            }
+          }
+        }
+        return null;
+      };
+
+      setMessages((messages) => {
+        for (const flags of unreadFlags) {
+          const message = findMessage(messages, flags.messageId);
+          if (!message) {
+            console.error(`Failed to find message ${flags.messageId}`);
+            continue;
+          }
+          const { $flags } = message;
+          const { version: _version, ...rest } = $flags ?? {};
+          message.$flags = {
+            ...rest,
+            isRead: true,
+          } as MessageFlag;
+        }
+        return [...messages];
+      });
+    },
+    [fetchTags],
+  );
+
   const fetchMessages = useAfterActions(findMessages);
   const fetchAll = useCallback(
     async (options?: MessageFetchOptions, reset = true) => {
@@ -81,6 +156,9 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           return [...msgs];
         });
       } else {
+        if (folder) {
+          flagAsRead(data as Message[]);
+        }
         setMessages((msgs) =>
           reset
             ? data.map((msg: any) => ({
@@ -97,7 +175,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         }));
       }
     },
-    [hasMessages, fetchMessages, recordId, model, folder, filter],
+    [hasMessages, fetchMessages, recordId, model, folder, filter, flagAsRead],
   );
 
   const postComment = useCallback(
@@ -139,7 +217,10 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           const $ind = $children.findIndex((x) => `${x.id}` === `${record.id}`);
           if ($ind > -1) {
             $children.splice($ind, 1);
-            messages[msgIndex] = { ...messages[msgIndex], $children: $children };
+            messages[msgIndex] = {
+              ...messages[msgIndex],
+              $children: $children,
+            };
           }
         } else {
           messages.splice(msgIndex, 1);
