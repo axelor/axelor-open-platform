@@ -185,13 +185,15 @@ export function DashletComponent({
 
 function DashletRefresh({ count }: { count: number }) {
   const { onRefresh } = useAtomValue(useDashletHandlerAtom());
-  const doRefresh = useAfterActions(async () => onRefresh?.());
+  const doRefresh = useAfterActions(
+    useCallback(async () => onRefresh?.(), [onRefresh]),
+  );
 
   useAsyncEffect(async () => {
     if (count) {
       doRefresh();
     }
-  }, [count, onRefresh]);
+  }, [count, doRefresh]);
 
   return null;
 }
