@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { FieldProps } from "../../builder";
 import { String } from "../string";
 import { Text } from "./text";
+import styles from "./text.edit.module.css";
 
 export function useEditablePopup() {
   const [popup, setPopup] = useState<any>(null);
@@ -65,12 +66,7 @@ export function TextEdit(props: FieldProps<string>) {
     }
   }, [setPopup]);
 
-  const handleBlur = useCallback(
-    (e: FocusEvent<HTMLTextAreaElement>) => {
-      setPopup(null);
-    },
-    [setPopup]
-  );
+  const handleBlur = useCallback(() => setPopup(null), [setPopup]);
 
   useEffect(() => {
     focus && handleFocus();
@@ -78,7 +74,12 @@ export function TextEdit(props: FieldProps<string>) {
 
   return (
     <Box d="flex" flex={1}>
-      <Box d={popup ? "none" : "flex"} ref={targetRef}>
+      <Box
+        className={styles.input}
+        d={popup ? "none" : "flex"}
+        flex={1}
+        ref={targetRef}
+      >
         <String
           {...props}
           inputProps={{
@@ -95,7 +96,7 @@ export function TextEdit(props: FieldProps<string>) {
           shadow
           data-column-index={schema.editIndex}
         >
-          <Box>
+          <Box flex={1}>
             <Text
               {...props}
               inputProps={{
