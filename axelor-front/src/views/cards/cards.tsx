@@ -11,6 +11,7 @@ import { useDataStore } from "@/hooks/use-data-store";
 import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
+import { useSearchTranslate } from "@/hooks/use-search-translate";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
@@ -83,6 +84,8 @@ export function Cards(props: ViewProps<CardsView>) {
   }, [view.width]);
 
   const orderBy = useMemo(() => parseOrderBy(view.orderBy), [view.orderBy]);
+  const getSearchTranslate = useSearchTranslate(orderBy, fields);
+
   const doSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
@@ -99,7 +102,11 @@ export function Cards(props: ViewProps<CardsView>) {
           };
           filter._domainAction = _domainAction;
         }
+
+        const translate = getSearchTranslate(filter);
+
         return dataStore.search({
+          translate,
           sortBy,
           filter,
           fields: names,
