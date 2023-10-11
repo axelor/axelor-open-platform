@@ -76,13 +76,31 @@ export function Duration(props: FieldProps<string | number>) {
 
   const { value, text, onChange, onBlur } = useInput(valueAtom, {
     validate: isValid,
-    format: format,
-    parse: toValue,
+    ...(!isTime && {
+      format,
+      parse: toValue,
+    }),
   });
 
   const displayText = useMemo(
-    () => toText(value, { big, seconds }) ?? "",
-    [big, seconds, value],
+    () => (isTime ? value : toText(value, { big, seconds })) ?? "",
+    [isTime, big, seconds, value],
+  );
+
+  const toMask = useCallback(
+    (value: string) => {
+      const shouldMaxHrLastDigit = isTime && value?.startsWith("2");
+      return [
+        ...(big && !isTime ? [/\d/] : []),
+        isTime ? /[0-2]/ : /\d/,
+        shouldMaxHrLastDigit ? /[0-3]/ : /\d/,
+        ":",
+        /[0-5]/,
+        /\d/,
+        ...(seconds ? [":", /[0-5]/, /\d/] : []),
+      ];
+    },
+    [big, seconds, isTime],
   );
 
   return (
@@ -101,15 +119,7 @@ export function Duration(props: FieldProps<string | number>) {
           required={required}
           onChange={onChange}
           onBlur={onBlur}
-          mask={[
-            ...(big && !isTime ? [/\d/] : []),
-            /\d/,
-            /\d/,
-            ":",
-            /[0-5]/,
-            /\d/,
-            ...(seconds ? [":", /[0-5]/, /\d/] : []),
-          ]}
+          mask={toMask}
         />
       )}
     </FieldControl>
