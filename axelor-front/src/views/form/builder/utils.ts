@@ -80,7 +80,7 @@ export function getWidget(schema: Schema, field: any): string {
   let widget = schema.widget ?? schema.type;
   
   // default widget depending on field server type
-  if (!isValidWidget(schema.widget) && (schema.type === "field" || schema.type === "panel-related")) {
+  if (!isValidWidget(schema.widget) && schema.type === "field") {
     widget = schema.serverType;
   }
 
