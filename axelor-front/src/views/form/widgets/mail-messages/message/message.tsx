@@ -98,7 +98,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
     $name,
     $thread,
     $numReplies = 0,
-    $data = [],
+    $children = [],
     $files,
     $avatar,
     $author,
@@ -255,7 +255,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
                   onClick={fetchReplies}
                   className={styles["pull-right"]}
                 >
-                  {i18n.get("replies ({0} of {1})", $data.length, $numReplies)}
+                  {i18n.get("replies ({0} of {1})", $children.length, $numReplies)}
                 </Box>
               </span>
             )}
@@ -279,9 +279,9 @@ export const Message = React.memo(function Message(props: MessageProps) {
             />
           </Box>
         )}
-        {$data.length > 0 && (
+        {$children.length > 0 && (
           <Box p={2} pe={0}>
-            {$data.map((msg) => (
+            {$children.map((msg) => (
               <Message {...props} parentId={data.id} key={msg.id} data={msg} />
             ))}
           </Box>

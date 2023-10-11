@@ -65,7 +65,7 @@ export type Message = {
   $name?: string;
   $thread?: boolean;
   $numReplies?: number;
-  $data?: Message[];
+  $children?: Message[];
 };
 
 export type MessageTrack = {

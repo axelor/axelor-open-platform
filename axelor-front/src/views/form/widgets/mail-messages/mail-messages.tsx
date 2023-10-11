@@ -76,7 +76,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         setMessages((msgs) => {
           const msgInd = msgs.findIndex((x) => `${x.id}` === `${parent}`);
           if (msgInd > -1) {
-            msgs[msgInd] = { ...msgs[msgInd], $data: data };
+            msgs[msgInd] = { ...msgs[msgInd], $children: data };
           }
           return [...msgs];
         });
@@ -135,11 +135,11 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       );
       if (isRemoved && msgIndex > -1) {
         if (record?.parent?.id) {
-          const $data = messages[msgIndex].$data || [];
-          const $ind = $data.findIndex((x) => `${x.id}` === `${record.id}`);
+          const $children = messages[msgIndex].$children || [];
+          const $ind = $children.findIndex((x) => `${x.id}` === `${record.id}`);
           if ($ind > -1) {
-            $data.splice($ind, 1);
-            messages[msgIndex] = { ...messages[msgIndex], $data };
+            $children.splice($ind, 1);
+            messages[msgIndex] = { ...messages[msgIndex], $children: $children };
           }
         } else {
           messages.splice(msgIndex, 1);
@@ -191,7 +191,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
             ...messages[msgIndex],
             ...(msg?.parent?.id
               ? {
-                  $data: (messages[msgIndex].$data || []).map(($msg) =>
+                  $children: (messages[msgIndex].$children || []).map(($msg) =>
                     `${$msg.id}` === `${msg.id}`
                       ? {
                           ...$msg,
