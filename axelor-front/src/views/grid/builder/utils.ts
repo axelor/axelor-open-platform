@@ -1,7 +1,8 @@
-import { GridState } from "@axelor/ui/grid";
+import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useMemo } from "react";
-import { useAtom } from "jotai";
+
+import { GridSortColumn, GridState } from "@axelor/ui/grid";
 
 import { GridView } from "@/services/client/meta.types";
 
@@ -10,7 +11,7 @@ export function useGridState(
     view?: GridView;
     params?: Record<string, any>;
   },
-  deps = []
+  deps = [],
 ) {
   const { view, params, ...gridState } = initialState || {};
   const groupBy: string = params?.groupBy || view?.groupBy;
@@ -25,19 +26,29 @@ export function useGridState(
           groupBy: groupBy.split(",").map((name) => ({ name })),
         }),
         ...(orderBy && {
-          orderBy: orderBy
-            .split(",")
-            .map((name) =>
-              name.startsWith("-")
-                ? { name: name.slice(1), order: "desc" }
-                : { name, order: "asc" }
-            ),
+          orderBy: parseOrderBy(orderBy),
         }),
         ...gridState,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    deps
+    deps,
   );
   const [state, setState] = useAtom(gridAtom);
   return [state, setState, gridAtom] as const;
+}
+
+export function parseOrderBy(orderBy?: string): GridSortColumn[] | undefined {
+  return orderBy
+    ?.split(",")
+    .map((name) =>
+      name.startsWith("-")
+        ? { name: name.slice(1), order: "desc" }
+        : { name, order: "asc" },
+    );
+}
+
+export function getSortBy(orderBy?: GridSortColumn[] | null) {
+  return orderBy?.map(
+    (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
+  );
 }

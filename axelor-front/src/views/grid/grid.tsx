@@ -54,7 +54,7 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { useCustomizePopup } from "./builder/customize";
 import { Details } from "./builder/details";
 import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
-import { useGridState } from "./builder/utils";
+import { getSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 
@@ -146,9 +146,7 @@ function GridInner(props: ViewProps<GridView>) {
   const getSearchOptions = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
-        const sortBy = orderBy?.map(
-          (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
-        );
+        const sortBy = getSortBy(orderBy);
         const { query = {}, search } = get(searchAtom!);
 
         const searchQuery = getSearchFilter(fields as any, view.items, search);

@@ -29,6 +29,7 @@ import {
 } from "@/view-containers/views/scope";
 
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
+import { getSortBy, parseOrderBy } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -81,9 +82,11 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [view.width]);
 
+  const orderBy = useMemo(() => parseOrderBy(view.orderBy), [view.orderBy]);
   const doSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
+        const sortBy = getSortBy(orderBy);
         const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
         const names = Object.keys(fields ?? {});
 
@@ -97,12 +100,13 @@ export function Cards(props: ViewProps<CardsView>) {
           filter._domainAction = _domainAction;
         }
         return dataStore.search({
+          sortBy,
           filter,
           fields: names,
           ...options,
         });
       },
-      [dataStore, fields, dashlet, searchAtom, getViewContext],
+      [orderBy, searchAtom, fields, dashlet, dataStore, getViewContext],
     ),
   );
 
