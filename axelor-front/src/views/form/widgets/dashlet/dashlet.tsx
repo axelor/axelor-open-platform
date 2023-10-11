@@ -71,10 +71,10 @@ export function DashletComponent({
         ...actionView,
         name: uniqueId("$dashlet"),
         params: {
+          ...actionView.params,
           dashlet: true,
           "show-toolbar": false,
           "dashlet.canSearch": canSearch,
-          ...actionView.params,
         },
         context: {
           ...(dashboard ? ctx : actionView.context),
