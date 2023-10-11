@@ -31,9 +31,6 @@ export function Cell(props: GridCellProps) {
       if (Comp) {
         return <Comp {...props} />;
       }
-      if (serverType === "BINARY" && name === "image") {
-        return <Image {...props} />;
-      }
       if (
         typeof value === "string" &&
         (serverType === "STRING" ||

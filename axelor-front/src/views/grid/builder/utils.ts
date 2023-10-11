@@ -5,6 +5,8 @@ import { useMemo } from "react";
 import { GridSortColumn, GridState } from "@axelor/ui/grid";
 
 import { GridView } from "@/services/client/meta.types";
+import * as WIDGETS from "../widgets";
+import { toCamelCase, toKebabCase } from "@/utils/names.ts";
 
 export function useGridState(
   initialState?: Partial<GridState> & {
@@ -50,5 +52,35 @@ export function parseOrderBy(orderBy?: string): GridSortColumn[] | undefined {
 export function getSortBy(orderBy?: GridSortColumn[] | null) {
   return orderBy?.map(
     (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
+  );
+}
+
+export function getWidget(item: any, field: any): string {
+  let widget = item.widget;
+
+  // default widget depending on field server type
+  if (!isValidWidget(item.widget)) {
+    widget = item.serverType;
+  }
+
+  // default image fields
+  if (!item.widget && field?.image) {
+    widget = "image";
+  }
+
+  // adapt widget naming, ie boolean-select to BooleanSelect
+  widget = normalizeWidget(widget) ?? widget;
+
+  return toKebabCase(widget);
+}
+
+function isValidWidget(widget: string): boolean {
+  return !!normalizeWidget(widget);
+}
+
+function normalizeWidget(widget: string): string | undefined {
+  return Object.keys(WIDGETS).find(
+    (name) =>
+      toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase(),
   );
 }

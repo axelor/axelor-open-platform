@@ -54,6 +54,7 @@ import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
+import { getWidget } from "../builder/utils";
 import { GridScope } from "./scope";
 
 import styles from "../grid.module.scss";
@@ -201,6 +202,11 @@ export const Grid = forwardRef<
       const serverType = (item as Field).serverType || field?.type;
       const columnProps: Partial<GridColumn> = {};
       const extraAttrs = columnAttrs?.[item.name!];
+      
+      let widget;
+      if (item.type === 'field') {
+          widget = getWidget(item, field);
+      }
 
       if (view.sortable === false) {
         columnProps.sortable = (item as Field).sortable === true;
@@ -262,11 +268,12 @@ export const Grid = forwardRef<
         ...field,
         ...item,
         ...attrs,
-        serverType,
+        ...(item.type === "field" && { serverType }),
         title,
         formatter: columnFormatter || formatter,
         ...columnProps,
         ...extraAttrs,
+        ...(widget && { widget }),
       } as any;
     });
 
