@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
-import { selectAtom, useAtomCallback } from "jotai/utils";
 import { focusAtom } from "jotai-optics";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isUndefined from "lodash/isUndefined";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
@@ -11,6 +11,7 @@ import { parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
 import { validate } from "@/utils/validate";
 import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
 
@@ -37,7 +38,7 @@ export function FormWidget(props: FormWidgetProps) {
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom, parentAtom }),
-    [formAtom, parentAtom, schema]
+    [formAtom, parentAtom, schema],
   );
 
   const dirtyAtom = useViewDirtyAtom();
@@ -48,19 +49,19 @@ export function FormWidget(props: FormWidgetProps) {
       isField(schema)
         ? createValueAtom({ schema, formAtom, dirtyAtom, actionExecutor })
         : undefined,
-    [actionExecutor, dirtyAtom, formAtom, schema]
+    [actionExecutor, dirtyAtom, formAtom, schema],
   );
 
   const hidden = useAtomValue(
-    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom])
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom]),
   );
 
   const readonly =
     useAtomValue(
       useMemo(
         () => selectAtom(widgetAtom, (a) => a.attrs.readonly),
-        [widgetAtom]
-      )
+        [widgetAtom],
+      ),
     ) || props.readonly;
 
   const required = useAtomValue(
@@ -73,15 +74,15 @@ export function FormWidget(props: FormWidgetProps) {
   const canEdit = useAtomValue(
     useMemo(
       () => selectAtom(widgetAtom, (a) => a.attrs.canEdit ?? true),
-      [widgetAtom]
-    )
+      [widgetAtom],
+    ),
   );
 
   const canView = useAtomValue(
     useMemo(
       () => selectAtom(widgetAtom, (a) => a.attrs.canView ?? true),
-      [widgetAtom]
-    )
+      [widgetAtom],
+    ),
   );
 
   const canShowEditor = schema.editor && valueAtom && canEdit && !readonly;
@@ -100,6 +101,15 @@ export function FormWidget(props: FormWidgetProps) {
 
   if (Comp) {
     return <Comp {...props} widgetAtom={widgetAtom} />;
+  }
+
+  // special case for reference fields to ensure related
+  // dotted fields are fetched when reference is changed
+  // with some action
+  if (hidden && isReference(schema)) {
+    return (
+      <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
+    );
   }
 
   if (hidden) {
@@ -136,14 +146,17 @@ function isField(schema: Schema) {
   return schema.jsonField || type === "field" || type === "panel-related";
 }
 
+function isReference(schema: Schema) {
+  const type = toKebabCase(schema.serverType ?? schema.widget);
+  return Boolean(type?.endsWith("-to-one"));
+}
+
 function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const attrs = useAtomValue(
-    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs), [widgetAtom])
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs), [widgetAtom]),
   );
   const Comp = useWidget(schema);
-
-  if (attrs.hidden) return null;
 
   const widgetProps = {
     schema,
@@ -177,9 +190,9 @@ function FormField({
           .valueOr({ errors: {} } as WidgetState)
           .prop("errors")
           .valueOr({ error: "" } as WidgetErrors)
-          .prop("error")
+          .prop("error"),
       ),
-    [formAtom, schema.name]
+    [formAtom, schema.name],
   );
 
   const clearError = useAtomCallback(
@@ -189,8 +202,8 @@ function FormField({
           set(serverErrorAtom, "");
         }
       },
-      [serverErrorAtom]
-    )
+      [serverErrorAtom],
+    ),
   );
 
   const valueCheck = useAtomCallback(
@@ -215,8 +228,8 @@ function FormField({
 
         set(widgetAtom, (prev) => ({ ...prev, errors }));
       },
-      [formAtom, schema, valueAtom, widgetAtom]
-    )
+      [formAtom, schema, valueAtom, widgetAtom],
+    ),
   );
 
   // trigger validation on value change
@@ -229,16 +242,16 @@ function FormField({
     async (signal) => {
       signal.aborted || clearError();
     },
-    [value, clearError]
+    [value, clearError],
   );
 
   const invalidAtom = useMemo(
     () =>
       selectAtom(
         widgetAtom,
-        ({ errors = {} }) => Object.values(errors).filter(Boolean).length > 0
+        ({ errors = {} }) => Object.values(errors).filter(Boolean).length > 0,
       ),
-    [widgetAtom]
+    [widgetAtom],
   );
   const invalid = useAtomValue(invalidAtom);
 
@@ -268,12 +281,13 @@ function useExpressions({
         const { states = {} } = get(formAtom);
         const invalid = Object.entries(states).some(
           ([k, { errors = {} }]) =>
-            (name === undefined || k === name) && Object.keys(errors).length > 0
+            (name === undefined || k === name) &&
+            Object.keys(errors).length > 0,
         );
         return !invalid;
       },
-      [formAtom]
-    )
+      [formAtom],
+    ),
   );
 
   const modeRef = useRef({ readonly, required });
@@ -315,8 +329,8 @@ function useExpressions({
           set(valueAtom, value, false, isDirty);
         }
       },
-      [valueAtom]
-    )
+      [valueAtom],
+    ),
   );
 
   const handleCondition = useAtomCallback(
@@ -327,7 +341,7 @@ function useExpressions({
         context: DataContext,
         attr: string,
         expr: string,
-        negate: boolean = false
+        negate: boolean = false,
       ) => {
         const value = Boolean(parseExpression(expr)(context));
         const state = get(widgetAtom);
@@ -338,8 +352,8 @@ function useExpressions({
           set(widgetAtom, { ...state, attrs: { ...attrs, [attr]: next } });
         }
       },
-      [widgetAtom]
-    )
+      [widgetAtom],
+    ),
   );
 
   const handleValidation = useAtomCallback(
@@ -356,8 +370,8 @@ function useExpressions({
           set(widgetAtom, { ...state, errors });
         }
       },
-      [widgetAtom]
-    )
+      [widgetAtom],
+    ),
   );
 
   useEffect(() => {

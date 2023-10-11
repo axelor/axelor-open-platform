@@ -45,7 +45,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, focus, required, domain } = attrs;
+  const { title, focus, required, domain, hidden } = attrs;
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
 
@@ -294,6 +294,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   // register form:refresh
   useFormRefresh(onRefSelectRefresh);
+
+  if (hidden) {
+    return null;
+  }
 
   return (
     <FieldControl {...props}>
