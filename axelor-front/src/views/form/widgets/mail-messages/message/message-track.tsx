@@ -15,13 +15,17 @@ export function formatter(_item: MessageTrack, field?: Property) {
     if (!value) {
       return value;
     }
+    
+    if (value.toLowerCase() === "true") return i18n.get("True");
+    if (value.toLowerCase() === "false") return i18n.get("False");
+    
     if (
       field &&
       !["MANY_TO_ONE", "ONE_TO_MANY", "ONE_TO_ONE", "MANY_TO_MANY"].includes(
         field.type
       )
     ) {
-      var formatter = (Formatters as any)[toKebabCase(field.type)];
+      const formatter = (Formatters as any)[toKebabCase(field.type)];
       if (formatter) {
         return formatter(value, {
           props: field,
@@ -29,8 +33,7 @@ export function formatter(_item: MessageTrack, field?: Property) {
         });
       }
     }
-    if (value === "True") return i18n.get("True");
-    if (value === "False") return i18n.get("False");
+    
     if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
       return moment(value).format("DD/MM/YYYY HH:mm");
     }
