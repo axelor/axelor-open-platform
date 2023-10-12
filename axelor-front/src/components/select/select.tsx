@@ -15,7 +15,7 @@ import {
   SelectProps as AxSelectProps,
   SelectCustomOption,
   SelectValue,
-  useRefs, 
+  useRefs,
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
@@ -131,7 +131,7 @@ export const Select = forwardRef(function Select<
         key: "select",
         title: (
           <Box d="flex" gap={6} alignItems="center">
-            <MaterialIcon icon="search" className={styles.icon}/>
+            <MaterialIcon icon="search" className={styles.icon} />
             <em>{i18n.get("Search more...")}</em>
           </Box>
         ),
@@ -140,19 +140,22 @@ export const Select = forwardRef(function Select<
     }
 
     if (onShowCreate) {
+      const canCreateWithInput =
+        inputValue && onShowCreateAndSelect && selectProps.multiple;
+
       options.push({
         key: "create",
         title: (
           <Box d="flex" gap={6} alignItems="center">
-            <MaterialIcon icon="add" className={styles.icon}/>
+            <MaterialIcon icon="add" className={styles.icon} />
             <em>
-              {inputValue && selectProps.multiple
+              {canCreateWithInput
                 ? i18n.get(`Create "{0}"...`, inputValue)
                 : i18n.get("Create...")}
             </em>
           </Box>
         ),
-        onClick: () => onShowCreate(inputValue),
+        onClick: () => onShowCreate(canCreateWithInput ? inputValue : ""),
       });
     }
 
@@ -161,14 +164,14 @@ export const Select = forwardRef(function Select<
         key: "create-and-select",
         title: (
           <Box d="flex" gap={6} alignItems="center">
-            <MaterialIcon icon="add_task" className={styles.icon}/>
+            <MaterialIcon icon="add_task" className={styles.icon} />
             <em> {i18n.get(`Create "{0}" and select...`, inputValue)}</em>
           </Box>
         ),
         onClick: () => onShowCreateAndSelect(inputValue),
       });
     }
-    
+
     return options;
   }, [
     inputValue,
