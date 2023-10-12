@@ -1,8 +1,8 @@
 import clsx from "clsx";
-import isEqual from "lodash/isEqual";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import isEqual from "lodash/isEqual";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -52,6 +52,12 @@ function processEditor(schema: Schema) {
   const fields = editor.fields ?? schema.fields;
   const flexbox = editor.flexbox ?? false;
 
+  const autoTitle = (item: Schema) => {
+    if (item.showTitle && item.type !== "panel") {
+      return item.autoTitle;
+    }
+  };
+
   const applyTitle = (item: Schema) => {
     const field = fields?.[item.name!];
     const result = { ...field, ...item };
@@ -64,8 +70,7 @@ function processEditor(schema: Schema) {
     ) {
       result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
     }
-    result.title =
-      item.title ?? field?.title ?? (result.showTitle ? field?.autoTitle : "");
+    result.title = item.title ?? field?.title ?? autoTitle(result) ?? "";
 
     if (!result.showTitle && !result.items) {
       result.placeholder =
