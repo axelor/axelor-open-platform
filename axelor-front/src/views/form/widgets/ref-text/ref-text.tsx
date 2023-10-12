@@ -22,7 +22,7 @@ export function RefText(props: FieldProps<any>) {
       (get) => {
         const value = get(valueAtom);
         return {
-          [targetName]: value,
+          [targetName]: value ?? "",
         };
       },
       (get, set, value: DataRecord, fireOnChange?: boolean) => {
