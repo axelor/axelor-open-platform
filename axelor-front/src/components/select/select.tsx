@@ -34,6 +34,7 @@ export interface SelectProps<Type, Multiple extends boolean>
   extends AxSelectProps<Type, Multiple> {
   canSelect?: boolean;
   fetchOptions?: (inputValue: string) => Promise<Type[]>;
+  canCreateOnTheFly?: boolean;
   onShowCreateAndSelect?: (inputValue: string) => void;
   onShowCreate?: (inputValue: string) => void;
   onShowSelect?: (inputValue: string) => void;
@@ -139,33 +140,42 @@ export const Select = forwardRef(function Select<
       });
     }
 
-    if (onShowCreate) {
-      const canCreateWithInput =
-        inputValue && onShowCreateAndSelect && selectProps.multiple;
+    const canShowCreateWithInput =
+      selectProps.canCreateOnTheFly && onShowCreate && inputValue;
+    const canShowCreateWithInputAndSelect =
+      selectProps.canCreateOnTheFly && onShowCreateAndSelect && inputValue;
 
+    if (canShowCreateWithInput) {
+      options.push({
+        key: "create-with-input",
+        title: (
+          <Box d="flex" gap={6} alignItems="center">
+            <MaterialIcon icon="add" className={styles.icon} />
+            <em>{i18n.get(`Create "{0}"...`, inputValue)}</em>
+          </Box>
+        ),
+        onClick: () => onShowCreate(inputValue),
+      });
+    } else if (onShowCreate) {
       options.push({
         key: "create",
         title: (
           <Box d="flex" gap={6} alignItems="center">
             <MaterialIcon icon="add" className={styles.icon} />
-            <em>
-              {canCreateWithInput
-                ? i18n.get(`Create "{0}"...`, inputValue)
-                : i18n.get("Create...")}
-            </em>
+            <em>{i18n.get("Create...")}</em>
           </Box>
         ),
-        onClick: () => onShowCreate(canCreateWithInput ? inputValue : ""),
+        onClick: () => onShowCreate(""),
       });
     }
 
-    if (onShowCreateAndSelect && inputValue) {
+    if (canShowCreateWithInputAndSelect) {
       options.push({
         key: "create-and-select",
         title: (
           <Box d="flex" gap={6} alignItems="center">
             <MaterialIcon icon="add_task" className={styles.icon} />
-            <em> {i18n.get(`Create "{0}" and select...`, inputValue)}</em>
+            <em>{i18n.get(`Create "{0}" and select...`, inputValue)}</em>
           </Box>
         ),
         onClick: () => onShowCreateAndSelect(inputValue),
@@ -175,7 +185,7 @@ export const Select = forwardRef(function Select<
     return options;
   }, [
     inputValue,
-    selectProps.multiple,
+    selectProps.canCreateOnTheFly,
     onShowCreate,
     onShowCreateAndSelect,
     onShowSelect,
