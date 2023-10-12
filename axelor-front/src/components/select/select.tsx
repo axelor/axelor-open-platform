@@ -10,16 +10,18 @@ import {
 } from "react";
 
 import {
+  Box,
   Select as AxSelect,
   SelectProps as AxSelectProps,
   SelectCustomOption,
   SelectValue,
-  useRefs,
+  useRefs, 
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
 
 import styles from "./select.module.scss";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 export type {
   SelectCustomOption,
@@ -124,15 +126,16 @@ export const Select = forwardRef(function Select<
   const customOptions = useMemo(() => {
     const options: SelectCustomOption[] = [];
 
-    if (onShowCreateAndSelect && inputValue) {
+    if (onShowSelect) {
       options.push({
-        key: "create-and-select",
+        key: "select",
         title: (
-          <span>
-            <em> {i18n.get(`Create "{0}" and select...`, inputValue)}</em>
-          </span>
+          <Box d="flex" gap={6} alignItems="center">
+            <MaterialIcon icon="search" className={styles.icon}/>
+            <em>{i18n.get("Search more...")}</em>
+          </Box>
         ),
-        onClick: () => onShowCreateAndSelect(inputValue),
+        onClick: () => onShowSelect(inputValue),
       });
     }
 
@@ -140,29 +143,32 @@ export const Select = forwardRef(function Select<
       options.push({
         key: "create",
         title: (
-          <span>
+          <Box d="flex" gap={6} alignItems="center">
+            <MaterialIcon icon="add" className={styles.icon}/>
             <em>
               {inputValue && selectProps.multiple
                 ? i18n.get(`Create "{0}"...`, inputValue)
                 : i18n.get("Create...")}
             </em>
-          </span>
+          </Box>
         ),
         onClick: () => onShowCreate(inputValue),
       });
     }
 
-    if (onShowSelect) {
+    if (onShowCreateAndSelect && inputValue) {
       options.push({
-        key: "select",
+        key: "create-and-select",
         title: (
-          <span>
-            <em>{i18n.get("Search more...")}</em>
-          </span>
+          <Box d="flex" gap={6} alignItems="center">
+            <MaterialIcon icon="add_task" className={styles.icon}/>
+            <em> {i18n.get(`Create "{0}" and select...`, inputValue)}</em>
+          </Box>
         ),
-        onClick: () => onShowSelect(inputValue),
+        onClick: () => onShowCreateAndSelect(inputValue),
       });
     }
+    
     return options;
   }, [
     inputValue,
