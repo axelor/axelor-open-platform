@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
-import noop from "lodash/noop";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -311,14 +310,17 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   // register form:refresh
   useFormRefresh(onRefresh);
 
-  // register tab:refresh
-  useViewTabRefresh("form", isMessageBox ? onRefresh : noop);
-
   const { total } = pagination;
 
   return (
     <>
-      {isMessageBox && <MessageBoxUpdates count={total} formAtom={formAtom} />}
+      {isMessageBox && (
+        <MessageBoxUpdates
+          count={total}
+          formAtom={formAtom}
+          onRefresh={onRefresh}
+        />
+      )}
       {(!isMessageBox || total > 0) && (
         <MessageBox
           fields={fields}
@@ -340,9 +342,11 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 function MessageBoxUpdates({
   count,
   formAtom,
+  onRefresh,
 }: {
   count: number;
   formAtom: FormAtom;
+  onRefresh: () => void;
 }) {
   const [__empty, setEmpty] = useAtom(
     useMemo(
@@ -371,6 +375,9 @@ function MessageBoxUpdates({
       document.dispatchEvent(event);
     }
   }, [active, tab, onRefresh]);
+
+  // register tab:refresh
+  useViewTabRefresh("form", onRefresh);
 
   return null;
 }
