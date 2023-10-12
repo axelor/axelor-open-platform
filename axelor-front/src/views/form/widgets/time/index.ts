@@ -1,1 +1,1 @@
-export { Duration as Time } from "../duration";
+export * from "./time";

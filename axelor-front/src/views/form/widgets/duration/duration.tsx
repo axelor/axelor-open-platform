@@ -3,7 +3,6 @@ import padStart from "lodash/padStart";
 import { useCallback, useMemo } from "react";
 
 import { moment } from "@/services/client/l10n";
-import { toKebabCase } from "@/utils/names";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { MaskedInput } from "../date/mask-input";
@@ -67,8 +66,6 @@ export function Duration(props: FieldProps<string | number>) {
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const isTime = toKebabCase(schema.widget!) === "time";
-
   const format = useCallback(
     (value?: string | number | null) => toText(value, { big, seconds }),
     [big, seconds],
@@ -76,31 +73,13 @@ export function Duration(props: FieldProps<string | number>) {
 
   const { value, text, onChange, onBlur } = useInput(valueAtom, {
     validate: isValid,
-    ...(!isTime && {
-      format,
-      parse: toValue,
-    }),
+    format,
+    parse: toValue,
   });
 
   const displayText = useMemo(
-    () => (isTime ? value : toText(value, { big, seconds })) ?? "",
-    [isTime, big, seconds, value],
-  );
-
-  const toMask = useCallback(
-    (value: string) => {
-      const shouldMaxHrLastDigit = isTime && value?.startsWith("2");
-      return [
-        ...(big && !isTime ? [/\d/] : []),
-        isTime ? /[0-2]/ : /\d/,
-        shouldMaxHrLastDigit ? /[0-3]/ : /\d/,
-        ":",
-        /[0-5]/,
-        /\d/,
-        ...(seconds ? [":", /[0-5]/, /\d/] : []),
-      ];
-    },
-    [big, seconds, isTime],
+    () => toText(value, { big, seconds }) ?? "",
+    [big, seconds, value],
   );
 
   return (
@@ -119,7 +98,15 @@ export function Duration(props: FieldProps<string | number>) {
           required={required}
           onChange={onChange}
           onBlur={onBlur}
-          mask={toMask}
+          mask={[
+            ...(big ? [/\d/] : []),
+            /\d/,
+            /\d/,
+            ":",
+            /[0-5]/,
+            /\d/,
+            ...(seconds ? [":", /[0-5]/, /\d/] : []),
+          ]}
         />
       )}
     </FieldControl>
