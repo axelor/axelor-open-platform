@@ -632,7 +632,7 @@ depending on the widget/type.
 | `x-icon-hover` | specify an icon for hover state
 | `x-icon-active` | specify an icon for active state (used with `toggle` widget)
 | `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive
-| `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all
+| `x-show-icons` | comma-separated list of names of icons to show, or `false` to hide them all
 
 * editor: `edit`, `view`, `select`, `clear`
 * multirelational field: `select`, `new`, `edit`, `view`, `remove` - _new in version 5.4_
