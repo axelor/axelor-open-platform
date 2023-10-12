@@ -574,18 +574,22 @@ const FormContainer = memo(function FormContainer({
 
   actionHandler.setRefreshHandler(actionReload);
   actionHandler.setSaveHandler(
-    useCallback(
-      async (record?: DataRecord) => {
-        if (record) {
-          await dataStore.save(record);
-        }
-        if (isDirty) {
-          await onSave({
-            callOnSave: false,
-          });
-        }
-      },
-      [dataStore, isDirty, onSave],
+    useAtomCallback(
+      useCallback(
+        async (get, set, record?: DataRecord) => {
+          if (record) {
+            await dataStore.save(record);
+          }
+          const rec = get(formAtom).record;
+          const isNew = (rec.id || 0) <= 0;
+          if (isDirty || isNew) {
+            await onSave({
+              callOnSave: false,
+            });
+          }
+        },
+        [dataStore, formAtom, isDirty, onSave],
+      ),
     ),
   );
   actionHandler.setValidateHandler(
