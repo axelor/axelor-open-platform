@@ -79,7 +79,10 @@ export function DateComponent({
         getDateTimeFormat({ props: schema as Field }),
       ],
       date: ["YYYY-MM-DD", l10n.getDateFormat()],
-      time: [`HH:mm${hasSeconds ? ":ss": ""}`, getTimeFormat({ props: schema as Field })],
+      time: [
+        `HH:mm${hasSeconds ? ":ss" : ""}`,
+        getTimeFormat({ props: schema as Field }),
+      ],
     }),
     [schema, hasSeconds],
   );
@@ -161,7 +164,7 @@ export function DateComponent({
   }, [handleClose]);
 
   const handleChange = useCallback(
-    (newValue: Date | string | null, event: SyntheticEvent) => {
+    (newValue: Date | string | null, event?: SyntheticEvent) => {
       if (
         (event?.target as HTMLElement)?.className ===
         "react-datepicker__now-button"
@@ -236,7 +239,13 @@ export function DateComponent({
             ) as any
           }
           showTimeInput={isDateTime}
-          customTimeInput={<TimeInput format={format} />}
+          customTimeInput={
+            <TimeInput
+              hasDate={Boolean(dateValue)}
+              format={format}
+              onDateChange={handleChange}
+            />
+          }
           onSelect={handleSelect}
           onChange={handleChange}
           onBlur={handleBlur}

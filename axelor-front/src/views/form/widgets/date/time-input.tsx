@@ -1,23 +1,44 @@
-import padStart from "lodash/padStart";
-import { forwardRef } from "react";
-
 import { Box } from "@axelor/ui";
+import padStart from "lodash/padStart";
+import { SyntheticEvent, forwardRef } from "react";
 
 interface TimeInputProps {
+  date?: Date | number;
+  hasDate?: boolean;
   format?: string;
   value?: string;
   onChange?: (value: string) => void;
+  onDateChange?: (value: Date | string | null, event?: SyntheticEvent) => void;
 }
 
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
-  ({ format, value, onChange }, ref) => {
-    const [hr, mm, ss] = `${value}`.split(":");
+  ({ format, value, hasDate, date: propDate, onDateChange }, ref) => {
+    const [hr, mm, ss] = `${
+      (hasDate && propDate
+        ? (propDate as Date)?.toLocaleTimeString(undefined, {
+            hour12: false,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })
+        : null) || value
+    }`.split(":");
     const hasSeconds = format?.includes("ss");
 
     const toText = (val: number) => padStart(`${val}`, 2, "0");
-    const setValue = (hr: string, mm: string, ss: string) =>
-      onChange &&
-      onChange(`${hr ?? 0}:${mm ?? 0}${hasSeconds ? `${ss ?? 0}` : ""}`);
+    const setValue = (hr: string, mm: string, ss: string) => {
+      const isPropDateValid =
+        hasDate &&
+        propDate instanceof Date &&
+        !isNaN(propDate as unknown as number);
+      const date = isPropDateValid ? propDate : new Date();
+
+      date.setHours(Number(hr || 0));
+      date.setMinutes(Number(mm || 0));
+      date.setSeconds(hasSeconds ? Number(ss || 0) : 0);
+
+      onDateChange?.(date);
+    };
 
     function handleHourChange(value: string) {
       setValue(value, mm, ss);
@@ -60,7 +81,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       <div ref={ref}>
         {renderSelect(24, hr, handleHourChange)}
         {renderSelect(60, mm, handleMinuteChange)}
-        {hasSeconds && renderSelect(24, ss, handleSecondChange)}
+        {hasSeconds && renderSelect(60, ss, handleSecondChange)}
       </div>
     );
   },
