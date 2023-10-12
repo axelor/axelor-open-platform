@@ -1,12 +1,14 @@
 import { useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import noop from "lodash/noop";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useTags } from "@/hooks/use-tags";
+import { useTabs } from "@/hooks/use-tabs";
+import { useTags, useTagsMail } from "@/hooks/use-tags";
 import {
   useViewAction,
+  useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
@@ -353,6 +355,22 @@ function MessageBoxUpdates({
   useEffect(() => {
     shouldMarkEmpty && setEmpty(empty);
   }, [shouldMarkEmpty, empty, setEmpty]);
+
+  const tab = useViewTab();
+  const { active } = useTabs();
+  const { unread } = useTagsMail();
+  const unreadRef = useRef(unread);
+
+  useEffect(() => {
+    unreadRef.current = unread;
+  }, [unread]);
+
+  useEffect(() => {
+    if (active === tab && unreadRef.current) {
+      const event = new CustomEvent("tab:refresh", { detail: tab.id });
+      document.dispatchEvent(event);
+    }
+  }, [active, tab, onRefresh]);
 
   return null;
 }
