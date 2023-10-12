@@ -50,12 +50,7 @@ function processEditor(schema: Schema) {
     result.title =
       item.title ?? field?.title ?? (result.showTitle ? field?.autoTitle : "");
     result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
-
-    if (result.items) {
-      result.items = result.items.map((item: Schema) =>
-        applyTitle({ ...item }),
-      );
-    }
+    
     return result;
   };
 
@@ -68,6 +63,12 @@ function processEditor(schema: Schema) {
 
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
+    }
+
+    if (result.items) {
+      result.items = result.items.map((item: Schema) =>
+        applyAttrs({ ...item }),
+      );
     }
 
     return result as Schema;
