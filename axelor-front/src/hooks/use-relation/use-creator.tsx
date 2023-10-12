@@ -24,6 +24,7 @@ export function useCreateOnTheFly(schema: Schema) {
       onEdit?: (record: DataRecord) => void;
       onSelect?: (record: DataRecord) => void;
     }) => {
+      if (!input) return onEdit?.({});
       const meta = await findView({
         type: "form",
         model,
@@ -36,11 +37,7 @@ export function useCreateOnTheFly(schema: Schema) {
       if (meta?.fields) {
         Object.keys(meta.fields).forEach((k) => {
           const field = meta.fields![k];
-          if (
-            ["name", "code"].includes(field.name) ||
-            createNames.includes(field.name) ||
-            field.nameColumn
-          ) {
+          if (createNames.includes(field.name)) {
             record[field.name] = input;
           } else if (field.required) {
             missing = true;
