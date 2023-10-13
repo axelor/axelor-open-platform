@@ -302,13 +302,20 @@ function useActionAttrs({
           const { statesByName, states: statesById, fields } = get(formAtom);
           const { target, name, value } = data;
 
-          const updateStates = (fieldName: string, newState: WidgetState) => ({
+          const updateStates = (
+            newState: WidgetState,
+            fieldName: string,
+            columnName?: string,
+          ) => ({
             statesByName: { ...statesByName, [fieldName]: newState },
             states: produce(statesById, (prev) => {
               // reset widget's own state so that the attibute set by the action get preference.
               Object.values(prev).forEach((state) => {
-                if (state.name === fieldName && name in state.attrs) {
-                  delete (state.attrs as any)[name];
+                if (state.name !== fieldName) return;
+                if (columnName) {
+                  delete (state.columns?.[columnName] as any)?.[name];
+                } else if (name in state.attrs) {
+                  delete (state.attrs as any)?.[name];
                 }
               });
             }),
@@ -332,7 +339,7 @@ function useActionAttrs({
                   },
                 },
               };
-              const newStates = updateStates(fieldName, newState);
+              const newStates = updateStates(newState, fieldName, column);
               set(formAtom, (prev) => ({
                 ...prev,
                 ...newStates,
@@ -359,7 +366,7 @@ function useActionAttrs({
                 }),
           };
 
-          const newStates = updateStates(data.target, newState);
+          const newStates = updateStates(newState, data.target);
           set(formAtom, (prev) => ({
             ...prev,
             ...newStates,

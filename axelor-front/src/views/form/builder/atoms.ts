@@ -1,6 +1,7 @@
 import { PrimitiveAtom, atom } from "jotai";
 import { focusAtom } from "jotai-optics";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
+import merge from "lodash/merge";
 import { SetStateAction } from "react";
 
 import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
@@ -48,14 +49,14 @@ export function createWidgetAtom(props: {
     o
       .prop("states")
       .prop(uid)
-      .valueOr({ name, parent, attrs: {} } as WidgetState)
+      .valueOr({ name, parent, attrs: {} } as WidgetState),
   );
 
   const attrsByNameAtom = focusAtom(formAtom, (o) =>
     o
       .prop("statesByName")
       .prop(name ?? "__")
-      .valueOr({ name, parent, attrs: {} } as WidgetState)
+      .valueOr({ name, parent, attrs: {} } as WidgetState),
   );
 
   const getStateByName = (key: keyof WidgetState, values: any) =>
@@ -77,13 +78,12 @@ export function createWidgetAtom(props: {
         ...restById
       } = get(attrsByIdAtom);
 
+      const columns = merge({}, columnsByName, columnsById);
+
       const nextState = {
         ...restByName,
         ...restById,
-        columns: getStateByName("columns", {
-          ...columnsByName,
-          ...columnsById,
-        }),
+        columns: getStateByName("columns", columns),
         errors: {
           ...errorsByName,
           ...errorsById,
@@ -110,7 +110,7 @@ export function createWidgetAtom(props: {
         }
         return prevState;
       });
-    }
+    },
   );
 
   return widgetAtom;
@@ -134,7 +134,7 @@ export function createValueAtom({
     onChange &&
       actionExecutor.execute(
         onChange,
-        name ? { context: { _source: name } } : {}
+        name ? { context: { _source: name } } : {},
       );
   };
 
@@ -147,7 +147,7 @@ export function createValueAtom({
         try {
           return JSON.parse(attrs);
         } catch {
-          return {};
+          // ignore
         }
       }
       return {};
@@ -162,7 +162,7 @@ export function createValueAtom({
         set,
         value: any,
         fireOnChange: boolean = false,
-        markDirty: boolean = true
+        markDirty: boolean = true,
       ) => {
         const prev = get(lensAtom);
         const next = JSON.stringify({
@@ -213,7 +213,7 @@ export function createValueAtom({
       set,
       value: any,
       fireOnChange: boolean = false,
-      markDirty: boolean = true
+      markDirty: boolean = true,
     ) => {
       const prev = get(lensAtom);
       const next =
@@ -230,7 +230,7 @@ export function createValueAtom({
         }
       }
       fireOnChange && triggerOnChange();
-    }
+    },
   );
 }
 
@@ -275,7 +275,7 @@ export const contextAtom = atom(
           context[name] = context[name].map((value: DataRecord) =>
             value.id && selected.includes(value.id)
               ? { ...value, selected: true }
-              : value
+              : value,
           );
         }
       }
@@ -289,5 +289,5 @@ export const contextAtom = atom(
     };
 
     return prepare(formAtom, options);
-  }
+  },
 );
