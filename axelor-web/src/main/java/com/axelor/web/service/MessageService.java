@@ -297,26 +297,38 @@ public class MessageService extends AbstractService {
       return res;
     }
 
-    flagMessages(request.getRecords());
+    final List<Map<String, Object>> data = flagMessages(request.getRecords());
+    res.setData(data);
     return res;
   }
 
   @Transactional
   @SuppressWarnings("unchecked")
-  public void flagMessages(List<Object> records) {
+  public List<Map<String, Object>> flagMessages(List<Object> records) {
+    final List<Map<String, Object>> data = new ArrayList<>(records.size());
     int counting = 0;
 
     for (Object record : records) {
+      final Map<String, Object> map;
+      @SuppressWarnings("rawtypes")
       MailFlags flag = flagMessage((Map) record);
+
       if (flag != null) {
         counting++;
-        JpaRepository.of(MailFlags.class).save(flag);
+        flag = JpaRepository.of(MailFlags.class).save(flag);
+        map = Map.of("id", flag.getId(), "version", flag.getVersion());
+      } else {
+        map = Collections.emptyMap();
       }
+
+      data.add(map);
 
       if (counting % 20 == 0) {
         JPA.clear();
       }
     }
+
+    return data;
   }
 
   private MailFlags flagMessage(Map<String, Object> record) {

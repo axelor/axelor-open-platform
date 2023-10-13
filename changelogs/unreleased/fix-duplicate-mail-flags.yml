@@ -1,0 +1,5 @@
+---
+title: Fix duplicate mail flags after reflagging messages
+type: fix
+description: |
+  `flag` endpoint now returns created flags ids.

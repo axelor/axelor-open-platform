@@ -60,14 +60,14 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
   const flagAsRead = useCallback(
     async (messages: Message[]) => {
-      const unreadFlags: MessageFlag[] = [];
+      const allFlags: MessageFlag[] = [];
 
       const pushUnread = (messages: Message[]) => {
         for (const message of messages) {
           const { $flags, $children } = message;
           const { isRead, version: _version, ...rest } = $flags ?? {};
           if (!isRead) {
-            unreadFlags.push({
+            allFlags.push({
               ...rest,
               isRead: true,
               messageId: message.id,
@@ -81,17 +81,24 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
       pushUnread(messages);
 
-      if (unreadFlags.length === 0) {
+      if (allFlags.length === 0) {
         return;
       }
 
-      const isUpdated = await DataSource.flags(unreadFlags);
+      const allUpdatedFlags = await DataSource.flags(allFlags);
 
-      if (!isUpdated) {
-        console.error(
-          `Failed to flag ${unreadFlags.length} message(s) as read`,
-        );
+      if (!allUpdatedFlags?.length) {
+        console.error(`Failed to flag ${allFlags.length} message(s) as read`);
         return;
+      }
+
+      // Merge flags with updated values
+      for (let i = 0; i < allFlags.length; ++i) {
+        const { id, version: _version, ...rest } = allFlags[i];
+        const updated = allUpdatedFlags[i];
+        if (!id || id === updated.id) {
+          allFlags[i] = { id, ...rest, ...updated };
+        }
       }
 
       fetchTags();
@@ -114,7 +121,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       };
 
       setMessages((messages) => {
-        for (const flags of unreadFlags) {
+        for (const flags of allFlags) {
           const message = findMessage(messages, flags.messageId);
           if (!message) {
             console.error(`Failed to find message ${flags.messageId}`);
@@ -125,6 +132,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           message.$flags = {
             ...rest,
             isRead: true,
+            ...flags,
           } as MessageFlag;
         }
         return [...messages];
@@ -157,9 +165,6 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           return [...msgs];
         });
       } else {
-        if (folder) {
-          flagAsRead(data as Message[]);
-        }
         setMessages((msgs) =>
           reset
             ? data.map((msg: any) => ({
@@ -174,6 +179,9 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
           total: totalRecords,
           hasNext: hasNextPage,
         }));
+        if (folder) {
+          flagAsRead(data as Message[]);
+        }
       }
     },
     [hasMessages, fetchMessages, recordId, model, folder, filter, flagAsRead],
@@ -241,7 +249,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const handleFlagsAction = useCallback(
     async (msg: Message, attrs: Partial<MessageFlag>, reload = false) => {
       const { $flags } = msg;
-      const isUpdated = await DataSource.flags([
+      const allUpdatedFlags = await DataSource.flags([
         {
           ...attrs,
           id: attrs.id!,
@@ -250,8 +258,11 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         },
       ]);
 
+      const updatedFlags = allUpdatedFlags?.[0];
+
       // handle error in update messages
-      if (!isUpdated) {
+      if (!updatedFlags || (attrs.id && attrs.id !== updatedFlags.id)) {
+        console.error(`Failed to flag message ${msg.id}`);
         return;
       }
 
@@ -259,8 +270,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         fetchTags();
       }
 
-      const flag = { ...attrs, version: undefined };
-      // version is outdated after flags update
+      const flag = { ...attrs, version: undefined, ...updatedFlags };
 
       if (reload) {
         fetchAll({ offset: 0, limit }, true);

@@ -32,7 +32,7 @@ export const DataSource = (() => {
       type?: string;
       limit?: number;
       offset?: number;
-    }
+    },
   ) {
     const { type, limit, offset } = options ?? {};
     return getMessages({ type, relatedId, relatedModel, limit, offset });
@@ -89,8 +89,13 @@ export const DataSource = (() => {
       },
     });
     if (resp.ok) {
-      const { status } = await resp.json();
-      return status === 0 ? true : false;
+      const {
+        status,
+        data,
+      }: { status: number; data?: Partial<MessageFlag>[] } = await resp.json();
+      if (status === 0) {
+        return data;
+      }
     }
     return Promise.reject(500);
   }
