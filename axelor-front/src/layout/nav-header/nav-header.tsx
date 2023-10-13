@@ -84,7 +84,7 @@ function FavoriteItem(props: CommandItemProps) {
           _domainContext: {},
         },
       }),
-    []
+    [],
   );
 
   const fetchData = useCallback(async () => {
@@ -102,7 +102,7 @@ function FavoriteItem(props: CommandItemProps) {
     (data: DataRecord) => {
       data.link && navigate(data.link);
     },
-    [navigate]
+    [navigate],
   );
 
   const handleFavoriteAdd = useCallback(async () => {
@@ -237,7 +237,7 @@ function QuickMenuBar() {
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(new DefaultActionHandler()),
-    []
+    [],
   );
 
   const items = useMemo(
@@ -264,7 +264,7 @@ function QuickMenuBar() {
           };
         }),
       })),
-    [menus, actionExecutor, refresh]
+    [menus, actionExecutor, refresh],
   );
 
   return <CommandBar items={items} />;
@@ -325,7 +325,14 @@ function FarItems() {
               subtext: unreadMailCount
                 ? i18n.get("{0} messages", unreadMailCount)
                 : i18n.get("no messages"),
-              onClick: () => openTab("mail.inbox"),
+              onClick: () => {
+                const detail = "mail.inbox";
+                openTab(detail);
+                if (unreadMailCount) {
+                  const event = new CustomEvent("tab:refresh", { detail });
+                  document.dispatchEvent(event);
+                }
+              },
             },
             { key: "m-div-1", divider: true },
             {
@@ -355,11 +362,13 @@ function FarItems() {
           showDownArrow: true,
           icon: () => (
             <Avatar
-              user={{
-                id: data?.user?.id,
-                code: data?.user?.login,
-                [data?.user?.nameField ?? "name"]: data?.user?.name,
-              } as any}
+              user={
+                {
+                  id: data?.user?.id,
+                  code: data?.user?.login,
+                  [data?.user?.nameField ?? "name"]: data?.user?.name,
+                } as any
+              }
               image={data?.user?.image ?? ""}
             />
           ),
