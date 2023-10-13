@@ -273,6 +273,12 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
             ...messages[msgIndex],
             ...(msg?.parent?.id
               ? {
+                  ...(!flag.isRead && {
+                    $flags: {
+                      ...messages[msgIndex].$flags,
+                      isRead: flag.isRead,
+                    } as MessageFlag,
+                  }),
                   $children: (messages[msgIndex].$children || []).map(($msg) =>
                     `${$msg.id}` === `${msg.id}`
                       ? {
