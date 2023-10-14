@@ -127,12 +127,15 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
   }
 
   let result = target;
+  let changed = false;
 
   for (const [key, value] of Object.entries(source)) {
     let newValue = value;
     if (newValue === result[key]) {
       continue;
     }
+
+    let isSelectedChanged = false;
 
     if (Array.isArray(value)) {
       const curr: DataRecord[] = result[key] ?? [];
@@ -142,10 +145,14 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
         );
         if (found) {
           let newItem = updateRecord(found, item);
-          if (newItem.selected !== item.selected) {
+          if (found.selected !== item.selected) {
             newItem = { ...newItem, selected: item.selected };
+            isSelectedChanged = true;
           }
           return newItem;
+        }
+        if (item.selected) {
+          isSelectedChanged = true;
         }
         return item;
       });
@@ -164,15 +171,12 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
       }
     }
 
-    if (
-      equals(result[key], newValue) &&
-      equals(result[key]?.selected, newValue?.selected)
-    ) {
-      continue;
+    const isChanged = key !== "selected" && !equals(result[key], newValue);
+    if (isChanged || isSelectedChanged) {
+      changed = changed || isChanged;
+      result = { ...result, [key]: newValue };
     }
-
-    result = { ...result, [key]: newValue };
   }
 
-  return target === result ? target : { ...result, _dirty: true };
+  return changed ? { ...result, _dirty: true } : result;
 }
