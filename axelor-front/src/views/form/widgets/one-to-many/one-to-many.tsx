@@ -243,12 +243,13 @@ export function OneToMany({
           shouldSearch.current = true;
           return;
         }
-        const ids = (value || [])
-          .filter((v) => (v?.id ?? 0) > 0 && !v._dirty)
+        const items = value || [];
+        const names = options?.fields ?? [];
+
+        const ids = items
+          .filter((v) => names.some((n) => v[n] === undefined))
+          .filter((v) => (v.id ?? 0) > 0)
           .map((v) => v.id);
-        const changedRecords = (value || []).filter(
-          ({ id }) => !ids.includes(id),
-        );
 
         let records: DataRecord[] = [];
         let page = dataStore.page;
@@ -275,7 +276,12 @@ export function OneToMany({
           records = res.records;
         }
 
-        setRecords([...records, ...changedRecords]);
+        const newItems = items.map((item) => {
+          const fetched = records.find((x) => x.id === item.id);
+          return fetched ? { ...fetched, ...item } : item;
+        });
+
+        setRecords(newItems);
 
         return {
           page,
