@@ -217,8 +217,15 @@ export function createScriptContext(
 
   return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
-      if (p === "record") return target;
+      if (p === "record") return receiver;
       if (p in helpers) return helpers[p as keyof typeof helpers];
+
+      // check access of dummy field without `$` prefix and warn
+      if (typeof p === "string" && Reflect.has(target, `$${p}`)) {
+        console.warn(`Trying to access dummy field "$${p}" as "${p}"?`);
+        return undefined;
+      }
+
       const value = Reflect.get(target, p, receiver) ?? get(target, p);
       if (p === "id" && value && value <= 0) {
         return null;
