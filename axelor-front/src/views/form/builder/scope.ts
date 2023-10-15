@@ -13,6 +13,7 @@ import {
 import { isCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { View } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names";
 import {
   ActionAttrData,
   ActionData,
@@ -378,12 +379,22 @@ function useActionValue({
   formAtom: FormAtom;
   actionHandler: ActionHandler;
 }) {
+  const { findItem } = useViewMeta();
+
+  const canDirty = useCallback(
+    (target: string) => {
+      const field = findItem(target);
+      return field?.canDirty !== false && !isCleanDummy(target);
+    },
+    [findItem],
+  );
+
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "value", []),
     useAtomCallback(
       useCallback(
         (get, set, data) => {
-          const { record, fields } = get(formAtom);
+          const { record } = get(formAtom);
           const { target, value, op } = data;
           let newRecord = record;
 
@@ -391,8 +402,9 @@ function useActionValue({
             newRecord = produce(record, (draft) => {
               if (target.includes(".")) {
                 const fieldName = target.split(".")[0];
-                const field = fields?.[fieldName];
-                if (field?.type.endsWith("TO_MANY")) {
+                const field = findItem(fieldName);
+                const type = toKebabCase(field?.serverType ?? field?.widget);
+                if (type?.endsWith("-to-many")) {
                   draft[fieldName]?.forEach?.((item: DataRecord) => {
                     setDeep(item, target.slice(fieldName.length + 1), value);
                   });
@@ -433,12 +445,12 @@ function useActionValue({
           if (record !== newRecord) {
             set(formAtom, (prev) => ({
               ...prev,
+              dirty: prev.dirty || canDirty(target),
               record: newRecord,
-              ...(!isCleanDummy(target) && { dirty: true }),
             }));
           }
         },
-        [formAtom],
+        [canDirty, findItem, formAtom],
       ),
     ),
     actionHandler,
@@ -452,32 +464,41 @@ function useActionRecord({
   formAtom: FormAtom;
   actionHandler: ActionHandler;
 }) {
+  const { findItem } = useViewMeta();
+
+  const canDirty = useCallback(
+    (target: string) => {
+      const field = findItem(target);
+      return field?.canDirty !== false && !isCleanDummy(target);
+    },
+    [findItem],
+  );
+
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "record" && Boolean(x.value), []),
     useAtomCallback(
       useCallback(
         (get, set, data) => {
           const record = get(formAtom).record;
-          if (data.value) {
-            const values = Object.entries(data.value).reduce(
-              (acc, [k, v]) => ({
-                ...acc,
-                [k]: processActionValue(v),
-              }),
-              {},
+          const values = Object.entries(data.value).reduce(
+            (acc, [k, v]) => ({
+              ...acc,
+              [k]: processActionValue(v),
+            }),
+            {} as DataRecord,
+          );
+          const result = { ...record, ...values };
+          const isDirty = () =>
+            Object.entries(values).some(
+              ([k, v]) => record[k] !== v && canDirty(k),
             );
-            const hasChanged = Object.keys(values).some(
-              (k) =>
-                !isCleanDummy(k) && record[k] !== (values as DataRecord)[k],
-            );
-            set(formAtom, (prev) => ({
-              ...prev,
-              ...(hasChanged && { dirty: true }),
-              record: { ...record, ...values },
-            }));
-          }
+          set(formAtom, (prev) => ({
+            ...prev,
+            dirty: prev.dirty || isDirty(),
+            record: result,
+          }));
         },
-        [formAtom],
+        [canDirty, formAtom],
       ),
     ),
     actionHandler,
