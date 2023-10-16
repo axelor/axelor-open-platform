@@ -1,7 +1,7 @@
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 
-import { request } from "./client";
+import { RequestOptions, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 import {
   ActionView,
@@ -52,6 +52,7 @@ async function processActionResult(data: ActionResult) {
 export async function actionView(
   name: string,
   context?: DataContext,
+  options?: RequestOptions,
 ): Promise<ActionView> {
   const url = `ws/action/${name}`;
   const data = context ? { context } : undefined;
@@ -71,7 +72,7 @@ export async function actionView(
       !view && data?.map?.(processActionResult);
       return view ?? null;
     }
-    return reject(data);
+    return reject(options?.silent ? null : data);
   }
 
   return Promise.reject(resp.status);

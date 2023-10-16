@@ -1,6 +1,6 @@
 import { LoadingCache } from "@/utils/cache";
 
-import { request } from "./client";
+import { request, RequestOptions } from "./client";
 import { DataContext } from "./data.types";
 import {
   actionView as fetchAction,
@@ -19,10 +19,11 @@ const makeKey = (...args: any[]) => args.map((x) => x || "").join(":");
 
 export async function findActionView(
   name: string,
-  context?: DataContext
+  context?: DataContext,
+  options?: RequestOptions,
 ): Promise<ActionView> {
-  return fetchAction(name, context).then((view) =>
-    view ? { ...view, name } : view
+  return fetchAction(name, context, options).then((view) =>
+    view ? { ...view, name } : view,
   );
 }
 
@@ -68,10 +69,10 @@ export async function findView<T extends ViewType>({
 
 export async function findFields(
   model: string,
-  jsonModel?: string
+  jsonModel?: string,
 ): Promise<MetaData> {
   return cache.get(makeKey("meta", model, jsonModel), () =>
-    fetchFields(model, jsonModel)
+    fetchFields(model, jsonModel),
   );
 }
 

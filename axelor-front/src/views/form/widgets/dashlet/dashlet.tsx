@@ -62,7 +62,9 @@ export function DashletComponent({
   const load = useAfterActions(
     useCallback(async () => {
       const context = getContext?.();
-      const actionView = await findActionView(action, context);
+      const actionView = await findActionView(action, context, {
+        silent: true,
+      });
       const ctx = {
         ...actionView.context,
         ...context,
