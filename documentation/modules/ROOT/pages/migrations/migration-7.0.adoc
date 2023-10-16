@@ -61,3 +61,18 @@ to encrypt it :
 - `com.axelor.auth.AuthService.encrypt(java.lang.Object, java.util.Map)` : Adapter method to be used with csv/xml data
 import in order to encrypt the password of the given user.
 
+=== MailFlags table changes
+
+The flag associated to the user and message is now retrieved on backend. This avoids duplicated mail flags after
+reflagging messages. As part of the change, the message is also required and indexes as been reviewed.
+
+Run following SQL script to adjust MailFlag table changes :
+
+[source,sql]
+----
+ALTER TABLE mail_flags ALTER COLUMN MESSAGE SET NOT NULL;
+DROP INDEX mail_flags_message_idx;
+DROP INDEX mail_flags_user_id_idx;
+CREATE INDEX mail_flags_user_id_message_idx ON mail_flags (user_id, message);
+----
+

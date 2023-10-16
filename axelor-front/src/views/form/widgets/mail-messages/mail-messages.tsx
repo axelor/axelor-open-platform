@@ -65,10 +65,9 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       const pushUnread = (messages: Message[]) => {
         for (const message of messages) {
           const { $flags, $children } = message;
-          const { isRead, version: _version, ...rest } = $flags ?? {};
+          const { isRead } = $flags ?? {};
           if (!isRead) {
             allFlags.push({
-              ...rest,
               isRead: true,
               messageId: message.id,
             } as MessageFlag);
@@ -93,11 +92,12 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       }
 
       // Merge flags with updated values
-      for (let i = 0; i < allFlags.length; ++i) {
-        const { id, version: _version, ...rest } = allFlags[i];
-        const updated = allUpdatedFlags[i];
-        if (!id || id === updated.id) {
-          allFlags[i] = { id, ...rest, ...updated };
+      for (let i = 0; i < allUpdatedFlags.length; ++i) {
+        const flag = allFlags.find(
+          (x) => x.messageId === allUpdatedFlags[i].messageId,
+        );
+        if (flag) {
+          Object.assign(flag, allUpdatedFlags[i]);
         }
       }
 
@@ -127,10 +127,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
             console.error(`Failed to find message ${flags.messageId}`);
             continue;
           }
-          const { $flags } = message;
-          const { version: _version, ...rest } = $flags ?? {};
           message.$flags = {
-            ...rest,
             isRead: true,
             ...flags,
           } as MessageFlag;
@@ -252,8 +249,6 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       const allUpdatedFlags = await DataSource.flags([
         {
           ...attrs,
-          id: attrs.id!,
-          version: undefined,
           messageId: msg.id,
         },
       ]);
@@ -261,7 +256,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       const updatedFlags = allUpdatedFlags?.[0];
 
       // handle error in update messages
-      if (!updatedFlags || (attrs.id && attrs.id !== updatedFlags.id)) {
+      if (!updatedFlags || !updatedFlags.messageId) {
         console.error(`Failed to flag message ${msg.id}`);
         return;
       }
@@ -270,7 +265,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
         fetchTags();
       }
 
-      const flag = { ...attrs, version: undefined, ...updatedFlags };
+      const flag = { ...attrs, ...updatedFlags };
 
       if (reload) {
         fetchAll({ offset: 0, limit }, true);

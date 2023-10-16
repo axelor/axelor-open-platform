@@ -52,11 +52,12 @@
     <![CDATA[
     The model to store message flags like unread, starred, voted etc.
     ]]>
-    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" />
-    <many-to-one name="message" ref="MailMessage" />
+    <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" initParam="true" index="false"/>
+    <many-to-one name="message" ref="MailMessage" required="true" initParam="true" index="false"/>
     <boolean name="isStarred" />
     <boolean name="isRead" />
     <boolean name="isArchived" />
+    <index columns="user,message"/>
   </entity>
 
   <entity name="MailFollower" table="MAIL_FOLLOWER" cacheable="true" repository="none">

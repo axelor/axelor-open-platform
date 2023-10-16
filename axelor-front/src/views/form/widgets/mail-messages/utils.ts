@@ -92,7 +92,7 @@ export const DataSource = (() => {
       const {
         status,
         data,
-      }: { status: number; data?: Partial<MessageFlag>[] } = await resp.json();
+      }: { status: number; data?: MessageFlag[] } = await resp.json();
       if (status === 0) {
         return data;
       }

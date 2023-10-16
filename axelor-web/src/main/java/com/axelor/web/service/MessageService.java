@@ -20,6 +20,7 @@ package com.axelor.web.service;
 
 import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -30,6 +31,7 @@ import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailFlagsRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.web.MailController;
 import com.axelor.rpc.ActionRequest;
@@ -316,7 +318,20 @@ public class MessageService extends AbstractService {
       if (flag != null) {
         counting++;
         flag = JpaRepository.of(MailFlags.class).save(flag);
-        map = Map.of("id", flag.getId(), "version", flag.getVersion());
+        map =
+            Map.of(
+                "id",
+                flag.getId(),
+                "version",
+                flag.getVersion(),
+                "messageId",
+                flag.getMessage().getId(),
+                "isStarred",
+                flag.getIsStarred(),
+                "isRead",
+                flag.getIsRead(),
+                "isArchived",
+                flag.getIsArchived());
       } else {
         map = Collections.emptyMap();
       }
@@ -332,14 +347,14 @@ public class MessageService extends AbstractService {
   }
 
   private MailFlags flagMessage(Map<String, Object> record) {
-    MailFlags flag = getFlag(record.get("id"));
+    MailMessage message = getMessage(record.get("messageId"));
+    if (message == null) {
+      return null;
+    }
+    User user = AuthUtils.getUser();
+    MailFlags flag = Beans.get(MailFlagsRepository.class).findBy(message, user);
     if (flag == null) {
-      flag = new MailFlags();
-      flag.setUser(AuthUtils.getUser());
-      flag.setMessage(getMessage(record.get("messageId")));
-      if (flag.getMessage() == null) {
-        return null;
-      }
+      flag = new MailFlags(user, message);
     }
 
     try {
@@ -395,14 +410,6 @@ public class MessageService extends AbstractService {
   private MailMessage getMessage(Object id) {
     try {
       return JPA.find(MailMessage.class, Long.parseLong(id.toString()));
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-  private MailFlags getFlag(Object id) {
-    try {
-      return JPA.find(MailFlags.class, Long.parseLong(id.toString()));
     } catch (Exception e) {
       return null;
     }

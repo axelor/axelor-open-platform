@@ -34,17 +34,17 @@ export function MessageMenu({
   }
 
   function onRead() {
-    onAction({ ...$flags!, isRead: !isRead });
+    onAction({ isRead: !isRead });
     onClose();
   }
 
   function onStarred() {
-    onAction({ ...$flags!, isStarred: !isStarred });
+    onAction({ isStarred: !isStarred });
     onClose();
   }
 
   function onArchived() {
-    onAction({ ...$flags!, isArchived: !isArchived }, true);
+    onAction({ isArchived: !isArchived }, true);
     onClose();
   }
 
@@ -77,7 +77,7 @@ export function MessageMenu({
           as="span"
           aria-describedby={id}
           aria-label="open"
-          className={clsx(styles.icon, styles['pull-right'])}
+          className={clsx(styles.icon, styles["pull-right"])}
           onClick={onOpen}
         >
           <MaterialIcon icon="arrow_drop_down" />

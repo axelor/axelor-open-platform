@@ -19,12 +19,10 @@ export type MessageFile = {
 };
 
 export type MessageFlag = {
-  id: number;
-  version?: number;
   isArchived?: boolean;
   isRead?: boolean;
   isStarred?: boolean;
-  messageId?: number;
+  messageId: number;
 };
 
 export type MessageBodyTag = {
