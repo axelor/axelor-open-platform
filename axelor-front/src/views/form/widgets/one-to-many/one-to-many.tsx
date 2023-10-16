@@ -75,6 +75,7 @@ export function OneToMany({
     widgetAttrs,
     canExport = widgetAttrs.canExport,
     canCopy = widgetAttrs.canCopy,
+    perms,
   } = schema;
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
@@ -151,7 +152,7 @@ export function OneToMany({
     ),
   );
 
-  const { hasButton } = usePermission(schema, widgetAtom);
+  const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
@@ -205,10 +206,6 @@ export function OneToMany({
     );
   }, [fields, model, schema, viewData]);
 
-  const editable =
-    (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
-    !readonly;
-
   const getContext = usePrepareContext(formAtom);
 
   const showEditor = useEditor();
@@ -216,6 +213,20 @@ export function OneToMany({
   const showSelector = useSelector();
   const [state, setState] = useGridState();
   const dataStore = useMemo(() => new DataStore(model), [model]);
+
+  const { editRow, selectedRows, rows } = state;
+
+  const canNew = !readonly && hasButton("new");
+  const canEdit = !readonly && hasButton("edit");
+  const canView = hasButton("view");
+  const canDelete = !readonly && hasButton("remove");
+  const canSelect = !readonly && hasButton("select");
+  const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
+
+  const editable =
+    (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable) &&
+    !readonly &&
+    canEdit;
 
   const clearSelection = useCallback(() => {
     setState((draft) => {
@@ -481,7 +492,6 @@ export function OneToMany({
     reorderRef.current = true;
   }, []);
 
-  const { editRow, selectedRows, rows } = state;
   const hasRowSelected = !!selectedRows?.length;
   const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
   const editRecord =
@@ -583,13 +593,6 @@ export function OneToMany({
   }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
 
   if (viewState === "loading") return null;
-
-  const canNew = !readonly && hasButton("new");
-  const canEdit = !readonly && hasButton("edit");
-  const canView = hasButton("view");
-  const canDelete = !readonly && hasButton("remove");
-  const canSelect = !readonly && hasButton("select");
-  const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
 
   return (
     <>
