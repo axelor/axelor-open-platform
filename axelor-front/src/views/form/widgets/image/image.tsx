@@ -23,7 +23,7 @@ export function Image(
   const imageRef = useRef<HTMLImageElement>(null);
   const [value, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, hidden },
   } = useAtomValue(widgetAtom);
 
   const recordAtom = useMemo(
@@ -98,6 +98,8 @@ export function Image(
   const { target, name } = isBinary
     ? { target: parentModel, name: schema.name }
     : schema;
+  
+  if (hidden) return null;
 
   return (
     <FieldControl {...props}>

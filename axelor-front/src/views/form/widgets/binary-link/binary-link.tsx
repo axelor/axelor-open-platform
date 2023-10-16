@@ -20,10 +20,11 @@ import {
 import styles from "./binary-link.module.scss";
 
 export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
-  const { schema, readonly, invalid, formAtom, valueAtom } = props;
+  const { schema, readonly, invalid, formAtom, widgetAtom, valueAtom } = props;
   const { name, accept, $json } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
+  const { attrs } = useAtomValue(widgetAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -93,6 +94,8 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   }
 
   const text = value?.fileName;
+
+  if (attrs.hidden) return null;
 
   return (
     <FieldControl {...props}>
