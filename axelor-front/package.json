@@ -77,7 +77,8 @@
   "pnpm": {
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
-      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch"
+      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch",
+      "@vitejs/plugin-legacy@4.1.1": "patches/@vitejs__plugin-legacy@4.1.1.patch"
     },
     "peerDependencyRules": {
       "ignoreMissing": [

@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@vitejs/plugin-legacy@4.1.1':
+    hash: pn7u3sa6racjlvbnvukxzotwxi
+    path: patches/@vitejs__plugin-legacy@4.1.1.patch
   bootstrap-sass@2.3.2:
     hash: amlqeundhlkijzm252e5cmoznm
     path: patches/bootstrap-sass@2.3.2.patch
@@ -146,7 +149,7 @@ devDependencies:
     version: 6.7.2(eslint@8.49.0)(typescript@5.2.2)
   '@vitejs/plugin-legacy':
     specifier: ^4.1.1
-    version: 4.1.1(terser@5.21.0)(vite@4.4.9)
+    version: 4.1.1(patch_hash=pn7u3sa6racjlvbnvukxzotwxi)(terser@5.21.0)(vite@4.4.9)
   '@vitejs/plugin-react':
     specifier: ^4.0.4
     version: 4.0.4(vite@4.4.9)
@@ -2780,7 +2783,7 @@ packages:
       eslint-visitor-keys: 3.4.3
     dev: true
 
-  /@vitejs/plugin-legacy@4.1.1(terser@5.21.0)(vite@4.4.9):
+  /@vitejs/plugin-legacy@4.1.1(patch_hash=pn7u3sa6racjlvbnvukxzotwxi)(terser@5.21.0)(vite@4.4.9):
     resolution: {integrity: sha512-um3gbVouD2Q/g19C0qpDfHwveXDCAHzs8OC3e9g6aXpKoD1H14himgs7wkMnhAynBJy7QqUoZNAXDuqN8zLR2g==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -2799,6 +2802,7 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+    patched: true
 
   /@vitejs/plugin-react@4.0.4(vite@4.4.9):
     resolution: {integrity: sha512-7wU921ABnNYkETiMaZy7XqpueMnpu5VxvVps13MjmCo+utBdD79sZzrApHawHtVX66cCJQQTXFcjH0y9dSUK8g==}
