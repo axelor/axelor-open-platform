@@ -379,6 +379,19 @@ function useActionAttrs({
   );
 }
 
+function useCanDirty() {
+  const { findItem } = useViewMeta();
+  const canDirty = useCallback(
+    (target: string) => {
+      const field = findItem(target);
+      if (field?.name === "selected") return false;
+      return field?.canDirty !== false && !isCleanDummy(target);
+    },
+    [findItem],
+  );
+  return canDirty;
+}
+
 function useActionValue({
   formAtom,
   actionHandler,
@@ -387,14 +400,7 @@ function useActionValue({
   actionHandler: ActionHandler;
 }) {
   const { findItem } = useViewMeta();
-
-  const canDirty = useCallback(
-    (target: string) => {
-      const field = findItem(target);
-      return field?.canDirty !== false && !isCleanDummy(target);
-    },
-    [findItem],
-  );
+  const canDirty = useCanDirty();
 
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "value", []),
@@ -471,16 +477,7 @@ function useActionRecord({
   formAtom: FormAtom;
   actionHandler: ActionHandler;
 }) {
-  const { findItem } = useViewMeta();
-
-  const canDirty = useCallback(
-    (target: string) => {
-      const field = findItem(target);
-      return field?.canDirty !== false && !isCleanDummy(target);
-    },
-    [findItem],
-  );
-
+  const canDirty = useCanDirty();
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "record" && Boolean(x.value), []),
     useAtomCallback(
@@ -496,6 +493,7 @@ function useActionRecord({
           );
           const result = updateRecord(record, values);
           const isDirty = () =>
+            result._dirty &&
             Object.entries(values).some(
               ([k, v]) => record[k] !== v && canDirty(k),
             );
