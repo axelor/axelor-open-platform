@@ -235,6 +235,59 @@ export function OneToMany({
     });
   }, [setState]);
 
+  const onRowSelectionChange = useAtomCallback(
+    useCallback(
+      (get, set, selection: number[]) => {
+        const items = get(valueAtom) ?? [];
+        if (items.length === 0) return;
+
+        const ids = selection
+          .map((x) => state.rows[x].record?.id as number)
+          .filter(Boolean);
+
+        const cur = items
+          .filter((x) => x.selected)
+          .map((x) => x.id!)
+          .filter(Boolean);
+
+        const a1 = [...ids].sort();
+        const b1 = [...cur].sort();
+
+        if (isEqual(a1, b1)) {
+          return;
+        }
+
+        const next = items.map((x) => ({
+          ...x,
+          selected: ids.includes(x.id!),
+        }));
+
+        set(valueAtom, next, false, false);
+      },
+      [state.rows, valueAtom],
+    ),
+  );
+
+  useEffect(() => {
+    const items = value ?? [];
+    const ids = items
+      .filter((x) => x.selected)
+      .map((x) => x.id!)
+      .filter(Boolean);
+    const selectedRows = state.rows
+      .map((row, i) => {
+        if (ids.includes(row.record?.id)) {
+          return i;
+        }
+        return undefined;
+      })
+      .filter((x) => x !== undefined) as number[];
+
+    setState((draft) => {
+      draft.selectedRows = selectedRows;
+    });
+  }, [setState, state.rows, value]);
+
   const onSearch = useAfterActions(
     useCallback(
       async (options?: SearchOptions) => {
@@ -722,6 +775,7 @@ export function OneToMany({
             onSave={isManyToMany ? onSaveRecord : onSave}
             onSearch={onSearch}
             onRowReorder={onRowReorder}
+            onRowSelectionChange={onRowSelectionChange}
             {...(!canNew &&
               editable && {
                 onRecordAdd: undefined,
