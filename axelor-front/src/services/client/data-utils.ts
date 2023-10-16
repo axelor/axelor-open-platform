@@ -7,7 +7,16 @@ import { DataRecord } from "./data.types";
  *
  */
 export function isDummy(name: string, fieldNames: string[]) {
-  return !fieldNames.includes(name) && !["id", "version"].includes(name);
+  return (
+    // in model
+    !fieldNames.includes(name) &&
+    // id and version may not be in fieldNames
+    !["id", "version"].includes(name) &&
+    // special case for enum fields
+    !(name.endsWith("$value") && fieldNames.includes(name.slice(0, -6))) &&
+    // extra data
+    !["$attachments", "$processInstanceId", "_dirty"].includes(name)
+  );
 }
 
 export function extractDummy(
