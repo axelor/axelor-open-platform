@@ -77,11 +77,13 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
   const actionView = useViewAction();
   const recordRef = useRef<DataRecord>();
   const contextRef = useRef<DataContext>();
+  const statesByNameRef = useRef<Record<string, WidgetState>>({});
+
   return useAtomCallback(
     useCallback(
       (get, set) => {
-        const { meta, record, parent } = get(formAtom);
-        if (recordRef.current === record) {
+        const { meta, record, statesByName, parent } = get(formAtom);
+        if (recordRef.current === record && statesByName === statesByNameRef.current) {
           return contextRef.current;
         }
 
@@ -101,6 +103,7 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
           ...ctx,
           ...options,
         });
+        statesByNameRef.current = statesByName;
         recordRef.current = record;
         contextRef.current = res;
         return res;
