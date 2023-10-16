@@ -119,6 +119,9 @@
       },
       "invalid_focus": {
         "shadow": "none"
+      },
+      "placeholder": {
+        "color": "var(--bs-tertiary-color)"
       }
     }
   }
