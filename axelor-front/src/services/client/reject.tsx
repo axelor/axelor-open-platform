@@ -1,5 +1,6 @@
 import { dialogs } from "@/components/dialogs";
 
+import { alerts } from "@/components/alerts";
 import { Box, Button } from "@axelor/ui";
 import { i18n } from "./i18n";
 import { session } from "./session";
@@ -15,8 +16,18 @@ export type ErrorReport = {
   constraints?: Record<string, string>;
 };
 
-export function reject(data: number | string | ErrorReport) {
-  if (typeof data === "number") {
+export type RejectType = number | string | ErrorReport | null;
+
+export function reject(data: RejectType) {
+  return handleReject(data);
+}
+
+export function rejectAsAlert(data: RejectType) {
+  return handleReject(data, showAlert);
+}
+
+function handleReject(data: RejectType, showError = showDialog) {
+  if (typeof data === "number" || data == null) {
     return Promise.reject(data);
   }
 
@@ -33,13 +44,31 @@ export function reject(data: number | string | ErrorReport) {
 
   const canShowStack = !!session.info?.user?.technical;
 
+  showError({
+    title,
+    message,
+    stacktrace: canShowStack ? stacktrace : undefined,
+  });
+
+  return Promise.reject(500);
+}
+
+const showDialog = ({
+  title,
+  message,
+  stacktrace,
+}: {
+  title: string;
+  message?: string;
+  stacktrace?: string;
+}) => {
   dialogs.box({
     title,
     content: message,
     yesNo: false,
     footer: () => (
       <Box flex={1}>
-        {stacktrace && canShowStack && (
+        {stacktrace && (
           <Button
             variant="secondary"
             onClick={() =>
@@ -62,6 +91,8 @@ export function reject(data: number | string | ErrorReport) {
       </Box>
     ),
   });
+};
 
-  return Promise.reject(500);
-}
+const showAlert = ({ title, message }: { title: string; message?: string }) => {
+  alerts.error({ title, message });
+};

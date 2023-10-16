@@ -1,5 +1,5 @@
-import { dialogs } from "@/components/dialogs";
 import { alerts } from "@/components/alerts";
+import { dialogs } from "@/components/dialogs";
 
 import { request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
@@ -14,7 +14,7 @@ import {
   SavedFilter,
   ViewTypes,
 } from "./meta.types";
-import { reject } from "./reject";
+import { rejectAsAlert as reject } from "./reject";
 
 export type MenuType = "all" | "quick" | "fav";
 
@@ -51,7 +51,7 @@ async function processActionResult(data: ActionResult) {
 
 export async function actionView(
   name: string,
-  context?: DataContext
+  context?: DataContext,
 ): Promise<ActionView> {
   const url = `ws/action/${name}`;
   const data = context ? { context } : undefined;
@@ -179,7 +179,7 @@ export interface ViewData<T> extends Partial<MetaData> {
 
 export async function fields(
   model: string,
-  jsonModel?: string
+  jsonModel?: string,
 ): Promise<MetaData> {
   const resp = await request({
     url: `ws/meta/fields/${model}${jsonModel ? `?jsonModel=${jsonModel}` : ""}`,
@@ -194,7 +194,7 @@ export async function fields(
           acc[field.name] = field;
           return acc;
         },
-        {} as Record<string, Property>
+        {} as Record<string, Property>,
       );
     }
     return status === 0 ? data : reject(data);
@@ -205,7 +205,7 @@ export async function fields(
 
 export async function view<
   T extends keyof ViewTypes,
-  V = ViewTypes[T]
+  V = ViewTypes[T],
 >(options: {
   type: T;
   name?: string;
@@ -237,7 +237,7 @@ export async function view<
 export async function chart<T = ChartView>(
   name: string,
   data?: DataContext,
-  dataset = false
+  dataset = false,
 ): Promise<T> {
   const resp = await request({
     url: `ws/meta/chart/${name}`,
@@ -258,7 +258,7 @@ export async function chart<T = ChartView>(
 
 export async function custom(
   name: string,
-  data?: DataContext
+  data?: DataContext,
 ): Promise<{
   data: DataRecord[];
   first?: DataRecord;
