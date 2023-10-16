@@ -513,6 +513,11 @@ const FormContainer = memo(function FormContainer({
         const { record } = formState;
         const fieldNames = Object.keys(meta.fields ?? {});
         const dummy = extractDummy(record, fieldNames);
+        const dummyVals = Object.entries(dummy).reduce((acc, [k, v]) => {
+          return k.startsWith("$")
+            ? { ...acc, [k.substring(1)]: v }
+            : { ...acc, [k]: v };
+        }, {});
 
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
@@ -526,6 +531,7 @@ const FormContainer = memo(function FormContainer({
 
         let res = await dataStore.save(
           {
+            ...dummyVals,
             ...processDataRecord(vals),
             _original: original, // pass original values to check for concurrent updates
           },
