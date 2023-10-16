@@ -275,7 +275,7 @@ const format: Formatter = (value, opts = {}) => {
   let name = props?.name;
 
   if (context && val === undefined) {
-    if ((props as JsonField).jsonField) {
+    if (props && (props as JsonField).jsonField) {
       const { jsonField, jsonPath } = props as JsonField;
       val = _.get(
         getJSON(_.get(context, jsonField as string)),
