@@ -217,12 +217,19 @@ export function createScriptContext(
 
   return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
-      if (p === "record") return receiver;
+      if (p === "record") {
+        if (session?.info?.application?.mode != 'prod') {
+          console.warn(`Trying to access field with "record." prefix. This is deprecated and support will be removed in next major version.`);
+        }
+        return receiver;
+      }
       if (p in helpers) return helpers[p as keyof typeof helpers];
 
       // check access of dummy field without `$` prefix and warn
       if (typeof p === "string" && Reflect.has(target, `$${p}`)) {
-        console.warn(`Trying to access dummy field "$${p}" as "${p}"?`);
+        if (session?.info?.application?.mode != 'prod') {
+          console.warn(`Trying to access dummy field "$${p}" as "${p}". Use "$${p}" instead.`);
+        }
         return undefined;
       }
 
