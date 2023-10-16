@@ -29,7 +29,14 @@ import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
 
 export function ManyToOne(props: FieldProps<DataRecord>) {
-  const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
+  const {
+    schema,
+    formAtom,
+    valueAtom,
+    widgetAtom,
+    readonly: _readonly,
+    invalid,
+  } = props;
   const {
     target,
     targetName,
@@ -42,9 +49,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     gridView,
     limit,
     searchLimit,
+    perms,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const { hasButton } = usePermission(schema, widgetAtom);
+  const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain, hidden } = attrs;
@@ -77,11 +85,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [setValue, value],
   );
 
+  const hasEdit = hasButton("edit");
   const canView = value && hasButton("view");
-  const canEdit = value && hasButton("edit") && attrs.canEdit;
+  const canEdit = value && hasEdit && attrs.canEdit;
   const canNew = hasButton("new") && attrs.canNew;
   const canSelect = hasButton("select");
   const isRefLink = schema.widget === "ref-link";
+  const readonly = _readonly || !hasEdit;
 
   const { findItems: findFormItems } = useViewMeta();
 
