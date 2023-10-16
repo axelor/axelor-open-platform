@@ -13,7 +13,7 @@ type SelectOption = {
 
 export function BooleanSelect(props: FieldProps<boolean | null>) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { widgetAttrs, nullable } = schema;
+  const { widgetAttrs, nullable, placeholder } = schema;
   const {
     nullText = "\u00A0",
     falseText = i18n.get("No"),
@@ -59,6 +59,7 @@ export function BooleanSelect(props: FieldProps<boolean | null>) {
         optionLabel={(x) => x.title}
         optionEqual={(x, y) => x.value === y.value}
         clearIcon={false}
+        placeholder={placeholder}
       />
     </FieldControl>
   );

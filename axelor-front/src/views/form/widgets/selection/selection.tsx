@@ -40,6 +40,7 @@ export function Selection<Multiple extends boolean>(
     valueAtom,
   } = props;
 
+  const { placeholder } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const {
     attrs: { required, focus },
@@ -104,6 +105,7 @@ export function Selection<Multiple extends boolean>(
         onChange={handleChange}
         renderOption={renderOption}
         renderValue={renderValue}
+        placeholder={placeholder}
       />
     </FieldControl>
   );
