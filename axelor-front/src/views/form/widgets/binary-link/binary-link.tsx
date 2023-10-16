@@ -99,37 +99,43 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
 
   return (
     <FieldControl {...props}>
-      <Box>
-        {text && (
-          <Button variant="link" title={name} onClick={() => handleDownload()}>
-            {text}
-          </Button>
+      <Box d="flex">
+        {!readonly && (
+          <Box
+            d="flex"
+            justifyContent="center"
+            className={clsx(styles.container, { [styles.invalid]: invalid })}
+          >
+            <form ref={formRef}>
+              <Box
+                as={"input"}
+                onChange={handleInputChange}
+                type="file"
+                ref={inputRef}
+                d="none"
+                accept={accept}
+              />
+            </form>
+            <Button variant="light" size="sm" d="flex" alignItems="center">
+              <MaterialIcon icon="upload" onClick={handleUpload} />
+            </Button>
+            <Button variant="light" size="sm" d="flex" alignItems="center">
+              <MaterialIcon icon="close" onClick={handleRemove} />
+            </Button>
+          </Box>
         )}
-      </Box>
-      {!readonly && (
-        <Box
-          d="flex"
-          justifyContent="center"
-          className={clsx(styles.container, { [styles.invalid]: invalid })}
-        >
-          <form ref={formRef}>
-            <Box
-              as={"input"}
-              onChange={handleInputChange}
-              type="file"
-              ref={inputRef}
-              d="none"
-              accept={accept}
-            />
-          </form>
-          <Button variant="light" size="sm" d="flex" alignItems="center">
-            <MaterialIcon icon="upload" onClick={handleUpload} />
-          </Button>
-          <Button variant="light" size="sm" d="flex" alignItems="center">
-            <MaterialIcon icon="close" onClick={handleRemove} />
-          </Button>
+        <Box>
+          {text && (
+            <Button
+              variant="link"
+              title={name}
+              onClick={() => handleDownload()}
+            >
+              {text}
+            </Button>
+          )}
         </Box>
-      )}
+      </Box>
     </FieldControl>
   );
 }
