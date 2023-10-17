@@ -28,13 +28,6 @@ import { formatRecord, transformRecord } from "./utils";
 
 import styles from "./gantt.module.scss";
 
-const FILTERS: { key: GanttType; title: string }[] = [
-  { key: GANTT_TYPES.YEAR, title: i18n.get("Year") },
-  { key: GANTT_TYPES.MONTH, title: i18n.get("Month") },
-  { key: GANTT_TYPES.WEEK, title: i18n.get("Week") },
-  { key: GANTT_TYPES.DAY, title: i18n.get("Day") },
-];
-
 const connectSetTypes = {
   start_finish: "startToFinish",
   finish_finish: "finishToFinish",
@@ -384,6 +377,16 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   // register tab:refresh
   useViewTabRefresh("gantt", onSearch);
 
+  const FILTERS: { key: GanttType; title: string }[] = useMemo(
+    () => [
+      { key: GANTT_TYPES.YEAR, title: i18n.get("Year") },
+      { key: GANTT_TYPES.MONTH, title: i18n.get("Month") },
+      { key: GANTT_TYPES.WEEK, title: i18n.get("Week") },
+      { key: GANTT_TYPES.DAY, title: i18n.get("Day") },
+    ],
+    [],
+  );
+  
   return (
     <Box d="flex" className={styles.container} flex={1} flexDirection="column">
       <ViewToolBar

@@ -219,21 +219,28 @@ type SelectType = {
   title: string;
 };
 
-const CurrentSelection: SelectType[] = [
-  { name: "day", title: i18n.get("Day") },
-  { name: "week", title: i18n.get("Week") },
-  { name: "month", title: i18n.get("Month") },
-  { name: "quarter", title: i18n.get("Quarter") },
-  { name: "year", title: i18n.get("Year") },
-];
+let currentSelection: SelectType[];
+let pastOrNextSelection: SelectType[];
 
-const PastOrNextSelection: SelectType[] = [
-  { name: "day", title: i18n.get("Days") },
-  { name: "week", title: i18n.get("Weeks") },
-  { name: "month", title: i18n.get("Months") },
-  { name: "quarter", title: i18n.get("Quarters") },
-  { name: "year", title: i18n.get("Years") },
-];
+const getCurrentSelection: () => SelectType[] = () =>
+  currentSelection ||
+  (currentSelection = [
+    { name: "day", title: i18n.get("Day") },
+    { name: "week", title: i18n.get("Week") },
+    { name: "month", title: i18n.get("Month") },
+    { name: "quarter", title: i18n.get("Quarter") },
+    { name: "year", title: i18n.get("Year") },
+  ]);
+
+const getPastOrNextSelection: () => SelectType[] = () =>
+  pastOrNextSelection ||
+  (pastOrNextSelection = [
+    { name: "day", title: i18n.get("Days") },
+    { name: "week", title: i18n.get("Weeks") },
+    { name: "month", title: i18n.get("Months") },
+    { name: "quarter", title: i18n.get("Quarters") },
+    { name: "year", title: i18n.get("Years") },
+  ]);
 
 export function Widget({ type, operator, onChange, value, ...rest }: any) {
   const props = {
@@ -263,8 +270,8 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
           value: timeUnit,
           onChange: (value: any) => onChange({ name: "timeUnit", value }),
           options: ["$inCurrent"].includes(operator)
-            ? CurrentSelection
-            : PastOrNextSelection,
+            ? getCurrentSelection()
+            : getPastOrNextSelection(),
         };
         return <Select {...props} />;
       };

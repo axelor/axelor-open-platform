@@ -60,23 +60,27 @@ function formatter(column: Field, value: any, record: any) {
   });
 }
 
-const labels: Record<GridLabel, string> = {
-  Sum: i18n.get("Sum"),
-  Min: i18n.get("Min"),
-  Max: i18n.get("Max"),
-  Avg: i18n.get("Avg"),
-  Count: i18n.get("Count"),
-  items: i18n.get("items"),
-  Ungroup: i18n.get("Ungroup"),
-  Hide: i18n.get("Hide"),
-  Show: i18n.get("Show"),
-  Groups: i18n.get("Groups"),
-  "Sort Ascending": i18n.get("Sort Ascending"),
-  "Sort Descending": i18n.get("Sort Descending"),
-  "Group by": i18n.get("Group by"),
-  "Customize...": i18n.get("Customize..."),
-  "No records found.": i18n.get("No records found."),
-};
+let labels: Record<GridLabel, string>;
+
+const getLabels: () => Record<GridLabel, string> = () =>
+  labels ||
+  (labels = {
+    Sum: i18n.get("Sum"),
+    Min: i18n.get("Min"),
+    Max: i18n.get("Max"),
+    Avg: i18n.get("Avg"),
+    Count: i18n.get("Count"),
+    items: i18n.get("items"),
+    Ungroup: i18n.get("Ungroup"),
+    Hide: i18n.get("Hide"),
+    Show: i18n.get("Show"),
+    Groups: i18n.get("Groups"),
+    "Sort Ascending": i18n.get("Sort Ascending"),
+    "Sort Descending": i18n.get("Sort Descending"),
+    "Group by": i18n.get("Group by"),
+    "Customize...": i18n.get("Customize..."),
+    "No records found.": i18n.get("No records found."),
+  });
 
 export type GridHandler = {
   form?: RefObject<GridFormHandler>;
@@ -433,7 +437,7 @@ export const Grid = forwardRef<
     <AxGridProvider>
       <ScopeProvider scope={GridScope} value={{ readonly }}>
         <AxGrid
-          labels={labels}
+          labels={getLabels()}
           cellRenderer={CustomCellRenderer}
           rowRenderer={CustomRowRenderer}
           allowColumnResize

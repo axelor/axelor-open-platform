@@ -1,26 +1,17 @@
 import clsx from "clsx";
 import { ScopeProvider } from "jotai-molecules";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import {
   SyntheticEvent,
-  forwardRef,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import {
-  Badge,
-  Box,
-  DndProvider,
-  Input,
-  Link,
-  useDrag,
-  useDragLayer,
-} from "@axelor/ui";
+import { Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
 import { GridRow, GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -65,12 +56,11 @@ import {
   toStrongText,
 } from "./builder/utils";
 import { legacyClassNames } from "@/styles/legacy";
-import { DMSGridScope, useDMSGridHandlerAtom } from "./builder/handler";
+import { DMSGridScope } from "./builder/handler";
 import gridRowStyles from "../grid/renderers/row/row.module.css";
 import styles from "./dms.module.scss";
 import { DMSCustomDragLayer } from "./builder/dms-drag-layer";
 
-const ROOT: TreeRecord = { id: null, fileName: i18n.get("DMS.Home") };
 const UNDEFINED_ID = -1;
 
 const promptInput = async (
@@ -111,8 +101,16 @@ export function Dms(props: ViewProps<GridView>) {
 
   const popupRecord = action.params?.["_popup-record"];
 
+  const ROOT = useMemo<TreeRecord>(
+    () =>
+      popupRecord ?? {
+        id: null,
+        fileName: i18n.get("DMS.Home"),
+      },
+    [popupRecord],
+  );
   const [state, setState] = useGridState();
-  const [root, setRoot] = useState<TreeRecord>(popupRecord ?? ROOT);
+  const [root, setRoot] = useState<TreeRecord>(ROOT);
   const [detailsId, setDetailsId] = useState<TreeRecord["id"]>(null);
   const [showDetails, setDetailsPopup] = useState(false);
 
@@ -464,7 +462,7 @@ export function Dms(props: ViewProps<GridView>) {
     async (node: TreeRecord, _records: DataRecord[]) => {
       // skip drop if node is included in selected grid row
       if (_records.find((r) => r.id === node.id)) return;
-      
+
       const records = await dataStore.save(
         _records.map(({ id, version }) => ({
           id,

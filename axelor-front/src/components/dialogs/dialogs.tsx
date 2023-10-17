@@ -108,7 +108,7 @@ export namespace dialogs {
     yesTitle?: string;
     noTitle?: string;
   } & Pick<DialogOptions, "size" | "padding" | "footer">) {
-    const [cancelButton, confirmButton] = defaultButtons;
+    const [cancelButton, confirmButton] = getDefaultButtons();
     const buttons = yesNo
       ? [
           { ...cancelButton, title: noTitle ?? cancelButton.title },
@@ -231,7 +231,7 @@ function Dialogs() {
   );
 }
 
-const defaultButtons: DialogButton[] = [
+const getDefaultButtons: () => DialogButton[] = () => [
   {
     name: "cancel",
     title: i18n.get("Cancel"),
@@ -260,7 +260,7 @@ export function ModalDialog(props: DialogOptions) {
     header,
     footer,
     padding,
-    buttons = defaultButtons,
+    buttons = getDefaultButtons(),
     classes = {},
     closeable = true,
     onClose,
