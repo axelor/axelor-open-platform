@@ -67,7 +67,7 @@ function HandlePath() {
       pathRef.current = path;
       if (action && path) {
         const found = tabs.items.find((x) => x.action.name === action);
-        if (!found) {
+        if (!found || found !== tabs.active) {
           queue.add(() =>
             tabs.open(action, {
               route: { mode, id },
