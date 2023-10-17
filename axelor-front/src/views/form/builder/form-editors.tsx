@@ -1,6 +1,6 @@
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -29,6 +29,8 @@ import { MetaScope } from "@/view-containers/views/scope";
 import { ScopeProvider } from "jotai-molecules";
 import { isEqual } from "lodash";
 import { useGetErrors } from "../form";
+import { useAfterActions } from "./scope";
+
 import styles from "./form-editors.module.scss";
 
 export type FieldEditorProps = FieldProps<any>;
@@ -615,6 +617,32 @@ const RecordEditor = memo(function RecordEditor({
 
   useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
   useAsyncEffect(async () => load(), [load]);
+
+  const mountRef = useRef<boolean>();
+  const executeAction = useAfterActions(
+    useCallback(
+      async (action: string) => {
+        await actionExecutor.waitFor(100);
+        if (mountRef.current) {
+          actionExecutor.execute(action);
+        }
+      },
+      [actionExecutor],
+    ),
+  );
+
+  useEffect(() => {
+    mountRef.current = true;
+    return () => {
+      mountRef.current = false;
+    };
+  });
+
+  useEffect(() => {
+    const id = value?.id ?? 0;
+    const { onNew } = schema.editor;
+    if (id <= 0 && onNew) executeAction(onNew);
+  }, [value?.id, schema.editor, executeAction]);
 
   return (
     <ScopeProvider scope={MetaScope} value={meta}>
