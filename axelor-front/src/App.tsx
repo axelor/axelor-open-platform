@@ -13,7 +13,7 @@ function App() {
   const { dir, lang } = useAppLang();
 
   useEffect(() => {
-    document.documentElement.dir = lang;
+    document.documentElement.lang = lang;
     document.documentElement.dir = dir;
   }, [dir, lang]);
 
