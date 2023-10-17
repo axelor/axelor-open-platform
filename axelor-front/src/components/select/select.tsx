@@ -77,7 +77,7 @@ export const Select = forwardRef(function Select<
         if (fetchOptions) {
           const items = await fetchOptions(inputValue);
           loadTimerRef.current = undefined;
-          setItems(items);
+          setItems(items || []);
         }
       }, 300);
     },
