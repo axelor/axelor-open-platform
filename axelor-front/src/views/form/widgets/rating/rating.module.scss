@@ -1,0 +1,18 @@
+.container {
+  padding-bottom: 0.32rem !important;
+  padding-top: 0.32rem !important;
+  overflow: hidden;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+.iconHover:hover {
+  transition: all 0.2s;
+  transform: scale(1.2);
+}

@@ -93,6 +93,8 @@ export function processWidget(field: Schema) {
         "translatable",
         "hideModeSwitch",
         "selectionShowCheckbox",
+        "ratingFill",
+        "ratingHighlightSelected",
       ].indexOf(name) !== -1
     ) {
       val = String(value)?.toLowerCase?.() === "true";

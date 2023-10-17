@@ -87,6 +87,31 @@ for a fix scale, or a field name for a dynamic evaluation.
 <field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
 ----
 
+== Rating
+
+The rating widget is used for `integer` data fields. It provides ability to collect measurable
+opinions/experiences/feedbacks/...
+
+Rating widget supports following attributes :
+
+* `max`: the number of icon to display. Default to `5`.
+* `x-rating-icon`: https://icons.getbootstrap.com/[Bootstrap] icon to use. It also supports comma-separated list of icons. Default to `star`.
+* `x-rating-color`: color to use when checked. It also supports comma-separated list of colors.
+* `x-rating-fill`: whether the icon should use fill style when checked. Defaults to `true`.
+* `x-rating-highlight-selected`: whether to highlight only the selected icon. Defaults to `false`.
+
+[source,xml]
+----
+<field name="myRating" type="Integer" widget="Rating"/>
+<field name="myRating" type="Integer" widget="Rating" x-rating-icon="heart"/>
+<field name="myRating" type="Integer" widget="Rating" max="8" x-rating-icon="airplane"/>
+<field name="myRating" type="Integer" widget="Rating" x-rating-icon="1-square,2-square,3-square,4-square,5-square"/>
+<field name="myRating" type="Integer" widget="Rating" x-rating-icon="emoji-angry,emoji-frown,emoji-neutral,emoji-smile,emoji-laughing" x-rating-color="#d32f2f,#d32f2f,#ed6c02,#2e7d32,#2e7d32" x-rating-highlight-selected="true" x-rating-fill="false"/>
+----
+
+By default, `star` icon will be colored in yellow when checked and `heart` in pink. The record value of the first icon
+is `1`, the last is the one defined in `max` attribute. By clicking on the last checked icon, it reset the value to `0`.
+
 == DateTime
 
 The datetime widgets is used for `date` and `datetime` fields.

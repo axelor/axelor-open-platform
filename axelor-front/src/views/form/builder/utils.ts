@@ -44,7 +44,7 @@ const FIELD_WIDGETS: Record<string, string[]> = {
     "InlineCheckbox",
     "Toggle",
   ],
-  integer: ["Duration", "Progress"],
+  integer: ["Duration", "Progress", "Rating"],
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
   "many-to-one": ["BinaryLink", "Image", "SuggestBox"],
