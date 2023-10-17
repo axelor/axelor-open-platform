@@ -86,7 +86,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   );
 
   const hasEdit = hasButton("edit");
-  const canView = value && hasButton("view");
+  const hasView = hasButton("view");
+  const canView = value && hasView;
   const canEdit = value && hasEdit && attrs.canEdit;
   const canNew = hasButton("new") && attrs.canNew;
   const canSelect = hasButton("select");
@@ -97,7 +98,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const ensureRelated = useCallback(
     async (value: DataRecord, refetch?: boolean) => {
-      if (value && value.id && value.id > 0) {
+      if (value && value.id && value.id > 0 && hasView) {
         const name = schema.name;
         const prefix = name + ".";
         const items = findFormItems();
@@ -118,13 +119,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
             const rec = await ds.read(value.id, { fields: missing }, true);
             return { ...value, ...rec, version: undefined };
           } catch (er) {
-            return { ...value, [targetName]: value.id };
+            return { ...value, [targetName]: value[targetName] ?? value.id };
           }
         }
       }
       return value;
     },
-    [findFormItems, schema.name, target, targetName],
+    [findFormItems, hasView, schema.name, target, targetName],
   );
 
   const handleEdit = useCallback(
