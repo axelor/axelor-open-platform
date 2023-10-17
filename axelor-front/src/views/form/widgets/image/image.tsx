@@ -112,7 +112,7 @@ export function Image(
         maxH={100}
         className={clsx(styles.image, {
           [styles.editable]: schema.editable,
-          [styles.invalid]: invalid,
+          [styles.invalid]: !isBinary && !readonly && invalid,
         })}
       >
         <Box
