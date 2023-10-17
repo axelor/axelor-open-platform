@@ -156,7 +156,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
 
   // referencing another field in the context?
   if (currency) {
-    currency = (_.get(context, currency) as string) ?? currency;
+    currency = (_.get(context, currency) as string);
   }
 
   let num = +value;
