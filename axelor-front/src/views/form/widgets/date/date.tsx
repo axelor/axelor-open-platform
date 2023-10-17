@@ -5,6 +5,7 @@ import {
   MouseEvent,
   SyntheticEvent,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -186,14 +187,26 @@ export function DateComponent({
     [onChange, valueFormat, value],
   );
 
-  const dateValue = useMemo(
-    () => (value ? moment(value).toDate() : null),
-    [value],
-  );
+  const $date = useMemo(() => {
+    if (!value) return null;
+    const $m = moment(value);
+    return $m.isValid() ? $m : null;
+  }, [value]);
+
+  const dateValue = useMemo(() => ($date ? $date.toDate() : $date), [$date]);
+
   const textValue = useMemo(
-    () => (value ? moment(value).format(format) : ""),
-    [format, value],
+    () => ($date ? $date.format(format) : ""),
+    [format, $date],
   );
+
+  useEffect(() => {
+    // if value exist and it's invalid moment date value
+    // then it should reset to null
+    if (value && !$date) {
+      onChange(null, false);
+    }
+  }, [value, $date, onChange]);
 
   function render() {
     return (
