@@ -1,11 +1,14 @@
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import isEqual from "lodash/isEqual";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEditor, useSelector } from "@/hooks/use-relation";
+import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -16,20 +19,16 @@ import {
   Property,
   Schema,
 } from "@/services/client/meta.types";
+import { toKebabCase, toSnakeCase } from "@/utils/names";
+import { MetaScope } from "@/view-containers/views/scope";
 
+import { useGetErrors } from "../form";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { FieldProps, FormState, WidgetAtom } from "./types";
-import { nextId, processView } from "./utils";
-
-import { DataStore } from "@/services/client/data-store";
-import { toKebabCase, toSnakeCase } from "@/utils/names";
-import { MetaScope } from "@/view-containers/views/scope";
-import { ScopeProvider } from "jotai-molecules";
-import { isEqual } from "lodash";
-import { useGetErrors } from "../form";
 import { useAfterActions } from "./scope";
+import { FieldProps, FormState, ValueAtom, WidgetAtom } from "./types";
+import { nextId, processView } from "./utils";
 
 import styles from "./form-editors.module.scss";
 
@@ -275,6 +274,12 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     [required, setInvalid, widgetAtom],
   );
 
+  const { itemsFamily, items } = useItemsFamily({
+    valueAtom,
+    multiple: false,
+    canShowNew: !readonly,
+  });
+
   const titleActions = !readonly && (
     <div className={styles.actions}>
       {canEdit && hasValue && canShowIcon("edit") && (
@@ -294,22 +299,187 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   return (
     <FieldControl {...props} titleActions={titleActions}>
-      <RecordEditor
-        schema={schema}
-        editor={editor}
-        fields={fields}
-        formAtom={formAtom}
-        widgetAtom={widgetAtom}
-        valueAtom={valueAtom}
-        model={model}
-        readonly={readonly}
-        setInvalid={handleInvalid}
-      />
+      {items.map((item) => (
+        <RecordEditor
+          key={item.id}
+          schema={schema}
+          editor={editor}
+          fields={fields}
+          formAtom={formAtom}
+          widgetAtom={widgetAtom}
+          valueAtom={itemsFamily(item)}
+          model={model}
+          readonly={readonly}
+          setInvalid={handleInvalid}
+        />
+      ))}
     </FieldControl>
   );
 }
 
 const IS_NEW = Symbol("isNew");
+
+function useItemsFamily({
+  valueAtom,
+  exclusive,
+  multiple = true,
+  canShowNew = true,
+}: {
+  valueAtom: ValueAtom<DataRecord | DataRecord[]>;
+  exclusive?: string;
+  multiple?: boolean;
+  canShowNew?: boolean;
+}) {
+  const isNew = useCallback(
+    (item: DataRecord) => item && Reflect.get(item, IS_NEW),
+    [],
+  );
+
+  const isClean = useCallback((item: DataRecord) => {
+    return item && Object.keys(item).length === 1;
+  }, []);
+
+  const makeArray = useCallback((value: unknown): DataRecord[] => {
+    if (Array.isArray(value)) return value;
+    if (value) return [value];
+    return [];
+  }, []);
+
+  const itemsFamily = useMemo(() => {
+    return atomFamily(
+      (record: DataRecord) =>
+        atom(
+          (get) => {
+            const items = makeArray(get(valueAtom));
+            return items.find((x: DataRecord) => x.id === record.id);
+          },
+          (get, set, value: DataRecord) => {
+            if (isNew(value) && isClean(value)) return;
+            let items = makeArray(get(valueAtom));
+            const found = items.find((x) => x.id === value.id);
+            if (found) {
+              items = items.map((x) => (x.id === value.id ? value : x));
+            }
+            if (exclusive && found && value[exclusive]) {
+              items = items.map((item) => ({
+                ...item,
+                [exclusive]: item.id === value.id ? value[exclusive] : false,
+              }));
+            }
+            const next = multiple ? items : items[0] ?? null;
+            set(valueAtom, next);
+          },
+        ),
+      (a, b) => a.id === b.id,
+    );
+  }, [makeArray, valueAtom, isNew, isClean, exclusive, multiple]);
+
+  const itemsAtom = useMemo(() => {
+    return atom(
+      (get) => {
+        const value = get(valueAtom);
+        return makeArray(value);
+      },
+      (get, set, value: DataRecord[]) => {
+        const items = makeArray(value);
+        const next = multiple ? items : items[0] ?? null;
+        set(valueAtom, next);
+      },
+    );
+  }, [makeArray, multiple, valueAtom]);
+
+  const addItem = useAtomCallback(
+    useCallback(
+      (get, set, record: DataRecord = { id: nextId() }) => {
+        const items = get(itemsAtom);
+        if (multiple) {
+          const last = items[items.length - 1];
+          if (last && isClean(last)) return;
+          itemsFamily(record);
+          set(itemsAtom, [...items, record]);
+        } else {
+          items.forEach((item) => itemsFamily.remove(item));
+          itemsFamily(record);
+          set(itemsAtom, makeArray(record));
+        }
+      },
+      [isClean, itemsAtom, itemsFamily, makeArray, multiple],
+    ),
+  );
+
+  const syncItem = useAtomCallback(
+    useCallback(
+      (get, set, item: DataRecord) => {
+        itemsFamily.remove(item);
+        itemsFamily(item);
+        const items = get(itemsAtom);
+        const next = items.map((x) => (x.id === item.id ? item : x));
+        set(itemsAtom, next);
+      },
+      [itemsAtom, itemsFamily],
+    ),
+  );
+
+  const removeItem = useAtomCallback(
+    useCallback(
+      (get, set, record: DataRecord) => {
+        itemsFamily.remove(record);
+        const items = get(itemsAtom);
+        set(
+          itemsAtom,
+          items.filter((x) => x.id !== record.id),
+        );
+      },
+      [itemsAtom, itemsFamily],
+    ),
+  );
+
+  const ensureNew = useAtomCallback(
+    useCallback(
+      (get) => {
+        const items = get(itemsAtom);
+        if (items.length === 0) {
+          const record = {
+            id: nextId(),
+            [IS_NEW]: true,
+          };
+          addItem(record);
+        }
+      },
+      [addItem, itemsAtom],
+    ),
+  );
+
+  const ensureSync = useAtomCallback(
+    useCallback(
+      (get) => {
+        const items = get(itemsAtom);
+        const item = items[0];
+        if (isNew(item) && !isClean(item)) {
+          syncItem({ ...item, [IS_NEW]: undefined });
+        }
+      },
+      [isClean, isNew, itemsAtom, syncItem],
+    ),
+  );
+
+  const items = useAtomValue(itemsAtom);
+
+  useEffect(() => {
+    if (items.length === 0) ensureNew();
+    if (items.length === 1) ensureSync();
+  }, [ensureNew, ensureSync, items.length]);
+
+  return {
+    itemsFamily,
+    itemsAtom,
+    items,
+    addItem,
+    syncItem,
+    removeItem,
+    isClean,
+  };
+}
 
 function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
@@ -321,130 +491,36 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
     return items.find((x) => x.exclusive)?.name;
   }, [editor]);
 
-  const itemsAtom = useMemo(() => {
-    return atom(
-      (get) => (get(valueAtom) ?? []) as DataRecord[],
-      (get, set, update: SetStateAction<DataRecord[]>) => {
-        set(valueAtom, update);
-      },
-    );
-  }, [valueAtom]);
-
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const canNew = !readonly && hasButton("new");
   const canShowNew = canNew && schema.editor.showOnNew !== false;
 
-  const isNew = useCallback(
-    (item: DataRecord) => item && Reflect.get(item, IS_NEW),
-    [],
-  );
-  const isNewClean = useCallback(
-    (item: DataRecord) => {
-      return item && isNew(item) && Object.keys(item).length === 1;
-    },
-    [isNew],
-  );
-
-  const itemsFamily = useMemo(() => {
-    return atomFamily(
-      (record: DataRecord) =>
-        atom(
-          (get) => get(valueAtom)?.find((x: DataRecord) => x.id === record.id),
-          (get, set, value: DataRecord) => {
-            if (isNewClean(value)) return;
-            set(valueAtom, (items: DataRecord[] = []) => {
-              let result = items;
-              let found = items.find((x) => x.id === value.id);
-              if (found) {
-                result = items.map((x) => (x.id === value.id ? value : x));
-              }
-              if (exclusive && found && value[exclusive]) {
-                result = result.map((item) => ({
-                  ...item,
-                  [exclusive]: item.id === value.id ? value[exclusive] : false,
-                }));
-              }
-              return result;
-            });
-          },
-        ),
-      (a, b) => a.id === b.id,
-    );
-  }, [valueAtom, isNewClean, exclusive]);
-
-  const items = useAtomValue(itemsAtom);
-
-  const addNew = useAtomCallback(
-    useCallback(
-      (get, set, record: DataRecord = { id: nextId() }) => {
-        itemsFamily(record);
-        set(itemsAtom, (items = []) => [...items, record]);
-      },
-      [itemsAtom, itemsFamily],
-    ),
-  );
-
-  const invalidate = useAtomCallback(
-    useCallback(
-      (get, set, item: DataRecord) => {
-        itemsFamily.remove(item);
-        itemsFamily(item);
-        set(itemsAtom, (items) =>
-          items.map((x) => (x.id === item.id ? item : x)),
-        );
-      },
-      [itemsAtom, itemsFamily],
-    ),
-  );
-
-  const remove = useAtomCallback(
-    useCallback(
-      (get, set, record: DataRecord) => {
-        itemsFamily.remove(record);
-        set(itemsAtom, (items) => items.filter((x) => x.id !== record.id));
-      },
-      [itemsAtom, itemsFamily],
-    ),
-  );
+  const { itemsFamily, items, addItem, removeItem, isClean } = useItemsFamily({
+    valueAtom,
+    exclusive,
+    canShowNew,
+  });
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
     (value: DataRecord, invalid: boolean) => {
-      if (value && isNewClean(value)) return;
+      if (value && isClean(value)) return;
       if (value) {
         setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
       }
     },
-    [isNewClean],
+    [isClean],
   );
 
-  const handleAdd = useCallback(() => addNew(), [addNew]);
+  const handleAdd = useCallback(() => addItem(), [addItem]);
 
   useAsyncEffect(async () => {
     const invalid = items.map((x) => errors[x.id!]).some((x) => x);
     setInvalid(widgetAtom, invalid);
   });
-
-  useEffect(() => {
-    if (items.length === 0 && canShowNew) {
-      const record = {
-        id: nextId(),
-        [IS_NEW]: true,
-      };
-      addNew(record);
-    }
-  }, [addNew, canShowNew, items.length]);
-
-  useEffect(() => {
-    const item = items[0];
-    if (isNew(item)) {
-      if (isNewClean(item)) return;
-      invalidate({ ...item, [IS_NEW]: undefined });
-    }
-  }, [invalidate, isNewClean, isNew, items]);
 
   return (
     <FieldControl {...props}>
@@ -460,7 +536,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
               formAtom={formAtom}
               widgetAtom={widgetAtom}
               valueAtom={itemsFamily(item)}
-              remove={remove}
+              remove={removeItem}
               readonly={readonly}
               setInvalid={handleInvalid}
             />
