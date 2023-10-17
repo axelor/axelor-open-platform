@@ -1,6 +1,6 @@
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -51,9 +51,13 @@ function processEditor(schema: Schema) {
       item.title ?? field?.title ?? (result.showTitle ? field?.autoTitle : "");
 
     if (!result.showTitle && !result.items) {
-      result.placeholder = result.placeholder ?? field?.placeholder ?? result.title ?? field?.title;
+      result.placeholder =
+        result.placeholder ??
+        field?.placeholder ??
+        result.title ??
+        field?.title;
     }
-    
+
     return result;
   };
 
@@ -303,6 +307,8 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   );
 }
 
+const IS_NEW = Symbol("isNew");
+
 function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const model = schema.target!;
@@ -323,7 +329,20 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   }, [valueAtom]);
 
   const { hasButton } = usePermission(schema, widgetAtom);
+
   const canNew = !readonly && hasButton("new");
+  const canShowNew = canNew && schema.editor.showOnNew !== false;
+
+  const isNew = useCallback(
+    (item: DataRecord) => item && Reflect.get(item, IS_NEW),
+    [],
+  );
+  const isNewClean = useCallback(
+    (item: DataRecord) => {
+      return item && isNew(item) && Object.keys(item).length === 1;
+    },
+    [isNew],
+  );
 
   const itemsFamily = useMemo(() => {
     return atomFamily(
@@ -331,6 +350,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
         atom(
           (get) => get(valueAtom)?.find((x: DataRecord) => x.id === record.id),
           (get, set, value: DataRecord) => {
+            if (isNewClean(value)) return;
             set(valueAtom, (items: DataRecord[] = []) => {
               let result = items;
               let found = items.find((x) => x.id === value.id);
@@ -349,16 +369,28 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
         ),
       (a, b) => a.id === b.id,
     );
-  }, [valueAtom, exclusive]);
+  }, [valueAtom, isNewClean, exclusive]);
 
   const items = useAtomValue(itemsAtom);
 
   const addNew = useAtomCallback(
     useCallback(
-      (get, set) => {
-        const record = { id: nextId() };
+      (get, set, record: DataRecord = { id: nextId() }) => {
         itemsFamily(record);
         set(itemsAtom, (items = []) => [...items, record]);
+      },
+      [itemsAtom, itemsFamily],
+    ),
+  );
+
+  const invalidate = useAtomCallback(
+    useCallback(
+      (get, set, item: DataRecord) => {
+        itemsFamily.remove(item);
+        itemsFamily(item);
+        set(itemsAtom, (items) =>
+          items.map((x) => (x.id === item.id ? item : x)),
+        );
       },
       [itemsAtom, itemsFamily],
     ),
@@ -375,15 +407,42 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   );
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+
   const setInvalid = useSetAtom(setInvalidAtom);
-  const handleInvalid = useCallback((value: DataRecord, invalid: boolean) => {
-    setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
-  }, []);
+  const handleInvalid = useCallback(
+    (value: DataRecord, invalid: boolean) => {
+      if (value && isNewClean(value)) return;
+      if (value) {
+        setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
+      }
+    },
+    [isNewClean],
+  );
+
+  const handleAdd = useCallback(() => addNew(), [addNew]);
 
   useAsyncEffect(async () => {
     const invalid = items.map((x) => errors[x.id!]).some((x) => x);
     setInvalid(widgetAtom, invalid);
   });
+
+  useEffect(() => {
+    if (items.length === 0 && canShowNew) {
+      const record = {
+        id: nextId(),
+        [IS_NEW]: true,
+      };
+      addNew(record);
+    }
+  }, [addNew, canShowNew, items.length]);
+
+  useEffect(() => {
+    const item = items[0];
+    if (isNew(item)) {
+      if (isNewClean(item)) return;
+      invalidate({ ...item, [IS_NEW]: undefined });
+    }
+  }, [invalidate, isNewClean, isNew, items]);
 
   return (
     <FieldControl {...props}>
@@ -407,7 +466,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
         </div>
         {canNew && (
           <div className={styles.actions}>
-            <MaterialIcon icon="add" onClick={addNew} />
+            <MaterialIcon icon="add" onClick={handleAdd} />
           </div>
         )}
       </div>
