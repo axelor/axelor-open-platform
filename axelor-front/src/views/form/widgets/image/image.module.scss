@@ -33,3 +33,7 @@
     right: calc(50% - 32px);
   }
 }
+
+.invalid {
+  border: var(--bs-input-invalid-border, 1px solid var(--bs-danger)) !important;
+}

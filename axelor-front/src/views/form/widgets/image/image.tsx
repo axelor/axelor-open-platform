@@ -16,7 +16,7 @@ import styles from "./image.module.scss";
 export function Image(
   props: FieldProps<string | DataRecord | undefined | null>,
 ) {
-  const { schema, readonly, formAtom, widgetAtom, valueAtom } = props;
+  const { schema, readonly, formAtom, widgetAtom, valueAtom, invalid } = props;
   const { type, serverType, $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const inputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +98,7 @@ export function Image(
   const { target, name } = isBinary
     ? { target: parentModel, name: schema.name }
     : schema;
-  
+
   if (hidden) return null;
 
   return (
@@ -112,6 +112,7 @@ export function Image(
         maxH={100}
         className={clsx(styles.image, {
           [styles.editable]: schema.editable,
+          [styles.invalid]: invalid,
         })}
       >
         <Box
