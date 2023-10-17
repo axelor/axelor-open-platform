@@ -1,4 +1,5 @@
 import { request } from "./client";
+import { i18n } from "./i18n";
 import { SelectorType } from "./meta.types";
 
 export interface ClientInfo {
@@ -94,6 +95,8 @@ async function init() {
 
   const data = await resp.json();
 
+  await i18n.load();
+
   return data as SessionInfo;
 }
 
@@ -133,7 +136,7 @@ export class Session {
       username: string;
       password: string;
     },
-    params?: URLSearchParams
+    params?: URLSearchParams,
   ): Promise<SessionInfo> {
     const url = "callback" + (params ? `?${params}` : "");
     const { status, ok } = await request({
