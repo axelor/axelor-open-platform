@@ -580,15 +580,15 @@ const FormContainer = memo(function FormContainer({
           if (record) {
             await dataStore.save(record);
           }
-          const rec = get(formAtom).record;
+          const { record: rec, dirty } = get(formAtom);
           const isNew = (rec.id || 0) <= 0;
-          if (isDirty || isNew) {
+          if (dirty || isNew) {
             await onSave({
               callOnSave: false,
             });
           }
         },
-        [dataStore, formAtom, isDirty, onSave],
+        [dataStore, formAtom, onSave],
       ),
     ),
   );
