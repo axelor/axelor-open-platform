@@ -18,6 +18,7 @@ import {
 } from "../image/utils";
 
 import styles from "./binary-link.module.scss";
+import { i18n } from "@/services/client/i18n.ts";
 
 export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
   const { schema, readonly, invalid, formAtom, widgetAtom, valueAtom } = props;
@@ -116,10 +117,22 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
                 accept={accept}
               />
             </form>
-            <Button variant="light" size="sm" d="flex" alignItems="center">
+            <Button
+              variant="light"
+              size="sm"
+              d="flex"
+              alignItems="center"
+              title={i18n.get("Upload")}
+            >
               <MaterialIcon icon="upload" onClick={handleUpload} />
             </Button>
-            <Button variant="light" size="sm" d="flex" alignItems="center">
+            <Button
+              variant="light"
+              size="sm"
+              d="flex"
+              alignItems="center"
+              title={i18n.get("Remove")}
+            >
               <MaterialIcon icon="close" onClick={handleRemove} />
             </Button>
           </Box>
