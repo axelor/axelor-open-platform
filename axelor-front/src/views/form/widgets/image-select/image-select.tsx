@@ -8,6 +8,7 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
   return (
     <Selection
       {...props}
+      autoComplete={false}
       renderValue={({ option }) => (
         <ImageSelectValue option={option} showLabel={labels} />
       )}
