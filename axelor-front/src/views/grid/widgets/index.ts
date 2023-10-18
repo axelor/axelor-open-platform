@@ -9,6 +9,7 @@ export * from "./image-select";
 export * from "./multi-select";
 export * from "./phone";
 export * from "./progress";
+export * from "./rating";
 export * from "./single-select";
 export * from "./tag-select";
 export * from "./url";
