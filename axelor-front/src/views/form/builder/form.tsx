@@ -34,17 +34,19 @@ export function useFormHandlers(
   meta: ViewData<FormView>,
   record: DataRecord,
   parent?: FormAtom,
-  initStates?: Record<string, WidgetState>
+  initStates?: Record<string, WidgetState>,
+  givenFormAtom?: FormAtom,
 ) {
   const formAtom = useMemo(
     () =>
+      givenFormAtom ??
       createFormAtom({
         meta,
         record,
         parent,
         statesByName: initStates,
       }),
-    [meta, record, parent, initStates]
+    [givenFormAtom, meta, record, parent, initStates],
   );
 
   const prepareContext = usePrepareContext(formAtom);
@@ -60,7 +62,7 @@ export function useFormHandlers(
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(actionHandler),
-    [actionHandler]
+    [actionHandler],
   );
 
   const recordHandler = useMemo(() => new FormRecordHandler(), []);
@@ -108,15 +110,15 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
         contextRef.current = res;
         return res;
       },
-      [actionView, formAtom, options]
-    )
+      [actionView, formAtom, options],
+    ),
   );
 }
 
 export function usePermission(
   schema: Schema,
   widgetAtom: WidgetAtom,
-  perms?: Perms
+  perms?: Perms,
 ) {
   const { attrs } = useAtomValue(widgetAtom);
   const props = useMemo(() => ({ ...schema, ...attrs }), [attrs, schema]);

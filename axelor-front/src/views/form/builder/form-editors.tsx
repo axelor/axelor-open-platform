@@ -24,6 +24,7 @@ import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { MetaScope } from "@/view-containers/views/scope";
 
 import { useGetErrors } from "../form";
+import { createFormAtom } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
@@ -677,8 +678,15 @@ const RecordEditor = memo(function RecordEditor({
     [editor, fields, model],
   );
 
-  const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, EMPTY_RECORD, parent);
+  const editorFormAtom = useMemo(
+    () =>
+      createFormAtom({
+        meta,
+        record: EMPTY_RECORD,
+        parent,
+      }),
+    [meta, parent],
+  );
 
   const [loaded, setLoaded] = useState<DataRecord>({});
 
@@ -686,7 +694,7 @@ const RecordEditor = memo(function RecordEditor({
     return atom(
       (get) => {
         const value = get(valueAtom) || EMPTY_RECORD;
-        const state = get(formAtom);
+        const state = get(editorFormAtom);
         const dirty = get(parent).dirty;
         const record = loaded.id && loaded.id === value.id ? loaded : value;
         return {
@@ -700,16 +708,17 @@ const RecordEditor = memo(function RecordEditor({
       },
       (get, set, update: SetStateAction<FormState>) => {
         const state =
-          typeof update === "function" ? update(get(formAtom)) : update;
+          typeof update === "function" ? update(get(editorFormAtom)) : update;
         const { record } = state;
 
-        set(formAtom, state);
-        if (state.dirty) {
-          set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
-        }
+        set(editorFormAtom, state);
+        set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
       },
     );
-  }, [formAtom, loaded, parent, valueAtom]);
+  }, [editorFormAtom, loaded, parent, valueAtom]);
+
+  const { formAtom, actionHandler, actionExecutor, recordHandler } =
+    useFormHandlers(meta, EMPTY_RECORD, parent, undefined, editorAtom);
 
   const getErrors = useGetErrors();
 
@@ -773,7 +782,7 @@ const RecordEditor = memo(function RecordEditor({
         actionExecutor={actionExecutor}
         actionHandler={actionHandler}
         fields={fields}
-        formAtom={editorAtom}
+        formAtom={formAtom}
         widgetAtom={widgetAtom}
         readonly={readonly}
       />
