@@ -39,9 +39,9 @@ function ActionM2O({
       {...props}
       options={[]}
       value={value ?? null}
-      optionKey={(x) => x.id!}
+      optionKey={(x) => x.name}
       optionLabel={(x) => x.title}
-      optionEqual={(x, y) => x.id === y.id}
+      optionEqual={(x, y) => x.name === y.name}
       fetchOptions={fetchOptions}
     />
   );
