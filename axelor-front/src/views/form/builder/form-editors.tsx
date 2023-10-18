@@ -48,7 +48,15 @@ function processEditor(schema: Schema) {
   const applyTitle = (item: Schema) => {
     const field = fields?.[item.name!];
     const result = { ...field, ...item };
-    result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
+
+    if (
+      result.type !== "panel" &&
+      result.type !== "separator" &&
+      result.type !== "button" &&
+      result.type !== "label"
+    ) {
+      result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
+    }
     result.title =
       item.title ?? field?.title ?? (result.showTitle ? field?.autoTitle : "");
 
