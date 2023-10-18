@@ -843,6 +843,7 @@ const RecordEditor = memo(function RecordEditor({
 
   checkInvalidRef.current = checkInvalid;
 
+  const idRef = useRef<number>();
   const id = useAtomValue(
     useMemo(() => selectAtom(valueAtom, (x) => x.id ?? 0), [valueAtom]),
   );
@@ -862,8 +863,10 @@ const RecordEditor = memo(function RecordEditor({
   }, [checkInvalid]);
 
   useEffect(() => {
+    if (id === idRef.current) return;
+    idRef.current = id;
     executeNew();
-  }, [executeNew, schema.name]);
+  }, [executeNew, id, schema.name]);
 
   return (
     <ScopeProvider scope={MetaScope} value={meta}>
