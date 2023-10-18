@@ -12,6 +12,7 @@ import {
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 
+import { toKebabCase } from "@/utils/names";
 import {
   FieldControl,
   FieldProps,
@@ -36,6 +37,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     limit,
     searchLimit,
   } = schema;
+
+  const isManyToMany =
+    toKebabCase(schema.serverType || schema.widget) === "many-to-many";
+
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
@@ -57,21 +62,32 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   });
 
   const handleChange = useCallback(
-    (value: SelectValue<DataRecord, true>) => {
-      if (Array.isArray(value)) {
-        const items = value.map(({ version: _, ...rest }) => rest);
-        setValue(items.length === 0 ? null : items, true);
+    (changedValue: SelectValue<DataRecord, true>) => {
+      if (Array.isArray(changedValue)) {
+        const items = changedValue.map(({ version: _, ...rest }) => rest);
+        const prev = value ?? [];
+        const markDirty =
+          !isManyToMany ||
+          prev.length !== items.length ||
+          items.some((item, index) => item.id !== prev[index].id);
+        setValue(items.length === 0 ? null : items, true, markDirty);
       } else {
-        setValue(value, true);
+        setValue(changedValue, true);
       }
     },
-    [setValue],
+    [isManyToMany, setValue, value],
   );
 
   const handleSelect = useCallback(
     (record: DataRecord) => {
-      const all = Array.isArray(value) ? value : [];
-      const next = all.find((x) => x.id === record.id) ? all : [...all, record];
+      const next = Array.isArray(value) ? [...value] : [];
+      const index = next.findIndex((x) => x.id === record.id);
+      if (index >= 0) {
+        const found = next[index];
+        next[index] = { ...found, ...record };
+      } else {
+        next.push(record);
+      }
       handleChange(next);
     },
     [handleChange, value],
