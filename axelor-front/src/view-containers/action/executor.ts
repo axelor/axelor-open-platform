@@ -8,6 +8,7 @@ import { download } from "@/utils/download";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
+import { getActiveTabId } from "@/layout/nav-tabs/utils";
 
 import { TaskQueue } from "./queue";
 import { ActionExecutor, ActionHandler, ActionOptions } from "./types";
@@ -153,7 +154,9 @@ export class DefaultActionExecutor implements ActionExecutor {
     }
 
     if (data.signal === "refresh-tab") {
-      await this.#handler.refresh();
+      const tabId = getActiveTabId();
+      const event = new CustomEvent("tab:refresh", { detail: { id: tabId } });
+      document.dispatchEvent(event);
     }
 
     if (data.info) {
