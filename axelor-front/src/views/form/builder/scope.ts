@@ -12,7 +12,7 @@ import {
 } from "@/hooks/use-parser/context";
 import { isCleanDummy, updateRecord } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { View } from "@/services/client/meta.types";
+import { Schema, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import {
   ActionAttrData,
@@ -287,6 +287,11 @@ function useActionData<T extends ActionData>(
   }, [actionHandler, check, handler]);
 }
 
+function isCollection(item: Schema) {
+  const type = item.serverType ?? item.widget ?? item.type ?? "";
+  return toKebabCase(type).endsWith("-to-many");
+}
+
 function useActionAttrs({
   formAtom,
   actionHandler,
@@ -294,6 +299,7 @@ function useActionAttrs({
   formAtom: FormAtom;
   actionHandler: ActionHandler;
 }) {
+  const { findItem } = useViewMeta();
   useActionData<ActionAttrData>(
     useCallback((x) => x.type === "attr", []),
     useAtomCallback(
@@ -324,8 +330,8 @@ function useActionAttrs({
           // collection field column ?
           if (target.includes(".")) {
             const fieldName = target.split(".")[0];
-            const field = fields[fieldName];
-            if (field?.type.endsWith("_TO_MANY")) {
+            const field = findItem(fieldName);
+            if (field && isCollection(field) && !field.editor) {
               const state = statesByName[fieldName] ?? {};
               const column = target.substring(target.indexOf(".") + 1);
               const columns = state.columns ?? {};
@@ -416,8 +422,7 @@ function useActionValue({
               if (target.includes(".")) {
                 const fieldName = target.split(".")[0];
                 const field = findItem(fieldName);
-                const type = toKebabCase(field?.serverType ?? field?.widget);
-                if (type?.endsWith("-to-many")) {
+                if (field && isCollection(field)) {
                   draft[fieldName]?.forEach?.((item: DataRecord) => {
                     setDeep(item, target.slice(fieldName.length + 1), value);
                   });
