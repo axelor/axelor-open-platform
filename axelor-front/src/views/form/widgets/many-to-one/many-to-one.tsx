@@ -65,15 +65,15 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   });
 
   const handleChange = useCallback(
-    (value: SelectValue<DataRecord, false>) => {
-      if (value && value.id && value.id > 0) {
-        const { version: _, ...rec } = value;
-        setValue(rec, true);
+    (changedValue: SelectValue<DataRecord, false>) => {
+      if (changedValue && changedValue.id && changedValue.id > 0) {
+        const { version: _, ...rec } = changedValue;
+        setValue(rec, true, rec.id !== value?.id);
       } else {
-        setValue(value, true);
+        setValue(changedValue, true);
       }
     },
-    [setValue],
+    [setValue, value],
   );
 
   const canView = value && hasButton("view");
