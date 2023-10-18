@@ -1,6 +1,7 @@
 import { uniqueId } from "lodash";
 
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
+import { closeTab_internal as closeTab } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as executeAction } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
@@ -8,7 +9,7 @@ import { download } from "@/utils/download";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
-import { getActiveTabId } from "@/layout/nav-tabs/utils";
+import { getActivePopups, getActiveTabId } from "@/layout/nav-tabs/utils";
 
 import { TaskQueue } from "./queue";
 import { ActionExecutor, ActionHandler, ActionOptions } from "./types";
@@ -95,6 +96,7 @@ export class DefaultActionExecutor implements ActionExecutor {
     action = actions.join(",");
 
     if (action === "close") {
+      this.#closeView();
       return this.#handler.close();
     }
 
@@ -319,7 +321,19 @@ export class DefaultActionExecutor implements ActionExecutor {
     }
 
     if (data.close || data.canClose) {
+      this.#closeView();
       this.#handler.close();
+    }
+  }
+
+  async #closeView() {
+    const tabId = getActiveTabId();
+    if (tabId) {
+      const popups = getActivePopups();
+      // should skip close tab for popup view
+      // as close of view is managed by popup itself
+      if (popups.length) return;
+      closeTab(tabId);
     }
   }
 

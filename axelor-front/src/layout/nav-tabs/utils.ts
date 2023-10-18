@@ -1,7 +1,11 @@
+export function getActivePopups() {
+  return document.querySelectorAll("body > [data-dialog='true']");
+}
+
 export function getActiveTabId(level = 0) {
   const elems = [
     document.querySelector(`[data-tab-content][data-tab-active='true']`),
-    ...document.querySelectorAll("body > [data-dialog='true']"),
+    ...getActivePopups(),
   ];
 
   for (let i = 0; i < level; ++i) {

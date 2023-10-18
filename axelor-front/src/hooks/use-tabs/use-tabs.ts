@@ -543,6 +543,11 @@ export function openTab_internal(
   getDefaultStore().set(openTabAtom, view, options);
 }
 
+// for internal use only with action handler
+export function closeTab_internal(view: string | ActionView) {
+  getDefaultStore().set(closeTabAtom, view);
+}
+
 export function useActiveTab_internal() {
   const active = getDefaultStore().get(activeAtom);
   const state = active ? getDefaultStore().get(active.state) : undefined;

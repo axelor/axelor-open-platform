@@ -898,17 +898,8 @@ const FormContainer = memo(function FormContainer({
   }, [readonly, setViewProps]);
 
   const tab = useViewTab();
-  const { active, close: closeTab } = useTabs();
+  const { active } = useTabs();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
-
-  useEffect(() => {
-    if (popup) return;
-    return actionHandler.subscribe((data) => {
-      if (data.type === "close") {
-        closeTab(tab.action);
-      }
-    });
-  }, [actionHandler, closeTab, isDirty, popup, tab.action]);
 
   const canNew = hasButton("new");
   const canEdit = readonly && !readonlyExclusive && hasButton("edit");
