@@ -29,7 +29,13 @@ import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { useAfterActions } from "./scope";
-import { FieldProps, FormState, ValueAtom, WidgetAtom } from "./types";
+import {
+  FieldProps,
+  FormState,
+  ValueAtom,
+  WidgetAtom,
+  WidgetState,
+} from "./types";
 import { nextId, processView } from "./utils";
 
 import styles from "./form-editors.module.scss";
@@ -655,6 +661,63 @@ const setInvalidAtom = atom(
 
 const EMPTY_RECORD = Object.freeze({});
 
+const findState = (
+  schema: Schema,
+  currentState: FormState,
+  parentState: FormState,
+) => {
+  const name = schema.name!;
+  const json = !!schema.json;
+  const jsonFields = schema.jsonFields ?? {};
+  const prefix = `${name}.`;
+
+  const isJsonField = (key: string) => {
+    return json && name === "attrs" && key in jsonFields;
+  };
+
+  const makeKey = (key: string) => {
+    return key.startsWith(prefix) ? key.substring(prefix.length) : key;
+  };
+
+  const currentStates = currentState.statesByName;
+  const parentStates = parentState.statesByName;
+
+  const states = Object.entries(parentStates)
+    .filter(([key]) => key.startsWith(prefix) || isJsonField(key))
+    .reduce(
+      (acc, [key, value]) => {
+        return { ...acc, [makeKey(key)]: value };
+      },
+      {} as Record<string, WidgetState>,
+    );
+
+  const merged = Object.entries(states).reduce(
+    (acc, [key, value]) => {
+      const current = currentStates[key];
+      const target: WidgetState = {
+        ...current,
+        ...value,
+        attrs: {
+          ...current?.attrs,
+          ...value?.attrs,
+        },
+      };
+      return { ...acc, [key]: target };
+    },
+    {} as Record<string, WidgetState>,
+  );
+
+  const result = {
+    ...currentState,
+    statesByName: {
+      ...currentStates,
+      ...merged,
+    },
+  };
+
+  return result;
+};
+
 const RecordEditor = memo(function RecordEditor({
   model,
   editor,
@@ -694,9 +757,14 @@ const RecordEditor = memo(function RecordEditor({
     return atom(
       (get) => {
         const value = get(valueAtom) || EMPTY_RECORD;
-        const state = get(editorFormAtom);
-        const dirty = get(parent).dirty;
         const record = loaded.id && loaded.id === value.id ? loaded : value;
+
+        const currentState = get(editorFormAtom);
+        const parentState = get(parent);
+
+        const state = findState(schema, currentState, parentState);
+        const dirty = parentState.dirty;
+
         return {
           ...state,
           dirty,
@@ -715,7 +783,7 @@ const RecordEditor = memo(function RecordEditor({
         set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
       },
     );
-  }, [editorFormAtom, loaded, parent, valueAtom]);
+  }, [editorFormAtom, loaded, parent, schema, valueAtom]);
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, EMPTY_RECORD, parent, undefined, editorAtom);
