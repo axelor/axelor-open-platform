@@ -101,7 +101,8 @@ public final class AppSettings {
         .replace("{month}", "" + now.getMonthValue())
         .replace("{day}", "" + now.getDayOfMonth())
         .replace("{java.io.tmpdir}", System.getProperty("java.io.tmpdir"))
-        .replace("{user.home}", System.getProperty("user.home"));
+        .replace("{user.home}", System.getProperty("user.home"))
+        .replace("{user.dir}", System.getProperty("user.dir"));
   }
 
   /**

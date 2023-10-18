@@ -1,0 +1,16 @@
+---
+title: Add support for `{user.dir}` variable in config file
+type: feature
+description: |
+  The `{user.dir}` refers to the current working directory.
+  It is useful during development where you have many different
+  instances to test with.
+  
+  For example:
+  
+  ```properties
+  data.upload.dir = {user.dir}/data/axelor
+  ```
+  
+  will store upload files under `data/axelor` found under
+  current working directory. 
