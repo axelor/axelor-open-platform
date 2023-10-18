@@ -3,13 +3,14 @@ import { focusAtom } from "jotai-optics";
 import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { Box, Button } from "@axelor/ui";
+import { Box, Button, SelectOptionProps } from "@axelor/ui";
 
 import { Select, SelectProps } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { SearchView } from "@/services/client/meta.types";
 
+import { SelectionTag } from "../form/widgets";
 import { fetchMenus } from "./utils";
 
 import styles from "./search-objects.module.scss";
@@ -42,11 +43,6 @@ function ActionM2O({
       optionLabel={(x) => x.title}
       optionEqual={(x, y) => x.id === y.id}
       fetchOptions={fetchOptions}
-      icons={
-        value
-          ? [{ icon: "close", onClick: () => props.onChange?.(null) }]
-          : [{ icon: "arrow_drop_down" }]
-      }
     />
   );
 }
@@ -130,6 +126,25 @@ export function SearchObjects({
     onClear?.();
   }
 
+  const renderValue = useCallback(
+    ({ option }: SelectOptionProps<DataRecord>) => {
+      return (
+        <SelectionTag
+          title={<span>{option?.title}</span>}
+          color="primary"
+          onRemove={() => {
+            if (Array.isArray(selectValue)) {
+              onSelectChange(
+                selectValue.filter((x) => x.model !== option.model),
+              );
+            }
+          }}
+        />
+      );
+    },
+    [selectValue, onSelectChange],
+  );
+
   const objects = searchParams.get("objects");
   useEffect(() => {
     if (objects) {
@@ -167,11 +182,7 @@ export function SearchObjects({
               onChange={(value) => {
                 onSelectChange(value as DataRecord[]);
               }}
-              icons={[
-                {
-                  icon: "arrow_drop_down",
-                },
-              ]}
+              renderValue={renderValue}
             />
           </Box>
           <Box d="flex">
