@@ -264,17 +264,8 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     ),
   );
 
-  const setInvalid = useSetAtom(setInvalidAtom);
-  const handleInvalid = useCallback(
-    (value: any, invalid: boolean) => {
-      if (required || value) {
-        setInvalid(widgetAtom, invalid);
-      }
-    },
-    [required, setInvalid, widgetAtom],
-  );
-
-  const { itemsFamily, items } = useItemsFamily({
+  const { itemsFamily, items, setInvalid } = useItemsFamily({
+    widgetAtom,
     valueAtom,
     multiple: false,
     canShowNew: !readonly,
@@ -310,7 +301,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           valueAtom={itemsFamily(item)}
           model={model}
           readonly={readonly}
-          setInvalid={handleInvalid}
+          setInvalid={setInvalid}
         />
       ))}
     </FieldControl>
@@ -320,11 +311,13 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 const IS_NEW = Symbol("isNew");
 
 function useItemsFamily({
+  widgetAtom,
   valueAtom,
   exclusive,
   multiple = true,
   canShowNew = true,
 }: {
+  widgetAtom: WidgetAtom;
   valueAtom: ValueAtom<DataRecord | DataRecord[]>;
   exclusive?: string;
   multiple?: boolean;
@@ -345,7 +338,24 @@ function useItemsFamily({
     return [];
   }, []);
 
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [newInvalid, setNewInvalid] = useState<boolean>(false);
   const [newItem, setNewItem] = useState<DataRecord>();
+
+  const setInvalid = useSetAtom(setInvalidAtom);
+  const handleInvalid = useCallback(
+    (value: DataRecord, invalid: boolean) => {
+      if (value && isNew(value) && isClean(value)) {
+        setNewInvalid(invalid);
+        return;
+      }
+      if (value) {
+        setNewInvalid(false);
+        setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
+      }
+    },
+    [isClean, isNew],
+  );
 
   const itemsAtom = useMemo(() => {
     return atom(
@@ -361,11 +371,25 @@ function useItemsFamily({
         const items = makeArray(value);
         if (items.length === 1 && isNew(items[0]) && isClean(items[0])) return;
         const next = multiple ? items : items[0] ?? null;
+        const invalid = items.map((x) => errors[x.id!]).some((x) => x);
         set(valueAtom, next);
         setNewItem(undefined);
+        setInvalid(widgetAtom, invalid || newInvalid);
       },
     );
-  }, [canShowNew, isClean, isNew, makeArray, multiple, newItem, valueAtom]);
+  }, [
+    canShowNew,
+    errors,
+    isClean,
+    isNew,
+    makeArray,
+    multiple,
+    newInvalid,
+    newItem,
+    setInvalid,
+    valueAtom,
+    widgetAtom,
+  ]);
 
   const itemsFamily = useMemo(() => {
     return atomFamily(
@@ -388,13 +412,13 @@ function useItemsFamily({
                 [exclusive]: item.id === value.id ? value[exclusive] : false,
               }));
             }
-            const next = multiple ? items : items[0] ?? null;
-            set(valueAtom, next);
+            const next = multiple ? items : items.slice(0, 1);
+            set(itemsAtom, next);
           },
         ),
       (a, b) => a.id === b.id,
     );
-  }, [itemsAtom, isNew, isClean, exclusive, multiple, valueAtom]);
+  }, [itemsAtom, isNew, isClean, exclusive, multiple]);
 
   const addItem = useAtomCallback(
     useCallback(
@@ -475,9 +499,10 @@ function useItemsFamily({
         const item = items[0];
         if (isNew(item) && !isClean(item)) {
           syncItem({ ...item, [IS_NEW]: undefined });
+          setInvalid(widgetAtom, newInvalid);
         }
       },
-      [isClean, isNew, itemsAtom, syncItem],
+      [isClean, isNew, itemsAtom, newInvalid, setInvalid, syncItem, widgetAtom],
     ),
   );
 
@@ -485,7 +510,7 @@ function useItemsFamily({
 
   useEffect(() => {
     if (items.length === 0) ensureNew();
-    if (items.length === 1) ensureSync();
+    // if (items.length === 1) ensureSync();
   }, [ensureNew, ensureSync, items.length]);
 
   return {
@@ -495,7 +520,7 @@ function useItemsFamily({
     addItem,
     syncItem,
     removeItem,
-    isClean,
+    setInvalid: handleInvalid,
   };
 }
 
@@ -514,31 +539,15 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const canNew = !readonly && hasButton("new");
   const canShowNew = canNew && schema.editor.showOnNew !== false;
 
-  const { itemsFamily, items, addItem, removeItem, isClean } = useItemsFamily({
-    valueAtom,
-    exclusive,
-    canShowNew,
-  });
-
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
-
-  const setInvalid = useSetAtom(setInvalidAtom);
-  const handleInvalid = useCallback(
-    (value: DataRecord, invalid: boolean) => {
-      if (value && isClean(value)) return;
-      if (value) {
-        setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
-      }
-    },
-    [isClean],
-  );
+  const { itemsFamily, items, addItem, removeItem, setInvalid } =
+    useItemsFamily({
+      widgetAtom,
+      valueAtom,
+      exclusive,
+      canShowNew,
+    });
 
   const handleAdd = useCallback(() => addItem(), [addItem]);
-
-  useAsyncEffect(async () => {
-    const invalid = items.map((x) => errors[x.id!]).some((x) => x);
-    setInvalid(widgetAtom, invalid);
-  });
 
   return (
     <FieldControl {...props}>
@@ -556,7 +565,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
               valueAtom={itemsFamily(item)}
               remove={removeItem}
               readonly={readonly}
-              setInvalid={handleInvalid}
+              setInvalid={setInvalid}
             />
           ))}
         </div>
@@ -681,35 +690,25 @@ const RecordEditor = memo(function RecordEditor({
     [editorAtom, getErrors],
   );
 
-  const invalid = useAtomValue(invalidAtom);
-  const invalidCheck = useAtomCallback(
-    useCallback(
-      (get, set) => {
-        setInvalid(get(valueAtom), invalid);
-      },
-      [invalid, setInvalid, valueAtom],
-    ),
-  );
-
   const ds = useMemo(() => new DataStore(model), [model]);
   const value = useAtomValue(valueAtom);
-  const load = useAtomCallback(
-    useCallback(
-      async (get, set) => {
-        const id = value?.id ?? 0;
-        if (id <= 0) return;
-        const names = Object.keys(fields ?? {});
-        const missing = names.some((x) => !Object.hasOwn(value, x));
-        if (missing) {
-          const rec = await ds.read(id, { fields: names });
-          setLoaded(rec);
-        }
-      },
-      [ds, fields, value],
-    ),
-  );
+  const invalid = useAtomValue(invalidAtom);
 
-  useAsyncEffect(async () => invalidCheck(), [invalidCheck]);
+  const load = useCallback(async () => {
+    const id = value?.id ?? 0;
+    if (id <= 0) return;
+    const names = Object.keys(fields ?? {});
+    const missing = names.some((x) => !Object.hasOwn(value, x));
+    if (missing) {
+      const rec = await ds.read(id, { fields: names });
+      setLoaded(rec);
+    }
+  }, [ds, fields, value]);
+
+  useAsyncEffect(async () => {
+    setInvalid(value, invalid);
+  }, [invalid, setInvalid, value]);
+
   useAsyncEffect(async () => load(), [load]);
 
   const mountRef = useRef<boolean>();
