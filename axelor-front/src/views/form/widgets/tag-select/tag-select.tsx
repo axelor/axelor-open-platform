@@ -227,13 +227,13 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       return (
         <Tag
           record={option}
-          targetName={targetName}
+          optionLabel={getOptionLabel}
           onClick={canView || canEdit ? handleEdit : undefined}
           onRemove={canRemove ? handleRemove : undefined}
         />
       );
     },
-    [canEdit, canRemove, canView, handleEdit, handleRemove, targetName],
+    [canEdit, canRemove, canView, getOptionLabel, handleEdit, handleRemove],
   );
 
   return (
@@ -273,13 +273,13 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
 type TagProps = {
   record: DataRecord;
-  targetName: string;
+  optionLabel: (record: DataRecord) => string;
   onRemove?: (record: DataRecord) => void;
   onClick?: (record: DataRecord) => void;
 };
 
 function Tag(props: TagProps) {
-  const { record, targetName, onClick, onRemove } = props;
+  const { record, optionLabel, onClick, onRemove } = props;
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -301,10 +301,10 @@ function Tag(props: TagProps) {
       title={
         canOpen ? (
           <span className={styles.tagLink} onClick={handleClick}>
-            {record[targetName]}
+            {optionLabel(record)}
           </span>
         ) : (
-          <span>{record[targetName]}</span>
+          <span>{optionLabel(record)}</span>
         )
       }
       color="primary"

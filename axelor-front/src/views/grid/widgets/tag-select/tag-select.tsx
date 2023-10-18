@@ -91,12 +91,19 @@ export function TagSelect(props: GridColumnProps) {
         ...item,
         id: item.id ?? `item_${ind}`,
       })) as DataRecord[],
-    [record, name]
+    [record, name],
+  );
+
+  const getTitle = useCallback(
+    (record: DataRecord) => record[`$t:${targetName}`] ?? record[targetName],
+    [targetName],
   );
 
   const renderItem = useCallback(
-    (item: DataRecord) => <SelectionTag title={item[targetName]} color={"indigo"} />,
-    [targetName]
+    (item: DataRecord) => (
+      <SelectionTag title={getTitle(item)} color={"indigo"} />
+    ),
+    [getTitle],
   );
 
   return (
