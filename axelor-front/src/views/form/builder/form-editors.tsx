@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
@@ -264,9 +265,10 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     ),
   );
 
-  const { itemsFamily, items, setInvalid } = useItemsFamily({
+  const { itemsFamily, items, isCleanInitial, setInvalid } = useItemsFamily({
     widgetAtom,
     valueAtom,
+    required,
     multiple: false,
     canShowNew: !readonly,
   });
@@ -289,7 +291,13 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   );
 
   return (
-    <FieldControl {...props} titleActions={titleActions}>
+    <FieldControl
+      {...props}
+      titleActions={titleActions}
+      className={clsx({
+        [styles.noErrors]: isCleanInitial,
+      })}
+    >
       {items.map((item) => (
         <RecordEditor
           key={item.id}
@@ -308,12 +316,13 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   );
 }
 
-const IS_NEW = Symbol("isNew");
+const IS_INITIAL = Symbol();
 
 function useItemsFamily({
   widgetAtom,
   valueAtom,
   exclusive,
+  required,
   multiple = true,
   canShowNew = true,
 }: {
@@ -321,16 +330,18 @@ function useItemsFamily({
   valueAtom: ValueAtom<DataRecord | DataRecord[]>;
   exclusive?: string;
   multiple?: boolean;
+  required?: boolean;
   canShowNew?: boolean;
 }) {
-  const isNew = useCallback(
-    (item: DataRecord) => item && Reflect.get(item, IS_NEW),
+  const isInitial = useCallback(
+    (item: DataRecord) => item && Reflect.get(item, IS_INITIAL),
     [],
   );
 
-  const isClean = useCallback((item: DataRecord) => {
-    return item && Object.keys(item).length === 1;
-  }, []);
+  const isClean = useCallback(
+    (item: DataRecord) => item && Object.keys(item).length === 1,
+    [],
+  );
 
   const makeArray = useCallback((value: unknown): DataRecord[] => {
     if (Array.isArray(value)) return value;
@@ -339,22 +350,25 @@ function useItemsFamily({
   }, []);
 
   const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const [newInvalid, setNewInvalid] = useState<boolean>(false);
-  const [newItem, setNewItem] = useState<DataRecord>();
+  const [initialInvalid, setInitialInvalid] = useState<boolean>(false);
+  const [initialItem, setInitialItem] = useState<DataRecord>();
 
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
     (value: DataRecord, invalid: boolean) => {
-      if (value && isNew(value) && isClean(value)) {
-        setNewInvalid(invalid);
+      if (value && isInitial(value) && isClean(value)) {
+        setInitialInvalid(invalid);
         return;
       }
+
       if (value) {
-        setNewInvalid(false);
-        setErrors((errors) => ({ ...errors, [value.id!]: invalid }));
+        const invalid_ =
+          invalid || (value.id && value.id <= 0 && required && isClean(value));
+        setInitialInvalid(false);
+        setErrors((errors) => ({ ...errors, [value.id!]: invalid_ }));
       }
     },
-    [isClean, isNew],
+    [isClean, isInitial, required],
   );
 
   const itemsAtom = useMemo(() => {
@@ -362,33 +376,29 @@ function useItemsFamily({
       (get) => {
         const value = get(valueAtom);
         const items = makeArray(value);
-        if (items.length === 0 && canShowNew && newItem) {
-          return [newItem];
+        if (items.length === 0 && canShowNew && initialItem) {
+          return [initialItem];
         }
         return items;
       },
       (get, set, value: DataRecord[]) => {
         const items = makeArray(value);
-        if (items.length === 1 && isNew(items[0]) && isClean(items[0])) return;
+        if (items.length === 1 && isInitial(items[0]) && isClean(items[0])) {
+          return;
+        }
         const next = multiple ? items : items[0] ?? null;
-        const invalid = items.map((x) => errors[x.id!]).some((x) => x);
         set(valueAtom, next);
-        setNewItem(undefined);
-        setInvalid(widgetAtom, invalid || newInvalid);
+        setInitialItem(undefined);
       },
     );
   }, [
     canShowNew,
-    errors,
     isClean,
-    isNew,
+    isInitial,
     makeArray,
     multiple,
-    newInvalid,
-    newItem,
-    setInvalid,
+    initialItem,
     valueAtom,
-    widgetAtom,
   ]);
 
   const itemsFamily = useMemo(() => {
@@ -400,7 +410,7 @@ function useItemsFamily({
             return items.find((x: DataRecord) => x.id === record.id);
           },
           (get, set, value: DataRecord) => {
-            if (isNew(value) && isClean(value)) return;
+            if (isInitial(value) && isClean(value)) return;
             let items = get(itemsAtom);
             const found = items.find((x) => x.id === value.id);
             if (found) {
@@ -418,7 +428,7 @@ function useItemsFamily({
         ),
       (a, b) => a.id === b.id,
     );
-  }, [itemsAtom, isNew, isClean, exclusive, multiple]);
+  }, [itemsAtom, isInitial, isClean, exclusive, multiple]);
 
   const addItem = useAtomCallback(
     useCallback(
@@ -430,13 +440,13 @@ function useItemsFamily({
         }
 
         const record =
-          item ?? items.length === 0
-            ? { id: nextId(), [IS_NEW]: true }
+          item ?? (items.length === 0 && !required)
+            ? { id: nextId(), [IS_INITIAL]: true }
             : { id: nextId() };
 
-        if (!item && record[IS_NEW]) {
+        if (!item && record[IS_INITIAL]) {
           itemsFamily(record);
-          setNewItem(record);
+          setInitialItem(record);
           return;
         }
 
@@ -449,7 +459,7 @@ function useItemsFamily({
           set(itemsAtom, makeArray(record));
         }
       },
-      [isClean, itemsAtom, itemsFamily, makeArray, multiple],
+      [isClean, itemsAtom, itemsFamily, makeArray, multiple, required],
     ),
   );
 
@@ -492,31 +502,31 @@ function useItemsFamily({
     ),
   );
 
-  const ensureSync = useAtomCallback(
+  const ensureValid = useAtomCallback(
     useCallback(
       (get) => {
+        if (initialItem) return;
         const items = get(itemsAtom);
-        const item = items[0];
-        if (isNew(item) && !isClean(item)) {
-          syncItem({ ...item, [IS_NEW]: undefined });
-          setInvalid(widgetAtom, newInvalid);
-        }
+        const invalid = items.map((x) => errors[x.id!]).some((x) => x);
+        setInvalid(widgetAtom, invalid || initialInvalid);
       },
-      [isClean, isNew, itemsAtom, newInvalid, setInvalid, syncItem, widgetAtom],
+      [errors, initialInvalid, initialItem, itemsAtom, setInvalid, widgetAtom],
     ),
   );
 
   const items = useAtomValue(itemsAtom);
+  const isCleanInitial = !!initialItem && isClean(initialItem);
 
+  useEffect(() => ensureValid(), [ensureValid]);
   useEffect(() => {
     if (items.length === 0) ensureNew();
-    // if (items.length === 1) ensureSync();
-  }, [ensureNew, ensureSync, items.length]);
+  }, [ensureNew, items.length]);
 
   return {
     itemsFamily,
     itemsAtom,
     items,
+    isCleanInitial,
     addItem,
     syncItem,
     removeItem,
@@ -539,19 +549,29 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const canNew = !readonly && hasButton("new");
   const canShowNew = canNew && schema.editor.showOnNew !== false;
 
-  const { itemsFamily, items, addItem, removeItem, setInvalid } =
-    useItemsFamily({
-      widgetAtom,
-      valueAtom,
-      exclusive,
-      canShowNew,
-    });
+  const {
+    itemsFamily,
+    items,
+    isCleanInitial,
+    addItem,
+    removeItem,
+    setInvalid,
+  } = useItemsFamily({
+    widgetAtom,
+    valueAtom,
+    exclusive,
+    canShowNew,
+  });
 
   const handleAdd = useCallback(() => addItem(), [addItem]);
 
   return (
     <FieldControl {...props}>
-      <div className={styles.collection}>
+      <div
+        className={clsx(styles.collection, {
+          [styles.noErrors]: isCleanInitial,
+        })}
+      >
         <div className={styles.items}>
           {items.map((item) => (
             <ItemEditor

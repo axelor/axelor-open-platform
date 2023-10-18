@@ -44,3 +44,10 @@
     }
   }
 }
+
+.noErrors:not(:focus-within) {
+  --ax-theme-input-invalid-border: var(
+    --ax-theme-input-border,
+    1px solid var(--bs-border-color)
+  );
+}
