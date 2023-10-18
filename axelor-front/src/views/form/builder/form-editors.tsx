@@ -579,10 +579,12 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   });
 
   const handleAdd = useCallback(() => addItem(), [addItem]);
+  const colSpan = Math.max(1, schema.editor.colSpan ?? 12);
 
   return (
     <FieldControl {...props}>
       <div
+        data-editor-span={colSpan}
         className={clsx(styles.collection, {
           [styles.noErrors]: isCleanInitial,
         })}

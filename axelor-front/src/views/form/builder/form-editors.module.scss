@@ -24,24 +24,29 @@
 .collection {
   display: flex;
   flex-direction: column;
-  .items {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  > .items {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: start;
     gap: 1rem;
-    .item {
-      flex: 1;
+    > .item {
+      grid-column: span 12;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-
       & > *:first-child {
         flex: 1;
       }
     }
-    .item:last-child {
+    > .item:last-child {
       margin-bottom: 0.5rem;
     }
+  }
+}
+
+@for $i from 1 through 12 {
+  .collection[data-editor-span="#{$i}"] > .items > .item {
+    grid-column: span $i;
   }
 }
 
