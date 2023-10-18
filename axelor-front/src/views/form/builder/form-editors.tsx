@@ -49,7 +49,10 @@ function processEditor(schema: Schema) {
     result.showTitle = item.showTitle ?? widgetAttrs.showTitles !== "false";
     result.title =
       item.title ?? field?.title ?? (result.showTitle ? field?.autoTitle : "");
-    result.placeholder = item.placeholder ?? field?.placeholder ?? result.title;
+
+    if (!result.showTitle && !result.items) {
+      result.placeholder = result.placeholder ?? field?.placeholder ?? result.title ?? field?.title;
+    }
     
     return result;
   };
