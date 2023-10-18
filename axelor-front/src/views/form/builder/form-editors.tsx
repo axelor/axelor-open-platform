@@ -345,17 +345,39 @@ function useItemsFamily({
     return [];
   }, []);
 
+  const [newItem, setNewItem] = useState<DataRecord>();
+
+  const itemsAtom = useMemo(() => {
+    return atom(
+      (get) => {
+        const value = get(valueAtom);
+        const items = makeArray(value);
+        if (items.length === 0 && canShowNew && newItem) {
+          return [newItem];
+        }
+        return items;
+      },
+      (get, set, value: DataRecord[]) => {
+        const items = makeArray(value);
+        if (items.length === 1 && isNew(items[0]) && isClean(items[0])) return;
+        const next = multiple ? items : items[0] ?? null;
+        set(valueAtom, next);
+        setNewItem(undefined);
+      },
+    );
+  }, [canShowNew, isClean, isNew, makeArray, multiple, newItem, valueAtom]);
+
   const itemsFamily = useMemo(() => {
     return atomFamily(
       (record: DataRecord) =>
         atom(
           (get) => {
-            const items = makeArray(get(valueAtom));
+            const items = get(itemsAtom);
             return items.find((x: DataRecord) => x.id === record.id);
           },
           (get, set, value: DataRecord) => {
             if (isNew(value) && isClean(value)) return;
-            let items = makeArray(get(valueAtom));
+            let items = get(itemsAtom);
             const found = items.find((x) => x.id === value.id);
             if (found) {
               items = items.map((x) => (x.id === value.id ? value : x));
@@ -372,29 +394,29 @@ function useItemsFamily({
         ),
       (a, b) => a.id === b.id,
     );
-  }, [makeArray, valueAtom, isNew, isClean, exclusive, multiple]);
-
-  const itemsAtom = useMemo(() => {
-    return atom(
-      (get) => {
-        const value = get(valueAtom);
-        return makeArray(value);
-      },
-      (get, set, value: DataRecord[]) => {
-        const items = makeArray(value);
-        const next = multiple ? items : items[0] ?? null;
-        set(valueAtom, next);
-      },
-    );
-  }, [makeArray, multiple, valueAtom]);
+  }, [itemsAtom, isNew, isClean, exclusive, multiple, valueAtom]);
 
   const addItem = useAtomCallback(
     useCallback(
-      (get, set, record: DataRecord = { id: nextId() }) => {
+      (get, set, item?: DataRecord) => {
         const items = get(itemsAtom);
+        const last = items.length ? items[items.length - 1] : null;
+        if (last && isClean(last)) {
+          return;
+        }
+
+        const record =
+          item ?? items.length === 0
+            ? { id: nextId(), [IS_NEW]: true }
+            : { id: nextId() };
+
+        if (!item && record[IS_NEW]) {
+          itemsFamily(record);
+          setNewItem(record);
+          return;
+        }
+
         if (multiple) {
-          const last = items[items.length - 1];
-          if (last && isClean(last)) return;
           itemsFamily(record);
           set(itemsAtom, [...items, record]);
         } else {
@@ -439,11 +461,7 @@ function useItemsFamily({
       (get) => {
         const items = get(itemsAtom);
         if (items.length === 0) {
-          const record = {
-            id: nextId(),
-            [IS_NEW]: true,
-          };
-          addItem(record);
+          addItem();
         }
       },
       [addItem, itemsAtom],
