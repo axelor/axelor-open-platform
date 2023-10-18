@@ -8,7 +8,7 @@ import { Box, Button, SelectOptionProps } from "@axelor/ui";
 import { Select, SelectProps } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { SearchView } from "@/services/client/meta.types";
+import { MenuItem, SearchView } from "@/services/client/meta.types";
 
 import { SelectionTag } from "../form/widgets";
 import { fetchMenus } from "./utils";
@@ -23,10 +23,7 @@ function ActionM2O({
 }: {
   actionMenus: SearchView["actionMenus"];
   parent?: DataRecord | null;
-} & Pick<
-  SelectProps<DataRecord, false>,
-  "placeholder" | "value" | "onChange"
->) {
+} & Pick<SelectProps<MenuItem, false>, "placeholder" | "value" | "onChange">) {
   const parentName = parent?.name;
   const fetchOptions = useCallback(async () => {
     const menus =
@@ -49,9 +46,9 @@ function ActionM2O({
 
 export type SearchObjectsState = {
   selectValue: DataRecord[];
-  actionCategory: DataRecord | null;
-  actionSubCategory: DataRecord | null;
-  action: DataRecord | null;
+  actionCategory: MenuItem | null;
+  actionSubCategory: MenuItem | null;
+  action: MenuItem | null;
 };
 
 export function SearchObjects({
@@ -95,7 +92,7 @@ export function SearchObjects({
   const [searchParams] = useSearchParams();
 
   const handleActionCategory = useCallback(
-    (value: DataRecord | null) => {
+    (value: MenuItem | null) => {
       setActionCategory(value);
       setActionSubCategory(null);
       setAction(null);
@@ -104,7 +101,7 @@ export function SearchObjects({
   );
 
   const handleActionSubCategory = useCallback(
-    (value: DataRecord | null) => {
+    (value: MenuItem | null) => {
       setActionSubCategory(value);
       setAction(null);
     },
@@ -112,7 +109,7 @@ export function SearchObjects({
   );
 
   const handleAction = useCallback(
-    (value: DataRecord | null) => {
+    (value: MenuItem | null) => {
       setAction(value);
     },
     [setAction],
@@ -205,7 +202,7 @@ export function SearchObjects({
                 actionMenus={actionMenus}
                 placeholder={i18n.get("Action Category")}
                 value={actionCategory}
-                onChange={(value) => handleActionCategory(value as DataRecord)}
+                onChange={(value) => handleActionCategory(value as MenuItem)}
               />
             </Box>
             <Box d="flex" className={styles.select}>
@@ -216,7 +213,7 @@ export function SearchObjects({
                   parent={actionCategory}
                   value={actionSubCategory}
                   onChange={(value) =>
-                    handleActionSubCategory(value as DataRecord)
+                    handleActionSubCategory(value as MenuItem)
                   }
                 />
               )}
@@ -228,7 +225,7 @@ export function SearchObjects({
                   placeholder={i18n.get("Action")}
                   parent={actionSubCategory}
                   value={action}
-                  onChange={(value) => handleAction(value as DataRecord)}
+                  onChange={(value) => handleAction(value as MenuItem)}
                 />
               )}
             </Box>

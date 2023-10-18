@@ -1,8 +1,9 @@
 import { request } from "@/services/client/client";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataContext } from "@/services/client/data.types";
+import { MenuItem } from "@/services/client/meta.types";
 import { LoadingCache } from "@/utils/cache";
 
-const cache = new LoadingCache<Promise<DataRecord[]>>();
+const cache = new LoadingCache<Promise<MenuItem[]>>();
 
 export async function fetchMenus(parent?: string) {
   const queryString = parent ? `?parent=${parent}` : "";
