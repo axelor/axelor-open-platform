@@ -754,6 +754,7 @@ const RecordEditor = memo(function RecordEditor({
   );
 
   const [loaded, setLoaded] = useState<DataRecord>({});
+  const checkInvalidRef = useRef<() => void>();
 
   const editorAtom = useMemo(() => {
     return atom(
@@ -783,6 +784,9 @@ const RecordEditor = memo(function RecordEditor({
 
         set(editorFormAtom, state);
         set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
+
+        // re-check validation
+        checkInvalidRef.current?.();
       },
     );
   }, [editorFormAtom, loaded, parent, schema, valueAtom]);
@@ -790,46 +794,27 @@ const RecordEditor = memo(function RecordEditor({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, EMPTY_RECORD, parent, undefined, editorAtom);
 
-  const getErrors = useGetErrors();
-
-  const invalidAtom = useMemo(
-    () => selectAtom(editorAtom, (state) => getErrors(state) !== null),
-    [editorAtom, getErrors],
-  );
-
   const ds = useMemo(() => new DataStore(model), [model]);
-  const value = useAtomValue(valueAtom);
-  const invalid = useAtomValue(invalidAtom);
-
-  const load = useCallback(async () => {
-    const id = value?.id ?? 0;
-    if (id <= 0) return;
-    const names = Object.keys(fields ?? {});
-    const missing = names.some((x) => !Object.hasOwn(value, x));
-    if (missing) {
-      const rec = await ds.read(id, { fields: names });
-      setLoaded(rec);
-    }
-  }, [ds, fields, value]);
-
-  useAsyncEffect(async () => {
-    setInvalid(value, invalid);
-  }, [invalid, setInvalid, value]);
+  const load = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const value = get(valueAtom);
+        const id = value?.id ?? 0;
+        if (id <= 0) return;
+        const names = Object.keys(fields ?? {});
+        const missing = names.some((x) => !Object.hasOwn(value, x));
+        if (missing) {
+          const rec = await ds.read(id, { fields: names });
+          setLoaded(rec);
+        }
+      },
+      [ds, fields, valueAtom],
+    ),
+  );
 
   useAsyncEffect(async () => load(), [load]);
 
   const mountRef = useRef<boolean>();
-  const executeAction = useAfterActions(
-    useCallback(
-      async (action: string) => {
-        await actionExecutor.waitFor(100);
-        if (mountRef.current) {
-          actionExecutor.execute(action);
-        }
-      },
-      [actionExecutor],
-    ),
-  );
 
   useEffect(() => {
     mountRef.current = true;
@@ -838,11 +823,47 @@ const RecordEditor = memo(function RecordEditor({
     };
   });
 
+  const getErrors = useGetErrors();
+
+  const invalidAtom = useMemo(
+    () => selectAtom(editorAtom, (state) => getErrors(state) !== null),
+    [editorAtom, getErrors],
+  );
+  const invalid = useAtomValue(invalidAtom);
+
+  const checkInvalid = useAtomCallback(
+    useCallback(
+      (get) => {
+        const value = get(valueAtom);
+        setInvalid(value, invalid);
+      },
+      [invalid, setInvalid, valueAtom],
+    ),
+  );
+
+  checkInvalidRef.current = checkInvalid;
+
+  const id = useAtomValue(
+    useMemo(() => selectAtom(valueAtom, (x) => x.id ?? 0), [valueAtom]),
+  );
+
+  const executeNew = useAfterActions(
+    useCallback(async () => {
+      const { onNew } = schema.editor;
+      await actionExecutor.waitFor(100);
+      if (mountRef.current && id <= 0 && onNew) {
+        actionExecutor.execute(onNew);
+      }
+    }, [actionExecutor, id, schema.editor]),
+  );
+
   useEffect(() => {
-    const id = value?.id ?? 0;
-    const { onNew } = schema.editor;
-    if (id <= 0 && onNew) executeAction(onNew);
-  }, [value?.id, schema.editor, executeAction]);
+    checkInvalid();
+  }, [checkInvalid]);
+
+  useEffect(() => {
+    executeNew();
+  }, [executeNew, schema.name]);
 
   return (
     <ScopeProvider scope={MetaScope} value={meta}>
