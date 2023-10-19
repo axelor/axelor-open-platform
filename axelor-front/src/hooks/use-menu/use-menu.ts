@@ -6,9 +6,12 @@ import * as meta from "@/services/client/meta";
 import { MenuItem } from "@/services/client/meta.types";
 import { useAsyncEffect } from "../use-async-effect";
 
-const menusAtom = atom<MenuItem[]>([]);
+const menusAtom = atom<MenuItem[] | null>(null);
 const loadingAtom = atom<boolean | null>(null);
 const errorAtom = atom<boolean>(false);
+
+// a empty array to be used as const reference
+const emptyMenus: MenuItem[] = [];
 
 export function useMenu() {
   const menus = useAtomValue(menusAtom);
@@ -19,7 +22,7 @@ export function useMenu() {
       const loading = get(loadingAtom);
       const menus = get(menusAtom);
       const error = get(errorAtom);
-      if (loading || error || menus.length) return;
+      if (loading || error || menus) return;
 
       set(loadingAtom, true);
       try {
@@ -38,7 +41,7 @@ export function useMenu() {
   }, [fetchMenus]);
 
   return {
-    menus,
+    menus: menus ?? emptyMenus,
     loading: loading ?? true,
   };
 }
