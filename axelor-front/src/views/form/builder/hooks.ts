@@ -120,7 +120,9 @@ export function useInput<T>(
     [parse, setValue, validate],
   );
 
-  const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const onChange = useCallback<
+    React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  >(
     (event) => {
       setChanged(event.target.value !== valueText);
       setText(event.target.value);
@@ -132,7 +134,9 @@ export function useInput<T>(
     [onChangeTrigger, setDirty, update, valueText],
   );
 
-  const onBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+  const onBlur = useCallback<
+    React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  >(
     (event) => {
       dirtyRef.current = undefined;
       if (changed) {

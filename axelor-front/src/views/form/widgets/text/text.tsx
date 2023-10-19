@@ -5,6 +5,7 @@ import { Input } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { useInput } from "../../builder/hooks";
 
 export function Text({
   inputProps,
@@ -23,35 +24,35 @@ export function Text({
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
 
-  const [value, setValue] = useAtom(valueAtom);
   const [changed, setChanged] = useState(false);
+  const { text, onChange, onBlur: onInputBlur } = useInput(valueAtom);
 
   const handleChange = useCallback<
     React.ChangeEventHandler<HTMLTextAreaElement>
   >(
     (e) => {
-      setValue(e.target.value);
+      onChange(e);
       setChanged(true);
     },
-    [setValue]
+    [onChange]
   );
 
   const handleBlur = useCallback<React.FocusEventHandler<HTMLTextAreaElement>>(
     (e) => {
       if (changed) {
         setChanged(false);
-        setValue(e.target.value, true);
+        onInputBlur(e);
       }
       onBlur?.(e);
     },
-    [changed, setValue, onBlur]
+    [changed, onBlur, onInputBlur]
   );
 
   return (
     <FieldControl {...props}>
       {readonly ? (
         <Input as="pre" bg={theme === "dark" ? "body" : "light"} mb={0}>
-          {value}
+          {text}
         </Input>
       ) : (
         <Input
@@ -61,7 +62,7 @@ export function Text({
           id={uid}
           invalid={invalid}
           placeholder={placeholder}
-          value={value || ""}
+          value={text}
           required={required}
           {...inputProps}
           onChange={handleChange}
