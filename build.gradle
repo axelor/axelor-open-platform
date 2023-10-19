@@ -1,4 +1,6 @@
 import com.axelor.common.VersionUtils
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 buildscript {
   apply from: "gradle/repos.gradle"
@@ -12,6 +14,24 @@ apply plugin: "idea"
 apply plugin: com.axelor.gradle.support.ChangelogSupport
 
 apply from: "version.gradle"
+
+def gitGitRevision(p) {
+  def gitFolder = "$p.projectDir/.git/"
+  if( !new File(gitFolder).exists() ) {
+    gitFolder = "$rootProject.projectDir/.git/"
+  }
+  if( !new File(gitFolder).exists() ) {
+    return null
+  }
+
+  def head = new File(gitFolder + "HEAD").text.split(":")
+  def isCommit = head.length == 1
+
+  if(isCommit) return head[0].trim()
+
+  def refHead = new File(gitFolder + head[1].trim())
+  return refHead.text.trim()
+}
 
 configure(subprojects - project(':axelor-front')) {
   apply from: "${rootDir}/gradle/libs.gradle"
@@ -40,7 +60,11 @@ configure(subprojects - project(':axelor-front')) {
 
   jar {
     manifest {
+      def gitRev = gitGitRevision(project);
       attributes(
+        'Build-Jdk-Spec': System.properties['java.specification.version'],
+        'Build-Jdk': System.properties['java.version'],
+        'Build-Date': ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")),
         'Implementation-Title': project.name,
         'Implementation-Version': project.version,
         'Implementation-Vendor': 'Axelor',
@@ -49,7 +73,11 @@ configure(subprojects - project(':axelor-front')) {
         'Specification-Title': project.name,
         'Specification-Version': project.version,
         'Specification-Vendor': 'Axelor')
+      if (gitRev) {
+        attributes['Implementation-Build'] = gitRev
+      }
     }
+
   }
 
   project.afterEvaluate {
