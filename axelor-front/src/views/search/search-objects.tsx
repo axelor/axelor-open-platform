@@ -33,6 +33,7 @@ function ActionM2O({
   }, [actionMenus, parentName]);
   return (
     <Select
+      key={parentName}
       {...props}
       options={[]}
       value={value ?? null}
