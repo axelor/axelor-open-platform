@@ -1,22 +1,22 @@
-import { useRef, useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Popup from "./popup/base";
 import {
+  addEvent,
+  cancelEvent,
+  collapseSelectionEnd,
+  filecontents,
+  getActions,
+  getSelectionHtml,
   isMediaNode,
   isOrContainsNode,
-  addEvent,
-  removeEvent,
-  cancelEvent,
-  filecontents,
-  pasteHtmlAtCaret,
-  selectionInside,
-  getSelectionHtml,
-  collapseSelectionEnd,
   normalizeHTML,
-  getActions,
+  pasteHtmlAtCaret,
+  removeEvent,
+  selectionInside,
 } from "./utils";
 
-import "./editor.scss";
 import clsx from "clsx";
+import "./editor.scss";
 
 function Link(props) {
   return (
@@ -124,7 +124,9 @@ function HTMLEditor({
           !document.queryCommandSupported(command)
           ? false
           : document.execCommand(command, false, param);
-      } catch (e) {}
+      } catch (e) {
+        // ignore
+      }
       return false;
     }
 
@@ -239,9 +241,9 @@ function HTMLEditor({
   const actions = useMemo(
     () =>
       getActions().filter(
-        ({ lite: _lite = lite }) => Boolean(_lite) === Boolean(lite)
+        ({ lite: _lite = lite }) => Boolean(_lite) === Boolean(lite),
       ),
-    [lite]
+    [lite],
   );
 
   function onKeyDown(e) {
@@ -251,7 +253,7 @@ function HTMLEditor({
     // Exec hotkey (onkeydown because e.g. CTRL+B would oben the bookmarks)
     if (character && !e.shiftKey && !e.altKey && e.ctrlKey && !e.metaKey) {
       const action = actions.find(
-        (x) => (x.hotkey || "").toLowerCase() === character.toLowerCase()
+        (x) => (x.hotkey || "").toLowerCase() === character.toLowerCase(),
       );
       if (action && action.command) {
         commands[action.command](e);
@@ -342,7 +344,8 @@ function HTMLEditor({
 
   function handleChange(e) {
     setDirty(value === e.target.value ? false : true);
-    onChange && onChange((htmlRef.current = e.target.value));
+    htmlRef.current = e.target.value;
+    onChange?.(e);
   }
 
   function emitFocus() {
@@ -351,7 +354,7 @@ function HTMLEditor({
 
   function handleBlur(e) {
     timer = setTimeout(() => {
-      onBlur && onBlur(e.target.value);
+      onBlur?.(e);
     }, 150);
   }
 
@@ -403,10 +406,10 @@ function HTMLEditor({
 
   return (
     <div className={clsx(className, "relative")}>
-      <div 
+      <div
         ref={containerRef}
         className="custom-html-editor-container"
-        {...(height && { style: { height }})}
+        {...(height && { style: { height } })}
       >
         {actions.length > 0 && (
           <Toolbar
