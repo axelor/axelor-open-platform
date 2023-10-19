@@ -144,7 +144,9 @@ export class DataStore extends DataSource {
 
     if (data.id) {
       records = records.map((record) =>
-        record.id === (data as DataRecord).id ? { ...record, ...res } : record,
+        record.id === (data as DataRecord).id
+          ? { ...record, ...data, ...res }
+          : record,
       );
     } else if (res.id && res.id !== data.id) {
       const totalCount = page.totalCount ?? this.records.length;
