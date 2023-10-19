@@ -53,7 +53,7 @@ function prepareFields(fields: SearchView["searchFields"]) {
     }
 
     return field.name ? { ...fields, [field.name]: field } : fields;
-  }, {});
+  }, {}) as Record<string, Property>;
 }
 
 export function Search(props: ViewProps<SearchView>) {
@@ -69,7 +69,7 @@ export function Search(props: ViewProps<SearchView>) {
         actionSubCategory: null,
         action: null,
       }),
-    []
+    [],
   );
   const record = useRef({}).current;
   const { meta } = props;
@@ -86,7 +86,7 @@ export function Search(props: ViewProps<SearchView>) {
       _viewType: action.viewType,
       _views: action.views,
     }),
-    [action]
+    [action],
   );
 
   const formMeta = useMemo(() => {
@@ -95,8 +95,15 @@ export function Search(props: ViewProps<SearchView>) {
     const fields = prepareFields(searchFields);
 
     function process(item: SearchField) {
-      const $item = { ...item, type: "field", canDirty: false } as Schema;
-      switch (toKebabCase($item.widget ?? "")) {
+      const $field = (fields[item.name] || {});
+      const $item = {
+        serverType: $field.type,
+        ...$field,
+        ...item,
+        type: "field",
+        canDirty: false,
+      } as Schema;
+      switch (toKebabCase($item.widget ?? $item.serverType ?? "")) {
         case "many-to-one":
         case "one-to-one":
         case "suggest-box":
@@ -156,7 +163,7 @@ export function Search(props: ViewProps<SearchView>) {
       type: "grid",
       hilites,
       items: [...(items || []), ...(buttons || [])].filter(
-        (item) => item.hidden !== true
+        (item) => item.hidden !== true,
       ),
     } as GridView;
   }, [view]);
@@ -204,13 +211,13 @@ export function Search(props: ViewProps<SearchView>) {
           }),
         });
       },
-      [recordsAtom, selects]
-    )
+      [recordsAtom, selects],
+    ),
   );
 
   const onView = useCallback(
     (record: DataRecord) => onEdit(record, true),
-    [onEdit]
+    [onEdit],
   );
 
   const onSearch = useAtomCallback(
@@ -235,9 +242,8 @@ export function Search(props: ViewProps<SearchView>) {
           limit,
         });
         const records = recordList.map((record: DataRecord, ind: number) => {
-          const selectFields = selects?.find(
-            (s) => s.model === record._model
-          )?.fields;
+          const selectFields = selects?.find((s) => s.model === record._model)
+            ?.fields;
           selectFields?.forEach((field) => {
             if (field.as && field.selectionList && record[field.as]) {
               record[field.as] = record[field.as]
@@ -245,8 +251,8 @@ export function Search(props: ViewProps<SearchView>) {
                 .map(
                   (v: string) =>
                     field.selectionList?.find(
-                      (item) => `${item.value}` === `${v}`
-                    )?.title ?? v
+                      (item) => `${item.value}` === `${v}`,
+                    )?.title ?? v,
                 )
                 .join(", ");
             }
@@ -268,16 +274,8 @@ export function Search(props: ViewProps<SearchView>) {
           onEdit(records[0], !options?.forceEdit);
         }
       },
-      [
-        formAtom,
-        searchObjectsAtom,
-        setRecords,
-        selects,
-        name,
-        limit,
-        onEdit,
-      ]
-    )
+      [formAtom, searchObjectsAtom, setRecords, selects, name, limit, onEdit],
+    ),
   );
 
   const onClear = useAtomCallback(
@@ -290,8 +288,8 @@ export function Search(props: ViewProps<SearchView>) {
         });
         setRecords([]);
       },
-      [formAtom, setRecords]
-    )
+      [formAtom, setRecords],
+    ),
   );
 
   const { rows, selectedRows } = state;
@@ -318,8 +316,8 @@ export function Search(props: ViewProps<SearchView>) {
           });
         }
       },
-      [selected, searchObjectsAtom]
-    )
+      [selected, searchObjectsAtom],
+    ),
   );
 
   const setFormValues = useAtomCallback(
@@ -335,8 +333,8 @@ export function Search(props: ViewProps<SearchView>) {
         setRecords([]);
         onSearch(params);
       },
-      [formAtom, params, setRecords, onSearch]
-    )
+      [formAtom, params, setRecords, onSearch],
+    ),
   );
 
   const handleFormKeyDown = useCallback(
@@ -345,7 +343,7 @@ export function Search(props: ViewProps<SearchView>) {
         onSearch();
       }
     },
-    [onSearch]
+    [onSearch],
   );
 
   const gridActionExecutor = useActionExecutor(gridView, {
