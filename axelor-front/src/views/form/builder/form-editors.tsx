@@ -496,12 +496,14 @@ function useItemsFamily({
       (get, set, record: DataRecord) => {
         itemsFamily.remove(record);
         const items = get(itemsAtom);
-        set(
-          itemsAtom,
-          items.filter((x) => x.id !== record.id),
-        );
+        const next = items.filter((x) => x.id !== record.id);
+        if (next.length === 0 && canShowNew) {
+          next.push({ id: nextId() });
+          itemsFamily(next[0]);
+        }
+        set(itemsAtom, next);
       },
-      [itemsAtom, itemsFamily],
+      [canShowNew, itemsAtom, itemsFamily],
     ),
   );
 
