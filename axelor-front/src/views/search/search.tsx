@@ -13,6 +13,7 @@ import {
   Property,
   Schema,
   SearchField,
+  SearchResultField,
   SearchView,
 } from "@/services/client/meta.types";
 import { ViewProps } from "../types";
@@ -35,24 +36,30 @@ import styles from "./search.module.scss";
 
 function prepareFields(fields: SearchView["searchFields"]) {
   return (fields || []).reduce((fields, _field) => {
-    const field = {
-      ..._field,
-      type: _field.type?.toUpperCase?.() ?? "STRING",
-    };
+    const field = { ..._field, type: _field.type?.toUpperCase?.() };
 
-    if (field.selectionList) {
-      field.type = "SELECTION";
-    }
-
-    if (field.type === "REFERENCE") {
+    if (field.type === "FIELD") {
+      field.type = "STRING";
+    } else if (field.type === "REFERENCE") {
       field.type = "MANY_TO_ONE";
     }
 
-    if (field.type && ["INTEGER", "LONG", "DECIMAL"].includes(field.type)) {
+    field.serverType = field.type?.toUpperCase?.() ?? "STRING";
+
+    if ((field.selection || field.selectionList) && !field.widget) {
+      field.widget = "Selection";
+    }
+
+    if (["INTEGER", "LONG", "DECIMAL"].includes(field.serverType)) {
       field.nullable = true;
     }
 
-    return field.name ? { ...fields, [field.name]: field } : fields;
+    return field.name
+      ? {
+          ...fields,
+          [field.name]: { ...field, type: "field", canDirty: false },
+        }
+      : fields;
   }, {}) as Record<string, Property>;
 }
 
@@ -95,14 +102,7 @@ export function Search(props: ViewProps<SearchView>) {
     const fields = prepareFields(searchFields);
 
     function process(item: SearchField) {
-      const $field = (fields[item.name] || {});
-      const $item = {
-        serverType: $field.type,
-        ...$field,
-        ...item,
-        type: "field",
-        canDirty: false,
-      } as Schema;
+      const $item = (fields[item.name] || {}) as Schema;
       switch (toKebabCase($item.widget ?? $item.serverType ?? "")) {
         case "many-to-one":
         case "one-to-one":
@@ -139,7 +139,10 @@ export function Search(props: ViewProps<SearchView>) {
 
   const gridView = useMemo(() => {
     const { name, hilites, buttons, resultFields } = view;
-    const items = [...(resultFields || [])];
+    const fields = prepareFields(
+      resultFields,
+    ) as unknown as SearchResultField[];
+    const items = [...(Object.values(fields) || [])];
     const objItemInd = items?.findIndex((item) => item.name === "object");
     const objItem = {
       title: i18n.get("Object"),
