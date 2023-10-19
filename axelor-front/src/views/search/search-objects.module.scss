@@ -1,4 +1,7 @@
 .search-objects {
+  & > * {
+    max-width: 50%;
+  }
   button {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -31,7 +34,12 @@
     display: flex;
     flex-direction: column;
 
-    .search-section,.actions-section {
+    & > * {
+      max-width: 100%;
+    }
+
+    .search-section,
+    .actions-section {
       display: flex;
       flex-direction: column;
       grid-template-columns: unset;
