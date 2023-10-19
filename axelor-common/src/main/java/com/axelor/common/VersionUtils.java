@@ -18,6 +18,9 @@
  */
 package com.axelor.common;
 
+import java.security.CodeSource;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +28,8 @@ import java.util.regex.Pattern;
 public final class VersionUtils {
 
   private static Version version;
+  private static String buildDate;
+  private static String gitHash;
 
   private static final Pattern VERSION_PATTERN =
       Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?(-SNAPSHOT)?$");
@@ -75,17 +80,42 @@ public final class VersionUtils {
    * @return an instance of {@link Version}
    */
   public static Version getVersion() {
-    if (version == null) {
-      version = createVersion();
-    }
     return version;
   }
 
-  private static Version createVersion() {
-    String version = VersionUtils.class.getPackage().getImplementationVersion();
-    if (version == null) {
-      return Version.UNKNOWN;
+  /**
+   * Get the Axelor SDK build date.
+   *
+   * @return build date
+   */
+  public static String getBuildDate() {
+    return buildDate;
+  }
+
+  /**
+   * Get the Axelor SDK build git hash.
+   *
+   * @return build git hash
+   */
+  public static String getGitHash() {
+    return gitHash;
+  }
+
+  static {
+    version = Version.UNKNOWN;
+    try {
+      CodeSource codeSource = VersionUtils.class.getProtectionDomain().getCodeSource();
+      String urlStr = codeSource.getLocation() == null ? "" : codeSource.getLocation().toString();
+      if (urlStr.startsWith("file:/") && urlStr.endsWith(".jar")) {
+        try (JarInputStream jar = new JarInputStream(codeSource.getLocation().openStream())) {
+          Manifest manifest = jar.getManifest();
+          buildDate = manifest.getMainAttributes().getValue("Build-Date");
+          gitHash = manifest.getMainAttributes().getValue("Implementation-Build");
+          version = new Version(manifest.getMainAttributes().getValue("Implementation-Version"));
+        }
+      }
+    } catch (Exception e) {
+      // ignore
     }
-    return new Version(version);
   }
 }

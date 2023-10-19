@@ -51,7 +51,14 @@ export function About() {
       <div>
         <p>
           {i18n.get("Version")}: {app.aopVersion}
+          <br/>
+          {technical && (
+            <span style={{ fontSize: "small" }}>
+              (build {app.aopBuildDate} - rev {app.aopGitHash?.slice(0, 12)})
+            </span>
+          )}
         </p>
+        
         <p>Copyright (c) 2005-{year} Axelor. All Rights Reserved.</p>
         <Box d="flex" g={1} flexDirection="column">
           <Link href="http://www.axelor.com">http://www.axelor.com</Link>

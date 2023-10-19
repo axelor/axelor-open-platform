@@ -23,6 +23,8 @@ export interface SessionInfo {
     help?: string;
     mode?: string;
     aopVersion?: string;
+    aopBuildDate?: string;
+    aopGitHash?: string;
   };
   authentication?: {
     callbackUrl?: string;

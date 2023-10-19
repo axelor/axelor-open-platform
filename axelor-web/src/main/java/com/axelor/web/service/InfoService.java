@@ -131,6 +131,8 @@ public class InfoService extends AbstractService {
     map.put("help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
     map.put("aopVersion", VersionUtils.getVersion().version);
+    map.put("aopBuildDate", VersionUtils.getBuildDate());
+    map.put("aopGitHash", VersionUtils.getGitHash());
 
     return map;
   }
