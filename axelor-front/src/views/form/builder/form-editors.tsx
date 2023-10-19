@@ -21,7 +21,7 @@ import {
   Schema,
 } from "@/services/client/meta.types";
 import { toKebabCase, toSnakeCase } from "@/utils/names";
-import { MetaScope } from "@/view-containers/views/scope";
+import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
 import { useGetErrors } from "../form";
 import { createFormAtom } from "./atoms";
@@ -861,6 +861,31 @@ const RecordEditor = memo(function RecordEditor({
       }
     }, [actionExecutor, id, schema.editor]),
   );
+
+  const tab = useViewTab();
+  const resetStates = useAtomCallback(
+    useCallback(
+      (get, set, event: Event) => {
+        if (event instanceof CustomEvent && event.detail === tab.id) {
+          set(editorFormAtom, (prev) => {
+            return {
+              ...prev,
+              states: {},
+              statesByName: {},
+            };
+          });
+        }
+      },
+      [editorFormAtom, tab.id],
+    ),
+  );
+
+  useEffect(() => {
+    document.addEventListener("form:reset-states", resetStates);
+    return () => {
+      document.removeEventListener("form:reset-states", resetStates);
+    };
+  }, [resetStates]);
 
   useEffect(() => {
     checkInvalid();

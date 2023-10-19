@@ -356,6 +356,11 @@ const FormContainer = memo(function FormContainer({
           recordRef.current = record;
         }
 
+        if (!keepStates) {
+          const event = new CustomEvent("form:reset-states", { detail: tabId });
+          document.dispatchEvent(event);
+        }
+
         switchTo("form", { route: { id }, props });
         set(formAtom, {
           ...prev,
