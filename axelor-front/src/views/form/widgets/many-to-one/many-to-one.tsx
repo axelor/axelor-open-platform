@@ -1,7 +1,9 @@
 import { useAtom, useAtomValue } from "jotai";
 import getObjValue from "lodash/get";
+import setObjValue from "lodash/set";
 import isEqual from "lodash/isEqual";
 import { useCallback, useMemo, useRef } from "react";
+import { useAtomCallback } from "jotai/utils";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -239,21 +241,39 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const valueRef = useRef<DataRecord>();
 
-  const ensureRelatedValues = useCallback(
-    async (signal?: AbortSignal, refetch?: boolean) => {
-      if (valueRef.current === value && !refetch) return;
-      if (value) {
-        const newValue = await ensureRelated(value, refetch);
-        if (!isEqual(newValue, value)) {
-          valueRef.current = newValue;
-          if (signal?.aborted) return;
-          setValue(newValue, false, false);
-        } else {
-          valueRef.current = value;
+  const ensureRelatedValues = useAtomCallback(
+    useCallback(
+      async (get, set, signal?: AbortSignal, refetch?: boolean) => {
+        if (valueRef.current === value && !refetch) return;
+        if (value) {
+          const newValue = await ensureRelated(value, refetch);
+          if (!isEqual(newValue, value)) {
+            valueRef.current = newValue;
+            if (signal?.aborted) return;
+            const { name } = schema;
+            const state = get(formAtom);
+            const record = { ...state.record };
+            setObjValue(record, name, newValue);
+            // updated reference dotted fields in record
+            Object.keys(record).forEach((fieldName) => {
+              if (fieldName.includes(".") && fieldName.startsWith(name)) {
+                const value =
+                  getObjValue(record, fieldName.split(".")) ||
+                  getObjValue(record, fieldName);
+                record[fieldName] = value;
+              }
+            });
+            set(formAtom, {
+              ...state,
+              record,
+            });
+          } else {
+            valueRef.current = value;
+          }
         }
-      }
-    },
-    [ensureRelated, setValue, value],
+      },
+      [schema, formAtom, ensureRelated, value],
+    ),
   );
 
   const onRefSelectRefresh = useCallback(() => {
