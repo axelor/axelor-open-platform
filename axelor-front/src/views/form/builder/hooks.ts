@@ -1,10 +1,18 @@
 import { useAtom } from "jotai";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
+import { useAtomCallback } from "jotai/utils";
 import * as WIDGETS from "../widgets";
 
 export function useWidget(schema: Schema) {
@@ -34,7 +42,7 @@ const defaultFormatter = <T>(value?: T | null) =>
 
 const defaultConverter = <T>(text: string) => (text ? (text as T) : null);
 
-const defaultValidator = (text: string) => true;
+const defaultValidator = () => true;
 
 /**
  * This hook can be used with input fields to handle value updates.
@@ -84,14 +92,24 @@ export function useInput<T>(
     parse = defaultConverter,
   } = options ?? {};
   const [value = defaultValue, setValue] = useAtom(valueAtom);
-
+  const valueText = useMemo(() => format(value) ?? "", [format, value]);
   const [changed, setChanged] = useState(false);
-  const [text, setText] = useState(() => format(value) ?? "");
+  const [text, setText] = useState(valueText);
 
-  useEffect(() => {
-    if (changed) return;
-    setText(() => format(value));
-  }, [changed, format, value]);
+  const dirtyAtom = useViewDirtyAtom();
+  const dirtyRef = useRef<boolean>();
+
+  const setDirty = useAtomCallback(
+    useCallback(
+      (get, set, dirty: boolean) => {
+        if (dirtyRef.current === undefined) {
+          dirtyRef.current = get(dirtyAtom);
+        }
+        set(dirtyAtom, dirty ? true : dirtyRef.current);
+      },
+      [dirtyAtom],
+    ),
+  );
 
   const update = useCallback(
     (text: string, fireOnChange: boolean) => {
@@ -104,15 +122,19 @@ export function useInput<T>(
 
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
-      setChanged(true);
+      setChanged(event.target.value !== valueText);
       setText(event.target.value);
-      update(event.target.value, onChangeTrigger === "change");
+      setDirty(event.target.value !== valueText);
+      if (onChangeTrigger === "change") {
+        update(event.target.value, true);
+      }
     },
-    [onChangeTrigger, update],
+    [onChangeTrigger, setDirty, update, valueText],
   );
 
   const onBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
     (event) => {
+      dirtyRef.current = undefined;
       if (changed) {
         setChanged(false);
         if (onChangeTrigger === "blur") {
@@ -122,6 +144,10 @@ export function useInput<T>(
     },
     [changed, onChangeTrigger, update],
   );
+
+  useEffect(() => {
+    setText(() => format(value) ?? "");
+  }, [format, value]);
 
   return {
     text,
