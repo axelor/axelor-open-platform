@@ -398,15 +398,23 @@ const FormContainer = memo(function FormContainer({
       ],
     ),
   );
-
-  const onNew = useCallback(async () => {
-    showConfirmDirty(
-      async () => isDirty,
-      async () => {
+  const doNew = useCallback(
+    async ({ confirmDirty = true }: { confirmDirty?: boolean } = {}) => {
+      if (confirmDirty) {
+        showConfirmDirty(
+          async () => isDirty,
+          async () => {
+            doEdit(null, { readonly: false, isNew: true });
+          },
+        );
+      } else {
         doEdit(null, { readonly: false, isNew: true });
-      },
-    );
-  }, [doEdit, isDirty, showConfirmDirty]);
+      }
+    },
+    [doEdit, isDirty, showConfirmDirty],
+  );
+
+  const onNew = useCallback(async () => doNew(), [doNew]);
 
   const onEdit = useCallback(async () => {
     setAttrs((prev) => ({
@@ -552,22 +560,26 @@ const FormContainer = memo(function FormContainer({
 
   const reload = useAtomCallback(
     useCallback(
-      async (get, set, options?: { callAction?: boolean }) => {
+      async (
+        get,
+        set,
+        options?: { callAction?: boolean; confirmDirty?: boolean },
+      ) => {
         const id = get(formAtom).record.id ?? 0;
         if (id <= 0) {
-          return onNew();
+          return doNew(options);
         }
         const rec = await doRead(id);
         await doEdit(rec, options);
       },
-      [doEdit, doRead, formAtom, onNew],
+      [doEdit, doNew, doRead, formAtom],
     ),
   );
 
   const onRefresh = useCallback(async () => {
     await showConfirmDirty(
       async () => isDirty,
-      async () => reload(),
+      async () => reload({ confirmDirty: false }),
     );
   }, [isDirty, reload, showConfirmDirty]);
 
