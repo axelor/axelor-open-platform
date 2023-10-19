@@ -507,15 +507,17 @@ function useItemsFamily({
     ),
   );
 
-  const ensureNew = useAtomCallback(
-    useCallback(
-      (get) => {
-        const items = get(itemsAtom);
-        if (items.length === 0) {
-          addItem();
-        }
-      },
-      [addItem, itemsAtom],
+  const ensureNew = useAfterActions(
+    useAtomCallback(
+      useCallback(
+        async (get) => {
+          const items = get(itemsAtom);
+          if (items.length === 0) {
+            addItem();
+          }
+        },
+        [addItem, itemsAtom],
+      ),
     ),
   );
 
@@ -536,8 +538,8 @@ function useItemsFamily({
 
   useEffect(() => ensureValid(), [ensureValid]);
   useEffect(() => {
-    if (items.length === 0) ensureNew();
-  }, [ensureNew, items.length]);
+    if (items.length === 0 && canShowNew) ensureNew();
+  }, [canShowNew, ensureNew, items.length]);
 
   return {
     itemsFamily,
@@ -910,7 +912,7 @@ function JsonEditor({
         const $record = get(formAtom).record;
         return { ...json, $record };
       },
-      (get, set, update: SetStateAction<any>) => {
+      (get, set, update: SetStateAction<DataRecord>) => {
         const state =
           typeof update === "function" ? update(get(valueAtom)) : update;
         const record = state ? compactJson(state) : state;
@@ -936,7 +938,7 @@ function JsonEditor({
 
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
-    (value: any, invalid: boolean) => {
+    (value: DataRecord, invalid: boolean) => {
       setInvalid(widgetAtom, invalid);
     },
     [setInvalid, widgetAtom],
