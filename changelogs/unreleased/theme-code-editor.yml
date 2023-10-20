@@ -1,0 +1,6 @@
+---
+title: CodeEditor `x-code-theme` is no more supported.
+type: change
+description: |
+  As part of the new v7 front-end built on top of React, `x-code-theme` is no more supported. 
+  It will be re-added in a future version.

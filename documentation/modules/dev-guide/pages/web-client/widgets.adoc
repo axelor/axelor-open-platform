@@ -555,12 +555,15 @@ editor to input the source code text.
 CodeEditor widget has two specials attributes:
 
 * `x-code-syntax`: syntax highlighting
-* `x-code-theme`: theme to style the editor.If not define use the default theme
+* `x-code-theme`: theme to style the editor. If not defined, use the default theme.
 
 [source,xml]
 ----
 <field name="script" widget="code-editor" x-code-syntax="xml"/>
 ----
+
+WARNING: As part of the new v7 front-end built on top of React, `x-code-theme` is no more supported. It will be
+re-added in a future version.
 
 == HTML
 
