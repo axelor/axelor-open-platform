@@ -19,6 +19,7 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
+import { removeVersion } from "../../builder/utils";
 import { SelectionTag } from "../selection";
 
 import styles from "./tag-select.module.scss";
@@ -64,7 +65,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const handleChange = useCallback(
     (changedValue: SelectValue<DataRecord, true>) => {
       if (Array.isArray(changedValue)) {
-        const items = changedValue.map(({ version: _, ...rest }) => rest);
+        const items = changedValue.map(removeVersion);
         const prev = value ?? [];
         const markDirty =
           !isManyToMany ||

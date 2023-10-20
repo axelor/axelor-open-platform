@@ -10,8 +10,8 @@ import {
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
-import convert from "@/utils/convert";
 import { MetaData } from "@/services/client/meta";
+import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS } from "./types";
 
 const SERVER_TYPES: string[] = [
@@ -308,4 +308,15 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
   }
 
   return result;
+}
+
+/**
+ * Renames version to $version so that it is not sent in requests.
+ *
+ * @param {DataRecord} record - The data record to be processed.
+ * @return {DataRecord} - The data record with $version.
+ */
+export function removeVersion(record: DataRecord) {
+  const { version, $version, ...rest } = record;
+  return { ...rest, $version: version ?? $version } as DataRecord;
 }

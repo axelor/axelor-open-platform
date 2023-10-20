@@ -24,6 +24,7 @@ import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
 import { useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
+import { removeVersion } from "../../builder/utils";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
 
@@ -67,7 +68,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const handleChange = useCallback(
     (changedValue: SelectValue<DataRecord, false>) => {
       if (changedValue && changedValue.id && changedValue.id > 0) {
-        const { version: _, ...rec } = changedValue;
+        const rec = removeVersion(changedValue);
         setValue(rec, true, rec.id !== value?.id);
       } else {
         setValue(changedValue, true);
