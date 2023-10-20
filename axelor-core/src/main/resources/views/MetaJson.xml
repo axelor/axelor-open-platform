@@ -85,15 +85,15 @@
         <field name="contextFieldTitle" hidden="true" />
         <field name="contextFieldTarget" hidden="true" />
         <field name="contextFieldTargetName" hidden="true" />
-        <field name="showIf" widget="code-editor" x-height="25" x-mode="javascript" />
-        <field name="hideIf" widget="code-editor" x-height="25" x-mode="javascript" />
-        <field name="requiredIf" widget="code-editor" x-height="25" x-mode="javascript" />
-        <field name="readonlyIf" widget="code-editor" x-height="25" x-mode="javascript" />
-        <field name="includeIf" widget="code-editor" x-height="25" x-mode="groovy" help="Server expression to check whether to use this field."/>
+        <field name="showIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
+        <field name="hideIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
+        <field name="requiredIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
+        <field name="readonlyIf" widget="code-editor" x-height="25" x-code-syntax="javascript" />
+        <field name="includeIf" widget="code-editor" x-height="25" x-code-syntax="groovy" help="Server expression to check whether to use this field."/>
       </panel>
       <panel title="Value Expression">
         <field name="valueExpr" showTitle="false" colSpan="12"
-          widget="code-editor" x-height="100" x-mode="javascript"/>
+          widget="code-editor" x-height="100" x-code-syntax="javascript"/>
       </panel>
       <panel-related field="roles">
         <field name="name" />
