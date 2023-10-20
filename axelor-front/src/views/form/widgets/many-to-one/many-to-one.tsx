@@ -85,20 +85,19 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [setValue, value],
   );
 
-  const hasEdit = hasButton("edit");
-  const hasView = hasButton("view");
-  const canView = value && hasView;
-  const canEdit = value && hasEdit && attrs.canEdit;
+  const canRead = perms?.read !== false;
+  const canView = value && hasButton("view");
+  const canEdit = value && hasButton("edit") && attrs.canEdit;
   const canNew = hasButton("new") && attrs.canNew;
   const canSelect = hasButton("select");
   const isRefLink = schema.widget === "ref-link";
-  const readonly = _readonly || !hasEdit;
+  const readonly = _readonly || !canRead;
 
   const { findItems: findFormItems } = useViewMeta();
 
   const ensureRelated = useCallback(
     async (value: DataRecord, refetch?: boolean) => {
-      if (value && value.id && value.id > 0 && hasView) {
+      if (value && value.id && value.id > 0 && canRead) {
         const name = schema.name;
         const prefix = name + ".";
         const items = findFormItems();
@@ -125,7 +124,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       }
       return value;
     },
-    [findFormItems, hasView, schema.name, target, targetName],
+    [findFormItems, canRead, schema.name, target, targetName],
   );
 
   const handleEdit = useCallback(
