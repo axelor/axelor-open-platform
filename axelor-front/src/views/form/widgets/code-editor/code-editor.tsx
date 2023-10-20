@@ -11,9 +11,8 @@ import styles from "./code-editor.module.scss";
 
 export function CodeEditor(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;
-  const { mode, codeSyntax, height = 400, width = "100%" } = schema;
+  const { codeSyntax, height = 400, width = "100%" } = schema;
 
-  const language = mode || codeSyntax;
   const appTheme = useAppTheme();
 
   const theme = appTheme === "dark" ? "vs-dark" : "light";
@@ -40,7 +39,7 @@ export function CodeEditor(props: FieldProps<string>) {
     >
       <Editor
         theme={theme}
-        language={language}
+        language={codeSyntax}
         value={value ?? ""}
         width={w}
         height={h}
