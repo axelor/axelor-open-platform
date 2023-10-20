@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 
-import { Box, CommandItemProps, Panel } from "@axelor/ui";
+import { Box, CommandItemProps, Panel, clsx } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
@@ -44,6 +44,7 @@ import {
 } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
+import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridColumnNames } from "@/views/grid/builder/scope";
@@ -123,6 +124,9 @@ function OneToManyInner({
 }) {
   const {
     name,
+    showBars,
+    toolbar,
+    menubar,
     target: model,
     fields,
     formView,
@@ -837,6 +841,8 @@ function OneToManyInner({
 
   useFormRefresh(onSearch);
 
+  const hasActions = showBars && (toolbar.length > 0 || menubar.length > 0);
+
   const rowSize = 45;
   const headerSize = 100;
   const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
@@ -849,7 +855,9 @@ function OneToManyInner({
     <>
       <Panel
         ref={panelRef}
-        className={styles.container}
+        className={clsx(styles.container, {
+          [styles.toolbar]: hasActions,
+        })}
         header={
           <div className={styles.title}>
             <FieldLabel
@@ -858,6 +866,13 @@ function OneToManyInner({
               formAtom={formAtom}
               widgetAtom={widgetAtom}
             />
+            {hasActions && (
+              <ToolbarActions
+                buttons={toolbar}
+                menus={menubar}
+                actionExecutor={actionExecutor}
+              />
+            )}
           </div>
         }
         toolbar={{

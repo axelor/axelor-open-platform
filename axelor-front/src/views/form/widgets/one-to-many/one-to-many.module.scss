@@ -1,5 +1,8 @@
 .container {
   --ax-panel-body-padding: 0;
+  &.toolbar {
+    --ax-panel-header-title-padding: 0 0.5rem;
+  }
 }
 
 .grid {
@@ -8,5 +11,9 @@
 
 .title {
   display: flex;
-  align-items: start;
+  align-items: center;
+}
+
+.titleText {
+  flex: 1;
 }
