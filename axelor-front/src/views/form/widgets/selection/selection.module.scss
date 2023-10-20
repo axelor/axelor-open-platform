@@ -4,6 +4,10 @@
   height: 1.5rem;
 }
 
+.readonly.editable {
+  --bs-body-bg: var(--bs-table-active-bg);
+}
+
 .tag-text {
   display: inline-block;
   max-width: 140px;

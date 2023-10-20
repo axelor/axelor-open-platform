@@ -94,6 +94,7 @@ export function Selection<Multiple extends boolean>(
       <Select
         className={clsx({
           [styles.readonly]: readonly,
+          [styles.editable]: schema.editable,
         })}
         autoFocus={focus}
         autoComplete={autoComplete}
