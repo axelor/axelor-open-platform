@@ -455,11 +455,12 @@ function useItemsFamily({
         }
 
         const record =
-          item ?? (items.length === 0 && !required)
+          item ??
+          (items.length === 0 && !required
             ? { id: nextId(), [IS_INITIAL]: true }
-            : { id: nextId() };
+            : { id: nextId() });
 
-        if (!item && record[IS_INITIAL]) {
+        if (isInitial(record)) {
           itemsFamily(record);
           setInitialItem(record);
           return;
@@ -474,7 +475,15 @@ function useItemsFamily({
           set(itemsAtom, makeArray(record));
         }
       },
-      [isClean, itemsAtom, itemsFamily, makeArray, multiple, required],
+      [
+        isClean,
+        isInitial,
+        itemsAtom,
+        itemsFamily,
+        makeArray,
+        multiple,
+        required,
+      ],
     ),
   );
 
@@ -582,7 +591,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
     canShowNew,
   });
 
-  const handleAdd = useCallback(() => addItem(), [addItem]);
+  const handleAdd = useCallback(() => addItem({ id: nextId() }), [addItem]);
   const colSpan = Math.max(1, schema.editor.colSpan ?? 12);
 
   return (
