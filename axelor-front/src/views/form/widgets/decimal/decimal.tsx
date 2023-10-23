@@ -146,7 +146,7 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const step = useMemo(
-    () => (scale > 0 ? Math.pow(10, -Math.floor(scale)) : 1),
+    () => (scale > 0 ? Math.pow(10, -Math.floor(scale)).toFixed(scale) : 1),
     [scale],
   );
 
