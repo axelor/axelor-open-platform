@@ -204,10 +204,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
   processAttrs(res.widgetAttrs ?? {}, parseNumber, ...NUMBER_ATTRS);
 
   if (
-    res.widget !== "panel" &&
-    res.widget !== "separator" &&
-    res.widget !== "button" &&
-    res.widget !== "label"
+    !["panel", "dashlet", "separator", "button", "label"].includes(res.widget)
   ) {
     res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;
   }
