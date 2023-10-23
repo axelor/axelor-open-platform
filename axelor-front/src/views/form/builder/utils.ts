@@ -168,7 +168,11 @@ function processAttrs(
   return schema;
 }
 
-export function processView(schema: Schema, fields: Record<string, Property>) {
+export function processView(
+  schema: Schema,
+  fields: Record<string, Property>,
+  parent?: Schema,
+) {
   const field = fields?.[schema.name!] ?? {};
   const attrs = defaultAttrs(field);
 
@@ -209,7 +213,11 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
     res.title = res.title ?? res.autoTitle ?? field.title ?? field.autoTitle;
   }
 
-  if (res.showIf || res.hideIf) {
+  const isCollectionItem = toKebabCase(parent?.serverType || "").endsWith(
+    "-to-many",
+  );
+
+  if ((res.showIf || res.hideIf) && !isCollectionItem) {
     res.hidden = true;
   }
 
@@ -232,7 +240,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 
   if (res.items) {
     res.items = res.items.map((item) =>
-      processView(item, res.fields ?? fields),
+      processView(item, res.fields ?? fields, res),
     );
   }
 
