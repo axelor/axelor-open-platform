@@ -157,7 +157,7 @@ export function DashletComponent({
               [classes.search]: hasSearch,
             })}
           >
-            <DashletTitle title={title || tab?.title} />
+            <DashletTitle title={attrs?.title ?? (title || tab?.title)} />
             {hasSearch && <DashletSearch />}
             {attrs?.refresh && <DashletRefresh count={attrs.refresh} />}
             <DashletActions
