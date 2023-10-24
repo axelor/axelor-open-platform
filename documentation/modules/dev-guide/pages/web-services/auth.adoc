@@ -11,7 +11,7 @@ The session can be established with login services:
 
 .Request
 ----
-POST /login.jsp HTTP/1.1
+POST /callback HTTP/1.1
 ----
 
 .Header
