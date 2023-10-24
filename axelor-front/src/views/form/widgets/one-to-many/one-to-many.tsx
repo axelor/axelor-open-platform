@@ -199,7 +199,7 @@ export function OneToMany({
   const viewMeta = useMemo(() => {
     return (
       viewData ?? {
-        view: schema as unknown as GridView,
+        view: { ...schema, type: "grid" } as GridView,
         fields,
         model,
       }
