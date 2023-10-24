@@ -1,5 +1,6 @@
-import { useAtom, useAtomValue } from "jotai";
-import { useCallback } from "react";
+import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import {
@@ -61,6 +62,30 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     targetName,
     targetSearch,
   });
+
+  const [originalField, setOriginalField] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(formAtom, (o) =>
+          o.prop("original").optional().prop(schema.name),
+        ),
+      [formAtom, schema.name],
+    ) as PrimitiveAtom<DataRecord[] | undefined>,
+  );
+
+  const originalFieldRef = useRef<DataRecord[]>();
+
+  // This widget manages saving independently from main record
+  useEffect(() => {
+    if (originalField === originalFieldRef.current) return;
+    setOriginalField((values) => {
+      if (Array.isArray(values)) {
+        values = values.map(removeVersion);
+      }
+      originalFieldRef.current = values;
+      return values;
+    });
+  }, [originalField, setOriginalField]);
 
   const handleChange = useCallback(
     (changedValue: SelectValue<DataRecord, true>) => {
