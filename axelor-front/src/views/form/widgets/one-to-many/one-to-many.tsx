@@ -2,6 +2,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import getNested from "lodash/get";
 import isEqual from "lodash/isEqual";
 import {
   SetStateAction,
@@ -29,6 +30,7 @@ import {
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
+import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
@@ -235,6 +237,7 @@ export function OneToMany({
     });
   }, [setState]);
 
+  const shouldSyncSelect = useRef(true);
   const onRowSelectionChange = useAtomCallback(
     useCallback(
       (get, set, selection: number[]) => {
@@ -262,31 +265,41 @@ export function OneToMany({
           selected: ids.includes(x.id!),
         }));
 
+        shouldSyncSelect.current = false;
         set(valueAtom, next, false, false);
       },
       [state.rows, valueAtom],
     ),
   );
 
-  useEffect(() => {
-    const items = value ?? [];
-    const ids = items
-      .filter((x) => x.selected)
-      .map((x) => x.id!)
-      .filter(Boolean);
-    const selectedRows = state.rows
-      .map((row, i) => {
-        if (ids.includes(row.record?.id)) {
-          return i;
-        }
-        return undefined;
-      })
-      .filter((x) => x !== undefined) as number[];
+  const syncSelection = useAfterActions(
+    useCallback(async () => {
+      const items = value ?? [];
+      const ids = items
+        .filter((x) => x.selected)
+        .map((x) => x.id!)
+        .filter(Boolean);
+      const selectedRows = state.rows
+        .map((row, i) => {
+          if (ids.includes(row.record?.id)) {
+            return i;
+          }
+          return undefined;
+        })
+        .filter((x) => x !== undefined) as number[];
 
-    setState((draft) => {
-      draft.selectedRows = selectedRows;
-    });
-  }, [setState, state.rows, value]);
+      setState((draft) => {
+        draft.selectedRows = selectedRows;
+      });
+    }, [setState, state.rows, value]),
+  );
+
+  useEffect(() => {
+    if (shouldSyncSelect.current) {
+      syncSelection();
+    }
+    shouldSyncSelect.current = true;
+  }, [syncSelection]);
 
   const doSearch = useAtomCallback(
     useCallback(
