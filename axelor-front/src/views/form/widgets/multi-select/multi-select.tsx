@@ -7,12 +7,8 @@ import { Selection as SelectionType } from "@/services/client/meta.types";
 import { FieldProps } from "../../builder";
 import { Selection, SelectionTag } from "../selection";
 
-export function MultiSelect(
-  props: FieldProps<string | number | null> & {
-    multiple?: boolean;
-  },
-) {
-  const { schema, multiple = true, readonly, valueAtom } = props;
+export function MultiSelect(props: FieldProps<string | number | null>) {
+  const { schema, readonly, valueAtom } = props;
   const { colorField = "color" } = schema;
   const [value, setValue] = useAtom(valueAtom);
 
@@ -55,7 +51,7 @@ export function MultiSelect(
   return (
     <Selection
       {...props}
-      multiple={multiple}
+      multiple={true}
       renderValue={renderValue}
       renderOption={renderOption}
     />
