@@ -1,0 +1,6 @@
+---
+title: Drop StaticResourceProvider
+type: remove
+description: |
+  StaticResourceProvider, used to register custom css or js files, 
+  has been dropped. There is no replacement at this time.

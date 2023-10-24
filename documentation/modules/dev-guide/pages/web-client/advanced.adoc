@@ -51,21 +51,3 @@ The `src/main/webapp` from modules will be copied in this dependency order:
 * finally, copy own webapp
 
 Depending on the structure of the webapp folder, it may overwrite resources of dependency modules.
-
-
-There is also an API `com.axelor.web.StaticResourceProvider` that can be used to register custom CSS and/or JavaScript files. Example:
-
-
-[source,java]
-----
-public class MyStaticResources implements StaticResourceProvider {
-
-  @Override
-  public void register(List<String> resources) {
-    resources.add("my/css/style.css");
-    resources.add("my/js/some.js");
-  }
-}
-----
-
-The application scans for any classes implementing that interface. The CSS and JavaScript files will be included in `index.jsp` file.
