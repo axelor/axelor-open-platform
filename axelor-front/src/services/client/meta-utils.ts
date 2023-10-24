@@ -92,6 +92,7 @@ export function processWidget(field: Schema) {
         "multiline",
         "translatable",
         "hideModeSwitch",
+        "selectionShowCheckbox",
       ].indexOf(name) !== -1
     ) {
       val = String(value)?.toLowerCase?.() === "true";

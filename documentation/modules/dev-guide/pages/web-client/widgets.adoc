@@ -391,6 +391,8 @@ image urls or font icons.
 
 The `MultiSelect` widget can be used with a selection field to select multiple values displayed as tags. Tag colors can be defined in the selection options via the `color` attribute.
 
+It also supports `x-selection-show-checkbox` attribute to show checkbox on options.
+
 == SingleSelect
 
 The `SingleSelect` widget can be used with a selection field to select a single value displayed as a tag. Tag colors can be defined in the selection options via the `color` attribute.

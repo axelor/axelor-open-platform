@@ -1015,6 +1015,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-selection-show-checkbox" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether to show checkbox on options for MultiSelect widget (defaults to `false`)
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
