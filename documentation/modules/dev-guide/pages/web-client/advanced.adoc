@@ -2,44 +2,6 @@
 :toc:
 :toc-title:
 
-== Extra partial JSP templates
-
-You can provide custom partial JSP templates which are included by main `index.jsp` if found in app's `src/main/webapp` folder. These templates are:
-
-* `index-head.jsp` - provide extra tags inside html `<head>` (mostly for adding extra `<link>` and/or `<meta>` tags)
-* `index-foot.jsp` - provide extra html to append at the bottom of page body (mostly used for adding a common footer)
-* `index-nav-buttons.jsp` - provide extra navigation buttons in the top-right part of the main header
-
-Examples:
-
-.index-head.jsp
-[source,html]
-----
-<!-- add font -->
-<link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-----
-
-.index-foot.jsp
-[source,html]
-----
-<footer>
-© 2020 Axelor. All rights reserved.
-</footer>
-----
-
-.index-nav-buttons.jsp
-[source,html]
-----
-<ul class="nav nav-shortcuts pull-right">
-  <li class="divider-vertical"></li>
-  <li>
-    <a href="http://axelor.com"><i class="fa fa-star"></i> Axelor</a>
-  </li>
-</ul>
-----
-
-
 == Per module web resources
 
 Modules can include web resources from `src/main/webapp folder`. Make sure to run `./gradlew copyWebapp` whenever the web resources are changed.

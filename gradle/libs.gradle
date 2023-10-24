@@ -79,7 +79,6 @@ libs.graal_js = "org.graalvm.js:js:22.0.0.2"
 // javax libs
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:4.0.1"
-libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
 libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"

@@ -13,7 +13,6 @@ dependencies {
   implementation project(":axelor-core")
 
   compileOnly libs.javax_servlet
-  compileOnly libs.javax_servlet_jsp
   compileOnly libs.websocket_api
 
   implementation libs.resteasy

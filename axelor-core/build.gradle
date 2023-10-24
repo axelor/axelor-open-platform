@@ -46,7 +46,6 @@ dependencies {
   api libs.commons_csv
 
   api libs.javax_servlet
-  api libs.javax_servlet_jsp
   api libs.javax_mail
   api libs.javax_jaxb
   api libs.graal_js
