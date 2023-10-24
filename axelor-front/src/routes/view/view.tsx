@@ -26,67 +26,51 @@ const noTabAtom: TabAtom = atom({}) as unknown as TabAtom;
 
 const queue = new TaskQueue();
 
-function HandleTab() {
+export function View() {
+  const params = useParams();
   const tabs = useTabs();
   const tabAtom = useMemo(
     () => tabs.active?.state ?? noTabAtom,
     [tabs.active?.state],
   );
   const tabState = useAtomValue(tabAtom);
-  const params = useMemo(() => {
+  const tabParams = useMemo(() => {
     const { action, mode, id } = tabState?.routes?.[tabState.type] ?? {};
     return { action, mode, id };
   }, [tabState]);
 
   const { redirect } = useRoute();
+
+  const pathRef = useRef<string | null>(null);
+  const tabPathRef = useRef<string | null>(null);
   const actionRef = useRef<string>();
 
-  useEffect(() => {
-    const { action, mode, id } = params;
-    if (action && actionRef.current !== action) {
-      const path = getURL(action, mode, id);
-      if (path) {
-        redirect(path);
-      }
-    }
-  }, [redirect, params]);
-
-  return null;
-}
-
-function HandlePath() {
-  const tabs = useTabs();
-  const params = useParams();
-  const pathRef = useRef<string | null>(null);
   const homeAction = session.info?.user?.action;
 
   useEffect(() => {
+    const { action: tabAction, mode: tabMode, id: tabId } = tabParams;
     const { action = homeAction, mode, id } = params;
+    const tabPath = getURL(tabAction, tabMode, tabId);
     const path = getURL(action, mode, id);
-    if (pathRef.current !== path) {
+
+    if (action && path && pathRef.current !== path) {
       pathRef.current = path;
-      if (action && path) {
-        const found = tabs.items.find((x) => x.action.name === action);
-        if (!found || found !== tabs.active) {
-          queue.add(() =>
-            tabs.open(action, {
-              route: { mode, id },
-              tab: true,
-            }),
-          );
-        }
-      }
+      queue.add(() =>
+        tabs.open(action, {
+          route: { mode, id },
+          tab: true,
+        }),
+      );
+    } else if (
+      tabPath &&
+      tabAction &&
+      actionRef.current !== tabAction &&
+      tabPathRef.current !== tabPath
+    ) {
+      tabPathRef.current = tabPath;
+      redirect(tabPath);
     }
-  }, [homeAction, params, tabs]);
+  }, [homeAction, params, redirect, tabParams, tabs]);
 
   return null;
-}
-
-export function View() {
-  return (
-    <>
-      <HandleTab />
-      <HandlePath />
-    </>
-  );
 }
