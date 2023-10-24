@@ -73,7 +73,7 @@ export function Button(props: WidgetProps) {
   const [wait, setWait] = useState(false);
 
   const handleClick = useCallback(async () => {
-    const { prompt, editOnSave, editable, onClick } = schema;
+    const { prompt, onClick } = schema;
     if (prompt) {
       const confirmed = await dialogs.confirm({
         content: prompt,
@@ -82,7 +82,6 @@ export function Button(props: WidgetProps) {
     }
     try {
       setWait(true);
-      editable && editOnSave && await editOnSave?.();
       await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
