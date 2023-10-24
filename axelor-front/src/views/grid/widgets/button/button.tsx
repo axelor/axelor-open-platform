@@ -23,7 +23,7 @@ export function Button(props: GridCellProps) {
     const { showIf, hideIf, readonlyIf } = field as Field;
     const ctx = createScriptContext({ ...context, ...record });
     let hidden: boolean | undefined;
-    let readonly: boolean | undefined;
+    let readonly = (field as Field).readonly;
     if (showIf) {
       hidden = !parseExpression(showIf)(ctx);
     } else if (hideIf) {

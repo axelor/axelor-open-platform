@@ -228,7 +228,7 @@ export const Grid = forwardRef<
         columnProps.$css = clsx(styles.number);
       }
 
-      if (item.hidden || extraAttrs?.hidden) {
+      if (extraAttrs?.hidden ?? item.hidden) {
         columnProps.visible = false;
       }
 
@@ -252,6 +252,7 @@ export const Grid = forwardRef<
         title,
         formatter: columnFormatter || formatter,
         ...columnProps,
+        ...extraAttrs,
       } as any;
     });
 
