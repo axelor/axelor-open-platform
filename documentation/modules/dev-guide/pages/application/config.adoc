@@ -484,37 +484,3 @@ public class AppService {
 
 If return value is null, it will show default logo/icon specified
 with `application.logo` and `application.icon` in configuration file.
-
-== Custom Style
-
-A special context setting `context.appStyle` can be used to provide custom style
-for web ui. For example:
-
-[source,properties]
-----
-context.appStyle = com.axelor.custom.StyleService:getStyle
-----
-
-and the code:
-
-[source,java]
-----
-public class StyleService {
-
-  public String getStyle() {
-    // we can even read the style from database
-    return "header .navbar .nav .fa-bars { color: #86bc25; }"; <1>
-  }
-}
-----
-<1> change the color of sidebar toggle icon
-
-The `getStyle()` method should return custom style as String value.
-
-The custom style is applied in following order:
-
-. default style
-. user theme if available
-. custom style if provided
-
-So the custom style will always override default and theme styles.

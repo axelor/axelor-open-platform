@@ -1,0 +1,6 @@
+---
+title: Drop custom style
+type: remove
+description: |
+  Custom Style (provided from special context setting `context.appStyle`) 
+  has been dropped. There is no replacement at this time.

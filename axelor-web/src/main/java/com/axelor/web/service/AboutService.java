@@ -125,26 +125,4 @@ public class AboutService extends AbstractService {
     return info;
   }
 
-  @GET
-  @Produces("text/css")
-  @Path("custom.css")
-  public String css() {
-    final String style = getStyle();
-    return StringUtils.notBlank(style) ? style : "";
-  }
-
-  public String getStyle() {
-    if (AppSettings.get().get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        Object style = helper.eval("__config__.appStyle");
-        if (style instanceof String) {
-          return style.toString();
-        }
-      } catch (Exception e) {
-      }
-    }
-    return null;
-  }
 }
