@@ -8,8 +8,7 @@ import { FieldProps } from "../../builder";
 import { Selection, SelectionTag } from "../selection";
 
 export function MultiSelect(props: FieldProps<string | number | null>) {
-  const { schema, readonly, valueAtom } = props;
-  const { colorField = "color" } = schema;
+  const { readonly, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
 
   const removeItem = useCallback(
@@ -28,24 +27,19 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
       return (
         <SelectionTag
           title={option.title}
-          color={option[colorField as keyof typeof option]}
+          color={option.color}
           onRemove={readonly ? undefined : () => removeItem(option)}
         />
       );
     },
-    [colorField, readonly, removeItem],
+    [readonly, removeItem],
   );
 
   const renderOption = useCallback(
     ({ option }: SelectOptionProps<SelectionType>) => {
-      return (
-        <SelectionTag
-          title={option.title}
-          color={option[colorField as keyof typeof option]}
-        />
-      );
+      return <SelectionTag title={option.title} color={option.color} />;
     },
-    [colorField],
+    [],
   );
 
   return (
