@@ -288,19 +288,19 @@ export function OneToMany({
     });
   }, [setState, state.rows, value]);
 
-  const onSearch = useAfterActions(
+  const doSearch = useAtomCallback(
     useCallback(
-      async (options?: SearchOptions) => {
+      async (get, set, options?: SearchOptions) => {
         // avoid search for internal value changes
         if (!shouldSearch.current) {
           shouldSearch.current = true;
           return;
         }
-        const items = value || [];
+        const items = get(valueAtom) ?? [];
         const names = options?.fields ?? [];
 
         const ids = items
-          .filter((v) => names.some((n) => v[n] === undefined))
+          .filter((v) => names.some((n) => getNested(v, n) === undefined))
           .filter((v) => (v.id ?? 0) > 0)
           .map((v) => v.id);
 
@@ -341,9 +341,11 @@ export function OneToMany({
           records,
         } as SearchResult;
       },
-      [value, sortBy, name, model, parentId, dataStore],
+      [dataStore, model, name, parentId, sortBy, valueAtom],
     ),
   );
+
+  const onSearch = useAfterActions(doSearch);
 
   const onExport = useCallback(async () => {
     const { fileName } = await dataStore.export({
@@ -361,6 +363,23 @@ export function OneToMany({
       fileName,
     );
   }, [dataStore, state.columns, state.orderBy]);
+
+  const valueRef = useRef<DataRecord[] | null>();
+  useEffect(() => {
+    const last = valueRef.current ?? [];
+    const next = value ?? [];
+
+    if (
+      last.length !== next.length ||
+      last.some((x) => {
+        const y = next.find((d) => d.id === x.id);
+        return y === undefined || !equals(x, y);
+      })
+    ) {
+      valueRef.current = value;
+      onSearch(dataStore.options);
+    }
+  }, [dataStore.options, onSearch, value]);
 
   const handleSelect = useAtomCallback(
     useCallback(
