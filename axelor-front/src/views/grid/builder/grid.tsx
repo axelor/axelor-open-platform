@@ -3,6 +3,7 @@ import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import uniq from "lodash/uniq";
+import uniqueId from "lodash/uniqueId";
 import {
   RefObject,
   forwardRef,
@@ -12,7 +13,6 @@ import {
   useRef,
   useState,
 } from "react";
-import uniqueId from "lodash/uniqueId";
 
 import {
   Grid as AxGrid,
@@ -37,6 +37,7 @@ import { MetaData } from "@/services/client/meta";
 import {
   AdvancedSearchAtom,
   Field,
+  FormView,
   GridView,
   JsonField,
 } from "@/services/client/meta.types";
@@ -397,16 +398,22 @@ export const Grid = forwardRef<
   );
 
   const CustomFormRenderer = useMemo(() => {
+    const items = view.items?.map((item) => {
+      const found = columns.find((x) => x.name === item.name);
+      if (found) return found;
+      return item;
+    });
+    const formView = { ...view, type: "form", items } as FormView;
     return (props: GridRowProps) => (
       <FormRenderer
         ref={formRef}
         {...props}
-        view={view}
+        view={formView}
         fields={fields}
         onInit={onFormInit}
       />
     );
-  }, [onFormInit, view, fields]);
+  }, [onFormInit, view, columns, fields]);
 
   useImperativeHandle(
     ref,

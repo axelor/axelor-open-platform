@@ -16,9 +16,11 @@ import { GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
-import { FormView, GridView, Schema } from "@/services/client/meta.types";
+import { FormView, Schema } from "@/services/client/meta.types";
 import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
   FormAtom,
@@ -30,14 +32,12 @@ import {
   WidgetProps,
   useFormHandlers,
 } from "@/views/form/builder";
-
-import { useShortcut } from "@/hooks/use-shortcut";
 import { useFormScope, useFormValidityScope } from "@/views/form/builder/scope";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
+
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
-  view: GridView;
+  view: FormView;
   fields?: MetaData["fields"];
   onInit?: () => void;
 }
@@ -96,7 +96,7 @@ export const FormLayoutComponent = ({
         showTitle: false,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [schema.items]
+    [schema.items],
   );
 
   return (
@@ -157,13 +157,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         fields,
         model: (view as Schema).target || view?.model,
       }),
-      [view, fields]
+      [view, fields],
     );
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find(
-        (item) => !item.readonly
-      )?.name;
+      const defaultColumnName = view.items?.find((item) => !item.readonly)
+        ?.name;
       const editColumn = view.items?.find((c) => c.name === editColumnName);
       const name = editColumn?.readonly
         ? defaultColumnName
@@ -187,7 +186,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         meta as unknown as ViewData<FormView>,
         record,
         parent,
-        initFormFieldsStates
+        initFormFieldsStates,
       );
     const onNewAction =
       (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
@@ -209,14 +208,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const checkInvalid = useAtomCallback(
       useCallback(
         (get, set, name?: string) => getErrors(get(formAtom), name),
-        [formAtom, getErrors]
-      )
+        [formAtom, getErrors],
+      ),
     );
 
     const handleCancel = useCallback(
       (columnIndex?: number) =>
         onCancel?.(record, rowIndex, columnIndex ?? cellIndex!),
-      [onCancel, record, rowIndex, cellIndex]
+      [onCancel, record, rowIndex, cellIndex],
     );
 
     const handleSave = useAtomCallback(
@@ -231,7 +230,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
               rowIndex,
               columnIndex ?? cellIndex!,
               false,
-              saveFromEdit
+              saveFromEdit,
             );
           }
 
@@ -256,7 +255,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             rowIndex,
             columnIndex ?? cellIndex!,
             true,
-            saveFromEdit
+            saveFromEdit,
           );
         },
         [
@@ -267,8 +266,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           getErrors,
           onSave,
           actionExecutor,
-        ]
-      )
+        ],
+      ),
     );
 
     const handleKeyDown = useCallback(
@@ -280,11 +279,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         if (e.key === `Enter`) {
           return handleSave?.(
             undefined,
-            findColumnIndexByNode(e.target as HTMLElement)
+            findColumnIndexByNode(e.target as HTMLElement),
           );
         }
       },
-      [handleSave, handleCancel]
+      [handleSave, handleCancel],
     );
 
     useShortcut({
@@ -328,21 +327,20 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             handleSave(true);
           }
         },
-        [getParent, formAtom, handleSave, handleCancel]
-      )
+        [getParent, formAtom, handleSave, handleCancel],
+      ),
     );
 
     const CustomLayout = useMemo(
-      () => (props: LayoutProps) =>
-        (
-          <FormLayoutComponent
-            {...props}
-            columns={columns}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
-        ),
-      [columns, handleSave, handleCancel]
+      () => (props: LayoutProps) => (
+        <FormLayoutComponent
+          {...props}
+          columns={columns}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      ),
+      [columns, handleSave, handleCancel],
     );
 
     useImperativeHandle(
@@ -355,7 +353,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           onCancel: handleCancel,
         };
       },
-      [checkInvalid, formAtom, handleSave, handleCancel]
+      [checkInvalid, formAtom, handleSave, handleCancel],
     );
 
     useEffect(() => {
@@ -398,5 +396,5 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         </Box>
       </FocusTrap>
     );
-  }
+  },
 );
