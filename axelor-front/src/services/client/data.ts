@@ -1,6 +1,8 @@
+import { dialogs } from "@/components/dialogs";
 import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
-import { SearchFilter } from "./meta.types";
+import { i18n } from "./i18n";
+import { Perms, SearchFilter } from "./meta.types";
 import { ErrorReport, reject } from "./reject";
 
 export type SearchOptions = {
@@ -53,6 +55,8 @@ export type ExportResult = {
   exportSize: number;
   fileName: string;
 };
+
+export type AccessType = "read" | "write" | "create" | "remove" | "export";
 
 export class DataSource {
   #model;
@@ -129,11 +133,9 @@ export class DataSource {
 
     if (!Array.isArray(data) && data?.$upload) {
       const upload = data.$upload;
-      return this.upload(
-        data,
-        upload.field,
-        upload.file,
-      ) as Promise<SaveResult<T>>;
+      return this.upload(data, upload.field, upload.file) as Promise<
+        SaveResult<T>
+      >;
     }
 
     const isRecords = Array.isArray(data);
@@ -282,5 +284,79 @@ export class DataSource {
       xhr.setRequestHeader("X-CSRF-Token", readCookie("CSRF-TOKEN")!);
       xhr.send(formData);
     });
+  }
+
+  async perms(id?: number | null) {
+    let url = `ws/rest/${this.model}/perms`;
+    const params = new URLSearchParams();
+
+    if ((id ?? 0) > 0) {
+      params.append("id", String(id));
+    }
+
+    if (params.size > 0) {
+      url += `?${params}`;
+    }
+
+    const resp = await request({ url, method: "GET" });
+
+    if (resp.ok) {
+      const { status, data } = await resp.json();
+
+      if (status === 0) {
+        if (data && Array.isArray(data)) {
+          return data.reduce(
+            (acc, curr) => {
+              acc[curr?.toLowerCase?.()] = true;
+              return acc;
+            },
+            {
+              read: false,
+              write: false,
+              create: false,
+              remove: false,
+              export: false,
+            },
+          ) as Perms;
+        }
+      }
+    }
+
+    return Promise.reject(resp.status);
+  }
+
+  async isPermitted(action: AccessType, id?: number | null, silent?: boolean) {
+    let url = `ws/rest/${this.model}/perms`;
+    const params = new URLSearchParams({ action });
+
+    if ((id ?? 0) > 0) {
+      params.append("id", String(id));
+    }
+
+    if (params.size > 0) {
+      url += `?${params}`;
+    }
+
+    const resp = await request({ url, method: "GET" });
+
+    if (resp.ok) {
+      const { status, errors } = await resp.json();
+
+      if (status === 0) {
+        return true;
+      }
+
+      if (!silent) {
+        dialogs.box({
+          title: i18n.get("Access error"),
+          content: Object.values(errors ?? {}).join("<br>"),
+          yesNo: false,
+        });
+      }
+
+      return false;
+    }
+
+    return Promise.reject(resp.status);
   }
 }
