@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 
 import { dialogsActive } from "@/components/dialogs";
+import { getActivePopup } from "@/view-containers/view-popup";
 import { device } from "@/utils/device";
 import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
 import { useTabs } from "../use-tabs";
@@ -27,7 +28,7 @@ const getKeys: (
   ctrlKey: boolean,
   altKey: boolean,
   shiftKey: boolean,
-  key: string
+  key: string,
 ) => {
   ctrlKey: boolean;
   altKey: boolean;
@@ -63,11 +64,12 @@ export function useShortcut(options: Options) {
     altKey: altKeyProp = false,
     shiftKey: shiftKeyProp = false,
   } = options;
+  const tab = useViewTab();
   const { ctrlKey, altKey, shiftKey, metaKey } = getKeys(
     ctrlKeyProp,
     altKeyProp,
     shiftKeyProp,
-    key
+    key,
   );
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -82,10 +84,12 @@ export function useShortcut(options: Options) {
       ) {
         e.stopPropagation();
         e.preventDefault();
+        const popupTabId = getActivePopup()?.tabId;
+        if (popupTabId && popupTabId !== tab.id) return;
         !dialogsActive() && action(e);
       }
     },
-    [key, ctrlKey, altKey, shiftKey, metaKey, canHandle, action]
+    [key, ctrlKey, altKey, shiftKey, metaKey, tab.id, canHandle, action],
   );
 
   useEffect(() => {
@@ -121,10 +125,12 @@ export function useShortcuts({
   const tab = useViewTab();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
+  const isActiveTab = active === tab;
+
   const canHandle = useCallback(
     (e: KeyboardEvent) =>
-      active === tab && currentViewType === viewType && canHandleProp(e),
-    [active, tab, currentViewType, viewType, canHandleProp]
+      isActiveTab && currentViewType === viewType && canHandleProp(e),
+    [isActiveTab, currentViewType, viewType, canHandleProp],
   );
 
   useShortcut({
@@ -195,7 +201,7 @@ export function useNavShortcuts({
   const canHandle = useCallback(
     (e: KeyboardEvent) =>
       active === tab && currentViewType === viewType && canHandleProp(e),
-    [active, tab, currentViewType, viewType, canHandleProp]
+    [active, tab, currentViewType, viewType, canHandleProp],
   );
 
   useShortcut({

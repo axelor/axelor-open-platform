@@ -9,6 +9,7 @@ import { PopupDialog, PopupProps } from "./view-popup";
 
 type PopupsState = {
   id: string;
+  tabId: string;
   popup: React.ReactNode;
 };
 
@@ -28,7 +29,7 @@ export async function showPopup(props: PopupProps) {
     <PopupDialog tab={tab} open={open} onClose={handleClose} {...rest} />
   );
 
-  popupStore.set(popupAtom, (prev) => [...prev, { id, popup }]);
+  popupStore.set(popupAtom, (prev) => [...prev, { id, popup, tabId: tab.id }]);
 
   const close = () => {
     popupStore.set(popupAtom, (prev) => prev.filter((x) => x.id !== id));
@@ -43,6 +44,11 @@ export function PopupsProvider() {
       <Popups />
     </Provider>
   );
+}
+
+export function getActivePopup() {
+  const popups = popupStore.get(popupAtom);
+  return popups?.slice(-1)?.[0];
 }
 
 function Popups() {
