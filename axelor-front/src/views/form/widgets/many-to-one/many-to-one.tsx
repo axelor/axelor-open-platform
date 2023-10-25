@@ -9,6 +9,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select, SelectIcon, SelectValue } from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePermitted } from "@/hooks/use-permitted";
 import {
   useBeforeSelect,
   useCompletion,
@@ -20,7 +21,6 @@ import {
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
-
 import { useViewMeta } from "@/view-containers/views/scope";
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
@@ -87,6 +87,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [setValue, value],
   );
 
+  const dataSource = useMemo(() => new DataSource(target), [target]);
+
   const canRead = perms?.read !== false;
   const canView = value && hasButton("view");
   const canEdit = value && hasButton("edit") && attrs.canEdit;
@@ -116,8 +118,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           : names.filter((x) => getObjValue(value, x) === undefined);
         if (missing.length > 0) {
           try {
-            const ds = new DataSource(target);
-            const rec = await ds.read(value.id, { fields: missing }, true);
+            const rec = await dataSource.read(
+              value.id,
+              { fields: missing },
+              true,
+            );
             return { ...value, ...rec, version: undefined };
           } catch (er) {
             return { ...value, [targetName]: value[targetName] ?? value.id };
@@ -126,12 +131,17 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       }
       return value;
     },
-    [findFormItems, canRead, schema.name, target, targetName],
+    [findFormItems, canRead, schema.name, targetName, dataSource],
   );
+
+  const isPermitted = usePermitted(target);
 
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {
       const $record = record ?? value;
+      if (!(await isPermitted($record, readonly))) {
+        return;
+      }
       if (showEditorInTab && ($record?.id ?? 0) > 0) {
         return showEditorInTab($record!, readonly);
       }
@@ -148,14 +158,15 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       });
     },
     [
+      value,
+      isPermitted,
+      showEditorInTab,
+      showEditor,
       title,
       target,
       formView,
-      value,
       getContext,
-      showEditor,
       handleChange,
-      showEditorInTab,
     ],
   );
 
