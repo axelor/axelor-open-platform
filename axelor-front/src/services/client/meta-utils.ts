@@ -175,6 +175,12 @@ export function findViewFields(
     view._included = true;
     fields = view.items = UseIncluded(view);
   }
+  
+  function pushIn(value: string, target: string[]) {
+    if (!target.includes(value)) {
+      target.push(value);
+    }
+  }
 
   function acceptEditor(item: Schema) {
     let collect = items;
@@ -189,19 +195,18 @@ export function findViewFields(
       _.each(items, (child) => {
         if (
           child.name &&
-          collect.indexOf(child.name) === -1 &&
           child.type === "field"
         ) {
-          collect.push(child.name);
+          pushIn(child.name, collect);
         } else if (child.type === "panel") {
           acceptItems(child.items);
         }
         if (child.widget === "ref-select") {
-          collect.push(child.related);
+          pushIn(child.related, collect);
         }
         if (typeof child.depends === "string") {
           child.depends.split(/\s*,\s*/).forEach((name) => {
-            collect.push(name);
+            pushIn(name, collect);
           });
         }
         processWidget(child);
@@ -217,7 +222,7 @@ export function findViewFields(
       collect = result.related[item.name] || (result.related[item.name] = []);
     }
     _.each(viewer.fields, (item) => {
-      collect.push(item.name);
+      pushIn(item.name, collect);
     });
     if (viewer.fields) {
       viewer.fields = processFields(viewer.fields);
@@ -228,11 +233,11 @@ export function findViewFields(
     if (item.editor) acceptEditor(item);
     if (item.viewer) acceptViewer(item);
     if (item.name && item.type === "panel-related") {
-      items.push(item.name);
+      pushIn(item.name, items);
     } else if (item.items) {
       findViewFields(item, result);
     } else if (item.name && item.type === "field") {
-      items.push(item.name);
+      pushIn(item.name, items);
     }
 
     // process tag-select
@@ -240,15 +245,11 @@ export function findViewFields(
     if (item.widget === "tag-select") {
       // fetch colors
       if (item.name && item.colorField) {
-        (result.related[item.name] || (result.related[item.name] = [])).push(
-          item.colorField,
-        );
+        pushIn(item.colorField, result.related[item.name] || (result.related[item.name] = []));
       }
       // fetch target names
       if (item.name && item.targetName) {
-        (result.related[item.name] || (result.related[item.name] = [])).push(
-          item.targetName,
-        );
+        pushIn(item.targetName, result.related[item.name] || (result.related[item.name] = []));
       }
     }
   });
