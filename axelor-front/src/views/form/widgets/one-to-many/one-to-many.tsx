@@ -726,6 +726,7 @@ export function OneToMany({
                 <DetailsForm
                   meta={detailMeta}
                   readonly={readonly || editable}
+                  parent={formAtom}
                   record={detailRecord}
                   formAtom={gridRef.current?.form?.current?.formAtom}
                   onClose={onCloseInDetail}

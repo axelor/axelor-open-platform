@@ -18,6 +18,7 @@ interface DetailsFormProps {
   record: DataRecord | null;
   readonly?: boolean;
   formAtom?: FormAtom;
+  parent?: FormAtom;
   onSave: (data: DataRecord) => void;
   onNew?: () => void;
   onClose?: () => void;
@@ -30,6 +31,7 @@ export function DetailsForm({
   formAtom: detailFormAtom,
   readonly,
   record,
+  parent,
   onNew,
   onClose,
   onSave,
@@ -39,7 +41,7 @@ export function DetailsForm({
     actionHandler,
     actionExecutor,
     recordHandler,
-  } = useFormHandlers(meta, record ?? defaultRecord);
+  } = useFormHandlers(meta, record ?? defaultRecord, parent);
 
   const formAtom = detailFormAtom ?? _formAtom;
   const getErrors = useGetErrors();
