@@ -450,28 +450,40 @@ const FormContainer = memo(function FormContainer({
     );
   }, []);
 
-  const handleOnSaveErrors = useCallback(async function onError(
-    error: ErrorReport,
-  ): Promise<DataRecord> {
-    const { entityId, entityName, title, message } = error;
-    if (entityId && entityName) {
-      const confirmed = await dialogs.confirm({
-        title: title!,
-        content: (
-          <div>
-            <p>{message}</p>
-            <p>{i18n.get("Would you like to reload the record?")}</p>
-          </div>
-        ),
-      });
+  const handleOnSaveErrors = useAtomCallback(
+    useCallback(
+      async function onError(
+        get,
+        set,
+        error: ErrorReport,
+      ): Promise<DataRecord> {
+        const { entityId, entityName, title, message } = error;
+        if (entityId && entityName) {
+          const confirmed = await dialogs.confirm({
+            title: title!,
+            content: (
+              <div>
+                <p>{message}</p>
+                <p>{i18n.get("Would you like to reload the record?")}</p>
+              </div>
+            ),
+          });
 
-      if (confirmed) {
-        return { id: entityId };
-      }
-      throw 500;
-    }
-    throw error;
-  }, []);
+          if (confirmed) {
+            const {
+              record: { id },
+            } = get(formAtom);
+            if ((id ?? 0) > 0) {
+              return { id };
+            }
+          }
+          throw 500;
+        }
+        throw error;
+      },
+      [formAtom],
+    ),
+  );
 
   const onSave = useAtomCallback(
     useCallback(
