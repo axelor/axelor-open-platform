@@ -545,6 +545,9 @@ function OneToManyInner({
     () => ({
       _viewType: "grid",
       _views: [{ type: "grid", name: gridView }],
+      ...(selectedIdsRef.current?.length > 0 && {
+        _ids: selectedIdsRef.current,
+      }),
       _parent: getContext(),
     }),
     [getContext, gridView],
