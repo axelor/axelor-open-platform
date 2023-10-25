@@ -20,7 +20,7 @@ const isSimple = (expression: string) => {
   return !expression.includes("{{") && !expression.includes("}}");
 };
 
-function isReact(template: string | undefined | null) {
+export function isReactTemplate(template: string | undefined | null) {
   const tmpl = template?.trim();
   return tmpl?.startsWith("<>") && tmpl?.endsWith("</>");
 }
@@ -43,7 +43,7 @@ export function useTemplate(template: string) {
   const { actionExecutor } = useFormScope();
 
   return useMemo(() => {
-    const Comp = isReact(template)
+    const Comp = isReactTemplate(template)
       ? processReactTemplate(template)
       : processLegacyTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
@@ -76,7 +76,7 @@ export function useTemplate(template: string) {
         },
       };
 
-      const context = isReact(template)
+      const context = isReactTemplate(template)
         ? createScriptContext(_context, opts)
         : createEvalContext(_context, opts);
 

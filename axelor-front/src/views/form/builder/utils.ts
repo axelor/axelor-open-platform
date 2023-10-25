@@ -63,6 +63,21 @@ function getDefaultServerType(schema: Schema): string {
   return toSnakeCase(serverType).toUpperCase();
 }
 
+export function isField(schema: Schema) {
+  const type = schema.type;
+  return schema.jsonField || type === "field" || type === "panel-related";
+}
+
+export function isReferenceField(schema: Schema) {
+  const type = toKebabCase(schema.serverType ?? schema.widget);
+  return Boolean(type?.endsWith("-to-one"));
+}
+
+export function isCollectionField(schema: Schema) {
+  const type = toKebabCase(schema.serverType ?? schema.widget);
+  return Boolean(type?.endsWith("-to-many"));
+}
+
 export const nextId = (() => {
   let id = 0;
   return () => --id;

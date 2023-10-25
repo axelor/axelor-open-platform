@@ -1,9 +1,9 @@
 import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { selectAtom } from "jotai/utils";
-import { useMemo } from "react";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { useCallback, useMemo } from "react";
 
-import { useTemplate } from "@/hooks/use-parser";
+import { isReactTemplate, useTemplate } from "@/hooks/use-parser";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Property } from "@/services/client/meta.types";
@@ -15,6 +15,7 @@ import { FormScope } from "./scope";
 import { FieldProps } from "./types";
 
 import styles from "./form-viewers.module.scss";
+import { isReferenceField } from "./utils";
 
 export type FieldViewerProps = FieldProps<any>;
 export type FormViewerProps = FieldViewerProps & {
@@ -121,6 +122,7 @@ function RecordViewer({
   record,
   valueAtom,
   widgetAtom,
+  formAtom: parent,
 }: FormViewerProps & { model: string; record: DataRecord }) {
   const meta: ViewData<FormView> = useMemo(
     () => ({
@@ -135,7 +137,7 @@ function RecordViewer({
   );
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, record);
+    useFormHandlers(meta, record, parent);
 
   return (
     <ScopeProvider scope={MetaScope} value={meta}>
@@ -167,9 +169,33 @@ function TemplateViewer({
   template,
   record,
   model: _model,
+  formAtom,
+  schema,
 }: FormViewerProps & { model: string; record: DataRecord }) {
   const Template = useTemplate(template);
-  const ctx = useMemo(() => ({ _model, ...record }), [_model, record]);
+
+  const isReact = useMemo(() => isReactTemplate(template), [template]);
+  const isReference = useMemo(() => isReferenceField(schema), [schema]);
+
+  // in v6, single-value relational field gets current record as
+  // context, instead of current reference value
+  const getLegacyContext = useAtomCallback(
+    useCallback(
+      (get) => {
+        if (isReact || !isReference) return undefined;
+        const { parent } = get(formAtom);
+        const { model: _model, record } = get(parent!);
+        return { _model, ...record };
+      },
+      [formAtom, isReact, isReference],
+    ),
+  );
+
+  const ctx = useMemo(
+    () => getLegacyContext() ?? { _model, ...record },
+    [_model, getLegacyContext, record],
+  );
+
   return (
     <div className={styles.content}>
       <Template context={ctx} />
