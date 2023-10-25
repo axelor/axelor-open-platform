@@ -326,10 +326,10 @@ function FarItems() {
                 ? i18n.get("{0} messages", unreadMailCount)
                 : i18n.get("no messages"),
               onClick: () => {
-                const detail = "mail.inbox";
-                openTab(detail);
+                const tabId = "mail.inbox";
+                openTab(tabId);
                 if (unreadMailCount) {
-                  const event = new CustomEvent("tab:refresh", { detail });
+                  const event = new CustomEvent("tab:refresh", { detail: { id: tabId } });
                   document.dispatchEvent(event);
                 }
               },

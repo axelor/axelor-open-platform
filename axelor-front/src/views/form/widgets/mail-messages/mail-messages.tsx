@@ -382,7 +382,7 @@ function MessageBoxUpdates({
 
   useEffect(() => {
     if (active === tab && unreadRef.current) {
-      const event = new CustomEvent("tab:refresh", { detail: tab.id });
+      const event = new CustomEvent("tab:refresh", { detail: { id: tab.id } });
       document.dispatchEvent(event);
     }
   }, [active, tab, onRefresh]);
