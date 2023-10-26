@@ -157,13 +157,14 @@ export class DefaultActionExecutor implements ActionExecutor {
     }
 
     if (data.info) {
-      await dialogs.box({
+      const waitForDialog = dialogs.box({
         title: data.info.title,
         content: data.info.message,
         yesNo: false,
         yesTitle: data.info.confirmBtnTitle,
       });
       if (data.pending) {
+        await waitForDialog;
         return this.#execute(data.pending, options);
       }
     }
