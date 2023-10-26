@@ -164,7 +164,8 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
         if (curr.version! >= 0) {
           newValue = updateRecord(curr, value);
         } else {
-          newValue = { ...curr, ...value };
+          // update nested-editor values?
+          newValue = { ...curr, $updatedValues: value };
         }
       } else {
         newValue = toCompact(value);
