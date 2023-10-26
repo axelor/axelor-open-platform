@@ -79,7 +79,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const canNew = hasButton("new");
   const canView = readonly && hasButton("view");
-  const canEdit = !readonly && hasButton("edit") && attrs.canEdit;
+  const canEdit = !readonly && hasButton("edit") && attrs.canEdit !== false;
   const canSelect = hasButton("select");
   const canRemove = !readonly && attrs.canRemove !== false;
 
