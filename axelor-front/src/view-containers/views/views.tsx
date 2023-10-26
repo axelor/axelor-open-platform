@@ -16,6 +16,7 @@ import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { filters as fetchFilters } from "@/services/client/meta";
 import { findFields, findView } from "@/services/client/meta-cache";
+import { DataContext } from "@/services/client/data.types";
 import {
   AdvancedSearchAtom,
   Property,
@@ -41,6 +42,7 @@ async function loadView(props: {
   name?: string;
   model?: string;
   resource?: string;
+  context?: DataContext;
 }) {
   const { type } = props;
   const meta = await findView(props);
@@ -59,10 +61,10 @@ function ViewContainer({
   searchAtom?: AdvancedSearchAtom;
   dataStore?: DataStore;
 }) {
-  const { model, params } = tab.action;
+  const { model, params, context } = tab.action;
   const { state, data } = useAsync(
-    async () => loadView({ model, ...view }),
-    [model, view],
+    async () => loadView({ context, model, ...view }),
+    [model, view, context],
   );
 
   const forceTitle = params?.["forceTitle"];

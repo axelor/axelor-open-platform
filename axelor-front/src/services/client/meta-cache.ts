@@ -32,12 +32,14 @@ export async function findView<T extends ViewType>({
   name,
   model,
   resource,
+  context,
   ...props
 }: {
   type: string;
   name?: string;
   model?: string;
   resource?: string;
+  context?: DataContext;
 }): Promise<ViewData<T>> {
   return cache.get(makeKey("view", model, type, name ?? resource), async () => {
     if (type === "html") {
@@ -54,7 +56,7 @@ export async function findView<T extends ViewType>({
       return { model, view: { name, model, type, ...viewProps }, fields };
     }
 
-    const data = await fetchView({ type: type as any, name, model });
+    const data = await fetchView({ type: type as any, name, model, context });
     const { related } = findViewFields(data.view);
 
     data.related = { ...data.related, ...related };
