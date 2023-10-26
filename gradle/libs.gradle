@@ -25,7 +25,7 @@ versions.slf4j = "2.0.9"
 versions.tomcat = "9.0.82"
 versions.tomcat_embed = "${versions.tomcat}"
 
-versions.asm = "9.5"
+versions.asm = "9.6"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
