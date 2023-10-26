@@ -21,6 +21,7 @@ import { GridRow } from "@axelor/ui/grid";
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePermitted } from "@/hooks/use-permitted";
 import {
   EditorOptions,
   useBeforeSelect,
@@ -544,15 +545,20 @@ export function OneToMany({
     setDetailRecord({ id: nextId() });
   }, []);
 
+  const isPermitted = usePermitted(model);
+
   const onEdit = useCallback(
-    (record: DataRecord, readonly = false) => {
+    async (record: DataRecord, readonly = false) => {
+      if (!(await isPermitted(record, readonly))) {
+        return;
+      }
       openEditor(
         { record, readonly },
         (record) => handleSelect([record]),
         onSave,
       );
     },
-    [openEditor, onSave, handleSelect],
+    [isPermitted, openEditor, onSave, handleSelect],
   );
 
   const onView = useCallback(
