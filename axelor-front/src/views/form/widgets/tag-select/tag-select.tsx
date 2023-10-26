@@ -1,6 +1,8 @@
 import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import isEqual from "lodash/isEqual";
+import getObjValue from "lodash/get";
 
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import {
@@ -12,6 +14,8 @@ import {
   useSelector,
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataSource } from "@/services/client/data";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import { toKebabCase } from "@/utils/names";
 import {
@@ -47,6 +51,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
 
+  const valueRef = useRef<DataRecord[]>();
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain } = attrs;
 
@@ -129,6 +134,60 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const canEdit = !readonly && hasButton("edit") && attrs.canEdit !== false;
   const canSelect = hasButton("select");
   const canRemove = !readonly && attrs.canRemove !== false;
+
+  const ensureRelated = useCallback(
+    async (value: DataRecord[]) => {
+      const names = [targetName, colorField].filter((s) => Boolean(s));
+      const ids = value
+        .filter((v) => names.some((name) => getObjValue(v, name) === undefined))
+        .map((v) => v.id);
+
+      if (ids.length > 0) {
+        let records: DataRecord[] = [];
+        try {
+          const ds = new DataSource(target);
+          records = await ds
+            .search({
+              fields: [targetName],
+              filter: {
+                _domain: "self.id in (:_ids)",
+                _domainContext: {
+                  _ids: ids as number[],
+                },
+              },
+            })
+            .then((res) => res.records);
+        } catch (er) {
+          records = ids.map((id) => ({ id, [targetName]: id }));
+          //
+        }
+        const newValue = value.map((v) => {
+          const rec = records.find((r) => r.id === v.id);
+          return rec ? rec : v;
+        });
+        return newValue;
+      }
+      return value;
+    },
+    [target, targetName, colorField],
+  );
+
+  const ensureRelatedValues = useCallback(
+    async (signal?: AbortSignal) => {
+      if (valueRef.current === value) return;
+      if (value) {
+        const newValue = await ensureRelated(value);
+        if (!isEqual(newValue, value)) {
+          valueRef.current = newValue;
+          if (signal?.aborted) return;
+          setValue(newValue, false, false);
+        } else {
+          valueRef.current = value;
+        }
+      }
+    },
+    [ensureRelated, setValue, value],
+  );
 
   const handleEdit = useCallback(
     async (record?: DataContext) => {
@@ -288,6 +347,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       handleRemove,
     ],
   );
+
+  useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
 
   return (
     <FieldControl {...props}>
