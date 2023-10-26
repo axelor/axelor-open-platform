@@ -27,12 +27,13 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
 import { useShortcut, useShortcuts } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
+import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { diff, extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
-import { FormView, Schema } from "@/services/client/meta.types";
+import { FormView, Perms, Schema } from "@/services/client/meta.types";
 import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { Formatters } from "@/utils/format";
@@ -185,6 +186,19 @@ export function Form(props: ViewProps<FormView>) {
     return await fetchRecord(meta, dataStore, recordId);
   }, [popupRecord, recordId, meta, dataStore]);
 
+  const [perms, setPerms] = useState(() => meta.perms);
+
+  const dataSource = useMemo(
+    () => meta.model && new DataSource(meta.model),
+    [meta.model],
+  );
+
+  useAsyncEffect(async () => {
+    if (!dataSource || params?.popup) return;
+    const recordPerms = await dataSource.perms(Number(recordId));
+    setPerms((perms) => ({ ...perms, ...recordPerms }));
+  }, [dataSource, params?.popup, recordId]);
+
   const isLoading = state !== "hasData";
   return (
     <FormContainer
@@ -193,6 +207,7 @@ export function Form(props: ViewProps<FormView>) {
       record={record}
       recordRef={recordRef}
       readonly={readonly}
+      perms={perms}
     />
   );
 }
@@ -204,12 +219,14 @@ const FormContainer = memo(function FormContainer({
   recordRef,
   searchAtom,
   isLoading,
+  perms,
   ...props
 }: ViewProps<FormView> & {
   record: DataRecord;
   recordRef: MutableRefObject<DataRecord | null>;
   readonly?: boolean;
   isLoading?: boolean;
+  perms?: Perms;
 }) {
   const { view: schema } = meta;
   const {
@@ -225,7 +242,7 @@ const FormContainer = memo(function FormContainer({
     useFormHandlers(meta, defaultRecord);
 
   const showConfirmDirty = useViewConfirmDirty();
-  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { hasButton } = usePerms(meta.view, perms ?? meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
 
   const readyAtom = useMemo(
