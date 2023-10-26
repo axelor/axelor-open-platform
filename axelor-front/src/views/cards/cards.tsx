@@ -66,11 +66,6 @@ export function Cards(props: ViewProps<CardsView>) {
     };
   }, [action.name, action.viewType, action.views, getContext]);
 
-  const actionExecutor = useActionExecutor(view, {
-    getContext: getActionContext,
-    onRefresh: () => doSearch({}),
-  });
-
   const { width, minWidth } = useMemo(() => {
     const width = view.width || "calc(100% / 3)";
     const widths = width
@@ -113,11 +108,26 @@ export function Cards(props: ViewProps<CardsView>) {
           ...options,
         });
       },
-      [orderBy, searchAtom, fields, dashlet, dataStore, getViewContext],
+      [
+        orderBy,
+        searchAtom,
+        fields,
+        dashlet,
+        dataStore,
+        getSearchTranslate,
+        getViewContext,
+      ],
     ),
   );
 
   const onSearch = useAfterActions(doSearch);
+
+  const onRefresh = useCallback(() => doSearch({}), [doSearch]);
+
+  const actionExecutor = useActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh,
+  });
 
   const getActionData = useAtomCallback(
     useCallback(
@@ -131,7 +141,6 @@ export function Cards(props: ViewProps<CardsView>) {
       [dataStore, searchAtom],
     ),
   );
-
   const records = useDataStore(dataStore, (ds) => ds.records);
   const Template = useTemplate(view.template!);
 
@@ -219,7 +228,7 @@ export function Cards(props: ViewProps<CardsView>) {
         dataStore,
         actionExecutor,
         view,
-        onRefresh: doSearch,
+        onRefresh,
       });
     }
   }, [
@@ -228,7 +237,7 @@ export function Cards(props: ViewProps<CardsView>) {
     searchAtom,
     dataStore,
     actionExecutor,
-    doSearch,
+    onRefresh,
     setDashletHandlers,
   ]);
 
@@ -252,7 +261,7 @@ export function Cards(props: ViewProps<CardsView>) {
   useShortcuts({
     viewType: view.type,
     onNew: canNew ? onNew : undefined,
-    onRefresh: onSearch,
+    onRefresh,
   });
 
   // register tab:refresh
@@ -318,6 +327,7 @@ export function Cards(props: ViewProps<CardsView>) {
               width={width}
               minWidth={minWidth}
               getContext={getContext}
+              onRefresh={onRefresh}
               {...(hasButton("edit") && { onEdit })}
               {...(hasButton("edit") && {
                 onEdit: hasEditPopup ? onEditInPopup : onEdit,

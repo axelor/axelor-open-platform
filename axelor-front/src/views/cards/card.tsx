@@ -22,6 +22,7 @@ export const Card = memo(function Card({
   onEdit,
   onView,
   onDelete,
+  onRefresh,
   Template,
   width,
   minWidth,
@@ -32,6 +33,7 @@ export const Card = memo(function Card({
   onEdit?: (record: DataRecord) => void;
   onView?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
+  onRefresh?: () => Promise<any>;
   Template: FunctionComponent<{
     context: DataContext;
     options?: EvalContextOptions;
@@ -45,11 +47,13 @@ export const Card = memo(function Card({
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
     const context = { ...getContext?.(), ...$record };
-    const actionExecutor = new DefaultActionExecutor(
-      new FormActionHandler((options?: DataContext) => context)
-    );
+    const actionHandler = new FormActionHandler(() => context);
+
+    onRefresh && actionHandler.setRefreshHandler(onRefresh);
+
+    const actionExecutor = new DefaultActionExecutor(actionHandler);
     return { context, actionExecutor };
-  }, [getContext, record, values]);
+  }, [getContext, onRefresh, record, values]);
 
   function handleClick() {
     onView?.(record);
@@ -63,11 +67,11 @@ export const Card = memo(function Card({
           ...obj,
           ...values,
         }),
-        {}
+        {},
       );
       values && setValues(values);
     },
-    [actionExecutor]
+    [actionExecutor],
   );
 
   const commandItems: CommandItemProps[] = [
@@ -101,8 +105,8 @@ export const Card = memo(function Card({
     <>
       <Box
         d="flex"
-        px={{base: 1, md: 2}}
-        mb={{base: 2, md: 3}}
+        px={{ base: 1, md: 2 }}
+        mb={{ base: 2, md: 3 }}
         className={classes.card}
         style={{
           width,
@@ -110,7 +114,7 @@ export const Card = memo(function Card({
         }}
       >
         <Box
-          p={{base: 2, md: 3}}
+          p={{ base: 2, md: 3 }}
           bgColor="body"
           w={100}
           border
