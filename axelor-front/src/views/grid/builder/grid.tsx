@@ -28,6 +28,7 @@ import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePermitted } from "@/hooks/use-permitted";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
 import { SearchOptions, SearchResult } from "@/services/client/data";
@@ -40,6 +41,7 @@ import {
   FormView,
   GridView,
   JsonField,
+  Property,
 } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
@@ -341,10 +343,17 @@ export const Grid = forwardRef<
     });
   }, [fields, records, setState]);
 
+  const isPermitted = usePermitted(
+    view.model ?? (view as unknown as Property)?.target ?? "",
+  );
+
   const handleRecordAdd = useCallback(async () => {
+    if (!(await isPermitted())) {
+      return false;
+    }
     setEvent("editable:add-new");
     return true;
-  }, []);
+  }, [isPermitted]);
 
   const handleRecordEdit = useCallback(
     async (
@@ -353,15 +362,18 @@ export const Grid = forwardRef<
       column?: GridColumn,
       colIndex?: number,
     ) => {
-      // skip edit row for edit icon
+      // Skip edit row for edit icon and check write permission
       if (
         ["icon", "button"].includes(column?.type ?? "") ||
-        column?.name === "$$edit"
-      )
+        column?.name === "$$edit" ||
+        !(await isPermitted(row.record, false, true))
+      ) {
         return null;
+      }
+
       await commitForm();
     },
-    [commitForm],
+    [commitForm, isPermitted],
   );
 
   const handleRecordDiscard = useCallback(
