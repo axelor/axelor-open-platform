@@ -13,7 +13,7 @@ import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 import { isPlainObject } from "@/services/client/data-utils";
 import { MetaData } from "@/services/client/meta";
 import convert from "@/utils/convert";
-import { Attrs, DEFAULT_ATTRS } from "./types";
+import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
 const SERVER_TYPES: string[] = [
   "string",
@@ -147,6 +147,46 @@ export function processContextValues(context: DataContext) {
   }
 
   return process(context);
+}
+
+export function processSaveValues(
+  record: DataRecord,
+  fields: FormState["fields"],
+) {
+  const values = processContextValues(record);
+
+  Object.keys(values).forEach((fieldName) => {
+    const field = fields[fieldName];
+    if (field?.json) {
+      let value = values[fieldName];
+      if (value && typeof value === "string") {
+        try {
+          value = JSON.parse(value);
+        } catch {
+          // handle error
+        }
+      }
+      values[fieldName] = value ? compactJson(value) : value;
+    }
+  });
+
+  return values;
+}
+
+function compactJson(record: DataRecord) {
+  const rec: DataRecord = {};
+  Object.entries(record).forEach(([k, v]) => {
+    if (k.indexOf("$") === 0 || v === null || v === undefined) return;
+    if (typeof v === "string" && v.trim() === "") return;
+    if (Array.isArray(v)) {
+      if (v.length === 0) return;
+      v = v.map(function (x) {
+        return x.id ? { id: x.id } : x;
+      });
+    }
+    rec[k] = v;
+  });
+  return JSON.stringify(rec);
 }
 
 const NUMBER_ATTRS = [

@@ -1,8 +1,8 @@
 import clsx from "clsx";
+import isEqual from "lodash/isEqual";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
-import isEqual from "lodash/isEqual";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -796,8 +796,16 @@ const RecordEditor = memo(function RecordEditor({
         const { record } = state;
 
         set(editorFormAtom, state);
-        set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
-
+        if (schema.json) {
+          set(
+            valueAtom,
+            isEqual(record, EMPTY_RECORD) ? null : record,
+            false,
+            state.dirty,
+          );
+        } else {
+          set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
+        }
         // re-check validation
         checkInvalidRef.current?.();
       },
@@ -937,6 +945,7 @@ function JsonEditor({
   );
   const model = useAtomValue(modelAtom);
   const jsonModel = schema.jsonModel;
+  const jsonValueRef = useRef<DataRecord>();
 
   const jsonAtom = useMemo(() => {
     return atom(
@@ -944,14 +953,28 @@ function JsonEditor({
         const value = get(valueAtom) || "{}";
         const json = JSON.parse(value);
         const $record = get(formAtom).record;
-        return { ...json, $record };
+        return {
+          ...(isEqual(jsonValueRef.current, json)
+            ? jsonValueRef.current
+            : (jsonValueRef.current = json)),
+          $record,
+        };
       },
-      (get, set, update: SetStateAction<DataRecord>) => {
+      (
+        get,
+        set,
+        update: SetStateAction<DataRecord>,
+        fireOnChange?: boolean,
+        markDirty?: boolean,
+      ) => {
         const state =
           typeof update === "function" ? update(get(valueAtom)) : update;
-        const record = state ? compactJson(state) : state;
-        set(valueAtom, state ? JSON.stringify(record) : null);
-
+        set(
+          valueAtom,
+          state ? JSON.stringify(state) : null,
+          fireOnChange,
+          markDirty,
+        );
         if (jsonModel) {
           const formState = get(formAtom);
           if (formState.record.jsonModel !== jsonModel) {
@@ -1007,20 +1030,4 @@ function processJsonView(schema: Schema) {
   }
 
   return result;
-}
-
-function compactJson(record: DataRecord) {
-  const rec: DataRecord = {};
-  Object.entries(record).forEach(([k, v]) => {
-    if (k.indexOf("$") === 0 || v === null || v === undefined) return;
-    if (typeof v === "string" && v.trim() === "") return;
-    if (Array.isArray(v)) {
-      if (v.length === 0) return;
-      v = v.map(function (x) {
-        return x.id ? { id: x.id } : x;
-      });
-    }
-    rec[k] = v;
-  });
-  return rec;
 }

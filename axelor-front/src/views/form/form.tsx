@@ -72,7 +72,7 @@ import {
 } from "./builder/scope";
 import {
   getDefaultValues,
-  processContextValues as processDataRecord,
+  processSaveValues,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
@@ -554,7 +554,7 @@ const FormContainer = memo(function FormContainer({
         let res = await dataStore.save(
           {
             ...dummyVals,
-            ...processDataRecord(vals),
+            ...processSaveValues(vals, formState.fields),
             _original: original, // pass original values to check for concurrent updates
           },
           opts,
