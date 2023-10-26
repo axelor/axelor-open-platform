@@ -283,7 +283,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
     if (canEdit && canView) result.push(edit);
     if (isSuggestBox) return result;
-    if (canEdit || canView) result.push(view);
+    if (!canEdit && canView) result.push(view);
     if (canNew) result.push(add);
     if (canSelect) result.push(find);
 
