@@ -327,7 +327,7 @@ function useActionAttrs({
             const field = fields[fieldName];
             if (field?.type.endsWith("_TO_MANY")) {
               const state = statesByName[fieldName] ?? {};
-              const column = target.split(".")[1];
+              const column = target.substring(target.indexOf(".") + 1);
               const columns = state.columns ?? {};
               const newState = {
                 ...state,
