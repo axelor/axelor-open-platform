@@ -69,6 +69,9 @@ export function View() {
     ) {
       tabPathRef.current = tabPath;
       redirect(tabPath);
+    } else if (tabs.items.length === 0) {
+      pathRef.current = null;
+      tabPathRef.current = null;
     }
   }, [homeAction, params, redirect, tabParams, tabs]);
 
