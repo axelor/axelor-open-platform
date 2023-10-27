@@ -48,7 +48,11 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { useActionExecutor, useAfterActions } from "../../builder/scope";
+import {
+  useActionExecutor,
+  useAfterActions,
+  useFormRefresh,
+} from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
@@ -310,7 +314,7 @@ export function OneToMany({
           return;
         }
         const items = get(valueAtom) ?? [];
-        const names = options?.fields ?? [];
+        const names = options?.fields ?? dataStore.options.fields ?? [];
 
         const ids = items
           .filter((v) => names.some((n) => getNested(v, n) === undefined))
@@ -666,7 +670,7 @@ export function OneToMany({
   );
 
   const onRowClick = useCallback(
-    (e: SyntheticEvent, row: GridRow, rowIndex: number) => {
+    (e: SyntheticEvent, row: GridRow) => {
       selected?.id === row?.record?.id && fetchAndSetDetailRecord(row.record);
     },
     [selected, fetchAndSetDetailRecord],
@@ -682,18 +686,23 @@ export function OneToMany({
     }
   }, [dataStore, selected, setValue]);
 
-  const onSaveRecord = useCallback(async (record: DataRecord) => {
-    const fieldList = Object.keys(viewData?.fields ?? fields);
-    const res = await dataStore.save(record, {
-      fields: fieldList,
-    });
-    return res && onSave(res)
-  }, [viewData?.fields, fields, dataStore, onSave]);
+  const onSaveRecord = useCallback(
+    async (record: DataRecord) => {
+      const fieldList = Object.keys(viewData?.fields ?? fields);
+      const res = await dataStore.save(record, {
+        fields: fieldList,
+      });
+      return res && onSave(res);
+    },
+    [viewData?.fields, fields, dataStore, onSave],
+  );
 
   useAsyncEffect(async () => {
     if (!detailMeta || recordId === selected?.id) return;
     fetchAndSetDetailRecord(selected);
   }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
+
+  useFormRefresh(onSearch);
 
   if (viewState === "loading") return null;
 
