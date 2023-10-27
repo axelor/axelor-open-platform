@@ -257,10 +257,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
             // updated reference dotted fields in record
             Object.keys(record).forEach((fieldName) => {
               if (fieldName.includes(".") && fieldName.startsWith(name)) {
-                const value =
-                  getObjValue(record, fieldName.split(".")) ||
-                  getObjValue(record, fieldName);
-                record[fieldName] = value;
+                record[fieldName] = getObjValue(record, fieldName.split("."));
               }
             });
             set(formAtom, {
