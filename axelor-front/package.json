@@ -14,7 +14,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@axelor/ui": "^0.0.19",
+    "@axelor/ui": "^0.0.20",
     "@babel/standalone": "^7.22.20",
     "@monaco-editor/react": "^4.5.2",
     "bootstrap-icons": "^1.11.1",
