@@ -17,7 +17,7 @@ import { DashletView } from "@/view-containers/view-dashlet";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { PopupScope } from "@/view-containers/view-popup/handler";
 import { Views } from "@/view-containers/views";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewAction, useViewTab } from "@/view-containers/views/scope";
 
 import {
   Attrs,
@@ -36,6 +36,7 @@ interface DashletProps {
   readonly?: boolean;
   dashboard?: boolean;
   attrs?: Attrs;
+  viewContext?: DataContext;
   getContext?: () => DataContext;
   viewId?: number;
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
@@ -52,6 +53,7 @@ export function DashletComponent({
   className,
   readonly,
   viewId,
+  viewContext,
   dashboard,
   onViewLoad,
   getContext,
@@ -69,6 +71,7 @@ export function DashletComponent({
         ...actionView.context,
         ...context,
       };
+      const { _id, _showRecord } = actionView.context || {};
       return await initTab({
         ...actionView,
         name: uniqueId("$dashlet"),
@@ -79,12 +82,19 @@ export function DashletComponent({
           "dashlet.canSearch": canSearch,
         },
         context: {
-          ...(dashboard ? ctx : actionView.context),
+          ...(dashboard
+            ? ctx
+            : {
+                ...viewContext,
+                ...actionView.context,
+                _id: _id || viewContext?._id,
+                _showRecord,
+              }),
           _model: ctx.model ?? ctx._model,
           _domainAction: action,
         },
       });
-    }, [action, canSearch, dashboard, getContext]),
+    }, [dashboard, action, canSearch, viewContext, getContext]),
   );
 
   const { data: tab, state } = useAsync(load, [load]);
@@ -254,6 +264,7 @@ export function Dashlet(props: WidgetProps) {
     useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom]),
   );
 
+  const viewContext = useViewAction()?.context;
   const getFormContext = usePrepareContext(formAtom);
 
   const getContext = useCallback(() => {
@@ -271,6 +282,7 @@ export function Dashlet(props: WidgetProps) {
         schema={schema}
         attrs={attrs}
         readonly={canEdit ? false : readonly}
+        viewContext={viewContext}
         getContext={getContext}
       />
     )
