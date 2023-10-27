@@ -141,7 +141,7 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const text = useMemo(
     () =>
-      value ? format(value, { props: { ...schema, scale } as Field }) : "",
+      value != null ? format(value, { props: { ...schema, scale } as Field }) : "",
     [scale, schema, value],
   );
 
