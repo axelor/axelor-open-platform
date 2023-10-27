@@ -61,6 +61,7 @@ export interface Property {
   reference?: boolean;
   collection?: boolean;
   enum?: boolean;
+  perms?: Perms;
 
   // x-* attributes
   order?: string;

@@ -41,6 +41,7 @@ import {
   FormView,
   GridView,
   JsonField,
+  Perms,
   Property,
 } from "@/services/client/meta.types";
 import format from "@/utils/format";
@@ -96,6 +97,7 @@ export const Grid = forwardRef<
   Partial<GridProps> & {
     view: GridView;
     fields?: MetaData["fields"];
+    perms?: Perms;
     searchOptions?: Partial<SearchOptions>;
     searchAtom?: AdvancedSearchAtom;
     editable?: boolean;
@@ -116,6 +118,7 @@ export const Grid = forwardRef<
   const {
     view,
     fields,
+    perms,
     searchOptions,
     searchAtom,
     actionExecutor,
@@ -343,17 +346,14 @@ export const Grid = forwardRef<
     });
   }, [fields, records, setState]);
 
-  const isPermitted = usePermitted(
-    view.model ?? (view as unknown as Property)?.target ?? "",
-  );
+  const model = view.model ?? (view as unknown as Property)?.target ?? "";
+
+  const isPermitted = usePermitted(model, perms);
 
   const handleRecordAdd = useCallback(async () => {
-    if (!(await isPermitted())) {
-      return false;
-    }
     setEvent("editable:add-new");
     return true;
-  }, [isPermitted]);
+  }, []);
 
   const handleRecordEdit = useCallback(
     async (

@@ -545,7 +545,7 @@ export function OneToMany({
     setDetailRecord({ id: nextId() });
   }, []);
 
-  const isPermitted = usePermitted(model);
+  const isPermitted = usePermitted(model, perms);
 
   const onEdit = useCallback(
     async (record: DataRecord, readonly = false) => {
@@ -815,6 +815,7 @@ export function OneToMany({
             records={records}
             view={(viewData?.view || schema) as GridView}
             fields={viewData?.fields || fields}
+            perms={perms}
             columnAttrs={columnAttrs}
             state={state}
             setState={setState}

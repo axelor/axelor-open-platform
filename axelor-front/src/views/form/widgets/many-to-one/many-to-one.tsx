@@ -134,7 +134,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [findFormItems, canRead, schema.name, targetName, dataSource],
   );
 
-  const isPermitted = usePermitted(target);
+  const isPermitted = usePermitted(target, perms);
 
   const handleEdit = useCallback(
     async (readonly = false, record?: DataContext) => {

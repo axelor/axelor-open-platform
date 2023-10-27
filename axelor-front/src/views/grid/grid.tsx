@@ -899,6 +899,7 @@ function GridInner(props: ViewProps<GridView>) {
             records={records}
             view={view}
             fields={fields}
+            perms={perms}
             state={state}
             setState={setState}
             sortType={"live"}
