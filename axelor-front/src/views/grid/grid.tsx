@@ -548,7 +548,9 @@ function GridInner(props: ViewProps<GridView>) {
   const getContext = useCallback<() => DataContext>(
     () => ({
       ...getViewContext(true),
-      _ids: selectedIdsRef.current,
+      ...(selectedIdsRef.current?.length > 0 && {
+        _ids: selectedIdsRef.current,
+      }),
       _model: action.model,
       _viewName: action.name,
       _viewType: action.viewType,
