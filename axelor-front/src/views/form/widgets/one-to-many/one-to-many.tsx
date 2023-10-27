@@ -398,12 +398,16 @@ export function OneToMany({
     useCallback(
       (get, set, records: DataRecord[]) => {
         setValue((prev) => {
-          const items = prev || [];
-          const ids = items.map((x) => x.id);
-          const newItems = records.filter(({ id }) => !ids.includes(id));
+          const items = records.map((x) =>
+            x.selected ? x : { ...x, selected: true },
+          );
+          const prevItems = prev || [];
+          const newItems = items.filter(
+            (x) => !prevItems.some((y) => y.id === x.id),
+          );
           return [
-            ...items.map((item) => {
-              const record = records.find((r) => r.id === item.id);
+            ...prevItems.map((item) => {
+              const record = items.find((r) => r.id === item.id);
               return record ? { ...item, ...record } : item;
             }),
             ...newItems.map((item) => {
