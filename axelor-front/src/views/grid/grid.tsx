@@ -926,6 +926,9 @@ function GridInner(props: ViewProps<GridView>) {
             {...dashletProps}
             {...popupProps}
             {...detailsProps}
+            {...(!canNew && {
+              onRecordAdd: undefined,
+            })}
           />
           {hasDetailsView && dirty && (
             <Box bg="light" className={styles.overlay} />
