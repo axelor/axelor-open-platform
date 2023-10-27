@@ -163,7 +163,7 @@ export function Form(props: ViewProps<FormView>) {
   const recordRef = useRef<DataRecord | null>(null);
 
   const { params } = action;
-  const recordId = String(id || action.context?._showRecord || "");
+  const recordId = String(id || "");
   const readonly =
     !params?.forceEdit &&
     (params?.forceReadonly || (viewProps.readonly ?? Boolean(recordId)));
