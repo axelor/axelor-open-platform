@@ -403,6 +403,8 @@ function useExpressions({
       bind,
     } = processSchema(schema);
 
+    const isExpr = (attr: unknown) => typeof attr === "string";
+
     const hasExpression =
       showIf ||
       hideIf ||
@@ -410,16 +412,16 @@ function useExpressions({
       requiredIf ||
       validIf ||
       collapseIf ||
-      canNew ||
-      canEdit ||
-      canSave ||
-      canCopy ||
-      canView ||
-      canRemove ||
-      canDelete ||
-      canArchive ||
-      canAttach ||
-      canSelect;
+      isExpr(canNew) ||
+      isExpr(canEdit) ||
+      isExpr(canSave) ||
+      isExpr(canCopy) ||
+      isExpr(canView) ||
+      isExpr(canRemove) ||
+      isExpr(canDelete) ||
+      isExpr(canArchive) ||
+      isExpr(canAttach) ||
+      isExpr(canSelect);
 
     if (hasExpression || bind) {
       return recordHandler.subscribe((record) => {
@@ -432,16 +434,16 @@ function useExpressions({
         if (collapseIf) handleCondition(ctx, "collapse", collapseIf);
         if (validIf) handleValidation(ctx, validIf);
 
-        if (canNew) handleCondition(ctx, "canNew", canNew);
-        if (canEdit) handleCondition(ctx, "canEdit", canEdit);
-        if (canView) handleCondition(ctx, "canView", canView);
-        if (canSave) handleCondition(ctx, "canSave", canSave);
-        if (canCopy) handleCondition(ctx, "canCopy", canCopy);
-        if (canRemove) handleCondition(ctx, "canRemove", canRemove);
-        if (canDelete) handleCondition(ctx, "canDelete", canDelete);
-        if (canArchive) handleCondition(ctx, "canArchive", canArchive);
-        if (canAttach) handleCondition(ctx, "canAttach", canAttach);
-        if (canSelect) handleCondition(ctx, "canSelect", canSelect);
+        if (isExpr(canNew)) handleCondition(ctx, "canNew", canNew);
+        if (isExpr(canEdit)) handleCondition(ctx, "canEdit", canEdit);
+        if (isExpr(canView)) handleCondition(ctx, "canView", canView);
+        if (isExpr(canSave)) handleCondition(ctx, "canSave", canSave);
+        if (isExpr(canCopy)) handleCondition(ctx, "canCopy", canCopy);
+        if (isExpr(canRemove)) handleCondition(ctx, "canRemove", canRemove);
+        if (isExpr(canDelete)) handleCondition(ctx, "canDelete", canDelete);
+        if (isExpr(canArchive)) handleCondition(ctx, "canArchive", canArchive);
+        if (isExpr(canAttach)) handleCondition(ctx, "canAttach", canAttach);
+        if (isExpr(canSelect)) handleCondition(ctx, "canSelect", canSelect);
       });
     }
   }, [
