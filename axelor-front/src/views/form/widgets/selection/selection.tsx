@@ -26,7 +26,7 @@ export type SelectionProps<Multiple extends boolean> = FieldProps<
     | "autoComplete"
     | "renderOption"
     | "renderValue"
-    | "disableAutoCloseOnSelect"
+    | "closeOnSelect"
   >;
 
 export function Selection<Multiple extends boolean>(
@@ -38,7 +38,7 @@ export function Selection<Multiple extends boolean>(
     invalid,
     multiple,
     autoComplete = true,
-    disableAutoCloseOnSelect,
+    closeOnSelect,
     renderOption,
     renderValue,
     widgetAtom,
@@ -112,7 +112,7 @@ export function Selection<Multiple extends boolean>(
         renderOption={renderOption}
         renderValue={renderValue}
         placeholder={placeholder}
-        disableAutoCloseOnSelect={disableAutoCloseOnSelect}
+        closeOnSelect={closeOnSelect}
       />
     </FieldControl>
   );

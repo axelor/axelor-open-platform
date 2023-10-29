@@ -87,7 +87,7 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
   return (
     <Selection
       {...props}
-      disableAutoCloseOnSelect={true}
+      closeOnSelect={false}
       multiple={true}
       renderValue={renderValue}
       renderOption={renderOption}
