@@ -2,22 +2,23 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Badge, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 
+import { Icon } from "@/components/icon";
 import { useMenu } from "@/hooks/use-menu";
+import { useSession } from "@/hooks/use-session";
+import { useShortcut } from "@/hooks/use-shortcut";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTagsList } from "@/hooks/use-tags";
-import { MenuItem, Tag } from "@/services/client/meta.types";
-
-import { useShortcut } from "@/hooks/use-shortcut";
 import { i18n } from "@/services/client/i18n";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+import { MenuItem, Tag } from "@/services/client/meta.types";
 import { unaccent } from "@/utils/sanitize";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+
 import { useSidebar } from "./hook";
 
 import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
 
-import { Icon } from "@/components/icon";
-import { useSession } from "@/hooks/use-session";
+
 import styles from "./nav-drawer.module.scss";
 
 function MenuTag({
@@ -67,7 +68,7 @@ function load(res: MenuItem[], tags: Tag[]) {
       iconColor,
     };
 
-    if (icon && !item.parent) {
+    if (icon) {
       props.icon = () => <MenuIcon icon={icon} color={iconColor} />;
     }
 
