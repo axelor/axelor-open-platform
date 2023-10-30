@@ -102,7 +102,7 @@ export function defaultAttrs(schema: Schema): Attrs {
 
 export function processActionValue(value: any): any {
   if (Array.isArray(value)) return value.map(processActionValue);
-  if (isPlainObject(value) && value.id === null) {
+  if (isPlainObject(value) && value.id == null) {
     return { ...value, id: nextId(), _dirty: true };
   }
   return value;

@@ -250,7 +250,7 @@ export function OneToMany({
         if (items.length === 0) return;
 
         const ids = selection
-          .map((x) => state.rows[x].record?.id as number)
+          .map((x) => state.rows[x]?.record?.id as number)
           .filter(Boolean);
 
         const cur = items
