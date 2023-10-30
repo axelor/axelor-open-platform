@@ -17,6 +17,8 @@ export function PanelTabs(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
+  const hidden = useAtomValue(widgetAtom).attrs?.hidden;
+
   const handleChange = useCallback(
     (item: NavTabItem) => setActiveTab(item.id),
     [],
@@ -99,6 +101,8 @@ export function PanelTabs(props: WidgetProps) {
   useEffect(() => {
     handleOnSelect(visibleTabs, activeTab);
   }, [activeTab, handleOnSelect, visibleTabs]);
+
+  if (hidden) return;
 
   return (
     <div className={styles.tabs}>

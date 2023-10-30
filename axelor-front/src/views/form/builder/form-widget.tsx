@@ -103,10 +103,13 @@ export function FormWidget(props: FormWidgetProps) {
     return <Comp {...props} widgetAtom={widgetAtom} />;
   }
 
-  // special case for reference fields to ensure related
+  // special cases
+  // 1. reference fields to ensure related
   // dotted fields are fetched when reference is changed
   // with some action
-  if (hidden && isReference(schema)) {
+  // 2. show/hide of panel-tabs loses active tab of it.
+  // always mount panel-tabs to persist it's state.
+  if (hidden && (isReference(schema) || schema.type === "panel-tabs")) {
     return (
       <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
     );

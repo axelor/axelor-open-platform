@@ -230,8 +230,9 @@ export function processView(
   const isCollectionItem = toKebabCase(parent?.serverType || "").endsWith(
     "-to-many",
   );
+  const isPanelTabs = res.type === "panel-tabs";
 
-  if ((res.showIf || res.hideIf) && !isCollectionItem) {
+  if ((res.showIf || res.hideIf) && !isCollectionItem && !isPanelTabs) {
     res.hidden = true;
   }
 
