@@ -158,6 +158,7 @@ export function useInput<T>(
     setText,
     value,
     setValue,
+    setChanged,
     onChange,
     onBlur,
   } as const;
