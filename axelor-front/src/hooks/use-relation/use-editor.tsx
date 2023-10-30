@@ -16,7 +16,7 @@ import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
 import { showErrors, useGetErrors } from "@/views/form";
-import { useFormScope } from "@/views/form/builder/scope";
+import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
 import { initTab } from "../use-tabs";
 
@@ -167,37 +167,39 @@ function Footer({
     );
   }, [handler, onClose]);
 
-  const handleConfirm = useCallback(async () => {
-    if (handler.getState === undefined) return onClose(true);
-    const state = handler.getState();
-    const record = state.record;
-    const canSave = state.dirty || !record.id;
+  const handleConfirm = useAfterActions(
+    useCallback(async () => {
+      if (handler.getState === undefined) return onClose(true);
+      const state = handler.getState();
+      const record = state.record;
+      const canSave = state.dirty || !record.id;
 
-    try {
-      const errors = getErrors(state);
-      if (errors) {
-        showErrors(errors);
-        return;
-      }
-
-      if (canSave) {
-        if (onSave) {
-          onSave(record);
-        } else if (onSelect && handler.onSave) {
-          const rec = await handler.onSave({
-            shouldSave: true,
-            callOnSave: true,
-            callOnLoad: false,
-          });
-          onSelect(rec);
+      try {
+        const errors = getErrors(state);
+        if (errors) {
+          showErrors(errors);
+          return;
         }
-      }
 
-      onClose(true);
-    } catch (e) {
-      // TODO: show error
-    }
-  }, [getErrors, handler, onClose, onSave, onSelect]);
+        if (canSave) {
+          if (onSave) {
+            onSave(record);
+          } else if (onSelect && handler.onSave) {
+            const rec = await handler.onSave({
+              shouldSave: true,
+              callOnSave: true,
+              callOnLoad: false,
+            });
+            onSelect(rec);
+          }
+        }
+
+        onClose(true);
+      } catch (e) {
+        // TODO: show error
+      }
+    }, [getErrors, handler, onClose, onSave, onSelect]),
+  );
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {
