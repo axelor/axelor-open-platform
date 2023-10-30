@@ -1,9 +1,22 @@
-import { DataRecord } from "@/services/client/data.types";
 import { atom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
+
+import { DataRecord } from "@/services/client/data.types";
+
 import { FieldProps, ValueAtom } from "../../builder";
+import { createValueFocusAtom } from "../../builder/atoms";
 import { ManyToOne } from "../many-to-one";
+
+const evalVar = (name: string) => {
+  if (name.startsWith("record.")) {
+    console.warn(
+      "Using `record.` prefix is deprecated for `evalXXX` props of `EvalRefSelect` widget:",
+      name,
+    );
+    return name.substring(7);
+  }
+  return name;
+};
 
 export function EvalRefSelect(props: FieldProps<any>) {
   const { formAtom } = props;
@@ -19,26 +32,26 @@ export function EvalRefSelect(props: FieldProps<any>) {
   const { evalTarget, evalTargetName, evalTitle, evalValue } = evalSchema;
 
   const targetAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.path(evalTarget)),
-    [evalTarget, formAtom]
+    () => createValueFocusAtom(formAtom, evalVar(evalTarget)),
+    [evalTarget, formAtom],
   );
 
   const targetNameAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.path(evalTargetName)),
-    [evalTargetName, formAtom]
+    () => createValueFocusAtom(formAtom, evalVar(evalTargetName)),
+    [evalTargetName, formAtom],
   );
 
   const target = useAtomValue(targetAtom);
   const targetName = useAtomValue(targetNameAtom);
 
   const titleAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.path(evalTitle)),
-    [evalTitle, formAtom]
+    () => createValueFocusAtom(formAtom, evalVar(evalTitle)),
+    [evalTitle, formAtom],
   );
 
   const valueAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.path(evalValue)),
-    [evalValue, formAtom]
+    () => createValueFocusAtom(formAtom, evalVar(evalValue)),
+    [evalValue, formAtom],
   );
 
   const myAtom: ValueAtom<DataRecord> = useMemo(() => {
@@ -57,7 +70,7 @@ export function EvalRefSelect(props: FieldProps<any>) {
         // if evalValue points to the same field, we need to set it to null first
         set(props.valueAtom, null);
         set(props.valueAtom, id, fireOnChange);
-      }
+      },
     );
   }, [props.valueAtom, targetName, titleAtom, valueAtom]);
 

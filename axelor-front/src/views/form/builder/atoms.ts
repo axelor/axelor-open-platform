@@ -1,4 +1,4 @@
-import { PrimitiveAtom, atom } from "jotai";
+import { PrimitiveAtom, WritableAtom, atom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import isEqual from "lodash/isEqual";
 import merge from "lodash/merge";
@@ -116,6 +116,22 @@ export function createWidgetAtom(props: {
   return widgetAtom;
 }
 
+export function createValueFocusAtom(formAtom: FormAtom, path: string) {
+  const names = path?.split(".") ?? [];
+  const lensAtom = focusAtom(formAtom, (o) => {
+    let lens = o.prop("record");
+    let next = names.shift();
+    while (next) {
+      lens = lens.reread((v) => v || {});
+      lens = lens.rewrite((v) => v || {});
+      lens = lens.prop(next);
+      next = names.shift();
+    }
+    return lens;
+  });
+  return lensAtom as WritableAtom<any, [any], void>;
+}
+
 export function createValueAtom({
   schema,
   formAtom,
@@ -187,26 +203,12 @@ export function createValueAtom({
       ? focusAtom(formAtom, (o) => o.prop("record").prop(name))
       : null;
 
-  const lensAtom = focusAtom(formAtom, (o) => {
-    let lens = o.prop("record");
-    if (name) {
-      const path = name.split(".");
-
-      let next = path.shift();
-      while (next) {
-        lens = lens.reread((v) => v || {});
-        lens = lens.rewrite((v) => v || {});
-        lens = lens.prop(next);
-        next = path.shift();
-      }
-    }
-    return lens;
-  });
+  const lensAtom = createValueFocusAtom(formAtom, name ?? "");
 
   return atom(
     (get) => {
       const value = get(lensAtom);
-      return (value ?? (lensDottedAtom ? get(lensDottedAtom) : value)) as any
+      return (value ?? (lensDottedAtom ? get(lensDottedAtom) : value)) as any;
     },
     (
       get,
