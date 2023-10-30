@@ -7,7 +7,7 @@ import { Selection as SelectionType } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { useSelectionList } from "./hooks";
+import { useSelectionDefault, useSelectionList } from "./hooks";
 
 import styles from "./selection.module.scss";
 
@@ -52,6 +52,7 @@ export function Selection<Multiple extends boolean>(
   } = useAtomValue(widgetAtom);
 
   const selectionList = useSelectionList({ schema, widgetAtom });
+  const selectionDefault = useSelectionDefault({ schema, value });
 
   const selectionValue = useMemo(() => {
     const selectionAll: SelectionType[] = schema.selectionList ?? [];
@@ -59,19 +60,15 @@ export function Selection<Multiple extends boolean>(
       const values = value == null ? [] : String(value ?? "").split(",");
       return values.map(
         (x) =>
-          selectionAll.find((item) => String(item.value) === String(x)) ?? {
-            title: x,
-            value: x,
-          },
+          selectionAll.find((item) => String(item.value) === String(x)) ??
+          selectionDefault,
       );
     }
     return (
-      selectionAll.find((item) => String(item.value) === String(value)) ?? {
-        title: value,
-        value: value,
-      }
+      selectionAll.find((item) => String(item.value) === String(value)) ??
+      selectionDefault
     );
-  }, [multiple, schema.selectionList, value]) as SelectValue<
+  }, [multiple, schema.selectionList, selectionDefault, value]) as SelectValue<
     SelectionType,
     Multiple
   >;

@@ -7,6 +7,7 @@ import { Schema, Selection } from "@/services/client/meta.types";
 
 import { WidgetAtom } from "../../builder";
 import { useFormScope } from "../../builder/scope";
+import { isIntegerField } from "../../builder/utils";
 
 function acceptNumber(value?: unknown) {
   if (value === null || value === undefined) return value;
@@ -74,4 +75,29 @@ export function useSelectionList({
         )
       : selectionList;
   }, [schema.selectionList, filterList, value]);
+}
+
+export function useSelectionDefault({
+  value,
+  schema,
+}: {
+  value: unknown;
+  schema: Schema;
+}) {
+  const selectionZero = useMemo(() => {
+    return (
+      isIntegerField(schema) &&
+      String(schema.defaultValue) === "0" &&
+      schema.selectionList &&
+      schema.selectionList.every((x: Selection) => String(x.value) !== "0")
+    );
+  }, [schema]);
+
+  const selectionDefault = useMemo(() => {
+    return selectionZero && String(value) === "0"
+      ? { value: "0", title: "" }
+      : { title: value, value };
+  }, [selectionZero, value]);
+
+  return selectionDefault as Selection;
 }

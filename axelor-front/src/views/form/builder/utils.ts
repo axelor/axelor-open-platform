@@ -69,6 +69,11 @@ export function isField(schema: Schema) {
   return schema.jsonField || type === "field" || type === "panel-related";
 }
 
+export function isIntegerField(schema: Schema) {
+  const type = toKebabCase(schema.serverType ?? schema.widget);
+  return type === "integer";
+}
+
 export function isReferenceField(schema: Schema) {
   const type = toKebabCase(schema.serverType ?? schema.widget);
   return Boolean(type?.endsWith("-to-one"));
