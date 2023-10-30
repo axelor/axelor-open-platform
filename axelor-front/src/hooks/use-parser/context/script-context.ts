@@ -84,7 +84,7 @@ export function createScriptContext(
       return popup;
     },
     $contains(iter: any, item: any) {
-      return Array.isArray(iter) ? iter.includes(item) : false;
+      return iter?.includes?.(item) ?? false;
     },
     $json(name: string) {
       const value = helpers.$get(name);
@@ -218,8 +218,10 @@ export function createScriptContext(
   return new Proxy<Context>(context as any, {
     get(target, p, receiver) {
       if (p === "record") {
-        if (session?.info?.application?.mode != 'prod') {
-          console.warn(`Trying to access field with "record." prefix. This is deprecated and support will be removed in next major version.`);
+        if (session?.info?.application?.mode != "prod") {
+          console.warn(
+            `Trying to access field with "record." prefix. This is deprecated and support will be removed in next major version.`,
+          );
         }
         return receiver;
       }
@@ -227,8 +229,10 @@ export function createScriptContext(
 
       // check access of dummy field without `$` prefix and warn
       if (typeof p === "string" && Reflect.has(target, `$${p}`)) {
-        if (session?.info?.application?.mode != 'prod') {
-          console.warn(`Trying to access dummy field "$${p}" as "${p}". Use "$${p}" instead.`);
+        if (session?.info?.application?.mode != "prod") {
+          console.warn(
+            `Trying to access dummy field "$${p}" as "${p}". Use "$${p}" instead.`,
+          );
         }
         return undefined;
       }
