@@ -71,6 +71,7 @@ export function Decimal(props: FieldProps<string | number>) {
     setChanged,
     onChange,
     onBlur,
+    onKeyDown,
   } = useInput(valueAtom, {
     validate: isNumberLike,
     parse,
@@ -108,8 +109,9 @@ export function Decimal(props: FieldProps<string | number>) {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
       if (e.key === "ArrowUp") increment(1n);
       if (e.key === "ArrowDown") increment(-1n);
+      onKeyDown(e);
     },
-    [increment],
+    [increment, onKeyDown],
   );
 
   const handleUp = useCallback<React.MouseEventHandler<HTMLSpanElement>>(

@@ -16,7 +16,7 @@ export function Time(props: FieldProps<string | number>) {
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { value, text, onChange, onBlur } = useInput(valueAtom, {
+  const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
     validate: isValid,
   });
 
@@ -51,6 +51,7 @@ export function Time(props: FieldProps<string | number>) {
           required={required}
           onChange={onChange}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
           mask={toMask}
         />
       )}

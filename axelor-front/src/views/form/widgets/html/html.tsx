@@ -12,7 +12,7 @@ import styles from "./html.module.scss";
 export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { lite } = schema;
-  const { text, onChange, onBlur } = useInput(valueAtom);
+  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom);
   return (
     <FieldControl {...props}>
       {readonly && <ViewerComponent value={text} />}
@@ -24,6 +24,7 @@ export function Html(props: FieldProps<string>) {
           value={text}
           onChange={onChange}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
           className={clsx(styles.container, {
             [styles.invalid]: props.invalid,
           })}

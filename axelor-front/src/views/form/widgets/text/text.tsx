@@ -1,10 +1,11 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import React, { useCallback, useState } from "react";
 
 import { Input } from "@axelor/ui";
 
-import { FieldControl, FieldProps } from "../../builder";
 import { useAppTheme } from "@/hooks/use-app-theme";
+
+import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 
 export function Text({
@@ -25,7 +26,7 @@ export function Text({
   const { required } = attrs;
 
   const [changed, setChanged] = useState(false);
-  const { text, onChange, onBlur: onInputBlur } = useInput(valueAtom);
+  const { text, onChange, onBlur: onInputBlur, onKeyDown } = useInput(valueAtom);
 
   const handleChange = useCallback<
     React.ChangeEventHandler<HTMLTextAreaElement>
@@ -67,6 +68,7 @@ export function Text({
           {...inputProps}
           onChange={handleChange}
           onBlur={handleBlur}
+          onKeyDown={onKeyDown}
         />
       )}
     </FieldControl>

@@ -24,7 +24,7 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { text, onChange, onBlur } = useInput(valueAtom);
+  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom);
 
   const [trValue, setTranslateValue] = useAtom(
     useMemo(
@@ -56,6 +56,7 @@ export function String({
           value={text}
           invalid={invalid}
           required={required}
+          onKeyDown={onKeyDown}
           onChange={onChange}
           onBlur={onBlur}
           {...inputProps}

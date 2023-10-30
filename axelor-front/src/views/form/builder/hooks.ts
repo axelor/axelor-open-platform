@@ -149,6 +149,18 @@ export function useInput<T>(
     [changed, onChangeTrigger, update],
   );
 
+  const onKeyDown = useCallback<
+    React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  >(
+    (event) => {
+      if (event.key === "Enter" && changed) {
+        setChanged(false);
+        update(text, true);
+      }
+    },
+    [changed, text, update],
+  );
+
   useEffect(() => {
     setText(() => format(value) ?? "");
   }, [format, value]);
@@ -161,5 +173,6 @@ export function useInput<T>(
     setChanged,
     onChange,
     onBlur,
+    onKeyDown,
   } as const;
 }

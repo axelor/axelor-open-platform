@@ -71,7 +71,7 @@ export function Duration(props: FieldProps<string | number>) {
     [big, seconds],
   );
 
-  const { value, text, onChange, onBlur } = useInput(valueAtom, {
+  const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
     validate: isValid,
     format,
     parse: toValue,
@@ -98,6 +98,7 @@ export function Duration(props: FieldProps<string | number>) {
           required={required}
           onChange={onChange}
           onBlur={onBlur}
+          onKeyDown={onKeyDown}
           mask={[
             ...(big ? [/\d/] : []),
             /\d/,
