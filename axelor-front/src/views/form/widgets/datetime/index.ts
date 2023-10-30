@@ -1,1 +1,1 @@
-export { Date as Datetime } from "../date";
+export { Date as Datetime, Date as DateTime } from "../date";
