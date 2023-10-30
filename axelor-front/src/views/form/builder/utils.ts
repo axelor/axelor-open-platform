@@ -71,7 +71,7 @@ export function isField(schema: Schema) {
 
 export function isIntegerField(schema: Schema) {
   const type = toKebabCase(schema.serverType ?? schema.widget);
-  return type === "integer";
+  return ["integer", "long"].includes(type);
 }
 
 export function isReferenceField(schema: Schema) {
