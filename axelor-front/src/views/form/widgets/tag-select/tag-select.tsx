@@ -30,7 +30,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const {
     target,
     targetName,
-    targetSearch,
+    targetSearch: _targetSearch,
+    colorField,
     canSuggest = true,
     placeholder,
     orderBy: sortBy,
@@ -54,6 +55,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
   const showCreator = useCreateOnTheFly(schema);
+  const targetSearch = useMemo<string[]>(
+    () => [...(_targetSearch || [])].concat(colorField ? [colorField] : []),
+    [_targetSearch, colorField],
+  );
 
   const search = useCompletion({
     sortBy,
@@ -248,18 +253,40 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const getOptionMatch = useCallback(() => true, []);
 
+  const renderOption = useCallback(
+    ({ option }: SelectOptionProps<DataRecord>) => {
+      return (
+        <Tag
+          record={option}
+          colorField={colorField}
+          optionLabel={getOptionLabel}
+        />
+      );
+    },
+    [colorField, getOptionLabel],
+  );
+
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => {
       return (
         <Tag
           record={option}
+          colorField={colorField}
           optionLabel={getOptionLabel}
           onClick={canView || canEdit ? handleEdit : undefined}
           onRemove={canRemove ? handleRemove : undefined}
         />
       );
     },
-    [canEdit, canRemove, canView, getOptionLabel, handleEdit, handleRemove],
+    [
+      canEdit,
+      canRemove,
+      canView,
+      colorField,
+      getOptionLabel,
+      handleEdit,
+      handleRemove,
+    ],
   );
 
   return (
@@ -292,6 +319,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         onShowSelect={canSelect ? showSelect : undefined}
         clearIcon={false}
         renderValue={renderValue}
+        renderOption={renderOption}
       />
     </FieldControl>
   );
@@ -299,13 +327,14 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
 type TagProps = {
   record: DataRecord;
+  colorField?: string;
   optionLabel: (record: DataRecord) => string;
   onRemove?: (record: DataRecord) => void;
   onClick?: (record: DataRecord) => void;
 };
 
 function Tag(props: TagProps) {
-  const { record, optionLabel, onClick, onRemove } = props;
+  const { record, colorField, optionLabel, onClick, onRemove } = props;
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -333,7 +362,7 @@ function Tag(props: TagProps) {
           <span>{optionLabel(record)}</span>
         )
       }
-      color="primary"
+      color={(colorField ? record[colorField] : "") || "primary"}
       onRemove={canRemove ? handleRemove : undefined}
     />
   );
