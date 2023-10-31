@@ -180,6 +180,9 @@ public class AxelorPlugin implements Plugin<Project> {
           AxelorUtils.findAxelorProjects(p)
               .forEach(
                   d -> {
+                    if (d == p) {
+                      return;
+                    }
                     dependsOn(generateCodeTask, d.getTasks().findByName(GenerateCode.TASK_NAME));
                     dependsOn(compileTask, d.getTasks().findByName(JavaPlugin.CLASSES_TASK_NAME));
                   });
