@@ -70,10 +70,7 @@ import {
   FormValidityScope,
   useAfterActions,
 } from "./builder/scope";
-import {
-  getDefaultValues,
-  processSaveValues,
-} from "./builder/utils";
+import { getDefaultValues, processSaveValues } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
@@ -236,10 +233,12 @@ const FormContainer = memo(function FormContainer({
   } = schema;
 
   const defaultRecord = useRef({ [defaultSymbol]: true }).current;
-  const { id: tabId, popup, popupOptions } = useViewTab();
+  const { id: tabId, popup, popupOptions, action } = useViewTab();
   const [, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
-    useFormHandlers(meta, defaultRecord);
+    useFormHandlers(meta, defaultRecord, {
+      context: action?.context,
+    });
 
   const showConfirmDirty = useViewConfirmDirty();
   const { hasButton } = usePerms(meta.view, perms ?? meta.perms);

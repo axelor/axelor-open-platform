@@ -16,10 +16,11 @@ import { defaultAttrs, processContextValues } from "./utils";
 export function createFormAtom(props: {
   meta: ViewData<FormView>;
   record: DataRecord;
+  context?: DataContext;
   parent?: PrimitiveAtom<FormState>;
   statesByName?: Record<string, WidgetState>;
 }) {
-  const { meta, record, parent, statesByName = {} } = props;
+  const { meta, record, parent, context, statesByName = {} } = props;
   const { model = "", fields = {} } = meta;
   const states: Record<string, WidgetState> = {};
   return atom<FormState>({
@@ -31,6 +32,7 @@ export function createFormAtom(props: {
     statesByName,
     fields,
     parent,
+    context,
   });
 }
 
@@ -266,9 +268,16 @@ export const contextAtom = atom(
   null,
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
-      const { model, record, parent, statesByName } = get(formAtom);
+      const {
+        model,
+        record,
+        context: _context,
+        parent,
+        statesByName,
+      } = get(formAtom);
 
       let context: DataContext = {
+        ..._context,
         ...options,
         ...record,
         _model: model,

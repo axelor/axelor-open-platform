@@ -37,10 +37,12 @@ export function useFormHandlers(
     parent?: FormAtom;
     states?: Record<string, WidgetState>;
     formAtom?: FormAtom;
+    context?: DataContext;
   },
 ) {
   const {
     parent,
+    context,
     states: statesByName,
     formAtom: givenFormAtom,
   } = options || {};
@@ -51,9 +53,10 @@ export function useFormHandlers(
         meta,
         record,
         parent,
+        context,
         statesByName,
       }),
-    [givenFormAtom, meta, record, parent, statesByName],
+    [givenFormAtom, meta, record, context, parent, statesByName],
   );
 
   const prepareContext = usePrepareContext(formAtom);

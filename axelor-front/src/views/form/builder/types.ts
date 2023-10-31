@@ -67,6 +67,7 @@ export interface FormState {
   readonly model: string;
   readonly fields: Record<string, Property>;
   readonly parent?: FormAtom;
+  readonly context?: DataContext;
 }
 
 export type WidgetAtom = PrimitiveAtom<WidgetState>;
