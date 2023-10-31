@@ -64,6 +64,7 @@ export const Select = forwardRef(function Select<
 
   const [items, setItems] = useState<Type[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [init, setInit] = useState(!fetchOptions);
 
   const selectRef = useRefs(ref);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -78,6 +79,7 @@ export const Select = forwardRef(function Select<
           const items = await fetchOptions(inputValue);
           loadTimerRef.current = undefined;
           setItems(items || []);
+          setInit(true);
         }
       }, 300);
     },
@@ -124,10 +126,15 @@ export const Select = forwardRef(function Select<
     }
   }, [autoFocus, selectRef]);
 
+  const currOptions = fetchOptions ? items : options;
+  const hasOptions = currOptions.length > 0;
+
   const customOptions = useMemo(() => {
+    if (!init) return [];
+
     const options: SelectCustomOption[] = [];
 
-    if (onShowSelect) {
+    if (onShowSelect && (hasOptions || inputValue)) {
       options.push({
         key: "select",
         title: (
@@ -184,15 +191,14 @@ export const Select = forwardRef(function Select<
 
     return options;
   }, [
+    init,
+    hasOptions,
     inputValue,
     selectProps.canCreateOnTheFly,
     onShowCreate,
     onShowCreateAndSelect,
     onShowSelect,
   ]);
-
-  const currOptions = fetchOptions ? items : options;
-  const moreOptions = currOptions.length || inputValue ? customOptions : [];
 
   return (
     <AxSelect
@@ -205,7 +211,7 @@ export const Select = forwardRef(function Select<
       readOnly={readOnly || !canSelect}
       openOnFocus={openOnFocus}
       options={currOptions}
-      customOptions={moreOptions}
+      customOptions={customOptions}
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       onChange={handleChange}
