@@ -133,7 +133,7 @@ export function limitScale(value?: number) {
 const formatNumber: Formatter = (value, opts = {}) => {
   const { props, context = {} } = opts;
   let { scale, currency, serverType, type, widgetAttrs } = props ?? {};
-  // special case for legacy angular filter, see __currency
+  // special case for filter, ie using hard coded currency, see __currency
   const { currencyText } = widgetAttrs ?? {};
 
   if (

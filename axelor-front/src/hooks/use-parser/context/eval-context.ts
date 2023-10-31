@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DataContext } from "@/services/client/data.types";
+
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import format from "@/utils/format";
@@ -12,7 +15,7 @@ export type EvalContextOptions = ScriptContextOptions & {
 
 export function createEvalContext(
   context: DataContext,
-  options: EvalContextOptions = {}
+  options: EvalContextOptions = {},
 ) {
   const { components = {}, helpers = {} } = options;
 
@@ -31,7 +34,11 @@ export function createEvalContext(
     },
     __currency(value: any, currency: string, scale = 2) {
       return format(value, {
-        props: { scale, type: "decimal", widgetAttrs: { currencyText: currency } } as any,
+        props: {
+          scale,
+          type: "decimal",
+          widgetAttrs: { currencyText: currency },
+        } as any,
       });
     },
     __percent(value: any, scale?: string | number) {

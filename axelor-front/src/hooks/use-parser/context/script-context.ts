@@ -9,6 +9,7 @@ import { Property } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 import { axelor } from "@/utils/globals";
+import { unaccent } from "@/utils/sanitize";
 import { ActionOptions } from "@/view-containers/action";
 
 let warnedRecordPrefix = false;
@@ -189,6 +190,7 @@ export function createScriptContext(
         });
       };
     },
+    ...filters,
     ...moreHelpers,
     ...globalHelpers,
   };
@@ -268,3 +270,39 @@ export function createScriptContext(
     },
   });
 }
+
+const filters = {
+  __date(value: any, formatText: string) {
+    if (value && formatText) {
+      return moment(value).format(formatText);
+    }
+    return format(value, { props: { type: "date" } as any });
+  },
+  __currency(value: any, currency: string, scale = 2) {
+    return format(value, {
+      props: {
+        scale,
+        type: "decimal",
+        widgetAttrs: { currencyText: currency },
+      } as any,
+    });
+  },
+  __percent(value: any, scale?: string | number) {
+    return format(value, { props: { scale, type: "percent" } as any });
+  },
+  __number(value: any, scale?: string | number) {
+    return format(value, { props: { scale, type: "decimal" } as any });
+  },
+  __unaccent(value: any) {
+    return unaccent(value);
+  },
+  __t(key: string, ...args: any[]) {
+    return i18n.get(key, ...args);
+  },
+  __lowercase(value: any) {
+    return typeof value === "string" ? value.toLowerCase() : value;
+  },
+  __uppercase(value: any) {
+    return typeof value === "string" ? value.toUpperCase() : value;
+  },
+};
