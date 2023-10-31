@@ -1,13 +1,17 @@
-import { atom, useAtomValue } from "jotai";
+import { SetStateAction, atom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useMemo, useRef } from "react";
+import isObject from "lodash/isObject";
 
 import { Box } from "@axelor/ui";
 
 import { useAsync } from "@/hooks/use-async";
 import { DataRecord } from "@/services/client/data.types";
 import { findFields } from "@/services/client/meta-cache";
-import { Selection as SelectionType } from "@/services/client/meta.types";
+import {
+  Schema,
+  Selection as SelectionType,
+} from "@/services/client/meta.types";
 
 import { createWidgetAtom } from "../../builder/atoms";
 import { FieldControl, FieldProps, ValueAtom } from "../../builder";
@@ -15,19 +19,45 @@ import { ManyToOne } from "../many-to-one";
 import { Selection } from "../selection";
 
 export function RefSelect(props: FieldProps<any>) {
-  const { schema, valueAtom, readonly } = props;
+  const { schema, formAtom, valueAtom: _valueAtom, readonly } = props;
+
+  const relatedAtom = useMemo(() => {
+    const related = schema.related ?? schema.name + "Id";
+    return focusAtom(formAtom, (o) => o.prop("record").path(related));
+  }, [formAtom, schema]);
+
+  const valueAtom = useMemo(() => {
+    return atom(
+      (get) => get(_valueAtom),
+      (
+        get,
+        set,
+        update: SetStateAction<any>,
+        markDirty?: boolean,
+        fireOnChange?: boolean,
+      ) => {
+        const value =
+          typeof update === "function" ? update(get(_valueAtom)) : update;
+        set(_valueAtom, value, markDirty, fireOnChange);
+        set(relatedAtom, null);
+      },
+    );
+  }, [_valueAtom, relatedAtom]);
 
   const selection = useMemo(() => {
     const items: SelectionType[] = schema.selectionList || [];
-    return items.reduce((acc, item) => {
-      acc[item.value!] = item;
-      return acc;
-    }, {} as Record<string, SelectionType>);
+    return items.reduce(
+      (acc, item) => {
+        acc[item.value!] = item;
+        return acc;
+      },
+      {} as Record<string, SelectionType>,
+    );
   }, [schema.selectionList]);
 
   const selectSchema = useMemo(
     () => ({ ...schema, showTitle: false }),
-    [schema]
+    [schema],
   );
 
   const isRefLink = schema.widget === "ref-link";
@@ -47,26 +77,44 @@ export function RefSelect(props: FieldProps<any>) {
       gridView,
       showTitle: false,
     }),
-    [domain, formView, gridView, schema, target]
+    [domain, formView, gridView, schema, target],
   );
 
   return (
     <FieldControl {...props}>
-      <Box d="flex" g={3}>
+      <Box
+        d="flex"
+        g={3}
+        flexDirection={{
+          base: "column",
+          md: "row",
+        }}
+        overflow="hidden"
+      >
         {(!isRefLink || !readonly) && (
-          <Box style={{ width: 200 }}>
+          <Box flex={1} overflow="hidden" style={{ maxWidth: 200 }}>
             <Selection {...props} schema={selectSchema} valueAtom={valueAtom} />
           </Box>
         )}
-        <Box flex="1">
-          {target && <RefItem {...props} schema={refSchema} />}
+        <Box flex={1} overflow="hidden">
+          {target && (
+            <RefItem
+              {...props}
+              schema={refSchema}
+              relatedValueAtom={relatedAtom}
+            />
+          )}
         </Box>
       </Box>
     </FieldControl>
   );
 }
 
-function RefItem(props: FieldProps<any>) {
+function RefItem(
+  props: FieldProps<any> & {
+    relatedValueAtom: ValueAtom<any>;
+  },
+) {
   const { schema } = props;
   const { target } = schema;
 
@@ -87,17 +135,23 @@ function RefItem(props: FieldProps<any>) {
   return null;
 }
 
-function RefItemInner(props: FieldProps<any> & { targetName: string }) {
-  const { formAtom, valueAtom, targetName } = props;
+function RefItemInner(
+  props: FieldProps<any> & {
+    targetName: string;
+    relatedValueAtom: ValueAtom<any>;
+  },
+) {
+  const {
+    formAtom,
+    relatedValueAtom,
+    valueAtom,
+    schema: _schema,
+    targetName,
+  } = props;
+  const related = _schema.related ?? _schema.name + "Id";
   const schema = useMemo(
-    () => ({ ...props.schema, targetName, related: props.schema.related }),
-    [props.schema, targetName]
-  );
-
-  const related = schema.related ?? schema.name + "Id";
-  const relatedAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.prop("record").path(related)),
-    [formAtom, related]
+    () => ({ ..._schema, name: related, targetName }),
+    [_schema, related, targetName],
   );
 
   const valRef = useRef<DataRecord | null>();
@@ -105,33 +159,35 @@ function RefItemInner(props: FieldProps<any> & { targetName: string }) {
   const refAtom: ValueAtom<DataRecord> = useMemo(() => {
     return atom(
       (get) => {
-        const id = get(relatedAtom);
+        const id = get(relatedValueAtom);
+        if (isObject(id)) return id;
         if (valRef.current && valRef.current.id === +(id || 0)) {
           return valRef.current;
         }
-        return { id };
+        return id ? { id } : null;
       },
       (get, set, value, fireOnChange, markDirty) => {
         const id = value && value.id && value.id > 0 ? value.id : null;
         valRef.current = value;
-        set(relatedAtom, null);
-        set(relatedAtom, id);
-        // trigger onchange
+        set(relatedValueAtom, null);
+        set(relatedValueAtom, id);
+        // // trigger onchange
         const prev = get(valueAtom);
         set(valueAtom, null, false, false);
         set(valueAtom, prev, fireOnChange, markDirty);
-      }
+      },
     );
-  }, [relatedAtom, valueAtom]);
+  }, [relatedValueAtom, valueAtom]);
 
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom }),
-    [formAtom, schema]
+    [formAtom, schema],
   );
-  
+
   return (
     <ManyToOne
       {...props}
+      key={(schema as Schema).target}
       schema={schema}
       valueAtom={refAtom}
       widgetAtom={widgetAtom}
