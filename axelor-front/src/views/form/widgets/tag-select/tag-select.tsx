@@ -158,8 +158,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
             })
             .then((res) => res.records);
         } catch (er) {
-          records = ids.map((id) => ({ id, [targetName]: id }));
-          //
+          records = ids.map((id) => ({
+            id,
+            [targetName]: value.find((x) => x.id === id)?.[targetName] ?? id,
+          }));
         }
         const newValue = value.map((v) => {
           const rec = records.find((r) => r.id === v.id);
