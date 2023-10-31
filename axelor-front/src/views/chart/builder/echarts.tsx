@@ -72,6 +72,12 @@ export function ECharts({
           };
         }
       }
+      if ($options.legend && !Array.isArray($options.legend)) {
+        $options.legend = {
+          ...$options.legend,
+          padding: [8, 32, 8, 32],
+        };
+      }
       chart.current.setOption(
         {
           ...$options,
