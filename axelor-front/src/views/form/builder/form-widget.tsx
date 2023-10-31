@@ -7,7 +7,11 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { createEvalContext } from "@/hooks/use-parser/context";
-import { parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
+import {
+  isLegacyExpression,
+  parseAngularExp,
+  parseExpression,
+} from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
@@ -318,8 +322,12 @@ function useExpressions({
     useCallback(
       (get, set, context: DataContext, bind: string) => {
         if (valueAtom) {
+          const func = isLegacyExpression(bind)
+            ? parseAngularExp(bind)
+            : parseExpression(bind);
+
           const prevValue = get(valueAtom);
-          const value = parseAngularExp(bind)(context) ?? null;
+          const value = func(context) ?? null;
 
           if (value === prevBindValue.current) return;
           prevBindValue.current = value;
