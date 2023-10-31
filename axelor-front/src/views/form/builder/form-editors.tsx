@@ -106,7 +106,9 @@ function processEditor(schema: Schema) {
   const items = editor.items?.map((item) =>
     applyAttrs({ ...item }),
   ) as Panel["items"];
-  const hasColSpan = flexbox || items?.some((x) => x.colSpan);
+
+  const hasColSpan = editor.layout !== "table";
+
   const cols = hasColSpan ? 12 : items?.length;
   const colWidths = hasColSpan
     ? undefined
