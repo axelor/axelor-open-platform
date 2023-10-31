@@ -820,7 +820,10 @@ const RecordEditor = memo(function RecordEditor({
   }, [editorFormAtom, loaded, parent, schema, valueAtom]);
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, EMPTY_RECORD, parent, undefined, editorAtom);
+    useFormHandlers(meta, EMPTY_RECORD, {
+      parent,
+      formAtom: editorAtom,
+    });
 
   const ds = useMemo(() => new DataStore(model), [model]);
   const load = useAtomCallback(

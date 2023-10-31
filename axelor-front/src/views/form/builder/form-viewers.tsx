@@ -137,7 +137,7 @@ function RecordViewer({
   );
 
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
-    useFormHandlers(meta, record, parent);
+    useFormHandlers(meta, record, { parent });
 
   return (
     <ScopeProvider scope={MetaScope} value={meta}>

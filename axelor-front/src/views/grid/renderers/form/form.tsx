@@ -180,12 +180,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { add: addWidgetValidator } = useFormValidityScope();
     const { formAtom: parent } = useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
-      useFormHandlers(
-        meta as unknown as ViewData<FormView>,
-        record,
+      useFormHandlers(meta as unknown as ViewData<FormView>, record, {
         parent,
-        initFormFieldsStates,
-      );
+        states: initFormFieldsStates,
+      });
     const onNewAction =
       (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
 

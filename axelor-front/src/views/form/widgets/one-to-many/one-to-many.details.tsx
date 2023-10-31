@@ -41,7 +41,7 @@ export function DetailsForm({
     actionHandler,
     actionExecutor,
     recordHandler,
-  } = useFormHandlers(meta, record ?? defaultRecord, parent);
+  } = useFormHandlers(meta, record ?? defaultRecord, { parent });
 
   const formAtom = detailFormAtom ?? _formAtom;
   const getErrors = useGetErrors();

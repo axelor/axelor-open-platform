@@ -27,16 +27,23 @@ import { processView } from "./utils";
  *
  * @param meta the form meta
  * @param record the form record
- * @param parent the parent form atom
+ * @param options contains parent, initialize states, existing form atom
  * @returns form atom, action handler and action executor
  */
 export function useFormHandlers(
   meta: ViewData<FormView>,
   record: DataRecord,
-  parent?: FormAtom,
-  initStates?: Record<string, WidgetState>,
-  givenFormAtom?: FormAtom,
+  options?: {
+    parent?: FormAtom;
+    states?: Record<string, WidgetState>;
+    formAtom?: FormAtom;
+  },
 ) {
+  const {
+    parent,
+    states: statesByName,
+    formAtom: givenFormAtom,
+  } = options || {};
   const formAtom = useMemo(
     () =>
       givenFormAtom ??
@@ -44,9 +51,9 @@ export function useFormHandlers(
         meta,
         record,
         parent,
-        statesByName: initStates,
+        statesByName,
       }),
-    [givenFormAtom, meta, record, parent, initStates],
+    [givenFormAtom, meta, record, parent, statesByName],
   );
 
   const prepareContext = usePrepareContext(formAtom);
@@ -85,7 +92,10 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
     useCallback(
       (get, set) => {
         const { meta, record, statesByName, parent } = get(formAtom);
-        if (recordRef.current === record && statesByName === statesByNameRef.current) {
+        if (
+          recordRef.current === record &&
+          statesByName === statesByNameRef.current
+        ) {
           return contextRef.current;
         }
 
