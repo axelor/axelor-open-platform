@@ -111,12 +111,7 @@ export function useEditor() {
         popup: true,
         forceEdit: !readonly,
         "show-toolbar": false,
-        "_popup-record": context?._parent
-          ? {
-              ...record,
-              _parent: context._parent,
-            }
-          : record,
+        "_popup-record": record,
       },
       context: {
         _showRecord: record?.id,
