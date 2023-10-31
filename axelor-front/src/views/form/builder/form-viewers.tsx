@@ -3,7 +3,8 @@ import { ScopeProvider } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
-import { isReactTemplate, useTemplate } from "@/hooks/use-parser";
+import { useTemplate } from "@/hooks/use-parser";
+import { isReactTemplate } from "@/hooks/use-parser/utils";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Property } from "@/services/client/meta.types";
@@ -13,9 +14,9 @@ import { useFormHandlers } from "./form";
 import { FieldControl } from "./form-field";
 import { FormScope } from "./scope";
 import { FieldProps } from "./types";
+import { isReferenceField } from "./utils";
 
 import styles from "./form-viewers.module.scss";
-import { isReferenceField } from "./utils";
 
 export type FieldViewerProps = FieldProps<any>;
 export type FormViewerProps = FieldViewerProps & {

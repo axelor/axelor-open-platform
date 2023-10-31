@@ -18,11 +18,13 @@ import {
 } from "./context";
 import { processLegacyTemplate } from "./template-legacy";
 import { processReactTemplate } from "./template-react";
-import { parseAngularExp, parseExpression } from "./utils";
 
-const isSimple = (expression: string) => {
-  return !expression.includes("{{") && !expression.includes("}}");
-};
+import {
+  isLegacyExpression,
+  isReactTemplate,
+  parseAngularExp,
+  parseExpression,
+} from "./utils";
 
 function useFindAttrs() {
   return useAtomCallback(
@@ -74,17 +76,12 @@ function useCreateParentContext(formAtom: FormAtom) {
   }, [$getField, parentAtom, parentState]);
 }
 
-export function isReactTemplate(template: string | undefined | null) {
-  const tmpl = template?.trim();
-  return tmpl?.startsWith("<>") && tmpl?.endsWith("</>");
-}
-
 export function useExpression(expression: string) {
   return useCallback(
     (context: DataContext, options?: EvalContextOptions) => {
-      const func = isSimple(expression)
-        ? parseExpression(expression)
-        : parseAngularExp(expression);
+      const func = isLegacyExpression(expression)
+        ? parseAngularExp(expression)
+        : parseExpression(expression);
       const evalContext = createEvalContext(context, options);
       return func(evalContext);
     },

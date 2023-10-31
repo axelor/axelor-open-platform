@@ -130,6 +130,37 @@ function resolveFilter(match) {
  */
 export function parseAngularExp(expr) {
   return cache.get(makeKey("ng-expr", expr), () =>
-    parseTemplate(expr.replace(/\{\{(.*?)\}\}/g, resolveFilter))
+    parseTemplate(expr.replace(/\{\{(.*?)\}\}/g, resolveFilter)),
   );
+}
+
+/**
+ * Check whether the expression is legacy angularjs expresion.
+ *
+ * @param {string|undefined|null} expression the expression to check
+ * @returns {boolean}
+ */
+export function isLegacyExpression(expression) {
+  return expression?.includes("{{") && expression?.includes("}}");
+}
+
+/**
+ * Check whether the template is legacy angularjs template.
+ *
+ * @param {string|undefined|null} template the template to check
+ * @returns {boolean}
+ */
+export function isLegacyTemplate(template) {
+  return !isReactTemplate(template);
+}
+
+/**
+ * Check whether the template is React template.
+ *
+ * @param {string|undefined|null} template the template to check
+ * @returns {boolean}
+ */
+export function isReactTemplate(template) {
+  const tmpl = template?.trim();
+  return tmpl?.startsWith("<>") && tmpl?.endsWith("</>");
 }
