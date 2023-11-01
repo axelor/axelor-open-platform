@@ -112,7 +112,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           .filter((name) => name.startsWith(prefix))
           .map((name) => name.substring(prefix.length));
 
-        const names = [targetName, ...related];
+        const names = [targetName, ...related].filter(Boolean);
         const missing = refetch
           ? names
           : names.filter((x) => getObjValue(value, x) === undefined);
