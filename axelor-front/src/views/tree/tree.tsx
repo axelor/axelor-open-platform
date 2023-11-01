@@ -137,12 +137,21 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         const { nodes } = view;
         const rootNode = nodes?.[0];
         const { _domainAction, ..._domainContext } = getContext() || {};
+        const parentNode = nodes?.find((n) => n.parent)?.parent;
+        const parentDomain =
+          isSameModelTree && parentNode ? `self.${parentNode} = null` : "";
+
+        const _domain =
+          rootNode?.domain && parentDomain
+            ? `${rootNode.domain} AND ${parentDomain}`
+            : rootNode?.domain || parentDomain;
+
         return dataStore.search({
           ...(rootNode && getSearchOptions(rootNode)),
           ...options,
           filter: {
             ...options.filter,
-            _domain: rootNode?.domain,
+            _domain,
             _domainAction,
             _domainContext: {
               ...options?.filter?._domainContext,
