@@ -432,7 +432,7 @@ function useActionValue({
               setDeep(draft, target, value);
             });
           }
-          if (op === "add") {
+          if (op === "add" && value) {
             const items: DataRecord[] = record[target] ?? [];
             const found = items.find((x) => x.id === value.id);
             if (found) {
@@ -451,7 +451,7 @@ function useActionValue({
               });
             }
           }
-          if (op === "del") {
+          if (op === "del" && value) {
             const items: DataRecord[] = record[target] ?? [];
             newRecord = setDeep(
               record,
