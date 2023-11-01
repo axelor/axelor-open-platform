@@ -112,11 +112,24 @@ export function OneToMany({
     ),
   );
 
+  const lastValueRef = useRef<DataRecord[] | null>();
+  const lastItemsRef = useRef<DataRecord[]>([]);
+  const getItems = useCallback((value: DataRecord[] | null | undefined) => {
+    if (lastValueRef.current === value) return lastItemsRef.current;
+    const items = value ?? [];
+    const isNum = (x: unknown) => typeof x === "number";
+    lastValueRef.current = value;
+    lastItemsRef.current = items.map((x) =>
+      isNum(x) ? ({ id: x } as unknown as DataRecord) : x,
+    );
+    return lastItemsRef.current;
+  }, []);
+
   const [value, setValue] = useAtom(
     useMemo(
       () =>
         atom(
-          (get) => get(valueAtom),
+          (get) => getItems(get(valueAtom)),
           (
             get,
             set,
@@ -155,7 +168,7 @@ export function OneToMany({
             });
           },
         ),
-      [valueAtom],
+      [getItems, valueAtom],
     ),
   );
 
@@ -246,7 +259,7 @@ export function OneToMany({
   const onRowSelectionChange = useAtomCallback(
     useCallback(
       (get, set, selection: number[]) => {
-        const items = get(valueAtom) ?? [];
+        const items = getItems(get(valueAtom));
         if (items.length === 0) return;
 
         const ids = selection
@@ -273,7 +286,7 @@ export function OneToMany({
         shouldSyncSelect.current = false;
         set(valueAtom, next, false, false);
       },
-      [state.rows, valueAtom],
+      [getItems, state.rows, valueAtom],
     ),
   );
 
@@ -314,11 +327,15 @@ export function OneToMany({
           shouldSearch.current = true;
           return;
         }
-        const items = get(valueAtom) ?? [];
+        const items = getItems(get(valueAtom));
         const names = options?.fields ?? dataStore.options.fields ?? [];
 
         const ids = items
-          .filter((v) => names.some((n) => getNested(v, n) === undefined))
+          .filter(
+            (v) =>
+              names.length === 0 ||
+              names.some((n) => getNested(v, n) === undefined),
+          )
           .filter((v) => (v.id ?? 0) > 0)
           .map((v) => v.id);
 
@@ -359,7 +376,7 @@ export function OneToMany({
           records,
         } as SearchResult;
       },
-      [dataStore, model, name, parentId, sortBy, valueAtom],
+      [dataStore, getItems, model, name, parentId, sortBy, valueAtom],
     ),
   );
 
