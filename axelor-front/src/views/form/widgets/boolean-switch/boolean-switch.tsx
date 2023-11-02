@@ -22,6 +22,7 @@ export function BooleanSwitch(props: FieldProps<boolean>) {
         invalid={invalid}
         checked={value ?? false}
         readOnly={readonly}
+        disabled={readonly}
         onChange={() => setValue(!value, true)}
         value=""
       />
