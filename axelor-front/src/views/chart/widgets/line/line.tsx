@@ -28,16 +28,16 @@ export function Line({ data, type, ...rest }: ChartProps) {
       produce((draft: any) => {
         applyTitles(draft, data);
         draft.series = series.map((line: any) => ({
-          type: "line",
           name: line.key,
+          type: "line",
           stack: "all",
           data: line.values.map(({ y }: any) => y),
           ...(type === "area" ? { areaStyle: {} } : {}),
         }));
         draft.xAxis.data = types;
-        draft.legend.data = series.map((x: any) => x.key);
+        draft.legend.data = series.map((x: any) => x.key).filter(x => x);
         draft.tooltip.valueFormatter = formatter;
-      })
+      }),
     );
   }, [type, data]);
 

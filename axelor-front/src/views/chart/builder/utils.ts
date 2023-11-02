@@ -276,7 +276,7 @@ export function getColor(type: ChartType) {
   if (["hbar", "bar", "line", "area"].includes(type)) {
     return ChartColors.reduce(
       ($colors, set) => $colors.concat([set[5], set[4]]),
-      []
+      [],
     );
   }
   return ChartColors.map((set) => set[5]);
@@ -399,7 +399,7 @@ export function PlusData(data: any) {
                 ? rec[series.key]
                 : Number(rec[series.key]),
             }),
-            {}
+            {},
           )
         : {};
       return {
@@ -441,9 +441,11 @@ export function PlotData(data: any) {
         if (!item) return { x: 0, y: 0 };
         const x = $conv(item[data.xAxis], data.xType) || 0;
         const y = $conv(
-          item[series.key] !== undefined ? item[series.key] : name || 0
+          item[series.key] !== undefined ? item[series.key] : name || 0,
         );
-        return { x, y, item };
+        const sort =
+          $conv(item[`$${data.xAxis}`] ?? item[data.xAxis], data.xType) || 0;
+        return { x, y, item, sort };
       });
 
       const my = map(values, "x");
@@ -453,7 +455,7 @@ export function PlotData(data: any) {
         return null;
       }
 
-      values = sortBy(values, "x");
+      values = sortBy(values, "sort");
 
       return {
         key: name || series.title,
@@ -475,13 +477,14 @@ export function PlotData(data: any) {
 export function getChartData(
   view: ChartView,
   records: ChartDataRecord[],
-  config: ChartView["config"]
+  config: ChartView["config"],
 ): ChartDataRecord[] {
   if (!view || !(records || []).length) return records;
   const { xType, xAxis } = view;
   if (xType && xAxis && FIELD_FORMATTERS[xType]) {
     return records.map((data) => ({
       ...data,
+      [`$${xAxis}`]: data[xAxis],
       [xAxis]: FIELD_FORMATTERS[xType](data[xAxis], config) || data[xAxis],
     }));
   }
