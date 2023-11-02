@@ -25,8 +25,8 @@
       <field name="language"/>
       <field name="theme" widget="theme-select"/>
       <panel stacked="true">
-        <field name="homeAction" hidden="true" x-bind="{{actionSelect.name}}"/>
-        <field name="actionSelect" x-dirty="false" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.home = true"/>
+        <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
+        <field name="__actionSelect" x-dirty="false" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.home = true"/>
       </panel>
       <field name="singleTab" widget="inline-checkbox" />
       <field name="noHelp" widget="inline-checkbox" />
