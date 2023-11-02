@@ -1,0 +1,6 @@
+---
+title: Improve `$fmt` script helper
+type: feature
+description: |
+  The `$fmt` helper accepts an optional `props` param to pass custom field
+  props (`currency`, `scale`, `second`, ...) : `$fmt("myField", { scale: 6 })`

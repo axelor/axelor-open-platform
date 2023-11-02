@@ -5,7 +5,7 @@ import { isPlainObject } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
-import { Property } from "@/services/client/meta.types";
+import { Property, Schema } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 import { axelor } from "@/utils/globals";
@@ -149,11 +149,14 @@ export function createScriptContext(
     $required() {
       return required;
     },
-    $fmt(name: string) {
+    $fmt(name: string, props?: Schema) {
       const value = helpers.$get(name);
       return format(value, {
         context,
-        props: getField(name),
+        props: {
+          ...getField(name),
+          ...props,
+        },
       });
     },
     $image(fieldName: string, imageName: string) {
