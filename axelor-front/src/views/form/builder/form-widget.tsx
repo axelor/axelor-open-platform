@@ -321,12 +321,18 @@ function useExpressions({
     [popup, readonly, required, valid],
   );
 
+  const prevBindValue = useRef();
+
   const handleBind = useAtomCallback(
     useCallback(
       (get, set, context: DataContext, bind: string) => {
         if (valueAtom) {
           const prevValue = get(valueAtom);
           const value = parseAngularExp(bind)(context) ?? null;
+
+          if (value === prevBindValue.current) return;
+          prevBindValue.current = value;
+
           // skip dirty for initial value set
           const isDirty = isUndefined(prevValue) ? false : prevValue !== value;
           set(valueAtom, value, false, isDirty);
