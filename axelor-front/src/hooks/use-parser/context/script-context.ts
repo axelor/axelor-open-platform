@@ -9,6 +9,12 @@ import { Property, Schema } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 import { axelor } from "@/utils/globals";
+import {
+  toCamelCase,
+  toKebabCase,
+  toSnakeCase,
+  toTitleCase,
+} from "@/utils/names";
 import { unaccent } from "@/utils/sanitize";
 import { ActionOptions } from "@/view-containers/action";
 
@@ -158,6 +164,27 @@ export function createScriptContext(
           ...props,
         },
       });
+    },
+    $unaccent(value: string) {
+      return unaccent(value);
+    },
+    $lowerCase(value: any) {
+      return typeof value === "string" ? value.toLowerCase() : value;
+    },
+    $upperCase(value: any) {
+      return typeof value === "string" ? value.toUpperCase() : value;
+    },
+    $titleCase(value: any) {
+      return typeof value === "string" ? toTitleCase(value) : value;
+    },
+    $snakeCase(value: any) {
+      return typeof value === "string" ? toSnakeCase(value) : value;
+    },
+    $kebabCase(value: any) {
+      return typeof value === "string" ? toKebabCase(value) : value;
+    },
+    $camelCase(value: any) {
+      return typeof value === "string" ? toCamelCase(value) : value;
     },
     $image(fieldName: string, imageName: string) {
       let record = context;
