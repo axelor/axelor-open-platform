@@ -225,7 +225,9 @@ public class I18nExtractor {
               accept(new I18nItem(error, file, locator.getLineNumber()));
 
               for (String attr : TEXT_ATTRS) {
-                if ("tag".equals(attr) && "message".equals(qName)) { continue; }
+                if ("tag".equals(attr) && "message".equals(qName)) {
+                  continue;
+                }
                 accept(new I18nItem(attributes.getValue(attr), file, locator.getLineNumber()));
               }
 
