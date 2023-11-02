@@ -26,7 +26,7 @@ const GridLayout = WidthProvider(Responsive);
 
 type MEDIA_TYPE = "xxs" | "xs" | "sm" | "md" | "lg";
 
-const CARD_HEIGHT = 180;
+const CARD_HEIGHT = 50;
 const BREAKPOINTS: Record<MEDIA_TYPE, number> = {
   lg: 1200,
   md: 996,
@@ -45,7 +45,15 @@ const COLS: Record<MEDIA_TYPE, number> = {
 const toNumbers = (str: number | string) =>
   str ? String(str).split(",").map(Number) : [];
 
-const getHeight = (span: number) => (180 * span) / CARD_HEIGHT;
+const getHeight = (span: number, fixedHeight?: string) => {
+  if (fixedHeight) {
+    const h = parseInt(fixedHeight);
+    if (h) {
+      return Math.floor(h / CARD_HEIGHT);
+    }
+  }
+  return (50 * span) / CARD_HEIGHT;
+};
 
 const getAttrs = (item: PanelDashlet, type: MEDIA_TYPE) => {
   const { colOffset = "", rowOffset = "", colSpan = "", rowSpan = "" } = item;
@@ -138,16 +146,14 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             ? (() => {
                 const custom = viewType === "custom";
                 const bounded = ["chart", "grid"].includes(viewType!);
-                const attrs = getAttrs(
-                  viewItems[
-                    item.i as unknown as number
-                  ] as unknown as PanelDashlet,
-                  type,
-                );
+                const viewItem = viewItems[
+                  item.i as unknown as number
+                ] as unknown as PanelDashlet;
+                const attrs = getAttrs(viewItem, type);
                 return {
                   ...item,
-                  h: attrs.h ?? (custom ? getHeight(1) : getHeight(2)),
-                  minH: item?.minH || (bounded ? getHeight(2) : getHeight(1)),
+                  h: attrs.h ?? getHeight(custom ? 3 : 7, viewItem?.height),
+                  minH: item?.minH || (bounded ? getHeight(6) : getHeight(3)),
                   minW: item?.minW || (bounded ? 4 : 1),
                 };
               })()
@@ -176,8 +182,8 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
               x: attrs.x ?? acc.x,
               y: attrs.y ?? acc.y,
               w: attrs.w ?? span,
-              h: attrs.h ?? getHeight(2),
-              minH: (item as any)?.minH || getHeight(1),
+              h: attrs.h ?? getHeight(6),
+              minH: (item as any)?.minH || getHeight(3),
               minW: (item as any)?.minW || 1,
               i: `${index}`,
             });
