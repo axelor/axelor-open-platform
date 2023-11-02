@@ -11,11 +11,13 @@ using `action-view` using a view parameter `details-view`.
   <view name="team-task-grid" type="grid" /> <1>
   <view name="team-task-form" type="form" /> <2>
   <view-param name="details-view" value="true" /> <3>
+  <view-param name="details-view-mode" value="overlay" /> <4>
 </action-view>
 ----
 <1> the grid view used by this action
 <2> the form view used by this action
 <3> `details-view` params configures grid view to show details view on right side
+<4> `details-view-mode` params configures how to show details view either as `overlay` (default - in form of popup) or `inline` (it will show side by side to grid)
 
 We can also provide alternative form view by specifying view name as `details-view` param value,
 like `<view-param name="details-view" value="another-form-view" />`.
