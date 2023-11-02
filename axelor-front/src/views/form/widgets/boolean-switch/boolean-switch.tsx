@@ -13,7 +13,7 @@ export function BooleanSwitch(props: FieldProps<boolean>) {
   } = useAtomValue(widgetAtom);
 
   return (
-    <FieldControl {...props}>
+    <FieldControl {...props} pointerEvents="none">
       <Switch
         {...(focus && { key: "focused" })}
         data-input

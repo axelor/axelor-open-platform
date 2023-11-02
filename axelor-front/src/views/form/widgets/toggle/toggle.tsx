@@ -15,13 +15,13 @@ export function Toggle(props: FieldProps<boolean>) {
 
   const handleClick = useCallback(
     () => setValue(!value, true),
-    [setValue, value]
+    [setValue, value],
   );
 
-  const ico = value ? (iconActive ?? icon ?? "square-fill") : (icon ?? "square");
+  const ico = value ? iconActive ?? icon ?? "square-fill" : icon ?? "square";
 
   return (
-    <FieldControl {...props} className={styles.container}>
+    <FieldControl {...props} className={styles.container} pointerEvents="none">
       <Button
         id={uid}
         variant="light"
