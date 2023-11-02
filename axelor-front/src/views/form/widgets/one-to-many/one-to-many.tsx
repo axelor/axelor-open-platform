@@ -126,6 +126,7 @@ function OneToManyInner({
     widgetAttrs,
     canExport = widgetAttrs.canExport,
     canCopy = widgetAttrs.canCopy,
+    height,
     perms,
   } = schema;
 
@@ -844,6 +845,12 @@ function OneToManyInner({
               ],
             },
           ],
+        }}
+        {...height && {
+          style: {
+            height,
+            maxHeight: height,
+          }
         }}
       >
         <ScopeProvider scope={MetaScope} value={viewMeta}>

@@ -1,16 +1,13 @@
 .container {
   --ax-panel-body-padding: 0;
+  height: 400px;
 }
 
 .grid {
-  max-height: 400px;
+  height: 100%;
 }
 
 .title {
   display: flex;
   align-items: start;
-}
-
-.grid {
-  max-height: 400px;
 }
