@@ -70,6 +70,10 @@ export interface Property {
   falseText?: string;
   big?: boolean;
   seconds?: boolean;
+  
+  // For react expression/template data/dateTime formatting
+  dateFormat?: string;
+  timeFormat?: string;
 
   // by view service
   autoTitle?: string;

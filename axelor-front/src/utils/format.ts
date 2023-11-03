@@ -14,6 +14,7 @@ export type FormatOptions = {
 export type Formatter = (value: any, opts?: FormatOptions) => string;
 
 export function getTimeFormat({ props }: FormatOptions = {}) {
+  if (props?.timeFormat) return props.timeFormat;
   const seconds = props?.seconds || props?.widgetAttrs?.seconds;
   let format = "HH:mm";
   if (seconds) {
@@ -22,13 +23,14 @@ export function getTimeFormat({ props }: FormatOptions = {}) {
   return format;
 }
 
-export function getDateFormat(opts: FormatOptions = {}) {
+export function getDateFormat({ props }: FormatOptions = {}) {
+  if (props?.dateFormat) return props.dateFormat;
   return l10n.getDateFormat();
 }
 
-export function getDateTimeFormat(opts: FormatOptions = {}) {
-  const dateFormat = getDateFormat(opts);
-  return dateFormat + " " + getTimeFormat(opts);
+export function getDateTimeFormat({ props }: FormatOptions = {}) {
+  const dateFormat = getDateFormat({ props });
+  return dateFormat + " " + getTimeFormat({ props });
 }
 
 export function getJSON(jsonStr: string) {
@@ -68,7 +70,7 @@ const formatDuration: Formatter = (value, opts = {}) => {
 };
 
 const formatDate: Formatter = (value, opts = {}) => {
-  const format = l10n.getDateFormat();
+  const format = getDateFormat(opts);
   return value ? moment(value).format(format) : "";
 };
 

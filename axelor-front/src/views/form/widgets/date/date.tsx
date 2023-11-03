@@ -15,9 +15,13 @@ import { Box, FocusTrap, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
-import { l10n, moment } from "@/services/client/l10n";
+import { moment } from "@/services/client/l10n";
 import { Field, Schema } from "@/services/client/meta.types";
-import { getDateTimeFormat, getTimeFormat } from "@/utils/format";
+import {
+  getDateFormat,
+  getDateTimeFormat,
+  getTimeFormat,
+} from "@/utils/format";
 import { toCamelCase } from "@/utils/names";
 
 import { FieldControl, FieldProps, WidgetState } from "../../builder";
@@ -79,7 +83,7 @@ export function DateComponent({
         `YYYY-MM-DDTHH:mm${hasSeconds ? ":ss" : ""}`,
         getDateTimeFormat({ props: schema as Field }),
       ],
-      date: ["YYYY-MM-DD", l10n.getDateFormat()],
+      date: ["YYYY-MM-DD", getDateFormat({ props: schema as Field })],
       time: [
         `HH:mm${hasSeconds ? ":ss" : ""}`,
         getTimeFormat({ props: schema as Field }),
