@@ -230,12 +230,12 @@ export function createValueAtom({
 
       if (prev !== next) {
         set(lensAtom, next);
+        if (dirty) {
+          set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
+          set(dirtyAtom, true);
+        }
       }
 
-      if (dirty) {
-        set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
-        set(dirtyAtom, true);
-      }
 
       fireOnChange && triggerOnChange();
     },
