@@ -334,6 +334,13 @@ export class DefaultActionExecutor implements ActionExecutor {
       ...view,
     };
 
+    if (this.#handler.refresh && tab.params?.popup) {
+      tab.params = {
+        ...tab.params,
+        __onPopupReload: () => this.#handler.refresh(),
+      };
+    }
+
     if (!tab.views) {
       tab.views = [{ type: viewType } as View];
       if (tab.viewType === "html") {

@@ -305,7 +305,9 @@ function useClose(
   );
 
   const triggerReload = useCallback(() => {
-    if (parentId.current) {
+    if (params?.__onPopupReload) {
+      params?.__onPopupReload?.();
+    } else if (parentId.current) {
       const event = new CustomEvent("tab:refresh", {
         detail: {
           id: parentId.current,
@@ -314,7 +316,7 @@ function useClose(
       });
       document.dispatchEvent(event);
     }
-  }, []);
+  }, [params]);
 
   const handleClose = useCallback(
     (record?: DataRecord) => {
