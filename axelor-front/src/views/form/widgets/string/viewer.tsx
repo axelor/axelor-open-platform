@@ -33,7 +33,7 @@ export function ViewerBox({
       ...style,
       padding: "0.375rem 0",
     }),
-    [style]
+    [style],
   );
   return <Box {...props} style={newStyle} />;
 }
@@ -49,6 +49,7 @@ export function ViewerLink({
     <Button
       px={0}
       variant="link"
+      alignSelf="start"
       textAlign="start"
       textDecoration="none"
       overflow="hidden"
