@@ -769,6 +769,10 @@ function OneToManyInner({
     },
     [viewData?.fields, fields, dataStore, onSave],
   );
+  
+  const onRefreshDetailsRecord = useCallback(() => {
+    detailRecord && fetchAndSetDetailRecord(detailRecord);
+  }, [detailRecord, fetchAndSetDetailRecord]);
 
   useAsyncEffect(async () => {
     if (!detailMeta || recordId === selected?.id) return;
@@ -920,6 +924,7 @@ function OneToManyInner({
                   parent={formAtom}
                   record={detailRecord}
                   formAtom={gridRef.current?.form?.current?.formAtom}
+                  onRefresh={onRefreshDetailsRecord}
                   onClose={onCloseInDetail}
                   onSave={isManyToMany ? onSaveRecord : onSave}
                   {...(canNew && { onNew: onAddInDetail })}

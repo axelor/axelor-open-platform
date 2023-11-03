@@ -11,6 +11,7 @@ import { i18n } from "@/services/client/i18n";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { Form, FormAtom, useFormHandlers } from "../../builder";
 import { Layout, showErrors, useGetErrors } from "../../form";
+import { useFormScope } from "../../builder/scope";
 import styles from "./one-to-many.details.module.scss";
 
 interface DetailsFormProps {
@@ -20,6 +21,7 @@ interface DetailsFormProps {
   formAtom?: FormAtom;
   parent?: FormAtom;
   onSave: (data: DataRecord) => void;
+  onRefresh?: () => void;
   onNew?: () => void;
   onClose?: () => void;
 }
@@ -32,6 +34,7 @@ export function DetailsForm({
   readonly,
   record,
   parent,
+  onRefresh,
   onNew,
   onClose,
   onSave,
@@ -42,6 +45,7 @@ export function DetailsForm({
     actionExecutor,
     recordHandler,
   } = useFormHandlers(meta, record ?? defaultRecord, { parent });
+  const parentScope = useFormScope();
 
   const formAtom = detailFormAtom ?? _formAtom;
   const getErrors = useGetErrors();
@@ -105,6 +109,15 @@ export function DetailsForm({
   useEffect(() => {
     setReady(true);
   }, [setReady]);
+
+  useEffect(() => {
+    actionHandler.setRefreshHandler(async () => {
+      onRefresh?.();
+    });
+    actionHandler.setSaveHandler(async () => {
+      parentScope.actionHandler?.save();
+    });
+  }, [actionHandler, parentScope.actionHandler, onRefresh]);
 
   return (
     record ? (
