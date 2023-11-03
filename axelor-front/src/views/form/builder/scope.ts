@@ -573,9 +573,10 @@ export function useActionExecutor(
     formActions?: boolean; // flag to handle form actions
     getContext?: () => DataContext;
     onRefresh?: () => Promise<any>;
+    onSave?: () => Promise<any>;
   },
 ) {
-  const { formActions = true, onRefresh, getContext } = options || {};
+  const { formActions = true, onSave, onRefresh, getContext } = options || {};
   const formScope = useFormScope();
   const formAtom = formActions ? formScope.formAtom : fallbackFormAtom;
 
@@ -586,10 +587,11 @@ export function useActionExecutor(
       _model: view.model,
     }));
 
+    onSave && actionHandler.setSaveHandler(onSave);
     onRefresh && actionHandler.setRefreshHandler(onRefresh);
 
     return actionHandler;
-  }, [getContext, onRefresh, view.model, view.name]);
+  }, [getContext, onRefresh, onSave, view.model, view.name]);
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(actionHandler),

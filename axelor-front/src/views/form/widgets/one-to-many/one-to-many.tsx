@@ -55,6 +55,7 @@ import {
   useActionExecutor,
   useAfterActions,
   useFormRefresh,
+  useFormScope,
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 import { fetchRecord } from "../../form";
@@ -513,10 +514,15 @@ function OneToManyInner({
     [viewData?.view, gridView, model],
   );
 
+  const parentScope = useFormScope();
+
   const actionExecutor = useActionExecutor(actionView, {
     formActions: false,
     getContext: getActionContext,
-    onRefresh: onSearch,
+    onRefresh: parentScope.actionHandler.refresh.bind(
+      parentScope.actionHandler,
+    ),
+    onSave: parentScope.actionHandler.save.bind(parentScope.actionHandler),
   });
 
   const [beforeSelect] = useBeforeSelect(schema);
@@ -769,7 +775,7 @@ function OneToManyInner({
     },
     [viewData?.fields, fields, dataStore, onSave],
   );
-  
+
   const onRefreshDetailsRecord = useCallback(() => {
     detailRecord && fetchAndSetDetailRecord(detailRecord);
   }, [detailRecord, fetchAndSetDetailRecord]);
