@@ -7,6 +7,7 @@ import {
 
 import { useSession } from "@/hooks/use-session";
 
+import { ChangePassword } from "./change-password";
 import { ErrorPage } from "./error";
 import { Login } from "./login";
 import { Root } from "./root";
@@ -26,6 +27,10 @@ const router = createHashRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/change-password",
+    element: <ChangePassword />,
   },
   {
     path: "/",

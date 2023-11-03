@@ -26,7 +26,6 @@ import java.util.Optional;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.util.Pac4jConstants;
 
@@ -53,10 +52,11 @@ public class JsonExtractor extends FormExtractor {
 
     final String username = (String) data.get("username");
     final String password = (String) data.get("password");
+    final String newPassword = (String) data.get("newPassword");
     if (username == null || password == null) {
       return Optional.empty();
     }
 
-    return Optional.of(new UsernamePasswordCredentials(username, password));
+    return Optional.of(new AxelorFormCredentials(username, password, newPassword));
   }
 }

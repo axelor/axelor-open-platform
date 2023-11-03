@@ -1,7 +1,9 @@
 import { FormEventHandler, useCallback, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
 
+import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { SessionInfo } from "@/services/client/session";
@@ -34,6 +36,10 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
 
+  const location = useLocation();
+  const locationState = location.state;
+  const { navigate } = useRoute();
+
   const session = useSession();
   const appInfo = session.data;
 
@@ -53,7 +59,17 @@ export function LoginForm({
 
       try {
         const info = await session.login({ username, password }, params);
-        if (info && info.user) {
+        const { user, route } = info;
+
+        if (route) {
+          const { path, state } = route;
+          navigate(path, {
+            state: {
+              ...locationState,
+              route: { ...state, username, password },
+            },
+          });
+        } else if (user) {
           onSuccess?.(info);
         } else {
           setShowError(true);
@@ -62,7 +78,15 @@ export function LoginForm({
         setShowError(true);
       }
     },
-    [session, username, password, onSuccess, defaultClient]
+    [
+      defaultClient,
+      session,
+      username,
+      password,
+      navigate,
+      locationState,
+      onSuccess,
+    ],
   );
 
   if (session.state === "loading" || session.state === "hasError") {
@@ -76,10 +100,11 @@ export function LoginForm({
     return <Reconnecting />;
   }
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } = appInfo?.application || {};
+  const { logo: appLogo = logo, name: appName = "Axelor" } =
+    appInfo?.application || {};
   const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
   const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
-    "All Rights Reserved"
+    "All Rights Reserved",
   )}.`;
 
   const copyright = appLegal || defaultLegal;

@@ -23,11 +23,10 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.axelor.inject.Beans;
+import java.util.Objects;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.BadCredentialsException;
@@ -43,14 +42,15 @@ public class AxelorAuthenticator implements Authenticator {
   public static final String UNKNOWN_USER = "User doesn’t exist.";
   public static final String USER_DISABLED = "User is disabled.";
   public static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
-  public static final String CHANGE_PASSWORD = /*$$(*/ "Please change your password." /*)*/;
-
-  public static final String NEW_PASSWORD_PARAMETER = "newPassword";
+  public static final String NEW_PASSWORD_MUST_BE_DIFFERENT = /*$$(*/
+      "New password must be different." /*)*/;
+  public static final String NEW_PASSWORD_DOES_NOT_MATCH_PATTERN = /*$$(*/
+      "New password does not match pattern." /*)*/;
 
   @Override
   public void validate(
       Credentials inputCredentials, WebContext context, SessionStore sessionStore) {
-    final UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) inputCredentials;
+    final AxelorFormCredentials credentials = (AxelorFormCredentials) inputCredentials;
 
     if (credentials == null) {
       throw new BadCredentialsException(NO_CREDENTIALS);
@@ -58,6 +58,7 @@ public class AxelorAuthenticator implements Authenticator {
 
     final String username = credentials.getUsername();
     final String password = credentials.getPassword();
+    final String newPassword = credentials.getNewPassword();
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
       throw new BadCredentialsException(INCOMPLETE_CREDENTIALS);
@@ -74,7 +75,6 @@ public class AxelorAuthenticator implements Authenticator {
     }
 
     final AuthService authService = AuthService.getInstance();
-    final String newPassword = context.getRequestParameter(NEW_PASSWORD_PARAMETER).orElse("");
 
     if (!authService.match(password, user.getPassword())) {
       if (StringUtils.isBlank(newPassword)) {
@@ -84,19 +84,30 @@ public class AxelorAuthenticator implements Authenticator {
       throw new BadCredentialsException(WRONG_CURRENT_PASSWORD);
     }
 
-    if (Boolean.TRUE.equals(user.getForcePasswordChange())) {
-      if (StringUtils.isBlank(newPassword)) {
+    final boolean hasNewPassword = StringUtils.notBlank(newPassword);
+    final boolean forcePasswordChange = Boolean.TRUE.equals(user.getForcePasswordChange());
+
+    if (hasNewPassword || forcePasswordChange) {
+      if (!hasNewPassword) {
         throw new ChangePasswordException();
+      }
+
+      if (Objects.equals(newPassword, password)) {
+        throw new ChangePasswordException(NEW_PASSWORD_MUST_BE_DIFFERENT);
+      }
+
+      if (!authService.passwordMatchesPattern(newPassword)) {
+        throw new ChangePasswordException(NEW_PASSWORD_DOES_NOT_MATCH_PATTERN);
       }
 
       JPA.runInTransaction(
           () -> {
             try {
-              Beans.get(AuthService.class).changePassword(user, newPassword);
-            } catch (IllegalArgumentException e) {
+              authService.changePassword(user, newPassword);
+              user.setForcePasswordChange(false);
+            } catch (Exception e) {
               throw new CredentialsException(e.getMessage());
             }
-            user.setForcePasswordChange(false);
           });
     }
 

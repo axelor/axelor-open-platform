@@ -18,12 +18,20 @@
  */
 package com.axelor.auth.pac4j.local;
 
+import com.axelor.auth.AuthService;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorUrlResolver;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import java.util.Map;
 import java.util.Optional;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
@@ -117,28 +125,41 @@ public class AxelorFormClient extends FormClient {
       SessionStore sessionStore,
       String username,
       String message,
-      CredentialsException e) {
+      CredentialsException exception) {
 
-    final String errorMessage = computeErrorMessage(e);
+    final String errorMessage = computeErrorMessage(exception);
 
-    if (e instanceof ChangePasswordException
-        || context.getRequestParameter(AxelorAuthenticator.NEW_PASSWORD_PARAMETER).isPresent()) {
-
+    if (exception instanceof ChangePasswordException) {
       context
           .getRequestParameter("tenantId")
           .ifPresent(tenantId -> sessionStore.set(context, "tenantId", tenantId));
 
-      String redirectUrl =
-          UriBuilder.from(urlResolver.compute("/change-password.jsp", context))
-              .addQueryParam(getUsernameParameter(), username)
-              .addQueryParam(ERROR_PARAMETER, errorMessage)
-              .toUri()
-              .toString();
-      return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
+      final AuthService authService = AuthService.getInstance();
+
+      try {
+        context.setResponseContentType(HttpConstants.APPLICATION_JSON + "; charset=utf-8");
+
+        final Builder<String, String> stateBuilder =
+            new ImmutableMap.Builder<String, String>()
+                .put("passwordPattern", authService.getPasswordPattern())
+                .put("passwordPatternTitle", authService.getPasswordPatternTitle());
+        if (StringUtils.notBlank(errorMessage)) {
+          stateBuilder.put(ERROR_PARAMETER, I18n.get(errorMessage));
+        }
+        final Map<String, String> state = stateBuilder.build();
+
+        final String content =
+            (new ObjectMapper())
+                .writeValueAsString(
+                    Map.of("route", Map.of("path", "/change-password", "state", state)));
+        return HttpActionHelper.buildFormPostContentAction(context, content);
+      } catch (JsonProcessingException e) {
+        logger.error(e.getMessage(), e);
+      }
     }
 
     logger.error("Authentication failed for user \"{}\": {}", username, errorMessage);
-    credentialsHandler.handleInvalidCredentials(this, username, e);
+    credentialsHandler.handleInvalidCredentials(this, username, exception);
     return handleInvalidCredentialsInternal(
         context, sessionStore, username, message, AxelorAuthenticator.INCORRECT_CREDENTIALS);
   }

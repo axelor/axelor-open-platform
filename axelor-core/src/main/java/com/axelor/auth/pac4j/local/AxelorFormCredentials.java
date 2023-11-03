@@ -18,17 +18,24 @@
  */
 package com.axelor.auth.pac4j.local;
 
-import org.pac4j.core.exception.CredentialsException;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
 
-public class ChangePasswordException extends CredentialsException {
+public class AxelorFormCredentials extends UsernamePasswordCredentials {
 
-  private static final long serialVersionUID = -1514519555256616172L;
+  private static final long serialVersionUID = -651333458711052314L;
 
-  public ChangePasswordException() {
-    super("");
+  private String newPassword;
+
+  public AxelorFormCredentials(String username, String password, String newPassword) {
+    super(username, password);
+    this.newPassword = newPassword;
   }
 
-  public ChangePasswordException(String message) {
-    super(message);
+  public AxelorFormCredentials(String username, String password) {
+    this(username, password, null);
+  }
+
+  public String getNewPassword() {
+    return newPassword;
   }
 }

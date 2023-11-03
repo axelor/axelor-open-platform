@@ -146,7 +146,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
     // If XHR, return status code only
     if (AuthPac4jInfo.isXHR(context)) {
-      return new OkAction(context.getRequestContent());
+      return new OkAction("{}");
     }
 
     final String requestedUrl =

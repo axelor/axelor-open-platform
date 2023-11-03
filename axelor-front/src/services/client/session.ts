@@ -83,6 +83,10 @@ export interface SessionInfo {
     dmsSpreadsheet?: boolean;
     studio?: boolean;
   };
+  route?: {
+    path: string;
+    state: Record<string, unknown>;
+  };
 }
 
 export type SessionListener = (info: SessionInfo | null) => void;
@@ -137,22 +141,35 @@ export class Session {
     args: {
       username: string;
       password: string;
+      newPassword?: string;
     },
     params?: URLSearchParams,
   ): Promise<SessionInfo> {
     const url = "callback" + (params ? `?${params}` : "");
-    const { status, ok } = await request({
+    const response = await request({
       url,
       method: "POST",
       body: args,
     });
 
-    if (ok) {
-      this.#infoPromise = init();
-      return this.#load();
+    const { status, ok } = response;
+
+    if (!ok) {
+      return Promise.reject(status);
     }
 
-    return Promise.reject(status);
+    const data = await response.json();
+    const { route } = data;
+
+    if (route?.path && this.#info) {
+      return {
+        ...this.#info,
+        route,
+      };
+    }
+
+    this.#infoPromise = init();
+    return this.#load();
   }
 
   async logout() {
