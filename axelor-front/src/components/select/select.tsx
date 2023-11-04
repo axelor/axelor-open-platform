@@ -60,6 +60,7 @@ export const Select = forwardRef(function Select<
     openOnFocus = true,
     value = null,
     onChange,
+    menuOptions,
     ...selectProps
   } = props;
 
@@ -234,6 +235,10 @@ export const Select = forwardRef(function Select<
       onOpen={handleOpen}
       onChange={handleChange}
       className={clsx(className, { [styles.readonly]: readOnly })}
+      menuOptions={{
+        maxWidth: 600,
+        ...menuOptions,
+      }}
     />
   );
 }) as unknown as <Type, Multiple extends boolean>(
