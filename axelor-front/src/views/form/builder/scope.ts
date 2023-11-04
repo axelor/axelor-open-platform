@@ -581,13 +581,15 @@ export function useAfterActions<Type, Args extends Array<unknown>>(
       argsRef.current = params;
       if (waitRef.current) return waitRef.current;
       const promise = new Promise<Type>((resolve, reject) => {
-        actionExecutor
-          .wait()
-          .then(reset)
-          .then((func) => func())
-          .then(resolve)
-          .catch(reject)
-          .finally(reset);
+        actionExecutor.waitFor().then(() =>
+          actionExecutor
+            .wait()
+            .then(reset)
+            .then((func) => func())
+            .then(resolve)
+            .catch(reject)
+            .finally(reset),
+        );
       });
       waitRef.current = promise;
       return promise;

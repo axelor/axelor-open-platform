@@ -506,7 +506,7 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
-  const onSave = useAtomCallback(
+  const doSave = useAtomCallback(
     useCallback(
       async (
         get,
@@ -587,6 +587,17 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
+  const onSave: typeof doSave = useAfterActions(
+    useCallback(
+      (options) => {
+        // XXX: Need to find a way to coordinate top save and grid commit.
+        actionExecutor.waitFor(300);
+        return doSave(options);
+      },
+      [actionExecutor, doSave],
+    ),
+  );
+
   const handleOnSave = useCallback(async () => {
     try {
       await onSave({
@@ -646,12 +657,12 @@ const FormContainer = memo(function FormContainer({
           const { record: rec, dirty } = get(formAtom);
           const isNew = (rec.id || 0) <= 0;
           if (dirty || isNew) {
-            await onSave({
+            await doSave({
               callOnSave: false,
             });
           }
         },
-        [dataStore, formAtom, onSave],
+        [dataStore, formAtom, doSave],
       ),
     ),
   );
