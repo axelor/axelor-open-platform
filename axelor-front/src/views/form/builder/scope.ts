@@ -570,15 +570,18 @@ function useActionRecord({
 export function useActionExecutor(
   view: View,
   options?: {
-    formActions?: boolean; // flag to handle form actions
+    formAtom?: FormAtom | null; // custom formAtom
     getContext?: () => DataContext;
     onRefresh?: () => Promise<any>;
     onSave?: () => Promise<any>;
   },
 ) {
-  const { formActions = true, onSave, onRefresh, getContext } = options || {};
+  const { onSave, onRefresh, getContext } = options || {};
   const formScope = useFormScope();
-  const formAtom = formActions ? formScope.formAtom : fallbackFormAtom;
+  const formAtom =
+    options?.formAtom === undefined
+      ? formScope.formAtom
+      : options?.formAtom ?? fallbackFormAtom;
 
   const actionHandler = useMemo(() => {
     const actionHandler = new FormActionHandler(() => ({

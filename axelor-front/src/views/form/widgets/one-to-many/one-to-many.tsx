@@ -517,7 +517,7 @@ function OneToManyInner({
   const parentScope = useFormScope();
 
   const actionExecutor = useActionExecutor(actionView, {
-    formActions: false,
+    formAtom: null,
     getContext: getActionContext,
     onRefresh: parentScope.actionHandler.refresh.bind(
       parentScope.actionHandler,

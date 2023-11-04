@@ -46,6 +46,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
+import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
@@ -559,9 +560,60 @@ function GridInner(props: ViewProps<GridView>) {
     }),
     [action, getViewContext],
   );
+
+  const formAtom = useMemo(
+    () =>
+      createFormAtom({
+        meta: meta as any,
+        record: {},
+      }),
+    [meta],
+  );
+
+  const handleRowSave = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const { record, dirty } = get(formAtom);
+        if (dirty) {
+          const res = await dataStore.save(record);
+          const rec = { ...record, ...res, _dirty: undefined };
+          set(formAtom, (prev) => ({ ...prev, dirty: false, record: rec }));
+          setState((draft) => {
+            const selected = draft.rows.find((x) => x.record?.id === record.id);
+            if (selected) {
+              selected.record = rec;
+            }
+          });
+        }
+      },
+      [dataStore, formAtom, setState],
+    ),
+  );
+
+  const handleRowSelectionChange = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        set(formAtom, (state) => {
+          const record = selectedRow?.record ?? {};
+          const dirty = record._dirty ?? false;
+          return {
+            ...state,
+            dirty,
+            record,
+          };
+        });
+      },
+      [formAtom, selectedRow?.record],
+    ),
+  );
+
+  useEffect(handleRowSelectionChange, [handleRowSelectionChange]);
+
   const actionExecutor = useActionExecutor(view, {
+    formAtom,
     getContext,
     onRefresh: doSearch,
+    onSave: handleRowSave,
   });
 
   const popupHandlerAtom = usePopupHandlerAtom();
