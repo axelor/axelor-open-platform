@@ -1,4 +1,4 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 
@@ -12,7 +12,6 @@ import {
   useMemo,
   useReducer,
   useRef,
-  useState,
 } from "react";
 
 import { Box, Panel, clsx } from "@axelor/ui";
@@ -56,7 +55,6 @@ import {
   FieldLabel,
   FieldProps,
   usePermission,
-  usePrepareContext,
   usePrepareWidgetContext,
 } from "../../builder";
 import {
@@ -151,31 +149,61 @@ function OneToManyInner({
   const gridRef = useRef<GridHandler>(null);
   const saveIdRef = useRef<number | null>();
 
-  const [records, setRecords] = useState<DataRecord[]>([]);
-  const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
-  const [, forceUpdate] = useReducer(() => ({}), {});
-
-  const widgetState = useMemo(
+  const collectionAtom = useMemo(
     () =>
       focusAtom(
         formAtom,
-        ({ statesByName = {} }) => statesByName[name],
-        ({ statesByName = {}, ...rest }, value) => ({
+        ({ collections }) =>
+          collections?.[name] ?? {
+            selected: [],
+            records: [],
+            record: null,
+          },
+        ({ collections, ...rest }, value) => ({
           ...rest,
-          statesByName: { ...statesByName, [name]: value },
+          collections: {
+            ...collections,
+            [name]: value,
+          },
         }),
       ),
     [formAtom, name],
   );
 
-  const setSelection = useSetAtom(
+  const [records, setRecords] = useAtom(
     useMemo(
       () =>
-        atom(null, (get, set, selectedIds: number[]) => {
-          const state = get(widgetState);
-          set(widgetState, { ...state, selected: selectedIds });
-        }),
-      [widgetState],
+        focusAtom(
+          collectionAtom,
+          (state) => state.records ?? [],
+          (state, records) => ({ ...state, records }),
+        ),
+      [collectionAtom],
+    ),
+  );
+
+  const [detailRecord, setDetailRecord] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(
+          collectionAtom,
+          (state) => state.record ?? null,
+          (state, record) => ({ ...state, record }),
+        ),
+      [collectionAtom],
+    ),
+  );
+
+  const [, forceUpdate] = useReducer(() => ({}), {});
+
+  const setSelection = useAtomCallback(
+    useCallback(
+      (get, set, selected: number[]) => {
+        set(collectionAtom, (prev) => {
+          return { ...prev, selected };
+        });
+      },
+      [collectionAtom],
     ),
   );
 
@@ -190,8 +218,8 @@ function OneToManyInner({
       isNum(x)
         ? ({ id: x } as unknown as DataRecord)
         : x.id === undefined || x.id === null
-        ? { ...x, _dirty: true, id: nextId() }
-        : x,
+          ? { ...x, _dirty: true, id: nextId() }
+          : x,
     );
     return lastItemsRef.current;
   }, []);
@@ -263,7 +291,7 @@ function OneToManyInner({
             }
           },
         ),
-      [getItems, valueAtom, schema.name],
+      [getItems, schema.name, setRecords, valueAtom],
     ),
   );
 
@@ -496,12 +524,13 @@ function OneToManyInner({
         valueAtom,
         dataStore,
         columnNames,
+        setState,
+        setRecords,
         orderBy,
         model,
         name,
         parentId,
         parentModel,
-        setState,
       ],
     ),
   );
@@ -680,14 +709,14 @@ function OneToManyInner({
       const { id, $id, ...rest } = record;
       record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
 
-      setState(draft => {
+      setState((draft) => {
         if (draft.editRow) {
           const [rowIndex] = draft.editRow;
           draft.editRow = null;
 
           if (draft.rows[rowIndex]) {
             draft.rows[rowIndex].record = record;
-          } 
+          }
         }
       });
       await handleSelect([record]);
@@ -696,7 +725,7 @@ function OneToManyInner({
       );
       return record;
     },
-    [handleSelect, setState],
+    [handleSelect, setDetailRecord, setState],
   );
 
   const onAdd = useCallback(() => {
@@ -713,7 +742,7 @@ function OneToManyInner({
 
   const onAddInDetail = useCallback(() => {
     setDetailRecord({ id: nextId() });
-  }, []);
+  }, [setDetailRecord]);
 
   const isPermitted = usePermitted(model, perms);
 
@@ -761,7 +790,7 @@ function OneToManyInner({
     setDetailRecord(null);
     gridRef.current?.form?.current?.onCancel?.();
     panelRef.current?.scrollIntoView?.({ behavior: "smooth" });
-  }, []);
+  }, [setDetailRecord]);
 
   const onRowReorder = useCallback(() => {
     reorderRef.current = true;
@@ -851,7 +880,7 @@ function OneToManyInner({
       }
       setDetailRecord(record);
     },
-    [detailMeta, dataStore],
+    [detailMeta, setDetailRecord, dataStore],
   );
 
   const onRowClick = useCallback(
