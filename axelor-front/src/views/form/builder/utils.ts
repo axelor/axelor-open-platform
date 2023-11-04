@@ -464,3 +464,19 @@ export function processOriginal(
     });
   return original;
 }
+
+export function createContextParams(schema: Schema) {
+  const source = schema.name ? { _source: schema.name } : undefined;
+  if (!schema.target) return source;
+  const form = schema.formView && { type: "form", name: schema.formView };
+  const grid = schema.gridView && { type: "grid", name: schema.gridView };
+  const _views = [grid, form].filter(Boolean);
+  const _viewName = _views[0]?.name;
+  const _viewType = _views[0]?.type ?? "grid";
+  return {
+    ...source,
+    _viewName,
+    _viewType,
+    _views,
+  };
+}

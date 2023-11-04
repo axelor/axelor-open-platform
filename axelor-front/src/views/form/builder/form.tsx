@@ -21,7 +21,7 @@ import {
   FormScope,
 } from "./scope";
 import { FormAtom, FormProps, WidgetAtom, WidgetState } from "./types";
-import { processView } from "./utils";
+import { createContextParams, processView } from "./utils";
 
 /**
  * Hook to create form atom and action handlers
@@ -86,6 +86,17 @@ export function useFormHandlers(
   };
 }
 
+export function usePrepareWidgetContext(
+  schema: Schema,
+  formAtom: FormAtom,
+  widgetAtom: WidgetAtom,
+  options?: DataContext,
+) {
+  const search = usePrepareContext(formAtom, options);
+  const params = useMemo(() => createContextParams(schema), [schema]);
+  return useCallback(() => search(params), [params, search]);
+}
+
 export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
   const actionView = useViewAction();
   const recordRef = useRef<DataRecord>();
@@ -94,7 +105,7 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
 
   return useAtomCallback(
     useCallback(
-      (get, set) => {
+      (get, set, extra?: DataContext) => {
         const { meta, record, statesByName, parent } = get(formAtom);
         if (
           recordRef.current === record &&
@@ -118,6 +129,7 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
         const res = set(contextAtom, ctxAtom, {
           ...ctx,
           ...options,
+          ...extra,
         });
         statesByNameRef.current = statesByName;
         recordRef.current = record;

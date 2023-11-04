@@ -10,7 +10,11 @@ import { deepEqual, deepGet, deepMerge, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
 
 import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
-import { defaultAttrs as getDefaultAttrs, processContextValues } from "./utils";
+import {
+  createContextParams,
+  defaultAttrs as getDefaultAttrs,
+  processContextValues,
+} from "./utils";
 
 export function createFormAtom(props: {
   meta: ViewData<FormView>;
@@ -112,12 +116,13 @@ export function createValueAtom({
 }) {
   const { name, editable, readonly, onChange } = schema;
 
-  const triggerOnChange = () =>
-    onChange &&
-    actionExecutor.execute(
-      onChange,
-      name ? { context: { _source: name } } : {},
-    );
+  const triggerOnChange = () => {
+    if (onChange) {
+      const params = createContextParams(schema);
+      const opts = params ? { context: params } : undefined;
+      return actionExecutor.execute(onChange, opts);
+    }
+  };
 
   // special case for editable grid form
   const dotted = editable && readonly && name?.includes(".");

@@ -17,7 +17,8 @@ import {
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
-import { usePermission, usePrepareContext } from "../../builder/form";
+
+import { usePermission, usePrepareWidgetContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
 import { useFormRefresh } from "../../builder/scope";
 import { FieldProps } from "../../builder/types";
@@ -56,7 +57,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const isSuggestBox = toKebabCase(widget) === "suggest-box";
 
-  const getContext = usePrepareContext(formAtom);
+  const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const showSelector = useSelector();
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
@@ -153,7 +154,10 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [showCreate],
   );
 
-  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema);
+  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(
+    schema,
+    getContext,
+  );
 
   const { ensureRelated, updateRelated, valueRef } = useEnsureRelated({
     field: schema,

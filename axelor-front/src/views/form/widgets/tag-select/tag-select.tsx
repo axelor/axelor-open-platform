@@ -16,13 +16,13 @@ import {
 } from "@/hooks/use-relation";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-
 import { toKebabCase } from "@/utils/names";
+
 import {
   FieldControl,
   FieldProps,
   usePermission,
-  usePrepareContext,
+  usePrepareWidgetContext,
 } from "../../builder";
 import { removeVersion } from "../../builder/utils";
 import { SelectionTag } from "../selection";
@@ -64,7 +64,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain } = attrs;
 
-  const getContext = usePrepareContext(formAtom);
+  const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const showSelector = useSelector();
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
@@ -229,7 +229,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [handleChange, value],
   );
 
-  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema);
+  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema, getContext);
 
   const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;

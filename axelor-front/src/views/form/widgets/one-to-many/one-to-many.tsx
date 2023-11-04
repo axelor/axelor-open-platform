@@ -57,6 +57,7 @@ import {
   FieldProps,
   usePermission,
   usePrepareContext,
+  usePrepareWidgetContext,
 } from "../../builder";
 import {
   useActionExecutor,
@@ -292,7 +293,7 @@ function OneToManyInner({
     );
   }, [fields, model, schema, viewData]);
 
-  const getContext = usePrepareContext(formAtom);
+  const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
 
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
@@ -610,7 +611,7 @@ function OneToManyInner({
     onSave: parentScope.actionHandler.save.bind(parentScope.actionHandler),
   });
 
-  const [beforeSelect] = useBeforeSelect(schema);
+  const [beforeSelect] = useBeforeSelect(schema, getContext);
 
   const onSelect = useCallback(async () => {
     const _domain = (await beforeSelect()) ?? domain;
