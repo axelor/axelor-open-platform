@@ -111,31 +111,88 @@ The `duration` widget can have following extra attributes:
 
 == Boolean
 
-The boolean widget is used for `boolean` data fields.
+The widget is used for `boolean` data fields.
 
 [source,xml]
 ----
 <field name="confirmed" widget="boolean" />
 ----
 
-NOTE: if field type is boolean, no need to specify `widget="boolean"`
+== BooleanSelect
 
-Additionally, the following variants of boolean widgets are provided:
-
-* `toggle` - a two state toggle button (true is down, up otherwise)
-* `boolean-select` - a combo box with yes/no selection
-* `boolean-radio` - a group of two radio boxes with yes/no text
-* `boolean-switch` - a switch like sliding widget for boolean fields
-* `inline-checkbox` -  same as default boolean widget but with the title on right
-
-The yes/no text can be configured with `x-true-text` and `x-false-text`
-attributes:
+The widget is used for `boolean` data fields. The field is rendered as a combo box with yes/no selection.
 
 [source,xml]
 ----
-<field name="some" widget="boolean-select" x-true-text="Yes" x-false-text="No" />
-<field name="some" widget="boolean-radio" x-true-text="On" x-false-text="Off" />
-<field name="some" widget="boolean-switch" />
+<field name="confirmed" widget="boolean-select" />
+----
+
+The yes/no text can be configured with `x-true-text` and `x-false-text` attributes:
+
+[source,xml]
+----
+<field name="confirmed" widget="boolean-select" x-true-text="Yes" x-false-text="No" />
+<field name="confirmed" widget="boolean-select" x-true-text="On" x-false-text="Off" />
+----
+
+== BooleanRadio
+
+The widget is used for `boolean` data fields. The field is rendered as a group of two radio boxes with
+yes/no text.
+
+[source,xml]
+----
+<field name="confirmed" widget="boolean-radio" />
+----
+
+The yes/no text can be configured with `x-true-text` and `x-false-text` attributes:
+
+[source,xml]
+----
+<field name="confirmed" widget="boolean-radio" x-true-text="Yes" x-false-text="No" />
+<field name="confirmed" widget="boolean-radio" x-true-text="On" x-false-text="Off" />
+----
+
+The radio list is rendered horizontally but can be changed to vertical with `x-direction="vertical"` attribute.
+
+== BooleanSwitch
+
+The widget is used for `boolean` data fields. The field is rendered as a switching selector.
+
+[source,xml]
+----
+<field name="confirmed" widget="boolean-switch" />
+----
+
+== Toggle
+
+The widget is used for `boolean` data fields. The field is rendered as a two state toggle button.
+
+[source,xml]
+----
+<field name="confirmed" widget="toggle" />
+----
+
+By default, the toggle button icon is a `square` for unchecked state and `square-fill` for checked state. It can be
+configured with following attributes :
+
+- `x-icon` - specify an icon for unchecked state
+- `x-icon-hover` - specify an icon for hover state
+- `x-icon-active` - specify an icon for checked state
+
+[source,xml]
+----
+<field name="some" type="Boolean" widget="Toggle" x-icon="star" x-icon-active="star-fill"/>
+----
+
+== InlineCheckbox
+
+The widget is used for `boolean` data fields. The field is rendered as default boolean widget but with
+the title on right.
+
+[source,xml]
+----
+<field name="confirmed" widget="inline-checkbox" />
 ----
 
 == Text
