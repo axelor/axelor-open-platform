@@ -178,7 +178,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     }, [editColumnName, view.items]);
 
     const { add: addWidgetValidator } = useFormValidityScope();
-    const { formAtom: parent } = useFormScope();
+    const { formAtom: parent, actionHandler: parentActionHandler } =
+      useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
       useFormHandlers(meta as unknown as ViewData<FormView>, record, {
         parent,
@@ -186,6 +187,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       });
     const onNewAction =
       (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
+
+    useEffect(() => {
+      actionHandler.setRefreshHandler(
+        parentActionHandler.refresh.bind(parentActionHandler),
+      );
+    }, [actionHandler, parentActionHandler]);
 
     const getParent = useCallback(() => {
       if (parentRef.current) return parentRef.current;
