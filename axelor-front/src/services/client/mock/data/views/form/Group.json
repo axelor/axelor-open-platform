@@ -43,27 +43,13 @@
               "autoTitle": "Navigation"
             },
             {
-              "type": "panel",
-              "stacked": true,
-              "items": [
-                {
-                  "type": "field",
-                  "name": "homeAction",
-                  "hidden": true,
-                  "bind": "{{__actionSelect.name}}",
-                  "autoTitle": "Home action"
-                },
-                {
-                  "type": "field",
-                  "name": "__actionSelect",
-                  "title": "Action",
-                  "widget": "SuggestBox",
-                  "canNew": "false",
-                  "target": "com.axelor.meta.db.MetaAction",
-                  "targetName": "name",
-                  "domain": "self.type = 'action-view' and self.home = true"
-                }
-              ]
+              "type": "field",
+              "name": "homeAction",
+              "widget": "ref-text",
+              "target": "com.axelor.meta.db.MetaAction",
+              "targetName": "name",
+              "domain": "self.type = 'action-view' and self.home = true",
+              "autoTitle": "Home action"
             },
             {
               "type": "field",

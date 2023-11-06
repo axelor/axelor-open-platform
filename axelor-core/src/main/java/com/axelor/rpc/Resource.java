@@ -59,7 +59,6 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
@@ -1677,18 +1676,6 @@ public class Resource<T extends Model> {
         Object enumValue = ((ValueEnum<?>) value).getValue();
         if (!Objects.equal(enumName, enumValue)) {
           result.put(name + "$value", ((ValueEnum<?>) value).getValue());
-        }
-      }
-
-      // special case for User/Group objects
-      if (result.get("homeAction") != null) {
-        MetaAction act =
-            JpaRepository.of(MetaAction.class)
-                .all()
-                .filter("self.name = ?", result.get("homeAction"))
-                .fetchOne();
-        if (act != null) {
-          result.put("__actionSelect", toMapCompact(act));
         }
       }
     }
