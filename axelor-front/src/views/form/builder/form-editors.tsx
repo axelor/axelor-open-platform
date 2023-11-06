@@ -979,12 +979,9 @@ function JsonEditor({
       ) => {
         const state =
           typeof update === "function" ? update(get(valueAtom)) : update;
-        set(
-          valueAtom,
-          state ? JSON.stringify(state) : null,
-          fireOnChange,
-          markDirty,
-        );
+        const { $record, ...value } = state ?? {};
+        const jsonValue = state ? JSON.stringify(value) : null;
+        set(valueAtom, jsonValue, fireOnChange, markDirty);
         if (jsonModel) {
           const formState = get(formAtom);
           if (formState.record.jsonModel !== jsonModel) {
