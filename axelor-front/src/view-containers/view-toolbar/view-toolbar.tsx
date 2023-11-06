@@ -225,6 +225,7 @@ export function ToolbarActions({
                 {...props}
                 formAtom={formAtom}
                 name={item.name}
+                hidden={item.hidden}
                 showIf={item.showIf}
                 hideIf={item.hideIf}
                 readonlyIf={item.readonlyIf}
