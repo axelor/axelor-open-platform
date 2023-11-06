@@ -14,8 +14,8 @@ export function useCompletion(options: {
   const { target, targetName, targetSearch, sortBy, limit = 10 } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
-    () => [[targetName], targetSearch].flat().filter(Boolean) as string[],
-    [targetName, targetSearch]
+    () => uniq([[targetName], targetSearch].flat().filter(Boolean)) as string[],
+    [targetName, targetSearch],
   );
 
   const search = useCallback(
@@ -24,17 +24,14 @@ export function useCompletion(options: {
       options?: {
         _domain?: string;
         _domainContext?: DataContext;
-      }
+      },
     ) => {
       const { _domain, _domainContext } = options || {};
       return dataSource.search({
+        translate: true,
         sortBy: sortBy?.split?.(","),
         limit,
-        fields: uniq([
-          "id",
-          ...(targetName ? [targetName] : []),
-          ...(targetSearch || []),
-        ]),
+        fields: uniq(["id", ...names]),
         filter: {
           _domain,
           _domainContext,
@@ -51,7 +48,7 @@ export function useCompletion(options: {
         },
       });
     },
-    [dataSource, sortBy, limit, names, targetName, targetSearch]
+    [dataSource, sortBy, limit, names],
   );
 
   return search;

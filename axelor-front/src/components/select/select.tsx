@@ -67,13 +67,19 @@ export const Select = forwardRef(function Select<
   const [init, setInit] = useState(!fetchOptions);
 
   const selectRef = useRefs(ref);
+  const textRef = useRef<string | null>(inputValue);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const clearTimer = useCallback(() => {
+    if (loadTimerRef.current) {
+      clearTimeout(loadTimerRef.current);
+      loadTimerRef.current = undefined;
+    }
+  }, []);
 
   const loadOptions = useCallback(
     (inputValue: string) => {
-      if (loadTimerRef.current) {
-        clearTimeout(loadTimerRef.current);
-      }
+      clearTimer();
       loadTimerRef.current = setTimeout(async () => {
         if (fetchOptions) {
           const items = await fetchOptions(inputValue);
@@ -83,34 +89,35 @@ export const Select = forwardRef(function Select<
         }
       }, 300);
     },
-    [fetchOptions],
+    [clearTimer, fetchOptions],
   );
 
   const handleOpen = useCallback(() => {
     if (onOpen) onOpen();
-    if (
-      fetchOptions &&
-      items.length === 0 &&
-      !inputValue &&
-      !loadTimerRef.current
-    ) {
+    if (fetchOptions && !inputValue && !loadTimerRef.current) {
       loadOptions("");
     }
-  }, [fetchOptions, inputValue, items.length, loadOptions, onOpen]);
+  }, [fetchOptions, inputValue, loadOptions, onOpen]);
 
   const handleInputChange = useCallback(
     (text: string) => {
       setInputValue(text);
       if (onInputChange) onInputChange(text);
-      if (fetchOptions && text) {
-        loadOptions(text);
+      if (fetchOptions) {
+        if (text) {
+          loadOptions(text);
+        } else if (textRef.current !== "") {
+          clearTimer();
+        }
       }
+      textRef.current = text;
     },
-    [fetchOptions, loadOptions, onInputChange],
+    [fetchOptions, loadOptions, clearTimer, onInputChange],
   );
 
   const handleChange = useCallback(
     (value: SelectValue<Type, Multiple>) => {
+      textRef.current = value ? "" : null;
       onChange?.(value);
     },
     [onChange],
