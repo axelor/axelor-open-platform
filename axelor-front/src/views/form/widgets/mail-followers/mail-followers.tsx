@@ -40,7 +40,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
 
   const onRefresh = useCallback(async () => {
     const list = await loadFollowers(model, modelId);
-    setFollowers(list);
+    setFollowers(list ?? []);
   }, [loadFollowers, model, modelId]);
 
   useAsyncEffect(async () => {
