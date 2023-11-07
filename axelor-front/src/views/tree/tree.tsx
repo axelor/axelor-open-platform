@@ -142,9 +142,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           isSameModelTree && parentNode ? `self.${parentNode} = null` : "";
 
         const _domain =
-          rootNode?.domain && parentDomain
+          (rootNode?.domain && parentDomain
             ? `${rootNode.domain} AND ${parentDomain}`
-            : rootNode?.domain || parentDomain;
+            : rootNode?.domain || parentDomain) || undefined;
 
         return dataStore.search({
           ...(rootNode && getSearchOptions(rootNode)),
