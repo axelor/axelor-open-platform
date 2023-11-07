@@ -272,7 +272,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
       const originalVersion = record?.version;
 
       const isChanged = (result: boolean, record?: DataRecord) =>
-        record ? record.version !== originalVersion : result;
+        result || record?.version !== originalVersion;
 
       const reloadOptions: Partial<EditorOptions> = {};
       let selected = false;
