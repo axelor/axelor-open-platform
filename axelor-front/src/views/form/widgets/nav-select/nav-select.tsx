@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import uniqueId from "lodash/uniqueId";
 import { useCallback, useMemo } from "react";
 
 import {
@@ -8,9 +9,13 @@ import {
   clsx,
 } from "@axelor/ui";
 
+import { DataRecord } from "@/services/client/data.types";
 import { Selection } from "@/services/client/meta.types";
 
-import { FieldControl, FieldProps } from "../../builder";
+import { FieldControl, FieldProps, ValueAtom } from "../../builder";
+import { createWidgetAtom } from "../../builder/atoms";
+import { isReferenceField } from "../../builder/utils";
+import { ManyToOne } from "../many-to-one";
 import { useSelectionList } from "../selection/hooks";
 
 import styles from "./nav-select.module.scss";
@@ -73,14 +78,15 @@ export function NavSelect(
 }
 
 function NavSelectInner(
-  props: FieldProps<string | number | Record<string, number>>,
+  props: FieldProps<string | number | Record<string, number> | DataRecord>,
 ) {
-  const { schema, widgetAtom, valueAtom } = props;
+  const { schema, widgetAtom, formAtom, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
 
   const { attrs } = useAtomValue(widgetAtom);
   const { readonly } = attrs;
 
+  const isReference = isReferenceField(schema);
   const selection = useSelectionList({ value, widgetAtom, schema });
   const items: SelectItem[] = useMemo(() => {
     return selection.map((selection, i) => {
@@ -95,14 +101,14 @@ function NavSelectInner(
   const onItemClick = useCallback(
     ({ selection }: SelectItem) => {
       if (readonly) return;
-      if (schema.serverType?.endsWith("_TO_ONE")) {
+      if (isReference) {
         const id = +selection.value!;
         setValue({ id }, true);
       } else {
         setValue(selection.value, true);
       }
     },
-    [readonly, schema.serverType, setValue],
+    [readonly, isReference, setValue],
   );
 
   const isItemActive = useCallback(
@@ -110,8 +116,33 @@ function NavSelectInner(
     [value],
   );
 
+  const hiddenWidgetAtom = useMemo(
+    () =>
+      isReference
+        ? createWidgetAtom({
+            schema: {
+              ...schema,
+              name: uniqueId("$nav"),
+              hideIf: undefined,
+              showIf: undefined,
+              hidden: true,
+            },
+            formAtom,
+          })
+        : null,
+    [isReference, formAtom, schema],
+  );
+
   return (
     <FieldControl {...props}>
+      {hiddenWidgetAtom && (
+        <ManyToOne
+          schema={schema}
+          widgetAtom={hiddenWidgetAtom}
+          valueAtom={valueAtom as ValueAtom<DataRecord>}
+          formAtom={formAtom}
+        />
+      )}
       <OverflowList
         className={styles.container}
         items={items}
