@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
@@ -475,6 +475,52 @@ function useActionValue({
   );
 }
 
+const updateJsonAtom = atom(
+  null,
+  (get, set, formAtom: FormAtom, values: DataRecord) => {
+    const { meta, fields, parent: parentAtom } = get(formAtom);
+    const isJson = Boolean(meta.view.json);
+    if (isJson) {
+      const parentState = parentAtom ? get(parentAtom) : null;
+      const parentFields = parentState?.fields ?? {};
+      const isOwn = (key: string) => key in fields || !(key in parentFields);
+      const isJson = (key: string) => parentFields[key]?.json;
+      const toJson = (value: unknown) =>
+        value && typeof value !== "string" ? JSON.stringify(value) : value;
+
+      const update = (targetAtom: FormAtom, vals: DataRecord) => {
+        const record = get(targetAtom).record;
+        const { _dirty, ...result } = updateRecord(record, vals) ?? {};
+        if (_dirty) {
+          set(targetAtom, (prev) => {
+            return {
+              ...prev,
+              dirty: prev.dirty || _dirty,
+              record: result ?? {},
+            };
+          });
+        }
+      };
+
+      const ownValues: DataRecord = {};
+      const topValues: DataRecord = {};
+
+      for (const [key, value] of Object.entries(values)) {
+        if (isOwn(key)) {
+          ownValues[key] = value;
+        } else {
+          topValues[key] = isJson(key) ? toJson(value) : value;
+        }
+      }
+
+      if (formAtom) update(formAtom, ownValues);
+      if (parentAtom) update(parentAtom, topValues);
+
+      return true;
+    }
+  },
+);
+
 function useActionRecord({
   formAtom,
   actionHandler,
@@ -483,11 +529,17 @@ function useActionRecord({
   actionHandler: ActionHandler;
 }) {
   const canDirty = useCanDirty();
+  const updateJson = useSetAtom(updateJsonAtom);
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "record" && Boolean(x.value), []),
     useAtomCallback(
       useCallback(
         (get, set, data) => {
+          // json field values?
+          if (updateJson(formAtom, data.value)) {
+            return;
+          }
+
           const record = get(formAtom).record;
           const values = Object.entries(data.value).reduce(
             (acc, [k, v]) => ({
@@ -508,7 +560,7 @@ function useActionRecord({
             record: result,
           }));
         },
-        [canDirty, formAtom],
+        [canDirty, formAtom, updateJson],
       ),
     ),
     actionHandler,
