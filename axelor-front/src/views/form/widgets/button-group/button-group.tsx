@@ -3,6 +3,7 @@ import { ButtonGroup as AxButtonGroup } from "@axelor/ui";
 import { useMemo } from "react";
 
 import { FormWidget, WidgetControl, WidgetProps } from "../../builder";
+import styles from "./button-group.module.scss";
 
 export function ButtonGroup(props: WidgetProps) {
   const { formAtom, parentAtom, schema, widgetAtom } = props;
@@ -17,7 +18,7 @@ export function ButtonGroup(props: WidgetProps) {
 
   return (
     <WidgetControl {...props}>
-      <AxButtonGroup>
+      <AxButtonGroup className={styles.buttonGroup}>
         {items?.map((item, ind) => (
           <FormWidget
             key={ind}

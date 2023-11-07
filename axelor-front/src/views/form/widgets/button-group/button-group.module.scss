@@ -1,0 +1,19 @@
+.buttonGroup {
+  & > button {
+    & {
+      border-left-width: var(--bs-btn-border-width);
+      border-left-color: var(--bs-btn-active-border-color);
+      &:first-child {
+        border-left-width: 0;
+      }
+    }
+    [dir="rtl"] & {
+      border-left: unset;
+      border-right-width: var(--bs-btn-border-width);
+      border-right-color: var(--bs-btn-active-border-color);
+      &:first-child {
+        border-right-width: 0;
+      }
+    }
+  }
+}
