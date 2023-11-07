@@ -227,7 +227,7 @@ function Footer({
     const { dirty } = getState?.() ?? {};
 
     try {
-      let rec: DataRecord | undefined = undefined;
+      let rec: DataRecord | undefined = getState?.()?.record;
       if (dirty && onSave) {
         rec = await onSave({
           shouldSave: true,
@@ -243,10 +243,10 @@ function Footer({
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {
-      const { actionExecutor } = handler;
+      const { actionExecutor, getState } = handler;
       await actionExecutor?.wait();
       if (data.type === "close") {
-        handleClose();
+        handleClose(getState?.()?.record);
       }
     });
   }, [handleClose, handler]);
@@ -293,9 +293,10 @@ function useClose(
     }
   }, []);
 
-  const isChanged = useCallback(
+  const shouldReload = useCallback(
     (record?: DataRecord) => {
-      const current = record ?? handler.getState?.().record;
+      if (record) return true;
+      const current = handler.getState?.().record;
       const original = originalRef.current;
       return (
         current?.id !== original?.id || current?.version !== original?.version
@@ -321,13 +322,13 @@ function useClose(
   const handleClose = useCallback(
     (record?: DataRecord) => {
       const popupCanReload = params?.popup === "reload";
-      const changed = isChanged(record);
-      if (popupCanReload && changed) {
+      const reload = shouldReload(record);
+      if (popupCanReload && reload) {
         triggerReload();
       }
-      close(changed);
+      close(reload);
     },
-    [close, isChanged, triggerReload, params?.popup],
+    [close, shouldReload, triggerReload, params?.popup],
   );
 
   return handleClose;
