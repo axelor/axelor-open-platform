@@ -375,13 +375,50 @@ public class Resource<T extends Model> {
     if (context != null
         && context.containsKey("_field")
         && context.containsKey("_field_ids")
-        && context.containsKey("id")) {
+        && context.containsKey("id")
+        && "self.id in (:_field_ids)".equals(request.getData().get("_domain"))) {
       final Model parent = context.asType(Model.class);
-      return !security
-          .get()
-          .isPermitted(JpaSecurity.CAN_READ, EntityHelper.getEntityClass(parent), parent.getId());
+      final String fieldName = (String) context.get("_field");
+      @SuppressWarnings("unchecked")
+      final Collection<Long> fieldIds =
+          Optional.of(context.get("_field_ids"))
+              .filter(Collection.class::isInstance)
+              .map(value -> (Collection<Number>) value)
+              .map(items -> items.stream().map(Number::longValue).collect(Collectors.toSet()))
+              .orElse(Collections.emptySet());
+      return !isPermittedReadByParent(parent, fieldName, fieldIds);
     }
     return true;
+  }
+
+  private boolean isPermittedReadByParent(
+      Model parent, String fieldName, Collection<Long> fieldIds) {
+    if (parent == null) {
+      return false;
+    }
+
+    final Class<Model> parentModel = EntityHelper.getEntityClass(parent);
+
+    if (!security.get().isPermitted(JpaSecurity.CAN_READ, parentModel, parent.getId())) {
+      return false;
+    }
+
+    final Mapper mapper = Mapper.of(parentModel);
+    final Property property = mapper.getProperty(fieldName);
+
+    if (property == null) {
+      return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    final Collection<? extends Model> items = (Collection<? extends Model>) property.get(parent);
+
+    if (items == null) {
+      return false;
+    }
+
+    final Set<Long> itemIds = items.stream().map(Model::getId).collect(Collectors.toSet());
+    return itemIds.containsAll(fieldIds);
   }
 
   private Query<?> getQuery(Request request) {
@@ -1101,7 +1138,7 @@ public class Resource<T extends Model> {
               continue;
             }
 
-            record = (Map) repository.validate((Map) record, request.getContext());
+            record = repository.validate((Map) record, request.getContext());
 
             final Long id = findId((Map) record);
             final JpaSecurity.AccessType accessType;
