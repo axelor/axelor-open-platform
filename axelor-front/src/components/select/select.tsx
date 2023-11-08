@@ -141,7 +141,7 @@ export const Select = forwardRef(function Select<
 
     const options: SelectCustomOption[] = [];
 
-    if (onShowSelect && (hasOptions || inputValue)) {
+    if (onShowSelect && hasOptions) {
       options.push({
         key: "select",
         title: (
