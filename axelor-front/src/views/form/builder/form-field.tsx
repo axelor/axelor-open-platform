@@ -163,11 +163,11 @@ export function HelpPopover({
   children: React.ReactElement;
   content?: () => JSX.Element | null;
 }) {
-  const { name, help } = schema;
+  const { type, name, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
 
-  const technical = session.info?.user?.technical && name;
+  const technical = session.info?.user?.technical && (name || type === "panel");
   const canShowHelp = help || technical;
 
   if (canShowHelp) {
@@ -200,7 +200,7 @@ function HelpContent(props: WidgetProps) {
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
 
-  const technical = session.info?.user?.technical && name;
+  const technical = session.info?.user?.technical && (name || type === "panel");
 
   const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });
@@ -244,7 +244,7 @@ function HelpContent(props: WidgetProps) {
           )}
           <dt>{i18n.get("Field name")}</dt>
           <dd>
-            <code>{name}</code>
+            <code>{name ?? "undefined"}</code>
           </dd>
           <dt>{i18n.get("Field type")}</dt>
           <dd>

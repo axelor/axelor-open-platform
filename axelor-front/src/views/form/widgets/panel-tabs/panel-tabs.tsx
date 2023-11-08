@@ -4,12 +4,19 @@ import { selectAtom } from "jotai/utils";
 import { focusAtom } from "jotai-optics";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Fade, NavTabItem, NavTabs } from "@axelor/ui";
+import { Box, Fade, NavTabItem, NavTabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 
-import { FormAtom, FormWidget, WidgetAtom, WidgetProps } from "../../builder";
+import {
+  FormAtom,
+  FormWidget,
+  HelpPopover,
+  WidgetAtom,
+  WidgetProps,
+} from "../../builder";
 import { useAfterActions, useFormScope } from "../../builder/scope";
+import { fallbackWidgetAtom } from "../../builder/atoms";
 
 import styles from "./panel-tabs.module.scss";
 
@@ -31,9 +38,20 @@ export function PanelTabs(props: WidgetProps) {
           ({
             ...tab,
             id: tab.uid,
-          }) as Schema,
+            ...(tab.title && {
+              title: (
+                <HelpPopover
+                  schema={tab}
+                  formAtom={formAtom}
+                  widgetAtom={fallbackWidgetAtom}
+                >
+                  <Box p={1}>{tab.title}</Box>
+                </HelpPopover>
+              ),
+            }),
+          }) as unknown as Schema,
       ),
-    [schema],
+    [schema, formAtom],
   );
 
   const [hiddenTabs, setHiddenTabs] = useState<Record<string, boolean>>(() =>

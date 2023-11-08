@@ -1,6 +1,9 @@
 .tabs {
   display: flex;
   flex-direction: column;
+  & [data-tab-id] {
+    --ax-nav-tabs-text-padding: 0;
+  }
 }
 
 .tabContent {
