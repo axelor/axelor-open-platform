@@ -30,7 +30,6 @@ export function Line({ data, type, ...rest }: ChartProps) {
         draft.series = series.map((line: any) => ({
           name: line.key,
           type: "line",
-          stack: "all",
           data: line.values.map(({ y }: any) => y),
           ...(type === "area" ? { areaStyle: {} } : {}),
         }));
