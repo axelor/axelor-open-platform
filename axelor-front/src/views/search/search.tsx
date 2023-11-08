@@ -98,8 +98,9 @@ export function Search(props: ViewProps<SearchView>) {
 
   const formMeta = useMemo(() => {
     const { view } = meta;
-    const { title, name, searchFields } = view;
+    const { title, name, selects, searchFields } = view;
     const fields = prepareFields(searchFields);
+    const model = meta.model || selects?.find(s => s.model)?.model;
 
     function process(item: SearchField) {
       const $item = (fields[item.name] || {}) as Schema;
@@ -121,8 +122,10 @@ export function Search(props: ViewProps<SearchView>) {
 
     return {
       ...meta,
+      model,
       view: {
         type: "form",
+        model,
         items: [
           {
             colSpan: 12,
