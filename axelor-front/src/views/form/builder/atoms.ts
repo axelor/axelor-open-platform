@@ -228,7 +228,7 @@ export function createValueAtom({
         schema.canDirty !== false &&
         Boolean(name && !isCleanDummy(name));
 
-      if (prev !== next) {
+      if (!isEqual(prev, next)) {
         set(lensAtom, next);
         if (dirty) {
           set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
