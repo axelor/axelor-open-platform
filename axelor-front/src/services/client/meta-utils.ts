@@ -176,7 +176,7 @@ export function findViewFields(
     view._included = true;
     fields = view.items = UseIncluded(view);
   }
-  
+
   function pushIn(value: string, target: string[]) {
     if (!target.includes(value)) {
       target.push(value);
@@ -194,10 +194,7 @@ export function findViewFields(
     }
     const acceptItems = (items: Schema[] = []) => {
       _.each(items, (child) => {
-        if (
-          child.name &&
-          child.type === "field"
-        ) {
+        if (child.name && child.type === "field") {
           pushIn(child.name, collect);
         } else if (child.type === "panel") {
           acceptItems(child.items);
@@ -246,11 +243,17 @@ export function findViewFields(
     if (item.widget === "tag-select") {
       // fetch colors
       if (item.name && item.colorField) {
-        pushIn(item.colorField, result.related[item.name] || (result.related[item.name] = []));
+        pushIn(
+          item.colorField,
+          result.related[item.name] || (result.related[item.name] = []),
+        );
       }
       // fetch target names
       if (item.name && item.targetName) {
-        pushIn(item.targetName, result.related[item.name] || (result.related[item.name] = []));
+        pushIn(
+          item.targetName,
+          result.related[item.name] || (result.related[item.name] = []),
+        );
       }
     }
   });
@@ -407,7 +410,7 @@ export function processView(
     }
   })();
 
-  _.forEach(view.items, (item) => {
+  _.forEach(view.items, (item, itemIndex) => {
     processWidget(item);
     processSelection(item);
 
@@ -442,6 +445,30 @@ export function processView(
       item.widget = "password";
     }
 
+    // convert dotted json fields
+    if (item.jsonField && item.name?.includes(".")) {
+      const jsonField = fields?.[item.name] ?? {};
+      const jsonItem = {
+        jsonField,
+        ...item,
+        colSpan: 12,
+        name: item.jsonPath,
+        type: jsonField.type,
+      };
+      item = {
+        type: "field",
+        name: item.jsonField,
+        jsonFields: [jsonItem],
+        json: true,
+        cols: 12,
+        colSpan: item.colSpan ?? 6,
+        showTitle: false,
+      };
+      if (view.items) {
+        view.items[itemIndex] = item;
+      }
+    }
+
     if (item.jsonFields && item.widget !== "json-raw") {
       const editor: Schema = {
         layout: view.type === "panel-json" ? "table" : undefined,
@@ -455,7 +482,9 @@ export function processView(
       });
       item.jsonFields.forEach((field: Schema) => {
         if (field.widgetAttrs) {
-          field.widgetAttrs = JSON.parse(field.widgetAttrs);
+          if (typeof field.widgetAttrs === "string") {
+            field.widgetAttrs = JSON.parse(field.widgetAttrs);
+          }
           if (field.widgetAttrs.showTitle !== undefined) {
             field.showTitle = field.widgetAttrs.showTitle;
           }

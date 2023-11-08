@@ -145,8 +145,7 @@ export function createValueAtom({
   dirtyAtom: PrimitiveAtom<boolean>;
   actionExecutor: ActionExecutor;
 }) {
-  const { name, editable, jsonField, jsonPath, readonly, onChange, $json } =
-    schema;
+  const { name, editable, readonly, onChange } = schema;
 
   const triggerOnChange = () => {
     onChange &&
@@ -155,49 +154,6 @@ export function createValueAtom({
         name ? { context: { _source: name } } : {},
       );
   };
-
-  if (!$json && jsonPath && jsonField) {
-    const lensAtom = focusAtom(formAtom, (o) => {
-      return o.prop("record").prop(jsonField);
-    });
-    const getJSON = (attrs: any) => {
-      if (attrs && typeof attrs === "string") {
-        try {
-          return JSON.parse(attrs);
-        } catch {
-          // ignore
-        }
-      }
-      return {};
-    };
-    return atom(
-      (get) => {
-        const attrs = getJSON(get(lensAtom));
-        return attrs?.[jsonPath] ?? schema.defaultValue ?? "";
-      },
-      (
-        get,
-        set,
-        value: any,
-        fireOnChange: boolean = false,
-        markDirty: boolean = true,
-      ) => {
-        const prev = get(lensAtom);
-        const next = JSON.stringify({
-          ...getJSON(prev),
-          [jsonPath]: value,
-        });
-        if (prev !== next) {
-          const dirty = Boolean(markDirty && name) && schema.canDirty !== false;
-
-          set(lensAtom, next);
-          set(formAtom, (prev) => ({ ...prev, dirty: prev.dirty || dirty }));
-          dirty && set(dirtyAtom, true);
-          fireOnChange && triggerOnChange();
-        }
-      },
-    );
-  }
 
   // special case for editable grid form
   const lensDottedAtom =
@@ -235,7 +191,6 @@ export function createValueAtom({
           set(dirtyAtom, true);
         }
       }
-
 
       fireOnChange && triggerOnChange();
     },
