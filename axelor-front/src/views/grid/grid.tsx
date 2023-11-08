@@ -124,7 +124,7 @@ function GridInner(props: ViewProps<GridView>) {
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
   const hasDetailsView = Boolean(detailsView);
   const gridWidth = action.params?.["grid-width"];
-  const hasPopup = action.params?.["popup"];
+  const hasPopup = action.params?.["popup"] || action.params?.["dashlet.in.popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 

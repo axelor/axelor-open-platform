@@ -33,6 +33,7 @@ import classes from "./dashlet.module.scss";
 interface DashletProps {
   schema: Schema;
   className?: string;
+  popup?: boolean;
   readonly?: boolean;
   dashboard?: boolean;
   attrs?: Attrs;
@@ -52,6 +53,7 @@ export function DashletComponent({
   attrs,
   className,
   readonly,
+  popup,
   viewId,
   viewContext,
   dashboard,
@@ -80,6 +82,9 @@ export function DashletComponent({
           dashlet: true,
           "show-toolbar": false,
           "dashlet.canSearch": canSearch,
+          ...(popup && {
+            "dashlet.in.popup": popup,
+          }),
         },
         context: {
           ...(dashboard
@@ -94,7 +99,7 @@ export function DashletComponent({
           _domainAction: action,
         },
       });
-    }, [dashboard, action, canSearch, viewContext, getContext]),
+    }, [dashboard, action, popup, canSearch, viewContext, getContext]),
   );
 
   const { data: tab, state } = useAsync(load, [load]);
@@ -281,6 +286,7 @@ export function Dashlet(props: WidgetProps) {
       <DashletComponent
         schema={schema}
         attrs={attrs}
+        popup={tab.popup}
         readonly={canEdit ? false : readonly}
         viewContext={viewContext}
         getContext={getContext}
