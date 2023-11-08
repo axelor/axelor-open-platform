@@ -109,7 +109,7 @@ function resolveFilter(match) {
   let arr = match.replace("{{", "").replace("}}", "").split("|");
   let code = arr.shift().trim();
   arr.forEach((a) => {
-    const [filterName, ...values] = a.trim().split(":");
+    const [filterName, ...values] = a.trim().split(/\s*:\s*/);
     const value = values.join(",");
     if (filterName && SUPPORTED_FILTERS.includes(filterName)) {
       if (value) {
