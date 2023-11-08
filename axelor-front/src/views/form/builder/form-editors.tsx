@@ -15,6 +15,7 @@ import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import {
   Editor,
+  Field,
   FormView,
   Panel,
   Property,
@@ -955,6 +956,8 @@ function JsonEditor({
   );
   const model = useAtomValue(modelAtom);
   const jsonModel = schema.jsonModel;
+  const jsonFields = processJsonFields(schema);
+  const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
   const jsonValueRef = useRef<DataRecord>();
 
   const jsonAtom = useMemo(() => {
@@ -979,21 +982,27 @@ function JsonEditor({
       ) => {
         const state =
           typeof update === "function" ? update(get(valueAtom)) : update;
-        const { $record, ...value } = state ?? {};
+        const { $record: _record, ...value } = state ?? {};
+        const jsonName = jsonNameField ? value?.[jsonNameField.name] : null;
         const jsonValue = state ? JSON.stringify(value) : null;
+
         set(valueAtom, jsonValue, fireOnChange, markDirty);
+
         if (jsonModel) {
           const formState = get(formAtom);
-          if (formState.record.jsonModel !== jsonModel) {
+          if (
+            formState.record.jsonModel !== jsonModel ||
+            formState.record.name !== jsonName
+          ) {
             set(formAtom, {
               ...formState,
-              record: { ...formState.record, jsonModel },
+              record: { ...formState.record, jsonModel, name: jsonName },
             });
           }
         }
       },
     );
-  }, [formAtom, jsonModel, valueAtom]);
+  }, [formAtom, jsonModel, jsonNameField, valueAtom]);
 
   const jsonEditor = useMemo(
     () => ({ ...processJsonView(editor), json: true }) as FormView,
@@ -1021,6 +1030,17 @@ function JsonEditor({
       readonly={readonly || schema.readonly}
     />
   );
+}
+
+function processJsonFields(schema: Schema) {
+  const fields: Record<string, Schema> = schema.jsonFields ?? {};
+  return Object.entries(fields).reduce((acc, [k, v]) => {
+    const { nameField: nameColumn, ...field } = v;
+    return {
+      ...acc,
+      [k]: nameColumn ? { ...field, nameColumn } : field,
+    };
+  }, {}) as Record<string, Field>;
 }
 
 function processJsonView(schema: Schema) {
