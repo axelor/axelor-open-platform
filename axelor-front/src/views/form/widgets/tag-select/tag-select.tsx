@@ -374,6 +374,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         onChange={handleChange}
         onOpen={handleOpen}
         onClose={handleClose}
+        canShowNoResultOption={true}
         canCreateOnTheFly={canNew && schema.create}
         onShowCreate={canNew ? showCreate : undefined}
         onShowCreateAndSelect={

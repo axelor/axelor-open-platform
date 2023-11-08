@@ -373,6 +373,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           onOpen={handleOpen}
           onClose={handleClose}
           canCreateOnTheFly={canNew && schema.create}
+          canShowNoResultOption={true}
           onShowCreate={canNew ? showCreate : undefined}
           onShowSelect={canSelect && !isSuggestBox ? showSelect : undefined}
           onShowCreateAndSelect={

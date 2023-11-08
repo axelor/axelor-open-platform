@@ -35,6 +35,7 @@ export interface SelectProps<Type, Multiple extends boolean>
   canSelect?: boolean;
   fetchOptions?: (inputValue: string) => Promise<Type[]>;
   canCreateOnTheFly?: boolean;
+  canShowNoResultOption?: boolean;
   onShowCreateAndSelect?: (inputValue: string) => void;
   onShowCreate?: (inputValue: string) => void;
   onShowSelect?: (inputValue: string) => void;
@@ -152,6 +153,15 @@ export const Select = forwardRef(function Select<
         ),
         onClick: () => onShowSelect(inputValue),
       });
+    } else if (selectProps.canShowNoResultOption && !hasOptions) {
+      options.push({
+        key: "no-result",
+        title: (
+          <Box d="flex" gap={6} alignItems="center">
+            <em>{i18n.get("No results found")}</em>
+          </Box>
+        ),
+      });
     }
 
     const canShowCreateWithInput =
@@ -205,6 +215,7 @@ export const Select = forwardRef(function Select<
     onShowCreate,
     onShowCreateAndSelect,
     onShowSelect,
+    selectProps.canShowNoResultOption,
   ]);
 
   return (
