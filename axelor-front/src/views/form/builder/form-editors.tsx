@@ -51,7 +51,6 @@ function processEditor(schema: Schema) {
   const editor: Editor = schema.editor;
   const widgetAttrs = editor.widgetAttrs ?? {};
   const fields = editor.fields ?? schema.fields;
-  const flexbox = editor.flexbox ?? false;
 
   const autoTitle = (item: Schema) => {
     if (item.showTitle && item.type !== "panel") {
@@ -62,6 +61,9 @@ function processEditor(schema: Schema) {
   const applyTitle = (item: Schema) => {
     const field = fields?.[item.name!];
     const result = { ...field, ...item };
+
+    // for json fields, always force autoTitle
+    if (schema.json) item.showTitle = undefined;
 
     if (
       result.type !== "panel" &&
