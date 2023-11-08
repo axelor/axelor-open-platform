@@ -31,7 +31,7 @@ export function createEvalContext(
     },
     __currency(value: any, currency: string, scale = 2) {
       return format(value, {
-        props: { scale, currency, type: "decimal" } as any,
+        props: { scale, type: "decimal", widgetAttrs: { currencyText: currency } } as any,
       });
     },
     __percent(value: any, scale?: string | number) {
