@@ -3,6 +3,7 @@ import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import get from "lodash/get";
+import uniq from "lodash/uniq";
 import uniqueId from "lodash/uniqueId";
 import {
   RefObject,
@@ -58,11 +59,7 @@ import { GridScope, useGridColumnNames } from "./scope";
 
 import styles from "../grid.module.scss";
 
-function formatter(column: Field, _value: any, record: DataRecord) {
-  const { name } = column;
-  const value =
-    (name?.includes(".") ? get(record, (name ?? "").split(".")) : null) ??
-    get(record, name);
+function formatter(column: Field, value: any, record: any) {
   return format(value, {
     props: column,
     context: record,
