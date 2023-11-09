@@ -12,6 +12,7 @@ import { ActionExecutor } from "@/view-containers/action";
 import { getNodeOfTreeRecord } from "../../utils";
 import format from "@/utils/format";
 import { useWidgetComp } from "../../hooks";
+import { toKebabCase } from "@/utils/names";
 
 export interface NodeTextProps {
   column: TreeColumn;
@@ -37,7 +38,7 @@ export function NodeText({
       ),
     [node, column]
   );
-  const { data: Component } = useWidgetComp(column.type!);
+  const { data: Component } = useWidgetComp(toKebabCase(column.widget || column.type!));
 
   if (Component && field) {
     return (
