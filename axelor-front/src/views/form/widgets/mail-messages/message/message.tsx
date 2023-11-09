@@ -1,23 +1,24 @@
-import React, { MouseEvent, useMemo, useState } from "react";
 import clsx from "clsx";
-import { Box, Button, Badge, TBackground, useTheme, Panel } from "@axelor/ui";
+import React, { MouseEvent, useMemo, useState } from "react";
 
+import { Badge, Box, Button, Panel, TBackground, useTheme } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useEditor } from "@/hooks/use-relation";
-import { findView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
+import { findView } from "@/services/client/meta-cache";
 import { FormProps } from "@/views/form/builder";
 
 import Avatar from "../avatar";
-import * as TYPES from "./types";
-import { MessageMenu } from "./message-menu";
 import { MessageFiles } from "./message-files";
-import { MessageTracks } from "./message-track";
 import { MessageInput } from "./message-input";
-import { getUser, getUserName } from "./utils";
+import { MessageMenu } from "./message-menu";
+import { MessageTracks } from "./message-track";
+import * as TYPES from "./types";
 import { MessageInputProps, MessageProps } from "./types";
+import { getUser, getUserName } from "./utils";
+
 import styles from "./message.module.scss";
 
 const TagStyle: Record<TYPES.MessageBodyTag["style"], TBackground> = {
@@ -255,7 +256,11 @@ export const Message = React.memo(function Message(props: MessageProps) {
                   onClick={fetchReplies}
                   className={styles["pull-right"]}
                 >
-                  {i18n.get("replies ({0} of {1})", $children.length, $numReplies)}
+                  {i18n.get(
+                    "replies ({0} of {1})",
+                    $children.length,
+                    $numReplies,
+                  )}
                 </Box>
               </span>
             )}
@@ -291,12 +296,6 @@ export const Message = React.memo(function Message(props: MessageProps) {
   );
 });
 
-const FILTERS = [
-  { title: i18n.get("All"), value: undefined },
-  { title: i18n.get("Comments"), value: "comment" },
-  { title: i18n.get("Notifications"), value: "notification" },
-] as const;
-
 export function MessageBox({
   isMail,
   inputProps: MessageInputProps,
@@ -323,6 +322,16 @@ export function MessageBox({
   onCommentRemove?: MessageProps["onRemove"];
 }) {
   const rtl = useTheme().dir === "rtl";
+
+  const filters = useMemo(
+    () => [
+      { title: i18n.get("All"), value: undefined },
+      { title: i18n.get("Comments"), value: "comment" },
+      { title: i18n.get("Notifications"), value: "notification" },
+    ],
+    [],
+  );
+
   return (
     <Panel
       className={clsx(styles.root, "mail-messages", {
@@ -333,7 +342,7 @@ export function MessageBox({
       {!isMail && (
         <Box d="flex" flexDirection="column" g={2} mb={3}>
           <Box d="flex" flexDirection={{ base: "column", md: "row" }} g={2}>
-            {FILTERS.map(({ title, value }, ind) => (
+            {filters.map(({ title, value }, ind) => (
               <Button
                 key={ind}
                 variant="primary"

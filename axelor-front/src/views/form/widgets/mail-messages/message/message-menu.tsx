@@ -20,7 +20,7 @@ export function MessageMenu({
   const [target, setTarget] = useState<HTMLElement | null>(null);
 
   const open = Boolean(target);
-  const t = i18n.get;
+  const _t = i18n.get;
   const id = open ? `actions-popover-${data.id}` : undefined;
   const { $flags, $thread, $canDelete } = data;
   const { isRead, isStarred, isArchived } = ($flags || {}) as MessageFlag;
@@ -85,14 +85,14 @@ export function MessageMenu({
       </Box>
       <Menu show={open} target={target} onHide={onClose} placement="bottom-end">
         <MenuItem onClick={onRead}>
-          {t(isRead ? "Mark as unread" : "Mark as read")}
+          {isRead ? _t("Mark as unread") : _t("Mark as read")}
         </MenuItem>
         <MenuItem onClick={onStarred}>
-          {t(isStarred ? "Mark as not important" : "Mark as important")}
+          {isStarred ? _t("Mark as not important") : _t("Mark as important")}
         </MenuItem>
         {$thread && (
           <MenuItem onClick={onArchived}>
-            {t(isArchived ? "Move to inbox" : "Move to archive")}
+            {isArchived ? _t("Move to inbox") : _t("Move to archive")}
           </MenuItem>
         )}
         {$canDelete && <MenuItem onClick={onDelete}>Delete</MenuItem>}
