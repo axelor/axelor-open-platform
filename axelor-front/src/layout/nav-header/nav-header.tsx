@@ -297,7 +297,7 @@ function FarItems() {
       items={[
         {
           key: "fav",
-          text: "Favorite",
+          text: i18n.get("Favorite"),
           iconOnly: true,
           iconProps: {
             icon: "star",
@@ -306,7 +306,7 @@ function FarItems() {
         },
         {
           key: "messages",
-          text: "Messages",
+          text: i18n.get("Messages"),
           icon: (props: any) => (
             <BadgeIcon
               {...props}

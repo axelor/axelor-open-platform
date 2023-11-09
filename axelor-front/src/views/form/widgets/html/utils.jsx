@@ -386,7 +386,7 @@ export function getActions() {
   return [
     {
       lite: false,
-      title: "Style",
+      title: _t("Style"),
       image: "\uf1dd",
       popup: DropdownPopup,
       ...getDropdown(
@@ -409,7 +409,7 @@ export function getActions() {
     },
     {
       lite: false,
-      title: "Font",
+      title: _t("Font"),
       image: "\uf031",
       ...getDropdown(
         [
@@ -442,7 +442,7 @@ export function getActions() {
     },
     {
       lite: false,
-      title: "Font size",
+      title: _t("Font size"),
       image: "\uf035",
       ...getDropdown(
         {
@@ -465,38 +465,38 @@ export function getActions() {
     },
     divider(false),
     {
-      title: "Bold (Ctrl+B)",
+      title: _t("Bold (Ctrl+B)"),
       image: "\uf032",
       command: "bold",
       hotkey: "b",
     },
     {
-      title: "Italic (Ctrl+I)",
+      title: _t("Italic (Ctrl+I)"),
       image: "\uf033",
       command: "italic",
       hotkey: "i",
     },
     {
-      title: "Underline (Ctrl+U)",
+      title: _t("Underline (Ctrl+U)"),
       image: "\uf0cd",
       command: "underline",
       hotkey: "u",
     },
     {
-      title: "Strikethrough (Ctrl+S)",
+      title: _t("Strikethrough (Ctrl+S)"),
       image: "\uf0cc",
       command: "strikeThrough",
       hotkey: "s",
     },
     {
-      title: "Remove format",
+      title: _t("Remove format"),
       image: "\uf12d",
       command: "removeFormat",
     },
     divider(),
     {
       lite: false,
-      title: "Text color",
+      title: _t("Font color"),
       image: "\uf1fc",
       popup: ColorPalettePopup,
       popupProps: {
@@ -509,7 +509,7 @@ export function getActions() {
     },
     {
       lite: false,
-      title: "Background color",
+      title: _t("Background color"),
       image: "\uf043",
       popup: ColorPalettePopup,
       popupProps: {
@@ -523,71 +523,71 @@ export function getActions() {
     divider(false),
     {
       lite: false,
-      title: "Insert link",
+      title: _t("Insert link"),
       image: "\uf08e",
       popup: CreateLinkPopup,
     },
     {
       lite: false,
-      title: "Insert image",
+      title: _t("Insert image"),
       image: "\uf030",
       popup: CreateImagePopup,
     },
     divider(false),
     {
-      title: "Left",
+      title: _t("Align left"),
       image: "\uf036",
       command: "justifyLeft",
     },
     {
-      title: "Center",
+      title: _t("Center"),
       image: "\uf037",
       command: "justifyCenter",
     },
     {
-      title: "Right",
+      title: _t("Align right"),
       image: "\uf038",
       command: "justifyRight",
     },
     {
-      title: "To Justify",
+      title: _t("Justify"),
       image: "\uf039",
       command: "justifyFull",
     },
     divider(),
     {
-      title: "Ordered list",
+      title: _t("Ordered list"),
       image: "\uf0cb",
       command: "insertOrderedList",
     },
     {
-      title: "Unordered list",
+      title: _t("Unordered list"),
       image: "\uf0ca",
       command: "insertUnorderedList",
     },
     divider(false),
     {
       lite: false,
-      title: "Indent",
+      title: _t("Indent"),
       image: "\uf03c",
       command: "indent",
     },
     {
       lite: false,
-      title: "Outdent",
+      title: _t("Outdent"),
       image: "\uf03b",
       command: "outdent",
     },
     divider(false),
     {
       lite: false,
-      title: "Normalize",
+      title: _t("Normalize"),
       image: "\uf0d0",
       command: "normalize",
     },
     {
       lite: false,
-      title: "Code",
+      title: _t("Code"),
       image: "\uf121",
       command: "toggleCode",
     },

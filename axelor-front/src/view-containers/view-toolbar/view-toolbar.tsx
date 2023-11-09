@@ -39,6 +39,7 @@ import { fallbackFormAtom } from "@/views/form/builder/atoms";
 import { ActionExecutor, ActionOptions } from "../action";
 
 import styles from "./view-toolbar.module.scss";
+import { i18n } from "@/services/client/i18n.ts";
 
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
@@ -379,7 +380,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     if (view?.viewId) {
       items.push({
         key: "view",
-        text: "View...",
+        text: i18n.get("View..."),
         onClick: () => {
           navigate(`/ds/form::com.axelor.meta.db.MetaView/edit/${view.viewId}`);
         },
@@ -389,7 +390,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     if (view?.modelId) {
       items.push({
         key: "model",
-        text: "Model...",
+        text: i18n.get("Model..."),
         onClick: () => {
           navigate(
             `/ds/form::com.axelor.meta.db.MetaModel/edit/${view.modelId}`,
@@ -401,7 +402,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     if (actionId) {
       items.push({
         key: "action",
-        text: "Action...",
+        text: i18n.get("Action..."),
         onClick: () => {
           navigate(`/ds/form::com.axelor.meta.db.MetaAction/edit/${actionId}`);
         },
@@ -411,6 +412,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     const command: CommandItemProps = {
       key: "settings",
       iconOnly: true,
+      description: i18n.get("Customize..."),
       iconProps: {
         icon: "settings",
       },
