@@ -108,7 +108,7 @@ public class MenuService {
         .select("menu", "help")
         .fetch(-1, 0)
         .stream()
-        .collect(Collectors.toMap(s -> (String) s.get("key"), s -> (String) s.get("value")));
+        .collect(Collectors.toMap(s -> (String) s.get("menu"), s -> (String) s.get("help")));
   }
 
   /**
