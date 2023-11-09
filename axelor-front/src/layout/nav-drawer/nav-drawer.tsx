@@ -10,14 +10,13 @@ import { useTabs } from "@/hooks/use-tabs";
 import { useTagsList } from "@/hooks/use-tags";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem, Tag } from "@/services/client/meta.types";
-import { unaccent } from "@/utils/sanitize";
+import { sanitize, unaccent } from "@/utils/sanitize";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useSidebar } from "./hook";
 
 import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
 import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
-
 
 import styles from "./nav-drawer.module.scss";
 
@@ -50,6 +49,7 @@ function load(res: MenuItem[], tags: Tag[]) {
     const {
       name,
       title,
+      help,
       action,
       tag,
       tagStyle: tagColor,
@@ -70,6 +70,9 @@ function load(res: MenuItem[], tags: Tag[]) {
 
     if (icon) {
       props.icon = () => <MenuIcon icon={icon} color={iconColor} />;
+    }
+    if (help) {
+      props.help = sanitize(help.replaceAll("\n", "<br>"));
     }
 
     const updatedTag = tags.filter((x) => item.name === x.name)[0];
