@@ -146,9 +146,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
   if ((serverType ?? type)?.toUpperCase() === "DECIMAL") {
     // referencing another field in the context?
     if (typeof scale === "string") {
-      const scaleVal =
-        _.get(context, scale.split(".")) ?? (_.get(context, scale) as number);
-      scale = +(scaleVal ?? scale);
+      scale = +((_.get(context, scale) as number) ?? scale);
     }
 
     if (typeof scale !== "number" || isNaN(scale)) {
