@@ -23,17 +23,19 @@ import styles from "./nav-drawer.module.scss";
 function MenuTag({
   item,
   tag,
+  hasTag,
   color,
 }: {
   item: MenuItem;
   tag: string;
+  hasTag?: boolean;
   color?: string;
 }) {
   const bg = (
     !color || color === "default" ? "secondary" : color
   ) as TBackground;
   return (
-    <Badge data-tag-name={item.name} bg={bg}>
+    <Badge data-tag-name={hasTag ? item.name : undefined} bg={bg}>
       {`${tag}`.toUpperCase()}
     </Badge>
   );
@@ -52,6 +54,7 @@ function load(res: MenuItem[], tags: Tag[]) {
       help,
       action,
       tag,
+      hasTag,
       tagStyle: tagColor,
       icon,
       iconBackground: iconColor,
@@ -78,7 +81,7 @@ function load(res: MenuItem[], tags: Tag[]) {
     const updatedTag = tags.filter((x) => item.name === x.name)[0];
     if (tag || updatedTag) {
       props.tag = () => (
-        <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} />
+        <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} hasTag={hasTag} />
       );
     }
 
