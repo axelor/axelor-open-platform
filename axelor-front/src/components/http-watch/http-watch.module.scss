@@ -1,7 +1,7 @@
 .indicator {
   position: fixed;
   top: 0;
-  padding: 0.25rem 1rem;
+  padding: 0.25rem 0.5rem;
   background-color: var(--bs-danger);
   color: var(--bs-white);
   border-radius: 0.5rem;
@@ -9,6 +9,8 @@
   border-top-right-radius: 0;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 100001;
+  font-size: small;
 }
 
 [dir="rtl"] .indicator {
@@ -16,16 +18,21 @@
   transform: translateX(50%);
 }
 
-.block {
+.block,
+.wait {
   position: fixed;
   top: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.5);
-  cursor: wait;
   display: flex;
   align-items: center;
   color: var(--bs-white);
   font-size: 1rem;
+  z-index: 100000;
+}
+
+.wait {
+  background-color: rgba(0, 0, 0, 0.5);
+  cursor: wait;
 }

@@ -7,6 +7,7 @@ import { SessionInfo, session } from "@/services/client/session";
 
 import { Loader } from "../loader/loader";
 import { LoginForm } from "../login-form";
+import { useHttpBlock } from "./use-block";
 import { useHttpWatch } from "./use-watch";
 
 import styles from "./http-watch.module.scss";
@@ -16,6 +17,7 @@ export function HttpWatch() {
   return (
     <>
       <HttpIndicator count={count} />
+      <HttpBlock count={count} />
       <HttpAuth resume={resume} />
     </>
   );
@@ -23,10 +25,8 @@ export function HttpWatch() {
 
 function HttpIndicator({ count }: { count: number }) {
   const [show, setShow] = useState(false);
-  const [block, setBlock] = useState(false);
 
   const timerRef = useRef<number>();
-  const blockRef = useRef<number>();
   const mountRef = useRef(false);
 
   const handleShow = useCallback(() => {
@@ -38,16 +38,6 @@ function HttpIndicator({ count }: { count: number }) {
     }, 300);
   }, [count]);
 
-  const handleBlock = useCallback(() => {
-    if (blockRef.current && count > 0) return;
-    if (blockRef.current) window.clearTimeout(blockRef.current);
-    const wait = count > 0 ? 5000 : 300;
-    blockRef.current = window.setTimeout(() => {
-      if (mountRef.current) setBlock(count > 0);
-      blockRef.current = undefined;
-    }, wait);
-  }, [count]);
-
   useEffect(() => {
     mountRef.current = true;
     return () => {
@@ -56,19 +46,42 @@ function HttpIndicator({ count }: { count: number }) {
   }, []);
 
   useEffect(() => () => window.clearTimeout(timerRef.current), []);
-  useEffect(() => () => window.clearTimeout(blockRef.current), []);
-
   useEffect(handleShow, [handleShow]);
-  useEffect(handleBlock, [handleBlock]);
 
   return (
     <Portal>
       <Fade in={show} mountOnEnter unmountOnExit>
         <div className={styles.indicator}>{i18n.get("Loading...")}</div>
       </Fade>
-      <Fade in={block} mountOnEnter unmountOnExit>
+    </Portal>
+  );
+}
+
+function HttpBlock({ count }: { count: number }) {
+  const [wait, setWait] = useState(false);
+  const [blocked] = useHttpBlock();
+
+  const active = blocked || count > 0;
+
+  useEffect(() => {
+    const delay = active ? 5000 : 300;
+    const timer = setTimeout(() => {
+      setWait(active);
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [active, count]);
+
+  return (
+    <Portal>
+      <Fade in={blocked || wait} mountOnEnter unmountOnExit>
         <div className={styles.block}>
-          <Loader text={i18n.get("Please wait...")} />
+          <Fade in={wait} mountOnEnter unmountOnExit>
+            <div className={styles.wait}>
+              <Loader delay={10} text={i18n.get("Please wait...")} />
+            </div>
+          </Fade>
         </div>
       </Fade>
     </Portal>
@@ -86,7 +99,7 @@ function HttpAuth({ resume }: { resume?: () => void }) {
         resume?.();
       }
     },
-    [prev, resume]
+    [prev, resume],
   );
   return (
     <Portal>
