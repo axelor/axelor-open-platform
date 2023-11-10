@@ -31,14 +31,17 @@ export function NodeText({
   const { data: record } = data;
 
   let value = get(record, column.name);
-  const field = useMemo<Field | undefined>(
-    () =>
-      (node?.items as TreeField[])?.find(
-        (item) => (item.as || item.name) === column.name
+  const field = useMemo<Field | undefined>(() => {
+    return {
+      ...column,
+      ...(node?.items as TreeField[])?.find(
+        (item) => (item.as || item.name) === column.name,
       ),
-    [node, column]
+    } as Field;
+  }, [node, column]);
+  const { data: Component } = useWidgetComp(
+    toKebabCase(column.widget || column.type!),
   );
-  const { data: Component } = useWidgetComp(toKebabCase(column.widget || column.type!));
 
   if (Component && field) {
     return (
