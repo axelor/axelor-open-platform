@@ -18,4 +18,4 @@ description: |
 
   Reload current tab after closing popup from dashlet.
   If the tab is dirty before opening the popup,
-  save confirmation dialog is be shown before proceeding.
+  save confirmation dialog is shown before proceeding.
