@@ -1,5 +1,8 @@
+import getValue from "lodash/get";
+
 import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
+
 import {
   ChangeEvent,
   KeyboardEvent,
@@ -60,28 +63,36 @@ export function MessageInput({
     setFiles((files) => files.filter((f) => f !== file));
   }
 
-  const handleSave = (data?: any) => {
-    onSave &&
-      onSave({
-        type: "comment",
-        ...(parent
-          ? {
-              relatedId: parent.relatedId,
-              relatedModel: parent.relatedModel,
-            }
-          : {}),
-        ...data,
-        files: data?.files?.map((x: MessageFile) => x["metaFile.id"] || x.id),
-      } as Message);
-    resetState();
-  };
+  const handleSave = useCallback(
+    (data?: any) => {
+      onSave &&
+        onSave({
+          type: "comment",
+          ...(parent
+            ? {
+                relatedId: parent.relatedId,
+                relatedModel: parent.relatedModel,
+              }
+            : {}),
+          ...data,
+          files: data?.files
+            ?.map((x: MessageFile) => getValue(x, "metaFile.id"))
+            .filter(Boolean),
+        } as Message);
+      resetState();
+    },
+    [onSave, parent],
+  );
 
-  function handlePost() {
-    handleSave({
-      body: value,
-      files,
-    });
-  }
+  const handlePost = useCallback(
+    function () {
+      handleSave({
+        body: value,
+        files,
+      });
+    },
+    [files, handleSave, value],
+  );
 
   function handleAttachment() {
     showDMSPopup({
