@@ -1,20 +1,26 @@
-import { uniqueId } from "lodash";
-
-import { openTab_internal as openTab } from "@/hooks/use-tabs";
-import { closeTab_internal as closeTab } from "@/hooks/use-tabs";
-import { i18n } from "@/services/client/i18n";
-import { ActionResult, action as executeAction } from "@/services/client/meta";
-import { ActionView, HtmlView, View } from "@/services/client/meta.types";
-import { download } from "@/utils/download";
+import uniqueId from "lodash/uniqueId";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
+import { block } from "@/components/http-watch/use-block";
+import {
+  closeTab_internal as closeTab,
+  openTab_internal as openTab,
+} from "@/hooks/use-tabs";
 import { getActivePopups, getActiveTabId } from "@/layout/nav-tabs/utils";
+import { i18n } from "@/services/client/i18n";
+import { ActionResult, action as actionRequest } from "@/services/client/meta";
+import { ActionView, HtmlView, View } from "@/services/client/meta.types";
+import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
 import { ActionExecutor, ActionHandler, ActionOptions } from "./types";
 
 const queue = new TaskQueue();
+
+const executeAction: typeof actionRequest = async (options) => {
+  return block(() => actionRequest(options));
+};
 
 export class DefaultActionExecutor implements ActionExecutor {
   #handler;
