@@ -12,9 +12,34 @@ import {
   SearchResult,
 } from "./data";
 import { DataRecord } from "./data.types";
+import getObjValue from "lodash/get";
 
 function ifDiff<T>(current: T, value: T): T {
   return isEqual(current, value) ? current : value;
+}
+
+function updateRecord(
+  initialRecord: DataRecord,
+  record: DataRecord,
+): DataRecord {
+  const rec: DataRecord = {};
+
+  Object.keys(initialRecord).forEach((fieldName) => {
+    const fieldValue = record[fieldName];
+    if (fieldName.includes(".")) {
+      rec[fieldName] =
+        getObjValue(record, fieldName.split(".")) ?? initialRecord[fieldName];
+    } else if (typeof fieldValue === "object" && !Array.isArray(fieldValue)) {
+      rec[fieldName] = updateRecord(
+        initialRecord[fieldName],
+        fieldValue as DataRecord,
+      );
+    } else {
+      rec[fieldName] = fieldValue ?? initialRecord[fieldName];
+    }
+  });
+
+  return rec;
 }
 
 export type DataStoreListener = (ds: DataStore) => void;
@@ -107,20 +132,8 @@ export class DataStore extends DataSource {
     if (res) {
       const records = this.records.slice();
       const recInd = records.findIndex((r) => r.id === res.id);
-      const { fields = [] } = this.#options;
-      if (recInd > -1 && fields.length) {
-        const record = records[recInd];
-        const changes = fields.reduce(
-          (rec, key) => ({
-            ...rec,
-            [key]: res[key] ?? record[key],
-          }),
-          {},
-        );
-        records[recInd] = {
-          ...record,
-          ...changes,
-        };
+      if (recInd > -1) {
+        records[recInd] = updateRecord(records[recInd], res);
         this.#accept(this.#options, this.#page, records);
       }
     }
@@ -173,11 +186,10 @@ export class DataStore extends DataSource {
     let page = this.#page;
 
     if (data.id) {
-      records = records.map((record) =>
-        record.id === (data as DataRecord).id
-          ? { ...record, ...data, ...res }
-          : record,
-      );
+      const recInd = records.findIndex((r) => r.id === res.id);
+      if (recInd > -1) {
+        records[recInd] = updateRecord(records[recInd], { ...data, ...res });
+      }
     } else if (res.id && res.id !== data.id) {
       const totalCount = page.totalCount ?? this.records.length;
 
