@@ -33,22 +33,21 @@ import { parseAngularExp } from "@/hooks/use-parser/utils";
 import { toKebabCase } from "@/utils/names";
 import { searchData } from "./utils";
 import styles from "./search.module.scss";
+import { getFieldServerType, getWidget } from "@/views/form/builder/utils";
 
 function prepareFields(fields: SearchView["searchFields"]) {
   return (fields || []).reduce((fields, _field) => {
     const field = { ..._field, type: _field.type?.toUpperCase?.() };
 
-    if (field.type === "FIELD") {
-      field.type = "STRING";
-    } else if (field.type === "REFERENCE") {
+    if (field.type === "REFERENCE") {
       field.type = "MANY_TO_ONE";
     }
-
-    field.serverType = field.type?.toUpperCase?.() ?? "STRING";
-
     if ((field.selection || field.selectionList) && !field.widget) {
       field.widget = "Selection";
     }
+
+    field.serverType = getFieldServerType({...field, type: "field"}, field) ?? "STRING";
+    field.widget = getWidget(field, null);
 
     if (["INTEGER", "LONG", "DECIMAL"].includes(field.serverType)) {
       field.nullable = true;
@@ -100,7 +99,7 @@ export function Search(props: ViewProps<SearchView>) {
     const { view } = meta;
     const { title, name, selects, searchFields } = view;
     const fields = prepareFields(searchFields);
-    const model = meta.model || selects?.find(s => s.model)?.model;
+    const model = meta.model || selects?.find((s) => s.model)?.model;
 
     function process(item: SearchField) {
       const $item = (fields[item.name] || {}) as Schema;
