@@ -1,4 +1,6 @@
-import { isEqual } from "lodash";
+import getObjValue from "lodash/get";
+import isEqual from "lodash/isEqual";
+import isPlainObject from "lodash/isPlainObject";
 
 import {
   DataSource,
@@ -11,8 +13,7 @@ import {
   SearchPage,
   SearchResult,
 } from "./data";
-import { DataRecord } from "./data.types";
-import getObjValue from "lodash/get";
+import { DataContext, DataRecord } from "./data.types";
 
 function ifDiff<T>(current: T, value: T): T {
   return isEqual(current, value) ? current : value;
@@ -96,13 +97,32 @@ export class DataStore extends DataSource {
     this.#listeners.forEach((fn) => fn(this));
   }
 
+  #setVersion(context: DataContext, nested = false) {
+    return Object.entries(context).reduce((acc, [key, value]) => {
+      if (isPlainObject(value) && value.version !== undefined) {
+        const { version: $version, ...rest } = value;
+        value = { $version, ...rest };
+        value = this.#setVersion(value, true);
+      }
+      if (Array.isArray(value)) {
+        value = value.map((item) => this.#setVersion(item, true));
+      }
+      if (nested && key === "version") {
+        return acc;
+      }
+      return { ...acc, [key]: value };
+    }, {} as DataContext);
+  }
+
   #prepareOption(options: SearchOptions) {
     const opts = this.#options;
     const { offset, limit } = this.#page;
     const { _domain, _domainContext } = opts?.filter ?? {};
     const filter = {
       _domain,
-      _domainContext,
+      _domainContext: _domainContext
+        ? this.#setVersion(_domainContext)
+        : undefined,
       ...options.filter,
     };
     return {
