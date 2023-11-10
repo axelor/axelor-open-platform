@@ -166,7 +166,11 @@ export function defaultAttrs(schema: Schema): Attrs {
 export function processActionValue(value: any): any {
   if (Array.isArray(value)) return value.map(processActionValue);
   if (isPlainObject(value) && value.id == null) {
-    return { ...value, id: nextId(), _dirty: true };
+    const record = { ...value, id: nextId(), _dirty: true };
+    return Object.entries(record).reduce(
+      (acc, [k, v]) => ({ ...acc, [k]: processActionValue(v) }),
+      {},
+    );
   }
   return value;
 }
