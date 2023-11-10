@@ -372,10 +372,13 @@ function OneToManyInner({
               _archived: true,
               _domain: "self.id in (:_field_ids)",
               _domainContext: {
-                id: parentId,
-                _model: parentModel,
+                _model: model,
                 _field: name,
                 _field_ids: ids as number[],
+                _parent: {
+                  id: parentId,
+                  _model: parentModel,
+                }
               },
             },
           });
@@ -395,7 +398,7 @@ function OneToManyInner({
           records,
         } as SearchResult;
       },
-      [dataStore, getItems, name, orderBy, parentId, parentModel, valueAtom],
+      [dataStore, getItems, model, name, orderBy, parentId, parentModel, valueAtom],
     ),
   );
 

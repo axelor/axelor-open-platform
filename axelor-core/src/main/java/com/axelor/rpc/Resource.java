@@ -371,24 +371,32 @@ public class Resource<T extends Model> {
 
   private boolean shouldCheckPermissions(Request request) {
     final Context context = request.getContext();
-    // if o2m/m2m search request
-    if (context != null
-        && context.containsKey("_field")
-        && context.containsKey("_field_ids")
-        && context.containsKey("id")
-        && "self.id in (:_field_ids)".equals(request.getData().get("_domain"))) {
-      final Model parent = context.asType(Model.class);
-      final String fieldName = (String) context.get("_field");
-      @SuppressWarnings("unchecked")
-      final Collection<Long> fieldIds =
-          Optional.of(context.get("_field_ids"))
-              .filter(Collection.class::isInstance)
-              .map(value -> (Collection<Number>) value)
-              .map(items -> items.stream().map(Number::longValue).collect(Collectors.toSet()))
-              .orElse(Collections.emptySet());
-      return !isPermittedReadByParent(parent, fieldName, fieldIds);
+    if (context == null) {
+      return true;
     }
-    return true;
+
+    final Context parentContext = context.getParent();
+    if (parentContext == null) {
+      return true;
+    }
+
+    if (!"self.id in (:_field_ids)".equals(request.getData().get("_domain"))) {
+      return true;
+    }
+
+    // o2m/m2m search request
+
+    final Model parent = parentContext.asType(Model.class);
+    final String fieldName = (String) context.get("_field");
+    @SuppressWarnings("unchecked")
+    final Collection<Long> fieldIds =
+        Optional.of(context.get("_field_ids"))
+            .filter(Collection.class::isInstance)
+            .map(value -> (Collection<Number>) value)
+            .map(items -> items.stream().map(Number::longValue).collect(Collectors.toSet()))
+            .orElse(Collections.emptySet());
+
+    return !isPermittedReadByParent(parent, fieldName, fieldIds);
   }
 
   private boolean isPermittedReadByParent(

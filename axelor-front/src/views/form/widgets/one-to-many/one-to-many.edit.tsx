@@ -139,10 +139,13 @@ export function OneToManyEdit({
             ...options?.filter,
             _domain: "self.id in (:_field_ids)",
             _domainContext: {
-              id: parentId,
-              _model: parentModel,
+              _model: model,
               _field: name,
               _field_ids: ids as number[],
+              _parent: {
+                id: parentId,
+                _model: parentModel,
+              }
             },
           },
         });
@@ -153,7 +156,7 @@ export function OneToManyEdit({
         );
       }
     },
-    [dataStore, name, parentId, parentModel, sortBy, value],
+    [dataStore, model, name, parentId, parentModel, sortBy, value],
   );
 
   const focusInput = useCallback(() => {
