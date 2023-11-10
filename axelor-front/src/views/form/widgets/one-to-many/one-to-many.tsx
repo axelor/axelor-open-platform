@@ -262,6 +262,7 @@ function OneToManyInner({
   const canDelete = !readonly && hasButton("remove");
   const canSelect = !readonly && hasButton("select");
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
+  const canMove = Boolean(schema.canMove ?? viewData?.view?.canMove);
 
   const orderBy = schema.orderBy ?? viewData?.view?.orderBy;
   const editable =
@@ -395,11 +396,18 @@ function OneToManyInner({
           records = res.records;
         }
 
-        const newItems = items.map((item) => {
-          const fetched = records.find((x) => x.id === item.id);
-          return fetched ? { ...fetched, ...item } : item;
-        });
+        const fetchedIds = records.map((r) => r.id);
+        const newItems = records
+          .map((record) => {
+            const item = items.find((item) => item.id === record.id);
+            return item ? { ...record, ...item } : record;
+          })
+          .concat(items.filter((item) => !fetchedIds.includes(item.id)));
 
+        // reset orderby on search
+        setState((draft) => {
+          draft.orderBy = null;
+        });
         setRecords(newItems);
 
         return {
@@ -417,6 +425,7 @@ function OneToManyInner({
         name,
         parentId,
         parentModel,
+        setState,
       ],
     ),
   );
@@ -716,7 +725,7 @@ function OneToManyInner({
   }, [selectedRows, rows, setSelection]);
 
   useEffect(() => {
-    if (orderBy && reorderRef.current) {
+    if (reorderRef.current) {
       setValue(
         (values) => {
           const valIds = values.map((v) => v.id);
@@ -725,17 +734,18 @@ function OneToManyInner({
             .map((r) => values.find((v) => v.id === r.record?.id))
             .map((r, ind) => ({
               ...r,
-              [orderBy]: ind + 1,
+              _dirty: true,
+              sequence: ind + 1,
               version: r?.version ?? r?.$version,
             })) as DataRecord[];
         },
         false,
-        false,
+        true,
         true,
       );
     }
     reorderRef.current = false;
-  }, [rows, orderBy, setValue]);
+  }, [rows, setValue]);
 
   const fetchAndSetDetailRecord = useCallback(
     async (selected: DataRecord) => {
@@ -790,6 +800,10 @@ function OneToManyInner({
   const rowSize = 45;
   const headerSize = 100;
   const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
+  const changed = useMemo(() => value?.some((x) => x._dirty), [value]);
+  const allowSorting = !canMove && !changed;
+  const allowGrouping = !canMove;
+  const allowRowReorder = canMove && !readonly;
 
   return (
     <>
@@ -882,7 +896,7 @@ function OneToManyInner({
           ],
         }}
         style={{
-          minHeight: headerSize + (2 * rowSize), // min 2 rows
+          minHeight: headerSize + 2 * rowSize, // min 2 rows
           maxHeight: maxHeight, // auto height to the max rows to display
         }}
       >
@@ -890,6 +904,9 @@ function OneToManyInner({
           <GridComponent
             className={styles["grid"]}
             ref={gridRef}
+            allowGrouping={allowGrouping}
+            allowSorting={allowSorting}
+            allowRowReorder={allowRowReorder}
             showEditIcon={canEdit || canView}
             readonly={readonly || !canEdit}
             editable={editable && canEdit}
