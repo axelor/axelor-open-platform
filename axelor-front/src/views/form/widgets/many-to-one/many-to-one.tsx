@@ -352,7 +352,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         (value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>{getOptionLabel(value)}</ViewerLink>
         ) : (
-          <ViewerInput value={value?.[targetName] || ""} />
+          <ViewerInput value={getOptionLabel(value)} />
         ))}
       {readonly || (
         <Select

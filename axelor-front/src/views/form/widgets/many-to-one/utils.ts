@@ -17,10 +17,10 @@ function getLabel(option: unknown, key: string) {
   return getObjValue(option, getTrKey(key)) ?? getObjValue(option, key);
 }
 
-export function useOptionLabel({ targetName = "id", targetSearch }: Schema) {
+export function useOptionLabel({ targetName, targetSearch }: Schema) {
   return useCallback(
     (option: unknown) => {
-      let label = getLabel(option, targetName);
+      let label = getLabel(option, targetName || "id");
 
       if (typeof label === "object") {
         const names = [
@@ -30,7 +30,7 @@ export function useOptionLabel({ targetName = "id", targetSearch }: Schema) {
         label = names.map((key) => getLabel(label, key)).find((value) => value);
       }
 
-      return label;
+      return label ?? "";
     },
     [targetName, targetSearch],
   );
