@@ -20,11 +20,7 @@ export function Boolean(props: FieldProps<boolean>) {
   const className = inline ? styles.inline : styles.checkbox;
 
   return (
-    <FieldControl
-      {...props}
-      className={className}
-      pointerEvents={inline ? undefined : "none"}
-    >
+    <FieldControl {...props} className={className}>
       <Input
         {...(focus && { key: "focused" })}
         data-input

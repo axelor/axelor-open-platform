@@ -29,13 +29,10 @@ export function WidgetControl({ className, children }: WidgetControlProps) {
   return <Box className={clsx(className, styles.container)}>{children}</Box>;
 }
 
-type PointerEvents = "none" | "auto" | "initial" | "inherit";
-
 export type FieldControlProps<T> = FieldProps<T> & {
   className?: string;
   showTitle?: boolean;
   titleActions?: React.ReactNode;
-  pointerEvents?: PointerEvents;
   children: React.ReactNode;
 };
 
@@ -47,7 +44,6 @@ export function FieldControl({
   widgetAtom,
   valueAtom,
   titleActions,
-  pointerEvents,
   children,
 }: FieldControlProps<any>) {
   const canShowTitle =
@@ -60,7 +56,7 @@ export function FieldControl({
   return (
     <Box className={clsx(className, styles.container)}>
       {(canShowTitle || titleActions) && (
-        <Box className={styles.title} style={{ pointerEvents }}>
+        <Box className={styles.title}>
           {canShowTitle && (
             <FieldLabel
               schema={schema}
