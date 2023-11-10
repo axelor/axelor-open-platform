@@ -395,7 +395,10 @@ const FormContainer = memo(function FormContainer({
             executeLate(action);
           }
 
-          isNewAction && setFormDirty(false);
+          const isDirty = isNewAction ? false : !!get(formAtom).dirty;
+
+          setFormDirty(isNewAction ? false : get(formAtom).dirty);
+          setDirty(isDirty);
           setReady(true);
         }
 
@@ -407,15 +410,16 @@ const FormContainer = memo(function FormContainer({
       [
         formAtom,
         readonly,
-        onLoadAction,
         onNewAction,
+        onLoadAction,
         switchTo,
         recordRef,
-        setReady,
+        tabId,
         setFormDirty,
+        setDirty,
+        setReady,
         actionExecutor,
         executeLate,
-        tabId,
       ],
     ),
   );

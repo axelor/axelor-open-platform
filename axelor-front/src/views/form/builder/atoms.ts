@@ -179,17 +179,18 @@ export function createValueAtom({
       const next =
         typeof value === "string" && value.trim() === "" ? null : value;
 
+      if (isEqual(prev, next)) return;
+
       const dirty =
         markDirty &&
         schema.canDirty !== false &&
         Boolean(name && !isCleanDummy(name));
 
-      if (!isEqual(prev, next)) {
-        set(lensAtom, next);
-        if (dirty) {
-          set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
-          set(dirtyAtom, true);
-        }
+      set(lensAtom, next);
+
+      if (dirty) {
+        set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
+        set(dirtyAtom, true);
       }
 
       fireOnChange && triggerOnChange();
