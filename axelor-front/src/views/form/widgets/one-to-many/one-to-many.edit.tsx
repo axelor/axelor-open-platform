@@ -95,6 +95,9 @@ export function OneToManyEdit({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
+  const parentModel = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
+  );
   const getContext = usePrepareContext(formAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
@@ -134,12 +137,12 @@ export function OneToManyEdit({
           sortBy: sortBy?.split?.(","),
           filter: {
             ...options?.filter,
-            _domain: "self.id in (:_ids)",
+            _domain: "self.id in (:_field_ids)",
             _domainContext: {
               id: parentId,
+              _model: parentModel,
               _field: name,
-              _model: model,
-              _ids: ids as number[],
+              _field_ids: ids as number[],
             },
           },
         });
@@ -150,7 +153,7 @@ export function OneToManyEdit({
         );
       }
     },
-    [value, sortBy, name, model, parentId, dataStore],
+    [dataStore, name, parentId, parentModel, sortBy, value],
   );
 
   const focusInput = useCallback(() => {

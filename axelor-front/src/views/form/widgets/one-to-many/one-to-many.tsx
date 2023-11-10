@@ -223,6 +223,9 @@ function OneToManyInner({
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
+  const parentModel = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
+  );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
   const { title, domain } = attrs;
@@ -367,12 +370,12 @@ function OneToManyInner({
             filter: {
               ...options?.filter,
               _archived: true,
-              _domain: "self.id in (:_ids)",
+              _domain: "self.id in (:_field_ids)",
               _domainContext: {
                 id: parentId,
+                _model: parentModel,
                 _field: name,
-                _model: model,
-                _ids: ids as number[],
+                _field_ids: ids as number[],
               },
             },
           });
@@ -392,7 +395,7 @@ function OneToManyInner({
           records,
         } as SearchResult;
       },
-      [dataStore, getItems, model, name, parentId, orderBy, valueAtom],
+      [dataStore, getItems, name, orderBy, parentId, parentModel, valueAtom],
     ),
   );
 
