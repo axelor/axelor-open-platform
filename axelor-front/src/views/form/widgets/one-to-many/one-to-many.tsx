@@ -180,6 +180,7 @@ function OneToManyInner({
             set,
             setter: SetStateAction<DataRecord[]>,
             callOnChange: boolean = true,
+            markDirty: boolean = true,
             resetRecords: boolean = false,
           ) => {
             shouldSearch.current = false;
@@ -187,7 +188,7 @@ function OneToManyInner({
               typeof setter === "function" ? setter(get(valueAtom)!) : setter;
             const valIds = (values || []).map((v) => v.id);
 
-            set(valueAtom, values, callOnChange);
+            set(valueAtom, values, callOnChange, markDirty);
 
             setRecords((records) => {
               if (resetRecords) {
@@ -434,29 +435,38 @@ function OneToManyInner({
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
-        setValue((prev) => {
-          const items = records.map((x) =>
-            x.selected ? x : { ...x, selected: true },
-          );
-          const prevItems = prev || [];
-          const newItems = items.filter(
-            (x) => !prevItems.some((y) => y.id === x.id),
-          );
-          return [
-            ...prevItems.map((item) => {
-              const record = items.find((r) => r.id === item.id);
-              return record ? { ...item, ...record } : item;
-            }),
-            ...newItems.map((item) => {
-              if (isManyToMany && (item.id ?? 0) > 0) {
-                return { ...item, version: undefined };
-              }
-              return item;
-            }),
-          ];
+        const prevItems = getItems(get(valueAtom));
+
+        const items = records.map((item) => {
+          if (isManyToMany && item.id && item.id > 0) {
+            const { version: $version, ...rest } = item;
+            item = { ...rest, $version };
+          }
+          return item.selected ? item : { ...item, selected: true };
         });
+
+        const newItems = items.filter(
+          (x) => !prevItems.some((y) => y.id === x.id),
+        );
+
+        const nextItems = [
+          ...prevItems.map((item) => {
+            const record = items.find((r) => r.id === item.id);
+            return record ? { ...item, ...record } : item;
+          }),
+          ...newItems.map((item) => {
+            if (isManyToMany && (item.id ?? 0) > 0) {
+              return { ...item, version: undefined };
+            }
+            return item;
+          }),
+        ];
+
+        const changed = !isManyToMany || prevItems.length !== nextItems.length;
+
+        setValue(nextItems, changed, changed);
       },
-      [isManyToMany, setValue],
+      [getItems, isManyToMany, setValue, valueAtom],
     ),
   );
 
@@ -689,6 +699,7 @@ function OneToManyInner({
               version: r?.version ?? r?.$version,
             })) as DataRecord[];
         },
+        false,
         false,
         true,
       );
