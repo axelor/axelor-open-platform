@@ -41,6 +41,8 @@ export interface SelectProps<Type, Multiple extends boolean>
   onShowSelect?: (inputValue: string) => void;
 }
 
+const EMPTY: any[] = [];
+
 export const Select = forwardRef(function Select<
   Type,
   Multiple extends boolean,
@@ -66,32 +68,30 @@ export const Select = forwardRef(function Select<
 
   const [items, setItems] = useState<Type[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [init, setInit] = useState(!fetchOptions);
 
+  const [ready, setReady] = useState(!fetchOptions);
   const selectRef = useRefs(ref);
-  const textRef = useRef<string | null>(inputValue);
   const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const clearTimer = useCallback(() => {
-    if (loadTimerRef.current) {
-      clearTimeout(loadTimerRef.current);
-      loadTimerRef.current = undefined;
-    }
-  }, []);
 
   const loadOptions = useCallback(
     (inputValue: string) => {
-      clearTimer();
-      loadTimerRef.current = setTimeout(async () => {
-        if (fetchOptions) {
-          const items = await fetchOptions(inputValue);
-          loadTimerRef.current = undefined;
-          setItems(items || []);
-          setInit(true);
-        }
-      }, 300);
+      if (loadTimerRef.current) {
+        clearTimeout(loadTimerRef.current);
+      }
+
+      loadTimerRef.current = setTimeout(
+        async () => {
+          if (fetchOptions) {
+            const items = await fetchOptions(inputValue);
+            loadTimerRef.current = undefined;
+            setItems(items || []);
+            setReady(true);
+          }
+        },
+        inputValue ? 300 : 0,
+      );
     },
-    [clearTimer, fetchOptions],
+    [fetchOptions],
   );
 
   const handleOpen = useCallback(() => {
@@ -101,6 +101,10 @@ export const Select = forwardRef(function Select<
     }
   }, [fetchOptions, inputValue, loadOptions, onOpen]);
 
+  const handleClose = useCallback(() => {
+    setReady(false);
+  }, []);
+
   const handleInputChange = useCallback(
     (text: string) => {
       setInputValue(text);
@@ -108,18 +112,14 @@ export const Select = forwardRef(function Select<
       if (fetchOptions) {
         if (text) {
           loadOptions(text);
-        } else if (textRef.current !== "") {
-          clearTimer();
         }
       }
-      textRef.current = text;
     },
-    [fetchOptions, loadOptions, clearTimer, onInputChange],
+    [fetchOptions, loadOptions, onInputChange],
   );
 
   const handleChange = useCallback(
     (value: SelectValue<Type, Multiple>) => {
-      textRef.current = value ? "" : null;
       onChange?.(value);
     },
     [onChange],
@@ -135,12 +135,10 @@ export const Select = forwardRef(function Select<
     }
   }, [autoFocus, selectRef]);
 
-  const currOptions = fetchOptions ? items : options;
+  const currOptions = fetchOptions ? (ready ? items : EMPTY) : options;
   const hasOptions = currOptions.length > 0;
 
   const customOptions = useMemo(() => {
-    if (!init) return [];
-
     const options: SelectCustomOption[] = [];
 
     if (onShowSelect && hasOptions) {
@@ -209,7 +207,6 @@ export const Select = forwardRef(function Select<
 
     return options;
   }, [
-    init,
     hasOptions,
     inputValue,
     selectProps.canCreateOnTheFly,
@@ -230,7 +227,7 @@ export const Select = forwardRef(function Select<
       readOnly={readOnly || !canSelect}
       openOnFocus={openOnFocus}
       options={currOptions}
-      customOptions={customOptions}
+      customOptions={ready ? customOptions : EMPTY}
       onInputChange={handleInputChange}
       onOpen={handleOpen}
       onChange={handleChange}
@@ -239,6 +236,9 @@ export const Select = forwardRef(function Select<
         maxWidth: 600,
         ...menuOptions,
       }}
+      {...(fetchOptions && {
+        onClose: handleClose,
+      })}
     />
   );
 }) as unknown as <Type, Multiple extends boolean>(
