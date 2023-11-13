@@ -233,7 +233,13 @@ const FormContainer = memo(function FormContainer({
   } = schema;
 
   const defaultRecord = useRef({ [defaultSymbol]: true }).current;
-  const { id: tabId, popup, popupOptions, action } = useViewTab();
+  const {
+    id: tabId,
+    popup,
+    popupOptions,
+    action,
+    state: tabAtom,
+  } = useViewTab();
   const [, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord, {
@@ -360,7 +366,16 @@ const FormContainer = memo(function FormContainer({
           document.dispatchEvent(event);
         }
 
-        switchTo("form", { route: { id }, props });
+        const tabState = get(tabAtom);
+        const tabRoute = tabState.routes?.form;
+        const tabProps = tabState.props?.form;
+        if (
+          tabRoute?.id !== String(id) ||
+          tabProps?.readonly != props.readonly
+        ) {
+          switchTo("form", { route: { id }, props });
+        }
+
         set(formAtom, {
           ...prev,
           dirty,
