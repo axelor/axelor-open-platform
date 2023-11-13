@@ -8,6 +8,7 @@ import { Box, InputFeedback, InputLabel } from "@axelor/ui";
 import { Tooltip } from "@/components/tooltip";
 import { useAsync } from "@/hooks/use-async";
 import { useTemplate } from "@/hooks/use-parser";
+import { useSession } from "@/hooks/use-session";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -99,15 +100,20 @@ export function FieldLabel({
   widgetAtom,
   className,
 }: WidgetProps & { className?: string }) {
+  const { data: sessionInfo } = useSession();
   const { uid, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title } = attrs;
+
+  const canShowHelp = !sessionInfo?.user?.noHelp && !!help;
 
   return (
     <HelpPopover schema={schema} formAtom={formAtom} widgetAtom={widgetAtom}>
       <InputLabel
         htmlFor={uid}
-        className={clsx(className, styles.label, { [styles.help]: help })}
+        className={clsx(className, styles.label, {
+          [styles.help]: canShowHelp,
+        })}
       >
         <span className={styles.labelText}>{title}</span>
       </InputLabel>
@@ -197,6 +203,7 @@ function HelpContent(props: WidgetProps) {
   const { domain } = attrs;
 
   const technical = session.info?.user?.technical && (name || type === "panel");
+  const canShowHelp = !session.info?.user?.noHelp && !!help;
 
   const value = name && original ? original[name] : undefined;
   let text = format(value, { props: schema as any });
@@ -226,8 +233,8 @@ function HelpContent(props: WidgetProps) {
 
   return (
     <Box className={styles.tooltip}>
-      {help && <Box className={styles.help}>{help}</Box>}
-      {help && technical && <hr />}
+      {canShowHelp && <Box className={styles.help}>{help}</Box>}
+      {canShowHelp && technical && <hr />}
       {technical && (
         <dl className={styles.details}>
           {model && (

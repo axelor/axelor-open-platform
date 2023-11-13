@@ -91,6 +91,7 @@ function load(res: MenuItem[], tags: Tag[]) {
 }
 
 export function NavDrawer() {
+  const { data: sessionInfo } = useSession();
   const { open: openTab } = useTabs();
   const { loading, menus } = useMenu();
   const { mode, show, small, sidebar, setSidebar } = useSidebar();
@@ -129,7 +130,15 @@ export function NavDrawer() {
 
   const tags = useTagsList();
 
-  const items = useMemo(() => load(menus, tags), [menus, tags]);
+  const items = useMemo(() => {
+    let navMenuItems = load(menus, tags);
+    if (sessionInfo?.user?.noHelp) {
+      navMenuItems = navMenuItems.map(({ help, ...rest }) => {
+        return rest;
+      });
+    }
+    return navMenuItems;
+  }, [menus, tags, sessionInfo?.user?.noHelp]);
 
   if (loading) return null;
 

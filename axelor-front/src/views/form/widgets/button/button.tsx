@@ -6,6 +6,7 @@ import { Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Tooltip } from "@/components/tooltip";
+import { useSession } from "@/hooks/use-session";
 import { Schema } from "@/services/client/meta.types";
 
 import { WidgetControl, WidgetProps } from "../../builder";
@@ -65,6 +66,7 @@ function findVariant(schema: Schema) {
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
   const { showTitle = true, editable, icon, help } = schema;
+  const { data: sessionInfo } = useSession();
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
   const { title } = attrs;
@@ -96,7 +98,7 @@ export function Button(props: WidgetProps) {
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
-  const hasHelp = !editable && !!help;
+  const hasHelp = !editable && !sessionInfo?.user?.noHelp && !!help;
 
   const BtnComponent: any = editable ? Box : Btn;
   const button = (

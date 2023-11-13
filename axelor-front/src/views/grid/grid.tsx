@@ -129,6 +129,7 @@ function GridInner(props: ViewProps<GridView>) {
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
   const { editable: _editable, inlineHelp } = view;
+  const canShowHelp = !sessionData?.user?.noHelp && inlineHelp;
 
   const showEditor = useManyEditor(action, dashlet);
 
@@ -886,7 +887,7 @@ function GridInner(props: ViewProps<GridView>) {
           )}
         </ViewToolBar>
       )}
-      {inlineHelp && (
+      {canShowHelp && (
         <div className={styles.help}>
           <HelpComponent text={inlineHelp.text} css={inlineHelp.css} />
         </div>
