@@ -378,7 +378,7 @@ function useActionAttrs({
             ...newStates,
           }));
         },
-        [formAtom],
+        [findItem, formAtom],
       ),
     ),
     actionHandler,
@@ -414,8 +414,13 @@ function useActionValue({
       useCallback(
         (get, set, data) => {
           const { record } = get(formAtom);
-          const { target, value, op } = data;
+          const { target, op } = data;
           let newRecord = record;
+          let value = data.value;
+
+          if (Array.isArray(value)) {
+            value = value.map((x) => (isNumber(x) ? { id: x } : x));
+          }
 
           if (op === "set") {
             newRecord = produce(record, (draft) => {
@@ -432,32 +437,32 @@ function useActionValue({
               setDeep(draft, target, value);
             });
           }
+
           if (op === "add" && value) {
             const items: DataRecord[] = record[target] ?? [];
-            const found = items.find((x) => x.id === value.id);
-            if (found) {
-              newRecord = produce(record, (draft) => {
-                setDeep(
-                  draft,
-                  target,
-                  items.map((x) =>
-                    x.id === value.id ? { ...found, ...value } : x,
-                  ),
-                );
-              });
-            } else {
-              newRecord = produce(record, (draft) => {
-                setDeep(draft, target, [...items, value]);
-              });
-            }
+            const records = Array.isArray(value) ? value : [value];
+            const newItems = records.filter(
+              (x) => items.findIndex((y) => x.id === y.id) === -1,
+            );
+            const curItems = items.map((x) => {
+              const found = records.find((y) => x.id === y.id);
+              return found ? { ...x, ...found } : x;
+            });
+            newRecord = produce(record, (draft) => {
+              setDeep(draft, target, [...curItems, ...newItems]);
+            });
           }
+
           if (op === "del" && value) {
             const items: DataRecord[] = record[target] ?? [];
-            newRecord = setDeep(
-              record,
-              target,
-              items.filter((x) => x.id !== value.id),
-            );
+            const records = Array.isArray(value) ? value : [value];
+            newRecord = produce(record, (draft) => {
+              setDeep(
+                draft,
+                target,
+                items.filter((item) => records.every((x) => item.id !== x.id)),
+              );
+            });
           }
 
           if (record !== newRecord) {
