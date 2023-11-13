@@ -63,6 +63,7 @@ import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -108,6 +109,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
@@ -369,66 +371,6 @@ public class Resource<T extends Model> {
     return request.getCriteria();
   }
 
-  private boolean shouldCheckPermissions(Request request) {
-    final Context context = request.getContext();
-    if (context == null) {
-      return true;
-    }
-
-    final Context parentContext = context.getParent();
-    if (parentContext == null) {
-      return true;
-    }
-
-    if (!"self.id in (:_field_ids)".equals(request.getData().get("_domain"))) {
-      return true;
-    }
-
-    // o2m/m2m search request
-
-    final Model parent = parentContext.asType(Model.class);
-    final String fieldName = (String) context.get("_field");
-    @SuppressWarnings("unchecked")
-    final Collection<Long> fieldIds =
-        Optional.of(context.get("_field_ids"))
-            .filter(Collection.class::isInstance)
-            .map(value -> (Collection<Number>) value)
-            .map(items -> items.stream().map(Number::longValue).collect(Collectors.toSet()))
-            .orElse(Collections.emptySet());
-
-    return !isPermittedReadByParent(parent, fieldName, fieldIds);
-  }
-
-  private boolean isPermittedReadByParent(
-      Model parent, String fieldName, Collection<Long> fieldIds) {
-    if (parent == null) {
-      return false;
-    }
-
-    final Class<Model> parentModel = EntityHelper.getEntityClass(parent);
-
-    if (!security.get().isPermitted(JpaSecurity.CAN_READ, parentModel, parent.getId())) {
-      return false;
-    }
-
-    final Mapper mapper = Mapper.of(parentModel);
-    final Property property = mapper.getProperty(fieldName);
-
-    if (property == null) {
-      return false;
-    }
-
-    @SuppressWarnings("unchecked")
-    final Collection<? extends Model> items = (Collection<? extends Model>) property.get(parent);
-
-    if (items == null) {
-      return false;
-    }
-
-    final Set<Long> itemIds = items.stream().map(Model::getId).collect(Collectors.toSet());
-    return itemIds.containsAll(fieldIds);
-  }
-
   private Query<?> getQuery(Request request) {
     return getQuery(request, security.get().getFilter(JpaSecurity.CAN_READ, model));
   }
@@ -477,14 +419,61 @@ public class Resource<T extends Model> {
     return filter == null ? getQuery(request) : getQuery(request, filter);
   }
 
+  @Nullable
+  private Filter getParentFilter(Request request) {
+    final Context context = request.getContext();
+    if (context == null) {
+      return null;
+    }
+
+    final Context parentContext = context.getParent();
+    if (parentContext == null) {
+      return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    final Class<Model> parentModel =
+        (Class<Model>) classForName((String) parentContext.get("_model"));
+    final Long parentId = (Long) parentContext.get("id");
+
+    if (!security.get().isPermitted(JpaSecurity.CAN_READ, parentModel, parentId)) {
+      return null;
+    }
+
+    final Mapper mapper = Mapper.of(parentModel);
+    final String fieldName = (String) context.get("_field");
+    final Property property = mapper.getProperty(fieldName);
+
+    if (property == null
+        || !property.isCollection()
+        || !property.getTarget().isAssignableFrom(model)) {
+      return null;
+    }
+
+    return new JPQLFilter(
+        String.format(
+            "self.id IN (SELECT __item.id FROM %s __parent JOIN __parent.%s __item WHERE __parent.id = ?)",
+            parentModel.getSimpleName(), property.getName()),
+        parentId);
+  }
+
+  private Class<?> classForName(String name) {
+    try {
+      return Class.forName(name);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @SuppressWarnings("all")
   public Response search(Request request) {
+    Filter filter = getParentFilter(request);
 
-    final Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
-    boolean check = filter == null || shouldCheckPermissions(request);
-
-    if (check) {
-      security.get().check(JpaSecurity.CAN_READ, model);
+    if (filter == null) {
+      filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
+      if (filter == null) {
+        security.get().check(JpaSecurity.CAN_READ, model);
+      }
     }
 
     if (LOG.isTraceEnabled()) {
@@ -500,7 +489,7 @@ public class Resource<T extends Model> {
     int offset = request.getOffset();
     int limit = request.getLimit();
 
-    Query<?> query = getSearchQuery(request, check ? filter : null).readOnly();
+    Query<?> query = getSearchQuery(request, filter).readOnly();
     List<?> data = null;
     String[] dottedFields = null;
     try {
