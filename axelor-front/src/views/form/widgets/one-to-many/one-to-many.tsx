@@ -118,7 +118,6 @@ function OneToManyInner({
     name,
     target: model,
     fields,
-    showTitle = true,
     formView,
     summaryView,
     gridView,
@@ -764,16 +763,14 @@ function OneToManyInner({
         ref={panelRef}
         className={styles.container}
         header={
-          showTitle && (
-            <div className={styles.title}>
-              <FieldLabel
-                className={styles.titleText}
-                schema={schema}
-                formAtom={formAtom}
-                widgetAtom={widgetAtom}
-              />
-            </div>
-          )
+          <div className={styles.title}>
+            <FieldLabel
+              className={styles.titleText}
+              schema={schema}
+              formAtom={formAtom}
+              widgetAtom={widgetAtom}
+            />
+          </div>
         }
         toolbar={{
           iconOnly: true,
