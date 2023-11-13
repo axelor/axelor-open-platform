@@ -754,6 +754,10 @@ function OneToManyInner({
 
   useFormRefresh(onSearch);
 
+  const rowSize = 45;
+  const headerSize = 100;
+  const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
+
   return (
     <>
       <Panel
@@ -846,11 +850,9 @@ function OneToManyInner({
             },
           ],
         }}
-        {...height && {
-          style: {
-            height,
-            maxHeight: height,
-          }
+        style={{
+          minHeight: headerSize + (2 * rowSize), // min 2 rows
+          maxHeight: maxHeight, // auto height to the max rows to display
         }}
       >
         <ScopeProvider scope={MetaScope} value={viewMeta}>
