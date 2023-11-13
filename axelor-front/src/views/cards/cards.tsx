@@ -85,17 +85,20 @@ export function Cards(props: ViewProps<CardsView>) {
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
         const sortBy = getSortBy(orderBy);
-        const { query: filter = {} } = searchAtom ? get(searchAtom) : {};
         const names = Object.keys(fields ?? {});
+        let { query: filter = {} } = searchAtom ? get(searchAtom) : {};
 
         if (dashlet) {
           const { _domainAction, ...formContext } = getViewContext() ?? {};
-          const { _domainContext } = filter;
-          filter._domainContext = {
-            ..._domainContext,
+          const _domainContext = {
+            ...filter._domainContext,
             ...formContext,
           };
-          filter._domainAction = _domainAction;
+          filter = {
+            ...filter,
+            _domainAction,
+            _domainContext,
+          };
         }
 
         const translate = getSearchTranslate(filter);
