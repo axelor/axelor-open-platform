@@ -150,7 +150,7 @@ function RefItemInner(
   } = props;
   const related = _schema.related ?? _schema.name + "Id";
   const schema = useMemo(
-    () => ({ ..._schema, name: related, targetName }),
+    () => ({ ..._schema, name: related, targetName, related }),
     [_schema, related, targetName],
   );
 

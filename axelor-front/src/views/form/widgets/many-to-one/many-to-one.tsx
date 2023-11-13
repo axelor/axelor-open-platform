@@ -254,6 +254,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           if (!isEqual(newValue, value)) {
             valueRef.current = newValue;
             if (signal?.aborted) return;
+            // related field of ref-select?
+            if (schema.related) {
+              setValue(newValue, false, false);
+              return;
+            }
             const { name } = schema;
             const state = get(formAtom);
             const record = { ...state.record };
