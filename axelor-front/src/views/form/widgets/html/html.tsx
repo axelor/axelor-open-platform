@@ -13,6 +13,7 @@ export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { lite } = schema;
   const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom);
+  const height = Math.max(100, schema.height);
   return (
     <FieldControl {...props}>
       {readonly && <ViewerComponent value={text} />}
@@ -20,7 +21,7 @@ export function Html(props: FieldProps<string>) {
         <EditorComponent
           t={i18n.get}
           lite={Boolean(lite)}
-          height={schema.height}
+          height={height}
           value={text}
           onChange={onChange}
           onBlur={onBlur}

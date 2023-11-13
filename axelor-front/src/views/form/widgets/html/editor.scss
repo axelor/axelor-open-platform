@@ -13,6 +13,8 @@ $spacing: 0.25rem;
   border-radius: 0;
   display: flex;
   flex-direction: column;
+  resize: vertical;
+  overflow: auto;
   & textarea {
     background-color: inherit;
     color: inherit;
@@ -26,7 +28,6 @@ $spacing: 0.25rem;
 .custom-html-editor-container textarea,
 .custom-html-editor-content {
   flex: 1;
-  min-height: 100px;
   position: relative;
   padding: $spacing * 2;
   overflow: auto;
