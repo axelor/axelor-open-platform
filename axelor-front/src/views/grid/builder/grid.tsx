@@ -234,6 +234,7 @@ export const Grid = forwardRef<
         !(item as Field).selection
       ) {
         columnProps.$css = clsx(styles.number);
+        columnProps.$headerCss = clsx(styles.numberHeaderColumn);
       }
 
       if (extraAttrs?.hidden ?? item.hidden) {
