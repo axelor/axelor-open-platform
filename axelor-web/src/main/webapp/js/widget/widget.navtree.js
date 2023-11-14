@@ -417,7 +417,6 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
       if (menu.help) {
         setTimeout(function () {
           var tooltip = element.children('a')
-          .addClass('has-help')
           .tooltip({
             html: true,
             title: menu.help,
