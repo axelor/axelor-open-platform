@@ -5,8 +5,8 @@ import { useMemo } from "react";
 import { GridSortColumn, GridState } from "@axelor/ui/grid";
 
 import { GridView } from "@/services/client/meta.types";
-import * as WIDGETS from "../widgets";
-import { toCamelCase, toKebabCase } from "@/utils/names.ts";
+import { toKebabCase } from "@/utils/names.ts";
+import { isValidWidget, normalizeWidget } from "@/views/form/builder/utils";
 
 export function useGridState(
   initialState?: Partial<GridState> & {
@@ -72,15 +72,4 @@ export function getWidget(item: any, field: any): string {
   widget = normalizeWidget(widget) ?? widget;
 
   return toKebabCase(widget);
-}
-
-function isValidWidget(widget: string): boolean {
-  return !!normalizeWidget(widget);
-}
-
-function normalizeWidget(widget: string): string | undefined {
-  return Object.keys(WIDGETS).find(
-    (name) =>
-      toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase(),
-  );
 }

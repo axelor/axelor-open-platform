@@ -71,7 +71,7 @@ export class Cache<T> {
    */
   get(key: string): T | undefined {
     const entry = this.#cache.get(key);
-    if (entry) {
+    if (entry !== undefined) {
       entry.accessAt = Date.now();
       entry.accessCount += 1;
       return entry.value;
@@ -129,7 +129,7 @@ export class LoadingCache<T> extends Cache<T> {
   get(key: string, loader: (key: string) => T): T;
   get(key: string, loader?: (key: string) => T): T | undefined {
     let value = super.get(key);
-    if (value) {
+    if (value !== undefined) {
       return value;
     }
 

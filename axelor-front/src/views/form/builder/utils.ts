@@ -12,6 +12,7 @@ import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
 import { isPlainObject } from "@/services/client/data-utils";
 import { MetaData } from "@/services/client/meta";
+import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
@@ -66,19 +67,32 @@ function getDefaultServerType(schema: Schema): string {
   return serverType;
 }
 
-function isValidWidget(widget: string): boolean {
+export function isValidWidget(widget: string): boolean {
   return !!normalizeWidget(widget);
 }
 
-function normalizeWidget(widget: string): string | undefined {
-  return Object.keys(WIDGETS).find(
-    (name) =>
-      toCamelCase(name).toLowerCase() === toCamelCase(widget).toLowerCase());
+function _normalizeWidget(widget: string): string | null {
+  return (
+    Object.keys(WIDGETS).find(
+      (name) => toCamelCase(name).toLowerCase() === widget,
+    ) ?? null
+  );
+}
+
+const normalizeWidgetCache = new LoadingCache<string | null>();
+
+export function normalizeWidget(widget: string): string | undefined {
+  return (
+    normalizeWidgetCache.get(
+      toCamelCase(widget).toLowerCase(),
+      _normalizeWidget,
+    ) ?? undefined
+  );
 }
 
 export function getWidget(schema: Schema, field: any): string {
   let widget = schema.widget ?? schema.type;
-  
+
   // default widget depending on field server type
   if (!isValidWidget(schema.widget) && schema.type === "field") {
     widget = schema.serverType;
@@ -91,7 +105,7 @@ export function getWidget(schema: Schema, field: any): string {
 
   // adapt widget naming, ie boolean-select to BooleanSelect
   widget = normalizeWidget(widget) ?? widget;
-  
+
   return toKebabCase(widget);
 }
 

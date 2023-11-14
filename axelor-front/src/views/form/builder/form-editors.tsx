@@ -21,7 +21,6 @@ import {
   Property,
   Schema,
 } from "@/services/client/meta.types";
-import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
 import { useGetErrors } from "../form";
