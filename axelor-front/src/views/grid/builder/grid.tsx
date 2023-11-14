@@ -235,7 +235,10 @@ export const Grid = forwardRef<
         columnProps.searchable = false;
       }
 
-      if (["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "")) {
+      if (
+        ["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "") &&
+        !(item as Field).selection
+      ) {
         columnProps.$css = clsx(styles.number);
       }
 
