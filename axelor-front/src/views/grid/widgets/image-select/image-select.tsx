@@ -11,7 +11,7 @@ export function ImageSelect(props: GridColumnProps) {
   const selectionList = schema?.selectionList as Selection[];
   const value = record?.[data?.name];
   const option = useMemo(
-    () => selectionList?.find((x) => x.value === value),
+    () => selectionList?.find((x) => String(x.value) === String(value)),
     [selectionList, value],
   );
   if (option) {
