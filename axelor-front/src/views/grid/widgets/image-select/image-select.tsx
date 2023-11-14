@@ -15,7 +15,7 @@ export function ImageSelect(props: GridColumnProps) {
     [selectionList, value],
   );
   if (option) {
-    return <ImageSelectValue option={option} />;
+    return <ImageSelectValue option={option} showLabel={schema.labels} />;
   }
   return null;
 }
