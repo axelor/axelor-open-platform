@@ -41,6 +41,7 @@ import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
 import { MetaScope } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
+import { useGridColumnNames } from "@/views/grid/builder/scope";
 import { useGridState } from "@/views/grid/builder/utils";
 
 import {
@@ -338,6 +339,11 @@ function OneToManyInner({
     shouldSyncSelect.current = true;
   }, [syncSelection]);
 
+  const columnNames = useGridColumnNames({
+    view: viewData?.view ?? schema,
+    fields: viewData?.fields ?? fields,
+  });
+
   const doSearch = useAtomCallback(
     useCallback(
       async (get, set, options?: SearchOptions) => {
@@ -347,7 +353,8 @@ function OneToManyInner({
           return;
         }
         const items = getItems(get(valueAtom));
-        const names = options?.fields ?? dataStore.options.fields ?? [];
+        const names =
+          options?.fields ?? dataStore.options.fields ?? columnNames;
 
         const ids = items
           .filter(
@@ -367,6 +374,7 @@ function OneToManyInner({
             limit: -1,
             offset: 0,
             sortBy: orderBy?.split?.(","),
+            fields: names,
             filter: {
               ...options?.filter,
               _archived: true,
@@ -378,7 +386,7 @@ function OneToManyInner({
                 _parent: {
                   id: parentId,
                   _model: parentModel,
-                }
+                },
               },
             },
           });
@@ -398,7 +406,17 @@ function OneToManyInner({
           records,
         } as SearchResult;
       },
-      [dataStore, getItems, model, name, orderBy, parentId, parentModel, valueAtom],
+      [
+        getItems,
+        valueAtom,
+        dataStore,
+        columnNames,
+        orderBy,
+        model,
+        name,
+        parentId,
+        parentModel,
+      ],
     ),
   );
 

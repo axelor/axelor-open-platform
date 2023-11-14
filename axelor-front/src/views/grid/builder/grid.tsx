@@ -3,7 +3,6 @@ import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { focusAtom } from "jotai-optics";
 import get from "lodash/get";
-import uniq from "lodash/uniq";
 import uniqueId from "lodash/uniqueId";
 import {
   RefObject,
@@ -55,7 +54,7 @@ import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
 import { getWidget } from "../builder/utils";
-import { GridScope } from "./scope";
+import { GridScope, useGridColumnNames } from "./scope";
 
 import styles from "../grid.module.scss";
 
@@ -154,21 +153,10 @@ export const Grid = forwardRef<
   const allowCheckboxSelection =
     (view.selector ?? user?.view?.grid?.selection ?? "checkbox") === "checkbox";
 
-  const names = useMemo(
-    () =>
-      uniq(
-        view.items!.reduce((names, item) => {
-          const field = fields?.[item.name!];
-          if ((item as JsonField).jsonField) {
-            return [...names, (item as JsonField).jsonField as string];
-          } else if (field) {
-            return [...names, field.name];
-          }
-          return names;
-        }, [] as string[]),
-      ),
-    [fields, view.items],
-  );
+  const names = useGridColumnNames({
+    view,
+    fields,
+  });
 
   const viewItems = useMemo(
     () =>
