@@ -36,18 +36,20 @@ public class Menu extends SimpleWidget {
 
     @JsonIgnore private String model;
 
+    @Override
     public String getModel() {
       return model;
     }
 
+    @Override
     public void setModel(String model) {
       this.model = model;
     }
   }
 
   @XmlType
-  @JsonTypeName("menu-item-devider")
-  public static class Devider extends Item {
+  @JsonTypeName("menu-item-divider")
+  public static class Divider extends Item {
 
     @Override
     public String getLocalizedTitle() {
@@ -65,7 +67,7 @@ public class Menu extends SimpleWidget {
   @XmlElements({
     @XmlElement(name = "item", type = Item.class),
     @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "divider", type = Devider.class)
+    @XmlElement(name = "divider", type = Divider.class)
   })
   private List<AbstractWidget> items;
 

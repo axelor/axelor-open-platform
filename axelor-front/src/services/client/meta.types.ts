@@ -196,7 +196,7 @@ export interface MenuItem extends Widget {
 }
 
 export interface MenuDivider extends Widget {
-  type: "menu-item-devider"; // XXX: typo
+  type: "menu-item-divider";
 }
 
 export interface Menu extends Widget {

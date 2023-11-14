@@ -191,7 +191,7 @@ export function ToolbarActions({
         return {
           key,
           text,
-          divider: item.type === "menu-item-devider",
+          divider: item.type === "menu-item-divider",
           description: help,
           iconOnly: !text && icon,
           showDownArrow: item.type === "menu",

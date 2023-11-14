@@ -18,7 +18,7 @@
  */
 package com.axelor.meta.schema.views;
 
-import com.axelor.meta.schema.views.Menu.Devider;
+import com.axelor.meta.schema.views.Menu.Divider;
 import com.axelor.meta.schema.views.Menu.Item;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
@@ -57,7 +57,7 @@ public class ExtendItemReplace {
     @XmlElement(name = "hilite", type = Hilite.class),
     @XmlElement(name = "item", type = Item.class),
     @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "divider", type = Devider.class),
+    @XmlElement(name = "divider", type = Divider.class),
     @XmlElement(name = "tooltip", type = ToolTip.class)
   })
   private List<AbstractWidget> items;
