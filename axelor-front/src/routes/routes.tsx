@@ -16,7 +16,7 @@ import { View } from "./view";
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { state, data } = useSession();
   const location = useLocation();
-  if (state === "loading") return <div>Loading</div>;
+  if (state === "loading") return null;
   if (data?.user) {
     return children;
   }
