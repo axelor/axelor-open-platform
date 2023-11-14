@@ -76,8 +76,8 @@ public abstract class SimpleWidget extends AbstractWidget {
 
   @JsonGetter("autoTitle")
   public String getAutoTitle() {
-    if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
-      String last = name.substring(name.lastIndexOf('.') + 1);
+    if (StringUtils.isBlank(title) && !StringUtils.isBlank(getName())) {
+      String last = getName().substring(getName().lastIndexOf('.') + 1);
       return I18n.get(Inflector.getInstance().humanize(last));
     }
     return null;
