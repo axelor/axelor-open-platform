@@ -70,7 +70,11 @@ import {
   FormValidityScope,
   useAfterActions,
 } from "./builder/scope";
-import { getDefaultValues, processSaveValues } from "./builder/utils";
+import {
+  getDefaultValues,
+  processOriginal,
+  processSaveValues,
+} from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
 import styles from "./form.module.scss";
@@ -573,7 +577,7 @@ const FormContainer = memo(function FormContainer({
           {
             ...dummyVals,
             ...processSaveValues(vals, formState.fields),
-            _original: original, // pass original values to check for concurrent updates
+            _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
           },
           opts,
         );

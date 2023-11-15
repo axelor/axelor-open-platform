@@ -422,3 +422,40 @@ export function removeVersion(record: DataRecord) {
   const { version, $version, ...rest } = record;
   return { ...rest, $version: version ?? $version } as DataRecord;
 }
+
+// Types that are saved independently from main record
+const INDEPENDENT_TYPES = new Set([
+  "MANY_TO_ONE",
+  "ONE_TO_ONE",
+  "MANY_TO_MANY",
+]);
+
+/**
+ * Processes the original record to avoid version check on independent relations.
+ *
+ * @param {DataRecord} record - The original data record to be processed.
+ * @param {MetaData["fields"]} fields - The metadata fields used for processing.
+ * @return {DataRecord} - The processed original data record.
+ */
+export function processOriginal(
+  record: DataRecord,
+  fields: MetaData["fields"],
+) {
+  const original = { ...record };
+  Object.values(fields)
+    .filter(
+      (field: Property) =>
+        INDEPENDENT_TYPES.has(field.type) && original[field.name],
+    )
+    .forEach((field: Property) => {
+      const value = original[field.name];
+      if (Array.isArray(value)) {
+        for (let i = 0; i < value.length; ++i) {
+          original[field.name][i] = removeVersion(value[i]);
+        }
+      } else {
+        original[field.name] = removeVersion(value);
+      }
+    });
+  return original;
+}
