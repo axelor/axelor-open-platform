@@ -109,16 +109,21 @@ export function getWidget(schema: Schema, field: any): string {
   return toKebabCase(widget);
 }
 
-export function getFieldServerType(schema: Schema, field: any): string | undefined {
+export function getFieldServerType(
+  schema: Schema,
+  field: any,
+): string | undefined {
   let serverType = field?.type;
-  
-  if (!serverType && schema.type === "field") {
-    serverType = getDefaultServerType(schema);
-  } else if (!serverType && schema.type === "panel-related") {
-    serverType = "ONE_TO_MANY";
+
+  if (!serverType) {
+    if (schema.type === "field") {
+      serverType = getDefaultServerType(schema);
+    } else if (schema.type === "panel-related") {
+      serverType = "ONE_TO_MANY";
+    }
   }
-  
-  return !serverType ? undefined : toSnakeCase(serverType).toUpperCase();
+
+  return serverType ? toSnakeCase(serverType).toUpperCase() : undefined;
 }
 
 export function isField(schema: Schema) {
