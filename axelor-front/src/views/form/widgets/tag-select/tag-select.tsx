@@ -1,10 +1,10 @@
-import { PrimitiveAtom, useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import isEqual from "lodash/isEqual";
+import { useAtom, useAtomValue } from "jotai";
 import getObjValue from "lodash/get";
+import isEqual from "lodash/isEqual";
+import { useCallback, useMemo, useRef } from "react";
 
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
   useCompletion,
@@ -13,9 +13,8 @@ import {
   useEditorInTab,
   useSelector,
 } from "@/hooks/use-relation";
-import { DataContext, DataRecord } from "@/services/client/data.types";
 import { DataSource } from "@/services/client/data";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 
 import { toKebabCase } from "@/utils/names";
 import {
@@ -72,30 +71,6 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     targetName,
     targetSearch,
   });
-
-  const [originalField, setOriginalField] = useAtom(
-    useMemo(
-      () =>
-        focusAtom(formAtom, (o) =>
-          o.prop("original").optional().prop(schema.name),
-        ),
-      [formAtom, schema.name],
-    ) as PrimitiveAtom<DataRecord[] | undefined>,
-  );
-
-  const originalFieldRef = useRef<DataRecord[]>();
-
-  // This widget manages saving independently from main record
-  useEffect(() => {
-    if (originalField === originalFieldRef.current) return;
-    setOriginalField((values) => {
-      if (Array.isArray(values)) {
-        values = values.map(removeVersion);
-      }
-      originalFieldRef.current = values;
-      return values;
-    });
-  }, [originalField, setOriginalField]);
 
   const handleChange = useCallback(
     (changedValue: SelectValue<DataRecord, true>) => {
