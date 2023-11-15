@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from "jotai";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -110,20 +110,26 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const canSelect = hasButton("select");
   const canRemove = !readonly && attrs.canRemove !== false;
 
+  const [ready, setReady] = useState(false);
+
   const ensureRelated = useCallback(
     async (value: DataRecord[]) => {
-      const names = [targetName, colorField].filter((s) => Boolean(s));
+      const names = [targetName, colorField].filter(Boolean);
       const ids = value
         .filter((v) => names.some((name) => getObjValue(v, name) === undefined))
         .map((v) => v.id);
 
-      if (ids.length > 0) {
+      const missing = names.filter((name) =>
+        value.some((v) => getObjValue(v, name) === undefined),
+      );
+
+      if (missing.length > 0 && ids.length > 0) {
         let records: DataRecord[] = [];
         try {
           const ds = new DataSource(target);
           records = await ds
             .search({
-              fields: [targetName],
+              fields: missing,
               filter: {
                 _domain: "self.id in (:_ids)",
                 _domainContext: {
@@ -140,7 +146,9 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         }
         const newValue = value.map((v) => {
           const rec = records.find((r) => r.id === v.id);
-          return rec ? rec : v;
+          if (rec == null) return v;
+          const { version: _version, $version: _$version, ...rest } = v;
+          return { ...rest, ...rec };
         });
         return newValue;
       }
@@ -162,6 +170,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           valueRef.current = value;
         }
       }
+      setReady(true);
     },
     [ensureRelated, setValue, value],
   );
@@ -344,7 +353,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         optionLabel={getOptionLabel}
         optionEqual={getOptionEqual}
         optionMatch={getOptionMatch}
-        value={value}
+        value={ready ? value : []}
         placeholder={placeholder}
         onChange={handleChange}
         onOpen={handleOpen}

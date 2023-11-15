@@ -237,25 +237,6 @@ export function findViewFields(
     } else if (item.name && item.type === "field") {
       pushIn(item.name, items);
     }
-
-    // process tag-select
-    processWidget(item);
-    if (item.widget === "tag-select") {
-      // fetch colors
-      if (item.name && item.colorField) {
-        pushIn(
-          item.colorField,
-          result.related[item.name] || (result.related[item.name] = []),
-        );
-      }
-      // fetch target names
-      if (item.name && item.targetName) {
-        pushIn(
-          item.targetName,
-          result.related[item.name] || (result.related[item.name] = []),
-        );
-      }
-    }
   });
 
   if (view.type === "calendar") {
