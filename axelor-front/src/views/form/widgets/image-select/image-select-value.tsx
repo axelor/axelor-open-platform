@@ -14,7 +14,7 @@ export function ImageSelectValue({
   const text = option?.title;
 
   return (
-    <Box d="flex" gap={6} alignItems="center">
+    <Box d="flex" gap={6} flexGrow={1} alignItems="center">
       {icon && !icon.includes(".") ? (
         <Icon icon={icon} />
       ) : (
