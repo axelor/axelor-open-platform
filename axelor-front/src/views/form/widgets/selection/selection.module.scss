@@ -1,7 +1,8 @@
 .tag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.5rem;
+  height: 1.5rem;
+  max-width: 100%;
 }
 
 .readonly.editable {
@@ -9,8 +10,7 @@
 }
 
 .tag-text {
-  display: inline-block;
-  white-space: wrap;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
