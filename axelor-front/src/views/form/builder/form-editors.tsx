@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -835,10 +836,19 @@ const RecordEditor = memo(function RecordEditor({
         const id = value?.id ?? 0;
         if (id <= 0) return;
         const names = Object.keys(fields ?? {});
-        const missing = names.some((x) => !Object.hasOwn(value, x));
+        const missing = names.some((x) => getObjValue(value, x) === undefined);
         if (missing) {
           const rec = await ds.read(id, { fields: names });
-          setLoaded(rec);
+          const result = names
+            .map((x) => x.split(".")[0])
+            .reduce(
+              (acc, x) => ({
+                ...acc,
+                [x]: rec[x],
+              }),
+              value,
+            );
+          setLoaded(result);
         }
       },
       [ds, fields, valueAtom],
