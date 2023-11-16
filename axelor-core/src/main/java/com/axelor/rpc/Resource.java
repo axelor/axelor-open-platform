@@ -467,13 +467,14 @@ public class Resource<T extends Model> {
 
   @SuppressWarnings("all")
   public Response search(Request request) {
-    Filter filter = getParentFilter(request);
+    final List<Filter> filters =
+        Stream.of(getParentFilter(request), security.get().getFilter(JpaSecurity.CAN_READ, model))
+            .filter(java.util.Objects::nonNull)
+            .collect(Collectors.toList());
+    final Filter filter = filters.isEmpty() ? null : Filter.or(filters);
 
     if (filter == null) {
-      filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
-      if (filter == null) {
-        security.get().check(JpaSecurity.CAN_READ, model);
-      }
+      security.get().check(JpaSecurity.CAN_READ, model);
     }
 
     if (LOG.isTraceEnabled()) {
