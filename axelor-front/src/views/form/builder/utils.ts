@@ -18,7 +18,7 @@ import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
 import * as WIDGETS from "../widgets";
 
-const SERVER_TYPES: string[] = [
+export const SERVER_TYPES: string[] = [
   "string",
   "boolean",
   "integer",

@@ -22,6 +22,7 @@ import {
   Property,
   Schema,
 } from "@/services/client/meta.types";
+import { toKebabCase } from "@/utils/names.ts";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
 import { useGetErrors } from "../form";
@@ -37,7 +38,13 @@ import {
   WidgetAtom,
   WidgetState,
 } from "./types";
-import { getFieldServerType, getWidget, nextId, processView } from "./utils";
+import {
+  getFieldServerType,
+  getWidget,
+  nextId,
+  processView,
+  SERVER_TYPES,
+} from "./utils";
 
 import styles from "./form-editors.module.scss";
 
@@ -91,7 +98,11 @@ function processEditor(schema: Schema) {
     const field = fields?.[item.name!];
 
     result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
-    result.serverType = getFieldServerType(item, field);
+    if (item.type == "field" || item.type == "panel-related") {
+      // Determinate server type only for field. For json fields,
+      // this is determinate later (see in JsonEditor)
+      result.serverType = getFieldServerType(item, field);
+    }
 
     if (result.selectionList) {
       result.widget = result.widget ?? "selection";
@@ -1016,8 +1027,12 @@ function JsonEditor({
   }, [formAtom, jsonModel, jsonNameField, valueAtom]);
 
   const jsonEditor = useMemo(
-    () => ({ ...processJsonView(editor), json: true }) as FormView,
-    [editor],
+    () =>
+      ({
+        ...processJsonView(editor, schema.jsonFields),
+        json: true,
+      }) as FormView,
+    [editor, schema.jsonFields],
   );
 
   const setInvalid = useSetAtom(setInvalidAtom);
@@ -1054,17 +1069,30 @@ function processJsonFields(schema: Schema) {
   }, {}) as Record<string, Field>;
 }
 
-function processJsonView(schema: Schema) {
+function processJsonView(schema: Schema, jsonFields: any) {
   const result = { ...schema, $json: true } as Schema;
 
-  if (schema.serverType) {
+  // json field are sent with schema.type mixing server type and type (field, panel, ...)
+  const isField = SERVER_TYPES.includes(
+    toKebabCase(schema.type!).toLowerCase(),
+  );
+
+  // Determinate the server type (if this is a field) and the widget in this order.
+  if (isField) {
+    result.serverType = getFieldServerType(
+      result,
+      jsonFields[schema.name!] as Property,
+    );
+  }
+  result.widget = getWidget(result, null);
+
+  // reset type only for fields at the end
+  if (isField) {
     result.type = "field";
-    result.serverType = getFieldServerType(result, null);
-    result.widget = getWidget(result, null);
   }
 
   if (Array.isArray(result.items)) {
-    result.items = result.items.map(processJsonView);
+    result.items = result.items.map((i) => processJsonView(i, jsonFields));
   }
 
   return result;
