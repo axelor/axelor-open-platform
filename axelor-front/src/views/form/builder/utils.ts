@@ -48,6 +48,7 @@ const FIELD_WIDGETS: Record<string, string[]> = {
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
   "many-to-one": ["BinaryLink", "Image", "SuggestBox"],
+  "many-to-many": ["TagSelect"],
 };
 
 function getDefaultServerType(schema: Schema): string {
