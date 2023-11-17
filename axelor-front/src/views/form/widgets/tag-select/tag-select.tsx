@@ -1,4 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -31,6 +32,7 @@ import styles from "./tag-select.module.scss";
 export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
+    name,
     target,
     targetName,
     targetSearch: _targetSearch,
@@ -49,6 +51,13 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const [value, setValue] = useAtom(valueAtom);
   const { hasButton } = usePermission(schema, widgetAtom);
+
+  const parentId = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
+  );
+  const parentModel = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
+  );
 
   const valueRef = useRef<DataRecord[]>();
   const { attrs } = useAtomValue(widgetAtom);
@@ -131,9 +140,15 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
             .search({
               fields: missing,
               filter: {
-                _domain: "self.id in (:_ids)",
+                _domain: "self.id in (:_field_ids)",
                 _domainContext: {
-                  _ids: ids as number[],
+                  _model: target,
+                  _field: name,
+                  _field_ids: ids as number[],
+                  _parent: {
+                    id: parentId,
+                    _model: parentModel,
+                  },
                 },
               },
             })
@@ -146,15 +161,15 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         }
         const newValue = value.map((v) => {
           const rec = records.find((r) => r.id === v.id);
-          if (rec == null) return v;
-          const { version: _version, $version: _$version, ...rest } = v;
-          return { ...rest, ...rec };
+          return rec
+            ? missing.reduce((acc, name) => ({ ...acc, [name]: rec[name] }), v)
+            : v;
         });
         return newValue;
       }
       return value;
     },
-    [target, targetName, colorField],
+    [targetName, colorField, target, name, parentId, parentModel],
   );
 
   const ensureRelatedValues = useCallback(
