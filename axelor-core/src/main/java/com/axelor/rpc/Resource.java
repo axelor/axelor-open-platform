@@ -468,12 +468,13 @@ public class Resource<T extends Model> {
   @SuppressWarnings("all")
   public Response search(Request request) {
     Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
-    if (filter != null) {
-      Filter parentFilter = getParentFilter(request);
-      filter = parentFilter == null ? filter : Filter.or(filter, parentFilter);
-    }
 
-    if (filter == null) {
+    if (filter != null) {
+      final Filter parentFilter = getParentFilter(request);
+      if (parentFilter != null) {
+        filter = Filter.or(filter, parentFilter);
+      }
+    } else {
       security.get().check(JpaSecurity.CAN_READ, model);
     }
 
