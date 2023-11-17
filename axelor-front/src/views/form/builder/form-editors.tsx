@@ -39,11 +39,11 @@ import {
   WidgetState,
 } from "./types";
 import {
+  SERVER_TYPES,
   getFieldServerType,
   getWidget,
   nextId,
   processView,
-  SERVER_TYPES,
 } from "./utils";
 
 import styles from "./form-editors.module.scss";
@@ -99,8 +99,8 @@ function processEditor(schema: Schema) {
 
     result.colSpan = item.colSpan ?? widgetAttrs.itemSpan;
     if (item.type == "field" || item.type == "panel-related") {
-      // Determinate server type only for field. For json fields,
-      // this is determinate later (see in JsonEditor)
+      // Determine server type only for field. For json fields,
+      // this is determined later (see in JsonEditor)
       result.serverType = getFieldServerType(item, field);
     }
 
@@ -1077,7 +1077,7 @@ function processJsonView(schema: Schema, jsonFields: any) {
     toKebabCase(schema.type!).toLowerCase(),
   );
 
-  // Determinate the server type (if this is a field) and the widget in this order.
+  // Determine the server type (if this is a field) and the widget in this order.
   if (isField) {
     result.serverType = getFieldServerType(
       result,
