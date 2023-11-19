@@ -16,6 +16,11 @@
   "dependencies": {
     "@axelor/ui": "^0.0.26",
     "@babel/standalone": "^7.23.5",
+    "@fullcalendar/core": "^6.1.9",
+    "@fullcalendar/daygrid": "^6.1.9",
+    "@fullcalendar/interaction": "^6.1.9",
+    "@fullcalendar/react": "^6.1.9",
+    "@fullcalendar/timegrid": "^6.1.9",
     "@monaco-editor/react": "^4.6.0",
     "bootstrap-icons": "^1.11.2",
     "bootstrap-sass": "2.3.2",
