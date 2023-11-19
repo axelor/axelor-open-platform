@@ -1,0 +1,21 @@
+.scheduler {
+  --fc-page-bg-color: var(--bs-body-bg);
+  --fc-neutral-bg-color: var(--bs-tertiary-bg);
+  --fc-neutral-text-color: var(--bs-tertiary-color);
+  --fc-border-color: var(--bs-border-color);
+
+  --fc-event-bg-color: var(--bs-primary);
+  --fc-event-border-color: var(--bs-primary);
+  --fc-event-text-color: #fff;
+  --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+  --fc-today-bg-color: rgba(var(--bs-warning-rgb), 0.15);
+}
+
+.scheduler {
+  overflow: auto;
+}
+.scheduler > div {
+  width: 100%;
+  height: 100%;
+}
