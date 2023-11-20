@@ -1,6 +1,9 @@
-import dayjs, { Dayjs, PluginFunc } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import dayjsLocale from "dayjs/locale.json";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import isBetween from "dayjs/plugin/isBetween";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -9,14 +12,13 @@ import { limitScale } from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { session } from "./session";
 
-for (let plugin of [
-  localizedFormat,
-  customParseFormat,
-  relativeTime,
-  weekOfYear,
-] as PluginFunc[]) {
-  dayjs.extend(plugin);
-}
+dayjs.extend(localizedFormat);
+dayjs.extend(customParseFormat);
+dayjs.extend(relativeTime);
+dayjs.extend(weekOfYear);
+dayjs.extend(isBetween);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
 
 const DEFAULT_LANGUAGE = "en";
 const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
@@ -87,7 +89,7 @@ session.subscribe(init);
 export function _findLocale(
   locales: readonly string[],
   locale: string,
-  tr = getNormalizedLocale
+  tr = getNormalizedLocale,
 ) {
   const parts = getNormalizedLocale(locale).split("-");
   for (let i = parts.length; i > 0; --i) {
@@ -155,7 +157,7 @@ export namespace l10n {
 
   export function formatNumber(
     value: number,
-    options?: Intl.NumberFormatOptions
+    options?: Intl.NumberFormatOptions,
   ) {
     let { minimumFractionDigits, maximumFractionDigits } = options ?? {};
     minimumFractionDigits = limitScale(minimumFractionDigits);
@@ -169,7 +171,7 @@ export namespace l10n {
 
   export function formatCurrency(
     value: number,
-    options?: Intl.NumberFormatOptions
+    options?: Intl.NumberFormatOptions,
   ) {
     return new Intl.NumberFormat(getLocale(), {
       style: "currency",
@@ -180,7 +182,7 @@ export namespace l10n {
 
   export function formatDateTime(
     date: number | Date,
-    options?: Intl.DateTimeFormatOptions
+    options?: Intl.DateTimeFormatOptions,
   ) {
     return new Intl.DateTimeFormat(getLocale(), {
       day: "numeric",
