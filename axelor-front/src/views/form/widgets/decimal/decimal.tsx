@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { get } from "lodash";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -57,6 +57,7 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<number>();
 
   const parse = useCallback(
     (value?: string | number | null) =>
@@ -77,6 +78,7 @@ export function Decimal(props: FieldProps<string | number>) {
     parse,
     format: parse,
   });
+  const textRef = useRef(textValue);
 
   const checkRange = useCallback((value: string, min: any, max: any) => {
     if (min != null && Number(value) < Number(min)) return min;
@@ -85,8 +87,10 @@ export function Decimal(props: FieldProps<string | number>) {
   }, []);
 
   const increment = useCallback(
-    (step: bigint) => {
-      const text = String(textValue ?? 0).trim();
+    (step: bigint, useTextRef?: boolean) => {
+      const text = String(
+        (useTextRef ? textRef.current : textValue) ?? 0,
+      ).trim();
       const nums = text.split(".");
 
       const int = nums[0];
@@ -97,7 +101,7 @@ export function Decimal(props: FieldProps<string | number>) {
       const res = checkRange(num, min, max);
 
       setChanged(true);
-      setValue(parse(res));
+      setValue((textRef.current = parse(res)));
     },
     [checkRange, max, min, parse, setChanged, setValue, textValue],
   );
@@ -114,22 +118,36 @@ export function Decimal(props: FieldProps<string | number>) {
     [increment, onKeyDown],
   );
 
-  const handleUp = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
-    (e) => {
+  const setTimer = useCallback((fn: () => void) => {
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = window.setInterval(() => {
+        fn();
+      }, 25);
+    }, 200);
+  }, []);
+
+  const clearTimer = useCallback(() => {
+    window.clearInterval(timerRef.current);
+  }, []);
+
+  const handleUp = useCallback(
+    (e: React.SyntheticEvent) => {
       e.preventDefault();
       if (inputRef.current) inputRef.current.focus();
       increment(1n);
+      setTimer(() => increment(1n, true));
     },
-    [increment],
+    [increment, setTimer],
   );
 
-  const handleDown = useCallback<React.MouseEventHandler<HTMLSpanElement>>(
-    (e) => {
+  const handleDown = useCallback(
+    (e: React.SyntheticEvent) => {
       e.preventDefault();
       if (inputRef.current) inputRef.current.focus();
       increment(-1n);
+      setTimer(() => increment(-1n, true));
     },
-    [increment],
+    [increment, setTimer],
   );
 
   const text = useMemo(
@@ -144,6 +162,10 @@ export function Decimal(props: FieldProps<string | number>) {
     () => (scale > 0 ? Math.pow(10, -Math.floor(scale)).toFixed(scale) : 1),
     [scale],
   );
+
+  useEffect(() => {
+    return () => clearTimer();
+  }, [clearTimer]);
 
   return (
     <FieldControl {...props}>
@@ -168,10 +190,20 @@ export function Decimal(props: FieldProps<string | number>) {
             onKeyDown={handleKeyDown}
           />
           <div className={styles.buttons}>
-            <span onMouseDown={handleUp}>
+            <span
+              onTouchStart={handleUp}
+              onTouchEnd={clearTimer}
+              onMouseDown={handleUp}
+              onMouseUp={clearTimer}
+            >
               <MaterialIcon icon="arrow_drop_up" />
             </span>
-            <span onMouseDown={handleDown}>
+            <span
+              onTouchStart={handleDown}
+              onTouchEnd={clearTimer}
+              onMouseDown={handleDown}
+              onMouseUp={clearTimer}
+            >
               <MaterialIcon icon="arrow_drop_down" />
             </span>
           </div>
