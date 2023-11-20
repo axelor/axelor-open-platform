@@ -63,7 +63,7 @@ export function Rating(props: FieldProps<number>) {
       const intValue = Math.floor(value ?? 0);
       const decimalValue = (value ?? 0) - intValue;
       return position === intValue + 1 && decimalValue > 0
-        ? decimalValue * 100
+        ? Math.min(Math.max(decimalValue * 100 - 1, 25), 75)
         : null;
     },
     [value],
