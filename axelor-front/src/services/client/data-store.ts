@@ -27,15 +27,23 @@ function updateRecord(
   Object.keys(initialRecord).forEach((fieldName) => {
     const fieldValue = record[fieldName];
     if (fieldName.includes(".")) {
+      const nestValue = getObjValue(record, fieldName.split("."));
       rec[fieldName] =
-        getObjValue(record, fieldName.split(".")) ?? initialRecord[fieldName];
-    } else if (typeof fieldValue === "object" && !Array.isArray(fieldValue)) {
+        nestValue !== undefined ? nestValue : initialRecord[fieldName];
+    } else if (
+      fieldValue &&
+      initialRecord[fieldName] &&
+      typeof fieldValue === "object" &&
+      !Array.isArray(fieldValue)
+    ) {
       rec[fieldName] = updateRecord(
         initialRecord[fieldName],
         fieldValue as DataRecord,
       );
     } else {
-      rec[fieldName] = fieldValue ?? initialRecord[fieldName];
+      rec[fieldName] = Object.hasOwn(record, fieldName)
+        ? fieldValue
+        : initialRecord[fieldName];
     }
   });
 
