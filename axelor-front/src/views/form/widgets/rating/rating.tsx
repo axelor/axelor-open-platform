@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtom } from "jotai";
-import { CSSProperties, useCallback } from "react";
+import { CSSProperties, useCallback, useMemo } from "react";
 
 import { Box } from "@axelor/ui";
 import {
@@ -8,6 +8,8 @@ import {
   BootstrapIconName,
 } from "@axelor/ui/icons/bootstrap-icon";
 
+import { Field } from "@/services/client/meta.types";
+import format from "@/utils/format";
 import { FieldControl, FieldProps } from "@/views/form/builder";
 
 import styles from "./rating.module.scss";
@@ -69,6 +71,12 @@ export function Rating(props: FieldProps<number>) {
     [value],
   );
 
+  const text = useMemo(
+    () =>
+      value != null ? format(value, { props: { ...schema } as Field }) : "",
+    [schema, value],
+  );
+
   return (
     <FieldControl {...props}>
       <Box
@@ -99,6 +107,7 @@ export function Rating(props: FieldProps<number>) {
                   onClick: () => handleClick(position, checked),
                 })}
                 style={{ ...(checked && highlightMe ? style.style : {}) }}
+                title={text}
               >
                 {partialWidth !== null ? (
                   <Box

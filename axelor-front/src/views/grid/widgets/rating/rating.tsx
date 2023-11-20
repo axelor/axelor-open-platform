@@ -1,4 +1,4 @@
-import { CSSProperties, useCallback } from "react";
+import { CSSProperties, useCallback, useMemo } from "react";
 
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
@@ -53,6 +53,11 @@ export function Rating(props: GridColumnProps) {
     [value],
   );
 
+  const text = useMemo(
+    () => (value != null ? data.formatter?.(data, value, record) : ""),
+    [data, record, value],
+  );
+
   return (
     <Box d="inline-flex">
       {Array.from({ length: maxSize }, (v, k) => k + 1).map((position) => {
@@ -70,6 +75,7 @@ export function Rating(props: GridColumnProps) {
           <Box
             key={position}
             style={{ ...(checked && highlightMe ? style.style : {}) }}
+            title={text}
           >
             {partialWidth !== null ? (
               <Box
