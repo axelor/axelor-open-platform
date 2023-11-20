@@ -2,7 +2,7 @@
 title: Add Rating widget
 type: feature
 description: |
-  Rating widget can be used on Integer field. It provides ability to 
+  Rating widget can be used on Integer,Long and Decimal field. It provides ability to 
   collect measurable opinions/experiences/feedbacks/...
   
   Example : 

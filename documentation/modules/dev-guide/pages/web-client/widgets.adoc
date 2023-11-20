@@ -89,7 +89,7 @@ for a fix scale, or a field name for a dynamic evaluation.
 
 == Rating
 
-The rating widget is used for `integer` data fields. It provides ability to collect measurable
+The rating widget is used for `integer`/`long`/`decimal` data fields. It provides ability to collect measurable
 opinions/experiences/feedbacks/...
 
 Rating widget supports following attributes :
@@ -111,6 +111,8 @@ Rating widget supports following attributes :
 
 By default, `star` icon will be colored in yellow when checked and `heart` in pink. The record value of the first icon
 is `1`, the last is the one defined in `max` attribute. By clicking on the last checked icon, it reset the value to `0`.
+
+Widget support partial rating on decimal fields but only for display purpose (for example, an average).
 
 == DateTime
 

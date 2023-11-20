@@ -1,11 +1,14 @@
 import clsx from "clsx";
+import { useAtom } from "jotai";
+
 import { Box } from "@axelor/ui";
-import { FieldControl, FieldProps } from "@/views/form/builder";
-import { useAtom } from "jotai/index";
 import {
   BootstrapIcon,
   BootstrapIconName,
 } from "@axelor/ui/icons/bootstrap-icon";
+
+import { FieldControl, FieldProps } from "@/views/form/builder";
+
 import styles from "./rating.module.scss";
 
 export function Rating(props: FieldProps<number>) {
@@ -44,6 +47,15 @@ export function Rating(props: FieldProps<number>) {
     return colors[position - 1];
   }
 
+  function getPartialWidth(position: number): number | null {
+    const intValue = Math.floor(value ?? 0);
+    const decimalValue = (value ?? 0) - intValue;
+    if (position === intValue + 1 && decimalValue > 0) {
+      return decimalValue * 100;
+    }
+    return null;
+  }
+
   return (
     <FieldControl {...props}>
       <Box
@@ -53,36 +65,80 @@ export function Rating(props: FieldProps<number>) {
           [styles.pointer]: !readonly,
         })}
       >
-        {Array.from({ length: maxSize }, (v, k) => k + 1).map((position, i) => {
-          const checked = position <= (value ?? 0);
-          const posIcon = getIcon(position);
-          const highlightMe = ratingHighlightSelected
-            ? value == position
-            : true;
-          const color = getColor(position);
-          const style =
-            (color && { style: { color: color } }) ??
-            PREDEFINED_ICONS[posIcon] ??
-            {};
+        {value != null &&
+          Array.from({ length: maxSize }, (v, k) => k + 1).map(
+            (position, i) => {
+              const partialWidth = getPartialWidth(position);
+              const checked = position <= Math.ceil(value ?? 0);
+              const posIcon = getIcon(position);
+              const highlightMe = ratingHighlightSelected
+                ? value == position
+                : true;
+              const color = getColor(position);
+              const style =
+                (color && { style: { color: color } }) ??
+                PREDEFINED_ICONS[posIcon] ??
+                {};
 
-          return (
-            <Box
-              key={position}
-              {...(!readonly && {
-                onClick: () => handleClick(position, checked),
-              })}
-              style={{ ...(checked && highlightMe ? style.style : {}) }}
-            >
-              <BootstrapIcon
-                icon={posIcon}
-                fill={ratingFill && checked}
-                className={clsx([styles.icon], {
-                  [styles.iconHover]: !readonly,
-                })}
-              />
-            </Box>
-          );
-        })}
+              return (
+                <Box
+                  key={position}
+                  {...(!readonly && {
+                    onClick: () => handleClick(position, checked),
+                  })}
+                  style={{ ...(checked && highlightMe ? style.style : {}) }}
+                >
+                  {partialWidth !== null ? (
+                    <Box
+                      style={{
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
+                      <Box
+                        style={{
+                          overflow: "hidden",
+                          position: "relative",
+                          width: `${partialWidth}%`,
+                        }}
+                      >
+                        <BootstrapIcon
+                          icon={posIcon}
+                          fill={ratingFill}
+                          className={clsx([styles.icon], {
+                            [styles.iconHover]: !readonly,
+                          })}
+                        />
+                      </Box>
+                      <Box
+                        style={{
+                          position: "absolute",
+                          top: "0",
+                          left: "0",
+                        }}
+                      >
+                        <BootstrapIcon
+                          icon={posIcon}
+                          fill={false}
+                          className={clsx([styles.icon], {
+                            [styles.iconHover]: !readonly,
+                          })}
+                        />
+                      </Box>
+                    </Box>
+                  ) : (
+                    <BootstrapIcon
+                      icon={posIcon}
+                      fill={ratingFill && checked}
+                      className={clsx([styles.icon], {
+                        [styles.iconHover]: !readonly,
+                      })}
+                    />
+                  )}
+                </Box>
+              );
+            },
+          )}
       </Box>
     </FieldControl>
   );
