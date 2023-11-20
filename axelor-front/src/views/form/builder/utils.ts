@@ -120,7 +120,7 @@ export function getFieldServerType(
     if (schema.type === "field") {
       serverType = getDefaultServerType(schema);
     } else if (schema.type === "panel-related") {
-      serverType = "ONE_TO_MANY";
+      serverType = schema.serverType ?? "ONE_TO_MANY";
     }
   }
 
