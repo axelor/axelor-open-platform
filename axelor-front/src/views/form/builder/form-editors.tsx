@@ -794,21 +794,27 @@ const RecordEditor = memo(function RecordEditor({
     return atom(
       (get) => {
         const value = get(valueAtom) || EMPTY_RECORD;
-        const record = loaded.id && loaded.id === value.id ? loaded : value;
+        const loadedRec = loaded.id && loaded.id === value.id ? loaded : value;
+        const record = { ...loadedRec, ...value };
 
         const currentState = get(editorFormAtom);
         const parentState = get(parent);
 
         const state = findState(schema, currentState, parentState);
+        const parentOriginal = getObjValue(parentState.original, schema.name);
+        const original = {
+          ...state.original,
+          ...(Array.isArray(parentOriginal)
+            ? parentOriginal.find((x) => x.id === record.id)
+            : parentOriginal),
+        };
         const dirty = parentState.dirty;
 
         return {
           ...state,
+          original,
           dirty,
-          record: {
-            ...record,
-            ...value,
-          },
+          record,
         };
       },
       (get, set, update: SetStateAction<FormState>) => {
