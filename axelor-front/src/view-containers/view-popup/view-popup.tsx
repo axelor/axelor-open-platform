@@ -7,7 +7,12 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, useClassNames } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
+import {
+  DialogButton,
+  DialogOptions,
+  ModalDialog,
+  dialogs,
+} from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { getActiveTabId } from "@/layout/nav-tabs/utils";
 import { DataRecord } from "@/services/client/data.types";
@@ -45,13 +50,13 @@ export type PopupProps = {
    * Additional header component
    *
    */
-  header?: () => JSX.Element | null;
+  header?: DialogOptions["header"];
 
   /**
    * Additional footer component
    *
    */
-  footer?: (close: (result: boolean) => void) => JSX.Element | null;
+  footer?: DialogOptions["footer"];
 
   /**
    * Additional handler component
@@ -110,7 +115,7 @@ export const PopupDialog = memo(function PopupDialog({
             {handler?.()}
           </>
         }
-        header={(close) => (
+        header={({ close }) => (
           <Header
             header={header}
             maximized={maximized}
@@ -139,7 +144,7 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
     <PopupDialog
       tab={tab}
       open={true}
-      footer={(close) => <Footer close={close} params={action.params} />}
+      footer={({ close }) => <Footer close={close} params={action.params} />}
       buttons={[]}
       onClose={handleClose}
       maximize={params["popup.maximized"]}
@@ -156,7 +161,7 @@ function Header({
   setMaximized,
   setExpanded,
 }: {
-  header?: () => JSX.Element | null;
+  header?: PopupProps["header"];
   params?: DataRecord;
   maximized: boolean;
   expanded: boolean;
@@ -180,7 +185,7 @@ function Header({
 
   return (
     <Box d="flex" g={2}>
-      {HeaderComp && <HeaderComp />}
+      {HeaderComp && <HeaderComp close={close} />}
       <Box d="flex" alignItems="center">
         <MaterialIcon
           icon={expanded ? "expand_less" : "expand_more"}

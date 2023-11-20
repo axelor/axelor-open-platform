@@ -12,7 +12,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { findView } from "@/services/client/meta-cache";
 import { ActionView, FormView, Schema } from "@/services/client/meta.types";
-import { showPopup } from "@/view-containers/view-popup";
+import { PopupProps, showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
 import { showErrors, useGetErrors } from "@/views/form";
@@ -30,6 +30,8 @@ export type EditorOptions = {
   viewName?: string;
   context?: DataContext;
   canSave?: boolean;
+  header?: PopupProps["header"];
+  footer?: PopupProps["footer"];
   onClose?: (result: boolean, record?: DataRecord) => void;
   onSave?: (record: DataRecord) => Promise<DataRecord> | void;
   onSelect?: (record: DataRecord) => void;
@@ -97,6 +99,8 @@ export function useEditor() {
       readonly,
       maximize,
       canSave = true,
+      header,
+      footer,
       onClose,
       onSave,
       onSelect,
@@ -126,8 +130,10 @@ export function useEditor() {
       open: true,
       maximize,
       onClose: (result, record) => onClose?.(result, record),
-      footer: (close) => (
+      header,
+      footer: ({ close }) => (
         <Footer
+          footer={footer}
           hasOk={canSave}
           onClose={close}
           onSave={onSave}
@@ -141,11 +147,13 @@ export function useEditor() {
 
 function Footer({
   hasOk = true,
+  footer: FooterComp,
   onClose,
   onSave,
   onSelect,
 }: {
   hasOk?: boolean;
+  footer?: EditorOptions["footer"];
   onClose: (result: boolean) => void;
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
@@ -208,15 +216,18 @@ function Footer({
   }, [handler, onClose]);
 
   return (
-    <Box d="flex" g={2}>
-      <Button variant="secondary" onClick={handleClose}>
-        {i18n.get("Close")}
-      </Button>
-      {hasOk && (
-        <Button variant="primary" onClick={handleConfirm}>
-          {i18n.get("OK")}
+    <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
+      {FooterComp && <FooterComp close={onClose} />}
+      <Box d="flex" g={2}>
+        <Button variant="secondary" onClick={handleClose}>
+          {i18n.get("Close")}
         </Button>
-      )}
+        {hasOk && (
+          <Button variant="primary" onClick={handleConfirm}>
+            {i18n.get("OK")}
+          </Button>
+        )}
+      </Box>
     </Box>
   );
 }

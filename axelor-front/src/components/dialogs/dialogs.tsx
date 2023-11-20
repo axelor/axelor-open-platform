@@ -29,13 +29,13 @@ export type DialogButton = {
   onClick: (fn: (result: boolean) => void) => void;
 };
 
+export type DialogClose = (result: boolean) => void;
+
 export type DialogOptions = {
   title?: string;
   content: React.ReactNode;
-  header?:
-    | ((close: (result: boolean) => void) => React.ReactNode)
-    | React.ReactNode;
-  footer?: (close: (result: boolean) => void) => React.ReactNode;
+  header?: (props: { close: DialogClose }) => React.ReactNode;
+  footer?: (props: { close: DialogClose }) => React.ReactNode;
   buttons?: DialogButton[];
   size?: "sm" | "md" | "lg" | "xl";
   padding?: string;
@@ -257,8 +257,8 @@ export function ModalDialog(props: DialogOptions) {
     size,
     title,
     content,
-    header,
-    footer,
+    header: Header,
+    footer: Footer,
     padding,
     buttons = getDefaultButtons(),
     classes = {},
@@ -316,7 +316,7 @@ export function ModalDialog(props: DialogOptions) {
           className={classes.header}
         >
           <DialogTitle className={styles.title}>{title}</DialogTitle>
-          {typeof header === "function" ? header(close) : header}
+          {Header && <Header close={close} />}
         </DialogHeader>
         <DialogContent
           className={clsx(classes.content, styles.content)}
@@ -327,7 +327,7 @@ export function ModalDialog(props: DialogOptions) {
           {content}
         </DialogContent>
         <DialogFooter className={classes.footer}>
-          {footer && footer(close)}
+          {Footer && <Footer close={close} />}
           {buttons.map((button) => (
             <Button
               autoFocus={button.variant === "primary"}

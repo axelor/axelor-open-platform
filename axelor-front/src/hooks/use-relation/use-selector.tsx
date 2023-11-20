@@ -1,5 +1,5 @@
 import { uniqueId } from "lodash";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
 import { GridState } from "@axelor/ui/grid";
@@ -7,9 +7,9 @@ import { GridState } from "@axelor/ui/grid";
 import { PageText } from "@/components/page-text";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { findView } from "@/services/client/meta-cache";
 import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-import { findView } from "@/services/client/meta-cache";
 
 import { i18n } from "@/services/client/i18n";
 import { useAtomValue } from "jotai";
@@ -79,7 +79,7 @@ export function useSelector() {
         onClose?.();
       },
       header: () => <Header />,
-      footer: (close) => (
+      footer: ({ close }) => (
         <Footer
           multiple={multiple}
           close={close}

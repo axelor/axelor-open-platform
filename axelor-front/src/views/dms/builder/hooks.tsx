@@ -108,7 +108,7 @@ export function useDMSPopup() {
       tab,
       open: true,
       onClose,
-      footer: (close) => <Footer onSelect={onSelect} onClose={close} />,
+      footer: ({close}) => <Footer onSelect={onSelect} onClose={close} />,
       buttons: [],
     });
   }, []);

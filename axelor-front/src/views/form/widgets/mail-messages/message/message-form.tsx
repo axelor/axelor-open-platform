@@ -44,7 +44,7 @@ export function useMessagePopup() {
             />
           ),
           buttons: [],
-          footer: (close) => (
+          footer: ({ close }) => (
             <FormFooter
               formAtom={formAtom}
               yesTitle={yesTitle}
