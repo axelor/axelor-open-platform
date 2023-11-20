@@ -1,56 +1,32 @@
+.container,
+.wrapper {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.container {
+  flex-direction: column;
+}
+
+.wrapper {
+  overflow: auto;
+  min-width: 0;
+  min-height: 0;
+}
+
 .calendar {
+  flex: 1;
+}
+
+.sidebar {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 0;
-
-  & .rbc-off-range-bg {
-    background-color: #e6e6e6;
-  }
-
-  & .rbc-date-cell.rbc-now {
-    background-color: inherit;
-  }
+  gap: 0.5rem;
 }
 
-.btn {
-  border: "none";
-  box-shadow: "none";
-  &:hover {
-    background-color: #eeeeee;
-  }
-  &.active {
-    background-color: #e0e0e0;
-  }
-}
-
-.title {
-  font-size: 0.85rem;
-}
-
-.checkbox:focus {
-  box-shadow: none;
-}
-
-.checkbox-label {
-  cursor: pointer;
-}
-
-.scheduler-panel {
-  width: 90%;
-}
-
-:global {
-  .calendar-hide-times {
-    .rbc-row-segment {
-      padding: 0.25rem 0.25rem 0 0.25rem;
-    }
-    .rbc-time-header {
-      flex-grow: 1;
-    }
-    .rbc-time-header-gutter,
-    .rbc-time-content {
-      display: none;
-    }
+.sidebar {
+  :global(.react-datepicker) {
+    border-radius: 0;
   }
 }

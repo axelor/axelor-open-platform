@@ -1,645 +1,524 @@
-import { useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
+import deepGet from "lodash/get";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, clsx, CommandItemProps } from "@axelor/ui/core";
-import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
-import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
-import { Event } from "@axelor/ui/scheduler/types";
+import { Box, Button } from "@axelor/ui";
 
+import { dialogs } from "@/components/dialogs";
+import {
+  Scheduler,
+  SchedulerEvent,
+  SchedulerView,
+} from "@/components/scheduler";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePerms } from "@/hooks/use-perms";
+import { useManyEditor } from "@/hooks/use-relation";
 import { SearchOptions } from "@/services/client/data";
 import { Criteria, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { l10n } from "@/services/client/l10n";
+import { moment } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
 import { CalendarView, FormView } from "@/services/client/meta.types";
-
-import { dialogs } from "@/components/dialogs";
-import { addDate, getNextOf } from "@/utils/date";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-
-import { useAsync } from "@/hooks/use-async";
-import { usePerms } from "@/hooks/use-perms";
-import { useManyEditor } from "@/hooks/use-relation";
-import { useShortcuts } from "@/hooks/use-shortcut";
 import {
   useViewContext,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
-import { ViewProps } from "../types";
-
 import { Picker as DatePicker } from "../form/widgets/date/picker";
-import Filters from "./components/filters";
-import Popover from "./components/popover";
-import { Filter } from "./components/types";
+import { ViewProps } from "../types";
+import { getColor } from "./colors";
+import { Filter, Filters } from "./filters";
+import { getTimes } from "./utils";
 
-import { DEFAULT_COLOR } from "./colors";
-import {
-  formatDate,
-  getEventFilters,
-  getTimes,
-  toDateOnly,
-  toDateOnlyString,
-  toDatetime,
-  toDatetimeString,
-} from "./utils";
-
+import { useShortcuts } from "@/hooks/use-shortcut";
 import styles from "./calendar.module.scss";
-
-const { get: _t } = i18n;
-
-const eventStyler = ({
-  event,
-}: {
-  event: SchedulerEvent & { $backgroundColor?: string };
-}) => ({
-  style: { backgroundColor: event.$backgroundColor },
-});
-
-l10n.getLocale();
 
 export function Calendar(props: ViewProps<CalendarView>) {
   const { meta, dataStore, searchAtom } = props;
-  const { view: metaView, fields: metaFields, perms: metaPerms } = meta;
   const {
     eventStart,
     eventStop,
     eventLength = 1,
     colorBy,
+    editable = true,
     mode: initialMode = "month",
-  } = metaView;
+  } = meta.view;
 
-  const advancedSearch = useAtomValue(searchAtom!);
+  const colorField = meta.fields?.[colorBy!];
+  const eventTitle = meta.view.items?.[0]?.name ?? "name";
+  const allDayOnly = meta.fields?.[eventStart]?.type === "DATE";
 
-  const nameField = (metaView.items?.[0] || { name: "name" }).name ?? "name";
+  const [mode, setMode] = useState<SchedulerView>(initialMode);
+  const [date, setDate] = useState<Date>(() => new Date());
 
-  const { hasButton } = usePerms(metaView, metaPerms);
-  const getViewContext = useViewContext();
+  const [events, setEvents] = useState<SchedulerEvent<DataRecord>[]>([]);
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   const { action, dashlet } = useViewTab();
-  const showEditor = useManyEditor(action, dashlet);
 
-  const editableAndButton = useCallback(
-    (name: string) => metaView.editable !== false && hasButton(name),
-    [hasButton, metaView.editable],
+  const [searchStart, setSearchStart] = useState<Date>();
+  const [searchEnd, setSearchEnd] = useState<Date>();
+
+  const { hasButton } = usePerms(meta.view, meta.perms);
+
+  const getViewContext = useViewContext();
+
+  const hasPermission = useCallback(
+    (name: string) => editable !== false && hasButton(name),
+    [hasButton, editable],
   );
 
-  const isDateCalendar = useMemo(
-    () => metaFields?.[eventStart]?.type === "DATE",
-    [metaFields, eventStart],
-  );
+  const searchNames = useMemo(() => {
+    const fieldNames = Object.keys(meta.fields ?? {});
+    const itemNames = [eventStart, eventStop!, colorBy!].filter(Boolean);
+    return [...new Set([...fieldNames, ...itemNames])];
+  }, [meta.fields, eventStart, eventStop, colorBy]);
 
-  const convertDate = useMemo(() => {
-    return isDateCalendar
-      ? {
-          toDate: toDateOnly,
-          toString: toDateOnlyString,
-        }
-      : {
-          toDate: toDatetime,
-          toString: toDatetimeString,
-        };
-  }, [isDateCalendar]);
-
-  const components = useMemo(
-    () => ({
-      week: {
-        header: ({ date, localizer }: any) => {
-          return localizer.format(date, "ddd D");
-        },
-      },
-      toolbar: () => null,
-    }),
-    [],
-  );
-
-  const searchFieldNames = useMemo(() => {
-    const schemaFieldNames = Object.keys(metaFields || {});
-    const viewFieldNames = [eventStart, eventStop, colorBy].filter(
-      (field) => field,
-    ) as string[];
-    return [...new Set([...schemaFieldNames, ...viewFieldNames])];
-  }, [metaFields, eventStart, eventStop, colorBy]);
-
-  const [calendarDate, setCalendarDate] = useState<Date>(() => new Date());
-  const [calendarMode, setCalendarMode] = useState<View>(initialMode);
-
-  const { start: calendarStart, end: calendarEnd } = useMemo(() => {
-    return getTimes(calendarDate, calendarMode);
-  }, [calendarDate, calendarMode]);
-
-  const filter = useMemo(() => {
-    const startCriteria: Criteria = {
-      operator: "and",
-      criteria: [
-        {
-          fieldName: eventStart,
-          operator: ">=",
-          value: calendarStart,
-        },
-        {
-          fieldName: eventStart,
-          operator: "<",
-          value: calendarEnd,
-        },
-      ],
-    };
-    const stopCriteria: Criteria | null = eventStop
-      ? ({
+  const fetchItems = useAtomCallback(
+    useCallback(
+      async (get, set, start: Date, end: Date) => {
+        let criteria: Criteria = {
           operator: "and",
           criteria: [
             {
-              fieldName: eventStop,
+              fieldName: eventStart,
               operator: ">=",
-              value: calendarStart,
+              value: start,
             },
             {
-              fieldName: eventStart, // include intermediate events: RM-31366
-              operator: "<",
-              value: calendarEnd,
+              fieldName: eventStart,
+              operator: "<=",
+              value: end,
             },
           ],
-        } as Criteria)
-      : null;
-    let filter: SearchOptions["filter"] = stopCriteria
-      ? ({
-          operator: "or",
-          criteria: [startCriteria, stopCriteria],
-        } as Criteria)
-      : startCriteria;
+        };
 
-    const { criteria, operator, ...filterQuery } = advancedSearch?.query || {};
+        if (eventStop) {
+          criteria = {
+            operator: "or",
+            criteria: [
+              criteria,
+              {
+                operator: "and",
+                criteria: [
+                  {
+                    fieldName: eventStop,
+                    operator: ">=",
+                    value: start,
+                  },
+                  {
+                    fieldName: eventStart,
+                    operator: "<=",
+                    value: end,
+                  },
+                ],
+              },
+            ],
+          };
+        }
 
-    if (criteria?.length) {
-      filter = {
-        ...filterQuery,
-        operator: "and",
-        criteria: [{ criteria, operator }, filter],
-      };
-    } else {
-      filter = { ...filter, ...filterQuery };
-    }
+        const opts: SearchOptions = {
+          limit: -1,
+          fields: searchNames,
+          filter: {
+            criteria: [criteria],
+          },
+        };
 
-    if (dashlet) {
-      const { _domainAction, ...formContext } = getViewContext() ?? {};
-      const { _domainContext } = filter;
-      filter._domainContext = {
-        ..._domainContext,
-        ...formContext,
-      };
-      filter._domainAction = _domainAction;
-    }
+        if (searchAtom) {
+          const { query = {} } = get(searchAtom);
+          if (query.criteria?.length) {
+            opts.filter = {
+              ...query,
+              operator: "and",
+              criteria: [
+                { operator: "and", criteria: query.criteria },
+                criteria,
+              ],
+            };
+          } else {
+            opts.filter = { ...opts.filter, ...query, criteria: [criteria] };
+          }
+        }
 
-    return filter;
-  }, [
-    eventStart,
-    calendarStart,
-    calendarEnd,
-    eventStop,
-    dashlet,
-    advancedSearch.query,
-    getViewContext,
-  ]);
+        if (dashlet && opts.filter) {
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
+          const { _domainContext } = opts.filter;
+          opts.filter._domainContext = {
+            ..._domainContext,
+            ...formContext,
+          };
+          opts.filter._domainAction = _domainAction;
+        }
 
-  const handleRefresh = useCallback(async () => {
-    const res = await dataStore.search({
-      filter,
-      fields: searchFieldNames,
-      limit: -1,
-    });
-    setRecords(res.records);
-  }, [dataStore, filter, searchFieldNames]);
-
-  useAsync(handleRefresh, [dataStore, filter]);
-
-  const [records, setRecords] = useState<DataRecord[]>([]);
-  useEffect(() => setRecords(dataStore.records), [dataStore.records]);
-
-  const unfilteredCalendarEvents: SchedulerEvent[] = useMemo(() => {
-    return records.map((record) => {
-      const { id, [nameField]: title } = record;
-      const start = convertDate.toDate(record[eventStart] as string);
-      const recordStop = eventStop && (record[eventStop] as string);
-      let end = convertDate.toDate(
-        recordStop ? recordStop : addDate(start, eventLength, "hours"),
-      );
-      if (end && isDateCalendar) {
-        end = convertDate.toDate(getNextOf(end, "days"));
-      }
-      return {
-        id,
-        title,
-        start,
-        end,
-        record,
-        allDay: isDateCalendar,
-      } as SchedulerEvent;
-    });
-  }, [
-    records,
-    nameField,
-    convertDate,
-    eventStart,
-    eventStop,
-    eventLength,
-    isDateCalendar,
-  ]);
-
-  const handleNavigationChange = useCallback((date: Date) => {
-    setCalendarDate(date);
-  }, []);
-
-  const handleViewChange = useCallback((view: View) => {
-    setCalendarMode(view);
-  }, []);
-
-  // Filters
-
-  const colorByField = colorBy && metaFields?.[colorBy];
-
-  const [filters, setFilters] = useState<Filter[]>([]);
+        const { records } = await dataStore.search(opts);
+        return records;
+      },
+      [
+        dashlet,
+        dataStore,
+        eventStart,
+        eventStop,
+        getViewContext,
+        searchAtom,
+        searchNames,
+      ],
+    ),
+  );
 
   useEffect(() => {
-    colorByField &&
-      setFilters(getEventFilters(unfilteredCalendarEvents || [], colorByField));
-  }, [unfilteredCalendarEvents, colorByField]);
+    return dataStore.subscribe((ds) => {
+      const records = [...ds.records].sort((x, y) => x.id! - y.id!);
+      const events = records.map((record) => {
+        const id = String(record.id);
+        const title = record[eventTitle];
+        const startValue = record[eventStart];
+        const endValue = eventStop && record[eventStop];
+        const start = startValue
+          ? moment(startValue).toDate()
+          : moment().toDate();
+        const end = endValue
+          ? moment(endValue).toDate()
+          : moment(start).add(eventLength, "hours").toDate();
 
-  const handleFilterChange = useCallback((ind: number) => {
-    if (ind > -1) {
-      setFilters((filters) =>
-        filters.map((filter, index) =>
-          index === ind ? { ...filter, checked: !filter.checked } : filter,
-        ),
-      );
-    }
-  }, []);
+        const allDay =
+          allDayOnly ||
+          (moment(start).format("HH:mm") === "00:00" &&
+            (!endValue || moment(end).format("HH:mm") === "00:00"));
 
-  const calendarEvents: SchedulerEvent[] = useMemo(() => {
-    const checkedFilters = filters.filter((x) => x.checked);
-    const showAll = checkedFilters.length === 0;
-    return unfilteredCalendarEvents.reduce(
-      (list: object[], event: SchedulerEvent) => {
-        const filter = (showAll ? filters : checkedFilters).find(
-          (filter: Filter) => filter.match!(event),
-        );
-        return filter || showAll
-          ? [
-              ...list,
-              {
-                ...event,
-                $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
-              },
-            ]
-          : list;
-      },
-      [],
-    ) as SchedulerEvent[];
-  }, [unfilteredCalendarEvents, filters]);
+        return {
+          id,
+          title,
+          start,
+          end,
+          allDay,
+          data: record,
+        };
+      });
 
-  // Toobar
+      const filters = colorField
+        ? events.reduce((acc, event) => {
+            const { name, target, targetName, selectionList } = colorField;
+            const getValue = (record: DataRecord) => {
+              const value = deepGet(record, name);
+              return target ? value?.id : value;
+            };
+            const getTitle = (record: DataRecord) => {
+              const value = deepGet(record, name);
+              return target && targetName
+                ? deepGet(value, targetName)
+                : selectionList?.find((x) => x.value == value)?.title ?? value;
+            };
+            const record = event.data!;
+            const value = getValue(record);
+            if ((value || value === 0) && !acc.some((x) => x.value === value)) {
+              const color = getColor(value);
+              const title = getTitle(record);
+              acc.push({
+                value,
+                title,
+                color,
+                match: (event) => getValue(event.data!) === value,
+              });
+            }
+            return acc;
+          }, [] as Filter[])
+        : [];
 
-  const handleNav = useCallback(
-    (amount: 1 | -1) => {
-      setCalendarDate((date) => addDate(date, amount, calendarMode));
-    },
-    [calendarMode],
-  );
-
-  const handleNext = useCallback(() => handleNav(1), [handleNav]);
-  const handlePrev = useCallback(() => handleNav(-1), [handleNav]);
-
-  const handleToday = useCallback(() => {
-    setCalendarDate(new Date());
-  }, []);
-
-  const calendarTitle = useMemo(() => {
-    return formatDate(calendarStart, calendarEnd, calendarMode);
-  }, [calendarStart, calendarEnd, calendarMode]);
-
-  const actions = useMemo<CommandItemProps[]>(() => {
-    const views: {
-      view: View;
-      text: string;
-      iconProps: MaterialIconProps;
-    }[] = [
-      {
-        view: "month",
-        text: _t("Month"),
-        iconProps: { icon: "calendar_view_month" },
-      },
-      {
-        view: "week",
-        text: _t("Week"),
-        iconProps: { icon: "calendar_view_week" },
-      },
-      {
-        view: "day",
-        text: _t("Day"),
-        iconProps: { icon: "calendar_view_day" },
-      },
-    ];
-
-    const today = new Date();
-    const inToday = today >= calendarStart && today <= calendarEnd;
-
-    return [
-      ...views.map(({ view, text, iconProps }) => ({
-        key: view,
-        text: text,
-        description: text,
-        iconProps,
-        iconOnly: false,
-        checked: view === calendarMode,
-        onClick: () => handleViewChange(view),
-      })),
-      {
-        key: "modeDivider",
-        divider: true,
-      },
-      {
-        key: "today",
-        text: _t("Today"),
-        description: _t("Today"),
-        iconProps: {
-          icon: "today",
-        },
-        iconOnly: false,
-        checked: inToday,
-        onClick: handleToday,
-      },
-      {
-        key: "refresh",
-        text: _t("Refresh"),
-        description: _t("Refresh"),
-        iconProps: {
-          icon: "refresh",
-        },
-        iconOnly: false,
-        onClick: handleRefresh,
-      },
-    ];
+      setEvents(events);
+      setFilters(filters);
+    });
   }, [
-    calendarStart,
-    calendarEnd,
-    handleToday,
-    handleRefresh,
-    calendarMode,
-    handleViewChange,
+    colorField,
+    dataStore,
+    eventLength,
+    eventStart,
+    eventStop,
+    eventTitle,
+    allDayOnly,
   ]);
 
-  useShortcuts({
-    viewType: metaView.type,
-    onRefresh: handleRefresh,
-  });
+  const onRefresh = useCallback(async () => {
+    if (searchStart && searchEnd) {
+      await fetchItems(searchStart, searchEnd);
+    }
+  }, [fetchItems, searchEnd, searchStart]);
 
-  const handleDateChange = useCallback(
-    (date: Date) => {
-      setCalendarDate(date);
-      handleNavigationChange(date);
-    },
-    [handleNavigationChange],
-  );
+  useEffect(() => {
+    const { start, end } = getTimes(date, "month");
+    if (
+      moment(start).isSameOrAfter(searchStart) &&
+      moment(start).isSameOrBefore(searchEnd) &&
+      moment(end).isSameOrAfter(searchStart) &&
+      moment(end).isSameOrBefore(searchEnd)
+    ) {
+      return;
+    }
+    setSearchStart(start);
+    setSearchEnd(end);
+  }, [date, searchEnd, searchStart]);
 
-  // Update
+  useAsyncEffect(async () => {
+    onRefresh();
+  }, [onRefresh]);
 
-  const _handleEventUpdate = useCallback(
-    async ({ event, start, end }: Event) => {
-      const record = (event as any).record as DataRecord;
-      const { id, version } = record;
-
-      const eventData = {
-        id,
-        version,
-        [eventStart]: convertDate.toString(start),
-      } as DataRecord;
-
-      if (eventStop) {
-        const _end = isDateCalendar ? addDate(end, -1, "days") : end;
-        eventData[eventStop] = convertDate.toString(_end);
+  const onDelete = useCallback(
+    async (record: DataRecord) => {
+      const id = record.id!;
+      const version = record.version!;
+      const confirmed = await dialogs.confirm({
+        content: i18n.get("Do you really want to delete the selected record?"),
+        yesTitle: i18n.get("Delete"),
+      });
+      if (confirmed) {
+        await dataStore.delete({ id, version });
+        await onRefresh();
       }
-
-      const eventStartJsonField =
-        eventStart && metaFields?.[eventStart]?.jsonField;
-      const eventStopJsonField =
-        eventStop && metaFields?.[eventStop]?.jsonField;
-      if (eventStartJsonField) {
-        eventData[eventStartJsonField] = record[eventStartJsonField];
-      }
-      if (eventStopJsonField) {
-        eventData[eventStopJsonField] = record[eventStopJsonField];
-      }
-
-      setRecords((records) =>
-        records.map((record) =>
-          record.id === eventData.id ? { ...record, ...eventData } : record,
-        ),
-      );
-
-      const updatedRecord = await dataStore.save(eventData);
-
-      setRecords((records) =>
-        records.map((record) =>
-          record.id === updatedRecord.id
-            ? { ...record, ...updatedRecord }
-            : record,
-        ),
-      );
+      return confirmed;
     },
-    [eventStart, convertDate, eventStop, dataStore, metaFields, isDateCalendar],
+    [dataStore, onRefresh],
   );
 
-  const handleEventUpdate = editableAndButton("edit")
-    ? _handleEventUpdate
-    : undefined;
-
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<SchedulerEvent | null>(
-    null,
-  );
-
-  const closePopover = useCallback(() => {
-    setAnchorEl(null);
-    setSelectedEvent(null);
-  }, []);
-
-  const handleEventSelect = useCallback(
-    ({ event }: Event, e: React.SyntheticEvent<any>) => {
-      e.stopPropagation();
-      setSelectedEvent(event);
-      setAnchorEl(e.currentTarget);
-    },
-    [],
-  );
-
+  const showEditor = useManyEditor(action, dashlet);
   const showRecord = useCallback(
-    async (
-      record: DataRecord,
-      readonly: boolean,
-      onSelect: (data: DataRecord) => void,
-    ) => {
+    async (record: DataRecord) => {
       const type = "form";
       const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
       const { name, model = action.model ?? "" } = formView;
+      const { view } = await findView({ type, name, model });
+      const { title = "", name: viewName } = view;
 
-      const view = await findView({ type, name, model });
-      const {
-        view: { title = "", name: viewName },
-      } = view;
+      const canEdit = hasPermission("edit");
+      const canDelete = canEdit && !!record.id && hasPermission("delete");
 
       showEditor({
         title,
         model,
         viewName,
         record,
-        readonly,
-        onSelect,
+        readonly: !canEdit,
+        onSelect: () => onRefresh(),
+        footer: ({ close }) => {
+          return (
+            canDelete && (
+              <Box flex={1}>
+                <Button
+                  variant="danger"
+                  onClick={async () => {
+                    const confirmed = await onDelete(record);
+                    if (confirmed) {
+                      close(true);
+                    }
+                  }}
+                >
+                  {i18n.get("Delete")}
+                </Button>
+              </Box>
+            )
+          );
+        },
       });
     },
-    [showEditor, action],
+    [
+      action.views,
+      action.model,
+      hasPermission,
+      showEditor,
+      onRefresh,
+      onDelete,
+    ],
   );
 
-  const handleOpenEvent = useCallback(
-    (
-      event: SchedulerEvent,
-      readonly: boolean,
-      onSelect: (data: DataRecord) => void,
-    ) => {
-      setAnchorEl(null);
-      const record = (event as Record<string, any>).record as DataRecord;
-      showRecord(record, readonly, onSelect);
+  const onPrev = useCallback(
+    () => setDate((prev) => moment(prev).add(-1, mode).toDate()),
+    [mode],
+  );
+
+  const onNext = useCallback(
+    () => setDate((prev) => moment(prev).add(1, mode).toDate()),
+    [mode],
+  );
+
+  const onDayClick = useCallback((date: Date) => {
+    setDate(() => date);
+    setMode(() => "day");
+  }, []);
+
+  const onDateChange = useCallback((date: Date) => {
+    setDate(() => date);
+  }, []);
+
+  const onFilterChange = useCallback((index: number) => {
+    if (index > -1) {
+      setFilters((filters) =>
+        filters.map((filter, i) =>
+          i === index ? { ...filter, checked: !filter.checked } : filter,
+        ),
+      );
+    }
+  }, []);
+
+  const onEventClick = useCallback(
+    ({ data: record }: SchedulerEvent<DataRecord>) => {
+      if (record) showRecord(record);
     },
     [showRecord],
   );
 
-  const _handleEditEvent = useCallback(
-    (event: SchedulerEvent) =>
-      handleOpenEvent(event, false, (data: DataRecord) => {
-        setRecords((records) =>
-          records.map((record) =>
-            record.id === data.id ? { ...record, ...data } : record,
-          ),
-        );
-      }),
-    [handleOpenEvent],
-  );
-
-  const _handleViewEvent = useCallback(
-    (event: SchedulerEvent) => handleOpenEvent(event, true, () => {}),
-    [handleOpenEvent],
-  );
-
-  const handleEditEvent = editableAndButton("edit")
-    ? _handleEditEvent
-    : undefined;
-  const handleViewEvent = hasButton("view") ? _handleViewEvent : undefined;
-
-  const _handleEventCreate = useCallback(
-    ({ start, end }: Event) => {
-      const record = {
-        [eventStart]: convertDate.toString(start),
-      } as DataRecord;
-
-      if (eventStop) {
-        const _end = isDateCalendar ? addDate(end, -1, "days") : end;
-        record[eventStop] = convertDate.toString(_end);
+  const onEventCreate = useCallback(
+    ({ start, end }: SchedulerEvent<DataRecord>) => {
+      if (hasPermission("new")) {
+        const record: DataRecord = {
+          [eventStart]: start.toISOString(),
+        };
+        if (eventStop) {
+          record[eventStop] = end.toISOString();
+        }
+        showRecord(record);
       }
-
-      showRecord(record, false, (data: DataRecord) => {
-        setRecords((records) => [...records, data]);
-      });
     },
-    [convertDate, eventStart, eventStop, isDateCalendar, showRecord],
+    [eventStart, eventStop, hasPermission, showRecord],
   );
 
-  const handleEventCreate = editableAndButton("new")
-    ? _handleEventCreate
-    : undefined;
-
-  const _handleDeleteEvent = useCallback(
-    async (event: SchedulerEvent) => {
-      closePopover();
-
-      const confirmed = await dialogs.confirm({
-        content: _t("Do you really want to delete the selected record?"),
-        yesTitle: _t("Delete"),
-      });
-
-      if (!confirmed) return;
-
-      const record = (event as Record<string, any>).record as DataRecord;
-      const { id, version } = record;
-      if (id == null || version == null) return;
-
-      await dataStore.delete({ id, version });
-      setRecords((records) => records.filter((record) => record.id !== id));
+  const onEventChange = useCallback(
+    async ({ start, end, data }: SchedulerEvent<DataRecord>) => {
+      const record: DataRecord = { ...data };
+      if (eventStart) record[eventStart] = start.toISOString();
+      if (eventStop) record[eventStop] = end.toISOString();
+      await dataStore.save(record);
+      await onRefresh();
     },
-    [closePopover, dataStore],
+    [dataStore, eventStart, eventStop, onRefresh],
   );
 
-  const handleDeleteEvent = editableAndButton("delete")
-    ? _handleDeleteEvent
-    : undefined;
+  const pageText = useMemo(() => toPageText(date, mode), [date, mode]);
+
+  const actions = useMemo(() => {
+    return [
+      {
+        key: "month",
+        text: i18n.get("Month"),
+        iconOnly: false,
+        checked: mode === "month",
+        onClick: () => setMode("month"),
+      },
+      {
+        key: "week",
+        text: i18n.get("Week"),
+        iconOnly: false,
+        checked: mode === "week",
+        onClick: () => setMode("week"),
+      },
+      {
+        key: "day",
+        text: i18n.get("Day"),
+        iconOnly: false,
+        checked: mode === "day",
+        onClick: () => setMode("day"),
+      },
+      {
+        key: "d1",
+        divider: true,
+      },
+      {
+        key: "today",
+        text: i18n.get("Today"),
+        iconOnly: false,
+        disabled: moment(date).startOf("day").isSame(moment().startOf("day")),
+        onClick: () => setDate(new Date()),
+      },
+      {
+        key: "refresh",
+        text: i18n.get("Refresh"),
+        iconOnly: false,
+        onClick: onRefresh,
+      },
+    ];
+  }, [date, mode, onRefresh]);
+
+  const filteredEvents = useMemo(() => {
+    const checked = filters.filter((x) => x.checked);
+    return events.reduce((acc, event) => {
+      const filter = filters.find((x) => x.match?.(event));
+      if (filter) {
+        event = {
+          ...event,
+          backgroundColor: filter.color,
+          borderColor: filter.color,
+        };
+      }
+      if (checked.length === 0 || checked.some((x) => x.match?.(event))) {
+        return [...acc, event];
+      }
+      return acc;
+    }, [] as SchedulerEvent<DataRecord>[]);
+  }, [events, filters]);
+
+  // register shortcuts
+  useShortcuts({ viewType: "calendar", onRefresh: onRefresh });
 
   // register tab:refresh
-  useViewTabRefresh("calendar", handleRefresh);
+  useViewTabRefresh("calendar", onRefresh);
 
   return (
-    <div
-      className={clsx(styles.calendar, {
-        "calendar-hide-times": isDateCalendar,
-      })}
-    >
+    <div className={styles.container}>
       <ViewToolBar
         meta={meta}
         actions={actions}
         pagination={{
           canPrev: true,
           canNext: true,
-          onNext: handleNext,
-          onPrev: handlePrev,
-          text: calendarTitle,
+          onNext,
+          onPrev,
+          text: pageText,
         }}
       />
-      <Box d="flex" flexDirection="row" flexGrow={1} overflow="auto">
-        <Box d="flex" py={2} className={styles["scheduler-panel"]}>
-          <Scheduler
-            events={calendarEvents}
-            date={calendarDate}
-            view={calendarMode}
-            onNavigationChange={handleNavigationChange}
-            onViewChange={handleViewChange}
-            onEventResize={handleEventUpdate}
-            onEventDrop={handleEventUpdate}
-            onEventSelect={handleEventSelect}
-            onEventCreate={handleEventCreate}
-            eventStyler={eventStyler}
-            components={components}
-            style={{ width: "100%" }}
-            selectable="ignoreEvents"
-          />
-          <Popover
-            anchorEl={anchorEl}
-            data={selectedEvent}
-            onEdit={handleEditEvent}
-            onView={handleViewEvent}
-            onDelete={handleDeleteEvent}
-            onClose={closePopover}
-            eventStart={eventStart}
-            eventStop={eventStop}
-            isDateCalendar={isDateCalendar}
-          />
-        </Box>
-        <Box flex={1} p={2} className={styles["calendar-panel"]}>
-          <DatePicker
-            selected={calendarDate}
-            onChange={handleDateChange}
-            {...({ inline: true } as any)}
-          />
-          <Filters data={filters} onChange={handleFilterChange} />
-        </Box>
-      </Box>
+      <div className={styles.wrapper}>
+        <Scheduler
+          className={styles.calendar}
+          view={mode}
+          date={date}
+          locale={moment.locale()}
+          allDayText={i18n.get("All Day")}
+          allDayOnly={allDayOnly}
+          moreText={(n) => i18n.get("+{0} more", n)}
+          events={filteredEvents}
+          editable={hasPermission("edit")}
+          onDayClick={onDayClick}
+          onEventClick={onEventClick}
+          onEventCreate={onEventCreate}
+          onEventChange={onEventChange}
+        />
+        <div className={styles.sidebar}>
+          <DatePicker selected={date} onChange={onDateChange} inline={true} />
+          <Filters data={filters} onChange={onFilterChange} />
+        </div>
+      </div>
     </div>
   );
+}
+
+function toPageText(date: Date, mode: SchedulerView) {
+  if (mode === "month") return moment(date).format("MMMM YYYY");
+  if (mode === "week") {
+    const start = moment(date).startOf("week");
+    const end = moment(date).endOf("week");
+
+    const startDate = start.format("MMM DD");
+    const startMonth = start.format("MMM");
+    const startYear = start.format("YYYY");
+
+    const endMonth = end.format("MMM");
+    const endYear = end.format("YYYY");
+    const endDate =
+      startMonth === endMonth ? end.format("DD") : end.format("MMM DD");
+
+    return startYear === endYear
+      ? `${startDate} - ${endDate}, ${endYear}`
+      : `${startDate}, ${startYear} - ${endDate}, ${endYear}`;
+  }
+  return moment(date).format("MMMM DD, YYYY");
 }

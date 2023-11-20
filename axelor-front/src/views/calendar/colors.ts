@@ -1,7 +1,7 @@
-const _usedColors: Record<string, string> = {};
-let _usedColorIndex = 0;
+const usedColors: Record<string, string> = {};
+const randomColors: Record<string, string> = {};
 
-const _randomColors: Record<string, string> = {};
+let usedColorIndex = 0;
 
 const colors: string[] = [
   "#304ffe",
@@ -55,21 +55,21 @@ export const DEFAULT_COLOR = "var(--bs-link-color)";
 
 export function getColor(value: string): string {
   function findColor() {
-    const color = colors[_usedColorIndex];
-    _usedColorIndex = (_usedColorIndex + 1) % colors.length;
+    const color = colors[usedColorIndex];
+    usedColorIndex = (usedColorIndex + 1) % colors.length;
     return color;
   }
-  return _usedColors[value] || (_usedColors[value] = findColor());
+  return usedColors[value] || (usedColors[value] = findColor());
 }
 
 export function getRandomColor(value: string): string {
   function findColor() {
-    const used = Object.values(_randomColors);
+    const used = Object.values(randomColors);
     let list = colors.filter((c) => !used.includes(c));
     if (!list.length) {
       list = colors;
     }
     return list[Math.floor(Math.random() * list.length)];
   }
-  return _randomColors[value] || (_randomColors[value] = findColor());
+  return randomColors[value] || (randomColors[value] = findColor());
 }
