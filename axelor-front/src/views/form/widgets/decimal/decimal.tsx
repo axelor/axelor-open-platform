@@ -67,8 +67,8 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const {
     text: textValue,
+    setText: setTextValue,
     value,
-    setValue,
     setChanged,
     onChange,
     onBlur,
@@ -101,9 +101,9 @@ export function Decimal(props: FieldProps<string | number>) {
       const res = checkRange(num, min, max);
 
       setChanged(true);
-      setValue((textRef.current = parse(res)));
+      setTextValue((textRef.current = parse(res)));
     },
-    [checkRange, max, min, parse, setChanged, setValue, textValue],
+    [checkRange, max, min, parse, setChanged, setTextValue, textValue],
   );
 
   const handleKeyDown = useCallback<
