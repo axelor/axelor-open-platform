@@ -192,6 +192,7 @@ function Footer({
         onClose(true);
       } catch (e) {
         // TODO: show error
+        console.error(e);
       }
     }, [getErrors, handler, onClose, onSave, onSelect]),
   );

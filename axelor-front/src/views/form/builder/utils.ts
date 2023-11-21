@@ -444,18 +444,13 @@ export function processOriginal(
 ) {
   const original = { ...record };
   Object.values(fields)
-    .filter(
-      (field: Property) =>
-        INDEPENDENT_TYPES.has(field.type) && original[field.name],
-    )
+    .filter((field: Property) => INDEPENDENT_TYPES.has(field.type))
     .forEach((field: Property) => {
       const value = original[field.name];
-      if (Array.isArray(value)) {
-        for (let i = 0; i < value.length; ++i) {
-          original[field.name][i] = removeVersion(value[i]);
-        }
-      } else {
-        original[field.name] = removeVersion(value);
+      if (value) {
+        original[field.name] = Array.isArray(value)
+          ? value.map(removeVersion)
+          : removeVersion(value);
       }
     });
   return original;
