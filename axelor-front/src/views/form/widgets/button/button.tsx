@@ -109,7 +109,7 @@ export function Button(props: WidgetProps) {
             title: help,
           })}
       disabled={disabled}
-      onClick={handleClick}
+      {...(!disabled && { onClick: handleClick })}
       className={clsx(styles.button, {
         [styles.help]: hasHelp,
       })}
