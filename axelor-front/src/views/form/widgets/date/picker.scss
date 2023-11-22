@@ -129,6 +129,15 @@
   border-color: var(--bs-secondary-bg);
 }
 
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: var(--bs-body-color);
+}
+
 .react-datepicker__day--selected:hover,
 .react-datepicker__day--in-selecting-range:hover,
 .react-datepicker__day--in-range:hover,
@@ -142,6 +151,7 @@
 .react-datepicker__year-text--in-selecting-range:hover,
 .react-datepicker__year-text--in-range:hover {
   background-color: var(--bs-primary);
+  color: var(--bs-white);
 }
 
 .react-datepicker__day--selected,
@@ -157,15 +167,7 @@
 .react-datepicker__year-text--in-selecting-range,
 .react-datepicker__year-text--in-range {
   background-color: var(--bs-primary);
-}
-
-.react-datepicker__current-month,
-.react-datepicker-time__header,
-.react-datepicker-year-header,
-.react-datepicker__day-name,
-.react-datepicker__day,
-.react-datepicker__time-name {
-  color: var(--bs-body-color);
+  color: var(--bs-white);
 }
 
 .react-datepicker__day--keyboard-selected,
