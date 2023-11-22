@@ -50,6 +50,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
 
   const [value, setValue] = useAtom(valueAtom);
+  const [hasSearchMore, setSearchMore] = useState(false);
   const { hasButton } = usePermission(schema, widgetAtom);
 
   const parentId = useAtomValue(
@@ -284,7 +285,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         _domain,
         _domainContext,
       };
-      const { records } = await search(text, options);
+      const { records, page } = await search(text, options);
+      setSearchMore((page.totalCount ?? 0) > records.length);
       return records;
     },
     [beforeSelect, domain, getContext, search],
@@ -379,7 +381,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         onShowCreateAndSelect={
           canNew && schema.create ? showCreateAndSelect : undefined
         }
-        onShowSelect={canSelect ? showSelect : undefined}
+        onShowSelect={canSelect && hasSearchMore ? showSelect : undefined}
         clearIcon={false}
         renderValue={renderValue}
         renderOption={renderOption}

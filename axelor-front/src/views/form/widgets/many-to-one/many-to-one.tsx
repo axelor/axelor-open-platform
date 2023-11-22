@@ -2,7 +2,7 @@ import { useAtom, useAtomValue } from "jotai";
 import getObjValue from "lodash/get";
 import setObjValue from "lodash/set";
 import isEqual from "lodash/isEqual";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useAtomCallback } from "jotai/utils";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -54,8 +54,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     perms,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
+  const [hasSearchMore, setSearchMore] = useState(false);
   const { hasButton } = usePermission(schema, widgetAtom, perms);
-
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain, hidden } = attrs;
 
@@ -236,7 +236,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         _domain,
         _domainContext,
       };
-      const { records } = await search(text, options);
+      const { records, page } = await search(text, options);
+      setSearchMore((page.totalCount ?? 0) > records.length);
       return records;
     },
     [beforeSelect, domain, getContext, search],
@@ -375,7 +376,9 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canCreateOnTheFly={canNew && schema.create}
           canShowNoResultOption={true}
           onShowCreate={canNew ? showCreate : undefined}
-          onShowSelect={canSelect && !isSuggestBox ? showSelect : undefined}
+          onShowSelect={
+            canSelect && !isSuggestBox && hasSearchMore ? showSelect : undefined
+          }
           onShowCreateAndSelect={
             canNew && schema.create ? showCreateAndSelect : undefined
           }
