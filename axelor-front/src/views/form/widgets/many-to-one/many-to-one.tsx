@@ -197,7 +197,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [showCreate],
   );
 
-  const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
+  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema);
 
   const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
@@ -242,14 +242,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     },
     [beforeSelect, domain, getContext, search],
   );
-
-  const handleOpen = useCallback(async () => {
-    beforeSelectProps?.onMenuOpen?.();
-  }, [beforeSelectProps]);
-
-  const handleClose = useCallback(() => {
-    beforeSelectProps?.onMenuClose?.();
-  }, [beforeSelectProps]);
 
   const valueRef = useRef<DataRecord>();
 
@@ -371,8 +363,8 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           value={value}
           placeholder={placeholder}
           onChange={handleChange}
-          onOpen={handleOpen}
-          onClose={handleClose}
+          onOpen={onMenuOpen}
+          onClose={onMenuClose}
           canCreateOnTheFly={canNew && schema.create}
           canShowNoResultOption={true}
           onShowCreate={canNew ? showCreate : undefined}

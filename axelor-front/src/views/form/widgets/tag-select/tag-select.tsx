@@ -229,7 +229,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [handleChange, value],
   );
 
-  const [beforeSelect, beforeSelectProps] = useBeforeSelect(schema);
+  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema);
 
   const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
@@ -291,14 +291,6 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     },
     [beforeSelect, domain, getContext, search],
   );
-
-  const handleOpen = useCallback(async () => {
-    beforeSelectProps?.onMenuOpen?.();
-  }, [beforeSelectProps]);
-
-  const handleClose = useCallback(() => {
-    beforeSelectProps?.onMenuClose?.();
-  }, [beforeSelectProps]);
 
   const getOptionKey = useCallback((option: DataRecord) => option.id!, []);
   const getOptionLabel = useCallback(
@@ -373,8 +365,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         value={ready ? value : []}
         placeholder={placeholder}
         onChange={handleChange}
-        onOpen={handleOpen}
-        onClose={handleClose}
+        onOpen={onMenuOpen}
+        onClose={onMenuClose}
         canShowNoResultOption={true}
         canCreateOnTheFly={canNew && schema.create}
         onShowCreate={canNew ? showCreate : undefined}
