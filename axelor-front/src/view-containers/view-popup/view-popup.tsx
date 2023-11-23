@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom } from "jotai/utils";
@@ -9,13 +10,14 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { DialogButton, ModalDialog, dialogs } from "@/components/dialogs";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { getActiveTabId } from "@/layout/nav-tabs/utils";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 
 import { Views } from "../views";
 import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
-import { DataRecord } from "@/services/client/data.types";
-import clsx from "clsx";
+import { showErrors, useGetErrors } from "@/views/form";
+
 import styles from "./view-popup.module.scss";
 
 export type PopupProps = {
@@ -215,6 +217,8 @@ function Footer({
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
 
+  const getErrors = useGetErrors();
+
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
@@ -224,11 +228,20 @@ function Footer({
 
   const handleConfirm = useCallback(async () => {
     const { getState, onSave } = handler;
-    const { dirty } = getState?.() ?? {};
+    const state = getState?.();
+
+    const errors = state && getErrors(state);
+    if (errors) {
+      showErrors(errors);
+      return;
+    }
+
+    const { dirty, record } = state ?? {};
+    const canSave = dirty || !record?.id;
 
     try {
-      let rec: DataRecord | undefined = getState?.()?.record;
-      if (dirty && onSave) {
+      let rec: DataRecord | undefined = record;
+      if (canSave && onSave) {
         rec = await onSave({
           shouldSave: true,
           callOnSave: true,
@@ -239,7 +252,7 @@ function Footer({
     } catch (e) {
       // TODO: show error
     }
-  }, [handleClose, handler]);
+  }, [getErrors, handleClose, handler]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {
