@@ -403,10 +403,22 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const onEventChange = useAtomCallback(
     useCallback(
-      async (get, set, { start, end, data }: SchedulerEvent<DataRecord>) => {
+      async (
+        get,
+        set,
+        { start, end, data, allDay }: SchedulerEvent<DataRecord>,
+      ) => {
         let record: DataRecord = { ...data };
-        if (eventStart) record[eventStart] = start.toISOString();
-        if (eventStop) record[eventStop] = end.toISOString();
+        let endValue = end ?? moment(start).add(eventLength, "hours").toDate();
+        if (allDay) {
+          endValue = moment(endValue).startOf("day").toDate();
+        }
+
+        const startStr = start.toISOString();
+        const endStr = endValue.toISOString();
+
+        if (eventStart) record[eventStart] = startStr;
+        if (eventStop) record[eventStop] = endStr;
 
         if (onChange) {
           set(formAtom, (prev) => ({ ...prev, record }));
@@ -422,6 +434,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       [
         actionExecutor,
         dataStore,
+        eventLength,
         eventStart,
         eventStop,
         formAtom,
