@@ -22,9 +22,14 @@ export function Filters({
   return (
     <Box d="flex" flexDirection="column">
       {data.map(({ title, value, color, checked = false }, ind) => (
-        <Box d="flex" alignItems="center" key={value} m={1}>
+        <Box
+          d="flex"
+          alignItems="center"
+          key={value}
+          m={1}
+          className={styles.filter}
+        >
           <Input
-            className={styles.checkbox}
             type="checkbox"
             style={{
               ...(checked ? { backgroundColor: color } : {}),
@@ -36,13 +41,7 @@ export function Filters({
             m={0}
             me={1}
           />
-          <Box
-            as="p"
-            mb={0}
-            style={{ color }}
-            className={styles["checkbox-label"]}
-            onClick={() => onChange(ind)}
-          >
+          <Box as="span" mb={0} style={{ color }} onClick={() => onChange(ind)}>
             {title}
           </Box>
         </Box>

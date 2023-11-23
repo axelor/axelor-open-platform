@@ -23,10 +23,18 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow-y: auto;
 }
 
 .sidebar {
   :global(.react-datepicker) {
     border-radius: 0;
+  }
+}
+
+.filter {
+  span,
+  input {
+    cursor: pointer;
   }
 }
