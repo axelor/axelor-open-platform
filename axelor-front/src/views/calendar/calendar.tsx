@@ -13,6 +13,7 @@ import {
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
+import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
 import { Criteria, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -26,13 +27,14 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
+import { createFormAtom } from "../form/builder/atoms";
+import { useActionExecutor } from "../form/builder/scope";
 import { Picker as DatePicker } from "../form/widgets/date/picker";
 import { ViewProps } from "../types";
 import { getColor } from "./colors";
 import { Filter, Filters } from "./filters";
 import { getTimes } from "./utils";
 
-import { useShortcuts } from "@/hooks/use-shortcut";
 import styles from "./calendar.module.scss";
 
 export function Calendar(props: ViewProps<CalendarView>) {
@@ -44,6 +46,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     colorBy,
     editable = true,
     mode: initialMode = "month",
+    onChange,
   } = meta.view;
 
   const colorField = meta.fields?.[colorBy!];
@@ -383,15 +386,49 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [eventStart, eventStop, hasPermission, showRecord],
   );
 
-  const onEventChange = useCallback(
-    async ({ start, end, data }: SchedulerEvent<DataRecord>) => {
-      const record: DataRecord = { ...data };
-      if (eventStart) record[eventStart] = start.toISOString();
-      if (eventStop) record[eventStop] = end.toISOString();
-      await dataStore.save(record);
-      await onRefresh();
-    },
-    [dataStore, eventStart, eventStop, onRefresh],
+  const formAtom = useMemo(
+    () =>
+      createFormAtom({
+        meta: meta as any,
+        record: {},
+      }),
+    [meta],
+  );
+
+  const actionExecutor = useActionExecutor(meta.view, {
+    formAtom,
+    getContext: getViewContext,
+    onRefresh,
+  });
+
+  const onEventChange = useAtomCallback(
+    useCallback(
+      async (get, set, { start, end, data }: SchedulerEvent<DataRecord>) => {
+        let record: DataRecord = { ...data };
+        if (eventStart) record[eventStart] = start.toISOString();
+        if (eventStop) record[eventStop] = end.toISOString();
+
+        if (onChange) {
+          set(formAtom, (prev) => ({ ...prev, record }));
+          await actionExecutor.execute(onChange, {
+            context: { ...record },
+          });
+          record = { ...record, ...get(formAtom).record };
+        }
+
+        await dataStore.save(record);
+        await onRefresh();
+      },
+      [
+        actionExecutor,
+        dataStore,
+        eventStart,
+        eventStop,
+        formAtom,
+        onChange,
+        onRefresh,
+      ],
+    ),
   );
 
   const pageText = useMemo(() => toPageText(date, mode), [date, mode]);
