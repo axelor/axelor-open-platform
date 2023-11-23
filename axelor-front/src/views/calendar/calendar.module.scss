@@ -13,10 +13,34 @@
   overflow: auto;
   min-width: 0;
   min-height: 0;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .calendar {
   flex: 1;
+}
+
+.calendar {
+  :global {
+    .fc-daygrid-day-top {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fc-daygrid-day-frame {
+      min-height: 6.5rem;
+    }
+
+    a.fc-daygrid-day-number,
+    a.fc-col-header-cell-cushion {
+      color: var(--bs-body-color);
+    }
+    a,
+    a[data-navlink]:hover {
+      text-decoration: none;
+    }
+  }
 }
 
 .sidebar {
@@ -24,12 +48,6 @@
   flex-direction: column;
   gap: 0.5rem;
   overflow-y: auto;
-}
-
-.sidebar {
-  :global(.react-datepicker) {
-    border-radius: 0;
-  }
 }
 
 .filter {
