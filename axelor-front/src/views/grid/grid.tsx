@@ -125,7 +125,8 @@ function GridInner(props: ViewProps<GridView>) {
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
   const hasDetailsView = Boolean(detailsView);
   const gridWidth = action.params?.["grid-width"];
-  const hasPopup = action.params?.["popup"] || action.params?.["dashlet.in.popup"];
+  const hasPopup =
+    action.params?.["popup"] || action.params?.["dashlet.in.popup"];
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
@@ -697,22 +698,22 @@ function GridInner(props: ViewProps<GridView>) {
   }, [state.selectedRows, state.rows, setState]);
 
   useAsyncEffect(async () => {
-    const { orderBy } = view;
-    if (orderBy && reorderRef.current) {
+    if (reorderRef.current) {
+      const orderField = orderBy?.[0]?.name || "sequence";
       const recIds = records.map((r) => r.id);
       const updateRecords = rows
         .filter((r) => recIds.includes(r.record?.id ?? 0))
         .map((r) => records.find((v) => v.id === r.record?.id))
         .map((r, ind) => ({
           id: r?.id,
-          [orderBy]: ind + 1,
+          [orderField]: ind + 1,
           version: r?.version ?? r?.$version,
         })) as DataRecord[];
       const res = await dataStore.save(updateRecords);
       res && onSearch();
     }
     reorderRef.current = false;
-  }, [view, rows, records, dataStore]);
+  }, [view, rows, records, dataStore, orderBy]);
 
   const searchOptions = useMemo(() => {
     if (currentPage) {

@@ -375,7 +375,7 @@ function OneToManyInner({
             ...options,
             limit: -1,
             offset: 0,
-            sortBy: orderBy?.split?.(","),
+            sortBy: orderBy?.split?.(/\s*,\s*/),
             fields: names,
             filter: {
               ...options?.filter,
@@ -728,6 +728,7 @@ function OneToManyInner({
     if (reorderRef.current) {
       setValue(
         (values) => {
+          const orderField = orderBy?.split(/\s*,\s*/)?.[0] || "sequence";
           const valIds = values.map((v) => v.id);
           return rows
             .filter((r) => valIds.includes(r.record?.id ?? 0))
@@ -735,7 +736,7 @@ function OneToManyInner({
             .map((r, ind) => ({
               ...r,
               _dirty: true,
-              sequence: ind + 1,
+              [orderField]: ind + 1,
               version: r?.version ?? r?.$version,
             })) as DataRecord[];
         },
@@ -745,7 +746,7 @@ function OneToManyInner({
       );
     }
     reorderRef.current = false;
-  }, [rows, setValue]);
+  }, [rows, setValue, orderBy]);
 
   const fetchAndSetDetailRecord = useCallback(
     async (selected: DataRecord) => {

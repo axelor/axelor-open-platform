@@ -52,8 +52,7 @@ The grid view has the following attributes:
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 |===
 
-IMPORTANT: The object should have a numeric field named `sequence` to allow
-re-ordering with drag & drop.
+IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, it defaults to `sequence`.
 
 The grid view has the following child items:
 

@@ -1,0 +1,8 @@
+---
+title: Allow canMove sequencing on any field specified by orderBy
+type: feature
+description: |
+  With `canMove`, the field used for sequencing does not have to be a field named `sequence`
+  anymore, but can be any field specified by `orderBy`.
+  Sequencing is done on field specified by `orderBy`, and it must be only one integer field.
+  If not specified, it defaults to `sequence`.
