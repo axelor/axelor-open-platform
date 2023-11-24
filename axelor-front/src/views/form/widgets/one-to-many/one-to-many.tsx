@@ -123,17 +123,17 @@ function OneToManyInner({
   viewData?: ViewData<GridView>;
 }) {
   const {
+    widgetAttrs,
     name,
-    showBars,
-    toolbar,
-    menubar,
+    showBars = widgetAttrs.showBars,
+    toolbar = viewData?.view?.toolbar,
+    menubar = viewData?.view?.menubar,
     target: model,
     fields,
     formView,
     summaryView,
     gridView,
     searchLimit,
-    widgetAttrs,
     canExport = widgetAttrs.canExport,
     canCopy = widgetAttrs.canCopy,
     height,
@@ -844,7 +844,7 @@ function OneToManyInner({
 
   useFormRefresh(onSearch);
 
-  const hasActions = showBars && (toolbar.length > 0 || menubar.length > 0);
+  const hasActions = showBars && (toolbar?.length || menubar?.length);
 
   const rowSize = 45;
   const headerSize = 100;
