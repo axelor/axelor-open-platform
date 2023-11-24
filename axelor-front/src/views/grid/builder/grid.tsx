@@ -454,7 +454,7 @@ export const Grid = forwardRef<
 
   if (init.state === "loading") return null;
 
-  const canMove = view?.canMove === true && !readonly;
+  const canMove = view?.canMove === true && !!view?.orderBy && !readonly;
 
   return (
     <AxGridProvider>

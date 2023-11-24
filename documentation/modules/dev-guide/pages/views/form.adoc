@@ -199,7 +199,7 @@ A `panel-related` includes the following attributes:
 | `edit-window` | display mode of edit window for relational fields. Can be `self`, `blank` or `popup` (default value).
 |===
 
-IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, it defaults to `sequence`.
+IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.
 
 [source,xml]
 -----

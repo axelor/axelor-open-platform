@@ -728,7 +728,7 @@ function OneToManyInner({
     if (reorderRef.current) {
       setValue(
         (values) => {
-          const orderField = orderBy?.split(/\s*,\s*/)?.[0] || "sequence";
+          const orderField = orderBy?.split(/\s*,\s*/)?.[0];
           const valIds = values.map((v) => v.id);
           return rows
             .filter((r) => valIds.includes(r.record?.id ?? 0))
@@ -736,7 +736,7 @@ function OneToManyInner({
             .map((r, ind) => ({
               ...r,
               _dirty: true,
-              [orderField]: ind + 1,
+              ...(orderField && { [orderField]: ind + 1 }),
               version: r?.version ?? r?.$version,
             })) as DataRecord[];
         },

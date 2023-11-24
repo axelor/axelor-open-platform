@@ -699,14 +699,14 @@ function GridInner(props: ViewProps<GridView>) {
 
   useAsyncEffect(async () => {
     if (reorderRef.current) {
-      const orderField = orderBy?.[0]?.name || "sequence";
+      const orderField = orderBy?.[0]?.name;
       const recIds = records.map((r) => r.id);
       const updateRecords = rows
         .filter((r) => recIds.includes(r.record?.id ?? 0))
         .map((r) => records.find((v) => v.id === r.record?.id))
         .map((r, ind) => ({
           id: r?.id,
-          [orderField]: ind + 1,
+          ...(orderField && { [orderField]: ind + 1 }),
           version: r?.version ?? r?.$version,
         })) as DataRecord[];
       const res = await dataStore.save(updateRecords);
