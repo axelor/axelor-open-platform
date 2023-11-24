@@ -3,7 +3,7 @@ import { readCookie, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
 import { i18n } from "./i18n";
 import { Perms, SearchFilter } from "./meta.types";
-import { ErrorReport, reject } from "./reject";
+import { ErrorReport, reject, rejectAsAlert } from "./reject";
 
 export type SearchOptions = {
   limit?: number;
@@ -99,7 +99,7 @@ export class DataSource {
               totalCount,
             },
           }
-        : Promise.reject(500);
+        : rejectAsAlert(records);
     }
 
     return Promise.reject(resp.status);
