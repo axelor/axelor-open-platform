@@ -187,10 +187,10 @@ export const Grid = forwardRef<
       const serverType = (item as Field).serverType || field?.type;
       const columnProps: Partial<GridColumn> = {};
       const extraAttrs = columnAttrs?.[item.name!];
-      
+
       let widget;
-      if (item.type === 'field') {
-          widget = getWidget(item, field);
+      if (item.type === "field") {
+        widget = getWidget(item, field);
       }
 
       if (view.sortable === false) {
@@ -454,6 +454,8 @@ export const Grid = forwardRef<
 
   if (init.state === "loading") return null;
 
+  const canMove = view?.canMove === true && !readonly;
+
   return (
     <AxGridProvider>
       <ScopeProvider scope={GridScope} value={{ readonly }}>
@@ -462,15 +464,15 @@ export const Grid = forwardRef<
           cellRenderer={CustomCellRenderer}
           rowRenderer={CustomRowRenderer}
           allowColumnResize
-          allowGrouping
-          allowSorting
+          allowGrouping={!canMove}
+          allowSorting={!canMove}
           allowSelection
           allowCellSelection
           allowColumnHide
           allowColumnOptions
           allowColumnCustomize
           allowCheckboxSelection={allowCheckboxSelection}
-          allowRowReorder={view?.canMove === true && !readonly}
+          allowRowReorder={canMove}
           sortType="state"
           selectionType="multiple"
           {...(editable &&
