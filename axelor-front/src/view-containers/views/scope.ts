@@ -14,9 +14,9 @@ import {
   TabState,
   useTabs,
 } from "@/hooks/use-tabs";
+import { SearchOptions } from "@/services/client/data";
 import { ViewData } from "@/services/client/meta";
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
-import { SearchOptions } from "@/services/client/data";
 import { usePrepareContext } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
@@ -251,7 +251,7 @@ export function useViewTabRefresh(
     (e: Event) => {
       if (
         e instanceof CustomEvent &&
-        (e.detail?.id === tab.id) &&
+        e.detail?.id === tab.id &&
         type === viewType
       ) {
         refresh({ forceReload: e.detail?.forceReload });
@@ -300,22 +300,7 @@ export function useViewMeta() {
   const findField = useCallback((name: string) => meta.fields?.[name], [meta]);
 
   const findItem = useCallback(
-    (fieldName: string) => {
-      const { view, fields = {} } = meta;
-      return walkSchema(view, fields, [], ({ path, schema, field }) => {
-        const name = path.join(".");
-        if (name === fieldName) {
-          const serverType = schema?.serverType || field?.type;
-          const more = serverType ? { serverType } : {};
-          return {
-            ...field,
-            ...schema,
-            ...schema?.widgetAttrs,
-            ...more,
-          };
-        }
-      });
-    },
+    (fieldName: string) => findViewItem(meta, fieldName),
     [meta],
   );
 
@@ -339,6 +324,26 @@ export function useViewMeta() {
     findItem,
     findItems,
   } as const;
+}
+
+export function findViewItem<T extends ViewType>(
+  meta: ViewData<T>,
+  fieldName: string,
+) {
+  const { view, fields = {} } = meta;
+  return walkSchema(view, fields, [], ({ path, schema, field }) => {
+    const name = path.join(".");
+    if (name === fieldName) {
+      const serverType = schema?.serverType || field?.type;
+      const more = serverType ? { serverType } : {};
+      return {
+        ...field,
+        ...schema,
+        ...schema?.widgetAttrs,
+        ...more,
+      };
+    }
+  });
 }
 
 function findSchemaItems(schema: Schema): Schema[] {

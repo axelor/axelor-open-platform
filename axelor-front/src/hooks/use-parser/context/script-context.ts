@@ -5,7 +5,7 @@ import { isPlainObject } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
-import { Field } from "@/services/client/meta.types";
+import { Property } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import format from "@/utils/format";
 import { axelor } from "@/utils/globals";
@@ -19,7 +19,7 @@ export type ScriptContextOptions = {
   readonly?: boolean;
   required?: boolean;
   popup?: boolean;
-  fields?: Record<string, Field>;
+  fields?: Record<string, Property>;
   helpers?: Record<string, any>;
 };
 
@@ -217,7 +217,9 @@ export function createScriptContext(
     }
   }
 
-  return new Proxy<Context>(context as any, {
+  let parentContext: unknown = undefined;
+
+  return new Proxy<Context>(context as Context, {
     get(target, p, receiver) {
       if (p === "record") {
         if (session?.info?.application?.mode != "prod" && !warnedRecordPrefix) {
@@ -227,6 +229,11 @@ export function createScriptContext(
           warnedRecordPrefix = true;
         }
         return receiver;
+      }
+      if (p === "_parent" && receiver._createParentContext) {
+        return (
+          parentContext ?? (parentContext = receiver._createParentContext())
+        );
       }
       if (p in helpers) return helpers[p as keyof typeof helpers];
 
@@ -256,7 +263,7 @@ export function createScriptContext(
       }
       return value;
     },
-    set(target, p, newValue, receiver) {
+    set() {
       throw new Error("Cannot update context");
     },
   });

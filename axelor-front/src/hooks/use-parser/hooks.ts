@@ -1,12 +1,15 @@
+import { atom, useAtomValue } from "jotai";
+import { selectAtom } from "jotai/utils";
 import get from "lodash/get";
 import set from "lodash/set";
 import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
 import { Hilite } from "@/services/client/meta.types";
-
-import { useViewMeta } from "@/view-containers/views/scope";
+import { findViewItem, useViewMeta } from "@/view-containers/views/scope";
+import { FormAtom } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
+
 import {
   EvalContextOptions,
   createEvalContext,
@@ -19,6 +22,31 @@ import { parseAngularExp, parseExpression } from "./utils";
 const isSimple = (expression: string) => {
   return !expression.includes("{{") && !expression.includes("}}");
 };
+
+function useCreateParentContext(formAtom: FormAtom) {
+  const parentAtom = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (x) => x.parent ?? atom(null)),
+      [formAtom],
+    ),
+  );
+
+  const parentState = useAtomValue(parentAtom);
+
+  return useCallback(() => {
+    if (parentState) {
+      const { record, model: _model, fields, meta } = parentState;
+      const $getField = (name: string) => findViewItem(meta, name);
+      const ctx = { ...record, _model };
+      return createScriptContext(ctx, {
+        fields,
+        helpers: {
+          $getField,
+        },
+      });
+    }
+  }, [parentState]);
+}
 
 export function isReactTemplate(template: string | undefined | null) {
   const tmpl = template?.trim();
@@ -40,7 +68,8 @@ export function useExpression(expression: string) {
 
 export function useTemplate(template: string) {
   const { findItem } = useViewMeta();
-  const { actionExecutor } = useFormScope();
+  const { actionExecutor, formAtom } = useFormScope();
+  const _createParentContext = useCreateParentContext(formAtom);
 
   return useMemo(() => {
     const Comp = isReactTemplate(template)
@@ -76,13 +105,14 @@ export function useTemplate(template: string) {
         },
       };
 
+      const ctx = { ..._context, _createParentContext };
       const context = isReactTemplate(template)
-        ? createScriptContext(_context, opts)
-        : createEvalContext(_context, opts);
+        ? createScriptContext(ctx, opts)
+        : createEvalContext(ctx, opts);
 
       return createElement(Comp, { context });
     };
-  }, [actionExecutor, findItem, template]);
+  }, [_createParentContext, actionExecutor, findItem, template]);
 }
 
 export function useHilites(hilites: Hilite[]) {
