@@ -172,7 +172,7 @@ function TemplateViewer({
   formAtom,
   schema,
 }: FormViewerProps & { model: string; record: DataRecord }) {
-  const Template = useTemplate(template);
+  const Template = useTemplate(template, schema);
 
   const isReact = useMemo(() => isReactTemplate(template), [template]);
   const isReference = useMemo(() => isReferenceField(schema), [schema]);

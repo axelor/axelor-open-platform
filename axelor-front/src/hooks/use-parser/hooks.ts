@@ -6,7 +6,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
-import { Hilite } from "@/services/client/meta.types";
+import { Hilite, Schema } from "@/services/client/meta.types";
 import { findViewItem, useViewMeta } from "@/view-containers/views/scope";
 import { FormAtom } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
@@ -67,10 +67,27 @@ export function useExpression(expression: string) {
   );
 }
 
-export function useTemplate(template: string) {
-  const { findItem } = useViewMeta();
+export function useTemplate(template: string, field?: Schema) {
+  const { findItem, findField } = useViewMeta();
   const { actionExecutor, formAtom } = useFormScope();
   const _createParentContext = useCreateParentContext(formAtom);
+  const $getField = useCallback(
+    (name: string) => {
+      if (field && field.name === name) {
+        const serverField = findField(name);
+        const serverType = field?.serverType || serverField?.type;
+        const more = serverType ? { serverType } : {};
+        return {
+          ...serverField,
+          ...field,
+          ...field?.widgetAttrs,
+          ...more,
+        };
+      }
+      return findItem(name);
+    },
+    [field, findField, findItem],
+  );
 
   return useMemo(() => {
     const Comp = isReactTemplate(template)
@@ -111,7 +128,7 @@ export function useTemplate(template: string) {
         ...options,
         execute,
         helpers: {
-          $getField: findItem,
+          $getField,
           ...helpers,
         },
       };
@@ -123,7 +140,7 @@ export function useTemplate(template: string) {
 
       return createElement(Comp, { context });
     };
-  }, [_createParentContext, actionExecutor, findItem, template]);
+  }, [$getField, _createParentContext, actionExecutor, findItem, template]);
 }
 
 export function useHilites(hilites: Hilite[]) {
