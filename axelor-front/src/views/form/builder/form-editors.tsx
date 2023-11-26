@@ -25,7 +25,7 @@ import {
 import { toKebabCase } from "@/utils/names.ts";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
-import { useGetErrors } from "../form";
+import { Layout as FormViewLayout, useGetErrors } from "../form";
 import { createFormAtom } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
@@ -33,6 +33,7 @@ import { GridLayout } from "./form-layouts";
 import { useAfterActions } from "./scope";
 import {
   FieldProps,
+  FormLayout,
   FormState,
   ValueAtom,
   WidgetAtom,
@@ -776,8 +777,10 @@ const RecordEditor = memo(function RecordEditor({
   readonly,
   setInvalid,
   schema,
+  layout,
 }: FormEditorProps & {
   model: string;
+  layout?: FormLayout;
   setInvalid: (value: DataRecord, invalid: boolean) => void;
 }) {
   const meta: ViewData<FormView> = useMemo(
@@ -972,6 +975,7 @@ const RecordEditor = memo(function RecordEditor({
         formAtom={formAtom}
         widgetAtom={widgetAtom}
         readonly={readonly}
+        layout={layout}
       />
     </ScopeProvider>
   );
@@ -1040,14 +1044,18 @@ function JsonEditor({
     );
   }, [formAtom, jsonModel, jsonNameField, valueAtom]);
 
-  const jsonEditor = useMemo(
-    () =>
-      ({
-        ...processJsonView(editor, schema.jsonFields),
-        json: true,
-      }) as FormView,
-    [editor, schema.jsonFields],
-  );
+  const jsonLayout = schema.jsonModel ? FormViewLayout : undefined;
+  const jsonEditor = useMemo(() => {
+    const view = { ...processJsonView(editor, schema.jsonFields), json: true };
+    const first = editor.items?.[0] as Schema;
+    // for custom model view, if first item is panel, consider
+    // it as root schema to handle sidebar and tabs property.
+    if (first?.type === "panel" && schema.jsonModel) {
+      const { items = [] } = first;
+      return { ...view, items } as FormView;
+    }
+    return view as FormView;
+  }, [editor, schema.jsonFields, schema.jsonModel]);
 
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
@@ -1068,6 +1076,7 @@ function JsonEditor({
       valueAtom={jsonAtom}
       setInvalid={handleInvalid}
       readonly={readonly || schema.readonly}
+      layout={jsonLayout}
     />
   );
 }
