@@ -698,8 +698,8 @@ function GridInner(props: ViewProps<GridView>) {
   }, [state.selectedRows, state.rows, setState]);
 
   useAsyncEffect(async () => {
-    if (reorderRef.current) {
-      const orderField = orderBy?.[0]?.name;
+    const orderField = orderBy?.[0]?.name;
+    if (reorderRef.current && orderField) {
       const recIds = records.map((r) => r.id);
       const updateRecords = rows
         .filter((r) => recIds.includes(r.record?.id ?? 0))
@@ -708,7 +708,7 @@ function GridInner(props: ViewProps<GridView>) {
           (r, ind) =>
             ({
               id: r?.id,
-              ...(orderField && { [orderField]: ind + 1 }),
+              [orderField]: ind + 1,
               version: r?.version ?? r?.$version,
             }) as DataRecord,
         )

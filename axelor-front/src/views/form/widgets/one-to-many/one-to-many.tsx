@@ -759,9 +759,15 @@ function OneToManyInner({
 
   useEffect(() => {
     if (reorderRef.current) {
+      const orderField = orderBy?.split(/\s*,\s*/)?.[0];
+
+      // For dummy fields, so that internal value change is detected
+      if (!orderField) {
+        valueRef.current = null;
+      }
+
       setValue(
         (values) => {
-          const orderField = orderBy?.split(/\s*,\s*/)?.[0];
           const valIds = values.map((v) => v.id);
           return rows
             .filter((r) => valIds.includes(r.record?.id ?? 0))
