@@ -53,7 +53,7 @@ The grid view has the following attributes:
 |===
 
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.
-On top-level grid, `canMove` requires `orderBy`.
+On top-level grid, `orderBy` is required with `canMove`.
 
 The grid view has the following child items:
 

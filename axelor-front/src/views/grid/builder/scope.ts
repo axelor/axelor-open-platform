@@ -4,6 +4,7 @@ import uniq from "lodash/uniq";
 import { useMemo } from "react";
 
 import { JsonField, Property, Schema } from "@/services/client/meta.types";
+import { parseOrderBy } from "./utils";
 
 export type GridHandler = {
   readonly?: boolean;
@@ -29,16 +30,19 @@ export function useGridColumnNames({
   return useMemo(
     () =>
       uniq(
-        view.items!.reduce((names, item) => {
-          const field = fields?.[item.name!];
-          if ((item as JsonField).jsonField) {
-            return [...names, (item as JsonField).jsonField as string];
-          } else if (field) {
-            return [...names, field.name];
-          }
-          return names;
-        }, [] as string[]),
+        [...view.items!, ...(parseOrderBy(view.orderBy) ?? [])].reduce(
+          (names, item) => {
+            const field = fields?.[item.name!];
+            if ((item as JsonField).jsonField) {
+              return [...names, (item as JsonField).jsonField as string];
+            } else if (field) {
+              return [...names, field.name];
+            }
+            return names;
+          },
+          [] as string[],
+        ),
       ),
-    [fields, view.items],
+    [fields, view.items, view.orderBy],
   );
 }

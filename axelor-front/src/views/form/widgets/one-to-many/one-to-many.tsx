@@ -36,13 +36,18 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
-import { FormView, GridView, View } from "@/services/client/meta.types";
+import {
+  FormView,
+  GridView,
+  Property,
+  View,
+} from "@/services/client/meta.types";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
 import { MetaScope } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridColumnNames } from "@/views/grid/builder/scope";
-import { useGridState } from "@/views/grid/builder/utils";
+import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 
 import {
   FieldError,
@@ -262,13 +267,41 @@ function OneToManyInner({
   const canDelete = !readonly && hasButton("remove");
   const canSelect = !readonly && hasButton("select") && (isManyToMany || attrs.canSelect);
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
-  const canMove = Boolean(schema.canMove ?? viewData?.view?.canMove);
+  const _canMove = Boolean(schema.canMove ?? viewData?.view?.canMove);
 
   const orderBy = schema.orderBy ?? viewData?.view?.orderBy;
   const editable =
     !readonly &&
     canEdit &&
     (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable);
+
+  const formFields = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.fields), [formAtom]),
+  );
+
+  const canMove = useMemo(() => {
+    if (_canMove !== true) return false;
+
+    // With dummy fields, it is allowed to have no orderBy.
+    const orderField = orderBy?.split(/\s*,\s*/)?.[0];
+    if (!orderField) {
+      return !formFields[name];
+    }
+
+    const schemaFields = Array.isArray(fields)
+      ? fields.reduce(
+          (acc: Record<string, Property>, item: Property) => ({
+            ...acc,
+            [item.name]: item,
+          }),
+          {} as Record<string, Property>,
+        )
+      : fields;
+    const allFields = { ...viewMeta.fields, ...schemaFields };
+    const field = allFields[orderField];
+
+    return field && isValidSequence(field);
+  }, [_canMove, orderBy, viewMeta.fields, fields, formFields, name]);
 
   const clearSelection = useCallback(() => {
     setState((draft) => {

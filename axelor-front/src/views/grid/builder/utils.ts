@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { GridSortColumn, GridState } from "@axelor/ui/grid";
 
-import { GridView } from "@/services/client/meta.types";
+import { GridView, Property } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names.ts";
 import { isValidWidget, normalizeWidget } from "@/views/form/builder/utils";
 
@@ -41,7 +41,7 @@ export function useGridState(
 
 export function parseOrderBy(orderBy?: string): GridSortColumn[] | undefined {
   return orderBy
-    ?.split(",")
+    ?.split(/\s*,\s*/)
     .map((name) =>
       name.startsWith("-")
         ? { name: name.slice(1), order: "desc" }
@@ -72,4 +72,13 @@ export function getWidget(item: any, field: any): string {
   widget = normalizeWidget(widget) ?? widget;
 
   return toKebabCase(widget);
+}
+
+export function isValidSequence(field: Property) {
+  const { type, name } = field;
+  return (
+    ["INTEGER", "LONG"].includes(type) &&
+    !["id", "version"].includes(name) &&
+    !name.includes(".")
+  );
 }

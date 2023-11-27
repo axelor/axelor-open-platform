@@ -54,7 +54,7 @@ import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
-import { getWidget } from "../builder/utils";
+import { getWidget, isValidSequence } from "../builder/utils";
 import { GridScope, useGridColumnNames } from "./scope";
 
 import styles from "../grid.module.scss";
@@ -452,9 +452,21 @@ export const Grid = forwardRef<
     [doAdd, event],
   );
 
-  if (init.state === "loading") return null;
+  const canMove = useMemo(() => {
+    if (readonly) return false;
 
-  const canMove = view?.canMove === true && !!view?.orderBy && !readonly;
+    const { canMove, orderBy } = view ?? {};
+    if (canMove !== true) return false;
+
+    // On top-level grid, orderBy is required for canMove
+    const orderField = orderBy?.split(/\s*,\s*/)?.[0];
+    if (!orderField) return false;
+
+    const field = fields?.[orderField];
+    return field && isValidSequence(field);
+  }, [readonly, view, fields]);
+
+  if (init.state === "loading") return null;
 
   return (
     <AxGridProvider>

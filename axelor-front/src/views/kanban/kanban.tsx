@@ -40,6 +40,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 import { useActionExecutor } from "../form/builder/scope";
+import { isValidSequence } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 
 import { KanbanBoard } from "./kanban-board";
@@ -542,14 +543,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
 
   const hasValidSequenceByField = useMemo(() => {
     const $sequenceBy = (fields?.[sequenceBy ?? ""] || {}) as Property;
-    if (
-      ["integer", "long"].indexOf(($sequenceBy?.type ?? "").toLowerCase()) ===
-        -1 ||
-      ["id", "version"].indexOf($sequenceBy?.name ?? "") > -1
-    ) {
-      return false;
-    }
-    return true;
+    return isValidSequence($sequenceBy);
   }, [fields, sequenceBy]);
 
   const Template = useTemplate(view.template!);

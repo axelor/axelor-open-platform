@@ -200,6 +200,7 @@ A `panel-related` includes the following attributes:
 |===
 
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.
+On one-to-many/many-to-many grids, `orderBy` is required with `canMove`, except for dummy fields.
 
 [source,xml]
 -----
