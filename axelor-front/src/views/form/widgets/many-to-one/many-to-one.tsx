@@ -1,9 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import getObjValue from "lodash/get";
-import setObjValue from "lodash/set";
-import isEqual from "lodash/isEqual";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useAtomCallback } from "jotai/utils";
+import { useCallback, useMemo, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -16,12 +12,11 @@ import {
   useCreateOnTheFly,
   useEditor,
   useEditorInTab,
+  useEnsureRelated,
   useSelector,
 } from "@/hooks/use-relation";
-import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
-import { useViewMeta } from "@/view-containers/views/scope";
 import { usePermission, usePrepareContext } from "../../builder/form";
 import { FieldControl } from "../../builder/form-field";
 import { useFormRefresh } from "../../builder/scope";
@@ -87,8 +82,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [setValue, value],
   );
 
-  const dataSource = useMemo(() => new DataSource(target), [target]);
-
   const canRead = perms?.read !== false;
   const canView = value && hasButton("view");
   const canEdit = value && hasButton("edit") && attrs.canEdit;
@@ -96,43 +89,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const canSelect = hasButton("select");
   const isRefLink = schema.widget === "ref-link";
   const readonly = _readonly || !canRead;
-
-  const { findItems: findFormItems } = useViewMeta();
-
-  const ensureRelated = useCallback(
-    async (value: DataRecord, refetch?: boolean) => {
-      if (value && value.id && value.id > 0 && canRead) {
-        const name = schema.name;
-        const prefix = name + ".";
-        const items = findFormItems();
-        const related = items
-          .flatMap((item) => [item.name, item.depends?.split(",")])
-          .flat()
-          .filter(Boolean)
-          .filter((name) => name.startsWith(prefix))
-          .map((name) => name.substring(prefix.length));
-
-        const names = [targetName, ...related].filter(Boolean);
-        const missing = refetch
-          ? names
-          : names.filter((x) => getObjValue(value, x) === undefined);
-        if (missing.length > 0) {
-          try {
-            const rec = await dataSource.read(
-              value.id,
-              { fields: missing },
-              true,
-            );
-            return { ...value, ...rec, version: undefined };
-          } catch (er) {
-            return { ...value, [targetName]: value[targetName] ?? value.id };
-          }
-        }
-      }
-      return value;
-    },
-    [findFormItems, canRead, schema.name, targetName, dataSource],
-  );
 
   const isPermitted = usePermitted(target, perms);
 
@@ -199,6 +155,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema);
 
+  const { ensureRelated, updateRelated, valueRef } = useEnsureRelated({
+    field: schema,
+    formAtom,
+    valueAtom,
+  });
+
   const showSelect = useCallback(async () => {
     const _domain = (await beforeSelect(true)) ?? domain;
     const _domainContext = _domain ? getContext() : {};
@@ -243,43 +205,11 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     [beforeSelect, domain, getContext, search],
   );
 
-  const valueRef = useRef<DataRecord>();
-
-  const ensureRelatedValues = useAtomCallback(
-    useCallback(
-      async (get, set, signal?: AbortSignal, refetch?: boolean) => {
-        if (valueRef.current === value && !refetch) return;
-        if (value) {
-          const newValue = await ensureRelated(value, refetch);
-          if (!isEqual(newValue, value)) {
-            valueRef.current = newValue;
-            if (signal?.aborted) return;
-            // related field of ref-select?
-            if (schema.related) {
-              setValue(newValue, false, false);
-              return;
-            }
-            const { name } = schema;
-            const state = get(formAtom);
-            const record = { ...state.record };
-            setObjValue(record, name, newValue);
-            // updated reference dotted fields in record
-            Object.keys(record).forEach((fieldName) => {
-              if (fieldName.includes(".") && fieldName.startsWith(name)) {
-                record[fieldName] = getObjValue(record, fieldName.split("."));
-              }
-            });
-            set(formAtom, {
-              ...state,
-              record,
-            });
-          } else {
-            valueRef.current = value;
-          }
-        }
-      },
-      [schema, formAtom, ensureRelated, value],
-    ),
+  const ensureRelatedValues = useCallback(
+    async (signal?: AbortSignal, refetch?: boolean) => {
+      if (value) updateRelated(value, refetch);
+    },
+    [value, updateRelated],
   );
 
   const onRefSelectRefresh = useCallback(() => {
@@ -287,7 +217,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
       valueRef.current = undefined;
       ensureRelatedValues(undefined, true);
     }
-  }, [schema, ensureRelatedValues]);
+  }, [schema.widget, valueRef, ensureRelatedValues]);
 
   const getOptionKey = useCallback((option: DataRecord) => option.id!, []);
   const getOptionLabel = useOptionLabel(schema);

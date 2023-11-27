@@ -11,6 +11,7 @@ import { useViewAction } from "@/view-containers/views/scope";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { contextAtom, createFormAtom } from "./atoms";
+import { DottedValues } from "./dotted";
 import { GridLayout } from "./form-layouts";
 import {
   ActionDataHandler,
@@ -169,6 +170,7 @@ export const Form = memo(function Form({
           recordHandler={recordHandler}
         />
         <ActionDataHandler formAtom={formAtom} />
+        <DottedValues formAtom={formAtom} />
         <Layout
           className={className}
           readonly={readonly}
