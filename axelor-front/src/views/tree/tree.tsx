@@ -38,7 +38,7 @@ import styles from "./tree.module.scss";
 
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
-  const { dashlet, popup, popupOptions } = useViewTab();
+  const { action, dashlet, popup, popupOptions } = useViewTab();
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
   const getViewContext = useViewContext();
 
@@ -137,21 +137,21 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         const { nodes } = view;
         const rootNode = nodes?.[0];
         const { _domainAction, ..._domainContext } = getContext() || {};
-        const parentNode = nodes?.find((n) => n.parent)?.parent;
-        const parentDomain =
-          isSameModelTree && parentNode ? `self.${parentNode} = null` : "";
 
-        const _domain =
-          (rootNode?.domain && parentDomain
-            ? `${rootNode.domain} AND ${parentDomain}`
-            : rootNode?.domain || parentDomain) || undefined;
+        let _domain = rootNode?.domain;
+
+        if (action.domain) {
+          _domain = `${action.domain.trim()}${
+            _domain ? ` AND (${_domain})` : ""
+          }`;
+        }
 
         return dataStore.search({
           ...(rootNode && getSearchOptions(rootNode)),
           ...options,
           filter: {
             ...options.filter,
-            _domain,
+            ...(_domain && { _domain }),
             _domainAction,
             _domainContext: {
               ...options?.filter?._domainContext,
@@ -169,7 +169,14 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         });
       }
     },
-    [dataStore, view, isSameModelTree, getSearchOptions, getContext],
+    [
+      dataStore,
+      view,
+      action.domain,
+      isSameModelTree,
+      getSearchOptions,
+      getContext,
+    ],
   );
 
   const onSearch = useAfterActions(doSearch);
@@ -189,7 +196,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         filter: {
           ...(parent && {
             _domain: `self.${parent}.id = :_parentId ${
-              domain ? `AND ${domain}` : ""
+              domain ? `AND (${domain})` : ""
             }`,
           }),
           _domainAction,
