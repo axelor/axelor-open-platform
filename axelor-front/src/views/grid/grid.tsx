@@ -704,11 +704,19 @@ function GridInner(props: ViewProps<GridView>) {
       const updateRecords = rows
         .filter((r) => recIds.includes(r.record?.id ?? 0))
         .map((r) => records.find((v) => v.id === r.record?.id))
-        .map((r, ind) => ({
-          id: r?.id,
-          ...(orderField && { [orderField]: ind + 1 }),
-          version: r?.version ?? r?.$version,
-        })) as DataRecord[];
+        .map(
+          (r, ind) =>
+            ({
+              id: r?.id,
+              ...(orderField && { [orderField]: ind + 1 }),
+              version: r?.version ?? r?.$version,
+            }) as DataRecord,
+        )
+        .filter(
+          (r) =>
+            !orderField ||
+            r[orderField] !== records.find((v) => v.id === r.id)?.[orderField],
+        );
       const res = await dataStore.save(updateRecords);
       res && onSearch();
     }
