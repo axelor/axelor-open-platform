@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.MetaStore;
@@ -337,10 +338,6 @@ public class PanelRelated extends AbstractPanel {
 
   @JsonGetter("fields")
   public List<Object> getTargetFields() {
-    if (getItems() == null || getItems().isEmpty()) {
-      return null;
-    }
-
     Class<?> target;
     try {
       target = Class.forName(getTarget());
@@ -355,15 +352,25 @@ public class PanelRelated extends AbstractPanel {
       return null;
     }
 
-    List<Object> targetFields = new ArrayList<>();
-    List<String> names =
-        getItems().stream()
-            .filter(x -> x instanceof SimpleWidget)
-            .map(x -> ((SimpleWidget) x).getName())
-            .filter(n -> !StringUtils.isBlank(n))
-            .collect(Collectors.toList());
+    List<String> fieldNames = new ArrayList<>();
+    if (ObjectUtils.notEmpty(getItems())) {
+      fieldNames.addAll(
+          getItems().stream()
+              .filter(x -> x instanceof SimpleWidget)
+              .map(x -> ((SimpleWidget) x).getName())
+              .filter(n -> !StringUtils.isBlank(n))
+              .collect(Collectors.toList()));
+    }
+    if (StringUtils.notBlank(orderBy)) {
+      fieldNames.add(orderBy);
+    }
 
-    final Map<String, Object> fields = MetaStore.findFields(target, names);
+    if (ObjectUtils.isEmpty(fieldNames)) {
+      return null;
+    }
+
+    List<Object> targetFields = new ArrayList<>();
+    final Map<String, Object> fields = MetaStore.findFields(target, fieldNames);
     targetFields.addAll((Collection<?>) fields.get("fields"));
 
     return targetFields;

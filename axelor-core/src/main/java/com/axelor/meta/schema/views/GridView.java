@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.axelor.common.StringUtils;
 import com.axelor.rpc.Request;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -318,7 +319,7 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   @Override
   public Set<String> getExtraNames() {
-    return Stream.of(getOrderBy()).filter("sequence"::equals).collect(Collectors.toSet());
+    return Stream.of(getOrderBy()).filter(n -> !StringUtils.isBlank(n)).collect(Collectors.toSet());
   }
 
   @Override
