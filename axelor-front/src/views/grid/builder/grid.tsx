@@ -232,6 +232,13 @@ export const Grid = forwardRef<
         columnProps.$headerCss = clsx(styles.numberHeaderColumn);
       }
 
+      if (
+        serverType === "TEXT" ||
+        ["html"].includes(item.widget?.toLowerCase() ?? "")
+      ) {
+        columnProps.$css = clsx(styles["multi-line-text"]);
+      }
+
       if (extraAttrs?.hidden ?? item.hidden) {
         columnProps.visible = false;
       }
@@ -499,6 +506,7 @@ export const Grid = forwardRef<
           state={state!}
           setState={setState!}
           records={records!}
+          rowHeight={view.rowHeight}
           {...gridProps}
           columns={columns}
           className={clsx(className, styles.grid)}

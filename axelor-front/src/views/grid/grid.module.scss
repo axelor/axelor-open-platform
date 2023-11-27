@@ -86,3 +86,12 @@
 .numberHeaderColumn span:first-child {
   justify-content: end;
 }
+
+.multi-line-text {
+  & > * {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow: hidden;
+    height: 100%;
+  }
+}
