@@ -207,9 +207,12 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const ensureRelatedValues = useCallback(
     async (signal?: AbortSignal, refetch?: boolean) => {
-      if (value) updateRelated(value, refetch);
+      // only handle ref-select
+      if (value && schema.related) {
+        updateRelated(value, refetch);
+      }
     },
-    [value, updateRelated],
+    [value, schema.related, updateRelated],
   );
 
   const onRefSelectRefresh = useCallback(() => {
