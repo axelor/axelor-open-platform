@@ -36,7 +36,9 @@ export function extractDummy(
  *
  */
 export function isCleanDummy(name: string) {
-  return name.startsWith("$") || name.startsWith("__");
+  const checkDummy = (symb: string) =>
+    name.split(".").some((x) => x.startsWith(symb));
+  return checkDummy("$") || checkDummy("__");
 }
 
 export function getBaseDummy(name: string) {
