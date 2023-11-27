@@ -11,7 +11,6 @@ import { parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
 import { validate } from "@/utils/validate";
 import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
 
@@ -104,12 +103,9 @@ export function FormWidget(props: FormWidgetProps) {
   }
 
   // special cases
-  // 1. reference fields to ensure related
-  // dotted fields are fetched when reference is changed
-  // with some action
-  // 2. show/hide of panel-tabs loses active tab of it.
+  // 1. show/hide of panel-tabs loses active tab of it.
   // always mount panel-tabs to persist it's state.
-  if (hidden && (isReference(schema) || schema.type === "panel-tabs")) {
+  if (hidden && schema.type === "panel-tabs") {
     return (
       <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
     );
@@ -147,11 +143,6 @@ export function FormWidget(props: FormWidgetProps) {
 function isField(schema: Schema) {
   const type = schema.type;
   return schema.jsonField || type === "field" || type === "panel-related";
-}
-
-function isReference(schema: Schema) {
-  const type = toKebabCase(schema.serverType ?? schema.widget);
-  return Boolean(type?.endsWith("-to-one"));
 }
 
 function FormItem(props: WidgetProps & { valueAtom?: ValueAtom<any> }) {

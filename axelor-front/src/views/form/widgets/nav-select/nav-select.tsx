@@ -68,18 +68,6 @@ function isSelected(selection: Selection, value: any) {
 export function NavSelect(
   props: FieldProps<string | number | Record<string, number>>,
 ) {
-  const { widgetAtom } = props;
-  const { attrs } = useAtomValue(widgetAtom);
-  const { hidden } = attrs;
-  if (hidden) {
-    return null;
-  }
-  return <NavSelectInner {...props} />;
-}
-
-function NavSelectInner(
-  props: FieldProps<string | number | Record<string, number> | DataRecord>,
-) {
   const { schema, widgetAtom, formAtom, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
 
