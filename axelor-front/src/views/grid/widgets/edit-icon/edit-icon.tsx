@@ -7,7 +7,7 @@ export function EditIcon() {
   const icon = readonly ? "description" : "edit";
   return (
     <Box h={100} d="flex" justifyContent="center" alignItems="center">
-      <MaterialIcon icon={icon} fontSize={20} />
+      <MaterialIcon icon={icon} />
     </Box>
   );
 }

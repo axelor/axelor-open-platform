@@ -145,7 +145,6 @@ function CustomizeDialog({
               key: "select",
               text: i18n.get("Select"),
               iconProps: {
-                fontSize: "1.25rem",
                 icon: "search",
               },
               onClick: handleSelect,
@@ -154,7 +153,6 @@ function CustomizeDialog({
               key: "remove",
               text: i18n.get("Remove"),
               iconProps: {
-                fontSize: "1.25rem",
                 icon: "close",
               },
               hidden: (selectedRows?.length ?? 0) === 0,

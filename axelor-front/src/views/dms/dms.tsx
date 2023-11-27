@@ -928,7 +928,7 @@ function Breadcrumbs({
       {data.map((item, ind) => {
         function render() {
           return item.id === root.id ? (
-            <MaterialIcon icon="home" fontSize={20} fill />
+            <MaterialIcon icon="home" fill />
           ) : (
             item.$displayName ?? item.fileName
           );

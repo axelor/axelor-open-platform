@@ -394,7 +394,7 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
         <div className={styles.tabText}>{title}</div>
         {showClose && (
           <div className={styles.tabClose} onClick={handleClose}>
-            <MaterialIcon icon="close" fontSize={20} />
+            <MaterialIcon icon="close" />
           </div>
         )}
       </div>

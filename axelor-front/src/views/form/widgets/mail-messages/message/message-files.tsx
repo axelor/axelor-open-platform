@@ -48,7 +48,6 @@ export function MessageFiles({
                 fill
                 icon="close"
                 onClick={() => onRemove($file, ind)}
-                fontSize={"1rem"}
               />
             </Box>
           )}

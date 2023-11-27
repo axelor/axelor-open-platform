@@ -64,7 +64,7 @@ export function SelectionTag({
               }
             }}
           >
-            <MaterialIcon icon="close" fontSize="1rem" />
+            <MaterialIcon icon="close" fontSize={16}/>
           </Box>
         )}
       </Badge>

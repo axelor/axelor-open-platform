@@ -140,7 +140,7 @@ export function MailFollowers({ schema, formAtom }: WidgetProps) {
               className={classes.icon}
               onClick={() => handleUnfollow(id)}
             >
-              <MaterialIcon icon="close" fontSize={20} />
+              <MaterialIcon icon="close" />
             </div>
             <MessageUser title={title!} id={$author?.id} model={$authorModel} />
           </ListItem>

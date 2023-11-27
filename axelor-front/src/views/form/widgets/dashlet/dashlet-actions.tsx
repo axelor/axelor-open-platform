@@ -142,7 +142,6 @@ function DashletMenu({
 
   return (
     <CommandBar
-      iconProps={{ fontSize: 20 }}
       items={[
         ...items,
         {

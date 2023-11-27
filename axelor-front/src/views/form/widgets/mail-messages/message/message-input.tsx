@@ -17,6 +17,7 @@ import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
 import { MessageFiles } from "./message-files";
 import { useMessagePopup } from "./message-form";
+import styles from "@/views/form/widgets/button/button.module.scss";
 
 function TextareaAutoSizeInput(props: any) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -149,7 +150,7 @@ export function MessageInput({
         />
       )}
 
-      <Box mt={2}>
+      <Box mt={2} d="flex">
         <Button
           variant="primary"
           size="sm"
@@ -159,7 +160,9 @@ export function MessageInput({
             onMouseDown: (e) => e.preventDefault(),
           })}
         >
-          {i18n.get("Post")}
+          <div className={styles.title}>
+            {i18n.get("Post")}
+          </div>
         </Button>
         <Button
           size="sm"
@@ -167,9 +170,10 @@ export function MessageInput({
           variant="primary"
           outline
           onClick={handleAttachment}
-          d="inline-flex"
         >
-          <MaterialIcon icon="attach_file" fontSize={20} />
+          <div className={styles.title}>
+            <MaterialIcon icon="attach_file"/>
+          </div>
         </Button>
         <Button
           size="sm"
@@ -177,11 +181,12 @@ export function MessageInput({
           variant="primary"
           outline
           onClick={handleEdit}
-          d="inline-flex"
         >
-          <MaterialIcon icon="edit" fontSize={20} />
+          <div className={styles.title}>
+            <MaterialIcon icon="edit"/>
+          </div>
         </Button>
       </Box>
     </Box>
-  );
+);
 }

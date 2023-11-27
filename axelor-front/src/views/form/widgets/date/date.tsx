@@ -247,7 +247,7 @@ export function DateComponent({
           timeInputLabel={
             (
               <Box>
-                <MaterialIcon icon="schedule" fontSize={20} />
+                <MaterialIcon icon="schedule" />
               </Box>
             ) as any
           }
