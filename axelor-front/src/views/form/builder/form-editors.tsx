@@ -417,13 +417,19 @@ function useItemsFamily({
         }
         return items;
       },
-      (get, set, value: DataRecord[]) => {
+      (
+        get,
+        set,
+        value: DataRecord[],
+        fireOnChange?: boolean,
+        markDirty?: boolean,
+      ) => {
         const items = makeArray(value);
         if (items.length === 1 && isInitial(items[0]) && isClean(items[0])) {
           return;
         }
         const next = multiple ? items : items[0] ?? null;
-        set(valueAtom, next);
+        set(valueAtom, next, fireOnChange, markDirty);
         setInitialItem(undefined);
       },
     );
@@ -445,7 +451,13 @@ function useItemsFamily({
             const items = get(itemsAtom);
             return items.find((x: DataRecord) => x.id === record.id);
           },
-          (get, set, value: DataRecord | null) => {
+          (
+            get,
+            set,
+            value: DataRecord | null,
+            fireOnChange?: boolean,
+            markDirty?: boolean,
+          ) => {
             if (isInitial(value) && isClean(value)) return;
             let items = get(itemsAtom);
             const found = items.find((x) => x.id === value?.id);
@@ -459,7 +471,7 @@ function useItemsFamily({
               }));
             }
             const next = multiple ? items : items.slice(0, 1);
-            set(itemsAtom, next);
+            set(itemsAtom, next, fireOnChange, markDirty);
           },
         ),
       (a, b) => a.id === b.id,
@@ -823,16 +835,12 @@ const RecordEditor = memo(function RecordEditor({
         const { record } = state;
 
         set(editorFormAtom, state);
-        if (schema.json) {
-          set(
-            valueAtom,
-            isEqual(record, EMPTY_RECORD) ? null : record,
-            false,
-            state.dirty,
-          );
-        } else {
-          set(valueAtom, isEqual(record, EMPTY_RECORD) ? null : record);
-        }
+        set(
+          valueAtom,
+          isEqual(record, EMPTY_RECORD) ? null : record,
+          schema.json ? false : undefined,
+          state.dirty,
+        );
         // re-check validation
         checkInvalidRef.current?.();
       },
