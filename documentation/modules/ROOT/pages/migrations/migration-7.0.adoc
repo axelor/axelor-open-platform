@@ -17,7 +17,7 @@ Here are the following changes due to this change :
 
 - `npm-install` Gradle task has been removed.
 
-=== Font Awesome icons deprecated
+== Font Awesome icons deprecated
 
 Font Awesome icons was used as main icons library. Now two library are used :
 https://marella.github.io/material-symbols/demo/[Material Symbols] and
@@ -29,7 +29,7 @@ Please be aware that some Font Awesome icons don't have any equivalent in Bootst
 instead. Missing icons will be log in console in non production mode.
 
 
-=== Plain user passwords are no longer hashed upon startup
+== Plain user passwords are no longer hashed upon startup
 
 For historical reasons, user passwords that were stored in plain text within the database were hashed upon startup. On
 databases with a large number of users, this could result in unnecessary time consumption during startup.
@@ -61,7 +61,7 @@ to encrypt it :
 - `com.axelor.auth.AuthService.encrypt(java.lang.Object, java.util.Map)` : Adapter method to be used with csv/xml data
 import in order to encrypt the password of the given user.
 
-=== MailFlags table changes
+== MailFlags table changes
 
 The flag associated to the user and message is now retrieved on backend. This avoids duplicated mail flags after
 reflagging messages. As part of the change, the message is also required and indexes as been reviewed.
@@ -76,7 +76,7 @@ DROP INDEX mail_flags_user_id_idx;
 CREATE INDEX mail_flags_user_id_message_idx ON mail_flags (user_id, message);
 ----
 
-=== Fields that prevent dirty record
+== Fields that prevent dirty record
 
 Current way to prevent making record dirty when changing a field value, is to prefix the field name with `$`. The rules
 are :
@@ -92,3 +92,62 @@ If the view field is marked as `x-dirty="false"`, the field value change will no
 
 The old dirty checking behavior of the `$` prefixed fields is now deprecated and will be removed during next major
 release.
+
+== React templates
+
+React templates can be used in favor of legacy Angular templates. They provide better integration with built-in UI
+components.
+
+If the template is wrapped inside `<></>` (react fragment), it is considered as React template :
+
+[source,xml]
+----
+<field ...>
+  <viewer>
+  <![CDATA[
+  <>
+    {some.value && <Box as="span">{some.value}</Box>}
+  </>
+  ]]>
+  </viewer>
+</field>
+----
+
+Following UI components are supported: `Box`, `Badge`, `Alert`, `AlertHeader`, `AlertLink`, `Button`, `ButtonGroup`,
+`Divider`, `Image`, `Link`, `List`, `ListItem`, `Panel`, `Popper`, `Scrollable`, `Table`, `TableBody`, `TableHead`,
+`TableFoot`, `TableRow`, `TableCell`, `TableCaption`, `Icon` (expose Bootstrap icons).
+
+React template no more rely on main record context but on the field context for reference field (legacy template was
+inconsistent). So templates should be now :
+
+[source,xml]
+----
+<!-- Legacy -->
+<field name="customer">
+<viewer><![CDATA[
+    <p>{{$get('customer.title.name')}}</p>
+]]></viewer>
+</field>
+
+<!-- React -->
+<field name="customer">
+<viewer><![CDATA[
+<>
+    <p>{{$get('title.name')}}</p>
+</>
+]]></viewer>
+</field>
+----
+
+Parent context can be used with `_parent` property :
+
+[source,xml]
+----
+<field name="customer">
+<viewer><![CDATA[
+<>
+    {_parent.some && <Box as="span">{_parent.$fmt("foo")}</Box>}
+</>
+]]></viewer>
+</field>
+----
