@@ -30,14 +30,12 @@ export function CodeEditor(props: FieldProps<string>) {
   const w = width && /^(\d+)$/.test(width) ? `${width}px` : width;
 
   return (
-    <FieldControl
-      {...props}
-      className={clsx(styles.container, {
-        [styles.invalid]: invalid,
-        [styles.readonly]: readonly,
-      })}
-    >
+    <FieldControl {...props}>
       <Editor
+        className={clsx(styles.container, {
+          [styles.invalid]: invalid,
+          [styles.readonly]: readonly,
+        })}
         theme={theme}
         language={codeSyntax}
         value={value ?? ""}
