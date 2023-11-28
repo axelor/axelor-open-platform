@@ -46,6 +46,10 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   @XmlAttribute private Integer dayLength;
 
+  @XmlAttribute private Boolean canDelete;
+
+  @XmlAttribute private Boolean canNew;
+
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
 
@@ -119,5 +123,21 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public Boolean getCanDelete() {
+    return canDelete;
+  }
+
+  public void setCanDelete(Boolean canDelete) {
+    this.canDelete = canDelete;
+  }
+
+  public Boolean getCanNew() {
+    return canNew;
+  }
+
+  public void setCanNew(Boolean canNew) {
+    this.canNew = canNew;
   }
 }

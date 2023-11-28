@@ -1996,6 +1996,16 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
