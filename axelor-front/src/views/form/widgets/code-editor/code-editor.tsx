@@ -11,7 +11,8 @@ import styles from "./code-editor.module.scss";
 
 export function CodeEditor(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;
-  const { codeSyntax, height = 400, width = "100%" } = schema;
+  const { codeSyntax, width = "100%" } = schema;
+  const height = schema.height ?? schema.widgetAttrs?.height ?? 400;
 
   const appTheme = useAppTheme();
 
