@@ -260,7 +260,7 @@ function OneToManyInner({
   const canEdit = !readonly && hasButton("edit");
   const canView = hasButton("view");
   const canDelete = !readonly && hasButton("remove");
-  const canSelect = !readonly && hasButton("select");
+  const canSelect = !readonly && hasButton("select") && (isManyToMany || attrs.canSelect);
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
   const canMove = Boolean(schema.canMove ?? viewData?.view?.canMove);
 
@@ -823,19 +823,15 @@ function OneToManyInner({
         toolbar={{
           iconOnly: true,
           items: [
-            ...(isManyToMany
-              ? [
-                  {
-                    key: "select",
-                    text: i18n.get("Select"),
-                    iconProps: {
-                      icon: "search",
-                    },
-                    onClick: onSelect,
-                    hidden: !canSelect,
-                  } as CommandItemProps,
-                ]
-              : []),
+            {
+              key: "select",
+              text: i18n.get("Select"),
+              iconProps: {
+                icon: "search",
+              },
+              onClick: onSelect,
+              hidden: !canSelect,
+            },
             {
               key: "new",
               text: i18n.get("New"),
