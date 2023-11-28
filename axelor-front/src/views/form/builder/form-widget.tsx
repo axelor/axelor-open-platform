@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
@@ -38,6 +38,10 @@ export function FormWidget(props: FormWidgetProps) {
   const widgetAtom = useMemo(
     () => createWidgetAtom({ schema, formAtom, parentAtom }),
     [formAtom, parentAtom, schema],
+  );
+
+  const setStates = useSetAtom(
+    useMemo(() => focusAtom(formAtom, (o) => o.prop("states")), [formAtom]),
   );
 
   const dirtyAtom = useViewDirtyAtom();
@@ -88,6 +92,16 @@ export function FormWidget(props: FormWidgetProps) {
   const canShowViewer = schema.viewer && valueAtom && canView && readonly;
   const showEditorAsViewer =
     schema.editor?.viewer && valueAtom && canView && readonly;
+
+  useAsyncEffect(async () => {
+    return () => {
+      // remove from widget state as clean-up on unmount
+      setStates((states) => {
+        const { [schema.uid]: _, ...newStates } = { ...states };
+        return newStates;
+      });
+    };
+  }, [schema.uid]);
 
   // eval field expression showIf, hideIf etc
   useExpressions({
