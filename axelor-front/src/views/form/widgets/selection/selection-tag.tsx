@@ -46,7 +46,6 @@ export function SelectionTag({
     return (
       <Badge
         {...colorProps}
-        px={2}
         className={clsx(styles["tag"], className, colorClass)}
       >
         <Box as="span" className={styles["tag-text"]}>
