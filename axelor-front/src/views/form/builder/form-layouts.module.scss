@@ -17,9 +17,9 @@
 }
 
 .stack {
-  gap: 1rem;
   display: flex;
   flex-direction: column;
+  row-gap: var(--ax-form-row-gap);
 }
 
 //

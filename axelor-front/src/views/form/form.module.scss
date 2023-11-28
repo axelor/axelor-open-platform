@@ -13,11 +13,11 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.5rem;
+  padding: var(--ax-form-padding);
 }
 
 .formView {
-  padding: 0.5rem;
+  padding: var(--ax-form-padding);
   flex: 1;
 }
 

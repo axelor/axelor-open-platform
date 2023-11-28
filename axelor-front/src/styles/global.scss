@@ -1,2 +1,8 @@
 @import "./global/scrollbar";
 @import "./global/vars";
+
+:root {
+  --ax-form-padding: var(--ax-theme-form-padding, 1rem);
+  --ax-form-row-gap: var(--ax-theme-form-row-gap, 1rem);
+  --ax-form-column-gap: var(--ax-theme-form-column-gap, 1rem);
+}

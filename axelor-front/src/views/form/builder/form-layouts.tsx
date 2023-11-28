@@ -10,7 +10,10 @@ import { legacyClassNames } from "@/styles/legacy";
 import styles from "./form-layouts.module.scss";
 
 function computeLayout(schema: Schema) {
-  const gap = schema.gap ?? "1rem";
+  const gap = typeof schema.gap === "number" ? `${schema.gap}px` : schema.gap;
+  const gaps = gap?.trim().split(/\s+/g).filter(Boolean) ?? [];
+  const rowGap = gaps[0] ?? "var(--ax-form-row-gap)";
+  const columnGap = gaps[1] ?? gaps[0] ?? "var(--ax-form-column-gap)";
   const cols = parseInt(schema.cols) || 12;
   const itemSpan =
     parseInt(schema.itemSpan ?? schema.widgetAttrs?.itemSpan) || 6;
@@ -70,7 +73,8 @@ function computeLayout(schema: Schema) {
     style: {
       display: "grid",
       gridTemplateColumns: template,
-      gap,
+      rowGap,
+      columnGap,
     },
     contents,
   };

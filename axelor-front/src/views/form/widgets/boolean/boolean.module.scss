@@ -7,6 +7,11 @@
   flex-direction: row-reverse;
   align-items: center;
   justify-content: flex-end;
+  column-gap: 0.5rem;
+  padding: var(--ax-theme-input-padding, 0.375rem 0.75rem);
+  padding-left: 0;
+  padding-right: 0;
+  margin: 1px 0;
 }
 
 .checkbox {
