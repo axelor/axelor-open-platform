@@ -128,6 +128,7 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
     return target;
   }
 
+  const { id } = target;
   let result = target;
   let changed = false;
 
@@ -180,6 +181,8 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
       result = { ...result, [key]: newValue };
     }
   }
+
+  result.id ||= id;
 
   return changed ? { ...result, _dirty: true } : result;
 }
