@@ -182,7 +182,5 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
     }
   }
 
-  result.id ||= id;
-
-  return changed ? { ...result, _dirty: true } : result;
+  return changed ? { ...result, _dirty: true, id: result.id || id } : result;
 }
