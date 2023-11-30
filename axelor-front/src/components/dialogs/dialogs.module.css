@@ -19,6 +19,7 @@
 .content {
   display: flex;
   padding: 0;
+  outline: none;
 }
 
 .box {

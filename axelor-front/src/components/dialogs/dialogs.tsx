@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import {
   Box,
@@ -282,6 +282,10 @@ export function ModalDialog(props: DialogOptions) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
+  const initialFocus = useCallback(() => contentRef.current!, []);
+
   const onHide = useCallback(() => {
     const record = handler.getState?.().record;
     onClose?.(result, record);
@@ -297,10 +301,12 @@ export function ModalDialog(props: DialogOptions) {
       <Dialog
         open={canShow}
         onHide={onHide}
+        onShow={initialFocus}
         scrollable
         fullscreen={maximize}
         size={size}
         className={clsx(classes.root, styles.root)}
+        initialFocus={initialFocus}
         data-dialog="true"
       >
         <DialogHeader
@@ -315,6 +321,8 @@ export function ModalDialog(props: DialogOptions) {
         <DialogContent
           className={clsx(classes.content, styles.content)}
           style={{ padding }}
+          tabIndex={-1}
+          ref={contentRef}
         >
           {content}
         </DialogContent>
