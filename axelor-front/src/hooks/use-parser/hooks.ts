@@ -1,5 +1,5 @@
 import { atom, useAtomValue } from "jotai";
-import { selectAtom } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import get from "lodash/get";
 import set from "lodash/set";
 import cloneDeep from "lodash/cloneDeep";
@@ -24,6 +24,18 @@ const isSimple = (expression: string) => {
   return !expression.includes("{{") && !expression.includes("}}");
 };
 
+function useFindAttrs() {
+  return useAtomCallback(
+    useCallback((get, set, formAtom: FormAtom, field: Schema) => {
+      const { uid, name } = field;
+      const { states, statesByName } = get(formAtom);
+      const { attrs: attrsById } = states[uid] ?? {};
+      const { attrs: attrsByName } = statesByName[name!] ?? {};
+      return { ...field, ...attrsByName, ...attrsById };
+    }, []),
+  );
+}
+
 function useCreateParentContext(formAtom: FormAtom) {
   const parentAtom = useAtomValue(
     useMemo(
@@ -34,10 +46,23 @@ function useCreateParentContext(formAtom: FormAtom) {
 
   const parentState = useAtomValue(parentAtom);
 
+  const findAttrs = useFindAttrs();
+  const $getField = useAtomCallback(
+    useCallback(
+      (get, set, name: string) => {
+        const { parent } = get(formAtom);
+        if (parent) {
+          const schema = findViewItem(get(parent).meta, name) ?? { name };
+          return findAttrs(parent, schema);
+        }
+      },
+      [findAttrs, formAtom],
+    ),
+  );
+
   return useCallback(() => {
-    if (parentState) {
-      const { record, model: _model, fields, meta } = parentState;
-      const $getField = (name: string) => findViewItem(meta, name);
+    if (parentAtom && parentState) {
+      const { record, model: _model, fields } = parentState;
       const ctx = { ...record, _model };
       return createScriptContext(ctx, {
         fields,
@@ -46,7 +71,7 @@ function useCreateParentContext(formAtom: FormAtom) {
         },
       });
     }
-  }, [parentState]);
+  }, [$getField, parentAtom, parentState]);
 }
 
 export function isReactTemplate(template: string | undefined | null) {
@@ -71,22 +96,24 @@ export function useTemplate(template: string, field?: Schema) {
   const { findItem, findField } = useViewMeta();
   const { actionExecutor, formAtom } = useFormScope();
   const _createParentContext = useCreateParentContext(formAtom);
+  const findAttrs = useFindAttrs();
   const $getField = useCallback(
     (name: string) => {
       if (field && field.name === name) {
         const serverField = findField(name);
         const serverType = field?.serverType || serverField?.type;
         const more = serverType ? { serverType } : {};
-        return {
+        const schema = {
           ...serverField,
           ...field,
           ...field?.widgetAttrs,
           ...more,
         };
+        return findAttrs(formAtom, schema);
       }
-      return findItem(name);
+      return findAttrs(formAtom, findItem(name) ?? { name });
     },
-    [field, findField, findItem],
+    [field, findAttrs, findField, findItem, formAtom],
   );
 
   return useMemo(() => {
@@ -140,7 +167,7 @@ export function useTemplate(template: string, field?: Schema) {
 
       return createElement(Comp, { context });
     };
-  }, [$getField, _createParentContext, actionExecutor, findItem, template]);
+  }, [$getField, _createParentContext, actionExecutor, template]);
 }
 
 export function useHilites(hilites: Hilite[]) {
