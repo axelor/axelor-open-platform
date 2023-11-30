@@ -163,6 +163,7 @@ function UseIncluded(view: Schema) {
 }
 
 export function findViewFields(
+  viewFields: Record<string, Property>,
   view: Schema,
   res?: { fields: string[]; related: Record<string, string[]> },
 ) {
@@ -198,6 +199,10 @@ export function findViewFields(
       _.each(items, (child) => {
         if (child.name && child.type === "field") {
           pushIn(child.name, collect);
+          const targetName = getNonDefaultTargetName(child, editor.fields);
+          if (targetName) {
+            pushIn(`${child.name}.${targetName}`, collect);
+          }
         } else if (child.type === "panel") {
           acceptItems(child.items);
         }
@@ -229,15 +234,31 @@ export function findViewFields(
     }
   }
 
+  function getNonDefaultTargetName(item: Schema, fields?: Record<string, Property>) {
+    const { name, targetName } = item;
+    if (name && targetName && fields) {
+      const { targetName: fieldTargetName } = fields[name] ?? {};
+      if (fieldTargetName && fieldTargetName !== targetName) {
+        return targetName as string;
+      }
+    }
+  }
+
   _.each(fields, (item) => {
     if (item.editor) acceptEditor(item);
     if (item.viewer) acceptViewer(item);
     if (item.name && item.type === "panel-related") {
       pushIn(item.name, items);
     } else if (item.items) {
-      findViewFields(item, result);
+      findViewFields(viewFields, item, result);
     } else if (item.name && item.type === "field") {
       pushIn(item.name, items);
+      const targetName = getNonDefaultTargetName(item, viewFields);
+      if (targetName) {
+        const collect =
+          result.related[item.name] || (result.related[item.name] = []);
+        pushIn(targetName, collect);
+      }
     }
   });
 

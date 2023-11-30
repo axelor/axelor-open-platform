@@ -57,13 +57,13 @@ export async function findView<T extends ViewType>({
     }
 
     const data = await fetchView({ type: type as any, name, model, context });
-    const { related } = findViewFields(data.view);
-
-    data.related = { ...data.related, ...related };
 
     // process the meta data
     processView(data, data.view);
     processWidgets(data.view);
+
+    const { related } = findViewFields(data.fields ?? {}, data.view);
+    data.related = { ...data.related, ...related };
 
     return data;
   });
