@@ -2,6 +2,7 @@ import { atom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import get from "lodash/get";
 import set from "lodash/set";
+import cloneDeep from "lodash/cloneDeep";
 import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
@@ -76,19 +77,29 @@ export function useTemplate(template: string) {
       ? processReactTemplate(template)
       : processLegacyTemplate(template);
     return (props: { context: DataContext; options?: EvalContextOptions }) => {
-      const _context = Object.keys(props.context).reduce((ctx, key) => {
-        const value = props.context[key];
-        const prev = get(ctx, key);
-        return set(
-          ctx,
-          key,
-          value && typeof value === "object"
-            ? Array.isArray(value)
-              ? [...value]
-              : { ...prev, ...value }
-            : value,
-        );
-      }, {} as any);
+      // Deep clone of all fields excluding dotted fields
+      const _context = Object.keys(props.context)
+        .filter((key) => !key.includes("."))
+        .reduce((cur, key) => {
+          return Object.assign(cur, { [key]: cloneDeep(props.context[key]) });
+        }, {} as any);
+
+      // Merge dot fields (ie some.foo.bar) into object (ie product[foo])
+      Object.keys(props.context)
+        .filter((key) => key.includes("."))
+        .reduce((cur, key) => {
+          const value = cloneDeep(props.context[key]);
+          const prev = get(cur, key);
+          return set(
+            cur,
+            key,
+            value && typeof value === "object"
+              ? Array.isArray(value)
+                ? [...value]
+                : { ...prev, ...value }
+              : value,
+          );
+        }, _context);
 
       const {
         helpers,
