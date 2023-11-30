@@ -151,3 +151,8 @@ Parent context can be used with `_parent` property :
 ]]></viewer>
 </field>
 ----
+
+== `x-show-bars` actions
+
+`x-show-bars` actions used to affect parent form.
+Now, they affect local grid context only.
