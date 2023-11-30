@@ -23,6 +23,9 @@ import styles from "./panel-tabs.module.scss";
 export function PanelTabs(props: WidgetProps) {
   const { schema, formAtom, widgetAtom, readonly } = props;
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [tabTitles, setTabTitles] = useState<
+    Record<string, string | undefined>
+  >({});
 
   const hidden = useAtomValue(widgetAtom).attrs?.hidden;
 
@@ -68,16 +71,25 @@ export function PanelTabs(props: WidgetProps) {
     });
   }, []);
 
+  const setTabTitle = useCallback((id: string, title?: string) => {
+    setTabTitles((titles) => {
+      if (title || titles[id]) {
+        return { ...titles, [id]: title };
+      }
+      return titles;
+    });
+  }, []);
+
   const visibleTabs = useMemo(
     () =>
       tabs
         .filter((item) => !hiddenTabs[item.uid])
         .map((item) => {
           // remove showIf/hideIf to avoid double evaluation
-          const { showIf, hideIf, ...rest } = item;
-          return rest as Schema;
+          const { showIf, hideIf, title, ...rest } = item;
+          return { ...rest, title: tabTitles[item.id] || title } as Schema;
         }),
-    [hiddenTabs, tabs],
+    [hiddenTabs, tabs, tabTitles],
   );
 
   useEffect(() => {
@@ -135,6 +147,7 @@ export function PanelTabs(props: WidgetProps) {
         parentAtom={widgetAtom}
         setHidden={setHidden}
         setActive={setActiveTab}
+        setTitle={setTabTitle}
       />
       {visibleTabs.map((item) => {
         const active = activeTab === item.uid;
@@ -189,12 +202,14 @@ const DummyTabs = memo(function DummyTabs({
   parentAtom,
   setHidden,
   setActive,
+  setTitle,
 }: {
   tabs: Schema[];
   formAtom: FormAtom;
   parentAtom: WidgetAtom;
   setHidden: (id: string, hidden: boolean) => void;
   setActive: (id: string) => void;
+  setTitle: (id: string, title?: string) => void;
 }) {
   const items = useMemo(() => {
     return tabs.map((item) => {
@@ -220,7 +235,12 @@ const DummyTabs = memo(function DummyTabs({
           formAtom={formAtom}
           parentAtom={parentAtom}
           render={(props) => (
-            <DummyTab {...props} setHidden={setHidden} setActive={setActive} />
+            <DummyTab
+              {...props}
+              setHidden={setHidden}
+              setActive={setActive}
+              setTitle={setTitle}
+            />
           )}
         />
       ))}
@@ -232,11 +252,15 @@ const DummyTab = memo(function DummyTab(
   props: WidgetProps & {
     setHidden: (id: string, hidden: boolean) => void;
     setActive: (id: string) => void;
+    setTitle: (id: string, title?: string) => void;
   },
 ) {
-  const { schema, widgetAtom, setHidden, setActive } = props;
+  const { schema, widgetAtom, setHidden, setActive, setTitle } = props;
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom]),
+  );
+  const title = useAtomValue(
+    useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.title), [widgetAtom]),
   );
   const [active, setActiveAttr] = useAtom(
     useMemo(
@@ -251,6 +275,10 @@ const DummyTab = memo(function DummyTab(
   useEffect(() => {
     setHidden(schema.uid, !!hidden);
   }, [hidden, schema.uid, setHidden]);
+
+  useEffect(() => {
+    setTitle(schema.uid, title);
+  }, [title, schema.uid, setTitle]);
 
   useEffect(() => {
     if (active) {
