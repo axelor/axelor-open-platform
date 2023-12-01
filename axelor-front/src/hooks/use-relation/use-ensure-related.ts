@@ -27,7 +27,15 @@ async function fetchRelated({
     const dataSource = new DataSource(target);
     const missing = refetch
       ? related
-      : related.filter((x) => deepGet(value, x) === undefined);
+      : related.filter((x) => {
+          let current = value;
+          for (const key of x.split(".")) {
+            current = current[key];
+            if (current === undefined) return true;
+            if (current === null) return false;
+          }
+          return false;
+        });
     if (missing.length > 0) {
       try {
         const rec = await dataSource.read(value.id, { fields: missing }, true);
