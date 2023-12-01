@@ -10,11 +10,16 @@
     "white": "#FFF",
     "black": "#333",
 
-    "body_color": "#5A5A7C",
+    "body_color": "#32325D",
     "emphasis_color": "#33325B"
   },
   "border": {
     "color": "#EAEAFE"
+  },
+  "typography": {
+    "body": {
+      "fontSize": "15px"
+    }
   },
   "components": {
     "Shell": {
@@ -25,6 +30,9 @@
     "Panel": {
       "header": {
         "bg": "#FBFBFF"
+      },
+      "title": {
+        "padding": "0.25rem 0.5rem"
       }
     },
     "Dropdown": {
@@ -66,6 +74,9 @@
       }
     },
     "NavTabs": {
+      "item": {
+        "padding": "0.25rem 0.5rem"
+      },
       "text": {
         "transform": "none"
       },
@@ -80,6 +91,9 @@
       }
     },
     "CommandBar": {
+      "button": {
+        "padding": "0.25rem"
+      },
       "button_hover": {
         "bg": "#F8F8FF"
       },
@@ -106,14 +120,23 @@
       },
       "cell_active": {
         "bg": "#F0F0FD"
+      },
+      "cell": {
+        "padding": "0.375rem 0.5rem"
       }
     },
+    "Button": {
+      "paddingX": "0.5rem",
+      "paddingY": "0.25rem"
+    },
     "Badge": {
+      "padding": "0.25rem 0.5rem",
       "border": {
         "radius": "1rem"
       }
     },
     "Input": {
+      "padding": "0.25rem 0.5rem",
       "focus": {
         "shadow": "none"
       },
