@@ -139,16 +139,25 @@
       }
     },
     "Input": {
-      "padding": "0.25rem 0.5rem",
+      "padding": "0.25rem 0",
       "focus": {
-        "shadow": "none"
+        "shadow": "none",
+        "border_width": "0 0 1px 0"
       },
       "invalid_focus": {
-        "shadow": "none"
+        "shadow": "none",
+        "border_width": "0 0 1px 0"
       },
       "placeholder": {
         "color": "var(--bs-tertiary-color)"
-      }
+      },
+      "invalid": {
+        "border_width": "0 0 1px 0"
+      },
+      "border": {
+        "radius": 0
+      },
+      "border_width": "0 0 1px 0"
     }
   }
 }
