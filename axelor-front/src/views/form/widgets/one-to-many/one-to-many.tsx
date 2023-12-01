@@ -863,12 +863,13 @@ function OneToManyInner({
         })}
         header={
           <div className={styles.title}>
-            <FieldLabel
-              className={styles.titleText}
-              schema={schema}
-              formAtom={formAtom}
-              widgetAtom={widgetAtom}
-            />
+            <div className={styles.titleText}>
+              <FieldLabel
+                schema={schema}
+                formAtom={formAtom}
+                widgetAtom={widgetAtom}
+              />
+            </div>
             {hasActions && (
               <ToolbarActions
                 buttons={toolbar}
