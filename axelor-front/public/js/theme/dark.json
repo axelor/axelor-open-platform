@@ -20,9 +20,26 @@
   "border": {
     "color": "rgba(234, 234, 255, 0.12)"
   },
+  "typography": {
+    "body": {
+      "fontSize": "15px"
+    }
+  },
   "components": {
     "Shell": {
       "bg": "#292A41"
+    },
+    "Panel": {
+      "header": {
+        "bg": "#3A3E5B",
+        "border": {
+          "width": 0
+        }
+      },
+      "title": {
+        "padding": "0.25rem 0.5rem"
+      },
+      "bg": "#30334E"
     },
     "Dropdown": {
       "item_hover": {
@@ -60,6 +77,9 @@
       }
     },
     "NavTabs": {
+      "item": {
+        "padding": "0.25rem 0.5rem"
+      },
       "text": {
         "transform": "none"
       },
@@ -73,36 +93,42 @@
         "bg": "transparent"
       }
     },
-    "Panel": {
-      "bg": "#30334E"
-    },
     "Table": {
       "bg": "transparent",
       "border": {
-        "color": "rgba(234, 234, 255, 0.12)"
+        "color": "rgba(234, 234, 255, 0.1)"
       },
       "header": {
-        "bg": "#3A3E5B"
-      },
-      "row_odd": {
         "bg": "transparent"
       },
+      "row_odd": {
+        "bg": "rgba(102, 108, 255, 0.05)"
+      },
       "row_hover": {
-        "bg": "rgba(234, 234, 255, 0.05)"
+        "bg": "rgba(102, 108, 255, 0.16)"
       },
       "row_active": {
         "bg": "rgba(102, 108, 255, 0.16)"
       },
       "cell_active": {
         "bg": "rgba(102, 108, 255, 0.18)"
+      },
+      "cell": {
+        "padding": "0.375rem 0.5rem"
       }
     },
+    "Button": {
+      "paddingX": "0.5rem",
+      "paddingY": "0.25rem"
+    },
     "Badge": {
+      "padding": "0.25rem 0.5rem",
       "border": {
         "radius": "1rem"
       }
     },
     "Input": {
+      "padding": "0.25rem 0.5rem",
       "focus": {
         "shadow": "none"
       },
