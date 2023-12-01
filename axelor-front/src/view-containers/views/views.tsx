@@ -62,10 +62,14 @@ function ViewContainer({
   dataStore?: DataStore;
 }) {
   const { model, params, context } = tab.action;
-  const { state, data } = useAsync(
+  const { state, data, error } = useAsync(
     async () => loadView({ context, model, ...view }),
     [model, view, context],
   );
+
+  if (state === "hasError") {
+    console.error(error);
+  }
 
   const forceTitle = params?.["forceTitle"];
   const viewData = data?.meta?.view;
