@@ -107,19 +107,19 @@
         "color": "#EFEDFE"
       },
       "header": {
-        "bg": "#FBFBFF"
-      },
-      "row_odd": {
         "bg": "#FFF"
       },
-      "row_hover": {
+      "row_odd": {
         "bg": "#FBFBFF"
       },
+      "row_hover": {
+        "bg": "#F0F0FD"
+      },
       "row_active": {
-        "bg": "#F8F8FF"
+        "bg": "#F0F0FD"
       },
       "cell_active": {
-        "bg": "#F0F0FD"
+        "bg": "#E8E8FD"
       },
       "cell": {
         "padding": "0.375rem 0.5rem"
