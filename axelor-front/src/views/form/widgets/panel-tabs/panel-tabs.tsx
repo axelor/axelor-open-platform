@@ -41,20 +41,9 @@ export function PanelTabs(props: WidgetProps) {
           ({
             ...tab,
             id: tab.uid,
-            ...(tab.title && {
-              title: (
-                <HelpPopover
-                  schema={tab}
-                  formAtom={formAtom}
-                  widgetAtom={fallbackWidgetAtom}
-                >
-                  <Box p={1}>{tab.title}</Box>
-                </HelpPopover>
-              ),
-            }),
           }) as unknown as Schema,
       ),
-    [schema, formAtom],
+    [schema],
   );
 
   const [hiddenTabs, setHiddenTabs] = useState<Record<string, boolean>>(() =>
@@ -132,12 +121,31 @@ export function PanelTabs(props: WidgetProps) {
     handleOnSelect(visibleTabs, activeTab);
   }, [activeTab, handleOnSelect, visibleTabs]);
 
+  const navTabs = useMemo(
+    () =>
+      visibleTabs.map((tab) => ({
+        ...tab,
+        ...(tab.title && {
+          title: (
+            <HelpPopover
+              schema={tab}
+              formAtom={formAtom}
+              widgetAtom={fallbackWidgetAtom}
+            >
+              <Box p={1}>{tab.title}</Box>
+            </HelpPopover>
+          ),
+        }),
+      })) as NavTabItem[],
+    [visibleTabs, formAtom],
+  );
+
   if (hidden) return;
 
   return (
     <div className={styles.tabs}>
       <NavTabs
-        items={visibleTabs as NavTabItem[]}
+        items={navTabs}
         active={activeTab ?? undefined}
         onItemClick={handleChange}
       />
