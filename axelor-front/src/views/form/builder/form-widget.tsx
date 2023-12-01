@@ -40,10 +40,10 @@ export function FormWidget(props: FormWidgetProps) {
     [formAtom, parentAtom, schema],
   );
 
-  const setStates = useSetAtom(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("states")), [formAtom]),
+  const statesAtom = useMemo(
+    () => focusAtom(formAtom, (o) => o.prop("states")),
+    [formAtom],
   );
-
   const dirtyAtom = useViewDirtyAtom();
   const { actionExecutor } = useFormScope();
 
@@ -93,15 +93,23 @@ export function FormWidget(props: FormWidgetProps) {
   const showEditorAsViewer =
     schema.editor?.viewer && valueAtom && canView && readonly;
 
+  const clearWidgetState = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const states = get(statesAtom);
+        if (states[schema.uid]) {
+          const { [schema.uid]: _, ...newStates } = states;
+          set(statesAtom, newStates);
+        }
+      },
+      [schema.uid, statesAtom],
+    ),
+  );
+
   useAsyncEffect(async () => {
-    return () => {
-      // remove from widget state as clean-up on unmount
-      setStates((states) => {
-        const { [schema.uid]: _, ...newStates } = { ...states };
-        return newStates;
-      });
-    };
-  }, [schema.uid]);
+    // clear widget state as clean-up on unmount
+    return () => clearWidgetState();
+  }, [clearWidgetState]);
 
   // eval field expression showIf, hideIf etc
   useExpressions({
