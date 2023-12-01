@@ -125,7 +125,7 @@ function OneToManyInner({
   const {
     widgetAttrs,
     name,
-    showBars = widgetAttrs.showBars,
+    showBars = widgetAttrs?.showBars,
     toolbar = viewData?.view?.toolbar,
     menubar = viewData?.view?.menubar,
     target: model,
@@ -134,8 +134,8 @@ function OneToManyInner({
     summaryView,
     gridView,
     searchLimit,
-    canExport = widgetAttrs.canExport,
-    canCopy = widgetAttrs.canCopy,
+    canExport = widgetAttrs?.canExport,
+    canCopy = widgetAttrs?.canCopy,
     height,
     perms,
   } = schema;
