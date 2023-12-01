@@ -9,7 +9,12 @@ import {
   type MetaData,
   type ViewData,
 } from "./meta";
-import { findViewFields, processView, processWidgets } from "./meta-utils";
+import {
+  findViewFields,
+  processFields,
+  processView,
+  processWidgets,
+} from "./meta-utils";
 import { FormView, type ActionView, type ViewType } from "./meta.types";
 import { reject } from "./reject";
 
@@ -58,12 +63,16 @@ export async function findView<T extends ViewType>({
 
     const data = await fetchView({ type: type as any, name, model, context });
 
-    // process the meta data
-    processView(data, data.view);
-    processWidgets(data.view);
+    if (data.fields) {
+      data.fields = processFields(data.fields);
+    }
 
     const { related } = findViewFields(data.fields ?? {}, data.view);
     data.related = { ...data.related, ...related };
+
+    // process the meta data
+    processView(data, data.view);
+    processWidgets(data.view);
 
     return data;
   });

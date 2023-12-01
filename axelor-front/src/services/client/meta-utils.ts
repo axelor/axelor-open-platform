@@ -24,7 +24,7 @@ function processJsonForm(view: Schema) {
   return view;
 }
 
-function processFields(fields: Property[] | Record<string, Property>) {
+export function processFields(fields: Property[] | Record<string, Property>) {
   let result: Record<string, Property> = {};
   if (_.isArray(fields)) {
     _.forEach(fields, (field) => {
