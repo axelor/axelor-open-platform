@@ -370,12 +370,12 @@ function useItemsFamily({
   canShowNew?: boolean;
 }) {
   const isInitial = useCallback(
-    (item: DataRecord) => item && Reflect.get(item, IS_INITIAL),
+    (item: DataRecord | null) => item && Reflect.get(item, IS_INITIAL),
     [],
   );
 
   const isClean = useCallback(
-    (item: DataRecord) => item && Object.keys(item).length === 1,
+    (item: DataRecord | null) => item && Object.keys(item).length === 1,
     [],
   );
 
@@ -445,17 +445,17 @@ function useItemsFamily({
             const items = get(itemsAtom);
             return items.find((x: DataRecord) => x.id === record.id);
           },
-          (get, set, value: DataRecord) => {
+          (get, set, value: DataRecord | null) => {
             if (isInitial(value) && isClean(value)) return;
             let items = get(itemsAtom);
-            const found = items.find((x) => x.id === value.id);
+            const found = items.find((x) => x.id === value?.id);
             if (found) {
-              items = items.map((x) => (x.id === value.id ? value : x));
+              items = items.map((x) => (x.id === value?.id ? value : x)) as DataRecord[];
             }
-            if (exclusive && found && value[exclusive]) {
+            if (exclusive && found && value?.[exclusive]) {
               items = items.map((item) => ({
                 ...item,
-                [exclusive]: item.id === value.id ? value[exclusive] : false,
+                [exclusive]: item.id === value?.id ? value[exclusive] : false,
               }));
             }
             const next = multiple ? items : items.slice(0, 1);
