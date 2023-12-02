@@ -139,7 +139,7 @@
       }
     },
     "Input": {
-      "padding": "0.25rem 0",
+      "padding": "calc(0.25rem + 1px) 0 0.25rem 0",
       "focus": {
         "shadow": "none",
         "border_width": "0 0 1px 0"
