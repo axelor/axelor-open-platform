@@ -12,3 +12,12 @@
     padding-left: 1.75rem !important;
   }
 }
+
+input.viewer {
+  border-color: transparent !important;
+}
+
+button.viewer {
+  outline: none;
+  user-select: auto;
+}

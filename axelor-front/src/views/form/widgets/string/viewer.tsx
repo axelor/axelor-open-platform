@@ -1,6 +1,8 @@
 import { Box, Button, Input } from "@axelor/ui";
 import { useMemo } from "react";
 
+import styles from "./string.module.scss";
+
 const noop = () => {};
 
 export function ViewerInput({
@@ -18,8 +20,8 @@ export function ViewerInput({
       disabled
       readOnly
       bg="body"
-      border={false}
       onChange={noop}
+      className={styles.viewer}
     />
   );
 }
@@ -54,6 +56,8 @@ export function ViewerLink({
       textDecoration="none"
       overflow="hidden"
       onClick={onClick}
+      tabIndex={-1}
+      className={styles.viewer}
     >
       {children}
     </Button>
