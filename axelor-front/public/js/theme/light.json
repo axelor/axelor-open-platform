@@ -138,6 +138,10 @@
         "radius": "1rem"
       }
     },
+    "Form": {
+      "padding": "1rem",
+      "gap": "0.5rem 0.75rem"
+    },
     "Input": {
       "padding": "calc(0.25rem + 1px) 0 0.25rem 0",
       "focus": {
