@@ -30,7 +30,7 @@ function computeLayout(schema: Schema) {
     });
 
   if (widths.length && widths.length < cols) {
-    widths.push(`repeat(${cols - widths.length}, auto-fit)`);
+    widths.push(`repeat(${cols - widths.length}, auto)`);
   }
   if (widths.length === 0) {
     widths.push(`repeat(${cols}, 1fr)`);
