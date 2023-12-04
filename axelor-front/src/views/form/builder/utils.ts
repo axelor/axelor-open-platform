@@ -10,7 +10,11 @@ import {
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
-import { isPlainObject } from "@/services/client/data-utils";
+import {
+  getBaseDummy,
+  isCleanDummy,
+  isPlainObject,
+} from "@/services/client/data-utils";
 import { MetaData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
@@ -190,10 +194,14 @@ export function processContextValues(context: DataContext) {
     const value = { ..._value };
     for (let k in value) {
       const v = value[k];
+      const isDummy = !IGNORE.includes(k) && k !== "$version" && isCleanDummy(k);
 
       // ignore values
       if (IGNORE.includes(k) || k.startsWith("$t:")) {
         delete value[k];
+      } else if (isDummy) {
+        k = getBaseDummy(k);
+        value[k] = value[k] ?? v;
       }
 
       if (v && typeof v === "object") {
