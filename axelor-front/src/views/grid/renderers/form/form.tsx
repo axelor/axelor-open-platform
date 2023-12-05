@@ -293,6 +293,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     useShortcut({
       key: "s",
       ctrlKey: true,
+      canHandle: useCallback(
+        () => !(view as Schema).serverType?.endsWith("_TO_MANY"),
+        [view],
+      ),
       action: useCallback(() => {
         void (async () => {
           await handleSave?.();

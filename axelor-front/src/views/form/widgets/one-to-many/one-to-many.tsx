@@ -76,7 +76,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { target: model, gridView } = schema;
 
   const { state, data } = useAsync(async () => {
-    const { items } = schema;
+    const { items, serverType } = schema;
     if ((items || []).length > 0) return;
     const { view, ...res } = await findView<GridView>({
       type: "grid",
@@ -86,6 +86,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
     return {
       ...res,
       view: view && {
+        serverType,
         ...view,
         ...[
           "canMove",

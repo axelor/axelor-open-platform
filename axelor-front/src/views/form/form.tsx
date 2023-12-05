@@ -919,13 +919,13 @@ const FormContainer = memo(function FormContainer({
         const input = document.activeElement as HTMLInputElement;
         const elem = containerRef.current;
 
-        // fake click to trigger outside click logic of any editable row
-        elem?.click?.();
-
         if (input && elem?.contains(input)) {
           input.blur?.();
           input.focus?.();
         }
+
+        // fake click to trigger outside click logic of any editable row
+        elem?.click?.();
       }
       await actionExecutor.waitFor();
       actionExecutor.wait().then(handleOnSave);
