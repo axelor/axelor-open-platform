@@ -77,6 +77,7 @@ export function Decimal(props: FieldProps<string | number>) {
     validate: isNumberLike,
     parse,
     format: parse,
+    schema,
   });
   const textRef = useRef(textValue);
 

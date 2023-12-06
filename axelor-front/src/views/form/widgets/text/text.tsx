@@ -26,7 +26,12 @@ export function Text({
   const { required } = attrs;
 
   const [changed, setChanged] = useState(false);
-  const { text, onChange, onBlur: onInputBlur, onKeyDown } = useInput(valueAtom);
+  const {
+    text,
+    onChange,
+    onBlur: onInputBlur,
+    onKeyDown,
+  } = useInput(valueAtom, { schema });
 
   const handleChange = useCallback<
     React.ChangeEventHandler<HTMLTextAreaElement>
@@ -35,7 +40,7 @@ export function Text({
       onChange(e);
       setChanged(true);
     },
-    [onChange]
+    [onChange],
   );
 
   const handleBlur = useCallback<React.FocusEventHandler<HTMLTextAreaElement>>(
@@ -46,7 +51,7 @@ export function Text({
       }
       onBlur?.(e);
     },
-    [changed, onBlur, onInputBlur]
+    [changed, onBlur, onInputBlur],
   );
 
   return (

@@ -18,6 +18,7 @@ export function Time(props: FieldProps<string | number>) {
 
   const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
     validate: isValid,
+    schema,
   });
 
   const toMask = useCallback(

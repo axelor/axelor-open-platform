@@ -75,6 +75,7 @@ export function Duration(props: FieldProps<string | number>) {
     validate: isValid,
     format,
     parse: toValue,
+    schema,
   });
 
   const displayText = useMemo(

@@ -12,7 +12,7 @@ import styles from "./html.module.scss";
 export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { lite } = schema;
-  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom);
+  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
   const height = Math.max(100, schema.height);
   return (
     <FieldControl {...props}>

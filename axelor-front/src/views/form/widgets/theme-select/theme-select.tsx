@@ -33,7 +33,7 @@ export function ThemeSelect(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { placeholder } = schema;
 
-  const { value, setValue } = useInput(valueAtom, { defaultValue: "" });
+  const { value, setValue } = useInput(valueAtom, { defaultValue: "", schema });
   const text = themes.find((x) => x.name === value)?.title ?? "";
   const selected = themes.find((x) => x.name === value) ?? null;
 

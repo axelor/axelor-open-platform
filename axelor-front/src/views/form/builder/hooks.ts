@@ -11,6 +11,7 @@ import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
+import { isCleanDummy } from "@/services/client/data-utils";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { useAtomCallback } from "jotai/utils";
 import * as WIDGETS from "../widgets";
@@ -82,6 +83,11 @@ export function useInput<T>(
      * Convert the input text to target value.
      */
     parse?: (text: string) => T | null;
+
+    /**
+     * Field schema.
+     */
+    schema?: Schema;
   },
 ) {
   const {
@@ -90,6 +96,7 @@ export function useInput<T>(
     validate = defaultValidator,
     format = defaultFormatter,
     parse = defaultConverter,
+    schema,
   } = options ?? {};
   const [value = defaultValue, setValue] = useAtom(valueAtom);
   const valueText = useMemo(() => format(value) ?? "", [format, value]);
@@ -98,6 +105,13 @@ export function useInput<T>(
 
   const dirtyAtom = useViewDirtyAtom();
   const dirtyRef = useRef<boolean>();
+
+  const { name, canDirty: _canDirty } = schema ?? {};
+
+  const canDirty = useMemo(
+    () => !name || (_canDirty !== false && !isCleanDummy(name)),
+    [_canDirty, name],
+  );
 
   const setDirty = useAtomCallback(
     useCallback(
@@ -126,12 +140,14 @@ export function useInput<T>(
     (event) => {
       setChanged(event.target.value !== valueText);
       setText(event.target.value);
-      setDirty(event.target.value !== valueText);
+      if (canDirty) {
+        setDirty(event.target.value !== valueText);
+      }
       if (onChangeTrigger === "change") {
         update(event.target.value, true);
       }
     },
-    [onChangeTrigger, setDirty, update, valueText],
+    [onChangeTrigger, canDirty, setDirty, update, valueText],
   );
 
   const onBlur = useCallback<

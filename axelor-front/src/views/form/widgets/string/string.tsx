@@ -24,7 +24,7 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom);
+  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
 
   const [trValue, setTranslateValue] = useAtom(
     useMemo(
