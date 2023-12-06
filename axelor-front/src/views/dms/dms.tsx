@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { ScopeProvider } from "jotai-molecules";
 import { useSetAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import {
@@ -11,8 +11,9 @@ import {
   useRef,
   useState,
 } from "react";
+
 import { Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
-import { GridRow, GridColumn, GridRowProps } from "@axelor/ui/grid";
+import { GridColumn, GridRow, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
@@ -37,8 +38,10 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
+import { legacyClassNames } from "@/styles/legacy";
 import { Grid as GridComponent } from "../grid/builder";
 import { useGridState } from "../grid/builder/utils";
+import gridRowStyles from "../grid/renderers/row/row.module.css";
 import { ViewProps } from "../types";
 import {
   DMS_NODE_TYPE,
@@ -48,6 +51,8 @@ import {
   DmsUpload,
   TreeRecord,
 } from "./builder";
+import { DMSCustomDragLayer } from "./builder/dms-drag-layer";
+import { DMSGridScope } from "./builder/handler";
 import { Uploader } from "./builder/scope";
 import {
   CONTENT_TYPE,
@@ -55,11 +60,8 @@ import {
   prepareCustomView,
   toStrongText,
 } from "./builder/utils";
-import { legacyClassNames } from "@/styles/legacy";
-import { DMSGridScope } from "./builder/handler";
-import gridRowStyles from "../grid/renderers/row/row.module.css";
+
 import styles from "./dms.module.scss";
-import { DMSCustomDragLayer } from "./builder/dms-drag-layer";
 
 const UNDEFINED_ID = -1;
 
@@ -501,11 +503,37 @@ export function Dms(props: ViewProps<GridView>) {
     [dataStore, onSearch],
   );
 
-  const handleNodeSelect = useCallback((record: TreeRecord) => {
-    setSelected(record.id);
-    setDetailsPopup(false);
-    setDetailsId(null);
-  }, []);
+  const clearSearch = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        if (searchAtom) {
+          set(searchAtom, (prev) => {
+            return {
+              ...prev,
+              query: undefined,
+              searchText: undefined,
+            };
+          });
+        }
+      },
+      [searchAtom],
+    ),
+  );
+
+  const handleNodeSelect = useCallback(
+    (record: TreeRecord) => {
+      setSelected(record.id);
+      setDetailsPopup(false);
+      setDetailsId(null);
+
+      clearSearch();
+      // When clicking again on same node, need to search to be up-to-date with cleared search
+      if (record.id === selected) {
+        onSearch();
+      }
+    },
+    [clearSearch, onSearch, selected],
+  );
 
   const handleNodeExpand = useCallback((record: TreeRecord) => {
     setExpanded((list) =>
