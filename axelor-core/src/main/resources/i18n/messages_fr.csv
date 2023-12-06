@@ -418,6 +418,7 @@
 "The addition data for UI widgets","Données additionnelles utilisées par l'interface",,
 "The color to use for tags","La couleur à utiliser pour les tags",,
 "The image icon to show in UI widgets","Icône utilisée par l'interface",,
+"The record(s) are referenced by other records. Please remove all the references first.","L'enregistrement est lié à d'autres enregistrements. Veuillez d'abord supprimer tous les liens.",,
 "The record(s) can't be updated as it violates unique constraint.","L'enregistrement ne peut pas être mis à jour car il enfreint la contrainte d'unicité.",,
 "The scheduler service has been stopped.","Le service de planificateur est arrêté.",,
 "The scheduler service is disabled.","Le service de planificateur est désactivé.",,

@@ -197,8 +197,8 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
   }
 
   static final String REFERENCE_ERROR_TTILE = /*$$(*/ "Reference error" /*)*/;
-  static final String REFERENCE_ERROR_MESSAGE =
-      "The record(s) are referenced by other records, please remove all the references first." /*)*/;
+  static final String REFERENCE_ERROR_MESSAGE = /*$$(*/
+      "The record(s) are referenced by other records. Please remove all the references first." /*)*/;
 
   static final String UNIQUE_VIOLATION_ERROR_TTILE = /*$$(*/ "Unique constraint violation" /*)*/;
   static final String UNIQUE_VIOLATION_ERROR_MESSAGE = /*$$(*/

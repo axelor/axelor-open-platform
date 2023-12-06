@@ -418,6 +418,7 @@
 "The addition data for UI widgets",,,
 "The color to use for tags",,,
 "The image icon to show in UI widgets",,,
+"The record(s) are referenced by other records. Please remove all the references first.",,,
 "The record(s) can't be updated as it violates unique constraint.",,,
 "The scheduler service has been stopped.",,,
 "The scheduler service is disabled.",,,

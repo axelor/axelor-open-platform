@@ -72,7 +72,7 @@ public class ImportException extends Exception {
     switch (state) {
       case "23503": // foreign key violation
         return new ImportException(
-            "The record(s) are referenced by other records, please remove all the references first.",
+            "The record(s) are referenced by other records. Please remove all the references first.",
             ex);
       case "23505": // unique constraint violation
         return new ImportException(
