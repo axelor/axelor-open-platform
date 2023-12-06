@@ -204,6 +204,15 @@ export function Dms(props: ViewProps<GridView>) {
       (get, set, options: Partial<SearchOptions> = {}) => {
         const { query = {} } = searchAtom ? get(searchAtom) : {};
 
+        let domain: string;
+        if (query._searchText?.trim()) {
+          domain = "self.isDirectory = FALSE";
+        } else {
+          domain = selected
+            ? `self.parent.id = ${selected}`
+            : "self.parent IS NULL";
+        }
+
         const sortBy = orderBy?.map(
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         );
@@ -213,11 +222,9 @@ export function Dms(props: ViewProps<GridView>) {
             sortBy,
             filter: {
               ...query,
-              _domain: `${action.domain ? `${action.domain} AND ` : ""}${
-                selected
-                  ? `self.parent.id = ${selected}`
-                  : "self.parent is null"
-              }`,
+              _domain: `${
+                action.domain ? `${action.domain} AND ` : ""
+              }${domain}`,
             },
             ...options,
             ...(options.fields && {
