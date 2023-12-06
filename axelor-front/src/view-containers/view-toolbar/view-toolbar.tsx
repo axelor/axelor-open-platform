@@ -126,7 +126,7 @@ function ActionCommandItem({
   return (
     <CommandItem
       {...props}
-      hidden={hidden || attrs?.hidden}
+      hidden={attrs?.hidden ?? hidden}
       {...((readonly || attrs?.readonly) && {
         onClick: undefined,
         disabled: true,
