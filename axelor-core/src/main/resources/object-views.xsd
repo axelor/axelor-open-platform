@@ -513,6 +513,9 @@
               The fix height can be either
               in 'px'
               or 'em', 'px' is assumed if not specified.
+
+              For 'text' and 'panel-related' widgets, it defines
+              the number of rows takes by the widget.
             </xsd:documentation>
           </xsd:annotation>
           <xsd:simpleType>
