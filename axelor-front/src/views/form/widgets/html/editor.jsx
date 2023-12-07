@@ -66,7 +66,6 @@ function HTMLEditor({
   hijackMenu,
   value,
   autoFocus,
-  onDirty,
   onChange,
   onBlur,
   onKeyDown: _onKeyDown,
@@ -81,7 +80,6 @@ function HTMLEditor({
     _selection: null,
     _mouseDownTarget: null,
   });
-  const [dirty, setDirty] = useState(false);
   const [popup, setPopup] = useState(null);
   const [toggle, setToggle] = useState(false);
   let timer = null;
@@ -343,7 +341,6 @@ function HTMLEditor({
   }
 
   function handleChange(e) {
-    setDirty(value === e.target.value ? false : true);
     htmlRef.current = e.target.value;
     onChange?.(e);
   }
@@ -379,13 +376,8 @@ function HTMLEditor({
     if (htmlRef.current !== value) {
       commands.setHTML((htmlRef.current = value));
       updates(true);
-      setDirty(false);
     }
   }, [value, commands, updates]);
-
-  useEffect(() => {
-    initRef.current && onDirty && onDirty(dirty);
-  }, [dirty, onDirty]);
 
   useEffect(() => {
     initRef.current = true;
