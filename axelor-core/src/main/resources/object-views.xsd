@@ -507,15 +507,14 @@
               Specify the widget height.&lt;br&gt;&lt;br&gt;
 
               The height can be
-              specified as percentage
+              specified as a percentage
               or fixed value.&lt;br&gt;&lt;br&gt;
 
-              The fix height can be either
-              in 'px'
-              or 'em', 'px' is assumed if not specified.
+              The fixed height can be either
+              in 'px' or 'em'; 'px' is assumed if not specified.
 
               For 'text' and 'panel-related' widgets, it defines
-              the number of rows takes by the widget.
+              the number of rows taken by the widget.
             </xsd:documentation>
           </xsd:annotation>
           <xsd:simpleType>
