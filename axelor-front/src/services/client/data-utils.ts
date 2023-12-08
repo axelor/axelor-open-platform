@@ -196,3 +196,73 @@ export function updateRecord(
 
   return changed ? { ...result, _dirty: true, id: result.id || id } : result;
 }
+
+export function equalsIgnoreClean(
+  value: DataRecord,
+  other: DataRecord,
+  canDirty: (name: string) => boolean,
+): boolean {
+  const a = compact(value);
+  const b = compact(other);
+  return _equalsIgnoreClean(a, b, canDirty);
+}
+
+function _equalsIgnoreClean(
+  value: DataRecord,
+  other: DataRecord,
+  canDirty: (path: string) => boolean,
+  pathPrefix: string = "",
+): boolean {
+  const keys = new Set(
+    [...Object.keys(value), ...Object.keys(other)].filter(
+      (key) => key !== "_dirty",
+    ),
+  );
+
+  for (const key of keys) {
+    const path = pathPrefix ? `${pathPrefix}.${key}` : key;
+
+    if (!canDirty(path)) continue;
+
+    let a = value[key];
+    let b = other[key];
+
+    if (a === undefined || b === undefined) {
+      continue;
+    }
+
+    if (isPlainObject(a) || isPlainObject(b)) {
+      a = isPlainObject(a) ? a : { id: a };
+      b = isPlainObject(b) ? b : { id: b };
+      if (!_equalsIgnoreClean(a, b, canDirty, path)) {
+        return false;
+      }
+    } else if (Array.isArray(a) || Array.isArray(b)) {
+      a = Array.isArray(a) ? a : [];
+      b = Array.isArray(b) ? b : [];
+
+      if (a.length !== b.length) {
+        return false;
+      }
+
+      for (let i = 0; i < a.length; ++i) {
+        if (
+          !b.some((x: unknown) => {
+            return _equalsIgnoreClean(
+              isPlainObject(a[i]) ? a[i] : { id: a[i] },
+              isPlainObject(x) ? x : { id: x },
+              canDirty,
+              path,
+            );
+          })
+        ) {
+          return false;
+        }
+      }
+    } else if (!isEqual(a, b)) {
+      return false;
+    }
+  }
+
+  return true;
+}

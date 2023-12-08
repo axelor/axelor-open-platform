@@ -408,7 +408,7 @@ function useActionAttrs({
   );
 }
 
-function useCanDirty() {
+export function useCanDirty() {
   const { findItem } = useViewMeta();
   const canDirty = useCallback(
     (target: string) => {

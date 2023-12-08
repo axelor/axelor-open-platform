@@ -18,6 +18,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { alerts } from "@/components/alerts";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
+import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
@@ -33,6 +34,7 @@ import {
   useFormHandlers,
 } from "@/views/form/builder";
 import {
+  useCanDirty,
   useFormEditableScope,
   useFormScope,
   useFormValidityScope,
@@ -228,6 +230,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       [onCancel, record, rowIndex, cellIndex],
     );
 
+    const canDirty = useCanDirty();
+
     const handleSave = useAtomCallback(
       useCallback(
         async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
@@ -244,7 +248,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           const formState = get(formAtom);
 
           // check record changes
-          if (isEqual(record, formState.record)) {
+          if (equalsIgnoreClean(record, formState.record, canDirty)) {
             return onSave?.(
               record,
               rowIndex,
@@ -270,13 +274,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           );
         },
         [
+          actionExecutor,
           formAtom,
           record,
-          rowIndex,
-          cellIndex,
+          canDirty,
           getErrors,
           onSave,
-          actionExecutor,
+          rowIndex,
+          cellIndex,
         ],
       ),
     );
