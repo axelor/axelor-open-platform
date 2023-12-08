@@ -201,14 +201,29 @@ export function Dms(props: ViewProps<GridView>) {
     [root],
   );
 
+  const selectNode = useCallback((record: TreeRecord) => {
+    setSelected(record.id);
+    setDetailsPopup(false);
+    setDetailsId(null);
+  }, []);
+
+  const shouldSearch = useRef(true);
+
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
+        if (!shouldSearch.current) {
+          shouldSearch.current = true;
+          return Promise.resolve(undefined);
+        }
+
         const { query = {} } = searchAtom ? get(searchAtom) : {};
 
         let domain: string;
         if (query._searchText?.trim()) {
           domain = "self.isDirectory = FALSE";
+          selectNode(root);
+          shouldSearch.current = false;
         } else {
           domain = selected
             ? `self.parent.id = ${selected}`
@@ -253,7 +268,15 @@ export function Dms(props: ViewProps<GridView>) {
             return result;
           });
       },
-      [searchAtom, action.domain, dataStore, selected, orderBy],
+      [
+        searchAtom,
+        orderBy,
+        dataStore,
+        action.domain,
+        selectNode,
+        root,
+        selected,
+      ],
     ),
   );
 
@@ -522,17 +545,10 @@ export function Dms(props: ViewProps<GridView>) {
 
   const handleNodeSelect = useCallback(
     (record: TreeRecord) => {
-      setSelected(record.id);
-      setDetailsPopup(false);
-      setDetailsId(null);
-
+      selectNode(record);
       clearSearch();
-      // When clicking again on same node, need to search to be up-to-date with cleared search
-      if (record.id === selected) {
-        onSearch();
-      }
     },
-    [clearSearch, onSearch, selected],
+    [selectNode, clearSearch],
   );
 
   const handleNodeExpand = useCallback((record: TreeRecord) => {
