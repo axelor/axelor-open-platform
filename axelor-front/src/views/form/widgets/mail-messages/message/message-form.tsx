@@ -153,7 +153,9 @@ function Form({
       <Box flex={1} border rounded>
         <HtmlEditor
           value={body || ""}
-          onChange={(e: string) => onChange("body", e)}
+          onChange={(
+            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+          ) => onChange("body", e.target.value)}
           {...({} as any)}
         />
       </Box>
