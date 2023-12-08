@@ -773,7 +773,7 @@ export function Dms(props: ViewProps<GridView>) {
               text: () => <PageText dataStore={dataStore} />,
             }}
           >
-            <Box d="flex">
+            <Box d="flex" className={styles.toolbar}>
               <Box
                 d="flex"
                 flex={1}
@@ -892,9 +892,11 @@ function DMSGridRow(props: GridRowProps) {
   );
 }
 
+const MAX_BREADCRUMBS = 3;
+
 function Breadcrumbs({
   root,
-  data,
+  data: _data,
   selected,
   onSelect,
 }: {
@@ -903,6 +905,18 @@ function Breadcrumbs({
   selected?: TreeRecord["id"];
   onSelect?: (data: TreeRecord) => void;
 }) {
+  const data = useMemo(() => {
+    if (_data.length <= MAX_BREADCRUMBS) {
+      return _data;
+    }
+    const [root, ...rest] = _data;
+    return [
+      root,
+      { ...rest.slice(-MAX_BREADCRUMBS)[0], $displayName: "..." },
+      ...rest.slice(1 - MAX_BREADCRUMBS),
+    ];
+  }, [_data]);
+
   return (
     <Box as="ul">
       {data.map((item, ind) => {
@@ -910,7 +924,7 @@ function Breadcrumbs({
           return item.id === root.id ? (
             <MaterialIcon icon="home" fontSize={20} fill />
           ) : (
-            item.fileName
+            item.$displayName ?? item.fileName
           );
         }
         return (
@@ -918,7 +932,9 @@ function Breadcrumbs({
             {selected === item.id && item.id ? (
               <Box as="span">{render()}</Box>
             ) : (
-              <Link onClick={() => onSelect?.(item)}>{render()}</Link>
+              <Link onClick={() => onSelect?.(item)} title={item.fileName}>
+                {render()}
+              </Link>
             )}
             {ind < data.length - 1 && (
               <Box as="span" color="secondary">

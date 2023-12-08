@@ -50,6 +50,11 @@
   }
 }
 
+.toolbar {
+  background-color: var(--ax-theme-shell-bg);
+  z-index: 1;
+}
+
 .breadcrumbs {
   min-width: 0;
   ul {
