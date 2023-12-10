@@ -2,11 +2,11 @@ import clsx from "clsx";
 import { memo, useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";
+import { legacyClassNames } from "@/styles/legacy";
 
 import { FormWidget } from "./form-widget";
 import { FormLayout, WidgetProps } from "./types";
 
-import { legacyClassNames } from "@/styles/legacy";
 import styles from "./form-layouts.module.scss";
 
 function computeLayout(schema: Schema) {
@@ -59,6 +59,7 @@ function computeLayout(schema: Schema) {
     last = colEnd;
 
     return {
+      className: colStart === 1 ? styles.first : undefined,
       style: {
         gridColumnStart: colStart,
         gridColumnEnd: colEnd,
@@ -71,10 +72,10 @@ function computeLayout(schema: Schema) {
 
   return {
     style: {
+      "--g-row-gap": rowGap,
+      "--g-col-gap": columnGap,
       display: "grid",
       gridTemplateColumns: template,
-      rowGap,
-      columnGap,
     },
     contents,
   };
@@ -126,10 +127,11 @@ export const GridLayout: FormLayout = memo(
           [styles.table]: schema.layout === "table",
         })}
       >
-        {contents.map(({ style, content }) => (
+        {contents.map(({ style, className, content }) => (
           <GridItem
             key={content.uid}
             style={style}
+            className={className}
             schema={content}
             formAtom={formAtom}
             parentAtom={parentAtom}
@@ -145,12 +147,16 @@ function GridItem(
   props: Omit<WidgetProps, "widgetAtom"> & {
     schema: Schema;
     style?: React.CSSProperties;
+    className?: string;
   },
 ) {
   const { schema, formAtom, parentAtom, readonly, style } = props;
   const className = useMemo(() => layoutClassName(schema), [schema]);
   return (
-    <div style={style} className={clsx(styles.gridItem, className)}>
+    <div
+      style={style}
+      className={clsx(styles.gridItem, props.className, className)}
+    >
       <FormWidget
         schema={schema}
         formAtom={formAtom}

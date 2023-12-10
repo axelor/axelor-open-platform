@@ -1,5 +1,25 @@
+.gridWrapper {
+  overflow: hidden;
+}
+
 .grid {
   align-items: start;
+  row-gap: var(--g-row-gap);
+}
+
+.gridItem {
+  margin-left: var(--g-row-gap);
+  &.first {
+    margin-left: 0;
+  }
+}
+
+[dir="rtl"] .gridItem {
+  margin-left: 0;
+  margin-right: var(--g-row-gap);
+  &.first {
+    margin-right: 0;
+  }
 }
 
 .gridItem:empty {
