@@ -15,8 +15,8 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useSidebar } from "./hook";
 
-import { ReactComponent as AppIcon } from "../../assets/axelor-icon.svg";
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+import AppIcon from "../../assets/axelor-icon.svg?react";
+import AppLogo from "../../assets/axelor.svg?react";
 
 import styles from "./nav-drawer.module.scss";
 
@@ -81,7 +81,12 @@ function load(res: MenuItem[], tags: Tag[]) {
     const updatedTag = tags.filter((x) => item.name === x.name)[0];
     if (tag || updatedTag) {
       props.tag = () => (
-        <MenuTag item={item} tag={updatedTag?.value ?? tag} color={tagColor} hasTag={hasTag} />
+        <MenuTag
+          item={item}
+          tag={updatedTag?.value ?? tag}
+          color={tagColor}
+          hasTag={hasTag}
+        />
       );
     }
 

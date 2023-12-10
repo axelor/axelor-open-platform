@@ -8,7 +8,7 @@ import { session } from "@/services/client/session";
 
 import { System } from "../system";
 
-import { ReactComponent as AppLogo } from "../../assets/axelor.svg";
+import AppLogo from "../../assets/axelor.svg?react";
 
 export function About() {
   const { info } = session;
