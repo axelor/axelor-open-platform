@@ -1,17 +1,16 @@
-import { PrimitiveAtom, WritableAtom, atom } from "jotai";
-import { focusAtom } from "jotai-optics";
-import isEqual from "lodash/isEqual";
-import merge from "lodash/merge";
-import { SetStateAction } from "react";
+import { produce } from "immer";
+import { PrimitiveAtom, SetStateAction, atom } from "jotai";
 
 import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
+import { deepEqual, deepGet, deepMerge, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
 
 import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
-import { defaultAttrs, processContextValues } from "./utils";
+import { defaultAttrs as getDefaultAttrs, processContextValues } from "./utils";
 
 export function createFormAtom(props: {
   meta: ViewData<FormView>;
@@ -42,56 +41,46 @@ export function createWidgetAtom(props: {
   parentAtom?: WidgetAtom;
 }) {
   const { schema, formAtom, parentAtom: parent } = props;
-  const { uid, name } = schema;
-  const attrs = defaultAttrs(schema);
+  const { uid, name = "__" } = schema;
 
-  let prevState: WidgetState = { name, parent, attrs: {} };
+  const defaultAttrs = getDefaultAttrs(schema);
+  const defaultState: WidgetState = { name, parent, attrs: {} };
 
-  const attrsByIdAtom = focusAtom(formAtom, (o) =>
-    o
-      .prop("states")
-      .prop(uid)
-      .valueOr({ name, parent, attrs: {} } as WidgetState),
-  );
+  const widgetAtom = focusAtom(
+    formAtom,
+    ({ states = {}, statesByName = {} }) => {
+      const stateById = states[uid] ?? defaultState;
+      const stateByName = statesByName[name] ?? defaultState;
 
-  const attrsByNameAtom = focusAtom(formAtom, (o) =>
-    o
-      .prop("statesByName")
-      .prop(name ?? "__")
-      .valueOr({ name, parent, attrs: {} } as WidgetState),
-  );
-
-  const getStateByName = (key: keyof WidgetState, values: any) =>
-    isEqual(prevState[key], values) ? prevState.columns : values;
-
-  const widgetAtom = atom<WidgetState, [SetStateAction<WidgetState>], void>(
-    (get) => {
       const {
         attrs: attrsByName,
         errors: errorsByName,
         columns: columnsByName,
         ...restByName
-      } = get(attrsByNameAtom);
+      } = stateByName;
 
       const {
         attrs: attrsById,
         errors: errorsById,
         columns: columnsById,
         ...restById
-      } = get(attrsByIdAtom);
+      } = stateById;
 
-      const columns = merge({}, columnsByName, columnsById);
+      const columns =
+        columnsByName && columnsById
+          ? deepMerge(columnsByName, columnsById)
+          : columnsById || columnsByName;
 
-      const nextState = {
+      const nextState: WidgetState = {
         ...restByName,
         ...restById,
-        columns: getStateByName("columns", columns),
+        columns,
         errors: {
           ...errorsByName,
           ...errorsById,
         },
         attrs: {
-          ...attrs,
+          ...defaultAttrs,
           ...attrsByName,
           ...attrsById,
         },
@@ -99,39 +88,27 @@ export function createWidgetAtom(props: {
         parent,
       };
 
-      return isEqual(prevState, nextState)
-        ? prevState
-        : (prevState = nextState);
+      return nextState;
     },
-    (get, set, state) => {
-      set(attrsByIdAtom, (prevState) => {
-        const prev = get(widgetAtom);
-        const next = typeof state === "function" ? state(prev) : state;
-        if (next !== prev) {
-          return next;
-        }
-        return prevState;
-      });
+    (state, slice) => {
+      return { ...state, states: { ...state.states, [uid]: slice } };
     },
+    deepEqual,
   );
 
   return widgetAtom;
 }
 
 export function createValueFocusAtom(formAtom: FormAtom, path: string) {
-  const names = path?.split(".") ?? [];
-  const lensAtom = focusAtom(formAtom, (o) => {
-    let lens = o.prop("record");
-    let next = names.shift();
-    while (next) {
-      lens = lens.reread((v) => v || {});
-      lens = lens.rewrite((v) => v || {});
-      lens = lens.prop(next);
-      next = names.shift();
-    }
-    return lens;
-  });
-  return lensAtom as WritableAtom<any, [any], void>;
+  return focusAtom(
+    formAtom,
+    (base) => deepGet(base.record, path),
+    (base, value) => {
+      return produce(base, (draft) => {
+        deepSet(draft, path, value);
+      });
+    },
+  );
 }
 
 export function createValueAtom({
@@ -155,18 +132,29 @@ export function createValueAtom({
     );
 
   // special case for editable grid form
-  const lensDottedAtom =
-    editable && readonly && name?.includes(".")
-      ? focusAtom(formAtom, (o) => o.prop("record").prop(name))
-      : null;
+  const dotted = editable && readonly && name?.includes(".");
 
-  const lensAtom = createValueFocusAtom(formAtom, name ?? "");
+  const prop = name!;
+  const lensAtom = dotted
+    ? focusAtom(
+        formAtom,
+        (base) => base.record[prop],
+        (base, value) => {
+          return { ...base, record: { ...base.record, [prop]: value } };
+        },
+      )
+    : focusAtom(
+        formAtom,
+        (base) => deepGet(base.record, prop),
+        (base, value) => {
+          return produce(base, (draft) => {
+            deepSet(draft.record, prop, value);
+          });
+        },
+      );
 
-  return atom(
-    (get) => {
-      const value = get(lensAtom);
-      return (value ?? (lensDottedAtom ? get(lensDottedAtom) : value)) as any;
-    },
+  return atom<WidgetState, [SetStateAction<WidgetState>], void>(
+    (get) => get(lensAtom),
     (
       get,
       set,
@@ -178,7 +166,7 @@ export function createValueAtom({
       const next =
         typeof value === "string" && value.trim() === "" ? null : value;
 
-      if (isEqual(prev, next)) return;
+      if (deepEqual(prev, next)) return;
 
       const dirty =
         markDirty &&
