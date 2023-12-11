@@ -17,12 +17,6 @@ export default defineConfig({
     legacy({
       modernPolyfills: true,
       renderLegacyChunks: false,
-      targets: [
-        "chrome >= 109",
-        "edge >= 109",
-        "firefox >= 91",
-        "safari >= 15.6",
-      ],
     }),
   ],
   optimizeDeps: {
