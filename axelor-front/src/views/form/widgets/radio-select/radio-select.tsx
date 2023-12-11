@@ -17,7 +17,7 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
   const selectionList = (schema.selectionList as TSelection[]) ?? [];
 
   const isRadio = toKebabCase(widget) === "radio-select";
-  const values = value
+  const values = value != null
     ? String(value)
         .split(",")
         .filter((x) => x)
