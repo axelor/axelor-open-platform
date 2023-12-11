@@ -224,8 +224,12 @@ export function Dms(props: ViewProps<GridView>) {
           domain = `self.isDirectory = FALSE${
             root.id ? ` AND self.parent.id = ${root.id}` : ""
           }`;
-          selectNode(root);
-          shouldSearch.current = false;
+
+          if (selected !== root.id) {
+            // Prevent duplicated search on node change
+            shouldSearch.current = false;
+            selectNode(root);
+          }
         } else {
           domain = selected
             ? `self.parent.id = ${selected}`
