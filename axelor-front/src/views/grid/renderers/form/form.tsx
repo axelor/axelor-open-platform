@@ -17,7 +17,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useShortcut } from "@/hooks/use-shortcut";
+import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
@@ -290,7 +290,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       [handleSave, handleCancel],
     );
 
-    useShortcut({
+    useTabShortcut({
       key: "g",
       altKey: true,
       action: useHandleFocus(containerRef),
@@ -407,7 +407,8 @@ function MainShortcuts({
     columnIndex?: number,
   ) => Promise<unknown>;
 }) {
-  useShortcut({
+  
+  useTabShortcut({
     key: "s",
     ctrlKey: true,
     action: useCallback(() => {
