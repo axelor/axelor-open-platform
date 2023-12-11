@@ -774,6 +774,16 @@ export function Dms(props: ViewProps<GridView>) {
             }}
           >
             <Box d="flex" className={styles.toolbar}>
+              {searchAtom && (
+                <AdvanceSearch
+                  stateAtom={searchAtom}
+                  dataStore={dataStore}
+                  items={view.items}
+                  customSearch={view.customSearch}
+                  freeSearch={view.freeSearch}
+                  onSearch={onSearch}
+                />
+              )}
               <Box
                 d="flex"
                 flex={1}
@@ -787,16 +797,6 @@ export function Dms(props: ViewProps<GridView>) {
                   onSelect={handleNodeSelect}
                 />
               </Box>
-              {searchAtom && (
-                <AdvanceSearch
-                  stateAtom={searchAtom}
-                  dataStore={dataStore}
-                  items={view.items}
-                  customSearch={view.customSearch}
-                  freeSearch={view.freeSearch}
-                  onSearch={onSearch}
-                />
-              )}
             </Box>
           </ViewToolBar>
         )}
