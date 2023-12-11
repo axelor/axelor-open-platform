@@ -74,7 +74,7 @@
     "vite-plugin-svgr": "^4.2.0",
     "vitest": "^1.0.4"
   },
-  "packageManager": "pnpm@8.7.6",
+  "packageManager": "pnpm@8.12.0+sha256.553e4eb0e2a2c9abcb419b3262bdc7aee8ae3c42e2301a1807d44575786160c9",
   "pnpm": {
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
