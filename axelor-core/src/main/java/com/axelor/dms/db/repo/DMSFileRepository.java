@@ -469,9 +469,9 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
                     .count()
                 > 0;
 
-    json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
-    json.put("downloadIcon", "fa fa-download");
-    json.put("detailsIcon", "fa fa-info-circle");
+    json.put("typeIcon", isFile ? "file-earmark" : "folder-fill");
+    json.put("downloadIcon", "download");
+    json.put("detailsIcon", "info-circle");
 
     json.put("canShare", canShare);
     json.put("canWrite", canCreate(file));
@@ -488,19 +488,18 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     if ("html".equals(file.getContentType())) {
       json.put("fileType", "text/html");
       json.put("contentType", "html");
-      json.put("typeIcon", "fa fa-file-text-o");
+      json.put("typeIcon", "file-earmark-text");
     }
     if ("spreadsheet".equals(file.getContentType())) {
       json.put("fileType", "text/json");
       json.put("contentType", "spreadsheet");
-      json.put("typeIcon", "fa fa-file-excel-o");
+      json.put("typeIcon", "file-earmark-excel");
     }
 
     if (metaFile != null) {
       String fileType = metaFile.getFileType();
-      String fileIcon = metaFiles.fileTypeIcon(metaFile);
       json.put("fileType", fileType);
-      json.put("typeIcon", "fa fa-colored " + fileIcon);
+      json.put("typeIcon", metaFiles.fileTypeIcon(metaFile));
       json.put("metaFile.sizeText", metaFile.getSizeText());
 
       // Put inlineUrl only if preview for that file type is supported, to prevent auto-downloading

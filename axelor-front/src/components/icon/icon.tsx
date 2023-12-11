@@ -1,6 +1,7 @@
 import {
   BootstrapIcon,
-  BootstrapIconName, BootstrapIconProps,
+  BootstrapIconName,
+  BootstrapIconProps,
 } from "@axelor/ui/icons/bootstrap-icon";
 
 import {
@@ -3617,19 +3618,21 @@ const ignore = [
 ];
 
 const findName = (icon: string) => {
-  let name =
-    icon
+  return icon
       .split(/\s+/g)
       .filter(Boolean)
       .filter((x) => !ignore.includes(x))
       .find(Boolean) ?? icon;
-  return name.replace(/^fa-/, "").replace(/-o$/, "");
+};
+
+const findBsName = (icon: string) => {
+  return findName(icon).replace(/^fa-/, "").replace(/-o$/, "");
 };
 
 const findMaterialIcon = (icon: string) => {
   let name = icon.replace(/-/g, "_");
   let found: MaterialIconName | undefined;
-  
+
   if (material.includes(icon)) found = icon as MaterialIconName;
   if (material.includes(name)) found = name as MaterialIconName;
 
@@ -3637,13 +3640,14 @@ const findMaterialIcon = (icon: string) => {
 };
 
 const findBootstrapIcon = (icon: string) => {
-  let name = findName(icon);
+  const name = findName(icon);
   let found: BootstrapIconName | undefined;
 
-  if (icon && icon.includes("fa-")) found = fa[icon];
-  if(!found) {
-    if (icon in bootstrap) found = icon as BootstrapIconName;
+  if (name && name.includes("fa-")) found = fa[name];
+  if (!found) {
+    const bsName = findBsName(name);
     if (name in bootstrap) found = name as BootstrapIconName;
+    if (bsName in bootstrap) found = bsName as BootstrapIconName;
   }
 
   return found;
@@ -3659,11 +3663,14 @@ export const Icon = forwardRef<HTMLElement, IconProps>(
     if (mi) return <MaterialIcon icon={mi} {...props} ref={ref} />;
     if (bi) return <BootstrapIcon icon={bi} {...props} />;
 
-    if (process.env.NODE_ENV !== 'production' && !logsMissingIcons.includes(icon)) {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      !logsMissingIcons.includes(icon)
+    ) {
       console.log("Unknown icon : " + icon);
       logsMissingIcons.push(icon);
     }
 
     return <MaterialIcon icon="apps" {...props} ref={ref} />;
-  }
+  },
 );

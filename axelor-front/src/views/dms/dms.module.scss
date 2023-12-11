@@ -86,3 +86,43 @@
     min-height: 400px;
   }
 }
+
+.grid [class*="icon_"] {
+
+  &[class*="bi-file-earmark"] {
+    color: #767676;
+  }
+
+  &[class*="bi-file-earmark-text"] {
+    color: #2185D0;
+  }
+
+  &[class*="bi-file-earmark-word"] {
+    color: #2185D0;
+  }
+
+  &[class*="bi-file-earmark-excel"] {
+    color: #21BA45;
+  }
+
+  &[class*="bi-file-earmark-ppt"] {
+    color: #a33e03;
+  }
+
+  &[class*="bi-file-earmark-pdf"] {
+    color: #DB2828;
+  }
+
+  &[class*="file-earmark-image"] {
+    color: #6435C9;
+  }
+
+  &[class*="file-earmark-play"] {
+    color: #DB2828;
+  }
+
+  &[class*="file-earmark-zip"] {
+    color: #A5673F;
+  }
+}
+

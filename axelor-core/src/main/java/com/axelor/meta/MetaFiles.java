@@ -712,32 +712,32 @@ public class MetaFiles {
   public String fileTypeIcon(MetaFile file) {
     String fileType = file.getFileType();
     if (fileType == null) {
-      return "fa-file-o";
+      return "file-earmark";
     }
     switch (fileType) {
       case "application/msword":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       case "application/vnd.oasis.opendocument.text":
-        return "fa-file-word-o";
+        return "file-earmark-word";
       case "application/vnd.ms-excel":
       case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
       case "application/vnd.oasis.opendocument.spreadsheet":
-        return "fa-file-excel-o";
+        return "file-earmark-excel";
       case "application/vnd.ms-powerpoint":
       case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
       case "application/vnd.oasis.opendocument.presentation":
-        return "fa-file-powerpoint-o";
+        return "file-earmark-ppt";
       case "application/pdf":
-        return "fa-file-pdf-o";
+        return "file-earmark-pdf";
       case "application/zip":
       case "application/gzip":
-        return "fa-file-archive-o";
+        return "file-earmark-zip";
       default:
-        if (fileType.startsWith("text")) return "fa-file-text-o";
-        if (fileType.startsWith("image")) return "fa-file-image-o";
-        if (fileType.startsWith("video")) return "fa-file-video-o";
+        if (fileType.startsWith("text")) return "file-earmark-text";
+        if (fileType.startsWith("image")) return "file-earmark-image";
+        if (fileType.startsWith("video")) return "file-earmark-play";
     }
-    return "fa-file-o";
+    return "file-earmark";
   }
 
   /**
