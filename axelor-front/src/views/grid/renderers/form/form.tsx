@@ -291,20 +291,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
 
     useShortcut({
-      key: "s",
-      ctrlKey: true,
-      canHandle: useCallback(
-        () => !(view as Schema).serverType?.endsWith("_TO_MANY"),
-        [view],
-      ),
-      action: useCallback(() => {
-        void (async () => {
-          await handleSave?.();
-        })();
-      }, [handleSave]),
-    });
-
-    useShortcut({
       key: "g",
       altKey: true,
       action: useHandleFocus(containerRef),
@@ -379,30 +365,57 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     }, [onInit]);
 
     return (
-      <FocusTrap initialFocus={false}>
-        <Box
-          ref={containerRef}
-          className={clsx(className, styles.container)}
-          d="flex"
-          onKeyDown={handleKeyDown}
-        >
-          <ClickAwayListener onClickAway={handleClickOutside}>
-            <Box d="flex">
-              <FormComponent
-                {...({} as FormProps)}
-                schema={view}
-                fields={fields!}
-                layout={CustomLayout as unknown as FormLayout}
-                readonly={false}
-                formAtom={formAtom}
-                actionHandler={actionHandler}
-                actionExecutor={actionExecutor}
-                recordHandler={recordHandler}
-              />
-            </Box>
-          </ClickAwayListener>
-        </Box>
-      </FocusTrap>
+      <>
+        {!(view as Schema).serverType && (
+          <MainShortcuts handleSave={handleSave} />
+        )}
+
+        <FocusTrap initialFocus={false}>
+          <Box
+            ref={containerRef}
+            className={clsx(className, styles.container)}
+            d="flex"
+            onKeyDown={handleKeyDown}
+          >
+            <ClickAwayListener onClickAway={handleClickOutside}>
+              <Box d="flex">
+                <FormComponent
+                  {...({} as FormProps)}
+                  schema={view}
+                  fields={fields!}
+                  layout={CustomLayout as unknown as FormLayout}
+                  readonly={false}
+                  formAtom={formAtom}
+                  actionHandler={actionHandler}
+                  actionExecutor={actionExecutor}
+                  recordHandler={recordHandler}
+                />
+              </Box>
+            </ClickAwayListener>
+          </Box>
+        </FocusTrap>
+      </>
     );
   },
 );
+
+function MainShortcuts({
+  handleSave,
+}: {
+  handleSave?: (
+    saveFromEdit?: boolean,
+    columnIndex?: number,
+  ) => Promise<unknown>;
+}) {
+  useShortcut({
+    key: "s",
+    ctrlKey: true,
+    action: useCallback(() => {
+      void (async () => {
+        await handleSave?.();
+      })();
+    }, [handleSave]),
+  });
+
+  return null;
+}
