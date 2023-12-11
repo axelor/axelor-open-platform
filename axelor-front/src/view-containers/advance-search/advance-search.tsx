@@ -28,8 +28,7 @@ import {
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
-import { useShortcut } from "@/hooks/use-shortcut";
-import { useTabs } from "@/hooks/use-tabs";
+import { useTabShortcut } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { Criteria } from "@/services/client/data.types";
@@ -509,14 +508,11 @@ function SearchInput({
 }) {
   const [value = "", setValue] = useAtom(valueAtom);
   const searchRef = useRef<HTMLInputElement>(null);
-  const { active } = useTabs();
   const tab = useViewTab();
-  const canHandle = useCallback(() => active === tab, [active, tab]);
 
-  useShortcut({
+  useTabShortcut({
     key: "f",
     altKey: true,
-    canHandle,
     action: useCallback(() => focusAndSelectInput(searchRef.current), []),
   });
 

@@ -205,24 +205,21 @@ export function useNavShortcuts({
   onPrev?: () => void;
   onNext?: () => void;
 }) {
-  const { active } = useTabs();
-  const tab = useViewTab();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
   const canHandle = useCallback(
-    (e: KeyboardEvent) =>
-      active === tab && currentViewType === viewType && canHandleProp(e),
-    [active, tab, currentViewType, viewType, canHandleProp],
+    (e: KeyboardEvent) => currentViewType === viewType && canHandleProp(e),
+    [currentViewType, viewType, canHandleProp],
   );
 
-  useShortcut({
+  useTabShortcut({
     key: "PageUp",
     altKey: true,
     canHandle,
     action: useCallback(() => onPrev?.(), [onPrev]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "PageDown",
     altKey: true,
     canHandle,

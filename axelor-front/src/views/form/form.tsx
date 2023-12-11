@@ -25,8 +25,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
-import { useShortcut, useShortcuts } from "@/hooks/use-shortcut";
-import { useTabs } from "@/hooks/use-tabs";
+import { useTabShortcut, useShortcuts } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { diff, extractDummy } from "@/services/client/data-utils";
@@ -898,7 +897,6 @@ const FormContainer = memo(function FormContainer({
   }, [readonly, setViewProps]);
 
   const tab = useViewTab();
-  const { active } = useTabs();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
   const canNew = hasButton("new");
@@ -971,15 +969,14 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
-  useShortcut({
+  useTabShortcut({
     key: "f",
     altKey: true,
     canHandle: useCallback(
       () =>
-        active === tab &&
         currentViewType === schema.type &&
         searchViewType != null,
-      [searchViewType, active, tab, currentViewType, schema.type],
+      [searchViewType, currentViewType, schema.type],
     ),
     action: useCallback(() => {
       void (async () => {
