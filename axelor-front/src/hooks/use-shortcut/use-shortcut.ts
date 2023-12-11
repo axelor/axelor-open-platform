@@ -100,6 +100,22 @@ export function useShortcut(options: Options) {
   }, [key, action, handleKeyDown]);
 }
 
+export function useTabShortcut({
+  canHandle = alwaysTrue,
+  ...options
+}: Options) {
+  const { active } = useTabs();
+  const tab = useViewTab();
+  const isActiveTab = active === tab;
+
+  const canHandleInTab = useCallback(
+    (e: KeyboardEvent) => isActiveTab && canHandle(e),
+    [isActiveTab, canHandle],
+  );
+
+  return useShortcut({ ...options, canHandle: canHandleInTab });
+}
+
 export function useShortcuts({
   viewType,
   canHandle: canHandleProp = alwaysTrue,
@@ -121,61 +137,56 @@ export function useShortcuts({
   onRefresh?: () => void;
   onFocus?: () => void;
 }) {
-  const { active } = useTabs();
-  const tab = useViewTab();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
-  const isActiveTab = active === tab;
-
   const canHandle = useCallback(
-    (e: KeyboardEvent) =>
-      isActiveTab && currentViewType === viewType && canHandleProp(e),
-    [isActiveTab, currentViewType, viewType, canHandleProp],
+    (e: KeyboardEvent) => currentViewType === viewType && canHandleProp(e),
+    [currentViewType, viewType, canHandleProp],
   );
 
-  useShortcut({
+  useTabShortcut({
     key: "Insert",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onNew?.(), [onNew]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "e",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onEdit?.(), [onEdit]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "s",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onSave?.(), [onSave]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "d",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onCopy?.(), [onCopy]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "Delete",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onDelete?.(), [onDelete]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "r",
     ctrlKey: true,
     canHandle,
     action: useCallback(() => onRefresh?.(), [onRefresh]),
   });
 
-  useShortcut({
+  useTabShortcut({
     key: "g",
     altKey: true,
     canHandle,
