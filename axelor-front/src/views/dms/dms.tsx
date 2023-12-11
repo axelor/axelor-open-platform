@@ -221,7 +221,9 @@ export function Dms(props: ViewProps<GridView>) {
 
         let domain: string;
         if (query._searchText?.trim()) {
-          domain = "self.isDirectory = FALSE";
+          domain = `self.isDirectory = FALSE${
+            root.id ? ` AND self.parent.id = ${root.id}` : ""
+          }`;
           selectNode(root);
           shouldSearch.current = false;
         } else {
