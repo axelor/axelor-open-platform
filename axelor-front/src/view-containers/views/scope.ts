@@ -166,7 +166,7 @@ export function useViewSwitch() {
           const hasView = tab.action?.views?.some((v) => v.type === type);
           if (!hasView) return;
           if (state.dirty && state.type !== type) {
-            set(tab.state, { dirty: false });
+            set(tab.state, { ...state, dirty: false });
           }
           open(action, { type, ...options });
         }

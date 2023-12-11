@@ -1,5 +1,5 @@
 import {
-  WritableAtom,
+  PrimitiveAtom,
   atom,
   getDefaultStore,
   useAtomValue,
@@ -107,7 +107,7 @@ export type TabState = {
  * This atom is used to keep track of tab state.
  *
  */
-export type TabAtom = WritableAtom<TabState, Partial<TabState>[], void>;
+export type TabAtom = PrimitiveAtom<TabState>;
 
 /**
  * A tab represents an action-view visible as a tab or popup view.
@@ -336,12 +336,13 @@ export async function initTab(
       (get) => get(tabAtom),
       (get, set, arg) => {
         const prev = get(tabAtom);
-        if (prev !== arg) {
-          set(tabAtom, (state) => {
-            const type = arg?.type ?? prev.type;
-            const route = arg?.routes?.[type] ?? prev.routes?.[type];
-            const props = arg?.props?.[type] ?? prev.props?.[type];
-            return updateTabState(id, { ...state, ...arg }, { route, props });
+        const next = typeof arg === "function" ? arg(prev) : arg;
+        if (prev !== next) {
+          set(tabAtom, () => {
+            const type = next?.type ?? prev.type;
+            const route = next?.routes?.[type] ?? prev.routes?.[type];
+            const props = next?.props?.[type] ?? prev.props?.[type];
+            return updateTabState(id, next, { route, props });
           });
         }
       },
@@ -552,7 +553,9 @@ export function useActiveTab_internal() {
   const active = getDefaultStore().get(activeAtom);
   const state = active ? getDefaultStore().get(active.state) : undefined;
   const setState = (state: Partial<TabState>) => {
-    if (active) getDefaultStore().set(active.state, state);
+    if (active) {
+      getDefaultStore().set(active.state, (prev) => ({ ...prev, ...state }));
+    }
   };
   return [state, setState] as const;
 }

@@ -114,10 +114,11 @@ export function DashletComponent({
         param: keyof TabProps,
         value: any,
       ) => {
-        const props = get(tab.state).props;
+        const { props, ...tabState } = get(tab.state);
         const viewProps = props?.[viewType];
         if (viewProps?.[param] !== value) {
           set(tab.state, {
+            ...tabState,
             props: {
               ...props,
               [viewType]: {
