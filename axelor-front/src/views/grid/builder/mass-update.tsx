@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useId } from "react";
 
 import {
   Box,
@@ -6,6 +6,7 @@ import {
   ClickAwayListener,
   Divider,
   Input,
+  InputLabel,
   Link,
   Popper,
 } from "@axelor/ui";
@@ -63,6 +64,7 @@ export function MassUpdater({
   onUpdate?: (values: Partial<DataRecord>, isAll?: boolean) => void;
   onClose: () => void;
 }) {
+  const hasAllId = useId();
   const [items, setItems] = useState<MassUpdateItem[]>([getNewItem()]);
   const [isUpdateAll, setUpdateAll] = useState(false);
 
@@ -117,9 +119,14 @@ export function MassUpdater({
       offset={[0, 8]}
     >
       <ClickAwayListener onClickAway={onClose}>
-        <Box className={styles.container} bg="body">
-          <Box className={styles.title} p={2} py={1}>
-            {i18n.get("Mass Update")}
+        <Box className={styles.container} bg="body" p={2}>
+          <Box d="flex" alignItems="center">
+            <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+              {i18n.get("Mass Update")}
+            </Box>
+            <Box as="span" className={styles.icon} onClick={onClose}>
+              <MaterialIcon icon="close" />
+            </Box>
           </Box>
           <Divider />
           <Box p={2} py={1}>
@@ -216,14 +223,20 @@ export function MassUpdater({
               <Box d="flex" ms={2}>
                 <Box d="flex" alignItems="center">
                   <Input
+                    id={hasAllId}
                     m={0}
                     type="checkbox"
                     checked={isUpdateAll}
                     onChange={(e) => setUpdateAll(!isUpdateAll)}
                   />
-                </Box>
-                <Box d="flex" alignItems="center" ms={1}>
-                  {i18n.get("Update all")}
+                  <InputLabel
+                    ms={1}
+                    mb={0}
+                    alignItems="center"
+                    htmlFor={hasAllId}
+                  >
+                    {i18n.get("Update all")}
+                  </InputLabel>
                 </Box>
               </Box>
             </Box>
