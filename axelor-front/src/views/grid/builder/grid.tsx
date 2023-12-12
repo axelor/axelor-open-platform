@@ -356,13 +356,13 @@ export const Grid = forwardRef<
     return true;
   }, []);
 
+  const onRecordAdd = useCallback(async () => {
+    await commitForm();
+    return handleRecordAdd();
+  }, [commitForm, handleRecordAdd]);
+
   const handleRecordEdit = useCallback(
-    async (
-      row: GridRow,
-      rowIndex?: number,
-      column?: GridColumn,
-      colIndex?: number,
-    ) => {
+    async (row: GridRow, rowIndex?: number, column?: GridColumn) => {
       // Skip edit row for edit icon and check write permission
       if (
         ["icon", "button"].includes(column?.type ?? "") ||
@@ -432,9 +432,9 @@ export const Grid = forwardRef<
     ref,
     () => ({
       form: formRef,
-      onAdd: handleRecordAdd,
+      onAdd: onRecordAdd,
     }),
-    [formRef, handleRecordAdd],
+    [formRef, onRecordAdd],
   );
 
   useAsyncEffect(

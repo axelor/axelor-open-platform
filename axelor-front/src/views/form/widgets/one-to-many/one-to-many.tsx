@@ -15,7 +15,7 @@ import {
   useState,
 } from "react";
 
-import { Box, CommandItemProps, Panel, clsx } from "@axelor/ui";
+import { Box, Panel, clsx } from "@axelor/ui";
 import { GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
@@ -34,7 +34,7 @@ import { DataStore } from "@/services/client/data-store";
 import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { ViewData } from "@/services/client/meta";
+import { ActionResult, ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
   FormView,
@@ -187,7 +187,7 @@ function OneToManyInner({
       () =>
         atom(
           (get) => getItems(get(valueAtom)),
-          (
+          async (
             get,
             set,
             setter: SetStateAction<DataRecord[]>,
@@ -200,7 +200,20 @@ function OneToManyInner({
               typeof setter === "function" ? setter(get(valueAtom)!) : setter;
             const valIds = (values || []).map((v) => v.id);
 
-            set(valueAtom, values, callOnChange, markDirty);
+            const result = await set(
+              valueAtom,
+              values,
+              callOnChange,
+              markDirty,
+            );
+
+            const hasValueChanged = (
+              result as unknown as ActionResult[]
+            )?.filter?.(
+              ({ values, attrs }) =>
+                values?.[schema.name] !== undefined ||
+                attrs?.[schema.name]?.value !== undefined,
+            );
 
             setRecords((records) => {
               if (resetRecords) {
@@ -224,9 +237,19 @@ function OneToManyInner({
                 })
                 .concat(newRecords);
             });
+
+            /**
+             * if same o2m field values is changed on onChange event of itself
+             * then have to wait for values to get updated in state
+             */
+            if (hasValueChanged) {
+              await new Promise((resolve) => {
+                setTimeout(() => resolve(true), 500);
+              });
+            }
           },
         ),
-      [getItems, valueAtom],
+      [getItems, valueAtom, schema.name],
     ),
   );
 
@@ -270,7 +293,8 @@ function OneToManyInner({
   const canEdit = !readonly && hasButton("edit");
   const canView = hasButton("view");
   const canDelete = !readonly && hasButton("remove");
-  const canSelect = !readonly && hasButton("select") && (isManyToMany || attrs.canSelect);
+  const canSelect =
+    !readonly && hasButton("select") && (isManyToMany || attrs.canSelect);
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
   const _canMove = Boolean(schema.canMove ?? viewData?.view?.canMove);
 
@@ -536,7 +560,7 @@ function OneToManyInner({
 
         const changed = !isManyToMany || prevItems.length !== nextItems.length;
 
-        setValue(nextItems, changed, changed);
+        return setValue(nextItems, changed, changed);
       },
       [getItems, isManyToMany, setValue, valueAtom],
     ),
@@ -640,10 +664,10 @@ function OneToManyInner({
   );
 
   const onSave = useCallback(
-    (record: DataRecord) => {
+    async (record: DataRecord) => {
       const { id, $id, ...rest } = record;
       record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
-      handleSelect([record]);
+      await handleSelect([record]);
       setDetailRecord((details) =>
         details?.id === record.id ? record : details,
       );
@@ -656,7 +680,8 @@ function OneToManyInner({
     openEditor({}, (record) => handleSelect([record]), onSave);
   }, [openEditor, onSave, handleSelect]);
 
-  const onAddInGrid = useCallback(() => {
+  const onAddInGrid = useCallback((e: any) => {
+    e?.preventDefault?.();
     const gridHandler = gridRef.current;
     if (gridHandler) {
       gridHandler.onAdd?.();
