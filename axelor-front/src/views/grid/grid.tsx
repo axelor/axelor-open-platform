@@ -236,6 +236,14 @@ function GridInner(props: ViewProps<GridView>) {
             .filter((id) => id > 0);
       const count = hasAll ? totalCount : ids.length;
       const { model } = view;
+      
+      if (count === 0) {
+        return dialogs.info({
+          content: hasAll
+            ? i18n.get("There are no records to update.")
+            : i18n.get("Please select at least one record."),
+        });
+      }
 
       const confirmed = await dialogs.confirm({
         content: i18n.get(
