@@ -147,13 +147,12 @@ export function createValueAtom({
 }) {
   const { name, editable, readonly, onChange } = schema;
 
-  const triggerOnChange = () => {
+  const triggerOnChange = () =>
     onChange &&
-      actionExecutor.execute(
-        onChange,
-        name ? { context: { _source: name } } : {},
-      );
-  };
+    actionExecutor.execute(
+      onChange,
+      name ? { context: { _source: name } } : {},
+    );
 
   // special case for editable grid form
   const lensDottedAtom =
@@ -193,7 +192,7 @@ export function createValueAtom({
         set(dirtyAtom, true);
       }
 
-      fireOnChange && triggerOnChange();
+      return fireOnChange && triggerOnChange();
     },
   );
 }
