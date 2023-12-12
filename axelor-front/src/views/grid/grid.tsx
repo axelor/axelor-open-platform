@@ -236,7 +236,7 @@ function GridInner(props: ViewProps<GridView>) {
             .filter((id) => id > 0);
       const count = hasAll ? totalCount : ids.length;
       const { model } = view;
-      
+
       if (count === 0) {
         return dialogs.info({
           content: hasAll
@@ -254,6 +254,17 @@ function GridInner(props: ViewProps<GridView>) {
       if (confirmed) {
         setMassUpdatePopperEl(null);
 
+        let _domain = action.domain;
+        let _context = { _model: model, ...action.context } as any;
+        if (!hasAll) {
+          if (_domain) {
+            _domain = _domain + " AND self.id IN (:__ids__)";
+          } else {
+            _domain = "self.id IN (:__ids__)";
+          }
+          _context = { __ids__: ids, ..._context };
+        }
+
         const { filter, ...data } = getSearchOptions();
         const resp = await request({
           url: `ws/rest/${model}/updateMass`,
@@ -262,13 +273,8 @@ function GridInner(props: ViewProps<GridView>) {
             data: {
               ...data,
               ...filter,
-              ...(!hasAll && {
-                _domain: "self.id IN (:__ids__)",
-                _domainContext: {
-                  __ids__: ids,
-                  _model: model,
-                },
-              }),
+              _domain: _domain,
+              _domainContext: _context,
             },
             records: [values],
           },
@@ -779,8 +785,8 @@ function GridInner(props: ViewProps<GridView>) {
           onRowClick: detailsViewOverlay
             ? onShowDetails
             : selectedDetail
-            ? onLoadDetails
-            : undefined,
+              ? onLoadDetails
+              : undefined,
         }),
       }
     : {};
