@@ -230,16 +230,17 @@ function GridInner(props: ViewProps<GridView>) {
   const onMassUpdate = useCallback(
     async (values: Partial<DataRecord>, hasAll?: boolean) => {
       const ids = hasAll
-        ? records.map((r) => r.id!)
+        ? []
         : (selectedRows || [])
             .map((ind) => rows[ind]?.record?.id)
             .filter((id) => id > 0);
+      const count = hasAll ? totalCount : ids.length;
       const { model } = view;
 
       const confirmed = await dialogs.confirm({
         content: i18n.get(
           "Do you really want to update all {0} record(s)?",
-          ids.length,
+          count,
         ),
       });
       if (confirmed) {
