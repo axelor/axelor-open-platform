@@ -159,7 +159,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find((item) => !item.readonly)
+      const defaultColumnName = view.items?.find((item) => !item.readonly && !item.hidden)
         ?.name;
       const editColumn = view.items?.find((c) => c.name === editColumnName);
       const name = editColumn?.readonly
