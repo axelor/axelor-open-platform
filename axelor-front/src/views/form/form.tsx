@@ -430,9 +430,10 @@ const FormContainer = memo(function FormContainer({
         readonly,
         onNewAction,
         onLoadAction,
-        switchTo,
+        tabAtom,
         recordRef,
         tabId,
+        switchTo,
         setFormDirty,
         setDirty,
         setReady,
@@ -973,9 +974,7 @@ const FormContainer = memo(function FormContainer({
     key: "f",
     altKey: true,
     canHandle: useCallback(
-      () =>
-        currentViewType === schema.type &&
-        searchViewType != null,
+      () => currentViewType === schema.type && searchViewType != null,
       [searchViewType, currentViewType, schema.type],
     ),
     action: useCallback(() => {

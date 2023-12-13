@@ -227,6 +227,9 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onSearch = useAfterActions(doSearch);
 
+  const { page } = dataStore;
+  const { offset = 0, limit = 40, totalCount = 0 } = page;
+
   const onMassUpdate = useCallback(
     async (values: Partial<DataRecord>, hasAll?: boolean) => {
       const ids = hasAll
@@ -288,7 +291,16 @@ function GridInner(props: ViewProps<GridView>) {
         onSearch();
       }
     },
-    [onSearch, getSearchOptions, selectedRows, rows, records, view],
+    [
+      selectedRows,
+      totalCount,
+      view,
+      rows,
+      action.domain,
+      action.context,
+      getSearchOptions,
+      onSearch,
+    ],
   );
 
   const onDelete = useCallback(
@@ -545,9 +557,6 @@ function GridInner(props: ViewProps<GridView>) {
       onEdit(records[0], true);
     }
   }, [records, onEdit, action]);
-
-  const { page } = dataStore;
-  const { offset = 0, limit = 40, totalCount = 0 } = page;
 
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
