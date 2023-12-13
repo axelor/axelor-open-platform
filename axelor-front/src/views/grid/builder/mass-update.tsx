@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { useMemo, useState, useId } from "react";
 
 import {
@@ -15,7 +16,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Select } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { Property } from "@/services/client/meta.types";
+import { Field, GridView, Property } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Widget } from "@/view-containers/advance-search/editor/components";
 
@@ -28,27 +29,35 @@ type MassUpdateItem = {
 
 const getNewItem = () => ({ field: null, value: null }) as MassUpdateItem;
 
-export function useMassUpdateFields(fields?: Record<string, Property>) {
-  return useMemo(
-    () =>
-      Object.keys(fields ?? {}).reduce(($fields, key) => {
-        const field = fields?.[key];
-        const { name = "" } = field || {};
-        if (
-          !field?.massUpdate ||
-          /^(id|version|selected|archived|((updated|created)(On|By)))$/.test(
-            name,
-          ) ||
-          (field as any).large ||
-          field.unique ||
-          ["BINARY", "ONE_TO_MANY", "MANY_TO_MANY"].includes(field.type)
-        ) {
-          return $fields;
-        }
-        return [...$fields, field];
-      }, [] as Property[]),
-    [fields],
-  );
+export function useMassUpdateFields(
+  fields: Record<string, Property> | undefined,
+  items: GridView["items"],
+) {
+  return useMemo(() => {
+    const _fields: Property[] = [];
+    const accept = (field: Property | undefined, item: Field) => {
+      if (
+        !field ||
+        !(item.massUpdate ?? field.massUpdate) ||
+        /^(id|version|selected|archived|((updated|created)(On|By)))$/.test(
+          field.name,
+        ) ||
+        (field as any).large ||
+        field.unique ||
+        ["BINARY", "ONE_TO_MANY", "MANY_TO_MANY"].includes(field.type)
+      ) {
+        return;
+      }
+      _fields.push({ ...field, title: item.title ?? field.title });
+    };
+    _.each(items, (item) => {
+      if (item.type === "field") {
+        accept(fields?.[item.name!], item as Field);
+      }
+    });
+
+    return _fields;
+  }, [fields, items]);
 }
 
 export function MassUpdater({

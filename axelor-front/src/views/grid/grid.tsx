@@ -858,7 +858,7 @@ function GridInner(props: ViewProps<GridView>) {
   // register tab:refresh
   useViewTabRefresh("grid", onSearch);
 
-  const massUpdateFields = useMassUpdateFields(allFields);
+  const massUpdateFields = useMassUpdateFields(allFields, view.items);
   const canMassUpdate = perms?.massUpdate && massUpdateFields.length > 0;
   const canCustomize =
     view.name &&
