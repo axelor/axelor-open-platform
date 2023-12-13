@@ -11,7 +11,7 @@ import { Icon } from "@/components/icon";
 import { Field } from "@/services/client/meta.types";
 
 import { WidgetControl, WidgetProps } from "../../builder";
-import { useFormScope, useWidgetState } from "../../builder/scope";
+import { useFormEditableScope, useFormScope, useWidgetState } from "../../builder/scope";
 import { useReadonly } from "../button/hooks";
 
 import styles from "./info-button.module.scss";
@@ -25,6 +25,7 @@ export function InfoButton(props: WidgetProps) {
     attrs: { title },
   } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
+  const { commit: commitEditableWidgets } = useFormEditableScope();
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
   );
@@ -44,6 +45,7 @@ export function InfoButton(props: WidgetProps) {
     }
     try {
       setWait(true);
+      await commitEditableWidgets();
       await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
@@ -54,7 +56,7 @@ export function InfoButton(props: WidgetProps) {
     } finally {
       setWait(false);
     }
-  }, [actionExecutor, schema]);
+  }, [commitEditableWidgets, actionExecutor, schema]);
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;

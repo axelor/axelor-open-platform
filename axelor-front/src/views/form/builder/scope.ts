@@ -219,6 +219,25 @@ export function useFormValidityScope() {
   return useAtomValue(scopeAtom);
 }
 
+export type FormEditableScopeState = {
+  add: (fn: () => void) => () => void;
+  commit: () => void;
+};
+
+export const FormEditableScope = createScope<FormEditableScopeState>({
+  add: () => () => {},
+  commit: () => {},
+});
+
+const formEditableMolecule = molecule((getMol, getScope) => {
+  return atom(getScope(FormEditableScope));
+});
+
+export function useFormEditableScope() {
+  const scopeAtom = useMolecule(formEditableMolecule);
+  return useAtomValue(scopeAtom);
+}
+
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
   const { findItem } = useViewMeta();
 

@@ -10,7 +10,7 @@ import { useSession } from "@/hooks/use-session";
 import { Schema } from "@/services/client/meta.types";
 
 import { WidgetControl, WidgetProps } from "../../builder";
-import { useFormScope } from "../../builder/scope";
+import { useFormEditableScope, useFormScope } from "../../builder/scope";
 import { useReadonly } from "./hooks";
 
 import { Icon } from "@/components/icon";
@@ -69,12 +69,13 @@ export function Button(props: WidgetProps) {
   const { data: sessionInfo } = useSession();
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
+  const { commit: commitEditableWidgets } = useFormEditableScope();
   const { title } = attrs;
 
   const variant = findVariant(schema);
   const [wait, setWait] = useState(false);
 
-  const handleClick = useCallback(async () => {
+  const handleClick = useCallback(async (e: Event) => {
     const { prompt, onClick } = schema;
     if (prompt) {
       const confirmed = await dialogs.confirm({
@@ -83,7 +84,9 @@ export function Button(props: WidgetProps) {
       if (!confirmed) return;
     }
     try {
+      e.preventDefault();
       setWait(true);
+      await commitEditableWidgets();
       await actionExecutor.waitFor();
       await actionExecutor.execute(onClick, {
         context: {
@@ -94,7 +97,7 @@ export function Button(props: WidgetProps) {
     } finally {
       setWait(false);
     }
-  }, [actionExecutor, schema]);
+  }, [commitEditableWidgets, actionExecutor, schema]);
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;

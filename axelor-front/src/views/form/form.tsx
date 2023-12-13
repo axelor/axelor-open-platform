@@ -65,6 +65,7 @@ import {
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
 import {
+  FormEditableScope,
   FormValidityHandler,
   FormValidityScope,
   useAfterActions,
@@ -300,6 +301,7 @@ const FormContainer = memo(function FormContainer({
 
   const copyRecordRef = useRef(false);
   const widgetsRef = useRef(new Set<FormValidityHandler>());
+  const editableWidgetsRef = useRef(new Set<() => void>());
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
@@ -937,6 +939,17 @@ const FormContainer = memo(function FormContainer({
     return () => widgetsRef.current.delete(fn);
   }, []);
 
+  const handleAddEditableWidget = useCallback((fn: () => void) => {
+    editableWidgetsRef.current.add(fn);
+    return () => editableWidgetsRef.current.delete(fn);
+  }, []);
+
+  const handleCommitEditableWidgets = useCallback(() => {
+    return Promise.all(
+      Array.from(editableWidgetsRef.current).map((fn) => fn()),
+    );
+  }, []);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleFocus = useHandleFocus(containerRef);
@@ -1133,23 +1146,31 @@ const FormContainer = memo(function FormContainer({
       )}
       <div className={styles.formViewScroller} ref={containerRef}>
         <ScopeProvider
-          scope={FormValidityScope}
+          scope={FormEditableScope}
           value={{
-            add: handleAddWidgetValidator,
+            add: handleAddEditableWidget,
+            commit: handleCommitEditableWidgets,
           }}
         >
-          <FormComponent
-            className={styles.formView}
-            readonly={readonly}
-            schema={meta.view}
-            fields={meta.fields!}
-            formAtom={formAtom}
-            recordHandler={recordHandler}
-            actionHandler={actionHandler}
-            actionExecutor={actionExecutor}
-            layout={Layout}
-            widgetAtom={widgetAtom}
-          />
+          <ScopeProvider
+            scope={FormValidityScope}
+            value={{
+              add: handleAddWidgetValidator,
+            }}
+          >
+            <FormComponent
+              className={styles.formView}
+              readonly={readonly}
+              schema={meta.view}
+              fields={meta.fields!}
+              formAtom={formAtom}
+              recordHandler={recordHandler}
+              actionHandler={actionHandler}
+              actionExecutor={actionExecutor}
+              layout={Layout}
+              widgetAtom={widgetAtom}
+            />
+          </ScopeProvider>
         </ScopeProvider>
       </div>
     </div>

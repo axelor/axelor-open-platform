@@ -32,7 +32,11 @@ import {
   WidgetProps,
   useFormHandlers,
 } from "@/views/form/builder";
-import { useFormScope, useFormValidityScope } from "@/views/form/builder/scope";
+import {
+  useFormEditableScope,
+  useFormScope,
+  useFormValidityScope,
+} from "@/views/form/builder/scope";
 
 import styles from "./form.module.scss";
 
@@ -159,8 +163,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find((item) => !item.readonly && !item.hidden)
-        ?.name;
+      const defaultColumnName = view.items?.find(
+        (item) => !item.readonly && !item.hidden,
+      )?.name;
       const editColumn = view.items?.find((c) => c.name === editColumnName);
       const name = editColumn?.readonly
         ? defaultColumnName
@@ -178,6 +183,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     }, [editColumnName, view.items]);
 
     const { add: addWidgetValidator } = useFormValidityScope();
+    const { add: addEditableWidget } = useFormEditableScope();
+
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
@@ -290,22 +297,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       [handleSave, handleCancel],
     );
 
-    useTabShortcut({
-      key: "g",
-      altKey: true,
-      action: useHandleFocus(containerRef),
-    });
-
-    const handleClickOutside = useAtomCallback(
+    const handleRecordCommit = useAtomCallback(
       useCallback(
-        (get, set, e: Event) => {
-          if (e.defaultPrevented) return;
-          const parent = getParent();
-
-          if (parent && !parent?.contains?.(e.target as Node)) {
-            return;
-          }
-
+        (get, set) => {
           const { record, original } = get(formAtom);
 
           if (isEqual(record, recordRef.current)) {
@@ -316,13 +310,32 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
           // check if not changed then discard it.
           if (isEqual(record, original)) {
-            handleCancel();
-          } else {
-            handleSave(true);
+            return handleCancel();
           }
+          return handleSave(true);
         },
-        [getParent, formAtom, handleSave, handleCancel],
+        [formAtom, handleSave, handleCancel],
       ),
+    );
+
+    useTabShortcut({
+      key: "g",
+      altKey: true,
+      action: useHandleFocus(containerRef),
+    });
+
+    const handleClickOutside = useCallback(
+      (e: Event) => {
+        if (e.defaultPrevented) return;
+        const parent = getParent();
+
+        if (parent && !parent?.contains?.(e.target as Node)) {
+          return;
+        }
+
+        return handleRecordCommit();
+      },
+      [getParent, handleRecordCommit],
     );
 
     const CustomLayout = useMemo(
@@ -353,6 +366,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     useEffect(() => {
       return addWidgetValidator(checkInvalid);
     }, [addWidgetValidator, checkInvalid]);
+
+    useEffect(() => {
+      return addEditableWidget(handleRecordCommit);
+    }, [addEditableWidget, handleRecordCommit]);
 
     useAsyncEffect(async () => {
       if (onNewAction) {
@@ -407,7 +424,6 @@ function MainShortcuts({
     columnIndex?: number,
   ) => Promise<unknown>;
 }) {
-  
   useTabShortcut({
     key: "s",
     ctrlKey: true,
