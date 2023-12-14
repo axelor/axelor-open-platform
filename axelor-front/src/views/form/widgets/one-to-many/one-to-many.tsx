@@ -1,7 +1,7 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+
 import getNested from "lodash/get";
 import isEqual from "lodash/isEqual";
 import {
@@ -42,6 +42,7 @@ import {
   Property,
   View,
 } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
@@ -154,7 +155,15 @@ function OneToManyInner({
   const [, forceUpdate] = useReducer(() => ({}), {});
 
   const widgetState = useMemo(
-    () => focusAtom(formAtom, (o) => o.prop("statesByName").prop(name)),
+    () =>
+      focusAtom(
+        formAtom,
+        ({ statesByName = {} }) => statesByName[name],
+        ({ statesByName = {}, ...rest }, value) => ({
+          ...rest,
+          statesByName: { ...statesByName, [name]: value },
+        }),
+      ),
     [formAtom, name],
   );
 

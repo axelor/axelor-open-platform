@@ -1,17 +1,20 @@
-import { ReactElement, useCallback, useEffect, useMemo } from "react";
-import { Box, Button } from "@axelor/ui";
-import { useAtomCallback } from "jotai/utils";
 import { useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { useAtomCallback } from "jotai/utils";
+import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
+import { Box, Button } from "@axelor/ui";
+
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import { i18n } from "@/services/client/i18n";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { focusAtom } from "@/utils/atoms";
+
 import { Form, FormAtom, useFormHandlers } from "../../builder";
-import { Layout, showErrors, useGetErrors } from "../../form";
 import { useFormScope } from "../../builder/scope";
+import { Layout, showErrors, useGetErrors } from "../../form";
+
 import styles from "./one-to-many.details.module.scss";
 
 interface DetailsFormProps {
@@ -52,7 +55,15 @@ export function DetailsForm({
   const isNew = (record?.id ?? 0) < 0 && !record?._dirty;
 
   const setReady = useSetAtom(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("ready")), [formAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          formAtom,
+          (state) => state.ready,
+          (state, ready) => ({ ...state, ready }),
+        ),
+      [formAtom],
+    ),
   );
 
   const handleSave = useAtomCallback(
@@ -94,8 +105,8 @@ export function DetailsForm({
         (record?.id ?? 0) > 0 || record?._dirty
           ? onLoad
           : readonly
-          ? ""
-          : onNew;
+            ? ""
+            : onNew;
       action && (await actionExecutor.execute(action));
     }
   }, [record, meta.view, readonly, actionExecutor]);
