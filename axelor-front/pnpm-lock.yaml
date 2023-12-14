@@ -73,9 +73,6 @@ dependencies:
   jotai-molecules:
     specifier: ^1.2.0
     version: 1.2.0(react@18.2.0)
-  jotai-optics:
-    specifier: ^0.3.1
-    version: 0.3.1(jotai@2.6.0)(optics-ts@2.4.1)
   jsdom:
     specifier: ^23.0.1
     version: 23.0.1
@@ -85,9 +82,6 @@ dependencies:
   monaco-editor:
     specifier: ^0.45.0
     version: 0.45.0
-  optics-ts:
-    specifier: ^2.4.1
-    version: 2.4.1
   parse5:
     specifier: ^7.1.2
     version: 7.1.2
@@ -4479,16 +4473,6 @@ packages:
       - vue
     dev: false
 
-  /jotai-optics@0.3.1(jotai@2.6.0)(optics-ts@2.4.1):
-    resolution: {integrity: sha512-KibUx9IneM2hGWGIYGs/v0KCxU985lg7W2c6dt5RodJCB2XPbmok8rkkLmdVk9+fKsn2shkPMi+AG8XzHgB3+w==}
-    peerDependencies:
-      jotai: '>=1.11.0'
-      optics-ts: '*'
-    dependencies:
-      jotai: 2.6.0(@types/react@18.2.43)(react@18.2.0)
-      optics-ts: 2.4.1
-    dev: false
-
   /jotai@2.6.0(@types/react@18.2.43)(react@18.2.0):
     resolution: {integrity: sha512-Vt6hsc04Km4j03l+Ax+Sc+FVft5cRJhqgxt6GTz6GM2eM3DyX3CdBdzcG0z2FrlZToL1/0OAkqDghIyARWnSuQ==}
     engines: {node: '>=12.20.0'}
@@ -4842,10 +4826,6 @@ packages:
     dependencies:
       mimic-fn: 4.0.0
     dev: true
-
-  /optics-ts@2.4.1:
-    resolution: {integrity: sha512-HaYzMHvC80r7U/LqAd4hQyopDezC60PO2qF5GuIwALut2cl5rK1VWHsqTp0oqoJJWjiv6uXKqsO+Q2OO0C3MmQ==}
-    dev: false
 
   /optionator@0.9.3:
     resolution: {integrity: sha512-JjCoypp+jKn1ttEFExxhetCKeJt9zhAgAve5FXHixTvFDW/5aEktX9bufBKLRRMdU7bNtpLfcGu94B3cdEJgjg==}
