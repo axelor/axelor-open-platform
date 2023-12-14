@@ -1,13 +1,16 @@
-import { Input, clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
+
+import { Input, clsx } from "@axelor/ui";
+
+import { focusAtom } from "@/utils/atoms";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import styles from "./string.module.scss";
 import { Translatable } from "./translatable";
 import { ViewerInput } from "./viewer";
+
+import styles from "./string.module.scss";
 
 export function String({
   inputProps,
@@ -26,10 +29,19 @@ export function String({
 
   const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
 
+  const trKey = `$t:${name}`;
   const [trValue, setTranslateValue] = useAtom(
     useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop(`$t:${name}`)),
-      [name, formAtom],
+      () =>
+        focusAtom(
+          formAtom,
+          ({ record }) => record[trKey],
+          ({ record, ...rest }, value) => ({
+            ...rest,
+            record: { ...record, [trKey]: value },
+          }),
+        ),
+      [formAtom, trKey],
     ),
   );
 
