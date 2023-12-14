@@ -1,7 +1,7 @@
+import { produce } from "immer";
 import { SetStateAction, atom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
-import { useMemo, useRef } from "react";
 import isObject from "lodash/isObject";
+import { useMemo, useRef } from "react";
 
 import { Box } from "@axelor/ui";
 
@@ -12,9 +12,11 @@ import {
   Schema,
   Selection as SelectionType,
 } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
+import { deepGet, deepSet } from "@/utils/objects";
 
-import { createWidgetAtom } from "../../builder/atoms";
 import { FieldControl, FieldProps, ValueAtom } from "../../builder";
+import { createWidgetAtom } from "../../builder/atoms";
 import { ManyToOne } from "../many-to-one";
 import { Selection } from "../selection";
 
@@ -23,7 +25,15 @@ export function RefSelect(props: FieldProps<any>) {
 
   const relatedAtom = useMemo(() => {
     const related = schema.related ?? schema.name + "Id";
-    return focusAtom(formAtom, (o) => o.prop("record").path(related));
+    return focusAtom(
+      formAtom,
+      (state) => deepGet(state.record, related),
+      (state, value) => {
+        return produce(state, (draft) => {
+          deepSet(draft.record, related, value);
+        });
+      },
+    );
   }, [formAtom, schema]);
 
   const valueAtom = useMemo(() => {
