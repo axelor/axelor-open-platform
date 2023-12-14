@@ -1,7 +1,6 @@
-import { useAtomCallback } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { focusAtom } from "jotai-optics";
 import { useAtom, useAtomValue } from "jotai";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
@@ -27,6 +26,7 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { useRoute } from "@/hooks/use-route";
 import { useNavShortcuts } from "@/hooks/use-shortcut";
+import { i18n } from "@/services/client/i18n.ts";
 import {
   Button,
   Menu,
@@ -34,12 +34,12 @@ import {
   MenuItem,
   Widget,
 } from "@/services/client/meta.types";
-import { FormAtom, RecordHandler, WidgetState } from "@/views/form/builder";
+import { FormAtom, RecordHandler } from "@/views/form/builder";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
+
 import { ActionExecutor, ActionOptions } from "../action";
 
 import styles from "./view-toolbar.module.scss";
-import { i18n } from "@/services/client/i18n.ts";
 
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
@@ -88,14 +88,7 @@ function ActionCommandItem({
 
   const attrs = useAtomValue(
     useMemo(
-      () =>
-        focusAtom(formAtom, (o) =>
-          o
-            .prop("statesByName")
-            .prop(name ?? "__")
-            .valueOr({ name, attrs: {} } as WidgetState)
-            .prop("attrs"),
-        ),
+      () => selectAtom(formAtom, (o) => o.statesByName[name!]?.attrs ?? {}),
       [name, formAtom],
     ),
   );
