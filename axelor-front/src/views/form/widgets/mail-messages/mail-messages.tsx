@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { selectAtom } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -11,6 +11,7 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 
+import { focusAtom } from "@/utils/atoms";
 import { FormAtom, WidgetProps } from "../../builder";
 import { useAfterActions, useFormRefresh } from "../../builder/scope";
 import { MessageBox } from "./message";
@@ -25,8 +26,8 @@ async function findMessages(
   const { total = 0, data = [] } = await (parent
     ? DataSource.replies(parent)
     : folder
-    ? DataSource.folder(folder!, limit, offset)
-    : DataSource.messages(id, model, { type, limit, offset }));
+      ? DataSource.folder(folder!, limit, offset)
+      : DataSource.messages(id, model, { type, limit, offset }));
   return {
     pageInfo: {
       totalRecords: total,
@@ -52,7 +53,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
   const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
   const fields = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("fields")), [formAtom]),
+    useMemo(() => selectAtom(formAtom, (o) => o.fields), [formAtom]),
   );
   const isMessageBox = model === "com.axelor.mail.db.MailMessage";
   const folder = isMessageBox ? name.split(".").pop() : "";
@@ -361,7 +362,15 @@ function MessageBoxUpdates({
 }) {
   const [__empty, setEmpty] = useAtom(
     useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("__empty")),
+      () =>
+        focusAtom(
+          formAtom,
+          ({ record }) => record.__empty,
+          ({ record, ...rest }, __empty) => ({
+            ...rest,
+            record: { ...record, __empty },
+          }),
+        ),
       [formAtom],
     ),
   );
