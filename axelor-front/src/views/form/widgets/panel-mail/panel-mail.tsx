@@ -1,7 +1,8 @@
 import { useAtomValue } from "jotai";
-import { GridLayout, WidgetProps } from "../../builder";
+import { selectAtom } from "jotai/utils";
 import { useMemo } from "react";
-import { focusAtom } from "jotai-optics";
+
+import { GridLayout, WidgetProps } from "../../builder";
 
 const WIDGET_COLSPAN: Record<string, number> = {
   "mail-messages": 9,
@@ -11,14 +12,11 @@ const WIDGET_COLSPAN: Record<string, number> = {
 export function PanelMail(props: WidgetProps) {
   const { formAtom, widgetAtom, schema } = props;
   const recordId = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
-      [formAtom]
-    )
+    useMemo(() => selectAtom(formAtom, (o) => o.record.id), [formAtom]),
   );
 
   const model = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom])
+    useMemo(() => selectAtom(formAtom, (o) => o.model), [formAtom]),
   );
 
   const $schema = useMemo(() => {
