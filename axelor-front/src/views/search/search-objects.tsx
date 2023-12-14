@@ -1,5 +1,4 @@
 import { PrimitiveAtom, useAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { useCallback, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -9,6 +8,7 @@ import { Select, SelectProps } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem, SearchView } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 
 import { SelectionTag } from "../form/widgets";
 import { fetchMenus } from "./utils";
@@ -71,24 +71,47 @@ export function SearchObjects({
 }) {
   const [selectValue, onSelectChange] = useAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("selectValue")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (state) => state.selectValue,
+          (state, selectValue) => ({ ...state, selectValue }),
+        ),
       [stateAtom],
     ),
   );
   const [actionCategory, setActionCategory] = useAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("actionCategory")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (state) => state.actionCategory,
+          (state, actionCategory) => ({ ...state, actionCategory }),
+        ),
       [stateAtom],
     ),
   );
   const [actionSubCategory, setActionSubCategory] = useAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("actionSubCategory")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (state) => state.actionSubCategory,
+          (state, actionSubCategory) => ({ ...state, actionSubCategory }),
+        ),
       [stateAtom],
     ),
   );
   const [action, setAction] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("action")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (state) => state.action,
+          (state, action) => ({ ...state, action }),
+        ),
+      [stateAtom],
+    ),
   );
   const [searchParams] = useSearchParams();
 
