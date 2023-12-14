@@ -1,7 +1,6 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
   MutableRefObject,
@@ -25,7 +24,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
-import { useTabShortcut, useShortcuts } from "@/hooks/use-shortcut";
+import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { diff, extractDummy } from "@/services/client/data-utils";
@@ -35,6 +34,7 @@ import { ViewData } from "@/services/client/meta";
 import { FormView, Perms, Schema } from "@/services/client/meta.types";
 import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
+import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -263,13 +263,26 @@ const FormContainer = memo(function FormContainer({
   const attachmentItem = useFormAttachment(formAtom);
 
   const readyAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.prop("ready")),
+    () =>
+      focusAtom(
+        formAtom,
+        (state) => state.ready,
+        (state, ready) => ({ ...state, ready }),
+      ),
     [formAtom],
   );
   const setReady = useSetAtom(readyAtom);
 
   const [formDirty, setFormDirty] = useAtom(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("dirty")), [formAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          formAtom,
+          (state) => state.dirty,
+          (state, dirty) => ({ ...state, dirty }),
+        ),
+      [formAtom],
+    ),
   );
 
   const archived = useAtomValue(
@@ -987,7 +1000,12 @@ const FormContainer = memo(function FormContainer({
 
   const setSearchFocusTabId = useSetAtom(
     useMemo(
-      () => focusAtom(searchAtom!, (o) => o.prop("focusTabId")),
+      () =>
+        focusAtom(
+          searchAtom!,
+          (state) => state.focusTabId,
+          (state, focusTabId) => ({ ...state, focusTabId }),
+        ),
       [searchAtom],
     ),
   );
@@ -1348,7 +1366,14 @@ export function useFormAttachment(formAtom: FormAtom) {
   const [$attachments, setAttachmentCount] = useAtom(
     useMemo(
       () =>
-        focusAtom(formAtom, (form) => form.prop("record").prop("$attachments")),
+        focusAtom(
+          formAtom,
+          (state) => state.record.$attachments ?? 0,
+          (state, $attachments) => ({
+            ...state,
+            record: { ...state.record, $attachments },
+          }),
+        ),
       [formAtom],
     ),
   );

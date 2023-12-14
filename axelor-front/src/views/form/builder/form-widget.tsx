@@ -1,5 +1,4 @@
 import { useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isUndefined from "lodash/isUndefined";
@@ -15,6 +14,7 @@ import {
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 import { validate } from "@/utils/validate";
 import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
 
@@ -23,14 +23,7 @@ import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
-import {
-  FieldProps,
-  ValueAtom,
-  WidgetAtom,
-  WidgetErrors,
-  WidgetProps,
-  WidgetState,
-} from "./types";
+import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
 
 type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
   render?: (props: WidgetProps) => React.ReactNode;
@@ -178,19 +171,27 @@ function FormField({
   ...props
 }: WidgetProps & { component: React.ElementType; valueAtom: ValueAtom<any> }) {
   const { schema, formAtom, widgetAtom, valueAtom } = props;
+  const { name = "" } = schema;
 
   const serverErrorAtom = useMemo(
     () =>
-      focusAtom(formAtom, (o) =>
-        o
-          .prop("statesByName")
-          .prop(schema.name ?? "")
-          .valueOr({ errors: {} } as WidgetState)
-          .prop("errors")
-          .valueOr({ error: "" } as WidgetErrors)
-          .prop("error"),
+      focusAtom(
+        formAtom,
+        (formState) => formState.statesByName[name]?.errors?.error,
+        (formState, error) => {
+          const { statesByName = {} } = formState;
+          const state = statesByName[name] ?? {};
+          const errors = state.errors ?? {};
+          return {
+            ...formState,
+            statesByName: {
+              ...statesByName,
+              [name]: { ...state, errors: { ...errors, error } },
+            },
+          };
+        },
       ),
-    [formAtom, schema.name],
+    [formAtom, name],
   );
 
   const clearError = useAtomCallback(
