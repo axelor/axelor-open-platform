@@ -26,7 +26,7 @@ import { request } from "@/services/client/client";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { findView } from "@/services/client/meta-cache";
+import { findActionView, findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { AdvanceSearch } from "@/view-containers/advance-search";
@@ -326,12 +326,13 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onEditInPopup = useCallback(
-    (record: DataRecord, readonly = false) => {
+    (record: DataRecord, context: DataContext, readonly = false) => {
       showEditor({
         model: view.model!,
         title: view.title ?? "",
         viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
         maximize: hasPopupMaximize,
+        context,
         record,
         readonly,
         onSearch: () => onSearch({}),
@@ -341,7 +342,7 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onEditInTab = useCallback(
-    (record: DataRecord, readonly = false) => {
+    (record: DataRecord, context: DataContext, readonly = false) => {
       openTab({
         ...action,
         name: uniqueId("$act"),
@@ -350,6 +351,7 @@ function GridInner(props: ViewProps<GridView>) {
           forceEdit: !readonly,
         },
         context: {
+          ...context,
           _showRecord: record.id,
         },
       });
@@ -362,13 +364,22 @@ function GridInner(props: ViewProps<GridView>) {
   const hasEditInMobile = isMobile && editable;
 
   const onEdit = useCallback(
-    (record: DataRecord, readonly = false) => {
+    async (record: DataRecord, readonly = false) => {
       if (dashlet || hasEditInMobile) {
+        let viewContext = {};
+        if (dashlet) {
+          const { _domainAction, ...formContext } = getViewContext() ?? {};
+          const actionView = await findActionView(_domainAction, formContext, {
+            silent: true,
+          });
+          viewContext = { ...actionView.context };
+        }
+
         const forceEdit = action.params?.["forceEdit"];
         if (hasPopup || hasEditInMobile || viewProps?.readonly === true) {
-          return onEditInPopup(record, readonly);
+          return onEditInPopup(record, viewContext, readonly);
         }
-        return onEditInTab(record, forceEdit ? false : readonly);
+        return onEditInTab(record, viewContext, forceEdit ? false : readonly);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";
@@ -379,12 +390,13 @@ function GridInner(props: ViewProps<GridView>) {
     },
     [
       dashlet,
-      hasPopup,
       hasEditInMobile,
-      action.params,
-      viewProps?.readonly,
       switchTo,
+      action.params,
+      hasPopup,
+      viewProps?.readonly,
       onEditInTab,
+      getViewContext,
       onEditInPopup,
     ],
   );
