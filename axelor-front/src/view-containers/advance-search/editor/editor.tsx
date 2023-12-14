@@ -1,6 +1,5 @@
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
 import { ReactElement, useCallback, useEffect, useMemo } from "react";
 
@@ -16,6 +15,7 @@ import {
   Field,
   SavedFilter,
 } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 
 import { AdvancedSearchState } from "../types";
 import { getContextFieldFilter } from "../utils";
@@ -84,14 +84,35 @@ export function Editor({
     useMemo(() => selectAtom(stateAtom, (s) => s.filters), [stateAtom]),
   );
   const [editor, setEditor] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.editor,
+          (o, v) => ({ ...o, editor: v }),
+        ),
+      [stateAtom],
+    ),
   );
   const [archived, setArchived] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("archived")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.archived,
+          (o, v) => ({ ...o, archived: v }),
+        ),
+      [stateAtom],
+    ),
   );
   const [contextField, setContextField] = useAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("contextField")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.contextField,
+          (o, v) => ({ ...o, contextField: v }),
+        ),
       [stateAtom],
     ),
   );

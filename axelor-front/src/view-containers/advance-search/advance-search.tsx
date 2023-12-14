@@ -1,5 +1,4 @@
 import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { useAtomCallback } from "jotai/utils";
 import {
   KeyboardEvent,
@@ -40,13 +39,15 @@ import {
   SearchFilter,
   View,
 } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
-import { useViewAction, useViewTab } from "../views/scope";
-
 import { focusAndSelectInput } from "@/views/form";
 import { SelectionTag } from "@/views/form/widgets";
+
+import { useViewAction, useViewTab } from "../views/scope";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
+import { useFields } from "./editor/utils";
 import { FilterList } from "./filter-list";
 import { AdvancedSearchState } from "./types";
 import {
@@ -54,7 +55,6 @@ import {
   getFreeSearchCriteria,
   prepareAdvanceSearchQuery,
 } from "./utils";
-import { useFields } from "./editor/utils";
 
 import styles from "./advance-search.module.scss";
 
@@ -80,38 +80,87 @@ export function AdvanceSearch({
   const [open, setOpen] = useState(false);
   const { data: sessionInfo } = useSession();
   const setEditor = useSetAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("editor")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.editor,
+          (o, v) => ({ ...o, editor: v }),
+        ),
+      [stateAtom],
+    ),
   );
   const setContextField = useSetAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("contextField")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.contextField,
+          (o, v) => ({ ...o, contextField: v }),
+        ),
       [stateAtom],
     ),
   );
   const { fields, contextFields } = useFields(stateAtom);
   const [filters, setFilters] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("filters")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.filters,
+          (o, v) => ({ ...o, filters: v }),
+        ),
+      [stateAtom],
+    ),
   );
   const [domains, setDomains] = useAtom(
-    useMemo(() => focusAtom(stateAtom, (o) => o.prop("domains")), [stateAtom]),
+    useMemo(
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.domains,
+          (o, v) => ({ ...o, domains: v }),
+        ),
+      [stateAtom],
+    ),
   );
   const freeSearchTextAtom = useMemo(
-    () => focusAtom(stateAtom, (o) => o.prop("searchText")),
+    () =>
+      focusAtom(
+        stateAtom,
+        (o) => o.searchText,
+        (o, v) => ({ ...o, searchText: v }),
+      ),
     [stateAtom],
   );
   const focusTabIdAtom = useMemo(
-    () => focusAtom(stateAtom, (o) => o.prop("focusTabId")),
+    () =>
+      focusAtom(
+        stateAtom,
+        (o) => o.focusTabId,
+        (o, v) => ({ ...o, focusTabId: v }),
+      ),
     [stateAtom],
   );
   const searchTextLabel = useAtomValue(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("searchTextLabel")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.searchTextLabel,
+          (o, v) => ({ ...o, searchTextLabel: v }),
+        ),
       [stateAtom],
     ),
   );
   const [filterType, setFilterType] = useAtom(
     useMemo(
-      () => focusAtom(stateAtom, (o) => o.prop("filterType")),
+      () =>
+        focusAtom(
+          stateAtom,
+          (o) => o.filterType,
+          (o, v) => ({ ...o, filterType: v }),
+        ),
       [stateAtom],
     ),
   );
@@ -213,8 +262,8 @@ export function AdvanceSearch({
             d === (filter as SearchFilter)
               ? { ...d, checked: !d.checked }
               : type === "click"
-              ? { ...d, checked: false }
-              : d,
+                ? { ...d, checked: false }
+                : d,
           ),
       );
       type === "click" && handleApply();
@@ -232,8 +281,8 @@ export function AdvanceSearch({
             f === (filter as SavedFilter)
               ? { ...f, checked: !f.checked }
               : type === "click"
-              ? { ...f, checked: false }
-              : f,
+                ? { ...f, checked: false }
+                : f,
           ),
       );
       if (type === "click") {
@@ -339,17 +388,17 @@ export function AdvanceSearch({
           exportFull
             ? { fields: [] }
             : items
-            ? {
-                fields: items
-                  ?.filter(
-                    (item) =>
-                      item.name &&
-                      (item as GridColumn).visible !== false &&
-                      (item as GridColumn).searchable !== false,
-                  )
-                  .map((item) => item.name) as string[],
-              }
-            : {},
+              ? {
+                  fields: items
+                    ?.filter(
+                      (item) =>
+                        item.name &&
+                        (item as GridColumn).visible !== false &&
+                        (item as GridColumn).searchable !== false,
+                    )
+                    .map((item) => item.name) as string[],
+                }
+              : {},
         )
         .then(({ exportSize, fileName }) => {
           if ((dataStore.page?.totalCount ?? 0) > exportSize) {
