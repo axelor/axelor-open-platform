@@ -1,6 +1,5 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { focusAtom } from "jotai-optics";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
@@ -14,18 +13,19 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useSession } from "@/hooks/use-session";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
+import { DataContext } from "@/services/client/data.types";
 import { filters as fetchFilters } from "@/services/client/meta";
 import { findFields, findView } from "@/services/client/meta-cache";
-import { DataContext } from "@/services/client/data.types";
 import {
   AdvancedSearchAtom,
   Property,
   SearchFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 import { toCamelCase, toKebabCase } from "@/utils/names";
-
 import { processContextValues } from "@/views/form/builder/utils";
+
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
 import { MetaScope, ViewScope } from "./scope";
@@ -83,14 +83,24 @@ function ViewContainer({
 
   const setTabTitle = useSetAtom(
     useMemo(
-      () => focusAtom(tab.state, (state) => state.prop("title")),
+      () =>
+        focusAtom(
+          tab.state,
+          (state) => state.title,
+          (state, title) => ({ ...state, title }),
+        ),
       [tab.state],
     ),
   );
 
   const setTabName = useSetAtom(
     useMemo(
-      () => focusAtom(tab.state, (state) => state.prop("name")),
+      () =>
+        focusAtom(
+          tab.state,
+          (state) => state.name,
+          (state, name) => ({ ...state, name }),
+        ),
       [tab.state],
     ),
   );
@@ -153,9 +163,11 @@ function ViewPane({
   const {
     action: { views = [] },
   } = tab;
-  const typeAtom = useMemo(() => {
-    return selectAtom(tab.state, (x) => x.type);
-  }, [tab.state]);
+
+  const typeAtom = useMemo(
+    () => selectAtom(tab.state, (x) => x.type),
+    [tab.state],
+  );
 
   const type = useAtomValue(typeAtom);
   const view = useMemo(() => views.find((x) => x.type === type), [type, views]);

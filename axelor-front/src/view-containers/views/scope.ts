@@ -1,6 +1,5 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
-import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
 import { SetStateAction, useCallback, useEffect, useMemo } from "react";
@@ -17,9 +16,11 @@ import {
 import { SearchOptions } from "@/services/client/data";
 import { ViewData } from "@/services/client/meta";
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 import { usePrepareContext } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
+
 const fallbackAtom: TabAtom = atom(
   () => ({
     title: "",
@@ -218,7 +219,12 @@ export function useViewProps() {
 export function useViewDirtyAtom() {
   const tab = useViewTab();
   return useMemo(
-    () => focusAtom(tab.state, (o) => o.prop("dirty").valueOr(false)),
+    () =>
+      focusAtom(
+        tab.state,
+        (o) => o.dirty ?? false,
+        (o, v) => ({ ...o, dirty: v }),
+      ),
     [tab.state],
   );
 }
