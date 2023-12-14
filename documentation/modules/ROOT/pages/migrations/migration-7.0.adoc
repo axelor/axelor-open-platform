@@ -115,7 +115,7 @@ If the template is wrapped inside `<></>` (react fragment), it is considered as 
 
 Following UI components are supported: `Box`, `Badge`, `Alert`, `AlertHeader`, `AlertLink`, `Button`, `ButtonGroup`,
 `Divider`, `Image`, `Link`, `List`, `ListItem`, `Panel`, `Popper`, `Scrollable`, `Table`, `TableBody`, `TableHead`,
-`TableFoot`, `TableRow`, `TableCell`, `TableCaption`, `Icon` (expose Bootstrap icons).
+`TableFoot`, `TableRow`, `TableCell`, `TableCaption`, `Icon`.
 
 React template no more rely on main record context but on the field context for reference field (legacy template was
 inconsistent). So templates should be now :

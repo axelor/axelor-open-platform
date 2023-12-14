@@ -26,7 +26,8 @@ import {
   TableHead,
   TableRow,
 } from "@axelor/ui";
-import { BootstrapIcon as Icon } from "@axelor/ui/icons/bootstrap-icon";
+
+import { Icon } from "@/components/icon";
 
 import { parseSafe } from "./parser";
 
