@@ -1,9 +1,7 @@
 import clsx from "clsx";
 import { atom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { focusAtom } from "jotai-optics";
-import get from "lodash/get";
-import uniq from "lodash/uniq";
+import { selectAtom } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import {
   RefObject,
@@ -51,10 +49,10 @@ import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 
+import { getWidget, isValidSequence } from "../builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
-import { getWidget, isValidSequence } from "../builder/utils";
 import { GridScope, useGridColumnNames } from "./scope";
 
 import styles from "../grid.module.scss";
@@ -168,7 +166,7 @@ export const Grid = forwardRef<
     useMemo(
       () =>
         searchAtom
-          ? focusAtom(searchAtom, (o) => o.prop("appliedContextField"))
+          ? selectAtom(searchAtom, (o) => o.appliedContextField)
           : atom(undefined),
       [searchAtom],
     ),

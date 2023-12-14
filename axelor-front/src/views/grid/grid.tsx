@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isString from "lodash/isString";
@@ -29,6 +28,7 @@ import { i18n } from "@/services/client/i18n";
 import { findActionView, findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
+import { focusAtom } from "@/utils/atoms";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -98,7 +98,12 @@ function GridInner(props: ViewProps<GridView>) {
   };
 
   const gridSearchAtom = useMemo(
-    () => focusAtom(searchAtom!, (o) => o.prop("search")),
+    () =>
+      focusAtom(
+        searchAtom!,
+        (state) => state.search,
+        (state, search) => ({ ...state, search }),
+      ),
     [searchAtom],
   );
   const allFields = useAtomValue(

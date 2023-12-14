@@ -1,16 +1,16 @@
 import { PrimitiveAtom, useAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
+import { ChangeEvent, KeyboardEvent, useMemo } from "react";
 
 import { Box, Input } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 
+import { Select } from "@/components/select";
 import { i18n } from "@/services/client/i18n";
 import { Field } from "@/services/client/meta.types";
-import { ChangeEvent, KeyboardEvent, useMemo } from "react";
+import { focusAtom } from "@/utils/atoms";
 
 import { SearchState } from "./types";
 
-import { Select } from "@/components/select";
 import styles from "./search-column.module.scss";
 
 export interface SearchColumnProps {
@@ -23,7 +23,12 @@ function SearchInput({ column, dataAtom, onSearch }: SearchColumnProps) {
   const field = column as Field;
   const [value, setValue] = useAtom(
     useMemo(
-      () => focusAtom(dataAtom, (o) => o.prop(column.name).valueOr("")),
+      () =>
+        focusAtom(
+          dataAtom,
+          (state) => state[column.name] ?? "",
+          (state, value) => ({ ...state, [column.name]: value }),
+        ),
       [column.name, dataAtom],
     ),
   );
