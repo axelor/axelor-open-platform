@@ -27,6 +27,7 @@ import java.util.Objects;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.AccountNotFoundException;
 import org.pac4j.core.exception.BadCredentialsException;
@@ -38,6 +39,7 @@ public class AxelorAuthenticator implements Authenticator {
 
   public static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
   public static final String NO_CREDENTIALS = "No credentials";
+  public static final String UNSUPPORTED_CREDENTIALS = "Unsupported credentials";
   public static final String INCOMPLETE_CREDENTIALS = "Incomplete credentials";
   public static final String UNKNOWN_USER = "User doesn’t exist.";
   public static final String USER_DISABLED = "User is disabled.";
@@ -50,15 +52,22 @@ public class AxelorAuthenticator implements Authenticator {
   @Override
   public void validate(
       Credentials inputCredentials, WebContext context, SessionStore sessionStore) {
-    final AxelorFormCredentials credentials = (AxelorFormCredentials) inputCredentials;
-
-    if (credentials == null) {
+    if (inputCredentials == null) {
       throw new BadCredentialsException(NO_CREDENTIALS);
     }
 
+    if (!(inputCredentials instanceof UsernamePasswordCredentials)) {
+      throw new BadCredentialsException(UNSUPPORTED_CREDENTIALS);
+    }
+
+    final UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) inputCredentials;
+
     final String username = credentials.getUsername();
     final String password = credentials.getPassword();
-    final String newPassword = credentials.getNewPassword();
+    final String newPassword =
+        credentials instanceof AxelorFormCredentials
+            ? ((AxelorFormCredentials) credentials).getNewPassword()
+            : null;
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
       throw new BadCredentialsException(INCOMPLETE_CREDENTIALS);
