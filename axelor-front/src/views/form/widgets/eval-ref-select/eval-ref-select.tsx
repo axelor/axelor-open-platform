@@ -1,10 +1,12 @@
+import { produce } from "immer";
 import { atom, useAtomValue } from "jotai";
 import { useMemo } from "react";
 
 import { DataRecord } from "@/services/client/data.types";
+import { focusAtom } from "@/utils/atoms";
+import { deepGet, deepSet } from "@/utils/objects";
 
-import { FieldProps, ValueAtom } from "../../builder";
-import { createValueFocusAtom } from "../../builder/atoms";
+import { FieldProps, FormAtom, ValueAtom } from "../../builder";
 import { ManyToOne } from "../many-to-one";
 
 const evalVar = (name: string) => {
@@ -17,6 +19,19 @@ const evalVar = (name: string) => {
   }
   return name;
 };
+
+function evalAtom(formAtom: FormAtom, prop: string) {
+  const name = evalVar(prop);
+  return focusAtom(
+    formAtom,
+    (form) => deepGet(form.record, name),
+    (form, value) => {
+      return produce(form, (draft) => {
+        deepSet(draft.record, name, value);
+      });
+    },
+  );
+}
 
 export function EvalRefSelect(props: FieldProps<any>) {
   const { formAtom } = props;
@@ -32,12 +47,12 @@ export function EvalRefSelect(props: FieldProps<any>) {
   const { evalTarget, evalTargetName, evalTitle, evalValue } = evalSchema;
 
   const targetAtom = useMemo(
-    () => createValueFocusAtom(formAtom, evalVar(evalTarget)),
+    () => evalAtom(formAtom, evalTarget),
     [evalTarget, formAtom],
   );
 
   const targetNameAtom = useMemo(
-    () => createValueFocusAtom(formAtom, evalVar(evalTargetName)),
+    () => evalAtom(formAtom, evalTargetName),
     [evalTargetName, formAtom],
   );
 
@@ -45,12 +60,12 @@ export function EvalRefSelect(props: FieldProps<any>) {
   const targetName = useAtomValue(targetNameAtom);
 
   const titleAtom = useMemo(
-    () => createValueFocusAtom(formAtom, evalVar(evalTitle)),
+    () => evalAtom(formAtom, evalTitle),
     [evalTitle, formAtom],
   );
 
   const valueAtom = useMemo(
-    () => createValueFocusAtom(formAtom, evalVar(evalValue)),
+    () => evalAtom(formAtom, evalValue),
     [evalValue, formAtom],
   );
 

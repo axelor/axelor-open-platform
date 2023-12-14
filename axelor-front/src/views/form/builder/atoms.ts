@@ -99,18 +99,6 @@ export function createWidgetAtom(props: {
   return widgetAtom;
 }
 
-export function createValueFocusAtom(formAtom: FormAtom, path: string) {
-  return focusAtom(
-    formAtom,
-    (base) => deepGet(base.record, path),
-    (base, value) => {
-      return produce(base, (draft) => {
-        deepSet(draft, path, value);
-      });
-    },
-  );
-}
-
 export function createValueAtom({
   schema,
   formAtom,
