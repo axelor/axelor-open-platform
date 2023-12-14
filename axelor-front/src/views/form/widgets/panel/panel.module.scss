@@ -18,6 +18,7 @@
     > div:nth-child(2) > div > div {
       padding: 0;
       background-color: transparent;
+      overflow: unset;
     }
     > div:nth-child(2) > div > div {
       padding-top: 0.5rem;
@@ -32,6 +33,7 @@
     > div:first-child > div > div {
       padding: 0;
       background-color: transparent;
+      overflow: unset;
     }
   }
 }
