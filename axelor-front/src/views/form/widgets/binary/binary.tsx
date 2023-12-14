@@ -1,10 +1,13 @@
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { selectAtom } from "jotai/utils";
+import { ChangeEvent, useMemo, useRef } from "react";
+
+import { Box, Button, ButtonGroup } from "@axelor/ui";
+
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
-import { Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { useAtomValue, useSetAtom } from "jotai";
-import { focusAtom } from "jotai-optics";
-import { ChangeEvent, useMemo, useRef } from "react";
+
 import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import {
   META_FILE_MODEL,
@@ -15,14 +18,20 @@ import {
 function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   return useSetAtom(
     useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop(fieldName)),
-      [formAtom, fieldName]
-    )
+      () =>
+        atom(null, (get, set, value: any) => {
+          set(formAtom, ({ record, ...rest }) => ({
+            ...rest,
+            record: { ...record, [fieldName]: value },
+          }));
+        }),
+      [formAtom, fieldName],
+    ),
   );
 }
 
 export function Binary(
-  props: FieldProps<string | DataRecord | undefined | null>
+  props: FieldProps<string | DataRecord | undefined | null>,
 ) {
   const { schema, readonly, formAtom } = props;
   const { name, accept } = schema;
@@ -30,19 +39,13 @@ export function Binary(
   const formRef = useRef<HTMLFormElement>(null);
 
   const parentId = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("id")),
-      [formAtom]
-    )
+    useMemo(() => selectAtom(formAtom, (o) => o.record.id), [formAtom]),
   );
   const parentVersion = useAtomValue(
-    useMemo(
-      () => focusAtom(formAtom, (o) => o.prop("record").prop("version")),
-      [formAtom]
-    )
+    useMemo(() => selectAtom(formAtom, (o) => o.record.version), [formAtom]),
   );
   const parentModel = useAtomValue(
-    useMemo(() => focusAtom(formAtom, (o) => o.prop("model")), [formAtom])
+    useMemo(() => selectAtom(formAtom, (o) => o.model), [formAtom]),
   );
 
   const setUpload = useFormFieldSetter(formAtom, "$upload");
