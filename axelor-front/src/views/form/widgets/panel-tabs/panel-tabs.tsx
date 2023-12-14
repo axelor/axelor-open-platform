@@ -1,12 +1,12 @@
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { focusAtom } from "jotai-optics";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, Fade, NavTabItem, NavTabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
+import { focusAtom } from "@/utils/atoms";
 
 import {
   FormAtom,
@@ -15,8 +15,8 @@ import {
   WidgetAtom,
   WidgetProps,
 } from "../../builder";
-import { useAfterActions, useFormScope } from "../../builder/scope";
 import { fallbackWidgetAtom } from "../../builder/atoms";
+import { useAfterActions, useFormScope } from "../../builder/scope";
 
 import styles from "./panel-tabs.module.scss";
 
@@ -273,8 +273,13 @@ const DummyTab = memo(function DummyTab(
   const [active, setActiveAttr] = useAtom(
     useMemo(
       () =>
-        focusAtom(widgetAtom, (o) =>
-          o.prop("attrs").valueOr({ active: false }).prop("active"),
+        focusAtom(
+          widgetAtom,
+          ({ attrs }) => attrs?.active ?? false,
+          ({ attrs, ...rest }, active) => ({
+            ...rest,
+            attrs: { ...attrs, active },
+          }),
         ),
       [widgetAtom],
     ),
