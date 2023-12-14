@@ -1,5 +1,10 @@
-import { WritableAtom, atom, useAtom, useAtomValue } from "jotai";
-import { focusAtom } from "jotai-optics";
+import {
+  PrimitiveAtom,
+  SetStateAction,
+  atom,
+  useAtom,
+  useAtomValue,
+} from "jotai";
 import { atomFamily, useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
@@ -7,6 +12,7 @@ import { Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataRecord } from "@/services/client/data.types";
+import { focusAtom } from "@/utils/atoms";
 
 import { FieldControl, FieldProps } from "../../builder";
 
@@ -24,16 +30,26 @@ function JsonItem({
   removeItem,
 }: {
   readonly?: boolean;
-  itemAtom: WritableAtom<JsonRawItem, [JsonRawItem], void>;
+  itemAtom: PrimitiveAtom<JsonRawItem>;
   removeItem: () => void;
 }) {
   const nameAtom = useMemo(
-    () => focusAtom(itemAtom, (o) => o.prop("name")),
-    [itemAtom]
+    () =>
+      focusAtom(
+        itemAtom,
+        (state) => state.name,
+        (state, name) => ({ ...state, name }),
+      ),
+    [itemAtom],
   );
   const valueAtom = useMemo(
-    () => focusAtom(itemAtom, (o) => o.prop("value")),
-    [itemAtom]
+    () =>
+      focusAtom(
+        itemAtom,
+        (state) => state.value,
+        (state, value) => ({ ...state, value }),
+      ),
+    [itemAtom],
   );
 
   const [name, setName] = useAtom(nameAtom);
@@ -43,14 +59,14 @@ function JsonItem({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setName(e.target.value);
     },
-    [setName]
+    [setName],
   );
 
   const handleValueChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setValue(e.target.value);
     },
-    [setValue]
+    [setValue],
   );
 
   if (readonly) {
@@ -86,9 +102,9 @@ export function JsonRaw(props: FieldProps<string>) {
         (get, set, record: DataRecord) => {
           const value = JSON.stringify(record);
           set(valueAtom, value);
-        }
+        },
       ),
-    [valueAtom]
+    [valueAtom],
   );
 
   const itemsAtom = useMemo(() => {
@@ -96,7 +112,7 @@ export function JsonRaw(props: FieldProps<string>) {
       (get) => {
         const record = get(recordAtom);
         return Object.entries(record).map(
-          ([name, value], index) => ({ id: index, name, value } as JsonRawItem)
+          ([name, value], index) => ({ id: index, name, value }) as JsonRawItem,
         );
       },
       (get, set, items: JsonRawItem[]) => {
@@ -105,14 +121,14 @@ export function JsonRaw(props: FieldProps<string>) {
           return acc;
         }, {} as DataRecord);
         set(recordAtom, newRecord);
-      }
+      },
     );
   }, [recordAtom]);
 
   const itemsFamily = useMemo(() => {
     return atomFamily(
       (id: number) => {
-        return atom(
+        const itemAtom = atom(
           (get) => {
             const items = get(itemsAtom);
             const item = items.find((item) => item.id === id) ?? {
@@ -122,7 +138,9 @@ export function JsonRaw(props: FieldProps<string>) {
             };
             return item as JsonRawItem;
           },
-          (get, set, value: JsonRawItem) => {
+          (get, set, state: SetStateAction<JsonRawItem>) => {
+            const value =
+              typeof state === "function" ? state(get(itemAtom)) : state;
             const items = get(itemsAtom);
             const newItems = items.map((item) => {
               const found = items.find((item) => item.name === value.name);
@@ -135,10 +153,11 @@ export function JsonRaw(props: FieldProps<string>) {
               return item;
             });
             set(itemsAtom, newItems);
-          }
+          },
         );
+        return itemAtom;
       },
-      (a: number, b: number) => a === b
+      (a: number, b: number) => a === b,
     );
   }, [itemsAtom]);
 
@@ -151,8 +170,8 @@ export function JsonRaw(props: FieldProps<string>) {
         set(itemsAtom, newItems);
         itemsFamily.remove(id);
       },
-      [items, itemsAtom, itemsFamily]
-    )
+      [items, itemsAtom, itemsFamily],
+    ),
   );
 
   const add = useAtomCallback(
@@ -166,8 +185,8 @@ export function JsonRaw(props: FieldProps<string>) {
         const newItems = [...items, { id: items.length, name: "", value: "" }];
         set(itemsAtom, newItems);
       },
-      [itemsAtom]
-    )
+      [itemsAtom],
+    ),
   );
 
   return (
