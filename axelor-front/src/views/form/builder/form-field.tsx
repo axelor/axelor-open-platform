@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Box, InputFeedback, InputLabel } from "@axelor/ui";
 
@@ -14,6 +14,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
+import { focusAtom } from "@/utils/atoms";
 import format from "@/utils/format";
 
 import { useFormScope } from "./scope";
@@ -50,8 +51,36 @@ export function FieldControl({
   const canShowTitle =
     showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [focus, setFocus] = useAtom(
+    useMemo(
+      () =>
+        focusAtom(
+          widgetAtom,
+          (state) => state.attrs.focus,
+          (state, focus) => ({ ...state, attrs: { ...state.attrs, focus } }),
+        ),
+      [widgetAtom],
+    ),
+  );
+
+  const handleFocusout = useCallback(() => setFocus(undefined), [setFocus]);
+
+  useEffect(() => {
+    if (!focus) return;
+    const content = contentRef.current;
+    if (content) {
+      content.addEventListener("focusout", handleFocusout);
+      return () => content.removeEventListener("focusout", handleFocusout);
+    }
+  }, [focus, handleFocusout]);
+
   function render() {
-    return <Box className={styles.content}>{children}</Box>;
+    return (
+      <Box className={styles.content} ref={contentRef}>
+        {children}
+      </Box>
+    );
   }
 
   return (
