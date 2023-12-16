@@ -33,6 +33,7 @@ import { Picker as DatePicker } from "../form/widgets/date/picker";
 import { ViewProps } from "../types";
 import { getColor } from "./colors";
 import { Filter, Filters } from "./filters";
+import { Popover } from "./popover";
 import { getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
@@ -284,6 +285,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [dataStore, onRefresh],
   );
 
+  const [popover, setPopover] = useState<{
+    event: SchedulerEvent<DataRecord>;
+    element: HTMLElement;
+  }>();
+
+  const showPopover = useCallback(
+    (event: SchedulerEvent<DataRecord>, element: HTMLElement) => {
+      requestAnimationFrame(() => {
+        setPopover({
+          event,
+          element,
+        });
+      });
+    },
+    [],
+  );
+
+  const hidePopover = useCallback(() => {
+    setPopover(undefined);
+  }, []);
+
+  const canEdit = hasPermission("edit");
+  const canDelete = canEdit && hasPermission("delete");
+
   const showEditor = useManyEditor(action, dashlet);
   const showRecord = useCallback(
     async (record: DataRecord) => {
@@ -294,9 +319,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const { view } = await findView({ type, name, model });
       const { title = "", name: viewName } = view;
 
-      const canEdit = hasPermission("edit");
-      const canDelete = canEdit && !!record.id && hasPermission("delete");
-
+      hidePopover();
       showEditor({
         title,
         model,
@@ -306,7 +329,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
         onSelect: () => onRefresh(),
         footer: ({ close }) => {
           return (
-            canDelete && (
+            canDelete &&
+            record.id && (
               <Box flex={1}>
                 <Button
                   variant="danger"
@@ -328,9 +352,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [
       action.views,
       action.model,
-      hasPermission,
+      hidePopover,
       showEditor,
+      canEdit,
       onRefresh,
+      canDelete,
       onDelete,
     ],
   );
@@ -365,10 +391,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
   }, []);
 
   const onEventClick = useCallback(
-    ({ data: record }: SchedulerEvent<DataRecord>) => {
-      if (record) showRecord(record);
+    (event: SchedulerEvent<DataRecord>, element: HTMLElement) => {
+      if (event.data) showPopover(event, element);
     },
-    [showRecord],
+    [showPopover],
   );
 
   const onEventCreate = useCallback(
@@ -547,6 +573,15 @@ export function Calendar(props: ViewProps<CalendarView>) {
           <Filters data={filters} onChange={onFilterChange} />
         </div>
       </div>
+      {popover?.element && (
+        <Popover
+          event={popover.event}
+          element={popover.element}
+          onEdit={canEdit ? showRecord : undefined}
+          onDelete={canDelete ? onDelete : undefined}
+          onClose={hidePopover}
+        />
+      )}
     </div>
   );
 }
