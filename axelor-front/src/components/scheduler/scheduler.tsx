@@ -48,6 +48,7 @@ export interface SchedulerProps<T> {
   locale?: string;
   allDayText?: string;
   allDayOnly?: boolean;
+  maxEvents?: number | boolean;
   moreText?: (n: number) => string;
   onDayClick?: (date: Date) => void;
   onEventClick?: (event: SchedulerEvent<T>, element: HTMLElement) => void;
@@ -76,6 +77,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
     events,
     allDayText,
     allDayOnly,
+    maxEvents = true,
     moreText,
     onEventCreate,
     onEventChange,
@@ -129,7 +131,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         ref={calendarRef}
         selectable={true}
         selectMirror={true}
-        dayMaxEvents={true}
+        dayMaxEvents={maxEvents}
         editable={editable}
         locale={locale}
         initialView={view}
