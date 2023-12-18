@@ -75,6 +75,19 @@ function HttpBlock({ count }: { count: number }) {
     };
   }, [active, count]);
 
+  useEffect(() => {
+    if (blocked || wait) {
+      const handler = (event: Event) => {
+        event.stopPropagation();
+        event.preventDefault();
+      };
+      document.addEventListener("keydown", handler, true);
+      return () => {
+        document.removeEventListener("keydown", handler, true);
+      };
+    }
+  }, [blocked, wait]);
+
   return (
     <Portal>
       <Fade in={blocked || wait} mountOnEnter unmountOnExit>
