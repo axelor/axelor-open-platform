@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Panel as AxPanel,
@@ -32,9 +32,17 @@ export function Panel(props: WidgetProps) {
   const { title, collapse } = attrs;
   const [collapsed, setCollapsed] = useState(collapse);
 
-  useEffect(() => {
+  const resetStates = useCallback(() => {
     canCollapse && setCollapsed(collapse);
   }, [canCollapse, collapse]);
+
+  useEffect(() => {
+    resetStates();
+    document.addEventListener("form:reset-states", resetStates);
+    return () => {
+      document.removeEventListener("form:reset-states", resetStates);
+    };
+  }, [resetStates]);
 
   const hasHeader = showTitle !== false && showFrame !== false && !!title;
 
@@ -82,7 +90,7 @@ export function Panel(props: WidgetProps) {
       (item) =>
         item.jsonFields &&
         Object.keys(item.jsonFields).length === 0 &&
-        item.widget !== "json-raw"
+        item.widget !== "json-raw",
     );
 
   if (isEmptyPanel) return null;
@@ -101,6 +109,7 @@ export function Panel(props: WidgetProps) {
       toolbar={toolbar}
       collapsible={hasHeader && canCollapse}
       collapsed={collapsed}
+      setCollapsed={setCollapsed}
       className={clsx(styles.panel, {
         [styles.noFrame]: showFrame === false,
         [styles.hasHeader]: hasHeader,
