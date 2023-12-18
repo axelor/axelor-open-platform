@@ -560,6 +560,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           locale={moment.locale()}
           allDayText={i18n.get("All Day")}
           allDayOnly={allDayOnly}
+          maxEvents={false}
           moreText={(n) => i18n.get("+{0} more", n)}
           events={filteredEvents}
           editable={hasPermission("edit")}
