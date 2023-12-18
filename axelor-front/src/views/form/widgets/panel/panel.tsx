@@ -26,7 +26,8 @@ export function Panel(props: WidgetProps) {
   const {
     showTitle = true,
     showFrame,
-    canCollapse = Boolean(schema.collapseIf),
+    collapseIf,
+    canCollapse = Boolean(collapseIf),
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { title, collapse } = attrs;
@@ -108,7 +109,7 @@ export function Panel(props: WidgetProps) {
       header={header}
       toolbar={toolbar}
       collapsible={hasHeader && canCollapse}
-      collapsed={collapsed}
+      collapsed={collapseIf && collapsed == null ? true : collapsed}
       setCollapsed={setCollapsed}
       className={clsx(styles.panel, {
         [styles.noFrame]: showFrame === false,
