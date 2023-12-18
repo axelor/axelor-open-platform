@@ -408,7 +408,7 @@ function OneToManyInner({
     fields: viewData?.fields ?? fields,
   });
 
-  const doSearch = useAtomCallback(
+  const onSearch = useAtomCallback(
     useCallback(
       async (get, set, options?: SearchOptions) => {
         // avoid search for internal value changes
@@ -491,8 +491,6 @@ function OneToManyInner({
       ],
     ),
   );
-
-  const onSearch = useAfterActions(doSearch);
 
   const onExport = useCallback(async () => {
     const { fileName } = await dataStore.export({
@@ -1015,7 +1013,6 @@ function OneToManyInner({
             onView={canView ? (canEdit ? onEdit : onView) : noop}
             onUpdate={onSave}
             onSave={isManyToMany ? onSaveRecord : onSave}
-            onSearch={onSearch}
             onRowReorder={onRowReorder}
             onRowSelectionChange={onRowSelectionChange}
             {...(!canNew &&
