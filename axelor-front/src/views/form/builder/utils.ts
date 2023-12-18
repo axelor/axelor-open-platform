@@ -396,7 +396,7 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
   for (const widget of widgets ?? []) {
     const { type } = widget;
 
-    if (type === "panel") {
+    if (["panel", "panel-json"].includes(type)) {
       const defaultValues = getDefaultJsonFieldValues((widget as Panel).items);
       Object.assign(result, defaultValues);
     } else if (type === "field") {
