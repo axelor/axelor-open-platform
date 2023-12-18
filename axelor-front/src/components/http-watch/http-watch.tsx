@@ -28,12 +28,14 @@ function HttpIndicator({ count }: { count: number }) {
 
   const timerRef = useRef<number>();
   const mountRef = useRef(false);
+  const countRef = useRef(count);
 
   const handleShow = useCallback(() => {
+    countRef.current = count;
     if (timerRef.current && count > 0) return;
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => {
-      if (mountRef.current) setShow(count > 0);
+      if (mountRef.current) setShow(countRef.current > 0);
       timerRef.current = undefined;
     }, 300);
   }, [count]);
