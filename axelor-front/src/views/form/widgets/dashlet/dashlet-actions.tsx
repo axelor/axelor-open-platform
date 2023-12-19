@@ -54,11 +54,15 @@ export function DashletActions({
   // register tab:refresh
   useViewTabRefresh(
     dashboard ? "dashboard" : "form",
-    dashboard && onRefresh ? onRefresh : noop
+    dashboard && onRefresh ? onRefresh : noop,
   );
 
   return (
-    <Box className={classes.actions} gap={1}>
+    <Box
+      className={classes.actions}
+      gap={1}
+      onMouseDown={(event) => event.stopPropagation()}
+    >
       {showBars && (toolbar || menubar) && (
         <ToolbarActions
           buttons={toolbar}
@@ -173,7 +177,7 @@ function DashletListMenu(
   props: DashletMenuProps & {
     dataStore: DataStore;
     gridStateAtom?: DashletHandler["gridStateAtom"];
-  }
+  },
 ) {
   const { dataStore, gridStateAtom, viewType, ...menuProps } = props;
   const page = useDataStore(dataStore, (store) => store.page);
@@ -194,11 +198,11 @@ function DashletListMenu(
         const { fileName } = await dataStore.export(options);
         download(
           `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
-          fileName
+          fileName,
         );
       },
-      [dataStore, gridStateAtom]
-    )
+      [dataStore, gridStateAtom],
+    ),
   );
 
   return (
