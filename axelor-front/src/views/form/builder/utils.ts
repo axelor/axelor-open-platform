@@ -15,6 +15,7 @@ import {
   isCleanDummy,
   isPlainObject,
 } from "@/services/client/data-utils";
+import { moment } from "@/services/client/l10n.ts";
 import { MetaData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
@@ -194,7 +195,8 @@ export function processContextValues(context: DataContext) {
     const value = { ..._value };
     for (let k in value) {
       const v = value[k];
-      const isDummy = !IGNORE.includes(k) && k !== "$version" && isCleanDummy(k);
+      const isDummy =
+        !IGNORE.includes(k) && k !== "$version" && isCleanDummy(k);
 
       // ignore values
       if (IGNORE.includes(k) || k.startsWith("$t:")) {
@@ -381,9 +383,16 @@ export function getDefaultValues(
 function getDefaultFieldValues(fields?: MetaData["fields"]) {
   const result: DataRecord = Object.entries(fields ?? {}).reduce(
     (acc, [key, field]) => {
-      const { defaultValue } = field;
+      let { defaultValue, defaultNow } = field;
       if (defaultValue === undefined || key.includes(".")) {
         return acc;
+      }
+      if (defaultNow) {
+        // ensure correct date/datetime
+        defaultValue =
+          field.type.toLowerCase() === "date"
+            ? moment().startOf("day").format("YYYY-MM-DD")
+            : moment().toISOString();
       }
       const value = convert(defaultValue, { props: field });
       return { ...acc, [key]: value };
