@@ -18,7 +18,7 @@ export function Image(
   props: FieldProps<string | DataRecord | undefined | null>,
 ) {
   const { schema, readonly, formAtom, widgetAtom, valueAtom, invalid } = props;
-  const { type, serverType, $json } = schema;
+  const { type, serverType, accept = "image/*", $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -158,7 +158,7 @@ export function Image(
           <Input
             onChange={handleInputChange}
             type="file"
-            accept="image/*"
+            accept={accept}
             ref={inputRef}
             d="none"
           />
