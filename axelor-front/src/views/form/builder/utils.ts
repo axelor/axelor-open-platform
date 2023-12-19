@@ -309,7 +309,7 @@ export function processView(
   const res: Schema = { ...attrs, ...schema };
 
   res.serverType = getFieldServerType(res, field);
-  res.uid = uniqueId("w");
+  res.uid = res.uid ?? uniqueId("w");
   res.widget = getWidget(res, field);
 
   if (res.widget === "progress") {

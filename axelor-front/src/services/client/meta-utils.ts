@@ -59,6 +59,9 @@ export function processSelection(field: Schema) {
 
 export function processWidget(field: Schema) {
   const attrs: Record<string, any> = {};
+  if (!field.uid) {
+    field.uid = _.uniqueId("w");
+  }
   _.each(field.widgetAttrs || {}, (value, name) => {
     let val = value;
     if (value === "null") val = null;
@@ -234,7 +237,10 @@ export function findViewFields(
     }
   }
 
-  function getNonDefaultTargetName(item: Schema, fields?: Record<string, Property>) {
+  function getNonDefaultTargetName(
+    item: Schema,
+    fields?: Record<string, Property>,
+  ) {
     const { name, targetName } = item;
     if (name && targetName && fields) {
       const { targetName: fieldTargetName } = fields[name] ?? {};
@@ -468,6 +474,7 @@ export function processView(
         colSpan: item.colSpan ?? 6,
         showTitle: false,
       };
+      processWidget(item);
       if (view.items) {
         view.items[itemIndex] = item;
       }
@@ -625,13 +632,15 @@ export function processView(
     });
 
     // wkf status
-    view.items?.unshift({
+    const wkfStatusItem = {
       colSpan: 12,
       type: "field",
       name: "$wkfStatus",
       showTitle: false,
       widget: "wkf-status",
-    });
+    };
+    processWidget(wkfStatusItem);
+    view.items?.unshift(wkfStatusItem);
   }
 
   if (meta.view.type !== "form") {
