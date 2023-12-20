@@ -180,9 +180,14 @@ export function Form(props: ViewProps<FormView>) {
       }
     }
     if (popupRecord) {
-      if (popupRecord._dirty) return popupRecord;
-      const res = await fetchRecord(meta, dataStore, popupRecord.id);
-      return { ...popupRecord, ...res };
+      if ((popupRecord?.id ?? 0) > 0) {
+        const res = await fetchRecord(meta, dataStore, popupRecord.id);
+        return popupRecord._dirty ? { ...res, ...popupRecord } : res;
+      } else {
+        return popupRecord?.id == null
+          ? getDefaultValues(meta.fields, meta.view.items)
+          : popupRecord;
+      }
     }
     return await fetchRecord(meta, dataStore, recordId);
   }, [popupRecord, recordId, meta, dataStore]);
