@@ -564,7 +564,7 @@ function useActionRecord({
             return;
           }
 
-          const record = get(formAtom).record;
+          const { record, fields } = get(formAtom);
           const values = Object.entries(data.value).reduce(
             (acc, [k, v]) => ({
               ...acc,
@@ -572,7 +572,7 @@ function useActionRecord({
             }),
             {} as DataRecord,
           );
-          const result = updateRecord(record, values);
+          const result = updateRecord(record, values, fields);
           const isDirty = () =>
             result._dirty &&
             Object.entries(values).some(

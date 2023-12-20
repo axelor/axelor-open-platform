@@ -1,5 +1,7 @@
+import { compactJson } from "@/views/form/builder/utils";
 import { isEqual } from "lodash";
 import { DataRecord } from "./data.types";
+import { Property } from "./meta.types";
 
 /**
  * Checks if the given name is the name of a dummy field.
@@ -125,7 +127,11 @@ function toCompact(value: DataRecord | null | undefined) {
   return { ...rest, $version };
 }
 
-export function updateRecord(target: DataRecord, source: DataRecord) {
+export function updateRecord(
+  target: DataRecord,
+  source: DataRecord,
+  fields?: Record<string, Property>,
+) {
   if (equals(target, source)) {
     return target;
   }
@@ -140,6 +146,10 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
       continue;
     }
 
+    if (fields?.[key]?.json) {
+      newValue = newValue && compactJson(JSON.parse(newValue));
+    }
+
     let isSelectedChanged = false;
 
     if (Array.isArray(value)) {
@@ -149,7 +159,7 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
           item.id > 0 ? x.id === item.id : equals(x, item),
         );
         if (found) {
-          let newItem = updateRecord(found, item);
+          let newItem = updateRecord(found, item, fields);
           if (found.selected !== item.selected) {
             newItem = { ...newItem, selected: item.selected };
             isSelectedChanged = true;
@@ -167,7 +177,7 @@ export function updateRecord(target: DataRecord, source: DataRecord) {
       const curr: DataRecord = result[key] ?? {};
       if (curr.id === value.id) {
         if (curr.version! >= 0) {
-          newValue = updateRecord(curr, value);
+          newValue = updateRecord(curr, value, fields);
         } else {
           // update nested-editor values?
           newValue = { ...curr, $updatedValues: value };

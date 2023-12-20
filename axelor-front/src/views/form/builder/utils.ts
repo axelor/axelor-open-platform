@@ -250,7 +250,7 @@ export function processSaveValues(
   return values;
 }
 
-function compactJson(record: DataRecord) {
+export function compactJson(record: DataRecord) {
   const rec: DataRecord = {};
   Object.entries(record).forEach(([k, v]) => {
     if (k.indexOf("$") === 0 || v === null || v === undefined) return;
