@@ -667,13 +667,24 @@ function OneToManyInner({
     async (record: DataRecord) => {
       const { id, $id, ...rest } = record;
       record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
+
+      setState(draft => {
+        if (draft.editRow) {
+          const [rowIndex] = draft.editRow;
+          draft.editRow = null;
+
+          if (draft.rows[rowIndex]) {
+            draft.rows[rowIndex].record = record;
+          } 
+        }
+      });
       await handleSelect([record]);
       setDetailRecord((details) =>
         details?.id === record.id ? record : details,
       );
       return record;
     },
-    [handleSelect],
+    [handleSelect, setState],
   );
 
   const onAdd = useCallback(() => {
