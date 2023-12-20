@@ -120,7 +120,10 @@ export const useGetErrors = () => {
       const errors = Object.values(states)
         .filter((s) => fieldName === undefined || s.name === fieldName)
         .filter((s) => !isHidden(s))
-        .filter((s) => Object.keys(s.errors ?? {}).length > 0)
+        .filter(
+          (s) =>
+            Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
+        )
         .map((s) => s.errors ?? {});
       return errors.length ? errors : null;
     },

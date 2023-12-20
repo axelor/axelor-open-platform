@@ -52,6 +52,7 @@ export interface WidgetState {
   errors?: WidgetErrors;
   columns?: Record<string, Attrs>;
   selected?: number[];
+  valid?: boolean;
   readonly name?: string;
   readonly parent?: WidgetAtom;
 }

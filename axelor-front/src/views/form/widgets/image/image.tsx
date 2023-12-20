@@ -1,6 +1,7 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useMemo, useRef } from "react";
+import { focusAtom } from "jotai-optics";
+import { ChangeEvent, useEffect, useMemo, useRef } from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -23,8 +24,15 @@ export function Image(
   const imageRef = useRef<HTMLImageElement>(null);
   const [value, setValue] = useAtom(valueAtom);
   const {
-    attrs: { title },
+    attrs: { title, required },
   } = useAtomValue(widgetAtom);
+
+  const setValid = useSetAtom(
+    useMemo(
+      () => focusAtom(widgetAtom, (o) => o.prop("valid").valueOr(false)),
+      [widgetAtom],
+    ),
+  );
 
   const recordAtom = useMemo(
     () =>
@@ -63,6 +71,7 @@ export function Image(
   function handleRemove() {
     inputRef.current && (inputRef.current.value = "");
     setValue(null, true);
+    isBinary && required && setValid(false);
   }
 
   async function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
@@ -76,6 +85,7 @@ export function Image(
         reader.onload = (e) => {
           const value = e.target?.result ?? null;
           setValue(value, true);
+          required && setValid(true);
         };
         reader.readAsDataURL(file);
       } else {
@@ -99,6 +109,29 @@ export function Image(
     ? { target: parentModel, name: schema.name }
     : schema;
 
+  const isBinaryImage = isBinary && value !== null && !value;
+  const url =
+    isBinary && value === null
+      ? makeImageURL(null)
+      : isBinary && value
+      ? (value as string)
+      : makeImageURL(record, target, name, parent);
+
+  useEffect(() => {
+    let ok = true;
+    if (isBinaryImage && required && url && !url.startsWith("data:")) {
+      const img = new window.Image();
+      img.onload = function () {
+        const exist = img.height > 1 && img.width > 1;
+        ok && setValid(exist);
+      };
+      img.src = url;
+    }
+    return () => {
+      ok = false;
+    };
+  }, [isBinaryImage, required, url, setValid]);
+
   return (
     <FieldControl {...props}>
       <Box
@@ -118,13 +151,7 @@ export function Image(
           as="img"
           p={schema.editable ? 0 : 1}
           d="inline-block"
-          src={
-            isBinary && value === null
-              ? makeImageURL(null)
-              : isBinary && value
-              ? (value as string)
-              : makeImageURL(record, target, name, parent)
-          }
+          src={url}
           alt={title}
         />
         <form>
