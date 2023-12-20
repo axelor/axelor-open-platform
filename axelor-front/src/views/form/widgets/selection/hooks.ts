@@ -94,9 +94,11 @@ export function useSelectionDefault({
   }, [schema]);
 
   const selectionDefault = useMemo(() => {
-    return selectionZero && String(value) === "0"
-      ? { value: "0", title: "" }
-      : { title: value, value };
+    if (selectionZero && String(value) === "0") {
+      return { value: "0", title: "" };
+    }
+
+    return value == null ? value : { title: value, value };
   }, [selectionZero, value]);
 
   return selectionDefault as Selection;
