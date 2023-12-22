@@ -98,6 +98,9 @@ export class DataStore extends DataSource {
   }
 
   #setVersion(context: DataContext, nested = false) {
+    if (!isPlainObject(context)) {
+      return context;
+    }
     return Object.entries(context).reduce((acc, [key, value]) => {
       if (isPlainObject(value) && value.version !== undefined) {
         const { version: $version, ...rest } = value;
