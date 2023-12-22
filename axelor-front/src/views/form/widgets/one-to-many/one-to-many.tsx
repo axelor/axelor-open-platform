@@ -204,21 +204,6 @@ function OneToManyInner({
               typeof setter === "function" ? setter(get(valueAtom)!) : setter;
             const valIds = (values || []).map((v) => v.id);
 
-            const result = await set(
-              valueAtom,
-              values,
-              callOnChange,
-              markDirty,
-            );
-
-            const hasValueChanged = (
-              result as unknown as ActionResult[]
-            )?.filter?.(
-              ({ values, attrs }) =>
-                values?.[schema.name] !== undefined ||
-                attrs?.[schema.name]?.value !== undefined,
-            );
-
             setRecords((records) => {
               if (resetRecords) {
                 return values
@@ -241,6 +226,21 @@ function OneToManyInner({
                 })
                 .concat(newRecords);
             });
+
+            const result = await set(
+              valueAtom,
+              values,
+              callOnChange,
+              markDirty,
+            );
+
+            const hasValueChanged = (
+              result as unknown as ActionResult[]
+            )?.filter?.(
+              ({ values, attrs }) =>
+                values?.[schema.name] !== undefined ||
+                attrs?.[schema.name]?.value !== undefined,
+            );
 
             /**
              * if same o2m field values is changed on onChange event of itself
