@@ -177,7 +177,11 @@ function OneToManyInner({
     const isNum = (x: unknown) => typeof x === "number";
     lastValueRef.current = value;
     lastItemsRef.current = items.map((x) =>
-      isNum(x) ? ({ id: x } as unknown as DataRecord) : x,
+      isNum(x)
+        ? ({ id: x } as unknown as DataRecord)
+        : x.id === null
+        ? { ...x, _dirty: true, id: nextId() }
+        : x,
     );
     return lastItemsRef.current;
   }, []);
