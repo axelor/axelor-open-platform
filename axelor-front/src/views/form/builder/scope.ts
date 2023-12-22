@@ -34,7 +34,6 @@ import {
   WidgetErrors,
   WidgetState,
 } from "./types";
-import { processActionValue } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -124,7 +123,7 @@ export class FormActionHandler extends DefaultActionHandler {
       op: "add",
       type: "value",
       target,
-      value: isNumber(value) ? { id: value } : processActionValue(value),
+      value: isNumber(value) ? { id: value } : value,
     });
   }
 
@@ -133,7 +132,7 @@ export class FormActionHandler extends DefaultActionHandler {
       op: "del",
       type: "value",
       target,
-      value: isNumber(value) ? { id: value } : processActionValue(value),
+      value: isNumber(value) ? { id: value } : value,
     });
   }
 
@@ -142,7 +141,7 @@ export class FormActionHandler extends DefaultActionHandler {
       op: "set",
       type: "value",
       target,
-      value: processActionValue(value),
+      value,
     });
   }
 
@@ -565,13 +564,7 @@ function useActionRecord({
           }
 
           const { record, fields } = get(formAtom);
-          const values = Object.entries(data.value).reduce(
-            (acc, [k, v]) => ({
-              ...acc,
-              [k]: processActionValue(v),
-            }),
-            {} as DataRecord,
-          );
+          const values = (data.value ?? {}) as DataRecord;
           const result = updateRecord(record, values, fields);
           const isDirty = () =>
             result._dirty &&
