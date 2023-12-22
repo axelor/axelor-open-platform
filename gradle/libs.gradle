@@ -14,7 +14,7 @@ versions.jackson = "2.15.3"
 versions.shiro = "1.13.0"
 versions.buji_pac4j = "8.0.0"
 versions.javaee_pac4j = "7.1.0"
-versions.pac4j = "5.7.1"
+versions.pac4j = "5.7.2"
 versions.ldaptive = "2.2.0"
 
 versions.junit4 = "4.13.2"
