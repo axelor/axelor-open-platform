@@ -593,6 +593,7 @@ const FormContainer = memo(function FormContainer({
           res = res.id ? await doRead(res.id) : res;
           res = { ...dummy, ...res }; // restore dummy values
           doEdit(res, {
+            callAction: false,
             readonly,
             isNew: vals.id !== res.id,
             keepStates: true,
@@ -650,7 +651,7 @@ const FormContainer = memo(function FormContainer({
           return doNew(options);
         }
         const rec = await doRead(id);
-        await doEdit(rec, options);
+        await doEdit(rec, { callAction: false, ...options });
       },
       [doEdit, doNew, doRead, formAtom],
     ),
