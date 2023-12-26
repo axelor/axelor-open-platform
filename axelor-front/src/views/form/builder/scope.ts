@@ -460,10 +460,10 @@ function useActionValue({
             const items: DataRecord[] = record[target] ?? [];
             const records = Array.isArray(value) ? value : [value];
             const newItems = records.filter(
-              (x) => items.findIndex((y) => x.id === y.id) === -1,
+              (x) => !x.id || items.findIndex((y) => x.id === y.id) === -1,
             );
             const curItems = items.map((x) => {
-              const found = records.find((y) => x.id === y.id);
+              const found = records.find((y) => y.id && x.id === y.id);
               return found ? { ...x, ...found } : x;
             });
             newRecord = produce(record, (draft) => {
