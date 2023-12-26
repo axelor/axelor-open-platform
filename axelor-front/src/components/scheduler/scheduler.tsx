@@ -4,6 +4,7 @@ import {
   EventChangeArg,
   EventClickArg,
 } from "@fullcalendar/core";
+import allLocales from "@fullcalendar/core/locales-all";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
@@ -133,6 +134,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         selectMirror={true}
         dayMaxEvents={maxEvents}
         editable={editable}
+        locales={allLocales}
         locale={locale}
         initialView={view}
         initialDate={date}
