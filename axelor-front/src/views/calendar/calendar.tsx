@@ -564,6 +564,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           moreText={(n) => i18n.get("+{0} more", n)}
           events={filteredEvents}
           editable={hasPermission("edit")}
+          editableDuration={Boolean(eventStop)}
           onDayClick={onDayClick}
           onEventClick={onEventClick}
           onEventCreate={onEventCreate}
