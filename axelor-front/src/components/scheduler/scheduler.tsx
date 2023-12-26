@@ -46,6 +46,7 @@ export interface SchedulerProps<T> {
   view?: SchedulerView;
   events?: SchedulerEvent<T>[];
   editable?: boolean;
+  editableDuration?: boolean;
   locale?: string;
   allDayText?: string;
   allDayOnly?: boolean;
@@ -73,6 +74,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
   const {
     className,
     editable = true,
+    editableDuration,
     locale,
     view: mode = "month",
     events,
@@ -145,6 +147,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         select={handleSet}
         eventChange={handleChange}
         eventClick={handleClick}
+        eventDurationEditable={editableDuration}
         navLinks={true}
         navLinkDayClick={handleDayClick}
         allDayText={allDayText}
