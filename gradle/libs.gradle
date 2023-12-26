@@ -152,7 +152,7 @@ libs.resteasy = [
 
 libs.resteasy_multipart = resteasy_module("resteasy-multipart-provider")
 libs.resteasy_guice = resteasy_module("resteasy-guice")
-libs.resteasy_client = resteasy_module("resteasy-client");
+libs.resteasy_client = resteasy_module("resteasy-client")
 libs.resteasy_server = [
   "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
   "io.undertow:undertow-core:2.2.28.Final",
