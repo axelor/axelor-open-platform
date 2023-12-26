@@ -28,15 +28,17 @@ export function Popover({
   const subtitle = useMemo(() => {
     const startDate = moment(start).format("LL");
     const startTitle = moment(start).format("HH:mm");
-    const endDate = moment(end).format("LL");
-    const endTitme = moment(end).format("HH:mm");
+    const _end = end && allDay ? moment(end).add(-1, "second") : end ?? start;
+    const endDate = moment(_end).format("LL");
+    const endTime = moment(_end).format("HH:mm");
+
     return allDay
-      ? startDate === endDate
+      ? startDate == endDate
         ? `${startDate}`
         : `${startDate} ⋅ ${endDate}`
-      : startDate === endDate
-        ? `${startDate} ⋅ ${startTitle} – ${endTitme}`
-        : `${startDate} ${startTitle} ⋅ ${endDate} – ${endTitme}`;
+      : startDate == endDate
+        ? `${startDate} ⋅ ${startTitle} – ${endTime}`
+        : `${startDate} ${startTitle} ⋅ ${endDate} – ${endTime}`;
   }, [allDay, end, start]);
 
   const handleEdit = useCallback(() => {
