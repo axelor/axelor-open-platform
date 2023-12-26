@@ -578,7 +578,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
         <Popover
           event={popover.event}
           element={popover.element}
-          onEdit={canEdit ? showRecord : undefined}
+          canEdit={canEdit}
+          onEdit={showRecord}
           onDelete={canDelete ? onDelete : undefined}
           onClose={hidePopover}
         />

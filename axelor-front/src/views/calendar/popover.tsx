@@ -12,6 +12,7 @@ import styles from "./popover.module.scss";
 export type PopoverProps = {
   event: SchedulerEvent<DataRecord>;
   element: HTMLElement;
+  canEdit?: boolean;
   onEdit?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
   onClose: () => void;
@@ -20,6 +21,7 @@ export type PopoverProps = {
 export function Popover({
   element,
   event,
+  canEdit,
   onEdit,
   onDelete,
   onClose,
@@ -55,7 +57,10 @@ export function Popover({
         <div className={styles.popover}>
           <div className={styles.header}>
             <div className={styles.actions}>
-              {onEdit && <MaterialIcon icon="edit" onClick={handleEdit} />}
+              <MaterialIcon
+                icon={canEdit ? "edit" : "description"}
+                onClick={handleEdit}
+              />
               {onDelete && (
                 <MaterialIcon icon="delete" onClick={handleDelete} />
               )}
