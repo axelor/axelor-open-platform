@@ -1,5 +1,5 @@
 import { Box } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 import { escape } from "lodash"
 
 export function Url(props: GridColumnProps) {

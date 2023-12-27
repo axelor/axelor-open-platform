@@ -19,13 +19,13 @@ import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
   GridColumn,
+  GridColumnProps,
   GridLabel,
   GridProps,
   GridRow,
   GridRowProps,
   getRows,
 } from "@axelor/ui/grid";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";

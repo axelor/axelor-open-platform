@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { Box } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 
 import { SingleSelectValue } from "../single-select/single-select-value";
 

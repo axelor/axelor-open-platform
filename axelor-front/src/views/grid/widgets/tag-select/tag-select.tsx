@@ -11,7 +11,7 @@ import {
   useOverflowMenu,
   useRefs,
 } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 
 import { Field } from "@/services/client/meta.types";
 import { SelectionTag } from "@/views/form/widgets";

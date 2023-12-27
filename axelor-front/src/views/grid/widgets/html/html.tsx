@@ -1,4 +1,4 @@
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 import { sanitize } from "@/utils/sanitize";
 
 export function Html(props: GridColumnProps) {

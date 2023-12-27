@@ -1,5 +1,5 @@
 import { Box, Input } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 import classes from "./boolean.module.scss";
 
 export function Boolean(props: GridColumnProps) {

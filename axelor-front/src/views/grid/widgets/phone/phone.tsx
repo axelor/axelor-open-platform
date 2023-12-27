@@ -1,5 +1,5 @@
 import { Box } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 
 export function Phone(props: GridColumnProps) {
   const { record, data } = props;

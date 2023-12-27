@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 
 import { Schema, Selection } from "@/services/client/meta.types";
 import { ImageSelectValue } from "@/views/form/widgets";

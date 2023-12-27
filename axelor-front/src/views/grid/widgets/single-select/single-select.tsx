@@ -1,4 +1,4 @@
-import { GridColumnProps } from "@axelor/ui/grid/grid-column";
+import { GridColumnProps } from "@axelor/ui/grid";
 import { SingleSelectValue } from "./single-select-value";
 
 export function SingleSelect(props: GridColumnProps) {
