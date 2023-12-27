@@ -188,7 +188,7 @@ export function Form(props: ViewProps<FormView>) {
         return popupRecord._dirty ? { ...res, ...popupRecord } : res;
       } else {
         return popupRecord?.id == null
-          ? getDefaultValues(meta.fields, meta.view.items)
+          ? { ...getDefaultValues(meta.fields, meta.view.items), ...popupRecord }
           : popupRecord;
       }
     }
