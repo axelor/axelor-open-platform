@@ -125,7 +125,7 @@
         "bg": "#E8E8FD"
       },
       "cell": {
-        "padding": "0.375rem 0.5rem"
+        "padding": "0.620rem 0.25rem"
       }
     },
     "Button": {

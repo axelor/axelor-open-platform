@@ -885,8 +885,8 @@ function OneToManyInner({
 
   const hasActions = showBars && (toolbar?.length || menubar?.length);
 
-  const rowSize = 45;
-  const headerSize = 100;
+  const rowSize = 35;
+  const headerSize = 80;
   const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
   const changed = useMemo(() => value?.some((x) => x._dirty), [value]);
   const allowSorting = !canMove && !changed;
