@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { focusAtom } from "jotai-optics";
 import { ChangeEvent, useEffect, useMemo, useRef } from "react";
 
 import { Box, Input, clsx } from "@axelor/ui";
@@ -8,6 +7,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
+import { focusAtom } from "@/utils/atoms";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { META_FILE_MODEL, makeImageURL, validateFileSize } from "./utils";
@@ -29,7 +29,12 @@ export function Image(
 
   const setValid = useSetAtom(
     useMemo(
-      () => focusAtom(widgetAtom, (o) => o.prop("valid").valueOr(false)),
+      () =>
+        focusAtom(
+          widgetAtom,
+          (state) => state.valid ?? false,
+          (state, valid) => ({ ...state, valid }),
+        ),
       [widgetAtom],
     ),
   );
@@ -114,8 +119,8 @@ export function Image(
     isBinary && value === null
       ? makeImageURL(null)
       : isBinary && value
-      ? (value as string)
-      : makeImageURL(record, target, name, parent);
+        ? (value as string)
+        : makeImageURL(record, target, name, parent);
 
   useEffect(() => {
     let ok = true;
