@@ -259,6 +259,11 @@
   }
 }
 
+.report-percent {
+  display: flex;
+  align-items: center;
+}
+
 [dir="rtl"] {
   .report-percent {
     float: left;

@@ -1,4 +1,5 @@
 import React, { LegacyRef } from "react";
+import { Icon } from "@/components/icon";
 import { legacyClassNames } from "@/styles/legacy";
 import { i18n } from "@/services/client/i18n";
 
@@ -24,7 +25,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
     eval: (arg: any) => any;
     context: Record<string, any>;
   },
-  boxRef
+  boxRef,
 ) {
   const ref = React.useRef<HTMLDivElement>();
   const value = $eval(_value);
@@ -47,11 +48,6 @@ export const ReportBox = React.forwardRef(function ReportBox(
     return "text-" + type;
   }
 
-  function percentLevelStyle() {
-    if (up == null) return null;
-    return "fa-level-" + (up ? "up" : "down");
-  }
-
   React.useEffect(() => {
     const el = ref.current;
     if (el) {
@@ -69,7 +65,12 @@ export const ReportBox = React.forwardRef(function ReportBox(
       ref={ref as LegacyRef<HTMLDivElement>}
       className={legacyClassNames("report-data", "hidden")}
     >
-      {icon && <i className={legacyClassNames("report-icon", "fa", icon)} />}
+      {icon && icon.includes("fa-") && (
+        <i className={legacyClassNames("report-icon", "fa", icon)} />
+      )}
+      {icon && !icon.includes("fa-") && (
+        <Icon icon={icon} className={legacyClassNames("report-icon")} />
+      )}
       <div>
         <h1>{format(value)}</h1>
         <small>{i18n.get(label)}</small>
@@ -78,11 +79,11 @@ export const ReportBox = React.forwardRef(function ReportBox(
             "report-percent",
             "font-bold",
             "pull-right",
-            percentStyle()
+            percentStyle(),
           )}
         >
           <span>{context.__percent(percent)}</span>
-          <i className={legacyClassNames("fa", percentLevelStyle())} />
+          {up != null && <Icon icon={"trending_" + (up ? "up" : "down")}/>}
         </div>
       </div>
       {tag && (
