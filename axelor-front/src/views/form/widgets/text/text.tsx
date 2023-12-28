@@ -7,6 +7,7 @@ import { useAppTheme } from "@/hooks/use-app-theme";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
+import styles from "./text.module.scss";
 
 export function Text({
   inputProps,
@@ -57,7 +58,7 @@ export function Text({
   return (
     <FieldControl {...props}>
       {readonly ? (
-        <Input as="pre" bg={theme === "dark" ? "body" : "light"} mb={0}>
+        <Input as="pre" bg={theme === "dark" ? "body" : "light"} mb={0} className={styles.pre}>
           {text}
         </Input>
       ) : (
@@ -74,6 +75,7 @@ export function Text({
           onChange={handleChange}
           onBlur={handleBlur}
           onKeyDown={onKeyDown}
+          className={styles.textarea}
         />
       )}
     </FieldControl>

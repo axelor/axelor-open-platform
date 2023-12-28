@@ -35,7 +35,7 @@ export function Button({ field, node, record, actionExecutor }: WidgetProps) {
       {icon && !icon.includes(".") ? (
         <Icon icon={icon} />
       ) : (
-        <img style={{ maxHeight: 24, width: "100%"}} alt={title} title={help} src={icon} />
+        <img style={{ maxHeight: 17, width: "100%"}} alt={title} title={help} src={icon} />
       )}
     </Link>
   );

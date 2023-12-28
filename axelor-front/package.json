@@ -14,7 +14,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@axelor/ui": "^0.0.27",
+    "@axelor/ui": "^0.0.28",
     "@babel/standalone": "^7.23.5",
     "@fullcalendar/core": "^6.1.9",
     "@fullcalendar/daygrid": "^6.1.9",
