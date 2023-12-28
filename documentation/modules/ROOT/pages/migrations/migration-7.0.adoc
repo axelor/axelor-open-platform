@@ -16,6 +16,7 @@ Current Angular front-end is now dropped in favor of new front-end built on top 
 Here are the following changes due to this change :
 
 - `npm-install` Gradle task has been removed.
+- input values aren't trimmed anymore : leading and trailing whitespaces are preserved.
 
 == Font Awesome icons deprecated
 
