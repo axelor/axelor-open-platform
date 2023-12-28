@@ -95,7 +95,7 @@
     },
     "CommandBar": {
       "button": {
-        "padding": "0.25rem"
+        "padding": "0.35rem 0.45rem"
       },
       "button_hover": {
         "bg": "#F8F8FF"

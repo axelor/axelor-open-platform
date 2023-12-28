@@ -93,6 +93,11 @@
         "bg": "transparent"
       }
     },
+    "CommandBar": {
+      "button": {
+        "padding": "0.35rem 0.45rem"
+      }
+    },
     "Table": {
       "bg": "transparent",
       "border": {
