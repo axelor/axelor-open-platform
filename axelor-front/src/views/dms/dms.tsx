@@ -588,19 +588,18 @@ export function Dms(props: ViewProps<GridView>) {
       row: GridRow,
     ) => {
       const record = row?.record;
-      const cellValue = record?.[col?.name];
-      if (cellValue === "fa fa-folder") {
+      if (col?.name === "typeIcon" && record.isDirectory) {
         handleDocumentOpen(e, row);
-      } else if (cellValue === "fa fa-download") {
+      } else if (col?.name === "downloadIcon") {
         row?.record && downloadAsBatch(row.record);
-      } else if (cellValue === "fa fa-info-circle") {
+      } else if (col?.name === "detailsIcon") {
         setDetailsPopup(true);
         setDetailsId(record.id);
-      } else if (cellValue?.includes("fa")) {
+      } else if (col?.name === "typeIcon") {
         handleDocumentOpen(e, row);
       }
 
-      if (cellValue !== "fa fa-info-circle") {
+      if (col?.name !== "detailsIcon") {
         setDetailsPopup(false);
         setDetailsId(null);
       }
