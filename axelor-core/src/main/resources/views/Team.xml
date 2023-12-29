@@ -29,22 +29,20 @@
     <field name="name"/>
     <field name="description"/>
     <template><![CDATA[
-    <div>
-      <div class="span4 card-image">
-        <img ng-src="{{$image(null, 'image')}}">
-        <strong>{{name}}</strong>
-      </div>
-      <div class="span8">
-        <strong>{{name}}</strong>
-        <p class="muted">{{description}}</p>
-        <div class="buttons">
-          <a class="btn btn-small btn-success" href="" ng-show="!_following" ui-action-click="com.axelor.mail.web.MailController:follow" x-translate>Subscribe</a>
-          <a class="btn btn-small btn-danger" href="" ng-show="_following" ui-action-click="com.axelor.mail.web.MailController:unfollow" x-translate>Unsubscribe</a>
-        </div>
-      </div>
-    </div>
-    ]]>
-    </template>
+    <>
+      <Box d="grid" gridTemplateColumns="40% 60%">
+        <Box>
+          <Image src={$image(null, 'image')} style={{ height: "64px", width: "64px", borderRadius: "100%"}}></Image>
+        </Box>
+        <Box>
+          <strong>{name}</strong>
+          <Box as="p">{description}</Box>
+          {!_following && <Button size="sm" variant="success" onClick={$action("com.axelor.mail.web.MailController:follow")}>{_t('Subscribe')}</Button>}
+          {_following && <Button size="sm" variant="danger" onClick={$action("com.axelor.mail.web.MailController:unfollow")}>{_t('Unsubscribe')}</Button>}
+        </Box>
+      </Box>
+    </>
+    ]]></template>
   </cards>
 
   <form name="team-form" title="Team" model="com.axelor.team.db.Team"
