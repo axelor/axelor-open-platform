@@ -43,14 +43,22 @@
     <panel itemSpan="12" showIf="fileType == 'application/pdf'">
       <field name="$pdf" showTitle="false" readonly="true">
         <viewer depends="inlineUrl"><![CDATA[
-          <iframe ng-src="{{record.inlineUrl}}" frameborder="0" scrolling="auto" height="700px"/>
+        <>
+          <Box flexGrow={1} position="relative" style={{ height: 700 }}>
+            {inlineUrl && (
+                <Box as="iframe" src={inlineUrl} h={100} w={100} flex={1}/>
+              )}
+          </Box>
+        </>
         ]]></viewer>
       </field>
     </panel>
     <panel itemSpan="12" showIf="fileType.indexOf('image') == 0">
       <field name="$img" showTitle="false" readonly="true">
         <viewer depends="inlineUrl,fileName"><![CDATA[
-          <img ng-src="{{record.inlineUrl}}" alt="{{record.fileName}}"/>
+        <>
+          <img style={{ width: "100%"}} alt={fileName} src={inlineUrl} />
+        </>
         ]]></viewer>
       </field>
     </panel>
