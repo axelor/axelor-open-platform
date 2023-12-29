@@ -2,7 +2,6 @@
 :toc:
 :toc-title:
 
-:url-fontawesome: http://fortawesome.github.io/Font-Awesome/icons
 :url-angular-templates: https://docs.angularjs.org/guide/templates
 
 == Usage
@@ -110,7 +109,7 @@ This template renders data as a small and simple report box (useful in dashboard
 
 Static attributes:
 
-* `icon` - {url-fontawesome}[Font Awesome] icon name
+* `icon` - icon name
 * `label` - a label to describe the value
 
 Dynamic expressions:

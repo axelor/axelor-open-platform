@@ -93,7 +93,7 @@ The `<button>` item can be used to put buttons at any row.
 
 | *`name`* | name of the button
 | `title` | title text for the button
-| `icon` | name of the icon to show (font-awesome icons)
+| `icon` | name of the icon to show
 | `prompt` | text to show if confirmation is required when button is clicked
 | *`onClick`* | the name of the action to execute when button is clicked
 | `css` | custom CSS class to apply - _new in version 5.4_

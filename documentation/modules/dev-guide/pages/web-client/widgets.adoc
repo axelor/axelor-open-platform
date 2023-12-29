@@ -402,8 +402,8 @@ Button widget has specials attributes:
 * `prompt`: confirmation message before performing client action
 * `link`: If specified then the button is rendered as a link.
 Use empty value if you only need a link effect and perform actual action with onClick.
-* `icon`: button icon (an image or font-awesome icon)
-* `iconHover`: button icon on mouse hover (an image or font-awesome icon)
+* `icon`: button icon (an image or an icon)
+* `iconHover`: button icon on mouse hover (an image or an icon)
 
 [source,xml]
 ----

@@ -2946,7 +2946,7 @@
         <xsd:attribute name="icon" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Specify the button icon (an image or FontAwesome icon).
+              Specify the button icon (an image or an icon).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
