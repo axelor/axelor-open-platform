@@ -118,6 +118,8 @@ Following UI components are supported: `Box`, `Badge`, `Alert`, `AlertHeader`, `
 `Divider`, `Image`, `Link`, `List`, `ListItem`, `Panel`, `Popper`, `Scrollable`, `Table`, `TableBody`, `TableHead`,
 `TableFoot`, `TableRow`, `TableCell`, `TableCaption`, `Icon`.
 
+Translation in template can be allowed using `_t` helper : `<>{_t("Draft")}</>`
+
 React template no more rely on main record context but on the field context for reference field (legacy template was
 inconsistent). So templates should be now :
 
