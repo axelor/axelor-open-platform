@@ -4,15 +4,15 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { MessageFile } from "./types";
 import { download as downloadFile } from "@/utils/download";
-import { legacyClassNames } from "@/styles/legacy";
 import styles from "./message-files.module.scss";
+import { Icon } from "@/components/icon";
 
 function download(file: MessageFile) {
   downloadFile(
     `ws/rest/com.axelor.meta.db.MetaFile/${
       file["metaFile.id"] || file["id"]
     }/content/download`,
-    file.fileName
+    file.fileName,
   );
 }
 
@@ -52,13 +52,9 @@ export function MessageFiles({
             </Box>
           )}
           {showIcon && (
-            <Box
-              as="i"
-              me={1}
-              className={legacyClassNames(
-                "fa",
-                $file.typeIcon || $file.fileIcon || "fa-paperclip"
-              )}
+            <Icon
+              icon={$file.typeIcon || $file.fileIcon || "paperclip"}
+              className={styles.icon}
             />
           )}
           <Box
