@@ -57,7 +57,7 @@
       <field name="$img" showTitle="false" readonly="true">
         <viewer depends="inlineUrl,fileName"><![CDATA[
         <>
-          <img style={{ width: "100%"}} alt={fileName} src={inlineUrl} />
+          <Image style={{ width: "100%"}} alt={fileName} src={inlineUrl} />
         </>
         ]]></viewer>
       </field>

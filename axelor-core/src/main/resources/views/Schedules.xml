@@ -16,7 +16,14 @@
 
   <form name="meta-schedule-form" title="Schedule" model="com.axelor.meta.db.MetaSchedule">
     <panel showIf="!isServiceEnable" hidden="true">
-      <static css="text-error"><![CDATA[<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The scheduler service is disabled.]]></static>
+      <static css="text-error"><![CDATA[
+      <>
+        <Box d="flex" alignItems="center">
+          <Icon icon={"exclamation-triangle"} />
+          <span>{_t("The scheduler service is disabled.")}</span>
+        </Box>
+      </>
+      ]]></static>
     </panel>
     <panel title="Overview">
       <field name="name"/>
