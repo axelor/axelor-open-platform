@@ -44,7 +44,13 @@
       min-width: 0;
       min-height: 0;
       --bs-border-radius: 0;
-      border: none !important
+      border: none !important;
     }
   }
+}
+
+.searchInput {
+  padding-left: 0.5rem !important;
+  border: 1px solid var(--bs-border-color) !important;
+  border-radius: var(--bs-border-radius) !important;
 }

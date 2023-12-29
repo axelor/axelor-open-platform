@@ -566,6 +566,7 @@ function SearchInput({
       icons={icons}
       readOnly={readonly}
       value={value}
+      className={styles.searchInput}
       onChange={(e) => setValue(e.target.value)}
       {...(readonly
         ? {
