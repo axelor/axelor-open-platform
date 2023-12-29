@@ -17,7 +17,7 @@ import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
 import { MessageFiles } from "./message-files";
 import { useMessagePopup } from "./message-form";
-import styles from "@/views/form/widgets/button/button.module.scss";
+import styles from "./message-input.module.scss";
 
 function TextareaAutoSizeInput(props: any) {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -34,7 +34,7 @@ function TextareaAutoSizeInput(props: any) {
     input && (input.style.height = getHeight());
   }, [value]);
 
-  return <Input ref={inputRef} as="textarea" rows={1} {...props} />;
+  return <Input ref={inputRef} as="textarea" rows={1} className={styles.textarea} {...props} />;
 }
 
 export function MessageInput({
