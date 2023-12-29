@@ -806,7 +806,7 @@
   <xsd:attributeGroup name="ExtraAttributes">
     <xsd:attribute name="x-bind" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify an angular.js expression to bind to the field.
+        <xsd:documentation>Specify an expression to bind to the field.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -2686,7 +2686,7 @@
     <xsd:attribute name="view-title" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          Specify an angular.js expression used to custom the opened tab title.
+          Specify an expression used to customize the opened tab title.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

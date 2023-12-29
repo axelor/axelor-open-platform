@@ -714,7 +714,7 @@ depending on the widget/type.
 |===
 | Attribute | Description
 
-| `x-bind` | angular.js expression to bind to the field value
+| `x-bind` | expression to bind to the field value
 | `x-related` | specify related field for `ref-select` widget
 | `x-create` | the names of required fields to be used for quick record creation from `select` widget
 | `x-icon` | specify an icon
@@ -749,8 +749,7 @@ It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
 
 == Expressions
 
-The form view widget's states can be set using angular.js boolean expressions
-from the xml views.
+The form view widget's states can be set using boolean expressions from the xml views.
 
 These are:
 

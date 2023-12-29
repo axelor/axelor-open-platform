@@ -2,8 +2,6 @@
 :toc:
 :toc-title:
 
-:url-angular-expression: https://docs.angularjs.org/guide/expression
-
 The grid view shows data in a list with several columns.
 
 As the grid views fetch many records to display in as list, it's important to
@@ -158,7 +156,7 @@ The attributes are:
 |===
 | Attribute | Description
 
-| *`if`* | an {url-angular-expression}[angular.js] like boolean expression
+| *`if`* | boolean expression
 | `color` | name of the text color style
 | `background` | name of the background color style
 | `strong` | whether to show text in bold fonts

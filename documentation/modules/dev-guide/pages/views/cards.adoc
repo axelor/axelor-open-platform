@@ -57,7 +57,7 @@ For example:
 
 == Template
 
-The `<template>` should be used to provide angular.js template to prepare the
+The `<template>` should be used to provide template to prepare the
 context of cards. It can use only the defined `<field>` values.
 
 A template helper function `$image(field, image)` can be used to put an image.

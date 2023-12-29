@@ -2,8 +2,6 @@
 :toc:
 :toc-title:
 
-:url-angular-templates: https://docs.angularjs.org/guide/templates
-
 == Usage
 
 The custom view allows to show arbitrary data using templates. This view
@@ -29,7 +27,7 @@ The custom view definition is:
   <!-- template is require -->
   <template>
   <![CDATA[
-  // angular.js template, data can be accessed using `data`, and first data item
+  // template, data can be accessed using `data`, and first data item
   // is accessible as `first`.
   ]]>
   </template>
@@ -76,7 +74,7 @@ The elements are:
 | Element | Description
 | `<field>` | field definitions for the dataset (optional, can be multiple)
 | *`<dataset>`* | dataset definition
-| *`<template>`* | an {url-angular-templates}[angular.js template]
+| *`<template>`* | a template
 |===
 
 === Field
@@ -93,8 +91,7 @@ The `<dataset>` element is used to define a dataset.
 
 === Template
 
-The `<template>` element is used to define an {url-angular-templates}[angular.js template]
-to render the data.
+The `<template>` element is used to define a template to render the data.
 
 The dataset result is available as `data` and the first result of the data is
 available as `first`.

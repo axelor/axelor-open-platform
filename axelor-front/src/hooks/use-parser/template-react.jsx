@@ -30,6 +30,7 @@ import {
 import { Icon } from "@/components/icon";
 
 import { parseSafe } from "./parser";
+import { legacyClassNames } from "@/styles/legacy";
 
 const COMPONENTS = {
   Alert,
@@ -57,6 +58,7 @@ const COMPONENTS = {
   TableHead,
   TableRow,
   Icon,
+  legacyClassNames,
 };
 
 function createContext(context) {

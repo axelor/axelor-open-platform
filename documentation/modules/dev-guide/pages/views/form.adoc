@@ -2,10 +2,6 @@
 :toc:
 :toc-title:
 
-:uri_angular_docs: https://docs.angularjs.org/guide/
-:url-angular-expression: https://docs.angularjs.org/guide/expression
-:url-angular-templates: https://docs.angularjs.org/guide/templates
-
 The form view shows a single record in form layout. It's the main view to see
 a record with details.
 
@@ -79,16 +75,16 @@ Form view can have the following attributes:
 | *`title`* | the form view title
 | `id` | If overriding some existing one, provide a unique id to identify this one.
 | `editable` | whether the form is editable
-| `readonlyIf` | an {url-angular-expression}[angular.js] boolean expression to make form readonly
+| `readonlyIf` | boolean expression to make form readonly
 | `onNew` | action to be called on creating new record
 | `onLoad` | action to be called when record is loaded
 | `onSave` | action to be called on saving this form
-| `canNew` | an {url-angular-expression}[angular.js] boolean expression to the 'New' button
-| `canEdit` | an {url-angular-expression}[angular.js] boolean expression to the 'Edit' button
-| `canDelete` | an {url-angular-expression}[angular.js] boolean expression to the 'Delete' button
-| `canCopy` | an {url-angular-expression}[angular.js] boolean expression to the 'Copy' button
-| `canSave` | an {url-angular-expression}[angular.js] boolean expression to the 'Save' button
-| `canAttach` | an {url-angular-expression}[angular.js] boolean expression to the 'Attachment' button
+| `canNew` | boolean expression to the 'New' button
+| `canEdit` | boolean expression to the 'Edit' button
+| `canDelete` | boolean expression to the 'Delete' button
+| `canCopy` | boolean expression to the 'Copy' button
+| `canSave` | boolean expression to the 'Save' button
+| `canAttach` | boolean expression to the 'Attachment' button
 | `width` | The preferred width style of the view: `mini`, `mid` or `large`.
 |===
 
@@ -122,12 +118,12 @@ A `panel` can have the following attributes:
 | `colSpan` | number of columns taken by the widget
 | `itemSpan` | default span for child items
 | `hidden` | whether to hide the widget
-| `hideIf` | an {url-angular-expression}[angular.js] boolean expression to hide the panel
+| `hideIf` | boolean expression to hide the panel
 | `readonly` | whether the widget should be considered readonly
-| `readonlyIf` | an {url-angular-expression}[angular.js] boolean expression to mark the panel readonly
-| `showIf` | an {url-angular-expression}[angular.js] boolean expression to show the panel
+| `readonlyIf` | boolean expression to mark the panel readonly
+| `showIf` | boolean expression to show the panel
 | `onTabSelect` | an action to execute when the panel tab is selected (if it's top-level in panel-tabs)
-| `showFrame` | whether to show frame arround the panel
+| `showFrame` | whether to show frame around the panel
 | `showTitle` | whether to show the panel title
 | `sidebar` | whether to show this panel in sidebar
 | `attached` | whether to attach the panel with previous one
@@ -246,10 +242,10 @@ A `panel-dashlet` can have following attributes:
 | `height` | height taken by the widget
 | `colSpan` | number of columns taken by the widget
 | `hidden` | whether to hide the widget
-| `hideIf` | an {url-angular-expression}[angular.js] boolean expression to hide the panel
+| `hideIf` | boolean expression to hide the panel
 | `readonly` | whether the widget should be considered readonly
-| `readonlyIf` | an {url-angular-expression}[angular.js] boolean expression to mark the panel readonly
-| `showIf` | an {url-angular-expression}[angular.js] boolean expression to show the panel
+| `readonlyIf` | boolean expression to mark the panel readonly
+| `showIf` | boolean expression to show the panel
 | `showTitle` | whether to show the panel title
 | `if-module` | use the widget if the given module is installed
 |===
@@ -395,8 +391,7 @@ We can define custom viewer for fields using `<viewer>` child element on a field
 </field>
 ----
 
-The viewer uses https://docs.angularjs.org/guide/templates[angular.js template] to render
-the values. The template can access current record with `record` variable.
+The viewer uses template to render the values.
 
 If viewer uses fields not in current form view, they should be listed as a comma
 seperated list of fields with `depends=""` attribute.
