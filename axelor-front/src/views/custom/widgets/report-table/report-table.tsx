@@ -51,16 +51,15 @@ export const ReportTable = forwardRef(function ReportTable(
 
   const onSearch = useCallback(() => {}, []);
 
-  const defaultColumnNames = useMemo<string>(() => {
+  const defaultColumnNames = useMemo<string[]>(() => {
     const [first] = records || [];
     return Object.keys(first || {})
       .filter((name) => name !== "$$hashKey")
-      .join(",");
   }, [records]);
 
   const { view: gridView, fields } = useMemo(() => {
     const sumCols = (sums || "").split(/\s*,\s*/);
-    const names = (columns ?? defaultColumnNames).split(/\s*,\s*/);
+    const names = columns ? columns.split(/\s*,\s*/) : defaultColumnNames;
     const fields: Record<string, Property> = {};
     const viewItems: Widget[] = [];
 
@@ -131,6 +130,7 @@ export const ReportTable = forwardRef(function ReportTable(
       allowCheckboxSelection={false}
       columnFormatter={formatter}
       onSearch={onSearch as any}
+      noRecordsText={i18n.get("No records found.")}
     />
   );
 });
