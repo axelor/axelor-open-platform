@@ -15,7 +15,7 @@ function getMaskFromFormat(str: string) {
   const mask = [];
   for (let i = 0; i < str.length; i++) {
     const ch = str[i];
-    if ([" ", "/", ":"].includes(ch)) {
+    if ([" ", "/", ":", "-", "."].includes(ch)) {
       mask.push(ch);
     } else {
       if (CHAR_MASK[ch] && str.indexOf(ch) === i) {
