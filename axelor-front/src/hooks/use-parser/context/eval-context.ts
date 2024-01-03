@@ -38,7 +38,7 @@ export function createEvalContext(
       return format(value, { props: { scale, type: "percent" } as any });
     },
     __number(value: any, scale?: string | number) {
-      return format(value, { props: { scale, type: "integer" } as any });
+      return format(value, { props: { scale, type: "decimal" } as any });
     },
     __unaccent(value: any) {
       return unaccent(value);
