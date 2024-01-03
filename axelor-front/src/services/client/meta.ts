@@ -12,6 +12,7 @@ import {
   Perms,
   Property,
   SavedFilter,
+  Schema,
   ViewTypes,
 } from "./meta.types";
 import { rejectAsAlert as reject } from "./reject";
@@ -176,6 +177,7 @@ export interface ViewData<T> extends Partial<MetaData> {
   jsonAttrs?: JsonField[];
   helps?: Record<string, Record<string, HelpOverride>>;
   related?: Record<string, string[]>; // additional fields after view processing
+  widgetSchema?: Schema;
 }
 
 export async function fields(

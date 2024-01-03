@@ -108,11 +108,13 @@ export function createValueAtom({
   formAtom,
   dirtyAtom,
   actionExecutor,
+  widgetSchema,
 }: {
   schema: Schema;
   formAtom: FormAtom;
   dirtyAtom: PrimitiveAtom<boolean>;
   actionExecutor: ActionExecutor;
+  widgetSchema?: Schema;
 }) {
   const { name, editable, readonly, onChange } = schema;
 
@@ -164,7 +166,8 @@ export function createValueAtom({
       const dirty =
         markDirty &&
         schema.canDirty !== false &&
-        Boolean(name && !isCleanDummy(name));
+        Boolean(name && !isCleanDummy(name)) &&
+        canDirty(widgetSchema);
 
       set(lensAtom, next);
 
@@ -176,6 +179,12 @@ export function createValueAtom({
       return fireOnChange && triggerOnChange();
     },
   );
+}
+
+function canDirty(schema?: Schema) {
+  if (!schema) return true;
+  const { name, canDirty } = schema;
+  return canDirty !== false && name && !isCleanDummy(name);
 }
 
 export const fallbackFormAtom = createFormAtom({

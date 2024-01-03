@@ -16,7 +16,11 @@ import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { validate } from "@/utils/validate";
-import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
+import {
+  useViewAction,
+  useViewDirtyAtom,
+  useViewMeta,
+} from "@/view-containers/views/scope";
 
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
@@ -40,12 +44,22 @@ export function FormWidget(props: FormWidgetProps) {
   const dirtyAtom = useViewDirtyAtom();
   const { actionExecutor } = useFormScope();
 
+  const {
+    meta: { widgetSchema },
+  } = useViewMeta();
+
   const valueAtom = useMemo(
     () =>
       isField(schema)
-        ? createValueAtom({ schema, formAtom, dirtyAtom, actionExecutor })
+        ? createValueAtom({
+            schema,
+            formAtom,
+            dirtyAtom,
+            actionExecutor,
+            widgetSchema,
+          })
         : undefined,
-    [actionExecutor, dirtyAtom, formAtom, schema],
+    [actionExecutor, dirtyAtom, formAtom, schema, widgetSchema],
   );
 
   const hidden = useAtomValue(

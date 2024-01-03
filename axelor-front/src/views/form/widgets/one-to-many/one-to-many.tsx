@@ -284,13 +284,14 @@ function OneToManyInner({
     toKebabCase(schema.serverType || schema.widget) === "many-to-many";
 
   const viewMeta = useMemo(() => {
-    return (
-      viewData ?? {
+    return {
+      ...(viewData ?? {
         view: { ...schema, type: "grid" } as GridView,
         fields,
         model,
-      }
-    );
+      }),
+      widgetSchema: schema,
+    };
   }, [fields, model, schema, viewData]);
 
   const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
@@ -783,11 +784,15 @@ function OneToManyInner({
 
   const { data: detailMeta } = useAsync(async () => {
     if (!hasMasterDetails) return;
-    return await findView<FormView>({
+    const meta = await findView<FormView>({
       type: "form",
       name: detailFormName,
       model,
     });
+    return {
+      ...meta,
+      widgetSchema: schema,
+    };
   }, [model, detailFormName]);
 
   useEffect(() => {
