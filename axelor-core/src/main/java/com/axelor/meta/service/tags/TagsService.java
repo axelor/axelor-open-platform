@@ -93,9 +93,16 @@ public class TagsService {
           /** Check whether the node can be visited */
           @Override
           public MenuNodeResult preChildVisit(MenuNode childNode) {
-            if (checker.isAllowed(childNode.getMetaMenu())
-                && checker.canShow(childNode.getMetaMenu())) {
-              return MenuNodeResult.CONTINUE;
+            try {
+              if (checker.isAllowed(childNode.getMetaMenu())
+                  && checker.canShow(childNode.getMetaMenu())) {
+                return MenuNodeResult.CONTINUE;
+              }
+            } catch (Exception e) {
+              LOG.error(
+                  "Unable to evaluate menu {} : {}",
+                  childNode.getMetaMenu().getName(),
+                  e.getMessage());
             }
             return MenuNodeResult.TERMINATE;
           }

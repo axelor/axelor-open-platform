@@ -34,8 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MenuService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MenuService.class);
 
   @Inject private TagsService tagsService;
 
@@ -76,9 +80,16 @@ public class MenuService {
           /** Check whether the node can be visited */
           @Override
           public MenuNodeResult preChildVisit(MenuNode childNode) {
-            if (checker.isAllowed(childNode.getMetaMenu())
-                && checker.canShow(childNode.getMetaMenu())) {
-              return MenuNodeResult.CONTINUE;
+            try {
+              if (checker.isAllowed(childNode.getMetaMenu())
+                  && checker.canShow(childNode.getMetaMenu())) {
+                return MenuNodeResult.CONTINUE;
+              }
+            } catch (Exception e) {
+              LOG.error(
+                  "Unable to evaluate menu {} : {}",
+                  childNode.getMetaMenu().getName(),
+                  e.getMessage());
             }
             return MenuNodeResult.TERMINATE;
           }
