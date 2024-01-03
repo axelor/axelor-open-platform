@@ -20,22 +20,31 @@ import AppLogo from "../../assets/axelor.svg?react";
 
 import styles from "./nav-drawer.module.scss";
 
+const TagStyle: Record<string, TBackground> = {
+  default: "secondary",
+  important: "danger",
+  success: "success",
+  warning: "warning",
+  info: "info",
+  inverse: "dark",
+};
+
 function MenuTag({
   item,
   tag,
   hasTag,
-  color,
+  color = "default",
 }: {
   item: MenuItem;
   tag: string;
   hasTag?: boolean;
   color?: string;
 }) {
-  const bg = (
-    !color || color === "default" ? "secondary" : color
-  ) as TBackground;
   return (
-    <Badge data-tag-name={hasTag ? item.name : undefined} bg={bg}>
+    <Badge
+      data-tag-name={hasTag ? item.name : undefined}
+      bg={TagStyle[color] ?? TagStyle["default"]}
+    >
       {`${tag}`.toUpperCase()}
     </Badge>
   );
