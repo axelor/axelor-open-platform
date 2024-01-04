@@ -46,7 +46,7 @@ import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
-import { MetaScope } from "@/view-containers/views/scope";
+import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridColumnNames } from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
@@ -190,8 +190,8 @@ function OneToManyInner({
       isNum(x)
         ? ({ id: x } as unknown as DataRecord)
         : x.id === undefined || x.id === null
-        ? { ...x, _dirty: true, id: nextId() }
-        : x,
+          ? { ...x, _dirty: true, id: nextId() }
+          : x,
     );
     return lastItemsRef.current;
   }, []);
@@ -681,14 +681,14 @@ function OneToManyInner({
       const { id, $id, ...rest } = record;
       record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
 
-      setState(draft => {
+      setState((draft) => {
         if (draft.editRow) {
           const [rowIndex] = draft.editRow;
           draft.editRow = null;
 
           if (draft.rows[rowIndex]) {
             draft.rows[rowIndex].record = record;
-          } 
+          }
         }
       });
       await handleSelect([record]);
@@ -758,11 +758,14 @@ function OneToManyInner({
     [setValue, clearSelection],
   );
 
+  const updateViewDirty = useUpdateViewDirty(formAtom);
+
   const onCloseInDetail = useCallback(() => {
     setDetailRecord(null);
     gridRef.current?.form?.current?.onCancel?.();
     panelRef.current?.scrollIntoView?.({ behavior: "smooth" });
-  }, []);
+    updateViewDirty();
+  }, [updateViewDirty]);
 
   const onRowReorder = useCallback(() => {
     reorderRef.current = true;
@@ -898,6 +901,8 @@ function OneToManyInner({
 
   useFormRefresh(onSearch);
 
+  const onDiscard = useCallback(() => updateViewDirty(), [updateViewDirty]);
+
   const hasActions = showBars && (toolbar?.length || menubar?.length);
 
   const rowSize = 40;
@@ -1032,6 +1037,7 @@ function OneToManyInner({
             onView={canView ? (canEdit ? onEdit : onView) : noop}
             onUpdate={onSave}
             onSave={isManyToMany ? onSaveRecord : onSave}
+            onDiscard={onDiscard}
             onRowReorder={onRowReorder}
             onRowSelectionChange={onRowSelectionChange}
             {...(!canNew &&

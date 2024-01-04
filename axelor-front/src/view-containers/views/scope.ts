@@ -14,11 +14,12 @@ import {
   useTabs,
 } from "@/hooks/use-tabs";
 import { SearchOptions } from "@/services/client/data";
+import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { ViewData } from "@/services/client/meta";
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
-import { usePrepareContext } from "@/views/form/builder";
-import { useFormScope } from "@/views/form/builder/scope";
+import { FormAtom, usePrepareContext } from "@/views/form/builder";
+import { useCanDirty, useFormScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
 
 const fallbackAtom: TabAtom = atom(
@@ -227,6 +228,33 @@ export function useViewDirtyAtom() {
       ),
     [tab.state],
   );
+}
+
+/**
+ * Hook that provides a function to update the view dirty state
+ * by comparing the record with the original.
+ *
+ * Intended use is for resetting dirty state after discarding/reverting changes.
+ *
+ * @param {FormAtom} formAtom
+ * @returns A callback function to update view dirty state.
+ */
+export function useUpdateViewDirty(formAtom: FormAtom) {
+  const viewDirtyAtom = useViewDirtyAtom();
+  const canDirty = useCanDirty();
+
+  const updateDirty = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const { record, original } = get(formAtom);
+        const dirty = !equalsIgnoreClean(record, original ?? {}, canDirty);
+        set(viewDirtyAtom, dirty);
+      },
+      [canDirty, formAtom, viewDirtyAtom],
+    ),
+  );
+
+  return updateDirty;
 }
 
 /**
