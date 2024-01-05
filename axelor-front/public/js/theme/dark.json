@@ -99,12 +99,12 @@
       }
     },
     "Table": {
-      "bg": "transparent",
+      "bg": "#292A41",
       "border": {
         "color": "rgba(234, 234, 255, 0.1)"
       },
       "header": {
-        "bg": "transparent"
+        "bg": "#292A41"
       },
       "row_odd": {
         "bg": "rgba(102, 108, 255, 0.05)"
