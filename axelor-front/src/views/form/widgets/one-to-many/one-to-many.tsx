@@ -179,7 +179,7 @@ function OneToManyInner({
     lastItemsRef.current = items.map((x) =>
       isNum(x)
         ? ({ id: x } as unknown as DataRecord)
-        : x.id === null
+        : x.id === undefined || x.id === null
         ? { ...x, _dirty: true, id: nextId() }
         : x,
     );
