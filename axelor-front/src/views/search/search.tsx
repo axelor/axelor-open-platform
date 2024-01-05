@@ -29,7 +29,7 @@ import { useGridState } from "../grid/builder/utils";
 import { useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
-import { parseAngularExp } from "@/hooks/use-parser/utils";
+import { isLegacyExpression, parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
 import { toKebabCase } from "@/utils/names";
 import { searchData } from "./utils";
 import styles from "./search.module.scss";
@@ -190,10 +190,10 @@ export function Search(props: ViewProps<SearchView>) {
 
         const title =
           (viewTitle
-            ? parseAngularExp(viewTitle)({
-                ...record,
-                id: $$id,
-              })
+            ? (isLegacyExpression(viewTitle) ? parseAngularExp(viewTitle) : parseExpression(viewTitle))({
+              ...record,
+              id: $$id,
+            })
             : "") || _modelTitle;
 
         openTab({
@@ -207,6 +207,7 @@ export function Search(props: ViewProps<SearchView>) {
           ],
           params: {
             forceEdit: !readonly,
+            forceTitle: true,
           },
           context: {
             _showRecord: $$id,
