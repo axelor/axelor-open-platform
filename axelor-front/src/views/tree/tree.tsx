@@ -23,7 +23,7 @@ import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewContext, useViewTab } from "@/view-containers/views/scope";
+import { useViewTabRefresh, useViewContext, useViewTab } from "@/view-containers/views/scope";
 
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
@@ -339,6 +339,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     viewType: view.type,
     onRefresh: handleRefresh,
   });
+
+  // register tab:refresh
+  useViewTabRefresh("tree", handleRefresh);
 
   return (
     <Box d="flex" flexDirection="column" overflow="auto" w={100}>
