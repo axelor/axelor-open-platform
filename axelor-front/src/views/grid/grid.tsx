@@ -885,7 +885,7 @@ function GridInner(props: ViewProps<GridView>) {
   useViewTabRefresh("grid", onSearch);
 
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
-  const canMassUpdate = perms?.massUpdate && massUpdateFields.length > 0;
+  const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
   const canCustomize =
     view.name &&
     userViewConfig?.customizationPermission &&
