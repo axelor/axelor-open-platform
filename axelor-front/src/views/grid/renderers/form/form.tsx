@@ -329,14 +329,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         if (e.defaultPrevented) return;
         const parent = getParent();
 
-        // When onChange is triggered, event target is document body.
-        const target = (
-          e.target === document.body
-            ? document.body.firstElementChild
-            : e.target
-        ) as Node;
-
-        if (parent && !parent?.contains?.(target)) {
+        if (parent && !parent?.contains?.(e.target as Node)) {
           return;
         }
 

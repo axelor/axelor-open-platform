@@ -61,8 +61,10 @@ function HttpIndicator({ count }: { count: number }) {
 
 function HttpBlock({ count }: { count: number }) {
   const [wait, setWait] = useState(false);
+  const [block, setBlock] = useState(false);
   const [blocked] = useHttpBlock();
 
+  const _block = blocked || wait;
   const active = blocked || count > 0;
 
   useEffect(() => {
@@ -76,21 +78,30 @@ function HttpBlock({ count }: { count: number }) {
   }, [active, count]);
 
   useEffect(() => {
-    if (blocked || wait) {
+    if (_block) {
+      // Delay block component in order to have correct target in click event listeners.
+      // Needed for correct event target in click away handling.
+      const timer = setTimeout(() => setBlock(_block), 100);
+
+      // Block keyboard events
       const handler = (event: Event) => {
         event.stopPropagation();
         event.preventDefault();
       };
       document.addEventListener("keydown", handler, true);
+
       return () => {
+        clearTimeout(timer);
         document.removeEventListener("keydown", handler, true);
       };
+    } else {
+      setBlock(_block);
     }
-  }, [blocked, wait]);
+  }, [_block]);
 
   return (
     <Portal>
-      <Fade in={blocked || wait} mountOnEnter unmountOnExit>
+      <Fade in={block} mountOnEnter unmountOnExit>
         <div className={styles.block}>
           <Fade in={wait} mountOnEnter unmountOnExit>
             <div className={styles.wait}>
