@@ -11,3 +11,18 @@
   border: 1px solid var(--bs-border-color) !important;
   border-radius: var(--bs-border-radius) !important;
 }
+
+.container {
+  position: relative;
+}
+.translatable textarea {
+  padding-right: 1.75rem !important;
+  overflow: hidden;
+  &[readonly] {
+    text-overflow: ellipsis;
+  }
+  [dir="rtl"] & {
+    padding-right: unset !important;
+    padding-left: 1.75rem !important;
+  }
+}

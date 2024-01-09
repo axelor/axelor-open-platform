@@ -7,7 +7,9 @@ import { useAppTheme } from "@/hooks/use-app-theme";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
+import { Translatable, useTranslationValue } from "../string/translatable";
 import styles from "./text.module.scss";
+import clsx from "clsx";
 
 export function Text({
   inputProps,
@@ -19,12 +21,14 @@ export function Text({
   >;
 }) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
-  const { uid, height, placeholder } = schema;
+  const { uid, height, placeholder, translatable } = schema;
   const { onBlur } = inputProps || {};
   const theme = useAppTheme();
 
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
+
+  const [trValue, setTranslateValue] = useTranslationValue(props);
 
   const [changed, setChanged] = useState(false);
   const {
@@ -56,9 +60,19 @@ export function Text({
   );
 
   return (
-    <FieldControl {...props}>
+    <FieldControl
+      {...props}
+      className={clsx(styles.container, {
+        [styles.translatable]: translatable && !readonly,
+      })}
+    >
       {readonly ? (
-        <Input as="pre" bg={theme === "dark" ? "body" : "light"} mb={0} className={styles.pre}>
+        <Input
+          as="pre"
+          bg={theme === "dark" ? "body" : "light"}
+          mb={0}
+          className={styles.pre}
+        >
           {text}
         </Input>
       ) : (
@@ -76,6 +90,13 @@ export function Text({
           onBlur={handleBlur}
           onKeyDown={onKeyDown}
           className={styles.textarea}
+        />
+      )}
+      {translatable && !readonly && (
+        <Translatable
+          position="top"
+          value={text}
+          onUpdate={setTranslateValue}
         />
       )}
     </FieldControl>
