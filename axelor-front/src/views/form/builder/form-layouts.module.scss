@@ -32,6 +32,7 @@
     grid-template-columns: 100% !important;
     .gridItem {
       grid-column: span 1 !important;
+      --g-row-gap: 0 !important;
     }
   }
 }
