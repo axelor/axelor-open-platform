@@ -284,6 +284,7 @@ function useActionData<T extends ActionData>(
   handler: (data: T) => void,
   actionHandler: ActionHandler,
 ) {
+  const { actionExecutor } = useFormScope();
   const doneRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -294,7 +295,7 @@ function useActionData<T extends ActionData>(
   }, []);
 
   useEffect(() => {
-    return actionHandler.subscribe((data) => {
+    const unsubscribe = actionHandler.subscribe((data) => {
       if (doneRef.current) return;
       if (data) {
         if (check(data)) {
@@ -302,7 +303,11 @@ function useActionData<T extends ActionData>(
         }
       }
     });
-  }, [actionHandler, check, handler]);
+
+    return () => {
+      actionExecutor.wait().then(unsubscribe);
+    };
+  }, [actionExecutor, actionHandler, check, handler]);
 }
 
 function isCollection(item: Schema) {
