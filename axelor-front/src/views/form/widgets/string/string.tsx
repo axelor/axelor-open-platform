@@ -3,11 +3,9 @@ import { useMemo } from "react";
 
 import { Input, clsx } from "@axelor/ui";
 
-import { focusAtom } from "@/utils/atoms";
-
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { Translatable } from "./translatable";
+import { Translatable, useTranslationValue } from "./translatable";
 import { ViewerInput } from "./viewer";
 
 import styles from "./string.module.scss";
@@ -21,29 +19,15 @@ export function String({
     "type" | "autoComplete" | "placeholder" | "onFocus"
   >;
 }) {
-  const { schema, readonly, widgetAtom, formAtom, valueAtom, invalid } = props;
-  const { uid, name, placeholder, translatable } = schema;
+  const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
+  const { uid, placeholder, translatable } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
   const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
 
-  const trKey = `$t:${name}`;
-  const [trValue, setTranslateValue] = useAtom(
-    useMemo(
-      () =>
-        focusAtom(
-          formAtom,
-          ({ record }) => record[trKey],
-          ({ record, ...rest }, value) => ({
-            ...rest,
-            record: { ...record, [trKey]: value },
-          }),
-        ),
-      [formAtom, trKey],
-    ),
-  );
+  const [trValue, setTranslateValue] = useTranslationValue(props);
 
   return (
     <FieldControl

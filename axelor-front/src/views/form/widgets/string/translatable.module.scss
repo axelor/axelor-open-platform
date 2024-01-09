@@ -1,8 +1,15 @@
 .container {
   position: absolute;
   right: 0.25rem;
-  bottom: 0;
   cursor: pointer;
+}
+
+.top {
+  top: 0.25rem;
+}
+
+.bottom {
+  bottom: 0rem;
 }
 
 .icon {

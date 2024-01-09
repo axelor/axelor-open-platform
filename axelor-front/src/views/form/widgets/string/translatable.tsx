@@ -1,7 +1,9 @@
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { Box, Divider, Input, InputLabel } from "@axelor/ui";
-import { useEffect, useState } from "react";
+import { Box, Divider, Input, InputLabel, clsx } from "@axelor/ui";
+import { useEffect, useMemo, useState } from "react";
+import { useAtom } from "jotai";
 
+import { focusAtom } from "@/utils/atoms";
 import { dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
 import { DataStore } from "@/services/client/data-store";
@@ -9,6 +11,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { DataRecord } from "@/services/client/data.types";
 import { DeleteOption } from "@/services/client/data";
 import { useSession } from "@/hooks/use-session";
+import { FieldProps } from "../../builder";
 import styles from "./translatable.module.scss";
 
 const ds = new DataStore("com.axelor.meta.db.MetaTranslation", {
@@ -30,7 +33,7 @@ function Translations({
 
   function handleChange(key: string, value: any, ind: number) {
     setValues((values) =>
-      values.map((v, i) => (ind === i ? { ...v, [key]: value } : v))
+      values.map((v, i) => (ind === i ? { ...v, [key]: value } : v)),
     );
   }
 
@@ -117,11 +120,31 @@ function Translations({
   );
 }
 
+export function useTranslationValue({ schema: { name }, formAtom }: FieldProps<string>) {
+  const trKey = `$t:${name}`;
+  return useAtom(
+    useMemo(
+      () =>
+        focusAtom(
+          formAtom,
+          ({ record }) => record[trKey],
+          ({ record, ...rest }, value) => ({
+            ...rest,
+            record: { ...record, [trKey]: value },
+          }),
+        ),
+      [formAtom, trKey],
+    ),
+  );
+}
+
 export function Translatable({
   value,
+  position = "bottom",
   onUpdate,
 }: {
   value: string;
+  position?: "top" | "bottom";
   onUpdate: (val: string) => void;
 }) {
   const lang = useSession().data?.user?.lang;
@@ -147,7 +170,7 @@ export function Translatable({
         if (isOk) {
           const removed = values
             .filter((v) => v.$removed)
-            .map(({ id, version }) => ({ id, version } as DeleteOption));
+            .map(({ id, version }) => ({ id, version }) as DeleteOption);
 
           removed.length && (await ds.delete(removed));
 
@@ -156,7 +179,7 @@ export function Translatable({
               ({ language, message, $data }) =>
                 language &&
                 message &&
-                ($data?.language !== language || $data?.message !== message)
+                ($data?.language !== language || $data?.message !== message),
             )
             .map(({ id, version, message, language }) => ({
               id,
@@ -169,7 +192,7 @@ export function Translatable({
           updated.length && (await ds.save(updated));
 
           const value = values.find(
-            (v) => v.language && v.message && v.language === lang
+            (v) => v.language && v.message && v.language === lang,
           );
 
           if (value) {
@@ -181,7 +204,10 @@ export function Translatable({
   }
 
   return (
-    <span onClick={handleClick} className={styles.container}>
+    <span
+      onClick={handleClick}
+      className={clsx(styles.container, styles[position])}
+    >
       <MaterialIcon icon="flag" fill />
     </span>
   );
