@@ -6,6 +6,8 @@ import { MessageTrack } from "./types";
 import { Box } from "@axelor/ui";
 import { FormProps } from "@/views/form/builder";
 import { moment } from "@/services/client/l10n";
+import { getDateFormat, getDateTimeFormat } from "@/utils/format";
+
 import styles from "./message-track.module.scss";
 
 export function formatter(_item: MessageTrack, field?: Property) {
@@ -33,12 +35,12 @@ export function formatter(_item: MessageTrack, field?: Property) {
         });
       }
     }
-    
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
-      return moment(value).format("DD/MM/YYYY HH:mm");
+
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d+)?$/.test(value)) {
+      return moment(value).format(getDateTimeFormat());
     }
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return moment(value).format("DD/MM/YYYY");
+      return moment(value).format(getDateFormat());
     }
     if (value === "0E-10") value = "0.000000000000";
     return value;
