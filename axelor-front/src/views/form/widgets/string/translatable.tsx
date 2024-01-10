@@ -1,6 +1,6 @@
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box, Divider, Input, InputLabel, clsx } from "@axelor/ui";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAtom } from "jotai";
 
 import { focusAtom } from "@/utils/atoms";
@@ -120,7 +120,10 @@ function Translations({
   );
 }
 
-export function useTranslationValue({ schema: { name }, formAtom }: FieldProps<string>) {
+export function useTranslationValue({
+  schema: { name },
+  formAtom,
+}: FieldProps<string>) {
   const trKey = `$t:${name}`;
   return useAtom(
     useMemo(
@@ -138,18 +141,16 @@ export function useTranslationValue({ schema: { name }, formAtom }: FieldProps<s
   );
 }
 
-export function Translatable({
+export function useTranslateModal({
   value,
-  position = "bottom",
   onUpdate,
 }: {
   value: string;
-  position?: "top" | "bottom";
   onUpdate: (val: string) => void;
 }) {
   const lang = useSession().data?.user?.lang;
 
-  async function handleClick() {
+  return useCallback(async () => {
     let values: DataRecord[] = [];
 
     await dialogs.modal({
@@ -201,12 +202,29 @@ export function Translatable({
         }
       },
     });
-  }
+  }, [lang, value, onUpdate]);
+}
+
+export function Translatable({
+  value,
+  position = "bottom",
+  className,
+  onUpdate,
+}: {
+  value: string;
+  position?: "top" | "bottom";
+  className?: string;
+  onUpdate: (val: string) => void;
+}) {
+  const showModal = useTranslateModal({
+    value,
+    onUpdate,
+  });
 
   return (
     <span
-      onClick={handleClick}
-      className={clsx(styles.container, styles[position])}
+      onClick={showModal}
+      className={clsx(styles.container, styles[position], className)}
     >
       <MaterialIcon icon="flag" fill />
     </span>

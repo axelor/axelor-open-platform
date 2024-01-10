@@ -1,10 +1,14 @@
 .container {
+  position: relative;
+}
+
+.editorContainer {
   border: 1px solid var(--bs-border-color);
   border-radius: var(--bs-border-radius);
 }
 
-.container:focus,
-.container:focus-within {
+.editorContainer:focus,
+.editorContainer:focus-within {
   border: var(--ax-theme-input-focus-border, 1px solid var(--bs-primary));
   box-shadow: var(
     --ax-theme-input-focus-shadow,
@@ -12,6 +16,17 @@
   );
 }
 
+.translate {
+  top: 0.25rem !important;
+}
+
+.viewer {
+  padding-right: 1.75rem !important;
+  [dir="rtl"] & {
+    padding-right: unset !important;
+    padding-left: 1.75rem !important;
+  }
+}
 .invalid {
   border: var(--ax-theme-input-invalid-border, 1px solid var(--bs-danger));
 }

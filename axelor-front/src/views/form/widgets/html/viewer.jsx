@@ -1,11 +1,11 @@
-import { Box } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 import classes from "./viewer.module.css";
 
-function HTMLViewer({ value }) {
+function HTMLViewer({ value, className = "" }) {
   return (
     <Box
       p={1}
-      className={classes.content}
+      className={clsx(classes.content, className)}
       dangerouslySetInnerHTML={{ __html: value }}
     />
   );

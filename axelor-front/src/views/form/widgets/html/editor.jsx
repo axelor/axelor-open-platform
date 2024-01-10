@@ -16,6 +16,7 @@ import {
 } from "./utils";
 
 import clsx from "clsx";
+import { i18n } from "@/services/client/i18n";
 import "./editor.scss";
 
 function Link(props) {
@@ -61,12 +62,14 @@ function Toolbar({ toggle, emitChange, actions, onAction }) {
 
 function HTMLEditor({
   lite,
+  translatable,
   height,
   placeholder,
   hijackMenu,
   value,
   autoFocus,
   onChange,
+  onTranslate,
   onBlur,
   onKeyDown: _onKeyDown,
   className,
@@ -238,10 +241,20 @@ function HTMLEditor({
 
   const actions = useMemo(
     () =>
-      getActions().filter(
-        ({ lite: _lite = lite }) => Boolean(_lite) === Boolean(lite),
-      ),
-    [lite],
+      getActions()
+        .filter(({ lite: _lite = lite }) => Boolean(_lite) === Boolean(lite))
+        .concat(
+          translatable
+            ? [
+                {
+                  title: i18n.get("Translate"),
+                  image: "\uf024",
+                  command: "translate",
+                },
+              ]
+            : [],
+        ),
+    [lite, translatable],
   );
 
   function onKeyDown(e) {
@@ -323,6 +336,9 @@ function HTMLEditor({
   }
 
   function onAction(e, { popup, popupProps, popupStyle, command }) {
+    if (command === "translate") {
+      return onTranslate?.();
+    }
     if (popup) {
       commands.openPopup(e, {
         component: popup,
