@@ -506,7 +506,7 @@ export const Grid = forwardRef<
           state={state!}
           setState={setState!}
           records={records!}
-          rowHeight={view.rowHeight}
+          rowHeight={Math.max(view.rowHeight ?? 35, 35)}
           {...gridProps}
           columns={columns}
           className={clsx(className, styles.grid)}

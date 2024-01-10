@@ -1,3 +1,4 @@
 .image {
-  height: 4rem;
+  max-height: 100%;
+  width: auto;
 }
