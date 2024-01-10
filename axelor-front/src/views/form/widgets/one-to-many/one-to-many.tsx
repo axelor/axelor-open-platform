@@ -31,7 +31,11 @@ import {
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { equals } from "@/services/client/data-utils";
+import {
+  arrayEqualsIgnoreClean,
+  equals,
+  isCleanDummy,
+} from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
@@ -40,6 +44,7 @@ import {
   FormView,
   GridView,
   Property,
+  Schema,
   View,
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -56,14 +61,13 @@ import {
   FieldLabel,
   FieldProps,
   usePermission,
-  usePrepareContext,
-  usePrepareWidgetContext,
+  usePrepareWidgetContext
 } from "../../builder";
 import {
   useActionExecutor,
   useAfterActions,
   useFormRefresh,
-  useFormScope,
+  useFormScope
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 import { fetchRecord } from "../../form";
@@ -541,6 +545,16 @@ function OneToManyInner({
     }
   }, [dataStore.options, onSearch, value]);
 
+  const canDirty = useCallback(
+    (target: string) => {
+      const { items } = viewData?.view || schema;
+      const item = items?.find((i) => i.name === target);
+      const { name, canDirty } = (item || {}) as Schema;
+      return !name || (!isCleanDummy(name) && canDirty !== false);
+    },
+    [viewData?.view, schema],
+  );
+
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
@@ -572,10 +586,11 @@ function OneToManyInner({
         ];
 
         const changed = !isManyToMany || prevItems.length !== nextItems.length;
+        const dirty = !arrayEqualsIgnoreClean(prevItems, nextItems, canDirty);
 
-        return setValue(nextItems, changed, changed);
+        return setValue(nextItems, changed, dirty);
       },
-      [getItems, isManyToMany, setValue, valueAtom],
+      [canDirty, getItems, isManyToMany, setValue, valueAtom],
     ),
   );
 

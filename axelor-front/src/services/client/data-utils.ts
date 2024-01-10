@@ -207,6 +207,35 @@ export function equalsIgnoreClean(
   return _equalsIgnoreClean(a, b, canDirty);
 }
 
+export function arrayEqualsIgnoreClean(
+  value: (DataRecord | number)[],
+  other: (DataRecord | number)[],
+  canDirty: (name: string) => boolean,
+): boolean {
+  const a = compact(value);
+  const b = compact(other);
+
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; ++i) {
+    if (
+      !b.some((x: unknown) => {
+        return _equalsIgnoreClean(
+          isPlainObject(a[i]) ? (a[i] as DataRecord) : { id: a[i] as number },
+          isPlainObject(x) ? x : { id: x },
+          canDirty,
+        );
+      })
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function _equalsIgnoreClean(
   value: DataRecord,
   other: DataRecord,
