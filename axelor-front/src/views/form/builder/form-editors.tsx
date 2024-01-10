@@ -30,7 +30,7 @@ import { createFormAtom } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { useAfterActions } from "./scope";
+import { useAfterActions, useFormScope } from "./scope";
 import {
   FieldProps,
   FormLayout,
@@ -855,6 +855,23 @@ const RecordEditor = memo(function RecordEditor({
       parent,
       formAtom: editorAtom,
     });
+
+  const { actionHandler: parentHandler } = useFormScope();
+  actionHandler.setSaveHandler(
+    useCallback(
+      async (record?: DataRecord) => parentHandler.save(record),
+      [parentHandler],
+    ),
+  );
+  actionHandler.setRefreshHandler(
+    useCallback(
+      async (target?: string) => parentHandler.refresh(target),
+      [parentHandler],
+    ),
+  );
+  actionHandler.setValidateHandler(
+    useCallback(async () => parentHandler.validate(), [parentHandler]),
+  );
 
   const ds = useMemo(() => new DataStore(model), [model]);
   const load = useAtomCallback(
