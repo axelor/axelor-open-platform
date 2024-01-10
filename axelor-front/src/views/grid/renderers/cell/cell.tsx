@@ -38,7 +38,7 @@ export function Cell(props: GridCellProps) {
           serverType === "ONE_TO_ONE" ||
           serverType === "MANY_TO_ONE")
       ) {
-        return <span dangerouslySetInnerHTML={{ __html: sanitize(value) }} />;
+        return <span>{value}</span>;
       }
       return children;
     }
