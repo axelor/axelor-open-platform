@@ -61,13 +61,15 @@ public class ErrorHandler {
       return httpActionAdapter.adapt(action, context);
     }
 
-    final var errorUriBulder = UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null);
+    final var errorUriBuilder =
+        UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null);
     context
         .getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
         .ifPresent(
             client ->
-                errorUriBulder.addQueryParam(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER, client));
-    final String errorUrl = errorUriBulder.toUri().toString();
+                errorUriBuilder.addQueryParam(
+                    Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER, client));
+    final String errorUrl = errorUriBuilder.toUri().toString();
 
     final HttpAction action = HttpActionHelper.buildRedirectUrlAction(context, errorUrl);
     return httpActionAdapter.adapt(action, context);
