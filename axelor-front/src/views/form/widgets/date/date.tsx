@@ -119,14 +119,17 @@ export function DateComponent({
           const targetValue = e.target?.value ?? null;
           val =
             targetValue && moment(targetValue, format).isValid()
-              ? moment(targetValue, format).format(valueFormat)
+              ? (() => {
+                  const m = moment(targetValue, format);
+                  return isDateTime ? m.toISOString() : m.format(valueFormat);
+                })()
               : null;
         }
         onChange(val, true);
         setChanged(false);
       }
     },
-    [changed, value, onChange, format, valueFormat],
+    [changed, value, onChange, format, valueFormat, isDateTime],
   );
 
   const handleClose = useCallback(
@@ -182,13 +185,16 @@ export function DateComponent({
 
       onChange(
         newValue && moment(newValue).isValid()
-          ? moment(newValue).format(valueFormat)
+          ? (() => {
+              const m = moment(newValue);
+              return isDateTime ? m.toISOString() : m.format(valueFormat);
+            })()
           : null,
         callOnChange,
       );
       setChanged(!callOnChange);
     },
-    [onChange, valueFormat, value],
+    [onChange, valueFormat, value, isDateTime],
   );
 
   const $date = useMemo(() => {
