@@ -676,7 +676,10 @@ function OneToManyInner({
         },
         ...(isManyToMany
           ? { onSelect }
-          : { onSave: (record) => onSave?.({ ...record, $id: id }) }),
+          : {
+              onSave: (record) => onSave?.({ ...record, $id: id }),
+              checkDirty: false,
+            }),
         ...options,
       });
     },

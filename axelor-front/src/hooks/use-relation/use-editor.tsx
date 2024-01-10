@@ -30,6 +30,7 @@ export type EditorOptions = {
   viewName?: string;
   context?: DataContext;
   canSave?: boolean;
+  checkDirty?: boolean;
   header?: PopupProps["header"];
   footer?: PopupProps["footer"];
   onClose?: (result: boolean, record?: DataRecord) => void;
@@ -99,6 +100,7 @@ export function useEditor() {
       readonly,
       maximize,
       canSave = true,
+      checkDirty = true,
       header,
       footer,
       onClose,
@@ -138,6 +140,7 @@ export function useEditor() {
           onClose={close}
           onSave={onSave}
           onSelect={onSelect}
+          checkDirty={checkDirty}
         />
       ),
       buttons: [],
@@ -151,12 +154,14 @@ function Footer({
   onClose,
   onSave,
   onSelect,
+  checkDirty = true,
 }: {
   hasOk?: boolean;
   footer?: EditorOptions["footer"];
   onClose: (result: boolean) => void;
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
+  checkDirty?: EditorOptions["checkDirty"];
 }) {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
@@ -175,7 +180,7 @@ function Footer({
       if (handler.getState === undefined) return onClose(true);
       const state = handler.getState();
       const record = state.record;
-      const canSave = state.dirty || !record.id;
+      const canSave = !checkDirty || state.dirty || !record.id;
 
       try {
         const errors = getErrors(state);
@@ -202,7 +207,7 @@ function Footer({
         // TODO: show error
         console.error(e);
       }
-    }, [getErrors, handler, onClose, onSave, onSelect]),
+    }, [checkDirty, getErrors, handler, onClose, onSave, onSelect]),
   );
 
   useEffect(() => {
