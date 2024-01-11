@@ -1,0 +1,7 @@
+---
+title: Fix tracking message value for datetime fields
+type: fix
+description: |
+  For datetime field, the tracking value stored in database 
+  should be in UTC so that it will be displayed depending 
+  on user timezone.
