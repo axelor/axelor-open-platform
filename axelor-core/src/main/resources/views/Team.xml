@@ -196,9 +196,9 @@
     <view name="team-topic-form" type="form" />
   </action-view>
 
-  <menuitem name="menu-team" order="-110" title="Teamwork" icon="fa-users" icon-background="blue"/>
-  <menuitem name="menu-team-tasks" title="Tasks" icon="fa-tasks" parent="menu-team" order="-80" />
-  <menuitem name="menu-team-teams" title="Teams" icon="fa-group" parent="menu-team" order="-70" />
+  <menuitem name="menu-team" order="-110" title="Teamwork" icon="people-fill" icon-background="blue"/>
+  <menuitem name="menu-team-tasks" title="Tasks" icon="list-task" parent="menu-team" order="-80" />
+  <menuitem name="menu-team-teams" title="Teams" icon="people-fill" parent="menu-team" order="-70" />
 
   <menuitem name="menu-team-tasks-due" title="Tasks due" parent="menu-team-tasks" action="team.tasks.due" order="-80" />
   <menuitem name="menu-team-tasks-todo" title="Tasks todo" parent="menu-team-tasks" action="team.tasks.todo" order="-70" />

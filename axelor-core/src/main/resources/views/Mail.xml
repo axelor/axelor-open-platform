@@ -69,7 +69,7 @@
 
   <!-- menu -->
   <menuitem name="menu-mail" order="-110"
-    title="Mail" icon="fa-envelope" parent="menu-team"/>
+    title="Mail" icon="envelope-fill" parent="menu-team"/>
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
     action="mail.inbox" order="-90" tag-get="com.axelor.mail.web.MailController:inboxMenuTag()" tag-style="warning"/>

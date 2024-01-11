@@ -33,14 +33,14 @@ export function prepareCustomView({ model }: GridView, record: DataRecord) {
                   {
                     type: "button",
                     title: i18n.get("Save"),
-                    icon: "fa-save",
+                    icon: "save",
                     onClick: "save",
                     colSpan: "3",
                   },
                   {
                     type: "button",
                     title: i18n.get("Download"),
-                    icon: "fa-download",
+                    icon: "download",
                     onClick: "save,action-dms-file-download",
                     colSpan: "3",
                   },

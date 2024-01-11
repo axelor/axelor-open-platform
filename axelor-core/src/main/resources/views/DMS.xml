@@ -16,7 +16,7 @@
   <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile" canNew="false"
     canAttach="false" canArchive="false" width="large">
     <toolbar>
-      <button name="downloadBtn" title="Download" icon="fa-download"
+      <button name="downloadBtn" title="Download" icon="download"
         onClick="action-dms-file-download" />
     </toolbar>
     <panel name="mainPanel" itemSpan="12">
@@ -211,7 +211,7 @@
 
   <!-- menu -->
   <menuitem name="menu-dms" order="-109"
-    title="Documents" icon="fa-archive" icon-background="brown"/>
+    title="Documents" icon="archive-fill" icon-background="brown"/>
   <menuitem name="menu-dms-all" title="All Documents" parent="menu-dms"
     action="dms.all" order="-90"/>
   <menuitem name="menu-dms-my" title="My Documents" parent="menu-dms"
