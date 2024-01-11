@@ -47,6 +47,8 @@ import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -158,6 +160,12 @@ final class AuditTracker {
     }
     if (value instanceof ZonedDateTime) {
       return ((ZonedDateTime) value).withZoneSameInstant(ZoneOffset.UTC).toString();
+    }
+    if (value instanceof LocalDateTime) {
+      return ((LocalDateTime) value)
+          .atZone(ZoneId.systemDefault())
+          .withZoneSameInstant(ZoneOffset.UTC)
+          .toString();
     }
     return value.toString();
   }
