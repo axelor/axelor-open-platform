@@ -1,10 +1,15 @@
 import { DataRecord } from "@/services/client/data.types";
-import { ActionData, ActionHandler, ActionListener } from "./types";
+import {
+  ActionAttrsData,
+  ActionData,
+  ActionHandler,
+  ActionListener,
+} from "./types";
 
 export class DefaultActionHandler implements ActionHandler {
   #listeners = new Set<ActionListener>();
 
-  setAttr(target: string, name: string, value: any) {}
+  setAttrs(attrs: ActionAttrsData["attrs"]) {}
   setFocus(target: string) {}
 
   setValue(name: string, value: any) {}

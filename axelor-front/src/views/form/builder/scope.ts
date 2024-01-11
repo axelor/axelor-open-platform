@@ -15,7 +15,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Schema, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import {
-  ActionAttrData,
+  ActionAttrsData,
   ActionData,
   ActionExecutor,
   ActionHandler,
@@ -93,21 +93,13 @@ export class FormActionHandler extends DefaultActionHandler {
     return this.#prepareContext();
   }
 
-  setAttr(target: string, name: string, value: any) {
-    if (name === "value" || name.startsWith("value:")) {
-      const op = value.substring(6) ?? "set";
-      return this.notify({
-        op,
-        type: "value",
-        target,
-        value,
-      });
-    }
+  setAttrs(attrs: ActionAttrsData["attrs"]) {
     this.notify({
-      type: "attr",
-      target,
-      name: ATTR_MAPPER[name] ?? name,
-      value,
+      type: "attrs",
+      attrs: attrs.map((attr) => ({
+        ...attr,
+        name: ATTR_MAPPER[attr.name] ?? attr.name,
+      })),
     });
   }
 
@@ -323,82 +315,82 @@ function useActionAttrs({
   actionHandler: ActionHandler;
 }) {
   const { findItem } = useViewMeta();
-  useActionData<ActionAttrData>(
-    useCallback((x) => x.type === "attr", []),
+  useActionData<ActionAttrsData>(
+    useCallback((x) => x.type === "attrs", []),
     useAtomCallback(
       useCallback(
-        (get, set, data) => {
-          const { statesByName, states: statesById, fields } = get(formAtom);
-          const { target, name, value } = data;
+        (get, set, { attrs }) => {
+          let { statesByName, states } = get(formAtom);
 
-          const updateStates = (
-            newState: WidgetState,
-            fieldName: string,
-            columnName?: string,
-          ) => ({
-            statesByName: { ...statesByName, [fieldName]: newState },
-            states: produce(statesById, (prev) => {
-              // reset widget's own state so that the attribute set by the action get preference.
-              Object.values(prev).forEach((state) => {
-                if (state.name !== fieldName) return;
-                if (columnName) {
-                  delete (state.columns?.[columnName] as any)?.[name];
-                } else if (name in state.attrs) {
-                  delete (state.attrs as any)?.[name];
-                }
+          attrs.forEach((attr) => {
+            const { target, name, value } = attr;
+
+            const updateState = (
+              newState: WidgetState,
+              fieldName: string,
+              columnName?: string,
+            ) => {
+              statesByName = { ...statesByName, [fieldName]: newState };
+              states = produce(states, (prev) => {
+                // reset widget's own state so that the attribute set by the action get preference.
+                Object.values(prev).forEach((state) => {
+                  if (state.name !== fieldName) return;
+                  if (columnName) {
+                    delete (state.columns?.[columnName] as any)?.[name];
+                  } else if (name in state.attrs) {
+                    delete (state.attrs as any)?.[name];
+                  }
+                });
               });
-            }),
+            };
+
+            // collection field column ?
+            if (target.includes(".")) {
+              const fieldName = target.split(".")[0];
+              const field = findItem(fieldName);
+              if (field && isCollection(field) && !field.editor) {
+                const state = statesByName[fieldName] ?? {};
+                const column = target.substring(target.indexOf(".") + 1);
+                const columns = state.columns ?? {};
+                const newState = {
+                  ...state,
+                  columns: {
+                    ...columns,
+                    [column]: {
+                      ...columns[column],
+                      [name]: value,
+                    },
+                  },
+                };
+                return updateState(newState, fieldName, column);
+              }
+            }
+
+            const state = statesByName[target] ?? {};
+            const newState = {
+              ...state,
+              ...(name === "error"
+                ? { errors: { ...state.errors, error: value } }
+                : {
+                    attrs: {
+                      ...state.attrs,
+                      [name]: (() => {
+                        if (name === "refresh") {
+                          return value ? (state.attrs?.refresh ?? 0) + 1 : 0;
+                        }
+                        return value;
+                      })(),
+                    },
+                  }),
+            };
+
+            updateState(newState, target);
           });
 
-          // collection field column ?
-          if (target.includes(".")) {
-            const fieldName = target.split(".")[0];
-            const field = findItem(fieldName);
-            if (field && isCollection(field) && !field.editor) {
-              const state = statesByName[fieldName] ?? {};
-              const column = target.substring(target.indexOf(".") + 1);
-              const columns = state.columns ?? {};
-              const newState = {
-                ...state,
-                columns: {
-                  ...columns,
-                  [column]: {
-                    ...columns[column],
-                    [name]: value,
-                  },
-                },
-              };
-              const newStates = updateStates(newState, fieldName, column);
-              set(formAtom, (prev) => ({
-                ...prev,
-                ...newStates,
-              }));
-              return;
-            }
-          }
-
-          const state = statesByName[target] ?? {};
-          const newState = {
-            ...state,
-            ...(name === "error"
-              ? { errors: { ...state.errors, error: value } }
-              : {
-                  attrs: {
-                    ...state.attrs,
-                    [name]: (() => {
-                      if (name === "refresh") {
-                        return value ? (state.attrs?.refresh ?? 0) + 1 : 0;
-                      }
-                      return value;
-                    })(),
-                  },
-                }),
-          };
-
-          const newStates = updateStates(newState, data.target);
           set(formAtom, (prev) => ({
             ...prev,
-            ...newStates,
+            statesByName,
+            states,
           }));
         },
         [findItem, formAtom],

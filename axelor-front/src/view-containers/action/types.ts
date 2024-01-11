@@ -9,11 +9,13 @@ export interface IActionData {
   type: string;
 }
 
-export interface ActionAttrData extends IActionData {
-  type: "attr";
-  target: string;
-  name: string;
-  value: any;
+export interface ActionAttrsData extends IActionData {
+  type: "attrs";
+  attrs: {
+    target: string;
+    name: string;
+    value: any;
+  }[];
 }
 
 export interface ActionValueData extends IActionData {
@@ -38,7 +40,7 @@ export interface ActionCloseData extends IActionData {
 }
 
 export type ActionData =
-  | ActionAttrData
+  | ActionAttrsData
   | ActionValueData
   | ActionFocusData
   | ActionCloseData
@@ -47,7 +49,7 @@ export type ActionData =
 export type ActionListener = (data: ActionData) => void;
 
 export interface ActionHandler {
-  setAttr(target: string, name: string, value: any): any;
+  setAttrs(attrs: ActionAttrsData["attrs"]): any;
   setFocus(target: string): void;
 
   setValue(name: string, value: any): void;
@@ -87,7 +89,7 @@ export type ActionOptions = {
 export interface ActionExecutor {
   execute(
     action: string,
-    options?: ActionOptions
+    options?: ActionOptions,
   ): Promise<ActionResult[] | void>;
   wait(): Promise<void>;
   waitFor(interval?: number): Promise<void>;

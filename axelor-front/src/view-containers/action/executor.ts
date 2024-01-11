@@ -1,4 +1,5 @@
 import uniqueId from "lodash/uniqueId";
+import isEmpty from "lodash/isEmpty";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
@@ -14,12 +15,49 @@ import { ActionView, HtmlView, View } from "@/services/client/meta.types";
 import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
-import { ActionExecutor, ActionHandler, ActionOptions } from "./types";
+import {
+  ActionAttrsData,
+  ActionExecutor,
+  ActionHandler,
+  ActionOptions,
+} from "./types";
 
 const queue = new TaskQueue();
 
 const executeAction: typeof actionRequest = async (options) => {
-  return block(() => actionRequest(options));
+  return block(() => actionRequest(options).then(processActionResult));
+};
+
+const processActionResult = (result: ActionResult[]): ActionResult[] => {
+  let actionAttrResult: ActionResult["attrs"] = {};
+  let actionValueResult: ActionResult["values"] = {};
+  const otherResults: ActionResult[] = [];
+
+  result.forEach((res) => {
+    const { attrs, values, ...rest } = res;
+    if (attrs) {
+      Object.entries(attrs).forEach(([k, v]) => {
+        if (v && typeof v === "object" && "value" in v) {
+          actionValueResult![k] = v.value;
+          delete attrs[k]["value"];
+          isEmpty(attrs[k]) && delete attrs[k];
+        }
+      });
+      actionAttrResult = { ...actionAttrResult, ...attrs };
+    }
+    if (values) {
+      actionValueResult = { ...actionValueResult, ...values };
+    }
+    if (!isEmpty(rest)) {
+      otherResults.push(rest);
+    }
+  });
+
+  return [
+    ...(isEmpty(actionAttrResult) ? [] : [{ attrs: actionAttrResult }]),
+    ...(isEmpty(actionValueResult) ? [] : [{ values: actionValueResult }]),
+    ...otherResults,
+  ] as ActionResult[];
 };
 
 export class DefaultActionExecutor implements ActionExecutor {
@@ -234,7 +272,13 @@ export class DefaultActionExecutor implements ActionExecutor {
         if (value.trim().length > 0) {
           hasErrors = true;
         }
-        this.#handler.setAttr(name, "error", value);
+        this.#handler.setAttrs([
+          {
+            target: name,
+            name: "error",
+            value,
+          },
+        ]);
       }
       if (hasErrors) {
         return Promise.reject();
@@ -399,10 +443,10 @@ export class DefaultActionExecutor implements ActionExecutor {
   }
 
   async #handleAttrs(data: Record<string, Record<string, any>>) {
+    const list: ActionAttrsData["attrs"] = [];
     for (const [target, attrs] of Object.entries(data)) {
       for (const [name, value] of Object.entries(attrs)) {
         switch (name) {
-          case "value":
           case "value:set":
             await this.#handler.setValue(target, value);
             break;
@@ -412,16 +456,16 @@ export class DefaultActionExecutor implements ActionExecutor {
           case "value:del":
             await this.#handler.delValue(target, value);
             break;
-          case "refresh":
-            target
-              ? await this.#handler.setAttr(target, name, value)
-              : await this.#handler.refresh(target);
-            break;
           default:
-            await this.#handler.setAttr(target, name, value);
+            if (name === "refresh" && !target) {
+              await this.#handler.refresh();
+            } else {
+              list.push({ target, name, value });
+            }
             break;
         }
       }
     }
+    list.length > 0 && (await this.#handler.setAttrs(list));
   }
 }
