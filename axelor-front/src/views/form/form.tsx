@@ -405,9 +405,7 @@ const FormContainer = memo(function FormContainer({
         set(formAtom, {
           ...prev,
           dirty,
-          ...(keepStates
-            ? null
-            : { states: {}, statesByName: {}, collections: {} }),
+          ...(keepStates ? null : { states: {}, statesByName: {} }),
           record,
           original: { ...record },
         });

@@ -9,13 +9,7 @@ import { focusAtom } from "@/utils/atoms";
 import { deepEqual, deepGet, deepMerge, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
 
-import {
-  CollectionState,
-  FormAtom,
-  FormState,
-  WidgetAtom,
-  WidgetState,
-} from "./types";
+import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
 import {
   createContextParams,
   defaultAttrs as getDefaultAttrs,
@@ -32,7 +26,6 @@ export function createFormAtom(props: {
   const { meta, record, parent, context, statesByName = {} } = props;
   const { model = "", fields = {} } = meta;
   const states: Record<string, WidgetState> = {};
-  const collections: Record<string, CollectionState> = {};
   return atom<FormState>({
     meta,
     model,
@@ -40,7 +33,6 @@ export function createFormAtom(props: {
     original: { ...record },
     states,
     statesByName,
-    collections,
     fields,
     parent,
     context,
@@ -217,7 +209,7 @@ export const contextAtom = atom(
         record,
         context: _context,
         parent,
-        collections,
+        statesByName,
       } = get(formAtom);
 
       let context: DataContext = {
@@ -228,16 +220,15 @@ export const contextAtom = atom(
       };
 
       // set selected flag for o2m/m2m fields
-      for (const [key, collection] of Object.entries(collections)) {
-        const name = key.startsWith("$") ? key.substring(1) : key;
-        const selected = collection.selected ?? [];
-        const items: DataRecord[] = context[key] ?? context[name] ?? [];
-        context[name] = items.map((item) => {
-          return {
-            ...item,
-            selected: selected.includes(item.id!),
-          };
-        });
+      for (let name in statesByName) {
+        const { selected } = statesByName[name];
+        if (selected && Array.isArray(context[name])) {
+          context[name] = context[name].map((value: DataRecord) =>
+            value.id && selected.includes(value.id)
+              ? { ...value, selected: true }
+              : value,
+          );
+        }
       }
 
       context = processContextValues(context);

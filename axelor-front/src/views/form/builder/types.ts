@@ -51,15 +51,10 @@ export interface WidgetState {
   attrs: Attrs;
   errors?: WidgetErrors;
   columns?: Record<string, Attrs>;
+  selected?: number[];
   valid?: boolean;
   readonly name?: string;
   readonly parent?: WidgetAtom;
-}
-
-export interface CollectionState {
-  selected: number[];
-  records: DataRecord[];
-  record: DataRecord | null;
 }
 
 export interface FormState {
@@ -69,7 +64,6 @@ export interface FormState {
   original?: DataRecord;
   states: Record<string, WidgetState>;
   statesByName: Record<string, WidgetState>;
-  collections: Record<string, CollectionState>;
   readonly meta: ViewData<FormView>;
   readonly model: string;
   readonly fields: Record<string, Property>;
@@ -113,7 +107,7 @@ export interface FormProps extends WidgetProps {
 export type FormLayout = (
   props: Omit<WidgetProps, "widgetAtom"> & {
     className?: string;
-  },
+  }
 ) => React.ReactNode;
 
 export type RecordListener = (data: FormState["record"]) => void;
