@@ -29,6 +29,7 @@ import { fallbackFormAtom } from "./atoms";
 import {
   FormAtom,
   FormProps,
+  FormState,
   RecordHandler,
   RecordListener,
   WidgetErrors,
@@ -39,19 +40,68 @@ type ContextCreator = () => DataContext;
 
 export class FormRecordHandler implements RecordHandler {
   #listeners = new Set<RecordListener>();
-  #record: DataContext = {};
+  #timer: number = 0;
+  #getState?: () => FormState;
+  #setState?: (state: FormState) => void;
+  #record?: DataContext | null = null;
+  #getRecord?: () => DataContext;
+
+  #clearTimer() {
+    if ("requestIdleCallback" in window) {
+      window.cancelIdleCallback(this.#timer);
+    } else {
+      clearTimeout(this.#timer);
+    }
+  }
+
+  #setTimer(cb: () => void) {
+    if ("requestIdleCallback" in window) {
+      this.#timer = window.requestIdleCallback(cb);
+    } else {
+      this.#timer = setTimeout(cb, 100) as unknown as number;
+    }
+  }
+
+  setRecordUpdater(getRecord: () => DataRecord) {
+    this.#record = null;
+    this.#getRecord = getRecord;
+  }
+
+  setStateUpdater(getter: () => FormState, setter: (state: FormState) => void) {
+    this.#getState = getter;
+    this.#setState = setter;
+  }
 
   subscribe(subscriber: RecordListener) {
     this.#listeners.add(subscriber);
-    subscriber(this.#record);
+    this.notify();
     return () => {
       this.#listeners.delete(subscriber);
     };
   }
 
-  notify(data: DataContext) {
-    this.#record = data;
-    this.#listeners.forEach((fn) => fn(data));
+  notify() {
+    this.#clearTimer();
+    this.#setTimer(() => {
+      const record = this.#record ?? (this.#record = this.#getRecord?.());
+      if (this.#getState && this.#setState && record) {
+        const lastState = this.#getState();
+        let state = lastState;
+        this.#listeners.forEach((fn) =>
+          fn(record, (update) => {
+            state = update(state);
+          }),
+        );
+
+        if (lastState !== state) {
+          this.#setState(state);
+        }
+      }
+    });
+  }
+
+  completed(): void {
+    this.#clearTimer();
   }
 }
 
@@ -705,26 +755,50 @@ export function FormRecordUpdates({
   );
   const { action } = useViewTab();
 
+  const getFormState = useAtomCallback(
+    useCallback((get) => get(formAtom), [formAtom]),
+  );
+  const setFormState = useAtomCallback(
+    useCallback(
+      (get, set, state: FormState) => set(formAtom, state),
+      [formAtom],
+    ),
+  );
+
+  useEffect(() => {
+    recordHandler.setStateUpdater(getFormState, setFormState);
+  }, [recordHandler, getFormState, setFormState]);
+
+  useEffect(() => {
+    recordHandler.setRecordUpdater(() =>
+      createEvalContext(
+        {
+          ...action.context,
+          ...record,
+        },
+        {
+          fields: fields as unknown as EvalContextOptions["fields"],
+          readonly,
+        },
+      ),
+    );
+  }, [action.context, fields, readonly, record, recordHandler]);
+
   const notify = useAfterActions(
     useCallback(async () => {
       if (isEqual(recordRef.current, record)) return;
       recordRef.current = record;
-      recordHandler.notify(
-        createEvalContext(
-          {
-            ...action.context,
-            ...record,
-          },
-          {
-            fields: fields as unknown as EvalContextOptions["fields"],
-            readonly,
-          },
-        ),
-      );
-    }, [action.context, fields, readonly, record, recordHandler]),
+      recordHandler.notify();
+    }, [record, recordHandler]),
   );
 
   useAsyncEffect(notify);
+
+  useEffect(() => {
+    return () => {
+      recordHandler.completed?.();
+    };
+  }, [recordHandler]);
 
   return null;
 }

@@ -107,12 +107,26 @@ export interface FormProps extends WidgetProps {
 export type FormLayout = (
   props: Omit<WidgetProps, "widgetAtom"> & {
     className?: string;
-  }
+  },
 ) => React.ReactNode;
 
-export type RecordListener = (data: FormState["record"]) => void;
+export type FormStateUpdater = (update: (prev: FormState) => FormState) => void;
+
+export type RecordListener = (
+  data: FormState["record"],
+  updater?: FormStateUpdater,
+) => void;
 
 export interface RecordHandler {
+  setStateUpdater: (
+    getter: () => FormState,
+    setter: (state: FormState) => void,
+  ) => void;
+  setRecordUpdater: (
+    getter: () => DataRecord,
+    setter?: (record: DataRecord) => void,
+  ) => void;
   subscribe(subscriber: RecordListener): () => void;
-  notify(data: FormState["record"]): void;
+  notify(): void;
+  completed?(): void;
 }
