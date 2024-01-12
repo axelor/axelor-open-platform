@@ -502,12 +502,9 @@ function OneToManyInner({
 
         const fetchedIds = records.map((r) => r.id);
         const newItems = records
-          .map((record): DataRecord => {
+          .map((record) => {
             const item = items.find((item) => item.id === record.id);
-            const { version: $version, ...rest } = record;
-            return item
-              ? { ...rest, $version, ...item }
-              : { ...rest, $version };
+            return item ? { ...record, ...item } : record;
           })
           .concat(items.filter((item) => !fetchedIds.includes(item.id)));
 
