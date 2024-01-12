@@ -12,7 +12,7 @@ import { toCamelCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
 import { isCleanDummy } from "@/services/client/data-utils";
-import { useViewDirtyAtom } from "@/view-containers/views/scope";
+import { useViewDirtyAtom, useViewMeta } from "@/view-containers/views/scope";
 import { useAtomCallback } from "jotai/utils";
 import * as WIDGETS from "../widgets";
 
@@ -108,10 +108,22 @@ export function useInput<T>(
 
   const { name, canDirty: _canDirty } = schema ?? {};
 
-  const canDirty = useMemo(
-    () => !name || (_canDirty !== false && !isCleanDummy(name)),
-    [_canDirty, name],
-  );
+  const {
+    meta: { widgetSchema },
+  } = useViewMeta();
+
+  const canDirty = useMemo(() => {
+    const { canDirty: widgetCanDirty, name: widgetName } = widgetSchema ?? {};
+
+    return (
+      widgetCanDirty !== false &&
+      widgetName &&
+      !isCleanDummy(widgetName) &&
+      _canDirty !== false &&
+      name &&
+      !isCleanDummy(name)
+    );
+  }, [_canDirty, name, widgetSchema]);
 
   const setDirty = useAtomCallback(
     useCallback(
