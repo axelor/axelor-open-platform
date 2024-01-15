@@ -52,6 +52,7 @@ The `<view-param>` parameter name accepts the following options:
 * `kanban-hide-columns` - hide specific columns in kanban (comma separated list of names)
 * `kanban-column-width` - desired kanban column width
 * `auto-reload` - enable view auto-reloading with value specified in seconds
+* `hideActions` - `true` to hide the actions in the search view
 
 [[popup-reload]]
 [NOTE]
