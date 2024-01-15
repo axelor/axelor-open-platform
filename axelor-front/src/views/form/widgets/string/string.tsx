@@ -25,7 +25,9 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
+  const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
+    schema,
+  });
 
   const [trValue, setTranslateValue] = useTranslationValue(props);
 
@@ -59,7 +61,11 @@ export function String({
         />
       )}
       {translatable && !readonly && (
-        <Translatable value={text} onUpdate={setTranslateValue} />
+        <Translatable
+          value={text}
+          onValueChange={setValue}
+          onUpdate={setTranslateValue}
+        />
       )}
     </FieldControl>
   );

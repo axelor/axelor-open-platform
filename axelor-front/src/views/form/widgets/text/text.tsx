@@ -36,6 +36,7 @@ export function Text({
     onChange,
     onBlur: onInputBlur,
     onKeyDown,
+    setValue,
   } = useInput(valueAtom, { schema });
 
   const handleChange = useCallback<
@@ -96,6 +97,7 @@ export function Text({
         <Translatable
           position="top"
           value={text}
+          onValueChange={setValue}
           onUpdate={setTranslateValue}
         />
       )}

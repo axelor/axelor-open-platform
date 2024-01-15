@@ -13,13 +13,16 @@ import styles from "./html.module.scss";
 export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { lite, translatable } = schema;
-  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, { schema });
+  const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
+    schema,
+  });
   const height = Math.max(100, schema.height);
 
   const [trValue, setTranslateValue] = useTranslationValue(props);
 
   const showTranslationModal = useTranslateModal({
     value: text,
+    onValueChange: setValue,
     onUpdate: setTranslateValue,
   });
 

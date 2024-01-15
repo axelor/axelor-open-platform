@@ -1,17 +1,18 @@
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box, Divider, Input, InputLabel, clsx } from "@axelor/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { focusAtom } from "@/utils/atoms";
 import { dialogs } from "@/components/dialogs";
-import { i18n } from "@/services/client/i18n";
-import { DataStore } from "@/services/client/data-store";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { DataRecord } from "@/services/client/data.types";
-import { DeleteOption } from "@/services/client/data";
 import { useSession } from "@/hooks/use-session";
+import { DeleteOption } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
+import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
+import { focusAtom } from "@/utils/atoms";
 import { FieldProps } from "../../builder";
+import { useFormScope } from "../../builder/scope";
 import styles from "./translatable.module.scss";
 
 const ds = new DataStore("com.axelor.meta.db.MetaTranslation", {
@@ -19,30 +20,39 @@ const ds = new DataStore("com.axelor.meta.db.MetaTranslation", {
 });
 
 function Translations({
-  value,
+  value: originalValue,
   onUpdate,
 }: {
   value: string;
-  onUpdate: (values: DataRecord[]) => void;
+  onUpdate: (value: string, translations: DataRecord[]) => void;
 }) {
-  const [values, setValues] = useState<DataRecord[]>([]);
+  const [value, setValue] = useState(originalValue);
+  const [translations, setTranslations] = useState<DataRecord[]>([]);
+
+  const handleValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setValue(value);
+    setTranslations((values) =>
+      values.map((v) => ({ ...v, key: `value:${value}` })),
+    );
+  };
 
   function handleAdd() {
-    setValues((values) => [...values, {}]);
+    setTranslations((values) => [...values, {}]);
   }
 
   function handleChange(key: string, value: any, ind: number) {
-    setValues((values) =>
+    setTranslations((values) =>
       values.map((v, i) => (ind === i ? { ...v, [key]: value } : v)),
     );
   }
 
   function handleRemove(ind: number) {
-    setValues((values) => values.filter((v, i) => i !== ind));
+    setTranslations((values) => values.filter((v, i) => i !== ind));
   }
 
   useAsyncEffect(async () => {
-    const key = `value:${value}`;
+    const key = `value:${originalValue}`;
     const { records = [] } = await ds.search({
       filter: {
         _domain: "self.key = :key",
@@ -51,18 +61,23 @@ function Translations({
         },
       },
     });
-    setValues(records.map((record) => ({ ...record, $data: record })));
-  }, [value]);
+    setTranslations(records.map((record) => ({ ...record, $data: record })));
+  }, [originalValue]);
 
   useEffect(() => {
-    onUpdate(values);
-  }, [values, onUpdate]);
+    onUpdate(value, translations);
+  }, [value, translations, onUpdate]);
 
   return (
     <Box d="flex" flex={1} flexDirection="column">
       <Box flex={1}>
         <InputLabel>{i18n.get("Value")}</InputLabel>
-        <Input data-input type="text" readOnly defaultValue={value} />
+        <Input
+          data-input
+          type="text"
+          value={value}
+          onChange={handleValueChange}
+        />
       </Box>
       <Box my={2} flex={1}>
         <Divider />
@@ -72,7 +87,7 @@ function Translations({
           <InputLabel>{i18n.get("Translation")}</InputLabel>
           <InputLabel>{i18n.get("Language")}</InputLabel>
         </Box>
-        {values.map((value, ind) => {
+        {translations.map((value, ind) => {
           if (value.$removed) return null;
           return (
             <Box key={ind} gap={5} my={2}>
@@ -142,84 +157,104 @@ export function useTranslationValue({
 }
 
 export function useTranslateModal({
-  value,
+  value: originalValue,
+  onValueChange,
   onUpdate,
 }: {
   value: string;
+  onValueChange: (val: string, fireOnChange?: boolean) => void;
   onUpdate: (val: string) => void;
 }) {
+  const { actionHandler, actionExecutor } = useFormScope();
   const lang = useSession().data?.user?.lang;
 
   return useCallback(async () => {
-    let values: DataRecord[] = [];
+    let value = originalValue;
+    let translations: DataRecord[] = [];
 
     await dialogs.modal({
       open: true,
-      title: i18n.get("Translations"),
+      title: i18n.get("Translation"),
       content: (
         <Box d="flex" p={3} flex={1}>
           <Translations
-            value={value}
-            onUpdate={(_values) => {
-              values = _values;
+            value={originalValue}
+            onUpdate={(_value, _translations) => {
+              value = _value;
+              translations = _translations;
             }}
           />
         </Box>
       ),
       onClose: async (isOk) => {
+        if (!isOk) return;
+
+        if (onValueChange && value !== originalValue) {
+          onValueChange(value, true);
+          await actionExecutor.waitFor();
+          await actionExecutor.wait();
+          await actionHandler.save();
+        }
+
         const key = `value:${value}`;
-        if (isOk) {
-          const removed = values
-            .filter((v) => v.$removed)
-            .map(({ id, version }) => ({ id, version }) as DeleteOption);
+        const removed = translations
+          .filter((v) => v.$removed)
+          .map(({ id, version }) => ({ id, version }) as DeleteOption);
 
-          removed.length && (await ds.delete(removed));
+        removed.length && (await ds.delete(removed));
 
-          const updated = values
-            .filter(
-              ({ language, message, $data }) =>
-                language &&
-                message &&
-                ($data?.language !== language || $data?.message !== message),
-            )
-            .map(({ id, version, message, language }) => ({
-              id,
-              version,
-              message,
-              language,
-              key,
-            }));
+        const updated = translations
+          .filter(
+            ({ language, key, message, $data }) =>
+              language &&
+              message &&
+              ($data?.language !== language ||
+                $data.key !== key ||
+                $data?.message !== message),
+          )
+          .map(({ id, version, message, language }) => ({
+            id,
+            version,
+            message,
+            language,
+            key,
+          }));
 
-          updated.length && (await ds.save(updated));
+        updated.length && (await ds.save(updated));
 
-          const value = values.find(
-            (v) => v.language && v.message && v.language === lang,
-          );
+        const translation = translations.find(
+          (v) => v.language && v.message && v.language === lang,
+        );
 
-          if (value) {
-            onUpdate(value.$removed ? "" : value.message);
-          }
+        if (translation) {
+          onUpdate(translation.$removed ? "" : translation.message);
         }
       },
     });
-  }, [lang, value, onUpdate]);
+  }, [
+    actionExecutor,
+    actionHandler,
+    lang,
+    onUpdate,
+    originalValue,
+    onValueChange,
+  ]);
 }
 
 export function Translatable({
   value,
+  onValueChange,
   position = "bottom",
   className,
   onUpdate,
 }: {
   value: string;
+  onValueChange: (val: string, fireOnChange?: boolean) => void;
   position?: "top" | "bottom";
   className?: string;
   onUpdate: (val: string) => void;
 }) {
-  const showModal = useTranslateModal({
-    value,
-    onUpdate,
-  });
+  const showModal = useTranslateModal({ value, onValueChange, onUpdate });
 
   return (
     <span
