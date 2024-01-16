@@ -134,7 +134,7 @@ public class CSVLogger {
             .write(Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(this.header)));
         this.filesName.add(this.currentFile.getName());
       }
-      Files.asCharSink(this.configFile, Charsets.UTF_8, FileWriteMode.APPEND)
+      Files.asCharSink(this.currentFile, Charsets.UTF_8, FileWriteMode.APPEND)
           .write("\n" + Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(values)));
     } catch (IOException e) {
     }
