@@ -29,7 +29,6 @@ Depending on the icons used, it will try to first use `Material Symbols` if the 
 Please be aware that some Font Awesome icons don't have any equivalent in Bootstrap Icons, so an apps icon will be use
 instead. Missing icons will be log in console in non production mode.
 
-
 == Plain user passwords are no longer hashed upon startup
 
 For historical reasons, user passwords that were stored in plain text within the database were hashed upon startup. On
@@ -155,7 +154,17 @@ Parent context can be used with `_parent` property :
 </field>
 ----
 
-== `x-show-bars` actions
+== Others Notable Changes
 
-`x-show-bars` actions used to affect parent form.
-Now, they affect local grid context only.
+Check the {product-version-changelog}[change log] for detailed list.
+
+- `x-show-bars` actions used to affect parent form. Now, they affect local grid context only
+- Collection editor without `x-viewer="true"` no more used in readonly
+- Changes in shortcuts
+- Some dependencies have been upgraded to newer versions
+- Remove top menus support
+- Drop custom style
+- Drop StaticResourceProvider
+- Remove `$context` variable in frontend eval expressions
+- `/ws/app/info` endpoint moved to `/ws/public/app/info`
+- Datetime fields value in tracking messages now stored in UTC
