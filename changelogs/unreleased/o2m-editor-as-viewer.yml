@@ -1,0 +1,8 @@
+---
+title: collection editor without x-viewer no more used in readonly
+type: change
+description:
+  For collection fields, if the editor isn't marked with `x-viewer="true"` 
+  and doesn't have any viewer defined, the editor is no more used in readonly 
+  mode. The default rendering behavior will be used instead (ie grid). This 
+  is more consistent with others fields behavior.
