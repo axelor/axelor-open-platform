@@ -196,6 +196,7 @@ export function Decimal(props: FieldProps<string | number>) {
               onTouchEnd={clearTimer}
               onMouseDown={handleUp}
               onMouseUp={clearTimer}
+              onMouseLeave={clearTimer}
             >
               <MaterialIcon icon="arrow_drop_up" />
             </span>
@@ -204,6 +205,7 @@ export function Decimal(props: FieldProps<string | number>) {
               onTouchEnd={clearTimer}
               onMouseDown={handleDown}
               onMouseUp={clearTimer}
+              onMouseLeave={clearTimer}
             >
               <MaterialIcon icon="arrow_drop_down" />
             </span>
