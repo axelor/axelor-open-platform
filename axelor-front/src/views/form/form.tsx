@@ -396,7 +396,7 @@ const FormContainer = memo(function FormContainer({
         const tabRoute = tabState.routes?.form;
         const tabProps = tabState.props?.form;
         if (
-          tabRoute?.id !== String(id) ||
+          String(tabRoute?.id) !== String(id) ||
           tabProps?.readonly != props.readonly
         ) {
           switchTo("form", { route: { id }, props });
