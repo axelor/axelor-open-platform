@@ -1,5 +1,5 @@
 ---
-title: `view.grid.selection` property is now set to `checkbox` by default
+title: The `view.grid.selection` property is now set to `checkbox` by default
 type: change
 description: |
   Checkbox selection in grid is now enabled by default.
