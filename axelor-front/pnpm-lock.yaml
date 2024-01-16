@@ -14,8 +14,8 @@ patchedDependencies:
 
 dependencies:
   '@axelor/ui':
-    specifier: ^0.0.31
-    version: 0.0.31(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
+    specifier: ^0.0.32
+    version: 0.0.32(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
   '@babel/standalone':
     specifier: ^7.23.5
     version: 7.23.5
@@ -215,8 +215,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
-  /@axelor/ui@0.0.31(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
-    resolution: {integrity: sha512-14m+euJ1Bi3iSBB4HGHE0pRY4otWC7UZV+s963IkH/+xa0cOJWqshjF555wRm8LpgGsY5F6OhtNCvIDJFi7GtQ==}
+  /@axelor/ui@0.0.32(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
+    resolution: {integrity: sha512-cSJN5jt9lRA80rBZvRVX6P6jdPN0qT1x3FxvEikvPI2e1B/lcjCttl+yjcm78oC3tIwriPRTLDmPG8wNR17DJQ==}
     peerDependencies:
       react: ^18.2.0-0
       react-dom: ^18.2.0-0
@@ -225,7 +225,8 @@ packages:
       '@floating-ui/react': 0.26.4(react-dom@18.2.0)(react@18.2.0)
       '@fluentui/priority-overflow': 9.1.10
       '@fluentui/react-context-selector': 9.1.42(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
-      '@material-symbols/font-400': 0.14.4
+      '@material-symbols/font-400': 0.14.5
+      '@material-symbols/metadata': 0.14.5
       '@popperjs/core': 2.11.8
       bootstrap: 5.3.2(@popperjs/core@2.11.8)
       bootstrap-icons: 1.11.3
@@ -2220,8 +2221,12 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@material-symbols/font-400@0.14.4:
-    resolution: {integrity: sha512-cOPccjGllvrhb+Txt+7iRUgT+ZMczTV9HVGtDnhrSH18wSmzuG0ExlDRMB1tgbNay96axcYgl7gfxOgZicaZ+A==}
+  /@material-symbols/font-400@0.14.5:
+    resolution: {integrity: sha512-i6+fZpG0GxzJsbC19DS/fna1oYsTEUaRcTFR8SiVHAQ0xjRlA7qSFEfkpFLG0GBEe17zMwjg7gj3Xm78RDg2Zw==}
+    dev: false
+
+  /@material-symbols/metadata@0.14.5:
+    resolution: {integrity: sha512-4MDw9vB9w1OoQ/w6oY6CzWaWovk00SFwv2UkpcN+R1uiVROqmEKU1nNd3XtzBOvoD8GibLVA+oFKJWv3lQH5Fw==}
     dev: false
 
   /@monaco-editor/loader@1.4.0(monaco-editor@0.45.0):
