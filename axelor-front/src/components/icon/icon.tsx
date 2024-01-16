@@ -2,6 +2,7 @@ import {
   BootstrapIcon,
   BootstrapIconName,
   BootstrapIconProps,
+  bootstrapIconNames,
 } from "@axelor/ui/icons/bootstrap-icon";
 
 import {
@@ -9,7 +10,6 @@ import {
   MaterialIconProps,
   materialIconNames
 } from "@axelor/ui/icons/material-icon";
-import bootstrap from "bootstrap-icons/font/bootstrap-icons.json";
 import { forwardRef } from "react";
 
 const fa: Record<string, BootstrapIconProps["icon"]> = {
@@ -754,8 +754,8 @@ const findBootstrapIcon = (icon: string) => {
   if (name && name.includes("fa-")) found = fa[name];
   if (!found) {
     const bsName = findBsName(name);
-    if (name in bootstrap) found = name as BootstrapIconName;
-    if (bsName in bootstrap) found = bsName as BootstrapIconName;
+    if (bootstrapIconNames.has(name)) found = name as BootstrapIconName;
+    if (bootstrapIconNames.has(bsName)) found = bsName as BootstrapIconName;
   }
 
   return found;

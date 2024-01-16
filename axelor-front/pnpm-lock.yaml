@@ -37,9 +37,6 @@ dependencies:
   '@monaco-editor/react':
     specifier: ^4.6.0
     version: 4.6.0(monaco-editor@0.45.0)(react-dom@18.2.0)(react@18.2.0)
-  bootstrap-icons:
-    specifier: ^1.11.3
-    version: 1.11.3
   bootstrap-sass:
     specifier: 2.3.2
     version: 2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm)

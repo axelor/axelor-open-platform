@@ -22,7 +22,6 @@
     "@fullcalendar/react": "^6.1.9",
     "@fullcalendar/timegrid": "^6.1.9",
     "@monaco-editor/react": "^4.6.0",
-    "bootstrap-icons": "^1.11.3",
     "bootstrap-sass": "2.3.2",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
