@@ -317,7 +317,10 @@ function useClose(
       const current = handler.getState?.().record;
       const original = originalRef.current;
       return (
-        current?.id !== original?.id || current?.version !== original?.version
+        !current ||
+        !original ||
+        current?.id !== original?.id ||
+        current?.version !== original?.version
       );
     },
     [handler],
