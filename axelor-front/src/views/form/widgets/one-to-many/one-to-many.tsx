@@ -221,7 +221,7 @@ function OneToManyInner({
             setRecords((records) => {
               if (resetRecords) {
                 return values
-                  .map((v) => records.find((r) => r.id === v.id))
+                  .map((v) => ({ ...records.find((r) => r.id === v.id), ...v }))
                   .filter((v) => v) as DataRecord[];
               }
               const recIds = records.map((r) => r.id);
