@@ -134,21 +134,29 @@ export function Decimal(props: FieldProps<string | number>) {
   const handleUp = useCallback(
     (e: React.SyntheticEvent) => {
       e.preventDefault();
+      if ((e as unknown as MouseEvent).button) {
+        clearTimer();
+        return;
+      }
       if (inputRef.current) inputRef.current.focus();
       increment(1n);
       setTimer(() => increment(1n, true));
     },
-    [increment, setTimer],
+    [increment, setTimer, clearTimer],
   );
 
   const handleDown = useCallback(
     (e: React.SyntheticEvent) => {
       e.preventDefault();
+      if ((e as unknown as MouseEvent).button) {
+        clearTimer();
+        return;
+      }
       if (inputRef.current) inputRef.current.focus();
       increment(-1n);
       setTimer(() => increment(-1n, true));
     },
-    [increment, setTimer],
+    [increment, setTimer, clearTimer],
   );
 
   const text = useMemo(
