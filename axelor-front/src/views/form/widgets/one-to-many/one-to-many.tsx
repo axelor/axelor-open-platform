@@ -327,13 +327,13 @@ function OneToManyInner({
     useMemo(() => selectAtom(formAtom, (form) => form.fields), [formAtom]),
   );
 
-  const canMove = useMemo(() => {
-    if (_canMove !== true) return false;
+  const [canMove, orderField] = useMemo(() => {
+    if (_canMove !== true) return [false, null];
 
     // With dummy fields, it is allowed to have no orderBy.
-    const orderField = orderBy?.split(/\s*,\s*/)?.[0];
+    const orderField = orderBy?.split(/\s*,\s*/)?.[0] as string | undefined;
     if (!orderField) {
-      return !formFields[name];
+      return [!formFields[name], null];
     }
 
     const schemaFields = Array.isArray(fields)
@@ -348,7 +348,7 @@ function OneToManyInner({
     const allFields = { ...viewMeta.fields, ...schemaFields };
     const field = allFields[orderField];
 
-    return field && isValidSequence(field);
+    return [Boolean(field) && isValidSequence(field), orderField];
   }, [_canMove, orderBy, viewMeta.fields, fields, formFields, name]);
 
   const clearSelection = useCallback(() => {
@@ -841,8 +841,6 @@ function OneToManyInner({
 
   useEffect(() => {
     if (reorderRef.current) {
-      const orderField = orderBy?.split(/\s*,\s*/)?.[0];
-
       // For dummy fields, so that internal value change is detected
       if (!orderField) {
         valueRef.current = null;
@@ -867,7 +865,7 @@ function OneToManyInner({
       );
     }
     reorderRef.current = false;
-  }, [rows, setValue, orderBy]);
+  }, [orderField, rows, setValue]);
 
   const fetchAndSetDetailRecord = useCallback(
     async (selected: DataRecord) => {
