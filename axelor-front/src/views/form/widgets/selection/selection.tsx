@@ -52,7 +52,7 @@ export function Selection<Multiple extends boolean>(
   } = useAtomValue(widgetAtom);
 
   const selectionList = useSelectionList({ schema, widgetAtom });
-  const selectionDefault = useSelectionDefault({ schema, value });
+  const { selectionDefault, selectionZero } = useSelectionDefault({ schema, value });
 
   const selectionValue = useMemo(() => {
     const selectionAll: SelectionType[] = schema.selectionList ?? [];
@@ -110,6 +110,9 @@ export function Selection<Multiple extends boolean>(
         renderValue={renderValue}
         placeholder={placeholder}
         closeOnSelect={closeOnSelect}
+        {...(selectionZero && String(value) === "0" && {
+          clearIcon: false,
+        })}
       />
     </FieldControl>
   );

@@ -84,7 +84,7 @@ export function useSelectionDefault({
   value: unknown;
   schema: Schema;
 }) {
-  const selectionZero = useMemo(() => {
+  const selectionZero = useMemo<boolean>(() => {
     return (
       isIntegerField(schema) &&
       String(schema.defaultValue) === "0" &&
@@ -99,7 +99,10 @@ export function useSelectionDefault({
     }
 
     return value == null ? value : { title: value, value };
-  }, [selectionZero, value]);
+  }, [selectionZero, value]) as Selection;
 
-  return selectionDefault as Selection;
+  return {
+    selectionZero,
+    selectionDefault,
+  };
 }
