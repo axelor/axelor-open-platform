@@ -338,7 +338,7 @@ function useActionAttrs({
           ) => ({
             statesByName: { ...statesByName, [fieldName]: newState },
             states: produce(statesById, (prev) => {
-              // reset widget's own state so that the attibute set by the action get preference.
+              // reset widget's own state so that the attribute set by the action get preference.
               Object.values(prev).forEach((state) => {
                 if (state.name !== fieldName) return;
                 if (columnName) {

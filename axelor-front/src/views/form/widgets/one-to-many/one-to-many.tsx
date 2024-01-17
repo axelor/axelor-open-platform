@@ -61,13 +61,13 @@ import {
   FieldLabel,
   FieldProps,
   usePermission,
-  usePrepareWidgetContext
+  usePrepareWidgetContext,
 } from "../../builder";
 import {
   useActionExecutor,
   useAfterActions,
   useFormRefresh,
-  useFormScope
+  useFormScope,
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
 import { fetchRecord } from "../../form";
