@@ -23,8 +23,14 @@ import com.axelor.meta.db.MetaMenu;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MenuNode {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MenuNode.class);
+
   private final List<MenuNode> children = new ArrayList<>();
   private MenuNode parent = null;
   private MetaMenu data = null;
@@ -86,9 +92,11 @@ public class MenuNode {
   public static MenuNode buildTree(List<MetaMenu> metaMenus) {
     MenuNode rootNode = new MenuNode(null);
 
-    List<MetaMenu> lst = new ArrayList<>(metaMenus);
-    while (!lst.isEmpty()) {
-      Iterator<MetaMenu> iterator = lst.iterator();
+    List<MetaMenu> menusToProcess = new ArrayList<>(metaMenus);
+    int nbrOfMenusToProcess = 0;
+    while (nbrOfMenusToProcess != menusToProcess.size() && !menusToProcess.isEmpty()) {
+      nbrOfMenusToProcess = menusToProcess.size();
+      Iterator<MetaMenu> iterator = menusToProcess.iterator();
       while (iterator.hasNext()) {
         MetaMenu next = iterator.next();
         MenuNode parent = rootNode.searchNode(next.getParent());
@@ -98,6 +106,12 @@ public class MenuNode {
         parent.addChild(next);
         iterator.remove();
       }
+    }
+
+    if (!menusToProcess.isEmpty()) {
+      LOG.warn(
+          "Some menus can't be processed. For the following menus, check the parent references : {}",
+          menusToProcess.stream().map(MetaMenu::getName).collect(Collectors.joining(", ")));
     }
 
     return rootNode;

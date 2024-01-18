@@ -1,0 +1,8 @@
+---
+title: Fix menus loading when menus that can't be added to N-ary Tree
+type: fix
+description:
+  When fetching the menus, if a menu is parent of itself or 
+  having wrong parent references, it load indefinitely. A log
+  will be displayed in console for menus that can't be added 
+  to N-ary Tree.
