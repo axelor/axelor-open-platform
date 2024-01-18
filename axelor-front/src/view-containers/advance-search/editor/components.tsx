@@ -1,15 +1,16 @@
 import clsx from "clsx";
-import isNumber from "lodash/isNumber";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
-import { Box, Input } from "@axelor/ui";
+import { Box, Input, SelectIcon } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select as AxSelect, SelectProps } from "@/components/select";
-import { useDataStore } from "@/hooks/use-data-store";
-import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { DateComponent } from "@/views/form/widgets";
+import { useCompletion, useSelector } from "@/hooks/use-relation";
+import { DataRecord } from "@/services/client/data.types";
+import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
 
 import styles from "./components.module.css";
 
@@ -32,15 +33,12 @@ function NumberField(props: any) {
   return <TextField {...props} type="number" />;
 }
 
-export function Select({
+function Select({
   value = null,
   options,
   className,
   ...props
-}: Omit<
-  SelectProps<SelectType, false>,
-  "optionKey" | "optionLabel" | "optionEqual"
->) {
+}: SelectProps<DataRecord, false>) {
   return (
     <AxSelect
       {...props}
@@ -122,44 +120,108 @@ export function SimpleWidget({
   return null;
 }
 
-export function RelationalWidget({ operator, onChange, ...rest }: any) {
-  const { field, value } = rest;
-  const dataStore = useMemo(
-    () => new DataStore(field.target, {}),
-    [field.target],
+const getOptionKey = (option: DataRecord) => option.id!;
+const getOptionEqual = (a: DataRecord, b: DataRecord) => a.id === b.id;
+const getOptionMatch = () => true;
+
+export function RelationalSelectWidget({
+  operator,
+  onChange,
+  isMulti = operator !== "=",
+  field: schema,
+  value,
+  placeholder,
+  className,
+}: any) {
+  const [hasSearchMore, setSearchMore] = useState(false);
+  const {
+    sortBy,
+    limit,
+    target,
+    targetName,
+    targetSearch,
+    gridView,
+    searchLimit,
+    domain,
+  } = schema;
+  const showSelector = useSelector();
+
+  const search = useCompletion({
+    sortBy,
+    limit,
+    target,
+    targetName,
+    targetSearch,
+  });
+
+  const getOptionLabel = useOptionLabel(schema);
+
+  const fetchOptions = useCallback(
+    async (text: string) => {
+      const { records, page } = await search(text, {
+        ...(domain && {
+          _domain: domain,
+          _domainContext: {},
+        }),
+      });
+      setSearchMore((page.totalCount ?? 0) > records.length);
+      return records;
+    },
+    [search, domain],
   );
 
-  const options = useDataStore(dataStore, (res) => res.records);
-
-  const fetchData = React.useCallback(async () => {
-    const res = await dataStore.search({
-      filter: {
-        _domain: undefined,
-        _domainContext: {},
+  const showSelect = useCallback(() => {
+    showSelector({
+      model: target,
+      viewName: gridView,
+      orderBy: sortBy,
+      multiple: false,
+      limit: searchLimit,
+      onSelect: async (records) => {
+        onChange(records[0]);
       },
     });
-    return res.records;
-  }, [dataStore]);
+  }, [showSelector, target, gridView, sortBy, searchLimit, onChange]);
+
+  const icons = useMemo(
+    () =>
+      [
+        {
+          icon: <MaterialIcon icon="search" />,
+          onClick: showSelect,
+        },
+      ] as SelectIcon[],
+    [showSelect],
+  );
+
+  return (
+    <AxSelect
+      className={clsx(styles.select, className)}
+      multiple={isMulti}
+      options={[] as DataRecord[]}
+      toggleIcon={false}
+      icons={icons}
+      placeholder={operator === "=" ? placeholder : ""}
+      optionKey={getOptionKey}
+      optionLabel={getOptionLabel}
+      optionEqual={getOptionEqual}
+      optionMatch={getOptionMatch}
+      fetchOptions={fetchOptions}
+      value={value}
+      onChange={(value) => onChange({ name: "value", value })}
+      {...(hasSearchMore && {
+        onShowSelect: showSelect,
+      })}
+    />
+  );
+}
+
+export function RelationalWidget(props: any) {
+  const { operator, onChange, ...rest } = props;
+  const { field, value } = rest;
 
   const isTextField = ["like", "notLike"].includes(operator);
   const isSelection = ["=", "in", "notIn"].includes(operator);
-
-  useEffect(() => {
-    if (isSelection) {
-      const ids = value?.filter?.((id: any) => isNumber(id));
-      if (ids?.length) {
-        dataStore.search({
-          filter: {
-            _domain: "self.id in (:_ids)",
-            _domainContext: {
-              _ids: ids as number[],
-            },
-          },
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelection, dataStore]);
 
   if (isTextField) {
     return (
@@ -170,46 +232,7 @@ export function RelationalWidget({ operator, onChange, ...rest }: any) {
       />
     );
   } else if (isSelection) {
-    const { isMulti = operator !== "=", field, value, className } = rest;
-    const { targetName } = field;
-
-    const $value = isMulti
-      ? value?.map?.((id: any) =>
-          isNumber(id) ? options.find((opt) => opt.id === id) || { id } : id,
-        ) ?? null
-      : value ?? null;
-
-    const trTargetName = `$t:${targetName}`;
-
-    return (
-      <AxSelect
-        multiple={isMulti}
-        className={clsx(styles.select, className)}
-        placeholder={operator === "=" ? rest.placeholder : ""}
-        options={options}
-        optionKey={(x) => x.id!}
-        optionLabel={(x) => x[trTargetName] ?? x[targetName] ?? ""}
-        optionEqual={(x, y) => x.id === y.id}
-        fetchOptions={fetchData}
-        value={$value}
-        onChange={(value) => {
-          onChange({
-            name: "value",
-            value: Array.isArray(value)
-              ? value.map((x) => ({
-                  id: x.id,
-                  [targetName]: x[targetName],
-                  [trTargetName]: x[trTargetName],
-                }))
-              : value && {
-                  id: value.id,
-                  [targetName]: value[targetName],
-                  [trTargetName]: value[trTargetName],
-                },
-          });
-        }}
-      />
-    );
+    return <RelationalSelectWidget {...props} />;
   }
   return null;
 }
@@ -264,7 +287,7 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
       const { value, value2, timeUnit, onChange } = props;
 
       const renderSelect = () => {
-        const props = {
+        const props: any = {
           isClearOnDelete: false,
           name: "timeUnit",
           value: timeUnit,
