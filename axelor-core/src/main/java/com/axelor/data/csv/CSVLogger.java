@@ -197,7 +197,7 @@ public class CSVLogger {
     if (!this.filesName.contains(name)) {
       return name;
     }
-    return getCurrentFile(fileName, level++);
+    return getCurrentFile(fileName, ++level);
   }
 
   /** Export the binding if not already exported */

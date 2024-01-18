@@ -1,0 +1,5 @@
+---
+title: Fix StackOverflowError in CSV data import
+type: fix
+description: |
+  In a CSV data import, if we log the error rows in a file, a StackOverflowError was thrown when more than 2 CSV files have some errors.
