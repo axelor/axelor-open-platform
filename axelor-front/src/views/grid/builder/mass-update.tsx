@@ -48,7 +48,12 @@ export function useMassUpdateFields(
       ) {
         return;
       }
-      _fields.push({ ...field, title: item.title ?? field.title });
+      _fields.push({
+        ...field,
+        ...item,
+        type: field.type,
+        placeholder: item.placeholder ?? item?.title ?? field.title,
+      });
     };
     _.each(items, (item) => {
       if (item.type === "field") {
