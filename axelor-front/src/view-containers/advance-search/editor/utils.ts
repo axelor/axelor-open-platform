@@ -10,6 +10,7 @@ import {
   Field,
   JsonField,
   Property,
+  Schema,
 } from "@/services/client/meta.types";
 
 type Config = {
@@ -153,7 +154,7 @@ export function useField(fields?: Field[], name?: string) {
   }, [name, fields]);
 }
 
-export function useFields(stateAtom: AdvancedSearchAtom) {
+export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
   const items = useAtomValue(
     useMemo(() => selectAtom(stateAtom, (s) => s.items), [stateAtom]),
   );
@@ -179,9 +180,20 @@ export function useFields(stateAtom: AdvancedSearchAtom) {
         ) {
           return list;
         }
+        const viewItem = viewItems?.find((item) => item.name === field.name);
+        const $field = item
+          ? { ...field, title: item.title ?? viewItem?.title ?? field.title }
+          : field;
         return [
           ...list,
-          item ? { ...field, title: item.title ?? field.title } : field,
+          {
+            ...$field,
+            ...(viewItem && {
+              ...viewItem,
+              type: $field.type,
+              title: $field.title,
+            }),
+          },
         ];
       },
       [] as Property[],
@@ -218,7 +230,7 @@ export function useFields(stateAtom: AdvancedSearchAtom) {
     });
 
     return sortBy(fieldList, "title") as unknown as Field[];
-  }, [fields, jsonFields, items]);
+  }, [fields, jsonFields, items, viewItems]);
 
   const contextFields = useMemo(
     () =>

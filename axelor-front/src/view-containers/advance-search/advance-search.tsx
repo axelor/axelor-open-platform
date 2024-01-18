@@ -101,7 +101,7 @@ export function AdvanceSearch({
       [stateAtom],
     ),
   );
-  const { fields, contextFields } = useFields(stateAtom);
+  const { fields, contextFields } = useFields(stateAtom, items);
   const [filters, setFilters] = useAtom(
     useMemo(
       () =>
