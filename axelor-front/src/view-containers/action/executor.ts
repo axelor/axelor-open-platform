@@ -214,7 +214,7 @@ export class DefaultActionExecutor implements ActionExecutor {
         title: data.alert.title ?? i18n.get("Warning"),
         content: data.alert.message,
         yesTitle: data.alert.confirmBtnTitle,
-        noTitle: data.alert.confirmBtnTitle,
+        noTitle: data.alert.cancelBtnTitle,
       });
       if (confirmed) {
         if (data.pending) {
