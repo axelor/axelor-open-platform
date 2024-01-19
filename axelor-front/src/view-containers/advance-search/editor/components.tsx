@@ -180,8 +180,12 @@ export function RelationalSelectWidget({
       onSelect: async (records) => {
         onChange(records[0]);
       },
+      ...(domain && {
+        domain,
+        context: {},
+      }),
     });
-  }, [showSelector, target, gridView, sortBy, searchLimit, onChange]);
+  }, [showSelector, target, gridView, sortBy, searchLimit, domain, onChange]);
 
   const icons = useMemo(
     () =>
