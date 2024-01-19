@@ -121,8 +121,7 @@ export const useGetErrors = () => {
         .filter((s) => fieldName === undefined || s.name === fieldName)
         .filter((s) => !isHidden(s))
         .filter(
-          (s) =>
-            Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
+          (s) => Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
         )
         .map((s) => s.errors ?? {});
       return errors.length ? errors : null;
@@ -188,7 +187,10 @@ export function Form(props: ViewProps<FormView>) {
         return popupRecord._dirty ? { ...res, ...popupRecord } : res;
       } else {
         return popupRecord?.id == null
-          ? { ...getDefaultValues(meta.fields, meta.view.items), ...popupRecord }
+          ? {
+              ...getDefaultValues(meta.fields, meta.view.items),
+              ...popupRecord,
+            }
           : popupRecord;
       }
     }
@@ -354,7 +356,9 @@ const FormContainer = memo(function FormContainer({
           dirty?: boolean;
           isNew?: boolean;
           keepStates?: boolean;
-          callAction?: boolean;
+          callAction?: boolean; // to call onLoad/onNew action immediately 
+          callOnNew?: boolean; // to call onNew action or not
+          callOnLoad?: boolean; // to call onLoad action or not
         },
       ) => {
         const id = String(record?.id ?? "");
@@ -363,12 +367,16 @@ const FormContainer = memo(function FormContainer({
           isNew,
           dirty = false,
           callAction = true,
+          callOnNew = true,
+          callOnLoad = true,
           keepStates,
           ...props
         } = { readonly, ...options };
 
         const isNewAction = !record;
-        const action = isNewAction ? onNewAction : onLoadAction;
+        const action = isNewAction
+          ? callOnNew && onNewAction
+          : callOnLoad && onLoadAction;
         const isNewFromUnsaved = isNew && record === null && !prev.record.id;
 
         record = record ?? {};
@@ -560,6 +568,7 @@ const FormContainer = memo(function FormContainer({
         options?: {
           shouldSave?: boolean;
           callOnSave?: boolean;
+          callOnRead?: boolean;
           callOnLoad?: boolean;
           handleErrors?: boolean;
         },
@@ -567,7 +576,8 @@ const FormContainer = memo(function FormContainer({
         const {
           shouldSave = true,
           callOnSave = true,
-          callOnLoad = true,
+          callOnRead = true,
+          callOnLoad = options?.callOnSave !== false,
           handleErrors = false,
         } = options ?? {};
         const formState = get(formAtom);
@@ -605,11 +615,12 @@ const FormContainer = memo(function FormContainer({
           opts,
         );
 
-        if (callOnLoad) {
+        if (callOnRead) {
           res = res.id ? await doRead(res.id) : res;
           res = { ...dummy, ...res }; // restore dummy values
           doEdit(res, {
             callAction: false,
+            callOnLoad,
             readonly,
             isNew: vals.id !== res.id,
             keepStates: true,

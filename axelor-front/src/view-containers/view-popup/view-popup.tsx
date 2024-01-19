@@ -250,7 +250,7 @@ function Footer({
         rec = await onSave({
           shouldSave: true,
           callOnSave: true,
-          callOnLoad: false,
+          callOnRead: false,
         });
       }
       handleClose(rec);

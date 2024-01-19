@@ -196,7 +196,7 @@ function Footer({
             const rec = await handler.onSave({
               shouldSave: true,
               callOnSave: true,
-              callOnLoad: false,
+              callOnRead: false,
             });
             onSelect(rec);
           }
