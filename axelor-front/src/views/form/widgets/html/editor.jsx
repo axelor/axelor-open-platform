@@ -85,7 +85,6 @@ function HTMLEditor({
   });
   const [popup, setPopup] = useState(null);
   const [toggle, setToggle] = useState(false);
-  let timer = null;
 
   const getRef = (key) => refs.current[key];
   const setRef = (key, value) => (refs.current[key] = value);
@@ -361,14 +360,8 @@ function HTMLEditor({
     onChange?.(e);
   }
 
-  function emitFocus() {
-    clearTimeout(timer);
-  }
-
   function handleBlur(e) {
-    timer = setTimeout(() => {
-      onBlur?.(e);
-    }, 150);
+    onBlur?.(e);
   }
 
   function emitChange() {
@@ -448,7 +441,6 @@ function HTMLEditor({
             onPaste={onPaste}
             onInput={emitChange}
             onBlur={emitBlur}
-            onFocus={emitFocus}
             {...(hijackMenu ? { onContextMenu } : {})}
           ></div>
         )}
