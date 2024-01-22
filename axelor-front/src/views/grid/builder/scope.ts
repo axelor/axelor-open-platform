@@ -36,7 +36,15 @@ export function useGridColumnNames({
             if ((item as JsonField).jsonField) {
               return [...names, (item as JsonField).jsonField as string];
             } else if (field) {
-              return [...names, field.name];
+              return [
+                ...names,
+                field.name,
+                ...(field.type?.endsWith("TO_ONE") &&
+                (item as Schema).target &&
+                (item as Schema).targetName
+                  ? [`${field.name}.${(item as Schema).targetName}`]
+                  : []),
+              ];
             }
             return names;
           },

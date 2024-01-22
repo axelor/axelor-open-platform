@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-import { DataContext } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { l10n, moment } from "@/services/client/l10n";
 import { Field, JsonField } from "@/services/client/meta.types";
 
@@ -157,10 +157,10 @@ const formatNumber: Formatter = (value, opts = {}) => {
   } else {
     scale = 0;
   }
-  
+
   if (currency) {
     // referencing another field in the context?
-    currency = (_.get(context, currency) as string);
+    currency = _.get(context, currency) as string;
   } else if (currencyText) {
     // else it is the currency text (legacy angular filter)
     currency = currencyText;
@@ -235,15 +235,20 @@ const formatSelection: Formatter = (value, opts = {}) => {
 };
 
 const formatOne: Formatter = (value, opts = {}) => {
-  const { props } = opts;
+  const { props, context: record } = opts;
 
   if (!value) return "";
   if (!props?.targetName) return value.name ?? value.code ?? value.id ?? "";
 
-  const name = props.targetName;
-  const key = `$t:${name}`;
-
-  return value[key] ?? value[name];
+  function getValue(value: DataRecord, name: string) {
+    const key = `$t:${name}`;
+    return value[key] ?? value[name];
+  }
+  
+  return (
+    getValue(value, props.targetName) ??
+    getValue(record!, `${props.name}.${props.targetName}`)
+  );
 };
 
 const formatMany: Formatter = (value, opts = {}) => {

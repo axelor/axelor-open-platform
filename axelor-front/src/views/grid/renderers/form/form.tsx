@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
+import setObjectValue from "lodash/set";
+import clone from "lodash/cloneDeep";
 import {
   KeyboardEvent,
   forwardRef,
@@ -149,6 +151,29 @@ function isFocusableField(item: Schema) {
   return true;
 }
 
+function processGridRecord(record: DataRecord) {
+  const $record: DataRecord = clone(record);
+  for (const [key, value] of Object.entries(record)) {
+    if (key.includes(".")) {
+      const hasTranslation = key.startsWith("$t:");
+      const [name, ...subFieldNames] = key.split(".");
+      const fieldName = hasTranslation ? name.slice("$t:".length) : name;
+      if (
+        Object.prototype.hasOwnProperty.call(record, fieldName) &&
+        record[fieldName]
+      ) {
+        const lastName = subFieldNames.pop();
+        const newKey = hasTranslation
+          ? [fieldName, ...subFieldNames, `$t:${lastName}`].join(".")
+          : key;
+        delete $record[key];
+        setObjectValue($record, newKey.split("."), value);
+      }
+    }
+  }
+  return $record;
+}
+
 export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
   function Form(props, ref) {
     const {
@@ -156,13 +181,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       fields,
       className,
       columns,
-      data: { record },
+      data: { record: _record },
       index: rowIndex,
       editCell: cellIndex,
       onInit,
       onSave,
       onCancel,
     } = props;
+    const record = useMemo(() => processGridRecord(_record), [_record]);
     const containerRef = useRef<HTMLDivElement>(null);
     const recordRef = useRef<DataRecord>({});
     const parentRef = useRef<Element>();
