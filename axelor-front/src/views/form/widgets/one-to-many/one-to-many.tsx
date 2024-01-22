@@ -351,6 +351,51 @@ function OneToManyInner({
     return [Boolean(field) && isValidSequence(field), orderField];
   }, [_canMove, orderBy, viewMeta.fields, fields, formFields, name]);
 
+  const reorderItems = useCallback(
+    (items: DataRecord[]) => {
+      if (!orderField) return items;
+
+      return [...items]
+        .sort((a, b) => {
+          // Apply records order
+          const indexA = records.findIndex((x) => x.id === a.id);
+          const indexB = records.findIndex((x) => x.id === b.id);
+
+          if (indexA >= 0 && indexB >= 0) {
+            return indexA - indexB;
+          } else if (indexA >= 0) {
+            return -1;
+          } else if (indexB >= 0) {
+            return 1;
+          }
+
+          return 0;
+        })
+        .map((value, ind) => {
+          const record = records?.find((x) => x.id === value.id);
+          // Compute order field
+          const {
+            $version,
+            version = $version,
+            [orderField]: prevOrder = record?.[orderField],
+            ...rest
+          } = value;
+          const nextOrder = ind + 1;
+
+          return prevOrder === nextOrder
+            ? value
+            : {
+                ...record,
+                ...rest,
+                version,
+                [orderField]: nextOrder,
+                _dirty: true,
+              };
+        });
+    },
+    [orderField, records],
+  );
+
   const clearSelection = useCallback(() => {
     setState((draft) => {
       draft.selectedRows = null;
@@ -529,7 +574,21 @@ function OneToManyInner({
   }, [dataStore, state.columns, state.orderBy]);
 
   const valueRef = useRef<DataRecord[] | null>();
-  useEffect(() => {
+  const [shouldReorder, setShouldReorder] = useState(false);
+
+  const formRecordId = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
+  );
+
+  const resetValue = useCallback(() => {
+    valueRef.current = null;
+  }, []);
+
+  // Reset value ref on form record change, so that we can distinguish
+  // between setting initial value and value change.
+  useEffect(resetValue, [formRecordId, resetValue]);
+
+  useAsyncEffect(async () => {
     const last = valueRef.current ?? [];
     const next = value ?? [];
 
@@ -540,10 +599,61 @@ function OneToManyInner({
         return y === undefined || !equals(x, y);
       })
     ) {
+      const prevValue = valueRef.current;
       valueRef.current = value;
-      onSearch(dataStore.options);
+      await onSearch(dataStore.options);
+      if (prevValue && orderField) {
+        setShouldReorder(true);
+      }
     }
-  }, [dataStore.options, onSearch, value]);
+  }, [dataStore.options, onSearch, orderField, value]);
+
+  const reorder = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        if (!orderField) return;
+        const prevItems = getItems(get(valueAtom));
+        const nextItems = prevItems
+          .sort((a, b) => {
+            let orderA = a[orderField];
+            if ((a.id ?? 0) <= 0 && !orderA) {
+              orderA = Infinity;
+            }
+
+            let orderB = b[orderField];
+            if ((b.id ?? 0) <= 0 && !orderB) {
+              orderB = Infinity;
+            }
+
+            return orderA - orderB;
+          })
+          .map(
+            (item, ind) =>
+              ({
+                ...item,
+                [orderField]: ind + 1,
+              }) as DataRecord,
+          );
+        valueRef.current = nextItems;
+        set(valueAtom, nextItems);
+
+        setRecords((prevRecords) =>
+          nextItems.map((item) => ({
+            ...prevRecords.find((record) => record.id === item.id),
+            ...item,
+          })),
+        );
+      },
+      [getItems, orderField, valueAtom],
+    ),
+  );
+
+  useEffect(() => {
+    if (shouldReorder) {
+      reorder();
+      setShouldReorder(false);
+    }
+  }, [reorder, shouldReorder]);
 
   const canDirty = useCallback(
     (target: string) => {
@@ -558,7 +668,7 @@ function OneToManyInner({
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
-        const prevItems = getItems(get(valueAtom));
+        const prevItems = reorderItems(getItems(get(valueAtom)));
 
         const items = records.map((item) => {
           if (isManyToMany && item.id && item.id > 0) {
@@ -590,7 +700,7 @@ function OneToManyInner({
 
         return setValue(nextItems, changed, dirty);
       },
-      [canDirty, getItems, isManyToMany, setValue, valueAtom],
+      [canDirty, reorderItems, getItems, isManyToMany, setValue, valueAtom],
     ),
   );
 
@@ -768,12 +878,12 @@ function OneToManyInner({
       if (confirmed) {
         const ids = records.map((r) => r.id);
         setValue((value) =>
-          (value || []).filter(({ id }) => !ids.includes(id)),
+          reorderItems((value || []).filter(({ id }) => !ids.includes(id))),
         );
         clearSelection();
       }
     },
-    [setValue, clearSelection],
+    [setValue, clearSelection, reorderItems],
   );
 
   const updateViewDirty = useUpdateViewDirty(formAtom);
@@ -915,7 +1025,12 @@ function OneToManyInner({
     fetchAndSetDetailRecord(selected);
   }, [detailMeta, selected?.id, fetchAndSetDetailRecord]);
 
-  useFormRefresh(onSearch);
+  const onRefresh = useCallback(() => {
+    resetValue();
+    onSearch();
+  }, [resetValue, onSearch]);
+
+  useFormRefresh(onRefresh);
 
   const onDiscard = useCallback(() => updateViewDirty(), [updateViewDirty]);
 
