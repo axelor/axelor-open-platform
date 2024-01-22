@@ -701,8 +701,8 @@ const FormContainer = memo(function FormContainer({
           if (record) {
             await dataStore.save(record);
           }
-          const { record: rec } = get(formAtom);
-          const dirty = get(dirtyAtom);
+          const { record: rec, dirty: formDirty } = get(formAtom);
+          const dirty = get(dirtyAtom) || formDirty;
           const isNew = (rec.id || 0) <= 0;
           if (dirty || isNew) {
             await doSave({
