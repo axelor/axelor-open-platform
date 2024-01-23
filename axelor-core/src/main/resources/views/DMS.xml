@@ -23,14 +23,8 @@
       <field name="fileName" title="Name" />
     </panel>
     <panel name="detailsPanel" title="Details" sidebar="true" readonly="true">
-      <panel stacked="true">
-        <panel name="fileTypePanel" showIf="fileType">
-          <field name="fileType" title="Type" />
-        </panel>
-        <panel name="directoryPanel" showIf="isDirectory">
-          <field name="isDirectory" title="Directory" />
-        </panel>
-      </panel>
+      <field name="fileType" title="Type" showIf="fileType"/>
+      <field name="isDirectory" title="Directory" showIf="isDirectory"/>
       <field name="createdBy" title="Owner" />
       <field name="createdOn" title="Created" />
       <field name="updatedOn" title="Modified" />
