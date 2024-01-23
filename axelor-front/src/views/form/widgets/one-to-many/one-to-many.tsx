@@ -1000,10 +1000,23 @@ function OneToManyInner({
       const rec =
         selected.id < 0 ? { ...selected } : await dataStore.copy(selected.id);
       const newId = nextId();
-      setValue((values) => [...values, { ...rec, _dirty: true, id: newId }]);
+      const maxOrder = orderField
+        ? records
+            .map((r) => r[orderField] as number | null | undefined)
+            .reduce((a, b) => ((a ?? 0) > (b ?? 0) ? a : b) ?? 0)
+        : null;
+      setValue((values) => [
+        ...values,
+        {
+          ...rec,
+          _dirty: true,
+          id: newId,
+          ...(orderField && maxOrder != null && { [orderField]: maxOrder + 1 }),
+        },
+      ]);
       saveIdRef.current = newId;
     }
-  }, [dataStore, selected, setValue]);
+  }, [dataStore, orderField, records, selected, setValue]);
 
   const onSaveRecord = useCallback(
     async (record: DataRecord) => {
