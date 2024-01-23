@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -25,7 +25,7 @@ import {
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { useAfterActions } from "../../builder/scope";
+import { useAfterActions, useFormTabScope } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 
 import classes from "./dashlet.module.scss";
@@ -261,6 +261,17 @@ function DashletViewLoad({
 }
 
 export function Dashlet(props: WidgetProps) {
+  const { active } = useFormTabScope();
+  const [show, setShow] = useState(active);
+
+  useEffect(() => {
+    setShow((prev) => prev || active);
+  }, [active]);
+
+  return show ? <DashletWrapper {...props} /> : null;
+}
+
+function DashletWrapper(props: WidgetProps) {
   const { schema, readonly, widgetAtom, formAtom } = props;
   const tab = useViewTab();
   const { attrs } = useAtomValue(widgetAtom);

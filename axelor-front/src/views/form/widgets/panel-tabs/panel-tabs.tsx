@@ -1,9 +1,10 @@
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, Fade, NavTabItem, NavTabs } from "@axelor/ui";
+import { Box, NavTabItem, NavTabs } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -16,7 +17,11 @@ import {
   WidgetProps,
 } from "../../builder";
 import { fallbackWidgetAtom } from "../../builder/atoms";
-import { useAfterActions, useFormScope } from "../../builder/scope";
+import {
+  FormTabScope,
+  useAfterActions,
+  useFormScope,
+} from "../../builder/scope";
 
 import styles from "./panel-tabs.module.scss";
 
@@ -190,16 +195,16 @@ function TabContent({
   const display = active ? "block" : "none";
 
   return (
-    <Fade in={active} mountOnEnter>
-      <div className={styles.tabContent} style={{ display }}>
+    <div className={styles.tabContent} style={{ display }}>
+      <ScopeProvider scope={FormTabScope} value={{ active }}>
         <FormWidget
           readonly={readonly}
           schema={schema}
           formAtom={formAtom}
           parentAtom={parentAtom}
         />
-      </div>
-    </Fade>
+      </ScopeProvider>
+    </div>
   );
 }
 

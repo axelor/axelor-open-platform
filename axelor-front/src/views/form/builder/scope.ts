@@ -229,6 +229,17 @@ export function useFormEditableScope() {
   return useAtomValue(scopeAtom);
 }
 
+export const FormTabScope = createScope<{ active: boolean }>({ active: true });
+
+const formTabMolecule = molecule((getMol, getScope) => {
+  return atom(getScope(FormTabScope));
+});
+
+export function useFormTabScope() {
+  const scopeAtom = useMolecule(formTabMolecule);
+  return useAtomValue(scopeAtom);
+}
+
 export function useWidgetState(formAtom: FormAtom, widgetName: string) {
   const { findItem } = useViewMeta();
 
