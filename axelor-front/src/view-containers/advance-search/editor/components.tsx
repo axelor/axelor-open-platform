@@ -242,12 +242,19 @@ export function RelationalWidget(props: any) {
 }
 
 type SelectType = {
-  name: string;
   title: string;
+  name: string;
+  value?: any;
+};
+
+type BooleanSelectType = {
+  title: string;
+  value: boolean;
 };
 
 let currentSelection: SelectType[];
 let pastOrNextSelection: SelectType[];
+let booleanSelection: BooleanSelectType[];
 
 const getCurrentSelection: () => SelectType[] = () =>
   currentSelection ||
@@ -269,6 +276,13 @@ const getPastOrNextSelection: () => SelectType[] = () =>
     { name: "year", title: i18n.get("Years") },
   ]);
 
+const getBooleanSelection: () => BooleanSelectType[] = () =>
+  booleanSelection ||
+  (booleanSelection = [
+    { value: true, title: i18n.get("Yes") },
+    { value: false, title: i18n.get("No") },
+  ]);
+
 export function Widget({ type, operator, onChange, value, ...rest }: any) {
   const props = {
     operator,
@@ -285,6 +299,23 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
     case "many-to-many":
     case "one-to-many":
       return <RelationalWidget {...props} />;
+    case "boolean": {
+      const selectionList = getBooleanSelection();
+      const { value } = props;
+      return operator === "=" && (
+        <AxSelect
+          optionKey={(x) => x.value as any}
+          optionLabel={(x) => x.title}
+          optionEqual={(x, y) => x.value === y.value}
+          className={styles.select}
+          value={selectionList.find(item => item.value === value) ?? null}
+          onChange={(value: any) =>
+            onChange({ name: "value", value: value?.value })
+          }
+          options={selectionList}
+        />
+      );
+    }
     case "date":
     case "time":
     case "datetime": {
