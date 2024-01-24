@@ -136,6 +136,19 @@ export const FormLayoutComponent = ({
   );
 };
 
+function isFocusableField(item: Schema) {
+  if (
+    item.readonly ||
+    item.hidden ||
+    ["button"].includes(item.type ?? "") ||
+    ["BINARY"].includes(item.serverType ?? "") ||
+    ["image", "binary", "binary-link", "image-link"].includes(item.widget ?? "")
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
   function Form(props, ref) {
     const {
@@ -163,9 +176,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
-      const defaultColumnName = view.items?.find(
-        (item) => !item.readonly && !item.hidden,
-      )?.name;
+      const defaultColumnName = view.items?.find(isFocusableField)?.name;
       const editColumn = view.items?.find((c) => c.name === editColumnName);
       const name = editColumn?.readonly
         ? defaultColumnName
