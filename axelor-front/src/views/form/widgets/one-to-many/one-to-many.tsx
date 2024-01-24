@@ -50,6 +50,7 @@ import {
 import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
+import { deepMerge } from "@/utils/objects";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
@@ -234,7 +235,7 @@ function OneToManyInner({
                 .filter((rec) => !deleteIds.includes(rec.id))
                 .map((rec) => {
                   const val = rec.id
-                    ? values.find((v) => v.id === rec.id)
+                    ? deepMerge(rec, values.find((v) => v.id === rec.id) ?? {})
                     : null;
                   return val ? { ...rec, ...val } : rec;
                 })
@@ -523,18 +524,33 @@ function OneToManyInner({
         }
 
         const fetchedIds = records.map((r) => r.id);
+
+        const unfetchedItems = items.reduce((obj, item, index) => {
+          if (!fetchedIds.includes(item.id)) {
+            obj[index] = item;
+          }
+          return obj;
+        }, {});
+
         const newItems = records
           .map((record) => {
             const item = items.find((item) => item.id === record.id);
             return item ? { ...record, ...item } : record;
           })
-          .concat(items.filter((item) => !fetchedIds.includes(item.id)));
+          .concat(Object.values(unfetchedItems));
 
         // reset orderby on search
         setState((draft) => {
           draft.orderBy = null;
         });
-        setRecords(newItems);
+
+        setRecords((records) => {
+          return newItems.map((item, index) => {
+            return unfetchedItems[index]
+              ? deepMerge(records[index] ?? {}, item)
+              : item;
+          });
+        });
 
         return {
           page,
@@ -638,10 +654,12 @@ function OneToManyInner({
         set(valueAtom, nextItems);
 
         setRecords((prevRecords) =>
-          nextItems.map((item) => ({
-            ...prevRecords.find((record) => record.id === item.id),
-            ...item,
-          })),
+          nextItems.map((item) =>
+            deepMerge(
+              prevRecords.find((record) => record.id === item.id) ?? {},
+              item,
+            ),
+          ),
         );
       },
       [getItems, orderField, valueAtom],
