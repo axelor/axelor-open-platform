@@ -198,7 +198,6 @@ export function findViewFields(
     if (editor.fields) {
       editor.fields = processFields(editor.fields);
     }
-    const editorItems = findViewItems(editor);
     const acceptItems = (items: Schema[] = []) => {
       _.each(items, (child) => {
         if (child.name && child.type === "field") {
@@ -219,7 +218,6 @@ export function findViewFields(
           });
         }
         processWidget(child);
-        processDotted(child, editorItems);
       });
     };
     acceptItems(editor.items);
@@ -285,26 +283,6 @@ export function findViewFields(
   }
 
   return result;
-}
-
-function findViewItems(schema: Schema): Schema[] {
-  const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
-  const nested = items.flatMap((item) => findViewItems(item));
-  return [...items, ...nested];
-}
-
-function processDotted(item: Schema, items: Schema[]) {
-  const prefix = `${item.name}.`;
-  const dotted =
-    item.name &&
-    items
-      .filter((x) => x.name?.startsWith(prefix))
-      .map((x) => x.name as string)
-      .map((x) => x.substring(prefix.length));
-
-  if ((dotted?.length ?? 0) > 0) {
-    item.dotted = dotted;
-  }
 }
 
 export function accept(params: ActionView) {
@@ -410,8 +388,6 @@ export function processView(
     const placeholder: Schema = helps.placeholder ?? {};
     const inline: Schema = helps.inline ?? {};
 
-    const viewItems = findViewItems(meta.view);
-
     _.forEach(view.items, (item) => {
       if (item.name && help[item.name]) {
         item.help = help[item.name].help;
@@ -430,9 +406,6 @@ export function processView(
           });
         }
       }
-
-      processDotted(item, viewItems);
-
       items.push(item);
     });
 
