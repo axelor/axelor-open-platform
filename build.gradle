@@ -78,6 +78,11 @@ configure(subprojects - project(':axelor-front')) {
       }
     }
 
+    from("${rootDir}") {
+      include "LICENSE"
+      into "META-INF"
+    }
+
   }
 
   project.afterEvaluate {
