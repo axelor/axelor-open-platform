@@ -1,3 +1,9 @@
 ---
 title: Add support to use `TagSelect` widget in grid
 type: feature
+description:
+  This allow to use `TagSelect` widget in grid. It will display 
+  records as badge. Full list will be displayed on mouse over 
+  when records can't be displayed in the grid cell.
+  
+  `target-name` is at this time not supported.
