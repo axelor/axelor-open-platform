@@ -1,8 +1,0 @@
----
-title: Add support to filter mail messages
-type: feature
-description: |
-  On the message stream widget, users can choose the messages types to display.
-  
-  Moreover, on the view definition, the `filter` attribute can be used to specify messages type
-  to show by default : `all` (default), `comment`, `notification`.

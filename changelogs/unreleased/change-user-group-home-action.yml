@@ -1,6 +1,0 @@
----
-title: Use ref-select widget for User/Group homeAction
-type: change
-description: |
-  Remove special case for User/Group records where we added a dummy `__actionSelect` field.
-  Instead, use ref-select widget on `homeAction`.

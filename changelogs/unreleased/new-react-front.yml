@@ -1,5 +1,0 @@
----
-title: Migrate to new front-end build on top of React
-type: feature
-description: |
-  Drop current Angular front-end in favor of new front-end build on top of React.

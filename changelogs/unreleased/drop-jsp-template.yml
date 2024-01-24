@@ -1,6 +1,0 @@
----
-title: Drop extra partial JSP templates
-type: remove
-description: |
-  Extra partial JSP templates support is no more supported and 
-  has been dropped. There is no replacement at this time.

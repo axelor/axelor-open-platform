@@ -1,6 +1,0 @@
----
-title: Remove `view.grid.editor-buttons` setting
-type: remove
-description: |
-  The setting `view.grid.editor-buttons` has been removed. It was use 
-  to show confirm/cancel buttons from grid row editor.

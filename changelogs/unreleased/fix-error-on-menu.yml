@@ -1,6 +1,0 @@
----
-title: Fix error when retrieving menu
-type: fix
-description: |
-  If an error occurs when evaluating menu conditions (ie script errors), it
-  shouldn't fail the all process, but don't display the failed menus.

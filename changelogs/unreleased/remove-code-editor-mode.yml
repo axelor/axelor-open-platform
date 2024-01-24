@@ -1,3 +1,0 @@
----
-title: Remove CodeEditor `x-mode` support in favor of `x-code-syntax`
-type: remove

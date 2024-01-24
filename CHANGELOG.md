@@ -1,3 +1,605 @@
+## 7.0.0 (2024-01-24)
+
+#### Feature
+
+* Support for Gantt dashlet
+* Add support to use `TagSelect` widget in grid
+
+  <details>
+  
+  This allow to use `TagSelect` widget in grid. It will display records as badge. Full list will be displayed on mouse over when records can't be displayed in the grid cell.
+  `target-name` is at this time not supported.
+  
+  </details>
+
+* Add support to filter mail messages
+
+  <details>
+  
+  On the message stream widget, users can choose the messages types to display.
+  
+  Moreover, on the view definition, the `filter` attribute can be used to specify messages type
+  to show by default : `all` (default), `comment`, `notification`.
+  
+  </details>
+
+* Add `x-dirty` attribute to view fields
+
+  <details>
+  
+  If the view field is marked as `x-dirty="false"`, the
+  field value change will not mark current record dirty.
+  
+  The old dirty checking behavior of the `$` prefixed
+  fields is now deprecated and will be removed during
+  next major release.
+  
+  </details>
+
+* Migrate to new front-end build on top of React
+
+  <details>
+  
+  Drop current Angular front-end in favor of new front-end build on top of React.
+  
+  </details>
+
+* Add support for `{user.dir}` variable in config file
+
+  <details>
+  
+  The `{user.dir}` refers to the current working directory.
+  It is useful during development where you have many different
+  instances to test with.
+  
+  For example:
+  
+  ```properties
+  data.upload.dir = {user.dir}/data/axelor
+  ```
+  
+  will store upload files under `data/axelor` found under
+  current working directory.
+  
+  </details>
+
+* Add support of `canDelete` and `canNew` attribute to calendar views
+* Improve `$fmt` script helper
+
+  <details>
+  
+  The `$fmt` helper accepts an optional `props` param to pass custom field
+  props (`currency`, `scale`, `second`, ...) : `$fmt("myField", { scale: 6 })`
+  
+  </details>
+
+* Add changelog plugin
+
+  <details>
+  
+  Provide a Gradle plugin to simplify changelog management.
+  
+  Each entry of the `CHANGELOG.md` file is generated from files in 
+  the `changelogs/unreleased/` folder.
+  
+  To use the plugin, in your `build.gradle` :
+  ```yaml
+  apply plugin: com.axelor.gradle.support.ChangelogSupport
+  
+  changelog {
+    version = "${project.version}"
+    output.set(file("CHANGELOG.md"))
+    inputPath.set(file("changelogs/unreleased"))
+    types.set(["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"])
+    header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
+  }
+  ```
+  
+  To generate the `CHANGELOG.md` with unreleased entries, run following Gradle task:
+  `./gradlew generateChangelog`
+  
+  </details>
+
+* Support view-param popup reload on dashlets
+
+  <details>
+  
+  ```xml
+  <view-param name="popup" value="true"/>
+  ```
+  
+  Open dashlet edit in popup (instead of new tab).
+  (This is currently for grid dashlet only. Other dashlet types always open popup.)
+  After closing, dashlet has up-to-date data for the record that was opened and edited.
+  (Search request may be performed by some dashlet types to achieve that result,
+  but it's room for later improvement.)
+  
+  ```xml
+  <view-param name="popup" value="reload"/>
+  ```
+  
+  Reload current tab after closing popup from dashlet.
+  If the tab is dirty before opening the popup,
+  save confirmation dialog is shown before proceeding.
+  
+  </details>
+
+* Add `auth.provider-default` configuration
+
+  <details>
+  
+  Normally, form client is the default client used for authentication.
+  When an authentication provider is defined as exclusive, form client is not loaded at all.
+  
+  Now, with `auth.provider-default` configuration, you can specify another non-exclusive client as default.
+  
+  Example:
+  `auth.provider-default = google` // google auth provider is used by default
+  
+  You can specify another client via the `client_name` query parameter in login URL.
+  
+  Example:
+  // Default client is used
+  http://localhost:8080/open-platform-demo/
+  
+  // Specify another client
+  http://localhost:8080/open-platform-demo/?client_name=form
+  
+  </details>
+
+* Export and view MetaFields
+
+  <details>
+  
+  Add x-can-export attributes on O2M metaFields on MetaModel form view
+  
+  </details>
+
+* Allow canMove sequencing on any field specified by orderBy
+
+  <details>
+  
+  With `canMove`, the field used for sequencing does not have to be a field named `sequence`
+  anymore, but can be any field specified by `orderBy`.
+  
+  Sequencing is done on field specified by `orderBy`, and it must be only one integer field.
+  If not specified, not sequencing is done.
+  
+  On top-level grid, `canMove` requires `orderBy`.
+  
+  </details>
+
+* Add index to MetaTranslation on message field
+* Support `action-menu` elements specific to a `search` view
+
+  <details>
+  
+  `action-menu` elements can now be defined inside a `search` view
+  to specify that they are specific to that view, and not available to all search views.
+  
+  </details>
+
+* Add `application.icon` and `context.appIcon` settings
+
+  <details>
+  
+  These settings allow to define an application icon used
+  for website favicon and small logo.
+  They can be used similarly to the `application.logo`
+  and `context.appLogo` settings.
+  The icon must be a multiple of 48px square
+  for favicon compatibility with most browsers.
+  
+  </details>
+
+* Add Rating widget
+
+  <details>
+  
+  Rating widget can be used on Integer,Long and Decimal field. It provides ability to 
+  collect measurable opinions/experiences/feedbacks/...
+  
+  Example : 
+  ```xml
+  <field name="note" type="Integer" widget="Rating"/>
+  <field name="note" type="Integer" widget="Rating" x-rating-icon="heart"/>
+  ```
+  
+  </details>
+
+#### Change
+
+* Upgrade Jackson from 2.13.4 to 2.15.3
+* /ws/app/info endpoint moved to /ws/public/app/info
+
+  <details>
+  
+  /ws/public/app/info either gives application login info
+  or session info if the user is logged in.
+  /ws/app/info is deprecated and will be dropped in a future release.
+  
+  </details>
+
+* Upgrade Guava from 31.1 to 32.1.3
+* Upgrade Undertow from 2.2.19 to 2.2.28
+* Upgrade Woodstox from 6.3.1 to 6.5.1
+* Improve flagging mail messages
+
+  <details>
+  
+  The flag associated to the user and message is now retrieved on backend. This 
+  avoids duplicated mail flags after reflagging messages. As part of the change, the 
+  message is also required and indexes as been reviewed.
+  
+  Run following SQL script to adjust MailFlag table changes :
+  ```
+  ALTER TABLE mail_flags ALTER COLUMN MESSAGE SET NOT NULL;
+  DROP INDEX mail_flags_message_idx;
+  DROP INDEX mail_flags_user_id_idx;
+  CREATE INDEX mail_flags_user_id_message_idx ON mail_flags (user_id, message);
+  ```
+  
+  </details>
+
+* Upgrade Hibernate ORM from 5.6.12 to 5.6.15
+* Upgrade Redisson from 3.17.6 to 3.19.3
+* Upgrade EhCache from 3.10.1 to 3.10.8
+* Upgrade Flyway from 9.3.1 to 9.22.3
+* Upgrade PostgreSQL JDBC from 42.5.0 to 42.7.1
+* Upgrade Apache Shiro from 1.9.1 to 1.13.0
+* Upgrade hsqldb from 2.7.0 to 2.7.2
+* Upgrade logback from 1.2.11 to 1.3.14
+* Refactor domain context of collection field search request
+
+  <details>
+  
+  Restructured `_domainContext` for collection field search request:
+  
+  ```json
+  {
+      "_model",
+      "_field",
+      "_field_ids",
+      "_parent": {
+          "id",
+          "_model"
+      }
+  }
+  ```
+  
+  </details>
+
+* Upgrade Jansi from 2.4.0 to 2.4.1
+* Upgrade ASM from 9.3 to 9.6
+* Upgrade Apache Commons CSV from 1.9.0 to 1.10.0
+* CodeEditor `x-code-theme` is no more supported.
+
+  <details>
+  
+  As part of the new v7 front-end built on top of React, `x-code-theme` is no more supported. 
+  It will be re-added in a future version.
+  
+  </details>
+
+* Use ref-select widget for User/Group homeAction
+
+  <details>
+  
+  Remove special case for User/Group records where we added a dummy `__actionSelect` field.
+  Instead, use ref-select widget on `homeAction`.
+  
+  </details>
+
+* Upgrade Hibernate Validator from 6.2.4 to 6.2.5
+* Upgrade MySQL JDBC from 8.0.30 to 8.0.33
+* Upgrade Junit5 from 5.9.1 to 5.10.1
+* Use Feature to discover studio module
+
+  <details>
+  
+  Instead of checking using module name, use specific feature to discover if 
+  studio module is used. This can be enabled using Studio feature.
+  
+  Example of how to enable the Studio feature from the module:
+  
+  ```java
+  public class MyModule extends AxelorModule {
+    @Override
+    protected void configure() {
+        AppSettings.get().enableFeature(AvailableAppFeatures.STUDIO)
+    }
+  }
+  ```
+  
+  or using `features.studio = true` in `axelor-config.properties.
+  
+  </details>
+
+* Upgrade Resteasy from 4.7.7 to 4.7.9
+* The `view.grid.selection` property is now set to `checkbox` by default
+
+  <details>
+  
+  Checkbox selection in grid is now enabled by default.
+  
+  Change to `view.grid.selection = none` to disable it globally.
+  
+  </details>
+
+* Upgrade Gradle Spotless plugin from 6.11.0 to 6.13.0
+* Upgrade slf4j from 1.7.36 to 2.0.9
+* Upgrade Jsoup from 1.15.3 to 1.17.1
+* Upgrade EclipseLink Moxy from 2.7.11 to 2.7.14
+* Upgrade pac4j from 5.4.5 to 5.7.2
+* Upgrade Caffeine from 3.1.1 to 3.1.6
+* Upgrade XStream from 1.4.19 to 1.4.20
+* Upgrade Apache Commons IO from 2.11.0 to 2.15.1
+* collection editor without x-viewer no more used in readonly
+
+  <details>
+  
+  For collection fields, if the editor isn't marked with `x-viewer="true"` and doesn't have any viewer defined, the editor is no more used in readonly mode. The default rendering behavior will be used instead (ie grid). This is more consistent with others fields behavior.
+  
+  </details>
+
+* Upgrade Apache Commons CLI from 1.5.0 to 1.6.0
+* Fix `x-show-bars` actions should not affect parent form
+
+  <details>
+  
+  `x-show-bars` actions used to affect parent form.
+  Now, they affect local grid context only.
+  
+  </details>
+
+* Upgrade Apache Tika from 2.4.1 to 2.9.1
+* Update shortcuts
+
+  <details>
+  
+  Here are the changes of the shortcuts : 
+  
+  Changed :
+  - delete current/selected record(s) : `Ctrl+Delete` instead of `Ctrl+D`
+  - navigate to previous page/record : `Alt+Page Up` instead of `Ctrl+J`
+  - navigate to next page/record : `Alt+Page Down` instead of `Ctrl+K`
+  
+  Added : 
+  - duplicate current record : `Ctrl+D`
+  
+  </details>
+
+* Upgrade embedded Tomcat from 9.0.65 to 9.0.84
+* Upgrade Groovy from 3.0.13 to 3.0.20
+* Upgrade ByteBuddy from 1.12.17 to 1.14.11
+* Upgrade Hazelcast from 5.1.3 to 5.3.6
+* Upgrade Hibernate Search from 5.11.10 to 5.11.12
+* Upgrade Greenmail from 1.6.10 to 1.6.15
+* Upgrade Unboundid LDAP SDK from 6.0.6 to 6.0.11
+* Upgrade Infinispan from 13.0.11 to 13.0.21
+* Upgrade Ldaptive from 2.1.1 to 2.2.0
+* No longer encrypt plain passwords on startup
+
+  <details>
+  
+  Due to historical reason, any users passwords stored in plain text in the database are encrypted on startup. 
+  On databases having large number of users, it is unnecessary time consuming on startup.
+  
+  To reset a forgotten admin password, update or insert an active admin user with a temporary password 'admin123' 
+  in database using the hashed password : 
+  ```
+  UPDATE auth_user set password = '$shiro1$SHA-512$1024$NE+wqQq/TmjZMvfI7ENh/g==$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA==' where code = 'admin';
+  ```
+  
+  Another way to generate passwords, is to use the Apache Command Line Hasher :
+  ```
+  $ (cd /tmp && curl -sSL -O https://repo1.maven.org/maven2/org/apache/shiro/tools/shiro-tools-hasher/1.11.0/shiro-tools-hasher-1.11.0-cli.jar)
+  $ java -jar /tmp/shiro-tools-hasher-1.11.0-cli.jar --algorithm SHA-512 --iterations 500000 -p
+  Password to hash:
+  Password to hash (confirm):
+  $shiro1$SHA-512$500000$pbUIjvJh1moFNc98vH+YbA==$Wtu3fIgNIL4ab9jWp6DyRa7vW5Zo33knW7JNV9KFJj08lal4WHBmVJSOHxJ0w+7SwlPvJ25O1QYNVb6wgmTHnA==
+  ```
+  
+  Also, if you import users with passwords from any source, either password must be hashed or you can use helpers 
+  methods to encrypt it :
+  
+  - `com.axelor.auth.AuthService.encrypt(java.lang.String)` : Encrypt the given password text.
+  - `com.axelor.auth.AuthService.encrypt(com.axelor.auth.db.User)` : Encrypt the password of the given user.
+  - `com.axelor.auth.AuthService.encrypt(java.lang.Object, java.util.Map)` : Adapter method to be used with csv/xml data
+  import in order to encrypt the password of the given user.
+  
+  </details>
+
+* Field names used by the create on the fly
+
+  <details>
+  
+  The create on the fly feature control by the `x-create` attribute 
+  is used to quickly create records and/or pre-filled values base on 
+  the current search input.
+  
+  Previously, any fields named `code`, `name` and the namecolumn of 
+  the object were filled by default. This is no more the cases: only 
+  the field names provided in the `x-create` attribute will be.
+  
+  </details>
+
+* Upgrade Snakeyaml from 1.32 to 1.33
+
+#### Remove
+
+* Remove `view.grid.editor-buttons` setting
+
+  <details>
+  
+  The setting `view.grid.editor-buttons` has been removed. It was use 
+  to show confirm/cancel buttons from grid row editor.
+  
+  </details>
+
+* Remove `$context` variable in frontend eval expressions
+
+  <details>
+  
+  This was never intended to be used.
+  Stick to direct field access: `myField`, not `$context.myField`.
+  
+  </details>
+
+* Remove DMS spreadsheet
+
+  <details>
+  
+  DMS spreadsheet is not implemented in community version of new frontend.
+  
+  Enable or disable internal features using `AppSettings.enableFeature` or
+  `AppSettings.disableFeature`.
+  
+  Example of how to enable the DMS spreadsheet feature from the module:
+  
+  ```java
+  public class MyModule extends AxelorModule {
+    @Override
+    protected void configure() {
+        AppSettings.get().enableFeature(AvailableAppFeatures.DMS_SPREADSHEET)
+    }
+  }
+  ```
+  
+  or using `features.dms-spreadsheet = true` in `axelor-config.properties.
+  
+  </details>
+
+* Remove `view.confirm-yes-no` setting
+
+  <details>
+  
+  The setting `view.confirm-yes-no` has been removed. It was used 
+  to show confirm dialog with yes/no buttons (else is Cancel/OK).
+  
+  </details>
+
+* Drop custom style
+
+  <details>
+  
+  Custom Style (provided from special context setting `context.appStyle`) 
+  has been dropped. There is no replacement at this time.
+  
+  </details>
+
+* Drop StaticResourceProvider
+
+  <details>
+  
+  StaticResourceProvider, used to register custom css or js files, 
+  has been dropped. There is no replacement at this time.
+  
+  </details>
+
+* Remove CodeEditor `x-mode` support in favor of `x-code-syntax`
+* Drop custom theme
+
+  <details>
+  
+  Custom theme is no more supported and has been dropped. 
+  There is no replacement at this time.
+  
+  </details>
+
+* Drop extra partial JSP templates
+
+  <details>
+  
+  Extra partial JSP templates support is no more supported and 
+  has been dropped. There is no replacement at this time.
+  
+  </details>
+
+* Remove `view.toolbar.show-titles` setting
+* Remove top menus support
+
+  <details>
+  
+  In this new version of the frontend, top menus aren't supported anymore.
+  
+  Run following SQL script to drop unnecessary columns :
+  
+  ```sql
+  ALTER TABLE meta_menu DROP COLUMN top_menu ;
+  ALTER TABLE meta_json_model DROP COLUMN menu_top;
+  ```
+  
+  </details>
+
+* Remove `view.menubar.location` setting
+
+  <details>
+  
+  The setting `view.menubar.location` has been removed. It was used 
+  to set menu style (left, top, both). There is no more support of top menus.
+  
+  </details>
+
+#### Fix
+
+* Fix bpm module discovery
+* Fix destination of data errors in CSV data import
+
+  <details>
+  
+  In a CSV data import, we can log the rows with an error in a new CSV file. They used to be logged in the XML config file.
+  
+  </details>
+
+* Fix menus loading when menus that can't be added to N-ary Tree
+
+  <details>
+  
+  When fetching the menus, if a menu is parent of itself or having wrong parent references, it load indefinitely. A log will be displayed in console for menus that can't be added to N-ary Tree.
+  
+  </details>
+
+* Fix StackOverflowError in CSV data import
+
+  <details>
+  
+  In a CSV data import, if we log the error rows in a file, a StackOverflowError was thrown when more than 2 CSV files have some errors.
+  
+  </details>
+
+* Fix pending actions not launched after notify
+* Fix error when retrieving menu
+
+  <details>
+  
+  If an error occurs when evaluating menu conditions (ie script errors), it
+  shouldn't fail the all process, but don't display the failed menus.
+  
+  </details>
+
+* Fix tracking message value for datetime fields
+
+  <details>
+  
+  For datetime field, the tracking value stored in database 
+  should be in UTC so that it will be displayed depending 
+  on user timezone.
+  
+  </details>
+
+#### Security
+
+* Fix search permission check on parent
+
+  <details>
+  
+  In search request, need to check parent really has requested items.
+  Otherwise, it is possible to specify unrelated parent and bypass permissions.
+  
+  </details>
+
+
 ## 6.1.5 (2023-08-16)
 
 #### Changes

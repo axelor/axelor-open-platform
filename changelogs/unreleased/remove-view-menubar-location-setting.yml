@@ -1,6 +1,0 @@
----
-title: Remove `view.menubar.location` setting
-type: remove
-description: |
-  The setting `view.menubar.location` has been removed. It was used 
-  to set menu style (left, top, both). There is no more support of top menus.

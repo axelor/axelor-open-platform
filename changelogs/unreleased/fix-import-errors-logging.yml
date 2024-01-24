@@ -1,5 +1,0 @@
----
-title: Fix destination of data errors in CSV data import
-type: fix
-description: |
-  In a CSV data import, we can log the rows with an error in a new CSV file. They used to be logged in the XML config file.

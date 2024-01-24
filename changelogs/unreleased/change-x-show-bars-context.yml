@@ -1,6 +1,0 @@
----
-title: Fix `x-show-bars` actions should not affect parent form
-type: change
-description: |
-  `x-show-bars` actions used to affect parent form.
-  Now, they affect local grid context only.

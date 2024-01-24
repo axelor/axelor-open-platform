@@ -1,7 +1,0 @@
----
-title: The `view.grid.selection` property is now set to `checkbox` by default
-type: change
-description: |
-  Checkbox selection in grid is now enabled by default.
-  
-  Change to `view.grid.selection = none` to disable it globally.

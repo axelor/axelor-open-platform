@@ -1,6 +1,0 @@
----
-title: Fix search permission check on parent
-type: security
-description: |
-  In search request, need to check parent really has requested items.
-  Otherwise, it is possible to specify unrelated parent and bypass permissions.
