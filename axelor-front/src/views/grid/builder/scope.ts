@@ -41,7 +41,8 @@ export function useGridColumnNames({
                 field.name,
                 ...(field.type?.endsWith("TO_ONE") &&
                 (item as Schema).target &&
-                (item as Schema).targetName
+                (item as Schema).targetName &&
+                (item as Schema).targetName !== field.targetName
                   ? [`${field.name}.${(item as Schema).targetName}`]
                   : []),
               ];
