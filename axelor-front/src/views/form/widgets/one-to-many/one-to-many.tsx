@@ -604,7 +604,7 @@ function OneToManyInner({
   // between setting initial value and value change.
   useEffect(resetValue, [formRecordId, resetValue]);
 
-  useAsyncEffect(async () => {
+  useEffect(() => {
     const last = valueRef.current ?? [];
     const next = value ?? [];
 
@@ -617,10 +617,12 @@ function OneToManyInner({
     ) {
       const prevValue = valueRef.current;
       valueRef.current = value;
-      await onSearch(dataStore.options);
-      if (prevValue && orderField) {
-        setShouldReorder(true);
-      }
+      (async () => {
+        await onSearch(dataStore.options);
+        if (prevValue && orderField) {
+          setShouldReorder(true);
+        }
+      })();
     }
   }, [dataStore.options, onSearch, orderField, value]);
 
@@ -1058,8 +1060,7 @@ function OneToManyInner({
 
   const onRefresh = useCallback(() => {
     resetValue();
-    onSearch();
-  }, [resetValue, onSearch]);
+  }, [resetValue]);
 
   useFormRefresh(onRefresh);
 
