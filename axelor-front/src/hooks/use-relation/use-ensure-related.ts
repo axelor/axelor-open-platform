@@ -7,7 +7,6 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { DataSource } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { Schema } from "@/services/client/meta.types";
-import { useViewMeta } from "@/view-containers/views/scope";
 
 import { FormAtom, ValueAtom } from "../../views/form/builder/types";
 
@@ -59,25 +58,16 @@ export function useEnsureRelated({
   valueAtom: ValueAtom<DataRecord>;
   dottedOnly?: boolean;
 }) {
-  const { name = "", targetName, depends } = field;
-  const { findItems } = useViewMeta();
+  const { name = "", dotted, targetName, depends } = field;
 
   const related = useMemo(() => {
-    const prefix = `${name}.`;
-    const items = findItems();
-    const dotted =
-      name &&
-      items
-        .filter((x) => x.name?.startsWith(prefix))
-        .map((x) => x.name as string)
-        .map((x) => x.substring(prefix.length));
-
     const names = dottedOnly
-      ? [...dotted].filter(Boolean)
-      : [...dotted, targetName, depends?.split(",")].flat().filter(Boolean);
+      ? [...(dotted ?? [])].filter(Boolean)
+      : [...(dotted ?? []), targetName, depends?.split(",")].flat().filter(Boolean);
 
     return [...new Set(names)] as string[];
-  }, [depends, dottedOnly, findItems, name, targetName]);
+  }, [depends, dotted, dottedOnly, targetName]);
+
 
   const valueRef = useRef<DataRecord>();
   const mountRef = useRef(false);

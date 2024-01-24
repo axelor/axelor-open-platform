@@ -27,7 +27,10 @@ import { FieldEditor } from "./form-editors";
 import { FieldViewer } from "./form-viewers";
 import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
-import { FieldProps, ValueAtom, WidgetAtom, WidgetProps } from "./types";
+import {
+  FieldProps, FormState,
+  FormStateUpdater, ValueAtom, WidgetAtom, WidgetProps
+} from "./types";
 
 type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
   render?: (props: WidgetProps) => React.ReactNode;
@@ -364,18 +367,36 @@ function useExpressions({
         context: DataContext,
         attr: string,
         expr: string,
-        negate: boolean = false,
+        options?: {
+          negate?: boolean;
+          updater?: FormStateUpdater;
+        },
       ) => {
+        const { negate = false, updater } = options ?? {};
         const value = Boolean(parseExpression(expr)(context));
         const state = get(widgetAtom);
         const attrs = state.attrs ?? {};
         const prev = attrs[attr as keyof typeof attrs];
         const next = negate ? !value : value;
         if (next !== prev) {
-          set(widgetAtom, { ...state, attrs: { ...attrs, [attr]: next } });
+          updater?.((formState: FormState) => {
+            const { states } = formState;
+            const { uid } = schema;
+            const state = formState?.states[uid];
+            return {
+              ...formState,
+              states: {
+                ...states,
+                [uid]: {
+                  ...state,
+                  attrs: { ...state?.attrs, [attr]: next },
+                },
+              },
+            };
+          });
         }
       },
-      [widgetAtom],
+      [schema, widgetAtom],
     ),
   );
 
@@ -439,26 +460,30 @@ function useExpressions({
       isExpr(canSelect);
 
     if (hasExpression || bind) {
-      return recordHandler.subscribe((record) => {
+      return recordHandler.subscribe((record, updater) => {
         const ctx = createContext(record);
+        const handleIf = (attr: string, expr: string, negate?: boolean) => {
+          return handleCondition(ctx, attr, expr, { negate, updater });
+        };
+
         if (bind) handleBind(ctx, bind);
-        if (showIf) handleCondition(ctx, "hidden", showIf, true);
-        if (hideIf) handleCondition(ctx, "hidden", hideIf);
-        if (readonlyIf) handleCondition(ctx, "readonly", readonlyIf);
-        if (requiredIf) handleCondition(ctx, "required", requiredIf);
-        if (collapseIf) handleCondition(ctx, "collapse", collapseIf);
+        if (showIf) handleIf("hidden", showIf, true);
+        if (hideIf) handleIf("hidden", hideIf);
+        if (readonlyIf) handleIf("readonly", readonlyIf);
+        if (requiredIf) handleIf("required", requiredIf);
+        if (collapseIf) handleIf("collapse", collapseIf);
         if (validIf) handleValidation(ctx, validIf);
 
-        if (isExpr(canNew)) handleCondition(ctx, "canNew", canNew);
-        if (isExpr(canEdit)) handleCondition(ctx, "canEdit", canEdit);
-        if (isExpr(canView)) handleCondition(ctx, "canView", canView);
-        if (isExpr(canSave)) handleCondition(ctx, "canSave", canSave);
-        if (isExpr(canCopy)) handleCondition(ctx, "canCopy", canCopy);
-        if (isExpr(canRemove)) handleCondition(ctx, "canRemove", canRemove);
-        if (isExpr(canDelete)) handleCondition(ctx, "canDelete", canDelete);
-        if (isExpr(canArchive)) handleCondition(ctx, "canArchive", canArchive);
-        if (isExpr(canAttach)) handleCondition(ctx, "canAttach", canAttach);
-        if (isExpr(canSelect)) handleCondition(ctx, "canSelect", canSelect);
+        if (isExpr(canNew)) handleIf("canNew", canNew);
+        if (isExpr(canEdit)) handleIf("canEdit", canEdit);
+        if (isExpr(canView)) handleIf("canView", canView);
+        if (isExpr(canSave)) handleIf("canSave", canSave);
+        if (isExpr(canCopy)) handleIf("canCopy", canCopy);
+        if (isExpr(canRemove)) handleIf("canRemove", canRemove);
+        if (isExpr(canDelete)) handleIf("canDelete", canDelete);
+        if (isExpr(canArchive)) handleIf("canArchive", canArchive);
+        if (isExpr(canAttach)) handleIf("canAttach", canAttach);
+        if (isExpr(canSelect)) handleIf("canSelect", canSelect);
       });
     }
   }, [

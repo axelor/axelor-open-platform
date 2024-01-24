@@ -350,7 +350,7 @@ function prepareActionResult(data: any): ActionResult[] {
       const { "signal-data": signalData, ...rest } = item;
       return {
         ...rest,
-        signalData,
+        ...(signalData && { signalData }),
       };
     });
   }

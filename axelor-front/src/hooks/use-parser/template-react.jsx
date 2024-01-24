@@ -31,6 +31,7 @@ import { Icon } from "@/components/icon";
 
 import { parseSafe } from "./parser";
 import { legacyClassNames } from "@/styles/legacy";
+import { LoadingCache } from "@/utils/cache";
 
 const COMPONENTS = {
   Alert,
@@ -72,11 +73,15 @@ function createContext(context) {
   });
 }
 
+const cache = new LoadingCache();
+
 export function processReactTemplate(template) {
-  const render = parseSafe(template);
-  const ReactComponent = ({ context }) => {
-    const ctx = useMemo(() => createContext(context), [context]);
-    return render(ctx);
-  };
-  return ReactComponent;
+  return cache.get(template, () => {
+    const render = parseSafe(template);
+    const ReactComponent = ({ context }) => {
+      const ctx = useMemo(() => createContext(context), [context]);
+      return render(ctx);
+    };
+    return ReactComponent;
+  });
 }
