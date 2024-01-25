@@ -1,0 +1,7 @@
+---
+title: Improve o2m fetch request for edit popup
+type: feature
+description: |
+  As soon as a row record is updated from popup view, reopening the popup 
+  for the same row will not trigger another fetch request, as the record 
+  is already fetched. This reduce number of requests.

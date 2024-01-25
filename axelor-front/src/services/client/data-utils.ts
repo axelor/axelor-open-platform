@@ -17,7 +17,7 @@ export function isDummy(name: string, fieldNames: string[]) {
     // special case for enum fields
     !(name.endsWith("$value") && fieldNames.includes(name.slice(0, -6))) &&
     // extra data
-    !["$attachments", "$processInstanceId", "_dirty"].includes(name) &&
+    !["$attachments", "$processInstanceId", "_dirty", "_fetched"].includes(name) &&
     // key of translatable fields
     !name.startsWith("$t:")
   );

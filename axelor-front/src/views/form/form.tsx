@@ -183,8 +183,12 @@ export function Form(props: ViewProps<FormView>) {
     }
     if (popupRecord) {
       if ((popupRecord?.id ?? 0) > 0) {
+        if (popupRecord._fetched) return popupRecord;
         const res = await fetchRecord(meta, dataStore, popupRecord.id);
-        return popupRecord._dirty ? { ...res, ...popupRecord } : res;
+        return {
+          _fetched: true,
+          ...(popupRecord._dirty ? { ...res, ...popupRecord } : res),
+        };
       } else {
         return popupRecord?.id == null
           ? {
@@ -356,7 +360,7 @@ const FormContainer = memo(function FormContainer({
           dirty?: boolean;
           isNew?: boolean;
           keepStates?: boolean;
-          callAction?: boolean; // to call onLoad/onNew action immediately 
+          callAction?: boolean; // to call onLoad/onNew action immediately
           callOnNew?: boolean; // to call onNew action or not
           callOnLoad?: boolean; // to call onLoad action or not
         },

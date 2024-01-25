@@ -173,6 +173,7 @@ export function processContextValues(context: DataContext) {
     "$attachments",
     "$processInstanceId",
     "_dirty",
+    "_fetched",
     "_showRecord",
     "_showSingle",
   ];
