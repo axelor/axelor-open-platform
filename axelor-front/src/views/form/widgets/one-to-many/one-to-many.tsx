@@ -216,7 +216,7 @@ function OneToManyInner({
           ) => {
             shouldSearch.current = false;
             const values =
-              typeof setter === "function" ? setter(get(valueAtom)!) : setter;
+              typeof setter === "function" ? setter(getItems(get(valueAtom)!)) : setter;
             const valIds = (values || []).map((v) => v.id);
 
             setRecords((records) => {
