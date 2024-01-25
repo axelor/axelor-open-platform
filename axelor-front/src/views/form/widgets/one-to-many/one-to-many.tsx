@@ -590,6 +590,7 @@ function OneToManyInner({
   }, [dataStore, state.columns, state.orderBy]);
 
   const valueRef = useRef<DataRecord[] | null>();
+  const forceRefreshRef = useRef(false);
   const [shouldReorder, setShouldReorder] = useState(false);
 
   const formRecordId = useAtomValue(
@@ -598,6 +599,7 @@ function OneToManyInner({
 
   const resetValue = useCallback(() => {
     valueRef.current = null;
+    forceRefreshRef.current = true;
   }, []);
 
   // Reset value ref on form record change, so that we can distinguish
@@ -609,12 +611,14 @@ function OneToManyInner({
     const next = value ?? [];
 
     if (
+      forceRefreshRef.current ||
       last.length !== next.length ||
       last.some((x) => {
         const y = next.find((d) => d.id === x.id);
         return y === undefined || !equals(x, y);
       })
     ) {
+      forceRefreshRef.current = false;
       const prevValue = valueRef.current;
       valueRef.current = value;
       (async () => {
@@ -973,7 +977,7 @@ function OneToManyInner({
     if (reorderRef.current) {
       // For dummy fields, so that internal value change is detected
       if (!orderField) {
-        valueRef.current = null;
+        resetValue();
       }
 
       setValue(
@@ -995,7 +999,7 @@ function OneToManyInner({
       );
     }
     reorderRef.current = false;
-  }, [orderField, rows, setValue]);
+  }, [orderField, resetValue, rows, setValue]);
 
   const fetchAndSetDetailRecord = useCallback(
     async (selected: DataRecord) => {

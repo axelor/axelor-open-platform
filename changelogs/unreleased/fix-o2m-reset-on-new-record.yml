@@ -1,0 +1,6 @@
+---
+title: Fix resetting o2m value when creating new record
+type: fix
+description: |
+  Issue happened when opening an existing record in form view then clicking on create new record.
+  O2M values from previous record were kept.
