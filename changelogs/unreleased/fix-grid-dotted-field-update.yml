@@ -1,0 +1,6 @@
+---
+title: Fix grid dotted field update
+type: fix
+description: |
+  On existing row, after edit, dotted fields were reverted to previous value.
+  Nested values were updated, but grid relies on dotted fields.

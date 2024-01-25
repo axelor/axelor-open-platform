@@ -1,7 +1,6 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-
 import getNested from "lodash/get";
 import isEqual from "lodash/isEqual";
 import {
@@ -77,6 +76,22 @@ import { DetailsForm } from "./one-to-many.details";
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
+
+function nestedToDotted(record: DataRecord) {
+  const result: DataRecord = { ...record };
+
+  Object.keys(record).forEach((key) => {
+    const path = key.split(".");
+    if (path.length > 1) {
+      const value = getNested(record, path);
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+  });
+
+  return result;
+}
 
 export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { schema } = props;
@@ -215,8 +230,11 @@ function OneToManyInner({
             resetRecords: boolean = false,
           ) => {
             shouldSearch.current = false;
-            const values =
-              typeof setter === "function" ? setter(getItems(get(valueAtom)!)) : setter;
+            const values = (
+              typeof setter === "function"
+                ? setter(getItems(get(valueAtom)!))
+                : setter
+            )?.map(nestedToDotted);
             const valIds = (values || []).map((v) => v.id);
 
             setRecords((records) => {
@@ -692,7 +710,7 @@ function OneToManyInner({
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
-        const prevItems = reorderItems(getItems(get(valueAtom)));
+        const prevItems = getItems(get(valueAtom));
 
         const items = records.map((item) => {
           if (isManyToMany && item.id && item.id > 0) {
@@ -706,7 +724,7 @@ function OneToManyInner({
           (x) => !prevItems.some((y) => y.id === x.id),
         );
 
-        const nextItems = [
+        const nextItems = reorderItems([
           ...prevItems.map((item) => {
             const record = items.find((r) => r.id === item.id);
             return record ? { ...item, ...record } : item;
@@ -717,7 +735,7 @@ function OneToManyInner({
             }
             return item;
           }),
-        ];
+        ]);
 
         const changed = !isManyToMany || prevItems.length !== nextItems.length;
         const dirty = !arrayEqualsIgnoreClean(prevItems, nextItems, canDirty);
