@@ -281,7 +281,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           const formState = get(formAtom);
 
           // check record changes
-          if (!formState.dirty) {
+          if (isEqual(record, formState.record)) {
             return onSave?.(
               record,
               rowIndex,
@@ -337,7 +337,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const handleRecordCommit = useAtomCallback(
       useCallback(
         (get, set) => {
-          const { record, dirty } = get(formAtom);
+          const { record, original } = get(formAtom);
 
           if (isEqual(record, recordRef.current)) {
             return;
@@ -346,7 +346,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           recordRef.current = record;
 
           // check if not changed then discard it.
-          if (!dirty) {
+          if (isEqual(record, original)) {
             return handleCancel();
           }
           return handleSave(true);
