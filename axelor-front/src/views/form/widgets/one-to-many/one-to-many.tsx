@@ -553,7 +553,7 @@ function OneToManyInner({
         const newItems = records
           .map((record) => {
             const item = items.find((item) => item.id === record.id);
-            return item ? { ...record, ...item } : record;
+            return item ? nestedToDotted({ ...record, ...item }) : record;
           })
           .concat(Object.values(unfetchedItems));
 
