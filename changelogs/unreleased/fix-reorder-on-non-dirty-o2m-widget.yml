@@ -1,6 +1,0 @@
----
-title: Fix reorder on non dirty o2m widget
-type: fix
-description: |  
-  Issue happens when o2m values are set through actions and those values are not persisted
-  (either computed or id is set to null) and on initial re-ordering, grid gets empty.

@@ -1,7 +1,0 @@
----
-title: Fix committing row on non-dirty O2M editable grid
-type: fix
-description: |
-  If a O2M field with an editable grid is a non-dirty field,
-  row changes were lost after committing. Need to compare record 
-  equality instead of the _dirty flag (not relevant in that case).

@@ -1,3 +1,58 @@
+## 7.0.1 (2024-01-26)
+
+#### Feature
+
+* Improve o2m fetch request for edit popup
+
+  <details>
+  
+  As soon as a row record is updated from popup view, reopening the popup 
+  for the same row will not trigger another fetch request, as the record 
+  is already fetched. This reduce number of requests.
+  
+  </details>
+
+#### Fix
+
+* Fix committing row on non-dirty O2M editable grid
+
+  <details>
+  
+  If a O2M field with an editable grid is a non-dirty field,
+  row changes were lost after committing. Need to compare record 
+  equality instead of the _dirty flag (not relevant in that case).
+  
+  </details>
+
+* Fix grid dotted field update
+
+  <details>
+  
+  On existing row, after edit, dotted fields were reverted to previous value.
+  Nested values were updated, but grid relies on dotted fields.
+  
+  </details>
+
+* Fix grid hilite not using action view context
+* Fix resetting o2m value when creating new record
+
+  <details>
+  
+  Issue happened when opening an existing record in form view then clicking on create new record.
+  O2M values from previous record were kept.
+  
+  </details>
+
+* Fix reorder on non dirty o2m widget
+
+  <details>
+  
+  Issue happens when o2m values are set through actions and those values are not persisted
+  (either computed or id is set to null) and on initial re-ordering, grid gets empty.
+  
+  </details>
+
+
 ## 7.0.0 (2024-01-24)
 
 #### Feature
