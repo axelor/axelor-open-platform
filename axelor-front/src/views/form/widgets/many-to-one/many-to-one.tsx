@@ -311,7 +311,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canShowNoResultOption={true}
           onShowCreate={canNew ? showCreate : undefined}
           onShowSelect={
-            canSelect && !isSuggestBox && hasSearchMore ? showSelect : undefined
+            canSelect && hasSearchMore ? showSelect : undefined
           }
           onShowCreateAndSelect={
             canNew && schema.create ? showCreateAndSelect : undefined
