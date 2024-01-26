@@ -7,12 +7,11 @@ import { useHilites } from "@/hooks/use-parser";
 import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { toCamelCase } from "@/utils/names";
-import { sanitize } from "@/utils/sanitize";
 import { FieldDetails } from "@/views/form/builder";
+import { useViewAction } from "@/view-containers/views/scope.ts";
 
 import { GridCellProps } from "../../builder/types";
 import * as WIDGETS from "../../widgets";
-import { Image } from "../../widgets/image";
 
 const getWidget = (name?: string) =>
   WIDGETS[toCamelCase(name ?? "") as keyof typeof WIDGETS];
@@ -22,7 +21,9 @@ export function Cell(props: GridCellProps) {
   const { name, type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
-  const $className = useHilites(hilites ?? [])(record)?.[0]?.css;
+  const { context } = useViewAction();
+  const $className = useHilites(hilites ?? [])({ ...context, ...record })?.[0]
+    ?.css;
 
   function render() {
     function renderContent() {
