@@ -329,7 +329,6 @@ export function Cards(props: ViewProps<CardsView>) {
               Template={Template}
               width={width}
               minWidth={minWidth}
-              getContext={getContext}
               onRefresh={onRefresh}
               {...(hasButton("edit") && { onEdit })}
               {...(hasButton("edit") && {

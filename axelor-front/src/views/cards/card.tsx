@@ -12,37 +12,39 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { FormActionHandler } from "../form/builder/scope";
 import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
+import { MetaData } from "@/services/client/meta";
 import { i18n } from "@/services/client/i18n";
+import { useViewAction } from "@/view-containers/views/scope";
 import classes from "./card.module.scss";
 
-export const Card = memo(function Card({
+export function CardTemplate({
+  component: TemplateComponent,
   record,
   fields,
-  getContext,
-  onEdit,
-  onView,
-  onDelete,
   onRefresh,
-  Template,
-  width,
-  minWidth,
 }: {
-  record: DataRecord;
-  fields?: any;
-  getContext?: () => DataContext;
-  onEdit?: (record: DataRecord) => void;
-  onView?: (record: DataRecord) => void;
-  onDelete?: (record: DataRecord) => void;
-  onRefresh?: () => Promise<any>;
-  Template: FunctionComponent<{
+  component: FunctionComponent<{
     context: DataContext;
     options?: EvalContextOptions;
   }>;
-  width?: string;
-  minWidth?: string;
+  record: DataRecord;
+  fields?: MetaData["fields"];
+  onRefresh?: () => Promise<any>;
 }) {
   // state to store updated action values
   const [values, setValues] = useState<DataRecord>({});
+  const action = useViewAction();
+
+  const getContext = useCallback(
+    () => ({
+      ...action.context,
+      _model: action.model,
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    }),
+    [action.model, action.context],
+  );
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
@@ -54,10 +56,6 @@ export const Card = memo(function Card({
     const actionExecutor = new DefaultActionExecutor(actionHandler);
     return { context, actionExecutor };
   }, [getContext, onRefresh, record, values]);
-
-  function handleClick() {
-    onView?.(record);
-  }
 
   const execute = useCallback(
     async (action: string, options?: ActionOptions) => {
@@ -73,6 +71,50 @@ export const Card = memo(function Card({
     },
     [actionExecutor],
   );
+
+  // reset values on record update(fetch)
+  useEffect(() => {
+    setValues({});
+  }, [record]);
+
+  return (
+    <TemplateComponent
+      context={context}
+      options={{
+        execute,
+        fields,
+      }}
+    />
+  );
+}
+
+export const Card = memo(function Card({
+  record,
+  fields,
+  onEdit,
+  onView,
+  onDelete,
+  onRefresh,
+  Template,
+  width,
+  minWidth,
+}: {
+  record: DataRecord;
+  fields?: any;
+  onEdit?: (record: DataRecord) => void;
+  onView?: (record: DataRecord) => void;
+  onDelete?: (record: DataRecord) => void;
+  onRefresh?: () => Promise<any>;
+  Template: FunctionComponent<{
+    context: DataContext;
+    options?: EvalContextOptions;
+  }>;
+  width?: string;
+  minWidth?: string;
+}) {
+  function handleClick() {
+    onView?.(record);
+  }
 
   const commandItems: CommandItemProps[] = [
     {
@@ -94,11 +136,6 @@ export const Card = memo(function Card({
       ],
     },
   ];
-
-  // reset values on record update(fetch)
-  useEffect(() => {
-    setValues({});
-  }, [record]);
 
   const showActions = onEdit || onDelete;
   return (
@@ -122,14 +159,14 @@ export const Card = memo(function Card({
           shadow="sm"
           onClick={handleClick}
         >
-          <Template
-            context={context}
-            options={{
-              execute,
-              fields,
-            }}
+          <CardTemplate
+            component={Template}
+            record={record}
+            fields={fields}
+            onRefresh={onRefresh}
           />
         </Box>
+
         {showActions && (
           <CommandBar className={classes.menuIcon} items={commandItems} />
         )}

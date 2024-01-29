@@ -45,6 +45,7 @@ import { ViewProps } from "../types";
 
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
+import { CardTemplate } from "../cards/card";
 import {
   getColumnIndex,
   getColumnRecords,
@@ -94,7 +95,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         ...getViewContext(true),
         _model: action.model,
       }) as DataContext,
-    [action, getViewContext],
+    [action.model, getViewContext],
   );
 
   const getActionContext = useCallback(() => {
@@ -554,13 +555,14 @@ export function Kanban(props: ViewProps<KanbanView>) {
         <KanbanCard
           view={view}
           fields={fields}
+          context={action.context}
           record={record}
-          getContext={getContext}
+          onRefresh={onRefresh}
           Template={Template}
         />
       ),
     }),
-    [view, fields, getContext, Template],
+    [action.context, view, fields, Template, onRefresh],
   );
 
   const canNew = hasButton("new");
@@ -643,13 +645,15 @@ function KanbanCard({
   view,
   fields,
   record,
-  getContext,
+  context,
+  onRefresh,
   Template,
 }: {
   record?: KanbanRecord;
   view: KanbanView;
+  context?: DataContext;
   fields?: MetaData["fields"];
-  getContext?: () => DataContext;
+  onRefresh?: () => Promise<any>;
   Template: FunctionComponent<{
     context: DataContext;
     options?: EvalContextOptions;
@@ -657,11 +661,11 @@ function KanbanCard({
 }) {
   const { template: templateString, hilites } = view;
   const divRef = useRef<any>(null);
-  const context = useMemo(
-    () => ({ ...getContext?.(), ...record }) as DataContext,
-    [getContext, record],
+  const $context = useMemo(
+    () => ({ ...context, ...record }) as unknown as DataContext,
+    [context, record],
   );
-  const className = useHilites(hilites ?? [])(context)?.[0]?.color;
+  const className = useHilites(hilites ?? [])($context)?.[0]?.color;
   const timer = useRef<any>();
   const [popover, setPopover] = useState(false);
   const [popoverData, setPopoverData] = useState<{ title: ""; body: "" }>({
@@ -719,7 +723,12 @@ function KanbanCard({
           className,
         )}
       >
-        <Template context={context} options={{ fields: fields as any }} />
+        <CardTemplate
+          component={Template}
+          fields={fields}
+          record={record! as DataRecord}
+          onRefresh={onRefresh}
+        />
       </Box>
 
       <Popper
