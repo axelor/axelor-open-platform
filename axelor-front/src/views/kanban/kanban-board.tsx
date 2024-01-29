@@ -226,11 +226,10 @@ export function KanbanBoard({
       columns.map((c) => ({
         ...c,
         id: `column-${c.title}-${c.name}`,
-        records: c.records?.map((r: KanbanRecord) => ({
-          ...r,
-          title: r.title || r.name,
+        records: c.records?.map((record: KanbanRecord) => ({
+          ...record,
+          title: record.title || record.name,
           renderer: ({
-            record,
             column,
           }: {
             record: KanbanRecord;

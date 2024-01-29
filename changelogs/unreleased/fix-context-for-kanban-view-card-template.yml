@@ -1,0 +1,6 @@
+---
+title: Fix context for kanban view card template
+type: fix
+description: |
+  Kanban card record should have preference over the action view context.
+  Also improve context by removing unnecessary values like renderer etc.

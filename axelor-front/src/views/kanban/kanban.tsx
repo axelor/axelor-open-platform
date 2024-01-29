@@ -658,7 +658,7 @@ function KanbanCard({
   const { template: templateString, hilites } = view;
   const divRef = useRef<any>(null);
   const context = useMemo(
-    () => ({ ...record, ...getContext?.() }) as DataContext,
+    () => ({ ...getContext?.(), ...record }) as DataContext,
     [getContext, record],
   );
   const className = useHilites(hilites ?? [])(context)?.[0]?.color;
