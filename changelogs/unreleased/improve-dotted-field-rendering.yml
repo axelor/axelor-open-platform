@@ -1,0 +1,7 @@
+---
+title: Improve dotted field rendering
+type: feature
+description: |
+  To avoid flashing issue on dotted field change, dotted field 
+  value is rendered and updated through state and state update
+  will be defer during action execution.

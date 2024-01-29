@@ -46,7 +46,7 @@ export function ThemeSelect(props: FieldProps<string>) {
 
   return (
     <FieldControl {...props}>
-      {readonly && <ViewerInput value={text} />}
+      {readonly && <ViewerInput name={schema.name} value={text} />}
       {readonly || (
         <Select
           autoComplete={false}

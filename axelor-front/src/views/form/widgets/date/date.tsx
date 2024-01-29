@@ -280,7 +280,7 @@ export function DateComponent({
   }
 
   return readonly ? (
-    <ViewerInput value={textValue} />
+    <ViewerInput name={schema.name} value={textValue} />
   ) : trapFocus ? (
     <FocusTrap enabled={open}>{render()}</FocusTrap>
   ) : (

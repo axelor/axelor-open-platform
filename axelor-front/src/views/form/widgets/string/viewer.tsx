@@ -1,19 +1,39 @@
 import { Box, Button, Input } from "@axelor/ui";
-import { useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 
+import { useAfterActions } from "../../builder/scope";
 import styles from "./string.module.scss";
 
 const noop = () => {};
 
+function DottedViewerInput({ value: _value, ...inputProps }: any) {
+  const [value, _setValue] = useState(_value);
+
+  const setValue = useAfterActions(
+    useCallback(async (value: string) => {
+      _setValue(value);
+    }, []),
+  );
+
+  useEffect(() => {
+    setValue(_value);
+  }, [setValue, _value]);
+
+  return <Input value={value} {...inputProps} />;
+}
+
 export function ViewerInput({
+  name,
   value,
   type,
 }: {
+  name?: string;
   type?: string;
   value: string | number;
 }) {
+  const InputComponent = name?.includes?.(".") ? DottedViewerInput : Input;
   return (
-    <Input
+    <InputComponent
       px={0}
       type={type || "text"}
       value={value}

@@ -178,7 +178,7 @@ export function Decimal(props: FieldProps<string | number>) {
 
   return (
     <FieldControl {...props}>
-      {readonly && <ViewerInput value={text} />}
+      {readonly && <ViewerInput name={schema.name} value={text} />}
       {readonly || (
         <div className={styles.container}>
           <Input

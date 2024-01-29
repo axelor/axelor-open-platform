@@ -5,7 +5,7 @@ import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string/viewer";
 
 export function RelativeTime(props: FieldProps<string>) {
-  const { valueAtom } = props;
+  const { schema, valueAtom } = props;
   const value = useAtomValue(valueAtom);
   const $value = (() => {
     try {
@@ -16,7 +16,7 @@ export function RelativeTime(props: FieldProps<string>) {
   })();
   return (
     <FieldControl {...props}>
-      <ViewerInput value={$value} />
+      <ViewerInput name={schema.name} value={$value} />
     </FieldControl>
   );
 }

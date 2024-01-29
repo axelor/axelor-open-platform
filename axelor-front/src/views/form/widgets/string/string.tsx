@@ -1,5 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
-import { useMemo } from "react";
+import { useAtomValue } from "jotai";
 
 import { Input, clsx } from "@axelor/ui";
 
@@ -40,6 +39,7 @@ export function String({
     >
       {readonly || trValue ? (
         <ViewerInput
+          name={schema.name}
           {...(inputProps?.type === "password" && { type: "password" })}
           value={trValue ?? text}
         />

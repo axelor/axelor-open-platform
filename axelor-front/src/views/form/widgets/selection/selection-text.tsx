@@ -20,7 +20,7 @@ export function SelectionText({
   );
   return (
     <Box d="flex">
-      <ViewerInput value={selected?.title ?? ""} />
+      <ViewerInput name={schema.name} value={selected?.title ?? ""} />
     </Box>
   );
 }

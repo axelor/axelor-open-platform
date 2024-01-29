@@ -287,7 +287,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         (value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>{getOptionLabel(value)}</ViewerLink>
         ) : (
-          <ViewerInput value={getOptionLabel(value)} />
+          <ViewerInput name={schema.name} value={getOptionLabel(value)} />
         ))}
       {readonly || (
         <Select
@@ -310,9 +310,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
           canCreateOnTheFly={canNew && schema.create}
           canShowNoResultOption={true}
           onShowCreate={canNew ? showCreate : undefined}
-          onShowSelect={
-            canSelect && hasSearchMore ? showSelect : undefined
-          }
+          onShowSelect={canSelect && hasSearchMore ? showSelect : undefined}
           onShowCreateAndSelect={
             canNew && schema.create ? showCreateAndSelect : undefined
           }

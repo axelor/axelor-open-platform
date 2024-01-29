@@ -38,7 +38,7 @@ export function Time(props: FieldProps<string | number>) {
 
   return (
     <FieldControl {...props}>
-      {readonly && <ViewerInput value={value || ""} />}
+      {readonly && <ViewerInput name={schema.name} value={value || ""} />}
       {readonly || (
         <MaskedInput
           {...(focus && { key: "focused" })}
