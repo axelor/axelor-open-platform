@@ -2,4 +2,26 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  align-self: center;
+  margin-bottom: auto;
+  margin-top: auto;
+  height: 2rem;
+  line-height: 2rem;
+}
+
+.phone {
+  display: flex;
+  flex-direction: row;
+}
+
+.country {
+  & button {
+    border: none;
+  }
+}
+
+.readonly {
+  .country {
+    margin-right: 0.25rem;
+  }
 }

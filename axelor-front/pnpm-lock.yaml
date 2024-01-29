@@ -97,6 +97,9 @@ dependencies:
   react-grid-layout:
     specifier: ^1.3.4
     version: 1.3.4(react-dom@18.2.0)(react@18.2.0)
+  react-international-phone:
+    specifier: ^4.2.6
+    version: 4.2.6(react@18.2.0)
   react-router-dom:
     specifier: ^6.20.1
     version: 6.20.1(react-dom@18.2.0)(react@18.2.0)
@@ -5126,6 +5129,14 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
       react-draggable: 4.4.6(react-dom@18.2.0)(react@18.2.0)
       react-resizable: 3.0.5(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /react-international-phone@4.2.6(react@18.2.0):
+    resolution: {integrity: sha512-El/ZVYmov5uGuk07nrfxe7M3/4Y8HhA9c3aCpAwilbPU8DekISwNSZMplqxzvxS+TIavIh28ZMDDx1u/4GqULg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-is@16.13.1:
