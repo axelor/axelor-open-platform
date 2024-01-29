@@ -169,12 +169,12 @@ export function createValueAtom({
         Boolean(name && !isCleanDummy(name)) &&
         canDirty(widgetSchema);
 
-      set(lensAtom, next);
-
       if (dirty) {
         set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
         set(dirtyAtom, true);
       }
+
+      set(lensAtom, next);
 
       return fireOnChange && triggerOnChange();
     },
