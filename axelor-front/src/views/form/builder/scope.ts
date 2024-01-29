@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -314,6 +314,31 @@ export function useWidgetState(formAtom: FormAtom, widgetName: string) {
 
   const state = findState();
   return state ?? {};
+}
+
+/**
+ * This hook is used to get handler, that handler will only executed
+ * When widget is activated.
+ *
+ */
+export function useFormActiveHandler() {
+  const { active } = useFormTabScope();
+  const [handler, setHandler] = useState<(() => void) | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (active && handler) {
+      handler?.();
+      setHandler(null);
+    }
+  }, [active, handler]);
+
+  const doHandle = useCallback((handler: () => void) => {
+    setHandler(() => handler);
+  }, []);
+
+  return doHandle;
 }
 
 export function useFormRefresh(refresh?: () => Promise<any> | void) {

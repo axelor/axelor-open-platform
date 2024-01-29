@@ -67,6 +67,7 @@ import {
   useActionExecutor,
   useAfterActions,
   useFormRefresh,
+  useFormActiveHandler,
   useFormScope,
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
@@ -620,6 +621,8 @@ function OneToManyInner({
     forceRefreshRef.current = true;
   }, []);
 
+  const setRefresh = useFormActiveHandler();
+
   // Reset value ref on form record change, so that we can distinguish
   // between setting initial value and value change.
   useEffect(resetValue, [formRecordId, resetValue]);
@@ -639,14 +642,14 @@ function OneToManyInner({
       forceRefreshRef.current = false;
       const prevValue = valueRef.current;
       valueRef.current = value;
-      (async () => {
+      setRefresh(async () => {
         await onSearch(dataStore.options);
         if (prevValue && orderField) {
           setShouldReorder(true);
         }
-      })();
+      });
     }
-  }, [dataStore.options, onSearch, orderField, value]);
+  }, [dataStore.options, onSearch, orderField, value, setRefresh]);
 
   const reorder = useAtomCallback(
     useCallback(

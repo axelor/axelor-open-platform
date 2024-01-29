@@ -16,7 +16,7 @@ import {
 } from "@/view-containers/view-dashlet/handler";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { useViewTabRefresh } from "@/view-containers/views/scope";
-import { useFormRefresh } from "../../builder/scope";
+import { useFormRefresh, useFormActiveHandler } from "../../builder/scope";
 
 import classes from "./dashlet-actions.module.scss";
 
@@ -48,8 +48,13 @@ export function DashletActions({
   const hasPagination = ["grid", "cards", "tree"].includes(viewType!);
   const { toolbar, menubar } = (view as GridView | CardsView) || {};
 
+  const setRefresh = useFormActiveHandler();
+  const doRefresh = useCallback(() => {
+    setRefresh(onRefresh ?? (() => {}));
+  }, [setRefresh, onRefresh]);
+
   // register form:refresh
-  useFormRefresh(onRefresh);
+  useFormRefresh(doRefresh);
 
   // register tab:refresh
   useViewTabRefresh(

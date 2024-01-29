@@ -2,7 +2,13 @@ import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual } from "lodash";
-import { SetStateAction, useCallback, useEffect, useMemo } from "react";
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { dialogs } from "@/components/dialogs";
 import {
@@ -19,7 +25,11 @@ import { ViewData } from "@/services/client/meta";
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { FormAtom, usePrepareContext } from "@/views/form/builder";
-import { useCanDirty, useFormScope } from "@/views/form/builder/scope";
+import {
+  useCanDirty,
+  useFormActiveHandler,
+  useFormScope,
+} from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
 
 const fallbackAtom: TabAtom = atom(
@@ -86,11 +96,22 @@ export function useViewAction() {
 export function useViewContext() {
   const { action, dashlet } = useViewTab();
   const { formAtom } = useFormScope();
+  const setState = useFormActiveHandler();
+
   const getFormContext = usePrepareContext(formAtom);
 
-  const recordId = useAtomValue(
+  const _recordId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
+  const [recordId, setRecordId] = useState(_recordId);
+
+  useEffect(() => {
+    // In case of form view dashlet, changing recordId will cause
+    // new callback generation as below, this will eventually result into
+    // search data of respective view, so now it will delay recordId change
+    // unless component get activated
+    setState(() => setRecordId(_recordId));
+  }, [_recordId, setState]);
 
   return useCallback(
     (actionContext?: boolean) => {
