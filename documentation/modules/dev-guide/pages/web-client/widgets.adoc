@@ -42,20 +42,23 @@ This widget can be used for string fields to enter url value.
 
 == Phone
 
-This widget can be used for string fields to enter phone values.
+The phone widget formats phone numbers. It renders the field as a phone number link in readonly mode,
+and as a phone number input with a country/region selector in edit mode.
+
+The default country is locale aware and is based on user language. If user language doesn't contain country code,
+a matching country is searched in user's browser locales. In case of no country match in browser locales, there is some fallback behavior. For example, if user language is `fr`, and browser locales are `fr`, `fr-CA`, `en`, `en-US`, then country would be `ca`. if user language is `ja`, country would fallback to `jp`.
 
 [source,xml]
 ----
 <field name="phone" widget="phone" />
 ----
 
-The phone widget uses the https://github.com/jackocnr/intl-tel-input[International Telephone Input] plugin. All `x-` prefixed attributes are passed to the plugin. Here are a few useful options:
+The following attributes are supported:
 
-* `x-placeholder-number-type` - number type to use for the placeholder, such as `MOBILE` (default) or `FIXED_LINE` (https://github.com/jackocnr/intl-tel-input/blob/master/src/js/utils.js#L114[list of all possible keys])
-* `x-custom-placeholder` - JSON of custom placeholders by country code
-* `x-initial-country` - initial country selection by specifying its country code (default is browser-dependent)
-* `x-preferred-countries` - countries to appear at the top of the list (space-separated list of country codes) (default is browser-dependent)
-* `x-only-countries` - in the dropdown, display only the countries you specify (space-separated list of country codes)
+* `x-placeholder-number-type` - country-dependent number type to use for the placeholder: `FIXED_LINE` (default) or `MOBILE`
+* `x-initial-country` - initial country selection by specifying its two-letter country code (defaults to user/browser locale)
+* `x-preferred-countries` - countries to appear at the top of the list (space-separated list of two-letter country codes) (defaults to user/browser locales)
+* `x-only-countries` - in the country dropdown, display only the countries you specify (space-separated list of two-letter country codes)
 
 == Password
 

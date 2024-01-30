@@ -1,0 +1,10 @@
+---
+title: Implement phone widget with react-international-phone
+type: feature
+description: |
+  Widget is supported on form and grid view.
+  The phone widget renders the field as a phone number link in readonly mode,
+  and as a phone number input with a country/region selector in edit mode.
+  
+  Compared to implementation in previous front-end,
+  `x-custom-placeholder` option is no longer supported.
