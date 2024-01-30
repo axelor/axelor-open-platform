@@ -17,7 +17,9 @@ export function isDummy(name: string, fieldNames: string[]) {
     // special case for enum fields
     !(name.endsWith("$value") && fieldNames.includes(name.slice(0, -6))) &&
     // extra data
-    !["$attachments", "$processInstanceId", "_dirty", "_fetched"].includes(name) &&
+    !["$attachments", "$processInstanceId", "_dirty", "_fetched"].includes(
+      name,
+    ) &&
     // key of translatable fields
     !name.startsWith("$t:")
   );
@@ -136,7 +138,7 @@ export function updateRecord(
     return target;
   }
 
-  const { id } = target;
+  const { id: _id } = target;
   let result = target;
   let changed = false;
 
@@ -194,7 +196,8 @@ export function updateRecord(
     }
   }
 
-  return changed ? { ...result, _dirty: true, id: result.id || id } : result;
+  const id = result.id || _id;
+  return changed ? { ...result, _dirty: true, ...(id && { id }) } : result;
 }
 
 export function equalsIgnoreClean(
