@@ -1,9 +1,25 @@
 import { useAtomValue } from "jotai";
-import { ChangeEvent, useEffect, useMemo, useRef } from "react";
-import { CountrySelector, usePhoneInput } from "react-international-phone";
+import {
+  ChangeEvent,
+  FocusEvent,
+  InputHTMLAttributes,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  CountryData,
+  CountrySelectorDropdown,
+  FlagImage,
+  defaultCountries,
+  usePhoneInput,
+} from "react-international-phone";
 
-import { Box, Input, clsx } from "@axelor/ui";
+import { Box, Button, Input, Portal, clsx } from "@axelor/ui";
 
+import { Icon } from "@/components/icon";
+import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
@@ -41,47 +57,82 @@ export function Phone({
   ...props
 }: FieldProps<string> & {
   inputProps?: Pick<
-    React.InputHTMLAttributes<HTMLInputElement>,
+    InputHTMLAttributes<HTMLInputElement>,
     "type" | "autoComplete" | "placeholder" | "onFocus"
   >;
 }) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, placeholder: _placeholder, widgetAttrs } = schema;
-  const { placeholderNumberType } = widgetAttrs;
+  const {
+    placeholderNumberType,
+    initialCountry,
+    onlyCountries: _onlyCountries,
+  }: {
+    placeholderNumberType?: "FIXED_LINE" | "MOBILE";
+    initialCountry?: string;
+    onlyCountries?: string;
+  } = widgetAttrs;
 
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
   const locale = l10n.getLocale();
 
+  const onlyCountries = useMemo(
+    () =>
+      _onlyCountries?.split(/\W+/).map((country) => country.toLowerCase()) ??
+      [],
+    [_onlyCountries],
+  );
+
   const defaultCountry = useMemo(() => {
-    // If user locale has no country code, look for a match in `navigator.languages`.
-    const [
-      language,
-      country = _findLocale(
-        navigator.languages.filter((l) => l.split("-")[1]),
-        locale,
-        (l) => l.split("-")[0],
-      )
-        ?.split("-")[1]
-        ?.toLowerCase(),
-    ] = locale.split("-").map((value) => value.toLowerCase());
-    return country ?? FALLBACK_COUNTRIES[language] ?? language;
-  }, [locale]);
+    let defaultCountry = initialCountry;
+
+    if (!defaultCountry) {
+      // If user locale has no country code, look for a match in `navigator.languages`.
+      const [
+        language,
+        country = _findLocale(
+          navigator.languages.filter((language) => language.split("-")[1]),
+          locale,
+          (language) => language.split("-")[0],
+        )
+          ?.split("-")[1]
+          ?.toLowerCase(),
+      ] = locale.split("-").map((value) => value.toLowerCase());
+      defaultCountry = country ?? FALLBACK_COUNTRIES[language] ?? language;
+    }
+
+    if (onlyCountries.length && !onlyCountries.includes(defaultCountry)) {
+      defaultCountry = onlyCountries[0];
+    }
+
+    return defaultCountry;
+  }, [initialCountry, locale, onlyCountries]);
 
   const preferredCountries = useMemo(
     () => [
       ...new Set([
         defaultCountry,
         ...navigator.languages
-          .map((l) => l.split("-")[1]?.toLowerCase())
-          .filter(Boolean),
+          .map((language) => language.split("-")[1]?.toLowerCase())
+          .filter(
+            (country) =>
+              country &&
+              (!onlyCountries.length || onlyCountries.includes(country)),
+          ),
       ]),
     ],
-    [defaultCountry],
+    [defaultCountry, onlyCountries],
   );
 
-  const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
+  const {
+    text,
+    onChange,
+    onBlur: _onBlur,
+    onKeyDown,
+    setValue,
+  } = useInput(valueAtom, {
     schema,
   });
 
@@ -93,14 +144,22 @@ export function Phone({
     handlePhoneValueChange,
     inputRef,
   } = usePhoneInput({
-    defaultCountry: "fr",
+    defaultCountry,
     value: text,
     onChange: ({ phone, country }) => {
+      // If case of only dial code, set empty value instead.
       onChange({
         target: { value: phone !== `+${country.dialCode}` ? phone : "" },
       } as ChangeEvent<HTMLInputElement>);
     },
   });
+
+  // If case of only dial code, set empty value instead.
+  const onBlur = useCallback(() => {
+    _onBlur({
+      target: { value: phone !== `+${country.dialCode}` ? phone : "" },
+    } as FocusEvent<HTMLInputElement>);
+  }, [_onBlur, country.dialCode, phone]);
 
   const placeholder = useMemo(() => {
     if (_placeholder) return _placeholder;
@@ -108,53 +167,115 @@ export function Phone({
     const { format = ".".repeat(9), dialCode } = country;
     let phoneFormat = typeof format === "string" ? format : format.default;
 
-    // Special case for French mobile numbers
-    if (dialCode === "33" && placeholderNumberType === "MOBILE") {
+    // Special case for French mobile phone numbers
+    if (
+      dialCode === "33" &&
+      placeholderNumberType?.toUpperCase() === "MOBILE"
+    ) {
       phoneFormat = phoneFormat.replace(".", "6");
     }
 
-    let currentNumber = 1;
-    const numbers = phoneFormat.replace(/\./g, () => `${currentNumber++ % 10}`);
+    let currentNumber = 0;
+    const numbers = phoneFormat.replace(/\./g, () => `${++currentNumber % 10}`);
     const placeholder = `+${dialCode} ${numbers}`;
 
     return placeholder;
   }, [_placeholder, country, placeholderNumberType]);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
-  useEffect(() => {
-    if (!text && !containerRef.current?.contains(document.activeElement)) {
-      setCountry(defaultCountry);
-    }
-  }, [defaultCountry, inputRef, setCountry, text]);
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+  const toggleDropdown = useCallback(
+    () => setShowDropdown(!showDropdown),
+    [showDropdown],
+  );
+
+  // Position for portaled dropdown
+  const dropdownPos = useMemo(() => {
+    if (!showDropdown) return {};
+    const { top, left } = buttonRef.current?.getBoundingClientRect() ?? {};
+    return { top, left };
+  }, [showDropdown]);
+
+  const countries = useMemo(() => {
+    // Filter out countries that are not in `onlyCountries`, if specified.
+    let countries = onlyCountries.length
+      ? defaultCountries.filter((country) => onlyCountries.includes(country[1]))
+      : defaultCountries;
+
+    // Translate country names
+    countries = countries.map((country) => {
+      const [name, ...rest] = country;
+      return [i18n.get(name), ...rest] as CountryData;
+    });
+    countries.sort((a, b) => a[0].localeCompare(b[0]));
+
+    return countries;
+  }, [onlyCountries]);
+
+  const countryIso2 = useMemo(() => {
+    const { iso2 } = country;
+    return onlyCountries.length && !onlyCountries.includes(iso2)
+      ? defaultCountry
+      : iso2;
+  }, [country, defaultCountry, onlyCountries]);
 
   const hasValue = text && text === phone;
+  const showButton = hasValue || !readonly;
 
   return (
-    <FieldControl {...props} className={clsx(styles.container)}>
-      <Box
-        className={clsx(styles.phone, { [styles.readonly]: readonly })}
-        ref={containerRef}
-      >
-        {(hasValue || !readonly) && (
-          <CountrySelector
-            selectedCountry={country?.iso2}
-            onSelect={(selectedCountry) => {
-              if (selectedCountry.iso2 === country.iso2) return;
-              setCountry(selectedCountry.iso2);
-              setValue(null);
-            }}
-            hideDropdown={readonly}
-            preferredCountries={preferredCountries}
-            className={clsx(styles.country)}
-          />
+    <FieldControl {...props} className={styles.container}>
+      <Box className={clsx(styles.phone, { [styles.readonly]: readonly })}>
+        {showButton && (
+          <>
+            <Button
+              ref={buttonRef}
+              className={styles.country}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                if (event.button === 0) {
+                  toggleDropdown();
+                }
+              }}
+              onTouchStart={(event) => {
+                event.preventDefault();
+                toggleDropdown();
+              }}
+              disabled={readonly}
+            >
+              <FlagImage iso2={countryIso2} />
+              {!readonly && (
+                <Icon icon={`arrow_drop_${showDropdown ? "up" : "down"}`} />
+              )}
+            </Button>
+            {!readonly && (
+              <Portal>
+                <Box className={styles.dropdown} style={dropdownPos}>
+                  <CountrySelectorDropdown
+                    show={showDropdown}
+                    selectedCountry={countryIso2}
+                    onSelect={(country) => {
+                      if (country.iso2 !== countryIso2) {
+                        setValue(null);
+                        setCountry(country.iso2);
+                      }
+                    }}
+                    onClose={() => setShowDropdown(false)}
+                    preferredCountries={preferredCountries}
+                    countries={countries}
+                  />
+                </Box>
+              </Portal>
+            )}
+          </>
         )}
         {readonly ? (
           <Box
             as="a"
             target="_blank"
             href={`tel:${phone}`}
-            className={clsx(styles.link)}
+            className={styles.link}
           >
             {hasValue && inputValue}
           </Box>

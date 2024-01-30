@@ -5,8 +5,8 @@
   align-self: center;
   margin-bottom: auto;
   margin-top: auto;
-  height: 2rem;
-  line-height: 2rem;
+  height: 32px;
+  line-height: 32px;
 }
 
 .phone {
@@ -15,13 +15,27 @@
 }
 
 .country {
-  & button {
-    border: none;
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  height: 32px;
 }
 
 .readonly {
   .country {
-    margin-right: 0.25rem;
+    opacity: 1;
+    margin-right: 0.5rem;
+  }
+}
+
+.dropdown {
+  position: fixed;
+}
+
+:global {
+  .react-international-phone-country-selector-dropdown {
+    outline: white;
   }
 }
