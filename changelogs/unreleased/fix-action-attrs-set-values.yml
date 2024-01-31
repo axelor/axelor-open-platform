@@ -1,0 +1,8 @@
+---
+title: Fix id field value erased when setting values from actions
+type: fix
+description: |
+  When setting values from actions (both action-attrs or action-record), 
+  cause the id field value to be erased. In most cases, this shouldn't 
+  be an issue but on new record (without id), and having id in context 
+  cause the id in context do be erased.
