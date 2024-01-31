@@ -167,7 +167,7 @@ function processGridRecord(record: DataRecord) {
           ? [fieldName, ...subFieldNames, `$t:${lastName}`].join(".")
           : key;
         delete $record[key];
-        setObjectValue($record, newKey.split("."), value);
+        setObjectValue($record, newKey.split("."), clone(value));
       }
     }
   }
