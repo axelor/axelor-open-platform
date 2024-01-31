@@ -14,6 +14,7 @@ import {
   CountrySelectorDropdown,
   FlagImage,
   defaultCountries,
+  getActiveFormattingMask,
   usePhoneInput,
 } from "react-international-phone";
 
@@ -175,8 +176,10 @@ export function Phone({
   const placeholder = useMemo(() => {
     if (_placeholder) return _placeholder;
 
-    const { format = ".".repeat(9), dialCode } = country;
-    let phoneFormat = typeof format === "string" ? format : format.default;
+    const { dialCode } = country;
+
+    // For placeholder, we just need the default mask for specified country.
+    let phoneFormat = getActiveFormattingMask({ phone: "", country });
 
     // Special case for French mobile phone numbers
     if (
