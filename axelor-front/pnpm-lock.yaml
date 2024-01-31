@@ -58,6 +58,9 @@ dependencies:
   font-awesome:
     specifier: ^4.7.0
     version: 4.7.0(patch_hash=b36n7p33c4ewtt5v6is5moc24u)
+  google-libphonenumber:
+    specifier: ^3.2.34
+    version: 3.2.34
   immer:
     specifier: ^10.0.3
     version: 10.0.3
@@ -123,6 +126,9 @@ devDependencies:
   '@types/echarts':
     specifier: ^4.9.22
     version: 4.9.22
+  '@types/google-libphonenumber':
+    specifier: ^7.4.30
+    version: 7.4.30
   '@types/jest':
     specifier: ^29.5.11
     version: 29.5.11
@@ -2687,6 +2693,10 @@ packages:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
     dev: true
 
+  /@types/google-libphonenumber@7.4.30:
+    resolution: {integrity: sha512-Td1X1ayRxePEm6/jPHUBs2tT6TzW1lrVB6ZX7ViPGellyzO/0xMNi+wx5nH6jEitjznq276VGIqjK5qAju0XVw==}
+    dev: true
+
   /@types/hoist-non-react-statics@3.3.1:
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
     dependencies:
@@ -4075,6 +4085,11 @@ packages:
       merge2: 1.4.1
       slash: 3.0.0
     dev: true
+
+  /google-libphonenumber@3.2.34:
+    resolution: {integrity: sha512-CLwkp0lZvMywh6dCh0T3Fm8XsfJhLAupc8AECwYkJNQBPW8wQPrv/tV0oFKCs8FMw+pTQyNPZoycgBzYjqtTZQ==}
+    engines: {node: '>=0.10'}
+    dev: false
 
   /gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}

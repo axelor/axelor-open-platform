@@ -1,3 +1,4 @@
+import { PhoneNumberUtil } from "google-libphonenumber";
 import { useAtomValue } from "jotai";
 import {
   ChangeEvent,
@@ -50,6 +51,16 @@ const FALLBACK_COUNTRIES: Record<string, string> = {
   uk: "ua", // Ukrainian -> Ukraine
   vi: "vn", // Vietnamese -> Vietnam
   zh: "cn", // Chinese -> China
+};
+
+const phoneUtil = PhoneNumberUtil.getInstance();
+
+const isPhoneValid = (phone: string) => {
+  try {
+    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
+  } catch (error) {
+    return false;
+  }
 };
 
 export function Phone({
@@ -294,6 +305,9 @@ export function Phone({
             onKeyDown={onKeyDown}
             onChange={handlePhoneValueChange}
             onBlur={onBlur}
+            className={clsx(styles.input, {
+              [styles.invalid]: hasValue && !isPhoneValid(phone),
+            })}
             {...inputProps}
           />
         )}
