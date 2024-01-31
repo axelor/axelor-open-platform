@@ -39,7 +39,11 @@ async function fetchRelated({
     if (missing.length > 0) {
       try {
         const rec = await dataSource.read(value.id, { fields: missing }, true);
-        return { ...value, ...rec, version: undefined };
+        return {
+          ...value,
+          ...rec,
+          ...(!field?.editor && { version: undefined }),
+        };
       } catch {
         return { ...value, [targetName]: value[targetName] ?? value.id };
       }

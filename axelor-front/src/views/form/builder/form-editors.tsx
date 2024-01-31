@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
+import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
+import isNumber from "lodash/isNumber";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -33,6 +34,7 @@ import { GridLayout } from "./form-layouts";
 import { useAfterActions, useFormScope } from "./scope";
 import {
   FieldProps,
+  FormAtom,
   FormLayout,
   FormState,
   ValueAtom,
@@ -231,6 +233,27 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const hasValue = useAtomValue(
     useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom]),
   );
+  const [shouldSyncVersion, syncVersion] = useAtom(
+    useMemo(
+      () =>
+        atom(
+          (get) => {
+            const value = get(valueAtom);
+            const { $version, version } = value || {};
+            return isNumber($version) && version === undefined;
+          },
+          (get, set) => {
+            const value = get(valueAtom);
+            value &&
+              set(valueAtom, {
+                ...value,
+                version: value.version ?? value.$version,
+              });
+          },
+        ),
+      [valueAtom],
+    ),
+  );
 
   const icons: boolean | string[] = useMemo(() => {
     const showIcons = String(schema.showIcons || "");
@@ -326,6 +349,12 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
       )}
     </div>
   );
+
+  useEffect(() => {
+    if (shouldSyncVersion) {
+      syncVersion();
+    }
+  }, [shouldSyncVersion, syncVersion]);
 
   return (
     <FieldControl
@@ -463,7 +492,9 @@ function useItemsFamily({
             let items = get(itemsAtom);
             const found = items.find((x) => x.id === value?.id);
             if (found) {
-              items = items.map((x) => (x.id === value?.id ? value : x)) as DataRecord[];
+              items = items.map((x) =>
+                x.id === value?.id ? value : x,
+              ) as DataRecord[];
             }
             if (exclusive && found && value?.[exclusive]) {
               items = items.map((item) => ({
@@ -806,11 +837,14 @@ const RecordEditor = memo(function RecordEditor({
   const checkInvalidRef = useRef<() => void>();
 
   const editorAtom = useMemo(() => {
+    const getRecord = (_value: DataRecord) => {
+      const value = _value || EMPTY_RECORD;
+      const loadedRec = loaded.id && loaded.id === value.id ? loaded : value;
+      return { ...loadedRec, ...value };
+    };
     return atom(
       (get) => {
-        const value = get(valueAtom) || EMPTY_RECORD;
-        const loadedRec = loaded.id && loaded.id === value.id ? loaded : value;
-        const record = { ...loadedRec, ...value };
+        const record = getRecord(get(valueAtom));
 
         const currentState = get(editorFormAtom);
         const parentState = get(parent);
@@ -835,7 +869,19 @@ const RecordEditor = memo(function RecordEditor({
       (get, set, update: SetStateAction<FormState>) => {
         const state =
           typeof update === "function" ? update(get(editorFormAtom)) : update;
-        const { record } = state;
+        const value = getRecord(get(valueAtom));
+
+        let { record } = state;
+
+        if (value?.id === record?.id) {
+          const version = value?.version ?? value?.$version;
+          if (
+            (version || version === 0) &&
+            version > (record.version ?? record.$version ?? 0)
+          ) {
+            record = { ...record, version, $version: version };
+          }
+        }
 
         set(editorFormAtom, state);
         set(
