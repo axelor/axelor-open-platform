@@ -1,0 +1,7 @@
+---
+title: Fix grid crash error (`object is not extensible`)
+type: fix
+description: |
+  When a grid has both a relational field (ie `product.category`) and 
+  na associated dotted field (ie `product.category.code`), enter in editable 
+  mode cause the grid widget to crash (`object is not extensible` error).
