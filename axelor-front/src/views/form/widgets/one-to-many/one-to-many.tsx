@@ -672,19 +672,26 @@ function OneToManyInner({
                 [orderField]: ind + 1,
               }) as DataRecord,
           );
-        valueRef.current = nextItems;
-        set(valueAtom, nextItems);
 
-        setRecords((prevRecords) =>
-          nextItems.map((item) =>
-            deepMerge(
-              prevRecords.find((record) => record.id === item.id) ?? {},
-              item,
+        if (
+          !isEqual(
+            records.map((x) => x[orderField]),
+            nextItems.map((x) => x[orderField]),
+          )
+        ) {
+          valueRef.current = nextItems;
+          set(valueAtom, nextItems);
+          setRecords((prevRecords) =>
+            nextItems.map((item) =>
+              deepMerge(
+                prevRecords.find((record) => record.id === item.id) ?? {},
+                item,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
-      [getItems, orderField, valueAtom],
+      [getItems, orderField, valueAtom, records],
     ),
   );
 
