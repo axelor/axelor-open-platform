@@ -30,11 +30,7 @@ import {
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import {
-  arrayEqualsIgnoreClean,
-  equals,
-  isCleanDummy,
-} from "@/services/client/data-utils";
+import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
@@ -43,7 +39,6 @@ import {
   FormView,
   GridView,
   Property,
-  Schema,
   View,
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -66,8 +61,8 @@ import {
 import {
   useActionExecutor,
   useAfterActions,
-  useFormRefresh,
   useFormActiveHandler,
+  useFormRefresh,
   useFormScope,
 } from "../../builder/scope";
 import { nextId } from "../../builder/utils";
@@ -700,16 +695,6 @@ function OneToManyInner({
     }
   }, [reorder, shouldReorder]);
 
-  const canDirty = useCallback(
-    (target: string) => {
-      const { items } = viewData?.view || schema;
-      const item = items?.find((i) => i.name === target);
-      const { name, canDirty } = (item || {}) as Schema;
-      return !name || (!isCleanDummy(name) && canDirty !== false);
-    },
-    [viewData?.view, schema],
-  );
-
   const handleSelect = useAtomCallback(
     useCallback(
       (get, set, records: DataRecord[]) => {
@@ -741,11 +726,11 @@ function OneToManyInner({
         ]);
 
         const changed = !isManyToMany || prevItems.length !== nextItems.length;
-        const dirty = !arrayEqualsIgnoreClean(prevItems, nextItems, canDirty);
+        const dirty = nextItems.some((item) => item._dirty);
 
         return setValue(nextItems, changed, dirty);
       },
-      [canDirty, reorderItems, getItems, isManyToMany, setValue, valueAtom],
+      [getItems, reorderItems, valueAtom, isManyToMany, setValue],
     ),
   );
 
@@ -852,7 +837,7 @@ function OneToManyInner({
   const onSave = useCallback(
     async (record: DataRecord) => {
       const { id, $id, ...rest } = record;
-      record = { ...rest, _dirty: true, id: id ?? $id ?? nextId() };
+      record = { ...rest, id: id ?? $id ?? nextId() };
 
       setState((draft) => {
         if (draft.editRow) {

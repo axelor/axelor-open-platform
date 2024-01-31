@@ -191,7 +191,7 @@ function Footer({
 
         if (canSave) {
           if (onSave) {
-            onSave(record);
+            onSave({ ...record, _dirty: state.dirty });
           } else if (onSelect && handler.onSave) {
             const rec = await handler.onSave({
               shouldSave: true,

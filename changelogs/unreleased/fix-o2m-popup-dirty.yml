@@ -1,0 +1,6 @@
+---
+title: Fix checking dirty when closing o2m popup
+type: fix
+description: |
+  Instead of comparing with previous row values to determine if the record is dirty,
+  we now pass dirty state from popup record and editable row record.

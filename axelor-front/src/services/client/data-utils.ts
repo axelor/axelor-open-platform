@@ -200,6 +200,8 @@ export function updateRecord(
   return changed ? { ...result, _dirty: true, ...(id && { id }) } : result;
 }
 
+const IGNORE_FIELDS = ["_dirty", "_fetched"];
+
 export function equalsIgnoreClean(
   value: DataRecord,
   other: DataRecord,
@@ -210,35 +212,6 @@ export function equalsIgnoreClean(
   return _equalsIgnoreClean(a, b, canDirty);
 }
 
-export function arrayEqualsIgnoreClean(
-  value: (DataRecord | number)[],
-  other: (DataRecord | number)[],
-  canDirty: (name: string) => boolean,
-): boolean {
-  const a = compact(value);
-  const b = compact(other);
-
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  for (let i = 0; i < a.length; ++i) {
-    if (
-      !b.some((x: unknown) => {
-        return _equalsIgnoreClean(
-          isPlainObject(a[i]) ? (a[i] as DataRecord) : { id: a[i] as number },
-          isPlainObject(x) ? x : { id: x },
-          canDirty,
-        );
-      })
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 function _equalsIgnoreClean(
   value: DataRecord,
   other: DataRecord,
@@ -247,7 +220,7 @@ function _equalsIgnoreClean(
 ): boolean {
   const keys = new Set(
     [...Object.keys(value), ...Object.keys(other)].filter(
-      (key) => key !== "_dirty",
+      (key) => !IGNORE_FIELDS.includes(key),
     ),
   );
 

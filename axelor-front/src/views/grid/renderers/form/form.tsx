@@ -299,7 +299,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           }
 
           return await onSave?.(
-            formState.record,
+            { ...formState.record, _dirty: formState.dirty },
             rowIndex,
             columnIndex ?? cellIndex!,
             true,
