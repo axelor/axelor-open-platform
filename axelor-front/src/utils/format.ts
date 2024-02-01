@@ -247,7 +247,8 @@ const formatOne: Formatter = (value, opts = {}) => {
   
   return (
     getValue(value, props.targetName) ??
-    getValue(record!, `${props.name}.${props.targetName}`)
+    (record && getValue(record, `${props.name}.${props.targetName}`)) ??
+    ""
   );
 };
 
