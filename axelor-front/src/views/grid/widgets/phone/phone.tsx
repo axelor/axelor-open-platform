@@ -1,7 +1,10 @@
-import { GridColumnProps } from "@axelor/ui/grid";
 import { FlagImage, usePhoneInput } from "react-international-phone";
 
 import { Box } from "@axelor/ui";
+import { GridColumnProps } from "@axelor/ui/grid";
+
+import { FLAG_SOURCES } from "@/views/form/widgets/phone/utils";
+
 import "react-international-phone/style.css";
 import styles from "./phone.module.scss";
 
@@ -12,10 +15,16 @@ export function Phone(props: GridColumnProps) {
     value: value ?? "",
   });
 
+  const { iso2 } = country;
+
   return (
     value && (
       <>
-        <FlagImage iso2={country.iso2} className={styles.country} />
+        <FlagImage
+          className={styles.country}
+          iso2={iso2}
+          src={FLAG_SOURCES[iso2]}
+        />
         <Box
           as="a"
           target="_blank"

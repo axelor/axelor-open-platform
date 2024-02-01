@@ -25,6 +25,7 @@ import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
+import { FLAGS, FLAG_SOURCES } from "./utils";
 
 import "react-international-phone/style.css";
 import styles from "./phone.module.scss";
@@ -258,7 +259,7 @@ export function Phone({
               }}
               disabled={readonly}
             >
-              <FlagImage iso2={countryIso2} />
+              <FlagImage iso2={countryIso2} src={FLAG_SOURCES[countryIso2]} />
               {!readonly && (
                 <Icon icon={`arrow_drop_${showDropdown ? "up" : "down"}`} />
               )}
@@ -278,6 +279,7 @@ export function Phone({
                     onClose={() => setShowDropdown(false)}
                     preferredCountries={preferredCountries}
                     countries={countries}
+                    flags={FLAGS}
                   />
                 </Box>
               </Portal>
