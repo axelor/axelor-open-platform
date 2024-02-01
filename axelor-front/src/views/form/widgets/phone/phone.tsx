@@ -201,10 +201,12 @@ export function Phone({
 
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
-  const toggleDropdown = useCallback(
-    () => setShowDropdown(!showDropdown),
-    [showDropdown],
-  );
+  const toggleTimeRef = useRef<number>(0);
+
+  const toggleDropdown = useCallback(() => {
+    toggleTimeRef.current = new Date().getTime();
+    setShowDropdown(!showDropdown);
+  }, [showDropdown]);
 
   // Position for portaled dropdown
   const dropdownPos = useMemo(() => {
@@ -275,8 +277,13 @@ export function Phone({
                         setValue(null);
                         setCountry(country.iso2);
                       }
+                      setShowDropdown(false);
                     }}
-                    onClose={() => setShowDropdown(false)}
+                    onClose={() => {
+                      if (new Date().getTime() - toggleTimeRef.current > 200) {
+                        setTimeout(() => setShowDropdown(false), 100);
+                      }
+                    }}
                     preferredCountries={preferredCountries}
                     countries={countries}
                     flags={FLAGS}
