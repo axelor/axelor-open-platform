@@ -67,7 +67,7 @@ export async function findView<T extends ViewType>({
       data.fields = processFields(data.fields);
     }
 
-    const { related } = findViewFields(data.fields ?? {}, data.view);
+    const { related } = await findViewFields(data.fields ?? {}, data.view);
     data.related = { ...data.related, ...related };
 
     // process the meta data

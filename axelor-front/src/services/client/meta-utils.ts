@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import { i18n } from "./i18n";
-import { ViewData } from "./meta";
+import { ViewData, viewFields as fetchViewFields } from "./meta";
 import { ActionView, Field, Property, Schema } from "./meta.types";
 
 function processJsonForm(view: Schema) {
@@ -165,7 +165,7 @@ function UseIncluded(view: Schema) {
   return items;
 }
 
-export function findViewFields(
+export async function findViewFields(
   viewFields: Record<string, Property>,
   view: Schema,
   res?: { fields: string[]; related: Record<string, string[]> },
@@ -250,13 +250,28 @@ export function findViewFields(
     }
   }
 
-  _.each(fields, (item) => {
+  for (let i = 0; i < fields.length; i++) {
+    const item = fields[i];
     if (item.editor) acceptEditor(item);
     if (item.viewer) acceptViewer(item);
     if (item.name && item.type === "panel-related") {
       pushIn(item.name, items);
+      // fetch view item fields definitions if fields doesn't exist
+      if (Object.keys(item.fields ?? {}).length === 0 && item.items?.length) {
+        try {
+          const { fields } = await fetchViewFields(
+            viewFields?.[item.name]?.target || item.target,
+            item.items
+              .filter((item) => item.type === "field" && item.name)
+              .map((item) => item.name) as string[],
+          );
+          item.fields = fields;
+        } catch (err) {
+          //ignore
+        }
+      }
     } else if (item.items) {
-      findViewFields(viewFields, item, result);
+      await findViewFields(viewFields, item, result);
     } else if (item.name && item.type === "field") {
       pushIn(item.name, items);
       const targetName = getNonDefaultTargetName(item, viewFields);
@@ -266,7 +281,7 @@ export function findViewFields(
         pushIn(targetName, collect);
       }
     }
-  });
+  }
 
   if (view.type === "calendar") {
     items.push(view.eventStart);

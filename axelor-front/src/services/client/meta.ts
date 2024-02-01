@@ -206,6 +206,36 @@ export async function fields(
   return Promise.reject(resp.status);
 }
 
+export async function viewFields(
+  model: string,
+  fields?: string[],
+): Promise<MetaData> {
+  const resp = await request({
+    url: `ws/meta/view/fields`,
+    method: "POST",
+    body: {
+      fields,
+      model,
+    },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    if (status === 0 && data?.fields) {
+      data.fields = data.fields.reduce(
+        (acc: Record<string, Property>, field: Property) => {
+          acc[field.name] = field;
+          return acc;
+        },
+        {} as Record<string, Property>,
+      );
+    }
+    return status === 0 ? data : reject(data);
+  }
+
+  return Promise.reject(resp.status);
+}
+
 export async function view<
   T extends keyof ViewTypes,
   V = ViewTypes[T],
