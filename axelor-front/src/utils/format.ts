@@ -240,9 +240,9 @@ const formatOne: Formatter = (value, opts = {}) => {
   if (!value) return "";
   if (!props?.targetName) return value.name ?? value.code ?? value.id ?? "";
 
-  function getValue(value: DataRecord, name: string) {
+  function getValue(val: DataRecord, name: string) {
     const key = `$t:${name}`;
-    return value[key] ?? value[name];
+    return val[key] ?? _.get(val, name);
   }
   
   return (
