@@ -5,6 +5,7 @@ import {
   FocusEvent,
   InputHTMLAttributes,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -198,6 +199,7 @@ export function Phone({
   }, [_placeholder, country, placeholderNumberType]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
@@ -211,8 +213,22 @@ export function Phone({
   // Position for portaled dropdown
   const dropdownPos = useMemo(() => {
     if (!showDropdown) return {};
-    const { top, left } = buttonRef.current?.getBoundingClientRect() ?? {};
-    return { top, left };
+    const { bottom, left } = buttonRef.current?.getBoundingClientRect() ?? {};
+    return { top: bottom, left };
+  }, [showDropdown]);
+
+  // Close dropdown on scroll.
+  useEffect(() => {
+    if (!showDropdown) return;
+
+    const handleScroll = (event: Event) => {
+      if (!dropdownRef.current?.contains(event.target as Element)) {
+        setShowDropdown(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
   }, [showDropdown]);
 
   const countries = useMemo(() => {
@@ -263,12 +279,19 @@ export function Phone({
             >
               <FlagImage iso2={countryIso2} src={FLAG_SOURCES[countryIso2]} />
               {!readonly && (
-                <Icon icon={`arrow_drop_${showDropdown ? "up" : "down"}`} />
+                <Icon
+                  icon={`arrow_drop_${showDropdown ? "up" : "down"}`}
+                  className={styles.arrow}
+                />
               )}
             </Button>
             {!readonly && (
               <Portal>
-                <Box className={styles.dropdown} style={dropdownPos}>
+                <Box
+                  ref={dropdownRef}
+                  className={styles.dropdown}
+                  style={dropdownPos}
+                >
                   <CountrySelectorDropdown
                     show={showDropdown}
                     selectedCountry={countryIso2}

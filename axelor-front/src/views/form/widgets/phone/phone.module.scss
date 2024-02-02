@@ -23,6 +23,10 @@
   height: 32px;
 }
 
+.arrow {
+  opacity: 0.6;
+}
+
 .readonly {
   .country {
     opacity: 1;
@@ -43,5 +47,6 @@
 :global {
   .react-international-phone-country-selector-dropdown {
     outline: white;
+    top: 7px;
   }
 }
