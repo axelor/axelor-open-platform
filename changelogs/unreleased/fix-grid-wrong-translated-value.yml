@@ -1,9 +1,0 @@
----
-title: Fix wrong translated value when changing m2o in grid row
-type: fix
-description: |
-  Issue happened on a grid row record, if a m2o has a translated target name.
-
-  When changing it to another value without a translation and after committing,
-  translation from previous value was shown instead. It appears as if m2o hadn't changed,
-  because we still see translation from previous value.

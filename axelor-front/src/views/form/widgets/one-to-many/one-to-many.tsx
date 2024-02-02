@@ -248,12 +248,23 @@ function OneToManyInner({
                 .filter((rec) => !deleteIds.includes(rec.id))
                 .map((rec) => {
                   const val = rec.id
-                    ? nestedToDotted({
-                        ...rec,
-                        ...values.find((v) => v.id === rec.id),
-                      })
+                    ? values.find((v) => v.id === rec.id)
                     : null;
-                  return val ? { ...rec, ...val } : rec;
+
+                  if (!val) return rec;
+
+                  const record = { ...rec };
+
+                  // Reset dotted fields for updated records.
+                  if (val.version != null) {
+                    Object.keys(record).forEach((key) => {
+                      if (key.includes(".")) {
+                        record[key] = undefined;
+                      }
+                    });
+                  }
+
+                  return nestedToDotted({ ...record, ...val });
                 })
                 .concat(newRecords);
             });
