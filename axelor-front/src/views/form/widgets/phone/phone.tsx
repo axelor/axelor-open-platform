@@ -80,10 +80,12 @@ export function Phone({
   const {
     placeholderNumberType,
     initialCountry,
+    preferredCountries: _preferredCountries,
     onlyCountries: _onlyCountries,
   }: {
     placeholderNumberType?: "FIXED_LINE" | "MOBILE";
     initialCountry?: string;
+    preferredCountries?: string;
     onlyCountries?: string;
   } = widgetAttrs;
 
@@ -124,8 +126,14 @@ export function Phone({
     return defaultCountry;
   }, [initialCountry, locale, onlyCountries]);
 
-  const preferredCountries = useMemo(
-    () => [
+  const preferredCountries = useMemo(() => {
+    if (_preferredCountries) {
+      return _preferredCountries
+        .split(/\W+/)
+        .map((country) => country.toLowerCase());
+    }
+
+    return [
       ...new Set([
         defaultCountry,
         ...navigator.languages
@@ -136,9 +144,8 @@ export function Phone({
               (!onlyCountries.length || onlyCountries.includes(country)),
           ),
       ]),
-    ],
-    [defaultCountry, onlyCountries],
-  );
+    ];
+  }, [_preferredCountries, defaultCountry, onlyCountries]);
 
   const {
     text,
