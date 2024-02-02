@@ -27,6 +27,7 @@ export type SelectionProps<Multiple extends boolean> = FieldProps<
     | "autoComplete"
     | "renderOption"
     | "renderValue"
+    | "inputStartAdornment"
     | "closeOnSelect"
   >;
 
@@ -40,6 +41,7 @@ export function Selection<Multiple extends boolean>(
     multiple,
     autoComplete = true,
     closeOnSelect,
+    inputStartAdornment,
     renderOption,
     renderValue,
     widgetAtom,
@@ -110,6 +112,7 @@ export function Selection<Multiple extends boolean>(
         optionMatch={optionMatch}
         value={selectionValue}
         onChange={handleChange}
+        inputStartAdornment={inputStartAdornment}
         renderOption={renderOption}
         renderValue={renderValue}
         placeholder={placeholder}
