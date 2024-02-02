@@ -326,6 +326,11 @@ export function processView(
   if ((res.showIf || res.hideIf) && !isCollectionItem && !isPanelTabs) {
     res.hidden = true;
   }
+  
+  // for editable grid case : avoid fields blinking
+  if (isField(res) && res.readonlyIf && parent?.editable) {
+    res.readonly = true;
+  }
 
   if (res.type === "panel-tabs") {
     res.items = res.items?.map((item) => {
