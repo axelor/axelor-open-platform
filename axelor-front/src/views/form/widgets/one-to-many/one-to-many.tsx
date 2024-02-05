@@ -72,7 +72,15 @@ import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
 
-function nestedToDotted(record: DataRecord) {
+/**
+ * Update dotted values from nested values.
+ * If previous record is specified, delete dotted values that do no match.
+ *
+ * @param {DataRecord} record - The input data record
+ * @param {DataRecord} [previousRecord] - The previous data record
+ * @returns {DataRecord} - The resulting data record with nested fields converted to dotted fields
+ */
+function nestedToDotted(record: DataRecord, previousRecord?: DataRecord) {
   const result: DataRecord = { ...record };
 
   Object.keys(record).forEach((key) => {
@@ -81,11 +89,32 @@ function nestedToDotted(record: DataRecord) {
       const value = getNested(record, path);
       if (value !== undefined) {
         result[key] = value;
+      } else if (previousRecord) {
+        const parentPath = findNearestParentPath(record, path);
+        const current = getNested(record, parentPath);
+        const prev = getNested(previousRecord, parentPath);
+        if (!current || current.id !== prev?.id) {
+          result[key] = undefined;
+        }
       }
     }
   });
 
   return result;
+}
+
+function findNearestParentPath(record: DataRecord, path: string[] | string) {
+  const keys = (Array.isArray(path) ? path : path.split(".")).slice(0, -1);
+  let current = record;
+  for (let i = 0; i < keys.length; ++i) {
+    const key = keys[i];
+    const value = current[key];
+    if (value == null || typeof value !== "object") {
+      return keys.slice(0, i);
+    }
+    current = value;
+  }
+  return keys;
 }
 
 export function OneToMany(props: FieldProps<DataRecord[]>) {
@@ -229,7 +258,7 @@ function OneToManyInner({
               typeof setter === "function"
                 ? setter(getItems(get(valueAtom)!))
                 : setter
-            )?.map(nestedToDotted);
+            )?.map((record) => nestedToDotted(record));
             const valIds = (values || []).map((v) => v.id);
 
             setRecords((records) => {
@@ -250,21 +279,7 @@ function OneToManyInner({
                   const val = rec.id
                     ? values.find((v) => v.id === rec.id)
                     : null;
-
-                  if (!val) return rec;
-
-                  const record = { ...rec };
-
-                  // Reset dotted fields for updated records.
-                  if (val.version != null) {
-                    Object.keys(record).forEach((key) => {
-                      if (key.includes(".")) {
-                        record[key] = undefined;
-                      }
-                    });
-                  }
-
-                  return nestedToDotted({ ...record, ...val });
+                  return val ? nestedToDotted({ ...rec, ...val }, rec) : rec;
                 })
                 .concat(newRecords);
             });
@@ -412,13 +427,7 @@ function OneToManyInner({
 
           return prevOrder === nextOrder
             ? value
-            : {
-                ...record,
-                ...rest,
-                version,
-                [orderField]: nextOrder,
-                _dirty: true,
-              };
+            : { ...rest, version, [orderField]: nextOrder, _dirty: true };
         });
     },
     [orderField, records],
@@ -559,7 +568,9 @@ function OneToManyInner({
         const newItems = records
           .map((record) => {
             const item = items.find((item) => item.id === record.id);
-            return item ? nestedToDotted({ ...record, ...item }) : record;
+            return item
+              ? nestedToDotted({ ...record, ...item }, record)
+              : record;
           })
           .concat(Object.values(unfetchedItems));
 
