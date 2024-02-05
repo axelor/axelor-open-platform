@@ -501,11 +501,8 @@ function OneToManyInner({
 
         const ids = items
           .filter(
-            (v) =>
-              names.length === 0 ||
-              names.some((n) => getNested(v, n) === undefined),
+            (v) => (v.id ?? 0) > 0 && v.version === undefined && !v._fetched,
           )
-          .filter((v) => (v.id ?? 0) > 0)
           .map((v) => v.id);
 
         let records: DataRecord[] = [];
