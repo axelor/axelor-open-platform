@@ -26,35 +26,10 @@ import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { FLAGS, FLAG_SOURCES } from "./utils";
+import { FALLBACK_COUNTRIES, FLAGS, FLAG_SOURCES } from "./utils";
 
 import "react-international-phone/style.css";
 import styles from "./phone.module.scss";
-
-// Fallback country codes when country is not found in language code
-const FALLBACK_COUNTRIES: Record<string, string> = {
-  af: "za", // Afrikaans -> South Africa
-  ar: "sa", // Arabic -> Saudi Arabia
-  be: "by", // Belarusian -> Belarus
-  bn: "bd", // Bengali -> Bangladesh
-  bs: "ba", // Bosnian -> Bosnia and Herzegovina
-  cs: "cz", // Czech -> Czech Republic
-  da: "dk", // Danish -> Denmark
-  el: "gr", // Greek -> Greece
-  en: "us", // English -> United States
-  et: "ee", // Estonian -> Estonia
-  fa: "ir", // Persian -> Iran
-  gu: "in", // Gujarati -> India
-  he: "il", // Hebrew -> Israel
-  hi: "in", // Hindi -> India
-  ja: "jp", // Japanese -> Japan
-  ko: "kr", // Korean -> South Korea
-  ms: "my", // Malay -> Malaysia
-  sv: "se", // Swedish -> Sweden
-  uk: "ua", // Ukrainian -> Ukraine
-  vi: "vn", // Vietnamese -> Vietnam
-  zh: "cn", // Chinese -> China
-};
 
 const phoneUtil = PhoneNumberUtil.getInstance();
 
@@ -147,8 +122,11 @@ export function Phone({
     ];
   }, [_preferredCountries, defaultCountry, onlyCountries]);
 
+  const value = useAtomValue(valueAtom);
+  const noPrefix = !!value && !value.startsWith("+");
+
   const {
-    text,
+    text: _text,
     onChange,
     onBlur: _onBlur,
     onKeyDown,
@@ -156,6 +134,10 @@ export function Phone({
   } = useInput(valueAtom, {
     schema,
   });
+
+  const text = useMemo(() => {
+    return noPrefix ? _text.replace(/^0/, "") : _text;
+  }, [_text, noPrefix]);
 
   const {
     inputValue,
@@ -173,6 +155,7 @@ export function Phone({
         target: { value: phone !== `+${country.dialCode}` ? phone : "" },
       } as ChangeEvent<HTMLInputElement>);
     },
+    disableDialCodeAndPrefix: noPrefix,
   });
 
   // If case of only dial code, set empty value instead.
@@ -200,10 +183,10 @@ export function Phone({
 
     let currentNumber = 0;
     const numbers = phoneFormat.replace(/\./g, () => `${++currentNumber % 10}`);
-    const placeholder = `+${dialCode} ${numbers}`;
+    const placeholder = noPrefix ? numbers : `+${dialCode} ${numbers}`;
 
     return placeholder;
-  }, [_placeholder, country, placeholderNumberType]);
+  }, [_placeholder, country, noPrefix, placeholderNumberType]);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -327,7 +310,7 @@ export function Phone({
           <Box
             as="a"
             target="_blank"
-            href={`tel:${phone}`}
+            href={`tel:${noPrefix ? value : phone}`}
             className={styles.link}
           >
             {hasValue && inputValue}
