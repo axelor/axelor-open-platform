@@ -45,7 +45,10 @@ export function createScriptContext(
   } = options ?? {};
 
   const { $getField } = moreHelpers;
-  const getField = (name: string) => $getField?.(name) ?? fields[name];
+  const getField = (name: string) => ({
+    ...fields[name],
+    ...$getField?.(name),
+  });
   const noFields = isEmpty(fields) && !$getField;
 
   const globalHelpers = {

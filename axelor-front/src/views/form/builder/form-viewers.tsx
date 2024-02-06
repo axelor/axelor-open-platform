@@ -171,6 +171,7 @@ function TemplateViewer({
   record,
   model: _model,
   formAtom,
+  fields,
   schema,
 }: FormViewerProps & { model: string; record: DataRecord }) {
   const Template = useTemplate(template, schema);
@@ -199,7 +200,7 @@ function TemplateViewer({
 
   return (
     <div className={styles.content}>
-      <Template context={ctx} />
+      <Template context={ctx} options={{ fields }} />
     </div>
   );
 }
