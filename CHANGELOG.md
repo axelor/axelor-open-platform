@@ -1,3 +1,118 @@
+## 7.0.2 (2024-02-06)
+
+#### Feature
+
+* Improve dashlets/collections data loading
+
+  <details>
+  
+  If a dashlet or a collection field isn't visible 
+  (either hidden or in a non active panel-tab), data should't be fetched.
+  Data should then fetched (if required) as soon as the widget is visible.
+  
+  </details>
+
+* Improve dotted field rendering
+
+  <details>
+  
+  To avoid flashing issue on dotted field change, dotted field 
+  value is rendered and updated through state and state update
+  will be defer during action execution.
+  
+  </details>
+
+#### Fix
+
+* Fix set records in collection editor
+* Fix context for kanban view card template
+
+  <details>
+  
+  Kanban card record should have preference over the action view context.
+  Also improve context by removing unnecessary values like renderer etc.
+  
+  </details>
+
+* Fix error when formatting m2o field value with missing context
+* Fix id field value erased when setting values from actions
+
+  <details>
+  
+  When setting values from actions (both action-attrs or action-record), 
+  cause the id field value to be erased. In most cases, this shouldn't 
+  be an issue but on new record (without id), and having id in context 
+  cause the id in context do be erased.
+  
+  </details>
+
+* Fix relational fields editor
+
+  <details>
+  
+  Relational fields displayed in editor wasn't saved with main record due 
+  to missing version fields when value set through action.
+  Moreover, after the value as saved, the new version value wasn't sync, 
+  so subsequent update triggerred concurrent update errors.
+  
+  </details>
+
+* Trigger o2m search for records that have id and no version
+* Fix update from value to no value on grid row
+
+  <details>
+  
+  Issue happened in two cases on o2m grid.
+  
+  First one is when changing from a m2o record that has a translation
+  to another one that has no translation. Translation from previous record was wrongly kept.
+  
+  Second one is when changing from a m2o record that has a dotted value
+  to another one that has no dotted value. Dotted value from previous record was wrongly kept.
+  
+  </details>
+
+* Fix o2m losing grid order after action setting grid rows
+
+  <details>
+  
+  Action was receiving o2m items in fetched order, not grid order.
+  
+  </details>
+
+* Fix checking dirty when closing o2m popup
+
+  <details>
+  
+  Instead of comparing with previous row values to determine if the record is dirty,
+  we now pass dirty state from popup record and editable row record.
+  
+  </details>
+
+* Fix custom field change should mark form dirty
+* Improve readonlyIf fields in editable grid
+
+  <details>
+  
+  This avoids fields blinking when entering in editable grid 
+  because they switch quickly from edit to read only mode.
+  
+  </details>
+
+* Fix collection editor icons visibility depending on perms
+* Fix grid crash error (`object is not extensible`)
+
+  <details>
+  
+  When a grid has both a relational field (ie `product.category`) and 
+  na associated dotted field (ie `product.category.code`), enter in editable 
+  mode cause the grid widget to crash (`object is not extensible` error).
+  
+  </details>
+
+* Fix *-to-one editor icons visibility depending on perms
+* Fix support for dotted collection field
+
 ## 7.0.1 (2024-01-26)
 
 #### Feature

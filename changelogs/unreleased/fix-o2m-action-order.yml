@@ -1,5 +1,0 @@
----
-title: Fix o2m losing grid order after action setting grid rows
-type: fix
-description: |
-  Action was receiving o2m items in fetched order, not grid order.

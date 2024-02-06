@@ -1,7 +1,0 @@
----
-title: Improve dashlets/collections data loading
-type: feature
-description: |
-  If a dashlet or a collection field isn't visible 
-  (either hidden or in a non active panel-tab), data should't be fetched.
-  Data should then fetched (if required) as soon as the widget is visible.

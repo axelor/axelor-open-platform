@@ -1,8 +1,0 @@
----
-title: Fix relational fields editor
-type: fix
-description: |
-  Relational fields displayed in editor wasn't saved with main record due 
-  to missing version fields when value set through action.
-  Moreover, after the value as saved, the new version value wasn't sync, 
-  so subsequent update triggerred concurrent update errors.

@@ -1,6 +1,0 @@
----
-title: Improve readonlyIf fields in editable grid
-type: fix
-description: |
-  This avoids fields blinking when entering in editable grid 
-  because they switch quickly from edit to read only mode.
