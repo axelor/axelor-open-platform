@@ -267,7 +267,11 @@ export function Phone({
               }}
               disabled={readonly}
             >
-              <FlagImage iso2={countryIso2} src={FLAG_SOURCES[countryIso2]} />
+              <FlagImage
+                iso2={countryIso2}
+                src={FLAG_SOURCES[countryIso2]}
+                className={styles.flag}
+              />
               {!readonly && (
                 <Icon
                   icon={`arrow_drop_${showDropdown ? "up" : "down"}`}
@@ -301,6 +305,7 @@ export function Phone({
                     preferredCountries={preferredCountries}
                     countries={countries}
                     flags={FLAGS}
+                    listItemFlagClassName={styles.flag}
                   />
                 </Box>
               </Portal>

@@ -34,7 +34,7 @@ const proxyAll: ProxyOptions = {
       req.url.startsWith(base + "node_modules/") ||
       /\/theme\/([^.]+)\.json/.test(req.url) ||
       req.url.startsWith(base + "js/libs/monaco-editor/vs/") ||
-      /\/img\/flags\/([^.]+)\.svg/.test(req.url)
+      /\/img\/flags\b.*\.svg/.test(req.url)
     ) {
       return req.url;
     }
