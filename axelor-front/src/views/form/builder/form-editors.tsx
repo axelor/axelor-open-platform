@@ -442,7 +442,12 @@ function useItemsFamily({
     return atom(
       (get) => {
         const value = get(valueAtom);
-        const items = makeArray(value);
+        const items = makeArray(value).map((item) => {
+          if (item.id) {
+            return item;
+          }
+          return {...item, id: nextId()};
+        })
         if (items.length === 0 && canShowNew && initialItem) {
           return [initialItem];
         }
