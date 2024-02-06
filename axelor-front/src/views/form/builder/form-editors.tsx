@@ -217,11 +217,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     perms,
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const {
-    title,
-    domain,
-    required,
-  } = attrs;
+  const { title, domain, required, canRemove: _canRemove = true } = attrs;
 
   const model = schema.target!;
 
@@ -233,11 +229,11 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom]),
   );
 
-  const canRemove = hasValue && hasButton('remove');
-  const canEdit = hasValue && hasButton('edit');
+  const canRemove = hasValue && _canRemove;
+  const canEdit = hasValue && hasButton("edit");
   const canSelect = hasButton("select");
-  const canView = hasValue && hasButton("view") && !hasButton('edit');
-  
+  const canView = hasValue && hasButton("view") && !hasButton("edit");
+
   const [shouldSyncVersion, syncVersion] = useAtom(
     useMemo(
       () =>
@@ -379,7 +375,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           widgetAtom={widgetAtom}
           valueAtom={itemsFamily(item)}
           model={model}
-          readonly={readonly || !hasButton('edit')}
+          readonly={readonly || !hasButton("edit")}
           setInvalid={setInvalid}
         />
       ))}
@@ -711,10 +707,10 @@ const ItemEditor = memo(function ItemEditor({
 }) {
   const { schema, widgetAtom, valueAtom, readonly } = props;
   const { perms } = schema;
-  
+
   const { hasButton } = usePermission(schema, widgetAtom, perms);
   const canRemove = !readonly && hasButton("remove");
-  
+
   const handleRemove = useAtomCallback(
     useCallback(
       (get) => {
