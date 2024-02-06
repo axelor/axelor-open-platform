@@ -59,7 +59,7 @@ export function Phone(props: GridColumnProps) {
     value && (
       <>
         <FlagImage
-          className={styles.country}
+          className={styles.flag}
           iso2={iso2}
           src={FLAG_SOURCES[iso2]}
         />
