@@ -214,25 +214,30 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     searchLimit,
     formView: formViewName,
     gridView: gridViewName,
+    perms,
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const {
     title,
     domain,
     required,
-    canEdit,
-    canView = true,
-    canSelect = true,
   } = attrs;
 
   const model = schema.target!;
 
   const showEditor = useEditor();
   const showSelector = useSelector();
+  const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const hasValue = useAtomValue(
     useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom]),
   );
+
+  const canRemove = hasValue && hasButton('remove');
+  const canEdit = hasValue && hasButton('edit');
+  const canSelect = hasButton("select");
+  const canView = hasValue && hasButton("view") && !hasButton('edit');
+  
   const [shouldSyncVersion, syncVersion] = useAtom(
     useMemo(
       () =>
@@ -335,16 +340,16 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   const titleActions = !readonly && (
     <div className={styles.actions}>
-      {canEdit && hasValue && canShowIcon("edit") && (
+      {canEdit && canShowIcon("edit") && (
         <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
       )}
-      {canView && !canEdit && hasValue && canShowIcon("view") && (
+      {canView && canShowIcon("view") && (
         <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
       )}
       {canSelect && canShowIcon("select") && (
         <MaterialIcon icon="search" onClick={handleSelect} />
       )}
-      {hasValue && canShowIcon("clear") && (
+      {canRemove && canShowIcon("clear") && (
         <MaterialIcon icon="delete" onClick={handleDelete} />
       )}
     </div>
@@ -374,7 +379,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           widgetAtom={widgetAtom}
           valueAtom={itemsFamily(item)}
           model={model}
-          readonly={readonly}
+          readonly={readonly || !hasButton('edit')}
           setInvalid={setInvalid}
         />
       ))}
