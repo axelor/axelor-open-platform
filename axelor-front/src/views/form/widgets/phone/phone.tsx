@@ -291,6 +291,7 @@ export function Phone({
                         setCountry(country.iso2);
                       }
                       setShowDropdown(false);
+                      inputRef.current?.focus();
                     }}
                     onClose={() => {
                       if (new Date().getTime() - toggleTimeRef.current > 200) {
