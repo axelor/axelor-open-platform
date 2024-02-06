@@ -396,25 +396,26 @@ function OneToManyInner({
 
   const reorderItems = useCallback(
     (items: DataRecord[]) => {
-      if (!orderField) return items;
+      let result = [...items];
 
-      return [...items]
-        .sort((a, b) => {
-          // Apply records order
-          const indexA = records.findIndex((x) => x.id === a.id);
-          const indexB = records.findIndex((x) => x.id === b.id);
+      result.sort((a, b) => {
+        // Apply records order
+        const indexA = records.findIndex((x) => x.id === a.id);
+        const indexB = records.findIndex((x) => x.id === b.id);
 
-          if (indexA >= 0 && indexB >= 0) {
-            return indexA - indexB;
-          } else if (indexA >= 0) {
-            return -1;
-          } else if (indexB >= 0) {
-            return 1;
-          }
+        if (indexA >= 0 && indexB >= 0) {
+          return indexA - indexB;
+        } else if (indexA >= 0) {
+          return -1;
+        } else if (indexB >= 0) {
+          return 1;
+        }
 
-          return 0;
-        })
-        .map((value, ind) => {
+        return 0;
+      });
+
+      if (orderField) {
+        result = result.map((value, ind) => {
           const record = records?.find((x) => x.id === value.id);
           // Compute order field
           const {
@@ -429,6 +430,9 @@ function OneToManyInner({
             ? value
             : { ...rest, version, [orderField]: nextOrder, _dirty: true };
         });
+      }
+
+      return result;
     },
     [orderField, records],
   );
