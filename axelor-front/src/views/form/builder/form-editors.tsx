@@ -629,6 +629,7 @@ function useItemsFamily({
 
 function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
+  const { perms } = schema;
   const model = schema.target!;
 
   const exclusive = useMemo(() => {
@@ -637,7 +638,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
     return items.find((x) => x.exclusive)?.name;
   }, [editor]);
 
-  const { hasButton } = usePermission(schema, widgetAtom);
+  const { hasButton } = usePermission(schema, widgetAtom, perms);
 
   const canNew = !readonly && hasButton("new");
   const canShowNew = canNew && schema.editor.showOnNew !== false;
@@ -696,7 +697,6 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
 
 const ItemEditor = memo(function ItemEditor({
   remove,
-  readonly,
   setInvalid,
   ...props
 }: FormEditorProps & {
@@ -704,7 +704,12 @@ const ItemEditor = memo(function ItemEditor({
   remove: (record: DataRecord) => void;
   setInvalid: (value: DataRecord, invalid: boolean) => void;
 }) {
-  const valueAtom = props.valueAtom;
+  const { schema, widgetAtom, valueAtom, readonly } = props;
+  const { perms } = schema;
+  
+  const { hasButton } = usePermission(schema, widgetAtom, perms);
+  const canRemove = !readonly && hasButton("remove");
+  
   const handleRemove = useAtomCallback(
     useCallback(
       (get) => {
@@ -716,7 +721,7 @@ const ItemEditor = memo(function ItemEditor({
   return (
     <div className={styles.item}>
       <RecordEditor {...props} readonly={readonly} setInvalid={setInvalid} />
-      {readonly || (
+      {canRemove && (
         <div className={styles.actions}>
           <MaterialIcon icon="close" onClick={handleRemove} />
         </div>
