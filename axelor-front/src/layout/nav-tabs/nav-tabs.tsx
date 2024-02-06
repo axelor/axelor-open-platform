@@ -58,7 +58,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const setTabContainerSize = useSetAtom(tabContainerSizeAtom);
   useEffect(
     () => setTabContainerSize(containerSize),
-    [setTabContainerSize, containerSize]
+    [setTabContainerSize, containerSize],
   );
 
   const doClose = useAtomCallback(
@@ -73,13 +73,13 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           const dirty = get(state).dirty ?? false;
           return dialogs.confirmDirty(
             async () => params?.["show-confirm"] !== false && dirty,
-            async () => close(tab)
+            async () => close(tab),
           );
         }
         return Promise.resolve(true);
       },
-      [close, tabs]
-    )
+      [close, tabs],
+    ),
   );
 
   const doCloseAll = useCallback(
@@ -90,7 +90,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         break;
       }
     },
-    [doClose, tabs]
+    [doClose, tabs],
   );
 
   const doRefresh = useCallback((tab: string) => {
@@ -132,7 +132,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         }
       }
     },
-    [doClose, doCloseAll, doRefresh, menuTarget]
+    [doClose, doCloseAll, doRefresh, menuTarget],
   );
 
   const handleContextHide = useCallback(() => {
@@ -146,10 +146,10 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
       document.dispatchEvent(
         new CustomEvent("tab:click", {
           detail: item.id,
-        })
+        }),
       );
     },
-    [open]
+    [open],
   );
 
   const handleAuxClick = useCallback<React.MouseEventHandler<HTMLDivElement>>(
@@ -160,7 +160,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         doClose(id);
       }
     },
-    [doClose]
+    [doClose],
   );
 
   const items = useItems(tabs, close, handleAuxClick, onContextMenu);
@@ -199,6 +199,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           <Views tab={tab} />
         </div>
       ))}
+      <TabsDirtyCheck tabs={tabs} />
       {popups.map((tab) => (
         <PopupViews key={tab.id} tab={tab} />
       ))}
@@ -227,20 +228,41 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   );
 }
 
+function TabsDirtyCheck({ tabs }: { tabs: Tab[] }) {
+  const isTabDirty = useAtomCallback(
+    useCallback((get) => tabs.some((tab) => get(tab.state).dirty), [tabs]),
+  );
+
+  useEffect(() => {
+    function beforeUnload(e: BeforeUnloadEvent) {
+      if (isTabDirty()) {
+        e.preventDefault();
+      }
+    }
+
+    window.addEventListener("beforeunload", beforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, [isTabDirty]);
+
+  return null;
+}
+
 function useItems(
   tabs: Tab[],
   closeTab: (view: any) => void,
   onAuxClick: React.MouseEventHandler<HTMLDivElement>,
-  onContextMenu: React.MouseEventHandler<HTMLDivElement>
+  onContextMenu: React.MouseEventHandler<HTMLDivElement>,
 ) {
   const { menus } = useMenu();
   const map = useMemo(
     () =>
       menus.reduce(
         (prev, menu) => ({ ...prev, [menu.name]: menu }),
-        {} as Record<string, MenuItem>
+        {} as Record<string, MenuItem>,
       ),
-    [menus]
+    [menus],
   );
 
   const findIcon = useCallback(
@@ -262,7 +284,7 @@ function useItems(
         iconColor,
       };
     },
-    [map, menus]
+    [map, menus],
   );
 
   return useMemo(() => {
@@ -300,8 +322,8 @@ function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
           canAutoReload && onRefresh(activeTabId);
         }
       },
-      [tab?.id, tab?.state, onRefresh]
-    )
+      [tab?.id, tab?.state, onRefresh],
+    ),
   );
 
   useEffect(() => {
@@ -309,7 +331,7 @@ function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
       const interval = Number(autoReload) * 1000;
       if (isNaN(interval) || interval <= 0) {
         return console.warn(
-          `${tab.id} auto-reload value must be a positive number in seconds: ${interval}`
+          `${tab.id} auto-reload value must be a positive number in seconds: ${interval}`,
         );
       }
 
@@ -331,7 +353,7 @@ function useTabAutoReload(tab: Tab | null, onRefresh: (tab: string) => void) {
     return () => {
       document.removeEventListener(
         "visibilitychange",
-        updateDocumentVisibility
+        updateDocumentVisibility,
       );
     };
   }, [autoReload]);
@@ -348,10 +370,10 @@ function SingleTab({ items }: { items: NavTabItem[] }) {
 
 function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
   const title = useAtomValue(
-    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state])
+    useMemo(() => selectAtom(tab.state, (x) => x.title), [tab.state]),
   );
   const dirty = useAtomValue(
-    useMemo(() => selectAtom(tab.state, (x) => x.dirty ?? false), [tab.state])
+    useMemo(() => selectAtom(tab.state, (x) => x.dirty ?? false), [tab.state]),
   );
 
   const { data } = useSession();
@@ -361,7 +383,7 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
   const handleCloseConfirm = useCallback(async () => {
     await dialogs.confirmDirty(
       async () => canConfirm && dirty,
-      async () => close(tab.id)
+      async () => close(tab.id),
     );
   }, [close, dirty, canConfirm, tab.id]);
 
@@ -371,7 +393,7 @@ function TabTitle({ tab, close }: { tab: Tab; close: (view: any) => any }) {
       e.stopPropagation();
       await handleCloseConfirm();
     },
-    [handleCloseConfirm]
+    [handleCloseConfirm],
   );
 
   const { active } = useTabs();
