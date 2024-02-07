@@ -26,6 +26,7 @@ import { focusAtom } from "@/utils/atoms";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 import { processContextValues } from "@/views/form/builder/utils";
 
+import { session } from "@/services/client/session";
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
 import { MetaScope, ViewScope } from "./scope";
@@ -200,7 +201,11 @@ const DataViews = memo(function DataViews({
   const {
     action: { name: actionName, domain, context, params },
   } = tab;
-  const limit = +params?.limit || 0;
+  const maxPerPage = session.info?.api?.pagination?.maxPerPage ?? 500;
+  const limit = Math.min(
+    +params?.limit || 0,
+    maxPerPage < 0 ? Infinity : maxPerPage,
+  );
 
   const dataStore = new DataStore(model, {
     ...(limit && { limit }),

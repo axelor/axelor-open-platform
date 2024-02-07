@@ -1,0 +1,6 @@
+---
+title: Fix pagination settings not taken into account
+type: fix
+description: |
+  `api.pagination.max-per-page` was taken into account on page text only.
+  `api.pagination.default-per-page` was not taken into account.

@@ -11,7 +11,7 @@ import styles from "./page-text.module.scss";
 
 export function PageText({ dataStore }: { dataStore: DataStore }) {
   const page = useDataStore(dataStore, (state) => state.page);
-  const maxLimit = session.info?.api?.pagination?.maxPerPage ?? 40;
+  const maxLimit = session.info?.api?.pagination?.maxPerPage ?? 500;
   const { offset = 0, totalCount = 0 } = page;
   const [showEditor, setShowEditor] = useState(false);
   const initialLimit = page.limit ?? maxLimit;

@@ -14,6 +14,7 @@ import {
   SearchResult,
 } from "./data";
 import { DataContext, DataRecord } from "./data.types";
+import { session } from "./session";
 
 function ifDiff<T>(current: T, value: T): T {
   return isEqual(current, value) ? current : value;
@@ -65,7 +66,8 @@ export class DataStore extends DataSource {
     this.#options = options;
     this.#page = {
       offset: options.offset ?? 0,
-      limit: options.limit ?? 40,
+      limit:
+        options.limit ?? session.info?.api?.pagination?.defaultPerPage ?? 40,
       totalCount: 0,
     };
   }
