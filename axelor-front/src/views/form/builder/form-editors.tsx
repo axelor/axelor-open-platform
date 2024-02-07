@@ -27,14 +27,13 @@ import { toKebabCase } from "@/utils/names.ts";
 import { MetaScope, useViewTab } from "@/view-containers/views/scope";
 
 import { Layout as FormViewLayout, useGetErrors } from "../form";
-import { createFormAtom } from "./atoms";
+import { createFormAtom, formDirtyUpdater } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
 import { useAfterActions, useFormScope } from "./scope";
 import {
   FieldProps,
-  FormAtom,
   FormLayout,
   FormState,
   ValueAtom,
@@ -895,6 +894,11 @@ const RecordEditor = memo(function RecordEditor({
         }
 
         set(editorFormAtom, state);
+
+        // the update is intended for dirty state changed
+        // no value changes occurs through this update
+        if (update === formDirtyUpdater) return;
+
         set(
           valueAtom,
           isEqual(record, EMPTY_RECORD) ? null : record,

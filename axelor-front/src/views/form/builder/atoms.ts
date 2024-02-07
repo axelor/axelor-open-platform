@@ -103,6 +103,10 @@ export function createWidgetAtom(props: {
   return widgetAtom;
 }
 
+export function formDirtyUpdater(prev: FormState) {
+  return prev.dirty ? prev : { ...prev, dirty: true };
+}
+
 export function createValueAtom({
   schema,
   formAtom,
@@ -170,7 +174,7 @@ export function createValueAtom({
         canDirty(widgetSchema);
 
       if (dirty) {
-        set(formAtom, (prev) => (prev.dirty ? prev : { ...prev, dirty }));
+        set(formAtom, formDirtyUpdater);
         set(dirtyAtom, true);
       }
 
