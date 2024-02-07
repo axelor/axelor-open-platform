@@ -4,6 +4,7 @@ import { FlagImage, usePhoneInput } from "react-international-phone";
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
+import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { Schema } from "@/services/client/meta.types";
 import {
@@ -58,11 +59,13 @@ export function Phone(props: GridColumnProps) {
   return (
     value && (
       <>
-        <FlagImage
-          className={styles.flag}
-          iso2={iso2}
-          src={FLAG_SOURCES[iso2]}
-        />
+        <Box title={i18n.get(country.name)} className={styles.flagContainer}>
+          <FlagImage
+            className={styles.flag}
+            iso2={iso2}
+            src={FLAG_SOURCES[iso2]}
+          />
+        </Box>
         <Box
           as="a"
           target="_blank"

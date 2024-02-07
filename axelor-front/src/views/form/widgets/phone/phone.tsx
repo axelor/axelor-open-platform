@@ -252,33 +252,35 @@ export function Phone({
       <Box className={clsx(styles.phone, { [styles.readonly]: readonly })}>
         {showButton && (
           <>
-            <Button
-              ref={buttonRef}
-              className={styles.country}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                if (event.button === 0) {
+            <Box title={i18n.get(country.name)}>
+              <Button
+                ref={buttonRef}
+                className={styles.country}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  if (event.button === 0) {
+                    toggleDropdown();
+                  }
+                }}
+                onTouchStart={(event) => {
+                  event.preventDefault();
                   toggleDropdown();
-                }
-              }}
-              onTouchStart={(event) => {
-                event.preventDefault();
-                toggleDropdown();
-              }}
-              disabled={readonly}
-            >
-              <FlagImage
-                iso2={countryIso2}
-                src={FLAG_SOURCES[countryIso2]}
-                className={styles.flag}
-              />
-              {!readonly && (
-                <Icon
-                  icon={`arrow_drop_${showDropdown ? "up" : "down"}`}
-                  className={styles.arrow}
+                }}
+                disabled={readonly}
+              >
+                <FlagImage
+                  iso2={countryIso2}
+                  src={FLAG_SOURCES[countryIso2]}
+                  className={styles.flag}
                 />
-              )}
-            </Button>
+                {!readonly && (
+                  <Icon
+                    icon={`arrow_drop_${showDropdown ? "up" : "down"}`}
+                    className={styles.arrow}
+                  />
+                )}
+              </Button>
+            </Box>
             {!readonly && (
               <Portal>
                 <Box
