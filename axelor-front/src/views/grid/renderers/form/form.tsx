@@ -94,7 +94,28 @@ export const FormLayoutComponent = ({
   const items = useMemo<Schema[]>(
     () =>
       (schema.items || []).map((item) => ({
-        ...item,
+        ...(item.jsonField
+          ? {
+              type: "field",
+              name: item.jsonField,
+              editor: {
+                items: [
+                  {
+                    ...item,
+                    colSpan: 12,
+                    name: item.jsonPath ?? item.name,
+                  },
+                ],
+                widgetAttrs: {
+                  showTitles: "false",
+                },
+              },
+              jsonFields: [item],
+              json: true,
+              cols: 12,
+              editColumnName: item.name,
+            }
+          : item),
         editable: true,
         editIndex: columns.findIndex((c) => c.name === item.name),
         showTitle: false,
@@ -106,7 +127,9 @@ export const FormLayoutComponent = ({
   return (
     <Box d="flex" alignItems="center">
       {columns.map((column, ind) => {
-        const item = items.find((item) => item.name === column.name);
+        const item = items.find(
+          (item) => (item.editColumnName ?? item.name) === column.name,
+        );
         return (
           <Box
             key={item?.uid ?? `column_${ind}`}
