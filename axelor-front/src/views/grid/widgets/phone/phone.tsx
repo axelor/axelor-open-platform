@@ -55,9 +55,10 @@ export function Phone(props: GridColumnProps) {
   });
 
   const { iso2 } = country;
+  const show = value && inputValue;
 
   return (
-    value && (
+    show && (
       <>
         <Box title={i18n.get(country.name)} className={styles.flagContainer}>
           <FlagImage
