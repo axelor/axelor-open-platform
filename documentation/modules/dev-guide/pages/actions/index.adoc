@@ -133,7 +133,6 @@ Some built-in variables are available to be used with expressions. This includes
 
 The following special actions can be used to perform some special operations:
 
-- `sync` - to sync record, can be used at the beginning or end only
 - `save` - to save record, can be used anywhere
 - `new` - start a new record, can be used at the end only
 - `close` - close current view, can be used at the end only

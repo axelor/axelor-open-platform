@@ -168,3 +168,4 @@ Check the {product-version-changelog}[change log] for detailed list.
 - Remove `$context` variable in frontend eval expressions
 - `/ws/app/info` endpoint moved to `/ws/public/app/info`
 - Datetime fields value in tracking messages now stored in UTC
+- `sync` action to sync record is no longer needed, so it is now removed
