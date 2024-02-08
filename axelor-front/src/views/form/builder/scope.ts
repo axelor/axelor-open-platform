@@ -326,7 +326,7 @@ export function useFormActiveHandler() {
   const [handler, setHandler] = useState<(() => void) | null>(
     null,
   );
-
+  
   useEffect(() => {
     if (active && handler) {
       handler?.();
@@ -636,6 +636,8 @@ function useActionRecord({
 }) {
   const canDirty = useCanDirty();
   const updateJson = useSetAtom(updateJsonAtom);
+  const { findItem } = useViewMeta();
+
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "record" && Boolean(x.value), []),
     useAtomCallback(
@@ -648,7 +650,7 @@ function useActionRecord({
 
           const { record, fields } = get(formAtom);
           const values = (data.value ?? {}) as DataRecord;
-          const result = updateRecord(record, values, fields);
+          const result = updateRecord(record, values, fields, { findItem });
           const isDirty = () =>
             result._dirty &&
             Object.entries(values).some(
@@ -660,7 +662,7 @@ function useActionRecord({
             record: result,
           }));
         },
-        [canDirty, formAtom, updateJson],
+        [canDirty, formAtom, updateJson, findItem],
       ),
     ),
     actionHandler,

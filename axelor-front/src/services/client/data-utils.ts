@@ -1,7 +1,10 @@
-import { compactJson } from "@/views/form/builder/utils";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
+import setObjValue from "lodash/set";
+import { produce } from "immer";
+
+import { compactJson, isReferenceField } from "@/views/form/builder/utils";
 import { DataRecord } from "./data.types";
-import { Property } from "./meta.types";
+import { Property, Schema } from "./meta.types";
 
 /**
  * Checks if the given name is the name of a dummy field.
@@ -133,7 +136,10 @@ export function updateRecord(
   target: DataRecord,
   source: DataRecord,
   fields?: Record<string, Property>,
+  options?: { findItem?: (fieldName: string) => Schema | undefined },
 ) {
+  const { findItem } = options || {};
+
   if (equals(target, source)) {
     return target;
   }
@@ -145,6 +151,20 @@ export function updateRecord(
   for (const [key, value] of Object.entries(source)) {
     let newValue = value;
     if (newValue === result[key]) {
+      continue;
+    }
+
+    // to set values of editor dotted fields
+    if (key.includes(".")) {
+      // get parentField
+      const fieldName = key.split(".").slice(0, -1).join(".");
+      const viewItem = findItem?.(fieldName);
+      if (viewItem && isReferenceField(viewItem) && viewItem?.editor) {
+        result = produce(result, (draft) => {
+          setObjValue(draft, key, value);
+        });
+        changed = true;
+      }
       continue;
     }
 
