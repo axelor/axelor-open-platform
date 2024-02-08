@@ -1,0 +1,3 @@
+---
+title: Return 404 http code when downloading files that don't exist
+type: fix

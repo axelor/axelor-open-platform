@@ -403,11 +403,13 @@ public class DmsService {
     }
 
     // if file
-    if (records.size() == 1) {
-      final DMSFile record = records.get(0);
+    final DMSFile record = records.get(0);
+    if (records.size() == 1 && !record.getIsDirectory()) {
       File file = getFile(record);
-      if (file != null) {
+      if (file != null && Files.exists(file.toPath())) {
         return stream(file, getFileName(record), inline);
+      } else {
+        return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
       }
     }
 
@@ -424,7 +426,11 @@ public class DmsService {
         };
 
     final String batchName = "documents-" + LocalDate.now() + ".zip";
-    return stream(so, batchName, inline);
+    try {
+      return stream(so, batchName, inline);
+    } catch (Exception e) {
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
   }
 
   private File getFile(DMSFile record) {
