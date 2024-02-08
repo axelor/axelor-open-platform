@@ -19,6 +19,7 @@ import {
   parseTemplate,
   stringToObject,
 } from "./utils";
+import { LoadingCache } from "@/utils/cache";
 
 const REACT_COMPONENTS = [];
 const CUSTOM_COMPONENTS = {};
@@ -408,20 +409,24 @@ function replaceTag(str) {
   return tag + closingTag;
 }
 
+const cache = new LoadingCache();
+
 export function processLegacyTemplate(template) {
-  const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag).trim();
-  const { childNodes = [] } = parseFragment(newTemplate);
-  const hasSingleChild = childNodes.length === 1;
-  const isCustomNode =
-    hasSingleChild && CUSTOM_COMPONENTS[childNodes[0].tagName];
-  const tree = generateTree(
-    isCustomNode
-      ? childNodes[0]
-      : {
-          tagName: hasSingleChild ? "" : "span",
-          attrs: [],
-          childNodes,
-        },
-  );
-  return process(tree);
+  return cache.get(template, () => {
+    const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag).trim();
+    const { childNodes = [] } = parseFragment(newTemplate);
+    const hasSingleChild = childNodes.length === 1;
+    const isCustomNode =
+      hasSingleChild && CUSTOM_COMPONENTS[childNodes[0].tagName];
+    const tree = generateTree(
+      isCustomNode
+        ? childNodes[0]
+        : {
+            tagName: hasSingleChild ? "" : "span",
+            attrs: [],
+            childNodes,
+          },
+    );
+    return process(tree);
+  });
 }
