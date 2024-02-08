@@ -1,3 +1,4 @@
+import { alerts } from "@/components/alerts";
 import { request } from "@/services/client/client";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -76,7 +77,7 @@ export function prepareCustomView({ model }: GridView, record: DataRecord) {
 
 export async function downloadAsBatch(
   record: DataRecord,
-  model = "com.axelor.dms.db.DMSFile"
+  model = "com.axelor.dms.db.DMSFile",
 ) {
   const resp = await request({
     url: `ws/dms/download/batch`,
@@ -91,8 +92,14 @@ export async function downloadAsBatch(
     if (batchId || batchName) {
       return download(
         `ws/dms/download/${batchId}?fileName=${batchName}`,
-        batchName
+        batchName,
       );
     }
+  } else {
+    alerts.error({
+      message: i18n.get(
+        "Some files can't be downloaded. Please check them and retry.",
+      ),
+    });
   }
 }
