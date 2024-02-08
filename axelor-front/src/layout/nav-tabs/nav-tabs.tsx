@@ -32,6 +32,7 @@ import { MenuItem } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
+import { isProduction } from "@/utils/app-settings.ts";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Icon } from "@/components/icon";
@@ -199,7 +200,9 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           <Views tab={tab} />
         </div>
       ))}
-      <TabsDirtyCheck tabs={tabs} />
+      {isProduction() && (
+        <TabsDirtyCheck tabs={tabs} />
+      )}
       {popups.map((tab) => (
         <PopupViews key={tab.id} tab={tab} />
       ))}
