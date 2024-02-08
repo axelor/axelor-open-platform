@@ -194,7 +194,7 @@ function TemplateViewer({
   );
 
   const ctx = useMemo(
-    () => getLegacyContext() ?? { _model, ...record },
+    () => ({ ...getLegacyContext(), _model, ...record }),
     [_model, getLegacyContext, record],
   );
 
