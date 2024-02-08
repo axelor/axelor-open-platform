@@ -10,6 +10,7 @@ import { Schema } from "@/services/client/meta.types";
 import {
   FALLBACK_COUNTRIES,
   FLAG_SOURCES,
+  getPhoneInfo,
 } from "@/views/form/widgets/phone/utils";
 
 import "react-international-phone/style.css";
@@ -57,6 +58,11 @@ export function Phone(props: GridColumnProps) {
   const { iso2 } = country;
   const show = value && inputValue;
 
+  const numberType = useMemo(
+    () => (show ? getPhoneInfo(phone).numberType : undefined),
+    [phone, show],
+  );
+
   return (
     show && (
       <>
@@ -72,6 +78,7 @@ export function Phone(props: GridColumnProps) {
           target="_blank"
           href={`tel:${noPrefix ? value : phone}`}
           className={styles.link}
+          title={numberType}
           onClick={(e) => e.stopPropagation()} // Prevent going into edit when clicking on link.
         >
           {inputValue}

@@ -1,4 +1,3 @@
-import { PhoneNumberUtil } from "google-libphonenumber";
 import { useAtomValue } from "jotai";
 import {
   ChangeEvent,
@@ -26,20 +25,10 @@ import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { FALLBACK_COUNTRIES, FLAGS, FLAG_SOURCES } from "./utils";
+import { FALLBACK_COUNTRIES, FLAGS, FLAG_SOURCES, getPhoneInfo } from "./utils";
 
 import "react-international-phone/style.css";
 import styles from "./phone.module.scss";
-
-const phoneUtil = PhoneNumberUtil.getInstance();
-
-const isPhoneValid = (phone: string) => {
-  try {
-    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
-  } catch (error) {
-    return false;
-  }
-};
 
 export function Phone({
   inputProps,
@@ -244,8 +233,16 @@ export function Phone({
       : iso2;
   }, [country, defaultCountry, onlyCountries]);
 
-  const hasValue = text && text === phone;
+  const hasValue = !!text && text === phone;
   const showButton = hasValue || !readonly;
+
+  const { isValidNumber, numberType } = useMemo(
+    () =>
+      hasValue
+        ? getPhoneInfo(phone)
+        : { isValidNumber: undefined, numberType: undefined },
+    [hasValue, phone],
+  );
 
   return (
     <FieldControl {...props} className={styles.container}>
@@ -320,6 +317,7 @@ export function Phone({
             target="_blank"
             href={`tel:${noPrefix ? value : phone}`}
             className={styles.link}
+            title={numberType}
           >
             {hasValue && inputValue}
           </Box>
@@ -338,8 +336,9 @@ export function Phone({
             onKeyDown={onKeyDown}
             onChange={handlePhoneValueChange}
             onBlur={onBlur}
+            title={numberType}
             className={clsx(styles.input, {
-              [styles.invalid]: hasValue && !isPhoneValid(phone),
+              [styles.invalid]: hasValue && !isValidNumber,
             })}
             {...inputProps}
           />
