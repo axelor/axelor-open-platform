@@ -344,6 +344,10 @@ public class DmsService {
     return javax.ws.rs.core.Response.ok(data).build();
   }
 
+  private boolean hasBatchIds(String batchIds) {
+    return ObjectUtils.notEmpty((List<?>) httpRequest.getSession().getAttribute(batchIds));
+  }
+
   private List<?> findBatchIds(String batchOrId) {
     List<?> ids = (List<?>) httpRequest.getSession().getAttribute(batchOrId);
     if (ids == null) {
@@ -360,6 +364,9 @@ public class DmsService {
   @HEAD
   @Path("download/{id}")
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
+    if (!hasBatchIds(batchOrId) && findFile(repository.find(Longs.tryParse(batchOrId))) == null) {
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
     return findBatchIds(batchOrId) == null
         ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
         : javax.ws.rs.core.Response.ok().build();
