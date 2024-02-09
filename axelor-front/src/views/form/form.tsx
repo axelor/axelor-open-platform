@@ -735,6 +735,7 @@ const FormContainer = memo(function FormContainer({
         async (get, set, record?: DataRecord) => {
           if (record) {
             await dataStore.save(record);
+            return;
           }
           const { record: rec, dirty: formDirty } = get(formAtom);
           const dirty = get(dirtyAtom) || formDirty;
