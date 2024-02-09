@@ -1,0 +1,3 @@
+---
+title: Fix save request payload containing unwanted values
+type: fix

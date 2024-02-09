@@ -15,6 +15,8 @@ export function isDummy(name: string, fieldNames: string[]) {
   return (
     // in model
     !fieldNames.includes(name) &&
+    // if a dot field exist, consider field to be part the model
+    !fieldNames.filter((key) => key.includes(".")).map((key) => key.split('.')[0]).includes(name) &&
     // id and version may not be in fieldNames
     !["id", "version"].includes(name) &&
     // special case for enum fields
