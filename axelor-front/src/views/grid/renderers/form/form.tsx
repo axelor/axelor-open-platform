@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import setObjectValue from "lodash/set";
+import uniqueId from "lodash/uniqueId";
 import clone from "lodash/cloneDeep";
 import {
   KeyboardEvent,
@@ -22,7 +23,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
-import { FormView, Schema } from "@/services/client/meta.types";
+import { FormView, Property, Schema } from "@/services/client/meta.types";
 import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
   FormAtom,
@@ -41,7 +42,6 @@ import {
 } from "@/views/form/builder/scope";
 
 import styles from "./form.module.scss";
-
 export interface GridFormRendererProps extends GridRowProps {
   view: FormView;
   fields?: MetaData["fields"];
@@ -86,18 +86,23 @@ export type GridFormHandler = {
 
 export const FormLayoutComponent = ({
   schema,
+  fields,
   formAtom,
   readonly,
   onCancel,
   columns = [],
-}: LayoutProps) => {
+}: LayoutProps & {
+  fields?: Record<string, Property>;
+}) => {
   const items = useMemo<Schema[]>(
     () =>
       (schema.items || []).map((item) => ({
         ...(item.jsonField
           ? {
+              uid: uniqueId("w"),
               type: "field",
               name: item.jsonField,
+              title: item.title || item.name,
               editor: {
                 items: [
                   {
@@ -403,12 +408,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       () => (props: LayoutProps) => (
         <FormLayoutComponent
           {...props}
+          fields={fields}
           columns={columns}
           onSave={handleSave}
           onCancel={handleCancel}
         />
       ),
-      [columns, handleSave, handleCancel],
+      [columns, fields, handleSave, handleCancel],
     );
 
     useImperativeHandle(
