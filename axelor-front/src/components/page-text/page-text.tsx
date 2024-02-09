@@ -2,6 +2,7 @@ import { FormEvent, KeyboardEvent, useCallback, useState } from "react";
 
 import { Button, Input } from "@axelor/ui";
 
+import { alerts } from "@/components/alerts";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
@@ -14,32 +15,43 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
   const maxLimit = getDefaultMaxPerPage();
   const { offset = 0, totalCount = 0 } = page;
   const [showEditor, setShowEditor] = useState(false);
-  const initialLimit = page.limit ?? maxLimit;
-  const [limit, setLimit] = useState(initialLimit);
+  const limit = page.limit ?? maxLimit;
+  const [userPageSize, setUserPageSize] = useState(limit);
 
   const onChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (e) => setLimit(+e.target.value),
-    []
+    (e) => setUserPageSize(+e.target.value),
+    [],
   );
 
   const onApply = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      dataStore.search({ limit });
+      let size = userPageSize;
+      if (
+        getDefaultMaxPerPage() > 0 &&
+        (userPageSize == 0 || userPageSize > getDefaultMaxPerPage())
+      ) {
+        size = getDefaultMaxPerPage();
+        setUserPageSize(getDefaultMaxPerPage());
+        alerts.warn({
+          message: i18n.get("Page size limited to {0} records", size),
+        });
+      }
+      dataStore.search({ limit: size });
       setShowEditor(false);
     },
-    [dataStore, limit]
+    [dataStore, userPageSize],
   );
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLFormElement>) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        setLimit(initialLimit);
+        setUserPageSize(limit);
         setShowEditor(false);
       }
     },
-    [initialLimit]
+    [limit],
   );
 
   const onShow = useCallback(() => setShowEditor(true), []);
@@ -58,9 +70,7 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
         <Input
           name="limit"
           type="number"
-          min={0}
-          max={maxLimit}
-          value={limit}
+          value={userPageSize}
           onChange={onChange}
           onFocus={(e) => e.target.select()}
           autoFocus
