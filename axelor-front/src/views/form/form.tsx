@@ -564,6 +564,26 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
+  /**
+   * Handle the form save. This includes 3 parts : 
+   * <ul>
+   * <li>firstly, checks the record errors. On errors, the process is interrupted.</li>
+   * <li>secondly, perform the save request.</li>
+   * <li>thirdly, read the record. This make sure the record is up-to-date.</li>
+   * </ul>
+   * 
+   * This also make sure to restore the dummy fields after the record is saved.
+   * 
+   * Options that can be used : 
+   *
+   * @param {boolean} [options.shouldSave] - (default: true) whether it should perform record save request
+   * @param {boolean} [options.callOnSave] - (default: true) whether it should call `onSave` actions
+   * @param {boolean} [options.callOnRead] - (default: true) whether it should read the record once save request is done
+   * @param {boolean} [options.callOnLoad] - (default: true) whether it should call `onLoad` actions (has effect if `callOnRead` is `true`)
+   * @param {boolean} [options.handleErrors] - (default: false) whether it should handle errors upon save request
+   * 
+   * @return {DataRecord} the record
+   */
   const doSave = useAtomCallback(
     useCallback(
       async (
