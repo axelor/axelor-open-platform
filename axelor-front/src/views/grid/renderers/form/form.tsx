@@ -102,6 +102,7 @@ export const FormLayoutComponent = ({
                 items: [
                   {
                     ...item,
+                    editable: true,
                     colSpan: 12,
                     name: item.jsonPath ?? item.name,
                   },
