@@ -530,6 +530,7 @@ export function processView(
           }
         }
         processWidget(field);
+        processSelection(field);
         // apply all widget attributes directly on field
         Object.assign(field, field.widgetAttrs);
         if (field.type === "panel" || field.type === "separator") {
