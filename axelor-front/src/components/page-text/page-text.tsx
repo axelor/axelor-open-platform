@@ -44,7 +44,7 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
 
   const onShow = useCallback(() => setShowEditor(true), []);
 
-  const to = Math.min(offset + limit, totalCount);
+  const to = limit > 0 ? Math.min(offset + limit, totalCount) : totalCount;
   const start = to === 0 ? 0 : offset + 1;
   const text = i18n.get("{0} to {1} of {2}", start, to, totalCount);
 
