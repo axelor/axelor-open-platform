@@ -19,6 +19,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
+import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -299,7 +300,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
-  const { offset = 0, limit = 40, totalCount = 0 } = dataStore?.page || {};
+  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = dataStore?.page || {};
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 

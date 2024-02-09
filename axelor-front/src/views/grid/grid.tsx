@@ -28,6 +28,7 @@ import { i18n } from "@/services/client/i18n";
 import { findActionView, findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
+import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
@@ -233,7 +234,7 @@ function GridInner(props: ViewProps<GridView>) {
   const onSearch = useAfterActions(doSearch);
 
   const { page } = dataStore;
-  const { offset = 0, limit = 40, totalCount = 0 } = page;
+  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
 
   const onMassUpdate = useCallback(
     async (values: Partial<DataRecord>, hasAll?: boolean) => {

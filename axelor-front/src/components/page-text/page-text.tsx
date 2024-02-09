@@ -5,13 +5,13 @@ import { Button, Input } from "@axelor/ui";
 import { useDataStore } from "@/hooks/use-data-store";
 import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
-import { session } from "@/services/client/session";
+import { getDefaultMaxPerPage } from "@/utils/app-settings.ts";
 
 import styles from "./page-text.module.scss";
 
 export function PageText({ dataStore }: { dataStore: DataStore }) {
   const page = useDataStore(dataStore, (state) => state.page);
-  const maxLimit = session.info?.api?.pagination?.maxPerPage ?? 500;
+  const maxLimit = getDefaultMaxPerPage();
   const { offset = 0, totalCount = 0 } = page;
   const [showEditor, setShowEditor] = useState(false);
   const initialLimit = page.limit ?? maxLimit;

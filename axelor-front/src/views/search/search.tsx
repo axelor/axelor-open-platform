@@ -30,6 +30,7 @@ import { useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
 import { isLegacyExpression, parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
+import { DEFAULT_SEARCH_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { toKebabCase } from "@/utils/names";
 import { searchData } from "./utils";
 import styles from "./search.module.scss";
@@ -80,7 +81,7 @@ export function Search(props: ViewProps<SearchView>) {
   const record = useRef({}).current;
   const { meta } = props;
   const { view } = meta;
-  const { name, selects, actionMenus, limit = 80 } = view;
+  const { name, selects, actionMenus, limit = DEFAULT_SEARCH_PAGE_SIZE } = view;
   const { action } = useViewTab();
   const { params } = action;
   const queryString = (location.search || "").slice(1);

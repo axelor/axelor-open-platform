@@ -9,6 +9,7 @@ import { SearchOptions } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { i18n } from "@/services/client/i18n";
 import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
+import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { download } from "@/utils/download";
 import {
   DashletHandler,
@@ -185,7 +186,7 @@ function DashletListMenu(
 ) {
   const { dataStore, gridStateAtom, viewType, ...menuProps } = props;
   const page = useDataStore(dataStore, (store) => store.page);
-  const { offset = 0, limit = 40, totalCount = 0 } = page;
+  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 

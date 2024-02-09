@@ -3,6 +3,7 @@ import { useCallback, useMemo } from "react";
 
 import { DataSource } from "@/services/client/data";
 import { DataContext } from "@/services/client/data.types";
+import { DEFAULT_COMPLETION_PAGE_SIZE } from "@/utils/app-settings.ts";
 
 export function useCompletion(options: {
   target: string;
@@ -11,7 +12,7 @@ export function useCompletion(options: {
   limit?: number;
   sortBy?: string;
 }) {
-  const { target, targetName, targetSearch, sortBy, limit = 10 } = options;
+  const { target, targetName, targetSearch, sortBy, limit = DEFAULT_COMPLETION_PAGE_SIZE } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
     () => uniq([[targetName], targetSearch].flat().filter(Boolean)) as string[],

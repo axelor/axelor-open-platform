@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTags, useTagsMail } from "@/hooks/use-tags";
+import { DEFAULT_MESSAGE_PAGE_SIZE } from "@/utils/app-settings.ts";
 import {
   useViewAction,
   useViewTab,
@@ -21,7 +22,7 @@ import { DataSource } from "./utils";
 async function findMessages(
   id: number,
   model: string,
-  { parent, folder, type, offset = 0, limit = 4 }: MessageFetchOptions,
+  { parent, folder, type, offset = 0, limit = DEFAULT_MESSAGE_PAGE_SIZE }: MessageFetchOptions,
 ) {
   const { total = 0, data = [] } = await (parent
     ? DataSource.replies(parent)

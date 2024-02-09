@@ -28,6 +28,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData } from "@/services/client/meta";
 import { KanbanView, Property } from "@/services/client/meta.types";
+import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { legacyClassNames } from "@/styles/legacy";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
@@ -57,7 +58,7 @@ import styles from "./kanban.module.scss";
 
 const hasMorePage = ({
   offset = 0,
-  limit = 20,
+  limit = DEFAULT_KANBAN_PAGE_SIZE,
   totalCount = 0,
 }: SearchPage) => {
   return offset + limit < totalCount;
@@ -78,7 +79,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const {
     columnBy,
     editWindow,
-    limit = +params?.limit || 20,
+    limit = +params?.limit || DEFAULT_KANBAN_PAGE_SIZE,
     sequenceBy,
   } = view;
   const hasEditPopup = dashlet || editWindow === "popup";

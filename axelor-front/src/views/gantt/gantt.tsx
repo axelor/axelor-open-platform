@@ -19,6 +19,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { Field, GanttView, Widget } from "@/services/client/meta.types";
+import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
@@ -286,7 +287,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   }, [dataStore]);
 
   const { page } = dataStore;
-  const { offset = 0, limit = 40, totalCount = 0 } = page;
+  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
 
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;

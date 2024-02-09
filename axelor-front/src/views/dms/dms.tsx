@@ -29,6 +29,7 @@ import { SearchOptions } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
+import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -609,7 +610,7 @@ export function Dms(props: ViewProps<GridView>) {
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
-  const { offset = 0, limit = 40, totalCount = 0 } = dataStore.page;
+  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = dataStore.page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
   const records = useDataStore(dataStore, (ds) => ds.records);
