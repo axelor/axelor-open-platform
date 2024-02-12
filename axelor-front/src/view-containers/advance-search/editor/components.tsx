@@ -34,11 +34,21 @@ function NumberField(props: any) {
 }
 
 function Select({
-  value = null,
+  value: _value = null,
   options,
   className,
+  onChange: _onChange,
   ...props
 }: SelectProps<DataRecord, false>) {
+  const value = useMemo(
+    () => options?.find((opt) => opt.name === _value) ?? _value,
+    [_value, options],
+  );
+  const onChange = useCallback(
+    (value: any) => _onChange?.(value?.name ?? value),
+    [_onChange],
+  );
+
   return (
     <AxSelect
       {...props}
@@ -49,6 +59,7 @@ function Select({
       optionKey={(x) => x.name}
       optionEqual={(x, y) => x.name === y.name}
       value={value}
+      onChange={onChange}
     />
   );
 }
