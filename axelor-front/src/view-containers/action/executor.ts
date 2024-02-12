@@ -29,8 +29,8 @@ const executeAction: typeof actionRequest = async (options) => {
 };
 
 const processActionResult = (result: ActionResult[]): ActionResult[] => {
-  let actionAttrResult: ActionResult["attrs"] = {};
   let actionValueResult: ActionResult["values"] = {};
+  const actionAttrResult: ActionResult["attrs"] = {};
   const otherResults: ActionResult[] = [];
 
   result.forEach((res) => {
@@ -39,11 +39,13 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
       Object.entries(attrs).forEach(([k, v]) => {
         if (v && typeof v === "object" && "value" in v) {
           actionValueResult![k] = v.value;
-          delete attrs[k]["value"];
-          isEmpty(attrs[k]) && delete attrs[k];
+        } else {
+          actionAttrResult![k] = {
+            ...actionAttrResult?.[k],
+            ...v,
+          };
         }
       });
-      actionAttrResult = { ...actionAttrResult, ...attrs };
     }
     if (values) {
       actionValueResult = { ...actionValueResult, ...values };
