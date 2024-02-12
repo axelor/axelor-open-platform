@@ -930,30 +930,6 @@ const FormContainer = memo(function FormContainer({
   }, [formDirty, setDirty]);
 
   useEffect(() => {
-    if (popup) {
-      setPopupHandlers({
-        getState,
-        onSave,
-        onEdit: doEdit,
-        onRead: doRead,
-        actionHandler,
-        actionExecutor,
-        readyAtom,
-      });
-    }
-  }, [
-    getState,
-    doEdit,
-    doRead,
-    onSave,
-    popup,
-    setPopupHandlers,
-    actionHandler,
-    actionExecutor,
-    readyAtom,
-  ]);
-
-  useEffect(() => {
     setViewProps((props) => ({ ...props, readonly }));
   }, [readonly, setViewProps]);
 
@@ -1023,6 +999,32 @@ const FormContainer = memo(function FormContainer({
     onRefresh: onRefresh,
     onFocus: handleFocus,
   });
+
+  useEffect(() => {
+    if (popup) {
+      setPopupHandlers({
+        getState,
+        onSave,
+        onEdit: doEdit,
+        onRead: doRead,
+        actionHandler,
+        actionExecutor,
+        readyAtom,
+        commitForm: handleCommitEditableWidgets,
+      });
+    }
+  }, [
+    getState,
+    doEdit,
+    doRead,
+    onSave,
+    popup,
+    setPopupHandlers,
+    actionHandler,
+    actionExecutor,
+    readyAtom,
+    handleCommitEditableWidgets,
+  ]);
 
   const { views = [] } = useViewAction();
 

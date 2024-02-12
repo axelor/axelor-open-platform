@@ -12,6 +12,7 @@ export type PopupHandler = {
   actionHandler?: ActionHandler;
   actionExecutor?: ActionExecutor;
   getState?: () => FormState;
+  commitForm?: () => Promise<void | void[]>;
   onNew?: () => Promise<void>;
   onRead?: (id: string | number) => Promise<DataRecord>;
   onEdit?: (record: DataRecord | null) => Promise<void>;

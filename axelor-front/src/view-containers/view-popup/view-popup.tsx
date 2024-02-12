@@ -232,7 +232,13 @@ function Footer({
   }, [handleClose, handler, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
-    const { getState, onSave } = handler;
+    const { getState, commitForm, onSave } = handler;
+
+    await commitForm?.();
+    
+    await handler.actionExecutor?.waitFor();
+    await handler.actionExecutor?.wait();
+
     const state = getState?.();
 
     const errors = state && getErrors(state);

@@ -178,6 +178,12 @@ function Footer({
   const handleConfirm = useAfterActions(
     useCallback(async () => {
       if (handler.getState === undefined) return onClose(true);
+
+      await handler.commitForm?.();
+    
+      await handler.actionExecutor?.waitFor();
+      await handler.actionExecutor?.wait();
+
       const state = handler.getState();
       const record = state.record;
       const canSave = !checkDirty || state.dirty || !record.id;
