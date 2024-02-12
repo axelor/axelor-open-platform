@@ -14,7 +14,7 @@ import { Moment, l10n, moment } from "@/services/client/l10n";
 import { MetaData } from "@/services/client/meta";
 import { Field, SavedFilter, Widget } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
-import { getNextOf } from "@/utils/date";
+import { getNextOf, getStartOf } from "@/utils/date";
 import { toKebabCase } from "@/utils/names";
 import { AdvancedSearchState } from "./types";
 
@@ -77,7 +77,7 @@ export function getCriteria(
         {
           fieldName,
           operator: ">=",
-          value: getValue(now.clone().startOf(timeUnit)),
+          value: getValue(getStartOf(now, timeUnit)),
         },
         {
           fieldName,
@@ -117,7 +117,7 @@ export function getCriteria(
         {
           fieldName,
           operator: ">=",
-          value: getValue(now.clone().startOf("day")),
+          value: getValue(getStartOf(now, "day")),
         },
         {
           fieldName,
@@ -207,8 +207,8 @@ export function getCriteria(
             case "notBetween": {
               let v2 = ["=", "!="].includes(operator) ? v1 : value2 || v1;
 
-              v1 = getValue(moment(v1).startOf("day"));
-              v2 = getValue(getNextOf(moment(v2), "day"));
+              v1 = getValue(getStartOf(v1, "day"));
+              v2 = getValue(getNextOf(v2, "day"));
 
               const flag = ["=", "between"].includes(operator);
 
@@ -230,7 +230,7 @@ export function getCriteria(
             }
             case "<":
             case ">=":
-              value = getValue(moment(value).startOf("day"));
+              value = getValue(getStartOf(value, "day"));
               break;
             case ">":
               operator = ">=";
