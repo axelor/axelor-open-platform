@@ -162,6 +162,7 @@ export const Form = memo(function Form({
   className,
   readonly,
   layout: Layout = GridLayout,
+  layoutProps,
 }: FormProps) {
   const schema = useMemo(() => processView(view, fields), [view, fields]);
   return (
@@ -184,6 +185,7 @@ export const Form = memo(function Form({
         <ActionDataHandler formAtom={formAtom} />
         <DottedValues formAtom={formAtom} />
         <Layout
+          {...layoutProps}
           className={className}
           readonly={readonly}
           schema={schema}

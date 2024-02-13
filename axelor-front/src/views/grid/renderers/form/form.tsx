@@ -23,7 +23,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
-import { FormView, Property, Schema } from "@/services/client/meta.types";
+import { FormView, Schema } from "@/services/client/meta.types";
 import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
   FormAtom,
@@ -86,14 +86,11 @@ export type GridFormHandler = {
 
 export const FormLayoutComponent = ({
   schema,
-  fields,
   formAtom,
   readonly,
   onCancel,
   columns = [],
-}: LayoutProps & {
-  fields?: Record<string, Property>;
-}) => {
+}: LayoutProps) => {
   const items = useMemo<Schema[]>(
     () =>
       (schema.items || []).map((item) => ({
@@ -408,13 +405,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       () => (props: LayoutProps) => (
         <FormLayoutComponent
           {...props}
-          fields={fields}
-          columns={columns}
           onSave={handleSave}
           onCancel={handleCancel}
         />
       ),
-      [columns, fields, handleSave, handleCancel],
+      [handleSave, handleCancel],
     );
 
     useImperativeHandle(
@@ -468,6 +463,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
                   schema={view}
                   fields={fields!}
                   layout={CustomLayout as unknown as FormLayout}
+                  layoutProps={{ columns }}
                   readonly={false}
                   formAtom={formAtom}
                   actionHandler={actionHandler}

@@ -102,6 +102,7 @@ export interface FormProps extends WidgetProps {
   actionExecutor: ActionExecutor;
   className?: string;
   layout?: FormLayout;
+  layoutProps?: Record<string, any>;
 }
 
 export type FormLayout = (
