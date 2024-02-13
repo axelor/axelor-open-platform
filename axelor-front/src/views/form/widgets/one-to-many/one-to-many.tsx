@@ -767,7 +767,9 @@ function OneToManyInner({
         ]);
 
         const changed = !isManyToMany || prevItems.length !== nextItems.length;
-        const dirty = nextItems.some((item) => item._dirty);
+        const dirty =
+          prevItems.length !== nextItems.length ||
+          nextItems.some((item) => item._dirty);
 
         return setValue(nextItems, changed, dirty);
       },
