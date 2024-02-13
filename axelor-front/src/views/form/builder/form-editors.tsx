@@ -1102,7 +1102,12 @@ function JsonEditor({
           typeof update === "function" ? update(get(valueAtom)) : update;
         const { $record: _record, ...value } = state ?? {};
         const jsonName = jsonNameField ? value?.[jsonNameField.name] : null;
-        const jsonValue = state ? JSON.stringify(value) : null;
+        const prevJsonValue = get(valueAtom);
+        const jsonValue = Object.keys(value || {}).length
+          ? JSON.stringify(value)
+          : ["{}", undefined].includes(prevJsonValue)
+            ? prevJsonValue
+            : null;
 
         set(valueAtom, jsonValue, fireOnChange, markDirty);
 
