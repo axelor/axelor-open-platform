@@ -1,0 +1,6 @@
+---
+title: Fix missing dotted fields in o2m grid if no parent fields
+type: fix
+description: |
+  Issue happened when there is a dotted field without its parent,
+  eg. "product.code" field, but no "product" field.

@@ -91,10 +91,12 @@ function nestedToDotted(record: DataRecord, previousRecord?: DataRecord) {
         result[key] = value;
       } else if (previousRecord) {
         const parentPath = findNearestParentPath(record, path);
-        const current = getNested(record, parentPath);
-        const prev = getNested(previousRecord, parentPath);
-        if (!current || current.id !== prev?.id) {
-          result[key] = undefined;
+        if (parentPath.length) {
+          const current = getNested(record, parentPath);
+          const prev = getNested(previousRecord, parentPath);
+          if (!current || current.id !== prev?.id) {
+            result[key] = undefined;
+          }
         }
       }
     }
@@ -106,14 +108,17 @@ function nestedToDotted(record: DataRecord, previousRecord?: DataRecord) {
 function findNearestParentPath(record: DataRecord, path: string[] | string) {
   const keys = (Array.isArray(path) ? path : path.split(".")).slice(0, -1);
   let current = record;
+
   for (let i = 0; i < keys.length; ++i) {
     const key = keys[i];
-    const value = current[key];
-    if (value == null || typeof value !== "object") {
-      return keys.slice(0, i);
+    current = current[key];
+
+    if (current == null || typeof current !== "object") {
+      const offset = current === null ? 1 : 0;
+      return keys.slice(0, i + offset);
     }
-    current = value;
   }
+
   return keys;
 }
 
