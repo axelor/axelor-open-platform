@@ -227,11 +227,20 @@ const formatBoolean: Formatter = (value, opts = {}) => {
 };
 
 const formatSelection: Formatter = (value, opts = {}) => {
-  const { props: { selectionList } = {} } = opts;
-  const item = (selectionList ?? []).find(
-    (x) => String(x.value) === String(value),
-  );
-  return item?.title ?? "";
+  const { props: { selectionList, widget } = {} } = opts;
+  if (widget === "multi-select") {
+    return String(value ?? "")
+      .split(/\s*,\s*/)
+      .map(
+        (item) => selectionList?.find((x) => String(x.value) === item)?.title ?? item,
+      )
+      .join(", ");
+  } else {
+    const item = (selectionList ?? []).find(
+      (x) => String(x.value) === String(value),
+    );
+    return item?.title ?? "";
+  }
 };
 
 const formatOne: Formatter = (value, opts = {}) => {
