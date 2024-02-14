@@ -326,7 +326,7 @@ export function processView(
   if ((res.showIf || res.hideIf) && !isCollectionItem && !isPanelTabs) {
     res.hidden = true;
   }
-  
+
   // for editable grid case : avoid fields blinking
   if (isField(res) && res.readonlyIf && parent?.editable) {
     res.readonly = true;
@@ -396,15 +396,39 @@ function getDefaultFieldValues(fields?: MetaData["fields"]) {
   return result;
 }
 
+const getJSON = (str: string) => {
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    // handler error
+  }
+  return {};
+};
+
 function getDefaultJsonFieldValues(widgets?: Widget[]) {
   const result: DataRecord = {};
+
+  function setJSONValues(name: string, values: Record<string, any>) {
+    result[name] = JSON.stringify({
+      ...getJSON(result[name] || "{}"),
+      ...values,
+    });
+  }
 
   for (const widget of widgets ?? []) {
     const { type } = widget;
 
     if (["panel", "panel-json"].includes(type)) {
       const defaultValues = getDefaultJsonFieldValues((widget as Panel).items);
-      Object.assign(result, defaultValues);
+      Object.entries(defaultValues).forEach(([k, v]) =>
+        setJSONValues(k, getJSON(v)),
+      );
+    } else if ((widget as Schema).jsonField && (widget as Schema).jsonPath) {
+      const { jsonField, jsonPath } = widget as Schema;
+      const defaultValues = getDefaultFieldValues({
+        [jsonPath]: widget as Property,
+      });
+      setJSONValues(jsonField, defaultValues);
     } else if (type === "field") {
       const { jsonFields, name } = widget as Field;
 
@@ -420,7 +444,7 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
           ]),
         );
         const defaultValues = getDefaultFieldValues(fields);
-        result[name] = JSON.stringify(defaultValues);
+        setJSONValues(name, defaultValues);
       }
     }
   }

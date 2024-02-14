@@ -330,7 +330,7 @@ export const Grid = forwardRef<
   }, []);
 
   const doAdd = useCallback(async () => {
-    const newRecord = { id: nextId(), ...getDefaultValues(fields) };
+    const newRecord = { id: nextId(), ...getDefaultValues(fields, view.items) };
     const newRecords = [...(records || []), newRecord];
     setState?.((draft) => {
       const { rows, columns, orderBy, groupBy } = draft;
@@ -350,7 +350,7 @@ export const Grid = forwardRef<
         null,
       ];
     });
-  }, [fields, records, setState]);
+  }, [fields, records, setState, view.items]);
 
   const model = view.model ?? (view as unknown as Property)?.target ?? "";
 
