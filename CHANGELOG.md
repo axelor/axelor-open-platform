@@ -1,3 +1,41 @@
+## 7.0.3 (2024-02-14)
+
+#### Fix
+
+* Fix formatter support in collection template viewer
+* Fix missing dotted fields in o2m grid if no parent fields
+
+  <details>
+  
+  Issue happened when there is a dotted field without its parent,
+  eg. "product.code" field, but no "product" field.
+  
+  </details>
+
+* Fix set multiple action attrs on same field
+* Display message if file(s) can't be downloaded
+* Fix pagination settings not taken into account
+
+  <details>
+  
+  `api.pagination.max-per-page` was taken into account on page text only.
+  `api.pagination.default-per-page` was not taken into account.
+  
+  </details>
+
+* Fix adding m2m item should mark form as dirty
+* Check for errors on save action if not dirty
+* Fix commit editable grid on ok in popup form
+* Fix o2m grid flashing on items reset
+* Fix custom field support in editable grid
+* Return 404 http code when downloading files that don't exist
+* Fix special operators support in advance search
+* Fix confirm lost change when reloading browser tab
+* Avoid grid re-rendering on auto-sizing
+* Fix action attr value for reference fields
+* Fix legacy template support for reference field
+* Fix save request payload containing unwanted values
+
 ## 7.0.2 (2024-02-06)
 
 #### Feature
