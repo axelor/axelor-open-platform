@@ -261,10 +261,6 @@ export function Phone({
                     toggleDropdown();
                   }
                 }}
-                onTouchStart={(event) => {
-                  event.preventDefault();
-                  toggleDropdown();
-                }}
                 disabled={readonly}
               >
                 <FlagImage
