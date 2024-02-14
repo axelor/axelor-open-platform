@@ -48,10 +48,26 @@ export const convertInteger: Converter<number> = (value, { props } = {}) => {
   return isNullOrUndefined(input) ? input : parseInt(String(input));
 };
 
+export const convertBoolean: Converter<boolean> = (
+  value: any,
+  { props } = {},
+) => {
+  const { nullable = false } = props ?? {};
+  
+  const input = convertNone(value, nullable, false);
+  if (isNullOrUndefined(input)) return input;
+
+  if (value?.toLowerCase?.() === "true") return true;
+  if (value?.toLowerCase?.() === "false") return false;
+
+  return Boolean(value);
+};
+
 export const Converters = {
   decimal: convertDecimal,
   integer: convertInteger,
   long: convertInteger,
+  boolean: convertBoolean,
 };
 
 const convert: Converter<any> = (value, opts = {}) => {
