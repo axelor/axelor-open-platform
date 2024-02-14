@@ -12,7 +12,7 @@ import { ManyToOne } from "../many-to-one";
 const evalVar = (name: string) => {
   if (name.startsWith("record.")) {
     console.warn(
-      "Using `record.` prefix is deprecated for `evalXXX` props of `EvalRefSelect` widget:",
+      "Using `record.` prefix is deprecated for `x-eval-*` attributes of `EvalRefSelect` widget:",
       name,
     );
     return name.substring(7);

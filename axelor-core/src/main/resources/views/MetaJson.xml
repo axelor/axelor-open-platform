@@ -76,12 +76,12 @@
           x-target="com.axelor.meta.db.MetaField"
           x-domain="self.name not in ('createdBy', 'updatedBy') and self.relationship = 'ManyToOne' and self.metaModel.fullName = :model"
           onChange="com.axelor.meta.web.MetaController:contextFieldChange"/>
-        <field name="contextFieldValue" colSpan="6" title="Value" showIf="model"
+        <field name="contextFieldValue" colSpan="6" title="Value" showIf="contextFieldTarget"
           widget="EvalRefSelect"
-          x-eval-target="record.contextFieldTarget"
-          x-eval-target-name="record.contextFieldTargetName"
-          x-eval-value="record.contextFieldValue"
-          x-eval-title="record.contextFieldTitle" />
+          x-eval-target="contextFieldTarget"
+          x-eval-target-name="contextFieldTargetName"
+          x-eval-value="contextFieldValue"
+          x-eval-title="contextFieldTitle" />
         <field name="contextFieldTitle" hidden="true" />
         <field name="contextFieldTarget" hidden="true" />
         <field name="contextFieldTargetName" hidden="true" />
