@@ -1,4 +1,4 @@
-import Editor from "@monaco-editor/react";
+import Editor, { loader } from "@monaco-editor/react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import { useCallback } from "react";
@@ -8,6 +8,8 @@ import { useAppTheme } from "@/hooks/use-app-theme";
 import { FieldControl, FieldProps } from "../../builder";
 
 import styles from "./code-editor.module.scss";
+
+loader.config({ paths: { vs: "js/libs/monaco-editor/vs" } });
 
 export function CodeEditor(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;

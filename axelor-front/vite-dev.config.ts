@@ -23,10 +23,18 @@ const proxyAll: ProxyOptions = {
   target: env.VITE_PROXY_TARGET,
   changeOrigin: true,
   bypass(req, res, options) {
-    if (req.url === base || req.url === base + "index.html" || req.url.startsWith(base + "src/")
-      || req.url.startsWith(base + "@fs/") || req.url === base + "@react-refresh"
-      || req.url.startsWith(base + "@id/") || req.url.startsWith(base + "@vite/")
-      || req.url.startsWith(base + "node_modules/") || /\/theme\/([^.]+)\.json/.test(req.url)) {
+    if (
+      req.url === base ||
+      req.url === base + "index.html" ||
+      req.url.startsWith(base + "src/") ||
+      req.url.startsWith(base + "@fs/") ||
+      req.url === base + "@react-refresh" ||
+      req.url.startsWith(base + "@id/") ||
+      req.url.startsWith(base + "@vite/") ||
+      req.url.startsWith(base + "node_modules/") ||
+      /\/theme\/([^.]+)\.json/.test(req.url) ||
+      req.url.startsWith(base + "js/libs/monaco-editor/vs/")
+    ) {
       return req.url;
     }
   },
@@ -53,5 +61,5 @@ export default mergeConfig(
         allow: ["..", "../../axelor-ui"],
       },
     },
-  })
+  }),
 );
