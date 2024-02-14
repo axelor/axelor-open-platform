@@ -1,6 +1,7 @@
 import { PhoneNumberUtil } from "google-libphonenumber";
 import { defaultCountries } from "react-international-phone";
 
+import flags from "@/assets/flags.svg";
 import { i18n } from "@/services/client/i18n";
 
 // Fallback country codes when country is not found in language code
@@ -30,18 +31,9 @@ export const FALLBACK_COUNTRIES: Record<string, string> = {
 
 export const FLAGS = defaultCountries.map((country) => {
   const iso2 = country[1];
-  const src = "img/flags.svg";
+  const src = flags;
   return { iso2, src };
 });
-
-export const FLAG_SOURCES = FLAGS.reduce(
-  (acc, flag) => {
-    const { iso2, src } = flag;
-    acc[iso2] = src;
-    return acc;
-  },
-  {} as Record<string, string>,
-);
 
 const UNKNOWN_NUMBER_TYPE = () => i18n.get("Unknown");
 

@@ -25,9 +25,11 @@ import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { FALLBACK_COUNTRIES, FLAGS, FLAG_SOURCES, getPhoneInfo } from "./utils";
+import { FALLBACK_COUNTRIES, FLAGS, getPhoneInfo } from "./utils";
 
 import "react-international-phone/style.css";
+
+import flags from "@/assets/flags.svg";
 import styles from "./phone.module.scss";
 
 export function Phone({
@@ -267,7 +269,7 @@ export function Phone({
               >
                 <FlagImage
                   iso2={countryIso2}
-                  src={FLAG_SOURCES[countryIso2]}
+                  src={flags}
                   className={styles.flag}
                 />
                 {!readonly && (

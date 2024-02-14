@@ -9,11 +9,12 @@ import { _findLocale, l10n } from "@/services/client/l10n";
 import { Schema } from "@/services/client/meta.types";
 import {
   FALLBACK_COUNTRIES,
-  FLAG_SOURCES,
   getPhoneInfo,
 } from "@/views/form/widgets/phone/utils";
 
 import "react-international-phone/style.css";
+
+import flags from "@/assets/flags.svg";
 import styles from "./phone.module.scss";
 
 export function Phone(props: GridColumnProps) {
@@ -67,11 +68,7 @@ export function Phone(props: GridColumnProps) {
     show && (
       <>
         <Box title={i18n.get(country.name)} className={styles.flagContainer}>
-          <FlagImage
-            className={styles.flag}
-            iso2={iso2}
-            src={FLAG_SOURCES[iso2]}
-          />
+          <FlagImage className={styles.flag} iso2={iso2} src={flags} />
         </Box>
         <Box
           as="a"
