@@ -120,7 +120,7 @@ export function createValueAtom({
   actionExecutor: ActionExecutor;
   widgetSchema?: Schema;
 }) {
-  const { name, editable, readonly, onChange } = schema;
+  const { name, readonly, onChange, inGridEditor } = schema;
 
   const triggerOnChange = () => {
     if (onChange) {
@@ -131,7 +131,7 @@ export function createValueAtom({
   };
 
   // special case for editable grid form
-  const dotted = editable && readonly && name?.includes(".");
+  const dotted = inGridEditor && readonly && name?.includes(".");
 
   const prop = name!;
   const lensAtom = dotted

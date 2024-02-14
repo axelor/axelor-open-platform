@@ -94,7 +94,7 @@ export function TextEdit(props: FieldProps<string>) {
           bgColor="body"
           style={{ ...popup?.style }}
           shadow
-          data-column-index={schema.editIndex}
+          data-column-index={schema.inGridEditorIndex}
         >
           <Box flex={1}>
             <Text

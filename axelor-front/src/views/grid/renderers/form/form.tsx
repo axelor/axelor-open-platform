@@ -104,7 +104,7 @@ export const FormLayoutComponent = ({
                 items: [
                   {
                     ...item,
-                    editable: true,
+                    inGridEditor: true,
                     colSpan: 12,
                     name: item.jsonPath ?? item.name,
                   },
@@ -116,11 +116,11 @@ export const FormLayoutComponent = ({
               jsonFields: [item],
               json: true,
               cols: 12,
-              editColumnName: item.name,
+              inGridEditorColName: item.name,
             }
           : item),
-        editable: true,
-        editIndex: columns.findIndex((c) => c.name === item.name),
+        inGridEditor: true,
+        inGridEditorIndex: columns.findIndex((c) => c.name === item.name),
         showTitle: false,
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,7 +131,7 @@ export const FormLayoutComponent = ({
     <Box d="flex" alignItems="center">
       {columns.map((column, ind) => {
         const item = items.find(
-          (item) => (item.editColumnName ?? item.name) === column.name,
+          (item) => (item.inGridEditorColName ?? item.name) === column.name,
         );
         return (
           <Box

@@ -147,14 +147,14 @@ export function Image(
         maxW={100}
         maxH={100}
         className={clsx(styles.image, {
-          [styles.editable]: schema.editable,
+          [styles.inGridEditor]: schema.inGridEditor,
           [styles.invalid]: !isBinary && !readonly && invalid,
         })}
       >
         <Box
           ref={imageRef}
           as="img"
-          p={schema.editable ? 0 : 1}
+          p={schema.inGridEditor ? 0 : 1}
           d="inline-block"
           src={url}
           alt={title}

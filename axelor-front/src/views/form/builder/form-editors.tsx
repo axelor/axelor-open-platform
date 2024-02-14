@@ -84,7 +84,7 @@ function processEditor(schema: Schema) {
     }
     result.title = item.title ?? field?.title ?? autoTitle(result) ?? "";
 
-    if (!result.showTitle && !result.items && !schema.editable) {
+    if (!result.showTitle && !result.items && !result.inGridEditor) {
       result.placeholder =
         result.placeholder ??
         field?.placeholder ??

@@ -27,7 +27,7 @@ export function useWidget(schema: Schema) {
   const type = toCamelCase(schema.serverType) as keyof typeof WIDGETS;
 
   const Comp =
-    (schema.editable && WIDGETS[editName]) || WIDGETS[name] || WIDGETS[type];
+    (schema.inGridEditor && WIDGETS[editName]) || WIDGETS[name] || WIDGETS[type];
 
   compRef.current = Comp as React.ElementType;
 

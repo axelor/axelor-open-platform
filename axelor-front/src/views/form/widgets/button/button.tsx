@@ -65,7 +65,7 @@ function findVariant(schema: Schema) {
 
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
-  const { showTitle = true, editable, icon, help } = schema;
+  const { showTitle = true, icon, help, inGridEditor } = schema;
   const { data: sessionInfo } = useSession();
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
@@ -101,9 +101,9 @@ export function Button(props: WidgetProps) {
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
-  const hasHelp = !editable && !sessionInfo?.user?.noHelp && !!help;
+  const hasHelp = !inGridEditor && !sessionInfo?.user?.noHelp && !!help;
 
-  const BtnComponent: any = editable ? Box : Btn;
+  const BtnComponent: any = inGridEditor ? Box : Btn;
   const button = (
     <BtnComponent
       {...(BtnComponent === Btn

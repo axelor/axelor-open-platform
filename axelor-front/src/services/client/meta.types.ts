@@ -786,6 +786,7 @@ export interface Schema {
   title?: string;
   help?: string;
   items?: Schema[];
+  inGridEditor?: boolean;
   [K: string]: any;
 }
 

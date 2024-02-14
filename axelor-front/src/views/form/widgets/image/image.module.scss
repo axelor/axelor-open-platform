@@ -2,7 +2,7 @@
   width: 140px;
   min-height: auto;
 
-  &.editable {
+  &.inGridEditor {
     width: fit-content;
     height: calc(4rem + 2px);
   }

@@ -147,7 +147,6 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
           "onNew",
           "orderBy",
           "groupBy",
-          "editable",
         ].reduce(
           (obj, key) => ({
             ...obj,
