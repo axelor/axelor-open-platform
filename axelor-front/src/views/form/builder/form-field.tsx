@@ -197,7 +197,7 @@ export function HelpPopover({
 
 function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
-  const { name, serverType, type, target, help, widget } = schema;
+  const { name, serverType, type, target, help, widget, selection } = schema;
   const { model, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
@@ -214,13 +214,7 @@ function HelpContent(props: WidgetProps) {
 
   if (serverType?.endsWith("_ONE") && value) {
     text = `(${value.id}, ${text})`;
-  }
-  if (serverType === "STRING" && text) {
-    if (text.length > 50) {
-      text = text.slice(0, 50) + "...";
-    }
-  }
-  if (value && ["ONE_TO_MANY", "MANY_TO_MANY"].includes(serverType)) {
+  } else if (value && ["ONE_TO_MANY", "MANY_TO_MANY"].includes(serverType)) {
     const length = value.length;
     const items = value
       .slice(0, length > 5 ? 5 : length)
@@ -229,6 +223,12 @@ function HelpContent(props: WidgetProps) {
       items.push("...");
     }
     text = items.join(", ");
+  } else if (value && (serverType === "ENUM" || selection)) {
+    text = `${value} -> ${text}`;
+  } else if (serverType === "STRING" && text) {
+    if (text.length > 50) {
+      text = text.slice(0, 50) + "...";
+    }
   }
 
   return (
