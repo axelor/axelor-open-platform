@@ -202,11 +202,15 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
         _domain,
         _domainContext,
       };
+      if (!target) {
+        return [];
+      }
+
       const { records, page } = await search(text, options);
       setSearchMore((page.totalCount ?? 0) > records.length);
       return records;
     },
-    [beforeSelect, domain, getContext, search],
+    [beforeSelect, domain, getContext, search, target],
   );
 
   const ensureRelatedValues = useCallback(
@@ -255,11 +259,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
     const result: SelectIcon[] = [];
 
-    if (canEdit && canView) result.push(edit);
-    if (isSuggestBox) return result;
-    if (!canEdit && canView) result.push(view);
-    if (canNew) result.push(add);
-    if (canSelect) result.push(find);
+    if (target) {
+      if (canEdit && canView) result.push(edit);
+      if (isSuggestBox) return result;
+      if (!canEdit && canView) result.push(view);
+      if (canNew) result.push(add);
+      if (canSelect) result.push(find);
+    }
 
     return result;
   }, [
@@ -270,6 +276,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     handleEdit,
     showSelect,
     isSuggestBox,
+    target,
   ]);
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
