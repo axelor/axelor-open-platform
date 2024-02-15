@@ -17,7 +17,7 @@ export function HttpWatch() {
   return (
     <>
       <HttpIndicator count={count} />
-      <HttpBlock count={count} />
+      <HttpBlock count={count} disabled={Boolean(resume)} />
       <HttpAuth resume={resume} />
     </>
   );
@@ -59,12 +59,12 @@ function HttpIndicator({ count }: { count: number }) {
   );
 }
 
-function HttpBlock({ count }: { count: number }) {
+function HttpBlock({ count, disabled }: { count: number, disabled?: boolean }) {
   const [wait, setWait] = useState(false);
   const [block, setBlock] = useState(false);
   const [blocked] = useHttpBlock();
 
-  const _block = blocked || wait;
+  const _block = !disabled && (blocked || wait);
   const active = blocked || count > 0;
 
   useEffect(() => {
