@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import { Box } from "@axelor/ui";
+import { Box, Overflow, OverflowItem } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
 import { SingleSelectValue } from "../single-select/single-select-value";
+import { OverflowMenu } from "../tag-select/overflow-menu";
 
 export function MultiSelect(props: GridColumnProps) {
   const { data, record } = props;
@@ -12,11 +13,22 @@ export function MultiSelect(props: GridColumnProps) {
     () => (value && typeof value === "string" ? value.split(",") : []),
     [value],
   );
+
+  const renderItem = useCallback(
+    (item: string) => <SingleSelectValue schema={data} value={item} />,
+    [data],
+  );
+
   return (
-    <Box d="flex" flexWrap="wrap" g={1}>
-      {items.map((item) => (
-        <SingleSelectValue key={item} schema={data} value={item} />
-      ))}
-    </Box>
+    <Overflow>
+      <Box d="flex" flexWrap="nowrap" gap={4} w={100}>
+        {items.map((item) => (
+          <OverflowItem key={item} id={String(item)}>
+            <Box>{renderItem(item)}</Box>
+          </OverflowItem>
+        ))}
+        <OverflowMenu<string> items={items} renderItem={renderItem} />
+      </Box>
+    </Overflow>
   );
 }
