@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from "react";
 
 import { Box, Overflow, OverflowItem } from "@axelor/ui";
-import { GridColumnProps } from "@axelor/ui/grid";
+import { OverflowMenu } from "@/components/overflow-menu/overflow-menu";
 
+import { GridColumnProps } from "@axelor/ui/grid";
 import { SingleSelectValue } from "../single-select/single-select-value";
-import { OverflowMenu } from "../tag-select/overflow-menu";
 
 export function MultiSelect(props: GridColumnProps) {
   const { data, record } = props;

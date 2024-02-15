@@ -2,10 +2,10 @@ import { useCallback, useMemo } from "react";
 import { Box, Overflow, OverflowItem } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
+import { OverflowMenu } from "@/components/overflow-menu/overflow-menu";
 import { Field } from "@/services/client/meta.types";
 import { SelectionTag } from "@/views/form/widgets";
 import { DataRecord } from "@/services/client/data.types";
-import { OverflowMenu } from "./overflow-menu";
 
 const getItemKey = (record: DataRecord) => record.id!;
 
