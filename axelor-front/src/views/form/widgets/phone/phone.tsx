@@ -23,6 +23,7 @@ import { Box, Button, Input, Portal, clsx } from "@axelor/ui";
 import { Icon } from "@/components/icon";
 import { i18n } from "@/services/client/i18n";
 import { _findLocale, l10n } from "@/services/client/l10n";
+import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { FALLBACK_COUNTRIES, FLAGS, getPhoneInfo } from "./utils";
@@ -155,6 +156,17 @@ export function Phone({
       target: { value: phone !== `+${country.dialCode}` ? phone : "" },
     } as FocusEvent<HTMLInputElement>);
   }, [_onBlur, country.dialCode, phone]);
+
+  const { id: routeId } = useViewRoute();
+  const routeIdRef = useRef(routeId);
+
+  useEffect(() => {
+    if (routeId === routeIdRef.current) return;
+    routeIdRef.current = routeId;
+    if (country.iso2 !== defaultCountry) {
+      setCountry(defaultCountry);
+    }
+  }, [routeId, country.iso2, defaultCountry, setCountry]);
 
   const placeholder = useMemo(() => {
     if (_placeholder) return _placeholder;
