@@ -26,7 +26,9 @@ import { removeVersion } from "../../builder/utils";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
 
-export function ManyToOne(props: FieldProps<DataRecord>) {
+export function ManyToOne(
+  props: FieldProps<DataRecord> & { isSuggestBox?: boolean },
+) {
   const {
     schema,
     formAtom,
@@ -34,13 +36,13 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
     widgetAtom,
     readonly: _readonly,
     invalid,
+    isSuggestBox,
   } = props;
   const {
     target,
     targetName,
     targetSearch,
     canSuggest = true,
-    widget,
     placeholder,
     orderBy: sortBy,
     formView,
@@ -54,8 +56,6 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   const { hasButton } = usePermission(schema, widgetAtom, perms);
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain, hidden } = attrs;
-
-  const isSuggestBox = toKebabCase(widget) === "suggest-box";
 
   const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const showSelector = useSelector();

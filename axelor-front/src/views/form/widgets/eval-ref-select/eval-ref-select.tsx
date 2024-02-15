@@ -6,8 +6,8 @@ import { DataRecord } from "@/services/client/data.types";
 import { focusAtom } from "@/utils/atoms";
 import { deepGet, deepSet } from "@/utils/objects";
 
-import { FieldProps, FormAtom, ValueAtom } from "../../builder";
-import { ManyToOne } from "../many-to-one";
+import { SuggestBox } from "..";
+import { FieldProps, FormAtom, ValueAtom, WidgetAtom } from "../../builder";
 
 const evalVar = (name: string) => {
   if (name.startsWith("record.")) {
@@ -34,11 +34,9 @@ function evalAtom(formAtom: FormAtom, prop: string) {
 }
 
 export function EvalRefSelect(props: FieldProps<any>) {
-  const { formAtom } = props;
+  const { formAtom, widgetAtom: _widgetAtom } = props;
   const evalSchema = useMemo(() => {
     return {
-      canNew: false,
-      canView: false,
       ...props.schema,
       ...props.schema.widgetAttrs,
     };
@@ -64,12 +62,12 @@ export function EvalRefSelect(props: FieldProps<any>) {
     [evalTitle, formAtom],
   );
 
-  const valueAtom = useMemo(
+  const _valueAtom = useMemo(
     () => evalAtom(formAtom, evalValue),
     [evalValue, formAtom],
   );
 
-  const myAtom: ValueAtom<DataRecord> = useMemo(() => {
+  const valueAtom: ValueAtom<DataRecord> = useMemo(() => {
     return atom(
       (get) => {
         const value = get(titleAtom);
@@ -81,13 +79,33 @@ export function EvalRefSelect(props: FieldProps<any>) {
         const record = value || {};
         const id = record.id && record.id > 0 ? record.id : null;
         set(titleAtom, record[targetName] || null);
-        set(valueAtom, id);
+        set(_valueAtom, id);
         // if evalValue points to the same field, we need to set it to null first
         set(props.valueAtom, null);
         set(props.valueAtom, id, fireOnChange);
       },
     );
-  }, [props.valueAtom, targetName, titleAtom, valueAtom]);
+  }, [props.valueAtom, targetName, titleAtom, _valueAtom]);
+
+  const widgetAtom: WidgetAtom = useMemo(() => {
+    return atom(
+      (get) => {
+        const value = get(_widgetAtom);
+        const { attrs, ...rest } = value;
+        return {
+          attrs: {
+            ...attrs,
+            canNew: false,
+            canView: false,
+          },
+          ...rest,
+        };
+      },
+      (get, set, value) => {
+        set(_widgetAtom, value);
+      },
+    );
+  }, [_widgetAtom]);
 
   const schema = useMemo(() => {
     return {
@@ -97,5 +115,12 @@ export function EvalRefSelect(props: FieldProps<any>) {
     };
   }, [evalSchema, target, targetName]);
 
-  return <ManyToOne {...props} schema={schema} valueAtom={myAtom} />;
+  return (
+    <SuggestBox
+      {...props}
+      schema={schema}
+      valueAtom={valueAtom}
+      widgetAtom={widgetAtom}
+    />
+  );
 }

@@ -1,1 +1,1 @@
-export { ManyToOne as SuggestBox } from "../many-to-one";
+export * from "./suggest-box";
