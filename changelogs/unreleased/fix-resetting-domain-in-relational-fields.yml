@@ -1,0 +1,7 @@
+---
+title: Fix resetting relational fields domain
+type: fix
+description: |
+  Resetting domain on relational fields by returning `null`
+  domain on onSelect event is not takes into account and
+  existing domain is still used.

@@ -166,7 +166,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
   });
 
   const showSelect = useCallback(async () => {
-    const _domain = (await beforeSelect(true)) ?? domain;
+    const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
     showSelector({
       model: target,
@@ -196,7 +196,7 @@ export function ManyToOne(props: FieldProps<DataRecord>) {
 
   const fetchOptions = useCallback(
     async (text: string) => {
-      const _domain = (await beforeSelect()) ?? domain;
+      const _domain = await beforeSelect(domain);
       const _domainContext = _domain ? getContext() : {};
       const options = {
         _domain,

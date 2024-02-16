@@ -229,10 +229,13 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [handleChange, value],
   );
 
-  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(schema, getContext);
+  const [beforeSelect, { onMenuOpen, onMenuClose }] = useBeforeSelect(
+    schema,
+    getContext,
+  );
 
   const showSelect = useCallback(async () => {
-    const _domain = (await beforeSelect(true)) ?? domain;
+    const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
     showSelector({
       model: target,
@@ -279,7 +282,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const fetchOptions = useCallback(
     async (text: string) => {
-      const _domain = (await beforeSelect()) ?? domain;
+      const _domain = await beforeSelect(domain);
       const _domainContext = _domain ? getContext() : {};
       const options = {
         _domain,
