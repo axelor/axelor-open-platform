@@ -37,7 +37,7 @@ task relocateTomcatEl(type: ShadowJar) {
 
 jar {
     dependsOn relocateTomcatEl
-    from(zipTree(relocateTomcatEl.archivePath)) {
+    from(zipTree(relocateTomcatEl.archiveFile)) {
         exclude 'META-INF/MANIFEST.MF'
     }
 }
@@ -51,7 +51,7 @@ eclipse {
     classpath {
         file {
             whenMerged {
-                entries += new Library(fileReference(file(relocateTomcatEl.archivePath)))
+                entries += new Library(fileReference(file(relocateTomcatEl.archiveFile)))
             }
         }
     }

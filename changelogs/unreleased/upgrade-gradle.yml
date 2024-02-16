@@ -1,0 +1,10 @@
+---
+title: Upgrade Gradle from 7.5.1 to 8.6
+type: change
+description: |
+  This upgrade Gradle from 7.5.1 to 8.6.
+  
+  Upgrade the Gradle Wrapper to benefit from new features and improvements : 
+  `./gradlew wrapper --gradle-version 8.6`
+  
+  This also include upgrade of Gradle plugins used.
