@@ -1,0 +1,42 @@
+= 7.1 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.1/CHANGELOG.md
+:gradle-7-5-8-0: https://docs.gradle.org/current/userguide/upgrading_version_7.html
+:gradle-8-0-8-6: https://docs.gradle.org/current/userguide/upgrading_version_8.html
+
+In this document, we will see the major steps to migrate from 7.0 to 7.1.
+
+== Dependencies upgrade
+
+Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
+list.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 7.1
+
+Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
+improvements : `./gradlew wrapper --gradle-version 7.5.1`.
+
+[NOTE]
+====
+Note that running the wrapper task once will update `gradle-wrapper.properties` only, but leave the wrapper itself in
+`gradle-wrapper.jar` untouched. This is usually fine as new versions of Gradle can be run even with ancient wrapper
+files. If you nevertheless want all the wrapper files to be completely up-to-date, you’ll need to run the `wrapper`
+task a second time.
+====
+
+Check Gradle migration to update your builds :
+
+- `7.5` -> `8.0` : {gradle-7-5-8-0}[Upgrading your build from Gradle 7.x to 8.0]
+- `8.0` -> `8.6` : {gradle-8-0-8-6}[Upgrading your build from Gradle 8.x to the latest]
+
+[NOTE]
+====
+Gradle can display such warning : `Path for java installation '/usr/lib/jvm/openjdk-11'
+(Common Linux Locations) does not contain a java executable`. It seems that Gradle will
+continue to show this message if the environment is fine.
+
+See https://github.com/gradle/gradle/issues/22921
+====
