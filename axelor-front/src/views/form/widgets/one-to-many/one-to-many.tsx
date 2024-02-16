@@ -817,7 +817,7 @@ function OneToManyInner({
   const [beforeSelect] = useBeforeSelect(schema, getContext);
 
   const onSelect = useCallback(async () => {
-    const _domain = await beforeSelect(domain);
+    const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
     showSelector({
       model,
