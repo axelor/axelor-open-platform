@@ -229,7 +229,7 @@ const formatBoolean: Formatter = (value, opts = {}) => {
 
 const formatSelection: Formatter = (value, opts = {}) => {
   const { props: { selectionList, widget } = {} } = opts;
-  if (widget === "multi-select") {
+  if (widget === "multi-select" || widget === "checkbox-select") {
     return getMultiValues(value)
       .map(
         (item) =>
