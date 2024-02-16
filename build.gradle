@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter
 buildscript {
   apply from: "gradle/repos.gradle"
   dependencies {
-    classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
+    classpath 'com.adarshr:gradle-test-logger-plugin:4.0.0'
   }
 }
 
