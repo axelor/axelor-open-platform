@@ -21,6 +21,7 @@ package com.axelor.auth.pac4j.local;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.inject.Beans;
 import java.util.Optional;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
@@ -70,6 +71,8 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
               .orElse(null);
       credentialsHandler.handleInvalidCredentials(this, username, error);
     }
+
+    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
 
     return credentials;
   }
