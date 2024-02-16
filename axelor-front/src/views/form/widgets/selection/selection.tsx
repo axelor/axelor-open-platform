@@ -8,6 +8,7 @@ import convert from "@/utils/convert";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useSelectionDefault, useSelectionList } from "./hooks";
+import { getMultiValues, joinMultiValues } from "./utils";
 
 import styles from "./selection.module.scss";
 
@@ -52,12 +53,15 @@ export function Selection<Multiple extends boolean>(
   } = useAtomValue(widgetAtom);
 
   const selectionList = useSelectionList({ schema, widgetAtom });
-  const { selectionDefault, selectionZero } = useSelectionDefault({ schema, value });
+  const { selectionDefault, selectionZero } = useSelectionDefault({
+    schema,
+    value,
+  });
 
   const selectionValue = useMemo(() => {
     const selectionAll: SelectionType[] = schema.selectionList ?? [];
     if (multiple) {
-      const values = value == null ? [] : String(value ?? "").split(",");
+      const values = getMultiValues(value);
       return values.map(
         (x) =>
           selectionAll.find((item) => String(item.value) === String(x)) ??
@@ -78,7 +82,7 @@ export function Selection<Multiple extends boolean>(
       let next: string | null = null;
       if (value) {
         next = Array.isArray(value)
-          ? value.map((x) => String(x.value)).join(",")
+          ? joinMultiValues(value.map((x) => String(x.value)))
           : convert(value.value, { props: schema }) ?? null;
       }
       setValue(next, true);
@@ -110,9 +114,10 @@ export function Selection<Multiple extends boolean>(
         renderValue={renderValue}
         placeholder={placeholder}
         closeOnSelect={closeOnSelect}
-        {...(selectionZero && String(value) === "0" && {
-          clearIcon: false,
-        })}
+        {...(selectionZero &&
+          String(value) === "0" && {
+            clearIcon: false,
+          })}
       />
     </FieldControl>
   );

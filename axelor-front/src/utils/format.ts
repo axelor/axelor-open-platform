@@ -3,6 +3,7 @@ import _ from "lodash";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { l10n, moment } from "@/services/client/l10n";
 import { Field, JsonField } from "@/services/client/meta.types";
+import { getMultiValues } from "@/views/form/widgets/selection/utils";
 
 import { toKebabCase } from "./names";
 
@@ -229,10 +230,10 @@ const formatBoolean: Formatter = (value, opts = {}) => {
 const formatSelection: Formatter = (value, opts = {}) => {
   const { props: { selectionList, widget } = {} } = opts;
   if (widget === "multi-select") {
-    return String(value ?? "")
-      .split(/\s*,\s*/)
+    return getMultiValues(value)
       .map(
-        (item) => selectionList?.find((x) => String(x.value) === item)?.title ?? item,
+        (item) =>
+          selectionList?.find((x) => String(x.value) === item)?.title ?? item,
       )
       .join(", ");
   } else {
@@ -253,7 +254,7 @@ const formatOne: Formatter = (value, opts = {}) => {
     const key = `$t:${name}`;
     return val[key] ?? _.get(val, name);
   }
-  
+
   return (
     getValue(value, props.targetName) ??
     (record && getValue(record, `${props.name}.${props.targetName}`)) ??

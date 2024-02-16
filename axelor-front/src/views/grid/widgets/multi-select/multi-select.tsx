@@ -1,18 +1,16 @@
 import { useCallback, useMemo } from "react";
+import { GridColumnProps } from "@axelor/ui/grid";
 
 import { Box, Overflow, OverflowItem } from "@axelor/ui";
 import { OverflowMenu } from "@/components/overflow-menu/overflow-menu";
+import { getMultiValues } from "@/views/form/widgets/selection/utils";
 
-import { GridColumnProps } from "@axelor/ui/grid";
 import { SingleSelectValue } from "../single-select/single-select-value";
 
 export function MultiSelect(props: GridColumnProps) {
   const { data, record } = props;
   const value = record?.[data?.name];
-  const items = useMemo(
-    () => (value && typeof value === "string" ? value.split(",") : []),
-    [value],
-  );
+  const items = useMemo(() => getMultiValues(value), [value]);
 
   const renderItem = useCallback(
     (item: string) => <SingleSelectValue schema={data} value={item} />,

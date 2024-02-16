@@ -5,6 +5,7 @@ import { Box } from "@axelor/ui";
 
 import { Selection as TSelection } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
+import { getMultiValues, joinMultiValues } from "@/views/form/widgets/selection/utils";
 
 import { FieldControl, FieldProps } from "../../builder";
 
@@ -17,11 +18,7 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
   const selectionList = (schema.selectionList as TSelection[]) ?? [];
 
   const isRadio = toKebabCase(widget) === "radio-select";
-  const values = value != null
-    ? String(value)
-        .split(",")
-        .filter((x) => x)
-    : [];
+  const values = value != null ? getMultiValues(value).filter((x) => x) : [];
 
   function handleClick({ value }: TSelection, checked: boolean) {
     if (readonly) return;
@@ -29,10 +26,13 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
       if (isRadio) {
         nullable && setValue(null, true);
       } else {
-        setValue(values.filter((x) => x !== value).join(","), true);
+        setValue(joinMultiValues(values.filter((x) => x !== value)), true);
       }
     } else {
-      setValue(isRadio ? value : [...values, value].join(","), true);
+      setValue(
+        isRadio ? value : joinMultiValues([...values, value] as string[]),
+        true,
+      );
     }
   }
   const vertical = direction === "vertical";

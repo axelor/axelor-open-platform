@@ -1,13 +1,14 @@
 import { useAtom } from "jotai";
 import { useCallback } from "react";
+import { Box } from "@axelor/ui";
+import clsx from "clsx";
 
 import { SelectOptionProps } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
 
 import { FieldProps } from "../../builder";
 import { Selection, SelectionTag } from "../selection";
-import { Box } from "@axelor/ui";
-import clsx from "clsx";
+import { getMultiValues, joinMultiValues } from "../selection/utils";
 import styles from "./multi-select.module.scss";
 
 export function MultiSelect(props: FieldProps<string | number | null>) {
@@ -18,10 +19,10 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
 
   const removeItem = useCallback(
     (item: SelectionType) => {
-      const items = value ? String(value).split(",") : [];
-      const next = items
-        .filter((x) => String(x) !== String(item.value))
-        .join(",");
+      const items = getMultiValues(value);
+      const next = joinMultiValues(
+        items.filter((x) => String(x) !== String(item.value)),
+      );
       setValue(next, true);
     },
     [setValue, value],
@@ -42,10 +43,10 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
 
   const deselectOption = useCallback(
     (item: SelectionType) => {
-      const items = value ? String(value).split(",") : [];
-      const next = items
-        .filter((x) => String(x) !== String(item.value))
-        .join(",");
+      const items = getMultiValues(value);
+      const next = joinMultiValues(
+        items.filter((x) => String(x) !== String(item.value)),
+      );
       setValue(next, true);
     },
     [setValue, value],
@@ -56,9 +57,7 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
       if (!selectionShowCheckbox) {
         return <SelectionTag title={option.title} color={option.color} />;
       }
-      const checked = (value ? String(value).split(",") : []).includes(
-        option.value!,
-      );
+      const checked = getMultiValues(value).includes(option.value!);
       return (
         <Box
           key={option.value}
