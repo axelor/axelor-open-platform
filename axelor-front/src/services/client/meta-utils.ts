@@ -328,7 +328,11 @@ export function processView(
   view = view || {};
 
   if (meta.jsonAttrs && view && view.items) {
-    if (view.type === "grid") {
+    const hasCustomAttrsField = Object.values(meta.fields ?? {}).some(
+      (f) => f.jsonField === "attrs",
+    );
+
+    if (view.type === "grid" && !hasCustomAttrsField) {
       const findLast = (
         array: any[],
         callback: (element: Schema, index?: number, array?: any[]) => boolean,
@@ -361,23 +365,20 @@ export function processView(
         return items;
       })(view.items);
     }
-    if (view.type === "form") {
-      const hasCustomAttrsField = Object.values(meta.fields ?? {}).some(
-        (f) => f.jsonField === "attrs",
-      );
-      !hasCustomAttrsField &&
-        view.items.push({
-          type: "panel",
-          title: i18n.get("Attributes"),
-          itemSpan: 12,
-          items: [
-            {
-              type: "field",
-              name: "attrs",
-              jsonFields: meta.jsonAttrs,
-            },
-          ],
-        });
+
+    if (view.type === "form" && !hasCustomAttrsField) {
+      view.items.push({
+        type: "panel",
+        title: i18n.get("Attributes"),
+        itemSpan: 12,
+        items: [
+          {
+            type: "field",
+            name: "attrs",
+            jsonFields: meta.jsonAttrs,
+          },
+        ],
+      });
     }
   }
 
@@ -481,8 +482,10 @@ export function processView(
       item.widget = "password";
     }
 
+    const isFormField = !["grid", "panel-related"].includes(view.type ?? "");
+
     // convert dotted json fields
-    if (item.jsonField && item.name?.includes(".")) {
+    if (isFormField && item.jsonField && item.name?.includes(".")) {
       const jsonField = fields?.[item.name] ?? {};
       const getWidgetAttrs = (field: Schema) => {
         if (typeof field.widgetAttrs === "string") {
@@ -598,10 +601,12 @@ export function processView(
         editor.items?.push(panelTab);
       }
 
-      item.widget = "json-field";
-      item.editor = editor;
-      if (!item.viewer) {
-        item.editor.viewer = true;
+      if (isFormField) {
+        item.widget = "json-field";
+        item.editor = editor;
+        if (!item.viewer) {
+          item.editor.viewer = true;
+        }
       }
     }
   });
