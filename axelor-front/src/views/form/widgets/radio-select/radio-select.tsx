@@ -45,6 +45,7 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
         m={0}
         d="flex"
         flexDirection={vertical ? "column" : "row"}
+        flexWrap={"wrap"}
         className={clsx({
           [styles.pointer]: !readonly,
           [styles.radio]: isRadio,

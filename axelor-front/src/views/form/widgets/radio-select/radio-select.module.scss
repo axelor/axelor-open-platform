@@ -1,23 +1,26 @@
+$size: 1.275rem;
+
 .ibox {
   display: inline-block;
   width: inherit;
   margin: 0;
   overflow: hidden;
+  white-space: nowrap;
   .pointer & {
     cursor: pointer;
   }
   & .box {
     display: inline-block;
     position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: $size;
+    height: $size;
     outline: none;
     &:before {
       content: ' ';
       display: inline-block;
-      border: 1px solid #ccc;
-      height: 1.25rem;
-      width: 1.25rem;
+      border: 1px solid var(--bs-border-color);
+      height: $size;
+      width: $size;
       transition: all 0.2s;
       .radio & {
         border-radius: 20px;
@@ -34,16 +37,16 @@
     content: ' ';
     display: inline-block;
     position: absolute;
-    top: 5px;
-    left: 4px;
-    width: 12px;
-    height: 7px;
-    border: 2px solid #fff;
+    top: 0.275rem;
+    left: 0.275rem;
+    width: 0.75rem;
+    height: 0.475rem;
+    border: 2px solid var(--bs-body-bg);
     border-top: 0;
     border-right: 0;
     transform: rotate(-45deg);
     .radio & {
-      width: 11px;
+      width: 0.725rem;
     }
   }
 }
