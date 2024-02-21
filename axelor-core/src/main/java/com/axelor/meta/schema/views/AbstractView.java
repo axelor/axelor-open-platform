@@ -98,6 +98,9 @@ public abstract class AbstractView {
 
   @XmlAttribute private Boolean extension;
 
+  @XmlAttribute(name = "x-json-model")
+  private String jsonModel;
+
   @JsonIgnore
   @XmlAttribute(name = "width")
   private String widthSpec;
@@ -196,6 +199,14 @@ public abstract class AbstractView {
 
   public void setModel(String model) {
     this.model = model;
+  }
+
+  public String getJsonModel() {
+    return jsonModel;
+  }
+
+  public void setJsonModel(String jsonModel) {
+    this.jsonModel = jsonModel;
   }
 
   public Boolean getEditable() {
