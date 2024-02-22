@@ -137,14 +137,26 @@ export function createValueAtom({
   const lensAtom = dotted
     ? focusAtom(
         formAtom,
-        (base) => deepGet(base.record, prop) ?? base.record[prop],
+        (base) => {
+          try {
+            return deepGet(base.record, prop) ?? base.record[prop]
+          } catch (err) {
+            return null;
+          }
+        },
         (base, value) => {
           return { ...base, record: { ...base.record, [prop]: value } };
         },
       )
     : focusAtom(
         formAtom,
-        (base) => deepGet(base.record, prop),
+        (base) => {
+          try {
+            return deepGet(base.record, prop);
+          } catch (err) {
+            return null;
+          }
+        },
         (base, value) => {
           return produce(base, (draft) => {
             deepSet(draft.record, prop, value);

@@ -459,11 +459,23 @@ export function processView(
     const fields = view.fields ?? meta.fields ?? {};
 
     if (item.name) {
+      const field = fields[item.name];
       _.forEach(fields[item.name], (value, key) => {
         if (!Object.hasOwn(item, key)) {
           item[key] = value;
         }
       });
+      const isCustomField =
+        item.name.includes(".") && meta.fields?.[item.name.split(".")[0]]?.json;
+
+      // in case when custom field is used in form
+      // but it doesn't exist in custom fields of that model
+      // another case : it was deleted/removed
+      if (isCustomField && !field) {
+        item.serverType = "STRING";
+        item.readonly = true;
+        item.readonlyIf = "true";
+      }
     }
 
     ["canNew", "canView", "canEdit", "canRemove", "canSelect"].forEach(
