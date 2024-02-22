@@ -88,6 +88,7 @@ export const Card = memo(function Card({
           <CardTemplate
             component={Template}
             record={record}
+            view={view}
             fields={fields}
             onRefresh={onRefresh}
           />

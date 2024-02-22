@@ -9,11 +9,13 @@ import { moment } from "@/services/client/l10n";
 
 import { useTemplateContext } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
+import { CalendarView } from "@/services/client/meta.types";
 import { MetaData } from "@/services/client/meta";
 
 import styles from "./popover.module.scss";
 
 export type PopoverProps = {
+  view: CalendarView;
   event: SchedulerEvent<DataRecord>;
   element: HTMLElement;
   canEdit?: boolean;
@@ -29,6 +31,7 @@ export type PopoverProps = {
 };
 
 export function Popover({
+  view,
   element,
   event,
   canEdit,
@@ -74,7 +77,7 @@ export function Popover({
   const {
     context,
     options: { execute },
-  } = useTemplateContext(record, onRefresh);
+  } = useTemplateContext(record, { view, onRefresh });
 
   // Close popover after clicking on link or button on template.
   const handleTemplateClick = useCallback(

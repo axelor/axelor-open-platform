@@ -32,6 +32,7 @@ import {
 
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { getSortBy, parseOrderBy } from "../grid/builder/utils";
+import { createContextParams } from "../form/builder/utils";
 import { ViewProps } from "../types";
 import { Card } from "./card";
 
@@ -56,22 +57,13 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const showEditor = useManyEditor(action, dashlet);
 
-  const getContext = useCallback(
+  const getActionContext = useCallback(
     () => ({
       ...getViewContext(true),
-      _model: action.model,
+      ...createContextParams(view, action),
     }),
-    [action.model, getViewContext],
+    [getViewContext, view, action],
   );
-
-  const getActionContext = useCallback(() => {
-    return {
-      ...getContext(),
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
-    };
-  }, [action.name, action.viewType, action.views, getContext]);
 
   const { width, minWidth } = useMemo(() => {
     const width = view.width || "calc(100% / 3)";

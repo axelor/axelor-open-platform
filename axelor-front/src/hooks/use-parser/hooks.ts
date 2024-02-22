@@ -12,8 +12,8 @@ import {
 } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { BaseHilite, Schema } from "@/services/client/meta.types";
 import { findViewItem } from "@/utils/schema";
+import { BaseHilite, Schema, View } from "@/services/client/meta.types";
 import {
   useViewAction,
   useViewMeta,
@@ -36,6 +36,7 @@ import {
   parseAngularExp,
   parseExpression,
 } from "./utils";
+import { createContextParams } from "@/views/form/builder/utils";
 
 function useFindAttrs() {
   return useAtomCallback(
@@ -186,8 +187,9 @@ export function useTemplate(
 
 export function useTemplateContext(
   record: DataRecord,
-  onRefresh?: () => Promise<void>,
+  options: { view: View; onRefresh?: () => Promise<void> },
 ) {
+  const { view, onRefresh } = options;
   // state to store updated action values
   const [values, setValues] = useState<DataRecord>({});
   const action = useViewAction();
@@ -195,12 +197,9 @@ export function useTemplateContext(
   const getContext = useCallback(
     () => ({
       ...action.context,
-      _model: action.model,
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
+      ...createContextParams(view, action),
     }),
-    [action.context, action.model, action.name, action.viewType, action.views],
+    [view, action],
   );
 
   const { context, actionExecutor } = useMemo(() => {

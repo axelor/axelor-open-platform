@@ -632,6 +632,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       </div>
       {popover?.element && (
         <Popover
+          view={meta.view}
           event={popover.event}
           element={popover.element}
           canEdit={canEdit}

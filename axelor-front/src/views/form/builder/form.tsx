@@ -1,5 +1,6 @@
 import { ScopeProvider } from "bunshi/react";
 import { memo, useCallback, useMemo, useRef } from "react";
+import pick from "lodash/pick";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -118,23 +119,20 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
         const json = view.json ?? false;
         const ctxAtom = json && parent ? parent : formAtom;
 
-        const { context, views } = actionView;
+        const [ctxView, ctxAction] = (() => {
+          if (parent) {
+            if (json) {
+              // json is part of the main view
+              return [get(parent)?.meta?.view, actionView];
+            }
+            // editor, parent context will be available
+            return [view];
+          }
+          return [view, actionView];
+        })();
 
-        const ctx: DataContext = {
-          ...((!parent || json) && context),
-          _viewType: view.type,
-          _viewName:
-            view.name ??
-            (() => {
-              if (json) {
-                return views?.find((v) => v.type === view.type)?.name;
-              }
-              return undefined;
-            })(),
-          _views: views?.map((x) => ({ name: x.name, type: x.type })),
-        };
         const res = set(contextAtom, ctxAtom, {
-          ...ctx,
+          ...createContextParams(ctxView, ctxAction),
           ...options,
           ...extra,
         });

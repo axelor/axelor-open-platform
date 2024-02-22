@@ -61,7 +61,7 @@ import { Dms } from "../dms";
 import { fetchRecord } from "../form";
 import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
-import { nextId } from "../form/builder/utils";
+import { createContextParams, nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
@@ -277,6 +277,7 @@ function GridInner(props: ViewProps<GridView>) {
           filter._domainContext = {
             ...filter?._domainContext,
             ...formContext,
+            ...createContextParams(view, action),
           };
           filter._domainAction = _domainAction;
         }
@@ -294,7 +295,8 @@ function GridInner(props: ViewProps<GridView>) {
         orderBy,
         searchAtom,
         fields,
-        view.items,
+        view,
+        action,
         dashlet,
         getViewContext,
         getSearchTranslate,
@@ -722,12 +724,9 @@ function GridInner(props: ViewProps<GridView>) {
       ...(selectedIdsRef.current?.length > 0 && {
         _ids: selectedIdsRef.current,
       }),
-      _model: action.model,
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
+      ...createContextParams(view, action),
     }),
-    [action, getViewContext],
+    [action, view, getViewContext],
   );
 
   const formAtom = useMemo(

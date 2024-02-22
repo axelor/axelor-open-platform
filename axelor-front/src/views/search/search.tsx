@@ -42,6 +42,7 @@ import {
 } from "./utils";
 import { processView } from "@/services/client/meta-utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { createContextParams } from "@/views/form/builder/utils";
 
 import styles from "./search.module.scss";
 
@@ -87,13 +88,8 @@ export function Search(props: ViewProps<SearchView>) {
   const hasSearchParams = searchParams.size > 0;
 
   const getContext = useCallback<() => DataContext>(
-    () => ({
-      ...action.context,
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
-    }),
-    [action],
+    () => createContextParams(view, action) as DataContext,
+    [view, action],
   );
 
   const { formMeta, formView } = useMemo(() => {
