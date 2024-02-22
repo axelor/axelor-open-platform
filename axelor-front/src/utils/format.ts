@@ -5,6 +5,7 @@ import { l10n, moment } from "@/services/client/l10n";
 import { Field, JsonField } from "@/services/client/meta.types";
 import { getMultiValues } from "@/views/form/widgets/selection/utils";
 
+import { getJSON } from "./data-record";
 import { toKebabCase } from "./names";
 
 export type FormatOptions = {
@@ -32,16 +33,6 @@ export function getDateFormat({ props }: FormatOptions = {}) {
 export function getDateTimeFormat({ props }: FormatOptions = {}) {
   const dateFormat = getDateFormat({ props });
   return dateFormat + " " + getTimeFormat({ props });
-}
-
-export function getJSON(jsonStr: string) {
-  let value = {};
-  try {
-    value = JSON.parse(jsonStr);
-  } catch (e) {
-    // Ignore
-  }
-  return value;
 }
 
 const formatDuration: Formatter = (value, opts = {}) => {

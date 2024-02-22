@@ -8,9 +8,8 @@ import { getMultiValues } from "@/views/form/widgets/selection/utils";
 import { SingleSelectValue } from "../single-select/single-select-value";
 
 export function MultiSelect(props: GridColumnProps) {
-  const { data, record } = props;
-  const value = record?.[data?.name];
-  const items = useMemo(() => getMultiValues(value), [value]);
+  const { data, rawValue } = props;
+  const items = useMemo(() => getMultiValues(rawValue), [rawValue]);
 
   const renderItem = useCallback(
     (item: string) => <SingleSelectValue schema={data} value={item} />,

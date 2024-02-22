@@ -4,7 +4,7 @@ import { GridColumn } from "@axelor/ui/grid";
 
 import { DataRecord } from "@/services/client/data.types";
 import { Schema } from "@/services/client/meta.types";
-import { getJSON } from "@/utils/format";
+import { getJSON } from "@/utils/data-record";
 
 export function getCellValue(record: DataRecord, data: GridColumn) {
   const { name, jsonField, jsonPath } = data as Schema;

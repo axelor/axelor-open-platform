@@ -9,12 +9,9 @@ import {
   Widget,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
+import { getJSON } from "@/utils/data-record";
 
-import {
-  getBaseDummy,
-  isCleanDummy,
-  isPlainObject,
-} from "@/services/client/data-utils";
+import { getBaseDummy, isCleanDummy } from "@/services/client/data-utils";
 import { moment } from "@/services/client/l10n.ts";
 import { MetaData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
@@ -395,15 +392,6 @@ function getDefaultFieldValues(fields?: MetaData["fields"]) {
   );
   return result;
 }
-
-const getJSON = (str: string) => {
-  try {
-    return JSON.parse(str);
-  } catch (err) {
-    // handler error
-  }
-  return {};
-};
 
 function getDefaultJsonFieldValues(widgets?: Widget[]) {
   const result: DataRecord = {};

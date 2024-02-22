@@ -43,6 +43,7 @@ import {
   Perms,
   Property,
 } from "@/services/client/meta.types";
+import { getFieldValue } from "@/utils/data-record";
 import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
@@ -62,6 +63,10 @@ function formatter(column: Field, value: any, record: any) {
     props: column,
     context: record,
   });
+}
+
+function columnValueGetter(column: Field, record: any) {
+  return getFieldValue(record, column as Field);
 }
 
 let labels: Record<GridLabel, string>;
@@ -262,6 +267,7 @@ export const Grid = forwardRef<
         ...(item.type === "field" && { serverType }),
         title,
         formatter: columnFormatter || formatter,
+        valueGetter: columnValueGetter,
         ...columnProps,
         ...extraAttrs,
         ...(widget && { widget }),

@@ -10,15 +10,15 @@ import { DataRecord } from "@/services/client/data.types";
 const getItemKey = (record: DataRecord) => record.id!;
 
 export function TagSelect(props: GridColumnProps) {
-  const { record, data } = props;
-  const { name, targetName = "" } = data as Field;
+  const { rawValue, data } = props;
+  const { targetName = "" } = data as Field;
   const list = useMemo(
     () =>
-      (record?.[name] || []).map((item: DataRecord, ind: number) => ({
+      (rawValue || []).map((item: DataRecord, ind: number) => ({
         ...item,
         id: item.id ?? `item_${ind}`,
       })) as DataRecord[],
-    [record, name],
+    [rawValue],
   );
 
   const getTitle = useCallback(

@@ -2,11 +2,10 @@ import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
 export function Phone(props: GridColumnProps) {
-  const { record, data } = props;
-  const value = record?.[data?.name];
+  const { rawValue } = props;
   return (
-    <Box as="a" href={`tel:${value}`}>
-      {value}
+    <Box as="a" href={`tel:${rawValue}`}>
+      {rawValue}
     </Box>
   );
 }
