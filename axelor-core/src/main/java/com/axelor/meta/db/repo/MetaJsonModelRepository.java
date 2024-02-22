@@ -84,6 +84,9 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       gridView.setModel(MetaJsonRecord.class.getName());
     }
 
+    gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
+    gridView.setTitle(jsonModel.getTitle());
+
     StringBuilder gridXml =
         new StringBuilder()
             .append("<grid")
@@ -125,8 +128,6 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
         .append("  <field name=\"attrs\" x-json-model=\"" + jsonModel.getName() + "\"/>\n")
         .append("</grid>\n");
 
-    gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
-    gridView.setTitle(jsonModel.getTitle());
     gridView.setXml(gridXml.toString());
 
     String onNew = jsonModel.getOnNew();
