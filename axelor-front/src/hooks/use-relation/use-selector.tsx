@@ -26,7 +26,7 @@ export type SelectorOptions = {
   context?: DataContext;
   limit?: number;
   onClose?: () => void;
-  onCreate?: () => void;
+  onCreate?: () => void | Promise<void>;
   onSelect?: (records: DataRecord[]) => void;
 };
 
@@ -219,24 +219,22 @@ function Footer({
   }, [handler, onSelect, onClose]);
 
   return (
-    <Box d="flex" g={2}>
+    <Box d="flex" g={2} flex={1}>
       <Handler multiple={multiple} onClose={onClose} onSelect={onSelect} />
-      <Box d="flex" {...(onCreate && { flex: 1 })}>
-        {onCreate && (
-          <Box d="flex" flex={1}>
-            <Button
-              variant="light"
-              onClick={() => {
-                onClose(false);
-                onCreate();
-              }}
-            >
-              {i18n.get("Create")}
-            </Button>
-          </Box>
-        )}
-      </Box>
-      <Box d="flex" g={2}>
+      {onCreate && (
+        <Box d="flex" flex={1}>
+          <Button
+            variant="light"
+            onClick={() => {
+              onClose(false);
+              onCreate();
+            }}
+          >
+            {i18n.get("Create")}
+          </Button>
+        </Box>
+      )}
+      <Box d="flex" g={2} ms={"auto"}>
         <Button variant="secondary" onClick={handleCancel}>
           {i18n.get("Close")}
         </Button>
