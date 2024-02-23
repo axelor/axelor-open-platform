@@ -816,31 +816,6 @@ function OneToManyInner({
 
   const [beforeSelect] = useBeforeSelect(schema, getContext);
 
-  const onSelect = useCallback(async () => {
-    const _domain = await beforeSelect(domain, true);
-    const _domainContext = _domain ? getContext() : {};
-    showSelector({
-      model,
-      multiple: true,
-      viewName: gridView,
-      orderBy: orderBy,
-      domain: _domain,
-      context: _domainContext,
-      limit: searchLimit,
-      onSelect: handleSelect,
-    });
-  }, [
-    showSelector,
-    orderBy,
-    model,
-    gridView,
-    domain,
-    searchLimit,
-    getContext,
-    beforeSelect,
-    handleSelect,
-  ]);
-
   const openEditor = useCallback(
     (
       options?: Partial<EditorOptions>,
@@ -920,6 +895,36 @@ function OneToManyInner({
   const onAddInDetail = useCallback(() => {
     setDetailRecord({ id: nextId() });
   }, []);
+
+  const onSelect = useCallback(async () => {
+    const _domain = await beforeSelect(domain, true);
+    const _domainContext = _domain ? getContext() : {};
+    showSelector({
+      model,
+      multiple: true,
+      viewName: gridView,
+      orderBy: orderBy,
+      domain: _domain,
+      context: _domainContext,
+      limit: searchLimit,
+      ...(canNew && {
+        onCreate: onAdd,
+      }),
+      onSelect: handleSelect,
+    });
+  }, [
+    canNew,
+    onAdd,
+    showSelector,
+    orderBy,
+    model,
+    gridView,
+    domain,
+    searchLimit,
+    getContext,
+    beforeSelect,
+    handleSelect,
+  ]);
 
   const isPermitted = usePermitted(model, perms);
 

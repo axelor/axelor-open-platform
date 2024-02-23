@@ -225,6 +225,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     useMemo(() => atom((get) => Boolean(get(valueAtom))), [valueAtom]),
   );
 
+  const canNew = hasButton("new") && attrs.canNew;
   const canRemove = hasValue && _canRemove;
   const canEdit = hasValue && hasButton("edit");
   const canSelect = hasButton("select");
@@ -267,6 +268,24 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     [icons],
   );
 
+  const handleEdit = useAtomCallback(
+    useCallback(
+      (get, set, readonly: boolean = false, record?: DataRecord) => {
+        showEditor({
+          model,
+          title: title ?? "",
+          onSelect: (record) => {
+            set(valueAtom, record, true);
+          },
+          record: record ?? get(valueAtom),
+          readonly,
+          viewName: formViewName,
+        });
+      },
+      [model, formViewName, showEditor, title, valueAtom],
+    ),
+  );
+
   const handleSelect = useAtomCallback(
     useCallback(
       async (get, set) => {
@@ -277,6 +296,10 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
           context: get(formAtom).record,
           limit: searchLimit,
           viewName: gridViewName,
+          multiple: false,
+          ...(canNew && {
+            onCreate: () => handleEdit(false, { id: null }),
+          }),
           onSelect: (records) => {
             set(valueAtom, records[0], true);
           },
@@ -289,27 +312,11 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
         model,
         orderBy,
         searchLimit,
+        canNew,
         showSelector,
+        handleEdit,
         valueAtom,
       ],
-    ),
-  );
-
-  const handleEdit = useAtomCallback(
-    useCallback(
-      (get, set, readonly: boolean = false) => {
-        showEditor({
-          model,
-          title: title ?? "",
-          onSelect: (record) => {
-            set(valueAtom, record, true);
-          },
-          record: get(valueAtom),
-          readonly,
-          viewName: formViewName,
-        });
-      },
-      [model, formViewName, showEditor, title, valueAtom],
     ),
   );
 

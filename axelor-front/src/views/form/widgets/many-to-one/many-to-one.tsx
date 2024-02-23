@@ -176,16 +176,21 @@ export function ManyToOne(
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
+      ...(canNew && {
+        onCreate: () => showCreate(""),
+      }),
       onSelect: async (records) => {
         const value = await ensureRelated(records[0]);
         handleChange(value);
       },
     });
   }, [
+    canNew,
     beforeSelect,
     domain,
     getContext,
     showSelector,
+    showCreate,
     target,
     gridView,
     sortBy,

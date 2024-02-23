@@ -234,6 +234,17 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     getContext,
   );
 
+  const showCreate = useCallback(
+    (input: string, popup = true) =>
+      showCreator({
+        input,
+        popup,
+        onEdit: handleEdit,
+        onSelect: handleSelect,
+      }),
+    [handleEdit, handleSelect, showCreator],
+  );
+
   const showSelect = useCallback(async () => {
     const _domain = await beforeSelect(domain, true);
     const _domainContext = _domain ? getContext() : {};
@@ -245,6 +256,9 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       domain: _domain,
       context: _domainContext,
       limit: searchLimit,
+      ...(canNew && {
+        onCreate: () => showCreate(""),
+      }),
       onSelect: async (records = []) => {
         const all = Array.isArray(value) ? value : [];
         const add = records.filter((x) => !all.some((a) => a.id === x.id));
@@ -252,9 +266,11 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       },
     });
   }, [
+    canNew,
     beforeSelect,
     domain,
     getContext,
+    showCreate,
     showSelector,
     target,
     gridView,
@@ -263,17 +279,6 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     value,
     handleChange,
   ]);
-
-  const showCreate = useCallback(
-    (input: string, popup = true) =>
-      showCreator({
-        input,
-        popup,
-        onEdit: handleEdit,
-        onSelect: handleSelect,
-      }),
-    [handleEdit, handleSelect, showCreator],
-  );
 
   const showCreateAndSelect = useCallback(
     (input: string) => showCreate(input, false),
