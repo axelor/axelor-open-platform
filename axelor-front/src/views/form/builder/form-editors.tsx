@@ -71,9 +71,6 @@ function processEditor(schema: Schema) {
     const field = fields?.[item.name!];
     const result = { ...field, ...item };
 
-    // for json fields, always force autoTitle
-    if (schema.json) item.showTitle = undefined;
-
     if (
       result.type !== "panel" &&
       result.type !== "separator" &&

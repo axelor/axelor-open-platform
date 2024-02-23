@@ -62,11 +62,9 @@ export function processSelection(field: Schema, editable?: boolean) {
   });
 }
 
-export function processWidget(field: Schema) {
+function processWidgetAttrs(field: Schema) {
   const attrs: Record<string, any> = {};
-  if (!field.uid) {
-    field.uid = _.uniqueId("w");
-  }
+
   _.each(field.widgetAttrs || {}, (value, name) => {
     let val = value;
     if (value === "null") val = null;
@@ -126,10 +124,18 @@ export function processWidget(field: Schema) {
     }
     attrs[_.camelCase(name)] = val;
   });
+
+  return attrs;
+}
+
+export function processWidget(field: Schema) {
+  if (!field.uid) {
+    field.uid = _.uniqueId("w");
+  }
   if (field.widget) {
     field.widget = _.kebabCase(field.widget);
   }
-  field.widgetAttrs = attrs;
+  field.widgetAttrs = processWidgetAttrs(field);
 }
 
 function UseIncluded(view: Schema) {
@@ -478,9 +484,16 @@ export function processView(
     // convert dotted json fields
     if (item.jsonField && item.name?.includes(".")) {
       const jsonField = fields?.[item.name] ?? {};
+      const getWidgetAttrs = (field: Schema) => {
+        if (typeof field.widgetAttrs === "string") {
+          field.widgetAttrs = JSON.parse(field.widgetAttrs);
+        }
+        return processWidgetAttrs(field);
+      };
       const jsonItem = {
-        jsonField,
+        ...jsonField,
         ...item,
+        widgetAttrs: { ...getWidgetAttrs(jsonField), ...getWidgetAttrs(item) },
         colSpan: 12,
         name: item.jsonPath,
         type: jsonField.type,
