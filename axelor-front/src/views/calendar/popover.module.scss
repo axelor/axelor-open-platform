@@ -3,6 +3,8 @@
   flex-direction: column;
   width: 440px;
   max-width: 440px;
+  max-height: 440px;
+  overflow: hidden;
 }
 
 .header,
@@ -32,7 +34,7 @@
 }
 
 .body {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0 1.5rem 0;
   flex-direction: column;
 }
 
@@ -62,4 +64,9 @@
 
 .subtitle {
   font-size: 0.9rem;
+  padding-bottom: 1rem;
+}
+
+.template {
+  padding-bottom: 0.5rem;
 }

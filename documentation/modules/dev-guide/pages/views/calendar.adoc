@@ -15,6 +15,18 @@ drop support.
   eventStop="endDate"
   eventLength="1">
   <field name="name" />
+  <field name="createDate" />
+  <field name="user" />
+  <template>
+    <![CDATA[
+    <>
+      <ul>
+        <li>{$fmt("createDate")}</li>
+        <li>{$fmt("user")}</li>
+      </ul>
+    </>
+    ]]>
+  </template>
 </calendar>
 -----
 
@@ -35,5 +47,9 @@ The calendar view attributes are:
 | `onChange` | an action to call when event is changed (with drag or resize)
 |===
 
-The calendar data shows records as events. The display value if the event is
-configured with `<field>` items.
+The calendar data shows records as events.
+
+First `<field>` item is used as event title.
+More `<field>` items can be specified for usage in the `<template>`.
+
+Optional `<template>` element is used to define the event popover content.

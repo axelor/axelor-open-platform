@@ -639,6 +639,7 @@ export interface CalendarView extends View {
   eventLength?: number;
   dayLength?: number;
   items?: Widget[];
+  template?: string;
 }
 
 export type GanttModeType = "year" | CalendarModeType;

@@ -46,7 +46,7 @@ export function CardTemplate({
       _viewType: action.viewType,
       _views: action.views,
     }),
-    [action],
+    [action.context, action.model, action.name, action.viewType, action.views],
   );
 
   const { context, actionExecutor } = useMemo(() => {

@@ -1,13 +1,18 @@
-import { useCallback, useMemo } from "react";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
 
 import { ClickAwayListener, Divider, Popper } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { SchedulerEvent } from "@/components/scheduler";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { moment } from "@/services/client/l10n";
 
+import { EvalContextOptions } from "@/hooks/use-parser/context";
 import styles from "./popover.module.scss";
+import { MetaData } from "@/services/client/meta";
+import { useViewAction } from "@/view-containers/views/scope";
+import { FormActionHandler } from "../form/builder/scope";
+import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 
 export type PopoverProps = {
   event: SchedulerEvent<DataRecord>;
@@ -16,6 +21,12 @@ export type PopoverProps = {
   onEdit?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
   onClose: () => void;
+  Template?: FunctionComponent<{
+    context: DataContext;
+    options?: EvalContextOptions;
+  }>;
+  fields?: MetaData["fields"];
+  onRefresh?: () => Promise<void>;
 };
 
 export function Popover({
@@ -25,6 +36,9 @@ export function Popover({
   onEdit,
   onDelete,
   onClose,
+  Template,
+  fields,
+  onRefresh,
 }: PopoverProps) {
   const { title, allDay, start, end, backgroundColor, data: record } = event;
   const subtitle = useMemo(() => {
@@ -50,6 +64,47 @@ export function Popover({
   const handleDelete = useCallback(() => {
     record && onDelete?.(record);
   }, [onDelete, record]);
+
+  // state to store updated action values
+  const [values, setValues] = useState<DataRecord>({});
+  const action = useViewAction();
+
+  const getContext = useCallback(
+    () => ({
+      ...action.context,
+      _model: action.model,
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    }),
+    [action.context, action.model, action.name, action.viewType, action.views],
+  );
+
+  const { context, actionExecutor } = useMemo(() => {
+    const $record = { ...record, ...values };
+    const context = { ...getContext?.(), ...$record };
+    const actionHandler = new FormActionHandler(() => context);
+
+    onRefresh && actionHandler.setRefreshHandler(onRefresh);
+
+    const actionExecutor = new DefaultActionExecutor(actionHandler);
+    return { context, actionExecutor };
+  }, [getContext, onRefresh, record, values]);
+
+  const execute = useCallback(
+    async (action: string, options?: ActionOptions) => {
+      const res = await actionExecutor.execute(action, options);
+      const values = res?.reduce?.(
+        (obj, { values }) => ({
+          ...obj,
+          ...values,
+        }),
+        {},
+      );
+      values && setValues(values);
+    },
+    [actionExecutor],
+  );
 
   return (
     <Popper open shadow rounded arrow target={element} placement="bottom">
@@ -78,6 +133,17 @@ export function Popover({
             <div className={styles.item}>
               <div className={styles.icon} />
               <div className={styles.subtitle}>{subtitle}</div>
+            </div>
+            <div className={styles.template}>
+              {Template && (
+                <Template
+                  context={context}
+                  options={{
+                    execute,
+                    fields,
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

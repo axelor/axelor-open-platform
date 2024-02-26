@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
 @JsonTypeName("calendar")
@@ -52,6 +53,8 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
+
+  @XmlCDATA @XmlElement private String template;
 
   @Override
   public List<AbstractWidget> getItems() {
@@ -139,5 +142,13 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   public void setCanNew(Boolean canNew) {
     this.canNew = canNew;
+  }
+
+  public String getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(String template) {
+    this.template = template;
   }
 }

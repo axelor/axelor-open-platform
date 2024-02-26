@@ -11,6 +11,7 @@ import {
   SchedulerView,
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -50,6 +51,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     editable = true,
     mode: initialMode = "month",
     onChange,
+    template = "",
   } = meta.view;
 
   // create clone of data store
@@ -551,6 +553,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }, [] as SchedulerEvent<DataRecord>[]);
   }, [events, filters]);
 
+  const Template = useTemplate(template);
+
   // register shortcuts
   useShortcuts({ viewType: "calendar", onRefresh: onRefresh });
 
@@ -602,6 +606,9 @@ export function Calendar(props: ViewProps<CalendarView>) {
           onEdit={showRecord}
           onDelete={canDelete ? onDelete : undefined}
           onClose={hidePopover}
+          Template={template ? Template : undefined}
+          fields={meta.fields}
+          onRefresh={onRefresh}
         />
       )}
     </div>

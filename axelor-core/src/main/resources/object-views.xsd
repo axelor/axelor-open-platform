@@ -1940,6 +1940,11 @@
               </xsd:complexContent>
             </xsd:complexType>
           </xsd:element>
+          <xsd:element name="template" type="xsd:string" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation>Define the event popover content template.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
         </xsd:sequence>
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
         <xsd:attribute name="eventStart" type="xsd:string" use="required">
