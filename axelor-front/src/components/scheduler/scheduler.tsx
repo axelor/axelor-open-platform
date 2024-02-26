@@ -152,6 +152,7 @@ export function Scheduler<T>(props: SchedulerProps<T>) {
         navLinkDayClick={handleDayClick}
         allDayText={allDayText}
         moreLinkText={moreText}
+        eventClassNames={styles.event}
       />
     </div>
   );
