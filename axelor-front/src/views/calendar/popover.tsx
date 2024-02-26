@@ -29,10 +29,10 @@ export function Popover({
   const { title, allDay, start, end, backgroundColor, data: record } = event;
   const subtitle = useMemo(() => {
     const startDate = moment(start).format("LL");
-    const startTitle = moment(start).format("HH:mm");
+    const startTitle = moment(start).format("LT");
     const _end = end && allDay ? moment(end).add(-1, "second") : end ?? start;
     const endDate = moment(_end).format("LL");
-    const endTime = moment(_end).format("HH:mm");
+    const endTime = moment(_end).format("LT");
 
     return allDay
       ? startDate == endDate

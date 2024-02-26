@@ -39,7 +39,7 @@ function MessageEvent({ data }: { data: TYPES.Message }) {
     <>
       {" "}
       {$eventText} {" - "}
-      <Box as="a" title={moment($eventTime).format("DD/MM/YYYY HH:mm")}>
+      <Box as="a" title={moment($eventTime).format("L LT")}>
         {moment($eventTime).fromNow()}
       </Box>
     </>
