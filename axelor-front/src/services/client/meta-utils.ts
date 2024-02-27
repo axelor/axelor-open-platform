@@ -46,7 +46,12 @@ export function processFields(fields: Property[] | Record<string, Property>) {
   return result;
 }
 
-export function processSelection(field: Schema) {
+export function processSelection(field: Schema, editable?: boolean) {
+  if (editable) {
+    if (field.widget === "radio-select") field.widget = "selection";
+    else if (field.widget === "checkbox-select") field.widget = "multi-select";
+  }
+  
   if ((field.selection || field.selectionList) && !field.widget) {
     field.widget = "selection";
   }
@@ -437,7 +442,7 @@ export function processView(
 
   _.forEach(view.items, (item, itemIndex) => {
     processWidget(item);
-    processSelection(item);
+    processSelection(item, meta?.view?.editable);
 
     // -to-many ?
     if (Array.isArray(view.fields)) {
@@ -530,7 +535,7 @@ export function processView(
           }
         }
         processWidget(field);
-        processSelection(field);
+        processSelection(field, meta?.view?.editable);
         // apply all widget attributes directly on field
         Object.assign(field, field.widgetAttrs);
         if (field.type === "panel" || field.type === "separator") {

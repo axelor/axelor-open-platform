@@ -1,0 +1,7 @@
+---
+title: Fix RadioSelect/CheckboxSelect widget in editable grid
+type: fix
+description: |
+  In grid, RadioSelect/CheckboxSelect widget can't be used for obvious 
+  display reason. When they are used, use default `selection` widget 
+  for `RadioSelect` and `MultiSelect` widget for `CheckboxSelect`.

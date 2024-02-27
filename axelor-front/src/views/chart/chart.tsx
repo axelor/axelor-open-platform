@@ -31,6 +31,7 @@ import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import { DataContext } from "@/services/client/data.types";
 import { processSelection, processWidget } from "@/services/client/meta-utils";
 import { i18n } from "@/services/client/i18n";
+import { getWidget } from "@/views/form/builder/utils.ts";
 import classes from "./chart.module.scss";
 
 export function Chart(props: ViewProps<ChartView>) {
@@ -76,8 +77,8 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     const model = "com.axelor.script.ScriptBindings";
     const fields: Record<string, Property> = (view.search || []).reduce(
       (fields, _item) => {
-        const item = { ..._item };
-        processSelection(item);
+        const item = { ..._item, widget: getWidget(_item, null) };
+        processSelection(item, true);
         processWidget(item);
         let type = item.type?.toUpperCase() || "STRING";
         if (type?.toLowerCase() === "reference") {
