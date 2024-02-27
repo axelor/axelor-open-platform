@@ -1,15 +1,25 @@
 import { atom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
+import cloneDeep from "lodash/cloneDeep";
 import get from "lodash/get";
 import set from "lodash/set";
-import cloneDeep from "lodash/cloneDeep";
-import { createElement, useCallback, useMemo } from "react";
+import {
+  createElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import { DataContext } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Hilite, Schema } from "@/services/client/meta.types";
-import { findViewItem, useViewMeta } from "@/view-containers/views/scope";
+import {
+  findViewItem,
+  useViewAction,
+  useViewMeta,
+} from "@/view-containers/views/scope";
 import { FormAtom } from "@/views/form/builder";
-import { useFormScope } from "@/views/form/builder/scope";
+import { FormActionHandler, useFormScope } from "@/views/form/builder/scope";
 
 import {
   EvalContextOptions,
@@ -19,6 +29,7 @@ import {
 import { processLegacyTemplate } from "./template-legacy";
 import { processReactTemplate } from "./template-react";
 
+import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
 import {
   isLegacyExpression,
   isReactTemplate,
@@ -165,6 +176,59 @@ export function useTemplate(template: string, field?: Schema) {
       return createElement(Comp, { context });
     };
   }, [$getField, _createParentContext, actionExecutor, template]);
+}
+
+export function useTemplateContext(
+  record: DataRecord,
+  onRefresh?: () => Promise<void>,
+) {
+  // state to store updated action values
+  const [values, setValues] = useState<DataRecord>({});
+  const action = useViewAction();
+
+  const getContext = useCallback(
+    () => ({
+      ...action.context,
+      _model: action.model,
+      _viewName: action.name,
+      _viewType: action.viewType,
+      _views: action.views,
+    }),
+    [action.context, action.model, action.name, action.viewType, action.views],
+  );
+
+  const { context, actionExecutor } = useMemo(() => {
+    const $record = { ...record, ...values };
+    const context = { ...getContext?.(), ...$record };
+    const actionHandler = new FormActionHandler(() => context);
+
+    onRefresh && actionHandler.setRefreshHandler(onRefresh);
+
+    const actionExecutor = new DefaultActionExecutor(actionHandler);
+    return { context, actionExecutor };
+  }, [getContext, onRefresh, record, values]);
+
+  const execute = useCallback(
+    async (action: string, options?: ActionOptions) => {
+      const res = await actionExecutor.execute(action, options);
+      const values = res?.reduce?.(
+        (obj, { values }) => ({
+          ...obj,
+          ...values,
+        }),
+        {},
+      );
+      values && setValues(values);
+    },
+    [actionExecutor],
+  );
+
+  // reset values on record update(fetch)
+  useEffect(() => {
+    setValues({});
+  }, [record]);
+
+  return { context, options: { execute } };
 }
 
 export function useHilites(hilites?: Hilite[]) {

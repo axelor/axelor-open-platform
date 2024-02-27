@@ -1,22 +1,13 @@
-import {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  memo,
-} from "react";
-import { Box, CommandItemProps, CommandBar, clsx } from "@axelor/ui";
+import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
+import { FunctionComponent, memo } from "react";
 
+import { useTemplateContext } from "@/hooks/use-parser";
+import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { SearchResult } from "@/services/client/data";
 import { CardsView, Property } from "@/services/client/meta.types";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { FormActionHandler } from "../form/builder/scope";
-import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
-import { EvalContextOptions } from "@/hooks/use-parser/context";
-import { MetaData } from "@/services/client/meta";
 import { i18n } from "@/services/client/i18n";
-import { useViewAction } from "@/view-containers/views/scope";
+import { MetaData } from "@/services/client/meta";
 import { useCardClassName } from "./use-card-classname";
 import classes from "./card.module.scss";
 
@@ -34,51 +25,10 @@ export function CardTemplate({
   fields?: MetaData["fields"];
   onRefresh?: () => Promise<any>;
 }) {
-  // state to store updated action values
-  const [values, setValues] = useState<DataRecord>({});
-  const action = useViewAction();
-
-  const getContext = useCallback(
-    () => ({
-      ...action.context,
-      _model: action.model,
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
-    }),
-    [action.context, action.model, action.name, action.viewType, action.views],
-  );
-
-  const { context, actionExecutor } = useMemo(() => {
-    const $record = { ...record, ...values };
-    const context = { ...getContext?.(), ...$record };
-    const actionHandler = new FormActionHandler(() => context);
-
-    onRefresh && actionHandler.setRefreshHandler(onRefresh);
-
-    const actionExecutor = new DefaultActionExecutor(actionHandler);
-    return { context, actionExecutor };
-  }, [getContext, onRefresh, record, values]);
-
-  const execute = useCallback(
-    async (action: string, options?: ActionOptions) => {
-      const res = await actionExecutor.execute(action, options);
-      const values = res?.reduce?.(
-        (obj, { values }) => ({
-          ...obj,
-          ...values,
-        }),
-        {},
-      );
-      values && setValues(values);
-    },
-    [actionExecutor],
-  );
-
-  // reset values on record update(fetch)
-  useEffect(() => {
-    setValues({});
-  }, [record]);
+  const {
+    context,
+    options: { execute },
+  } = useTemplateContext(record, onRefresh);
 
   return (
     <TemplateComponent
