@@ -25,8 +25,10 @@ import org.hibernate.cfg.Environment;
 import org.junit.jupiter.api.Disabled;
 
 /**
- * `AbstractBaseCache#shouldHitQueryCache` fail with Infinispan : cache isn't hit Moreover
- * Infinispan 13.0.8.Final depends on Caffeine 2.8.4. Caffeine 3+ isn't compatible with Infinispan.
+ * `AbstractBaseCache#shouldHitQueryCache` fail with Infinispan : cache isn't hit
+ * Moreover, Infinispan 13.0.21.Final depends on Caffeine 2.8.4. We use Caffeine 3+,
+ * but it isn't compatible with Infinispan. To run the test, manually uncomment caffeine
+ * dependency load in `implementation` configuration.
  */
 @Disabled
 @GuiceModules(InfinispanTest.InfinispanTestModule.class)
