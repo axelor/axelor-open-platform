@@ -5,6 +5,7 @@ import { FormState, WidgetErrors } from "@/views/form/builder";
 import { WritableAtom, atom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { ActionExecutor, ActionHandler } from "../action";
+import { CommandItemProps } from "@axelor/ui";
 
 export type PopupHandler = {
   data?: any;
@@ -27,6 +28,7 @@ export type PopupHandler = {
   onRefresh?: () => Promise<void>;
   readyAtom?: WritableAtom<boolean | undefined, [boolean | undefined], void>;
   dirtyAtom?: WritableAtom<boolean, [boolean], void>;
+  attachmentItem?: CommandItemProps | null;
 };
 
 export const PopupScope = createScope<PopupHandler>({});

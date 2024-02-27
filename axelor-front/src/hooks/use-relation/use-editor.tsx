@@ -3,7 +3,7 @@ import { useAtomCallback } from "jotai/utils";
 import { uniqueId } from "lodash";
 import { useCallback, useEffect, useRef } from "react";
 
-import { Box, Button } from "@axelor/ui";
+import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
@@ -242,20 +242,27 @@ function Footer({
     });
   }, [handler, onClose]);
 
+  const { attachmentItem } = handler;
+
+  const commandItems = [attachmentItem].filter(Boolean) as CommandItemProps[];
+
   return (
-    <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
-      {FooterComp && <FooterComp close={onClose} />}
-      <Box d="flex" g={2}>
-        <Button variant="secondary" onClick={handleClose}>
-          {i18n.get("Close")}
-        </Button>
-        {hasOk && popupCanSave && (
-          <Button variant="primary" onClick={handleConfirm}>
-            {i18n.get("OK")}
+    <>
+      {commandItems && <CommandBar items={commandItems} iconOnly />}
+      <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
+        {FooterComp && <FooterComp close={onClose} />}
+        <Box d="flex" g={2}>
+          <Button variant="secondary" onClick={handleClose}>
+            {i18n.get("Close")}
           </Button>
-        )}
+          {hasOk && popupCanSave && (
+            <Button variant="primary" onClick={handleConfirm}>
+              {i18n.get("OK")}
+            </Button>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 

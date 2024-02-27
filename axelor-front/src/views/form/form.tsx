@@ -1044,6 +1044,7 @@ const FormContainer = memo(function FormContainer({
         readyAtom,
         dirtyAtom,
         commitForm: handleCommitEditableWidgets,
+        attachmentItem: canAttach ? attachmentItem : null,
       });
     }
   }, [
@@ -1059,6 +1060,8 @@ const FormContainer = memo(function FormContainer({
     readyAtom,
     dirtyAtom,
     handleCommitEditableWidgets,
+    attachmentItem,
+    canAttach,
   ]);
 
   const { views = [] } = useViewAction();
