@@ -85,7 +85,7 @@ public class DatabaseTask extends AbstractRunTask {
 
   @Override
   protected File getManifestJar() {
-    return FileUtils.getFile(getProject().getBuildDir(), "database", "classpath.jar");
+    return FileUtils.getFile(getProject().getLayout().getBuildDirectory().get().getAsFile(), "database", "classpath.jar");
   }
 
   @Override

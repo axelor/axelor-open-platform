@@ -65,7 +65,7 @@ public class GenerateCode extends DefaultTask {
   }
 
   private static File getOutputBase(Project project) {
-    return project.getBuildDir();
+    return project.getLayout().getBuildDirectory().get().getAsFile();
   }
 
   public static File getJavaOutputDir(Project project) {

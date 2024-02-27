@@ -55,7 +55,7 @@ public class AxelorPlugin implements Plugin<Project> {
   private final String version = VersionUtils.getVersion().version;
 
   public static File getClassOutputDir(Project project, String sourceType) {
-    return new File(project.getBuildDir(), "classes/" + sourceType + "/main");
+    return project.getLayout().getBuildDirectory().dir( "classes/" + sourceType + "/main").get().getAsFile();
   }
 
   @Override

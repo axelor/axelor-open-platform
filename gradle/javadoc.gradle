@@ -21,7 +21,7 @@ task generateDocs(type: Javadoc) {
     }
   }
 
-  destinationDir = file("${buildDir}/docs")
+  destinationDir = project.layout.buildDirectory.dir("docs").get().asFile
   failOnError = false
 
   source = projectsIncludeInJavadocs.sourceSets.main.allJava

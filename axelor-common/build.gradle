@@ -21,7 +21,7 @@ void writeManifest(File dir, boolean force) {
 }
 
 afterEvaluate {
-  writeManifest(file("${project.buildDir}/resources/main"), true)
+  writeManifest(project.layout.buildDirectory.dir("resources/main").get().asFile, true)
   writeManifest(file("${projectDir}/bin/main"), false) // to eclipse output dir
-  writeManifest(file("${projectDir}/out/production/resources"), false) // to intelij output dir
+  writeManifest(file("${projectDir}/out/production/resources"), false) // to intellij output dir
 }

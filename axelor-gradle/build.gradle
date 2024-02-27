@@ -36,8 +36,8 @@ gradlePlugin {
 }
 
 def generateLibsList(config) {
-  def outDir = new File(project.buildDir, "resources/main/com/axelor/gradle")
-  def outFile = new File(outDir, "${config}-libs.txt");
+  def outDir = project.layout.buildDirectory.dir("resources/main/com/axelor/gradle").get().asFile
+  def outFile = new File(outDir, "${config}-libs.txt")
   outDir.mkdirs()
   outFile.text = ""
   configurations.getByName(config).dependencies.each {

@@ -39,7 +39,7 @@ public class CopyWebapp extends DefaultTask {
 
   @OutputDirectory
   public File getOutputDir() {
-    return new File(getProject().getBuildDir(), "webapp");
+    return new File(getProject().getLayout().getBuildDirectory().get().getAsFile(), "webapp");
   }
 
   @InputFiles
@@ -83,10 +83,10 @@ public class CopyWebapp extends DefaultTask {
     project.copy(
         task -> {
           task.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE);
-          task.into(project.getBuildDir());
+          task.into(project.getLayout().getBuildDirectory());
           task.from(getFiles());
           task.into(
-              project.getBuildDir().toPath().resolve("/webapp").toFile(),
+              project.getLayout().getBuildDirectory().dir("/webapp").get().getAsFile(),
               copySpec -> {
                 copySpec.from(getFrontFiles());
                 copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
