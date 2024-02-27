@@ -1924,6 +1924,8 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
         <xsd:sequence>
+          <xsd:element name="hilite" type="tns:CalendarEventHilite" minOccurs="0"
+            maxOccurs="unbounded" />
           <xsd:element name="field" maxOccurs="unbounded">
             <xsd:complexType>
               <xsd:complexContent>
@@ -4089,4 +4091,25 @@
       <xsd:enumeration value="none"></xsd:enumeration>
     </xsd:restriction>
   </xsd:simpleType>
+
+  <xsd:complexType name="CalendarEventHilite">
+    <xsd:attribute name="if" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Styling condition</xsd:documentation>
+      </xsd:annotation></xsd:attribute>
+    <xsd:attribute name="styles">
+      <xsd:annotation>
+        <xsd:documentation>
+          Comma-separated list of styles to apply: fill (default), outline, stripe, strike
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern
+            value="(fill|outline|stripe|strike)(\W+(fill|outline|stripe|strike))*">
+          </xsd:pattern>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
 </xsd:schema>

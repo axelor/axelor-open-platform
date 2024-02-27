@@ -12,7 +12,7 @@ import {
 } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Hilite, Schema } from "@/services/client/meta.types";
+import { BaseHilite, Hilite, Schema } from "@/services/client/meta.types";
 import {
   findViewItem,
   useViewAction,
@@ -231,7 +231,7 @@ export function useTemplateContext(
   return { context, options: { execute } };
 }
 
-export function useHilites(hilites?: Hilite[]) {
+export function useHilites<T extends BaseHilite>(hilites?: T[]) {
   return useCallback(
     (context: DataContext, options?: EvalContextOptions) => {
       const evalContext = createEvalContext(context, options);

@@ -1,0 +1,27 @@
+.outline {
+  background-color: var(--bs-body-bg);
+}
+
+.stripe {
+  background-image: linear-gradient(
+    45deg,
+    transparent,
+    transparent 40%,
+    rgba(0, 0, 0, 0.2) 40%,
+    rgba(0, 0, 0, 0.2) 50%,
+    transparent 50%,
+    transparent 90%,
+    rgba(0, 0, 0, 0.2) 90%,
+    rgba(0, 0, 0, 0.2)
+  ) !important;
+  background-size: 12px 12px !important;
+}
+
+.strike {
+  :global {
+    .fc-event-title,
+    .fc-event-time {
+      text-decoration: line-through;
+    }
+  }
+}

@@ -14,9 +14,13 @@ drop support.
   eventStart="startDate"
   eventStop="endDate"
   eventLength="1">
+  <hilite if="state === 'todo'" styles="outline" />
+  <hilite if="state === 'progress'" styles="stripe" />
+  <hilite if="state === 'complete'" styles="strike" />
   <field name="name" />
   <field name="createDate" />
   <field name="user" />
+  <field name="state" />
   <template>
     <![CDATA[
     <>
@@ -48,6 +52,21 @@ The calendar view attributes are:
 |===
 
 The calendar data shows records as events.
+
+== Hilite
+
+`<hilite>` items can be used to conditionally apply styles to events.
+
+The `<hilite>` attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+| *`if`* | boolean expression
+| `styles` | comma-separated list of styles to apply: `fill` (default), `outline`, `stripe`, `strike`
+|===
+
+== Template
 
 First `<field>` item is used as event title.
 More `<field>` items can be specified for usage in the `<template>`.

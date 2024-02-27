@@ -51,6 +51,9 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   @XmlAttribute private Boolean canNew;
 
+  @XmlElement(name = "hilite")
+  private List<CalendarEventHilite> hilites;
+
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
 
@@ -142,6 +145,14 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   public void setCanNew(Boolean canNew) {
     this.canNew = canNew;
+  }
+
+  public List<CalendarEventHilite> getHilites() {
+    return hilites;
+  }
+
+  public void setHilites(List<CalendarEventHilite> hilites) {
+    this.hilites = hilites;
   }
 
   public String getTemplate() {

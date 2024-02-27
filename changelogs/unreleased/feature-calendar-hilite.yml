@@ -1,0 +1,9 @@
+---
+title: Support hilites on calendar view
+type: feature
+description: |
+  Support <hilite> elements on calendar view to define hiliting rules.
+    
+  The hilite attributes are:
+    - if: boolean expression condition
+    - styles: comma-separated list of styles: fill (default), outline, stripe, strike

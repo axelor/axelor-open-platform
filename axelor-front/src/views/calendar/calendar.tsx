@@ -11,7 +11,7 @@ import {
   SchedulerView,
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useTemplate } from "@/hooks/use-parser";
+import { useHilites, useTemplate } from "@/hooks/use-parser";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -40,6 +40,7 @@ import { Popover } from "./popover";
 import { getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
+import eventStyles from "./event.module.scss";
 
 export function Calendar(props: ViewProps<CalendarView>) {
   const { meta, dataStore: _dataStore, searchAtom } = props;
@@ -51,6 +52,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     editable = true,
     mode: initialMode = "month",
     onChange,
+    hilites,
     template = "",
   } = meta.view;
 
@@ -535,15 +537,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
     ];
   }, [date, mode, onRefresh]);
 
+  const handleHilites = useHilites(hilites ?? []);
+
   const filteredEvents = useMemo(() => {
     const checked = filters.filter((x) => x.checked);
     return events.reduce((acc, event) => {
       const filter = filters.find((x) => x.match?.(event));
       if (filter) {
+        const classNames = handleHilites(event.data ?? {})?.[0]?.styles?.split(
+          /\W+/,
+        );
+        const colors: Partial<SchedulerEvent<DataRecord>> =
+          classNames?.includes("outline")
+            ? {
+                textColor: filter.color,
+                borderColor: filter.color,
+              }
+            : {
+                backgroundColor: filter.color,
+                borderColor: filter.color,
+              };
         event = {
           ...event,
-          backgroundColor: filter.color,
-          borderColor: filter.color,
+          ...colors,
+          classNames: classNames?.map((x) => eventStyles[x]),
         };
       }
       if (checked.length === 0 || checked.some((x) => x.match?.(event))) {
@@ -551,7 +568,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       }
       return acc;
     }, [] as SchedulerEvent<DataRecord>[]);
-  }, [events, filters]);
+  }, [events, filters, handleHilites]);
 
   const Template = useTemplate(template);
 

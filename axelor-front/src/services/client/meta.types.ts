@@ -1,6 +1,6 @@
+import { AdvancedSearchState } from "@/view-containers/advance-search/types";
 import { PrimitiveAtom } from "jotai";
 import { DataContext, DataRecord } from "./data.types";
-import { AdvancedSearchState } from "@/view-containers/advance-search/types";
 
 export type PropertyType =
   | "STRING"
@@ -70,7 +70,7 @@ export interface Property {
   falseText?: string;
   big?: boolean;
   seconds?: boolean;
-  
+
   // For react expression/template data/dateTime formatting
   dateFormat?: string;
   timeFormat?: string;
@@ -142,12 +142,19 @@ export interface Tooltip extends Omit<Viewer, "type"> {
   call?: string;
 }
 
-export interface Hilite {
+export interface BaseHilite {
+  condition: string;
+}
+
+export interface Hilite extends BaseHilite {
   color?: string;
   background?: string;
   strong?: boolean;
-  condition?: string;
   css?: string;
+}
+
+export interface CalendarEventHilite extends BaseHilite {
+  styles?: string;
 }
 
 export interface Label extends Widget {
@@ -638,6 +645,7 @@ export interface CalendarView extends View {
   eventStop?: string;
   eventLength?: number;
   dayLength?: number;
+  hilites?: CalendarEventHilite[];
   items?: Widget[];
   template?: string;
 }

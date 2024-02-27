@@ -50,7 +50,7 @@ function useFieldClassNames(schema: Schema) {
   const [contentClassName, setContentClassName] = useState<string>();
 
   const { recordHandler } = useFormScope();
-  const getHilite = useHilites(schema.hilites);
+  const getHilite = useHilites(hilites);
 
   useEffect(() => {
     if (!hilites?.length) return;

@@ -26,6 +26,7 @@ export interface SchedulerEvent<T> {
   textColor?: string;
   backgroundColor?: string;
   borderColor?: string;
+  classNames?: string[];
   data?: T;
 }
 
