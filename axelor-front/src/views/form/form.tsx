@@ -565,23 +565,23 @@ const FormContainer = memo(function FormContainer({
   );
 
   /**
-   * Handle the form save. This includes 3 parts : 
+   * Handle the form save. This includes 3 parts:
    * <ul>
-   * <li>firstly, checks the record errors. On errors, the process is interrupted.</li>
+   * <li>firstly, check the record errors. On errors, the process is interrupted.</li>
    * <li>secondly, perform the save request.</li>
-   * <li>thirdly, read the record. This make sure the record is up-to-date.</li>
+   * <li>thirdly, read the record. This makes sure the record is up-to-date.</li>
    * </ul>
-   * 
-   * This also make sure to restore the dummy fields after the record is saved.
-   * 
-   * Options that can be used : 
+   *
+   * This also makes sure to restore the dummy fields after the record is saved.
+   *
+   * Options that can be used:
    *
    * @param {boolean} [options.shouldSave] - (default: true) whether it should perform record save request
    * @param {boolean} [options.callOnSave] - (default: true) whether it should call `onSave` actions
    * @param {boolean} [options.callOnRead] - (default: true) whether it should read the record once save request is done
    * @param {boolean} [options.callOnLoad] - (default: true) whether it should call `onLoad` actions (has effect if `callOnRead` is `true`)
    * @param {boolean} [options.handleErrors] - (default: false) whether it should handle errors upon save request
-   * 
+   *
    * @return {DataRecord} the record
    */
   const doSave = useAtomCallback(
@@ -759,7 +759,7 @@ const FormContainer = memo(function FormContainer({
           if (await dataStore.verify({ id, version })) return;
           throw new Error(
             i18n.get(
-              "The record has been updated or delete by another action.",
+              "The record has been updated or deleted by another action.",
             ),
           );
         },
@@ -1487,7 +1487,7 @@ function useCheckVersion(
           const confirmed = await dialogs.confirm({
             content:
               i18n.get(
-                "The record has been updated or delete by another action.",
+                "The record has been updated or deleted by another action.",
               ) +
               "<br>" +
               i18n.get("Would you like to reload the current record?"),

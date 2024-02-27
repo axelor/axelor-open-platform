@@ -395,7 +395,7 @@ public class I18nExtractor {
             }
             if (item.text.length() != item.text.trim().length()) {
               log.warn(
-                  "Remove leading/trailing white spaces from '{}', of following text: '{}'",
+                  "Remove leading/trailing white spaces from '{}', of the following text: '{}'",
                   location,
                   item.text);
             }
