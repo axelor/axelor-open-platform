@@ -442,8 +442,8 @@ function useItemsFamily({
           if (item.id) {
             return item;
           }
-          return {...item, id: nextId()};
-        })
+          return { ...item, id: nextId() };
+        });
         if (items.length === 0 && canShowNew && initialItem) {
           return [initialItem];
         }
@@ -894,7 +894,12 @@ const RecordEditor = memo(function RecordEditor({
 
         // the update is intended for dirty state changed
         // no value changes occurs through this update
-        if (update === formDirtyUpdater) return;
+        // also need to sync dirty with parent form dirty state
+        if (update === formDirtyUpdater) {
+          return (
+            state.dirty && set(parent, (state) => ({ ...state, dirty: true }))
+          );
+        }
 
         set(
           valueAtom,
