@@ -1,0 +1,12 @@
+---
+title: Upgrade PostgreSQL JDBC driver from 42.7.1 to 42.7.2
+type: security
+description: |
+  SQL injection is possible when using the non-default connection property 
+  `preferQueryMode=simple` in combination with application code that has a 
+  vulnerable SQL that negates a parameter value.
+  
+  See https://www.cve.org/CVERecord?id=CVE-2024-1597
+
+  As we are using the default query mode, we aren't impacted. But administrators 
+  can still change the JDBC URL themself to use the impacted query mode.
