@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -133,7 +135,22 @@ public abstract class AbstractWidget {
 
   @XmlTransient
   public void setWidgetAttrs(Map<String, Object> attrs) {
-    // does nothing
+    if (ObjectUtils.isArray(attrs)) {
+      otherAttributes = null;
+      return;
+    }
+
+    otherAttributes = new HashMap<>();
+
+    for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      if (ObjectUtils.notEmpty(value)) {
+        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, key);
+        String qn = String.format("x-%s", name);
+        otherAttributes.put(QName.valueOf(qn), value.toString());
+      }
+    }
   }
 
   public String getModel() {
