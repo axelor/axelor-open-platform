@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useMemo } from "react";
+import { FunctionComponent, MouseEvent, useCallback, useMemo } from "react";
 
 import { ClickAwayListener, Divider, Popper } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -76,6 +76,17 @@ export function Popover({
     options: { execute },
   } = useTemplateContext(record, onRefresh);
 
+  // Close popover after clicking on link or button on template.
+  const handleTemplateClick = useCallback(
+    (event: MouseEvent) => {
+      const element = event.target as Element;
+      if (["A", "BUTTON"].includes(element.tagName)) {
+        setTimeout(onClose);
+      }
+    },
+    [onClose],
+  );
+
   return (
     <Popper open shadow rounded arrow target={element} placement="bottom">
       <ClickAwayListener onClickAway={onClose}>
@@ -104,7 +115,10 @@ export function Popover({
               <div className={styles.icon} />
               <div className={styles.subtitle}>{subtitle}</div>
             </div>
-            <div className={styles.template}>
+            <div
+              className={styles.template}
+              onClickCapture={handleTemplateClick}
+            >
               {Template && (
                 <Template
                   context={context}
