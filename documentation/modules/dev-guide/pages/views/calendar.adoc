@@ -17,6 +17,7 @@ drop support.
   <hilite if="state === 'todo'" styles="outline" />
   <hilite if="state === 'progress'" styles="stripe" />
   <hilite if="state === 'complete'" styles="strike" />
+  <hilite if="$moment().isAfter(endDate ?? startDate)" styles="fade" />
   <field name="name" />
   <field name="createDate" />
   <field name="user" />
@@ -56,6 +57,7 @@ The calendar data shows records as events.
 == Hilite
 
 `<hilite>` items can be used to conditionally apply styles to events.
+All hilites that match their `if` conditions are applied.
 
 The `<hilite>` attributes are:
 
@@ -63,7 +65,7 @@ The `<hilite>` attributes are:
 |===
 | Attribute | Description
 | *`if`* | boolean expression
-| `styles` | comma-separated list of styles to apply: `fill` (default), `outline`, `stripe`, `strike`
+| `styles` | comma-separated list of styles to apply: `fill` (default), `outline`, `stripe`, `strike`, `fade`
 |===
 
 == Template

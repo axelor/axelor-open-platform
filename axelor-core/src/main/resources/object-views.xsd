@@ -4100,13 +4100,13 @@
     <xsd:attribute name="styles">
       <xsd:annotation>
         <xsd:documentation>
-          Comma-separated list of styles to apply: fill (default), outline, stripe, strike
+          Comma-separated list of styles to apply: fill (default), outline, stripe, strike, fade
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
           <xsd:pattern
-            value="(fill|outline|stripe|strike)(\W+(fill|outline|stripe|strike))*">
+            value="(fill|outline|stripe|strike|fade)(\W+(fill|outline|stripe|strike|fade))*">
           </xsd:pattern>
         </xsd:restriction>
       </xsd:simpleType>

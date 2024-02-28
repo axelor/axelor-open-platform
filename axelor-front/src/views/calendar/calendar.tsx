@@ -544,23 +544,24 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return events.reduce((acc, event) => {
       const filter = filters.find((x) => x.match?.(event));
       if (filter) {
-        const classNames = handleHilites(event.data ?? {})?.[0]?.styles?.split(
-          /\W+/,
+        const classNames = handleHilites(event.data ?? {})?.flatMap(
+          (x) => x.styles?.split(/\W+/) ?? [],
         );
-        const colors: Partial<SchedulerEvent<DataRecord>> =
-          classNames?.includes("outline")
-            ? {
-                textColor: filter.color,
-                borderColor: filter.color,
-              }
-            : {
-                backgroundColor: filter.color,
-                borderColor: filter.color,
-              };
+        const colors: Partial<SchedulerEvent<DataRecord>> = classNames.includes(
+          "outline",
+        )
+          ? {
+              textColor: filter.color,
+              borderColor: filter.color,
+            }
+          : {
+              backgroundColor: filter.color,
+              borderColor: filter.color,
+            };
         event = {
           ...event,
           ...colors,
-          classNames: classNames?.map((x) => eventStyles[x]),
+          classNames: classNames.map((x) => eventStyles[x]),
         };
       }
       if (checked.length === 0 || checked.some((x) => x.match?.(event))) {

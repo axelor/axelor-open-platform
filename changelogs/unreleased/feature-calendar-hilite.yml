@@ -6,4 +6,4 @@ description: |
     
   The hilite attributes are:
     - if: boolean expression condition
-    - styles: comma-separated list of styles: fill (default), outline, stripe, strike
+    - styles: comma-separated list of styles: fill (default), outline, stripe, strike, fade
