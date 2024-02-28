@@ -1,6 +1,7 @@
+import { useCallback } from "react";
 import { useAtomValue } from "jotai";
 
-import { Input, clsx } from "@axelor/ui";
+import { Box, Input, clsx } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
@@ -11,12 +12,16 @@ import styles from "./string.module.scss";
 
 export function String({
   inputProps,
+  inputEndAdornment,
+  onChange,
   ...props
 }: FieldProps<string> & {
   inputProps?: Pick<
     React.InputHTMLAttributes<HTMLInputElement>,
     "type" | "autoComplete" | "placeholder" | "onFocus"
   >;
+  inputEndAdornment?: JSX.Element;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, placeholder, translatable } = schema;
@@ -24,9 +29,23 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
+  const {
+    text,
+    onChange: _onChange,
+    onBlur,
+    onKeyDown,
+    setValue,
+  } = useInput(valueAtom, {
     schema,
   });
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e);
+      _onChange(e);
+    },
+    [onChange, _onChange],
+  );
 
   const [trValue, setTranslateValue] = useTranslationValue(props);
 
@@ -44,21 +63,24 @@ export function String({
           value={trValue ?? text}
         />
       ) : (
-        <Input
-          {...(focus && { key: "focused" })}
-          data-input
-          type="text"
-          id={uid}
-          autoFocus={focus}
-          placeholder={placeholder}
-          value={text}
-          invalid={invalid}
-          required={required}
-          onKeyDown={onKeyDown}
-          onChange={onChange}
-          onBlur={onBlur}
-          {...inputProps}
-        />
+        <Box d="flex">
+          <Input
+            {...(focus && { key: "focused" })}
+            data-input
+            type="text"
+            id={uid}
+            autoFocus={focus}
+            placeholder={placeholder}
+            value={text}
+            invalid={invalid}
+            required={required}
+            onKeyDown={onKeyDown}
+            onChange={handleInputChange}
+            onBlur={onBlur}
+            {...inputProps}
+          />
+          {inputEndAdornment}
+        </Box>
       )}
       {translatable && !readonly && (
         <Translatable
