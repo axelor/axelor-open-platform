@@ -19,7 +19,8 @@ import { Criteria, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
-import { CalendarView, FormView } from "@/services/client/meta.types";
+import { CalendarView, Field, FormView } from "@/services/client/meta.types";
+import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewContext,
@@ -51,8 +52,16 @@ export function Calendar(props: ViewProps<CalendarView>) {
   } = meta.view;
 
   const colorField = meta.fields?.[colorBy!];
-  const eventTitle = meta.view.items?.[0]?.name ?? "name";
   const allDayOnly = meta.fields?.[eventStart]?.type === "DATE";
+
+  const titleField = useMemo(() => {
+    const item = meta.view.items?.[0];
+    const { widgetAttrs } = item ?? {};
+    return {
+      ...item,
+      ...widgetAttrs,
+    } as Field;
+  }, [meta.view.items]);
 
   const [mode, setMode] = useState<SchedulerView>(initialMode);
   const [date, setDate] = useState<Date>(() => new Date());
@@ -177,7 +186,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const records = [...ds.records].sort((x, y) => x.id! - y.id!);
       const events = records.map((record) => {
         const id = String(record.id);
-        const title = record[eventTitle];
+        const title = format(record[titleField.name], {
+          props: titleField,
+          context: record,
+        });
         const startValue = record[eventStart];
         const endValue = eventStop && record[eventStop];
         const start = startValue
@@ -240,7 +252,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     eventLength,
     eventStart,
     eventStop,
-    eventTitle,
+    titleField,
     allDayOnly,
   ]);
 
