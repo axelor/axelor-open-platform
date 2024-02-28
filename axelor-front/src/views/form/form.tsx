@@ -1010,6 +1010,7 @@ const FormContainer = memo(function FormContainer({
         actionHandler,
         actionExecutor,
         readyAtom,
+        dirtyAtom,
         commitForm: handleCommitEditableWidgets,
       });
     }
@@ -1023,6 +1024,7 @@ const FormContainer = memo(function FormContainer({
     actionHandler,
     actionExecutor,
     readyAtom,
+    dirtyAtom,
     handleCommitEditableWidgets,
   ]);
 

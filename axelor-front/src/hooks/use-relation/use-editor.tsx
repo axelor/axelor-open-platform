@@ -176,44 +176,51 @@ function Footer({
   }, [handler, onClose]);
 
   const handleConfirm = useAfterActions(
-    useCallback(async () => {
-      if (handler.getState === undefined) return onClose(true);
+    useAtomCallback(
+      useCallback(
+        async (get) => {
+          if (handler.getState === undefined) return onClose(true);
 
-      await handler.commitForm?.();
-    
-      await handler.actionExecutor?.waitFor();
-      await handler.actionExecutor?.wait();
+          await handler.commitForm?.();
 
-      const state = handler.getState();
-      const record = state.record;
-      const canSave = !checkDirty || state.dirty || !record.id;
+          await handler.actionExecutor?.waitFor();
+          await handler.actionExecutor?.wait();
 
-      try {
-        const errors = getErrors(state);
-        if (errors) {
-          showErrors(errors);
-          return;
-        }
+          const state = handler.getState();
+          const record = state.record;
+          const dirtyAtom = handler.dirtyAtom;
+          const dirty = (dirtyAtom && get(dirtyAtom)) || state.dirty;
+          const canSave = !checkDirty || dirty || !record.id;
 
-        if (canSave) {
-          if (onSave) {
-            onSave({ ...record, _dirty: state.dirty });
-          } else if (onSelect && handler.onSave) {
-            const rec = await handler.onSave({
-              shouldSave: true,
-              callOnSave: true,
-              callOnRead: false,
-            });
-            onSelect(rec);
+          try {
+            const errors = getErrors(state);
+            if (errors) {
+              showErrors(errors);
+              return;
+            }
+
+            if (canSave) {
+              if (onSave) {
+                onSave({ ...record, _dirty: state.dirty });
+              } else if (onSelect && handler.onSave) {
+                const rec = await handler.onSave({
+                  shouldSave: true,
+                  callOnSave: true,
+                  callOnRead: false,
+                });
+                onSelect(rec);
+              }
+            }
+
+            onClose(true);
+          } catch (e) {
+            // TODO: show error
+            console.error(e);
           }
-        }
-
-        onClose(true);
-      } catch (e) {
-        // TODO: show error
-        console.error(e);
-      }
-    }, [checkDirty, getErrors, handler, onClose, onSave, onSelect]),
+        },
+        [checkDirty, getErrors, handler, onClose, onSave, onSelect],
+      ),
+    ),
   );
 
   useEffect(() => {

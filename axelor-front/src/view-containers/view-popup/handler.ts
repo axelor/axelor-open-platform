@@ -25,6 +25,7 @@ export type PopupHandler = {
   onSearch?: (options?: SearchOptions) => Promise<SearchResult>;
   onRefresh?: () => Promise<void>;
   readyAtom?: WritableAtom<boolean | undefined, [boolean | undefined], void>;
+  dirtyAtom?: WritableAtom<boolean, [boolean], void>;
 };
 
 export const PopupScope = createScope<PopupHandler>({});
