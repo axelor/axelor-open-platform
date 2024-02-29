@@ -39,4 +39,13 @@ Gradle can display such warning : `Path for java installation '/usr/lib/jvm/open
 continue to show this message if the environment is fine.
 
 See https://github.com/gradle/gradle/issues/22921
+
+A possible workaround is to create a symbolic link to the directory containing the `java` executable:
+
+[source,sh]
+----
+cd /usr/lib/jvm/openjdk-11
+sudo ln -s ../java-11-openjdk-amd64/bin .
+----
+
 ====
