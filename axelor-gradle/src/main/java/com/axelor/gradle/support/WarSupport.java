@@ -53,8 +53,7 @@ public class WarSupport extends AbstractSupport {
 
     final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
     war.from(project.getLayout().getBuildDirectory().dir("webapp"));
-    war.exclude(
-        "node_modules", "gulpfile.js", "package.json", "Brocfile.js", ".jshintignore", ".jshintrc");
+    war.exclude("**/.*");
     war.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
   }
 }

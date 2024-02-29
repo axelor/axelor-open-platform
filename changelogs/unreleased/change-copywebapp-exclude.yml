@@ -1,0 +1,6 @@
+---
+title: copyWebapp Gradle task excludes hidden files only
+type: change
+description: |
+  copyWebapp Gradle task used to exclude development files used by previous axelor-web front-end.
+  Now, it excludes hidden files only.
