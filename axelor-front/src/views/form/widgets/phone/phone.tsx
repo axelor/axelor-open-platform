@@ -336,7 +336,7 @@ export function Phone({
             ref={inputRef}
             {...(focus && { key: "focused" })}
             data-input
-            type="text"
+            type="tel"
             id={uid}
             autoFocus={focus}
             placeholder={placeholder}
