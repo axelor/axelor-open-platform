@@ -260,7 +260,6 @@ public class InfoService extends AbstractService {
           "viewCustomizationPermission",
           Optional.ofNullable(group.getViewCustomizationPermission())
               .map(ViewCustomizationPermission::getValue));
-      map.put("canViewCollaboration", group.getCanViewCollaboration());
     }
 
     return map;
@@ -290,11 +289,6 @@ public class InfoService extends AbstractService {
 
     map.put(
         "allowCustomization", SETTINGS.getBoolean(AvailableAppSettings.VIEW_CUSTOMIZATION, true));
-
-    final Map<String, Object> collaboration = new HashMap<>();
-    collaboration.put(
-        "enabled", SETTINGS.getBoolean(AvailableAppSettings.VIEW_COLLABORATION_ENABLED, true));
-    map.put("collaboration", collaboration);
 
     return map;
   }

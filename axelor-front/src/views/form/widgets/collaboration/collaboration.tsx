@@ -26,8 +26,8 @@ const _t = i18n.get;
 
 export const Collaboration = memo(({ formAtom }: { formAtom: FormAtom }) => {
   const { data: sessionData } = useSession();
-  const { enabled = true } = sessionData?.view?.collaboration ?? {};
-  const { canViewCollaboration: canView = true } = sessionData?.user ?? {};
+  const { enabled = false } = sessionData?.view?.collaboration ?? {};
+  const { canViewCollaboration: canView = false } = sessionData?.user ?? {};
 
   const { model, record } = useAtomValue(formAtom);
   const { id: recordId, version: recordVersion } = record;

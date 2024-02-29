@@ -25,7 +25,6 @@
       <field name="navigation"/>
       <field name="homeAction" widget="ref-text" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view' and self.home = true" />
       <field name="technicalStaff"/>
-      <field name="canViewCollaboration"/>
       <field name="viewCustomizationPermission"/>
     </panel>
     <panel-tabs>

@@ -2,6 +2,8 @@
 :toc:
 :toc-title:
 
+> 🏷️ Available in Axelor Enterprise edition
+
 Views collaboration allows to see users that are seeing/editing/updating the current opened record.
 
 == Overview
