@@ -25,7 +25,7 @@ export function useGridState(
         rows: [],
         columns: [],
         ...(groupBy && {
-          groupBy: groupBy.split(",").map((name) => ({ name })),
+          groupBy: groupBy.split(/\s*,\s*/).map((name) => ({ name })),
         }),
         ...(orderBy && {
           orderBy: parseOrderBy(orderBy),
