@@ -250,6 +250,8 @@ export function Dms(props: ViewProps<GridView>) {
                 action.domain ? `${action.domain} AND ` : ""
               }${domain}`,
             },
+            // reset offset is not provided (ie, not using PageText)
+            offset: 0,
             ...options,
             ...(options.fields && {
               fields: uniq([
