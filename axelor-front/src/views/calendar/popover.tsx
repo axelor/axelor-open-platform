@@ -115,11 +115,11 @@ export function Popover({
               <div className={styles.icon} />
               <div className={styles.subtitle}>{subtitle}</div>
             </div>
-            <div
-              className={styles.template}
-              onClickCapture={handleTemplateClick}
-            >
-              {Template && (
+            {Template && (
+              <div
+                className={styles.template}
+                onClickCapture={handleTemplateClick}
+              >
                 <Template
                   context={context}
                   options={{
@@ -127,8 +127,8 @@ export function Popover({
                     fields,
                   }}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </ClickAwayListener>
