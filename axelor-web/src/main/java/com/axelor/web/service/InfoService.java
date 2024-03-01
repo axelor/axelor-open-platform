@@ -98,6 +98,7 @@ public class InfoService extends AbstractService {
    */
   @GET
   @Path("info")
+  @InfoEndpoint
   @Tag(name = "Metadata")
   @Operation(
       summary = "Retrieve metadata information for the application",
