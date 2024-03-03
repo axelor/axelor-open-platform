@@ -1,0 +1,28 @@
+---
+title: Add support to fetch graph with save and fetch requests
+type: feature
+description: |
+  We can now pass `select` map to the `save` and `fetch` requests
+  to return object graph. If `fields` and `related` options are also
+  given, they will be merged with the graph.
+  
+  The format of the `select` map is as follow:
+  
+  ```json
+  {
+   ...
+   "select": {
+     "name": true,
+     "customer": {
+       "name": true
+     },
+     "items": {
+       "product": {
+         "name": true
+       },
+       "quantity": true
+       "price": true
+     }
+   }
+  }
+  ```

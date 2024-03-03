@@ -32,11 +32,16 @@ export type SearchResult = {
   records: DataRecord[];
 };
 
+export type SelectOptions = {
+  [K: string]: boolean | SelectOptions;
+};
+
 export type ReadOptions = {
   fields?: string[];
   related?: {
     [K: string]: string[];
   };
+  select?: SelectOptions
 };
 
 export type SaveOptions<T extends DataRecord | DataRecord[]> = ReadOptions & {

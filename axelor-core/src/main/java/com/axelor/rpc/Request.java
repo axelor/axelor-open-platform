@@ -48,6 +48,8 @@ public class Request {
 
   private Map<String, List<String>> related;
 
+  private Map<String, Object> select;
+
   private String model;
 
   private Context context;
@@ -152,6 +154,14 @@ public class Request {
 
   public void setRelated(Map<String, List<String>> related) {
     this.related = related;
+  }
+
+  public Map<String, Object> getSelect() {
+    return select;
+  }
+
+  public void setSelect(Map<String, Object> select) {
+    this.select = select;
   }
 
   @JsonIgnore

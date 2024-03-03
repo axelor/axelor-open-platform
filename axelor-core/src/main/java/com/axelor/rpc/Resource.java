@@ -1057,20 +1057,81 @@ public class Resource<T extends Model> {
       throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
     }
 
+    final List<Object> data = new ArrayList<>();
+
+    data.add(repository.populate(toMap(entity, request), request.getContext()));
+
     response.setStatus(Response.STATUS_SUCCESS);
-
-    final List<Object> data = Lists.newArrayList();
-    final String[] fields =
-        request.getFields() == null ? null : request.getFields().toArray(new String[] {});
-    final Map<String, Object> map = toMap(entity, filterPermitted(entity, fields));
-    final Map<String, Object> values = mergeRelated(request, entity, map);
-
-    data.add(repository.populate(values, request.getContext()));
     response.setData(data);
 
     firePostRequestEvent(RequestEvent.FETCH, req, response);
 
     return response;
+  }
+
+  private Map<String, Object> toMap(Model entity, Request request) {
+    final String[] fields =
+        request.getFields() == null ? null : request.getFields().toArray(new String[] {});
+    final Map<String, Object> map = toMap(entity, filterPermitted(entity, fields));
+    final Map<String, Object> values = mergeRelated(request, entity, map);
+    final Map<String, Object> select = request.getSelect();
+
+    if (ObjectUtils.notEmpty(select)) {
+      return mergeGraph(values, toGraph(entity, select));
+    }
+
+    return values;
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> toGraph(Model entity, Map<String, Object> select) {
+    final Map<String, Object> result = new HashMap<String, Object>();
+    final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
+    final Property nameProperty =
+        mapper.getNameField() == null ? mapper.getProperty("code") : mapper.getNameField();
+
+    result.put("id", entity.getId());
+    result.put("$version", entity.getVersion());
+
+    if (nameProperty != null) {
+      result.put(nameProperty.getName(), nameProperty.get(entity));
+    }
+
+    String[] names = filterPermitted(entity, select.keySet().toArray(new String[] {}));
+
+    for (String name : names) {
+      Object selector = select.get(name);
+      Property property = mapper.getProperty(name);
+
+      if (Boolean.FALSE.equals((selector)) || property == null) {
+        continue;
+      }
+
+      Object value = property.get(entity);
+      if (value == null) {
+        result.put(name, value);
+        continue;
+      }
+
+      Map<String, Object> selectorMap =
+          selector instanceof Map ? (Map<String, Object>) selector : Collections.emptyMap();
+
+      if (property.isReference()) {
+        value = toGraph((Model) value, selectorMap);
+      }
+
+      if (property.isCollection()) {
+        value =
+            ((Collection<?>) value)
+                .stream()
+                    .map(item -> toGraph((Model) item, selectorMap))
+                    .collect(Collectors.toList());
+      }
+
+      result.put(name, value);
+    }
+
+    return result;
   }
 
   @SuppressWarnings("all")
@@ -1126,6 +1187,41 @@ public class Resource<T extends Model> {
         target.put(key, old);
       }
     }
+    return target;
+  }
+
+  @SuppressWarnings("all")
+  private Map<String, Object> mergeGraph(Map<String, Object> target, Map<String, Object> graph) {
+    if (target == null || graph == null || graph.isEmpty()) {
+      return target;
+    }
+    for (Map.Entry<String, Object> entry : graph.entrySet()) {
+      String name = entry.getKey();
+      Object value = entry.getValue();
+      Object old = target.get(name);
+
+      if (value instanceof Map && old instanceof Map) {
+        value = mergeGraph((Map) old, (Map) value);
+      }
+
+      if (value instanceof Collection && old instanceof Collection) {
+        Collection<Map> newItems = (Collection<Map>) value;
+        Collection<Map> oldItems = (Collection<Map>) old;
+        value =
+            oldItems.stream()
+                .map(
+                    item ->
+                        newItems.stream()
+                            .filter(x -> Objects.equal(x.get("id"), item.get("id")))
+                            .findFirst()
+                            .map(found -> mergeGraph(item, found))
+                            .orElse(item))
+                .collect(Collectors.toList());
+      }
+
+      target.put(name, value);
+    }
+
     return target;
   }
 
@@ -1249,7 +1345,7 @@ public class Resource<T extends Model> {
               I18nBundle.invalidate();
             }
 
-            data.add(repository.populate(toMap(bean, names), request.getContext()));
+            data.add(repository.populate(toMap(bean, request), request.getContext()));
           }
         });
 
