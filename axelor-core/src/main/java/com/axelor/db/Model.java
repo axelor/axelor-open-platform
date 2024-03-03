@@ -38,6 +38,9 @@ public abstract class Model {
 
   @Version private Integer version;
 
+  // Represents the collection id of the record in the UI widgets (collection fields)
+  @Transient private transient Long cid;
+
   // Represents the selected state of the record in the UI widgets
   @Transient private transient boolean selected;
 
@@ -62,6 +65,26 @@ public abstract class Model {
 
   public void setVersion(Integer version) {
     this.version = version;
+  }
+
+  /**
+   * Get the collection id of the record. The collection widgets use this value to identify exact
+   * record from the action/save request responses.
+   *
+   * @return collection id
+   */
+  public Long getCid() {
+    return cid;
+  }
+
+  /**
+   * Set the collection id for the record. The collection widgets use this value to identify exact
+   * record from the action/save request responses.
+   *
+   * @param cid the collection id
+   */
+  public void setCid(Long cid) {
+    this.cid = cid;
   }
 
   /**

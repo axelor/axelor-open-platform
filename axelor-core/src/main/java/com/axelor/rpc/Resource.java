@@ -1093,6 +1093,9 @@ public class Resource<T extends Model> {
     result.put("id", entity.getId());
     result.put("$version", entity.getVersion());
 
+    if (entity.getCid() != null) result.put("cid", entity.getCid());
+    if (Boolean.TRUE.equals(entity.isSelected())) result.put("selected", entity.isSelected());
+
     if (nameProperty != null) {
       result.put(nameProperty.getName(), nameProperty.get(entity));
     }

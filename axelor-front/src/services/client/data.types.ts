@@ -3,6 +3,7 @@ import { View } from "./meta.types";
 
 export type DataRecord = {
   id?: number | null;
+  cid?: number | null;
   version?: number | null;
   $version?: number | null;
   selected?: boolean;

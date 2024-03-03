@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
 public class ContextHandler<T> {
 
   private static final String FIELD_ID = "id";
+  private static final String FIELD_CID = "cid";
   private static final String FIELD_VERSION = "version";
   private static final String FIELD_SELECTED = "selected";
 
@@ -159,6 +160,9 @@ public class ContextHandler<T> {
       }
       // use managed instance
       final Object bean = JPA.em().find(property.getTarget(), id);
+      if (map.containsKey(FIELD_CID)) {
+        Mapper.of(property.getTarget()).set(bean, FIELD_CID, map.get(FIELD_CID));
+      }
       if (map.containsKey(FIELD_SELECTED)) {
         Mapper.of(property.getTarget()).set(bean, FIELD_SELECTED, map.get(FIELD_SELECTED));
       }

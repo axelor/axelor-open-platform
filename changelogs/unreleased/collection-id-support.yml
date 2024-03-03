@@ -1,0 +1,6 @@
+---
+title: Add support to identify collection items from save/action response
+type: feature
+description: |
+  The client can now set `cid` (collection id) to unsaved collection
+  items to identify the same from the `save` and `action` responses.
