@@ -29,7 +29,6 @@ import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.auth.pac4j.AxelorSecurityLogic;
 import com.axelor.auth.pac4j.ClientListProvider;
 import com.axelor.common.Inflector;
-import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
@@ -40,13 +39,6 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import com.google.inject.servlet.RequestScoped;
-import io.swagger.v3.oas.annotations.Hidden;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,35 +46,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
-@RequestScoped
-@Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
-@Path("/public/app")
 public class InfoService extends AbstractService {
-
-  @Context private HttpServletRequest request;
 
   private final AuthPac4jInfo pac4jInfo;
 
   private final String defaultClient;
   private final boolean exclusive;
 
-  private static final AppSettings SETTINGS = AppSettings.get();
+  protected static final AppSettings SETTINGS = AppSettings.get();
 
   private static final Inflector inflector = Inflector.getInstance();
 
@@ -96,15 +74,6 @@ public class InfoService extends AbstractService {
   /**
    * Retrieves either application login information or session information if the user is logged in.
    */
-  @GET
-  @Path("info")
-  @InfoEndpoint
-  @Tag(name = "Metadata")
-  @Operation(
-      summary = "Retrieve metadata information for the application",
-      description =
-          "Retrieve metadata information for `application` and `authentication`. "
-              + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
   public Map<String, Object> info() {
     final User user = AuthUtils.getUser();
     final Map<String, Object> map = new HashMap<>();
@@ -328,37 +297,6 @@ public class InfoService extends AbstractService {
                     inflector.camelize(
                         key.substring(AvailableAppSettings.FEATURE_PREFIX.length()), true),
                 value -> SETTINGS.getBoolean(value, false)));
-  }
-
-  @GET
-  @Path("logo")
-  @Hidden
-  public Response getLogoContent() {
-    return getImageContent(getLogo());
-  }
-
-  @GET
-  @Path("icon")
-  @Hidden
-  public Response getIconContent() {
-    return getImageContent(getIcon());
-  }
-
-  private Response getImageContent(String pathString) {
-    if (StringUtils.notEmpty(pathString)) {
-      final ServletContext context = request.getServletContext();
-      try (final InputStream inputStream = context.getResourceAsStream(pathString)) {
-        if (inputStream != null) {
-          final byte[] imageData = inputStream.readAllBytes();
-          final String mediaType = MimeTypesUtils.getContentType(pathString);
-          return Response.ok(imageData).type(mediaType).build();
-        }
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
-    }
-
-    return Response.status(Response.Status.NOT_FOUND).build();
   }
 
   /**
