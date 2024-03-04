@@ -40,6 +40,11 @@
     a[data-navlink]:hover {
       text-decoration: none;
     }
+
+    .fc-v-event .fc-event-title,
+    .fc-daygrid-dot-event .fc-event-title {
+      font-weight: 500;
+    }
   }
 }
 
