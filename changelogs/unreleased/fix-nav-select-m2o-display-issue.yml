@@ -1,0 +1,6 @@
+---
+title: Fix m2o with nav-select widget display issue
+type: fix
+  When showIf/hideIf is specified with nav-select widget on m2o field
+  Then it was displaying m2o selection along with nav-select.
+  It should only display nav-select widget. 

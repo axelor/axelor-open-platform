@@ -110,6 +110,7 @@ export function NavSelect(
         ? createWidgetAtom({
             schema: {
               ...schema,
+              uid: uniqueId("w"),
               name: uniqueId("$nav"),
               hideIf: undefined,
               showIf: undefined,
