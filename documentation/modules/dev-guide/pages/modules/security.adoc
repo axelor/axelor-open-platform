@@ -178,6 +178,8 @@ Unlike the object permission rules, view permission rules follows `Grant all -> 
 
 == Single Sign-On
 
+> 🏷️ Available in Axelor Enterprise edition
+
 === Common Configuration
 
 :direct-vs-indirect-clients: https://www.pac4j.org/docs/clients.html#1-direct-vs-indirect-clients

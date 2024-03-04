@@ -20,18 +20,15 @@ package com.axelor.auth.pac4j;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.pac4j.core.config.Config;
-import org.pac4j.jee.filter.CallbackFilter;
+import org.pac4j.http.client.indirect.FormClient;
 
 @Singleton
-public class AxelorCallbackFilter extends CallbackFilter {
+public class ClientListDefaultService extends ClientListService {
 
   @Inject
-  public AxelorCallbackFilter(
-      Config config, AxelorCallbackLogic callbackLogic, ClientListService clientListService) {
-    setConfig(config);
-    setDefaultClient(clientListService.getDefaultClientName());
-    setCallbackLogic(callbackLogic);
-    setRenewSession(false);
+  public ClientListDefaultService(FormClient formClient) {
+    clients.add(formClient);
+    defaultClientName = formClient.getName();
+    init();
   }
 }

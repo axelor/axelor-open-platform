@@ -25,13 +25,13 @@ import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.auth.pac4j.local.AxelorIndirectBasicAuthClient;
 import com.axelor.auth.pac4j.local.BasicAuthCallbackClientFinder;
 import com.axelor.auth.pac4j.local.JsonExtractor;
+import com.axelor.meta.MetaScanner;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.servlet.ServletContext;
@@ -87,9 +87,13 @@ public class AuthPac4jModule extends ShiroWebModule {
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
-    bindAndExpose(new TypeLiteral<List<Client>>() {})
-        .toProvider(ClientListProvider.class)
-        .asEagerSingleton();
+    final Class<? extends ClientListService> clientListService =
+        MetaScanner.findSubTypesOf(ClientListService.class).find().stream()
+            .filter(cls -> !ClientListDefaultService.class.equals(cls))
+            .findFirst()
+            .orElse(ClientListDefaultService.class);
+    bindAndExpose(ClientListService.class).to(clientListService).asEagerSingleton();
+
     bindAndExpose(Clients.class).toProvider(ClientsProvider.class);
     bindAndExpose(Config.class).toProvider(ConfigProvider.class);
 
@@ -138,9 +142,9 @@ public class AuthPac4jModule extends ShiroWebModule {
   }
 
   @Provides
-  public DefaultCallbackClientFinder callbackClientFinder(List<Client> clients) {
+  public DefaultCallbackClientFinder callbackClientFinder(ClientListService clientListService) {
     final Optional<String> clientName =
-        clients.stream()
+        clientListService.get().stream()
             .filter(IndirectBasicAuthClient.class::isInstance)
             .findFirst()
             .map(Client::getName);

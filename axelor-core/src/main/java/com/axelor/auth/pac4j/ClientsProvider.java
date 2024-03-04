@@ -19,10 +19,8 @@
 package com.axelor.auth.pac4j;
 
 import com.google.inject.Provider;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 
 @Singleton
@@ -31,8 +29,8 @@ public class ClientsProvider implements Provider<Clients> {
   private Clients clients;
 
   @Inject
-  public ClientsProvider(AuthPac4jInfo authPac4jInfo, List<Client> clients) {
-    this.clients = new Clients("/callback", clients);
+  public ClientsProvider(AuthPac4jInfo authPac4jInfo, ClientListService clientListService) {
+    this.clients = new Clients("/callback", clientListService.get());
   }
 
   @Override

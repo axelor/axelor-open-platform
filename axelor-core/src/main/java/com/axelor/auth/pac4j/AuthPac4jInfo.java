@@ -24,59 +24,19 @@ import com.axelor.auth.pac4j.local.AxelorAuthenticator;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import org.pac4j.core.client.Client;
-import org.pac4j.core.client.Clients;
-import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.authenticator.Authenticator;
-import org.pac4j.http.client.indirect.FormClient;
-import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.jee.context.JEEContext;
 
 @Singleton
 public class AuthPac4jInfo {
 
-  private Set<String> centralClients;
-
   private Authenticator authenticator;
-
-  private final Map<String, Map<String, String>> clientInfo = new HashMap<>();
-
-  @Nullable
-  public Map<String, String> getClientInfo(String clientName) {
-    return clientInfo.get(clientName);
-  }
-
-  public void setClientInfo(String clientName, Map<String, String> info) {
-    clientInfo.put(clientName, info);
-  }
 
   public String getBaseUrl() {
     return AppSettings.get().getBaseURL();
-  }
-
-  public Set<String> getCentralClients() {
-    if (centralClients == null) {
-      centralClients =
-          Beans.get(Clients.class).getClients().stream()
-              .filter(IndirectClient.class::isInstance)
-              .filter(
-                  client ->
-                      Stream.of(FormClient.class, IndirectBasicAuthClient.class)
-                          .noneMatch(cls -> cls.isInstance(client)))
-              .map(Client::getName)
-              .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-    return centralClients;
   }
 
   /**

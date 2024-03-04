@@ -26,49 +26,32 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
-import com.axelor.auth.pac4j.AxelorSecurityLogic;
-import com.axelor.auth.pac4j.ClientListProvider;
 import com.axelor.common.Inflector;
-import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.core.profile.factory.ProfileManagerFactory;
-import org.pac4j.jee.context.JEEContext;
-import org.pac4j.jee.context.session.JEESessionStore;
 
 public class InfoService extends AbstractService {
 
   private final AuthPac4jInfo pac4jInfo;
-
-  private final String defaultClient;
-  private final boolean exclusive;
 
   protected static final AppSettings SETTINGS = AppSettings.get();
 
   private static final Inflector inflector = Inflector.getInstance();
 
   @Inject
-  public InfoService(AuthPac4jInfo pac4jInfo, ClientListProvider clientListProvider) {
+  public InfoService(AuthPac4jInfo pac4jInfo) {
     this.pac4jInfo = pac4jInfo;
-    this.defaultClient = clientListProvider.getDefaultClientName();
-    this.exclusive = clientListProvider.isExclusive();
   }
 
   /**
@@ -126,69 +109,12 @@ public class InfoService extends AbstractService {
     return Map.of("enabled", enabled, "allowTryItOut", allowTryItOut);
   }
 
-  private Map<String, Object> authInfo() {
+  protected Map<String, Object> authInfo() {
     final Map<String, Object> map = new HashMap<>();
 
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());
 
-    if (ObjectUtils.notEmpty(pac4jInfo.getCentralClients())) {
-      map.put("clients", clientsInfo());
-    }
-
-    if (StringUtils.notEmpty(defaultClient)) {
-      map.put("defaultClient", defaultClient);
-    }
-
-    if (exclusive) {
-      map.put("exclusive", exclusive);
-    }
-
-    // find central client name
-    final JEEContext jeeContext =
-        new JEEContext(Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class));
-    final ProfileManagerFactory profileManagerFactory =
-        Beans.get(AxelorSecurityLogic.class).getProfileManagerFactory();
-    final ProfileManager profileManager =
-        profileManagerFactory.apply(jeeContext, JEESessionStore.INSTANCE);
-
-    profileManager
-        .getProfile()
-        .filter(
-            profile ->
-                Beans.get(AuthPac4jInfo.class)
-                    .getCentralClients()
-                    .contains(profile.getClientName()))
-        .ifPresent(profile -> map.put("currentClient", profile.getClientName()));
-
     return map;
-  }
-
-  private List<Object> clientsInfo() {
-    final List<Object> clients = new ArrayList<>();
-
-    for (final String client : pac4jInfo.getCentralClients()) {
-      final Map<String, Object> clientMap = new HashMap<>();
-      final Map<String, String> info = pac4jInfo.getClientInfo(client);
-      if (info == null) {
-        continue;
-      }
-
-      clientMap.put("name", client);
-
-      final String icon = info.get("icon");
-      if (StringUtils.notEmpty(icon)) {
-        clientMap.put("icon", icon);
-      }
-
-      final String title = info.get("title");
-      if (StringUtils.notEmpty(title)) {
-        clientMap.put("title", title);
-      }
-
-      clients.add(clientMap);
-    }
-
-    return clients;
   }
 
   private Map<String, Object> userInfo() {

@@ -47,10 +47,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.oidc.profile.OidcProfile;
-import org.pac4j.oidc.profile.OidcProfileDefinition;
 
 @Singleton
 public class AuthPac4jProfileService {
@@ -122,19 +119,6 @@ public class AuthPac4jProfileService {
 
     if (uri == null) {
       return null;
-    }
-
-    if (profile instanceof OidcProfile) {
-      final Map<String, String> requestProperties =
-          Optional.ofNullable(profile.getAttribute(OidcProfileDefinition.ACCESS_TOKEN))
-              .map(
-                  token ->
-                      Collections.singletonMap(
-                          HttpConstants.AUTHORIZATION_HEADER,
-                          HttpConstants.BEARER_HEADER_PREFIX + token.toString()))
-              .orElse(Collections.emptyMap());
-
-      return downloadUrl(uri.toURL(), requestProperties);
     }
 
     return downloadUrl(uri.toURL());

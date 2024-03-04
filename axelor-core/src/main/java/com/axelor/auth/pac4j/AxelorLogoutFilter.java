@@ -39,19 +39,19 @@ import org.pac4j.jee.filter.LogoutFilter;
 public class AxelorLogoutFilter extends LogoutFilter {
 
   @Inject
-  public AxelorLogoutFilter(Config config, AxelorLogoutLogic logoutLogic) {
+  public AxelorLogoutFilter(
+      Config config, AxelorLogoutLogic logoutLogic, AxelorLogoutFilterConfig filterConfig)
+      throws ServletException {
+
     final AppSettings settings = AppSettings.get();
     final String logoutUrlPattern =
         settings.get(AvailableAppSettings.AUTH_LOGOUT_URL_PATTERN, null);
-    final boolean localLogout = settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_LOCAL, true);
-    final boolean centralLogout =
-        settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
 
     setConfig(config);
     setLogoutUrlPattern(logoutUrlPattern);
-    setLocalLogout(localLogout);
-    setCentralLogout(centralLogout);
     setLogoutLogic(logoutLogic);
+
+    init(filterConfig);
   }
 
   @Override

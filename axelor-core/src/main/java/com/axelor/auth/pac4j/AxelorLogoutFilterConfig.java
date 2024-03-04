@@ -18,20 +18,31 @@
  */
 package com.axelor.auth.pac4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.pac4j.core.config.Config;
-import org.pac4j.jee.filter.CallbackFilter;
+import com.axelor.inject.Beans;
+import java.util.Enumeration;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
-@Singleton
-public class AxelorCallbackFilter extends CallbackFilter {
+public class AxelorLogoutFilterConfig implements FilterConfig {
 
-  @Inject
-  public AxelorCallbackFilter(
-      Config config, AxelorCallbackLogic callbackLogic, ClientListService clientListService) {
-    setConfig(config);
-    setDefaultClient(clientListService.getDefaultClientName());
-    setCallbackLogic(callbackLogic);
-    setRenewSession(false);
+  @Override
+  public String getFilterName() {
+    return AxelorLogoutFilter.class.getName();
+  }
+
+  @Override
+  public ServletContext getServletContext() {
+    return Beans.get(HttpServletRequest.class).getServletContext();
+  }
+
+  @Override
+  public String getInitParameter(String name) {
+    return null;
+  }
+
+  @Override
+  public Enumeration<String> getInitParameterNames() {
+    return null;
   }
 }

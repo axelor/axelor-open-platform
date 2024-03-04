@@ -34,7 +34,6 @@ import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
-import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.matching.matcher.Matcher;
 import org.pac4j.core.util.Pac4jConstants;
 
@@ -42,7 +41,6 @@ import org.pac4j.core.util.Pac4jConstants;
 public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
   private final ErrorHandler errorHandler;
-  private final AuthPac4jInfo authPac4jInfo;
 
   private final String defaultClientName;
 
@@ -50,12 +48,8 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
   @Inject
   public AxelorSecurityLogic(
-      ErrorHandler errorHandler,
-      AuthPac4jInfo authPac4jInfo,
-      Config config,
-      ClientListProvider clientListProvider) {
+      ErrorHandler errorHandler, Config config, ClientListService clientListService) {
     this.errorHandler = errorHandler;
-    this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
 
     final List<Authorizer> authorizers =
@@ -70,30 +64,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     setMatchingChecker(
         (context, sessionStore, matcherNames, matchersMap, clients) ->
             matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
-    defaultClientName = clientListProvider.getDefaultClientName();
-  }
-
-  // Don't save requested URL if redirected to a non-default central client,
-  // so that the requested URL saved before redirection will be used instead.
-  @Override
-  protected void saveRequestedUrl(
-      WebContext context,
-      SessionStore sessionStore,
-      List<Client> currentClients,
-      AjaxRequestResolver ajaxRequestResolver) {
-
-    context
-        .getRequestParameter(HASH_LOCATION_PARAMETER)
-        .ifPresent(
-            hashLocation -> sessionStore.set(context, HASH_LOCATION_PARAMETER, hashLocation));
-
-    if (context.getRequestParameter(Pac4jConstants.DEFAULT_FORCE_CLIENT_PARAMETER).isEmpty()
-        || currentClients.size() != 1
-        || !authPac4jInfo
-            .getCentralClients()
-            .contains(findClient(context, currentClients).getName())) {
-      super.saveRequestedUrl(context, sessionStore, currentClients, ajaxRequestResolver);
-    }
+    defaultClientName = clientListService.getDefaultClientName();
   }
 
   @Override

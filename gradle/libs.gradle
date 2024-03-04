@@ -184,16 +184,6 @@ libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
   "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
 
-  dependencies.create("org.pac4j:pac4j-oidc:${versions.pac4j}") {
-    exclude group: 'org.mockito', module: 'mockito-core'
-  },
-  "org.pac4j:pac4j-oauth:${versions.pac4j}",
-  dependencies.create("org.pac4j:pac4j-saml:${versions.pac4j}") {
-    exclude group: 'xml-apis', module: 'xml-apis'
-    exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
-    exclude group: 'org.hibernate.javax.persistence', module: 'hibernate-jpa-2.1-api'
-  },
-  "org.pac4j:pac4j-cas:${versions.pac4j}",
   "org.pac4j:pac4j-http:${versions.pac4j}",
   "org.pac4j:pac4j-ldap:${versions.pac4j}",
   "org.ldaptive:ldaptive:${versions.ldaptive}"

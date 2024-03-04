@@ -159,8 +159,6 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
-  String AUTH_ORDER = "auth.provider-order";
-  String AUTH_DEFAULT = "auth.provider-default";
   String AUTH_CALLBACK_URL = "auth.callback-url";
 
   String AUTH_USER_PROVISIONING = "auth.user.provisioning";
@@ -169,8 +167,6 @@ public interface AvailableAppSettings {
 
   String AUTH_LOGOUT_DEFAULT_URL = "auth.logout.default-url";
   String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url-pattern";
-  String AUTH_LOGOUT_LOCAL = "auth.logout.local";
-  String AUTH_LOGOUT_CENTRAL = "auth.logout.central";
 
   String AUTH_LOCAL_BASIC_AUTH = "auth.local.basic-auth";
 

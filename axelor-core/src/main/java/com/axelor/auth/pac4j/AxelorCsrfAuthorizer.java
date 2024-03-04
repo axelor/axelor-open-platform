@@ -41,9 +41,9 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
   private final Set<String> directClients;
 
   @Inject
-  public AxelorCsrfAuthorizer(ClientListProvider clientListProvider) {
+  public AxelorCsrfAuthorizer(ClientListService clientListService) {
     super(AuthPac4jModule.CSRF_HEADER_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
-    directClients = clientListProvider.getDirectClientNames();
+    directClients = clientListService.getDirectClientNames();
   }
 
   /**
