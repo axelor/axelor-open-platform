@@ -26,7 +26,6 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.web.AppSessionListener;
-import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.ArrayList;
@@ -34,15 +33,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 @RequestScoped
@@ -51,24 +46,6 @@ import javax.ws.rs.core.MediaType;
 @Path("/app")
 @Hidden
 public class AboutService extends AbstractService {
-
-  @Context private HttpServletRequest request;
-
-  @Context private HttpServletResponse response;
-
-  @Inject private AppInfo info;
-
-  /**
-   * Retrieves application information.
-   *
-   * @deprecated Use /public/app/info instead.
-   */
-  @GET
-  @Path("info")
-  @Deprecated(since = "7.0.0", forRemoval = true)
-  public Map<String, Object> info() {
-    return info.info(request.getServletContext());
-  }
 
   @GET
   @Path("sysinfo")
