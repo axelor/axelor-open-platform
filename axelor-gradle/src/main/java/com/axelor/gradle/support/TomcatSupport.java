@@ -114,7 +114,8 @@ public class TomcatSupport extends AbstractSupport {
         .findFirst()
         .ifPresent(webapps::add);
 
-    final File merged = new File(project.getLayout().getBuildDirectory().get().getAsFile(), "webapp");
+    final File merged =
+        new File(project.getLayout().getBuildDirectory().get().getAsFile(), "webapp");
     if (merged.exists()) {
       webapps.add(merged);
     }
@@ -135,7 +136,9 @@ public class TomcatSupport extends AbstractSupport {
       }
     }
 
-    extraClasses.add(FileUtils.getFile(project.getLayout().getBuildDirectory().get().getAsFile(), "classes", "java", "main"));
+    extraClasses.add(
+        FileUtils.getFile(
+            project.getLayout().getBuildDirectory().get().getAsFile(), "classes", "java", "main"));
 
     props.setProperty(
         "extraClasses",
@@ -159,13 +162,19 @@ public class TomcatSupport extends AbstractSupport {
             .collect(Collectors.joining(",")));
 
     props.setProperty(
-        "baseDir", FileUtils.getFile(project.getLayout().getBuildDirectory().getAsFile().get(), "tomcat").getAbsolutePath());
+        "baseDir",
+        FileUtils.getFile(project.getLayout().getBuildDirectory().getAsFile().get(), "tomcat")
+            .getAbsolutePath());
     props.setProperty("port", "8080");
     props.setProperty(
         "contextPath",
         "/" + ((War) project.getTasks().getByName("war")).getArchiveBaseName().get());
 
-    final File target = FileUtils.getFile(project.getLayout().getBuildDirectory().getAsFile().get(), "tomcat", TOMCAT_RUNNER_CONFIG);
+    final File target =
+        FileUtils.getFile(
+            project.getLayout().getBuildDirectory().getAsFile().get(),
+            "tomcat",
+            TOMCAT_RUNNER_CONFIG);
 
     // make sure to have parent dir
     target.getParentFile().mkdirs();

@@ -90,7 +90,8 @@ public abstract class AbstractRunTask extends DefaultTask {
 
   @Internal
   protected File getManifestJar() {
-    return FileUtils.getFile(getProject().getLayout().getBuildDirectory().get().getAsFile(), "classpath.jar");
+    return FileUtils.getFile(
+        getProject().getLayout().getBuildDirectory().get().getAsFile(), "classpath.jar");
   }
 
   @Input

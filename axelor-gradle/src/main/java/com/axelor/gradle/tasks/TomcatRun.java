@@ -50,7 +50,8 @@ public class TomcatRun extends AbstractRunTask {
   }
 
   public static List<String> getArgs(Project project, int port) {
-    final File baseDir = FileUtils.getFile(project.getLayout().getBuildDirectory().getAsFile().get(), "tomcat");
+    final File baseDir =
+        FileUtils.getFile(project.getLayout().getBuildDirectory().getAsFile().get(), "tomcat");
     final File confFile = FileUtils.getFile(baseDir, TomcatSupport.TOMCAT_RUNNER_CONFIG);
 
     final List<String> args = new ArrayList<>();
@@ -97,7 +98,8 @@ public class TomcatRun extends AbstractRunTask {
   @Override
   @Internal
   protected File getManifestJar() {
-    return FileUtils.getFile(getProject().getLayout().getBuildDirectory().getAsFile().get(), "tomcat", "classpath.jar");
+    return FileUtils.getFile(
+        getProject().getLayout().getBuildDirectory().getAsFile().get(), "tomcat", "classpath.jar");
   }
 
   @Override
