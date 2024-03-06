@@ -70,6 +70,9 @@ export function About() {
           >
             {i18n.get("Documentation")}
           </Link>
+          <Link href="#/api-documentation">
+            {i18n.get("API Doc")}
+          </Link>
           <Link href="http://www.gnu.org/licenses/agpl.html">
             {i18n.get("License")}
           </Link>

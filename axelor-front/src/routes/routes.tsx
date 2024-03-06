@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { useSession } from "@/hooks/use-session";
+import { Swagger } from "@/routes/swagger";
 
 import { ChangePassword } from "./change-password";
 import { ErrorPage } from "./error";
@@ -31,6 +32,14 @@ const router = createHashRouter([
   {
     path: "/change-password",
     element: <ChangePassword />,
+  },
+  {
+    path: "/api-documentation",
+    element: (
+      <ProtectedRoute>
+        <Swagger/>
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/",
