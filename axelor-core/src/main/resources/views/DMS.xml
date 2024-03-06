@@ -5,10 +5,10 @@
 
   <!-- DMSFile views -->
   <grid name="dms-file-grid" title="Documents" model="com.axelor.dms.db.DMSFile" edit-icon="false">
-    <field name="typeIcon" x-type="icon"/>
+    <field name="typeIcon" widget="Icon"/>
     <field name="fileName"/>
-    <field name="downloadIcon" x-type="icon"/>
-    <field name="detailsIcon" x-type="icon"/>
+    <field name="downloadIcon" widget="icon"/>
+    <field name="detailsIcon" widget="icon"/>
     <field name="updatedOn" title="Last modified" width="130"/>
     <field name="metaFile.sizeText" title="Size" width="80"/>
   </grid>

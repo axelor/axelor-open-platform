@@ -205,7 +205,7 @@ export const Grid = forwardRef<
         columnProps.computed = true;
       }
 
-      if (item.type === "button" || attrs?.type === "icon") {
+      if (item.type === "button" || item.widget === "icon") {
         columnProps.sortable = false;
         columnProps.searchable = false;
         columnProps.editable = false;
@@ -376,7 +376,8 @@ export const Grid = forwardRef<
     async (row: GridRow, rowIndex?: number, column?: GridColumn) => {
       // Skip edit row for edit icon and check write permission
       if (
-        ["icon", "button"].includes(column?.type ?? "") ||
+        column?.type === "button" ||
+        ["icon"].includes((column as Field)?.widget ?? "") ||
         column?.name === "$$edit" ||
         !(await isPermitted(row.record, false, true))
       ) {
