@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -47,6 +48,7 @@ import javax.ws.rs.core.Response;
 public class InfoResource {
 
   @Context private HttpServletRequest request;
+  @Context private HttpServletResponse response;
 
   private final InfoService infoService;
 
@@ -67,7 +69,7 @@ public class InfoResource {
                   "Retrieve metadata information for `application` and `authentication`. "
                           + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
   public Map<String, Object> info() {
-    return infoService.info();
+    return infoService.info(request, response);
   }
 
   @GET

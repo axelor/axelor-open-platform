@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class InfoService extends AbstractService {
 
@@ -57,11 +59,11 @@ public class InfoService extends AbstractService {
   /**
    * Retrieves either application login information or session information if the user is logged in.
    */
-  public Map<String, Object> info() {
+  public Map<String, Object> info(HttpServletRequest request, HttpServletResponse response) {
     final User user = AuthUtils.getUser();
     final Map<String, Object> map = new HashMap<>();
     map.put("application", appInfo());
-    map.put("authentication", authInfo());
+    map.put("authentication", authInfo(request, response));
     if (user != null) {
       map.put("user", userInfo());
       map.put("view", viewInfo());
@@ -101,15 +103,15 @@ public class InfoService extends AbstractService {
     return map;
   }
 
-  private Map<String, Object> swaggerUIInfo() {
-    final boolean enabled =
-        SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ENABLED, true);
-    final boolean allowTryItOut =
-        SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT, false);
-    return Map.of("enabled", enabled, "allowTryItOut", allowTryItOut);
-  }
+    private Map<String, Object> swaggerUIInfo() {
+        final boolean enabled =
+                SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ENABLED, true);
+        final boolean allowTryItOut =
+                SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT, false);
+        return Map.of("enabled", enabled, "allowTryItOut", allowTryItOut);
+    }
 
-  protected Map<String, Object> authInfo() {
+  protected Map<String, Object> authInfo(HttpServletRequest request, HttpServletResponse response) {
     final Map<String, Object> map = new HashMap<>();
 
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());
