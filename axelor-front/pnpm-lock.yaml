@@ -58,9 +58,6 @@ dependencies:
   font-awesome:
     specifier: ^4.7.0
     version: 4.7.0(patch_hash=b36n7p33c4ewtt5v6is5moc24u)
-  google-libphonenumber:
-    specifier: ^3.2.34
-    version: 3.2.34
   immer:
     specifier: ^10.0.3
     version: 10.0.3
@@ -76,6 +73,9 @@ dependencies:
   jsdom:
     specifier: ^23.0.1
     version: 23.0.1
+  libphonenumber-js:
+    specifier: ^1.10.57
+    version: 1.10.57
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -4086,11 +4086,6 @@ packages:
       slash: 3.0.0
     dev: true
 
-  /google-libphonenumber@3.2.34:
-    resolution: {integrity: sha512-CLwkp0lZvMywh6dCh0T3Fm8XsfJhLAupc8AECwYkJNQBPW8wQPrv/tV0oFKCs8FMw+pTQyNPZoycgBzYjqtTZQ==}
-    engines: {node: '>=0.10'}
-    dev: false
-
   /gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
     dependencies:
@@ -4604,6 +4599,10 @@ packages:
       prelude-ls: 1.2.1
       type-check: 0.4.0
     dev: true
+
+  /libphonenumber-js@1.10.57:
+    resolution: {integrity: sha512-OjsEd9y4LgcX+Ig09SbxWqcGESxliDDFNVepFhB9KEsQZTrnk3UdEU+cO0sW1APvLprHstQpS23OQpZ3bwxy6Q==}
+    dev: false
 
   /lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}

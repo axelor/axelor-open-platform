@@ -1,4 +1,4 @@
-import { PhoneNumberUtil } from "google-libphonenumber";
+import parsePhoneNumber from "libphonenumber-js/max";
 import { defaultCountries } from "react-international-phone";
 
 import flags from "@/assets/flags.svg";
@@ -38,40 +38,34 @@ export const FLAGS = defaultCountries.map((country) => {
 
 const UNKNOWN_NUMBER_TYPE = () => i18n.get("Unknown");
 
-const NUMBER_TYPES = [
-  () => i18n.get("Fixed line"),
-  () => i18n.get("Mobile"),
-  () => i18n.get("Fixed line or mobile"),
-  () => i18n.get("Toll free"),
-  () => i18n.get("Premium rate"),
-  () => i18n.get("Shared cost"),
-  () => i18n.get("VoIP"),
-  () => i18n.get("Personal number"),
-  () => i18n.get("Pager"),
-  () => i18n.get("UAN"),
-  () => i18n.get("Voicemail"),
-];
-
-const phoneUtil = PhoneNumberUtil.getInstance();
+const NUMBER_TYPES: Record<string, () => string> = {
+  FIXED_LINE: () => i18n.get("Fixed line"),
+  MOBILE: () => i18n.get("Mobile"),
+  FIXED_LINE_OR_MOBILE: () => i18n.get("Fixed line or mobile"),
+  TOLL_FREE: () => i18n.get("Toll free"),
+  PREMIUM_RATE: () => i18n.get("Premium rate"),
+  SHARED_COST: () => i18n.get("Shared cost"),
+  VOIP: () => i18n.get("VoIP"),
+  PERSONAL_NUMBER: () => i18n.get("Personal number"),
+  PAGER: () => i18n.get("Pager"),
+  UAN: () => i18n.get("UAN"),
+  VOICEMAIL: () => i18n.get("Voicemail"),
+};
 
 export function getPhoneInfo(phone: string) {
-  try {
-    const number = phoneUtil.parseAndKeepRawInput(phone);
-    const isValidNumber = phoneUtil.isValidNumber(number);
-    const numberType = isValidNumber ? phoneUtil.getNumberType(number) : -1;
-    return {
-      isValidNumber,
-      numberType: NUMBER_TYPES[numberType as number]() ?? UNKNOWN_NUMBER_TYPE(),
-    };
-  } catch (error) {
-    return {
-      isValidNumber: false,
-      numberType: UNKNOWN_NUMBER_TYPE(),
-    };
-  }
+  const number = parsePhoneNumber(phone);
+  const isValidNumber = number?.isValid() ?? false;
+  const numberType = number?.getType() ?? "UNKNOWN";
+  return {
+    isValidNumber,
+    numberType: NUMBER_TYPES[numberType]?.() ?? UNKNOWN_NUMBER_TYPE(),
+  };
 }
 
-export function useDefaultCountry(initialCountry?: string, onlyCountries?: string[]) {
+export function useDefaultCountry(
+  initialCountry?: string,
+  onlyCountries?: string[],
+) {
   let defaultCountry = initialCountry;
 
   if (!defaultCountry) {
