@@ -57,8 +57,8 @@ The following attributes are supported:
 
 * `x-placeholder-number-type` - country-dependent number type to use for the placeholder: `FIXED_LINE` (default) or `MOBILE`
 * `x-initial-country` - initial country selection by specifying its two-letter country code (defaults to user/browser locale)
-* `x-preferred-countries` - countries to appear at the top of the list (space-separated list of two-letter country codes) (defaults to user/browser locales)
-* `x-only-countries` - in the country dropdown, display only the countries you specify (space-separated list of two-letter country codes)
+* `x-preferred-countries` - countries to appear at the top of the list (comma-separated list of two-letter country codes) (defaults to user/browser locales)
+* `x-only-countries` - in the country dropdown, only display the specified countries (comma-separated list of two-letter country codes)
 
 == Password
 
