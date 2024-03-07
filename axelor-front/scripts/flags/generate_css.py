@@ -42,16 +42,13 @@ if __name__ == "__main__":
     # Retrieve country codes from specified directory
     try:
         country_codes = [
-            filename[:-4]
+            os.path.splitext(filename)[0]
             for filename in sorted(os.listdir(args.dir))
             if filename.endswith(".svg")
         ]
     except Exception as e:
         print(f"Error reading directory {args.dir}: {e}")
         exit(1)
-
-    # Sort country codes to ensure correct order
-    country_codes.sort()
 
     # Generate CSS
     css = generate_css(country_codes)
