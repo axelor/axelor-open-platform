@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 
-import { Box, InputFeedback, InputLabel } from "@axelor/ui";
+import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
 import { useAsync } from "@/hooks/use-async";
@@ -51,7 +51,6 @@ export function FieldControl({
   const canShowTitle =
     showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
 
-  const contentRef = useRef<HTMLDivElement>(null);
   const [focus, setFocus] = useAtom(
     useMemo(
       () =>
@@ -64,22 +63,14 @@ export function FieldControl({
     ),
   );
 
-  const handleFocusout = useCallback(() => setFocus(undefined), [setFocus]);
-
-  useEffect(() => {
-    if (!focus) return;
-    const content = contentRef.current;
-    if (content) {
-      content.addEventListener("focusout", handleFocusout);
-      return () => content.removeEventListener("focusout", handleFocusout);
-    }
-  }, [focus, handleFocusout]);
-
   function render() {
-    return (
-      <Box className={styles.content} ref={contentRef}>
-        {children}
-      </Box>
+    const content = <Box className={styles.content}>{children}</Box>;
+    return focus ? (
+      <ClickAwayListener onClickAway={() => setFocus(undefined)}>
+        {content}
+      </ClickAwayListener>
+    ) : (
+      content
     );
   }
 
