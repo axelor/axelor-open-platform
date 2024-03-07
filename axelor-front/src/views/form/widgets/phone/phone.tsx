@@ -22,11 +22,10 @@ import { Box, Button, Input, Portal, clsx } from "@axelor/ui";
 
 import { Icon } from "@/components/icon";
 import { i18n } from "@/services/client/i18n";
-import { _findLocale, l10n } from "@/services/client/l10n";
 import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { FALLBACK_COUNTRIES, FLAGS, getPhoneInfo } from "./utils";
+import { FLAGS, getPhoneInfo, useDefaultCountry } from "./utils";
 
 import "react-international-phone/style.css";
 
@@ -59,8 +58,6 @@ export function Phone({
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const locale = l10n.getLocale();
-
   const onlyCountries = useMemo(
     () =>
       _onlyCountries?.split(/\W+/).map((country) => country.toLowerCase()) ??
@@ -68,30 +65,7 @@ export function Phone({
     [_onlyCountries],
   );
 
-  const defaultCountry = useMemo(() => {
-    let defaultCountry = initialCountry;
-
-    if (!defaultCountry) {
-      // If user locale has no country code, look for a match in `navigator.languages`.
-      const [
-        language,
-        country = _findLocale(
-          navigator.languages.filter((language) => language.split("-")[1]),
-          locale,
-          (language) => language.split("-")[0],
-        )
-          ?.split("-")[1]
-          ?.toLowerCase(),
-      ] = locale.split("-").map((value) => value.toLowerCase());
-      defaultCountry = country ?? FALLBACK_COUNTRIES[language] ?? language;
-    }
-
-    if (onlyCountries.length && !onlyCountries.includes(defaultCountry)) {
-      defaultCountry = onlyCountries[0];
-    }
-
-    return defaultCountry;
-  }, [initialCountry, locale, onlyCountries]);
+  const defaultCountry = useDefaultCountry(initialCountry, onlyCountries);
 
   const preferredCountries = useMemo(() => {
     if (_preferredCountries) {

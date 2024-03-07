@@ -3,6 +3,7 @@ import { defaultCountries } from "react-international-phone";
 
 import flags from "@/assets/flags.svg";
 import { i18n } from "@/services/client/i18n";
+import { _findLocale, l10n } from "@/services/client/l10n";
 
 // Fallback country codes when country is not found in language code
 export const FALLBACK_COUNTRIES: Record<string, string> = {
@@ -68,4 +69,31 @@ export function getPhoneInfo(phone: string) {
       numberType: UNKNOWN_NUMBER_TYPE(),
     };
   }
+}
+
+export function useDefaultCountry(initialCountry?: string, onlyCountries?: string[]) {
+  let defaultCountry = initialCountry;
+
+  if (!defaultCountry) {
+    const locale = l10n.getLocale();
+
+    // If user locale has no country code, look for a match in `navigator.languages`.
+    const [
+      language,
+      country = _findLocale(
+        navigator.languages.filter((language) => language.split("-")[1]),
+        locale,
+        (language) => language.split("-")[0],
+      )
+        ?.split("-")[1]
+        ?.toLowerCase(),
+    ] = locale.split("-").map((value) => value.toLowerCase());
+    defaultCountry = country ?? FALLBACK_COUNTRIES[language] ?? language;
+  }
+
+  if (onlyCountries?.length && !onlyCountries.includes(defaultCountry)) {
+    defaultCountry = onlyCountries[0];
+  }
+
+  return defaultCountry;
 }

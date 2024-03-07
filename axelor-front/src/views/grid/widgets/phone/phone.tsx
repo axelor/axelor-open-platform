@@ -5,11 +5,10 @@ import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
 import { i18n } from "@/services/client/i18n";
-import { _findLocale, l10n } from "@/services/client/l10n";
 import { Schema } from "@/services/client/meta.types";
 import {
-  FALLBACK_COUNTRIES,
   getPhoneInfo,
+  useDefaultCountry,
 } from "@/views/form/widgets/phone/utils";
 
 import "react-international-phone/style.css";
@@ -21,28 +20,7 @@ export function Phone(props: GridColumnProps) {
   const { rawValue: value, data } = props;
   const { initialCountry } = data as Schema;
 
-  const locale = l10n.getLocale();
-
-  const defaultCountry = useMemo(() => {
-    let defaultCountry = initialCountry;
-
-    if (!defaultCountry) {
-      // If user locale has no country code, look for a match in `navigator.languages`.
-      const [
-        language,
-        country = _findLocale(
-          navigator.languages.filter((language) => language.split("-")[1]),
-          locale,
-          (language) => language.split("-")[0],
-        )
-          ?.split("-")[1]
-          ?.toLowerCase(),
-      ] = locale.split("-").map((value) => value.toLowerCase());
-      defaultCountry = country ?? FALLBACK_COUNTRIES[language] ?? language;
-    }
-
-    return defaultCountry;
-  }, [initialCountry, locale]);
+  const defaultCountry = useDefaultCountry(initialCountry);
 
   const noPrefix = !!value && !value.startsWith("+");
 
