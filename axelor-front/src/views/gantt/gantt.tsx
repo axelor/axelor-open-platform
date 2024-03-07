@@ -418,9 +418,6 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           <Button variant="secondary" outline ms={2} onClick={() => onSearch()}>
             {i18n.get("Refresh")}
           </Button>
-          <Button variant="secondary" outline>
-            {i18n.get("Print")}
-          </Button>
         </Box>
       </ViewToolBar>
       <Box d="flex" flex={1} overflow="auto" px={1}>
