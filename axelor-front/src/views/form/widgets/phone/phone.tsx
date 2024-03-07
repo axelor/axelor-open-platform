@@ -224,12 +224,9 @@ export function Phone({
   const hasValue = !!text && text === phone;
   const showButton = hasValue || !readonly;
 
-  const { isValidNumber, numberType } = useMemo(
-    () =>
-      hasValue
-        ? getPhoneInfo(phone)
-        : { isValidNumber: undefined, numberType: undefined },
-    [hasValue, phone],
+  const { isPossibleNumber, numberType } = useMemo(
+    () => getPhoneInfo(phone),
+    [phone],
   );
 
   const handleOpenPhoneLink = useCallback(() => {
@@ -327,14 +324,14 @@ export function Phone({
               onBlur={onBlur}
               title={numberType}
               className={clsx(styles.input, {
-                [styles.invalid]: hasValue && !isValidNumber,
+                [styles.invalid]: hasValue && !isPossibleNumber,
               })}
               {...inputProps}
             />
             <Button
               onClick={handleOpenPhoneLink}
               className={styles.inputIcon}
-              disabled={!isValidNumber}
+              disabled={!isPossibleNumber}
               title={i18n.get("Call")}
             >
               <Icon icon="telephone" />

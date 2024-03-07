@@ -36,8 +36,6 @@ export const FLAGS = defaultCountries.map((country) => {
   return { iso2, src };
 });
 
-const UNKNOWN_NUMBER_TYPE = () => i18n.get("Unknown");
-
 const NUMBER_TYPES: Record<string, () => string> = {
   FIXED_LINE: () => i18n.get("Fixed line"),
   MOBILE: () => i18n.get("Mobile"),
@@ -50,15 +48,16 @@ const NUMBER_TYPES: Record<string, () => string> = {
   PAGER: () => i18n.get("Pager"),
   UAN: () => i18n.get("UAN"),
   VOICEMAIL: () => i18n.get("Voicemail"),
+  UNKNOWN: () => i18n.get("Unknown"),
 };
 
-export function getPhoneInfo(phone: string) {
-  const number = parsePhoneNumber(phone);
-  const isValidNumber = number?.isValid() ?? false;
+export function getPhoneInfo(phone?: string) {
+  const number = parsePhoneNumber(phone ?? "");
+  const isPossibleNumber = number?.isPossible() ?? false;
   const numberType = number?.getType() ?? "UNKNOWN";
   return {
-    isValidNumber,
-    numberType: NUMBER_TYPES[numberType]?.() ?? UNKNOWN_NUMBER_TYPE(),
+    isPossibleNumber,
+    numberType: NUMBER_TYPES[numberType]?.() ?? NUMBER_TYPES.UNKNOWN(),
   };
 }
 
