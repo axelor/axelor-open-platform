@@ -169,3 +169,10 @@ Check the {product-version-changelog}[change log] for detailed list.
 - `/ws/app/info` endpoint moved to `/ws/public/app/info`
 - Datetime fields value in tracking messages now stored in UTC
 - `sync` action to sync record is no longer needed, so it is now removed
+
+Due to the nature of front-end changes, some features haven't been implemented. We expect to
+reinstate them in a future version. Concerned features are :
+
+- Markdown widget
+- Phone widget with flag feature
+- Print Gantt view
