@@ -232,6 +232,10 @@ export function Phone({
     [hasValue, phone],
   );
 
+  const handleOpenPhoneLink = useCallback(() => {
+    window.open(`tel:${noPrefix ? value : phone}`, "_blank");
+  }, [noPrefix, value, phone]);
+
   return (
     <FieldControl {...props} className={styles.container}>
       <Box className={clsx(styles.phone, { [styles.readonly]: readonly })}>
@@ -306,26 +310,36 @@ export function Phone({
             {hasValue && inputValue}
           </Box>
         ) : (
-          <Input
-            ref={inputRef}
-            {...(focus && { key: "focused" })}
-            data-input
-            type="tel"
-            id={uid}
-            autoFocus={focus}
-            placeholder={placeholder}
-            value={inputValue}
-            invalid={invalid}
-            required={required}
-            onKeyDown={onKeyDown}
-            onChange={handlePhoneValueChange}
-            onBlur={onBlur}
-            title={numberType}
-            className={clsx(styles.input, {
-              [styles.invalid]: hasValue && !isValidNumber,
-            })}
-            {...inputProps}
-          />
+          <Box className={styles.inputWrapper}>
+            <Input
+              ref={inputRef}
+              {...(focus && { key: "focused" })}
+              data-input
+              type="tel"
+              id={uid}
+              autoFocus={focus}
+              placeholder={placeholder}
+              value={inputValue}
+              invalid={invalid}
+              required={required}
+              onKeyDown={onKeyDown}
+              onChange={handlePhoneValueChange}
+              onBlur={onBlur}
+              title={numberType}
+              className={clsx(styles.input, {
+                [styles.invalid]: hasValue && !isValidNumber,
+              })}
+              {...inputProps}
+            />
+            <Button
+              onClick={handleOpenPhoneLink}
+              className={styles.inputIcon}
+              disabled={!isValidNumber}
+              title={i18n.get("Call")}
+            >
+              <Icon icon="telephone" />
+            </Button>
+          </Box>
         )}
       </Box>
     </FieldControl>

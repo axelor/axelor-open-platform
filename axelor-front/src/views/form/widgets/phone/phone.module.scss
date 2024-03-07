@@ -16,6 +16,24 @@
   flex-direction: row;
 }
 
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.inputIcon {
+  display: flex;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.5rem;
+  border: 0;
+}
+
 .country {
   display: flex;
   flex-direction: row;
