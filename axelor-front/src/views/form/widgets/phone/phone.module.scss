@@ -59,7 +59,7 @@
 }
 
 .input {
-  &.invalid {
+  &.warning {
     border-color: var(--bs-warning) !important;
   }
 }

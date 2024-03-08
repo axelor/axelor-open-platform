@@ -328,7 +328,7 @@ export function Phone({
               onBlur={onBlur}
               title={numberType}
               className={clsx(styles.input, {
-                [styles.invalid]: hasValue && !isPossibleNumber,
+                [styles.warning]: !invalid && hasValue && !isPossibleNumber,
               })}
               {...inputProps}
             />
