@@ -116,13 +116,12 @@ task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
   description "Update version text in source files."
   group "Axelor"
   processFiles = fileTree(projectDir) {
-    include '**/resources/**/*.xml'
-    include '**/resources/domain-models.xsd'
-    include '**/resources/object-views.xsd'
-    include '**/resources/data-import.xsd'
-    include '**/resources/templates/**/*.tmpl'
+    include '**/src/**/resources/**/*.xml'
+    include '**/src/**/resources/domain-models.xsd'
+    include '**/src/**/resources/object-views.xsd'
+    include '**/src/**/resources/data-import.xsd'
+    include '**/src/**/data/**/*.xml'
     include '**/data/**/*config.xml'
-    include '**/webapp/package.json'
   }
 }
 

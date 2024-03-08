@@ -151,7 +151,11 @@ public class AxelorPlugin implements Plugin<Project> {
               task.setDescription(UpdateVersion.TASK_DESCRIPTION);
               task.setGroup(UpdateVersion.TASK_GROUP);
               final ConfigurableFileTree files = project.fileTree(project.getProjectDir());
-              files.include("**/resources/**/*.xml", "**/data/**/*config.xml");
+              files.include(
+                  "src/**/resources/**/*.xml",
+                  "resources/**/*.xml",
+                  "src/**/data/**/*.xml",
+                  "data/**/*.xml");
               task.setProcessFiles(files);
             });
 
