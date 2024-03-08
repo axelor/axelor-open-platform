@@ -40,10 +40,8 @@ public class UpdateVersion extends DefaultTask {
 
   private static final Pattern XML_PATTERN =
       Pattern.compile("(domain-models|object-views|data-import)_\\d+\\.\\d+\\.xsd");
-  private static final Pattern JSON_PATTERN = Pattern.compile("version\".*,");
   private static final Pattern XSD_PATTERN = Pattern.compile("version=\"(\\d+\\.\\d+)\"\\s*\\>");
 
-  private String version = VersionUtils.getVersion().version;
   private String feature = VersionUtils.getVersion().feature;
 
   @InputFiles @SkipWhenEmpty private FileTree processFiles;
@@ -71,7 +69,6 @@ public class UpdateVersion extends DefaultTask {
     if (name.endsWith(".xsd")) txt = process_xsd(txt);
     if (name.endsWith(".xml")) txt = process_xml(txt);
     if (name.endsWith(".tmpl")) txt = process_xml(txt);
-    if (name.endsWith(".json")) txt = process_json(txt);
 
     if (str == txt) {
       return;
@@ -87,9 +84,5 @@ public class UpdateVersion extends DefaultTask {
 
   private String process_xsd(String text) {
     return XSD_PATTERN.matcher(text).replaceAll("version=\"" + feature + "\">");
-  }
-
-  private String process_json(String text) {
-    return JSON_PATTERN.matcher(text).replaceAll("\"version\": \"" + version + "\",");
   }
 }
