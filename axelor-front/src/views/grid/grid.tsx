@@ -114,12 +114,16 @@ function GridInner(props: ViewProps<GridView>) {
     ),
   );
 
+  const viewSelectedCell = viewProps?.selectedCell;
+  const viewSelectedRows = viewProps?.selectedRows?.slice?.(0, 1);
   const [state, setState, gridStateAtom] = useGridState({
     view,
     params: action.params,
-    selectedCell: viewProps?.selectedCell,
-    selectedRows: viewProps?.selectedRows?.slice?.(0, 1),
+    selectedCell: viewSelectedCell,
+    selectedRows: viewSelectedRows,
   });
+
+  const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
   const records = useDataStore(dataStore, (ds) => ds.records);
   const showCustomizeDialog = useCustomizePopup({
     view,
@@ -561,6 +565,10 @@ function GridInner(props: ViewProps<GridView>) {
   useAsyncEffect(async () => {
     if (!detailsMeta) return;
     const record = selectedDetail?.id ? selectedDetail : null;
+    if (record && hasRowSelectedFromState.current) {
+      hasRowSelectedFromState.current = false;
+      return;
+    }
     initDetailsRef.current && fetchAndSetDetailsRecord(record);
     initDetailsRef.current = true;
   }, [selectedDetail?.id, detailsMeta, dataStore]);
