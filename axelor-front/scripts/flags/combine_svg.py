@@ -7,10 +7,12 @@ import os
 DEFAULT_SIZE = 36
 TARGET_SIZE = 24
 
+ET.register_namespace("", "http://www.w3.org/2000/svg")
+
 
 def combine_svgs_horizontally(svg_directory, output_file):
     namespaces = {"svg": "http://www.w3.org/2000/svg"}
-    combined_svg = ET.Element("svg", xmlns="http://www.w3.org/2000/svg")
+    combined_svg = ET.Element("svg")
     current_x_offset = 0
     max_height = 0
 
