@@ -53,7 +53,6 @@
     "@testing-library/react": "^14.1.2",
     "@types/dompurify": "^3.0.5",
     "@types/echarts": "^4.9.22",
-    "@types/google-libphonenumber": "^7.4.30",
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.10.4",

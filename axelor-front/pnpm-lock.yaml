@@ -126,9 +126,6 @@ devDependencies:
   '@types/echarts':
     specifier: ^4.9.22
     version: 4.9.22
-  '@types/google-libphonenumber':
-    specifier: ^7.4.30
-    version: 7.4.30
   '@types/jest':
     specifier: ^29.5.11
     version: 29.5.11
@@ -2691,10 +2688,6 @@ packages:
 
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
-    dev: true
-
-  /@types/google-libphonenumber@7.4.30:
-    resolution: {integrity: sha512-Td1X1ayRxePEm6/jPHUBs2tT6TzW1lrVB6ZX7ViPGellyzO/0xMNi+wx5nH6jEitjznq276VGIqjK5qAju0XVw==}
     dev: true
 
   /@types/hoist-non-react-statics@3.3.1:
