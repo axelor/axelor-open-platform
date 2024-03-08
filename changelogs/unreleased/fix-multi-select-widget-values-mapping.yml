@@ -1,6 +1,0 @@
----
-title: Fix multi selection widgets values mapping
-type: fix
-description: |
-  Make sure to map values from the previous concatenation
-  that was using `Comma-separated + space`.

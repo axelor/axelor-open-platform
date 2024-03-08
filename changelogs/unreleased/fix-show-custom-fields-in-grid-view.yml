@@ -1,3 +1,0 @@
----
-title: Don't add default json fields (`attrs.*`) if already present in grid view
-type: fix

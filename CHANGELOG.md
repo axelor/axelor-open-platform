@@ -1,3 +1,121 @@
+## 7.0.4 (2024-03-08)
+
+#### Feature
+
+* Add support to format `multi-select` widget
+* In field help popover, display value for selection/enum fields.
+
+#### Fix
+
+* Fix grid open details view by default
+* Fix widgetAttrs issue with custom field
+* Fix resetting relational fields domain
+
+  <details>
+  
+  Resetting domain on relational fields by returning `null`
+  domain on onSelect event is not takes into account and
+  existing domain is still used.
+  
+  </details>
+
+* Reset grid offset on DMS search
+* Always call onSelect on o2m when showing selector
+* Fix create support in selector popup in relational field
+* Fix invalid text widget style
+* Fix grid group when groupBy having leading/trailing spaces
+* Fix updating fields focus
+
+  <details>
+  
+  Changing fields focus attrs hasn't any effect if refocus same field again.
+  This also fix unfocusable M2O fields.
+  
+  </details>
+
+* Fix m2o with nav-select widget display issue
+
+  <details>
+  
+  When showIf/hideIf is specified with nav-select widget on m2o field
+  Then it was displaying m2o selection along with nav-select.
+  It should only display nav-select widget.
+  
+  </details>
+
+* Fix ref-text should not allow create/view record
+* Fix eval-ref-select to use suggest box behavior
+* Fix how grid retrieve the field record value
+
+  <details>
+  
+  This also fix wrong values displayed in grid for custom fields.
+  
+  </details>
+
+* Fix mark form dirty on editor change
+* Disabled http block overlay when login popup is displayed.
+* Fix multi selection widgets values mapping
+
+  <details>
+  
+  Make sure to map values from the previous concatenation
+  that was using `Comma-separated + space`.
+  
+  </details>
+
+* Don't add default json fields (`attrs.*`) if already present in grid view
+* Fix unformatted calendar event titles
+* Fix default values of json fields
+* Fix single tab issue
+
+  <details>
+  
+  When single tab is enabled, any tab is already opened then
+  it should first close the current tab and open new tab as
+  single tab only.
+  
+  </details>
+
+* Fix RadioSelect/CheckboxSelect widget ui display
+
+  <details>
+  
+  Don't display radio/checkbox select items onto one line
+  but wrap them depending on available space (break into multiple lines).
+  
+  </details>
+
+* Fix RadioSelect/CheckboxSelect widget in editable grid
+
+  <details>
+  
+  In grid, RadioSelect/CheckboxSelect widget can't be used for obvious 
+  display reason. When they are used, use default `selection` widget 
+  for `RadioSelect` and `MultiSelect` widget for `CheckboxSelect`.
+  
+  </details>
+
+* Improve multi-select widget in grid view
+
+#### Security
+
+* Upgrade PostgreSQL JDBC driver from 42.7.1 to 42.7.2
+
+  <details>
+  
+  SQL injection is possible when using the non-default connection property 
+  `preferQueryMode=simple` in combination with application code that has a 
+  vulnerable SQL that negates a parameter value.
+  
+  See https://www.cve.org/CVERecord?id=CVE-2024-1597
+  
+  As we are using the default query mode, we aren't impacted. But administrators 
+  can still change the JDBC URL themself to use the impacted query mode.
+  
+  </details>
+
+
 ## 7.0.3 (2024-02-14)
 
 #### Fix

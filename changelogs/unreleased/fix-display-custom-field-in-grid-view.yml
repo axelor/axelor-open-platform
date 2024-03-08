@@ -1,5 +1,0 @@
----
-title: Fix how grid retrieve the field record value
-type: fix
-description: |
-  This also fix wrong values displayed in grid for custom fields.

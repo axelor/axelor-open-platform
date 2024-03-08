@@ -1,6 +1,0 @@
----
-title: Fix RadioSelect/CheckboxSelect widget ui display
-type: fix
-description: |
-  Don't display radio/checkbox select items onto one line
-  but wrap them depending on available space (break into multiple lines).

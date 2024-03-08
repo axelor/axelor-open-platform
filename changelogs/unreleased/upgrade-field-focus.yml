@@ -1,6 +1,0 @@
----
-title: Fix updating fields focus
-type: fix
-description: |
-  Changing fields focus attrs hasn't any effect if refocus same field again.
-  This also fix unfocusable M2O fields.
