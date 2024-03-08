@@ -431,7 +431,7 @@ const openTabAtom = atom(
       const canConfirm = activeTab.action.params?.["show-confirm"] !== false;
       const closed = await dialogs.confirmDirty(
         async () => (canConfirm && get(activeTab.state).dirty) ?? false,
-        async () => set(closeTabAtom, activeTab.action),
+        async () => {},
       );
       if (!closed) return activeTab;
     }
@@ -461,7 +461,11 @@ const openTabAtom = atom(
         }
         const newState = tab.popup
           ? { active, tabs, popups: [...popups, tab] }
-          : { active: tab.id, tabs: [...tabs, tab], popups };
+          : {
+              active: tab.id,
+              tabs: singleTab ? [tab] : [...tabs, tab],
+              popups,
+            };
         return newState;
       });
     }

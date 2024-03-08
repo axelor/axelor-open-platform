@@ -1,0 +1,7 @@
+---
+title: Fix single tab issue
+type: fix
+description: |
+  When single tab is enabled, any tab is already opened then
+  it should first close the current tab and open new tab as
+  single tab only.
