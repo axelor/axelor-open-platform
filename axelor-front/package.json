@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css,scss,html}\"",
     "test": "vitest",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "svgo": "svgo --multipass src/assets/*.svg"
   },
   "dependencies": {
     "@axelor/ui": "^0.0.36",
@@ -73,6 +74,7 @@
     "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "sass": "^1.69.5",
+    "svgo": "^3.2.0",
     "terser": "^5.26.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.11",
