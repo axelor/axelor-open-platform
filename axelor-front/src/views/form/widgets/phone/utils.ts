@@ -52,12 +52,14 @@ const NUMBER_TYPES: Record<string, () => string> = {
 };
 
 export function getPhoneInfo(phone?: string) {
-  const number = parsePhoneNumber(phone ?? "");
-  const isPossibleNumber = number?.isPossible() ?? false;
-  const numberType = number?.getType() ?? "UNKNOWN";
+  const phoneNumber = parsePhoneNumber(phone ?? "");
   return {
-    isPossibleNumber,
-    numberType: NUMBER_TYPES[numberType]?.() ?? NUMBER_TYPES.UNKNOWN(),
+    isPossible: () => phoneNumber?.isPossible(),
+    isValid: () => phoneNumber?.isValid(),
+    getDisplayType: () => {
+      const type = phoneNumber?.getType();
+      return (type && NUMBER_TYPES[type]?.()) ?? NUMBER_TYPES.UNKNOWN();
+    },
   };
 }
 

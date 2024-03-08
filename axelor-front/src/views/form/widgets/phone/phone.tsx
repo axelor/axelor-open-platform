@@ -224,10 +224,14 @@ export function Phone({
   const hasValue = !!text && text === phone;
   const showButton = hasValue || !readonly;
 
-  const { isPossibleNumber, numberType } = useMemo(
-    () => getPhoneInfo(phone),
-    [phone],
-  );
+  const { isPossibleNumber, numberType } = useMemo(() => {
+    const phoneNumber = getPhoneInfo(phone);
+
+    return {
+      isPossibleNumber: phoneNumber.isPossible(),
+      numberType: phoneNumber.getDisplayType(),
+    };
+  }, [phone]);
 
   const handleOpenPhoneLink = useCallback(() => {
     window.open(`tel:${noPrefix ? value : phone}`, "_blank");

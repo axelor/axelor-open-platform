@@ -38,7 +38,7 @@ export function Phone(props: GridColumnProps) {
   const show = value && inputValue;
 
   const numberType = useMemo(
-    () => (show ? getPhoneInfo(phone).numberType : undefined),
+    () => (show ? getPhoneInfo(phone).getDisplayType() : undefined),
     [phone, show],
   );
 
