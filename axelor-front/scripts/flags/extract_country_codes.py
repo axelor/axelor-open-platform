@@ -3,6 +3,7 @@
 import re
 import sys
 
+DEFAULT_FILE_PATH = "../../node_modules/react-international-phone/dist/types.d.ts"
 
 def extract_country_codes_from_line_with_prefix(file_path, prefix):
     country_codes = []
@@ -20,8 +21,7 @@ def extract_country_codes_from_line_with_prefix(file_path, prefix):
 
 
 if __name__ == "__main__":
-    default_file_path = "../../node_modules/react-international-phone/dist/types.d.ts"
-    file_path = sys.argv[1] if len(sys.argv) > 1 else default_file_path
+    file_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_FILE_PATH
 
     prefix = "export type CountryIso2 ="
     country_codes = extract_country_codes_from_line_with_prefix(file_path, prefix)
