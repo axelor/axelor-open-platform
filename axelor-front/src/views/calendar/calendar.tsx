@@ -22,6 +22,7 @@ import { findView } from "@/services/client/meta-cache";
 import { CalendarView, Field, FormView } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { DataStore } from "@/services/client/data-store";
 import {
   useViewContext,
   useViewTab,
@@ -40,7 +41,7 @@ import { getTimes } from "./utils";
 import styles from "./calendar.module.scss";
 
 export function Calendar(props: ViewProps<CalendarView>) {
-  const { meta, dataStore, searchAtom } = props;
+  const { meta, dataStore: _dataStore, searchAtom } = props;
   const {
     eventStart,
     eventStop,
@@ -51,6 +52,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
     onChange,
   } = meta.view;
 
+  // create clone of data store
+  const dataStore = useMemo(
+    () => new DataStore(_dataStore.model, _dataStore.options),
+    [_dataStore],
+  );
   const colorField = meta.fields?.[colorBy!];
   const allDayOnly = meta.fields?.[eventStart]?.type === "DATE";
 
