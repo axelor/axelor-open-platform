@@ -9,6 +9,7 @@ import {
 import { Navigate, useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -32,6 +33,8 @@ export function ChangePassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(error);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { logo: appLogo = logo, name: appName = "Axelor" } =
     appInfo?.application || {};
@@ -190,16 +193,30 @@ export function ChangePassword() {
               <InputLabel htmlFor="newPassword">
                 {i18n.get("New password")}
               </InputLabel>
-              <Input
-                ref={newPasswordInputRef}
-                id="newPassword"
-                name="newPassword"
-                type="password"
-                autoFocus
-                mb={3}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
+              <Box d="flex" position="relative">
+                <Input
+                  ref={newPasswordInputRef}
+                  id="newPassword"
+                  name="newPassword"
+                  type={showPassword ? "text" : "password"}
+                  autoFocus
+                  mb={3}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                <Button
+                  as="span"
+                  onClick={() => setShowPassword((value) => !value)}
+                  className={styles.eyeIcon}
+                  title={
+                    showPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                >
+                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                </Button>
+              </Box>
               {newPasswordValidity && (
                 <Box className={styles.validity}>{newPasswordValidity}</Box>
               )}
@@ -209,15 +226,32 @@ export function ChangePassword() {
               <InputLabel htmlFor="confirmPassword">
                 {i18n.get("Confirm new password")}
               </InputLabel>
-              <Input
-                ref={confirmPasswordInputRef}
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                mb={3}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+              <Box d="flex" position="relative">
+                <Input
+                  ref={confirmPasswordInputRef}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  mb={3}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                <Button
+                  as="span"
+                  onClick={() => setShowConfirmPassword((value) => !value)}
+                  className={styles.eyeIcon}
+                  title={
+                    showConfirmPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                >
+                  <BootstrapIcon
+                    icon={showConfirmPassword ? "eye-slash" : "eye"}
+                  />
+                </Button>
+              </Box>
+
               {confirmPasswordValidity && (
                 <Box className={styles.validity}>{confirmPasswordValidity}</Box>
               )}

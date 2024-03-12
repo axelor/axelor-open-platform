@@ -2,6 +2,7 @@ import { FormEventHandler, useCallback, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -35,6 +36,7 @@ export function LoginForm({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const location = useLocation();
   const locationState = location.state;
@@ -147,15 +149,28 @@ export function LoginForm({
             onChange={(e) => setUsername(e.target.value)}
           />
           <InputLabel htmlFor="password">{i18n.get("Password")}</InputLabel>
-          <Input
-            name="password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            mb={3}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <Box d="flex" position="relative">
+            <Input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="current-password"
+              mb={3}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              onClick={() => setShowPassword((value) => !value)}
+              className={styles.eyeIcon}
+              title={
+                showPassword
+                  ? i18n.get("Hide password")
+                  : i18n.get("Show password")
+              }
+            >
+              <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+            </Button>
+          </Box>
           <Box d="flex" alignItems="center">
             <Input type="checkbox" p={0} m={0} me={1} />
             <Box as="p" mb={0}>
