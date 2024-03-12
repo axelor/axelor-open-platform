@@ -46,25 +46,10 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
     directClients = clientListProvider.getDirectClientNames();
   }
 
-  @Override
-  public boolean isAuthorized(
-      WebContext context, SessionStore sessionStore, List<UserProfile> profiles) {
-    // No CSRF check for native clients nor direct clients
-    if (AuthPac4jInfo.isNativeClient(context) || isDirectClient(profiles)) {
-      return true;
-    }
-
-    return internalIsAuthorized(context, sessionStore, profiles);
-  }
-
-  private boolean isDirectClient(List<UserProfile> profiles) {
-    return !profiles.isEmpty() && directClients.contains(profiles.get(0).getClientName());
-  }
-
   /**
    * Matches {@link AxelorCsrfGenerator} behavior.
    *
-   * <p>Code taken from:
+   * <p>Code based on:
    * https://github.com/pac4j/pac4j/blob/4.5.x/pac4j-core/src/main/java/org/pac4j/core/authorization/authorizer/CsrfAuthorizer.java#L40
    *
    * @param context the web context
@@ -72,8 +57,16 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
    * @param profiles the user profiles
    * @return whether the access is authorized
    */
-  protected boolean internalIsAuthorized(
+  @Override
+  public boolean isAuthorized(
       WebContext context, SessionStore sessionStore, List<UserProfile> profiles) {
+
+    // No CSRF check for native clients nor direct clients
+    // We also authorize non-native direct clients
+    if (AuthPac4jInfo.isNativeClient(context) || isDirectClient(profiles)) {
+      return true;
+    }
+
     final boolean checkRequest =
         isCheckAllRequests()
             || isPost(context)
@@ -86,9 +79,13 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
       @SuppressWarnings("unchecked")
       final Optional<String> sessionToken =
           (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
-      return sessionToken.isPresent()
-          && (sessionToken.get().equals(parameterToken) || sessionToken.get().equals(headerToken));
+      return !sessionToken.isPresent()
+          || (sessionToken.get().equals(parameterToken) || sessionToken.get().equals(headerToken));
     }
     return true;
+  }
+
+  private boolean isDirectClient(List<UserProfile> profiles) {
+    return !profiles.isEmpty() && directClients.contains(profiles.get(0).getClientName());
   }
 }

@@ -49,7 +49,10 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
 
   @Override
   public boolean matches(WebContext context, SessionStore sessionStore) {
-    addResponseCookieAndHeader(context, sessionStore);
+    // No CSRF cookie/header for native clients
+    if (!AuthPac4jInfo.isNativeClient(context)) {
+      addResponseCookieAndHeader(context, sessionStore);
+    }
     return true;
   }
 
