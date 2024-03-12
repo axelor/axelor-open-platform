@@ -43,15 +43,17 @@ public class PostSessionTenantFilter extends AbstractTenantFilter {
       throws IOException, ServletException {
     final HttpServletRequest req = (HttpServletRequest) request;
     if (INDEX_PAGE.equals(req.getServletPath())) {
-      final HttpSession session = req.getSession();
-      final Map<String, String> tenants = getTenants(false);
-      final String tenantId = (String) session.getAttribute(SESSION_KEY_TENANT_ID);
-      if (!tenants.containsKey(tenantId)) {
-        session.invalidate();
-        WebUtils.issueRedirect(request, response, "/");
-        return;
+      final HttpSession session = req.getSession(false);
+      if (session != null) {
+        final Map<String, String> tenants = getTenants(false);
+        final String tenantId = (String) session.getAttribute(SESSION_KEY_TENANT_ID);
+        if (!tenants.containsKey(tenantId)) {
+          session.invalidate();
+          WebUtils.issueRedirect(request, response, "/");
+          return;
+        }
+        session.setAttribute(SESSION_KEY_TENANT_MAP, getTenants(false));
       }
-      req.getSession().setAttribute(SESSION_KEY_TENANT_MAP, getTenants(false));
     }
     chain.doFilter(request, response);
   }

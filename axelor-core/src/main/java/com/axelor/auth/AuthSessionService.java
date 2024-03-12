@@ -19,6 +19,7 @@
 package com.axelor.auth;
 
 import java.time.LocalDateTime;
+import javax.annotation.Nullable;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 
@@ -27,22 +28,30 @@ public class AuthSessionService {
   private static final String LOGIN_DATE = "com.axelor.internal.loginDate";
 
   public void updateLoginDate() {
-    updateLoginDate(AuthUtils.getSubject().getSession());
+    updateLoginDate(AuthUtils.getSubject().getSession(false));
   }
 
   public void updateLoginDate(Session session) {
-    session.setAttribute(LOGIN_DATE, LocalDateTime.now());
+    if (session != null) {
+      session.setAttribute(LOGIN_DATE, LocalDateTime.now());
+    }
   }
 
+  @Nullable
   public LocalDateTime getLoginDate() {
-    return getLoginDate(AuthUtils.getSubject().getSession());
+    return getLoginDate(AuthUtils.getSubject().getSession(false));
   }
 
+  @Nullable
   public LocalDateTime getLoginDate(Session session) {
     try {
-      return (LocalDateTime) session.getAttribute(LOGIN_DATE);
+      if (session != null) {
+        return (LocalDateTime) session.getAttribute(LOGIN_DATE);
+      }
     } catch (InvalidSessionException e) {
-      return null;
+      // Fall through
     }
+
+    return null;
   }
 }

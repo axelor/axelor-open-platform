@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.inject.Beans;
 import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
@@ -31,11 +30,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.HttpHeaders;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionKey;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 import org.apache.shiro.web.util.WebUtils;
 
@@ -54,28 +56,45 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   @Override
   public Session start(SessionContext context) throws AuthorizationException {
     final HttpServletRequest request = WebUtils.getHttpRequest(context);
-    return createSession(
-        context, request, Optional.ofNullable(context.getHost()).orElseGet(request::getRemoteHost));
+    return getSession(
+        true,
+        context,
+        request,
+        Optional.ofNullable(context.getHost()).orElseGet(request::getRemoteHost));
   }
 
   @Override
   public Session getSession(SessionKey key) throws SessionException {
     final HttpServletRequest request = WebUtils.getHttpRequest(key);
-    return createSession(key, request, request.getRemoteHost());
+    return getSession(false, key, request, request.getRemoteHost());
   }
 
   public void changeSessionId() {
-    final HttpServletRequest request = Beans.get(HttpServletRequest.class);
-    request.changeSessionId();
-    if (request.isSecure()) {
-      setSameSiteNone(Beans.get(HttpServletResponse.class));
+    final Subject subject = SecurityUtils.getSubject();
+    final HttpServletRequest request = WebUtils.getHttpRequest(subject);
+    final HttpServletResponse response = WebUtils.getHttpResponse(subject);
+    final boolean sessionCreationEnabled =
+        !Boolean.FALSE.equals(request.getAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED));
+
+    if (subject.getSession(sessionCreationEnabled) != null) {
+      request.changeSessionId();
     }
 
-    updateCookiePath(Beans.get(HttpServletResponse.class), request.getContextPath());
+    if (request.isSecure()) {
+      setSameSiteNone(response);
+    }
+
+    updateCookiePath(response, request.getContextPath());
   }
 
-  protected Session createSession(Object source, HttpServletRequest request, String host) {
-    final HttpSession httpSession = request.getSession();
+  protected Session getSession(
+      boolean create, Object source, HttpServletRequest request, String host) {
+    final HttpSession httpSession = request.getSession(create);
+
+    if (httpSession == null) {
+      return null;
+    }
+
     final HttpServletResponse response = WebUtils.getHttpResponse(source);
 
     if (httpSession.isNew() && request.isSecure()) {

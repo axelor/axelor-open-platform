@@ -59,11 +59,11 @@ public class AxelorUserAuthorizer implements Authorizer {
   }
 
   private boolean isAllowed(User user) {
-    final LocalDateTime loginDate =
-        authSessionService.getLoginDate(AuthUtils.getSubject().getSession());
+    final LocalDateTime loginDate = authSessionService.getLoginDate();
     return AuthUtils.isActive(user)
         && (user.getPasswordUpdatedOn() == null
-            || loginDate != null && !loginDate.isBefore(user.getPasswordUpdatedOn()));
+            || loginDate == null
+            || !loginDate.isBefore(user.getPasswordUpdatedOn()));
   }
 
   private void removeSession() {

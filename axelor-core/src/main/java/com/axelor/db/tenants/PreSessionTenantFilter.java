@@ -73,35 +73,37 @@ public class PreSessionTenantFilter extends AbstractTenantFilter {
     }
 
     if (isLoginRequest(req)) {
-      final HttpSession session = req.getSession();
-      final Map<String, String> tenants = getTenants(true);
-      final String switchTo = !isLoginSubmit(req) ? req.getParameter("tenant") : null;
+      final HttpSession session = req.getSession(false);
+      if (session != null) {
+        final Map<String, String> tenants = getTenants(true);
+        final String switchTo = !isLoginSubmit(req) ? req.getParameter("tenant") : null;
 
-      if (tenants.containsKey(switchTo)) {
-        tenantId = switchTo;
-      }
+        if (tenants.containsKey(switchTo)) {
+          tenantId = switchTo;
+        }
 
-      if (!tenants.containsKey(tenantId)) {
-        tenantId = tenants.isEmpty() ? null : tenants.keySet().iterator().next();
-      }
+        if (!tenants.containsKey(tenantId)) {
+          tenantId = tenants.isEmpty() ? null : tenants.keySet().iterator().next();
+        }
 
-      // update cookie on login attempt or change tenant request
-      if (isLoginSubmit(req) || !StringUtils.isBlank(switchTo)) {
-        if (switchTo != null) {
-          // remove all session attribute except shiro attrs
-          final Enumeration<String> attrs = session.getAttributeNames();
-          while (attrs.hasMoreElements()) {
-            final String attr = attrs.nextElement();
-            if (SESSION_KEY_PREFIX_KEEP_LIST.stream().noneMatch(attr::startsWith)) {
-              session.removeAttribute(attr);
+        // update cookie on login attempt or change tenant request
+        if (isLoginSubmit(req) || !StringUtils.isBlank(switchTo)) {
+          if (switchTo != null) {
+            // remove all session attribute except shiro attrs
+            final Enumeration<String> attrs = session.getAttributeNames();
+            while (attrs.hasMoreElements()) {
+              final String attr = attrs.nextElement();
+              if (SESSION_KEY_PREFIX_KEEP_LIST.stream().noneMatch(attr::startsWith)) {
+                session.removeAttribute(attr);
+              }
             }
           }
+          setCookie(req, res, TENANT_COOKIE_NAME, tenantId);
         }
-        setCookie(req, res, TENANT_COOKIE_NAME, tenantId);
-      }
 
-      session.setAttribute(SESSION_KEY_TENANT_MAP, tenants);
-      session.setAttribute(SESSION_KEY_TENANT_ID, tenantId);
+        session.setAttribute(SESSION_KEY_TENANT_MAP, tenants);
+        session.setAttribute(SESSION_KEY_TENANT_ID, tenantId);
+      }
     }
 
     return StringUtils.isBlank(tenantId) ? null : tenantId;

@@ -65,6 +65,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -339,17 +340,22 @@ public class DmsService {
     data.put("batchId", batchId);
     data.put("batchName", batchName);
 
-    httpRequest.getSession().setAttribute(batchId, ids);
+    final HttpSession session = httpRequest.getSession(false);
+    if (session != null) {
+      session.setAttribute(batchId, ids);
+    }
 
     return javax.ws.rs.core.Response.ok(data).build();
   }
 
   private boolean hasBatchIds(String batchIds) {
-    return ObjectUtils.notEmpty((List<?>) httpRequest.getSession().getAttribute(batchIds));
+    final HttpSession session = httpRequest.getSession(false);
+    return session != null && ObjectUtils.notEmpty((List<?>) session.getAttribute(batchIds));
   }
 
   private List<?> findBatchIds(String batchOrId) {
-    List<?> ids = (List<?>) httpRequest.getSession().getAttribute(batchOrId);
+    final HttpSession session = httpRequest.getSession(false);
+    List<?> ids = session != null ? (List<?>) session.getAttribute(batchOrId) : null;
     if (ids == null) {
       Long id = Longs.tryParse(batchOrId);
       ids = id == null ? null : Arrays.asList(id);
