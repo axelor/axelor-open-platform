@@ -203,6 +203,7 @@ export function ChangePassword() {
                   mb={3}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  spellCheck="false"
                 />
                 <Button
                   as="span"
@@ -235,6 +236,7 @@ export function ChangePassword() {
                   mb={3}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  spellCheck="false"
                 />
                 <Button
                   as="span"

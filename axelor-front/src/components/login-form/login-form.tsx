@@ -147,6 +147,9 @@ export function LoginForm({
             mb={3}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck="false"
           />
           <InputLabel htmlFor="password">{i18n.get("Password")}</InputLabel>
           <Box d="flex" position="relative">
@@ -158,6 +161,7 @@ export function LoginForm({
               mb={3}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              spellCheck="false"
             />
             <Button
               onClick={() => setShowPassword((value) => !value)}
