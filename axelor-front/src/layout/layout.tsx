@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import { Box } from "@axelor/ui";
 
@@ -30,6 +30,7 @@ export function Layout() {
   const { show, sidebar, setSidebar } = useSidebar();
   const { xs } = useResponsive();
   const { isMobile } = useDevice();
+  const { pathname } = useLocation();
 
   const [tabContainer, tabContainerRef] = useState<HTMLDivElement | null>(null);
 
@@ -43,7 +44,8 @@ export function Layout() {
     );
   }
 
-  const tabsPortal = isMobile ? null : tabContainer;
+  const tabbable = pathname === "/" || pathname.startsWith("/ds/");
+  const tabsPortal = isMobile || !tabbable ? null : tabContainer;
 
   return (
     <div

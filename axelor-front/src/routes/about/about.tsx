@@ -1,10 +1,13 @@
+import { useAtomValue } from "jotai";
 import { useCallback } from "react";
 
 import { Box, Button, Link } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { useRoute } from "@/hooks/use-route";
 import { i18n } from "@/services/client/i18n";
 import { session } from "@/services/client/session";
+import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { System } from "../system";
 
@@ -16,6 +19,16 @@ export function About() {
 
   const year = new Date().getFullYear();
   const technical = user?.technical;
+
+  const { navigate } = useRoute();
+
+  const popupHandlerAtom = usePopupHandlerAtom();
+  const { close: closePopup } = useAtomValue(popupHandlerAtom);
+
+  const showSwagger = useCallback(() => {
+    closePopup?.();
+    navigate({ pathname: "/api-documentation" });
+  }, [navigate, closePopup]);
 
   const showSystemInfo = useCallback(() => {
     dialogs.info({
@@ -70,9 +83,11 @@ export function About() {
           >
             {i18n.get("Documentation")}
           </Link>
-          <Link href="#/api-documentation">
-            {i18n.get("API Doc")}
-          </Link>
+          {technical && (
+            <Button variant="link" onClick={showSwagger}>
+              {i18n.get("API Documentation")}
+            </Button>
+          )}
           <Link href="http://www.gnu.org/licenses/agpl.html">
             {i18n.get("License")}
           </Link>

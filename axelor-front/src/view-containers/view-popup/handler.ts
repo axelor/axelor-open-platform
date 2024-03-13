@@ -29,6 +29,7 @@ export type PopupHandler = {
   readyAtom?: WritableAtom<boolean | undefined, [boolean | undefined], void>;
   dirtyAtom?: WritableAtom<boolean, [boolean], void>;
   attachmentItem?: CommandItemProps | null;
+  close?: (result?: boolean) => void;
 };
 
 export const PopupScope = createScope<PopupHandler>({});

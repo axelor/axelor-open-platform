@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { Provider, atom, createStore, useAtomValue } from "jotai";
+import { Provider, atom, createStore, useAtom, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -271,7 +271,7 @@ export function ModalDialog(props: DialogOptions) {
   const [result, setResult] = useState(false);
 
   const close = useCallback(
-    (result: boolean) => {
+    (result: boolean = false) => {
       setOpen?.(false);
       setShow(false);
       setResult(result);
@@ -280,7 +280,14 @@ export function ModalDialog(props: DialogOptions) {
   );
 
   const handlerAtom = usePopupHandlerAtom();
-  const handler = useAtomValue(handlerAtom);
+  const [handler, setHandler] = useAtom(handlerAtom);
+
+  useEffect(() => {
+    setHandler((handler) => ({
+      ...handler,
+      close,
+    }));
+  }, [close, setHandler]);
 
   const contentRef = useRef<HTMLDivElement | null>(null);
 

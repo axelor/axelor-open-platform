@@ -406,6 +406,12 @@ const openTabAtom = atom(
 
     const name = viewName(view);
 
+    const hash = window.location.hash;
+
+    if (hash && hash !== "#/" && !hash.startsWith("#/ds/")) {
+      window.location.hash = "";
+    }
+
     // special case of relational field popups
     if (name.startsWith("$selector")) {
       return name === view ? null : await initTab(view, options);

@@ -34,14 +34,6 @@ const router = createHashRouter([
     element: <ChangePassword />,
   },
   {
-    path: "/api-documentation",
-    element: (
-      <ProtectedRoute>
-        <Swagger/>
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: "/",
     element: (
       <ProtectedRoute>
@@ -57,6 +49,10 @@ const router = createHashRouter([
       {
         path: "/ds/:action/:mode?/:id?",
         element: <View />,
+      },
+      {
+        path: "/api-documentation",
+        element: <Swagger />,
       },
     ],
   },
