@@ -164,8 +164,15 @@ public class AxelorUtils {
   public static Project findProject(Project project, ResolvedArtifact artifact) {
     final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
     if (cid instanceof ProjectComponentIdentifier) {
-      String path = ((ProjectComponentIdentifier) cid).getProjectPath();
+      ProjectComponentIdentifier id = (ProjectComponentIdentifier) cid;
+      String path = id.getProjectPath();
       Project sub = project.findProject(path);
+      if (":".equals(path)) {
+        sub = includedBuildRoots(project).stream()
+                .filter(p -> p.getName().equals(id.getProjectName()))
+                .findFirst()
+                .orElse(sub);
+      }
       // consider projects from included builds
       if (sub == null) {
         sub =
