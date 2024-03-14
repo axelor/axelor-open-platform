@@ -26,7 +26,7 @@ public final class JsonFunction {
 
   public static final String DEFAULT_TYPE = "text";
 
-  private static final Pattern NAME_PATTERN = Pattern.compile("\\w+");
+  private static final Pattern NAME_PATTERN = Pattern.compile("[\\w_\\.]+");
   private static final Pattern TYPE_PATTERN =
       Pattern.compile("(text|boolean|integer|decimal)", Pattern.CASE_INSENSITIVE);
 
@@ -64,7 +64,7 @@ public final class JsonFunction {
     Preconditions.checkArgument(path != null, "name cannot be null");
     Preconditions.checkArgument(path.indexOf('.') > -1, "not a json path");
 
-    final int dot = path.indexOf('.');
+    final int dot = path.lastIndexOf('.');
     final int col = path.indexOf("::");
 
     final String type = col == -1 ? DEFAULT_TYPE : path.substring(col + 2);
@@ -96,7 +96,6 @@ public final class JsonFunction {
             .append("json_extract_")
             .append(validateType(type))
             .append("(")
-            .append("self.")
             .append(validateField(field));
     for (String item : attribute.split("\\.")) {
       builder.append(", ").append("'").append(validateField(item)).append("'");

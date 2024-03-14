@@ -1,0 +1,6 @@
+---
+title: Add support to use domain with custom fields on level >= 1
+type: feature
+description: |
+  This adds support to use following domain : `self.myM2O.attrs.myCustomFied = 'some'`. 
+  It was restricted to first level only.
