@@ -12,6 +12,7 @@ export * from "./dashlet";
 export * from "./date";
 export * from "./datetime";
 export * from "./decimal";
+export * from "./drawing";
 export * from "./duration";
 export * from "./email";
 export * from "./eval-ref-select";

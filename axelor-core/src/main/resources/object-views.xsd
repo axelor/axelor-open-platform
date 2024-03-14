@@ -1067,6 +1067,26 @@
         <xsd:documentation>In the phone country dropdown, only display the specified countries (comma-separated list of two-letter country codes)</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-stroke-width" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The stroke width, default to 0.5</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-stroke-color" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The stroke color, default to black. Can be any color name</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-drawing-height" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The drawing height in px, default to 200</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-drawing-width" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>The drawing width in px, default to 500</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">

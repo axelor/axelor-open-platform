@@ -46,7 +46,8 @@
     "react-international-phone": "^4.2.6",
     "react-router-dom": "^6.20.1",
     "react-text-mask": "^5.5.0",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "signature_pad": "^4.2.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.5",

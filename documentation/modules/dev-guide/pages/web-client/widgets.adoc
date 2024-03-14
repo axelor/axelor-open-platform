@@ -393,6 +393,26 @@ Image widget has specials attributes:
 <field name="metaFile" widget="image" />
 ----
 
+== Drawing
+
+The drawing widget is used to freely draw on a pop-up canvas.
+It uses `binary` fields that stores image data or `many-to-one`
+fields referencing `com.axelor.meta.db.MetaFile` records.
+
+Drawing widget supports following attributes :
+
+* `x-stroke-width`: The stroke width. Default to 0.5.
+* `x-stroke-color`: The stroke color. Can be any color name. Default to black.
+* `x-drawing-height`: The drawing height in px. Default to 200.
+* `x-drawing-width`: The drawing width in px. Default to 500.
+
+[source,xml]
+----
+<field name="signature" widget="drawing" />
+<field name="signature" widget="drawing" x-stroke-width="2" x-stroke-color="red" />
+<field name="signature" widget="drawing" x-stroke-width="1.5" x-stroke-color="aqua" x-drawing-height="800" x-drawing-width="700" />
+----
+
 == Button
 
 The button widget is used to show a clickable button on a form.
