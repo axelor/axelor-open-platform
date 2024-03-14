@@ -21,7 +21,8 @@
 
 .actions {
   position: absolute;
-  left: calc(50% - 32px);
+  left: 50%;
+  transform: translate(-50%);
   bottom: 12px;
   opacity: 0;
   padding: 2px;
