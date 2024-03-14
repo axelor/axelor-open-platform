@@ -83,7 +83,7 @@ export function About() {
           >
             {i18n.get("Documentation")}
           </Link>
-          {technical && (
+          {technical && app.swaggerUI?.enabled && (
             <Button variant="link" onClick={showSwagger}>
               {i18n.get("API Documentation")}
             </Button>

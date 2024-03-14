@@ -19,6 +19,8 @@
 package com.axelor.web;
 
 import com.axelor.app.AppModule;
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
@@ -111,7 +113,16 @@ public class AppServletModule extends ServletModule {
           }
         });
 
-    install(new OpenApiModule());
+    final AppSettings settings = AppSettings.get();
+
+    final boolean swaggerUIEnabled =
+        settings.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ENABLED, true);
+    final boolean openApiEnabled =
+        settings.getBoolean(AvailableAppSettings.APPLICATION_OPENAPI_ENABLED, swaggerUIEnabled);
+
+    if (openApiEnabled) {
+      install(new OpenApiModule());
+    }
 
     // install additional modules
     for (Module module : getModules()) {

@@ -25,6 +25,10 @@ export interface SessionInfo {
     aopVersion?: string;
     aopBuildDate?: string;
     aopGitHash?: string;
+    swaggerUI?: {
+      enabled?: boolean;
+      allowTryItOut?: boolean;
+    };
   };
   authentication?: {
     callbackUrl?: string;

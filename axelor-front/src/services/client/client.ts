@@ -1,6 +1,9 @@
 import { isArrayLikeObject, isPlainObject } from "lodash";
 import { $request, $use } from "../http";
 
+export const CSRF_HEADER_NAME = "X-CSRF-Token";
+export const CSRF_COOKIE_NAME = "CSRF-TOKEN";
+
 export const readCookie = (name: string) => {
   const match = document.cookie.match(
     new RegExp("(^|;\\s*)(" + name + ")=([^;]*)"),
@@ -12,12 +15,12 @@ export const readCookie = (name: string) => {
 
 $use(async (args, next) => {
   const { init = {} } = args;
-  const token = readCookie("CSRF-TOKEN");
+  const token = readCookie(CSRF_COOKIE_NAME);
   const headers: Record<string, string> = {
     Accept: "application/json",
   };
 
-  if (token) headers["X-CSRF-Token"] = token;
+  if (token) headers[CSRF_HEADER_NAME] = token;
 
   args.init = {
     ...init,

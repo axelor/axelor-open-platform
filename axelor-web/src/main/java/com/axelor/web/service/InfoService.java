@@ -143,7 +143,17 @@ public class InfoService extends AbstractService {
     map.put("aopBuildDate", VersionUtils.getBuildDate());
     map.put("aopGitHash", VersionUtils.getGitHash());
 
+    map.put("swaggerUI", swaggerUIInfo());
+
     return map;
+  }
+
+  private Map<String, Object> swaggerUIInfo() {
+    final boolean enabled =
+        SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ENABLED, true);
+    final boolean allowTryItOut =
+        SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT, false);
+    return Map.of("enabled", enabled, "allowTryItOut", allowTryItOut);
   }
 
   private Map<String, Object> authInfo() {

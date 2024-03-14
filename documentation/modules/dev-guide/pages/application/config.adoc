@@ -229,6 +229,9 @@ db.default.password = secret
 | `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
 | `api.pagination.default-per-page` | define the default number of items per page | 40
+| `application.openapi.enabled` | enable OpenAPI resource endpoint | true
+| `application.swagger-ui.enabled` | enable both OpenAPI resource endpoint and Swagger UI | true
+| `application.swagger-ui.allow-try-it-out` | allow "Try it out" in Swagger UI | false
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
 | `encryption.password` | encryption password |

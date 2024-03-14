@@ -51,6 +51,10 @@ public interface AvailableAppSettings {
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
+  String APPLICATION_OPENAPI_ENABLED = "application.openapi.enabled";
+  String APPLICATION_SWAGGER_UI_ENABLED = "application.swagger-ui.enabled";
+  String APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT = "application.swagger-ui.allow-try-it-out";
+
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";
