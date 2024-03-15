@@ -258,7 +258,7 @@ const FormContainer = memo(function FormContainer({
     action,
     state: tabAtom,
   } = useViewTab();
-  const [, setViewProps] = useViewProps();
+  const [viewProps, setViewProps] = useViewProps();
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord, {
       context: action?.context,
@@ -868,7 +868,11 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
-  const pagination = usePagination(dataStore, record, readonly);
+  const pagination = usePagination(
+    viewProps?.dataStore ?? dataStore,
+    record,
+    readonly,
+  );
   const popupHandlerAtom = usePopupHandlerAtom();
   const setPopupHandlers = useSetAtom(popupHandlerAtom);
 

@@ -40,6 +40,7 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
+import { DataStore } from "@/services/client/data-store";
 import { useActionExecutor } from "../form/builder/scope";
 import { isValidSequence } from "../grid/builder/utils";
 import { ViewProps } from "../types";
@@ -126,6 +127,26 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return $columns;
   }, [view, columnBy, fields]);
 
+  const columnsDataStore = useMemo(
+    () =>
+      $columns.reduce(
+        (stores, col) => ({
+          ...stores,
+          [getColumnByValue(col.value)!]: new DataStore(
+            dataStore.model,
+            dataStore.options,
+          ),
+        }),
+        {} as Record<string, DataStore>,
+      ),
+    [getColumnByValue, $columns, dataStore],
+  );
+
+  const getColumnDataStore = useCallback(
+    (value: any) => columnsDataStore[getColumnByValue(value)] ?? dataStore,
+    [columnsDataStore, getColumnByValue, dataStore],
+  );
+
   const fetchRecords = useAtomCallback(
     useCallback(
       (get, set, value: any, options: Partial<SearchOptions> = {}) => {
@@ -164,7 +185,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
           filter._domainAction = _domainAction;
         }
 
-        return dataStore.search({
+        const ds = getColumnDataStore(value);
+        return ds.search({
           ...(sequenceBy && { sortBy: [sequenceBy] }),
           filter,
           limit,
@@ -176,7 +198,6 @@ export function Kanban(props: ViewProps<KanbanView>) {
       },
       [
         dashlet,
-        dataStore,
         fields,
         searchAtom,
         limit,
@@ -184,6 +205,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         sequenceBy,
         getViewContext,
         getColumnByValue,
+        getColumnDataStore,
       ],
     ),
   );
@@ -279,19 +301,29 @@ export function Kanban(props: ViewProps<KanbanView>) {
   );
 
   const onEdit = useCallback(
-    ({ record }: { record: KanbanRecord }, readonly = false) => {
+    (
+      { record, column }: { record: KanbanRecord; column?: KanbanColumn },
+      readonly = false,
+    ) => {
       const recordId = (record.id || 0) as number;
       const id = recordId > 0 ? String(recordId) : "";
       switchTo("form", {
         route: { id },
-        props: { readonly },
+        props: {
+          readonly,
+          recordId: id,
+          ...(column && { dataStore: getColumnDataStore(column.name) }),
+        },
       });
     },
-    [switchTo],
+    [switchTo, getColumnDataStore],
   );
 
   const onEditInPopup = useCallback(
-    ({ record }: { record: KanbanRecord }, readonly = false) => {
+    (
+      { record }: { record: KanbanRecord; column?: KanbanColumn },
+      readonly = false,
+    ) => {
       const viewName = action.views?.find((v) => v.type === "form")?.name;
       const { title, model } = view;
       model &&
@@ -347,7 +379,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
             ...values,
             [columnBy!]: getColumnByValue(column.name),
           };
-          const saved = await dataStore.save(record);
+          const ds = getColumnDataStore(column.name);
+          const saved = await ds.save(record);
           saved &&
             setColumns((columns) => {
               const state = columns.find((c) => c.name === column.name);
@@ -363,17 +396,19 @@ export function Kanban(props: ViewProps<KanbanView>) {
     [
       getContext,
       getColumnByValue,
+      getColumnDataStore,
       actionExecutor,
       setColumns,
-      dataStore,
       columnBy,
       view,
     ],
   );
 
   const onView = useCallback(
-    ({ record }: { record: KanbanRecord }) => {
-      hasEditPopup ? onEditInPopup({ record }, true) : onEdit({ record }, true);
+    ({ record, column }: { record: KanbanRecord; column?: KanbanColumn }) => {
+      hasEditPopup
+        ? onEditInPopup({ record, column }, true)
+        : onEdit({ record, column }, true);
     },
     [hasEditPopup, onEdit, onEditInPopup],
   );
@@ -477,7 +512,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
       ];
 
       try {
-        const res = await dataStore.save(updatedRecords);
+        const ds = getColumnDataStore(column.name);
+        const res = await ds.save(updatedRecords);
 
         records.splice(index, res.length, ...(res as KanbanRecord[]));
 
@@ -502,7 +538,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       columns,
       actionExecutor,
       fields,
-      dataStore,
+      getColumnDataStore,
       getColumnByValue,
       getContext,
       setColumns,

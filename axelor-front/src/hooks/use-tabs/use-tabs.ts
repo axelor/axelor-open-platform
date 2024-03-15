@@ -16,6 +16,7 @@ import {
   HtmlView,
   SavedFilter,
 } from "@/services/client/meta.types";
+import { DataStore } from "@/services/client/data-store";
 import { session } from "@/services/client/session";
 import { device } from "@/utils/device";
 
@@ -46,6 +47,7 @@ export type TabProps = {
   readonly?: boolean;
   recordId?: boolean;
   showSingle?: boolean;
+  dataStore?: DataStore;
 };
 
 /**

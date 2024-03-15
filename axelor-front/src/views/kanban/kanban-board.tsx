@@ -37,7 +37,13 @@ interface KanbanBoardProps {
     column: KanbanColumn;
     record: KanbanRecord;
   }) => void;
-  onCardClick?: ({ record }: { record: KanbanRecord }) => void;
+  onCardClick?: ({
+    record,
+    column,
+  }: {
+    record: KanbanRecord;
+    column?: KanbanColumn;
+  }) => void;
   onCardDelete?: ({
     column,
     record,
@@ -45,7 +51,13 @@ interface KanbanBoardProps {
     column: KanbanColumn;
     record: KanbanRecord;
   }) => void;
-  onCardEdit?: ({ record }: { record: KanbanRecord }) => void;
+  onCardEdit?: ({
+    record,
+    column,
+  }: {
+    record: KanbanRecord;
+    column?: KanbanColumn;
+  }) => void;
 }
 
 function RecordRenderer({
@@ -75,7 +87,7 @@ function RecordRenderer({
           key: "edit",
           text: i18n.get("Edit"),
           hidden: !canEdit,
-          onClick: () => onCardEdit && onCardEdit({ record }),
+          onClick: () => onCardEdit && onCardEdit({ record, column }),
         },
         {
           key: "delete",
@@ -92,10 +104,10 @@ function RecordRenderer({
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       if (canEdit && onCardClick) {
-        onCardClick({ record });
+        onCardClick({ record, column });
       }
     },
-    [canEdit, onCardClick, record],
+    [canEdit, onCardClick, record, column],
   );
 
   return (
