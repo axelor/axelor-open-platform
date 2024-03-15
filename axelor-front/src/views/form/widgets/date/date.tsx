@@ -183,15 +183,16 @@ export function DateComponent({
 
       const callOnChange = event?.type === "click" ? true : false;
 
-      onChange(
-        newValue && moment(newValue).isValid()
-          ? (() => {
-              const m = moment(newValue);
-              return isDateTime ? m.toISOString() : m.format(valueFormat);
-            })()
-          : null,
-        callOnChange,
-      );
+      callOnChange &&
+        onChange(
+          newValue && moment(newValue).isValid()
+            ? (() => {
+                const m = moment(newValue);
+                return isDateTime ? m.toISOString() : m.format(valueFormat);
+              })()
+            : null,
+          callOnChange,
+        );
       setChanged(!callOnChange);
     },
     [onChange, valueFormat, value, isDateTime],
