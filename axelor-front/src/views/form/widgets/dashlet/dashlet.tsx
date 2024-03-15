@@ -82,6 +82,7 @@ export function DashletComponent({
           dashlet: true,
           "show-toolbar": false,
           "dashlet.canSearch": canSearch,
+          "dashlet.params": actionView.params,
           ...(popup && {
             "dashlet.in.popup": popup,
           }),

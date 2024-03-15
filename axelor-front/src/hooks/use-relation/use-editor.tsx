@@ -31,6 +31,7 @@ export type EditorOptions = {
   context?: DataContext;
   canSave?: boolean;
   checkDirty?: boolean;
+  params?: ActionView["params"];
   header?: PopupProps["header"];
   footer?: PopupProps["footer"];
   onClose?: (result: boolean, record?: DataRecord) => void;
@@ -101,24 +102,28 @@ export function useEditor() {
       maximize,
       canSave = true,
       checkDirty = true,
+      params,
       header,
       footer,
       onClose,
       onSave,
       onSelect,
     } = options;
+
+    const tabParams = {
+      "show-toolbar": false,
+      ...params,
+      popup: true,
+      forceEdit: !readonly,
+      "_popup-record": record,
+    };
     const tab = await initTab({
       name: uniqueId("$selector"),
       title,
       model,
       viewType: "form",
       views: [{ type: "form", name: viewName, ...view }],
-      params: {
-        popup: true,
-        forceEdit: !readonly,
-        "show-toolbar": false,
-        "_popup-record": record,
-      },
+      params: tabParams,
       context: {
         _showRecord: record?.id,
         ...context,
@@ -137,6 +142,7 @@ export function useEditor() {
         <Footer
           footer={footer}
           hasOk={canSave}
+          params={tabParams}
           onClose={close}
           onSave={onSave}
           onSelect={onSelect}
@@ -151,6 +157,7 @@ export function useEditor() {
 function Footer({
   hasOk = true,
   footer: FooterComp,
+  params,
   onClose,
   onSave,
   onSelect,
@@ -162,7 +169,11 @@ function Footer({
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
   checkDirty?: EditorOptions["checkDirty"];
+  params?: ActionView["params"];
 }) {
+  const popupCanConfirm = params?.["show-confirm"] !== false;
+  const popupCanSave = params?.["popup-save"] !== false;
+
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
@@ -170,10 +181,10 @@ function Footer({
 
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
-      async () => handler.getState?.().dirty ?? false,
+      async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
       async () => onClose(false),
     );
-  }, [handler, onClose]);
+  }, [handler, popupCanConfirm, onClose]);
 
   const handleConfirm = useAfterActions(
     useAtomCallback(
@@ -240,7 +251,7 @@ function Footer({
         <Button variant="secondary" onClick={handleClose}>
           {i18n.get("Close")}
         </Button>
-        {hasOk && (
+        {hasOk && popupCanSave && (
           <Button variant="primary" onClick={handleConfirm}>
             {i18n.get("OK")}
           </Button>

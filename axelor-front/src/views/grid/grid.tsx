@@ -131,6 +131,7 @@ function GridInner(props: ViewProps<GridView>) {
   });
 
   const { orderBy, rows, selectedRows, selectedCell } = state;
+  const dashletParams = action.params?.["dashlet.params"];
   const detailsView = action.params?.["details-view"];
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
   const hasDetailsView = Boolean(detailsView);
@@ -339,16 +340,27 @@ function GridInner(props: ViewProps<GridView>) {
     (record: DataRecord, context: DataContext, readonly = false) => {
       showEditor({
         model: view.model!,
-        title: view.title ?? "",
+        title: (action.params?.["forceTitle"] ? action.title : view.title) ?? "",
         viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
         maximize: hasPopupMaximize,
         context,
         record,
         readonly,
         onSearch: () => onSearch({}),
+        ...(dashlet && {
+          params: dashletParams,
+        }),
       });
     },
-    [view, action, hasPopupMaximize, showEditor, onSearch],
+    [
+      view,
+      action,
+      hasPopupMaximize,
+      dashlet,
+      dashletParams,
+      showEditor,
+      onSearch,
+    ],
   );
 
   const onEditInTab = useCallback(
@@ -358,6 +370,9 @@ function GridInner(props: ViewProps<GridView>) {
         name: uniqueId("$act"),
         viewType: "form",
         params: {
+          ...(dashlet && {
+            ...dashletParams,
+          }),
           forceEdit: !readonly,
         },
         context: {
@@ -366,7 +381,7 @@ function GridInner(props: ViewProps<GridView>) {
         },
       });
     },
-    [action],
+    [action, dashlet, dashletParams],
   );
 
   const canEdit = hasButton("edit");
