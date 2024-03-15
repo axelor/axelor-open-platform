@@ -1,0 +1,6 @@
+---
+title: Reduce collaboration avatar height
+type: fix
+description: |
+  Reduce collaboration avatar height so that it does not increase toolbar height once shown.
+  Also fix grouped avatars icon width.

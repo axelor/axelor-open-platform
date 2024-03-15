@@ -10,12 +10,13 @@
 .avatarContainer {
   border-radius: 50%;
   border: 0.25rem solid;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2rem;
+  width: 2rem;
+  display: flex;
 }
 
 .avatarContainer > * {
-  font-size: 1rem;
+  font-size: 0.75rem;
 }
 
 .avatar {
@@ -24,6 +25,7 @@
 
 .menu {
   height: 100%;
+  width: 100%;
 }
 
 .joined {

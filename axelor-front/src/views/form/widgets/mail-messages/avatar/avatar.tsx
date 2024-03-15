@@ -7,7 +7,7 @@ import { checkUrl, getAvatarText, getColor, getName } from "./utils";
 
 import classes from "./avatar.module.scss";
 
-function Avatar({
+const Avatar = React.memo(function ({
   user,
   image: propImage,
   title: propTitle,
@@ -43,7 +43,7 @@ function Avatar({
     checkUrl(
       image,
       () => setCanShowImage(true),
-      () => setCanShowImage(false)
+      () => setCanShowImage(false),
     );
   }, [image]);
 
@@ -68,6 +68,6 @@ function Avatar({
       {text}
     </span>
   );
-}
+});
 
-export default React.memo(Avatar);
+export default Avatar;
