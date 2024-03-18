@@ -1,4 +1,4 @@
-import { cloneElement } from "react";
+import { SyntheticEvent, cloneElement } from "react";
 
 import { Box, ClickAwayListener, Popper, usePopperTrigger } from "@axelor/ui";
 
@@ -8,18 +8,30 @@ export type TooltipProps = {
   children: React.ReactElement;
   title?: string;
   content: () => JSX.Element | null;
+  disableContentClick?: boolean;
 };
 
-export function Tooltip({ children, title, content: Content }: TooltipProps) {
+export function Tooltip({
+  children,
+  title,
+  content: Content,
+  disableContentClick = true,
+}: TooltipProps) {
   const { open, targetEl, setTargetEl, setContentEl, onClickAway } =
     usePopperTrigger({
       trigger: "hover",
       interactive: true,
       delay: {
         open: 1000,
-        close: 100
-      }
+        close: 100,
+      },
     });
+
+  function handleContentClick(e: SyntheticEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   return (
     <>
       {cloneElement(children, {
@@ -35,7 +47,13 @@ export function Tooltip({ children, title, content: Content }: TooltipProps) {
         shadow
       >
         <ClickAwayListener onClickAway={onClickAway}>
-          <Box ref={setContentEl} className={styles.container}>
+          <Box
+            ref={setContentEl}
+            {...(disableContentClick && {
+              onClick: handleContentClick,
+            })}
+            className={styles.container}
+          >
             {title && <Box className={styles.title}>{title}</Box>}
             <Box className={styles.content}>
               <Content />
