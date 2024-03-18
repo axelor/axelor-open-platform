@@ -340,7 +340,8 @@ function GridInner(props: ViewProps<GridView>) {
     (record: DataRecord, context: DataContext, readonly = false) => {
       showEditor({
         model: view.model!,
-        title: (action.params?.["forceTitle"] ? action.title : view.title) ?? "",
+        title:
+          (action.params?.["forceTitle"] ? action.title : view.title) ?? "",
         viewName: (action.views?.find((v) => v.type === "form") || {})?.name,
         maximize: hasPopupMaximize,
         context,
@@ -794,11 +795,25 @@ function GridInner(props: ViewProps<GridView>) {
     }
   }, [currentPage, limit]);
 
+  const onGridColumnSearch = useCallback(
+    (_options?: SearchOptions) =>
+      doSearch({ offset: 0, ..._options }).then(() => {
+        if (dataStore.page?.offset === 0) {
+          switchTo("grid", { route: { id: "1" } });
+        }
+      }),
+    [doSearch, dataStore, switchTo],
+  );
+
   const searchColumnRenderer = useMemo(() => {
     return (props: any) => (
-      <SearchColumn {...props} dataAtom={gridSearchAtom} onSearch={onSearch} />
+      <SearchColumn
+        {...props}
+        dataAtom={gridSearchAtom}
+        onSearch={onGridColumnSearch}
+      />
     );
-  }, [gridSearchAtom, onSearch]);
+  }, [gridSearchAtom, onGridColumnSearch]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
   const showEditIcon = popupOptions?.showEditIcon !== false && canEdit;
