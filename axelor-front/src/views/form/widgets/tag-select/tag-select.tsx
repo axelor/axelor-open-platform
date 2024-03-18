@@ -29,6 +29,8 @@ import { SelectionTag } from "../selection";
 
 import styles from "./tag-select.module.scss";
 
+const EMPTY: DataRecord[] = [];
+
 export function TagSelect(props: FieldProps<DataRecord[]>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
@@ -370,7 +372,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         optionLabel={getOptionLabel}
         optionEqual={getOptionEqual}
         optionMatch={getOptionMatch}
-        value={ready ? value : []}
+        value={ready ? (value ?? EMPTY) : EMPTY}
         placeholder={placeholder}
         onChange={handleChange}
         onOpen={onMenuOpen}
