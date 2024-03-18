@@ -15,6 +15,7 @@ import { i18n } from "@/services/client/i18n";
 import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
+import { SearchOptions } from "@/services/client/data";
 
 export type SelectorOptions = {
   model: string;
@@ -130,25 +131,36 @@ function Handler({
 function Header() {
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
-  if (handler.dataStore) {
-    return <SelectorHeader dataStore={handler.dataStore} />;
+  if (handler.dataStore && handler.onSearch) {
+    return (
+      <SelectorHeader
+        dataStore={handler.dataStore}
+        onSearch={handler.onSearch}
+      />
+    );
   }
   return null;
 }
 
-function SelectorHeader({ dataStore }: { dataStore: DataStore }) {
+function SelectorHeader({
+  dataStore,
+  onSearch,
+}: {
+  dataStore: DataStore;
+  onSearch: (options?: SearchOptions) => void;
+}) {
   const page = useDataStore(dataStore, (state) => state.page);
   const { offset = 0, limit = 0, totalCount = 0 } = page;
 
   const onNext = useCallback(() => {
     const nextOffset = Math.min(offset + limit, totalCount);
-    dataStore.search({ offset: nextOffset });
-  }, [dataStore, limit, offset, totalCount]);
+    onSearch({ offset: nextOffset });
+  }, [onSearch, limit, offset, totalCount]);
 
   const onPrev = useCallback(() => {
     const nextOffset = Math.max(offset - limit, 0);
-    dataStore.search({ offset: nextOffset });
-  }, [dataStore, limit, offset]);
+    onSearch({ offset: nextOffset });
+  }, [onSearch, limit, offset]);
 
   const commands = useMemo(() => {
     const items: CommandItemProps[] = [
