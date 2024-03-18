@@ -177,6 +177,7 @@ function OneToManyInner({
     widgetAttrs,
     name,
     showBars = widgetAttrs?.showBars,
+    groupBy = viewData?.view?.groupBy,
     toolbar = viewData?.view?.toolbar,
     menubar = viewData?.view?.menubar,
     target: model,
@@ -350,7 +351,9 @@ function OneToManyInner({
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
-  const [state, setState] = useGridState();
+  const [state, setState] = useGridState({
+    params: { groupBy },
+  });
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
   const { editRow, selectedRows, rows } = state;
