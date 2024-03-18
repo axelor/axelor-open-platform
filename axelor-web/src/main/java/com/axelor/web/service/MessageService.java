@@ -201,7 +201,7 @@ public class MessageService extends AbstractService {
   }
 
   /**
-   * Get all replied of the message identified with the given id
+   * Get all replies of the message identified with the given id
    *
    * @param id root message id
    * @return response
@@ -210,7 +210,7 @@ public class MessageService extends AbstractService {
   @Path("{id}/replies")
   @Operation(
       summary = "Read replies",
-      description = "This service returns all replied of the message identified with the given id.")
+      description = "This service returns all replies of the message identified with the given id.")
   public Response replies(@PathParam("id") long id) {
     final ActionRequest req = new ActionRequest();
     final ActionResponse res = new ActionResponse();
@@ -249,7 +249,7 @@ public class MessageService extends AbstractService {
   @Path("{id}")
   @Operation(
       summary = "Delete message",
-      description = "This service delete message identified with the given id.")
+      description = "This service deletes message identified with the given id.")
   public Response messageRemove(@PathParam("id") long id) {
     removeMessage(id);
 
@@ -291,7 +291,7 @@ public class MessageService extends AbstractService {
   @Path("{id}/flag")
   @Operation(
       summary = "Flag message",
-      description = "This service flag message identified with the given id.")
+      description = "This service flags message identified with the given id.")
   public Response flagMessage(@PathParam("id") long id, Request request) {
     final ActionResponse res = new ActionResponse();
 
@@ -305,7 +305,7 @@ public class MessageService extends AbstractService {
   }
 
   /**
-   * Flag messages contains in the given request
+   * Flag messages contained in the given request
    *
    * @param request the request contains the flags
    * @return response
@@ -314,7 +314,7 @@ public class MessageService extends AbstractService {
   @Path("flag")
   @Operation(
       summary = "Flag message",
-      description = "This service flag message messages contains in the given request.")
+      description = "This service flags messages contained in the given request.")
   public Response flagMessages(Request request) {
     final ActionResponse res = new ActionResponse();
 

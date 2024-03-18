@@ -389,6 +389,9 @@ public class DmsService {
 
   @HEAD
   @Path("download/{id}")
+  @Operation(
+      summary = "Check file existence",
+      description = "Check that the specified DMS file exists.")
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
     if (!hasBatchIds(batchOrId) && findFile(repository.find(Longs.tryParse(batchOrId))) == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();

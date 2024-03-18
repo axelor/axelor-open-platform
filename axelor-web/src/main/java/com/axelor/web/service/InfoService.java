@@ -99,7 +99,11 @@ public class InfoService extends AbstractService {
   @GET
   @Path("info")
   @Tag(name = "Metadata")
-  @Operation(summary = "Retrieve metadata information for the application")
+  @Operation(
+      summary = "Retrieve metadata information for the application",
+      description =
+          "Retrieve metadata information for `application` and `authentication`. "
+              + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
   public Map<String, Object> info() {
     final User user = AuthUtils.getUser();
     final Map<String, Object> map = new HashMap<>();

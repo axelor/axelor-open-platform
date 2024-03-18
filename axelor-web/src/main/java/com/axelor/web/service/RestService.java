@@ -280,7 +280,8 @@ public class RestService extends ResourceService {
   @Operation(
       summary = "Update a record",
       description =
-          "This service returns the updated record. !Important : Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.!")
+          "This service returns the updated record. "
+              + "**Important: Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.**")
   public Response update(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -303,7 +304,8 @@ public class RestService extends ResourceService {
   @Operation(
       summary = "Update records in mass",
       description =
-          "This service returns list of updated records. !Important : Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.!")
+          "This service returns list of updated records. "
+              + "**Important: Version number is used in order to ensure non-conflicting modifications of the records, and thus must be specified.**")
   public Response updateMass(Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();

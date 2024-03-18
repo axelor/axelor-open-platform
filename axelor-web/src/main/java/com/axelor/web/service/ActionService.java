@@ -29,6 +29,7 @@ import com.axelor.rpc.Response;
 import com.axelor.ui.QuickMenuService;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -108,12 +109,24 @@ public class ActionService extends AbstractService {
   }
 
   @POST
+  @Operation(
+      summary = "Execute an action",
+      description =
+          "Execute an action along with the provided data context. "
+              + "The action can be single or list of comma-separated actions. "
+              + "An action can be either an xml action or a method call.")
   public Response execute(ActionRequest request) {
     return actionExecutor.execute(request);
   }
 
   @POST
   @Path("{action}")
+  @Operation(
+      summary = "Execute an action",
+      description =
+          "Execute an action along with the provided data context. "
+              + "The action can be single or list of comma-separated actions. "
+              + "An action can be either an xml action or a method call.")
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
     return actionExecutor.execute(request);
