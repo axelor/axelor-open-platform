@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, Button } from "@axelor/ui";
-import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
+import { TextLink } from "@/components/text-link";
 import { i18n } from "@/services/client/i18n";
+import { Button } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { String } from "../string";
@@ -35,14 +36,9 @@ export function Email(props: FieldProps<string>) {
     return (
       <FieldControl {...props}>
         {value && (
-          <Box
-            as="a"
-            target="_blank"
-            href={`mailto:${value}`}
-            className={styles.link}
-          >
+          <TextLink href={`mailto:${value}`} className={styles.link}>
             {value}
-          </Box>
+          </TextLink>
         )}
       </FieldControl>
     );

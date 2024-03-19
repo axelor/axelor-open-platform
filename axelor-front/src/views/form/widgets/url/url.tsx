@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, Button } from "@axelor/ui";
-import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
+import { TextLink } from "@/components/text-link";
 import { i18n } from "@/services/client/i18n";
+import { Button } from "@axelor/ui";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
-import { String } from "../string";
 import { FieldControl, FieldProps } from "../../builder";
+import { String } from "../string";
 
 import styles from "./url.module.scss";
 
@@ -29,7 +30,7 @@ export function Url(props: FieldProps<string>) {
   }, []);
 
   const handleOpenUrl = useCallback(() => {
-    window.open(url as string, "_blank");
+    window.open(url as string, "_blank", "noopener,noreferrer");
   }, [url]);
 
   useEffect(() => {
@@ -39,11 +40,7 @@ export function Url(props: FieldProps<string>) {
   if (readonly) {
     return (
       <FieldControl {...props}>
-        {value && (
-          <Box as="a" target="_blank" href={value}>
-            {value}
-          </Box>
-        )}
+        {value && <TextLink href={value}>{value}</TextLink>}
       </FieldControl>
     );
   }

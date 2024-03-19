@@ -436,7 +436,7 @@ export class DefaultActionExecutor implements ActionExecutor {
       }
 
       if (view && url && tab.params?.target === "_blank") {
-        window.open(url);
+        window.open(url, tab.params?.target, "noopener,noreferrer");
         return;
       }
     }

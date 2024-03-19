@@ -1,12 +1,10 @@
-import { Box } from "@axelor/ui";
+import { escape } from "lodash";
+
+import { TextLink } from "@/components/text-link";
 import { GridColumnProps } from "@axelor/ui/grid";
-import { escape } from "lodash"
 
 export function Url(props: GridColumnProps) {
   const { value } = props;
-  return (
-    <Box as="a" target="_blank" href={escape(value)}>
-      {escape(value)}
-    </Box>
-  );
+
+  return <TextLink href={escape(value)}>{escape(value)}</TextLink>;
 }

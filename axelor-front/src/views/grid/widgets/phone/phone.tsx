@@ -4,6 +4,7 @@ import { FlagImage, usePhoneInput } from "react-international-phone";
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
+import { TextLink } from "@/components/text-link";
 import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import {
@@ -48,16 +49,14 @@ export function Phone(props: GridColumnProps) {
         <Box title={i18n.get(country.name)} className={styles.flagContainer}>
           <FlagImage className={styles.flag} iso2={iso2} src={flags} />
         </Box>
-        <Box
-          as="a"
-          target="_blank"
+        <TextLink
           href={`tel:${noPrefix ? value : phone}`}
           className={styles.link}
           title={numberType}
           onClick={(e) => e.stopPropagation()} // Prevent going into edit when clicking on link.
         >
           {inputValue}
-        </Box>
+        </TextLink>
       </>
     )
   );

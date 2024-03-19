@@ -12,7 +12,6 @@ import {
   Divider,
   Image,
   LinearProgress,
-  Link,
   List,
   ListItem,
   Panel,
@@ -28,6 +27,7 @@ import {
 } from "@axelor/ui";
 
 import { Icon } from "@/components/icon";
+import { TextLink as Link } from "@/components/text-link";
 
 import { parseSafe } from "./parser";
 import { legacyClassNames } from "@/styles/legacy";

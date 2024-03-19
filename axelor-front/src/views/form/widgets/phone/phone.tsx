@@ -21,6 +21,7 @@ import {
 import { Box, Button, Input, Portal, clsx } from "@axelor/ui";
 
 import { Icon } from "@/components/icon";
+import { TextLink } from "@/components/text-link";
 import { i18n } from "@/services/client/i18n";
 import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
@@ -234,7 +235,7 @@ export function Phone({
   }, [phone]);
 
   const handleOpenPhoneLink = useCallback(() => {
-    window.open(`tel:${noPrefix ? value : phone}`, "_blank");
+    window.open(`tel:${noPrefix ? value : phone}`, "_blank", "noopener,noreferrer");
   }, [noPrefix, value, phone]);
 
   return (
@@ -301,15 +302,13 @@ export function Phone({
           </>
         )}
         {readonly ? (
-          <Box
-            as="a"
-            target="_blank"
+          <TextLink
             href={`tel:${noPrefix ? value : phone}`}
             className={styles.link}
             title={numberType}
           >
             {hasValue && inputValue}
-          </Box>
+          </TextLink>
         ) : (
           <Box className={styles.inputWrapper}>
             <Input

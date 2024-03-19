@@ -448,7 +448,7 @@ const openTabAtom = atom(
       const html = tab.action.views?.find((x) => x.type === "html") as HtmlView;
       const url = html?.name || html?.resource;
       if (url) {
-        window.open(url);
+        window.open(url, tab?.action.params?.target, "noopener,noreferrer");
       }
       return tab;
     }
