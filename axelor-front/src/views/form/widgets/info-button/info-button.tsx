@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
+import getValue from "lodash/get";
 import { useCallback, useMemo, useState } from "react";
 
 import { Box, Button } from "@axelor/ui";
@@ -11,7 +12,11 @@ import { Icon } from "@/components/icon";
 import { Field } from "@/services/client/meta.types";
 
 import { WidgetControl, WidgetProps } from "../../builder";
-import { useFormEditableScope, useFormScope, useWidgetState } from "../../builder/scope";
+import {
+  useFormEditableScope,
+  useFormScope,
+  useWidgetState,
+} from "../../builder/scope";
 import { useReadonly } from "../button/hooks";
 
 import styles from "./info-button.module.scss";
@@ -27,9 +32,9 @@ export function InfoButton(props: WidgetProps) {
   const { actionExecutor } = useFormScope();
   const { commit: commitEditableWidgets } = useFormEditableScope();
   const record = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom])
+    useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
-  const value = record[field];
+  const value = getValue(record, field);
 
   const { attrs: fieldSchema = {} } = useWidgetState(formAtom, field ?? "");
 
