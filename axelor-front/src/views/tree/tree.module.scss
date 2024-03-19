@@ -1,3 +1,7 @@
+.container {
+  --ax-theme-shell-view-toolbar-border: none;
+}
+
 .tree {
   --bs-table-bg: var(--bs-body-bg);
   --bs-table-active-bg: var(--ax-grid-active-bg, var(--bs-secondary-bg));

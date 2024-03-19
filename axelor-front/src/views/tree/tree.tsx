@@ -1,6 +1,6 @@
 import { useSetAtom } from "jotai";
 import { uniq } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import {
   Box,
@@ -12,7 +12,6 @@ import {
 
 import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useDataStore } from "@/hooks/use-data-store";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
@@ -24,7 +23,11 @@ import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewTabRefresh, useViewContext, useViewTab } from "@/view-containers/views/scope";
+import {
+  useViewTabRefresh,
+  useViewContext,
+  useViewTab,
+} from "@/view-containers/views/scope";
 
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { ViewProps } from "../types";
@@ -40,7 +43,9 @@ import styles from "./tree.module.scss";
 export function Tree({ meta }: ViewProps<TreeView>) {
   const { view } = meta;
   const { action, dashlet, popup, popupOptions } = useViewTab();
+  const [records, setRecords] = useState<TreeRecord[]>([]);
   const [sortColumns, setSortColumns] = useState<TreeSortColumn[]>([]);
+  const [resetCount, doReset] = useReducer((c) => c + 1, 0);
   const getViewContext = useViewContext();
 
   const getContext = useCallback(
@@ -224,8 +229,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
       if (!node) return record;
 
+      const [lastNode] = view.nodes?.slice(-1) ?? [];
       const {
-        parent = isSameModelTree ? view.nodes?.pop?.()?.parent : "",
+        parent = isSameModelTree ? lastNode?.parent : "",
         model,
         items = [],
       } = node;
@@ -266,13 +272,17 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   }, [onSearch]);
 
   const rootNode = view.nodes?.[0];
-  const records = useDataStore(
-    dataStore!,
-    useCallback(
-      (ds) => toTreeData(rootNode!, ds.records),
-      [rootNode, toTreeData],
-    ),
-  );
+  useEffect(() => {
+    if (dataStore && rootNode) {
+      const setTreeData = () =>
+        setRecords(() => toTreeData(rootNode, dataStore.records));
+        
+      setTreeData();
+      return dataStore.subscribe(() => {
+        setTreeData();
+      });
+    }
+  }, [rootNode, dataStore, toTreeData, resetCount]);
 
   const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
@@ -300,7 +310,11 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
-  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = dataStore?.page || {};
+  const {
+    offset = 0,
+    limit = DEFAULT_PAGE_SIZE,
+    totalCount = 0,
+  } = dataStore?.page || {};
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
@@ -323,8 +337,9 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   );
 
   const handleRefresh = useCallback(async () => {
+    doReset();
     await onSearch({});
-  }, [onSearch]);
+  }, [doReset, onSearch]);
 
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
@@ -345,7 +360,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   useViewTabRefresh("tree", handleRefresh);
 
   return (
-    <Box d="flex" flexDirection="column" overflow="auto" w={100}>
+    <Box
+      className={styles.container}
+      d="flex"
+      flexDirection="column"
+      overflow="auto"
+      w={100}
+    >
       {showToolbar && (
         <ViewToolBar
           meta={meta}
