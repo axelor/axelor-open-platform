@@ -1,19 +1,18 @@
 .container {
-  position: absolute;
-  right: 0.25rem;
+  display: flex;
+  border: 0;
+  padding: 0;
   cursor: pointer;
 }
 
 .top {
+  position: absolute;
   top: 0.25rem;
-}
-
-.bottom {
-  bottom: 0rem;
-}
-
-.icon {
-  cursor: pointer;
+  right: 0.25rem;
+  [dir="rtl"] & {
+    right: unset !important;
+    left: 0.25rem !important;
+  }
 }
 
 .list > div {

@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { useCallback } from "react";
+import { Fragment, useCallback, useMemo } from "react";
 
 import { AdornedInput, clsx } from "@axelor/ui";
 
@@ -49,13 +49,35 @@ export function String({
 
   const [trValue, setTranslateValue] = useTranslationValue(props);
 
+  const endAdornment = useMemo(() => {
+    const elements = [
+      inputEndAdornment,
+      translatable && !readonly ? (
+        <Translatable
+          value={text}
+          onValueChange={setValue}
+          onUpdate={setTranslateValue}
+        />
+      ) : undefined,
+    ].filter(Boolean);
+    return elements.length ? (
+      <>
+        {elements.map((element, index) => (
+          <Fragment key={index}>{element}</Fragment>
+        ))}
+      </>
+    ) : undefined;
+  }, [
+    inputEndAdornment,
+    readonly,
+    setTranslateValue,
+    setValue,
+    text,
+    translatable,
+  ]);
+
   return (
-    <FieldControl
-      {...props}
-      className={clsx(styles.container, {
-        [styles.translatable]: translatable && !readonly,
-      })}
-    >
+    <FieldControl {...props} className={clsx(styles.container)}>
       {readonly || trValue ? (
         <ViewerInput
           name={schema.name}
@@ -76,15 +98,8 @@ export function String({
           onKeyDown={onKeyDown}
           onChange={handleInputChange}
           onBlur={onBlur}
-          endAdornment={inputEndAdornment}
+          endAdornment={endAdornment}
           {...inputProps}
-        />
-      )}
-      {translatable && !readonly && (
-        <Translatable
-          value={text}
-          onValueChange={setValue}
-          onUpdate={setTranslateValue}
         />
       )}
     </FieldControl>
