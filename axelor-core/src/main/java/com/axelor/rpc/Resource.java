@@ -1132,6 +1132,10 @@ public class Resource<T extends Model> {
       }
 
       result.put(name, value);
+
+      if (property.isTranslatable() && value instanceof String) {
+        Translator.translate(result, property);
+      }
     }
 
     return result;
