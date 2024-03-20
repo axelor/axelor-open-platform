@@ -1,0 +1,3 @@
+---
+title: Fix redundant search request on grid view pagination
+type: fix

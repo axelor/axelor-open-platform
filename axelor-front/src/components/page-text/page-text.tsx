@@ -1,4 +1,10 @@
-import { FormEvent, KeyboardEvent, useCallback, useState } from "react";
+import {
+  FormEvent,
+  KeyboardEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 
 import { Button, Input } from "@axelor/ui";
 
@@ -22,6 +28,10 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
     (e) => setUserPageSize(+e.target.value),
     [],
   );
+  const currentPage = useMemo(
+    () => Math.floor(offset / limit) + 1,
+    [offset, limit],
+  );
 
   const onApply = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
@@ -37,10 +47,15 @@ export function PageText({ dataStore }: { dataStore: DataStore }) {
           message: i18n.get("Page size limited to {0} records", size),
         });
       }
-      dataStore.search({ limit: size });
+      dataStore.search({
+        limit: size,
+        ...(currentPage && {
+          offset: (currentPage - 1) * size,
+        }),
+      });
       setShowEditor(false);
     },
-    [dataStore, userPageSize],
+    [dataStore, currentPage, userPageSize],
   );
 
   const handleKeyDown = useCallback(

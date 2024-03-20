@@ -606,13 +606,14 @@ function GridInner(props: ViewProps<GridView>) {
   const maxPage = Math.ceil(totalCount / limit);
   const hasRowSelected = !!selectedRows?.length;
   const currentPage = useMemo(() => {
+    if (dashlet || popup) return 0;
     const hasPageSet = pageSetRef.current;
     pageSetRef.current = true;
     if (hasPageSet || dataStore.records.length === 0) {
       return +(viewRoute?.id || 1);
     }
     return Math.floor(offset / limit) + 1;
-  }, [dataStore, offset, limit, viewRoute?.id]);
+  }, [dataStore, offset, limit, viewRoute?.id, dashlet, popup]);
 
   const getContext = useCallback<() => DataContext>(
     () => ({
@@ -794,6 +795,23 @@ function GridInner(props: ViewProps<GridView>) {
       return { offset: (currentPage - 1) * limit };
     }
   }, [currentPage, limit]);
+
+  const onGridSearch = useCallback(
+    (options?: SearchOptions) => {
+      const currOptions = dataStore.options || {};
+      // if any search options changed then only trigger search
+      if (
+        options &&
+        Object.entries(options).every(([k, v]) =>
+          isEqual(currOptions[k as keyof SearchOptions], v),
+        )
+      ) {
+        return;
+      }
+      return onSearch(options);
+    },
+    [onSearch, dataStore],
+  );
 
   const onGridColumnSearch = useCallback(
     (_options?: SearchOptions) =>
@@ -1056,7 +1074,7 @@ function GridInner(props: ViewProps<GridView>) {
             actionExecutor={actionExecutor}
             onEdit={readonly === true ? onView : onEdit}
             onView={onView}
-            onSearch={onSearch}
+            onSearch={onGridSearch}
             onSave={onSave}
             onDiscard={onDiscard}
             onRowReorder={onRowReorder}
