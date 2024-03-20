@@ -40,7 +40,11 @@ export function Url(props: FieldProps<string>) {
   if (readonly) {
     return (
       <FieldControl {...props}>
-        {value && <TextLink href={value}>{value}</TextLink>}
+        {value && (
+          <TextLink href={value} className={styles.link}>
+            {value}
+          </TextLink>
+        )}
       </FieldControl>
     );
   }

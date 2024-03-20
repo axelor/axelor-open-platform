@@ -1,3 +1,11 @@
+.link {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding: var(--ax-theme-input-padding, 0.375rem 0.75rem);
+  border-bottom: 1px solid transparent;
+}
+
 .inputIcon {
   display: flex;
   border: 0;
