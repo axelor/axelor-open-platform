@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { Box, Button } from "@axelor/ui";
+import { Button } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
-import { i18n } from "@/services/client/i18n";
 
-import { String } from "../string";
+import { i18n } from "@/services/client/i18n";
 import { FieldProps } from "../../builder";
+import { String } from "../string";
 
 import styles from "./password.module.scss";
 

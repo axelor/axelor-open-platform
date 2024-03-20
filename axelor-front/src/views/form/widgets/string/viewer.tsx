@@ -1,4 +1,4 @@
-import { Box, Button, Input } from "@axelor/ui";
+import { Box, Button, Input, clsx } from "@axelor/ui";
 import { useCallback, useEffect, useState, useMemo } from "react";
 
 import { useAfterActions } from "../../builder/scope";
@@ -41,7 +41,7 @@ export function ViewerInput({
       readOnly
       bg="body"
       onChange={noop}
-      className={styles.viewer}
+      className={clsx(styles.input, styles.viewer)}
     />
   );
 }

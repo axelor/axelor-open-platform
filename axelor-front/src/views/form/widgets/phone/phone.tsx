@@ -18,7 +18,7 @@ import {
   usePhoneInput,
 } from "react-international-phone";
 
-import { Box, Button, Input, Portal, clsx } from "@axelor/ui";
+import { AdornedInput, Box, Button, Portal, clsx } from "@axelor/ui";
 
 import { Icon } from "@/components/icon";
 import { TextLink } from "@/components/text-link";
@@ -235,7 +235,11 @@ export function Phone({
   }, [phone]);
 
   const handleOpenPhoneLink = useCallback(() => {
-    window.open(`tel:${noPrefix ? value : phone}`, "_blank", "noopener,noreferrer");
+    window.open(
+      `tel:${noPrefix ? value : phone}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
   }, [noPrefix, value, phone]);
 
   return (
@@ -311,7 +315,7 @@ export function Phone({
           </TextLink>
         ) : (
           <Box className={styles.inputWrapper}>
-            <Input
+            <AdornedInput
               ref={inputRef}
               {...(focus && { key: "focused" })}
               data-input
@@ -329,16 +333,17 @@ export function Phone({
               className={clsx(styles.input, {
                 [styles.warning]: !invalid && hasValue && !isPossibleNumber,
               })}
+              endAdornment={
+                <Button
+                  onClick={handleOpenPhoneLink}
+                  disabled={!isPossibleNumber}
+                  title={i18n.get("Call")}
+                >
+                  <Icon icon="telephone" />
+                </Button>
+              }
               {...inputProps}
             />
-            <Button
-              onClick={handleOpenPhoneLink}
-              className={styles.inputIcon}
-              disabled={!isPossibleNumber}
-              title={i18n.get("Call")}
-            >
-              <Icon icon="telephone" />
-            </Button>
           </Box>
         )}
       </Box>

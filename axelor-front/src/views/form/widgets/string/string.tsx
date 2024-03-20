@@ -1,7 +1,7 @@
-import { useCallback } from "react";
 import { useAtomValue } from "jotai";
+import { useCallback } from "react";
 
-import { Box, Input, clsx } from "@axelor/ui";
+import { AdornedInput, clsx } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
@@ -63,24 +63,22 @@ export function String({
           value={trValue ?? text}
         />
       ) : (
-        <Box d="flex">
-          <Input
-            {...(focus && { key: "focused" })}
-            data-input
-            type="text"
-            id={uid}
-            autoFocus={focus}
-            placeholder={placeholder}
-            value={text}
-            invalid={invalid}
-            required={required}
-            onKeyDown={onKeyDown}
-            onChange={handleInputChange}
-            onBlur={onBlur}
-            {...inputProps}
-          />
-          {inputEndAdornment}
-        </Box>
+        <AdornedInput
+          {...(focus && { key: "focused" })}
+          data-input
+          type="text"
+          id={uid}
+          autoFocus={focus}
+          placeholder={placeholder}
+          value={text}
+          invalid={invalid}
+          required={required}
+          onKeyDown={onKeyDown}
+          onChange={handleInputChange}
+          onBlur={onBlur}
+          endAdornment={inputEndAdornment}
+          {...inputProps}
+        />
       )}
       {translatable && !readonly && (
         <Translatable
