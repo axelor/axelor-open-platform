@@ -799,6 +799,7 @@ public class Entity implements BaseType<Entity> {
 
     if (modelClass) {
       JavaField id = new JavaField("id", "Long");
+      JavaField cid = new JavaField("cid", "Long", Modifier.PRIVATE | Modifier.TRANSIENT);
       JavaField version = new JavaField("version", "Integer", Modifier.PRIVATE);
       JavaField selected =
           new JavaField("selected", "boolean", Modifier.PRIVATE | Modifier.TRANSIENT);
@@ -809,12 +810,16 @@ public class Entity implements BaseType<Entity> {
       archived.annotation(
           new JavaAnnotation("com.axelor.db.annotations.Widget").param("massUpdate", "true"));
 
+      pojo.field(cid);
       pojo.field(version);
       pojo.field(selected);
       pojo.field(archived);
 
       pojo.method(id.getGetterMethod().modifiers(Modifier.PUBLIC | Modifier.ABSTRACT));
       pojo.method(id.getSetterMethod().modifiers(Modifier.PUBLIC | Modifier.ABSTRACT));
+
+      pojo.method(cid.getGetterMethod());
+      pojo.method(cid.getSetterMethod());
 
       pojo.method(version.getGetterMethod());
       pojo.method(version.getSetterMethod());
