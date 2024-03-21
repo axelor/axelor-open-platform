@@ -12,13 +12,16 @@ import { String } from "../string";
 import styles from "./email.module.scss";
 
 export function Email(props: FieldProps<string>) {
-  const { readonly, valueAtom } = props;
+  const { readonly, valueAtom, schema } = props;
+  const { pattern } = schema;
   const value = useAtomValue(valueAtom);
   const [email, setEmail] = useState(value);
 
+  const regexp = useMemo(() => new RegExp(pattern ?? "", "i"), [pattern]);
+
   const isValidEmail = useMemo(() => {
-    return !!email?.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/g);
-  }, [email]);
+    return email && regexp.test(email);
+  }, [email, regexp]);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
