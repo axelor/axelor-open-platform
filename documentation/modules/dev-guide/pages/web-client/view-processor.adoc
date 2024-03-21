@@ -1,0 +1,23 @@
+= View Processors
+:toc:
+:toc-title:
+
+View processors allow to programmatically add view elements. They are automatically discovered on application startup,
+and they are executed in module resolution order, after finding view in `MetaService::findView`, which is used by
+`view` API endpoint.
+
+WARNING: You manipulate the view structure at this point. It is important to understand and validate each changes
+depending on object manipulated in order to avoid unexpected behavior during the rendering. Use it with caution.
+
+Example:
+
+[source,java]
+----
+public class MyViewProcessor implements ViewProcessor {
+
+  @Override
+  public void process(AbstractView view) {
+    // Do something to the `view`.
+  }
+}
+----

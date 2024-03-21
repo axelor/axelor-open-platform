@@ -26,6 +26,7 @@ import com.axelor.meta.db.repo.MetaJsonReferenceUpdater;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
 import com.axelor.meta.loader.ViewWatcherObserver;
+import com.axelor.meta.service.ViewProcessor;
 import com.axelor.report.ReportEngineProvider;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
@@ -68,6 +69,10 @@ public class AppModule extends AbstractModule {
     // Init QuickMenuCreator
     Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
 
+    // View processor binder
+    final Multibinder<ViewProcessor> viewProcessorBinder =
+        Multibinder.newSetBinder(binder(), ViewProcessor.class);
+
     bind(AppSettingsObserver.class);
     bind(ViewWatcherObserver.class);
 
@@ -89,6 +94,26 @@ public class AppModule extends AbstractModule {
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
+    }
+
+    // Configure view processors
+
+    final List<Class<? extends ViewProcessor>> viewProcessorClasses =
+        ModuleManager.getResolution().stream()
+            .flatMap(name -> MetaScanner.findSubTypesOf(name, ViewProcessor.class).find().stream())
+            .collect(Collectors.toList());
+
+    if (!viewProcessorClasses.isEmpty()) {
+      log.atInfo()
+          .setMessage("View processors: {}")
+          .addArgument(
+              () ->
+                  viewProcessorClasses.stream()
+                      .map(Class::getSimpleName)
+                      .collect(Collectors.joining(", ")))
+          .log();
+      viewProcessorClasses.forEach(
+          viewProcessor -> viewProcessorBinder.addBinding().to(viewProcessor));
     }
   }
 }

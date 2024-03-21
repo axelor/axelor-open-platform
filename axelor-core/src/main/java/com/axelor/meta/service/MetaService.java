@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -98,6 +99,8 @@ public class MetaService {
   @Inject private MetaFiles metaFiles;
 
   @Inject private ActionExecutor actionExecutor;
+
+  @Inject private Set<ViewProcessor> viewProcessors;
 
   private boolean test(MenuItem item, ScriptHelper helper) {
     final String module = item.getModuleToCheck();
@@ -194,6 +197,7 @@ public class MetaService {
     Response response = new Response();
 
     AbstractView data = XMLViews.findView(name, type, model);
+    viewProcessors.forEach(viewProcessor -> viewProcessor.process(data));
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
