@@ -1,0 +1,6 @@
+---
+title: Improve email pattern
+type: feature
+description: |
+  Allow to use any printable characters in local part.
+  Also remove upper limit on domain tld size.
