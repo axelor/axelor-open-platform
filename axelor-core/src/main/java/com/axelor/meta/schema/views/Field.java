@@ -305,6 +305,10 @@ public class Field extends SimpleWidget {
     return target;
   }
 
+  public void setTarget(String target) {
+    this.target = target;
+  }
+
   public String getTargetName() {
     if (targetName != null) return targetName;
     String targetModel = getTarget();
@@ -314,6 +318,10 @@ public class Field extends SimpleWidget {
     } catch (Exception e) {
     }
     return null;
+  }
+
+  public void setTargetName(String targetName) {
+    this.targetName = targetName;
   }
 
   public Boolean getRequired() {
@@ -413,8 +421,16 @@ public class Field extends SimpleWidget {
     return bind;
   }
 
+  public void setBind(String bind) {
+    this.bind = bind;
+  }
+
   public String getEnumType() {
     return enumType;
+  }
+
+  public void setEnumType(String enumType) {
+    this.enumType = enumType;
   }
 
   public String getRelated() {
@@ -426,8 +442,16 @@ public class Field extends SimpleWidget {
     return related;
   }
 
+  public void setRelated(String related) {
+    this.related = related;
+  }
+
   public String getCreate() {
     return create;
+  }
+
+  public void setCreate(String create) {
+    this.create = create;
   }
 
   public Boolean getCanReload() {

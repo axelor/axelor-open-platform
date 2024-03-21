@@ -66,6 +66,22 @@ public class ExtendItemReplace {
 
   @XmlElement private PanelEditor editor;
 
+  public List<Button> getToolbar() {
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
+  }
+
+  public List<Menu> getMenubar() {
+    return menubar;
+  }
+
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
+  }
+
   public List<AbstractWidget> getItems() {
     return items;
   }

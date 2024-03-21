@@ -40,6 +40,10 @@ public abstract class AbstractPanel extends AbstractContainer {
     return showFrame;
   }
 
+  public void setShowFrame(Boolean showFrame) {
+    this.showFrame = showFrame;
+  }
+
   public Boolean getSidebar() {
     return sidebar;
   }
@@ -52,12 +56,24 @@ public abstract class AbstractPanel extends AbstractContainer {
     return stacked;
   }
 
+  public void setStacked(Boolean stacked) {
+    this.stacked = stacked;
+  }
+
   public Boolean getAttached() {
     return attached;
   }
 
+  public void setAttached(Boolean attached) {
+    this.attached = attached;
+  }
+
   public String getOnTabSelect() {
     return onTabSelect;
+  }
+
+  public void setOnTabSelect(String onTabSelect) {
+    this.onTabSelect = onTabSelect;
   }
 
   protected List<AbstractWidget> process(List<AbstractWidget> items) {

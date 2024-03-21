@@ -72,16 +72,32 @@ public class PanelEditor extends AbstractPanel {
     return layout;
   }
 
+  public void setLayout(String layout) {
+    this.layout = layout;
+  }
+
   public Boolean getViewer() {
     return viewer;
+  }
+
+  public void setViewer(Boolean viewer) {
+    this.viewer = viewer;
   }
 
   public Boolean getShowOnNew() {
     return showOnNew;
   }
 
+  public void setShowOnNew(Boolean showOnNew) {
+    this.showOnNew = showOnNew;
+  }
+
   public String getOnNew() {
     return onNew;
+  }
+
+  public void setOnNew(String onNew) {
+    this.onNew = onNew;
   }
 
   public List<AbstractWidget> getItems() {

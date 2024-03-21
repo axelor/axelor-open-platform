@@ -189,8 +189,16 @@ public abstract class SimpleWidget extends AbstractWidget {
     return rowSpan;
   }
 
+  public void setRowSpan(String rowSpan) {
+    this.rowSpan = rowSpan;
+  }
+
   public String getRowOffset() {
     return rowOffset;
+  }
+
+  public void setRowOffset(String rowOffset) {
+    this.rowOffset = rowOffset;
   }
 
   public String getCss() {

@@ -166,6 +166,10 @@ public abstract class AbstractView {
     this.css = css;
   }
 
+  public String getWidthSpec() {
+    return widthSpec;
+  }
+
   public void setWidthSpec(String widthSpec) {
     this.widthSpec = widthSpec;
   }

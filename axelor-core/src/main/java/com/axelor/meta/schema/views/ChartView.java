@@ -58,32 +58,64 @@ public class ChartView extends AbstractView {
     return stacked;
   }
 
+  public void setStacked(Boolean stacked) {
+    this.stacked = stacked;
+  }
+
   public String getOnInit() {
     return onInit;
+  }
+
+  public void setOnInit(String onInit) {
+    this.onInit = onInit;
   }
 
   public List<ChartSearchField> getSearchFields() {
     return searchFields;
   }
 
+  public void setSearchFields(List<ChartSearchField> searchFields) {
+    this.searchFields = searchFields;
+  }
+
   public DataSet getDataSet() {
     return dataSet;
+  }
+
+  public void setDataSet(DataSet dataSet) {
+    this.dataSet = dataSet;
   }
 
   public ChartCategory getCategory() {
     return category;
   }
 
+  public void setCategory(ChartCategory category) {
+    this.category = category;
+  }
+
   public List<ChartSeries> getSeries() {
     return series;
+  }
+
+  public void setSeries(List<ChartSeries> series) {
+    this.series = series;
   }
 
   public List<ChartConfig> getConfig() {
     return config;
   }
 
+  public void setConfig(List<ChartConfig> config) {
+    this.config = config;
+  }
+
   public List<ChartAction> getActions() {
     return actions;
+  }
+
+  public void setActions(List<ChartAction> actions) {
+    this.actions = actions;
   }
 
   @XmlType
@@ -100,8 +132,16 @@ public class ChartView extends AbstractView {
       return key;
     }
 
+    public void setKey(String key) {
+      this.key = key;
+    }
+
     public String getType() {
       return type;
+    }
+
+    public void setType(String type) {
+      this.type = type;
     }
 
     @JsonGetter("title")
@@ -112,6 +152,10 @@ public class ChartView extends AbstractView {
     @JsonIgnore
     public String getTitle() {
       return title;
+    }
+
+    public void setTitle(String title) {
+      this.title = title;
     }
   }
 
@@ -137,16 +181,32 @@ public class ChartView extends AbstractView {
       return key;
     }
 
+    public void setKey(String key) {
+      this.key = key;
+    }
+
     public String getGroupBy() {
       return groupBy;
+    }
+
+    public void setGroupBy(String groupBy) {
+      this.groupBy = groupBy;
     }
 
     public String getType() {
       return type;
     }
 
+    public void setType(String type) {
+      this.type = type;
+    }
+
     public String getSide() {
       return side;
+    }
+
+    public void setSide(String side) {
+      this.side = side;
     }
 
     @JsonGetter("title")
@@ -159,12 +219,24 @@ public class ChartView extends AbstractView {
       return title;
     }
 
+    public void setTitle(String title) {
+      this.title = title;
+    }
+
     public String getAggregate() {
       return aggregate;
     }
 
+    public void setAggregate(String aggregate) {
+      this.aggregate = aggregate;
+    }
+
     public Integer getScale() {
       return scale;
+    }
+
+    public void setScale(Integer scale) {
+      this.scale = scale;
     }
   }
 
@@ -205,13 +277,25 @@ public class ChartView extends AbstractView {
       return name;
     }
 
+    public void setName(String name) {
+      this.name = name;
+    }
+
     @JsonIgnore
     public String getTitle() {
       return title;
     }
 
+    public void setTitle(String title) {
+      this.title = title;
+    }
+
     public String getAction() {
       return action;
+    }
+
+    public void setAction(String action) {
+      this.action = action;
     }
 
     @JsonGetter("title")

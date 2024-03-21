@@ -109,6 +109,14 @@ public class KanbanView extends CardsView {
     this.limit = limit;
   }
 
+  public Integer getLimitColumns() {
+    return limitColumns;
+  }
+
+  public void setLimitColumns(Integer limitColumns) {
+    this.limitColumns = limitColumns;
+  }
+
   private Class<?> getModelClass() {
     try {
       return Class.forName(this.getModel());

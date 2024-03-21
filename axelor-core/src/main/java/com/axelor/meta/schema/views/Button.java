@@ -56,12 +56,24 @@ public class Button extends SimpleWidget {
     return icon;
   }
 
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
+
   public String getIconHover() {
     return iconHover;
   }
 
+  public void setIconHover(String iconHover) {
+    this.iconHover = iconHover;
+  }
+
   public String getLink() {
     return link;
+  }
+
+  public void setLink(String link) {
+    this.link = link;
   }
 
   @JsonGetter("prompt")

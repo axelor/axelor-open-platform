@@ -47,12 +47,24 @@ public class TreeView extends AbstractView {
     return showHeader;
   }
 
+  public void setShowHeader(Boolean showHeader) {
+    this.showHeader = showHeader;
+  }
+
   public List<TreeColumn> getColumns() {
     return columns;
   }
 
+  public void setColumns(List<TreeColumn> columns) {
+    this.columns = columns;
+  }
+
   public List<Node> getNodes() {
     return nodes;
+  }
+
+  public void setNodes(List<Node> nodes) {
+    this.nodes = nodes;
   }
 
   @XmlType
@@ -85,24 +97,48 @@ public class TreeView extends AbstractView {
       return model;
     }
 
+    public void setModel(String model) {
+      this.model = model;
+    }
+
     public String getParent() {
       return parent;
+    }
+
+    public void setParent(String parent) {
+      this.parent = parent;
     }
 
     public String getOnClick() {
       return onClick;
     }
 
+    public void setOnClick(String onClick) {
+      this.onClick = onClick;
+    }
+
     public Boolean getDraggable() {
       return draggable;
+    }
+
+    public void setDraggable(Boolean draggable) {
+      this.draggable = draggable;
     }
 
     public String getDomain() {
       return domain;
     }
 
+    public void setDomain(String domain) {
+      this.domain = domain;
+    }
+
     public String getOrderBy() {
       return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+      this.orderBy = orderBy;
     }
 
     public List<AbstractWidget> getItems() {
@@ -112,6 +148,10 @@ public class TreeView extends AbstractView {
         }
       }
       return items;
+    }
+
+    public void setItems(List<AbstractWidget> items) {
+      this.items = items;
     }
   }
 
@@ -123,6 +163,10 @@ public class TreeView extends AbstractView {
 
     public String getAs() {
       return as;
+    }
+
+    public void setAs(String as) {
+      this.as = as;
     }
 
     @Override

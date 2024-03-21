@@ -46,6 +46,10 @@ public class SearchFilters extends AbstractView implements ContainerView {
     return items;
   }
 
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
+
   public List<SearchFilter> getFilters() {
     if (filters != null) {
       for (SearchFilter searchFilter : filters) {
@@ -53,6 +57,10 @@ public class SearchFilters extends AbstractView implements ContainerView {
       }
     }
     return filters;
+  }
+
+  public void setFilters(List<SearchFilter> filters) {
+    this.filters = filters;
   }
 
   @XmlType
@@ -73,6 +81,10 @@ public class SearchFilters extends AbstractView implements ContainerView {
       return name;
     }
 
+    public void setName(String name) {
+      this.name = name;
+    }
+
     @JsonGetter("title")
     public String getLocalizedTitle() {
       return I18n.get(title);
@@ -83,8 +95,16 @@ public class SearchFilters extends AbstractView implements ContainerView {
       return title;
     }
 
+    public void setTitle(String title) {
+      this.title = title;
+    }
+
     public String getDomain() {
       return domain;
+    }
+
+    public void setDomain(String domain) {
+      this.domain = domain;
     }
 
     public Map<String, Object> getContext() {
@@ -96,6 +116,14 @@ public class SearchFilters extends AbstractView implements ContainerView {
         context.put(ctx.getName(), ctx.getValue());
       }
       return context;
+    }
+
+    public List<SearchContext> getContexts() {
+      return contexts;
+    }
+
+    public void setContexts(List<SearchContext> contexts) {
+      this.contexts = contexts;
     }
   }
 
@@ -110,8 +138,16 @@ public class SearchFilters extends AbstractView implements ContainerView {
       return name;
     }
 
+    public void setName(String name) {
+      this.name = name;
+    }
+
     public String getValue() {
       return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
     }
   }
 }

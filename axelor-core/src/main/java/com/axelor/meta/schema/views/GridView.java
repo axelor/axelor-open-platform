@@ -327,6 +327,7 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
     return extendItems;
   }
 
+  @Override
   public void setExtends(List<Extend> extendItems) {
     this.extendItems = extendItems;
   }

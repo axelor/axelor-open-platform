@@ -24,4 +24,6 @@ public interface ExtendableView {
   Boolean getExtension();
 
   List<Extend> getExtends();
+
+  void setExtends(List<Extend> extendItems);
 }
