@@ -7,8 +7,6 @@ import { i18n } from "@/services/client/i18n";
 import { FieldProps } from "../../builder";
 import { String } from "../string";
 
-import styles from "./password.module.scss";
-
 export function Password(props: FieldProps<string>) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -23,7 +21,6 @@ export function Password(props: FieldProps<string>) {
         <Button
           as="span"
           onClick={() => setShowPassword((value) => !value)}
-          className={styles.eyeIcon}
           title={
             showPassword ? i18n.get("Hide password") : i18n.get("Show password")
           }

@@ -56,7 +56,6 @@ export function Url(props: FieldProps<string>) {
       inputEndAdornment={
         <Button
           onClick={handleOpenUrl}
-          className={styles.inputIcon}
           disabled={!isValidUrl}
           title={i18n.get("Open URL")}
         >

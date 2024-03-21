@@ -52,7 +52,6 @@ export function Email(props: FieldProps<string>) {
         <Button
           onClick={handleOpenEmailLink}
           disabled={!isValidEmail}
-          className={styles.inputIcon}
           title={i18n.get("Write an email")}
         >
           <BootstrapIcon icon={"envelope"} />
