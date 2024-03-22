@@ -59,14 +59,14 @@ dependencies:
     specifier: ^4.7.0
     version: 4.7.0(patch_hash=b36n7p33c4ewtt5v6is5moc24u)
   immer:
-    specifier: ^10.0.3
-    version: 10.0.3
+    specifier: ^10.0.4
+    version: 10.0.4
   jotai:
     specifier: ^2.6.0
     version: 2.6.0(@types/react@18.2.73)(react@18.2.0)
   jotai-immer:
     specifier: ^0.2.0
-    version: 0.2.0(immer@10.0.3)(jotai@2.6.0)(react@18.2.0)
+    version: 0.2.0(immer@10.0.4)(jotai@2.6.0)(react@18.2.0)
   jotai-molecules:
     specifier: ^1.2.0
     version: 1.2.0(react@18.2.0)
@@ -249,7 +249,7 @@ packages:
       csstype: 3.1.3
       dayjs: 1.11.10
       focus-trap: 7.5.4
-      immer: 10.0.3
+      immer: 10.0.4
       react: 18.2.0
       react-beautiful-dnd: 13.1.1(react-dom@18.2.0)(react@18.2.0)
       react-dnd: 16.0.1(@types/node@20.11.30)(@types/react@18.2.73)(react@18.2.0)
@@ -5198,8 +5198,8 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /immer@10.0.3:
-    resolution: {integrity: sha512-pwupu3eWfouuaowscykeckFmVTpqbzW+rXFCX8rQLkZzM9ftBmU/++Ra+o+L27mz03zJTlyV4UUr+fdKNffo4A==}
+  /immer@10.0.4:
+    resolution: {integrity: sha512-cuBuGK40P/sk5IzWa9QPUaAdvPHjkk1c+xYsd9oZw+YQQEV+10G0P5uMpGctZZKnyQ+ibRO08bD25nWLmYi2pw==}
     dev: false
 
   /immutable@3.8.2:
@@ -5521,14 +5521,14 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /jotai-immer@0.2.0(immer@10.0.3)(jotai@2.6.0)(react@18.2.0):
+  /jotai-immer@0.2.0(immer@10.0.4)(jotai@2.6.0)(react@18.2.0):
     resolution: {integrity: sha512-hahK8EPiROS9RoNWmX/Z8rY9WkAijspX4BZ1O7umpcwI4kPNkbcCpu/PhiQ8FMcpEcF6KmbpbMpSSj/GFmo8NA==}
     peerDependencies:
       immer: '*'
       jotai: '>=1.11.0'
       react: '>=17.0.0'
     dependencies:
-      immer: 10.0.3
+      immer: 10.0.4
       jotai: 2.6.0(@types/react@18.2.73)(react@18.2.0)
       react: 18.2.0
     dev: false
