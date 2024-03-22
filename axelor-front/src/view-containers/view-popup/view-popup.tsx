@@ -21,7 +21,7 @@ import { i18n } from "@/services/client/i18n";
 import { Views } from "../views";
 import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
-import { showErrors, useGetErrors } from "@/views/form";
+import { showErrors } from "@/views/form";
 
 import styles from "./view-popup.module.scss";
 
@@ -222,8 +222,6 @@ function Footer({
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
 
-  const getErrors = useGetErrors();
-
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
@@ -232,7 +230,7 @@ function Footer({
   }, [handleClose, handler, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
-    const { getState, commitForm, onSave } = handler;
+    const { getState, getErrors, commitForm, onSave } = handler;
 
     await commitForm?.();
     
@@ -241,7 +239,7 @@ function Footer({
 
     const state = getState?.();
 
-    const errors = state && getErrors(state);
+    const errors = getErrors?.();
     if (errors) {
       showErrors(errors);
       return;
@@ -263,7 +261,7 @@ function Footer({
     } catch (e) {
       // TODO: show error
     }
-  }, [getErrors, handleClose, handler]);
+  }, [handleClose, handler]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {

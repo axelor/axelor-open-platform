@@ -15,7 +15,7 @@ import { ActionView, FormView, Schema } from "@/services/client/meta.types";
 import { PopupProps, showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { useViewTab } from "@/view-containers/views/scope";
-import { showErrors, useGetErrors } from "@/views/form";
+import { showErrors } from "@/views/form";
 import { useAfterActions, useFormScope } from "@/views/form/builder/scope";
 
 import { initTab } from "../use-tabs";
@@ -177,8 +177,6 @@ function Footer({
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
-  const getErrors = useGetErrors();
-
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
       async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
@@ -204,7 +202,7 @@ function Footer({
           const canSave = !checkDirty || dirty || !record.id;
 
           try {
-            const errors = getErrors(state);
+            const errors = handler.getErrors?.();
             if (errors) {
               showErrors(errors);
               return;

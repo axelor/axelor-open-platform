@@ -1,7 +1,7 @@
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
-import { FormState } from "@/views/form/builder";
+import { FormState, WidgetErrors } from "@/views/form/builder";
 import { WritableAtom, atom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { ActionExecutor, ActionHandler } from "../action";
@@ -12,6 +12,7 @@ export type PopupHandler = {
   actionHandler?: ActionHandler;
   actionExecutor?: ActionExecutor;
   getState?: () => FormState;
+  getErrors?: () => WidgetErrors[] | undefined;
   commitForm?: () => Promise<void | void[]>;
   onNew?: () => Promise<void>;
   onRead?: (id: string | number) => Promise<DataRecord>;

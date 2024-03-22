@@ -13,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import uniq from "lodash/uniq";
 
 import { Block, Box, CommandItemProps } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -93,16 +94,17 @@ export const fetchRecord = async (
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {
-  const titles = Object.values(errors).flatMap((e) => Object.values(e));
-  alerts.error({
-    message: (
-      <ul>
-        {titles.map((title, i) => (
-          <li key={i}>{title}</li>
-        ))}
-      </ul>
-    ),
-  });
+  const titles = uniq(Object.values(errors).flatMap((e) => Object.values(e)));
+  titles.length &&
+    alerts.error({
+      message: (
+        <ul>
+          {titles.map((title, i) => (
+            <li key={i}>{title}</li>
+          ))}
+        </ul>
+      ),
+    });
 };
 
 export const useGetErrors = () => {
@@ -117,13 +119,25 @@ export const useGetErrors = () => {
             (s.parent && isHidden(store.get(s.parent))),
         );
       };
+
+      const serverErrors = Object.keys(statesByName)
+        .filter((k) => statesByName[k].errors?.error)
+        .filter((v) => Object.values(states).some((w) => w.name === v))
+        .map((o) => Object.values(states).find((w) => w.name === o))
+        .filter((s) => !isHidden(s!))
+        .map((w) => {
+          const error = i18n.get(`{0} is invalid`, w?.attrs?.title || w?.name);
+          return { error } as WidgetErrors;
+        });
+
       const errors = Object.values(states)
         .filter((s) => fieldName === undefined || s.name === fieldName)
         .filter((s) => !isHidden(s))
         .filter(
           (s) => Object.keys(s.errors ?? {}).length > 0 && s.valid !== true,
         )
-        .map((s) => s.errors ?? {});
+        .map((s) => s.errors ?? {})
+        .concat(serverErrors);
       return errors.length ? errors : null;
     },
     [store],
@@ -522,12 +536,26 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
-  const getErrors = useGetErrors();
+  const getFieldErrors = useGetErrors();
   const getWidgetErrors = useCallback(() => {
     return Array.from(widgetsRef.current).some((checkWidgetInvalid) =>
       checkWidgetInvalid(),
     );
   }, []);
+
+  const getErrors = useAtomCallback(
+    useCallback(
+      (get) => {
+        const formState = get(formAtom);
+        const errors = getFieldErrors(formState);
+        if (errors || getWidgetErrors()) {
+          return errors || [];
+        }
+        return;
+      },
+      [formAtom, getFieldErrors, getWidgetErrors],
+    ),
+  );
 
   const handleOnSaveErrors = useAtomCallback(
     useCallback(
@@ -605,9 +633,9 @@ const FormContainer = memo(function FormContainer({
           handleErrors = false,
         } = options ?? {};
         const formState = get(formAtom);
-        const errors = getErrors(formState);
-        if (errors || getWidgetErrors()) {
-          errors && showErrors(errors);
+        const errors = getErrors();
+        if (errors) {
+          showErrors(errors);
           return Promise.reject();
         }
 
@@ -656,7 +684,6 @@ const FormContainer = memo(function FormContainer({
       [
         formAtom,
         getErrors,
-        getWidgetErrors,
         meta.fields,
         onSaveAction,
         handleOnSaveErrors,
@@ -1008,6 +1035,7 @@ const FormContainer = memo(function FormContainer({
     if (popup) {
       setPopupHandlers({
         getState,
+        getErrors,
         onSave,
         onEdit: doEdit,
         onRead: doRead,
@@ -1020,6 +1048,7 @@ const FormContainer = memo(function FormContainer({
     }
   }, [
     getState,
+    getErrors,
     doEdit,
     doRead,
     onSave,
