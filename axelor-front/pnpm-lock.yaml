@@ -15,7 +15,7 @@ patchedDependencies:
 dependencies:
   '@axelor/ui':
     specifier: ^0.0.36
-    version: 0.0.36(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
+    version: 0.0.36(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
   '@babel/standalone':
     specifier: ^7.23.5
     version: 7.23.5
@@ -63,7 +63,7 @@ dependencies:
     version: 10.0.3
   jotai:
     specifier: ^2.6.0
-    version: 2.6.0(@types/react@18.2.43)(react@18.2.0)
+    version: 2.6.0(@types/react@18.2.73)(react@18.2.0)
   jotai-immer:
     specifier: ^0.2.0
     version: 0.2.0(immer@10.0.3)(jotai@2.6.0)(react@18.2.0)
@@ -117,7 +117,7 @@ dependencies:
     version: 4.2.0
   swagger-ui-react:
     specifier: ^5.12.0
-    version: 5.12.0(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)
+    version: 5.12.0(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
   '@testing-library/jest-dom':
@@ -142,8 +142,8 @@ devDependencies:
     specifier: ^20.10.4
     version: 20.10.4
   '@types/react':
-    specifier: ^18.2.43
-    version: 18.2.43
+    specifier: ^18.2.67
+    version: 18.2.73
   '@types/react-datepicker':
     specifier: ^4.19.3
     version: 4.19.3(react-dom@18.2.0)(react@18.2.0)
@@ -230,7 +230,7 @@ packages:
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
-  /@axelor/ui@0.0.36(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
+  /@axelor/ui@0.0.36(@types/node@20.10.4)(@types/react-dom@18.2.17)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
     resolution: {integrity: sha512-78V91ceLBkW3PFAl3mYkKPbFecMjZPhHSQ98tcOhkoTIGGnYaWqZbS+VhBZ55YeSsFALcSgf8LekP1IdSrKh/Q==}
     peerDependencies:
       react: ^18.2.0-0
@@ -239,7 +239,7 @@ packages:
       '@emotion/is-prop-valid': 1.2.1
       '@floating-ui/react': 0.26.4(react-dom@18.2.0)(react@18.2.0)
       '@fluentui/priority-overflow': 9.1.10
-      '@fluentui/react-context-selector': 9.1.42(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
+      '@fluentui/react-context-selector': 9.1.42(@types/react-dom@18.2.17)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
       '@material-symbols/font-400': 0.14.5
       '@material-symbols/metadata': 0.14.5
       '@popperjs/core': 2.11.8
@@ -252,7 +252,7 @@ packages:
       immer: 10.0.3
       react: 18.2.0
       react-beautiful-dnd: 13.1.1(react-dom@18.2.0)(react@18.2.0)
-      react-dnd: 16.0.1(@types/node@20.10.4)(@types/react@18.2.43)(react@18.2.0)
+      react-dnd: 16.0.1(@types/node@20.10.4)(@types/react@18.2.73)(react@18.2.0)
       react-dnd-html5-backend: 16.0.1
       react-dom: 18.2.0(react@18.2.0)
       react-transition-group: 4.4.5(react-dom@18.2.0)(react@18.2.0)
@@ -2091,7 +2091,7 @@ packages:
       '@swc/helpers': 0.5.2
     dev: false
 
-  /@fluentui/react-context-selector@9.1.42(@types/react-dom@18.2.17)(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
+  /@fluentui/react-context-selector@9.1.42(@types/react-dom@18.2.17)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2):
     resolution: {integrity: sha512-Xq9JcPBCRLkCnrUd83qSFgEYZc1BYyxFXLamtev5Ok1SSF53XI4yqN7Y34A13fSu/Q2wGeZibHcCTHJIXad2sQ==}
     peerDependencies:
       '@types/react': '>=16.14.0 <19.0.0'
@@ -2100,16 +2100,16 @@ packages:
       react-dom: '>=16.14.0 <19.0.0'
       scheduler: ^0.19.0 || ^0.20.0
     dependencies:
-      '@fluentui/react-utilities': 9.15.2(@types/react@18.2.43)(react@18.2.0)
+      '@fluentui/react-utilities': 9.15.2(@types/react@18.2.73)(react@18.2.0)
       '@swc/helpers': 0.5.2
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       '@types/react-dom': 18.2.17
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       scheduler: 0.20.2
     dev: false
 
-  /@fluentui/react-utilities@9.15.2(@types/react@18.2.43)(react@18.2.0):
+  /@fluentui/react-utilities@9.15.2(@types/react@18.2.73)(react@18.2.0):
     resolution: {integrity: sha512-Oq016/dHu7PXW5x/2RtLts1ULiyd7JctXFdvi9IacLs/J1nLfg2KSBzzLqKxtdyVvgbZ9Mlu6kPITbFtF9dsIA==}
     peerDependencies:
       '@types/react': '>=16.14.0 <19.0.0'
@@ -2117,7 +2117,7 @@ packages:
     dependencies:
       '@fluentui/keyboard-keys': 9.0.7
       '@swc/helpers': 0.5.2
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       react: 18.2.0
     dev: false
 
@@ -3154,7 +3154,7 @@ packages:
   /@types/hoist-non-react-statics@3.3.1:
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       hoist-non-react-statics: 3.3.2
     dev: false
 
@@ -3207,7 +3207,7 @@ packages:
     resolution: {integrity: sha512-85F9eKWu9fGiD9r4KVVMPYAdkJJswR3Wci9PvqplmB6T+D+VbUqPeKtifg96NZ4nEhufjehW+SX4JLrEWVplWw==}
     dependencies:
       '@popperjs/core': 2.11.8
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       date-fns: 2.30.0
       react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
@@ -3218,19 +3218,19 @@ packages:
   /@types/react-dom@18.2.17:
     resolution: {integrity: sha512-rvrT/M7Df5eykWFxn6MYt5Pem/Dbyc1N8Y0S9Mrkw2WFCRiqUgw9P7ul2NpwsXCSM1DVdENzdG9J5SreqfAIWg==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
 
   /@types/react-grid-layout@1.3.5:
     resolution: {integrity: sha512-WH/po1gcEcoR6y857yAnPGug+ZhkF4PaTUxgAbwfeSH/QOgVSakKHBXoPGad/sEznmkiaK3pqHk+etdWisoeBQ==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
     dev: true
 
   /@types/react-redux@7.1.26:
     resolution: {integrity: sha512-UKPo7Cm7rswYU6PH6CmTNCRv5NYF3HrgKuHEYTK8g/3czYLrUux50gQ2pkxc9c7ZpQZi+PNhgmI8oNIRoiVIxg==}
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       hoist-non-react-statics: 3.3.2
       redux: 4.2.1
     dev: false
@@ -3238,24 +3238,20 @@ packages:
   /@types/react-text-mask@5.4.14:
     resolution: {integrity: sha512-VkQuH+7Ol+ue/EFe9EFqJAmDe3ay5VML29l3aJkdzAriMhiprJOmdAFjZ3jOT6p3+nBgEUHxaQtUgg8k8Sk5wA==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
     dev: true
 
   /@types/react-transition-group@4.4.10:
     resolution: {integrity: sha512-hT/+s0VQs2ojCX823m60m5f0sL5idt9SO6Tj6Dg+rdphGPIeJbJ6CxvBYkgkGKrYeDjvIpKTR38UzmtHJOGW3Q==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
     dev: true
 
-  /@types/react@18.2.43:
-    resolution: {integrity: sha512-nvOV01ZdBdd/KW6FahSbcNplt2jCJfyWdTos61RYHV+FVv5L/g9AOX1bmbVcWcLFL8+KHQfh1zVIQrud6ihyQA==}
+  /@types/react@18.2.73:
+    resolution: {integrity: sha512-XcGdod0Jjv84HOC7N5ziY3x+qL0AfmubvKOZ9hJjJ2yd5EE+KYjWhdOjt387e9HPheHkdggF9atTifMRtyAaRA==}
     dependencies:
       '@types/prop-types': 15.7.11
-      '@types/scheduler': 0.16.8
       csstype: 3.1.3
-
-  /@types/scheduler@0.16.8:
-    resolution: {integrity: sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==}
 
   /@types/semver@7.5.6:
     resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
@@ -3268,7 +3264,7 @@ packages:
   /@types/swagger-ui-react@4.18.3:
     resolution: {integrity: sha512-Mo/R7IjDVwtiFPs84pWvh5pI9iyNGBjmfielxqbOh2Jv+8WVSDVe8Nu25kb5BOuV2xmGS3o33jr6nwDJMBcX+Q==}
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
     dev: true
 
   /@types/trusted-types@2.0.7:
@@ -5310,7 +5306,7 @@ packages:
       react: '>=17.0.0'
     dependencies:
       immer: 10.0.3
-      jotai: 2.6.0(@types/react@18.2.43)(react@18.2.0)
+      jotai: 2.6.0(@types/react@18.2.73)(react@18.2.0)
       react: 18.2.0
     dev: false
 
@@ -5326,7 +5322,7 @@ packages:
       - vue
     dev: false
 
-  /jotai@2.6.0(@types/react@18.2.43)(react@18.2.0):
+  /jotai@2.6.0(@types/react@18.2.73)(react@18.2.0):
     resolution: {integrity: sha512-Vt6hsc04Km4j03l+Ax+Sc+FVft5cRJhqgxt6GTz6GM2eM3DyX3CdBdzcG0z2FrlZToL1/0OAkqDghIyARWnSuQ==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
@@ -5338,7 +5334,7 @@ packages:
       react:
         optional: true
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       react: 18.2.0
     dev: false
 
@@ -6188,7 +6184,7 @@ packages:
       dnd-core: 16.0.1
     dev: false
 
-  /react-dnd@16.0.1(@types/node@20.10.4)(@types/react@18.2.43)(react@18.2.0):
+  /react-dnd@16.0.1(@types/node@20.10.4)(@types/react@18.2.73)(react@18.2.0):
     resolution: {integrity: sha512-QeoM/i73HHu2XF9aKksIUuamHPDvRglEwdHL4jsp784BgUuWcg6mzfxT0QDdQz8Wj0qyRKx2eMg8iZtWvU4E2Q==}
     peerDependencies:
       '@types/hoist-non-react-statics': '>= 3.3.1'
@@ -6206,7 +6202,7 @@ packages:
       '@react-dnd/invariant': 4.0.2
       '@react-dnd/shallowequal': 4.0.2
       '@types/node': 20.10.4
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       dnd-core: 16.0.1
       fast-deep-equal: 3.1.3
       hoist-non-react-statics: 3.3.2
@@ -6354,7 +6350,7 @@ packages:
       react-is: 17.0.2
     dev: false
 
-  /react-redux@9.1.0(@types/react@18.2.43)(react@18.2.0)(redux@5.0.1):
+  /react-redux@9.1.0(@types/react@18.2.73)(react@18.2.0)(redux@5.0.1):
     resolution: {integrity: sha512-6qoDzIO+gbrza8h3hjMA9aq4nwVFCKFtY2iLxCtVT38Swyy2C/dJCGBXHeHLtx6qlg/8qzc2MrhOeduf5K32wQ==}
     peerDependencies:
       '@types/react': ^18.2.25
@@ -6369,7 +6365,7 @@ packages:
       redux:
         optional: true
     dependencies:
-      '@types/react': 18.2.43
+      '@types/react': 18.2.73
       '@types/use-sync-external-store': 0.0.3
       react: 18.2.0
       redux: 5.0.1
@@ -7015,7 +7011,7 @@ packages:
       - debug
     dev: false
 
-  /swagger-ui-react@5.12.0(@types/react@18.2.43)(react-dom@18.2.0)(react@18.2.0):
+  /swagger-ui-react@5.12.0(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-9QHLaGuo1x8jyGjGQMPOtcDFYH4lFb7L+FIYtplldUzo/JFgwfgUnpnUWadnhkVRJEGsHJqoy7IWJ4dK7WaPRQ==}
     peerDependencies:
       react: '>=16.8.0 <19'
@@ -7044,7 +7040,7 @@ packages:
       react-immutable-proptypes: 2.2.0(immutable@3.8.2)
       react-immutable-pure-component: 2.2.2(immutable@3.8.2)(react-dom@18.2.0)(react@18.2.0)
       react-inspector: 6.0.2(react@18.2.0)
-      react-redux: 9.1.0(@types/react@18.2.43)(react@18.2.0)(redux@5.0.1)
+      react-redux: 9.1.0(@types/react@18.2.73)(react@18.2.0)(redux@5.0.1)
       react-syntax-highlighter: 15.5.0(react@18.2.0)
       redux: 5.0.1
       redux-immutable: 4.0.0(immutable@3.8.2)
