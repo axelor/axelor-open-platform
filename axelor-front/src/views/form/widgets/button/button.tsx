@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
@@ -66,6 +66,9 @@ function findVariant(schema: Schema) {
 export function Button(props: WidgetProps) {
   const { schema, widgetAtom } = props;
   const { showTitle = true, icon, help, inGridEditor } = schema;
+
+  const [titleHelp, setTitleHelp] = useState("");
+  const btnTextRef = useRef<HTMLSpanElement | null>(null);
   const { data: sessionInfo } = useSession();
   const { attrs } = useAtomValue(widgetAtom);
   const { actionExecutor } = useFormScope();
@@ -107,7 +110,23 @@ export function Button(props: WidgetProps) {
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
-  const hasHelp = !inGridEditor && !sessionInfo?.user?.noHelp && !!help;
+  const hasHelp =
+    !inGridEditor && !sessionInfo?.user?.noHelp && (!!help || !!titleHelp);
+
+  useEffect(() => {
+    const textElement = btnTextRef.current as HTMLElement;
+
+    let titleHelp = "";
+    if (
+      title &&
+      !help &&
+      textElement &&
+      textElement.scrollWidth > textElement.offsetWidth
+    ) {
+      titleHelp = title;
+    }
+    setTitleHelp(titleHelp);
+  }, [title, help]);
 
   const BtnComponent: any = inGridEditor ? Box : Btn;
   const button = (
@@ -120,13 +139,17 @@ export function Button(props: WidgetProps) {
       disabled={disabled}
       {...(!disabled && { onClick: handleClick })}
       className={clsx(styles.button, {
-        [styles.help]: hasHelp,
+        [styles.help]: hasHelp && !titleHelp,
         [styles[variant]]: variant,
       })}
     >
       <div className={styles.title}>
         {icon && <ButtonIcon {...props} />}
-        {showTitle && title}
+        {showTitle && (
+          <span ref={btnTextRef} className={styles.titleText}>
+            {title}
+          </span>
+        )}
       </div>
     </BtnComponent>
   );
@@ -135,7 +158,9 @@ export function Button(props: WidgetProps) {
     return (
       <>
         {hasHelp && (
-          <Tooltip content={() => <span>{help}</span>}>{button}</Tooltip>
+          <Tooltip content={() => <span>{help || titleHelp}</span>}>
+            {button}
+          </Tooltip>
         )}
         {hasHelp || button}
       </>

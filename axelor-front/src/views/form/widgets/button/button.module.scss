@@ -35,9 +35,17 @@ div.button[disabled] {
   justify-content: center;
   gap: 0.5rem;
 }
+.titleText {
+  flex: 1;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
 .help .title {
   display: inline-flex;
+  max-width: calc(100% - 0.5rem);
 }
 
 .help::after {
