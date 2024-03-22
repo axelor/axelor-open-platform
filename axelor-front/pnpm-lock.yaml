@@ -68,8 +68,8 @@ dependencies:
     specifier: ^2.7.1
     version: 2.7.2(@types/react@18.2.73)(react@18.2.0)
   jotai-immer:
-    specifier: ^0.2.0
-    version: 0.2.0(immer@10.0.4)(jotai@2.7.2)(react@18.2.0)
+    specifier: ^0.3.0
+    version: 0.3.0(immer@10.0.4)(jotai@2.7.2)(react@18.2.0)
   jsdom:
     specifier: ^24.0.0
     version: 24.0.0
@@ -5516,11 +5516,11 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /jotai-immer@0.2.0(immer@10.0.4)(jotai@2.7.2)(react@18.2.0):
-    resolution: {integrity: sha512-hahK8EPiROS9RoNWmX/Z8rY9WkAijspX4BZ1O7umpcwI4kPNkbcCpu/PhiQ8FMcpEcF6KmbpbMpSSj/GFmo8NA==}
+  /jotai-immer@0.3.0(immer@10.0.4)(jotai@2.7.2)(react@18.2.0):
+    resolution: {integrity: sha512-k+o4rWfWWLyHfucHAdoiN+l8flxMrKC/bEFvJA98znj+kbPW5R90EPa1u8mhWLJTABW3xjAp7Z3kyD3FVi0Hgw==}
     peerDependencies:
       immer: '*'
-      jotai: '>=1.11.0'
+      jotai: '>=2.0.0'
       react: '>=17.0.0'
     dependencies:
       immer: 10.0.4

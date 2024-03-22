@@ -34,7 +34,7 @@
     "font-awesome": "^4.7.0",
     "immer": "^10.0.4",
     "jotai": "^2.7.1",
-    "jotai-immer": "^0.2.0",
+    "jotai-immer": "^0.3.0",
     "jsdom": "^24.0.0",
     "libphonenumber-js": "^1.10.59",
     "lodash": "^4.17.21",
