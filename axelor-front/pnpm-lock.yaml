@@ -17,8 +17,8 @@ dependencies:
     specifier: ^0.0.36
     version: 0.0.36(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.20.2)
   '@babel/standalone':
-    specifier: ^7.23.5
-    version: 7.23.5
+    specifier: ^7.23.10
+    version: 7.24.3
   '@fullcalendar/core':
     specifier: ^6.1.11
     version: 6.1.11
@@ -1834,8 +1834,8 @@ packages:
     dependencies:
       regenerator-runtime: 0.14.1
 
-  /@babel/standalone@7.23.5:
-    resolution: {integrity: sha512-4bqgawmyDPu+9gQhZOKh1ftCUa6BAT0KztElMcWAJgOgQJRNhmGVA0M0McedEqvGi7SbfiBBvlH13Jc47P919A==}
+  /@babel/standalone@7.24.3:
+    resolution: {integrity: sha512-PbObiI21Z/1DoJLr6DKsdmyp7uUIuw6zv5zIMorH98rOBE/TehkjK7xqXiwJmbCqi7deVbIksDerZ9Ds9hRLGw==}
     engines: {node: '>=6.9.0'}
     dev: false
 
