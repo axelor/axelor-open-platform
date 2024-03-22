@@ -28,7 +28,7 @@
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.10",
-    "dompurify": "^3.0.6",
+    "dompurify": "^3.0.11",
     "echarts": "^5.4.3",
     "font-awesome": "^4.7.0",
     "immer": "^10.0.3",
