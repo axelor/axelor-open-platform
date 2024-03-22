@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
+import { Icon } from "@/components/icon";
 import { useAsync } from "@/hooks/use-async";
 import { useTemplate } from "@/hooks/use-parser";
 import { useSession } from "@/hooks/use-session";
@@ -116,10 +117,11 @@ export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
 
 export function FieldLabel({
   schema,
+  icon,
   formAtom,
   widgetAtom,
   className,
-}: WidgetProps & { className?: string }) {
+}: WidgetProps & { className?: string; icon?: string }) {
   const { data: sessionInfo } = useSession();
   const { uid, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
@@ -135,7 +137,14 @@ export function FieldLabel({
           [styles.help]: canShowHelp,
         })}
       >
-        <span className={styles.labelText}>{title}</span>
+        <span
+          className={clsx(styles.labelText, {
+            [styles.icon]: Boolean(icon),
+          })}
+        >
+          {icon && <Icon icon={icon} />}
+          {title}
+        </span>
       </InputLabel>
     </HelpPopover>
   );

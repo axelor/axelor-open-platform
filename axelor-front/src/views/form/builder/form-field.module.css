@@ -39,6 +39,13 @@
   text-overflow: ellipsis;
 }
 
+.labelText.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .label.help::after {
   content: "?";
   font-size: 0.75rem;

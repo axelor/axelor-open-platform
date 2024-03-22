@@ -26,6 +26,7 @@ export function Panel(props: WidgetProps) {
   const {
     showTitle = true,
     showFrame,
+    icon,
     collapseIf,
     canCollapse = Boolean(collapseIf),
   } = schema;
@@ -98,7 +99,12 @@ export function Panel(props: WidgetProps) {
 
   const header = hasHeader ? (
     <div className={styles.title}>
-      <FieldLabel schema={schema} formAtom={formAtom} widgetAtom={widgetAtom} />
+      <FieldLabel
+        icon={icon}
+        schema={schema}
+        formAtom={formAtom}
+        widgetAtom={widgetAtom}
+      />
     </div>
   ) : undefined;
 
