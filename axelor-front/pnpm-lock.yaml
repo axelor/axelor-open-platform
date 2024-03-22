@@ -74,8 +74,8 @@ dependencies:
     specifier: ^23.0.1
     version: 23.0.1
   libphonenumber-js:
-    specifier: ^1.10.57
-    version: 1.10.57
+    specifier: ^1.10.59
+    version: 1.10.59
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
@@ -5692,8 +5692,8 @@ packages:
       type-check: 0.4.0
     dev: true
 
-  /libphonenumber-js@1.10.57:
-    resolution: {integrity: sha512-OjsEd9y4LgcX+Ig09SbxWqcGESxliDDFNVepFhB9KEsQZTrnk3UdEU+cO0sW1APvLprHstQpS23OQpZ3bwxy6Q==}
+  /libphonenumber-js@1.10.59:
+    resolution: {integrity: sha512-HeTsOrDF/hWhEiKqZVwg9Cqlep5x2T+IYDENvT2VRj3iX8JQ7Y+omENv+AIn0vC8m6GYhivfCed5Cgfw27r5SA==}
     dev: false
 
   /lines-and-columns@1.2.4:
