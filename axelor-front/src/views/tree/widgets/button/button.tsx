@@ -5,7 +5,8 @@ import styles from "./button.module.scss";
 import { useCallback } from "react";
 
 export function Button({ field, node, record, actionExecutor }: WidgetProps) {
-  const { name, icon, onClick, title, help } = field;
+  const { name, icon, onClick, title, help: _help } = field;
+  const help = _help || title;
 
   const handleClick = useCallback(
     async (event: React.MouseEvent<HTMLElement>) => {

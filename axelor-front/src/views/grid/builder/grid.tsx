@@ -211,7 +211,6 @@ export const Grid = forwardRef<
         columnProps.editable = false;
         columnProps.computed = true;
         columnProps.width = columnProps.width || 40;
-        columnProps.title = " ";
         columnProps.action = true;
       }
 
@@ -276,7 +275,7 @@ export const Grid = forwardRef<
 
     if (showEditIcon && view.editIcon !== false) {
       columns.unshift({
-        title: "",
+        action: true,
         name: "$$edit",
         widget: "edit-icon",
         computed: true,

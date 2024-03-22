@@ -16,7 +16,8 @@ import styles from "./button.module.scss";
 export function Button(props: GridCellProps) {
   const { record, data: field, actionExecutor, onUpdate } = props;
   const { onClick } = field as ButtonField;
-  const { name, icon, css, help } = field as Field;
+  const { title, name, icon, css, help: _help } = field as Field;
+  const help = _help || title;
   const { context } = useViewAction();
 
   const { hidden, readonly } = useMemo(() => {
