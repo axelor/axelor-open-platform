@@ -58,7 +58,7 @@
     "@types/dompurify": "^3.0.5",
     "@types/echarts": "^4.9.22",
     "@types/jest": "^29.5.12",
-    "@types/lodash": "^4.14.202",
+    "@types/lodash": "^4.17.0",
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.67",
     "@types/react-datepicker": "^4.19.3",
