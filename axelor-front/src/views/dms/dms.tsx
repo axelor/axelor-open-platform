@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useSetAtom } from "jotai";
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { useAtomCallback } from "jotai/utils";
 import { uniq } from "lodash";
 import {

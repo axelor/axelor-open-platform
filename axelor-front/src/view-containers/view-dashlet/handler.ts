@@ -2,7 +2,7 @@ import { DataStore } from "@/services/client/data-store";
 import { AdvancedSearchAtom, View } from "@/services/client/meta.types";
 import { PrimitiveAtom, atom } from "jotai";
 import { GridState } from "@axelor/ui/grid";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { createScope, molecule, useMolecule } from "bunshi/react";
 
 import { DataContext } from "@/services/client/data.types";
 import { SearchOptions } from "@/services/client/data";

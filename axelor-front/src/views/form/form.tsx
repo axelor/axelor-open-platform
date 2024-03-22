@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
   MutableRefObject,

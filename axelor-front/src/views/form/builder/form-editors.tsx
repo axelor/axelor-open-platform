@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";

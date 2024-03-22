@@ -3,7 +3,7 @@ import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { FormState, WidgetErrors } from "@/views/form/builder";
 import { WritableAtom, atom } from "jotai";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { createScope, molecule, useMolecule } from "bunshi/react";
 import { ActionExecutor, ActionHandler } from "../action";
 import { CommandItemProps } from "@axelor/ui";
 

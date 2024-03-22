@@ -1,4 +1,4 @@
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { memo, useCallback, useMemo, useRef } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";

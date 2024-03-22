@@ -1,5 +1,5 @@
 import { atom, useAtomValue } from "jotai";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { createScope, molecule, useMolecule } from "bunshi/react";
 import uniq from "lodash/uniq";
 import { useMemo } from "react";
 

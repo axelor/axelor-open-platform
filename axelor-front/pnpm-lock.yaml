@@ -40,6 +40,9 @@ dependencies:
   bootstrap-sass:
     specifier: 2.3.2
     version: 2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm)
+  bunshi:
+    specifier: ^2.1.4
+    version: 2.1.4(react@18.2.0)
   clsx:
     specifier: ^2.1.0
     version: 2.1.0
@@ -67,9 +70,6 @@ dependencies:
   jotai-immer:
     specifier: ^0.2.0
     version: 0.2.0(immer@10.0.4)(jotai@2.7.2)(react@18.2.0)
-  jotai-molecules:
-    specifier: ^1.2.0
-    version: 1.2.0(react@18.2.0)
   jsdom:
     specifier: ^23.0.1
     version: 23.0.1
@@ -3988,8 +3988,8 @@ packages:
     dev: false
     optional: true
 
-  /bunshi@2.0.2(react@18.2.0):
-    resolution: {integrity: sha512-bsYQT1KJPVQ+8JFDcB5gHZgmvlRXGCu46cR9qZTKsM8GNAOJXmjAYXuePkJt7bQYxrUNw7ub4OSwnImMkPvPhQ==}
+  /bunshi@2.1.4(react@18.2.0):
+    resolution: {integrity: sha512-8kHpSsfFQu3Dj6nuVP5qr6wwqeXHbdu/hqrT1hdv6N4KcIQ0amHJYR0iSgjYhxazS6NlQb6JacP1/A7EJ+ZRAg==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16'
@@ -5530,18 +5530,6 @@ packages:
       immer: 10.0.4
       jotai: 2.7.2(@types/react@18.2.73)(react@18.2.0)
       react: 18.2.0
-    dev: false
-
-  /jotai-molecules@1.2.0(react@18.2.0):
-    resolution: {integrity: sha512-Mrp2IZ6SAQUc3iANBXtcb1tgNUH6IR9I3/oGcsu2SX1jFUHwZPwvhtrOKcGlE1KJ8Coe2LfbBbVUyAozRn7H+Q==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>=16'
-    dependencies:
-      bunshi: 2.0.2(react@18.2.0)
-      react: 18.2.0
-    transitivePeerDependencies:
-      - vue
     dev: false
 
   /jotai@2.7.2(@types/react@18.2.73)(react@18.2.0):

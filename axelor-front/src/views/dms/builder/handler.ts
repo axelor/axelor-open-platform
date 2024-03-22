@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { createScope, molecule, useMolecule } from "bunshi/react";
 
 import { DataRecord } from "@/services/client/data.types";
 

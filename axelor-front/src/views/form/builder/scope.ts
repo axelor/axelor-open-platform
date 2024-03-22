@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

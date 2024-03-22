@@ -1,4 +1,4 @@
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { ReactElement, useMemo } from "react";
 
 import { DashletScope } from "./handler";

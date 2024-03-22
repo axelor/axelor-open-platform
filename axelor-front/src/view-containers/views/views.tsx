@@ -1,5 +1,5 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";

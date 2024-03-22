@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
-import { ScopeProvider } from "jotai-molecules";
+import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
