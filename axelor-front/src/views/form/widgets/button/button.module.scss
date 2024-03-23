@@ -48,3 +48,13 @@ div.button[disabled] {
   margin: 0 2px;
   vertical-align: super;
 }
+
+.link {
+  width: fit-content;
+  text-decoration: none;
+  padding-left: 0;
+  padding-right: 0;
+  &:hover {
+    text-decoration: underline;
+  }
+}

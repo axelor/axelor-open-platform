@@ -55,9 +55,9 @@ const variants = [
 ] as const;
 
 function findVariant(schema: Schema) {
-  if (schema.link) return "link";
+  if (typeof schema.link === "string") return "link";
   if (schema.css) {
-    let variant = schema.css.replace("btn-", "");
+    const variant = schema.css.replace("btn-", "");
     if (variants.includes(variant)) return variant;
   }
   return "primary";
@@ -75,29 +75,35 @@ export function Button(props: WidgetProps) {
   const variant = findVariant(schema);
   const [wait, setWait] = useState(false);
 
-  const handleClick = useCallback(async (e: Event) => {
-    const { prompt, onClick } = schema;
-    if (prompt) {
-      const confirmed = await dialogs.confirm({
-        content: prompt,
-      });
-      if (!confirmed) return;
-    }
-    try {
-      e.preventDefault();
-      setWait(true);
-      await commitEditableWidgets();
-      await actionExecutor.waitFor();
-      await actionExecutor.execute(onClick, {
-        context: {
-          _source: schema.name,
-          _signal: schema.name,
-        },
-      });
-    } finally {
-      setWait(false);
-    }
-  }, [commitEditableWidgets, actionExecutor, schema]);
+  const handleClick = useCallback(
+    async (e: Event) => {
+      if (schema.link) {
+        return window.open(schema.link, "_self", "noopener,noreferrer");
+      }
+      const { prompt, onClick } = schema;
+      if (prompt) {
+        const confirmed = await dialogs.confirm({
+          content: prompt,
+        });
+        if (!confirmed) return;
+      }
+      try {
+        e.preventDefault();
+        setWait(true);
+        await commitEditableWidgets();
+        await actionExecutor.waitFor();
+        await actionExecutor.execute(onClick, {
+          context: {
+            _source: schema.name,
+            _signal: schema.name,
+          },
+        });
+      } finally {
+        setWait(false);
+      }
+    },
+    [commitEditableWidgets, actionExecutor, schema],
+  );
 
   const readonly = useReadonly(widgetAtom);
   const disabled = wait || readonly;
@@ -115,6 +121,7 @@ export function Button(props: WidgetProps) {
       {...(!disabled && { onClick: handleClick })}
       className={clsx(styles.button, {
         [styles.help]: hasHelp,
+        [styles[variant]]: variant,
       })}
     >
       <div className={styles.title}>
