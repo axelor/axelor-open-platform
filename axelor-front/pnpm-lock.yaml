@@ -142,7 +142,7 @@ devDependencies:
     specifier: ^20.11.30
     version: 20.11.30
   '@types/react':
-    specifier: ^18.2.67
+    specifier: ^18.2.73
     version: 18.2.73
   '@types/react-datepicker':
     specifier: ^6.2.0
