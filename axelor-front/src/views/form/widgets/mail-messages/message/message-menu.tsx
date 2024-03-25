@@ -4,7 +4,7 @@ import { Message, MessageFlag } from "./types";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box, Menu, MenuItem } from "@axelor/ui";
 import styles from "./message-menu.module.scss";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 
 export function MessageMenu({
   data,

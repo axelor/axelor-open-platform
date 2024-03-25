@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";

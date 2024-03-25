@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import { Box } from '@axelor/ui/core';
-import clsx from 'clsx';
+import { clsx } from "@axelor/ui";
 
 import { ChartGroupType } from '../../builder';
 import { i18n } from '@/services/client/i18n';

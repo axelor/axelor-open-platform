@@ -1,7 +1,7 @@
 import { Fragment, memo, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import { isEqual } from "lodash";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 
 import { Box, useDrop } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";

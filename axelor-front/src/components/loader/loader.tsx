@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useEffect, useState } from "react";
 
 import { Box, CircularProgress } from "@axelor/ui";

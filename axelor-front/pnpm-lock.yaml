@@ -43,9 +43,6 @@ dependencies:
   bunshi:
     specifier: ^2.1.4
     version: 2.1.4(react@18.2.0)
-  clsx:
-    specifier: ^2.1.0
-    version: 2.1.0
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0

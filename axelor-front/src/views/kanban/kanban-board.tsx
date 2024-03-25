@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps, Input } from "@axelor/ui";

@@ -1,5 +1,5 @@
 import Editor, { loader } from "@monaco-editor/react";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useAtom } from "jotai";
 import { useCallback } from "react";
 

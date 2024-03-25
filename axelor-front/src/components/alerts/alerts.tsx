@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import { createRef, useEffect } from "react";

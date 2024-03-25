@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
@@ -200,9 +200,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           <Views tab={tab} />
         </div>
       ))}
-      {isProduction() && (
-        <TabsDirtyCheck tabs={tabs} />
-      )}
+      {isProduction() && <TabsDirtyCheck tabs={tabs} />}
       {popups.map((tab) => (
         <PopupViews key={tab.id} tab={tab} />
       ))}

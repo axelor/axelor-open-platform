@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { useAtomCallback } from "jotai/utils";
@@ -612,7 +612,11 @@ export function Dms(props: ViewProps<GridView>) {
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
-  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = dataStore.page;
+  const {
+    offset = 0,
+    limit = DEFAULT_PAGE_SIZE,
+    totalCount = 0,
+  } = dataStore.page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
   const records = useDataStore(dataStore, (ds) => ds.records);

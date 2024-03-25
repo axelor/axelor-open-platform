@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useCallback } from "react";
 import { Box } from "@axelor/ui";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 
 import { SelectOptionProps } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";

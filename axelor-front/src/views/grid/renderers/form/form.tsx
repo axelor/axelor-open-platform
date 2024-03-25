@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import setObjectValue from "lodash/set";

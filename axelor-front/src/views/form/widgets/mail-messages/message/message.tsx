@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import React, { MouseEvent, useMemo, useState } from "react";
 
 import { Badge, Box, Button, Panel, TBackground, useTheme } from "@axelor/ui";

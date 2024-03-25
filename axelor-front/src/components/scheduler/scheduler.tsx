@@ -9,7 +9,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useCallback, useEffect, useRef } from "react";
 
 import styles from "./scheduler.module.scss";

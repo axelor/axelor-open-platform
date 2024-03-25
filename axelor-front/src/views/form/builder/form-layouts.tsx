@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { memo, useMemo } from "react";
 
 import { Schema } from "@/services/client/meta.types";

@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { Box } from "@axelor/ui";

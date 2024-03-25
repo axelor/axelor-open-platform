@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import { Box, Input, SelectIcon } from "@axelor/ui";
@@ -313,18 +313,20 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
     case "boolean": {
       const selectionList = getBooleanSelection();
       const { value } = props;
-      return operator === "=" && (
-        <AxSelect
-          optionKey={(x) => x.value as any}
-          optionLabel={(x) => x.title}
-          optionEqual={(x, y) => x.value === y.value}
-          className={styles.select}
-          value={selectionList.find(item => item.value === value) ?? null}
-          onChange={(value: any) =>
-            onChange({ name: "value", value: value?.value })
-          }
-          options={selectionList}
-        />
+      return (
+        operator === "=" && (
+          <AxSelect
+            optionKey={(x) => x.value as any}
+            optionLabel={(x) => x.title}
+            optionEqual={(x, y) => x.value === y.value}
+            className={styles.select}
+            value={selectionList.find((item) => item.value === value) ?? null}
+            onChange={(value: any) =>
+              onChange({ name: "value", value: value?.value })
+            }
+            options={selectionList}
+          />
+        )
       );
     }
     case "date":

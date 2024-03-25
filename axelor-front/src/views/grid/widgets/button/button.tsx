@@ -1,6 +1,6 @@
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useMemo } from "react";
 
 import { Icon } from "@/components/icon";

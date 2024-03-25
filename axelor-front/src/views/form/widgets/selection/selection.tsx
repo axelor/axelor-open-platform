@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
 

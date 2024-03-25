@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";

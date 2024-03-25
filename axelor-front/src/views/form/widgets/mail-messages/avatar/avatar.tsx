@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import React, { useEffect, useMemo, useState } from "react";
 
 import { legacyClassNames } from "@/styles/legacy";

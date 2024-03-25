@@ -15,7 +15,7 @@ import {
   selectionInside,
 } from "./utils";
 
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { i18n } from "@/services/client/i18n";
 import "./editor.scss";
 

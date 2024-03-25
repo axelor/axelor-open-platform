@@ -26,7 +26,6 @@
     "@monaco-editor/react": "^4.6.0",
     "bootstrap-sass": "2.3.2",
     "bunshi": "^2.1.4",
-    "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.10",
     "dompurify": "^3.0.11",

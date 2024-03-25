@@ -9,7 +9,7 @@ import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { Translatable, useTranslationValue } from "../string/translatable";
 import styles from "./text.module.scss";
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 
 export function Text({
   inputProps,

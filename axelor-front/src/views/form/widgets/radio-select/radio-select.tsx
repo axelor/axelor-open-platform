@@ -1,11 +1,14 @@
-import clsx from "clsx";
+import { clsx } from "@axelor/ui";
 import { useAtom } from "jotai";
 
 import { Box } from "@axelor/ui";
 
 import { Selection as TSelection } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
-import { getMultiValues, joinMultiValues } from "@/views/form/widgets/selection/utils";
+import {
+  getMultiValues,
+  joinMultiValues,
+} from "@/views/form/widgets/selection/utils";
 
 import { FieldControl, FieldProps } from "../../builder";
 
