@@ -9,6 +9,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
 import format, { DEFAULT_SCALE } from "@/utils/format";
+import { useViewContext } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
@@ -25,6 +26,8 @@ export function Decimal(props: FieldProps<string | number>) {
   const { uid, minSize: min, maxSize: max, placeholder } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required, scale: scaleAttr } = attrs;
+
+  const getViewContext = useViewContext();
 
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
@@ -162,9 +165,12 @@ export function Decimal(props: FieldProps<string | number>) {
   const text = useMemo(
     () =>
       value != null
-        ? format(value, { props: { ...schema, scale } as Field })
+        ? format(value, {
+            props: { ...schema, ...schema.widgetAttrs, scale } as Field,
+            context: getViewContext(),
+          })
         : "",
-    [scale, schema, value],
+    [value, scale, schema, getViewContext],
   );
 
   const step = useMemo(
