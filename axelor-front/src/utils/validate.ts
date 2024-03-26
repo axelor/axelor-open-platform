@@ -16,7 +16,10 @@ export type Validate = (
 ) => WidgetErrors | undefined;
 
 const isEmpty = (value: any) =>
-  value === undefined || value === null || value === "";
+  value === undefined ||
+  value === null ||
+  value === "" ||
+  (Array.isArray(value) && value.length === 0);
 
 const validateRequired: Validate = (value, { props }) => {
   const { title, required } = props;
