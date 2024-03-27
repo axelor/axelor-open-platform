@@ -18,3 +18,4 @@
 | navigate to next page/record |  kbd:[Alt+Page Down] |  kbd:[⌥Opt+Page Down]
 | focus left menu search box | kbd:[Ctrl+M]  |  kbd:[⌘Сmd+M]
 | toggle left menu | kbd:[F9] | kbd:[F9]
+|===
