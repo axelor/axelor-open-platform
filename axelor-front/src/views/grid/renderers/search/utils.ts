@@ -26,7 +26,7 @@ function getDateTimeFormat(field?: Field) {
 function stripOperator(
   value: any,
   field: Field,
-  formatter: (value: any, field?: Field) => any = (e) => e
+  formatter: (value: any, field?: Field) => any = (e) => e,
 ) {
   let match = /(<)(.*)(<)(.*)/.exec(value);
   if (match) {
@@ -102,7 +102,7 @@ function toTimeMoment(val: any, field: Field) {
 function getSearchCriteria(
   fields: Record<string, Field>,
   items: GridView["items"],
-  values: SearchState
+  values: SearchState,
 ): Filter[] {
   let options = {};
 
@@ -128,9 +128,25 @@ function getSearchCriteria(
         op = "=";
         value = !/f|n|false|no|0/.test(value);
         break;
+      case "many-to-many":
+      case "one-to-many":
+        if (value?.includes?.(" | ")) {
+          return {
+            operator: "or",
+            criteria: value
+              .split(" | ")
+              .filter((v: string) => v.trim())
+              .map((value: string) => ({
+                fieldName: field.name,
+                operator: "like",
+                value,
+              })),
+          };
+        }
+        break;
       case "time":
       case "date":
-      case "datetime":
+      case "datetime": {
         const mappers = {
           time: (v?: Dayjs) =>
             v && v.format(getTimeFormat({ seconds: true } as Field)),
@@ -168,7 +184,7 @@ function getSearchCriteria(
             case "=":
             case "!=":
             case "between":
-            case "notBetween":
+            case "notBetween": {
               const hasNot = $op === "!=";
               let $v1: any = $value;
               let $v2: any = (
@@ -197,9 +213,11 @@ function getSearchCriteria(
                   },
                 ],
               };
+            }
           }
         }
         break;
+      }
       case "enum":
       case "selection":
         if (!(field.widget || "").toLowerCase().startsWith("multi")) {
@@ -231,7 +249,7 @@ function getSearchCriteria(
 export function getSearchFilter(
   fields: Record<string, Field>,
   viewItems: GridView["items"],
-  search?: SearchState
+  search?: SearchState,
 ): Criteria | null {
   return search && Object.keys(search || {}).length > 0
     ? {

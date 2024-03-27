@@ -1,0 +1,6 @@
+---
+title: Add search support on collection field in grid view
+type: feature
+description: |
+  This adds support to search if the target model as a target name available 
+  (ie namecolumn). Multi values search is also supported using ` | ` separator.
