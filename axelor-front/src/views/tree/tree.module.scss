@@ -13,6 +13,9 @@
   --bs-table-cell-padding: 0.35rem;
 }
 
-.tree {
-  margin-top: 0.5rem;
-}
+.placeholder {
+  min-height: 4rem;
+  background-color: var(--bs-gray-100);
+  border: 1px dashed var(--bs-border-color);
+  margin: 0.25rem;
+} 

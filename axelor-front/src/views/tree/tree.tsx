@@ -241,10 +241,12 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         id: data.id,
         version: data.version,
         ...(parent && {
-          [parent]: {
-            id: parentRecord.data?.id,
-            version: parentRecord.data?.version,
-          },
+          [parent]: parentRecord.data
+            ? {
+                id: parentRecord.data?.id,
+                version: parentRecord.data?.version,
+              }
+            : null,
         }),
       });
 
@@ -276,7 +278,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     if (dataStore && rootNode) {
       const setTreeData = () =>
         setRecords(() => toTreeData(rootNode, dataStore.records));
-        
+
       setTreeData();
       return dataStore.subscribe(() => {
         setTreeData();
@@ -400,6 +402,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           columns={columns}
           records={records}
           sortable
+          {...(isSameModelTree && {
+            droppable: isSameModelTree,
+            droppableText: <DroppableRoot />,
+          })}
           nodeRenderer={nodeRenderer}
           textRenderer={nodeTextRenderer}
           onSort={handleSort}
@@ -407,6 +413,20 @@ export function Tree({ meta }: ViewProps<TreeView>) {
           onNodeMove={handleNodeMove}
         />
       </TreeProvider>
+    </Box>
+  );
+}
+
+function DroppableRoot() {
+  return (
+    <Box
+      className={styles.placeholder}
+      d="flex"
+      flex={1}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
+      {i18n.get("Drop here")}
     </Box>
   );
 }
