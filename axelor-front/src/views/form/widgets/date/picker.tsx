@@ -20,14 +20,17 @@ const DEFAULT_LOCALE = "en";
 const LOCALE_LOADERS: Record<string, () => Promise<any>> = {
   [DEFAULT_LOCALE]: () => Promise.resolve(),
   "ar-DZ": () => import("date-fns/locale/ar-DZ"),
+  "ar-EG": () => import("date-fns/locale/ar-EG"),
   "ar-MA": () => import("date-fns/locale/ar-MA"),
   "ar-SA": () => import("date-fns/locale/ar-SA"),
   "ar-TN": () => import("date-fns/locale/ar-TN"),
+  "ar": () => import("date-fns/locale/ar"),
   "de-AT": () => import("date-fns/locale/de-AT"),
   "de": () => import("date-fns/locale/de"),
   "en-AU": () => import("date-fns/locale/en-AU"),
   "en-CA": () => import("date-fns/locale/en-CA"),
   "en-GB": () => import("date-fns/locale/en-GB"),
+  "en-IE": () => import("date-fns/locale/en-IE"),
   "en-IN": () => import("date-fns/locale/en-IN"),
   "en-NZ": () => import("date-fns/locale/en-NZ"),
   "en-US": () => import("date-fns/locale/en-US"),
@@ -37,6 +40,7 @@ const LOCALE_LOADERS: Record<string, () => Promise<any>> = {
   "fr-CH": () => import("date-fns/locale/fr-CH"),
   "fr": () => import("date-fns/locale/fr"),
   "hi": () => import("date-fns/locale/hi"),
+  "it-CH": () => import("date-fns/locale/it-CH"),
   "it": () => import("date-fns/locale/it"),
   "ja": () => import("date-fns/locale/ja"),
   "ko": () => import("date-fns/locale/ko"),
@@ -45,7 +49,9 @@ const LOCALE_LOADERS: Record<string, () => Promise<any>> = {
   "pt-BR": () => import("date-fns/locale/pt-BR"),
   "pt": () => import("date-fns/locale/pt"),
   "ru": () => import("date-fns/locale/ru"),
+  "uk": () => import("date-fns/locale/uk"),
   "zh-CN": () => import("date-fns/locale/zh-CN"),
+  "zh-HK": () => import("date-fns/locale/zh-HK"),
   "zh-TW": () => import("date-fns/locale/zh-TW"),
 };
 
@@ -79,7 +85,7 @@ export const Picker = forwardRef<
       setDefaultLocale(locale);
       setLoaded(true);
     },
-    [locale]
+    [locale],
   );
 
   if (loaded) {
