@@ -49,8 +49,6 @@ This widget can be used for string fields to enter phone values.
 <field name="phone" widget="phone" />
 ----
 
-_New in version 5.4.2:_
-
 The phone widget uses the https://github.com/jackocnr/intl-tel-input[International Telephone Input] plugin. All `x-` prefixed attributes are passed to the plugin. Here are a few useful options:
 
 * `x-placeholder-number-type` - number type to use for the placeholder, such as `MOBILE` (default) or `FIXED_LINE` (https://github.com/jackocnr/intl-tel-input/blob/master/src/js/utils.js#L114[list of all possible keys])
@@ -512,7 +510,7 @@ Available tag color values for `MultiSelect`, `SingleSelect`, and `TagSelect`:
   <option value="deeporange" color="deeporange">Deep Orange</option>
   <option value="brown" color="brown">Brown</option>
   <option value="grey" color="grey">Grey</option>
-  <option value="bluegrey" color="bluegrey">Blue Grey</option> <!-- new in version 5.4 -->
+  <option value="bluegrey" color="bluegrey">Blue Grey</option>
   <option value="black" color="black">Black</option>
   <option value="white" color="white">White</option>
 </selection>
@@ -724,7 +722,7 @@ depending on the widget/type.
 | `x-show-icons` | comma-separated list of names of icons to show, or `false` to hide them all
 
 * editor: `edit`, `view`, `select`, `clear`
-* multirelational field: `select`, `new`, `edit`, `view`, `remove` - _new in version 5.4_
+* multirelational field: `select`, `new`, `edit`, `view`, `remove`
 | `x-can-copy` | whether to allow copy of o2m/m2m field items
 | `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`)
 | `x-code-syntax` | syntax highlighting for the code editor widget
@@ -744,7 +742,7 @@ It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
 | `x-seconds` | show seconds in a duration widget
 | `x-accept` | specify the file types the file input should accept
 | `x-color-field` | specify the color field to use with `tag-select` widget
-| `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized - _new in version 5.4_
+| `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized
 |===
 
 == Expressions

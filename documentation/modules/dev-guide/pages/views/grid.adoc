@@ -94,7 +94,7 @@ The `<button>` item can be used to put buttons at any row.
 | `icon` | name of the icon to show
 | `prompt` | text to show if confirmation is required when button is clicked
 | *`onClick`* | the name of the action to execute when button is clicked
-| `css` | custom CSS class to apply - _new in version 5.4_
+| `css` | custom CSS class to apply
 |===
 
 == Toolbar
@@ -110,7 +110,6 @@ are shown along with the top toolbar.
 </toolbar>
 -----
 
-_New in version 5.4:_
 In the case of grid view displayed as child of a form view or as a dashlet, first three buttons will be displayed.
 
 == Menubar
@@ -131,7 +130,6 @@ shown in the top toolbar.
 </menubar>
 -----
 
-_New in version 5.4:_
 In the case of grid view displayed as child of a form view or as a dashlet, first menu will be displayed.
 
 
@@ -175,8 +173,6 @@ The following color & background styles are defined:
 | `danger` | highlight style to show criticality
 | `info` | highlight style to indicate information
 |===
-
-_New in version 5.4_:
 
 Besides those styles, these colors are also available:
 
@@ -236,7 +232,7 @@ or on o2m/m2m fields.
 The `<field>` and `<filter>` elements are optional but at least one element
 should be present in `<search-filters>`.
 
-The `<filter>` element can have a `name` attribute to be used in the list of names for the xref:actions/action-view.adoc#view-action[`default-search-filters`] `view-param`. - _new in version 5.4.2_
+The `<filter>` element can have a `name` attribute to be used in the list of names for the xref:actions/action-view.adoc#view-action[`default-search-filters`] `view-param`.
 
 IMPORTANT: Searching on o2m/m2m fields may result in duplicate records in view.
 There is no generic optimal way to prevent this.

@@ -131,7 +131,7 @@ A `panel` can have the following attributes:
 | `if-module` | use the widget if the given module is installed
 | `canCollapse` | specify whether the panel is collapsible
 | `collapseIf` | specify a boolean expression to collapse/expend this panel
-| `help` | help text displayed on mouse hover - _new in version 5.4_
+| `help` | help text displayed on mouse hover
 |===
 
 [source,xml]
@@ -359,7 +359,7 @@ The `editor` can use the following widgets:
 * `field` - binds a model field, automatically selects appropriate widget
 * `button` - a button widget that executes some action
 * `spacer` - can be used to skip a cell
-* `separator` - can be used to define a boundary - _new in version 5.4_
+* `separator` - can be used to define a boundary
 * `label` - can be used to set a static label
 * `panel` - an embedded panel
 
@@ -405,8 +405,6 @@ The viewer template can have following helper functions to render values:
 * `$fmt(fieldName)` - get formated value of the given field
 
 == Field tooltip
-
-_New in version 5.4_
 
 We can define a details template on a field to show extra information about the cell with mouse over.
 

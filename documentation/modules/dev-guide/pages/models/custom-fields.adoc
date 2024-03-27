@@ -342,7 +342,7 @@ JPQL functions can be used to extract and set values in custom fields:
 | extract a Boolean from specified JSON field
 
 | `json_set(jsonField, path, value)`
-| set value in specified JSON field - _new in version 5.4_
+| set value in specified JSON field
 |===
 
 Example:

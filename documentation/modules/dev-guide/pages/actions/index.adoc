@@ -44,7 +44,7 @@ The context may contain some extra information like `\\__parent__` context.
 Also, the values of multi-value fields (O2M/M2M) are marked with `selected` flag
 to check whether the record is selected.
 
-These extra attributes are available: (_new in version 5.4_)
+These extra attributes are available :
 
 * `_viewName` - name of the current view
 * `_viewType` - type of the current view

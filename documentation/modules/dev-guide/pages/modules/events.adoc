@@ -144,8 +144,6 @@ public class ContactObserver {
 
 ==== Workflow Status Tags
 
-_New in version 5.4_
-
 Observing fetch events, it is possible to add workflow status as tags in the form view.
 
 [source,java]
