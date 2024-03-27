@@ -586,7 +586,7 @@ function SearchInput({
         <Box className={styles.chipList} d="flex" flex={1}>
           <SelectionTag
             title={label}
-            color="indigo"
+            color="primary"
             onRemove={() => onClear?.()}
           />
         </Box>

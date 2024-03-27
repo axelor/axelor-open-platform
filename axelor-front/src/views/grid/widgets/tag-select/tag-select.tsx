@@ -28,7 +28,7 @@ export function TagSelect(props: GridColumnProps) {
 
   const renderItem = useCallback(
     (item: DataRecord) => (
-      <SelectionTag title={getTitle(item)} color={"indigo"} />
+      <SelectionTag title={getTitle(item)} color={"primary"} />
     ),
     [getTitle],
   );
