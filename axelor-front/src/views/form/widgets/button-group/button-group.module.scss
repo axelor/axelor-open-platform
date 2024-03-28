@@ -1,5 +1,8 @@
 .buttonGroup {
+  display: flex;
   & > button {
+    flex: 1 !important;
+    overflow: hidden;
     & {
       border-left-width: var(--bs-btn-border-width);
       border-left-color: var(--bs-btn-active-border-color);
