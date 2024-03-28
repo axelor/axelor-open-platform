@@ -24,7 +24,6 @@ import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -64,10 +63,10 @@ public class InfoResource {
   @Path("info")
   @Tag(name = "Metadata")
   @Operation(
-          summary = "Retrieve metadata information for the application",
-          description =
-                  "Retrieve metadata information for `application` and `authentication`. "
-                          + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
+      summary = "Retrieve metadata information for the application",
+      description =
+          "Retrieve metadata information for `application` and `authentication`. "
+              + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
   public Map<String, Object> info() {
     return infoService.info(request, response);
   }

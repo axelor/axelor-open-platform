@@ -168,7 +168,8 @@ public class AxelorUtils {
       String path = id.getProjectPath();
       Project sub = project.findProject(path);
       if (":".equals(path)) {
-        sub = includedBuildRoots(project).stream()
+        sub =
+            includedBuildRoots(project).stream()
                 .filter(p -> p.getName().equals(id.getProjectName()))
                 .findFirst()
                 .orElse(sub);
