@@ -227,7 +227,7 @@ function Footer({
             console.error(e);
           }
         },
-        [checkDirty, getErrors, handler, onClose, onSave, onSelect],
+        [checkDirty, handler, onClose, onSave, onSelect],
       ),
     ),
   );
