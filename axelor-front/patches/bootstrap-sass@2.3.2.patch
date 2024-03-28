@@ -1,5 +1,1106 @@
+diff --git a/.npmignore b/.npmignore
+deleted file mode 100644
+index a4a9d0dba362aef329f1bef9e2ed1703ec8cb485..0000000000000000000000000000000000000000
+diff --git a/bootstrap-2.3.2.css b/bootstrap-2.3.2.css
+index e0b051e2f74c3fd49545de6b22829b697409bc0f..32ad71267112c33f1ea9a2033b0561239afe9013 100644
+--- a/bootstrap-2.3.2.css
++++ b/bootstrap-2.3.2.css
+@@ -24,8 +24,6 @@ audio,
+ canvas,
+ video {
+   display: inline-block;
+-  *display: inline;
+-  *zoom: 1;
+ }
+ 
+ audio:not([controls]) {
+@@ -94,7 +92,6 @@ textarea {
+ 
+ button,
+ input {
+-  *overflow: visible;
+   line-height: normal;
+ }
+ 
+@@ -246,7 +243,6 @@ a:focus {
+ 
+ .row {
+   margin-left: -20px;
+-  *zoom: 1;
+ }
+ .row:before, .row:after {
+   display: table;
+@@ -368,7 +364,6 @@ a:focus {
+ 
+ .row-fluid {
+   width: 100%;
+-  *zoom: 1;
+ }
+ .row-fluid:before, .row-fluid:after {
+   display: table;
+@@ -387,7 +382,6 @@ a:focus {
+   box-sizing: border-box;
+   float: left;
+   margin-left: 2.127659574468085%;
+-  *margin-left: 2.074468085106383%;
+ }
+ .row-fluid [class*="span"]:first-child {
+   margin-left: 0;
+@@ -397,147 +391,111 @@ a:focus {
+ }
+ .row-fluid .span1 {
+   width: 6.382978723404255%;
+-  *width: 6.329787234042553%;
+ }
+ .row-fluid .span2 {
+   width: 14.893617021276595%;
+-  *width: 14.840425531914892%;
+ }
+ .row-fluid .span3 {
+   width: 23.404255319148934%;
+-  *width: 23.351063829787233%;
+ }
+ .row-fluid .span4 {
+   width: 31.91489361702128%;
+-  *width: 31.861702127659576%;
+ }
+ .row-fluid .span5 {
+   width: 40.42553191489362%;
+-  *width: 40.37234042553192%;
+ }
+ .row-fluid .span6 {
+   width: 48.93617021276595%;
+-  *width: 48.88297872340425%;
+ }
+ .row-fluid .span7 {
+   width: 57.44680851063829%;
+-  *width: 57.39361702127659%;
+ }
+ .row-fluid .span8 {
+   width: 65.95744680851064%;
+-  *width: 65.90425531914893%;
+ }
+ .row-fluid .span9 {
+   width: 74.46808510638297%;
+-  *width: 74.41489361702126%;
+ }
+ .row-fluid .span10 {
+   width: 82.97872340425532%;
+-  *width: 82.92553191489361%;
+ }
+ .row-fluid .span11 {
+   width: 91.48936170212765%;
+-  *width: 91.43617021276594%;
+ }
+ .row-fluid .span12 {
+   width: 100%;
+-  *width: 99.94680851063829%;
+ }
+ .row-fluid .offset1 {
+   margin-left: 10.638297872340425%;
+-  *margin-left: 10.53191489361702%;
+ }
+ .row-fluid .offset1:first-child {
+   margin-left: 8.51063829787234%;
+-  *margin-left: 8.404255319148938%;
+ }
+ .row-fluid .offset2 {
+   margin-left: 19.148936170212764%;
+-  *margin-left: 19.04255319148936%;
+ }
+ .row-fluid .offset2:first-child {
+   margin-left: 17.02127659574468%;
+-  *margin-left: 16.914893617021278%;
+ }
+ .row-fluid .offset3 {
+   margin-left: 27.659574468085104%;
+-  *margin-left: 27.5531914893617%;
+ }
+ .row-fluid .offset3:first-child {
+   margin-left: 25.53191489361702%;
+-  *margin-left: 25.425531914893618%;
+ }
+ .row-fluid .offset4 {
+   margin-left: 36.170212765957444%;
+-  *margin-left: 36.06382978723405%;
+ }
+ .row-fluid .offset4:first-child {
+   margin-left: 34.04255319148936%;
+-  *margin-left: 33.93617021276596%;
+ }
+ .row-fluid .offset5 {
+   margin-left: 44.68085106382979%;
+-  *margin-left: 44.57446808510638%;
+ }
+ .row-fluid .offset5:first-child {
+   margin-left: 42.5531914893617%;
+-  *margin-left: 42.4468085106383%;
+ }
+ .row-fluid .offset6 {
+   margin-left: 53.191489361702125%;
+-  *margin-left: 53.085106382978715%;
+ }
+ .row-fluid .offset6:first-child {
+   margin-left: 51.063829787234035%;
+-  *margin-left: 50.95744680851063%;
+ }
+ .row-fluid .offset7 {
+   margin-left: 61.702127659574465%;
+-  *margin-left: 61.59574468085106%;
+ }
+ .row-fluid .offset7:first-child {
+   margin-left: 59.57446808510638%;
+-  *margin-left: 59.46808510638298%;
+ }
+ .row-fluid .offset8 {
+   margin-left: 70.2127659574468%;
+-  *margin-left: 70.10638297872339%;
+ }
+ .row-fluid .offset8:first-child {
+   margin-left: 68.08510638297872%;
+-  *margin-left: 67.9787234042553%;
+ }
+ .row-fluid .offset9 {
+   margin-left: 78.72340425531914%;
+-  *margin-left: 78.61702127659572%;
+ }
+ .row-fluid .offset9:first-child {
+   margin-left: 76.59574468085106%;
+-  *margin-left: 76.48936170212764%;
+ }
+ .row-fluid .offset10 {
+   margin-left: 87.23404255319149%;
+-  *margin-left: 87.12765957446807%;
+ }
+ .row-fluid .offset10:first-child {
+   margin-left: 85.1063829787234%;
+-  *margin-left: 84.99999999999999%;
+ }
+ .row-fluid .offset11 {
+   margin-left: 95.74468085106382%;
+-  *margin-left: 95.6382978723404%;
+ }
+ .row-fluid .offset11:first-child {
+   margin-left: 93.61702127659574%;
+-  *margin-left: 93.51063829787232%;
+ }
+ .row-fluid .offset12 {
+   margin-left: 104.25531914893617%;
+-  *margin-left: 104.14893617021275%;
+ }
+ .row-fluid .offset12:first-child {
+   margin-left: 102.12765957446808%;
+-  *margin-left: 102.02127659574467%;
+ }
+ 
+ [class*="span"].hide,
+@@ -553,7 +511,6 @@ a:focus {
+ .container {
+   margin-right: auto;
+   margin-left: auto;
+-  *zoom: 1;
+ }
+ .container:before, .container:after {
+   display: table;
+@@ -567,7 +524,6 @@ a:focus {
+ .container-fluid {
+   padding-right: 20px;
+   padding-left: 20px;
+-  *zoom: 1;
+ }
+ .container-fluid:before, .container-fluid:after {
+   display: table;
+@@ -758,9 +714,7 @@ ol.inline {
+ ul.inline > li,
+ ol.inline > li {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   padding-left: 5px;
+   padding-right: 5px;
+ }
+@@ -783,7 +737,6 @@ dd {
+ }
+ 
+ .dl-horizontal {
+-  *zoom: 1;
+ }
+ .dl-horizontal:before, .dl-horizontal:after {
+   display: table;
+@@ -1070,7 +1023,6 @@ input[type="color"]:focus,
+ input[type="radio"],
+ input[type="checkbox"] {
+   margin: 4px 0 0;
+-  *margin-top: 0;
+   /* IE7 */
+   margin-top: 1px \9;
+   /* IE8-9 */
+@@ -1091,7 +1043,6 @@ select,
+ input[type="file"] {
+   height: 30px;
+   /* In IE7, the height of the select element cannot be changed by height, only font-size */
+-  *margin-top: 4px;
+   /* For IE7, add top margin to align select with labels */
+   line-height: 30px;
+ }
+@@ -1312,7 +1263,6 @@ textarea.span12,
+ }
+ 
+ .controls-row {
+-  *zoom: 1;
+ }
+ .controls-row:before, .controls-row:after {
+   display: table;
+@@ -1511,7 +1461,6 @@ select:focus:invalid:focus {
+   margin-bottom: 20px;
+   background-color: whitesmoke;
+   border-top: 1px solid #e5e5e5;
+-  *zoom: 1;
+ }
+ .form-actions:before, .form-actions:after {
+   display: table;
+@@ -1534,9 +1483,7 @@ select:focus:invalid:focus {
+ 
+ .help-inline {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   vertical-align: middle;
+   padding-left: 5px;
+ }
+@@ -1569,7 +1516,6 @@ select:focus:invalid:focus {
+ .input-prepend .uneditable-input {
+   position: relative;
+   margin-bottom: 0;
+-  *margin-left: 0;
+   vertical-align: top;
+   -webkit-border-radius: 0 4px 4px 0;
+   -moz-border-radius: 0 4px 4px 0;
+@@ -1751,9 +1697,7 @@ input.search-query {
+ .form-horizontal .input-prepend,
+ .form-horizontal .input-append {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   margin-bottom: 0;
+   vertical-align: middle;
+ }
+@@ -1806,7 +1750,6 @@ legend + .control-group {
+ 
+ .form-horizontal .control-group {
+   margin-bottom: 20px;
+-  *zoom: 1;
+ }
+ .form-horizontal .control-group:before, .form-horizontal .control-group:after {
+   display: table;
+@@ -1823,13 +1766,9 @@ legend + .control-group {
+   text-align: right;
+ }
+ .form-horizontal .controls {
+-  *display: inline-block;
+-  *padding-left: 20px;
+   margin-left: 180px;
+-  *margin-left: 0;
+ }
+ .form-horizontal .controls:first-child {
+-  *padding-left: 180px;
+ }
+ .form-horizontal .help-block {
+   margin-bottom: 0;
+@@ -1894,7 +1833,6 @@ table {
+ .table-bordered {
+   border: 1px solid #dddddd;
+   border-collapse: separate;
+-  *border-collapse: collapse;
+   border-left: 0;
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+@@ -2097,7 +2035,6 @@ table th[class*="span"],
+   display: inline-block;
+   width: 14px;
+   height: 14px;
+-  *margin-right: .3em;
+   line-height: 14px;
+   vertical-align: text-top;
+   background-image: url("../img/glyphicons-halflings.png");
+@@ -2696,7 +2633,6 @@ table th[class*="span"],
+ }
+ 
+ .dropdown-toggle {
+-  *margin-bottom: -3px;
+ }
+ 
+ .dropdown-toggle:active,
+@@ -2734,8 +2670,6 @@ table th[class*="span"],
+   background-color: white;
+   border: 1px solid #ccc;
+   border: 1px solid rgba(0, 0, 0, 0.2);
+-  *border-right-width: 2px;
+-  *border-bottom-width: 2px;
+   -webkit-border-radius: 6px;
+   -moz-border-radius: 6px;
+   border-radius: 6px;
+@@ -2751,10 +2685,8 @@ table th[class*="span"],
+   left: auto;
+ }
+ .dropdown-menu .divider {
+-  *width: 100%;
+   height: 1px;
+   margin: 9px 1px;
+-  *margin: -5px 0 5px;
+   overflow: hidden;
+   background-color: #e5e5e5;
+   border-bottom: 1px solid white;
+@@ -2817,7 +2749,6 @@ table th[class*="span"],
+ }
+ 
+ .open {
+-  *z-index: 1000;
+ }
+ .open > .dropdown-menu {
+   display: block;
+@@ -3004,9 +2935,7 @@ button.close {
+ 
+ .btn {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   padding: 4px 12px;
+   margin-bottom: 0;
+   font-size: 14px;
+@@ -3026,16 +2955,13 @@ button.close {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFE6E6E6', GradientType=0);
+   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #e6e6e6;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+   border: 1px solid #cccccc;
+-  *border: 0;
+   border-bottom-color: #b3b3b3;
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
+   border-radius: 4px;
+-  *margin-left: .3em;
+   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+   -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+@@ -3043,13 +2969,11 @@ button.close {
+ .btn:hover, .btn:focus, .btn:active, .btn.active, .btn.disabled, .btn[disabled] {
+   color: #333333;
+   background-color: #e6e6e6;
+-  *background-color: #d9d9d9;
+ }
+ .btn:active, .btn.active {
+   background-color: #cccccc \9;
+ }
+ .btn:first-child {
+-  *margin-left: 0;
+ }
+ .btn:hover, .btn:focus {
+   color: #333333;
+@@ -3163,14 +3087,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF0088CC', endColorstr='#FF0044CC', GradientType=0);
+   border-color: #0044cc #0044cc #002a80;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #0044cc;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+   color: white;
+   background-color: #0044cc;
+-  *background-color: #003bb3;
+ }
+ .btn-primary:active, .btn-primary.active {
+   background-color: #003399 \9;
+@@ -3189,14 +3111,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFBB450', endColorstr='#FFF89406', GradientType=0);
+   border-color: #f89406 #f89406 #ad6704;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #f89406;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active, .btn-warning.disabled, .btn-warning[disabled] {
+   color: white;
+   background-color: #f89406;
+-  *background-color: #df8505;
+ }
+ .btn-warning:active, .btn-warning.active {
+   background-color: #c67605 \9;
+@@ -3215,14 +3135,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFEE5F5B', endColorstr='#FFBD362F', GradientType=0);
+   border-color: #bd362f #bd362f #802420;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #bd362f;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active, .btn-danger.disabled, .btn-danger[disabled] {
+   color: white;
+   background-color: #bd362f;
+-  *background-color: #a9302a;
+ }
+ .btn-danger:active, .btn-danger.active {
+   background-color: #942a25 \9;
+@@ -3241,14 +3159,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF62C462', endColorstr='#FF51A351', GradientType=0);
+   border-color: #51a351 #51a351 #387038;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #51a351;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .btn-success.disabled, .btn-success[disabled] {
+   color: white;
+   background-color: #51a351;
+-  *background-color: #499249;
+ }
+ .btn-success:active, .btn-success.active {
+   background-color: #408140 \9;
+@@ -3267,14 +3183,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF5BC0DE', endColorstr='#FF2F96B4', GradientType=0);
+   border-color: #2f96b4 #2f96b4 #1f6377;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #2f96b4;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-info:hover, .btn-info:focus, .btn-info:active, .btn-info.active, .btn-info.disabled, .btn-info[disabled] {
+   color: white;
+   background-color: #2f96b4;
+-  *background-color: #2a85a0;
+ }
+ .btn-info:active, .btn-info.active {
+   background-color: #24748c \9;
+@@ -3293,14 +3207,12 @@ input[type="button"].btn-block {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF444444', endColorstr='#FF222222', GradientType=0);
+   border-color: #222222 #222222 black;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #222222;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .btn-inverse:hover, .btn-inverse:focus, .btn-inverse:active, .btn-inverse.active, .btn-inverse.disabled, .btn-inverse[disabled] {
+   color: white;
+   background-color: #222222;
+-  *background-color: #151515;
+ }
+ .btn-inverse:active, .btn-inverse.active {
+   background-color: #090909 \9;
+@@ -3308,8 +3220,6 @@ input[type="button"].btn-block {
+ 
+ button.btn,
+ input[type="submit"].btn {
+-  *padding-top: 3px;
+-  *padding-bottom: 3px;
+ }
+ button.btn::-moz-focus-inner,
+ input[type="submit"].btn::-moz-focus-inner {
+@@ -3318,18 +3228,12 @@ input[type="submit"].btn::-moz-focus-inner {
+ }
+ button.btn.btn-large,
+ input[type="submit"].btn.btn-large {
+-  *padding-top: 7px;
+-  *padding-bottom: 7px;
+ }
+ button.btn.btn-small,
+ input[type="submit"].btn.btn-small {
+-  *padding-top: 3px;
+-  *padding-bottom: 3px;
+ }
+ button.btn.btn-mini,
+ input[type="submit"].btn.btn-mini {
+-  *padding-top: 1px;
+-  *padding-bottom: 1px;
+ }
+ 
+ .btn-link,
+@@ -3367,16 +3271,12 @@ input[type="submit"].btn.btn-mini {
+ .btn-group {
+   position: relative;
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   font-size: 0;
+   vertical-align: middle;
+   white-space: nowrap;
+-  *margin-left: .3em;
+ }
+ .btn-group:first-child {
+-  *margin-left: 0;
+ }
+ 
+ .btn-group + .btn-group {
+@@ -3481,27 +3381,19 @@ input[type="submit"].btn.btn-mini {
+   -webkit-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+   -moz-box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+   box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.125), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+-  *padding-top: 5px;
+-  *padding-bottom: 5px;
+ }
+ 
+ .btn-group > .btn-mini + .dropdown-toggle {
+   padding-left: 5px;
+   padding-right: 5px;
+-  *padding-top: 2px;
+-  *padding-bottom: 2px;
+ }
+ 
+ .btn-group > .btn-small + .dropdown-toggle {
+-  *padding-top: 5px;
+-  *padding-bottom: 4px;
+ }
+ 
+ .btn-group > .btn-large + .dropdown-toggle {
+   padding-left: 12px;
+   padding-right: 12px;
+-  *padding-top: 7px;
+-  *padding-bottom: 7px;
+ }
+ 
+ .btn-group.open .dropdown-toggle {
+@@ -3568,9 +3460,7 @@ input[type="submit"].btn.btn-mini {
+ 
+ .btn-group-vertical {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+ }
+ 
+ .btn-group-vertical > .btn {
+@@ -3754,10 +3644,8 @@ input[type="submit"].btn.btn-mini {
+ }
+ 
+ .nav-list .divider {
+-  *width: 100%;
+   height: 1px;
+   margin: 9px 1px;
+-  *margin: -5px 0 5px;
+   overflow: hidden;
+   background-color: #e5e5e5;
+   border-bottom: 1px solid white;
+@@ -3765,7 +3653,6 @@ input[type="submit"].btn.btn-mini {
+ 
+ .nav-tabs,
+ .nav-pills {
+-  *zoom: 1;
+ }
+ .nav-tabs:before, .nav-tabs:after,
+ .nav-pills:before,
+@@ -3960,7 +3847,6 @@ input[type="submit"].btn.btn-mini {
+ }
+ 
+ .tabbable {
+-  *zoom: 1;
+ }
+ .tabbable:before, .tabbable:after {
+   display: table;
+@@ -4050,7 +3936,6 @@ input[type="submit"].btn.btn-mini {
+ .tabs-left > .nav-tabs .active > a:hover,
+ .tabs-left > .nav-tabs .active > a:focus {
+   border-color: #ddd transparent #ddd #ddd;
+-  *border-right-color: white;
+ }
+ 
+ .tabs-right > .nav-tabs {
+@@ -4075,7 +3960,6 @@ input[type="submit"].btn.btn-mini {
+ .tabs-right > .nav-tabs .active > a:hover,
+ .tabs-right > .nav-tabs .active > a:focus {
+   border-color: #ddd #ddd #ddd transparent;
+-  *border-left-color: white;
+ }
+ 
+ .nav > .disabled > a {
+@@ -4092,8 +3976,6 @@ input[type="submit"].btn.btn-mini {
+ .navbar {
+   overflow: visible;
+   margin-bottom: 20px;
+-  *position: relative;
+-  *z-index: 2;
+ }
+ 
+ .navbar-inner {
+@@ -4115,7 +3997,6 @@ input[type="submit"].btn.btn-mini {
+   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+   -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+-  *zoom: 1;
+ }
+ .navbar-inner:before, .navbar-inner:after {
+   display: table;
+@@ -4184,7 +4065,6 @@ input[type="submit"].btn.btn-mini {
+ 
+ .navbar-form {
+   margin-bottom: 0;
+-  *zoom: 1;
+ }
+ .navbar-form:before, .navbar-form:after {
+   display: table;
+@@ -4367,7 +4247,6 @@ input[type="submit"].btn.btn-mini {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFF2F2F2', endColorstr='#FFE6E6E6', GradientType=0);
+   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #e6e6e6;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.075);
+@@ -4377,7 +4256,6 @@ input[type="submit"].btn.btn-mini {
+ .navbar .btn-navbar:hover, .navbar .btn-navbar:focus, .navbar .btn-navbar:active, .navbar .btn-navbar.active, .navbar .btn-navbar.disabled, .navbar .btn-navbar[disabled] {
+   color: white;
+   background-color: #e6e6e6;
+-  *background-color: #d9d9d9;
+ }
+ .navbar .btn-navbar:active, .navbar .btn-navbar.active {
+   background-color: #cccccc \9;
+@@ -4601,14 +4479,12 @@ input[type="submit"].btn.btn-mini {
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF151515', endColorstr='#FF040404', GradientType=0);
+   border-color: #040404 #040404 black;
+   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+-  *background-color: #040404;
+   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+ }
+ .navbar-inverse .btn-navbar:hover, .navbar-inverse .btn-navbar:focus, .navbar-inverse .btn-navbar:active, .navbar-inverse .btn-navbar.active, .navbar-inverse .btn-navbar.disabled, .navbar-inverse .btn-navbar[disabled] {
+   color: white;
+   background-color: #040404;
+-  *background-color: black;
+ }
+ .navbar-inverse .btn-navbar:active, .navbar-inverse .btn-navbar.active {
+   background-color: black \9;
+@@ -4625,9 +4501,7 @@ input[type="submit"].btn.btn-mini {
+ }
+ .breadcrumb > li {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   text-shadow: 0 1px 0 white;
+ }
+ .breadcrumb > li > .divider {
+@@ -4644,9 +4518,7 @@ input[type="submit"].btn.btn-mini {
+ 
+ .pagination ul {
+   display: inline-block;
+-  *display: inline;
+   /* IE7 inline-block hack */
+-  *zoom: 1;
+   margin-left: 0;
+   margin-bottom: 0;
+   -webkit-border-radius: 4px;
+@@ -4786,7 +4658,6 @@ input[type="submit"].btn.btn-mini {
+   margin: 20px 0;
+   list-style: none;
+   text-align: center;
+-  *zoom: 1;
+ }
+ .pager:before, .pager:after {
+   display: table;
+@@ -4866,7 +4737,6 @@ input[type="submit"].btn.btn-mini {
+   background-color: white;
+   border: 1px solid #999;
+   border: 1px solid rgba(0, 0, 0, 0.3);
+-  *border: 1px solid #999;
+   /* IE6-7 */
+   -webkit-border-radius: 6px;
+   -moz-border-radius: 6px;
+@@ -4925,7 +4795,6 @@ input[type="submit"].btn.btn-mini {
+   -webkit-box-shadow: inset 0 1px 0 white;
+   -moz-box-shadow: inset 0 1px 0 white;
+   box-shadow: inset 0 1px 0 white;
+-  *zoom: 1;
+ }
+ .modal-footer:before, .modal-footer:after {
+   display: table;
+@@ -5161,7 +5030,6 @@ input[type="submit"].btn.btn-mini {
+ .thumbnails {
+   margin-left: -20px;
+   list-style: none;
+-  *zoom: 1;
+ }
+ .thumbnails:before, .thumbnails:after {
+   display: table;
+@@ -5222,7 +5090,6 @@ a.thumbnail:focus {
+ .media,
+ .media-body {
+   overflow: hidden;
+-  *overflow: visible;
+   zoom: 1;
+ }
+ 
+@@ -5803,7 +5670,6 @@ a.label:hover, a.label:focus, a.badge:hover, a.badge:focus {
+ }
+ 
+ .clearfix {
+-  *zoom: 1;
+ }
+ .clearfix:before, .clearfix:after {
+   display: table;
+diff --git a/bootstrap-responsive-2.3.2.css b/bootstrap-responsive-2.3.2.css
+index 41b3f6e38d47a7d084fdaf72f36de6d2915cb2d5..61dd1ec84d391e4e6157a0902b10e47d70b25a57 100644
+--- a/bootstrap-responsive-2.3.2.css
++++ b/bootstrap-responsive-2.3.2.css
+@@ -80,7 +80,6 @@
+   }
+ }
+ .clearfix {
+-  *zoom: 1;
+ }
+ .clearfix:before, .clearfix:after {
+   display: table;
+@@ -111,7 +110,6 @@
+ @media (min-width: 1200px) {
+   .row {
+     margin-left: -30px;
+-    *zoom: 1;
+   }
+   .row:before, .row:after {
+     display: table;
+@@ -233,7 +231,6 @@
+ 
+   .row-fluid {
+     width: 100%;
+-    *zoom: 1;
+   }
+   .row-fluid:before, .row-fluid:after {
+     display: table;
+@@ -252,7 +249,6 @@
+     box-sizing: border-box;
+     float: left;
+     margin-left: 2.564102564102564%;
+-    *margin-left: 2.5109110747408616%;
+   }
+   .row-fluid [class*="span"]:first-child {
+     margin-left: 0;
+@@ -262,147 +258,111 @@
+   }
+   .row-fluid .span1 {
+     width: 5.982905982905983%;
+-    *width: 5.929714493544281%;
+   }
+   .row-fluid .span2 {
+     width: 14.529914529914532%;
+-    *width: 14.476723040552828%;
+   }
+   .row-fluid .span3 {
+     width: 23.076923076923077%;
+-    *width: 23.023731587561375%;
+   }
+   .row-fluid .span4 {
+     width: 31.62393162393162%;
+-    *width: 31.570740134569927%;
+   }
+   .row-fluid .span5 {
+     width: 40.17094017094017%;
+-    *width: 40.11774868157847%;
+   }
+   .row-fluid .span6 {
+     width: 48.717948717948715%;
+-    *width: 48.664757228587014%;
+   }
+   .row-fluid .span7 {
+     width: 57.26495726495726%;
+-    *width: 57.21176577559556%;
+   }
+   .row-fluid .span8 {
+     width: 65.81196581196582%;
+-    *width: 65.75877432260411%;
+   }
+   .row-fluid .span9 {
+     width: 74.35897435897436%;
+-    *width: 74.30578286961266%;
+   }
+   .row-fluid .span10 {
+     width: 82.90598290598291%;
+-    *width: 82.8527914166212%;
+   }
+   .row-fluid .span11 {
+     width: 91.45299145299145%;
+-    *width: 91.39979996362975%;
+   }
+   .row-fluid .span12 {
+     width: 100%;
+-    *width: 99.94680851063829%;
+   }
+   .row-fluid .offset1 {
+     margin-left: 11.11111111111111%;
+-    *margin-left: 11.004728132387708%;
+   }
+   .row-fluid .offset1:first-child {
+     margin-left: 8.547008547008547%;
+-    *margin-left: 8.440625568285142%;
+   }
+   .row-fluid .offset2 {
+     margin-left: 19.65811965811966%;
+-    *margin-left: 19.551736679396257%;
+   }
+   .row-fluid .offset2:first-child {
+     margin-left: 17.094017094017094%;
+-    *margin-left: 16.98763411529369%;
+   }
+   .row-fluid .offset3 {
+     margin-left: 28.205128205128204%;
+-    *margin-left: 28.0987452264048%;
+   }
+   .row-fluid .offset3:first-child {
+     margin-left: 25.641025641025642%;
+-    *margin-left: 25.53464266230224%;
+   }
+   .row-fluid .offset4 {
+     margin-left: 36.75213675213675%;
+-    *margin-left: 36.645753773413354%;
+   }
+   .row-fluid .offset4:first-child {
+     margin-left: 34.18803418803419%;
+-    *margin-left: 34.081651209310785%;
+   }
+   .row-fluid .offset5 {
+     margin-left: 45.299145299145295%;
+-    *margin-left: 45.1927623204219%;
+   }
+   .row-fluid .offset5:first-child {
+     margin-left: 42.73504273504273%;
+-    *margin-left: 42.62865975631933%;
+   }
+   .row-fluid .offset6 {
+     margin-left: 53.84615384615384%;
+-    *margin-left: 53.739770867430444%;
+   }
+   .row-fluid .offset6:first-child {
+     margin-left: 51.28205128205128%;
+-    *margin-left: 51.175668303327875%;
+   }
+   .row-fluid .offset7 {
+     margin-left: 62.39316239316238%;
+-    *margin-left: 62.28677941443899%;
+   }
+   .row-fluid .offset7:first-child {
+     margin-left: 59.82905982905983%;
+-    *margin-left: 59.72267685033642%;
+   }
+   .row-fluid .offset8 {
+     margin-left: 70.94017094017094%;
+-    *margin-left: 70.83378796144753%;
+   }
+   .row-fluid .offset8:first-child {
+     margin-left: 68.37606837606839%;
+-    *margin-left: 68.26968539734497%;
+   }
+   .row-fluid .offset9 {
+     margin-left: 79.48717948717949%;
+-    *margin-left: 79.38079650845607%;
+   }
+   .row-fluid .offset9:first-child {
+     margin-left: 76.92307692307693%;
+-    *margin-left: 76.81669394435352%;
+   }
+   .row-fluid .offset10 {
+     margin-left: 88.03418803418803%;
+-    *margin-left: 87.92780505546462%;
+   }
+   .row-fluid .offset10:first-child {
+     margin-left: 85.47008547008548%;
+-    *margin-left: 85.36370249136206%;
+   }
+   .row-fluid .offset11 {
+     margin-left: 96.58119658119658%;
+-    *margin-left: 96.47481360247316%;
+   }
+   .row-fluid .offset11:first-child {
+     margin-left: 94.01709401709402%;
+-    *margin-left: 93.91071103837061%;
+   }
+   .row-fluid .offset12 {
+     margin-left: 105.12820512820512%;
+-    *margin-left: 105.02182214948171%;
+   }
+   .row-fluid .offset12:first-child {
+     margin-left: 102.56410256410257%;
+-    *margin-left: 102.45771958537915%;
+   }
+ 
+   input,
+@@ -502,7 +462,6 @@
+ @media (min-width: 768px) and (max-width: 979px) {
+   .row {
+     margin-left: -20px;
+-    *zoom: 1;
+   }
+   .row:before, .row:after {
+     display: table;
+@@ -624,7 +583,6 @@
+ 
+   .row-fluid {
+     width: 100%;
+-    *zoom: 1;
+   }
+   .row-fluid:before, .row-fluid:after {
+     display: table;
+@@ -643,7 +601,6 @@
+     box-sizing: border-box;
+     float: left;
+     margin-left: 2.7624309392265194%;
+-    *margin-left: 2.709239449864817%;
+   }
+   .row-fluid [class*="span"]:first-child {
+     margin-left: 0;
+@@ -653,147 +610,111 @@
+   }
+   .row-fluid .span1 {
+     width: 5.801104972375691%;
+-    *width: 5.747913483013988%;
+   }
+   .row-fluid .span2 {
+     width: 14.3646408839779%;
+-    *width: 14.311449394616199%;
+   }
+   .row-fluid .span3 {
+     width: 22.92817679558011%;
+-    *width: 22.87498530621841%;
+   }
+   .row-fluid .span4 {
+     width: 31.491712707182323%;
+-    *width: 31.43852121782062%;
+   }
+   .row-fluid .span5 {
+     width: 40.05524861878453%;
+-    *width: 40.00205712942283%;
+   }
+   .row-fluid .span6 {
+     width: 48.61878453038674%;
+-    *width: 48.56559304102504%;
+   }
+   .row-fluid .span7 {
+     width: 57.18232044198895%;
+-    *width: 57.12912895262725%;
+   }
+   .row-fluid .span8 {
+     width: 65.74585635359117%;
+-    *width: 65.69266486422946%;
+   }
+   .row-fluid .span9 {
+     width: 74.30939226519337%;
+-    *width: 74.25620077583166%;
+   }
+   .row-fluid .span10 {
+     width: 82.87292817679558%;
+-    *width: 82.81973668743387%;
+   }
+   .row-fluid .span11 {
+     width: 91.43646408839778%;
+-    *width: 91.38327259903608%;
+   }
+   .row-fluid .span12 {
+     width: 100%;
+-    *width: 99.94680851063829%;
+   }
+   .row-fluid .offset1 {
+     margin-left: 11.32596685082873%;
+-    *margin-left: 11.219583872105325%;
+   }
+   .row-fluid .offset1:first-child {
+     margin-left: 8.56353591160221%;
+-    *margin-left: 8.457152932878806%;
+   }
+   .row-fluid .offset2 {
+     margin-left: 19.88950276243094%;
+-    *margin-left: 19.783119783707537%;
+   }
+   .row-fluid .offset2:first-child {
+     margin-left: 17.12707182320442%;
+-    *margin-left: 17.02068884448102%;
+   }
+   .row-fluid .offset3 {
+     margin-left: 28.45303867403315%;
+-    *margin-left: 28.346655695309746%;
+   }
+   .row-fluid .offset3:first-child {
+     margin-left: 25.69060773480663%;
+-    *margin-left: 25.584224756083227%;
+   }
+   .row-fluid .offset4 {
+     margin-left: 37.01657458563536%;
+-    *margin-left: 36.91019160691196%;
+   }
+   .row-fluid .offset4:first-child {
+     margin-left: 34.25414364640884%;
+-    *margin-left: 34.14776066768544%;
+   }
+   .row-fluid .offset5 {
+     margin-left: 45.58011049723757%;
+-    *margin-left: 45.47372751851417%;
+   }
+   .row-fluid .offset5:first-child {
+     margin-left: 42.81767955801105%;
+-    *margin-left: 42.71129657928765%;
+   }
+   .row-fluid .offset6 {
+     margin-left: 54.14364640883978%;
+-    *margin-left: 54.037263430116376%;
+   }
+   .row-fluid .offset6:first-child {
+     margin-left: 51.38121546961326%;
+-    *margin-left: 51.27483249088986%;
+   }
+   .row-fluid .offset7 {
+     margin-left: 62.70718232044199%;
+-    *margin-left: 62.60079934171858%;
+   }
+   .row-fluid .offset7:first-child {
+     margin-left: 59.94475138121546%;
+-    *margin-left: 59.83836840249207%;
+   }
+   .row-fluid .offset8 {
+     margin-left: 71.2707182320442%;
+-    *margin-left: 71.16433525332079%;
+   }
+   .row-fluid .offset8:first-child {
+     margin-left: 68.50828729281768%;
+-    *margin-left: 68.40190431409427%;
+   }
+   .row-fluid .offset9 {
+     margin-left: 79.8342541436464%;
+-    *margin-left: 79.72787116492299%;
+   }
+   .row-fluid .offset9:first-child {
+     margin-left: 77.07182320441989%;
+-    *margin-left: 76.96544022569647%;
+   }
+   .row-fluid .offset10 {
+     margin-left: 88.39779005524862%;
+-    *margin-left: 88.2914070765252%;
+   }
+   .row-fluid .offset10:first-child {
+     margin-left: 85.6353591160221%;
+-    *margin-left: 85.52897613729868%;
+   }
+   .row-fluid .offset11 {
+     margin-left: 96.96132596685082%;
+-    *margin-left: 96.8549429881274%;
+   }
+   .row-fluid .offset11:first-child {
+     margin-left: 94.1988950276243%;
+-    *margin-left: 94.09251204890089%;
+   }
+   .row-fluid .offset12 {
+     margin-left: 105.52486187845304%;
+-    *margin-left: 105.41847889972962%;
+   }
+   .row-fluid .offset12:first-child {
+     margin-left: 102.76243093922652%;
+-    *margin-left: 102.6560479605031%;
+   }
+ 
+   input,
 diff --git a/lib/_button-groups.scss b/lib/_button-groups.scss
-index 1b08d50f5e916c0129f8f094bb16d87f2aee1b60..c955d2d6ee175fb13875bea0aec3df3b327e25cf 100644
+index 1b08d50f5e916c0129f8f094bb16d87f2aee1b60..e85f69ffe53fa2f1dc76c45a1bf368a79b691e53 100644
 --- a/lib/_button-groups.scss
 +++ b/lib/_button-groups.scss
 @@ -22,8 +22,8 @@
@@ -13,6 +1114,64 @@ index 1b08d50f5e916c0129f8f094bb16d87f2aee1b60..c955d2d6ee175fb13875bea0aec3df3b
    > .btn + .btn,
    > .btn-group + .btn,
    > .btn + .btn-group {
+@@ -104,24 +104,16 @@
+   padding-left: 8px;
+   padding-right: 8px;
+   @include box-shadow(inset 1px 0 0 rgba(255,255,255,.125), inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05));
+-  *padding-top: 5px;
+-  *padding-bottom: 5px;
+ }
+ .btn-group > .btn-mini + .dropdown-toggle {
+   padding-left: 5px;
+   padding-right: 5px;
+-  *padding-top: 2px;
+-  *padding-bottom: 2px;
+ }
+ .btn-group > .btn-small + .dropdown-toggle {
+-  *padding-top: 5px;
+-  *padding-bottom: 4px;
+ }
+ .btn-group > .btn-large + .dropdown-toggle {
+   padding-left: 12px;
+   padding-right: 12px;
+-  *padding-top: 7px;
+-  *padding-bottom: 7px;
+ }
+ 
+ .btn-group.open {
+diff --git a/lib/_buttons.scss b/lib/_buttons.scss
+index a92268b5fa22b7a7fcbaf58e654a5685889f0f7b..73c1aec9a86750a2f2e38e2433f94ae15ef5f13a 100644
+--- a/lib/_buttons.scss
++++ b/lib/_buttons.scss
+@@ -19,7 +19,6 @@
+   cursor: pointer;
+   @include buttonBackground($btnBackground, $btnBackgroundHighlight, $grayDark, 0 1px 1px rgba(255,255,255,.75));
+   border: 1px solid $btnBorder;
+-  *border: 0; // Remove the border to prevent IE7's black border on input:focus
+   border-bottom-color: darken($btnBorder, 10%);
+   @include border-radius($baseBorderRadius);
+   @include ie7-restore-left-whitespace(); // Give IE7 some love
+@@ -180,20 +179,12 @@ input[type="submit"].btn {
+   }
+ 
+   // IE7 has some default padding on button controls
+-  *padding-top: 3px;
+-  *padding-bottom: 3px;
+ 
+   &.btn-large {
+-    *padding-top: 7px;
+-    *padding-bottom: 7px;
+   }
+   &.btn-small {
+-    *padding-top: 3px;
+-    *padding-bottom: 3px;
+   }
+   &.btn-mini {
+-    *padding-top: 1px;
+-    *padding-bottom: 1px;
+   }
+ }
+ 
 diff --git a/lib/_code.scss b/lib/_code.scss
 index b9e2f6f224ef8eeeca5b1d590ab614b51e310612..897f32bd89a4741088a7d5c9dd01c9bbc2132023 100644
 --- a/lib/_code.scss
@@ -28,8 +1187,37 @@ index b9e2f6f224ef8eeeca5b1d590ab614b51e310612..897f32bd89a4741088a7d5c9dd01c9bb
    font-size: $baseFontSize - 1; // 14px to 13px
    line-height: $baseLineHeight;
    word-break: break-all;
+diff --git a/lib/_dropdowns.scss b/lib/_dropdowns.scss
+index f5949fa018e1dfa732d15f3fc2351e32f1056024..ad891d8062dbe8f69a6b507a11c5fc299a96c203 100644
+--- a/lib/_dropdowns.scss
++++ b/lib/_dropdowns.scss
+@@ -10,7 +10,6 @@
+ }
+ .dropdown-toggle {
+   // The caret makes the toggle a bit too tall in IE7
+-  *margin-bottom: -3px;
+ }
+ .dropdown-toggle:active,
+ .open .dropdown-toggle {
+@@ -52,8 +51,6 @@
+   background-color: $dropdownBackground;
+   border: 1px solid #ccc; // Fallback for IE7-8
+   border: 1px solid $dropdownBorder;
+-  *border-right-width: 2px;
+-  *border-bottom-width: 2px;
+   @include border-radius(6px);
+   @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+   -webkit-background-clip: padding-box;
+@@ -128,7 +125,6 @@
+ .open {
+   // IE7's z-index only goes to the nearest positioned ancestor, which would
+   // make the menu appear below buttons that appeared later on the page
+-  *z-index: $zindexDropdown;
+ 
+   & > .dropdown-menu {
+     display: block;
 diff --git a/lib/_forms.scss b/lib/_forms.scss
-index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416a65667ee 100644
+index 6b05636cdd1a478bc49d35381bf5acad33e94286..08088b1b8fc99c6d948748ff68f2f769297b11d5 100644
 --- a/lib/_forms.scss
 +++ b/lib/_forms.scss
 @@ -81,7 +81,7 @@ input[type="color"],
@@ -41,7 +1229,23 @@ index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416
    font-size: $baseFontSize;
    line-height: $baseLineHeight;
    color: $gray;
-@@ -403,7 +403,7 @@ select:focus:invalid {
+@@ -135,7 +135,6 @@ input[type="color"],
+ input[type="radio"],
+ input[type="checkbox"] {
+   margin: 4px 0 0;
+-  *margin-top: 0; /* IE7 */
+   margin-top: 1px \9; /* IE8-9 */
+   line-height: normal;
+ }
+@@ -155,7 +154,6 @@ input[type="checkbox"] {
+ select,
+ input[type="file"] {
+   height: $inputHeight; /* In IE7, the height of the select element cannot be changed by height, only font-size */
+-  *margin-top: 4px; /* For IE7, add top margin to align select with labels */
+   line-height: $inputHeight;
+ }
+ 
+@@ -403,7 +401,7 @@ select:focus:invalid {
  
  .help-block {
    display: block; // account for any element using help-block
@@ -50,7 +1254,7 @@ index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416
  }
  
  .help-inline {
-@@ -422,7 +422,7 @@ select:focus:invalid {
+@@ -422,7 +420,7 @@ select:focus:invalid {
  .input-append,
  .input-prepend {
    display: inline-block;
@@ -59,7 +1263,15 @@ index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416
    vertical-align: middle;
    font-size: 0; // white space collapse hack
    white-space: nowrap; // Prevent span and input from separating
-@@ -630,7 +630,7 @@ input.search-query {
+@@ -441,7 +439,6 @@ select:focus:invalid {
+   .uneditable-input {
+     position: relative; // placed here by default so that on :focus we can place the input above the .add-on for full border and box-shadow goodness
+     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
+-    *margin-left: 0;
+     vertical-align: top;
+     @include border-radius(0 $inputBorderRadius $inputBorderRadius 0);
+     // Make input on top when focused so blue border and shadow always show
+@@ -630,7 +627,7 @@ input.search-query {
  
  // Margin to space out fieldsets
  .control-group {
@@ -68,7 +1280,20 @@ index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416
  }
  
  // Legend collapses margin, so next element is responsible for spacing
-@@ -679,7 +679,7 @@ legend + .control-group {
+@@ -659,12 +656,8 @@ legend + .control-group {
+   .controls {
+     // Super jank IE7 fix to ensure the inputs in .input-append and input-prepend
+     // don't inherit the margin of the parent, in this case .controls
+-    *display: inline-block;
+-    *padding-left: 20px;
+     margin-left: $horizontalComponentOffset;
+-    *margin-left: 0;
+     &:first-child {
+-      *padding-left: $horizontalComponentOffset;
+     }
+   }
+   // Remove bottom margin on block level help text since that's accounted for on .control-group
+@@ -679,7 +672,7 @@ legend + .control-group {
    .input-prepend,
    .input-append {
      + .help-block {
@@ -77,20 +1302,59 @@ index 6b05636cdd1a478bc49d35381bf5acad33e94286..4ec8624c3cd71340d0727a13ac52d416
      }
    }
    // Move over buttons in .form-actions to align with .controls
+diff --git a/lib/_media.scss b/lib/_media.scss
+index e461e446d2319ca1c81af5253136b7b21a142f46..21063eb2ba052c901fe3763a031b1afa13f0c070 100644
+--- a/lib/_media.scss
++++ b/lib/_media.scss
+@@ -10,7 +10,6 @@
+ .media,
+ .media-body {
+   overflow: hidden;
+-  *overflow: visible;
+   zoom: 1;
+ }
+ 
 diff --git a/lib/_mixins.scss b/lib/_mixins.scss
-index 53303aa0de928ca407a4613c3ac90913d343b69f..4ef20fd4d79435230f181ff055d3f97484317438 100644
+index 53303aa0de928ca407a4613c3ac90913d343b69f..70bcb1c08e805a6b43565adf73af5210a4a2df54 100644
 --- a/lib/_mixins.scss
 +++ b/lib/_mixins.scss
-@@ -9,6 +9,8 @@
+@@ -9,8 +9,9 @@
  // Clearfix
  // --------
  // For clearing floats like a boss h5bp.com/q
 +@use "sass:math";
 +
  @mixin clearfix {
-   *zoom: 1;
+-  *zoom: 1;
    &:before,
-@@ -379,7 +381,7 @@
+   &:after {
+     display: table;
+@@ -45,8 +46,6 @@
+ // IE7 inline-block
+ // ----------------
+ @mixin ie7-inline-block() {
+-  *display: inline; /* IE7 inline-block hack */
+-  *zoom: 1;
+ }
+ 
+ // IE7 likes to collapse whitespace on either side of the inline-block elements.
+@@ -56,15 +55,12 @@
+ // mean that space between those elements will be .6em (~2 space characters) in IE7,
+ // instead of the 1 space in other browsers.
+ @mixin ie7-restore-left-whitespace() {
+-  *margin-left: .3em;
+ 
+   &:first-child {
+-    *margin-left: 0;
+   }
+ }
+ 
+ @mixin ie7-restore-right-whitespace() {
+-  *margin-right: .3em;
+ }
+ 
+ // Sizing shortcuts
+@@ -379,7 +375,7 @@
  
  // Opacity
  @mixin opacity($opacity) {
@@ -99,16 +1363,34 @@ index 53303aa0de928ca407a4613c3ac90913d343b69f..4ef20fd4d79435230f181ff055d3f974
    filter: alpha(opacity=$opacity);
  }
  
-@@ -494,7 +496,7 @@
+@@ -492,10 +488,8 @@
+   // to IE7 to keep the 1px left/right space in other browsers.
+   // It is unclear where IE is getting the extra space that we need
    // to negative-margin away, but so it goes.
-   *width: 100%;
+-  *width: 100%;
    height: 1px;
 -  margin: (($baseLineHeight / 2) - 1) 1px; // 8px 1px
+-  *margin: -5px 0 5px;
 +  margin: (($baseLineHeight * 0.5) - 1) 1px; // 8px 1px
-   *margin: -5px 0 5px;
    overflow: hidden;
    background-color: $top;
-@@ -528,7 +530,7 @@
+   border-bottom: 1px solid $bottom;
+@@ -506,14 +500,12 @@
+ @mixin buttonBackground($startColor, $endColor, $textColor: #fff, $textShadow: 0 -1px 0 rgba(0,0,0,.25)) {
+   // gradientBar will set the background to a pleasing blend of these, to support IE<=9
+   @include gradientBar($startColor, $endColor, $textColor, $textShadow);
+-  *background-color: $endColor; /* Darken IE7 buttons by default so they stand out more given they won't have borders */
+   @include reset-filter();
+ 
+   // in these cases the gradient won't cover the background, so we override
+   &:hover, &:focus, &:active, &.active, &.disabled, &[disabled] {
+     color: $textColor;
+     background-color: $endColor;
+-    *background-color: darken($endColor, 5%);
+   }
+ 
+   // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
+@@ -528,7 +520,7 @@
  // Vertically center elements in the navbar.
  // Example: an element has a height of 30px, so write out `.navbarVerticalAlign(30px);` to calculate the appropriate top margin.
  @mixin navbarVerticalAlign($elementHeight) {
@@ -117,41 +1399,58 @@ index 53303aa0de928ca407a4613c3ac90913d343b69f..4ef20fd4d79435230f181ff055d3f974
  }
  
  
-@@ -618,7 +620,7 @@
+@@ -618,7 +610,6 @@
        @include input-block-level();
        float: left;
        margin-left: $fluidGridGutterWidth;
 -      *margin-left: $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
-+      *margin-left: $fluidGridGutterWidth - (math.div(.5, $gridRowWidth) * 100px * 1%);
      }
      [class*="span"]:first-child {
        margin-left: 0;
-@@ -650,17 +652,17 @@
+@@ -650,17 +641,14 @@
  
  @mixin grid-fluid-span($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
    width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1));
 -  *width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%);
-+  *width: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%);
  }
  
  @mixin grid-fluid-offset($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
    margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth * 2);
 -  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + ($fluidGridGutterWidth * 2) - (.5 / $gridRowWidth * 100px * 1%);
-+  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%) + ($fluidGridGutterWidth * 2) - (math.div(.5, $gridRowWidth) * 100px * 1%);
  }
  
  @mixin grid-fluid-offset-first-child($columns, $fluidGridColumnWidth, $fluidGridGutterWidth) {
    margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) + ($fluidGridGutterWidth);
 -  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (.5 / $gridRowWidth * 100px * 1%) + $fluidGridGutterWidth - (.5 / $gridRowWidth * 100px * 1%);
-+  *margin-left: ($fluidGridColumnWidth * $columns) + ($fluidGridGutterWidth * ($columns - 1)) - (math.div(.5, $gridRowWidth) * 100px * 1%) + $fluidGridGutterWidth - (math.div(.5, $gridRowWidth) * 100px * 1%);
  }
  
  
+diff --git a/lib/_modals.scss b/lib/_modals.scss
+index 749baa6a875203fc84ac87f04e94ddb1b2c98321..606f83e354726b43d9511f94309876cd110f5dcd 100644
+--- a/lib/_modals.scss
++++ b/lib/_modals.scss
+@@ -31,7 +31,6 @@
+   background-color: $white;
+   border: 1px solid #999;
+   border: 1px solid rgba(0,0,0,.3);
+-  *border: 1px solid #999; /* IE6-7 */
+   @include border-radius(6px);
+   @include box-shadow(0 3px 7px rgba(0,0,0,0.3));
+   @include background-clip(padding-box);
 diff --git a/lib/_navbar.scss b/lib/_navbar.scss
-index a65aa4abef59570bbdd7723459dc1060c490417f..4a856c395491ddb4774994b269bef349997ae4e5 100644
+index a65aa4abef59570bbdd7723459dc1060c490417f..d673f6d1ff2b9814a59293eb18913f4f614bff0e 100644
 --- a/lib/_navbar.scss
 +++ b/lib/_navbar.scss
-@@ -50,7 +50,7 @@
+@@ -12,8 +12,6 @@
+   margin-bottom: $baseLineHeight;
+ 
+   // Fix for IE7's bad z-indexing so dropdowns don't appear below content that follows the navbar
+-  *position: relative;
+-  *z-index: 2;
+ }
+ 
+ // Inner for background effects
+@@ -50,7 +48,7 @@
    float: left;
    display: block;
    // Vertically center the text given $navbarHeight
@@ -160,7 +1459,7 @@ index a65aa4abef59570bbdd7723459dc1060c490417f..4a856c395491ddb4774994b269bef349
    margin-left: -20px; // negative indent to left-align the text down the page
    font-size: 20px;
    font-weight: 200;
-@@ -242,7 +242,7 @@
+@@ -242,7 +240,7 @@
  .navbar .nav > li > a {
    float: none;
    // Vertically center the text given $navbarHeight
@@ -169,6 +1468,47 @@ index a65aa4abef59570bbdd7723459dc1060c490417f..4a856c395491ddb4774994b269bef349
    color: $navbarLinkColor;
    text-decoration: none;
    text-shadow: 0 1px 0 $navbarBackgroundHighlight;
+diff --git a/lib/_navs.scss b/lib/_navs.scss
+index 31c4451d12efa1e846bfc33941efb05e1e9833f3..dab894691584276e801742d35fc134e0c62a4405 100644
+--- a/lib/_navs.scss
++++ b/lib/_navs.scss
+@@ -367,7 +367,6 @@
+ .tabs-left > .nav-tabs .active > a:hover,
+ .tabs-left > .nav-tabs .active > a:focus {
+   border-color: #ddd transparent #ddd #ddd;
+-  *border-right-color: $white;
+ }
+ 
+ // Tabs on the right
+@@ -388,7 +387,6 @@
+ .tabs-right > .nav-tabs .active > a:hover,
+ .tabs-right > .nav-tabs .active > a:focus {
+   border-color: #ddd #ddd #ddd transparent;
+-  *border-left-color: $white;
+ }
+ 
+ 
+diff --git a/lib/_reset.scss b/lib/_reset.scss
+index 2f0f029cab8317707eeae0791a83c9651ccedc28..e02e824dbef387fd7dd73faaf3a8a254370737b2 100644
+--- a/lib/_reset.scss
++++ b/lib/_reset.scss
+@@ -27,8 +27,6 @@ audio,
+ canvas,
+ video {
+   display: inline-block;
+-  *display: inline;
+-  *zoom: 1;
+ }
+ 
+ // Prevents modern browsers from displaying 'audio' without controls
+@@ -107,7 +105,6 @@ textarea {
+ }
+ button,
+ input {
+-  *overflow: visible; // Inner spacing ie IE6/7
+   line-height: normal; // FF3/4 have !important on line-height in UA stylesheet
+ }
+ button::-moz-focus-inner,
 diff --git a/lib/_responsive-navbar.scss b/lib/_responsive-navbar.scss
 index 9898a16eb441bf46de60b41a87b18f4428496549..3d580c8b1c18d3dc1459b1a6f3efe1a458df3521 100644
 --- a/lib/_responsive-navbar.scss
@@ -193,6 +1533,18 @@ index 9898a16eb441bf46de60b41a87b18f4428496549..3d580c8b1c18d3dc1459b1a6f3efe1a4
      border-top: 1px solid $navbarBackground;
      border-bottom: 1px solid $navbarBackground;
      @include box-shadow(inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1));
+diff --git a/lib/_tables.scss b/lib/_tables.scss
+index 3db661e93edc9fc12fa62fb9b03e5653627842b9..a2136a9d264fd4a9d991c32d083727b1b060255b 100644
+--- a/lib/_tables.scss
++++ b/lib/_tables.scss
+@@ -74,7 +74,6 @@ table {
+ .table-bordered {
+   border: 1px solid $tableBorder;
+   border-collapse: separate; // Done so we can round those corners!
+-  *border-collapse: collapse; // IE7 can't round corners anyway
+   border-left: 0;
+   @include border-radius($baseBorderRadius);
+   th,
 diff --git a/lib/_type.scss b/lib/_type.scss
 index f68e7ba2d05e9c8865e164544724dcadc72d5118..6a2fc101f3227e3bf80ed7c3b35d36a44551df2f 100644
 --- a/lib/_type.scss

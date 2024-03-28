@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   bootstrap-sass@2.3.2:
-    hash: amlqeundhlkijzm252e5cmoznm
+    hash: 7jwz2hglnrq3hxry2suq775qi4
     path: patches/bootstrap-sass@2.3.2.patch
   font-awesome@4.7.0:
     hash: b36n7p33c4ewtt5v6is5moc24u
@@ -39,7 +39,7 @@ dependencies:
     version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
   bootstrap-sass:
     specifier: 2.3.2
-    version: 2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm)
+    version: 2.3.2(patch_hash=7jwz2hglnrq3hxry2suq775qi4)
   bunshi:
     specifier: ^2.1.4
     version: 2.1.4(react@18.2.0)
@@ -3909,7 +3909,7 @@ packages:
     resolution: {integrity: sha512-+3lpHrCw/it2/7lBL15VR0HEumaBss0+f/Lb6ZvHISn1mlK83jjFpooTLsMWbIjJMDjDjOExMsTxnXSIT4k4ww==}
     dev: false
 
-  /bootstrap-sass@2.3.2(patch_hash=amlqeundhlkijzm252e5cmoznm):
+  /bootstrap-sass@2.3.2(patch_hash=7jwz2hglnrq3hxry2suq775qi4):
     resolution: {integrity: sha512-wMrr+dc1ORsOrf74+rHNkyhgRfA6tE3xzY4zacm6mDGgYDhkYHyLP6rybIqDGihjXo9nCL9zqUFGGXPcHSooHw==}
     dev: false
     patched: true
