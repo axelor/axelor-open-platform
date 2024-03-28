@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
+import isUndefined from "lodash/isUndefined";
 
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
@@ -80,8 +81,12 @@ export function Button(props: WidgetProps) {
 
   const handleClick = useCallback(
     async (e: Event) => {
-      if (schema.link) {
-        return window.open(schema.link, "_self", "noopener,noreferrer");
+      if (
+        schema.link ||
+        (typeof schema.link === "string" && !isUndefined(attrs.link))
+      ) {
+        const link = !isUndefined(attrs.link) ? attrs.link : schema.link;
+        return link && window.open(link, "_self", "noopener,noreferrer");
       }
       const { prompt, onClick } = schema;
       if (prompt) {
@@ -105,7 +110,7 @@ export function Button(props: WidgetProps) {
         setWait(false);
       }
     },
-    [commitEditableWidgets, actionExecutor, schema],
+    [commitEditableWidgets, actionExecutor, schema, attrs.link],
   );
 
   const readonly = useReadonly(widgetAtom);

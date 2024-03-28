@@ -52,3 +52,4 @@ The following attributes can be changed:
 * `active` - open the given panel if included in a panel-tabs
 * `url` or `url:set` - change the iframe url in dashlet
 * `prompt` - change prompt message of button
+* `link` - change the link url of button

@@ -36,7 +36,9 @@ export const DEFAULT_ATTRS = {
   canSelect: undefined as unknown as boolean,
 };
 
-export type Attrs = Partial<typeof DEFAULT_ATTRS>;
+export type Attrs = Partial<typeof DEFAULT_ATTRS> & {
+  link?: string;
+};
 
 export type WidgetErrors = {
   required?: string;
