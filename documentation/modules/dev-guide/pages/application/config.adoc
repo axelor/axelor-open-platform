@@ -223,8 +223,8 @@ db.default.password = secret
 | `view.allow-customization` | whether to disable views customization | true
 | `view.adv-search.share` | whether to disable advance search sharing | true
 | `view.adv-search.export-full` | whether to disable export full option in advance search | true
-| `view.collaboration.enabled` | whether to enable view collaboration | true
 | `view.form.check-version` | whether to check version value for concurrent updates when switching tabs | false
+| `view.collaboration.enabled` | whether to enable view collaboration (🏷️ EE only) | true
 | `user.password.pattern` | pattern to validate user password | .{4,}
 | `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
