@@ -1,5 +1,0 @@
----
-title: Fix decimal form widget currency formatting
-type: fix
-description: |
-  Formatting with `x-currency` was working on grid, but missing on decimal form widget.

@@ -1,6 +1,0 @@
----
-title: Add support to drop node to root in tree view
-type: feature
-description: |
-  When tree view nodes are on same model, this allow to move 
-  nodes to root, using draggable area in bottom of the view.

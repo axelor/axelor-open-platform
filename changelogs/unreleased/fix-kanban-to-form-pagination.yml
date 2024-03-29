@@ -1,7 +1,0 @@
----
-title: Fix kanban to form pagination
-type: fix
-description: |
-  When click on card to open form from kanban column then
-  it should allow to do pagination(prev/next) for that column
-  set of records in form view.

@@ -1,8 +1,0 @@
----
-title: Fix issues in tree view
-type: fix
-description : |
-  This fix several issues in tree view : 
-  - reset tree data on refresh
-  - several errors when moving nodes
-  - save not triggered after d&d nodes

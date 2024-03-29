@@ -1,3 +1,74 @@
+## 7.0.5 (2024-03-29)
+
+#### Feature
+
+* Add support to drop node to root in tree view
+
+  <details>
+  
+  When tree view nodes are on same model, this allow to move 
+  nodes to root, using draggable area in bottom of the view.
+  
+  </details>
+
+#### Fix
+
+* Fix action view params for panel-dashlet
+* Fix issues in tree view
+
+  <details>
+  
+  This fix several issues in tree view : 
+  - reset tree data on refresh
+  - several errors when moving nodes
+  - save not triggered after d&d nodes
+  
+  </details>
+
+* Fix button-group widget display
+* Fix search grid on selector popup pagination
+* Fix data views search after switch from calendar view
+* Add missing icon support in panel
+* Fix show truncated title as help in form button widget
+* Fix validate required attr on collection fields
+* Reduce collaboration avatar height
+
+  <details>
+  
+  Reduce collaboration avatar height so that it does not increase toolbar height once shown.
+  Also fix grouped avatars icon width.
+  
+  </details>
+
+* Fix showing title or help on buttons mouseover in grid/tree view
+* Fix groupBy support in collection grid field
+* Fix reset data offset on grid header search
+* Fix tag-select search issue
+* Fix info-button content with dotted fields
+* Fix kanban to form pagination
+
+  <details>
+  
+  When click on card to open form from kanban column then
+  it should allow to do pagination(prev/next) for that column
+  set of records in form view.
+  
+  </details>
+
+* Fix decimal form widget currency formatting
+
+  <details>
+  
+  Formatting with `x-currency` was working on grid, but missing on decimal form widget.
+  
+  </details>
+
+* Fix prevent propagation of click on tooltip content
+* Fix show action condition errors in form view
+* Fix button link
+* Fix redundant search request on grid view pagination
+* Fix call onChange action date input change
+
 ## 7.0.4 (2024-03-08)
 
 #### Feature
