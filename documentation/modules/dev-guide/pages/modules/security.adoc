@@ -239,7 +239,6 @@ Base authentication provider settings:
 | `client`                | client class name
 | `title`                 | title displayed on login page
 | `icon`                  | icon displayed on login page
-| `absolute-url-required` | specify whether this client requires absolute URLs (defaults to false)
 | `exclusive`             | if there is only one provider, specify whether it is exclusive, meaning we don’t show the default login page (defaults to false)
 |===
 
@@ -251,7 +250,6 @@ Example custom configuration:
 auth.provider.my-provider.client = org.pac4j.oidc.client.GoogleOidcClient
 auth.provider.my-provider.title = My Google Provider
 auth.provider.my-provider.icon = img/signin/google.svg
-auth.provider.my-provider.absolute-url-required = false
 auth.provider.my-provider.exclusive = false
 auth.provider.my-provider.client-id = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
 auth.provider.my-provider.secret = qySuozNl72zzM5SKW-0kczwV
@@ -589,9 +587,7 @@ auth.provider.oauth.profile-attrs.is_admin = Boolean|is_admin
 
 === SAML
 
-You can configure login with any SAML identity provider using the SAML v2.0 protocol. Basic configuration consists of the path to the keystore, the keystore password, the private key password, the path to the identity provider metadata, and the path to the service provider metadata.
-
-This provider requires absolute URLs and is exclusive by default.
+You can configure login with any SAML identity provider using the SAML v2.0 protocol. Basic configuration consists of the path to the keystore, the keystore password, the private key password, the path to the identity provider metadata, and the path to the service provider metadata. You must also specify full callback URL to the SAML client for proper SP metadata generation. This provider is exclusive by default.
 
 .axelor-config.properties
 [source,properties]
@@ -611,6 +607,8 @@ auth.provider.saml.private-key-password = open-platform-demo-passwd
 auth.provider.saml.identity-provider-metadata-path = http://localhost:9012/simplesaml/saml2/idp/metadata.php
 # path to SP metadata
 auth.provider.saml.service-provider-metadata-path = path/to/sp-metadata.xml
+# full callback URL for proper SP metadata generation
+auth.provider.saml.callback-url = https://example.com/my-axelor-app/callback
 -----
 
 By default, the SAML client will accept assertions based on a previous authentication for one hour, but you can change that behavior.
