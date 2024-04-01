@@ -29,7 +29,7 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 @JsonTypeName("custom")
 public class CustomView extends AbstractView implements ContainerView {
 
-  @XmlElement(name = "field", type = Field.class)
+  @XmlElement(name = "field", type = PanelField.class)
   private List<AbstractWidget> items;
 
   @JsonIgnore

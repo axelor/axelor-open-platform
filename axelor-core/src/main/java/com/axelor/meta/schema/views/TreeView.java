@@ -167,7 +167,7 @@ public class TreeView extends AbstractView {
 
   @XmlType
   @JsonInclude(Include.NON_NULL)
-  public static class NodeField extends Field {
+  public static class NodeField extends PanelField {
 
     @XmlAttribute private String as;
 

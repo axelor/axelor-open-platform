@@ -44,7 +44,7 @@ public class CardsView extends AbstractView implements ContainerView {
   @XmlElement(name = "menu")
   private List<Menu> menubar;
 
-  @XmlElement(name = "field", type = Field.class)
+  @XmlElement(name = "field", type = PanelField.class)
   private List<AbstractWidget> items;
 
   @XmlElement(name = "hilite", type = Hilite.class)

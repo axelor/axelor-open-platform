@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 @JsonTypeName("search-filters")
 public class SearchFilters extends AbstractView implements ContainerView {
 
-  @XmlElement(name = "field", type = Field.class)
+  @XmlElement(name = "field", type = PanelField.class)
   private List<AbstractWidget> items;
 
   @XmlElement(name = "filter")

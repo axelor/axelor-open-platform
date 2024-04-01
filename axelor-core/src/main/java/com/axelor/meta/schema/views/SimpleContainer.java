@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 public abstract class SimpleContainer extends AbstractContainer {
 
   @XmlElements({
-    @XmlElement(name = "field", type = Field.class),
+    @XmlElement(name = "field", type = PanelField.class),
     @XmlElement(name = "spacer", type = Spacer.class),
     @XmlElement(name = "separator", type = Separator.class),
     @XmlElement(name = "label", type = Label.class),

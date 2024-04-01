@@ -60,7 +60,7 @@ public class GanttView extends AbstractView implements ContainerView {
   @XmlAttribute(name = "x-finish-to-finish")
   private String finishToFinish;
 
-  @XmlElement(name = "field", type = Field.class)
+  @XmlElement(name = "field", type = PanelField.class)
   private List<AbstractWidget> items;
 
   public String getMode() {

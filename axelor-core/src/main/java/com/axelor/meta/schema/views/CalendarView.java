@@ -56,7 +56,7 @@ public class CalendarView extends AbstractView implements ContainerView {
   @XmlElement(name = "hilite")
   private List<CalendarEventHilite> hilites;
 
-  @XmlElement(name = "field", type = Field.class)
+  @XmlElement(name = "field", type = PanelField.class)
   private List<AbstractWidget> items;
 
   @XmlCDATA @XmlElement private String template;
