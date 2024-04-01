@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Icon } from "@/components/icon";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { Button as ButtonField, Field } from "@/services/client/meta.types";
+import { dialogs } from "@/components/dialogs";
 import { useViewAction } from "@/view-containers/views/scope";
 import { GridCellProps } from "../../builder/types";
 import { processContextValues } from "@/views/form/builder/utils";
@@ -15,7 +16,7 @@ import styles from "./button.module.scss";
 
 export function Button(props: GridCellProps) {
   const { record, data: field, actionExecutor, onUpdate } = props;
-  const { onClick } = field as ButtonField;
+  const { prompt, onClick } = field as ButtonField;
   const { title, name, icon, css, help: _help } = field as Field;
   const help = _help || title;
   const { context } = useViewAction();
@@ -43,7 +44,14 @@ export function Button(props: GridCellProps) {
   });
 
   async function handleClick() {
-    if (!readonly && onClick && actionExecutor) {
+    if (!readonly && actionExecutor) {
+      if (prompt) {
+        const confirmed = await dialogs.confirm({
+          content: prompt,
+        });
+        if (!confirmed) return;
+      }
+      if (!onClick) return;
       await actionExecutor.waitFor();
       const res = await actionExecutor.execute(onClick, {
         context: {
