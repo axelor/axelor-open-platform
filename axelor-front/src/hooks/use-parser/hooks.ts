@@ -167,11 +167,11 @@ export function useTemplate(template: string, field?: Schema) {
   }, [$getField, _createParentContext, actionExecutor, template]);
 }
 
-export function useHilites(hilites: Hilite[]) {
+export function useHilites(hilites?: Hilite[]) {
   return useCallback(
     (context: DataContext, options?: EvalContextOptions) => {
       const evalContext = createEvalContext(context, options);
-      return hilites.filter((x) =>
+      return (hilites ?? []).filter((x) =>
         parseExpression(x.condition ?? "")(evalContext),
       );
     },

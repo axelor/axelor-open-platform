@@ -18,11 +18,11 @@ const getWidget = (name?: string) =>
 
 export function Cell(props: GridCellProps) {
   const { view, data, value, record } = props;
-  const { name, type, tooltip, widget, serverType, hilites } = data as Field;
+  const { type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const { context } = useViewAction();
-  const $className = useHilites(hilites ?? [])({ ...context, ...record })?.[0]
+  const $className = useHilites(hilites)({ ...context, ...record })?.[0]
     ?.css;
 
   function render() {

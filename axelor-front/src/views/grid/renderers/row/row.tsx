@@ -23,7 +23,7 @@ export const Row = memo(function Row(
   const { children, style, className, onDoubleClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
   const { context } = useViewAction();
-  const $className = useHilites(hilites ?? [])({ ...context, ...record })?.[0]
+  const $className = useHilites(hilites)({ ...context, ...record })?.[0]
     ?.css;
   return (
     <Box
