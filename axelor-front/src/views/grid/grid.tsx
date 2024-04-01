@@ -1024,6 +1024,7 @@ function GridInner(props: ViewProps<GridView>) {
               onClick: () => onSearch(),
             },
           ]}
+          dataStore={dataStore}
           getActionData={getActionData}
           actionExecutor={actionExecutor}
           pagination={{

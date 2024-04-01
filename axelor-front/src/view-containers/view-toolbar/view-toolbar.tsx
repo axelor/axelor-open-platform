@@ -9,6 +9,7 @@ import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
+import { DataStore } from "@/services/client/data-store";
 import { toTitleCase } from "@/utils/names";
 
 import {
@@ -43,6 +44,7 @@ import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
   actions: CommandItemProps[];
+  dataStore?: DataStore;
   formAtom?: FormAtom;
   actionExecutor?: ActionExecutor;
   recordHandler?: RecordHandler;
@@ -275,6 +277,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const {
     meta,
     formAtom,
+    dataStore,
     actions = [],
     actionExecutor,
     recordHandler,
@@ -311,11 +314,14 @@ export function ViewToolBar(props: ViewToolBarProps) {
           async () => dirty,
           async () => {
             const { props = {} } = get(viewTab.state);
-            const { selectedId = 0 } = props[viewType] ?? {};
-            if (viewType === "grid" && type === "form" && selectedId > 0) {
-              switchTo(type, {
-                route: { id: String(selectedId) },
-              });
+            const { selectedId } = props[viewType] ?? {};
+            if (type === "form") {
+              const id = selectedId ?? dataStore?.records?.[0]?.id;
+              if (id) {
+                switchTo(type, {
+                  route: { id: String(id) },
+                });
+              }
             } else {
               switchTo(type);
             }
@@ -323,7 +329,15 @@ export function ViewToolBar(props: ViewToolBarProps) {
           },
         );
       },
-      [dirty, switchTo, viewTab.state, viewType, showConfirmDirty, setDirty],
+      [
+        dirty,
+        switchTo,
+        viewTab.state,
+        viewType,
+        showConfirmDirty,
+        setDirty,
+        dataStore,
+      ],
     ),
   );
 
