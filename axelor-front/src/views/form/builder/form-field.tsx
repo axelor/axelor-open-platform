@@ -1,19 +1,23 @@
 import clsx from "clsx";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
 import { Icon } from "@/components/icon";
 import { useAsync } from "@/hooks/use-async";
-import { useTemplate } from "@/hooks/use-parser";
+import { useHilites, useTemplate } from "@/hooks/use-parser";
 import { useSession } from "@/hooks/use-session";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { Schema, Tooltip as TooltipType } from "@/services/client/meta.types";
+import {
+  Hilite,
+  Schema,
+  Tooltip as TooltipType,
+} from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
 import format from "@/utils/format";
@@ -22,6 +26,7 @@ import { useFormScope } from "./scope";
 import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
+import { legacyClassNames } from "@/styles/legacy";
 
 export type WidgetControlProps = WidgetProps & {
   className?: string;
@@ -39,6 +44,33 @@ export type FieldControlProps<T> = FieldProps<T> & {
   children: React.ReactNode;
 };
 
+function useFieldClassNames(schema: Schema) {
+  const hilites = schema.hilites as Hilite[];
+  const [labelClassName, setLabelClassName] = useState<string>();
+  const [contentClassName, setContentClassName] = useState<string>();
+
+  const { recordHandler } = useFormScope();
+  const getHilite = useHilites(schema.hilites);
+
+  useEffect(() => {
+    if (!hilites?.length) return;
+
+    recordHandler.subscribe((record) => {
+      const { color, background, css } = getHilite(record)?.[0] ?? {};
+      setLabelClassName(color ? legacyClassNames(`hilite-${color}-text`) : "");
+      setContentClassName(
+        css
+          ? legacyClassNames(css, {
+              "hilite-fill-body-bg": background,
+            })
+          : "",
+      );
+    });
+  }, [hilites, recordHandler, getHilite]);
+
+  return [labelClassName, contentClassName];
+}
+
 export function FieldControl({
   schema,
   className,
@@ -49,6 +81,7 @@ export function FieldControl({
   titleActions,
   children,
 }: FieldControlProps<any>) {
+  const [labelClassName, contentClassName] = useFieldClassNames(schema);
   const canShowTitle =
     showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
 
@@ -65,7 +98,9 @@ export function FieldControl({
   );
 
   function render() {
-    const content = <Box className={styles.content}>{children}</Box>;
+    const content = (
+      <Box className={clsx(styles.content, contentClassName)}>{children}</Box>
+    );
     return focus ? (
       <ClickAwayListener onClickAway={() => setFocus(undefined)}>
         {content}
@@ -82,6 +117,7 @@ export function FieldControl({
           {canShowTitle && (
             <FieldLabel
               schema={schema}
+              className={labelClassName}
               formAtom={formAtom}
               widgetAtom={widgetAtom}
             />

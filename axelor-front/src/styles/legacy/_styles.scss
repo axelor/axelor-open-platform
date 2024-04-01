@@ -158,6 +158,10 @@ $label_backgrounds_text: (
     color: map.get($text, $name) !important;
     background-color: $value !important;
   }
+  .hilite-#{$name}.hilite-fill-body-bg {
+    --bs-body-bg: #{$value} !important;
+    --bs-body-bg-rgb: #{$value} !important;
+  }
 }
 
 @each $name, $properties in $text_styles {
