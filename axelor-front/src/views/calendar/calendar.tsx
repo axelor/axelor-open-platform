@@ -561,6 +561,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     <div className={styles.container}>
       <ViewToolBar
         meta={meta}
+        dataStore={dataStore}
         actions={actions}
         pagination={{
           canPrev: true,

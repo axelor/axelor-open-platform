@@ -278,6 +278,7 @@ export function Cards(props: ViewProps<CardsView>) {
       {showToolbar && (
         <ViewToolBar
           meta={meta}
+          dataStore={dataStore}
           getActionData={getActionData}
           actionExecutor={actionExecutor}
           actions={[
