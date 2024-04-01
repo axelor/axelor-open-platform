@@ -1,4 +1,4 @@
-import { Box, Panel, Popper } from "@axelor/ui";
+import { Box, Panel, Popper, clsx } from "@axelor/ui";
 import { useAtom, useSetAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useAtomCallback } from "jotai/utils";
@@ -18,7 +18,7 @@ import {
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useHilites, useTemplate } from "@/hooks/use-parser";
+import { useTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
@@ -48,6 +48,7 @@ import { ViewProps } from "../types";
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
 import { CardTemplate } from "../cards/card";
+import { useCardClassName } from "../cards/use-card-classname";
 import {
   getColumnIndex,
   getColumnRecords,
@@ -592,14 +593,13 @@ export function Kanban(props: ViewProps<KanbanView>) {
         <KanbanCard
           view={view}
           fields={fields}
-          context={action.context}
           record={record}
           onRefresh={onRefresh}
           Template={Template}
         />
       ),
     }),
-    [action.context, view, fields, Template, onRefresh],
+    [view, fields, Template, onRefresh],
   );
 
   const canNew = hasButton("new");
@@ -682,11 +682,10 @@ function KanbanCard({
   view,
   fields,
   record,
-  context,
   onRefresh,
   Template,
 }: {
-  record?: KanbanRecord;
+  record: KanbanRecord;
   view: KanbanView;
   context?: DataContext;
   fields?: MetaData["fields"];
@@ -696,13 +695,9 @@ function KanbanCard({
     options?: EvalContextOptions;
   }>;
 }) {
-  const { template: templateString, hilites } = view;
+  const { template: templateString } = view;
   const divRef = useRef<any>(null);
-  const $context = useMemo(
-    () => ({ ...context, ...record }) as unknown as DataContext,
-    [context, record],
-  );
-  const className = useHilites(hilites ?? [])($context)?.[0]?.color;
+  const className = useCardClassName(view, record as DataRecord);
   const timer = useRef<any>();
   const [popover, setPopover] = useState(false);
   const [popoverData, setPopoverData] = useState<{ title: ""; body: "" }>({
@@ -754,11 +749,7 @@ function KanbanCard({
               onMouseDown: hidePopover,
             }
           : {})}
-        className={legacyClassNames(
-          "kanban-card",
-          styles["kanban-card"],
-          className,
-        )}
+        className={clsx(styles["kanban-card"], className)}
       >
         <CardTemplate
           component={Template}

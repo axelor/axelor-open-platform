@@ -6,8 +6,10 @@ import {
   useState,
   memo,
 } from "react";
-import { Box, CommandItemProps, CommandBar } from "@axelor/ui";
+import { Box, CommandItemProps, CommandBar, clsx } from "@axelor/ui";
 
+import { SearchResult } from "@/services/client/data";
+import { CardsView, Property } from "@/services/client/meta.types";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { FormActionHandler } from "../form/builder/scope";
 import { ActionOptions, DefaultActionExecutor } from "@/view-containers/action";
@@ -15,6 +17,7 @@ import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { MetaData } from "@/services/client/meta";
 import { i18n } from "@/services/client/i18n";
 import { useViewAction } from "@/view-containers/views/scope";
+import { useCardClassName } from "./use-card-classname";
 import classes from "./card.module.scss";
 
 export function CardTemplate({
@@ -43,7 +46,7 @@ export function CardTemplate({
       _viewType: action.viewType,
       _views: action.views,
     }),
-    [action.model, action.context],
+    [action],
   );
 
   const { context, actionExecutor } = useMemo(() => {
@@ -91,6 +94,7 @@ export function CardTemplate({
 export const Card = memo(function Card({
   record,
   fields,
+  view,
   onEdit,
   onView,
   onDelete,
@@ -100,11 +104,12 @@ export const Card = memo(function Card({
   minWidth,
 }: {
   record: DataRecord;
-  fields?: any;
+  view: CardsView;
+  fields?: Record<string, Property>;
   onEdit?: (record: DataRecord) => void;
   onView?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
-  onRefresh?: () => Promise<any>;
+  onRefresh?: () => Promise<SearchResult>;
   Template: FunctionComponent<{
     context: DataContext;
     options?: EvalContextOptions;
@@ -112,6 +117,8 @@ export const Card = memo(function Card({
   width?: string;
   minWidth?: string;
 }) {
+  const className = useCardClassName(view, record);
+
   function handleClick() {
     onView?.(record);
   }
@@ -151,10 +158,10 @@ export const Card = memo(function Card({
         }}
       >
         <Box
+          className={clsx(classes.cardContent, className)}
           p={{ base: 2, md: 3 }}
           bgColor="body"
           w={100}
-          border
           rounded
           shadow="sm"
           onClick={handleClick}

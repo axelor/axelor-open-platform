@@ -247,7 +247,11 @@ export function Cards(props: ViewProps<CardsView>) {
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
-  const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = dataStore.page;
+  const {
+    offset = 0,
+    limit = DEFAULT_PAGE_SIZE,
+    totalCount = 0,
+  } = dataStore.page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
 
@@ -327,6 +331,7 @@ export function Cards(props: ViewProps<CardsView>) {
               key={record.id}
               record={record}
               fields={fields}
+              view={view}
               onView={onView}
               Template={Template}
               width={width}

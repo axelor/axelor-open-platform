@@ -12,30 +12,6 @@
   }
 }
 
-.kanban-card {
-  border-left: 3px solid #e7eaec;
-}
-
-.kanban-card.primary {
-  border-left: 3px solid #428bca;
-}
-
-.kanban-card.warning {
-  border-left: 3px solid #f0ad4e;
-}
-
-.kanban-card.danger {
-  border-left: 3px solid #d9534f;
-}
-
-.kanban-card.info {
-  border-left: 3px solid #5bc0de;
-}
-
-.kanban-card.success {
-  border-left: 3px solid #5cb85c;
-}
-
 .kanban-card h4 {
   margin: 0 0 4px 0;
   font-weight: 600;
@@ -46,8 +22,8 @@
   width: 1.5rem;
   height: 1.5rem;
   position: absolute;
-  right: 0.375rem;
-  bottom: 0.5rem;
+  right: 0.25rem;
+  bottom: 0.25rem;
   border-radius: 100%;
 }
 

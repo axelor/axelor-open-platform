@@ -21,6 +21,12 @@
   & .menuIcon button[class*="open"] {
     visibility: inherit;
   }
+
+}
+
+.cardContent {
+  position: relative;
+  border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
 }
 
 .card img {

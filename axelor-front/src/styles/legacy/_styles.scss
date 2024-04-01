@@ -143,6 +143,10 @@ $label_backgrounds_text: (
 }
 
 @each $name, $value in $colors {
+  .hilite-#{$name}-card {
+    border-left: 3px solid $value !important;
+  }
+
   .hilite-#{$name}-text,
   .hilite-#{$name}-text input:first-of-type,
   .hilite-#{$name}-text textarea:first-of-type,
