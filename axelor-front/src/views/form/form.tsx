@@ -1009,10 +1009,8 @@ const FormContainer = memo(function FormContainer({
     return () => editableWidgetsRef.current.delete(fn);
   }, []);
 
-  const handleCommitEditableWidgets = useCallback(() => {
-    return Promise.all(
-      Array.from(editableWidgetsRef.current).map((fn) => fn()),
-    );
+  const handleCommitEditableWidgets = useCallback(async () => {
+    await Promise.all(Array.from(editableWidgetsRef.current).map((fn) => fn()));
   }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);

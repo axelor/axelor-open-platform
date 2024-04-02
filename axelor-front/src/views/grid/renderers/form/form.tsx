@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import { useAtomCallback } from "jotai/utils";
+import { useAtomValue, useSetAtom } from "jotai";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import clone from "lodash/cloneDeep";
 import isEqual from "lodash/isEqual";
 import setObjectValue from "lodash/set";
 import uniqueId from "lodash/uniqueId";
-import clone from "lodash/cloneDeep";
 import {
   KeyboardEvent,
   forwardRef,
@@ -24,6 +25,7 @@ import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { useGetErrors, useHandleFocus } from "@/views/form";
 import {
   FormAtom,
@@ -257,6 +259,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       });
     const onNewAction =
       (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
+
+    const formDirty = useAtomValue(
+      useMemo(() => selectAtom(formAtom, (x) => x.dirty), [formAtom]),
+    );
+    const dirtyAtom = useViewDirtyAtom();
+    const setDirty = useSetAtom(dirtyAtom);
+
+    useEffect(() => {
+      formDirty !== undefined && setDirty(formDirty);
+    }, [formDirty, setDirty]);
 
     useEffect(() => {
       actionHandler.setRefreshHandler(

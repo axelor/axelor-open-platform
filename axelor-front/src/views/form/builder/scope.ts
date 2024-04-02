@@ -262,7 +262,7 @@ export function useFormValidityScope() {
 
 export type FormEditableScopeState = {
   add: (fn: () => void) => () => void;
-  commit: () => void;
+  commit: () => void | Promise<void>;
 };
 
 export const FormEditableScope = createScope<FormEditableScopeState>({
@@ -323,10 +323,8 @@ export function useWidgetState(formAtom: FormAtom, widgetName: string) {
  */
 export function useFormActiveHandler() {
   const { active } = useFormTabScope();
-  const [handler, setHandler] = useState<(() => void) | null>(
-    null,
-  );
-  
+  const [handler, setHandler] = useState<(() => void) | null>(null);
+
   useEffect(() => {
     if (active && handler) {
       handler?.();
