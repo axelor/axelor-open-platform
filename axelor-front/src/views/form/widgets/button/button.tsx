@@ -81,19 +81,19 @@ export function Button(props: WidgetProps) {
 
   const handleClick = useCallback(
     async (e: Event) => {
-      if (
-        schema.link ||
-        (typeof schema.link === "string" && !isUndefined(attrs.link))
-      ) {
-        const link = !isUndefined(attrs.link) ? attrs.link : schema.link;
-        return link && window.open(link, "_self", "noopener,noreferrer");
-      }
       const { prompt, onClick } = schema;
       if (prompt) {
         const confirmed = await dialogs.confirm({
           content: prompt,
         });
         if (!confirmed) return;
+      }
+      if (
+        schema.link ||
+        (typeof schema.link === "string" && !isUndefined(attrs.link))
+      ) {
+        const link = !isUndefined(attrs.link) ? attrs.link : schema.link;
+        return link && window.open(link, "_self", "noopener,noreferrer");
       }
       try {
         e.preventDefault();
