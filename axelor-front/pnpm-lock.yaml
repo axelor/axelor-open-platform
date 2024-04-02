@@ -14,8 +14,8 @@ patchedDependencies:
 
 dependencies:
   '@axelor/ui':
-    specifier: ^0.0.36
-    version: 0.0.36(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
+    specifier: ^0.1.0
+    version: 0.1.0(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
   '@babel/standalone':
     specifier: ^7.24.3
     version: 7.24.3
@@ -193,7 +193,7 @@ devDependencies:
     specifier: ^3.2.0
     version: 3.2.0
   terser:
-    specifier: ^5.29.2
+    specifier: ^5.30.0
     version: 5.30.0
   typescript:
     specifier: ^5.4.3
@@ -227,20 +227,20 @@ packages:
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
-  /@axelor/ui@0.0.36(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
-    resolution: {integrity: sha512-78V91ceLBkW3PFAl3mYkKPbFecMjZPhHSQ98tcOhkoTIGGnYaWqZbS+VhBZ55YeSsFALcSgf8LekP1IdSrKh/Q==}
+  /@axelor/ui@0.1.0(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
+    resolution: {integrity: sha512-IiqWE1ala9jrf4di4QhW9ewnrB3b6hbqKPaSYyztJC/oTHWNL1ZLvk0b7jqO4Cg7r6c7grvkqw6d/ag5gH1LOw==}
     peerDependencies:
       react: ^18.2.0-0
       react-dom: ^18.2.0-0
     dependencies:
-      '@emotion/is-prop-valid': 1.2.1
-      '@floating-ui/react': 0.26.4(react-dom@18.2.0)(react@18.2.0)
-      '@fluentui/priority-overflow': 9.1.10
-      '@fluentui/react-context-selector': 9.1.42(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
-      '@material-symbols/font-400': 0.14.5
-      '@material-symbols/metadata': 0.14.5
+      '@emotion/is-prop-valid': 1.2.2
+      '@floating-ui/react': 0.26.10(react-dom@18.2.0)(react@18.2.0)
+      '@fluentui/priority-overflow': 9.1.11
+      '@fluentui/react-context-selector': 9.1.57(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
+      '@material-symbols/font-400': 0.17.1
+      '@material-symbols/metadata': 0.17.1
       '@popperjs/core': 2.11.8
-      bootstrap: 5.3.2(@popperjs/core@2.11.8)
+      bootstrap: 5.3.3(@popperjs/core@2.11.8)
       bootstrap-icons: 1.11.3
       color: 4.2.3
       csstype: 3.1.3
@@ -1818,13 +1818,6 @@ packages:
       regenerator-runtime: 0.14.0
     dev: false
 
-  /@babel/runtime@7.23.5:
-    resolution: {integrity: sha512-NdUTHcPe4C99WxPub+K9l9tK5/lV4UXIoaHSYgzco9BCyjKAAwzdBI+wWtYqHt7LJdbo74ZjRPJgzVweq1sz0w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      regenerator-runtime: 0.14.0
-    dev: false
-
   /@babel/runtime@7.24.1:
     resolution: {integrity: sha512-+BIznRzyqBf+2wCTxcKE3wDjfGeCoVE61KSHGpkzqrLi8qxqFwBeUFyId2cxkTmm55fzDGnm0+yCxaxygrLUnQ==}
     engines: {node: '>=6.9.0'}
@@ -1930,8 +1923,8 @@ packages:
     resolution: {integrity: sha512-URg8UM6lfC9ZYqFipItRSxYJdgpU5d2Z4KnjsJ+rj6tgAmGme7E+PQNCiud8g0HDaZKMovu2qjfa0f5Ge0Vlsg==}
     dev: false
 
-  /@emotion/is-prop-valid@1.2.1:
-    resolution: {integrity: sha512-61Mf7Ufx4aDxx1xlDeOm8aFFigGHE4z+0sKCa+IHCeZKiyP9RLD0Mmx7m8b9/Cf37f7NAvQOOJAbQQGVr5uERw==}
+  /@emotion/is-prop-valid@1.2.2:
+    resolution: {integrity: sha512-uNsoYd37AFmaCdXlg6EYD1KaPOaRWRByMCYzbKUX4+hhMfrxdVSelShywL4JVaAeM/eHUOSprYBQls+/neX3pw==}
     dependencies:
       '@emotion/memoize': 0.8.1
     dev: false
@@ -2205,6 +2198,19 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
+  /@floating-ui/react@0.26.10(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-sh6f9gVvWQdEzLObrWbJ97c0clJObiALsFe0LiR/kb3tDRKwEhObASEH2QyfdoO/ZBPzwxa9j+nYFo+sqgbioA==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@floating-ui/react-dom': 2.0.4(react-dom@18.2.0)(react@18.2.0)
+      '@floating-ui/utils': 0.2.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      tabbable: 6.2.0
+    dev: false
+
   /@floating-ui/react@0.26.4(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-pRiEz+SiPyfTcckAtLkEf3KJ/sUbB4X4fWMcDm27HT2kfAq+dH+hMc2VoOkNaGpDE35a2PKo688ugWeHaToL3g==}
     peerDependencies:
@@ -2220,28 +2226,32 @@ packages:
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
 
+  /@floating-ui/utils@0.2.1:
+    resolution: {integrity: sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==}
+    dev: false
+
   /@fluentui/keyboard-keys@9.0.7:
     resolution: {integrity: sha512-vaQ+lOveQTdoXJYqDQXWb30udSfTVcIuKk1rV0X0eGAgcHeSDeP1HxMy+OgHOQZH3OiBH4ZYeWxb+tmfiDiygQ==}
     dependencies:
       '@swc/helpers': 0.5.2
     dev: false
 
-  /@fluentui/priority-overflow@9.1.10:
-    resolution: {integrity: sha512-EaZrYXqFT15U7scpPw1x9PkKMZP0j2ElR9uwH6ZTrdKWfbUNZ62jEHNy4hLhdj86Pu7MwnXspkExZjBrKcjFbg==}
+  /@fluentui/priority-overflow@9.1.11:
+    resolution: {integrity: sha512-sdrpavvKX2kepQ1d6IaI3ObLq5SAQBPRHPGx2+wiMWL7cEx9vGGM0fmeicl3soqqmM5uwCmWnZk9QZv9XOY98w==}
     dependencies:
       '@swc/helpers': 0.5.2
     dev: false
 
-  /@fluentui/react-context-selector@9.1.42(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
-    resolution: {integrity: sha512-Xq9JcPBCRLkCnrUd83qSFgEYZc1BYyxFXLamtev5Ok1SSF53XI4yqN7Y34A13fSu/Q2wGeZibHcCTHJIXad2sQ==}
+  /@fluentui/react-context-selector@9.1.57(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
+    resolution: {integrity: sha512-cxUBg7GFnhYzOTpY3bhwR8jFA/74cqnKyE3YwNmN3HNjwCjj6c5qBRmHTl0B9NsXkEzXiDqa7P+xhb0H7/3y0g==}
     peerDependencies:
       '@types/react': '>=16.14.0 <19.0.0'
-      '@types/react-dom': '>=16.14.0 <19.0.0'
+      '@types/react-dom': '>=16.9.0 <19.0.0'
       react: '>=16.14.0 <19.0.0'
       react-dom: '>=16.14.0 <19.0.0'
-      scheduler: ^0.19.0 || ^0.20.0
+      scheduler: '>=0.19.0 <=0.23.0'
     dependencies:
-      '@fluentui/react-utilities': 9.15.2(@types/react@18.2.73)(react@18.2.0)
+      '@fluentui/react-utilities': 9.18.6(@types/react@18.2.73)(react@18.2.0)
       '@swc/helpers': 0.5.2
       '@types/react': 18.2.73
       '@types/react-dom': 18.2.23
@@ -2250,16 +2260,42 @@ packages:
       scheduler: 0.23.0
     dev: false
 
-  /@fluentui/react-utilities@9.15.2(@types/react@18.2.73)(react@18.2.0):
-    resolution: {integrity: sha512-Oq016/dHu7PXW5x/2RtLts1ULiyd7JctXFdvi9IacLs/J1nLfg2KSBzzLqKxtdyVvgbZ9Mlu6kPITbFtF9dsIA==}
+  /@fluentui/react-shared-contexts@9.16.0(@types/react@18.2.73)(react@18.2.0):
+    resolution: {integrity: sha512-KUfjbVKQOK3bEZ4ImZZDMtEQWQToRqfmLVGilKV9m5ksfcgk/B5v0ny08LCFPRSmtCW/WB1N+eaMLYQm6y9vkA==}
+    peerDependencies:
+      '@types/react': '>=16.14.0 <19.0.0'
+      react: '>=16.14.0 <19.0.0'
+    dependencies:
+      '@fluentui/react-theme': 9.1.19
+      '@swc/helpers': 0.5.2
+      '@types/react': 18.2.73
+      react: 18.2.0
+    dev: false
+
+  /@fluentui/react-theme@9.1.19:
+    resolution: {integrity: sha512-mrVhKbr4o9UKERPxgghIRDU59S7gRizrgz3/wwyMt7elkr8Sw+OpwKIeEw9x6P0RTcFDC00nggaMJhBGs7Xo4A==}
+    dependencies:
+      '@fluentui/tokens': 1.0.0-alpha.16
+      '@swc/helpers': 0.5.2
+    dev: false
+
+  /@fluentui/react-utilities@9.18.6(@types/react@18.2.73)(react@18.2.0):
+    resolution: {integrity: sha512-TLWL0jqArzZXZLLzA/Mi7gMDBr8tc7LcCnCnZBIHniVB/eESMKgTYl6EwbepHfkkcPfp+amH9U4CbXADNqQQsw==}
     peerDependencies:
       '@types/react': '>=16.14.0 <19.0.0'
       react: '>=16.14.0 <19.0.0'
     dependencies:
       '@fluentui/keyboard-keys': 9.0.7
+      '@fluentui/react-shared-contexts': 9.16.0(@types/react@18.2.73)(react@18.2.0)
       '@swc/helpers': 0.5.2
       '@types/react': 18.2.73
       react: 18.2.0
+    dev: false
+
+  /@fluentui/tokens@1.0.0-alpha.16:
+    resolution: {integrity: sha512-Gr9G8LIlUhZYX5j6CfDQrofQqsWAz/q54KabWn1tWV/1083WwyoTZXiG1k6b37NnK7Feye7D7Nz+4MNqoKpXGw==}
+    dependencies:
+      '@swc/helpers': 0.5.2
     dev: false
 
   /@fullcalendar/core@6.1.11:
@@ -2428,12 +2464,12 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@material-symbols/font-400@0.14.5:
-    resolution: {integrity: sha512-i6+fZpG0GxzJsbC19DS/fna1oYsTEUaRcTFR8SiVHAQ0xjRlA7qSFEfkpFLG0GBEe17zMwjg7gj3Xm78RDg2Zw==}
+  /@material-symbols/font-400@0.17.1:
+    resolution: {integrity: sha512-/th3kTwMV9H5BcnjUf3gmZRSu31tR3INKJutjDPSMXuX9d/BQmdambNIDCZs/3jMCFchWHUpxWqFoWThf1laYA==}
     dev: false
 
-  /@material-symbols/metadata@0.14.5:
-    resolution: {integrity: sha512-4MDw9vB9w1OoQ/w6oY6CzWaWovk00SFwv2UkpcN+R1uiVROqmEKU1nNd3XtzBOvoD8GibLVA+oFKJWv3lQH5Fw==}
+  /@material-symbols/metadata@0.17.1:
+    resolution: {integrity: sha512-mDkEF23dCJbS+zRzBvmfQVhYg9KW+hcw3g4f09BMJFnxrZO0j2QICC5ddOWxVM/Yzez1IAE2dkl7pspHkOUAzw==}
     dev: false
 
   /@monaco-editor/loader@1.4.0(monaco-editor@0.47.0):
@@ -3913,8 +3949,8 @@ packages:
     dev: false
     patched: true
 
-  /bootstrap@5.3.2(@popperjs/core@2.11.8):
-    resolution: {integrity: sha512-D32nmNWiQHo94BKHLmOrdjlL05q1c8oxbtBphQFb9Z5to6eGRDCm0QgeaZ4zFBHzfg2++rqa2JkqCcxDy0sH0g==}
+  /bootstrap@5.3.3(@popperjs/core@2.11.8):
+    resolution: {integrity: sha512-8HLCdWgyoMguSO9o+aH+iuZ+aht+mzW0u3HIMzVu7Srrpv7EBBxTnrFlSCskwdY1+EOFQSm7uMJhNQHkdPcmjg==}
     peerDependencies:
       '@popperjs/core': ^2.11.8
     dependencies:
@@ -6305,7 +6341,7 @@ packages:
       react: ^16.8.5 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.24.1
       css-box-model: 1.2.1
       memoize-one: 5.2.1
       raf-schd: 4.0.3
@@ -6500,7 +6536,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.24.1
       '@types/react-redux': 7.1.26
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -6651,7 +6687,7 @@ packages:
   /redux@4.2.1:
     resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
     dependencies:
-      '@babel/runtime': 7.23.5
+      '@babel/runtime': 7.24.1
     dev: false
 
   /redux@5.0.1:
