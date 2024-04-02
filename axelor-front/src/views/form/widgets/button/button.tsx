@@ -1,5 +1,6 @@
 import { clsx } from "@axelor/ui";
 import { useAtomValue } from "jotai";
+import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import isUndefined from "lodash/isUndefined";
 
@@ -65,7 +66,7 @@ function findVariant(schema: Schema) {
 }
 
 export function Button(props: WidgetProps) {
-  const { schema, widgetAtom } = props;
+  const { schema, widgetAtom, formAtom } = props;
   const { showTitle = true, icon, help, inGridEditor } = schema;
 
   const [titleHelp, setTitleHelp] = useState("");
@@ -78,6 +79,16 @@ export function Button(props: WidgetProps) {
 
   const variant = findVariant(schema);
   const [wait, setWait] = useState(false);
+
+  const getParent = useAtomCallback(
+    useCallback(
+      (get) => {
+        const { parent } = get(formAtom);
+        return parent ? get(parent) : null;
+      },
+      [formAtom],
+    ),
+  );
 
   const handleClick = useCallback(
     async (e: Event) => {
@@ -98,7 +109,10 @@ export function Button(props: WidgetProps) {
       try {
         e.preventDefault();
         setWait(true);
-        await commitEditableWidgets();
+        // With main form, need to commit any editable widgets before the action.
+        if (!getParent()) {
+          await commitEditableWidgets();
+        }
         await actionExecutor.waitFor();
         await actionExecutor.execute(onClick, {
           context: {
@@ -110,7 +124,7 @@ export function Button(props: WidgetProps) {
         setWait(false);
       }
     },
-    [commitEditableWidgets, actionExecutor, schema, attrs.link],
+    [schema, actionExecutor, getParent, commitEditableWidgets, attrs.link],
   );
 
   const readonly = useReadonly(widgetAtom);

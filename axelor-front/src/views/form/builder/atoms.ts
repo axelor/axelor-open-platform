@@ -139,7 +139,7 @@ export function createValueAtom({
         formAtom,
         (base) => {
           try {
-            return deepGet(base.record, prop) ?? base.record[prop]
+            return deepGet(base.record, prop) ?? base.record[prop];
           } catch (err) {
             return null;
           }
