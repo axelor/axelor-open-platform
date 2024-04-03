@@ -1,16 +1,17 @@
-import { legacyClassNames } from "@/styles/legacy";
-import { Box } from "@axelor/ui";
 import clsx from "clsx";
 import { useMemo } from "react";
+import { Box } from "@axelor/ui";
 
+import { dialogs } from "@/components/dialogs";
 import { Icon } from "@/components/icon";
+import { createScriptContext } from "@/hooks/use-parser/context";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { Button as ButtonField, Field } from "@/services/client/meta.types";
-import { dialogs } from "@/components/dialogs";
+import { legacyClassNames } from "@/styles/legacy";
 import { useViewAction } from "@/view-containers/views/scope";
-import { GridCellProps } from "../../builder/types";
+import { useCanDirty } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
-import { createScriptContext } from "@/hooks/use-parser/context";
+import { GridCellProps } from "../../builder/types";
 
 import styles from "./button.module.scss";
 
@@ -20,6 +21,8 @@ export function Button(props: GridCellProps) {
   const { title, name, icon, css, help: _help } = field as Field;
   const help = _help || title;
   const { context } = useViewAction();
+
+  const canDirty = useCanDirty();
 
   const { hidden, readonly } = useMemo(() => {
     const { showIf, hideIf, readonlyIf } = field as Field;
@@ -72,7 +75,14 @@ export function Button(props: GridCellProps) {
         }),
         {},
       );
-      Object.keys(values || {}).length && onUpdate?.({ ...record, ...values });
+
+      const fieldNames = Object.keys(values || {});
+
+      if (fieldNames.length) {
+        const _dirty =
+          record._dirty || fieldNames.some((name) => canDirty(name));
+        onUpdate?.({ ...record, ...values, _dirty });
+      }
     }
   }
 
