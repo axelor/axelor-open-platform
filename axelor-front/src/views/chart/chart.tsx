@@ -95,7 +95,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
           },
         };
       },
-      {}
+      {},
     );
     const meta = {
       view: {
@@ -132,21 +132,29 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
 
   const { formAtom, ...formProps } = useFormHandlers(
     formMeta,
-    useRef({}).current
+    useRef({}).current,
   );
 
   const getContext = useViewContext();
   const getErrors = useGetErrors();
 
+  const getRecordContext = useAtomCallback(
+    useCallback(
+      (get) => get(formAtom).record,
+      [formAtom],
+    ),
+  );
+
   const actionExecutor = useMemo(() => {
     return new DefaultActionExecutor(
       new FormActionHandler(() => ({
         ...getContext(),
+        ...getRecordContext(),
         _chart: chartName,
         _model: "com.axelor.script.ScriptBindings",
-      }))
+      })),
     );
-  }, [getContext, chartName]);
+  }, [getContext, getRecordContext, chartName]);
 
   const onDataInit = useAtomCallback(
     useCallback(
@@ -170,7 +178,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
                   : values;
               }, {}),
             }),
-            {}
+            {},
           );
           const formState = get(formAtom);
           set(formAtom, {
@@ -181,8 +189,8 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         }
         return false;
       },
-      [formMeta, formAtom, actionExecutor, view.onInit, getContext]
-    )
+      [formMeta, formAtom, actionExecutor, view.onInit, getContext],
+    ),
   );
 
   const onRefresh = useAtomCallback(
@@ -215,13 +223,13 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         const records = await fetchChart<ChartDataRecord[]>(
           chartName,
           context,
-          true
+          true,
         );
         fetched.current = true;
         setRecords(records);
       },
-      [chartName, view, formMeta, formAtom, getErrors, getContext]
-    )
+      [chartName, view, formMeta, formAtom, getErrors, getContext],
+    ),
   );
 
   const onExport = useCallback(async () => {
@@ -230,7 +238,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     const name = (view.title || "export").toLowerCase().replace(/ /g, "_");
     const header = records.reduce(
       (list, row) => unique([...(list as []), ...Object.keys(row)]),
-      []
+      [],
     );
     let content = "data:text/csv;charset=utf-8," + header.join(";") + "\n";
 
@@ -252,7 +260,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     async (action: string, options?: ActionOptions) => {
       return actionExecutor.execute(action, options);
     },
-    [actionExecutor]
+    [actionExecutor],
   );
 
   const onClickAction = useCallback(
@@ -261,7 +269,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         context: { ...record, _signal: "onClick" },
       });
     },
-    [view, onAction]
+    [view, onAction],
   );
 
   const onDatasetAction = useCallback(
@@ -270,7 +278,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
         context: { _data: records, ...context },
       });
     },
-    [records, onAction]
+    [records, onAction],
   );
 
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
