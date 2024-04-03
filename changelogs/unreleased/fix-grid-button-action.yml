@@ -1,0 +1,5 @@
+---
+title: Fix dirty form handling after grid button action
+type: fix
+description: |
+  This fixes dirty form handling for both editable and non-editable grid.
