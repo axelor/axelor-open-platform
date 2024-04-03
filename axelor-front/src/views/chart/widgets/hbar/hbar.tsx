@@ -20,7 +20,8 @@ const defaultOption = {
   series: [],
 };
 
-export function Hbar({ data, ...rest }: ChartProps) {
+export function Hbar(props: ChartProps) {
+  const { data } = props;
   const [type, setType] = useState<ChartGroupType>(
     data.stacked ? "stack" : "group"
   );
@@ -45,7 +46,7 @@ export function Hbar({ data, ...rest }: ChartProps) {
   return (
     <>
       <BarGroup value={type} onChange={setType} />
-      <ECharts options={options} {...(rest as any)} />
+      <ECharts options={options} {...(props as any)} />
     </>
   );
 }

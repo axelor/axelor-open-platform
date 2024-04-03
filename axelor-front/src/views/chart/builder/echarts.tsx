@@ -1,13 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useTheme } from "@axelor/ui";
 import * as echarts from "echarts";
 
 import { ChartProps, ChartType } from "./types";
 import { getColor, prepareTheme } from "./utils";
 import { useAppTheme } from "@/hooks/use-app-theme";
+import { DataRecord } from "@/services/client/data.types";
 import classes from "./echarts.module.scss";
 
 export function ECharts({
+  data,
   type,
   height,
   width,
@@ -16,7 +18,7 @@ export function ECharts({
   isMerge = false,
   lazyUpdate = false,
   onClick,
-}: Pick<ChartProps, "legend" | "onClick"> & {
+}: Pick<ChartProps, "data" | "legend" | "onClick"> & {
   type: ChartType;
   height: number | string;
   width: number | string;
@@ -28,6 +30,12 @@ export function ECharts({
   const chart = useRef<echarts.ECharts | null>(null);
   const theme = useAppTheme();
   const isRTL = useTheme().dir === "rtl";
+
+  const seriesBy = useMemo(() => {
+    const { series, xAxis } = data;
+    const { groupBy } = series?.[0] ?? {};
+    return groupBy || xAxis || "";
+  }, [data]);
 
   useEffect(() => {
     echarts.registerTheme(theme, prepareTheme(type));
@@ -44,12 +52,14 @@ export function ECharts({
     const instance = chart.current;
     if (onClick && instance) {
       instance.on("click", function (event: any) {
-        const context = event?.data?.raw?.[0];
-        onClick(context);
-        // TODO: call action
+        const { seriesName, data } = event || {};
+        const context =
+          data?.raw?.find((r: DataRecord) => r[seriesBy] === seriesName) ??
+          data?.raw?.[0];
+        onClick(context?._original ?? context);
       });
     }
-  }, [onClick]);
+  }, [seriesBy, onClick]);
 
   useEffect(() => {
     chart.current &&

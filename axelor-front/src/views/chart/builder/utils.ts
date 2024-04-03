@@ -444,7 +444,8 @@ export function PlotData(data: any) {
           item[series.key] !== undefined ? item[series.key] : name || 0,
         );
         const sort =
-          $conv(item[`$${data.xAxis}`] ?? item[data.xAxis], data.xType) || 0;
+          $conv(item._original?.[data.xAxis] ?? item[data.xAxis], data.xType) ||
+          0;
         return { x, y, item, sort };
       });
 
@@ -484,7 +485,7 @@ export function getChartData(
   if (xType && xAxis && FIELD_FORMATTERS[xType]) {
     return records.map((data) => ({
       ...data,
-      [`$${xAxis}`]: data[xAxis],
+      _original: data,
       [xAxis]: FIELD_FORMATTERS[xType](data[xAxis], config) || data[xAxis],
     }));
   }

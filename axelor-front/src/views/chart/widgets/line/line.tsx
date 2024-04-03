@@ -40,5 +40,5 @@ export function Line({ data, type, ...rest }: ChartProps) {
     );
   }, [type, data]);
 
-  return <ECharts options={options} {...(rest as any)} />;
+  return <ECharts options={options} data={data} {...(rest as any)} />;
 }

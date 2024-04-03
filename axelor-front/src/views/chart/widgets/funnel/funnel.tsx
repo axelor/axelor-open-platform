@@ -55,7 +55,8 @@ const defaultOption = {
   ],
 };
 
-export function Funnel({ data, ...rest }: ChartProps) {
+export function Funnel(props: ChartProps) {
+  const { data } = props;
   const [options, setOptions] = useState(defaultOption);
   const isRTL = useTheme().dir === "rtl";
 
@@ -80,5 +81,5 @@ export function Funnel({ data, ...rest }: ChartProps) {
     );
   }, [isRTL, data]);
 
-  return <ECharts options={options} {...(rest as any)} />;
+  return <ECharts options={options} {...(props as any)} />;
 }

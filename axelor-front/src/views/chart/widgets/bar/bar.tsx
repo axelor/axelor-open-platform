@@ -20,9 +20,10 @@ const defaultOption = {
   series: [],
 };
 
-export function Bar({ data, ...rest }: ChartProps) {
+export function Bar(props: ChartProps) {
+  const { data } = props;
   const [type, setType] = useState<ChartGroupType>(
-    data.stacked ? "stack" : "group"
+    data.stacked ? "stack" : "group",
   );
   const [options, setOptions] = useState(defaultOption);
 
@@ -38,14 +39,14 @@ export function Bar({ data, ...rest }: ChartProps) {
         draft.tooltip.valueFormatter = formatter;
         draft.dataset.dimensions = ["x", ...dimensions];
         draft.dataset.source = source;
-      })
+      }),
     );
   }, [type, data]);
 
   return (
     <>
       <BarGroup value={type} onChange={setType} />
-      <ECharts options={options} {...(rest as any)} />
+      <ECharts options={options} {...(props as any)} />
     </>
   );
 }

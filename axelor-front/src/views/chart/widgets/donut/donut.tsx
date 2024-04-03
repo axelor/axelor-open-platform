@@ -35,7 +35,8 @@ const defaultOption = {
   ],
 };
 
-export function Donut({ data, ...rest }: ChartProps) {
+export function Donut(props: ChartProps) {
+  const { data } = props;
   const [options, setOptions] = React.useState(defaultOption);
 
   React.useEffect(() => {
@@ -53,5 +54,5 @@ export function Donut({ data, ...rest }: ChartProps) {
     );
   }, [data]);
 
-  return <ECharts options={options} {...(rest as any)} />;
+  return <ECharts options={options} {...(props as any)} />;
 }
