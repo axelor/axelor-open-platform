@@ -72,7 +72,7 @@ export function usePerms(state: Schema, perms = defaultPerms) {
     /**
      * Check whether the given operation button is available.
      *
-     * The button is not available is specified by the meta attrs
+     * The button is not available if specified by the meta attrs
      * or not permitted for that operation.
      *
      * @param name operation name
