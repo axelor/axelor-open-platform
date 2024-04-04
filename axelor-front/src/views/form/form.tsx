@@ -227,7 +227,7 @@ export function Form(props: ViewProps<FormView>) {
   );
 
   useAsyncEffect(async () => {
-    if (!dataSource || params?.popup) return;
+    if (!dataSource || params?.popup || !recordId) return;
     const recordPerms = await dataSource.perms(Number(recordId));
     setPerms((perms) => ({ ...perms, ...recordPerms }));
   }, [dataSource, params?.popup, recordId]);
