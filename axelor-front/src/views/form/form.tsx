@@ -335,10 +335,15 @@ const FormContainer = memo(function FormContainer({
     });
   }, [recordHandler, schema.readonlyIf]);
 
+  const canNew = hasButton("new");
+  const canSaveNew = canNew && !record.id;
+  const hasEdit = hasButton("edit") || canSaveNew;
+  const hasSave = hasButton("save") || canSaveNew;
+
   const readonly = useMemo(() => {
     const readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
-    return !readonly && !hasButton("edit") ? true : readonly;
-  }, [readonlyExclusive, attrs.readonly, props.readonly, hasButton]);
+    return !readonly && !hasEdit ? true : readonly;
+  }, [readonlyExclusive, attrs.readonly, props.readonly, hasEdit]);
 
   const prevType = useSelectViewState(
     useCallback((state) => state.prevType, []),
@@ -995,9 +1000,8 @@ const FormContainer = memo(function FormContainer({
   const tab = useViewTab();
   const currentViewType = useSelectViewState(useCallback((x) => x.type, []));
 
-  const canNew = hasButton("new");
-  const canEdit = readonly && !readonlyExclusive && hasButton("edit");
-  const canSave = !readonly && hasButton("save");
+  const canEdit = readonly && !readonlyExclusive && hasEdit;
+  const canSave = !readonly && hasSave;
   const canDelete = hasButton("delete") && record.id;
   const canCopy = !isDirty && canNew && hasButton("copy") && record.id;
   const canArchive = hasButton("archive") && record.id;

@@ -1,0 +1,4 @@
+
+---
+title: Allow saving new record if user has create but no write permission
+type: fix
