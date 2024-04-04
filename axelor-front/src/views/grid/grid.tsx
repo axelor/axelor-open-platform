@@ -160,9 +160,9 @@ function GridInner(props: ViewProps<GridView>) {
   const getSearchOptions = useAtomCallback(
     useCallback(
       (get, set, options: SearchOptions = {}) => {
-        const sortBy = getSortBy(orderBy);
         const { query = {}, search } = get(searchAtom!);
 
+        const sortBy = getSortBy(orderBy);
         const searchQuery = getSearchFilter(fields as any, view.items, search);
 
         const filter: SearchOptions["filter"] = {
@@ -791,10 +791,14 @@ function GridInner(props: ViewProps<GridView>) {
   }, [view, rows, records, dataStore, orderBy]);
 
   const searchOptions = useMemo(() => {
+    const options: Partial<SearchOptions> = {
+      sortBy: getSortBy(orderBy),
+    };
     if (currentPage) {
-      return { offset: (currentPage - 1) * limit };
+      return { ...options, offset: (currentPage - 1) * limit };
     }
-  }, [currentPage, limit]);
+    return options;
+  }, [orderBy, currentPage, limit]);
 
   const onGridSearch = useCallback(
     (options?: SearchOptions) => {
