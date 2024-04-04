@@ -176,3 +176,4 @@ reinstate them in a future version. Concerned features are :
 - Markdown widget
 - Phone widget with flag feature
 - Print Gantt view
+- Following chart types : `area`, `radar`, `scatter`

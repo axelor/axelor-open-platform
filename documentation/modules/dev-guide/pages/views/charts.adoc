@@ -2,9 +2,9 @@
 :toc:
 :toc-title:
 
-:nvd3: https://nvd3-community.github.io/nvd3/
+:apache-echarts: https://echarts.apache.org/
 
-The chart view shows data as 2D graphs and is powered by {nvd3}[NVD3].
+The chart view shows data as 2D graphs and is powered by {apache-echarts}[Apache ECharts].
 
 [source,xml]
 -----
@@ -102,8 +102,6 @@ Most important config values are:
 * `hideLegend` - show/hide the legend
 * `min/max` -  used with gauge chart, define the minimum and maximum values.
 * `onClick` - call specified action with clicked data in context
-
-Please check the {nvd3}[NVD3 documentation] for more configurations.
 
 == Colors
 
