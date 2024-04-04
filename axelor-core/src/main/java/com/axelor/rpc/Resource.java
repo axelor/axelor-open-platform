@@ -252,7 +252,7 @@ public class Resource<T extends Model> {
   }
 
   public Response perms() {
-    Set<JpaSecurity.AccessType> perms = security.get().getAccessTypes(model, null);
+    Set<JpaSecurity.AccessType> perms = security.get().getAccessTypes(model);
     Response response = new Response();
 
     response.setData(perms);

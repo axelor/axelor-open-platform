@@ -110,10 +110,15 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
   }
 
   @Override
+  public Set<AccessType> getAccessTypes(Class<? extends Model> model) {
+    return getAccessTypes(model, null);
+  }
+
+  @Override
   public Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id) {
     final Set<AccessType> types = Sets.newHashSet();
     for (AccessType type : AccessType.values()) {
-      if (isPermitted(type, model, id)) {
+      if (id == null ? isPermitted(type, model) : isPermitted(type, model, id)) {
         types.add(type);
       }
     }
