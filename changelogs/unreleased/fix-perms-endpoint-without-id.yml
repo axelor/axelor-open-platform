@@ -1,0 +1,8 @@
+
+---
+title: Fix perms endpoint without id
+type: fix
+description: |
+  If permission is found, access should be granted in case of no id.
+  Without id, `AuthSecurity::isPermitted` had ids `[null]` and access was granted
+  if permission filter result count happened to equal 1.

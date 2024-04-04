@@ -48,6 +48,8 @@ public interface JpaSecurity {
   public static final AccessType CAN_REMOVE = AccessType.REMOVE;
   public static final AccessType CAN_EXPORT = AccessType.EXPORT;
 
+  Set<AccessType> getAccessTypes(Class<? extends Model> model);
+
   Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id);
 
   boolean hasRole(String name);
