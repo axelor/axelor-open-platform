@@ -11,10 +11,7 @@ const defaultOption = {
     bottom: 5,
     type: "scroll",
   },
-  tooltip: {
-    trigger: "item",
-    formatter: "{b} : {c}",
-  },
+  tooltip: {},
   xAxis: { type: "category" },
   yAxis: {},
   series: [
@@ -61,7 +58,7 @@ export function Funnel(props: ChartProps) {
   const isRTL = useTheme().dir === "rtl";
 
   useEffect(() => {
-    const { xAxis, dataset, series: [{ key }] = [] } = data;
+    const { xAxis, dataset, scale, series: [{ key }] = [] } = data;
 
     setOptions(
       produce((draft: any) => {
@@ -76,7 +73,12 @@ export function Funnel(props: ChartProps) {
         }
         draft.series[0][isRTL ? "right" : "left"] = "10%";
         draft.tooltip.valueFormatter = (v: any) =>
-          Formatters.decimal(v, { props: data as unknown as Field });
+          Formatters.decimal(v, {
+            props: {
+              serverType: "DECIMAL",
+              scale,
+            } as unknown as Field,
+          });
       }),
     );
   }, [isRTL, data]);

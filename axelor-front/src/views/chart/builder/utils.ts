@@ -414,7 +414,9 @@ export function PlusData(data: any) {
     types,
     data: result,
     formatter: (value: any) =>
-      Formatters.decimal(value, { props: { scale } as Field }),
+      Formatters.decimal(value, {
+        props: { serverType: "DECIMAL", scale } as Field,
+      }),
   };
 }
 
@@ -471,7 +473,9 @@ export function PlotData(data: any) {
     types,
     data: result,
     formatter: (value: any) =>
-      Formatters.decimal(value, { props: { scale } as Field }),
+      Formatters.decimal(value, {
+        props: { serverType: "DECIMAL", scale } as Field,
+      }),
   };
 }
 
