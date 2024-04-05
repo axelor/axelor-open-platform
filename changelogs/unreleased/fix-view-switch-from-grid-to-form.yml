@@ -1,9 +1,0 @@
----
-title: Fix view switch from grid to form in view toolbar
-type: fix
-description: |
-  When we switch to form through view toolbar from grid view
-  Then if any row is selected then it should open in form else
-  open the first available record in grid.
-  If no records are available then it should skip navigation to 
-  form view.

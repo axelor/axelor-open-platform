@@ -1,3 +1,38 @@
+## 7.0.6 (2024-04-05)
+
+#### Fix
+
+* Fix pass related record on click action in chart
+* Add missing hilite support in form view field
+* Fix sorting in grid view
+* Fix format decimal value in chart tooltip
+* Fix view switch to form in calendar/cards view
+
+  <details>
+  
+  When we switch to form through view toolbar from calendar/cards
+  view then it should open first available record in form.
+  If no records are available then it should skip navigation to 
+  form view.
+  
+  </details>
+
+* Fix pass search fields in action context in chart
+* Add missing hilite support in cards view
+* Fix prompt support in grid view button
+* Fix view switch from grid to form in view toolbar
+
+  <details>
+  
+  When we switch to form through view toolbar from grid view
+  Then if any row is selected then it should open in form else
+  open the first available record in grid.
+  If no records are available then it should skip navigation to 
+  form view.
+  
+  </details>
+
+
 ## 7.0.5 (2024-03-29)
 
 #### Feature

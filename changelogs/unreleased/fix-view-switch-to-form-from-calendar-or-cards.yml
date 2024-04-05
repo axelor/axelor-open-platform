@@ -1,8 +1,0 @@
----
-title: Fix view switch to form in calendar/cards view
-type: fix
-description: |
-  When we switch to form through view toolbar from calendar/cards
-  view then it should open first available record in form.
-  If no records are available then it should skip navigation to 
-  form view.
