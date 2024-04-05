@@ -69,12 +69,8 @@ const typesConfig: Config[] = [
     operators: ["$isTrue", "$isFalse"],
   },
   {
-    types: ["one-to-one", "many-to-one", "many-to-many"],
+    types: ["one-to-one", "many-to-one", "one-to-many", "many-to-many"],
     operators: ["like", "notLike", "in", "notIn", "isNull", "notNull"],
-  },
-  {
-    types: ["one-to-many"],
-    operators: ["isNull", "notNull"],
   },
 ];
 
@@ -117,7 +113,7 @@ const getOperators: () => { name: string; title: string }[] = () =>
     { name: "$isCurrentGroup", title: i18n.get("is current group") },
   ]);
 
-const EXTRA_OPERATORS_BY_TARGET = {
+const EXTRA_OPERATORS_BY_TARGET: Record<string, string[]> = {
   "com.axelor.auth.db.User": ["$isCurrentUser"],
   "com.axelor.auth.db.Group": ["$isCurrentGroup"],
 };
@@ -135,13 +131,12 @@ export function useField(fields?: Field[], name?: string) {
     let typeOperators = types[type] || [];
 
     if (field?.target) {
-      if (!field?.targetName) {
-        typeOperators = ["isNull", "notNull"];
-      } else {
-        typeOperators = typeOperators.concat(
-          (EXTRA_OPERATORS_BY_TARGET as any)[field.target] || [],
-        );
-      }
+      typeOperators = !field?.targetName
+        ? ["isNull", "notNull"]
+        : [
+            ...typeOperators,
+            ...(EXTRA_OPERATORS_BY_TARGET[field.target] || []),
+          ];
     }
 
     return {
