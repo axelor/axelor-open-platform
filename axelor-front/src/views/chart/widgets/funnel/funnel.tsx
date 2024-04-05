@@ -12,8 +12,6 @@ const defaultOption = {
     type: "scroll",
   },
   tooltip: {},
-  xAxis: { type: "category" },
-  yAxis: {},
   series: [
     {
       name: "",
@@ -31,20 +29,13 @@ const defaultOption = {
         show: true,
         position: "inside",
       },
-      labelLine: {
-        length: 10,
-        lineStyle: {
-          width: 1,
-          type: "solid",
-        },
-      },
       itemStyle: {
         borderColor: "#fff",
         borderWidth: 1,
       },
       emphasis: {
         label: {
-          fontSize: 20,
+          fontWeight: "bold",
         },
       },
       data: [],
