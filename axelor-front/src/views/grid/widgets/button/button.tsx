@@ -8,7 +8,7 @@ import { parseExpression } from "@/hooks/use-parser/utils";
 import { Button as ButtonField, Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useViewAction } from "@/view-containers/views/scope";
-import { useCanDirty } from "@/views/form/builder/scope";
+import { useCanDirty, useFormEditableScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
 import { GridCellProps } from "../../builder/types";
 
@@ -39,6 +39,8 @@ export function Button(props: GridCellProps) {
     return { hidden, readonly };
   }, [field, record, context]);
 
+  const { commit: commitEditableWidgets } = useFormEditableScope();
+
   if (!icon || hidden) return null;
 
   const className = clsx({
@@ -54,6 +56,7 @@ export function Button(props: GridCellProps) {
         if (!confirmed) return;
       }
       if (!onClick) return;
+      await commitEditableWidgets();
       await actionExecutor.waitFor();
       const res = await actionExecutor.execute(onClick, {
         context: {
