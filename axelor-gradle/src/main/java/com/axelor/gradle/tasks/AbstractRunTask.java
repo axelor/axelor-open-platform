@@ -4,67 +4,38 @@
  */
 package com.axelor.gradle.tasks;
 
-import com.axelor.common.FileUtils;
-import com.axelor.common.StringUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaPluginExtension;
-import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.Input;
+import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Internal;
-import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
-import org.gradle.process.ExecOperations;
-import org.gradle.process.JavaExecSpec;
 
-public abstract class AbstractRunTask extends DefaultTask {
-
-  private ExecOperations execOperations;
-  private String config;
-
-  @Input
-  @Optional
-  public String getConfig() {
-    return config;
-  }
+public abstract class AbstractRunTask extends JavaExec {
 
   @Option(option = "config", description = "specify the appliction config file path.")
   public void setConfig(String config) {
-    this.config = config;
+    this.jvmArgs("-Daxelor.config", config);
   }
 
-  @Input
-  @Optional
-  protected List<String> getJvmArgs() {
-    final List<String> jvmArgs = new ArrayList<>();
-    if (StringUtils.notBlank(config)) {
-      jvmArgs.add("-Daxelor.config=" + config);
-    }
-    return jvmArgs;
-  }
+  @Internal
+  protected abstract String getMainClassName();
 
-  @Input
-  @Optional
-  protected List<String> getArgs() {
-    final List<String> args = new ArrayList<>();
-    return args;
-  }
+  @Internal
+  protected abstract File getManifestJar();
 
-  @Classpath
-  protected FileCollection getClasspath() {
+  @Internal
+  protected FileCollection getManifestClasspath() {
     final FileCollection classpath =
         getProject()
             .getExtensions()
@@ -75,17 +46,10 @@ public abstract class AbstractRunTask extends DefaultTask {
     return classpath;
   }
 
-  @Internal
-  protected File getManifestJar() {
-    return FileUtils.getFile(
-        getProject().getLayout().getBuildDirectory().get().getAsFile(), "classpath.jar");
-  }
-
-  @Input
-  protected abstract String getMainClass();
-
-  protected File createManifestJar() {
+  public File createManifestJar() {
     final File manifestJar = getManifestJar();
+    final FileCollection classpath = getManifestClasspath();
+    final String mainClass = getMainClassName();
     final Manifest manifest = new Manifest();
     final Attributes attributes = manifest.getMainAttributes();
 
@@ -96,10 +60,10 @@ public abstract class AbstractRunTask extends DefaultTask {
     }
 
     attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
-    attributes.put(Attributes.Name.MAIN_CLASS, getMainClass());
+    attributes.put(Attributes.Name.MAIN_CLASS, mainClass);
     attributes.put(
         Attributes.Name.CLASS_PATH,
-        getClasspath().getFiles().stream()
+        classpath.getFiles().stream()
             .map(File::toURI)
             .map(Object::toString)
             .collect(Collectors.joining(" ")));
@@ -111,20 +75,24 @@ public abstract class AbstractRunTask extends DefaultTask {
     }
   }
 
-  protected void configure(JavaExecSpec task) {}
-
-  public AbstractRunTask(ExecOperations execOperations) {
-    this.execOperations = execOperations;
+  @Internal
+  protected File getBuildDir() {
+    return getProject().getLayout().getBuildDirectory().get().getAsFile();
   }
 
-  @TaskAction
-  public void exec() throws Exception {
-    execOperations.javaexec(
-        task -> {
-          task.classpath(createManifestJar());
-          task.args(getArgs());
-          task.jvmArgs(getJvmArgs());
-          configure(task);
-        });
+  @Override
+  public Property<String> getMainClass() {
+    super.getMainClass().set(getMainClassName());
+    return super.getMainClass();
+  }
+
+  @Override
+  public FileCollection getClasspath() {
+    FileCollection classpath = super.getClasspath();
+    File jar = createManifestJar();
+    if (!classpath.contains(jar)) {
+      super.classpath(jar);
+    }
+    return classpath;
   }
 }
