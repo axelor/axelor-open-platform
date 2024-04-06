@@ -46,10 +46,15 @@ public abstract class AbstractRunTask extends JavaExec {
     return classpath;
   }
 
-  public File createManifestJar() {
+  private File createManifestJar() {
     final File manifestJar = getManifestJar();
     final FileCollection classpath = getManifestClasspath();
     final String mainClass = getMainClassName();
+    return createManifestJar(manifestJar, classpath, mainClass);
+  }
+
+  public static File createManifestJar(
+      File manifestJar, FileCollection classpath, String mainClass) {
     final Manifest manifest = new Manifest();
     final Attributes attributes = manifest.getMainAttributes();
 

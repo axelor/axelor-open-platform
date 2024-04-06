@@ -1,0 +1,37 @@
+= VSCode
+:toc:
+:toc-title:
+
+:url-vscode: https://code.visualstudio.com/
+:url-vscode-java: https://code.visualstudio.com/docs/java/java-tutorial
+
+The application project can be imported in {url-vscode}[VSCode] as {url-vscode-java}[Java] project.
+
+From the vscode, open the project folder using menu:File[Open Folder].
+
+== Debug
+
+Run the following task to generate a `Run` launcher:
+
+```shell
+./gradlew generateLauncher
+```
+
+This will generate `.vscode/launch.json`.
+Switch to "Run and Debug" kbd:[CTRL+SHIFT+D] panel
+and debug with the `Run` task.
+
+Whenever the sources are changed, re-run following task:
+
+```shell
+./gradlew classes
+```
+
+This task will re-compile updated classes and the debugger
+will try to hot reload the changes.
+
+[IMPORTANT]
+====
+* repeat `./gradlew generateCode` whenever you add/change any domain model definitions
+* repeat `./gradlew generateLauncher` if you run gradle clean task or delete build directory
+====
