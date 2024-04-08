@@ -8,13 +8,13 @@
 
 In this document, we will see the major steps to migrate from 7.0 to 7.1.
 
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 7.1
+
 == Dependencies upgrade
 
 Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
 list.
-
-NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
-introduced in 7.1
 
 Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
 improvements : `./gradlew wrapper --gradle-version 8.6`.
