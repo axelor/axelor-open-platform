@@ -17,7 +17,7 @@ export function useCardClassName(
   return useMemo(() => {
     const data = { ...context, ...record };
     const color = getHilites(data)?.[0]?.color;
-    return legacyClassNames("kanban-card", {
+    return legacyClassNames({
       [`hilite-${color}-card`]: color,
     });
   }, [getHilites, context, record]);

@@ -749,7 +749,7 @@ function KanbanCard({
               onMouseDown: hidePopover,
             }
           : {})}
-        className={clsx(styles["kanban-card"], className)}
+        className={clsx(legacyClassNames("kanban-card"), styles["kanban-card"], className)}
       >
         <CardTemplate
           component={Template}
