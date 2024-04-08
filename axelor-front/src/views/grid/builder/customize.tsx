@@ -13,7 +13,9 @@ import { resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
 import { useSelector } from "@/hooks/use-relation";
+import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { toTitleCase } from "@/utils/names";
+
 import styles from "./customize.module.scss";
 
 const reload = () => window.location.reload();
@@ -39,7 +41,7 @@ function CustomizeDialog({
       id: ind + 1,
       ...item,
       title: item.title || item.autoTitle,
-    })) as DataRecord[]
+    })) as DataRecord[],
   );
   const showSelector = useSelector();
 
@@ -50,7 +52,7 @@ function CustomizeDialog({
       { title: i18n.get("Title"), name: "title" },
       { title: i18n.get("Name"), name: "name" },
     ],
-    []
+    [],
   );
 
   const getSavedView = useCallback(
@@ -67,18 +69,18 @@ function CustomizeDialog({
         .filter((r) => records.includes(r))
         .map((record) => {
           const schemaItem = view.items?.find(
-            (v) => v.name === record.name
+            (v) => v.name === record.name,
           ) || {
             name: record.name,
             type: "field",
           };
           if (saveWidths && schemaItem.type === "field") {
             const mainGridItem = gridState?.columns?.find(
-              (c) => c.name === record.name && c.computed && c.width
+              (c) => c.name === record.name && c.computed && c.width,
             );
             mainGridItem &&
               ((schemaItem as Field).width = `${parseInt(
-                String(mainGridItem.width)!
+                String(mainGridItem.width)!,
               )}`);
           }
           return schemaItem;
@@ -91,7 +93,7 @@ function CustomizeDialog({
         items,
       } as GridView;
     },
-    [view, shared, state.rows, saveWidths, records]
+    [view, shared, state.rows, saveWidths, records],
   );
 
   const handleSelect = useCallback(() => {
@@ -126,7 +128,7 @@ function CustomizeDialog({
     });
     confirmed &&
       setRecords((records) =>
-        records.filter((r, ind) => !selectedRows?.includes(ind))
+        records.filter((r, ind) => !selectedRows?.includes(ind)),
       );
   }, [selectedRows]);
 
@@ -206,12 +208,16 @@ export function useCustomizePopup({
   view,
   stateAtom,
 }: {
-  view: GridView;
+  view?: GridView;
   stateAtom: WritableAtom<GridState, any, any>;
 }) {
-  return useAtomCallback(
+  const canCustomize = view?.name && isUserAllowedCustomizeViews();
+
+  const showCustomizeDialog = useAtomCallback(
     useCallback(
       async (get, set, { title }: { title?: string }) => {
+        if (!view) return;
+
         const gridState = get(stateAtom);
         const canShare =
           (session?.info?.user?.viewCustomizationPermission ?? 0) > 1;
@@ -223,24 +229,24 @@ export function useCustomizePopup({
         const buttons: DialogButton[] = (
           canReset
             ? [
-              {
-                name: "reset",
-                title: i18n.get("Reset"),
-                variant: "danger",
-                onClick: async (fn) => {
-                  const confirmed = await dialogs.confirm({
-                    content: i18n.get(
-                      "Are you sure you want to reset this view customization?"
-                    ),
-                  });
-                  if (confirmed) {
-                    fn(false);
-                    await resetView(view);
-                    reload();
-                  }
-                },
-              } as DialogButton,
-            ]
+                {
+                  name: "reset",
+                  title: i18n.get("Reset"),
+                  variant: "danger",
+                  onClick: async (fn) => {
+                    const confirmed = await dialogs.confirm({
+                      content: i18n.get(
+                        "Are you sure you want to reset this view customization?",
+                      ),
+                    });
+                    if (confirmed) {
+                      fn(false);
+                      await resetView(view);
+                      reload();
+                    }
+                  },
+                } as DialogButton,
+              ]
             : []
         ).concat([
           {
@@ -281,10 +287,12 @@ export function useCustomizePopup({
           ),
           buttons,
           size: "lg",
-          onClose: () => { },
+          onClose: () => {},
         });
       },
-      [view, stateAtom]
-    )
+      [view, stateAtom],
+    ),
   );
+
+  return canCustomize ? showCustomizeDialog : undefined;
 }

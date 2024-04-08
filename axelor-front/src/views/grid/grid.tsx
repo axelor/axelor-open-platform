@@ -93,10 +93,6 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const { isMobile } = useDevice();
   const { data: sessionData } = useSession();
-  const userViewConfig = {
-    allowCustomization: sessionData?.view?.allowCustomization,
-    customizationPermission: sessionData?.user?.viewCustomizationPermission,
-  };
 
   const gridSearchAtom = useMemo(
     () =>
@@ -125,7 +121,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
   const records = useDataStore(dataStore, (ds) => ds.records);
-  const showCustomizeDialog = useCustomizePopup({
+  const onColumnCustomize = useCustomizePopup({
     view,
     stateAtom: gridStateAtom,
   });
@@ -947,10 +943,6 @@ function GridInner(props: ViewProps<GridView>) {
 
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
   const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
-  const canCustomize =
-    view.name &&
-    userViewConfig?.customizationPermission &&
-    userViewConfig?.allowCustomization !== false;
 
   const gridViewStyles =
     detailsMeta && !detailsViewOverlay && gridWidth
@@ -1084,9 +1076,7 @@ function GridInner(props: ViewProps<GridView>) {
             onDiscard={onDiscard}
             onRowReorder={onRowReorder}
             noRecordsText={i18n.get("No records found.")}
-            {...(canCustomize && {
-              onColumnCustomize: showCustomizeDialog,
-            })}
+            onColumnCustomize={onColumnCustomize}
             {...(dashlet ? {} : searchProps)}
             {...dashletProps}
             {...popupProps}

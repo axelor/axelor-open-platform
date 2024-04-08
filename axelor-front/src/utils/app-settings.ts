@@ -48,3 +48,13 @@ export function getDefaultPageSize(): number {
 export function getDefaultMaxPerPage(): number {
   return session.info?.api?.pagination?.maxPerPage ?? DEFAULT_MAX_PER_PAGE;
 }
+
+/**
+ * Check if the user is allowed to customize views
+ */
+export function isUserAllowedCustomizeViews(): boolean {
+  return Boolean(
+    session.info?.view?.allowCustomization !== false &&
+      session.info?.user?.viewCustomizationPermission,
+  );
+}

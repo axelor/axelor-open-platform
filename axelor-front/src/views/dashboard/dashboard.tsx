@@ -3,7 +3,6 @@ import { Layout, Layouts, Responsive, WidthProvider } from "react-grid-layout";
 
 import { Box, clsx, useTheme } from "@axelor/ui";
 
-import { useSession } from "@/hooks/use-session";
 import { saveView } from "@/services/client/meta-cache";
 import {
   Dashboard as DashboardView,
@@ -14,6 +13,7 @@ import {
 import { DashletComponent } from "../form/widgets/dashlet";
 import { ViewProps } from "../types";
 import { useResizeDetector } from "@/hooks/use-resize-detector";
+import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { useViewContext } from "@/view-containers/views/scope";
 
 import "react-grid-layout/css/styles.css";
@@ -79,7 +79,6 @@ const getAttrs = (item: PanelDashlet, type: MEDIA_TYPE) => {
 };
 
 export function Dashboard({ meta }: ViewProps<DashboardView>) {
-  const { data } = useSession();
   const { view } = meta;
   const { items = [] } = view;
   const [layouts, setLayouts] = useState<Layouts | null>(null);
@@ -89,10 +88,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
 
   const isRTL = useTheme().dir === "rtl";
 
-  const hasViewCustomize = Boolean(
-    data?.view?.allowCustomization !== false &&
-      data?.user?.viewCustomizationPermission,
-  );
+  const hasViewCustomize = isUserAllowedCustomizeViews();
 
   const updateLayout = useCallback(
     (updater: (key: MEDIA_TYPE, layouts?: Layout[]) => Layout[]) => {

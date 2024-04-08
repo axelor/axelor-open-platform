@@ -48,6 +48,7 @@ import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
 import { useGridColumnNames } from "@/views/grid/builder/scope";
+import { useCustomizePopup } from "@/views/grid/builder/customize";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 
 import {
@@ -351,8 +352,12 @@ function OneToManyInner({
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
-  const [state, setState] = useGridState({
+  const [state, setState, gridStateAtom] = useGridState({
     params: { groupBy },
+  });
+  const onColumnCustomize = useCustomizePopup({
+    view: viewData?.view,
+    stateAtom: gridStateAtom,
   });
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
@@ -1277,6 +1282,7 @@ function OneToManyInner({
               !detailRecord && {
                 onRowClick,
               })}
+            onColumnCustomize={onColumnCustomize}
           />
         </ScopeProvider>
         {hasMasterDetails && detailMeta ? (
