@@ -1,3 +1,17 @@
+## 7.0.7 (2024-04-08)
+
+#### Fix
+
+* Fix classname on card view template
+* Fix dirty form handling after grid button action
+
+  <details>
+  
+  This fixes dirty form handling for both editable and non-editable grid.
+  
+  </details>
+
+
 ## 7.0.6 (2024-04-05)
 
 #### Fix
