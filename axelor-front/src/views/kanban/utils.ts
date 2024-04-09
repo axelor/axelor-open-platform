@@ -53,7 +53,15 @@ export function reorderCards({
   current.splice(sourceIndex, 1);
   next.splice(destinationIndex, 0, target);
   const newColumns = columns.map((c) => ({ ...c }));
-  newColumns[getColumnIndex(columns, sourceColumn.name)].records = current;
-  newColumns[getColumnIndex(columns, destinationColumn.name)].records = next;
+
+  const sourceCol = newColumns[getColumnIndex(columns, sourceColumn.name)];
+  const destCol = newColumns[getColumnIndex(columns, destinationColumn.name)];
+
+  sourceCol.records = current;
+  destCol.records = next;
+
+  sourceCol.totalCount && sourceCol.totalCount--;
+  destCol.totalCount ? destCol.totalCount++ : (destCol.totalCount = 1);
+
   return newColumns;
 }

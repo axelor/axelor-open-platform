@@ -236,6 +236,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
               column.loading = false;
               column.records = records as KanbanRecord[];
               column.hasMore = hasMorePage(page);
+              column.totalCount = page.totalCount;
             }
           });
         }),
@@ -259,6 +260,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
                 ...(records as KanbanRecord[]),
               );
               columns[columnIndex].hasMore = hasMorePage(page);
+              columns[columnIndex].totalCount = page.totalCount;
             }
           });
         },
@@ -292,6 +294,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
               const state = columns.find((c) => c.name === column.name);
               state &&
                 (state.records = state.records?.filter((r) => r.id !== id));
+              state?.totalCount && state.totalCount--;
             });
         } catch {
           // Ignore
@@ -390,6 +393,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
                   saved as KanbanRecord,
                   ...(state.records || []),
                 ]);
+              state?.totalCount && state.totalCount++;
             });
         }
       }

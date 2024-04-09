@@ -170,8 +170,14 @@ function ColumnRenderer({
       flexDirection="column"
       className={legacyClassNames(styles["column"], "kanban-column")}
     >
-      <Box as="h6" mb={1} p={2} className={styles["column-title"]}>
-        {title}
+      <Box d="flex" mb={1} p={2} justifyContent="space-between">
+        <Box as="h6" className={styles["column-title"]}>
+          {title}
+        </Box>
+        <Box
+          alignSelf="center"
+          style={{ fontSize: "small" }}
+        >{`${column?.records?.length}/${column.totalCount ?? 0}`}</Box>
       </Box>
       {canCreate && onCardAdd && (
         <Box d="flex" g={2}>

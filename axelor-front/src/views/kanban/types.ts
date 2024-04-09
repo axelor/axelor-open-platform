@@ -15,4 +15,5 @@ export interface KanbanColumn extends Column {
   canDelete?: boolean;
   canCreate?: boolean;
   hasMore?: boolean;
+  totalCount?: number;
 }
