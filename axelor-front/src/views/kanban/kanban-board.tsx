@@ -202,8 +202,21 @@ function ColumnRenderer({
           readonly={readonly}
           className={styles["record-list"]}
         />
-        {hasMore && (
-          <Box d="flex" justifyContent="center" pb={1}>
+        {hasMore && !noData && (
+          <Box d="flex" flexDirection="column" justifyContent="center" py={2}>
+            <Box
+              d="flex"
+              justifyContent="center"
+              py={2}
+              className={styles["bottom-column-text"]}
+            >
+              {i18n.get(
+                "Showing {0} of {1} items.",
+                column.records?.length,
+                column.totalCount,
+              )}
+            </Box>
+
             <Button
               onClick={() => onLoadMore?.({ column })}
               outline
@@ -214,12 +227,21 @@ function ColumnRenderer({
             </Button>
           </Box>
         )}
+        {!hasMore && !noData && !loading && (
+          <Box
+            d="flex"
+            justifyContent="center"
+            py={2}
+            className={styles["bottom-column-text"]}
+          >
+            {i18n.get("Showing all items.")}
+          </Box>
+        )}
         {noData && (
           <Box
-            as="p"
-            m={0}
+            py={2}
             textAlign="center"
-            className={styles["no-records-text"]}
+            className={styles["bottom-column-text"]}
           >
             {i18n.get("No records found.")}
           </Box>
