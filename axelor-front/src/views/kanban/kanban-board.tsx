@@ -1,7 +1,13 @@
-import { clsx } from "@axelor/ui";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { Box, Button, CommandBar, CommandItemProps, Input } from "@axelor/ui";
+import {
+  Box,
+  Button,
+  clsx,
+  CommandBar,
+  CommandItemProps,
+  Input,
+} from "@axelor/ui";
 import { Kanban } from "@axelor/ui/kanban";
 
 import { Loader } from "@/components/loader/loader";
@@ -169,7 +175,11 @@ function ColumnRenderer({
       </Box>
       {canCreate && onCardAdd && (
         <Box d="flex" g={2}>
-          <Input value={text} onChange={(e) => setText(e.target.value)} />
+          <Input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className={styles.addInput}
+          />
           <Button disabled={!text.trim()} variant="primary" onClick={handleAdd}>
             {i18n.get("Add")}
           </Button>
