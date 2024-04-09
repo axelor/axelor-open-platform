@@ -16,12 +16,12 @@
   border-left: 3px solid var(--bs-border-color);
   user-select: none;
   background-color: var(--bs-body-bg);
+  overflow-wrap: break-word;
   &:hover {
     cursor: pointer;
     box-shadow: var(--bs-box-shadow-sm);
   }
 }
-
 
 :global {
   .card-summary.popover {
