@@ -625,6 +625,7 @@ export interface KanbanView extends View {
   freeSearch?: string;
   editWindow?: string;
   columnBy?: string;
+  collapseColumns?: string;
   sequenceBy?: string;
   draggable?: boolean;
   onNew?: string;

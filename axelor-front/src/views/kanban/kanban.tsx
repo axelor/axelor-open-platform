@@ -214,22 +214,32 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const onSearch = useCallback(
     (options: Partial<SearchOptions> = {}): any => {
       const hideColumns = hideCols.split(",");
-      const columns = ($columns || [])
-        .filter((item) => !hideColumns.includes(item.value))
-        .map(({ value: name, title, canCreate, collapsed }: any) => ({
-          id: name,
-          name,
-          title,
-          collapsed,
-          canCreate,
-          loading: true,
-          records: [],
-        }));
+      const collapseColumns = view.collapseColumns?.split(",");
 
-      setColumns(columns);
+      let defaultColumns = ($columns || []).filter(
+        (item) => !hideColumns.includes(item.value),
+      );
 
-      columns.map((column: any, index: number) =>
-        fetchRecords(column.name, options).then(({ page, records }) => {
+      // If no data is fetched, first initialize columns with default properties
+      if (columns.length === 0) {
+        defaultColumns = defaultColumns.map(
+          ({ value: name, title, canCreate }: any) => ({
+            id: name,
+            name,
+            title,
+            collapsed: collapseColumns?.includes(name),
+            canCreate,
+            loading: true,
+            records: [],
+          }),
+        );
+
+        setColumns(defaultColumns);
+      }
+
+      // Fetch records for each column
+      defaultColumns.map((column, index) =>
+        fetchRecords(column.value, options).then(({ page, records }) => {
           setColumns((draft) => {
             const column = draft[index];
             if (column) {
@@ -242,12 +252,29 @@ export function Kanban(props: ViewProps<KanbanView>) {
         }),
       );
     },
-    [hideCols, setColumns, $columns, fetchRecords],
+    [
+      hideCols,
+      view.collapseColumns,
+      columns.length,
+      $columns,
+      setColumns,
+      fetchRecords,
+    ],
   );
 
   const onRefresh = useCallback(() => {
     return onSearch({ offset: 0 });
   }, [onSearch]);
+
+  const onCollapse = useCallback(
+    (column: KanbanColumn) => {
+      setColumns((columns) => {
+        const columnIndex = columns.findIndex((c) => c.name === column.name);
+        columns[columnIndex].collapsed = !column.collapsed;
+      });
+    },
+    [setColumns],
+  );
 
   const onLoadMore = useCallback(
     ({ column: { name, records } }: { column: KanbanColumn }) => {
@@ -667,6 +694,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           columnWidth={colWidth}
           columns={columns}
           components={components as any}
+          onCollapse={onCollapse}
           onLoadMore={onLoadMore}
           onCardMove={onMove}
           onCardClick={onView}

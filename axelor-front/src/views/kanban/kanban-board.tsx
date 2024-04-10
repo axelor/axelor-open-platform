@@ -9,10 +9,10 @@ import {
   Input,
 } from "@axelor/ui";
 import { Kanban } from "@axelor/ui/kanban";
+import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { Loader } from "@/components/loader/loader";
 import { i18n } from "@/services/client/i18n";
-import { legacyClassNames } from "@/styles/legacy";
 
 import { KanbanColumn, KanbanRecord } from "./types";
 
@@ -24,6 +24,7 @@ interface KanbanBoardProps {
   responsive?: boolean;
   readonly?: boolean;
   components: { Card: React.JSXElementConstructor<{ record: KanbanRecord }> };
+  onCollapse?: (column: KanbanColumn) => void;
   onLoadMore?: ({ column }: { column: KanbanColumn }) => void;
   onCardMove?: ({
     column,
@@ -138,6 +139,7 @@ function ColumnRenderer({
   column,
   readonly,
   overflow,
+  onCollapse,
   onLoadMore,
   onCardAdd,
   RecordList,
@@ -146,6 +148,7 @@ function ColumnRenderer({
   readonly?: boolean;
   overflow?: boolean;
   RecordList: any;
+  onCollapse?: KanbanBoardProps["onCollapse"];
   onLoadMore?: KanbanBoardProps["onLoadMore"];
   onCardAdd?: KanbanBoardProps["onCardAdd"];
 }) {
@@ -161,6 +164,26 @@ function ColumnRenderer({
     });
   }
 
+  const handleCollapse = useCallback(() => {
+    onCollapse?.(column);
+  }, [column, onCollapse]);
+
+  if (column.collapsed) {
+    return (
+      <Box rounded={3} className={styles.collapsed}>
+        <Button onClick={handleCollapse} border={false} m={0} p={2}>
+          <BootstrapIcon icon="chevron-right" />
+        </Button>
+        <Box
+          as="h6"
+          className={`${styles["column-title"]} ${styles["collapsed-column-title"]}`}
+        >
+          {title}
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box
       h={100}
@@ -168,11 +191,16 @@ function ColumnRenderer({
       rounded={3}
       flexGrow={1}
       flexDirection="column"
-      className={legacyClassNames(styles["column"], "kanban-column")}
+      className={clsx(styles["column"], "kanban-column")}
     >
       <Box d="flex" mb={1} p={2} justifyContent="space-between">
-        <Box as="h6" className={styles["column-title"]}>
-          {title}
+        <Box d="flex">
+          <Button onClick={handleCollapse} border={false} p={0} me={2}>
+            <BootstrapIcon icon="chevron-down" />
+          </Button>
+          <Box as="h6" className={styles["column-title"]}>
+            {title}
+          </Box>
         </Box>
         <Box
           alignSelf="center"
@@ -222,6 +250,7 @@ function ColumnRenderer({
               outline
               size="sm"
               variant="secondary"
+              alignSelf="center"
             >
               {i18n.get("Load more")}
             </Button>
@@ -262,6 +291,7 @@ export function KanbanBoard({
   readonly,
   responsive,
   components,
+  onCollapse,
   onLoadMore,
   onCardAdd,
   onCardMove,
@@ -316,6 +346,7 @@ export function KanbanBoard({
               readonly,
               RecordList,
               overflow: !responsive,
+              onCollapse,
               onCardAdd,
               onLoadMore,
             }}
@@ -325,6 +356,7 @@ export function KanbanBoard({
     [
       columns,
       responsive,
+      onCollapse,
       onLoadMore,
       onCardAdd,
       onCardClick,

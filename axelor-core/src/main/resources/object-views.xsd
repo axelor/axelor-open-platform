@@ -2281,7 +2281,7 @@
       <xsd:extension base="tns:CardsView">
         <xsd:attribute name="columnBy" type="xsd:string" use="required">
           <xsd:annotation>
-            <xsd:documentation>Specify a selection field to create columns.</xsd:documentation>
+            <xsd:documentation>Specify a field to create columns. Can be an enum, selection or a reference field.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="cardWidth" use="prohibited" />
@@ -2322,6 +2322,11 @@
             <xsd:documentation>
               Specify maximum number of columns when columnBy is a reference field.
             </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-collapse-columns" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separated list of columns that are collapsed by default (reference fields not supported).</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

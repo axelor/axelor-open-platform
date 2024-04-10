@@ -1,0 +1,8 @@
+---
+title: Improve kanban UI/UX
+type: feature
+description: |
+  Kanban columns can now be collapsed. An 'x-collapse-columns' property
+  has been added, accepting a comma-separated list of column names that
+  should be collapsed by default (reference fields not supported). This 
+  comes with other visual changes such as pagination and minor fixes.

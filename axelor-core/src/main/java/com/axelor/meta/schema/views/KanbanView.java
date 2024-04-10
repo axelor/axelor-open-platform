@@ -54,6 +54,9 @@ public class KanbanView extends CardsView {
   @XmlAttribute(name = "x-limit-columns")
   private Integer limitColumns;
 
+  @XmlAttribute(name = "x-collapse-columns")
+  private String collapseColumns;
+
   @Override
   public Set<String> getExtraNames() {
     return Stream.of(getColumnBy(), getSequenceBy())
@@ -115,6 +118,14 @@ public class KanbanView extends CardsView {
 
   public void setLimitColumns(Integer limitColumns) {
     this.limitColumns = limitColumns;
+  }
+
+    public String getCollapseColumns() {
+    return collapseColumns;
+  }
+
+  public void setCollapseColumns(String collapseColumns) {
+    this.collapseColumns = collapseColumns;
   }
 
   private Class<?> getModelClass() {
