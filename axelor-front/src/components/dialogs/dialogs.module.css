@@ -1,5 +1,5 @@
 .root {
-  z-index: inherit;
+  z-index: inherit !important;
 }
 
 .backdrop {
