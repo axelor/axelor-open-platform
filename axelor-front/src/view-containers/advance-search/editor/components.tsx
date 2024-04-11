@@ -196,17 +196,26 @@ function RelationalSelectWidget({
       model: target,
       viewName: gridView,
       orderBy: sortBy,
-      multiple: false,
+      multiple,
       limit: searchLimit,
       onSelect: async (records) => {
-        onChange(records[0] as { name: string; value: any });
+        onChange({ name: "value", value: multiple ? records : records[0] });
       },
       ...(domain && {
         domain,
         context: {},
       }),
     });
-  }, [showSelector, target, gridView, sortBy, searchLimit, domain, onChange]);
+  }, [
+    showSelector,
+    multiple,
+    target,
+    gridView,
+    sortBy,
+    searchLimit,
+    domain,
+    onChange,
+  ]);
 
   const icons = useMemo(
     () =>
