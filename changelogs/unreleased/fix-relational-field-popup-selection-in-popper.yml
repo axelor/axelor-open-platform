@@ -1,0 +1,7 @@
+---
+title: Fix relation field popup selection conflicts in popper
+type: fix
+description: |
+  When relational field is searched using popup in advanced search
+  or in mass update popper, the popper should remain open and should
+  not affect any click event happens in selector popup wizard.

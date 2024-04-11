@@ -4,12 +4,10 @@ import { useMemo, useState, useId } from "react";
 import {
   Box,
   Button,
-  ClickAwayListener,
   Divider,
   Input,
   InputLabel,
   Link,
-  Popper,
 } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -19,6 +17,7 @@ import { i18n } from "@/services/client/i18n";
 import { Field, GridView, Property } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Widget } from "@/view-containers/advance-search/editor/components";
+import { ViewPopper } from "@/view-containers/view-popup/view-popper";
 
 import styles from "./mass-update.module.scss";
 
@@ -125,139 +124,138 @@ export function MassUpdater({
     .map((item) => item.field);
 
   return (
-    <Popper
+    <ViewPopper
       bg="body"
       open={open}
       target={target!}
       placement={`bottom-start`}
       offset={[0, 8]}
+      onClose={onClose}
     >
-      <ClickAwayListener onClickAway={onClose}>
-        <Box className={styles.container} bg="body" p={2}>
-          <Box d="flex" alignItems="center">
-            <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
-              {i18n.get("Mass Update")}
-            </Box>
-            <Box as="span" className={styles.icon} onClick={onClose}>
-              <MaterialIcon icon="close" />
-            </Box>
+      <Box className={styles.container} bg="body" p={2}>
+        <Box d="flex" alignItems="center">
+          <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+            {i18n.get("Mass Update")}
           </Box>
-          <Divider />
-          <Box p={2} py={1}>
-            <Box as="table" w={100}>
-              <tbody>
-                {items.map((item, index) => {
-                  const { field } = item;
-                  const options = fields.filter(
-                    (f) => !selectedItems.includes(f) || f === field,
-                  );
-                  return (
-                    <tr key={index}>
-                      <td
-                        width={20}
-                        className={styles.remove}
-                        onClick={() => onRemove(index)}
-                      >
-                        <MaterialIcon icon="close" />
-                      </td>
-                      <td>
-                        <Select
-                          multiple={false}
-                          placeholder={i18n.get("Select")}
-                          options={options}
-                          optionKey={(x) => x.name}
-                          optionLabel={(x) => x.title ?? x.autoTitle ?? x.name}
-                          optionEqual={(x, y) => x.name === y.name}
-                          onChange={(value) => {
-                            onChange(
-                              "field",
-                              fields.find((x) => x.name === value?.name),
-                              index,
-                            );
+          <Box as="span" className={styles.icon} onClick={onClose}>
+            <MaterialIcon icon="close" />
+          </Box>
+        </Box>
+        <Divider />
+        <Box p={2} py={1}>
+          <Box as="table" w={100}>
+            <tbody>
+              {items.map((item, index) => {
+                const { field } = item;
+                const options = fields.filter(
+                  (f) => !selectedItems.includes(f) || f === field,
+                );
+                return (
+                  <tr key={index}>
+                    <td
+                      width={20}
+                      className={styles.remove}
+                      onClick={() => onRemove(index)}
+                    >
+                      <MaterialIcon icon="close" />
+                    </td>
+                    <td>
+                      <Select
+                        multiple={false}
+                        placeholder={i18n.get("Select")}
+                        options={options}
+                        optionKey={(x) => x.name}
+                        optionLabel={(x) => x.title ?? x.autoTitle ?? x.name}
+                        optionEqual={(x, y) => x.name === y.name}
+                        onChange={(value) => {
+                          onChange(
+                            "field",
+                            fields.find((x) => x.name === value?.name),
+                            index,
+                          );
+                        }}
+                        value={field}
+                      />
+                    </td>
+                    <td>
+                      {field && (
+                        <Widget
+                          {...{
+                            operator: "=",
+                            inputProps: {
+                              className: styles.widget,
+                              placeholder: field.placeholder || field.title,
+                            },
+                            field,
+                            filter: item,
+                            onChange: (e: any) =>
+                              onChange("value", e?.value ?? null, index),
                           }}
-                          value={field}
                         />
-                      </td>
-                      <td>
-                        {field && (
-                          <Widget
-                            {...{
-                              operator: "=",
-                              inputProps: {
-                                className: styles.widget,
-                                placeholder: field.placeholder || field.title,
-                              },
-                              field,
-                              filter: item,
-                              onChange: (e: any) =>
-                                onChange("value", e?.value ?? null, index),
-                            }}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Box>
+          <Box d="flex" ps={4} mt={2} style={{ height: 20 }}>
+            <Box>
+              <Link mx={1} onClick={onAdd}>
+                {i18n.get("Add Field")}
+              </Link>
             </Box>
-            <Box d="flex" ps={4} mt={2} style={{ height: 20 }}>
-              <Box>
-                <Link mx={1} onClick={onAdd}>
-                  {i18n.get("Add Field")}
-                </Link>
-              </Box>
-              <Divider vertical />
-              <Box>
-                <Link mx={1} onClick={onClear}>
-                  {i18n.get("Clear")}
-                </Link>
-              </Box>
+            <Divider vertical />
+            <Box>
+              <Link mx={1} onClick={onClear}>
+                {i18n.get("Clear")}
+              </Link>
             </Box>
           </Box>
-          <Divider />
-          <Box p={2}>
-            <Box d="flex" ms={1}>
-              <Button
-                outline
-                size="sm"
-                variant="primary"
-                disabled={selectedItems.length === 0}
-                onClick={handleUpdate}
-              >
-                {i18n.get("Update")}
-              </Button>
-              <Button
-                outline
-                ms={2}
-                size="sm"
-                variant="primary"
-                onClick={onClose}
-              >
-                {i18n.get("Cancel")}
-              </Button>
-              <Box d="flex" ms={2}>
-                <Box d="flex" alignItems="center">
-                  <Input
-                    id={hasAllId}
-                    m={0}
-                    type="checkbox"
-                    checked={isUpdateAll}
-                    onChange={(e) => setUpdateAll(!isUpdateAll)}
-                  />
-                  <InputLabel
-                    ms={1}
-                    mb={0}
-                    alignItems="center"
-                    htmlFor={hasAllId}
-                  >
-                    {i18n.get("Update all")}
-                  </InputLabel>
-                </Box>
+        </Box>
+        <Divider />
+        <Box p={2}>
+          <Box d="flex" ms={1}>
+            <Button
+              outline
+              size="sm"
+              variant="primary"
+              disabled={selectedItems.length === 0}
+              onClick={handleUpdate}
+            >
+              {i18n.get("Update")}
+            </Button>
+            <Button
+              outline
+              ms={2}
+              size="sm"
+              variant="primary"
+              onClick={onClose}
+            >
+              {i18n.get("Cancel")}
+            </Button>
+            <Box d="flex" ms={2}>
+              <Box d="flex" alignItems="center">
+                <Input
+                  id={hasAllId}
+                  m={0}
+                  type="checkbox"
+                  checked={isUpdateAll}
+                  onChange={(e) => setUpdateAll(!isUpdateAll)}
+                />
+                <InputLabel
+                  ms={1}
+                  mb={0}
+                  alignItems="center"
+                  htmlFor={hasAllId}
+                >
+                  {i18n.get("Update all")}
+                </InputLabel>
               </Box>
             </Box>
           </Box>
         </Box>
-      </ClickAwayListener>
-    </Popper>
+      </Box>
+    </ViewPopper>
   );
 }

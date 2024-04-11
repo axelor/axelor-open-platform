@@ -22,6 +22,7 @@ import { Views } from "../views";
 import { PopupHandler, PopupScope, usePopupHandlerAtom } from "./handler";
 
 import { showErrors } from "@/views/form";
+import { handlePopper } from "./view-popper";
 
 import styles from "./view-popup.module.scss";
 
@@ -94,6 +95,8 @@ export const PopupDialog = memo(function PopupDialog({
   );
   const [maximized, setMaximized] = useState<boolean>(maximize ?? false);
   const [expanded, setExpanded] = useState<boolean>(true);
+
+  useEffect(() => handlePopper(), []);
 
   return (
     <ScopeProvider scope={PopupScope} value={{}}>

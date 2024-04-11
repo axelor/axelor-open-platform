@@ -9,15 +9,7 @@ import {
   useState,
 } from "react";
 
-import {
-  Box,
-  ClickAwayListener,
-  Divider,
-  FocusTrap,
-  Popper,
-  TextField,
-  useTheme,
-} from "@axelor/ui";
+import { Box, Divider, FocusTrap, TextField, useTheme } from "@axelor/ui";
 import { GridColumn } from "@axelor/ui/grid";
 import {
   MaterialIcon,
@@ -44,6 +36,7 @@ import { download } from "@/utils/download";
 import { focusAndSelectInput } from "@/views/form";
 import { SelectionTag } from "@/views/form/widgets";
 
+import { ViewPopper } from "../view-popup/view-popper";
 import { useViewAction, useViewTab } from "../views/scope";
 import { Editor } from "./editor";
 import { getEditorDefaultState } from "./editor/editor";
@@ -256,15 +249,14 @@ export function AdvanceSearch({
 
   const handleDomainCheck = useCallback(
     (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
-      setDomains(
-        (domains) =>
-          domains?.map((d) =>
-            d === (filter as SearchFilter)
-              ? { ...d, checked: !d.checked }
-              : type === "click"
-                ? { ...d, checked: false }
-                : d,
-          ),
+      setDomains((domains) =>
+        domains?.map((d) =>
+          d === (filter as SearchFilter)
+            ? { ...d, checked: !d.checked }
+            : type === "click"
+              ? { ...d, checked: false }
+              : d,
+        ),
       );
       type === "click" && handleApply();
     },
@@ -275,20 +267,18 @@ export function AdvanceSearch({
     (filter: SearchFilter | SavedFilter, type?: "click" | "change") => {
       const isSingle = type === "click" && !filter.checked;
       setFilterType(isSingle ? "single" : "all");
-      setFilters(
-        (filters) =>
-          filters?.map((f) =>
-            f === (filter as SavedFilter)
-              ? { ...f, checked: !f.checked }
-              : type === "click"
-                ? { ...f, checked: false }
-                : f,
-          ),
+      setFilters((filters) =>
+        filters?.map((f) =>
+          f === (filter as SavedFilter)
+            ? { ...f, checked: !f.checked }
+            : type === "click"
+              ? { ...f, checked: false }
+              : f,
+        ),
       );
       if (type === "click") {
-        setDomains(
-          (domains) =>
-            domains?.map((d) => (d.checked ? { ...d, checked: false } : d)),
+        setDomains((domains) =>
+          domains?.map((d) => (d.checked ? { ...d, checked: false } : d)),
         );
         try {
           let filterCustom = JSON.parse(
@@ -453,83 +443,83 @@ export function AdvanceSearch({
         onClear={handleClear}
         onSearch={handleFreeSearch}
       />
-      <Popper
+      <ViewPopper
         bg="body"
         open={open}
         className={styles.popper}
         target={containerRef.current}
         placement={`bottom-${rtl ? "end" : "start"}`}
+        onClose={handleClose}
       >
-        <ClickAwayListener onClickAway={handleClose}>
-          <Box
-            {...(rtl ? { dir: "rtl" } : {})}
-            className={styles.popperContent}
-            p={2}
-          >
-            <FocusTrap initialFocus={false} enabled={open}>
-              <Box d="flex" flexDirection="column">
-                <Box d="flex" alignItems="center">
-                  <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
-                    {i18n.get("Advanced Search")}
-                  </Box>
-                  <Box as="span" className={styles.icon} onClick={handleClose}>
-                    <MaterialIcon icon="close" />
-                  </Box>
+        <Box
+          {...(rtl ? { dir: "rtl" } : {})}
+          className={styles.popperContent}
+          p={2}
+        >
+          <FocusTrap initialFocus={false} enabled={open}>
+            <Box d="flex" flexDirection="column">
+              <Box d="flex" alignItems="center">
+                <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+                  {i18n.get("Advanced Search")}
                 </Box>
-                <Divider />
-                <Box
-                  d="flex"
-                  className={styles.filterList}
-                  alignItems="flex-start"
-                  mb={customSearch ? 0 : 1}
-                >
-                  {(domains || []).length > 0 && (
-                    <FilterList
-                      title={i18n.get("Filters")}
-                      items={domains}
-                      disabled={filterType === "single"}
-                      onFilterCheck={handleDomainCheck}
-                    />
-                  )}
-                  {(filters || []).length > 0 && (
-                    <FilterList
-                      title={i18n.get("My Filters")}
-                      items={filters}
-                      disabled={filterType === "single"}
-                      onFilterCheck={handleFilterCheck}
-                    />
-                  )}
-                  {!customSearch && !domains?.length && !filters?.length && (
-                    <Box as="p" mb={0} p={1} flex={1}>
-                      {i18n.get("No filters available")}
-                    </Box>
-                  )}
+                <Box as="span" className={styles.icon} onClick={handleClose}>
+                  <MaterialIcon icon="close" />
                 </Box>
-
-                {customSearch &&
-                  ((filters?.length ?? 0) > 0 ||
-                    (domains?.length ?? 0) > 0) && <Divider mt={1} />}
-
-                {customSearch && (
-                  <Editor
-                    stateAtom={stateAtom}
-                    fields={fields}
-                    contextFields={contextFields}
-                    canExport={canExport}
-                    canShare={advanceSearchConfig?.share}
-                    canExportFull={advanceSearchConfig?.exportFull}
-                    onApply={handleEditorApply}
-                    onClear={handleClear}
-                    onExport={handleExport}
-                    onSave={handleFilterSave}
-                    onDelete={handleFilterRemove}
+              </Box>
+              <Divider />
+              <Box
+                d="flex"
+                className={styles.filterList}
+                alignItems="flex-start"
+                mb={customSearch ? 0 : 1}
+              >
+                {(domains || []).length > 0 && (
+                  <FilterList
+                    title={i18n.get("Filters")}
+                    items={domains}
+                    disabled={filterType === "single"}
+                    onFilterCheck={handleDomainCheck}
                   />
                 )}
+                {(filters || []).length > 0 && (
+                  <FilterList
+                    title={i18n.get("My Filters")}
+                    items={filters}
+                    disabled={filterType === "single"}
+                    onFilterCheck={handleFilterCheck}
+                  />
+                )}
+                {!customSearch && !domains?.length && !filters?.length && (
+                  <Box as="p" mb={0} p={1} flex={1}>
+                    {i18n.get("No filters available")}
+                  </Box>
+                )}
               </Box>
-            </FocusTrap>
-          </Box>
-        </ClickAwayListener>
-      </Popper>
+
+              {customSearch &&
+                ((filters?.length ?? 0) > 0 || (domains?.length ?? 0) > 0) && (
+                  <Divider mt={1} />
+                )}
+
+              {customSearch && (
+                <Editor
+                  stateAtom={stateAtom}
+                  fields={fields}
+                  contextFields={contextFields}
+                  canExport={canExport}
+                  canShare={advanceSearchConfig?.share}
+                  canExportFull={advanceSearchConfig?.exportFull}
+                  onApply={handleEditorApply}
+                  onClear={handleClear}
+                  onExport={handleExport}
+                  onSave={handleFilterSave}
+                  onDelete={handleFilterRemove}
+                />
+              )}
+            </Box>
+          </FocusTrap>
+        </Box>
+      </ViewPopper>
     </Box>
   );
 }
