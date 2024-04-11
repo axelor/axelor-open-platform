@@ -137,7 +137,7 @@ function CustomizeDialog({
   }, [onUpdate, getSavedView]);
 
   return (
-    <Box flex={1} p={3}>
+    <Box d="flex" flexDirection="column" flex={1} p={3}>
       <Panel
         className={styles.panel}
         header={title}
