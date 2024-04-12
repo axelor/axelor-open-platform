@@ -607,14 +607,24 @@ function GridInner(props: ViewProps<GridView>) {
   const maxPage = Math.ceil(totalCount / limit);
   const hasRowSelected = !!selectedRows?.length;
   const currentPage = useMemo(() => {
-    if (dashlet || popup) return 0;
+    if (dashlet) return 0;
     const hasPageSet = pageSetRef.current;
     pageSetRef.current = true;
     if (hasPageSet || dataStore.records.length === 0) {
       return +(viewRoute?.id || 1);
     }
     return Math.floor(offset / limit) + 1;
-  }, [dataStore, offset, limit, viewRoute?.id, dashlet, popup]);
+  }, [dataStore, offset, limit, viewRoute?.id, dashlet]);
+
+  const updatePage = useCallback(
+    (page: number) => {
+      if (dashlet) return;
+      switchTo("grid", {
+        route: { id: String(page) },
+      });
+    },
+    [dashlet, switchTo],
+  );
 
   const getContext = useCallback<() => DataContext>(
     () => ({
@@ -720,15 +730,13 @@ function GridInner(props: ViewProps<GridView>) {
   ]);
 
   useEffect(() => {
-    if (dashlet || popup) return;
+    if (popup) return;
     let nextPage = currentPage;
     if (offset > totalCount) {
       nextPage = Math.ceil(totalCount / limit) || nextPage;
     }
-    switchTo("grid", {
-      route: { id: String(nextPage) },
-    });
-  }, [dashlet, popup, currentPage, limit, offset, switchTo, totalCount]);
+    updatePage(nextPage);
+  }, [popup, currentPage, limit, offset, updatePage, totalCount]);
 
   useEffect(() => {
     setViewProps((viewProps) => {
@@ -825,10 +833,10 @@ function GridInner(props: ViewProps<GridView>) {
     (_options?: SearchOptions) =>
       doSearch({ offset: 0, ..._options }).then(() => {
         if (dataStore.page?.offset === 0) {
-          switchTo("grid", { route: { id: "1" } });
+          updatePage(1);
         }
       }),
-    [doSearch, dataStore, switchTo],
+    [doSearch, dataStore, updatePage],
   );
 
   const searchColumnRenderer = useMemo(() => {
@@ -911,18 +919,13 @@ function GridInner(props: ViewProps<GridView>) {
   }, [onDelete, selectedRows, rows]);
 
   const handlePrev = useCallback(
-    () =>
-      switchTo("grid", {
-        route: { id: String(Math.max(minPage, currentPage - 1)) },
-      }),
-    [currentPage, minPage, switchTo],
+    () => updatePage(Math.max(minPage, currentPage - 1)),
+    [currentPage, minPage, updatePage],
   );
+
   const handleNext = useCallback(
-    () =>
-      switchTo("grid", {
-        route: { id: String(Math.min(maxPage, currentPage + 1)) },
-      }),
-    [currentPage, maxPage, switchTo],
+    () => updatePage(Math.min(maxPage, currentPage + 1)),
+    [currentPage, maxPage, updatePage],
   );
 
   useShortcuts({
