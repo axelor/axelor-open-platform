@@ -233,6 +233,7 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onSearch = useAfterActions(doSearch);
+  const onSearchRef = useRef(onSearch);
 
   const { page } = dataStore;
   const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
@@ -798,9 +799,12 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onGridSearch = useCallback(
     (options?: SearchOptions) => {
+      const hasOnSearchChanged = onSearchRef.current !== onSearch;
+
       const currOptions = dataStore.options || {};
       // if any search options changed then only trigger search
       if (
+        !hasOnSearchChanged &&
         options &&
         Object.entries(options).every(([k, v]) =>
           isEqual(currOptions[k as keyof SearchOptions], v),
@@ -808,7 +812,7 @@ function GridInner(props: ViewProps<GridView>) {
       ) {
         return;
       }
-      return onSearch(options);
+      return (onSearchRef.current = onSearch)(options);
     },
     [onSearch, dataStore],
   );
