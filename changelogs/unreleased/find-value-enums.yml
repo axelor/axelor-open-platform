@@ -1,0 +1,5 @@
+---
+title: Add support to find value enums
+type: feature
+description: |
+  A new `JpaScanner#findEnums` method added to find all value enums in the classpath.
