@@ -23,6 +23,7 @@ export type ChartType =
   | "donut"
   | "funnel"
   | "gauge"
-  | "text";
+  | "text"
+  | "radar";
 
 export type ChartGroupType = "stack" | "group";
