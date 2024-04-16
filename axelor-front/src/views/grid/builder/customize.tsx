@@ -37,11 +37,13 @@ function CustomizeDialog({
   const [saveWidths, setSaveWidths] = useState(false);
   const [shared, setShared] = useState(false);
   const [records, setRecords] = useState(
-    (view.items || []).map((item, ind) => ({
-      id: ind + 1,
-      ...item,
-      title: item.title || item.autoTitle,
-    })) as DataRecord[],
+    (view.items || [])
+      .map((item, ind) => ({
+        id: ind + 1,
+        ...item,
+        title: item.title || item.autoTitle,
+      }))
+      .filter((item) => item.hidden !== true) as DataRecord[],
   );
   const showSelector = useSelector();
 
