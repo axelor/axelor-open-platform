@@ -1,45 +1,14 @@
 import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
 import { FunctionComponent, memo } from "react";
 
-import { useTemplateContext } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { SearchResult } from "@/services/client/data";
 import { CardsView, Property } from "@/services/client/meta.types";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { MetaData } from "@/services/client/meta";
+import { CardTemplate } from "./card-template";
 import { useCardClassName } from "./use-card-classname";
 import classes from "./card.module.scss";
-
-export function CardTemplate({
-  component: TemplateComponent,
-  record,
-  fields,
-  onRefresh,
-}: {
-  component: FunctionComponent<{
-    context: DataContext;
-    options?: EvalContextOptions;
-  }>;
-  record: DataRecord;
-  fields?: MetaData["fields"];
-  onRefresh?: () => Promise<any>;
-}) {
-  const {
-    context,
-    options: { execute },
-  } = useTemplateContext(record, onRefresh);
-
-  return (
-    <TemplateComponent
-      context={context}
-      options={{
-        execute,
-        fields,
-      }}
-    />
-  );
-}
 
 export const Card = memo(function Card({
   record,

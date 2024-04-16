@@ -19,12 +19,21 @@ The kanban view is a agile dashboard like view.
   <hilite color="info" if="progress &gt;= 50" />
   <hilite color="warning" if="progress &gt; 0" />
   <template><![CDATA[
-  <h4>{{name}}</h4>
-  <img ng-if="user" src="{{$image('user', 'image')}}">
-  <div class="card-body">{{notes}}</div>
-  <div class="card-footer">
-    <i class='fa fa-clock-o'></i> <span>{{startDate|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-  </div>
+    <Box as="strong">
+        {name}
+    </Box>
+    <Box d="flex" mt={2}>
+        {notes}
+    </Box>
+    <Box d="grid" gridTemplateColumns="auto auto" style={{ fontSize: "0.85rem", color: "grey" }} mt={2}>
+        <Box d="flex" g={2}>
+          <Icon icon={"clock"} />
+          {startDate && <span>{$moment(startDate).format('LLL')}</span>}
+        </Box>
+        <Box d="flex" justifyContent="flex-end">
+          {user && <Image src={$image('user', 'image')} style={{ width: "1.5rem", height: "1.5rem", borderRadius: "100%" }}/>}
+        </Box>
+    </Box>
   ]]></template>
 </kanban>
 -----

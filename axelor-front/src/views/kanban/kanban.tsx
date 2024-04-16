@@ -20,10 +20,11 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
+import { isLegacyTemplate } from "@/hooks/use-parser/utils";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
-import { SearchOptions, SearchPage } from "@/services/client/data";
+import { SearchOptions } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -45,7 +46,7 @@ import { useActionExecutor } from "../form/builder/scope";
 import { isValidSequence } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 
-import { CardTemplate } from "../cards/card";
+import { CardTemplate } from "../cards/card-template";
 import { useCardClassName } from "../cards/use-card-classname";
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
@@ -747,6 +748,7 @@ function KanbanCard({
   }, []);
 
   const hasPopover = (templateString || "").includes("popover");
+  const isLegacyTmpl = isLegacyTemplate(templateString);
 
   useEffect(() => {
     return () => hidePopover();
@@ -763,7 +765,11 @@ function KanbanCard({
               onMouseDown: hidePopover,
             }
           : {})}
-        className={clsx(styles["kanban-card"], className)}
+        className={clsx(
+          isLegacyTmpl ? legacyClassNames("kanban-card") : "",
+          styles["kanban-card"],
+          className,
+        )}
       >
         <CardTemplate
           component={Template}

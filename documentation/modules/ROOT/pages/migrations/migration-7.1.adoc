@@ -49,3 +49,117 @@ sudo ln -s ../java-11-openjdk-amd64/bin .
 ----
 
 ====
+
+
+== Kanban views
+
+In Kanban views, the template has some automatic styles applied, especially for `img` and `h4`.
+This makes different rendering and styles between cards and kanban views. In order to align them, these
+automatic predefined styles has been removed in React template only. Here are the changes :
+
+[cols="1,2,2"]
+|===
+| What is concerned ? | Old styles | Migration
+
+| Any `img` elements or `Image` components
+a| This put img on right bottom corner
+[source,css]
+----
+width: 1.5rem;
+height: 1.5rem;
+position: absolute;
+right: 0.25rem;
+bottom: 0.25rem;
+border-radius: 100%;
+----
+a| Image should be embedded in an appropriate container
+[source]
+----
+<Image style={{ width: "1.5rem", height: "1.5rem", borderRadius: "100%" }}/>
+----
+
+| Any `h4` elements or `<Box as="h4">` components
+a|
+[source,css]
+----
+margin: 0 0 4px 0;
+font-weight: 600;
+font-size: 13px;
+----
+a|
+
+[source]
+----
+<Box as="strong" mb={2}>
+  {some}
+</Box>
+----
+
+| Usage of `card-footer` classname
+a|
+[source,css]
+----
+margin-top: 4px;
+color: #777;
+font-size: 12px;
+----
+a|
+
+[source]
+----
+<Box style={{ fontSize: "0.85rem", color: "grey" }} mt={2}>
+  {some}
+</Box>
+----
+
+| Usage of `css="rect-image"`
+a| Apply circle image style
+[source,css]
+----
+border-radius: 0;
+----
+a| Use `borderRadius` on image
+
+[source]
+----
+<Image style={{ borderRadius: "100%" }}/>
+----
+
+|===
+
+Here is a full example from legacy Angular template :
+
+[source,html]
+----
+<h4>{{name}}</h4>
+<img ng-if="user" ng-src="{{$image('user', 'image')}}">
+<div class="card-body">{{notes}}</div>
+<div class="card-footer">
+    <i class='fa fa-clock-o'></i>
+    <span ng-if="startDate">{{$moment(startDate).format('LLL')}}</span>
+</div>
+----
+
+should be migrated in React template :
+
+[source]
+----
+<Box as="strong">
+    {name}
+</Box>
+<Box d="flex" mt={2}>
+    {notes}
+</Box>
+<Box d="grid" gridTemplateColumns="auto auto" style={{ fontSize: "0.85rem", color: "grey" }} mt={2}>
+    <Box d="flex" g={2}>
+      <Icon icon={"clock"} />
+      {startDate && <span>{$moment(startDate).format('LLL')}</span>}
+    </Box>
+    <Box d="flex" justifyContent="flex-end">
+      {user && <Image src={$image('user', 'image')} style={{ width: "1.5rem", height: "1.5rem", borderRadius: "100%" }}/>}
+    </Box>
+</Box>
+----
+
+
+
