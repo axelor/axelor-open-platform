@@ -1,3 +1,4 @@
+import { DataStore } from "@/services/client/data-store";
 import { Column, Record } from "@axelor/ui/kanban";
 
 export interface KanbanRecord extends Record {
@@ -6,14 +7,12 @@ export interface KanbanRecord extends Record {
 }
 
 export interface KanbanColumn extends Column {
+  name: string;
+  dataStore: DataStore;
   collapsed?: boolean;
   loading?: boolean;
-  name?: string;
-  value?: any;
   records?: KanbanRecord[];
   canEdit?: boolean;
   canDelete?: boolean;
   canCreate?: boolean;
-  hasMore?: boolean;
-  totalCount?: number;
 }

@@ -18,7 +18,9 @@ import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 import { Kanban } from "@axelor/ui/kanban";
 
 import { Loader } from "@/components/loader/loader";
+import { SearchPage } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
+import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings";
 
 import { KanbanColumn, KanbanRecord } from "./types";
 
@@ -162,9 +164,12 @@ function ColumnRenderer({
   scrollTop?: number;
   handleScroll?: (e: React.SyntheticEvent) => void;
 }) {
-  const { title, canCreate, loading, hasMore } = column;
-  const noData = !loading && column.records?.length === 0;
   const [text, setText] = useState("");
+
+  const { title, canCreate, loading } = column;
+  const page = column.dataStore.page;
+  const hasMore = (page.totalCount ?? 0) > (column?.records?.length ?? 0);
+  const noData = !loading && !page.totalCount;
 
   function handleAdd() {
     setText("");
@@ -224,7 +229,7 @@ function ColumnRenderer({
         <Box
           alignSelf="center"
           style={{ fontSize: "small" }}
-        >{`${column?.records?.length}/${column.totalCount ?? 0}`}</Box>
+        >{`${column?.records?.length}/${page.totalCount ?? 0}`}</Box>
       </Box>
       {canCreate && onCardAdd && (
         <Box d="flex" g={2}>
@@ -262,7 +267,7 @@ function ColumnRenderer({
               {i18n.get(
                 "Showing {0} of {1} items.",
                 column.records?.length,
-                column.totalCount,
+                page.totalCount,
               )}
             </Box>
 
@@ -384,7 +389,7 @@ export function KanbanBoard({
             }}
           />
         ),
-      })) as KanbanColumn[],
+      })) as unknown as KanbanColumn[],
     [
       columns,
       responsive,

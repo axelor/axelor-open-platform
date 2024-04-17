@@ -60,8 +60,10 @@ export function reorderCards({
   sourceCol.records = current;
   destCol.records = next;
 
-  sourceCol.totalCount && sourceCol.totalCount--;
-  destCol.totalCount ? destCol.totalCount++ : (destCol.totalCount = 1);
+  sourceCol.dataStore.page.totalCount && sourceCol.dataStore.page.totalCount--;
+  destCol.dataStore.page.totalCount
+    ? destCol.dataStore.page.totalCount++
+    : (destCol.dataStore.page.totalCount = 1);
 
   return newColumns;
 }
