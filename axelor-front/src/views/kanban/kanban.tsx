@@ -24,12 +24,13 @@ import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions, SearchPage } from "@/services/client/data";
+import { DataStore } from "@/services/client/data-store";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData } from "@/services/client/meta";
 import { KanbanView, Property } from "@/services/client/meta.types";
-import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { legacyClassNames } from "@/styles/legacy";
+import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -40,15 +41,14 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-import { DataStore } from "@/services/client/data-store";
 import { useActionExecutor } from "../form/builder/scope";
 import { isValidSequence } from "../grid/builder/utils";
 import { ViewProps } from "../types";
 
-import { KanbanBoard } from "./kanban-board";
-import { KanbanColumn, KanbanRecord } from "./types";
 import { CardTemplate } from "../cards/card";
 import { useCardClassName } from "../cards/use-card-classname";
+import { KanbanBoard } from "./kanban-board";
+import { KanbanColumn, KanbanRecord } from "./types";
 import {
   getColumnIndex,
   getColumnRecords,
@@ -73,6 +73,12 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const [columns, setColumns] = useAtom(
     useMemo(() => atomWithImmer<KanbanColumn[]>([]), []),
   );
+
+  const columnsRef = useRef(columns);
+
+  useEffect(() => {
+    columnsRef.current = columns;
+  }, [columns]);
 
   const { hasButton } = usePerms(meta.view, meta.perms);
   const switchTo = useViewSwitch();
@@ -211,35 +217,42 @@ export function Kanban(props: ViewProps<KanbanView>) {
     ),
   );
 
+  const [collapseColumns, setCollapseColumns] = useState<string[]>(
+    () => view.collapseColumns?.split(/\s*,\s*/) ?? [],
+  );
+
   const onSearch = useCallback(
-    (options: Partial<SearchOptions> = {}): any => {
-      const hideColumns = hideCols.split(",");
-      const collapseColumns = view.collapseColumns?.split(",");
+    (options: Partial<SearchOptions> = {}, force?: boolean): any => {
+      const hideColumns = hideCols.split(/\s*,\s*/);
 
-      let defaultColumns = ($columns || []).filter(
-        (item) => !hideColumns.includes(item.value),
-      );
-
-      // If no data is fetched, first initialize columns with default properties
-      if (columns.length === 0) {
-        defaultColumns = defaultColumns.map(
-          ({ value: name, title, canCreate }: any) => ({
+      let columns = columnsRef.current;
+      if (!columns.length) {
+        columns = ($columns || [])
+          .filter((item) => !hideColumns.includes(item.value))
+          .map(({ value: name, title, canCreate, collapsed }) => ({
             id: name,
             name,
             title,
-            collapsed: collapseColumns?.includes(name),
+            collapsed: collapsed || collapseColumns.includes(name),
             canCreate,
             loading: true,
             records: [],
-          }),
-        );
+          }));
 
-        setColumns(defaultColumns);
+        setColumns(columns);
+      } else if (force) {
+        columns = columns.map((column) => ({
+          ...column,
+          loading: column.loading || column.collapsed,
+        }));
+        setColumns(columns);
       }
 
-      // Fetch records for each column
-      defaultColumns.map((column, index) =>
-        fetchRecords(column.value, options).then(({ page, records }) => {
+      columns.forEach((column: KanbanColumn, index: number) => {
+        if (column.collapsed || (!column.loading && !force)) {
+          return;
+        }
+        fetchRecords(column.name, options).then(({ page, records }) => {
           setColumns((draft) => {
             const column = draft[index];
             if (column) {
@@ -249,28 +262,26 @@ export function Kanban(props: ViewProps<KanbanView>) {
               column.totalCount = page.totalCount;
             }
           });
-        }),
-      );
+        });
+      });
     },
-    [
-      hideCols,
-      view.collapseColumns,
-      columns.length,
-      $columns,
-      setColumns,
-      fetchRecords,
-    ],
+    [$columns, collapseColumns, hideCols, fetchRecords, setColumns],
   );
 
   const onRefresh = useCallback(() => {
-    return onSearch({ offset: 0 });
+    return onSearch({ offset: 0 }, true);
   }, [onSearch]);
 
   const onCollapse = useCallback(
     (column: KanbanColumn) => {
-      setColumns((columns) => {
-        const columnIndex = columns.findIndex((c) => c.name === column.name);
-        columns[columnIndex].collapsed = !column.collapsed;
+      setColumns((draft) => {
+        const col = draft.find((c) => c.name === column.name);
+        if (!col) return;
+        col.collapsed = !column.collapsed;
+        const { name = "", collapsed } = col;
+        setCollapseColumns((cols) =>
+          collapsed ? [...cols, name] : cols.filter((c) => c !== name),
+        );
       });
     },
     [setColumns],
@@ -602,8 +613,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
   }, [dashlet, view, dataStore, actionExecutor, onRefresh, setDashletHandlers]);
 
   useAsyncEffect(async () => {
-    await onRefresh();
-  }, [onRefresh]);
+    await onSearch({ offset: 0 });
+  }, [onSearch]);
 
   // register tab:refresh
   useViewTabRefresh("kanban", onRefresh);
