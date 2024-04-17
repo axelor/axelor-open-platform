@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Box,
@@ -8,8 +14,8 @@ import {
   CommandItemProps,
   Input,
 } from "@axelor/ui";
-import { Kanban } from "@axelor/ui/kanban";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
+import { Kanban } from "@axelor/ui/kanban";
 
 import { Loader } from "@/components/loader/loader";
 import { i18n } from "@/services/client/i18n";
@@ -143,6 +149,8 @@ function ColumnRenderer({
   onLoadMore,
   onCardAdd,
   RecordList,
+  scrollTop,
+  handleScroll,
 }: {
   column: KanbanColumn;
   readonly?: boolean;
@@ -151,6 +159,8 @@ function ColumnRenderer({
   onCollapse?: KanbanBoardProps["onCollapse"];
   onLoadMore?: KanbanBoardProps["onLoadMore"];
   onCardAdd?: KanbanBoardProps["onCardAdd"];
+  scrollTop?: number;
+  handleScroll?: (e: React.SyntheticEvent) => void;
 }) {
   const { title, canCreate, loading, hasMore } = column;
   const noData = !loading && column.records?.length === 0;
@@ -167,6 +177,15 @@ function ColumnRenderer({
   const handleCollapse = useCallback(() => {
     onCollapse?.(column);
   }, [column, onCollapse]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container && scrollTop != null) {
+      container.scrollTop = scrollTop;
+    }
+  }, [scrollTop]);
 
   if (column.collapsed) {
     return (
@@ -224,6 +243,8 @@ function ColumnRenderer({
           [styles["overflow"]]: overflow,
           [styles["no-data"]]: noData,
         })}
+        onScroll={handleScroll}
+        ref={containerRef}
       >
         <RecordList
           column={column}
@@ -301,6 +322,8 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const { Card } = components;
 
+  const scrollTopsRef = useRef<Record<string, number>>();
+
   const $columns = useMemo(
     () =>
       columns.map((c) => ({
@@ -349,6 +372,15 @@ export function KanbanBoard({
               onCollapse,
               onCardAdd,
               onLoadMore,
+              scrollTop: scrollTopsRef.current?.[column.name ?? ""],
+              handleScroll: (e) => {
+                if (!scrollTopsRef.current) {
+                  scrollTopsRef.current = {};
+                }
+                scrollTopsRef.current[column.name ?? ""] = (
+                  e.target as HTMLElement
+                ).scrollTop;
+              },
             }}
           />
         ),
