@@ -11,6 +11,20 @@
 }
 
 .wkfStatus li {
-  margin: 0.125rem 0.125rem 0.5rem;
+  margin: 0.125rem 0.125rem;
   font-size: 14px;
+  span {
+    vertical-align: middle;
+    line-height: normal;
+  }
+}
+
+.help::after {
+  position: relative;
+  content: "?";
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 2px;
+  vertical-align: super;
+  float: right;
 }

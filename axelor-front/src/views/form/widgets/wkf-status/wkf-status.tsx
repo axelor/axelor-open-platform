@@ -1,8 +1,10 @@
+import { Box } from "@axelor/ui";
+import { useAtomValue } from "jotai";
+
+import { Tooltip } from "@/components/tooltip";
 import { Schema } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
-import { useAtomValue } from "jotai";
 import { FieldProps } from "../../builder";
-
 import styles from "./wkf-status.module.css";
 
 const getTagProps = ({ color = "blue" }: Schema) => {
@@ -17,9 +19,15 @@ export function WkfStatus({ valueAtom }: FieldProps<any>) {
     fields && (
       <ul className={styles.wkfStatus}>
         {fields.map((field: Schema) => (
-          <li key={field.name}>
-            <span {...getTagProps(field)}>{field.title}</span>
-          </li>
+          <Tooltip
+            key={field.name}
+            title={field.title}
+            content={() => <span>{field.help}</span>}
+          >
+            <Box d="flex" as="li" {...(field.help && { className: styles.help })}>
+              <span {...getTagProps(field)}>{field.title}</span>
+            </Box>
+          </Tooltip>
         ))}
       </ul>
     )
