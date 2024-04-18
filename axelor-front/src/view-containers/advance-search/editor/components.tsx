@@ -68,7 +68,7 @@ export function BooleanRadio({ name, onChange, value: valueProp, data }: any) {
   return (
     <Box d="flex" alignItems="center" ms={1} me={1}>
       {data.map(({ value, label }: any, index: number) => (
-        <Box d="flex" alignItems="center" key={index} me={2}>
+        <Box as="label" d="flex" alignItems="center" key={index} me={2}>
           <Input
             type="radio"
             value={value}

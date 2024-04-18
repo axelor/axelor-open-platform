@@ -41,7 +41,7 @@ function FormControl({
   children: ReactElement;
 }) {
   return (
-    <Box d="flex" alignItems="center" gap={8}>
+    <Box as="label" d="flex" alignItems="center" gap={8}>
       {children}
       <Box as="p" mb={0}>
         {title}

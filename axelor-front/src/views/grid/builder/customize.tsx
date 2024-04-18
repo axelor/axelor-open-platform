@@ -178,23 +178,25 @@ function CustomizeDialog({
       </Panel>
       <Panel>
         <div className={styles.checkbox}>
-          <Input
-            data-input
-            type="checkbox"
-            checked={saveWidths}
-            onChange={() => setSaveWidths(!saveWidths)}
-          />
-          <InputLabel ms={2}>{i18n.get("Save column widths")}</InputLabel>
-        </div>
-        {canShare && (
-          <div className={styles.checkbox}>
+          <InputLabel d="flex" alignItems="center" gap={8}>
             <Input
               data-input
               type="checkbox"
-              checked={shared}
-              onChange={() => setShared(!shared)}
+              checked={saveWidths}
+              onChange={() => setSaveWidths(!saveWidths)}
             />
-            <InputLabel ms={2}>
+            {i18n.get("Save column widths")}
+          </InputLabel>
+        </div>
+        {canShare && (
+          <div className={styles.checkbox}>
+            <InputLabel d="flex" alignItems="center" gap={8}>
+              <Input
+                data-input
+                type="checkbox"
+                checked={shared}
+                onChange={() => setShared(!shared)}
+              />
               {i18n.get("Apply as default for all users")}
             </InputLabel>
           </div>

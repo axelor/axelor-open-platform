@@ -175,11 +175,18 @@ export function LoginForm({
               <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
             </Button>
           </Box>
-          <Box d="flex" alignItems="center">
-            <Input type="checkbox" p={0} m={0} me={1} />
-            <Box as="p" mb={0}>
+          <Box d="flex">
+            <InputLabel d="flex" alignItems="center" gap={8}>
+              <Input
+                type="checkbox"
+                p={0}
+                m={0}
+                me={1}
+                id="rememberme"
+                name="rememberme"
+              />
               {i18n.get("Remember me")}
-            </Box>
+            </InputLabel>
           </Box>
           {errorText && (
             <Alert mt={3} mb={1} p={2} variant="danger">
