@@ -1,7 +1,14 @@
 import { FormEventHandler, useCallback, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
+import {
+  AdornedInput,
+  Alert,
+  Box,
+  Button,
+  Input,
+  InputLabel,
+} from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { useRoute } from "@/hooks/use-route";
@@ -153,7 +160,7 @@ export function LoginForm({
           />
           <InputLabel htmlFor="password">{i18n.get("Password")}</InputLabel>
           <Box d="flex" position="relative">
-            <Input
+            <AdornedInput
               name="password"
               type={showPassword ? "text" : "password"}
               id="password"
@@ -162,18 +169,19 @@ export function LoginForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               spellCheck="false"
-            />
-            <Button
-              onClick={() => setShowPassword((value) => !value)}
-              className={styles.eyeIcon}
-              title={
-                showPassword
-                  ? i18n.get("Hide password")
-                  : i18n.get("Show password")
+              endAdornment={
+                <Button
+                  onClick={() => setShowPassword((value) => !value)}
+                  title={
+                    showPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                >
+                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                </Button>
               }
-            >
-              <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
-            </Button>
+            />
           </Box>
           <Box d="flex">
             <InputLabel d="flex" alignItems="center" gap={8}>
