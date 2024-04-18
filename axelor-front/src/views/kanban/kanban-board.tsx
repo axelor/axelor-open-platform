@@ -18,6 +18,7 @@ import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 import { Kanban } from "@axelor/ui/kanban";
 
 import { Loader } from "@/components/loader/loader";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { SearchPage } from "@/services/client/data";
 import { i18n } from "@/services/client/i18n";
 import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings";
@@ -192,6 +193,8 @@ function ColumnRenderer({
     }
   }, [scrollTop]);
 
+  const small = useMediaQuery("(max-width: 768px)");
+
   if (column.collapsed) {
     return (
       <Box rounded={3} className={styles.collapsed}>
@@ -215,7 +218,7 @@ function ColumnRenderer({
       rounded={3}
       flexGrow={1}
       flexDirection="column"
-      className={clsx(styles["column"], "kanban-column")}
+      className={clsx(styles[small ? "small-column" : `column`])}
     >
       <Box d="flex" mb={1} p={2} justifyContent="space-between">
         <Box d="flex">
@@ -238,7 +241,12 @@ function ColumnRenderer({
             onChange={(e) => setText(e.target.value)}
             className={styles.addInput}
           />
-          <Button disabled={!text.trim()} variant="primary" onClick={handleAdd}>
+          <Button
+            disabled={!text.trim()}
+            variant="primary"
+            onClick={handleAdd}
+            flexShrink={0}
+          >
             {i18n.get("Add")}
           </Button>
         </Box>

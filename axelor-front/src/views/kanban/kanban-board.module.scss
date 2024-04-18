@@ -19,6 +19,14 @@
 
 .column-wrapper {
   display: flex;
+  width: 24em;
+  min-width: 250px;
+  word-break: break-word;
+}
+
+.column-wrapper:has(.collapsed) {
+  min-width: auto;
+  width: auto;
 }
 
 .board.responsive .column-wrapper {
@@ -32,8 +40,12 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 1rem;
-  width: 24em;
-  min-width: 250px;
+}
+
+.small-column {
+  background-color: var(--bs-tertiary-bg);
+  gap: 0.5rem;
+  padding: 1rem;
 }
 
 .collapsed {
