@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -21,14 +21,20 @@ import { useViewAction, useViewTab } from "@/view-containers/views/scope";
 
 import {
   Attrs,
+  HelpPopover,
   WidgetProps,
   usePermission,
   usePrepareContext,
 } from "../../builder";
-import { useAfterActions, useFormTabScope } from "../../builder/scope";
+import {
+  useAfterActions,
+  useFormScope,
+  useFormTabScope,
+} from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 
 import classes from "./dashlet.module.scss";
+import { createWidgetAtom } from "../../builder/atoms";
 
 interface DashletProps {
   schema: Schema;
@@ -43,9 +49,34 @@ interface DashletProps {
   onViewLoad?: (schema: Schema, viewId?: number, viewType?: string) => void;
 }
 
-function DashletTitle({ title }: { title?: string }) {
+function DashletTitle({
+  title,
+  model,
+  schema,
+}: {
+  title?: string;
+  model?: string;
+  schema: Schema;
+}) {
+  const { formAtom } = useFormScope();
+  const widgetAtom = useRef(createWidgetAtom({ schema, formAtom })).current;
+
   const dashlet = useAtomValue(useDashletHandlerAtom());
-  return <Box className={classes.title}>{dashlet.title || title}</Box>;
+  const displayTitle = dashlet.title || title;
+  const $schema = useMemo(() => ({ ...schema, model }), [schema, model]);
+
+  return (
+    <Box className={classes.title}>
+      <HelpPopover
+        title={displayTitle}
+        schema={$schema}
+        formAtom={formAtom}
+        widgetAtom={widgetAtom}
+      >
+        <span>{displayTitle}</span>
+      </HelpPopover>
+    </Box>
+  );
 }
 
 export function DashletComponent({
@@ -174,7 +205,11 @@ export function DashletComponent({
               [classes.search]: hasSearch,
             })}
           >
-            <DashletTitle title={attrs?.title ?? (title || tab?.title)} />
+            <DashletTitle
+              schema={schema}
+              model={tab.action.model}
+              title={attrs?.title ?? (title || tab?.title)}
+            />
             {hasSearch && <DashletSearch />}
             {attrs?.refresh && <DashletRefresh count={attrs.refresh} />}
             <DashletActions

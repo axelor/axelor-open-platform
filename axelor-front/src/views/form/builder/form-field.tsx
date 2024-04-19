@@ -222,25 +222,28 @@ export function FieldDetails({
 
 export function HelpPopover({
   schema,
+  title,
   formAtom,
   widgetAtom,
   children,
   content,
 }: WidgetProps & {
+  title?: string;
   children: React.ReactElement;
   content?: () => JSX.Element | null;
 }) {
   const { type, name, help } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title } = attrs;
 
-  const technical = session.info?.user?.technical && (name || type === "panel");
+  const technical =
+    session.info?.user?.technical &&
+    (name || ["panel", "dashlet"].includes(type ?? ""));
   const canShowHelp = help || technical;
 
   if (canShowHelp) {
     return (
       <Tooltip
-        title={title}
+        title={title ?? attrs.title}
         content={
           content ??
           (() => (
@@ -262,12 +265,16 @@ export function HelpPopover({
 
 function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
-  const { name, serverType, type, target, help, widget, selection } = schema;
-  const { model, original } = useAtomValue(formAtom);
+  const { name, serverType, type, target, help, widget, selection, action } =
+    schema;
+  const { model: formModel, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;
 
-  const technical = session.info?.user?.technical && (name || type === "panel");
+  const model = (type === "dashlet" && schema.model) || formModel;
+  const technical =
+    session.info?.user?.technical &&
+    (name || ["panel", "dashlet"].includes(type!));
   const canShowHelp = !session.info?.user?.noHelp && !!help;
 
   const value = name && original ? original[name] : undefined;
@@ -331,6 +338,14 @@ function HelpContent(props: WidgetProps) {
               <dt>{i18n.get("Filter")}</dt>
               <dd>
                 <code>{domain}</code>
+              </dd>
+            </>
+          )}
+          {action && (
+            <>
+              <dt>{i18n.get("Action")}</dt>
+              <dd>
+                <code>{action}</code>
               </dd>
             </>
           )}
