@@ -43,13 +43,18 @@ div.button[disabled] {
   text-overflow: ellipsis;
 }
 
+.help {
+  display: flex;
+  justify-content: center;;
+}
+
 .help .title {
   display: inline-flex;
   max-width: calc(100% - 0.5rem);
 }
 
 .help::after {
-  position: absolute;
+  position: relative;
   content: "?";
   font-size: 0.75rem;
   font-weight: 600;
@@ -62,7 +67,9 @@ div.button[disabled] {
   text-decoration: none;
   padding-left: 0;
   padding-right: 0;
-  &:hover {
+  max-width: 100%;
+  justify-content: start;
+  &:hover &,&:hover > * {
     text-decoration: underline;
   }
 }
