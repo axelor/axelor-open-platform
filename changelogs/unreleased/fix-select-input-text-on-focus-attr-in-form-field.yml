@@ -1,0 +1,5 @@
+---
+title: Fix select input text on focus attribute in form field
+type: fix
+description: |
+  When focus is set through action-attrs, select input text.

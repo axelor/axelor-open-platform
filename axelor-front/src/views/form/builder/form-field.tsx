@@ -1,7 +1,7 @@
 import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
@@ -81,6 +81,7 @@ export function FieldControl({
   titleActions,
   children,
 }: FieldControlProps<any>) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [labelClassName, contentClassName] = useFieldClassNames(schema);
   const canShowTitle =
     showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
@@ -96,6 +97,16 @@ export function FieldControl({
       [widgetAtom],
     ),
   );
+  const focusInput = useDeferredValue(focus);
+
+  useEffect(() => {
+    if (focusInput) {
+      const input = containerRef.current?.querySelector?.(
+        "input,textarea",
+      ) as HTMLInputElement;
+      input && input?.select?.();
+    }
+  }, [focusInput]);
 
   function render() {
     const content = (
@@ -111,7 +122,7 @@ export function FieldControl({
   }
 
   return (
-    <Box className={clsx(className, styles.container)}>
+    <Box ref={containerRef} className={clsx(className, styles.container)}>
       {(canShowTitle || titleActions) && (
         <Box className={styles.title}>
           {canShowTitle && (
