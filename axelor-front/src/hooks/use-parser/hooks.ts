@@ -49,27 +49,27 @@ function useFindAttrs() {
   );
 }
 
-function useCreateParentContext(formAtom: FormAtom) {
-  const parentAtom = useAtomValue(
+function useCreateParentContext(formAtom: FormAtom, parent?: boolean) {
+  const _parentAtom = useAtomValue(
     useMemo(
       () => selectAtom(formAtom, (x) => x.parent ?? atom(null)),
       [formAtom],
     ),
   );
-
+  const parentAtom = parent ? formAtom : _parentAtom;
   const parentState = useAtomValue(parentAtom);
 
   const findAttrs = useFindAttrs();
   const $getField = useAtomCallback(
     useCallback(
       (get, set, name: string) => {
-        const { parent } = get(formAtom);
+        const parent = parentAtom as FormAtom;
         if (parent) {
           const schema = findViewItem(get(parent).meta, name) ?? { name };
           return findAttrs(parent, schema);
         }
       },
-      [findAttrs, formAtom],
+      [findAttrs, parentAtom],
     ),
   );
 
@@ -100,10 +100,16 @@ export function useExpression(expression: string) {
   );
 }
 
-export function useTemplate(template: string, field?: Schema) {
+export function useTemplate(
+  template: string,
+  { field, parent: parentFormAtom }: { field?: Schema; parent?: FormAtom } = {},
+) {
   const { findItem, findField } = useViewMeta();
   const { actionExecutor, formAtom } = useFormScope();
-  const _createParentContext = useCreateParentContext(formAtom);
+  const _createParentContext = useCreateParentContext(
+    parentFormAtom ?? formAtom,
+    Boolean(parentFormAtom),
+  );
   const findAttrs = useFindAttrs();
   const $getField = useCallback(
     (name: string) => {

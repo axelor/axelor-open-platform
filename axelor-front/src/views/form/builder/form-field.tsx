@@ -23,7 +23,7 @@ import { focusAtom } from "@/utils/atoms";
 import format from "@/utils/format";
 
 import { useFormScope } from "./scope";
-import { FieldProps, ValueAtom, WidgetProps } from "./types";
+import { FieldProps, FormAtom, ValueAtom, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
 import { legacyClassNames } from "@/styles/legacy";
@@ -204,18 +204,20 @@ export function FieldLabel({
 }
 
 export function FieldDetails({
+  data,
   fetch = true,
   model,
   record,
-  data,
+  parent,
 }: {
+  data: TooltipType;
   fetch?: boolean;
   model?: string;
   record?: DataRecord;
-  data: TooltipType;
+  parent?: FormAtom;
 }) {
   const { depends, template } = data;
-  const Template = useTemplate(template!);
+  const Template = useTemplate(template!, { parent });
   const { data: context } = useAsync(async () => {
     let values = { ...record };
     if (fetch && model && record?.id) {
@@ -411,6 +413,9 @@ function FieldTooltipContent({
       data={data}
       model={model}
       record={record}
+      {...(isRelational && {
+        parent: formAtom,
+      })}
     />
   );
 }
