@@ -225,7 +225,7 @@ function ColumnRenderer({
     >
       <Box d="flex" mb={1} p={2} justifyContent="space-between">
         <Box d="flex">
-          <Button onClick={handleCollapse} border={false} p={0} me={2}>
+          <Button d="flex" onClick={handleCollapse} border={false} p={0} me={2}>
             <BootstrapIcon icon="chevron-down" />
           </Button>
           <Box as="h6" className={styles["column-title"]}>
