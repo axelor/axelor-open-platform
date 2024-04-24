@@ -16,12 +16,15 @@ import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
 import { SearchOptions } from "@/services/client/data";
+import { ActionView, GridView } from "@/services/client/meta.types";
 
 export type SelectorOptions = {
   model: string;
   title?: string;
   multiple?: boolean;
+  view?: GridView;
   viewName?: string;
+  viewParams?: ActionView["params"];
   orderBy?: string;
   domain?: string;
   context?: DataContext;
@@ -36,7 +39,9 @@ export function useSelector() {
     const {
       title,
       model,
+      view: gridView,
       viewName,
+      viewParams,
       orderBy,
       multiple,
       domain,
@@ -47,25 +52,31 @@ export function useSelector() {
       onSelect,
     } = options;
 
-    const { view } = await findView({
-      type: "grid",
-      name: viewName,
-      model,
-    });
+    async function getViewTitle() {
+      const { view } = await findView({
+        type: "grid",
+        name: viewName,
+        model,
+      });
+      return view?.title;
+    }
+
+    const tabTitle = title || (await getViewTitle()) || "";
 
     const tab = await initTab({
       name: uniqueId("$selector"),
-      title: title || view?.title || "",
+      title: tabTitle,
       model,
       viewType: "grid",
-      views: [{ type: "grid", name: viewName }],
+      views: [{ type: "grid", name: viewName, ...gridView }],
       params: {
         limit,
-        popup: true,
         orderBy,
         "show-toolbar": false,
         "_popup-edit-icon": false,
         "_popup-multi-select": multiple,
+        ...viewParams,
+        popup: true,
       },
       domain,
       context,
@@ -134,6 +145,7 @@ function Header() {
   if (handler.dataStore && handler.onSearch) {
     return (
       <SelectorHeader
+        records={handler.dataRecords}
         dataStore={handler.dataStore}
         onSearch={handler.onSearch}
       />
@@ -143,14 +155,18 @@ function Header() {
 }
 
 function SelectorHeader({
+  records,
   dataStore,
   onSearch,
 }: {
+  records?: DataRecord[];
   dataStore: DataStore;
   onSearch: (options?: SearchOptions) => void;
 }) {
   const page = useDataStore(dataStore, (state) => state.page);
+
   const { offset = 0, limit = 0, totalCount = 0 } = page;
+  const isCustomPager = records && records !== dataStore.records;
 
   const onNext = useCallback(() => {
     const nextOffset = Math.min(offset + limit, totalCount);
@@ -188,7 +204,12 @@ function SelectorHeader({
 
   return (
     <Box d="flex" alignItems="center" g={2}>
-      <PageText dataStore={dataStore} />
+      <PageText
+        dataStore={dataStore}
+        {...(isCustomPager && {
+          count: records.length - dataStore.records.length,
+        })}
+      />
       <CommandBar items={commands} />
     </Box>
   );

@@ -6,13 +6,14 @@ import { useAtomCallback } from "jotai/utils";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
-import { Field, GridView } from "@/services/client/meta.types";
+import { Field, GridView, Property } from "@/services/client/meta.types";
 import { useGridState } from "./utils";
 import { DataRecord } from "@/services/client/data.types";
 import { resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
 import { useSelector } from "@/hooks/use-relation";
+import { nextId } from "@/views/form/builder/utils";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { toTitleCase } from "@/utils/names";
 
@@ -25,11 +26,13 @@ type ViewHandler = (state?: GridState) => GridView | undefined;
 function CustomizeDialog({
   title = i18n.get("Columns"),
   view,
+  fields,
   canShare,
   onUpdate,
 }: {
   title?: string;
   view: GridView;
+  fields?: Record<string, Property>;
   canShare?: boolean;
   onUpdate?: (fn: ViewHandler) => void;
 }) {
@@ -99,10 +102,70 @@ function CustomizeDialog({
   );
 
   const handleSelect = useCallback(() => {
+    const extraFields = view?.items
+      ?.filter(
+        (item) =>
+          (item.name && item.name.includes(".")) || item.type !== "field",
+      )
+      .map((item) => ({
+        id: nextId(),
+        name: item.name,
+        label: item.title,
+      }));
     showSelector({
       model: "com.axelor.meta.db.MetaField",
       title: i18n.get("Columns"),
       multiple: true,
+      view: {
+        name: "custom-meta-field-grid",
+        fields: {
+          label: {
+            name: "label",
+            type: "STRING",
+            required: true,
+          },
+          name: {
+            name: "name",
+            type: "STRING",
+            required: true,
+          },
+        },
+        type: "grid",
+        items: [
+          {
+            type: "field",
+            name: "label",
+            title: "Title",
+          },
+          {
+            type: "field",
+            name: "name",
+            title: "Name",
+          },
+        ],
+      } as unknown as GridView,
+      viewParams: {
+        "selector.grid.getExtraRecords": (search?: Record<string, string>) => {
+          if (search && search.name) {
+            return extraFields?.filter((f) => f.name?.includes(search.name));
+          }
+          return extraFields;
+        },
+        "selector.grid.props": {
+          columnAttrs: {
+            label: {
+              searchable: false,
+              sortable: false,
+            },
+          },
+          columnFormatter: (column: Field, value: any, record: DataRecord) => {
+            if (column.name === "label") {
+              return value || toTitleCase(record.name ?? "");
+            }
+            return value;
+          },
+        },
+      },
       domain:
         "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames",
       context: {
@@ -122,7 +185,7 @@ function CustomizeDialog({
         ]);
       },
     });
-  }, [showSelector, view.model]);
+  }, [showSelector, view, fields]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
@@ -210,9 +273,11 @@ function CustomizeDialog({
 
 export function useCustomizePopup({
   view,
+  fields,
   stateAtom,
 }: {
   view?: GridView;
+  fields?: Record<string, Property>;
   stateAtom: WritableAtom<GridState, any, any>;
 }) {
   const canCustomize = view?.name && isUserAllowedCustomizeViews();
@@ -282,6 +347,7 @@ export function useCustomizePopup({
           content: (
             <CustomizeDialog
               view={view}
+              fields={fields}
               title={title}
               canShare={canShare}
               onUpdate={(fn) => {
@@ -294,7 +360,7 @@ export function useCustomizePopup({
           onClose: () => {},
         });
       },
-      [view, stateAtom],
+      [view, fields, stateAtom],
     ),
   );
 

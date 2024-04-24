@@ -125,10 +125,28 @@ function GridInner(props: ViewProps<GridView>) {
     selectedRows: viewSelectedRows,
   });
 
+  const selector = action?.name?.startsWith("$selector");
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
-  const records = useDataStore(dataStore, (ds) => ds.records);
+  const dsRecords = useDataStore(dataStore, (ds) => ds.records);
+  const getRecords = useAtomCallback(
+    useCallback(
+      (get) => {
+        const getExtraRecords =
+          action.params?.["selector.grid.getExtraRecords"];
+        if (selector && getExtraRecords && dataStore.page.offset === 0) {
+          const { search } = get(searchAtom!);
+          return [...dsRecords, ...getExtraRecords(search)];
+        }
+        return dsRecords;
+      },
+      [selector, dsRecords, dataStore.page.offset, action.params, searchAtom],
+    ),
+  );
+  const records = useMemo(() => getRecords(), [getRecords]);
+
   const onColumnCustomize = useCustomizePopup({
     view,
+    fields,
     stateAtom: gridStateAtom,
   });
 
@@ -680,11 +698,12 @@ function GridInner(props: ViewProps<GridView>) {
     if (popup) {
       setPopupHandlers({
         data: state,
+        dataRecords: records,
         dataStore: dataStore,
         onSearch,
       });
     }
-  }, [state, onSearch, popup, dataStore, setPopupHandlers]);
+  }, [state, records, onSearch, popup, dataStore, setPopupHandlers]);
 
   useEffect(() => {
     if (dashlet) {
@@ -1114,11 +1133,7 @@ function GridInner(props: ViewProps<GridView>) {
             state={state}
             setState={setState}
             sortType={"live"}
-            editable={
-              dashlet || action?.name?.startsWith("$selector")
-                ? false
-                : editable
-            }
+            editable={!dashlet && !selector && editable}
             expandable={view.widget === "expandable"}
             expandableView={view.summaryView ?? formViewName}
             showEditIcon={canEdit}
@@ -1133,6 +1148,9 @@ function GridInner(props: ViewProps<GridView>) {
             onRowReorder={onRowReorder}
             noRecordsText={i18n.get("No records found.")}
             onColumnCustomize={onColumnCustomize}
+            {...(selector && {
+              ...action.params?.["selector.grid.props"],
+            })}
             {...(dashlet ? {} : searchProps)}
             {...dashletProps}
             {...popupProps}
