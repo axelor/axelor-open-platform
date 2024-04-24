@@ -122,9 +122,9 @@ export class DataStore extends DataSource {
   #prepareOption(options: SearchOptions) {
     const opts = this.#options;
     const { offset, limit } = this.#page;
-    const { _domain, _domainContext } = opts?.filter ?? {};
+    const { _domainContext } = opts?.filter ?? {};
     const filter = {
-      _domain,
+      ...opts?.filter,
       _domainContext: _domainContext
         ? this.#setVersion(_domainContext)
         : undefined,
