@@ -247,6 +247,7 @@ export function DateComponent({
           textValue={textValue}
           customInput={
             <DateInput
+              inputValue={textValue}
               invalid={invalid}
               eventOnBlur={handleBlur}
               format={format}

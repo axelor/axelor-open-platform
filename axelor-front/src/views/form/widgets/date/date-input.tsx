@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { Box } from "@axelor/ui";
 import { MaskedInput } from "./mask-input";
@@ -30,10 +30,19 @@ function getMaskFromFormat(str: string) {
 
 export const DateInput = forwardRef<any, any>(
   (
-    { className, format, open, onOpen, onClose, onKeyDown, ...props }: any,
-    ref
+    {
+      className,
+      inputValue,
+      format,
+      open,
+      onOpen,
+      onClose,
+      onKeyDown,
+      ...props
+    }: any,
+    ref,
   ) => {
-    const { eventOnBlur: onBlur, onChange, onFocus } = props;
+    const { name, eventOnBlur: onBlur, onChange, onFocus } = props;
 
     function handleBlur({ target: { name, value } }: any) {
       if (open) return;
@@ -52,6 +61,16 @@ export const DateInput = forwardRef<any, any>(
         onKeyDown && onKeyDown(e);
       }, 100);
     }
+
+    // sync date input with inputValue
+    useEffect(() => {
+      onChange?.({
+        target: {
+          name,
+          value: inputValue,
+        },
+      });
+    }, [name, inputValue, onChange]);
 
     return (
       <Box className={classes.inputWrapper}>
@@ -75,5 +94,5 @@ export const DateInput = forwardRef<any, any>(
         </Box>
       </Box>
     );
-  }
+  },
 );
