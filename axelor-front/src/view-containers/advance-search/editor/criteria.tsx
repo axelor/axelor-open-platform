@@ -12,19 +12,19 @@ import { useField } from "./utils";
 import styles from "./criteria.module.scss";
 
 export const Criteria = memo(function Criteria({
-  value,
+  filter,
   fields,
   index,
   onRemove,
   onChange,
 }: {
   index: number;
-  value?: Filter;
+  filter?: Filter;
   fields?: Field[];
   onChange?: (e: { name: string; value: any }, index: number) => void;
   onRemove?: (index: number) => void;
 }) {
-  const { fieldName, operator } = value || {};
+  const { fieldName, operator } = filter || {};
   const { field, options } = useField(fields, fieldName);
 
   function handleRemove() {
@@ -53,7 +53,7 @@ export const Criteria = memo(function Criteria({
             onChange={(value) =>
               handleChange({ name: "fieldName", value: value?.name })
             }
-            value={fields.find((x) => x.name === value?.fieldName) ?? null}
+            value={field}
           />
         )}
         {Boolean(options?.length) && (
@@ -67,17 +67,19 @@ export const Criteria = memo(function Criteria({
             onChange={(value) =>
               handleChange({ name: "operator", value: value?.name })
             }
-            value={options.find((x) => x.name === value?.operator) ?? null}
+            value={options.find((x) => x.name === operator) ?? null}
           />
         )}
-        {operator && (
+        {operator && field && filter && (
           <Widget
             {...{
               operator,
               field,
-              value,
+              filter,
               onChange: handleChange,
-              className: styles.criteria,
+              inputProps: {
+                className: styles.criteria,
+              },
             }}
           />
         )}

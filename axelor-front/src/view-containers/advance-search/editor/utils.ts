@@ -168,7 +168,7 @@ export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
   const $fields = useMemo(() => {
     const fieldList = Object.values(fields || {}).reduce(
       (list: Property[], field: Property) => {
-        const { type, large } = field as any;
+        const { type, large } = field as Schema;
         const item = items?.find((item) => item.name === field.name);
         if (
           type === "binary" ||
@@ -206,7 +206,7 @@ export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
     });
 
     Object.keys(jsonFields || {}).forEach((prefix) => {
-      const { title } = fields?.[prefix as any] || {};
+      const { title } = fields?.[prefix] || {};
       const keys = Object.keys(jsonFields?.[prefix] || {});
 
       keys?.forEach?.((name: string) => {
@@ -220,7 +220,7 @@ export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
           key += "::" + (field.jsonType || "text");
         }
         fieldList.push({
-          ...(field as any),
+          ...(field as unknown as Property),
           name: key,
           title: `${field.title || field.autoTitle} ${
             title ? `(${title})` : ""
@@ -241,7 +241,7 @@ export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
           contextFieldValue,
           contextFieldTarget,
           contextFieldTargetName,
-        } = field as any;
+        } = field as JsonField;
         if (contextField && !ctxFields.find((x) => x.name === contextField)) {
           const field = $fields.find((field) => field.name === contextField);
           const title = field?.title ?? toTitleCase(contextField);
@@ -250,7 +250,7 @@ export function useFields(stateAtom: AdvancedSearchAtom, viewItems?: Schema[]) {
             title,
             value: {
               id: contextFieldValue,
-              [contextFieldTargetName]: contextFieldTitle,
+              [contextFieldTargetName!]: contextFieldTitle,
             },
             target: contextFieldTarget,
             targetName: contextFieldTargetName,

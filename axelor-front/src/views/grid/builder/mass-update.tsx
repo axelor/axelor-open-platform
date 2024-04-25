@@ -183,10 +183,12 @@ export function MassUpdater({
                           <Widget
                             {...{
                               operator: "=",
-                              className: styles.widget,
-                              placeholder: field.placeholder || field.title,
+                              inputProps: {
+                                className: styles.widget,
+                                placeholder: field.placeholder || field.title,
+                              },
                               field,
-                              value: item,
+                              filter: item,
                               onChange: (e: any) =>
                                 onChange("value", e?.value ?? null, index),
                             }}

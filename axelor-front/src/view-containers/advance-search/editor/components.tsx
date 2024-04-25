@@ -1,7 +1,14 @@
-import { clsx } from "@axelor/ui";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  ChangeEventHandler,
+  ComponentProps,
+  JSXElementConstructor,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { Box, Input, SelectIcon } from "@axelor/ui";
+import { clsx, Box, Input, SelectIcon, SelectValue } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select as AxSelect, SelectProps } from "@/components/select";
@@ -9,28 +16,33 @@ import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { DateComponent } from "@/views/form/widgets";
 import { useCompletion, useSelector } from "@/hooks/use-relation";
-import { DataRecord } from "@/services/client/data.types";
+import { Field, Property, Schema } from "@/services/client/meta.types";
+import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
 import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
 import { getFieldType } from "./utils";
 
 import styles from "./components.module.css";
 
-function TextField(props: any) {
+function TextField(
+  props: ComponentProps<typeof Input> & {
+    onChange: (value: any) => void;
+  },
+) {
   return (
     <Input
       {...props}
       value={props.value ?? ""}
-      onChange={(e) => props.onChange(e.target.value)}
+      onChange={(e) => props.onChange?.(e.target.value)}
     />
   );
 }
 
-function DateField(props: any) {
+function DateField(props: ComponentProps<typeof DateComponent>) {
   const schema = useRef({ type: "date" }).current;
-  return <DateComponent schema={schema} trapFocus {...props} />;
+  return <DateComponent trapFocus {...props} schema={schema} />;
 }
 
-function NumberField(props: any) {
+function NumberField(props: ComponentProps<typeof TextField>) {
   return <TextField {...props} type="number" />;
 }
 
@@ -38,20 +50,21 @@ function Select({
   value: _value = null,
   options,
   className,
-  onChange: _onChange,
+  onChange,
   ...props
 }: SelectProps<DataRecord, false>) {
   const value = useMemo(
     () => options?.find((opt) => opt.name === _value) ?? _value,
     [_value, options],
   );
-  const onChange = useCallback(
-    (value: any) => _onChange?.(value?.name ?? value),
-    [_onChange],
+
+  const handleChange = useCallback(
+    (value: SelectValue<DataRecord, false>) => onChange?.(value?.name ?? value),
+    [onChange],
   );
 
   return (
-    <AxSelect
+    <AxSelect<DataRecord, false>
       {...props}
       className={clsx(styles.select, className)}
       multiple={false}
@@ -60,50 +73,42 @@ function Select({
       optionKey={(x) => x.name}
       optionEqual={(x, y) => x.name === y.name}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
     />
   );
 }
 
-export function BooleanRadio({ name, onChange, value: valueProp, data }: any) {
-  return (
-    <Box d="flex" alignItems="center" ms={1} me={1}>
-      {data.map(({ value, label }: any, index: number) => (
-        <Box as="label" d="flex" alignItems="center" key={index} me={2}>
-          <Input
-            type="radio"
-            value={value}
-            checked={value === valueProp}
-            onChange={onChange}
-            name={name}
-            m={0}
-            me={2}
-          />
-          <Box as="p" mb={0}>
-            {label}
-          </Box>
-        </Box>
-      ))}
-    </Box>
-  );
-}
+type WidgetInputProps = {
+  className?: string;
+  placeholder?: string;
+  options?: any[];
+};
 
-export function SimpleWidget({
+type WidgetProps = Pick<Filter, "value" | "value2" | "timeUnit"> & {
+  operator: FilterOp;
+  field: Field | Property;
+  onChange: (e: { name: string; value: any }) => void;
+  component?: JSXElementConstructor<any>;
+  inputProps?: WidgetInputProps;
+};
+
+function SimpleWidget({
   component: Component,
   operator,
   onChange,
   value,
   value2,
-  style,
-  ...rest
-}: any) {
+  inputProps,
+}: WidgetProps) {
+  if (!Component) return;
+
   if (["=", "!=", ">", ">=", "<", "<=", "like", "notLike"].includes(operator)) {
     return (
       <Component
         name="value"
         onChange={(value: any) => onChange({ name: "value", value: value })}
         value={value}
-        {...rest}
+        {...inputProps}
       />
     );
   }
@@ -113,17 +118,16 @@ export function SimpleWidget({
       <>
         <Component
           name="value"
-          style={{ ...style }}
           onChange={(value: any) => onChange({ name: "value", value })}
           value={value}
-          {...rest}
+          {...inputProps}
         />
 
         <Component
           name="value2"
           onChange={(value: any) => onChange({ name: "value2", value })}
           value={value2}
-          {...rest}
+          {...inputProps}
         />
       </>
     );
@@ -136,15 +140,18 @@ const getOptionKey = (option: DataRecord) => option.id!;
 const getOptionEqual = (a: DataRecord, b: DataRecord) => a.id === b.id;
 const getOptionMatch = () => true;
 
-export function RelationalSelectWidget({
+type RelationWidgetProps = WidgetProps & {
+  multiple?: boolean;
+};
+
+function RelationalSelectWidget({
   operator,
-  onChange,
-  isMulti = operator !== "=",
+  multiple = operator !== "=",
   field: schema,
   value,
-  placeholder,
-  className,
-}: any) {
+  onChange,
+  inputProps,
+}: RelationWidgetProps) {
   const [hasSearchMore, setSearchMore] = useState(false);
   const {
     sortBy,
@@ -155,7 +162,9 @@ export function RelationalSelectWidget({
     gridView,
     searchLimit,
     domain,
-  } = schema;
+  } = schema as Schema;
+  const { className, placeholder } = inputProps || {};
+
   const showSelector = useSelector();
 
   const search = useCompletion({
@@ -190,7 +199,7 @@ export function RelationalSelectWidget({
       multiple: false,
       limit: searchLimit,
       onSelect: async (records) => {
-        onChange(records[0]);
+        onChange(records[0] as { name: string; value: any });
       },
       ...(domain && {
         domain,
@@ -213,7 +222,7 @@ export function RelationalSelectWidget({
   return (
     <AxSelect
       className={clsx(styles.select, className)}
-      multiple={isMulti}
+      multiple={multiple}
       options={[] as DataRecord[]}
       toggleIcon={false}
       icons={icons}
@@ -232,9 +241,8 @@ export function RelationalSelectWidget({
   );
 }
 
-export function RelationalWidget(props: any) {
-  const { operator, onChange, ...rest } = props;
-  const { field, value } = rest;
+export function RelationalWidget(props: RelationWidgetProps) {
+  const { operator, onChange, value, inputProps } = props;
 
   const isTextField = ["like", "notLike"].includes(operator);
   const isSelection = ["=", "in", "notIn"].includes(operator);
@@ -243,14 +251,51 @@ export function RelationalWidget(props: any) {
     return (
       <TextField
         name="value"
-        onChange={(value: any) => onChange({ name: "value", value: value })}
-        {...rest}
+        onChange={(value) => onChange({ name: "value", value: value })}
+        value={value}
+        {...inputProps}
       />
     );
   } else if (isSelection) {
     return <RelationalSelectWidget {...props} />;
   }
   return null;
+}
+
+export function BooleanRadio({
+  name,
+  onChange,
+  value: valueProp,
+  options,
+}: {
+  name: string;
+  options: {
+    label: string;
+    value: any;
+  }[];
+  value: any;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}) {
+  return (
+    <Box d="flex" alignItems="center" ms={1} me={1}>
+      {options.map(({ value, label }, index: number) => (
+        <Box as="label" d="flex" alignItems="center" key={index} me={2}>
+          <Input
+            type="radio"
+            value={value}
+            checked={value === valueProp}
+            onChange={onChange}
+            name={name}
+            m={0}
+            me={2}
+          />
+          <Box as="p" mb={0}>
+            {label}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
 }
 
 type SelectType = {
@@ -295,16 +340,24 @@ const getBooleanSelection: () => BooleanSelectType[] = () =>
     { value: false, title: i18n.get("No") },
   ]);
 
-export function Widget({ field, operator, onChange, value, ...rest }: any) {
+export function Widget({
+  inputProps,
+  field,
+  operator,
+  onChange,
+  filter,
+}: Omit<WidgetProps, "value" | "value2" | "timeUnit"> & {
+  filter: Filter;
+}) {
   const type = getFieldType(field);
   const props = {
+    inputProps,
     field,
     operator,
-    value: value.value,
-    value2: value.value2,
-    timeUnit: value.timeUnit,
+    value: filter.value,
+    value2: filter.value2,
+    timeUnit: filter.timeUnit,
     onChange,
-    ...rest,
   };
 
   switch (toKebabCase(type)) {
@@ -354,12 +407,10 @@ export function Widget({ field, operator, onChange, value, ...rest }: any) {
         return (
           <>
             <TextField
+              {...inputProps}
               name="value"
-              onChange={(value: any) =>
-                onChange({ name: "value", value: value })
-              }
+              onChange={(value) => onChange({ name: "value", value: value })}
               value={value}
-              {...rest}
             />
             {renderSelect()}
           </>
@@ -375,25 +426,31 @@ export function Widget({ field, operator, onChange, value, ...rest }: any) {
           {...props}
           value={value}
           value2={value2}
-          onChange={({ name, value }: any) => onChange({ name, value })}
-          {...{ component: DateField }}
+          onChange={onChange}
+          component={DateField}
         />
       );
     }
     case "integer":
     case "long":
     case "decimal":
-      return <SimpleWidget {...props} {...{ component: NumberField, type }} />;
+      return <SimpleWidget {...props} component={NumberField} />;
     case "enum": {
       const options = (field.selectionList ?? []).map(
-        ({ title, value, data }: any) => ({
+        ({ title, value, data }) => ({
           name: (data && data.value) || value,
           title: title,
         }),
       );
-      return <SimpleWidget {...props} {...{ component: Select, options }} />;
+      return (
+        <SimpleWidget
+          {...props}
+          component={Select}
+          inputProps={{ ...props.inputProps, options }}
+        />
+      );
     }
     default:
-      return <SimpleWidget {...props} {...{ component: TextField }} />;
+      return <SimpleWidget {...props} component={TextField} />;
   }
 }

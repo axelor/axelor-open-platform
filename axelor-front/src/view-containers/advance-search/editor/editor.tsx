@@ -13,6 +13,7 @@ import { moment, Moment } from "@/services/client/l10n";
 import {
   AdvancedSearchAtom,
   Field,
+  JsonField,
   SavedFilter,
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -290,7 +291,7 @@ export function Editor({
     () =>
       fields.filter((field) => {
         const { contextField: contextFieldName, contextFieldValue } =
-          field as any;
+          field as JsonField;
         return (
           !contextFieldName ||
           (contextField?.field?.name === contextFieldName &&
@@ -353,8 +354,8 @@ export function Editor({
           {selectedContextField && (
             <RelationalWidget
               operator="in"
-              isMulti={false}
-              onChange={({ value }: any) =>
+              multiple={false}
+              onChange={({ value }) =>
                 setContextField((data) => ({ ...data, value }))
               }
               value={contextField.value}
@@ -366,9 +367,9 @@ export function Editor({
       <Box d="flex" alignItems="center" g={2}>
         <BooleanRadio
           name="operator"
-          onChange={(e: any) => handleChange("operator", e.target.value)}
+          onChange={(e) => handleChange("operator", e.target.value)}
           value={operator}
-          data={[
+          options={[
             { label: i18n.get("and"), value: "and" },
             { label: i18n.get("or"), value: "or" },
           ]}
@@ -390,11 +391,11 @@ export function Editor({
         g={2}
         w={100}
       >
-        {criteria.map((item: any, index: number) => (
+        {criteria.map((item, index: number) => (
           <Criteria
             key={index}
             index={index}
-            value={item as Filter}
+            filter={item as Filter}
             fields={criteriaFields}
             onRemove={handleCriteriaRemove}
             onChange={handleCriteriaChange}
