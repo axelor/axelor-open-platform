@@ -1103,6 +1103,22 @@
         <xsd:documentation>The drawing width in px, default to 500</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />
+  </xsd:attributeGroup>
+
+  <xsd:attributeGroup name="ExtraCollectionAttributes">
+    <xsd:attribute name="x-tree-field" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify sub-field to be used in the tree structure.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-tree-limit" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>Specify the nesting limit allowed in the tree structure.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
@@ -1317,6 +1333,7 @@
             </xsd:choice>
           </xsd:sequence>
         </xsd:choice>
+        <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="sortable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
@@ -1335,6 +1352,12 @@
           <xsd:annotation>
             <xsd:documentation>
               List of comma separated field names to group the data items.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="summary-view" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify custom form view to be used for summary view
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1400,6 +1423,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1571,6 +1595,7 @@
             <xsd:documentation>Specify the row selection control</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="widget" type="xsd:string" />
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
         <xsd:attributeGroup ref="tns:ExtraAttributes" />

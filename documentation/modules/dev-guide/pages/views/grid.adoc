@@ -46,6 +46,7 @@ The grid view has the following attributes:
 | `canSave` | whether to allow saving records
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `canArchive` | whether to allow archiving/unarchiving records
+| `widget` | name of the widget to be used in the grid: `expandable`, `tree-grid`
 | `x-no-fetch` | whether to fetch initial records
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 |===

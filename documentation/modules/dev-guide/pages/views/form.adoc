@@ -193,6 +193,11 @@ A `panel-related` includes the following attributes:
 | `height` | number of rows (not pixel height)
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 | `edit-window` | display mode of edit window for relational fields. Can be `self`, `blank` or `popup` (default value).
+| `widget` | name of the widget to be used in the grid: `master-detail`, `expandable`, `tree-grid`
+| `x-expand-all` | specify comma separated list of expandable form fields like `items`
+| `x-tree-field` | sub-field to be used in the tree structure
+| `x-tree-limit` | nesting limit allowed in the tree structure
+
 |===
 
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.

@@ -23,16 +23,21 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.common.StringUtils;
 import com.axelor.rpc.Request;
 import com.axelor.script.ScriptHelper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 
 @XmlType
 @JsonTypeName("grid")
@@ -62,6 +67,9 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   @XmlAttribute private Boolean canMove;
 
+  @XmlAttribute(name = "summary-view")
+  private String summaryView;
+
   @XmlAttribute(name = "edit-icon")
   private Boolean editIcon = Boolean.TRUE;
 
@@ -77,8 +85,12 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
   @XmlAttribute(name = "x-selector")
   private String selector;
 
+  @JsonIgnore @XmlAnyAttribute private Map<QName, String> otherAttributes;
+
   @XmlElement(name = "help")
   private Help inlineHelp;
+
+  @XmlAttribute private String widget;
 
   @XmlElementWrapper
   @XmlElement(name = "button")
@@ -138,6 +150,14 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   public void setFreeSearch(String freeSearch) {
     this.freeSearch = freeSearch;
+  }
+
+  public String getSummaryView() {
+    return summaryView;
+  }
+
+  public void setSummaryView(String summaryView) {
+    this.summaryView = summaryView;
   }
 
   public String getOnNew() {
@@ -236,6 +256,24 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
     this.selector = selector;
   }
 
+  public Map<QName, String> getOtherAttributes() {
+    return otherAttributes;
+  }
+
+  public void setOtherAttributes(Map<QName, String> otherAttributes) {
+    this.otherAttributes = otherAttributes;
+  }
+
+  @XmlTransient
+  public Map<String, Object> getWidgetAttrs() {
+    return AbstractWidget.getWidgetAttrs(otherAttributes);
+  }
+
+  @XmlTransient
+  public void setWidgetAttrs(Map<String, Object> attrs) {
+    // does nothing
+  }
+
   public Help getInlineHelp() {
     if (inlineHelp == null) {
       return null;
@@ -257,6 +295,14 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   public void setInlineHelp(Help inlineHelp) {
     this.inlineHelp = inlineHelp;
+  }
+
+  public String getWidget() {
+    return widget;
+  }
+
+  public void setWidget(String widget) {
+    this.widget = widget;
   }
 
   public List<Hilite> getHilites() {

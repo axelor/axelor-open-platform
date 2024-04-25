@@ -50,6 +50,9 @@ public class PanelRelated extends AbstractPanel {
   @XmlAttribute(name = "grid-view")
   private String gridView;
 
+  @XmlAttribute(name = "summary-view")
+  private String summaryView;
+
   @XmlAttribute(name = "x-search-limit")
   private Integer searchLimit;
 
@@ -99,16 +102,20 @@ public class PanelRelated extends AbstractPanel {
   @XmlAttribute(name = "edit-window")
   private String editWindow;
 
+  @XmlAttribute private String widget;
+
   @XmlElements({
     @XmlElement(name = "field", type = PanelField.class),
     @XmlElement(name = "button", type = Button.class),
   })
   private List<AbstractWidget> items;
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -142,6 +149,14 @@ public class PanelRelated extends AbstractPanel {
 
   public void setGridView(String gridView) {
     this.gridView = gridView;
+  }
+
+  public String getSummaryView() {
+    return summaryView;
+  }
+
+  public void setSummaryView(String summaryView) {
+    this.summaryView = summaryView;
   }
 
   public Integer getSearchLimit() {
@@ -318,6 +333,14 @@ public class PanelRelated extends AbstractPanel {
 
   public void setEditWindow(String editWindow) {
     this.editWindow = editWindow;
+  }
+
+  public String getWidget() {
+    return widget;
+  }
+
+  public void setWidget(String widget) {
+    this.widget = widget;
   }
 
   public List<AbstractWidget> getItems() {

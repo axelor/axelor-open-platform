@@ -87,15 +87,14 @@ public abstract class AbstractWidget {
     this.otherAttributes = otherAttributes;
   }
 
-  @XmlTransient
-  public Map<String, Object> getWidgetAttrs() {
+  public static Map<String, Object> getWidgetAttrs(Map<QName, String> otherAttributes) {
     if (otherAttributes == null || otherAttributes.isEmpty()) {
       return null;
     }
     final Map<String, Object> attrs = Maps.newHashMap();
-    for (QName qn : otherAttributes.keySet()) {
-      String name = qn.getLocalPart();
-      String value = otherAttributes.get(qn);
+    for (final Map.Entry<QName, String> entry : otherAttributes.entrySet()) {
+      String name = entry.getKey().getLocalPart();
+      final String value = entry.getValue();
       if (name.startsWith("x-") || name.startsWith("data-")) {
         name = name.replaceFirst("^(x|data)-", "");
         name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
@@ -108,9 +107,15 @@ public abstract class AbstractWidget {
         String targetName = Mapper.of(target).getNameField().getName();
         attrs.put("targetName", targetName);
       } catch (Exception e) {
+        // Ignore
       }
     }
     return attrs;
+  }
+
+  @XmlTransient
+  public Map<String, Object> getWidgetAttrs() {
+    return getWidgetAttrs(otherAttributes);
   }
 
   @XmlTransient
