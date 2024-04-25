@@ -1317,7 +1317,6 @@
             </xsd:choice>
           </xsd:sequence>
         </xsd:choice>
-        <xsd:attribute name="expandable" type="xsd:boolean" />
         <xsd:attribute name="sortable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>

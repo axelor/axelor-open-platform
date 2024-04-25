@@ -38,8 +38,6 @@ import javax.xml.bind.annotation.XmlType;
 @JsonTypeName("grid")
 public class GridView extends AbstractView implements ContainerView, ExtendableView {
 
-  @XmlAttribute private Boolean expandable;
-
   @XmlAttribute private Boolean sortable;
 
   @XmlAttribute private String orderBy;
@@ -101,14 +99,6 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   @XmlElement(name = "extend")
   private List<Extend> extendItems;
-
-  public Boolean getExpandable() {
-    return expandable;
-  }
-
-  public void setExpandable(Boolean expandable) {
-    this.expandable = expandable;
-  }
 
   public Boolean getSortable() {
     return sortable;
