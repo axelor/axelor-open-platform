@@ -181,7 +181,11 @@ export function DateComponent({
         if (newValue === value) return;
       }
 
-      const callOnChange = event?.type === "click" ? true : false;
+      const callOnChange =
+        event?.type === "click" ||
+        (event?.type === "keydown" && (event as KeyboardEvent)?.key === "Enter")
+          ? true
+          : false;
 
       callOnChange &&
         onChange(
