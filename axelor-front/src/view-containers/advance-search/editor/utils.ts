@@ -118,15 +118,20 @@ const EXTRA_OPERATORS_BY_TARGET: Record<string, string[]> = {
   "com.axelor.auth.db.Group": ["$isCurrentGroup"],
 };
 
+export function getFieldType(field?: Field | Property) {
+  let type = toKebabCase(field?.type || "");
+
+  if (field && field.selectionList) {
+    type = "enum";
+  }
+
+  return type;
+}
+
 export function useField(fields?: Field[], name?: string) {
   return useMemo(() => {
     const field = fields?.find((item) => item.name === name);
-
-    let type = toKebabCase(field?.type || "");
-
-    if (field && field.selectionList) {
-      type = "enum";
-    }
+    const type = getFieldType(field);
 
     let typeOperators = types[type] || [];
 

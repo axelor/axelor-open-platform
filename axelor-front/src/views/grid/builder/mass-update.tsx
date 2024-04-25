@@ -185,7 +185,6 @@ export function MassUpdater({
                               operator: "=",
                               className: styles.widget,
                               placeholder: field.placeholder || field.title,
-                              type: toKebabCase(field.type),
                               field,
                               value: item,
                               onChange: (e: any) =>

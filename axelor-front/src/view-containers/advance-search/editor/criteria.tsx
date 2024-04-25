@@ -25,7 +25,7 @@ export const Criteria = memo(function Criteria({
   onRemove?: (index: number) => void;
 }) {
   const { fieldName, operator } = value || {};
-  const { type, field, options } = useField(fields, fieldName);
+  const { field, options } = useField(fields, fieldName);
 
   function handleRemove() {
     onRemove?.(index);
@@ -74,7 +74,6 @@ export const Criteria = memo(function Criteria({
           <Widget
             {...{
               operator,
-              type,
               field,
               value,
               onChange: handleChange,

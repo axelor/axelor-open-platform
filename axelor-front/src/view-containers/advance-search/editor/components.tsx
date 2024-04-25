@@ -11,6 +11,7 @@ import { DateComponent } from "@/views/form/widgets";
 import { useCompletion, useSelector } from "@/hooks/use-relation";
 import { DataRecord } from "@/services/client/data.types";
 import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
+import { getFieldType } from "./utils";
 
 import styles from "./components.module.css";
 
@@ -294,8 +295,10 @@ const getBooleanSelection: () => BooleanSelectType[] = () =>
     { value: false, title: i18n.get("No") },
   ]);
 
-export function Widget({ type, operator, onChange, value, ...rest }: any) {
+export function Widget({ field, operator, onChange, value, ...rest }: any) {
+  const type = getFieldType(field);
   const props = {
+    field,
     operator,
     value: value.value,
     value2: value.value2,
@@ -382,7 +385,7 @@ export function Widget({ type, operator, onChange, value, ...rest }: any) {
     case "decimal":
       return <SimpleWidget {...props} {...{ component: NumberField, type }} />;
     case "enum": {
-      const options = (rest.field.selectionList ?? []).map(
+      const options = (field.selectionList ?? []).map(
         ({ title, value, data }: any) => ({
           name: (data && data.value) || value,
           title: title,
