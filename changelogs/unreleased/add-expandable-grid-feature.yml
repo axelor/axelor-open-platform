@@ -1,0 +1,63 @@
+---
+title: Add expandable grid support
+type: feature
+description: |
+  Two types of expandable widgets are supported with collection field/grid view
+  
+  1.tree-grid (widget="tree-grid") (only supported on form collection field)
+  
+  ```xml
+    <panel-related
+      title="Items (Tree)"
+      readonlyIf="confirmed"
+      field="items"
+      form-view="order-line-form"
+      grid-view="order-line-grid"
+      editable="true"
+      onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+      widget="tree-grid"
+      x-tree-field="items"
+      x-tree-limit="2"
+      x-tree-field-title="Add new item"
+    >
+      <field name="product" onChange="action-order-line-change-product"/>
+      <field name="price" width="200" />
+      <field name="quantity" width="150" />
+    </panel-related>
+  ```
+  Options:
+
+  - x-tree-field: used to define nested o2m field of order-line model (currently it's same as order object i.e. items)
+  - x-tree-limit (optional): used to specify limit to support nested tree structure.
+  - x-tree-field-title (optional): by default it uses main title for sub items heading (title will only display when item contains no-sub items)
+  - x-expand-all: in case of tree-grid, it's enabled by default, it uses x-tree-field value as x-expand-all value. To disable it, we can pass `x-expand-all="false"`
+  
+  Note: onChange action will only work on top-level collection grid, while other actions defined like onNew/onLoad will work on nested editable grid line as well.
+
+  2.expandable (widget="expandable")
+  ```xml
+  <panel-related
+    title="Items (Expandable)"
+    readonlyIf="confirmed"
+    field="items"
+    form-view="order-line-form"
+    grid-view="order-line-grid"
+    editable="true"
+    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+    widget="expandable"
+    summary-view="order-line-nested"
+    x-expand-all="items"
+  /> 
+  ```
+
+  Options:
+
+  - summary-view: used to define expandable form-view, if not specified then by default it will use form-view attribute.
+  - x-expand-all: to enable expand all feature, you have to specify comma-separated list of nested expandable collection field if any.
+
+  Notes:
+
+  Actions like onChange, onNew, onLoad will work as per schema definition defined in order-form or order-line-nested form.
+  Options like `x-tree-field`, `x-tree-limit`, `x-tree-field-title` have no impact in case of expandable widget.
+  If `widget`/`summary-view` are defined in specified grid-view, then it will automatically be used in panel-related, we don't need it to specify.
+  To disable it we can pass widget="one-to-many/many-to-many" depending on type of field.

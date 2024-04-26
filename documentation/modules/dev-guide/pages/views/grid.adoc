@@ -46,13 +46,16 @@ The grid view has the following attributes:
 | `canSave` | whether to allow saving records
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `canArchive` | whether to allow archiving/unarchiving records
-| `widget` | name of the widget to be used in the grid: `expandable`, `tree-grid`
+| `widget` | name of the widget to be used in the grid: `master-detail`, `expandable`, `tree-grid`
 | `x-no-fetch` | whether to fetch initial records
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 |===
 
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.
 On top-level grid, `orderBy` is required with `canMove`.
+
+NOTE: Only xref:web-client/widgets.adoc#expandable[Expandable] widget is supported on top-level grid. Other widgets are supported when used as `grid-view` of a form field only.
+See widgets xref:web-client/widgets.adoc#masterdetail[MasterDetail], xref:web-client/widgets.adoc#expandable[Expandable] and xref:web-client/widgets.adoc#treegrid[TreeGrid] for usage and available widget attributes.
 
 The grid view has the following child items:
 

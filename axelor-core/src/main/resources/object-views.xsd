@@ -1113,6 +1113,12 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-tree-field-title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify sub-field title to be used for nested tree level.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-tree-limit" type="xsd:int">
       <xsd:annotation>
         <xsd:documentation>Specify the nesting limit allowed in the tree structure.

@@ -348,6 +348,95 @@ When using `viewer` with `one-to-many` fields, values should be referenced with
 The widget is used for `many-to-many` fields. This is same widget as `one-to-many`
 but one additional icon to select existing records.
 
+== MasterDetail
+
+This widget is supported on one-to-many and many-to-many fields. It allows to show a form view below the grid view for the currently selected row.
+
+Example:
+
+[source,xml]
+----
+  <panel-related
+    title="Items (MasterDetail)"
+    readonlyIf="confirmed"
+    field="items"
+    form-view="order-line-form"
+    grid-view="order-line-grid"
+    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+    widget="master-detail"
+    summary-view="order-line-nested"
+  />
+----
+
+Attribute:
+
+* `summary-view` - (optional) used to define the form view shown below the grid view. If not specified, the view specified by `form-view` attribute is used instead.
+
+NOTE: If grid is editable, summary form view stays readonly.
+
+== Expandable
+
+This widget is supported on one-to-many fields and top-level grids. It allows to show an expandable form view below each row.
+
+Example:
+
+[source,xml]
+----
+  <panel-related
+    title="Items (Expandable)"
+    readonlyIf="confirmed"
+    field="items"
+    form-view="order-line-form"
+    grid-view="order-line-grid"
+    editable="true"
+    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+    widget="expandable"
+    summary-view="order-line-nested"
+    x-expand-all="items"
+  />
+----
+
+Attributes:
+
+* `summary-view` - (optional) used to define the expandable form view. If not specified, the view specified by `form-view` attribute is used instead.
+* `x-expand-all` - (optional) to enable expand all feature, you have to specify comma-separated list of nested expandable collection fields if any. Supported on form field only, not on top-level grid.
+
+== TreeGrid
+
+This widget is supported on one-to-many fields. It allows to show a tree-like structure in a grid view.
+
+Example:
+
+[source,xml]
+----
+    <panel-related
+      title="Items (Tree)"
+      readonlyIf="confirmed"
+      field="items"
+      form-view="order-line-form"
+      grid-view="order-line-grid"
+      editable="true"
+      onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+      widget="tree-grid"
+      x-tree-field="items"
+      x-tree-limit="2"
+      x-tree-field-title="Add new item"
+    >
+      <field name="product" onChange="action-order-line-change-product"/>
+      <field name="price" width="200" />
+      <field name="quantity" width="150" />
+    </panel-related>
+----
+
+Attributes:
+
+* `x-tree-field` - used to define the nested o2m field.
+* `x-tree-limit` - (optional) used to specify limit to support nested tree structure.
+* `x-tree-field-title` - (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
+* `x-expand-all` - (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`
+
+NOTE: Only `onChange` action on root collection is performed. Actions defined on sub-items are not supported.
+
 == Binary
 
 The binary widget is file upload widget used with `binary` fields.
