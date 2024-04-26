@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import React, { ReactElement, useMemo } from "react";
 
 import { Box } from "@axelor/ui";
 
@@ -8,7 +8,6 @@ import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { toCamelCase } from "@/utils/names";
 import { FieldDetails } from "@/views/form/builder";
-import { useViewAction } from "@/view-containers/views/scope.ts";
 
 import { GridCellProps } from "../../builder/types";
 import * as WIDGETS from "../../widgets";
@@ -17,14 +16,16 @@ const getWidget = (name?: string) =>
   WIDGETS[toCamelCase(name ?? "") as keyof typeof WIDGETS];
 
 export function Cell(props: GridCellProps) {
-  const { view, data, value, record } = props;
+  const { view, viewContext, data, value, record } = props;
   const { type, tooltip, widget, serverType, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
-  const { context } = useViewAction();
-  const $className = useHilites(hilites)({ ...context, ...record })?.[0]
-    ?.css;
 
+  const getHilite = useHilites(hilites);
+  const $className = useMemo(
+    () => getHilite({ ...viewContext, ...record })?.[0]?.css,
+    [viewContext, getHilite, record],
+  );
   function render() {
     function renderContent() {
       const Comp =

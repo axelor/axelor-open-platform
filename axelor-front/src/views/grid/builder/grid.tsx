@@ -49,6 +49,7 @@ import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
+import { useViewAction } from "@/view-containers/views/scope";
 
 import { getWidget, isValidSequence } from "../builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
@@ -145,6 +146,8 @@ export const Grid = forwardRef<
     className,
     ...gridProps
   } = props;
+
+  const { context: viewContext } = useViewAction();
 
   const formRef = useRef<GridFormHandler>(null);
   const [event, setEvent] = useState("");
@@ -420,10 +423,11 @@ export const Grid = forwardRef<
         {...props}
         onUpdate={onUpdate}
         view={view}
+        viewContext={viewContext}
         actionExecutor={actionExecutor}
       />
     ),
-    [view, actionExecutor, onUpdate],
+    [view, actionExecutor, onUpdate, viewContext],
   );
 
   const CustomFormRenderer = useMemo(() => {
