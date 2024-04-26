@@ -120,7 +120,7 @@ public class KanbanView extends CardsView {
     this.limitColumns = limitColumns;
   }
 
-    public String getCollapseColumns() {
+  public String getCollapseColumns() {
     return collapseColumns;
   }
 
