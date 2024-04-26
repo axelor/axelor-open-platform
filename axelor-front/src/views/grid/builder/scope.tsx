@@ -1,7 +1,6 @@
-import { atom, useAtomValue } from "jotai";
-import { createScope, molecule, useMolecule } from "bunshi/react";
+import { DataRecord } from "@/services/client/data.types";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import uniq from "lodash/uniq";
-import { useMemo } from "react";
 
 import { JsonField, Property, Schema } from "@/services/client/meta.types";
 import { parseOrderBy } from "./utils";
@@ -10,14 +9,10 @@ export type GridHandler = {
   readonly?: boolean;
 };
 
-export const GridScope = createScope<GridHandler>({});
+export const GridContext = createContext<GridHandler>({});
 
-const gridMolecule = molecule((getMol, getScope) => {
-  return atom(getScope(GridScope));
-});
-
-export function useGridScope() {
-  return useAtomValue(useMolecule(gridMolecule));
+export function useGridContext() {
+  return useContext(GridContext);
 }
 
 export function useGridColumnNames({

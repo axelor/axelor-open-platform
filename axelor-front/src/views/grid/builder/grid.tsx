@@ -482,11 +482,16 @@ export const Grid = forwardRef<
     return field && isValidSequence(field);
   }, [readonly, view, fields]);
 
+  const gridContext = useMemo(
+    () => ({ readonly: !editable && readonly }),
+    [editable, readonly],
+  );
+
   if (init.state === "loading") return null;
 
   return (
     <AxGridProvider>
-      <ScopeProvider scope={GridScope} value={{ readonly }}>
+      <GridContext.Provider value={gridContext}>
         <AxGrid
           labels={getLabels()}
           cellRenderer={CustomCellRenderer}
@@ -522,7 +527,7 @@ export const Grid = forwardRef<
           columns={columns}
           className={clsx(className, styles.grid)}
         />
-      </ScopeProvider>
+      </GridContext.Provider>
     </AxGridProvider>
   );
 });
