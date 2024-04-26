@@ -11,6 +11,9 @@
   border: var(--ax-theme-panel-border, 1px solid var(--bs-border-color));
   border-radius: var(--ax-theme-panel-border-radius, var(--bs-border-radius));
 
+  &.noRadius {
+    border-radius: 0;
+  }
   > div {
     --ax-panel-border: 0;
   }

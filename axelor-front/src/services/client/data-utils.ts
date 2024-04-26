@@ -16,7 +16,10 @@ export function isDummy(name: string, fieldNames: string[]) {
     // in model
     !fieldNames.includes(name) &&
     // if a dot field exist, consider field to be part the model
-    !fieldNames.filter((key) => key.includes(".")).map((key) => key.split('.')[0]).includes(name) &&
+    !fieldNames
+      .filter((key) => key.includes("."))
+      .map((key) => key.split(".")[0])
+      .includes(name) &&
     // id and version may not be in fieldNames
     !["id", "version"].includes(name) &&
     // special case for enum fields
@@ -134,6 +137,13 @@ function toCompact(value: DataRecord | null | undefined) {
   return { ...rest, $version };
 }
 
+function updateItem(item: DataRecord) {
+  if (item.id === null && item.cid) {
+    return { ...item, id: item.cid };
+  }
+  return item;
+}
+
 export function updateRecord(
   target: DataRecord,
   source: DataRecord,
@@ -141,6 +151,8 @@ export function updateRecord(
   options?: { findItem?: (fieldName: string) => Schema | undefined },
 ) {
   const { findItem } = options || {};
+
+  source = updateItem(source);
 
   if (equals(target, source)) {
     return target;
@@ -179,10 +191,14 @@ export function updateRecord(
     if (Array.isArray(value)) {
       const curr: DataRecord[] = result[key] ?? [];
       newValue = value.map((item) => {
+        item = updateItem(item);
         const found = curr.find((x) =>
-          item.id > 0 ? x.id === item.id : equals(x, item),
+          item.id ? x.id === item.id : equals(x, item),
         );
         if (found) {
+          if (found._changed) {
+            item = { ...item, _changed: false, _original: undefined };
+          }
           let newItem = updateRecord(found, item, fields);
           if (found.selected !== item.selected) {
             newItem = { ...newItem, selected: item.selected };

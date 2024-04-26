@@ -1,11 +1,18 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
+import { produce } from "immer";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import getNested from "lodash/get";
 import isEqual from "lodash/isEqual";
+import pick from "lodash/pick";
+import uniq from "lodash/uniq";
+import uniqueId from "lodash/uniqueId";
 import {
+  ForwardedRef,
+  HTMLAttributes,
   SetStateAction,
   SyntheticEvent,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
@@ -15,7 +22,7 @@ import {
 } from "react";
 
 import { Box, Panel, clsx } from "@axelor/ui";
-import { GridRow } from "@axelor/ui/grid";
+import { GridColumnProps, GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
@@ -36,9 +43,11 @@ import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
 import {
+  Field,
   FormView,
   GridView,
   Property,
+  Schema,
   View,
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -47,8 +56,16 @@ import { toKebabCase } from "@/utils/names";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
-import { useGridColumnNames } from "@/views/grid/builder/scope";
 import { useCustomizePopup } from "@/views/grid/builder/customize";
+import { ExpandIcon } from "@/views/grid/builder/expandable";
+import {
+  CollectionTree,
+  GridExpandableContext,
+  useCollectionTree,
+  useGridColumnNames,
+  useGridExpandableContext,
+  useIsRootCollectionTree,
+} from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 
 import {
@@ -65,7 +82,7 @@ import {
   useFormRefresh,
   useFormScope,
 } from "../../builder/scope";
-import { nextId } from "../../builder/utils";
+import { getDefaultValues, nextId } from "../../builder/utils";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
 
@@ -123,9 +140,31 @@ function findNearestParentPath(record: DataRecord, path: string[] | string) {
   return keys;
 }
 
+function flattenItems(record: DataRecord, name: string) {
+  return (record?.[name] || []).reduce(
+    (arr: DataRecord[], item: DataRecord) => [
+      ...arr,
+      item,
+      ...flattenItems(item, name),
+    ],
+    [],
+  );
+}
+
+function isExpandableWidget(schema: Schema) {
+  return ["tree-grid", "expandable"].includes(schema.widget ?? "");
+}
+
 export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { schema } = props;
   const { target: model, gridView } = schema;
+  const { actionExecutor } = useFormScope();
+  const isRootCollection = useIsRootCollectionTree();
+
+  const waitForActions = useCallback(async () => {
+    await actionExecutor.waitFor();
+    await actionExecutor.wait();
+  }, [actionExecutor]);
 
   const { state, data } = useAsync(async () => {
     const { items, serverType } = schema;
@@ -159,9 +198,50 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
     };
   }, [schema, model]);
 
+  const mergedSchema = useMemo(
+    () => ({
+      ...schema,
+      widget: schema.widgetAttrs.widget ?? data?.view.widget ?? schema.widget,
+      widgetAttrs: {
+        ...data?.view.widgetAttrs,
+        ...schema.widgetAttrs,
+      },
+    }),
+    [data?.view.widget, data?.view.widgetAttrs, schema],
+  );
+
   if (state !== "hasData") return null;
 
-  return <OneToManyInner {...props} viewData={data} />;
+  const hasExpandable =
+    isExpandableWidget(mergedSchema) ||
+    (data?.view && isExpandableWidget(data?.view as Schema));
+  const isRootTreeGrid = hasExpandable && isRootCollection;
+
+  function render() {
+    return (
+      <OneToManyInner
+        {...props}
+        schema={mergedSchema}
+        viewData={data}
+        isRootTreeGrid={isRootTreeGrid}
+      />
+    );
+  }
+
+  if (hasExpandable) {
+    return (
+      <CollectionTree
+        enabled={hasExpandable}
+        {...(isRootTreeGrid && {
+          waitForActions,
+        })}
+      >
+        {render()}
+      </CollectionTree>
+    );
+  }
+
+  return render();
 }
 
 function OneToManyInner({
@@ -170,11 +250,14 @@ function OneToManyInner({
   widgetAtom,
   formAtom,
   viewData,
+  isRootTreeGrid,
   ...props
 }: FieldProps<DataRecord[]> & {
   viewData?: ViewData<GridView>;
+  isRootTreeGrid?: boolean;
 }) {
   const {
+    widget,
     widgetAttrs,
     name,
     showBars = widgetAttrs?.showBars,
@@ -184,7 +267,7 @@ function OneToManyInner({
     target: model,
     fields,
     formView,
-    summaryView,
+    summaryView = viewData?.view?.summaryView,
     gridView,
     searchLimit,
     canExport = widgetAttrs?.canExport,
@@ -197,6 +280,7 @@ function OneToManyInner({
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
+  const recordsSyncRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridHandler>(null);
   const saveIdRef = useRef<number | null>();
@@ -204,6 +288,44 @@ function OneToManyInner({
   const [records, setRecords] = useState<DataRecord[]>([]);
   const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
   const [, forceUpdate] = useReducer(() => ({}), {});
+
+  const { level: expandLevel = 0 } = useGridExpandableContext();
+  const {
+    items: itemsAtom,
+    expand: expandAtom,
+    getItem,
+    enabled: isCollectionTree,
+    waitForActions: waitForCollectionActions,
+  } = useCollectionTree();
+
+  const isExpandable = widget === "expandable";
+  const isTreeGrid = widget === "tree-grid";
+  const isSubTreeGrid = isTreeGrid && !isRootTreeGrid;
+  const expandable = isExpandable || isTreeGrid;
+  const isTreeLimitExceed = useMemo(() => {
+    const treeLimit = isNaN(widgetAttrs?.treeLimit)
+      ? null
+      : +widgetAttrs.treeLimit;
+    return isTreeGrid && (treeLimit ?? 0) > 0 && expandLevel >= treeLimit!;
+  }, [isTreeGrid, widgetAttrs?.treeLimit, expandLevel]);
+
+  const expandAll = useAtomValue(expandAtom);
+  const expandFieldList = useMemo<string[]>(() => {
+    const expandAll =
+      (isTreeGrid && widgetAttrs?.treeField) || widgetAttrs?.expandAll;
+    if (isCollectionTree && expandAll) {
+      const value = expandAll;
+      if (!["true", "false"].includes(value?.toLowerCase())) {
+        return uniq(value.split(","));
+      }
+    }
+    return [];
+  }, [
+    isCollectionTree,
+    isTreeGrid,
+    widgetAttrs?.treeField,
+    widgetAttrs?.expandAll,
+  ]);
 
   const widgetState = useMemo(
     () =>
@@ -240,7 +362,14 @@ function OneToManyInner({
       isNum(x)
         ? ({ id: x } as unknown as DataRecord)
         : x.id === undefined || x.id === null
-          ? { ...x, _dirty: true, id: nextId() }
+          ? {
+              ...x,
+              _dirty: true,
+              ...(() => {
+                const id = x.cid ?? nextId();
+                return { id, cid: id };
+              })(),
+            }
           : x,
     );
     return lastItemsRef.current;
@@ -297,13 +426,12 @@ function OneToManyInner({
               markDirty,
             );
 
-            const hasValueChanged = (
-              result as unknown as ActionResult[]
-            )?.filter?.(
-              ({ values, attrs }) =>
-                values?.[schema.name] !== undefined ||
-                attrs?.[schema.name]?.value !== undefined,
-            );
+            const hasValueChanged =
+              (result as unknown as ActionResult[])?.filter?.(
+                ({ values, attrs }) =>
+                  values?.[schema.name] !== undefined ||
+                  attrs?.[schema.name]?.value !== undefined,
+              ).length > 0;
 
             /**
              * if same o2m field values is changed on onChange event of itself
@@ -313,10 +441,29 @@ function OneToManyInner({
               await new Promise((resolve) => {
                 setTimeout(() => resolve(true), 500);
               });
+            } else if (isRootTreeGrid && values) {
+              // reset _changed and _original
+              const updatedValues = produce(values, (draft) => {
+                function process(obj: any) {
+                  if (obj && Array.isArray(obj)) {
+                    obj.map(process);
+                    return;
+                  }
+                  if (obj && typeof obj === "object") {
+                    if (obj._changed) {
+                      delete obj._changed;
+                      delete obj._original;
+                    }
+                    Object.entries(obj).forEach(([, v]) => process(v));
+                  }
+                }
+                draft.map(process);
+              });
+              set(valueAtom, updatedValues, false, false);
             }
           },
         ),
-      [getItems, valueAtom, schema.name],
+      [getItems, valueAtom, schema.name, isRootTreeGrid],
     ),
   );
 
@@ -334,7 +481,13 @@ function OneToManyInner({
   const readonly = props.readonly || attrs.readonly;
 
   const isManyToMany =
-    toKebabCase(schema.serverType || schema.widget) === "many-to-many";
+    toKebabCase(schema.serverType || widget) === "many-to-many";
+
+  const gridViewData = useMemo(
+    () => ({ ...(viewData?.view || schema), widget, widgetAttrs }) as GridView,
+    [schema, viewData?.view, widget, widgetAttrs],
+  );
+  const gridViewFields = viewData?.fields || fields;
 
   const viewMeta = useMemo(() => {
     return {
@@ -352,12 +505,12 @@ function OneToManyInner({
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
   const showSelector = useSelector();
-  const [state, setState, gridStateAtom] = useGridState({
+  const [state, setState, gridAtom] = useGridState({
     params: { groupBy },
   });
   const onColumnCustomize = useCustomizePopup({
     view: viewData?.view,
-    stateAtom: gridStateAtom,
+    stateAtom: gridAtom,
   });
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
@@ -440,7 +593,13 @@ function OneToManyInner({
 
           return prevOrder === nextOrder
             ? value
-            : { ...rest, version, [orderField]: nextOrder, _dirty: true };
+            : {
+                ...record,
+                ...rest,
+                version,
+                [orderField]: nextOrder,
+                _dirty: true,
+              };
         });
       }
 
@@ -514,11 +673,12 @@ function OneToManyInner({
   );
 
   useEffect(() => {
-    if (shouldSyncSelect.current) {
+    // no support of sync selection with collection tree widget
+    if (shouldSyncSelect.current && !isCollectionTree) {
       syncSelection();
     }
     shouldSyncSelect.current = true;
-  }, [syncSelection]);
+  }, [syncSelection, isCollectionTree]);
 
   const columnNames = useGridColumnNames({
     view: viewData?.view ?? schema,
@@ -534,9 +694,11 @@ function OneToManyInner({
           return;
         }
         const items = getItems(get(valueAtom));
-        const names =
-          options?.fields ?? dataStore.options.fields ?? columnNames;
+        let names = options?.fields ?? dataStore.options.fields ?? columnNames;
 
+        if (expandFieldList.length) {
+          names = uniq([...names, ...expandFieldList]);
+        }
         const ids = items
           .filter(
             (v) => (v.id ?? 0) > 0 && v.version === undefined && !v._fetched,
@@ -595,20 +757,35 @@ function OneToManyInner({
           draft.orderBy = null;
         });
 
+        let currNewEditRecord: DataRecord;
+        if (isCollectionTree) {
+          const state = get(gridAtom);
+          const editRecord = state.rows?.[state.editRow?.[0] ?? -1]?.record;
+          if (editRecord && (editRecord.id ?? 0) < 0 && !editRecord._dirty) {
+            currNewEditRecord = editRecord;
+          }
+        }
+        recordsSyncRef.current = true;
         setRecords((records) => {
           const newRecords = newItems.map((item, index) => {
             return unfetchedItems[index]
-              ? nestedToDotted({ ...records[index], ...item })
+              ? nestedToDotted({ ...records[index], ...item, cid: item.cid })
               : item;
           });
           const newIds = newRecords.map((r) => r.id);
           const recIds = records.map((r) => r.id);
           const ids = [
-            ...recIds.filter((id) => newIds.includes(id)), // preserve existing record order
+            ...recIds.filter(
+              (id) => newIds.includes(id) || id === currNewEditRecord?.id,
+            ), // preserve existing record order
             ...newIds.filter((id) => !recIds.includes(id)), // append new record
           ];
           return ids
-            .map((id) => newRecords.find((r) => r.id === id))
+            .map((id) =>
+              currNewEditRecord?.id === id
+                ? currNewEditRecord
+                : newRecords.find((r) => r.id === id),
+            )
             .filter((rec) => rec) as DataRecord[];
         });
 
@@ -620,6 +797,7 @@ function OneToManyInner({
       [
         getItems,
         valueAtom,
+        gridAtom,
         dataStore,
         columnNames,
         orderBy,
@@ -628,6 +806,8 @@ function OneToManyInner({
         parentId,
         parentModel,
         setState,
+        isCollectionTree,
+        expandFieldList,
       ],
     ),
   );
@@ -714,6 +894,7 @@ function OneToManyInner({
           .map(
             (item, ind) =>
               ({
+                ...records.find((r) => r.id === item.id),
                 ...item,
                 [orderField]: ind + 1,
               }) as DataRecord,
@@ -750,7 +931,16 @@ function OneToManyInner({
 
   const handleSelect = useAtomCallback(
     useCallback(
-      (get, set, records: DataRecord[]) => {
+      (
+        get,
+        set,
+        records: DataRecord[],
+        {
+          select = true,
+          change = true,
+          dirty: _dirty = true,
+        }: { select?: boolean; change?: boolean; dirty?: boolean } = {},
+      ) => {
         const prevItems = getItems(get(valueAtom));
 
         const items = records.map((item) => {
@@ -758,7 +948,7 @@ function OneToManyInner({
             const { version: $version, ...rest } = item;
             item = { ...rest, $version };
           }
-          return item.selected ? item : { ...item, selected: true };
+          return !select || item.selected ? item : { ...item, selected: true };
         });
 
         const newItems = items.filter(
@@ -778,10 +968,12 @@ function OneToManyInner({
           }),
         ]);
 
-        const changed = !isManyToMany || prevItems.length !== nextItems.length;
+        const changed =
+          change && (!isManyToMany || prevItems.length !== nextItems.length);
         const dirty =
-          prevItems.length !== nextItems.length ||
-          nextItems.some((item) => item._dirty);
+          _dirty &&
+          (prevItems.length !== nextItems.length ||
+            nextItems.some((item) => item._dirty));
 
         return setValue(nextItems, changed, dirty);
       },
@@ -813,13 +1005,20 @@ function OneToManyInner({
 
   const parentScope = useFormScope();
 
+  const onParentRefresh = useCallback(
+    (target?: string) => parentScope.actionHandler.refresh(target),
+    [parentScope.actionHandler],
+  );
+  const onParentSave = useCallback(
+    (record?: DataRecord) => parentScope.actionHandler.save(record),
+    [parentScope.actionHandler],
+  );
+
   const actionExecutor = useActionExecutor(actionView, {
     formAtom: null,
     getContext: getActionContext,
-    onRefresh: parentScope.actionHandler.refresh.bind(
-      parentScope.actionHandler,
-    ),
-    onSave: parentScope.actionHandler.save.bind(parentScope.actionHandler),
+    onRefresh: onParentRefresh,
+    onSave: onParentSave,
   });
 
   const [beforeSelect] = useBeforeSelect(schema, getContext);
@@ -847,7 +1046,15 @@ function OneToManyInner({
         ...(isManyToMany
           ? { onSelect }
           : {
-              onSave: (record) => onSave?.({ ...record, $id: id }),
+              onSave: (record) =>
+                onSave?.({
+                  ...record,
+                  $id: id,
+                  ...(isCollectionTree && {
+                    _changed: true,
+                    _original: options?.record || {},
+                  }),
+                }),
               checkDirty: false,
             }),
         ...options,
@@ -861,13 +1068,18 @@ function OneToManyInner({
       formView,
       getContext,
       isManyToMany,
+      isCollectionTree,
     ],
   );
 
   const onSave = useCallback(
-    async (record: DataRecord) => {
-      const { id, $id, ...rest } = record;
-      record = { ...rest, id: id ?? $id ?? nextId() };
+    async (
+      record: DataRecord,
+      options: { select?: boolean; change?: boolean; dirty?: boolean } = {},
+    ) => {
+      const { $id, ...rest } = record;
+      const id = record.id ?? $id ?? nextId();
+      record = { ...rest, id, cid: id };
 
       setState((draft) => {
         if (draft.editRow) {
@@ -879,7 +1091,7 @@ function OneToManyInner({
           }
         }
       });
-      await handleSelect([record]);
+      await handleSelect([record], options);
       setDetailRecord((details) =>
         details?.id === record.id ? record : details,
       );
@@ -888,17 +1100,86 @@ function OneToManyInner({
     [handleSelect, setState],
   );
 
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
+
+  const onO2MSave = useCallback((record: DataRecord) => {
+    return onSaveRef.current(record, { select: false });
+  }, []);
+
+  const onO2MUpdate = useCallback((record: DataRecord) => {
+    return onSaveRef.current(record, {
+      select: false,
+      change: true,
+      dirty: false,
+    });
+  }, []);
+
   const onAdd = useCallback(() => {
     openEditor({}, (record) => handleSelect([record]), onSave);
   }, [openEditor, onSave, handleSelect]);
 
-  const onAddInGrid = useCallback((e: any) => {
-    e?.preventDefault?.();
-    const gridHandler = gridRef.current;
-    if (gridHandler) {
-      gridHandler.onAdd?.();
-    }
-  }, []);
+  const handleAddInGrid = useCallback(
+    async (record?: DataRecord) => {
+      const gridHandler = gridRef.current;
+      if (isCollectionTree) {
+        await gridHandler?.commit?.();
+        await waitForCollectionActions?.();
+
+        // clear sorting if applied
+        setState((draft) => {
+          draft.orderBy = null;
+        });
+
+        const newRecord = {
+          id: nextId(),
+          ...expandFieldList.reduce(
+            (obj, field) => ({ ...obj, [field]: [] }),
+            {} as DataRecord,
+          ),
+          ...getDefaultValues(gridViewFields, gridViewData.items),
+        };
+        setRecords(
+          (records) =>
+            (record
+              ? records?.reduce(
+                  (_records: DataRecord[], rec) =>
+                    rec.id === record.id
+                      ? [..._records, rec, newRecord]
+                      : [..._records, rec],
+                  [],
+                )
+              : [...(records || []), newRecord]) as DataRecord[],
+        );
+        setState((draft) => {
+          const recIndex = record
+            ? draft.rows.findIndex((r) => r.key === record.id)
+            : -1;
+          const lastIndex = draft.rows?.length ?? 0;
+          draft.editRow = [recIndex > -1 ? recIndex + 1 : lastIndex, null];
+        });
+      } else {
+        gridHandler?.onAdd?.();
+      }
+    },
+    [
+      expandFieldList,
+      setRecords,
+      setState,
+      isCollectionTree,
+      gridViewFields,
+      gridViewData,
+      waitForCollectionActions,
+    ],
+  );
+
+  const onAddInGrid = useCallback(
+    (e: any) => {
+      e?.preventDefault?.();
+      handleAddInGrid();
+    },
+    [handleAddInGrid],
+  );
 
   const onAddInDetail = useCallback(() => {
     setDetailRecord({ id: nextId() });
@@ -990,7 +1271,7 @@ function OneToManyInner({
   }, []);
 
   const hasRowSelected = !!selectedRows?.length;
-  const hasMasterDetails = toKebabCase(schema.widget) === "master-detail";
+  const hasMasterDetails = toKebabCase(widget) === "master-detail";
   const editRecord =
     editable && hasMasterDetails && editRow && rows?.[editRow?.[0]]?.record;
   const selected =
@@ -1051,13 +1332,16 @@ function OneToManyInner({
           const valIds = values.map((v) => v.id);
           return rows
             .filter((r) => valIds.includes(r.record?.id ?? 0))
-            .map((r) => values.find((v) => v.id === r.record?.id))
-            .map((r, ind) => ({
-              ...r,
-              _dirty: true,
-              ...(orderField && { [orderField]: ind + 1 }),
-              version: r?.version ?? r?.$version,
-            })) as DataRecord[];
+            .map((r, ind) => {
+              const item = values.find((v) => v.id === r.record?.id);
+              return {
+                ...r.record,
+                ...item,
+                _dirty: true,
+                ...(orderField && { [orderField]: ind + 1 }),
+                version: item?.version ?? item?.$version,
+              };
+            }) as DataRecord[];
         },
         false,
         true,
@@ -1134,17 +1418,219 @@ function OneToManyInner({
 
   useFormRefresh(onRefresh);
 
-  const onDiscard = useCallback(() => updateViewDirty(), [updateViewDirty]);
+  const onDiscard = useCallback(
+    (record: DataRecord) => {
+      if (isCollectionTree) {
+        if ((record.id ?? -1) < 0 && !record._dirty) {
+          setRecords((records) =>
+            records.filter((rec) => rec.id !== record.id),
+          );
+        }
+      }
+      updateViewDirty();
+    },
+    [isCollectionTree, updateViewDirty],
+  );
 
   const hasActions = showBars && (toolbar?.length || menubar?.length);
-
   const rowSize = 40;
-  const headerSize = 75;
+  const headerSize = isSubTreeGrid ? rowSize : 75;
   const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
   const changed = useMemo(() => value?.some((x) => x._dirty), [value]);
   const allowSorting = !canMove && !changed;
   const allowGrouping = !canMove;
   const allowRowReorder = canMove && !readonly;
+  const canShowHeader = !isSubTreeGrid; // widgetAttrs?.showHeader !== "false";
+  const noHeader =
+    !canShowHeader &&
+    (readonly || (value?.length ?? 0) > 0 || (records?.length ?? 0) > 0);
+  const canShowTitle =
+    !noHeader && (schema.showTitle ?? widgetAttrs?.showTitle ?? true);
+  const canExpandAll = isRootTreeGrid && widgetAttrs?.expandAll !== "false";
+
+  const selectFieldsAtom = useMemo(() => {
+    return focusAtom(
+      formAtom,
+      (o) => o.select?.[name] ?? {},
+      (o, v) => ({
+        ...o,
+        select: {
+          ...o.select,
+          [name]: {
+            ...o.select?.[name],
+            ...v,
+          },
+        },
+      }),
+    );
+  }, [name, formAtom]);
+
+  const setSelectFields = useSetAtom(selectFieldsAtom);
+
+  const syncRecordsToTree = useAtomCallback(
+    useCallback(
+      (get, set, records: DataRecord[]) => {
+        const values = getItems(get(valueAtom)).map((item) => {
+          const found = records.find((r) => r.id === item.id);
+          return found ? { ...item, ...found } : item;
+        });
+
+        if (isRootTreeGrid) {
+          const selectFields = get(selectFieldsAtom) || {};
+          const allItems: DataRecord[] = [
+            ...values.map((v) => ({ ...v, _model: model })),
+          ];
+
+          values.forEach((value) => {
+            const list = Object.keys(selectFields)
+              .filter((f) => selectFields[f]?._model)
+              .reduce(
+                (_items, key) => [
+                  ..._items,
+                  ...(flattenItems(value, key).map((v: DataRecord) => ({
+                    ...v,
+                    _model: selectFields[key]?._model,
+                  })) as DataRecord[]),
+                ],
+                [] as DataRecord[],
+              );
+            allItems.push(...list);
+          });
+
+          const collectionItems = produce(get(itemsAtom), (draft) => {
+            allItems.forEach((item) => {
+              const found = draft.find(
+                (v) =>
+                  v.model === item._model &&
+                  (v.record.id === item.id || v.record.id === item.cid),
+              );
+              if (found) {
+                found.record = { ...found.record, ...item };
+              } else {
+                draft.push({ record: { ...item }, model });
+              }
+            });
+          });
+
+          set(itemsAtom, collectionItems);
+        }
+      },
+      [isRootTreeGrid, valueAtom, selectFieldsAtom, itemsAtom, getItems, model],
+    ),
+  );
+
+  const hasRowExpanded = useAtomCallback(
+    useCallback(
+      (get, set, { record }: GridRow) => {
+        if (isTreeLimitExceed) return null;
+
+        const isNew = (record.id ?? 0) < 0;
+        const itemState = get(itemsAtom).find(
+          (item) =>
+            item.record.id === record.cid || item.record.id === record.id,
+        );
+        if (isNew || itemState?.expanded === false)
+          return Boolean(itemState?.expanded);
+
+        const noChildren =
+          expandFieldList.length > 0 &&
+          expandFieldList.every(
+            (field) =>
+              record[field] !== undefined && record[field]?.length === 0,
+          );
+
+        if (readonly && noChildren) {
+          return null;
+        }
+
+        if (expandAll && noChildren) {
+          return itemState?.expanded ?? false;
+        }
+        return expandAll || itemState?.expanded;
+      },
+      [isTreeLimitExceed, expandAll, itemsAtom, expandFieldList, readonly],
+    ),
+  );
+
+  const onRowExpand = useAtomCallback(
+    useCallback(
+      (get, set, row: GridRow, expand?: boolean) => {
+        const noSubItems =
+          expandFieldList.length > 0 &&
+          expandFieldList.every(
+            (field) =>
+              row.record?.[field] !== undefined &&
+              row.record?.[field]?.length === 0,
+          );
+        const itemAtom = getItem(row.record?.id ?? 0, model);
+        itemAtom &&
+          set(itemAtom, (state) => ({
+            ...state,
+            expanded: noSubItems && !expand ? undefined : Boolean(expand),
+          }));
+      },
+      [getItem, model, expandFieldList],
+    ),
+  );
+
+  useEffect(() => {
+    if (recordsSyncRef.current) {
+      recordsSyncRef.current = false;
+      if (expandable && isRootTreeGrid) {
+        syncRecordsToTree(records);
+      }
+    }
+  }, [isRootTreeGrid, expandable, records, syncRecordsToTree]);
+
+  useEffect(() => {
+    const fieldsSelect = gridViewData?.items
+      ?.filter((item) => item.type === "field" && item.name)
+      .reduce((_select: Record<string, any>, item) => {
+        const { target, targetName } = item as Field;
+        return {
+          ..._select,
+          [item.name!]: target && targetName ? { [targetName]: true } : true,
+        };
+      }, {});
+    setSelectFields((state: any) => ({ ...state, ...fieldsSelect }));
+  }, [setSelectFields, gridViewData?.items]);
+
+  const expandableContext = useMemo(
+    () => ({ selectAtom: selectFieldsAtom, level: expandLevel + 1 }),
+    [expandLevel, selectFieldsAtom],
+  );
+
+  const expandableView = useMemo(() => {
+    if (isTreeGrid) {
+      const treeField = schema.widgetAttrs?.treeField;
+      const treeFieldTitle = schema.widgetAttrs?.treeFieldTitle ?? schema.title;
+      return {
+        model,
+        fields: {
+          [treeField]: {
+            ...pick(schema, ["target", "targetName"]),
+            type: schema.serverType,
+            name: treeField,
+            title: treeFieldTitle,
+          },
+        },
+        view: {
+          type: "form",
+          model: model,
+          items: [
+            {
+              ...schema,
+              onChange: undefined,
+              title: treeFieldTitle,
+              uid: uniqueId("w"),
+              name: treeField,
+            },
+          ],
+        },
+      } as ViewData<FormView>;
+    }
+    return summaryView ?? formView;
+  }, [schema, model, summaryView, formView, isTreeGrid]);
 
   return (
     <>
@@ -1152,15 +1638,24 @@ function OneToManyInner({
         ref={panelRef}
         className={clsx(styles.container, {
           [styles.toolbar]: hasActions,
+          [styles.rootTreeGrid]: isRootTreeGrid,
+          [styles.subTreeGrid]: isSubTreeGrid,
+          [styles.tree]: isTreeGrid,
+          [styles.hasHeader]: !isRootTreeGrid && canShowHeader,
+          [styles.hasNewHeader]: isTreeGrid && !state.rows?.length,
+          [styles.noHeader]: noHeader,
+          [styles.noTitle]: !canShowTitle,
         })}
         header={
           <div className={styles.title}>
             <div className={styles.titleText}>
-              <FieldLabel
-                schema={schema}
-                formAtom={formAtom}
-                widgetAtom={widgetAtom}
-              />
+              {canShowTitle && (
+                <FieldLabel
+                  schema={schema}
+                  formAtom={formAtom}
+                  widgetAtom={widgetAtom}
+                />
+              )}
             </div>
             {hasActions && (
               <ToolbarActions
@@ -1243,48 +1738,80 @@ function OneToManyInner({
           ],
         }}
         style={{
-          minHeight: headerSize + 2 * rowSize, // min 2 rows
-          maxHeight: maxHeight, // auto height to the max rows to display
+          minHeight:
+            headerSize +
+            (isSubTreeGrid ? (readonly ? -headerSize : 0) : 2 * rowSize), // min 2 rows
+          ...(!expandable && {
+            maxHeight, // auto height to the max rows to display
+          }),
         }}
       >
-        <ScopeProvider scope={MetaScope} value={viewMeta}>
-          <GridComponent
-            className={styles["grid"]}
-            ref={gridRef}
-            allowGrouping={allowGrouping}
-            allowSorting={allowSorting}
-            allowRowReorder={allowRowReorder}
-            showEditIcon={canEdit || canView}
-            readonly={readonly || !canEdit}
-            editable={editable && canEdit}
-            records={records}
-            view={(viewData?.view || schema) as GridView}
-            fields={viewData?.fields || fields}
-            perms={perms}
-            columnAttrs={columnAttrs}
-            state={state}
-            setState={setState}
-            actionExecutor={actionExecutor}
-            onFormInit={forceUpdate}
-            onEdit={canEdit ? onEdit : canView ? onView : noop}
-            onView={canView ? (canEdit ? onEdit : onView) : noop}
-            onUpdate={onSave}
-            onSave={isManyToMany ? onSaveRecord : onSave}
-            onDiscard={onDiscard}
-            onRowReorder={onRowReorder}
-            onRowSelectionChange={onRowSelectionChange}
-            {...(!canNew &&
-              editable && {
-                onRecordAdd: undefined,
+        <GridExpandableContext.Provider value={expandableContext}>
+          <ScopeProvider scope={MetaScope} value={viewMeta}>
+            <GridComponent
+              className={clsx(styles["grid"], {
+                [styles.noRecords]: records.length === 0,
               })}
-            {...(hasMasterDetails &&
-              selected &&
-              !detailRecord && {
-                onRowClick,
+              ref={gridRef}
+              allowGrouping={allowGrouping}
+              allowSorting={allowSorting}
+              allowRowReorder={allowRowReorder}
+              showEditIcon={canEdit || canView}
+              {...(isTreeGrid && {
+                showAsTree: true,
+                showNewIcon: canNew,
+                showDeleteIcon: canDelete,
               })}
-            onColumnCustomize={onColumnCustomize}
-          />
-        </ScopeProvider>
+              readonly={readonly || !canEdit}
+              editable={editable && canEdit}
+              records={records}
+              expandable={expandable}
+              expandableView={expandableView}
+              view={gridViewData}
+              fields={gridViewFields}
+              perms={perms}
+              columnAttrs={columnAttrs}
+              state={state}
+              setState={setState}
+              actionExecutor={actionExecutor}
+              hasRowExpanded={hasRowExpanded}
+              onFormInit={forceUpdate}
+              onEdit={canEdit ? onEdit : canView ? onView : noop}
+              onView={canView ? (canEdit ? onEdit : onView) : noop}
+              onUpdate={isManyToMany ? onSave : onO2MUpdate}
+              onDelete={onDelete}
+              onSave={isManyToMany ? onSaveRecord : onO2MSave}
+              onDiscard={onDiscard}
+              onRowExpand={onRowExpand}
+              onRowReorder={onRowReorder}
+              onRowSelectionChange={onRowSelectionChange}
+              {...(canNew && {
+                onNew: editable && canEdit ? handleAddInGrid : onAdd,
+              })}
+              {...(canDelete && {
+                onDelete: onDelete,
+              })}
+              {...(!canNew &&
+                editable && {
+                  onRecordAdd: undefined,
+                })}
+              {...(hasMasterDetails &&
+                selected &&
+                !detailRecord && {
+                  onRowClick,
+                })}
+              {...(isSubTreeGrid && {
+                headerRowRenderer: HideGridHeaderRow,
+                allowColumnCustomize: false,
+                allowColumnHide: false,
+              })}
+              {...(canExpandAll && {
+                headerCellRenderer: CustomGridHeaderCell,
+              })}
+              onColumnCustomize={onColumnCustomize}
+            />
+          </ScopeProvider>
+        </GridExpandableContext.Provider>
         {hasMasterDetails && detailMeta ? (
           <Box d="flex" flexDirection="column" p={2}>
             {(!editable || selected) && (
@@ -1308,4 +1835,77 @@ function OneToManyInner({
       <FieldError widgetAtom={widgetAtom} />
     </>
   );
+}
+
+type GridHeaderCellProps = GridColumnProps & HTMLAttributes<HTMLDivElement>;
+type GridHeaderCellRef = ForwardedRef<HTMLDivElement>;
+
+const GridHeaderCell = forwardRef(function GridHeaderCell(
+  props: GridHeaderCellProps,
+  ref: GridHeaderCellRef,
+) {
+  const { title, className, children, style, onClick } = props;
+  return (
+    <div ref={ref} {...{ title, className, style, onClick }}>
+      {children && typeof children === "object" ? (
+        children
+      ) : (
+        <span>{children}</span>
+      )}
+    </div>
+  );
+});
+
+const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
+  props: GridHeaderCellProps,
+  ref: GridHeaderCellRef,
+) {
+  const { items: itemsAtom, expand: expandAtom } = useCollectionTree();
+
+  const expandAll = useAtomValue(expandAtom);
+  const handleClick = useAtomCallback(
+    useCallback(
+      (get, set, expanded: boolean) => {
+        const items = get(itemsAtom).map((item) =>
+          item.expanded === expanded || item.expanded === undefined
+            ? item
+            : {
+                ...item,
+                expanded,
+              },
+        );
+        set(itemsAtom, items);
+        set(expandAtom, expanded);
+      },
+      [expandAtom, itemsAtom],
+    ),
+  );
+
+  return (
+    <GridHeaderCell
+      ref={ref}
+      {...props}
+      title={expandAll ? i18n.get("Collapse All") : i18n.get("Expand All")}
+      onClick={() => handleClick(!expandAll)}
+    >
+      <ExpandIcon expand={expandAll} />
+    </GridHeaderCell>
+  );
+});
+
+const CustomGridHeaderCell = forwardRef(function CustomGridHeaderCell(
+  props: GridHeaderCellProps,
+  ref: GridHeaderCellRef,
+) {
+  const { data } = props;
+
+  if (data.type === "row-expand") {
+    return <ExpandHeaderCell ref={ref} {...props} />;
+  }
+
+  return <GridHeaderCell ref={ref} {...props} />;
+});
+
+function HideGridHeaderRow() {
+  return null;
 }

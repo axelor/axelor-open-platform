@@ -1,5 +1,7 @@
 import _ from "lodash";
 
+import { toKebabCase } from "@/utils/names";
+import { normalizeWidget } from "@/views/form/builder/utils";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
 import { ActionView, Field, Property, Schema } from "./meta.types";
@@ -51,7 +53,7 @@ export function processSelection(field: Schema, editable?: boolean) {
     if (field.widget === "radio-select") field.widget = "selection";
     else if (field.widget === "checkbox-select") field.widget = "multi-select";
   }
-  
+
   if ((field.selection || field.selectionList) && !field.widget) {
     field.widget = "selection";
   }
@@ -717,6 +719,11 @@ export function processWidgets(schema: Schema, parent?: Schema) {
     if (!parent) {
       schema.colSpan = schema.colSpan ?? 12;
     }
+  }
+
+  if (schema.widget) {
+    const widget = normalizeWidget(schema.widget);
+    schema.widget = widget && toKebabCase(widget);
   }
 
   return schema;

@@ -4,7 +4,7 @@ import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, NavTabItem, NavTabs } from "@axelor/ui";
+import { Box, NavTabItem, NavTabs, clsx } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
@@ -196,9 +196,13 @@ function TabContent({
   readonly?: boolean;
 }) {
   const display = active ? "block" : "none";
-
   return (
-    <div className={styles.tabContent} style={{ display }}>
+    <div
+      className={clsx(styles.tabContent, {
+        [styles.noRadius]: schema.widgetAttrs?.displayMode === "tree",
+      })}
+      style={{ display }}
+    >
       <ScopeProvider scope={FormTabScope} value={{ active }}>
         <FormWidget
           readonly={readonly}

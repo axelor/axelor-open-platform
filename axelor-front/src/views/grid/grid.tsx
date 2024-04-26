@@ -490,17 +490,20 @@ function GridInner(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch],
   );
 
+  const formViewName = useMemo(
+    () => (action.views?.find((v) => v.type === "form") || {})?.name,
+    [action.views],
+  );
+
   const { data: detailsMeta } = useAsync(async () => {
     if (!hasDetailsView) return null;
-    const name = isString(detailsView)
-      ? detailsView
-      : (action.views?.find((v) => v.type === "form") || {})?.name;
+    const name = isString(detailsView) ? detailsView : formViewName;
     return await findView<FormView>({
       type: "form",
       name,
       model: view.model,
     });
-  }, [view.model]);
+  }, [view.model, formViewName]);
 
   const fetchAndSetDetailsRecord = useCallback(
     async (record: DataRecord | null) => {
@@ -1072,6 +1075,8 @@ function GridInner(props: ViewProps<GridView>) {
                 ? false
                 : editable
             }
+            expandable={view.widget === "expandable"}
+            expandableView={view.summaryView ?? formViewName}
             showEditIcon={canEdit}
             searchOptions={searchOptions}
             searchAtom={searchAtom}

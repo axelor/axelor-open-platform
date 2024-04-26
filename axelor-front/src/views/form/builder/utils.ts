@@ -298,6 +298,11 @@ export function processView(
 
   res.serverType = getFieldServerType(res, field);
   res.uid = res.uid ?? uniqueId("w");
+  
+  if (res.widget) {
+    res.widgetAttrs = ({ ...res.widgetAttrs, widget: res.widget });
+  }
+
   res.widget = getWidget(res, field);
 
   if (res.widget === "progress") {

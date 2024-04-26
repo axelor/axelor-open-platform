@@ -7,6 +7,7 @@ import setObjectValue from "lodash/set";
 import uniqueId from "lodash/uniqueId";
 import {
   KeyboardEvent,
+  SyntheticEvent,
   forwardRef,
   useCallback,
   useEffect,
@@ -16,7 +17,7 @@ import {
 } from "react";
 
 import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
-import { GridRowProps } from "@axelor/ui/grid";
+import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
@@ -42,8 +43,14 @@ import {
   useFormScope,
   useFormValidityScope,
 } from "@/views/form/builder/scope";
+import {
+  useCollectionTree,
+  useCollectionTreeEditable,
+} from "../../builder/scope";
+import { ExpandIcon } from "../../builder/expandable";
 
 import styles from "./form.module.scss";
+
 export interface GridFormRendererProps extends GridRowProps {
   view: FormView;
   fields?: MetaData["fields"];
@@ -90,9 +97,20 @@ export const FormLayoutComponent = ({
   schema,
   formAtom,
   readonly,
+  expand,
+  onExpand,
   onCancel,
+  onCellClick,
   columns = [],
-}: LayoutProps) => {
+}: LayoutProps & {
+  expand?: boolean;
+  onCellClick?: (
+    e: React.SyntheticEvent,
+    col: GridColumn,
+    colIndex: number,
+  ) => void;
+  onExpand?: () => void;
+}) => {
   const items = useMemo<Schema[]>(
     () =>
       (schema.items || []).map((item) => ({
@@ -129,6 +147,11 @@ export const FormLayoutComponent = ({
     [schema.items],
   );
 
+  const expandColumn = columns.find((col) => col.type === "row-expand");
+  const undoColumn = columns.find(
+    (col) =>
+      col.type === "row-checked" || (col as Schema).widget === "edit-icon",
+  );
   return (
     <Box d="flex" alignItems="center">
       {columns.map((column, ind) => {
@@ -147,9 +170,42 @@ export const FormLayoutComponent = ({
               },
             })}
           >
-            {!item && ind === 0 && (
-              <Box d="flex" justifyContent="center" alignItems="center">
-                <MaterialIcon icon="undo" onClick={() => onCancel?.()} />
+            {!item && column === expandColumn && (
+              <Box d="flex" onClick={() => onExpand?.()}>
+                <ExpandIcon expand={expand} />
+              </Box>
+            )}
+            {!item && column === undoColumn && (
+              <Box
+                d="flex"
+                justifyContent="center"
+                alignItems="center"
+                onClick={() => onCancel?.()}
+              >
+                <MaterialIcon icon="undo" />
+              </Box>
+            )}
+            {!item && (column as Schema).widget === "new-icon" && (
+              <Box
+                d="flex"
+                justifyContent="center"
+                alignItems="center"
+                onClick={(e) => onCellClick?.(e, column, ind)}
+              >
+                <MaterialIcon icon="add" />
+              </Box>
+            )}
+            {!item && (column as Schema).widget === "delete-icon" && (
+              <Box
+                d="flex"
+                justifyContent="center"
+                alignItems="center"
+                onClick={async (e) => {
+                  onCancel?.();
+                  onCellClick?.(e, column, ind);
+                }}
+              >
+                <MaterialIcon icon="delete" />
               </Box>
             )}
             {item && (
@@ -209,13 +265,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       fields,
       className,
       columns,
-      data: { record: _record },
+      data: gridRow,
       index: rowIndex,
       editCell: cellIndex,
+      onCellClick,
+      onExpand,
       onInit,
       onSave,
       onCancel,
     } = props;
+    const { record: _record, expand } = gridRow;
     const record = useMemo(() => processGridRecord(_record), [_record]);
     const containerRef = useRef<HTMLDivElement>(null);
     const recordRef = useRef<DataRecord>({});
@@ -249,6 +308,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const { add: addWidgetValidator } = useFormValidityScope();
     const { add: addEditableWidget } = useFormEditableScope();
+    const { enabled: isCollectionTree } = useCollectionTree();
+    const { setCommit } = useCollectionTreeEditable();
 
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
@@ -325,7 +386,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
               rowIndex,
               columnIndex ?? cellIndex!,
               false,
-              saveFromEdit,
+              saveFromEdit || expand,
             );
           }
 
@@ -337,7 +398,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           }
 
           return await onSave?.(
-            { ...formState.record, _dirty: formState.dirty },
+            {
+              ...formState.record,
+              _dirty: formState.dirty,
+              ...(isCollectionTree && {
+                _changed: true,
+                _original: formState.original,
+              }),
+            },
             rowIndex,
             columnIndex ?? cellIndex!,
             true,
@@ -345,6 +413,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           );
         },
         [
+          expand,
           actionExecutor,
           formAtom,
           record,
@@ -352,6 +421,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           onSave,
           rowIndex,
           cellIndex,
+          isCollectionTree,
         ],
       ),
     );
@@ -364,12 +434,12 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         }
         if (e.key === `Enter`) {
           return handleSave?.(
-            undefined,
+            expand ? true : undefined,
             findColumnIndexByNode(e.target as HTMLElement),
           );
         }
       },
-      [handleSave, handleCancel],
+      [expand, handleSave, handleCancel],
     );
 
     const handleRecordCommit = useAtomCallback(
@@ -399,6 +469,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       action: useHandleFocus(containerRef),
     });
 
+    const handleExpand = useCallback(async () => {
+      await handleRecordCommit();
+      onExpand?.(gridRow, !gridRow.expand);
+    }, [gridRow, onExpand, handleRecordCommit]);
+
     const handleClickOutside = useCallback(
       (e: Event) => {
         if (e.defaultPrevented) return;
@@ -413,15 +488,26 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       [getParent, handleRecordCommit],
     );
 
+    const handleCellClick = useCallback(
+      (e: SyntheticEvent, col: GridColumn, colIndex: number) => {
+        onCellClick?.(e, col, colIndex, gridRow, rowIndex);
+      },
+      [onCellClick, gridRow, rowIndex],
+    );
+
     const CustomLayout = useMemo(
       () => (props: LayoutProps) => (
         <FormLayoutComponent
           {...props}
+          expand={expand}
+          onCellClick={handleCellClick}
+          onExpand={handleExpand}
           onSave={handleSave}
           onCancel={handleCancel}
         />
       ),
-      [handleSave, handleCancel],
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [expand, handleSave, handleCancel],
     );
 
     useImperativeHandle(
@@ -444,6 +530,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     useEffect(() => {
       return addEditableWidget(handleRecordCommit);
     }, [addEditableWidget, handleRecordCommit]);
+
+    useAsyncEffect(async () => {
+      setCommit?.(handleRecordCommit);
+      return () => {
+        setCommit?.(null);
+      };
+    }, [handleRecordCommit, setCommit]);
 
     useAsyncEffect(async () => {
       if (onNewAction) {

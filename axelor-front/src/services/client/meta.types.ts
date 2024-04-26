@@ -522,6 +522,9 @@ export interface GridView extends View {
   menubar?: Menu[];
   hilites?: Hilite[];
   items?: (Field | Button)[];
+  summaryView?: string;
+  widget?: "master-detail" | "expandable" | "tree-grid";
+  widgetAttrs?: Record<string, any>;
 }
 
 export interface CardsView extends View {

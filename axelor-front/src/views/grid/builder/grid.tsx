@@ -1,6 +1,5 @@
 import { clsx } from "@axelor/ui";
 import { atom, useAtomValue } from "jotai";
-import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import {
@@ -33,7 +32,7 @@ import { useSession } from "@/hooks/use-session";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { MetaData } from "@/services/client/meta";
+import { MetaData, ViewData } from "@/services/client/meta";
 import {
   AdvancedSearchAtom,
   Field,
@@ -48,6 +47,7 @@ import format from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
 import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
+import { findView } from "@/services/client/meta-cache";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 import { useViewAction } from "@/view-containers/views/scope";
 
@@ -55,7 +55,12 @@ import { getWidget, isValidSequence } from "../builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
-import { GridScope, useGridColumnNames } from "./scope";
+import {
+  GridContext,
+  useCollectionTreeEditable,
+  useGridColumnNames,
+} from "./scope";
+import { ExpandIcon, ExpandableFormView } from "./expandable";
 
 import styles from "../grid.module.scss";
 
@@ -96,25 +101,33 @@ export type GridHandler = {
   form?: RefObject<GridFormHandler>;
   onAdd?: () => void;
   onSave?: () => void;
+  commit?: () => void;
 };
 
 export const Grid = forwardRef<
   GridHandler,
   Partial<GridProps> & {
     view: GridView;
+    expandable?: boolean;
+    expandableView?: string | ViewData<FormView>;
     fields?: MetaData["fields"];
     perms?: Perms;
     searchOptions?: Partial<SearchOptions>;
     searchAtom?: AdvancedSearchAtom;
     editable?: boolean;
     readonly?: boolean;
+    showAsTree?: boolean;
+    showNewIcon?: boolean;
     showEditIcon?: boolean;
+    showDeleteIcon?: boolean;
     columnAttrs?: Record<string, Partial<Attrs>>;
     columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
     onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
+    onNew?: (record: GridRow["record"]) => any;
     onEdit?: (record: GridRow["record"]) => any;
+    onDelete?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
     onUpdate?: (record: GridRow["record"]) => void;
     onSave?: (record: GridRow["record"]) => void;
@@ -123,12 +136,17 @@ export const Grid = forwardRef<
 >(function Grid(props, ref) {
   const {
     view,
+    expandable,
+    expandableView,
     fields,
     perms,
     searchOptions,
     searchAtom,
     actionExecutor,
+    showAsTree,
+    showNewIcon,
     showEditIcon = true,
+    showDeleteIcon,
     editable = false,
     readonly,
     columnAttrs,
@@ -138,7 +156,9 @@ export const Grid = forwardRef<
     setState,
     onFormInit,
     onSearch,
+    onNew,
     onEdit,
+    onDelete,
     onUpdate,
     onView,
     onSave,
@@ -155,6 +175,8 @@ export const Grid = forwardRef<
   const { data: user } = useSession();
   const allowCheckboxSelection =
     (view.selector ?? user?.view?.grid?.selection ?? "checkbox") === "checkbox";
+
+  const { commit: commitTreeForm } = useCollectionTreeEditable();
 
   const names = useGridColumnNames({
     view,
@@ -231,7 +253,7 @@ export const Grid = forwardRef<
       if (!searchable || (isCollection && !field?.targetName)) {
         columnProps.searchable = false;
       }
-      
+
       if (!searchable || isCollection) {
         columnProps.sortable = false;
       }
@@ -281,11 +303,38 @@ export const Grid = forwardRef<
       } as any;
     });
 
+    if (showNewIcon) {
+      columns.push({
+        title: "",
+        name: "$$new",
+        widget: "new-icon",
+        computed: true,
+        editable: false,
+        sortable: false,
+        searchable: false,
+        width: 40,
+      } as GridColumn);
+    }
+
     if (showEditIcon && view.editIcon !== false) {
-      columns.unshift({
-        action: true,
+      const editColumn = {
+        title: "",
         name: "$$edit",
         widget: "edit-icon",
+        computed: true,
+        editable: false,
+        sortable: false,
+        searchable: false,
+        width: 40,
+      } as GridColumn;
+      showAsTree ? columns.push(editColumn) : columns.unshift(editColumn);
+    }
+
+    if (showDeleteIcon) {
+      columns.push({
+        title: "",
+        name: "$$delete",
+        widget: "delete-icon",
         computed: true,
         editable: false,
         sortable: false,
@@ -299,12 +348,30 @@ export const Grid = forwardRef<
     viewItems,
     view.sortable,
     view.editIcon,
+    showAsTree,
     showEditIcon,
+    showNewIcon,
+    showDeleteIcon,
     fields,
     columnFormatter,
     columnAttrs,
     contextField,
   ]);
+
+  const model = view.model ?? (view as unknown as Property)?.target ?? "";
+
+  // cache expadable form in advance
+  const { data: expandViewMeta } = useAsync(async () => {
+    if (expandable) {
+      return typeof expandableView === "object"
+        ? expandableView
+        : await findView<FormView>({
+            type: "form",
+            name: expandableView,
+            model,
+          });
+    }
+  }, [expandable, model, fields, expandableView]);
 
   const init = useAsync(async () => {
     onSearch?.({ ...searchOptions, fields: names });
@@ -316,15 +383,18 @@ export const Grid = forwardRef<
       col: GridColumn,
       colIndex: number,
       row: GridRow,
-      rowIndex: number,
     ) => {
-      if (col.name === "$$edit") {
+      if (col.name === "$$new") {
+        onNew?.(row.record);
+      } else if (col.name === "$$edit") {
         onEdit?.(row.record);
+      } else if (col.name === "$$delete") {
+        onDelete?.([row.record]);
       } else if (isMobile) {
         onView?.(row.record);
       }
     },
-    [isMobile, onEdit, onView],
+    [isMobile, onNew, onEdit, onView, onDelete],
   );
 
   const handleRowDoubleClick = useCallback(
@@ -340,13 +410,21 @@ export const Grid = forwardRef<
     if (form) {
       return await form?.onSave?.(true);
     }
-  }, []);
+
+    if (commitTreeForm) {
+      await commitTreeForm();
+    }
+  }, [commitTreeForm]);
 
   const doAdd = useCallback(async () => {
-    const newRecord = { id: nextId(), ...getDefaultValues(fields, view.items) };
+    const newRecord = {
+      id: nextId(),
+      ...getDefaultValues(fields, view.items),
+    };
     const newRecords = [...(records || []), newRecord];
     setState?.((draft) => {
       const { rows, columns, orderBy, groupBy } = draft;
+      const _rows = draft.rows;
       const newRows: GridRow[] = getRows({
         rows,
         columns,
@@ -355,7 +433,10 @@ export const Grid = forwardRef<
         records: newRecords,
       });
 
-      draft.rows = newRows;
+      draft.rows = newRows.map((row) => {
+        const oldRow = _rows.find((r) => r.key === row.key);
+        return oldRow ? { ...row, expand: oldRow.expand } : row;
+      });
       draft.selectedCell = null;
       draft.selectedRows = null;
       draft.editRow = [
@@ -364,8 +445,6 @@ export const Grid = forwardRef<
       ];
     });
   }, [fields, records, setState, view.items]);
-
-  const model = view.model ?? (view as unknown as Property)?.target ?? "";
 
   const isPermitted = usePermitted(model, perms);
 
@@ -383,9 +462,9 @@ export const Grid = forwardRef<
     async (row: GridRow, rowIndex?: number, column?: GridColumn) => {
       // Skip edit row for edit icon and check write permission
       if (
-        column?.type === "button" ||
         ["icon"].includes((column as Field)?.widget ?? "") ||
-        column?.name === "$$edit" ||
+        ["button", "row-expand"].includes(column?.type ?? "") ||
+        ["$$new", "$$edit", "$$delete"].includes(column?.name ?? "") ||
         !(await isPermitted(row.record, false, true))
       ) {
         return null;
@@ -402,6 +481,11 @@ export const Grid = forwardRef<
       if ((record.id ?? -1) < 0 && !record._dirty) {
         setState?.((draft) => {
           draft.rows = draft.rows.filter((r) => r?.record?.id !== record.id);
+          draft.selectedCell = null;
+        });
+      } else {
+        setState?.((draft) => {
+          draft.selectedCell = null;
         });
       }
       onDiscard?.(record);
@@ -448,13 +532,42 @@ export const Grid = forwardRef<
     );
   }, [onFormInit, view, columns, fields]);
 
+  const detailsProps = useMemo(
+    () => ({
+      rowDetailsExpandIcon: ExpandIcon,
+    }),
+    [],
+  );
+
+  const RowDetailsRenderer = useMemo(() => {
+    return ({
+      data,
+      onClose,
+    }: GridRowProps & {
+      onClose?: () => void;
+    }) =>
+      expandViewMeta ? (
+        <ExpandableFormView
+          gridView={view}
+          meta={expandViewMeta}
+          record={data.record!}
+          onUpdate={onUpdate}
+          onSave={onSave}
+          onDiscard={handleRecordDiscard}
+          onClose={onClose}
+        />
+      ) : null;
+    // eslint-disable-next-line
+  }, [view, onSave, onUpdate, expandViewMeta]);
+
   useImperativeHandle(
     ref,
     () => ({
       form: formRef,
       onAdd: onRecordAdd,
+      commit: commitForm,
     }),
-    [formRef, onRecordAdd],
+    [formRef, onRecordAdd, commitForm],
   );
 
   useAsyncEffect(
@@ -510,6 +623,7 @@ export const Grid = forwardRef<
           allowColumnCustomize
           allowCheckboxSelection={allowCheckboxSelection}
           allowRowReorder={canMove}
+          allowRowExpand={expandable}
           sortType="state"
           selectionType="multiple"
           {...(editable &&
@@ -521,6 +635,10 @@ export const Grid = forwardRef<
               onRecordEdit: handleRecordEdit,
               onRecordDiscard: handleRecordDiscard,
             })}
+          {...(expandable && {
+            rowDetailsRenderer: RowDetailsRenderer,
+            ...detailsProps,
+          })}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
           state={state!}

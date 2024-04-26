@@ -6,9 +6,77 @@
   }
 }
 
+.noTitle > *:first-child > * {
+  padding: 0;
+  min-height: 2rem;
+}
+
+.hasHeader {
+  margin: 0.125rem;
+}
+
+.hasNewHeader:not(.noHeader) {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+}
+
+.tree {
+  border-radius: 0;
+  --ax-expandable-form-view-padding: 0 0 0 1.175rem;
+  [dir="rtl"] & {
+    --ax-expandable-form-view-padding: 0 1.175rem 0 0;
+  }
+}
+
+.noHeader {
+  border-color: transparent;
+  border-width: 0;
+}
+
+.container.tree {
+  border-left-width: 1px;
+}
+
+.noHeader.tree {
+  border-left: var(--ax-panel-border) !important;
+}
+
+.noHeader:not(.tree) > * {
+  border-left: var(--ax-panel-border);
+}
+
+.noHeader > *:first-child {
+  display: none;
+}
+
+.tree .grid > * {
+  min-height: unset !important;
+}
+.tree .grid.noRecords {
+  border-color: transparent;
+}
+
+.tree.noHeader .grid.noRecords {
+  height: 0;
+}
+
 .grid {
   height: 100%;
   overflow: unset;
+}
+
+.tree:not(.rootTreeGrid) .grid {
+  --bs-table-header-border: none;
+  --bs-table-footer-border: none;
+}
+
+.tree .grid {
+  --bs-table-striped-bg: var(--bs-body-bg);
+  --bs-table-body-border: none;
+}
+
+.tree.hasNewHeader {
+  border: none;
 }
 
 .title {

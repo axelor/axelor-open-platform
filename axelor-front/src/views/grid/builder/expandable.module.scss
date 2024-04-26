@@ -1,0 +1,18 @@
+.formViewScroller {
+  padding: var(--ax-expandable-form-view-padding, 0.5rem);
+}
+.formView {
+  padding: 0;
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+}
+
+.expandIcon {
+  transform: rotate(-90deg);
+  transition: all 0.2s ease-in-out;
+}
+
+.expanded {
+  transform: rotate(0deg);
+}

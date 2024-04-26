@@ -261,8 +261,9 @@ export function useFormValidityScope() {
 }
 
 export type FormEditableScopeState = {
+  id?: null | number | string;
   add: (fn: () => void) => () => void;
-  commit: () => void | Promise<void>;
+  commit: () => void | Promise<void | void[]>;
 };
 
 export const FormEditableScope = createScope<FormEditableScopeState>({
@@ -341,10 +342,15 @@ export function useFormActiveHandler() {
 
 export function useFormRefresh(refresh?: () => Promise<any> | void) {
   const tab = useViewTab();
+  const formId = useFormEditableScope().id;
+
   const handleRefresh = useCallback(
     (e: Event) =>
-      e instanceof CustomEvent && e.detail === tab.id && refresh?.(),
-    [refresh, tab.id],
+      e instanceof CustomEvent &&
+      (e.detail === tab.id ||
+        (e.detail?.tabId === tab.id && e.detail?.formId === formId)) &&
+      refresh?.(),
+    [refresh, formId, tab.id],
   );
 
   useEffect(() => {
