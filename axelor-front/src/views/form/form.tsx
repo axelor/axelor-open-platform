@@ -28,7 +28,10 @@ import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { diff, extractDummy } from "@/services/client/data-utils";
+import {
+  diff,
+  extractDummy,
+} from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -84,11 +87,12 @@ export const fetchRecord = async (
   meta: ViewData<FormView>,
   dataStore: DataStore,
   id?: string | number,
+  select?: Record<string, any>,
 ) => {
   if (id && +id > 0) {
     const fields = Object.keys(meta.fields ?? {});
     const related = meta.related;
-    return dataStore.read(+id, { fields, related });
+    return dataStore.read(+id, { fields, related, select });
   }
   return getDefaultValues(meta.fields, meta.view.items);
 };
@@ -348,9 +352,25 @@ const FormContainer = memo(function FormContainer({
   const dirtyAtom = useViewDirtyAtom();
   const [isDirty, setDirty] = useAtom(dirtyAtom);
 
+  const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
+    widgetsRef.current.add(fn);
+    return () => widgetsRef.current.delete(fn);
+  }, []);
+
+  const handleAddEditableWidget = useCallback((fn: () => void) => {
+    editableWidgetsRef.current.add(fn);
+    return () => editableWidgetsRef.current.delete(fn);
+  }, []);
+
+  const handleCommitEditableWidgets = useCallback(() => {
+    return Promise.all(
+      Array.from(editableWidgetsRef.current).map((fn) => fn()),
+    );
+  }, []);
+
   const doRead = useCallback(
-    async (id: number | string) => {
-      return await fetchRecord(meta, dataStore, id);
+    async (id: number | string, select?: Record<string, any>) => {
+      return await fetchRecord(meta, dataStore, id, select);
     },
     [dataStore, meta],
   );
@@ -654,7 +674,7 @@ const FormContainer = memo(function FormContainer({
 
         if (!shouldSave) return record;
 
-        const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
+        const { record: rec, original = {}, select } = get(formAtom); // record may have changed by actions
         const vals = diff(rec, original);
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
 
@@ -664,11 +684,16 @@ const FormContainer = memo(function FormContainer({
             ...processSaveValues(vals, formState.fields),
             _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
           },
-          opts,
+          {
+            ...opts,
+            fields: Object.keys(meta.fields ?? {}),
+            related: meta.related,
+            select,
+          },
         );
 
         if (callOnRead) {
-          res = res.id ? await doRead(res.id) : res;
+          // res = res.id ? await doRead(res.id, select) : res;
           res = { ...dummy, ...res }; // restore dummy values
           doEdit(res, {
             callAction: false,
@@ -685,11 +710,12 @@ const FormContainer = memo(function FormContainer({
         formAtom,
         getErrors,
         meta.fields,
+        meta.related,
         onSaveAction,
         handleOnSaveErrors,
         dataStore,
         actionExecutor,
-        doRead,
+        // doRead,
         doEdit,
         readonly,
       ],
@@ -698,12 +724,13 @@ const FormContainer = memo(function FormContainer({
 
   const onSave: typeof doSave = useAfterActions(
     useCallback(
-      (options) => {
+      async (options) => {
         // XXX: Need to find a way to coordinate top save and grid commit.
         actionExecutor.waitFor(300);
+        await handleCommitEditableWidgets();
         return doSave(options);
       },
-      [actionExecutor, doSave],
+      [actionExecutor, doSave, handleCommitEditableWidgets],
     ),
   );
 
@@ -724,11 +751,12 @@ const FormContainer = memo(function FormContainer({
         set,
         options?: { callAction?: boolean; confirmDirty?: boolean },
       ) => {
-        const id = get(formAtom).record.id ?? 0;
+        const { record, select } = get(formAtom);
+        const id = record.id ?? 0;
         if (id <= 0) {
           return doNew(options);
         }
-        const rec = await doRead(id);
+        const rec = await doRead(id, select);
         await doEdit(rec, { callAction: false, ...options });
       },
       [doEdit, doNew, doRead, formAtom],
@@ -998,20 +1026,6 @@ const FormContainer = memo(function FormContainer({
     },
     [actionExecutor, handleOnSave],
   );
-
-  const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
-    widgetsRef.current.add(fn);
-    return () => widgetsRef.current.delete(fn);
-  }, []);
-
-  const handleAddEditableWidget = useCallback((fn: () => void) => {
-    editableWidgetsRef.current.add(fn);
-    return () => editableWidgetsRef.current.delete(fn);
-  }, []);
-
-  const handleCommitEditableWidgets = useCallback(async () => {
-    await Promise.all(Array.from(editableWidgetsRef.current).map((fn) => fn()));
-  }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
 

@@ -26,11 +26,23 @@ export function createFormAtom(props: {
   const { meta, record, parent, context, statesByName = {} } = props;
   const { model = "", fields = {} } = meta;
   const states: Record<string, WidgetState> = {};
+  const select = Object.values(fields)
+    .filter((field) => field.type?.endsWith("TO_MANY"))
+    .reduce(
+      (select, field) => ({
+        ...select,
+        [field.name]: {
+          _model: field.target,
+        },
+      }),
+      {},
+    );
   return atom<FormState>({
     meta,
     model,
     record: { ...record },
     original: { ...record },
+    select,
     states,
     statesByName,
     fields,

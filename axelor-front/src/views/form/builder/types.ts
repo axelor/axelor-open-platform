@@ -64,6 +64,7 @@ export interface FormState {
   ready?: boolean;
   record: DataRecord;
   original?: DataRecord;
+  select?: Record<string, any>;
   states: Record<string, WidgetState>;
   statesByName: Record<string, WidgetState>;
   readonly meta: ViewData<FormView>;
