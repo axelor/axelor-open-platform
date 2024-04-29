@@ -1,55 +1,45 @@
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import { Box } from "@axelor/ui";
 import padStart from "lodash/padStart";
-import { SyntheticEvent, forwardRef } from "react";
 
 interface TimeInputProps {
-  date?: Date | number;
-  hasDate?: boolean;
+  dateValue?: Date | null;
   format?: string;
   value?: string;
-  onChange?: (value: string) => void;
-  onDateChange?: (value: Date | string | null, event?: SyntheticEvent) => void;
+  onUpdate?: (value: Date) => void;
 }
 
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
-  ({ format, value, hasDate, date: propDate, onDateChange }, ref) => {
-    const [hr, mm, ss] = `${
-      (hasDate && propDate
-        ? (propDate as Date)?.toLocaleTimeString(undefined, {
-            hour12: false,
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })
-        : null) || value
-    }`.split(":");
+  ({ format, value, dateValue: propDate, onUpdate }, ref) => {
+    const [{ hour, minute, second }, setTimes] = useState({
+      hour: "",
+      minute: "",
+      second: "",
+    });
     const hasSeconds = format?.includes("ss");
 
     const toText = (val: number) => padStart(`${val}`, 2, "0");
-    const setValue = (hr: string, mm: string, ss: string) => {
-      const isPropDateValid =
-        hasDate &&
-        propDate instanceof Date &&
-        !isNaN(propDate as unknown as number);
-      const date = isPropDateValid ? propDate : new Date();
+    const setValue = (hour: string, minute: string, second: string) => {
+      const date = propDate || new Date();
 
-      date.setHours(Number(hr || 0));
-      date.setMinutes(Number(mm || 0));
-      date.setSeconds(hasSeconds ? Number(ss || 0) : 0);
+      date.setHours(Number(hour || 0));
+      date.setMinutes(Number(minute || 0));
+      date.setSeconds(hasSeconds ? Number(second || 0) : 0);
 
-      onDateChange?.(date);
+      setTimes({ hour, minute, second });
+      onUpdate?.(date);
     };
 
     function handleHourChange(value: string) {
-      setValue(value, mm, ss);
+      setValue(value, minute, second);
     }
 
     function handleMinuteChange(value: string) {
-      setValue(hr, value, ss);
+      setValue(hour, value, second);
     }
 
     function handleSecondChange(value: string) {
-      setValue(hr, mm, value);
+      setValue(hour, minute, value);
     }
 
     function renderSelect(
@@ -77,11 +67,31 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       );
     }
 
+    const timeAsStr = useMemo(
+      () =>
+        `${
+          (propDate
+            ? (propDate as Date)?.toLocaleTimeString(undefined, {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })
+            : null) || value
+        }`,
+      [propDate, value],
+    );
+
+    useEffect(() => {
+      const [hour, minute, second] = timeAsStr.split(":");
+      setTimes({ hour, minute, second });
+    }, [timeAsStr]);
+
     return (
       <div ref={ref}>
-        {renderSelect(24, hr, handleHourChange)}
-        {renderSelect(60, mm, handleMinuteChange)}
-        {hasSeconds && renderSelect(60, ss, handleSecondChange)}
+        {renderSelect(24, hour, handleHourChange)}
+        {renderSelect(60, minute, handleMinuteChange)}
+        {hasSeconds && renderSelect(60, second, handleSecondChange)}
       </div>
     );
   },
