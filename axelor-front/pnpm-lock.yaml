@@ -14,8 +14,8 @@ patchedDependencies:
 
 dependencies:
   '@axelor/ui':
-    specifier: ^0.1.0
-    version: 0.1.0(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
+    specifier: ^0.1.1
+    version: 0.1.1(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0)
   '@babel/standalone':
     specifier: ^7.24.3
     version: 7.24.3
@@ -227,8 +227,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
 
-  /@axelor/ui@0.1.0(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
-    resolution: {integrity: sha512-IiqWE1ala9jrf4di4QhW9ewnrB3b6hbqKPaSYyztJC/oTHWNL1ZLvk0b7jqO4Cg7r6c7grvkqw6d/ag5gH1LOw==}
+  /@axelor/ui@0.1.1(@types/node@20.11.30)(@types/react-dom@18.2.23)(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)(scheduler@0.23.0):
+    resolution: {integrity: sha512-Y0PWznf4NB48Fl+jhX+3VDOBvSMrZ0SqxDWL4kD1suE84f7BDKDynEorBQ+6J/eAea3q3Ux5AzMFDTjntiAYbQ==}
     peerDependencies:
       react: ^18.2.0-0
       react-dom: ^18.2.0-0
