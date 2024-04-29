@@ -8,7 +8,13 @@ import {
 } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-import { Alert, Box, Button, Input, InputLabel } from "@axelor/ui";
+import {
+  AdornedInput,
+  Alert,
+  Box,
+  Button,
+  InputLabel
+} from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { useRoute } from "@/hooks/use-route";
@@ -194,7 +200,7 @@ export function ChangePassword() {
                 {i18n.get("New password")}
               </InputLabel>
               <Box d="flex" position="relative">
-                <Input
+                <AdornedInput
                   ref={newPasswordInputRef}
                   id="newPassword"
                   name="newPassword"
@@ -204,19 +210,22 @@ export function ChangePassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   spellCheck="false"
-                />
-                <Button
-                  as="span"
-                  onClick={() => setShowPassword((value) => !value)}
-                  className={styles.eyeIcon}
-                  title={
-                    showPassword
-                      ? i18n.get("Hide password")
-                      : i18n.get("Show password")
+                  endAdornment={
+                    <Button
+                      as="span"
+                      onClick={() => setShowPassword((value) => !value)}
+                      title={
+                        showPassword
+                          ? i18n.get("Hide password")
+                          : i18n.get("Show password")
+                      }
+                    >
+                      <BootstrapIcon
+                        icon={showPassword ? "eye-slash" : "eye"}
+                      />
+                    </Button>
                   }
-                >
-                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
-                </Button>
+                />
               </Box>
               {newPasswordValidity && (
                 <Box className={styles.validity}>{newPasswordValidity}</Box>
@@ -228,7 +237,7 @@ export function ChangePassword() {
                 {i18n.get("Confirm new password")}
               </InputLabel>
               <Box d="flex" position="relative">
-                <Input
+                <AdornedInput
                   ref={confirmPasswordInputRef}
                   id="confirmPassword"
                   name="confirmPassword"
@@ -237,21 +246,22 @@ export function ChangePassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   spellCheck="false"
-                />
-                <Button
-                  as="span"
-                  onClick={() => setShowConfirmPassword((value) => !value)}
-                  className={styles.eyeIcon}
-                  title={
-                    showConfirmPassword
-                      ? i18n.get("Hide password")
-                      : i18n.get("Show password")
+                  endAdornment={
+                    <Button
+                      as="span"
+                      onClick={() => setShowConfirmPassword((value) => !value)}
+                      title={
+                        showConfirmPassword
+                          ? i18n.get("Hide password")
+                          : i18n.get("Show password")
+                      }
+                    >
+                      <BootstrapIcon
+                        icon={showConfirmPassword ? "eye-slash" : "eye"}
+                      />
+                    </Button>
                   }
-                >
-                  <BootstrapIcon
-                    icon={showConfirmPassword ? "eye-slash" : "eye"}
-                  />
-                </Button>
+                />
               </Box>
 
               {confirmPasswordValidity && (
