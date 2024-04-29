@@ -67,6 +67,7 @@ export function DateComponent({
   const { uid, placeholder } = schema;
   const pickerRef = useRef<any>();
   const boxRef = useRef<HTMLDivElement>(null);
+  const valueRef = useRef<string | null>();
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);
@@ -138,7 +139,17 @@ export function DateComponent({
       if (focus) {
         focusInput(getInput());
       } else {
-        handleBlur();
+        handleBlur(
+          (() => {
+            const value = valueRef.current;
+            if (value !== undefined) {
+              valueRef.current = undefined;
+              return {
+                target: { value },
+              } as unknown as FocusEvent<HTMLInputElement>;
+            }
+          })(),
+        );
       }
     },
     [getInput, handleBlur],
@@ -191,7 +202,18 @@ export function DateComponent({
         onChange(
           newValue && moment(newValue).isValid()
             ? (() => {
-                const m = moment(newValue);
+                const timeValue = valueRef.current;
+                let m = moment(newValue);
+                if (timeValue) {
+                  const tm = moment(timeValue, format);
+                  if (tm.isValid()) {
+                    m = m
+                      .set("hour", tm.hour())
+                      .set("minute", tm.minute())
+                      .set("second", tm.second());
+                  }
+                  valueRef.current = undefined;
+                }
                 return isDateTime ? m.toISOString() : m.format(valueFormat);
               })()
             : null,
@@ -199,7 +221,17 @@ export function DateComponent({
         );
       setChanged(!callOnChange);
     },
-    [onChange, valueFormat, value, isDateTime],
+    [onChange, format, valueFormat, value, isDateTime],
+  );
+
+  const handleTimeChange = useCallback(
+    (newValue: Date) => {
+      const m =
+        newValue && moment(newValue).isValid() ? moment(newValue) : null;
+      valueRef.current = m && m.format(format);
+      setChanged(true);
+    },
+    [format],
   );
 
   const $date = useMemo(() => {
@@ -270,9 +302,9 @@ export function DateComponent({
           showTimeInput={isDateTime}
           customTimeInput={
             <TimeInput
-              hasDate={Boolean(dateValue)}
+              dateValue={dateValue}
               format={format}
-              onDateChange={handleChange}
+              onUpdate={handleTimeChange}
             />
           }
           onSelect={handleSelect}
