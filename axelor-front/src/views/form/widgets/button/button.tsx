@@ -158,12 +158,10 @@ export function Button(props: WidgetProps) {
       })}
     >
       <div className={styles.title}>
-        {icon && <ButtonIcon {...props} />}
-        {showTitle && (
-          <span ref={btnTextRef} className={styles.titleText}>
-            {title}
-          </span>
-        )}
+        <span ref={btnTextRef} className={styles.titleContent}>
+          {icon && <ButtonIcon {...props} />}
+          {showTitle && <span className={styles.titleText}>{title}</span>}
+        </span>
       </div>
     </BtnComponent>
   );

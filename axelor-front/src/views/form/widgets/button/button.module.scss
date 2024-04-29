@@ -35,12 +35,15 @@ div.button[disabled] {
   justify-content: center;
   gap: 0.5rem;
 }
-.titleText {
+.titleContent {
   flex: 1;
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  & > * {
+    vertical-align: middle;
+  }
 }
 
 .help {
@@ -69,7 +72,7 @@ div.button[disabled] {
   padding-right: 0;
   max-width: 100%;
   justify-content: start;
-  &:hover &,&:hover > * {
+  &:hover &,&:hover .titleText {
     text-decoration: underline;
   }
 }
