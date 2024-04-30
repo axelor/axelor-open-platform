@@ -23,6 +23,8 @@ module.exports = {
       },
     ],
     "@typescript-eslint/ban-types": "warn",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn",
     "prefer-const": "warn",
   },
 };
