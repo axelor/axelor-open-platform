@@ -120,7 +120,7 @@ export function MessageInput({
     });
   }
 
-  const handleKeyPress = useCallback(
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       // Post message on Ctrl+Enter
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -139,7 +139,7 @@ export function MessageInput({
         placeholder={i18n.get("Write your comment here")}
         onChange={handleInputChange}
         onBlur={() => onBlur && onBlur(value)}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyDown}
       />
       {files && (
         <MessageFiles

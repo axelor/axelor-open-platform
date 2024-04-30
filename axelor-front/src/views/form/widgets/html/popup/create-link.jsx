@@ -17,10 +17,9 @@ function LinkPopup({ commands, getEditor }) {
     url && linkElement && (linkElement.href = url);
   }
 
-  function handleKeyPress(e) {
-    const key = e.which || e.keyCode;
+  function handleKeyDown(e) {
     const url = e.target.value.trim();
-    if (key !== 13) return;
+    if (e.key !== "Enter") return;
     if (!linkElement && url) {
       const $url = !/^[a-z0-9]+:\/\//.test(url) ? `http://${url}` : url;
       if (commands.getSelectedHTML()) {
@@ -47,7 +46,7 @@ function LinkPopup({ commands, getEditor }) {
       placeholder="www.example.com"
       defaultValue={linkElement ? linkElement.href : ''}
       onChange={handleChange}
-      onKeyPress={handleKeyPress}
+      onKeyDown={handleKeyDown}
     />
   );
 }
