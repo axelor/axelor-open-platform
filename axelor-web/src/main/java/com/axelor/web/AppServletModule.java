@@ -73,7 +73,8 @@ public class AppServletModule extends ServletModule {
     final AuthModule authModule = new AuthModule(getServletContext());
     final AppModule appModule = new AppModule();
     final SchedulerModule schedulerModule = new SchedulerModule();
-    return Arrays.asList(authModule, appModule, schedulerModule);
+    final WebSocketModule webSocketModule = new WebSocketModule();
+    return Arrays.asList(authModule, appModule, schedulerModule, webSocketModule);
   }
 
   protected void afterConfigureServlets() {
@@ -89,9 +90,6 @@ public class AppServletModule extends ServletModule {
 
     // initialize JPA
     install(new JpaModule(jpaUnit, true, false));
-
-    // WebSocket
-    install(new WebSocketModule());
 
     // trick to ensure PersistFilter is registered before anything else
     install(
