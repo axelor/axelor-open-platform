@@ -10,6 +10,7 @@ import { Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 
 import {
+  FieldLabelTitle,
   FormAtom,
   FormWidget,
   HelpPopover,
@@ -137,7 +138,9 @@ export function PanelTabs(props: WidgetProps) {
               formAtom={formAtom}
               widgetAtom={fallbackWidgetAtom}
             >
-              <Box p={1}>{tab.title}</Box>
+              <Box p={1}>
+                <FieldLabelTitle title={tab.title} />
+              </Box>
             </HelpPopover>
           ),
         }),

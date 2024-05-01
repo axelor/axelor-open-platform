@@ -21,6 +21,7 @@ import { useViewAction, useViewTab } from "@/view-containers/views/scope";
 
 import {
   Attrs,
+  FieldLabelTitle,
   HelpPopover,
   WidgetProps,
   usePermission,
@@ -73,7 +74,7 @@ function DashletTitle({
         formAtom={formAtom}
         widgetAtom={widgetAtom}
       >
-        <span>{displayTitle}</span>
+        <FieldLabelTitle title={displayTitle} />
       </HelpPopover>
     </Box>
   );

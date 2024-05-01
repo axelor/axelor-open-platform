@@ -27,6 +27,7 @@ import { FieldProps, ValueAtom, WidgetProps } from "./types";
 
 import styles from "./form-field.module.css";
 import { legacyClassNames } from "@/styles/legacy";
+import { sanitize } from "@/utils/sanitize";
 
 export type WidgetControlProps = WidgetProps & {
   className?: string;
@@ -162,6 +163,11 @@ export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
   return error && <InputFeedback invalid>{error}</InputFeedback>;
 }
 
+export function FieldLabelTitle({ title }: { title?: string }) {
+  const __html = useMemo(() => title && sanitize(title), [title]);
+  return __html && <span dangerouslySetInnerHTML={{ __html }} />;
+}
+
 export function FieldLabel({
   schema,
   icon,
@@ -190,7 +196,7 @@ export function FieldLabel({
           })}
         >
           {icon && <Icon icon={icon} />}
-          {title}
+          <FieldLabelTitle title={title} />
         </span>
       </InputLabel>
     </HelpPopover>
