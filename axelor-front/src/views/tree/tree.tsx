@@ -58,14 +58,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     },
     [getViewContext, view],
   );
-
-  const getActionContext = useCallback(() => getContext(true), [getContext]);
-
-  const actionExecutor = useActionExecutor(view, {
-    getContext: getActionContext,
-    onRefresh: () => doSearch({}),
-  });
-
   // check parent/child is of same model
   const isSameModelTree = useMemo(() => {
     const model = view?.nodes?.[0]?.model;
@@ -187,6 +179,11 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   const onSearch = useAfterActions(doSearch);
 
+  const onRefresh = useCallback(async () => {
+    doReset();
+    await onSearch({});
+  }, [doReset, onSearch]);
+
   const onSearchNode = useCallback(
     async (treeNode: TreeRecord) => {
       const node = getNodeOfTreeRecord(view, treeNode, true);
@@ -305,10 +302,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       setDashletHandlers({
         dataStore,
         view,
-        onRefresh: () => doSearch({}),
+        onRefresh,
       });
     }
-  }, [dashlet, view, dataStore, doSearch, setDashletHandlers]);
+  }, [dashlet, view, dataStore, onRefresh, setDashletHandlers]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
@@ -319,6 +316,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   } = dataStore?.page || {};
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
+
+  const getActionContext = useCallback(() => getContext(true), [getContext]);
+
+  const actionExecutor = useActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh,
+  });
 
   const nodeRenderer = useMemo(
     () => (props: NodeProps) => (
@@ -338,11 +342,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     [view, actionExecutor],
   );
 
-  const handleRefresh = useCallback(async () => {
-    doReset();
-    await onSearch({});
-  }, [doReset, onSearch]);
-
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
     [limit, offset, onSearch],
@@ -355,11 +354,11 @@ export function Tree({ meta }: ViewProps<TreeView>) {
 
   useShortcuts({
     viewType: view.type,
-    onRefresh: handleRefresh,
+    onRefresh,
   });
 
   // register tab:refresh
-  useViewTabRefresh("tree", handleRefresh);
+  useViewTabRefresh("tree", onRefresh);
 
   return (
     <Box
@@ -388,7 +387,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
                 iconProps: {
                   icon: "refresh",
                 },
-                onClick: handleRefresh,
+                onClick: onRefresh,
               },
             ],
           }}
