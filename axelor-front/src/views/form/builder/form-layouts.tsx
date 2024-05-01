@@ -47,7 +47,8 @@ function computeLayout(schema: Schema) {
       !item.editor;
 
     const colSpan = parseInt(item.colSpan) || itemSpan;
-    let colStart = last > numCols ? 1 : last;
+    const colOffset = parseInt(item.colOffset) || 0;
+    let colStart = (last > numCols ? 1 : last) + colOffset;
     let colEnd = colStart + colSpan;
 
     // if not enough columns, move to next row
