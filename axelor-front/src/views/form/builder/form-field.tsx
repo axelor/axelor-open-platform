@@ -1,7 +1,14 @@
 import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
@@ -163,10 +170,12 @@ export function FieldError({ widgetAtom }: Pick<WidgetProps, "widgetAtom">) {
   return error && <InputFeedback invalid>{error}</InputFeedback>;
 }
 
-export function FieldLabelTitle({ title }: { title?: string }) {
-  const __html = useMemo(() => title && sanitize(title), [title]);
-  return __html && <span dangerouslySetInnerHTML={{ __html }} />;
-}
+export const FieldLabelTitle = forwardRef<HTMLSpanElement, { title?: string }>(
+  function FieldLabelTitle({ title }, ref) {
+    const __html = useMemo(() => title && sanitize(title), [title]);
+    return __html && <span ref={ref} dangerouslySetInnerHTML={{ __html }} />;
+  },
+);
 
 export function FieldLabel({
   schema,
