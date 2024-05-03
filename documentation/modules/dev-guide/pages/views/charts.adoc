@@ -100,7 +100,11 @@ Most important config values are:
 * `colors` - specify base colors for charts, each color is used to provide 4 gradient shades
 * `shades` - number of gradient shades used for colors
 * `hideLegend` - show/hide the legend
-* `min/max` -  used with gauge chart, define the minimum and maximum values.
+* `axisScale` - used with radar chart, define the axis scales. Values can be :
+- `fixed` : use a fixed scale for all axis. Value should be provided by `max` config.
+- `distinct` : use a distinct scale by axis, based on the series values. This is the default.
+- `unique` : use a unique scale for all axis, based on the series values.
+* `min/max` -  used with gauge and radar chart(max support), define the minimum and maximum values.
 * `onClick` - call specified action with clicked data in context
 
 == Colors

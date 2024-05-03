@@ -30,28 +30,47 @@ export function Radar(props: ChartProps) {
 
   useEffect(() => {
     const { data: source, formatter } = PlusData(data);
+    const { axisScale = "distinct", max } = data.config || {};
+
     setOptions(
       produce((draft: any) => {
         draft.tooltip.valueFormatter = formatter;
         draft.legend.data = [];
         draft.radar.indicator = [];
+        draft.series[0].data = [];
+
+        let maxValue = 0;
 
         source.forEach(({ x, y, raw, ...values }) => {
           draft.legend.data.push(x);
 
-          for (const [k] of Object.entries(values)) {
+          for (const [k, v] of Object.entries(values)) {
             const found = draft.radar.indicator.find(
               (i: { name: string; max: number }) => i.name === k,
             );
+
+            maxValue = Math.max(maxValue, v as number);
+
             if (!found) {
               draft.radar.indicator.push({
                 name: k,
+                ...(axisScale === "fixed" &&
+                  max && {
+                    max: +max,
+                  }),
               });
             }
           }
         });
 
-        draft.series[0].data = [];
+        if (axisScale === "unique") {
+          draft.radar.indicator.forEach(
+            (ind: { name: string; max: number }) => {
+              ind.max = maxValue;
+            },
+          );
+        }
+        
         source.forEach((s) => {
           draft.series[0].data.push({
             name: s.x,
