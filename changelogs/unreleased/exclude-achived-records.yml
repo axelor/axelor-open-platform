@@ -1,0 +1,5 @@
+---
+title: Exclude archived M2O from selection
+type: fix
+description: |
+  When M2O is used as a selection (`NavSelect` widget or in `Kanban#columnBy`), exclude archived records.

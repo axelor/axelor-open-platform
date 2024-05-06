@@ -501,6 +501,7 @@ public final class MetaStore {
     String name = nameField == null ? "id" : nameField.getName();
 
     Query<?> query = Query.of(model);
+    query.filter("self.archived is null OR self.archived = false");
 
     if (StringUtils.notBlank(orderBy)) {
       query.order(orderBy);
