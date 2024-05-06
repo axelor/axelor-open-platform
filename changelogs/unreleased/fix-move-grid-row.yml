@@ -1,0 +1,7 @@
+---
+title: Fix dragging grid row with parent container scroll
+type: fix
+description: |
+  If parent container has a scroll, it create dragging row issue : 
+  the dragging element isn't at the right position. wheel scroll is 
+  now disabled to avoid unexpected behavior.
