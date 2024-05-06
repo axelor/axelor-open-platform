@@ -643,8 +643,9 @@ You can define the binding type for the authentication request.
 .axelor-config.properties
 [source,properties]
 -----
-# binding type for the authentication request: SAML2_POST_BINDING_URI / SAML2_POST_SIMPLE_SIGN_BINDING_URI / SAML2_REDIRECT_BINDING_URI
-auth.provider.saml.authn-request-binding-type = SAML2_POST_BINDING_URI
+# binding type for the authentication request: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" /
+# "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" / "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+auth.provider.saml.authn-request-binding-type = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 -----
 
 You can define the binding type for the authentication response.
@@ -652,8 +653,8 @@ You can define the binding type for the authentication response.
 .axelor-config.properties
 [source,properties]
 -----
-# binding type for the authentication response: SAML2_POST_BINDING_URI / SAML2_ARTIFACT_BINDING_URI
-auth.provider.saml.response-binding-type = SAML2_POST_BINDING_URI
+# binding type for the authentication response: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" / "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+auth.provider.saml.response-binding-type = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 -----
 
 By SAML specification, the authentication request must not contain a NameQualifier, if the SP entity is in the format nameid-format:entity. However, some IdP require that information to be present. You can force a NameQualifier in the request.
