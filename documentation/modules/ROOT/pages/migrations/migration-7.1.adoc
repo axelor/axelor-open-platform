@@ -4,7 +4,7 @@
 
 :product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.1/CHANGELOG.md
 :gradle-7-5-8-0: https://docs.gradle.org/current/userguide/upgrading_version_7.html
-:gradle-8-0-8-6: https://docs.gradle.org/current/userguide/upgrading_version_8.html
+:gradle-8-0-8-7: https://docs.gradle.org/current/userguide/upgrading_version_8.html
 
 In this document, we will see the major steps to migrate from 7.0 to 7.1.
 
@@ -17,7 +17,7 @@ Some dependencies have been upgraded to newer versions. Check the {product-versi
 list.
 
 Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
-improvements : `./gradlew wrapper --gradle-version 8.6`.
+improvements : `./gradlew wrapper --gradle-version 8.7`.
 
 [NOTE]
 ====
@@ -30,7 +30,7 @@ task a second time.
 Check Gradle migration to update your builds :
 
 - `7.5` -> `8.0` : {gradle-7-5-8-0}[Upgrading your build from Gradle 7.x to 8.0]
-- `8.0` -> `8.6` : {gradle-8-0-8-6}[Upgrading your build from Gradle 8.x to the latest]
+- `8.0` -> `8.7` : {gradle-8-0-8-7}[Upgrading your build from Gradle 8.x to the latest]
 
 [NOTE]
 ====
