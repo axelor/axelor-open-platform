@@ -66,7 +66,7 @@ public class TenantConnectionProvider
       throw new TenantNotFoundException("No such tenant found: " + tenantIdentifier);
     }
     DataSource dataSource = dataSourceMap().get(tenantIdentifier);
-    LOGGER.debug("using tenant: {}", tenantIdentifier);
+    LOGGER.trace("using tenant: {}", tenantIdentifier);
     if (dataSource == null) {
       dataSource = createDataSource(validate(configProvider.find(tenantIdentifier)));
       dataSourceMap().put(tenantIdentifier, dataSource);

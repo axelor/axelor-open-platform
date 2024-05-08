@@ -24,7 +24,6 @@ import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.db.tenants.TenantResolver;
 import com.axelor.web.AppSessionListener;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -64,8 +63,7 @@ public class AboutService extends AbstractService {
         try {
           if (session == null
               || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
-              || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE
-              || !TenantResolver.isCurrentTenantSession(session)) {
+              || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
             continue;
           }
         } catch (IllegalStateException e) {

@@ -18,7 +18,10 @@
  */
 package com.axelor.db.tenants;
 
-import javax.servlet.http.HttpSession;
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 /** The tenant identifier resolver. */
@@ -51,13 +54,21 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
     return tenant == null ? null : tenant;
   }
 
-  public static boolean isCurrentTenantSession(HttpSession session) {
-    if (session == null) return false;
-    return !enabled
-        || CURRENT_TENANT.get() == null
-        || CURRENT_TENANT
-            .get()
-            .equals(session.getAttribute(AbstractTenantFilter.SESSION_KEY_TENANT_ID));
+  public static Map<String, String> getTenants() {
+    final Map<String, String> map = new LinkedHashMap<>();
+    if (enabled) {
+      final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
+      final User user = AuthUtils.getUser();
+      for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
+        if (Boolean.FALSE.equals(config.getActive()) || Boolean.FALSE.equals(config.getVisible())) {
+          continue;
+        }
+        if (user == null || provider.hasAccess(user, config)) {
+          map.put(config.getTenantId(), config.getTenantName());
+        }
+      }
+    }
+    return map;
   }
 
   @Override

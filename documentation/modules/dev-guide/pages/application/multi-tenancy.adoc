@@ -91,6 +91,13 @@ public class DemoModule extends AxelorModule {
 It's up to the `MyTenantConfigProvider` to decide how to resolve tenants (may be using jdbc connection
 to some external database).
 
+== Authentication
+
+Clients without session support (e.g. direct basic auth) should provide `X-Tenant-ID` header
+with every request to select a tenant.
+
+Clients with session support should send `X-Tenant-ID` header with login request.
+
 == Limitations
 
 Following features are disabled in multi-tenancy mode:
