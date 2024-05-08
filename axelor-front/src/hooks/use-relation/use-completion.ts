@@ -12,22 +12,33 @@ export function useCompletion(options: {
   limit?: number;
   sortBy?: string;
 }) {
-  const { target, targetName, targetSearch, sortBy, limit = DEFAULT_COMPLETION_PAGE_SIZE } = options;
+  const {
+    target,
+    targetName,
+    targetSearch,
+    sortBy,
+    limit = DEFAULT_COMPLETION_PAGE_SIZE,
+  } = options;
   const dataSource = useMemo(() => new DataSource(target), [target]);
   const names = useMemo(
-    () => uniq([[targetName], targetSearch].flat().filter(Boolean)) as string[],
+    () =>
+      uniq(
+        [[targetName], targetSearch]
+          .flat()
+          .filter((name) => name !== "id" && Boolean(name)),
+      ) as string[],
     [targetName, targetSearch],
   );
 
   const search = useCallback(
     async (
       term: string,
-      options?: {
+      opts?: {
         _domain?: string;
         _domainContext?: DataContext;
       },
     ) => {
-      const { _domain, _domainContext } = options || {};
+      const { _domain, _domainContext } = opts || {};
       return dataSource.search({
         translate: true,
         sortBy: sortBy?.split?.(","),
