@@ -36,6 +36,8 @@ export interface SessionInfo {
     defaultClient?: string;
     exclusive?: boolean;
     currentClient?: string;
+    tenants?: Record<string, string>;
+    tenant?: string;
   };
   user?: {
     id: number;
@@ -147,12 +149,19 @@ export class Session {
       password: string;
       newPassword?: string;
     },
-    params?: URLSearchParams,
+    options?: {
+      params?: URLSearchParams;
+      tenant?: string;
+    },
   ): Promise<SessionInfo> {
+    const params = options?.params;
+    const tenant = options?.tenant;
     const url = "callback" + (params ? `?${params}` : "");
+    const headers = tenant ? { "X-Tenant-ID": String(tenant) } : undefined;
     const response = await request({
       url,
       method: "POST",
+      headers,
       body: args,
     });
 

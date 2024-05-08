@@ -1,0 +1,8 @@
+---
+title: Re-introduce multi-tenancy support
+type: change
+description: |
+  Clients without session support (e.g. basic auth) should provide `X-Tenant-ID` header
+  with every requests to select a tenant.
+  
+  Clients with session support should send `X-Tenant-ID` header with login request.

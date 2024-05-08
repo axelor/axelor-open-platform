@@ -66,7 +66,7 @@ export function ChangePassword() {
       try {
         const info = await session.login(
           { username, password, newPassword },
-          params,
+          { params },
         );
 
         const { user, route } = info;

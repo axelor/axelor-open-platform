@@ -1,4 +1,4 @@
-import { FormEventHandler, useCallback, useState } from "react";
+import { FormEventHandler, useCallback, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -8,6 +8,7 @@ import {
   Button,
   Input,
   InputLabel,
+  Select,
 } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
@@ -54,6 +55,28 @@ export function LoginForm({
 
   const defaultClient = appInfo?.authentication?.defaultClient;
 
+  const [tenantId, setTenantId] = useState(appInfo?.authentication?.tenant);
+
+  const tenants = useMemo(() => {
+    const val = appInfo?.authentication?.tenants ?? {};
+    return Object.entries(val).map(([name, title]) => ({
+      name,
+      title,
+    }));
+  }, [appInfo?.authentication?.tenants]);
+
+  const tenant = useMemo(() => {
+    return tenants?.find((x) => x.name === tenantId) ?? tenants?.[0];
+  }, [tenantId, tenants]);
+
+  const handleTenantChange = useCallback(
+    (value?: { name: string; title: string } | null) => {
+      const id = value?.name ?? "";
+      setTenantId(id);
+    },
+    [],
+  );
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
@@ -67,7 +90,10 @@ export function LoginForm({
           : undefined;
 
       try {
-        const info = await session.login({ username, password }, params);
+        const info = await session.login(
+          { username, password },
+          { params, tenant: tenantId },
+        );
         const { user, route } = info;
 
         if (route) {
@@ -92,6 +118,7 @@ export function LoginForm({
       session,
       username,
       password,
+      tenantId,
       navigate,
       locationState,
       onSuccess,
@@ -183,6 +210,20 @@ export function LoginForm({
               }
             />
           </Box>
+          {tenants.length > 1 && (
+            <Box mb={4}>
+              <InputLabel htmlFor="database">{i18n.get("Database")}</InputLabel>
+              <Select
+                id="database"
+                multiple={false}
+                value={tenant}
+                options={tenants}
+                optionKey={(x) => x.name}
+                optionLabel={(x) => x.title}
+                onChange={handleTenantChange}
+              />
+            </Box>
+          )}
           <Box d="flex">
             <InputLabel d="flex" alignItems="center" gap={8}>
               <Input
