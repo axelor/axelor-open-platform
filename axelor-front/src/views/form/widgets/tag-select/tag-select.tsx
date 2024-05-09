@@ -14,6 +14,7 @@ import {
   useEditorInTab,
   useSelector,
 } from "@/hooks/use-relation";
+import { useOptionLabel } from "../many-to-one/utils";
 import { DataSource } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
@@ -302,14 +303,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     [beforeSelect, domain, getContext, search],
   );
 
+  const getOptionLabel = useOptionLabel(schema);
   const getOptionKey = useCallback((option: DataRecord) => option.id!, []);
-  const getOptionLabel = useCallback(
-    (option: DataRecord) => {
-      const trKey = `$t:${targetName}`;
-      return option[trKey] ?? option[targetName];
-    },
-    [targetName],
-  );
   const getOptionEqual = useCallback(
     (a: DataRecord, b: DataRecord) => a.id === b.id,
     [],
