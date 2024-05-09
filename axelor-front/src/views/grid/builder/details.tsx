@@ -20,7 +20,7 @@ import {
   useGetErrors,
   useHandleFocus,
 } from "../../form";
-import { Form, useFormHandlers } from "../../form/builder"
+import { Form, useFormHandlers } from "../../form/builder";
 
 import styles from "./details.module.scss";
 
@@ -84,6 +84,7 @@ export function Details({
 
   const canNew = hasButton("new");
   const canSave = hasButton("save");
+  const canEdit = hasButton("edit");
 
   const handleRefresh = isNew ? onNew : onRefresh;
 
@@ -120,7 +121,7 @@ export function Details({
               {
                 key: "save",
                 text: i18n.get("Save"),
-                hidden: !canSave,
+                hidden: !canSave || !canEdit,
                 iconProps: {
                   icon: "save",
                 },
@@ -182,7 +183,7 @@ export function Details({
               <Form
                 schema={meta.view}
                 fields={meta.fields!}
-                readonly={false}
+                readonly={!canEdit}
                 formAtom={formAtom}
                 actionHandler={actionHandler}
                 actionExecutor={actionExecutor}
