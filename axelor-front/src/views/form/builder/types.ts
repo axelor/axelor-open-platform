@@ -97,7 +97,7 @@ export interface FieldProps<T> extends WidgetProps {
   invalid?: boolean;
 }
 
-export interface FormProps extends WidgetProps {
+export interface FormProps extends Omit<WidgetProps, "widgetAtom"> {
   fields: Record<string, Property>;
   actionHandler: ActionHandler;
   recordHandler: RecordHandler;
@@ -105,6 +105,7 @@ export interface FormProps extends WidgetProps {
   className?: string;
   layout?: FormLayout;
   layoutProps?: Record<string, any>;
+  widgetAtom?: WidgetAtom;
 }
 
 export type FormLayout = (

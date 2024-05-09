@@ -33,7 +33,7 @@ export interface DetailsProps {
   onNew?: () => void;
   onRefresh?: () => void;
   onCancel?: () => void;
-  onSave?: (record: DataRecord) => Promise<any>;
+  onSave?: (record: DataRecord) => Promise<void>;
 }
 
 export function Details({
@@ -60,22 +60,21 @@ export function Details({
     useCallback(
       async (get) => {
         const state = get(formAtom);
-        const { record } = state;
         const errors = getErrors(state);
         if (errors) {
           showErrors(errors);
           return;
         }
-        onSave?.(record);
+        onSave?.(state.record);
       },
       [formAtom, getErrors, onSave],
     ),
   );
 
   useAsyncEffect(async () => {
-    const { onLoad, onNew } = meta.view;
+    const { onLoad: _onLoad, onNew: _onNew } = meta.view;
     if (record) {
-      const action = (record?.id ?? 0) > 0 ? onLoad : onNew;
+      const action = (record?.id ?? 0) > 0 ? _onLoad : _onNew;
       action && (await actionExecutor.execute(action));
     }
   }, [record, meta.view, actionExecutor]);
@@ -188,7 +187,6 @@ export function Details({
                 actionExecutor={actionExecutor}
                 recordHandler={recordHandler}
                 layout={Layout}
-                {...({} as any)}
               />
             </ScopeProvider>
           </Box>
