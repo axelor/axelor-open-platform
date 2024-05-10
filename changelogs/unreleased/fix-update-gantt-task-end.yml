@@ -1,0 +1,3 @@
+---
+title: Fix update gantt taskEnd when it's defined
+type: fix

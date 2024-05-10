@@ -136,15 +136,15 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       formatter: (record: DataRecord) => formatRecord(view, record),
       transformer: (record: DataRecord) => transformRecord(view, record),
     }),
-    [view]
+    [view],
   );
 
   const handleExpand = useCallback(
     (record: DataRecord, _expand?: boolean) =>
       setRecords((records) =>
-        records.map((r) => (r.id === record.id ? { ...r, _expand } : r))
+        records.map((r) => (r.id === record.id ? { ...r, _expand } : r)),
       ),
-    []
+    [],
   );
 
   const onSearch = useCallback(
@@ -158,7 +158,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       });
       setRecords(records);
     },
-    [dataStore, domain, context]
+    [dataStore, domain, context],
   );
 
   const updateRecord = useCallback(
@@ -168,11 +168,11 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       updated &&
         setRecords((records) =>
           records.map((r) =>
-            r.id === record.id ? { ...r, ...formatter(updated) } : r
-          )
+            r.id === record.id ? { ...r, ...formatter(updated) } : r,
+          ),
         );
     },
-    [transformer, formatter, dataStore]
+    [transformer, formatter, dataStore],
   );
 
   const handleRecordConnect = useCallback(
@@ -189,7 +189,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         }
       }
     },
-    [records, updateRecord]
+    [records, updateRecord],
   );
 
   const handleRecordDisconnect = useCallback(
@@ -204,13 +204,13 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         });
       }
     },
-    [records, updateRecord]
+    [records, updateRecord],
   );
 
   const handleRecordUpdate = useCallback(
     (record: DataRecord, changes: DataRecord) =>
-      updateRecord({ ...record, ...changes }),
-    [updateRecord]
+      updateRecord({ id: record.id, version: record.version, ...changes }),
+    [updateRecord],
   );
 
   const handleRecordRemove = useCallback(
@@ -227,7 +227,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         }
       }
     },
-    [dataStore]
+    [dataStore],
   );
 
   const handleRecordEdit = useCallback(
@@ -245,13 +245,13 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
               return isNew
                 ? [...records, record]
                 : records.map((r) =>
-                    r.id === record.id ? { ...r, ...record } : r
+                    r.id === record.id ? { ...r, ...record } : r,
                   );
             });
           },
         });
     },
-    [view, showEditor]
+    [view, showEditor],
   );
 
   const handleRecordAddSubTask = useCallback(
@@ -273,7 +273,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           }),
       });
     },
-    [view, handleRecordEdit]
+    [view, handleRecordEdit],
   );
 
   useEffect(() => {
@@ -298,7 +298,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         .concat(
           view.taskUser
             ? [{ type: "field", name: view.taskUser } as Widget]
-            : []
+            : [],
         )
         .map((item, ind) => ({
           ...(ind === 0 && {
@@ -340,7 +340,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       handleExpand,
       handleRecordAddSubTask,
       handleRecordRemove,
-    ]
+    ],
   );
 
   const ganttRecords = useMemo(() => {
@@ -348,7 +348,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
     function collect(
       parent?: DataRecord["id"],
-      level: number = 1
+      level: number = 1,
     ): DataRecord[] {
       return records
         .filter(
@@ -356,7 +356,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
             item[view.taskStart!] &&
             (parent
               ? (getParent(item) || {}).id === parent
-              : getParent(item) === parent)
+              : getParent(item) === parent),
         )
         .reduce((list, _item) => {
           const item: DataRecord = { ..._item, _level: level };
@@ -387,7 +387,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     ],
     [],
   );
-  
+
   return (
     <Box d="flex" className={styles.container} flex={1} flexDirection="column">
       <ViewToolBar
