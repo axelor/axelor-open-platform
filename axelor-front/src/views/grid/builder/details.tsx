@@ -3,6 +3,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
 import { ReactElement, useCallback, useRef } from "react";
+import { ScopeProvider } from "bunshi/react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
@@ -11,6 +12,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
+import { MetaScope } from "@/view-containers/views/scope";
 import {
   Layout,
   showErrors,
@@ -18,7 +20,7 @@ import {
   useGetErrors,
   useHandleFocus,
 } from "../../form";
-import { Form, useFormHandlers } from "../../form/builder";
+import { Form, useFormHandlers } from "../../form/builder"
 
 import styles from "./details.module.scss";
 
@@ -66,8 +68,8 @@ export function Details({
         }
         onSave?.(record);
       },
-      [formAtom, getErrors, onSave]
-    )
+      [formAtom, getErrors, onSave],
+    ),
   );
 
   useAsyncEffect(async () => {
@@ -176,17 +178,19 @@ export function Details({
             className={styles.form}
             ref={containerRef}
           >
-            <Form
-              schema={meta.view}
-              fields={meta.fields!}
-              readonly={false}
-              formAtom={formAtom}
-              actionHandler={actionHandler}
-              actionExecutor={actionExecutor}
-              recordHandler={recordHandler}
-              layout={Layout}
-              {...({} as any)}
-            />
+            <ScopeProvider scope={MetaScope} value={meta}>
+              <Form
+                schema={meta.view}
+                fields={meta.fields!}
+                readonly={false}
+                formAtom={formAtom}
+                actionHandler={actionHandler}
+                actionExecutor={actionExecutor}
+                recordHandler={recordHandler}
+                layout={Layout}
+                {...({} as any)}
+              />
+            </ScopeProvider>
           </Box>
         </Box>
       </Box>
