@@ -56,7 +56,7 @@ const variants = [
   "dark",
 ] as const;
 
-function findVariant(schema: Schema) {
+export function findVariant(schema: Schema) {
   if (typeof schema.link === "string") return "link";
   if (schema.css) {
     const variant = schema.css.replace("btn-", "");

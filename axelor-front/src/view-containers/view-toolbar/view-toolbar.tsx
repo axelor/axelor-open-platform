@@ -33,10 +33,11 @@ import {
   Menu,
   MenuDivider,
   MenuItem,
-  Widget,
+  Schema,
 } from "@/services/client/meta.types";
 import { FormAtom, RecordHandler } from "@/views/form/builder";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
+import { findVariant as findButtonVariant } from "@/views/form/widgets/button";
 
 import { ActionExecutor, ActionOptions } from "../action";
 
@@ -76,15 +77,14 @@ const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
 function ActionCommandItem({
   formAtom = fallbackFormAtom,
   recordHandler,
-  name,
-  showIf,
-  hideIf,
-  readonlyIf,
+  schema,
   ...props
 }: CommandItemProps &
-  Pick<ViewToolBarProps, "formAtom" | "recordHandler"> &
-  Pick<Widget, "name" | "showIf" | "hideIf" | "readonlyIf">) {
-  const [hidden, setHidden] = useState<boolean | undefined>(props.hidden);
+  Pick<ViewToolBarProps, "formAtom" | "recordHandler"> & {
+    schema: Schema;
+  }) {
+  const { name, showIf, hideIf, readonlyIf } = schema;
+  const [hidden, setHidden] = useState<boolean | undefined>(schema.hidden);
   const [readonly, setReadonly] = useState<boolean>(false);
   const { action } = useViewTab();
 
@@ -121,6 +121,9 @@ function ActionCommandItem({
   return (
     <CommandItem
       {...props}
+      {...(schema.css && {
+        variant: findButtonVariant(schema),
+      })}
       hidden={attrs?.hidden ?? hidden}
       {...((readonly || attrs?.readonly) && {
         onClick: undefined,
@@ -219,12 +222,8 @@ export function ToolbarActions({
             render: (props) => (
               <ActionCommandItem
                 {...props}
+                schema={item}
                 formAtom={formAtom}
-                name={item.name}
-                hidden={item.hidden}
-                showIf={item.showIf}
-                hideIf={item.hideIf}
-                readonlyIf={item.readonlyIf}
                 recordHandler={recordHandler}
               />
             ),
