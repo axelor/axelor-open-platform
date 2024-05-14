@@ -101,7 +101,16 @@ libs.hibernate = [
 
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.8"
-libs.redisson = "org.redisson:redisson-hibernate-53:3.29.0"
+libs.redisson = [
+    dependencies.create("org.redisson:redisson-hibernate-53:3.29.0") {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
+        exclude group: "com.fasterxml.jackson.dataformat", module: "jackson-dataformat-yaml"
+    },
+    // overrides jackson version used
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
+]
 libs.hazelcast = "com.hazelcast:hazelcast:5.3.7"
 libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.6"
 libs.infinispan = [
@@ -119,7 +128,13 @@ libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.9.2") {
 }
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:9.22.3"
+libs.flywaydb = [
+    dependencies.create("org.flywaydb:flyway-core:9.22.3") {
+        exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-toml'
+    },
+    // overrides jackson version used
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-toml:${versions.jackson}"
+]
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.14"
@@ -139,6 +154,10 @@ def resteasy_module = { name ->
     dependencies.create("org.jboss.resteasy:${name}:${versions.resteasy}") {
         exclude module: "smallrye-config"
         exclude module: "resteasy-jaxb-provider"
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
+        exclude group: "com.fasterxml.jackson.jaxrs", module: "jackson-jaxrs-json-provider"
         exclude module: "mail", group: "javax.mail"
     }
 }
@@ -159,7 +178,17 @@ libs.resteasy_server = [
   "io.undertow:undertow-servlet:2.2.32.Final"
 ]
 
-libs.swagger_jaxrs2 = "io.swagger.core.v3:swagger-jaxrs2:2.2.21"
+libs.swagger_jaxrs2 = [
+    dependencies.create("io.swagger.core.v3:swagger-jaxrs2:2.2.22") {
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+        exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
+        exclude group: "com.fasterxml.jackson.jaxrs", module: "jackson-jaxrs-json-provider"
+        exclude group: "com.fasterxml.jackson.datatype", module: "jackson-datatype-jsr310"
+        exclude group: "com.fasterxml.jackson.dataformat", module: "jackson-dataformat-yaml"
+    },
+    // overrides jackson version used
+    "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
+]
 
 // jackson
 libs.jackson_libs = [
@@ -183,9 +212,12 @@ libs.apache_shiro = [
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
   "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
-
-  "org.pac4j:pac4j-http:${versions.pac4j}",
-  "org.pac4j:pac4j-ldap:${versions.pac4j}",
+  dependencies.create("org.pac4j:pac4j-http:${versions.pac4j}") {
+      exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+  },
+  dependencies.create("org.pac4j:pac4j-ldap:${versions.pac4j}") {
+      exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
+  },
   "org.ldaptive:ldaptive:${versions.ldaptive}"
 ]
 
