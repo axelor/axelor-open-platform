@@ -32,18 +32,21 @@ public final class JsonFunction {
 
   private String field;
 
+  private String prefix;
+
   private String attribute;
 
   private String type;
 
-  public JsonFunction(String field, String attribute, String type) {
+  public JsonFunction(String field, String attribute, String type, String prefix) {
     this.field = field;
     this.attribute = attribute;
     this.type = type;
+    this.prefix = prefix;
   }
 
   public JsonFunction(String field, String attribute) {
-    this(field, attribute, DEFAULT_TYPE);
+    this(field, attribute, DEFAULT_TYPE, "self");
   }
 
   private static String validateField(String name) {
@@ -61,6 +64,10 @@ public final class JsonFunction {
   }
 
   public static JsonFunction fromPath(String path) {
+    return fromPath("self", path);
+  }
+
+  public static JsonFunction fromPath(String prefix, String path) {
     Preconditions.checkArgument(path != null, "name cannot be null");
     Preconditions.checkArgument(path.indexOf('.') > -1, "not a json path");
 
@@ -73,8 +80,8 @@ public final class JsonFunction {
     final String attribute = rest.substring(dot + 1);
 
     return "long".equals(type)
-        ? new JsonFunction(field, attribute, "integer")
-        : new JsonFunction(field, attribute, type);
+        ? new JsonFunction(field, attribute, "integer", prefix)
+        : new JsonFunction(field, attribute, type, prefix);
   }
 
   public String getField() {
@@ -96,6 +103,7 @@ public final class JsonFunction {
             .append("json_extract_")
             .append(validateType(type))
             .append("(")
+            .append(prefix + ".")
             .append(validateField(field));
     for (String item : attribute.split("\\.")) {
       builder.append(", ").append("'").append(validateField(item)).append("'");

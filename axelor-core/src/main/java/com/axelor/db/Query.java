@@ -1018,8 +1018,8 @@ public class Query<T extends Model> {
           }
 
           if (property.isJson()) {
-            String jsonPath = i == 0 ? "self." + name : String.join(".", prefix, item, path[i + 1]);
-            return JsonFunction.fromPath(jsonPath).toString();
+            String jsonPath = i == 0 ? name : String.join(".", item, path[i + 1]);
+            return JsonFunction.fromPath(i == 0 ? "self" : prefix, jsonPath).toString();
           }
 
           if (prefix == null) {
