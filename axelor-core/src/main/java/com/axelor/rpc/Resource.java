@@ -627,12 +627,19 @@ public class Resource<T extends Model> {
 
   private static final int DEFAULT_EXPORT_MAX_SIZE = -1;
   private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
+  private static final boolean DEFAULT_EXPORT_COLLECTIONS_ENABLED =  false;
+  private static final String DEFAULT_EXPORT_COLLECTIONS_SEPARATOR = " | ";
 
   private static final int EXPORT_MAX_SIZE =
       AppSettings.get().getInt(AvailableAppSettings.DATA_EXPORT_MAX_SIZE, DEFAULT_EXPORT_MAX_SIZE);
   private static final int EXPORT_FETCH_SIZE =
       AppSettings.get()
           .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
+  private static final boolean EXPORT_COLLECTION_ENABLED =
+          AppSettings.get().getBoolean(AvailableAppSettings.DATA_EXPORT_COLLECTIONS_ENABLED, DEFAULT_EXPORT_COLLECTIONS_ENABLED);
+  private static final String EXPORT_COLLECTION_SEPARATOR =
+          AppSettings.get()
+                  .get(AvailableAppSettings.DATA_EXPORT_COLLECTIONS_SEPARATOR, DEFAULT_EXPORT_COLLECTIONS_SEPARATOR);
 
   public Response export(Request request, Charset charset) {
     return export(request, charset, AppFilter.getLocale(), ';');
@@ -740,7 +747,6 @@ public class Resource<T extends Model> {
         if (property.isPrimary()
             || property.isTransient()
             || property.isVersion()
-            || property.isCollection()
             || property.isPassword()
             || property.getType() == PropertyType.BINARY) {
           continue;
@@ -767,8 +773,8 @@ public class Resource<T extends Model> {
         prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
       }
       if (prop == null
-          || prop.isCollection()
           || prop.isTransient()
+          || (prop.isCollection() && !EXPORT_COLLECTION_ENABLED)
           || prop.getType() == PropertyType.BINARY) {
         continue;
       }
@@ -779,7 +785,7 @@ public class Resource<T extends Model> {
       String name = prop.getName();
       String title = prop.getTitle();
       String model = getModel().getName();
-      if (prop.isReference()) {
+      if (prop.isReference() || prop.isCollection()) {
         model = prop.getTarget().getName();
       }
       if (!perms.canExport(AuthUtils.getUser(), model, name)) {
@@ -821,6 +827,11 @@ public class Resource<T extends Model> {
           continue;
         }
         name = name + '.' + prop.getName();
+      } else if (prop.isCollection()) {
+        prop = Mapper.of(prop.getTarget()).getNameField();
+        if (prop == null) {
+          continue;
+        }
       } else if (options != null && !options.isEmpty()) {
         Map<String, String> map = new HashMap<>();
         for (Selection.Option option : options) {
@@ -835,7 +846,8 @@ public class Resource<T extends Model> {
       names.add(name);
       header.add(escapeCsv(title));
 
-      if (prop.isTranslatable()) {
+      if (prop.isTranslatable() || (prop.isCollection()
+              && Mapper.of(prop.getTarget()).getNameField().isTranslatable())) {
         translatableNames.add(name);
       }
     }
@@ -850,51 +862,35 @@ public class Resource<T extends Model> {
     Query<?> query = getQuery(request);
     Query<?>.Selector selector = query.select(names.toArray(new String[0]));
 
-    List<?> data = selector.values(limit, offset);
+    List<Map> data = selector.fetch(limit, offset);
 
     final L10n formatter = L10n.getInstance(locale);
 
     while (!data.isEmpty()) {
-      for (Object item : data) {
-        List<?> row = (List<?>) item;
+      for (Map item : data) {
+        Map<String, Object> row = (Map<String, Object>) item;
         List<String> line = new ArrayList<>();
         int index = 0;
-        // Ignore first two items (id, version).
-        row = row.size() > 2 ? row.subList(2, 2 + names.size()) : Collections.emptyList();
-        for (Object value : row) {
-          Object objValue = value == null ? "" : value;
-          if (selection.containsKey(index)) {
-            final Map sel = selection.get(index);
-            objValue =
-                Arrays.stream(objValue.toString().split("\\s*,\\s*"))
-                    .map(
-                        part -> {
-                          Object val = sel.get(part);
-                          return ObjectUtils.isEmpty(val) ? part : val;
-                        })
-                    .filter(java.util.Objects::nonNull)
-                    .map(String::valueOf)
-                    .collect(Collectors.joining(", "));
-          }
-          if (objValue instanceof String) {
-            if (translatableNames.contains(names.get(index))) {
-              objValue = getValueTranslation(bundle, (String) objValue);
+        for (String field : names) {
+          Object rowValue = row.get(field);
+          Object objValue = rowValue == null ? "" : rowValue;
+
+          String strValue = null;
+          if (objValue instanceof List) {
+            List<String> parts = new ArrayList<>();
+            String nameField = getMapper(mapper, field).getNameField().getName();
+            for (Map<String, Object> itemVal : (List<Map<String, Object>>) objValue) {
+              parts.add(format(itemVal.get(nameField), translatableNames, formatter, names, index, bundle, selection));
             }
-          } else if (objValue instanceof Number) {
-            objValue = formatter.format((Number) objValue, false);
-          } else if (objValue instanceof LocalDate) {
-            objValue = formatter.format((LocalDate) objValue);
-          } else if (objValue instanceof LocalTime) {
-            objValue = formatter.format((LocalTime) objValue);
-          } else if (objValue instanceof LocalDateTime) {
-            objValue = formatter.format((LocalDateTime) objValue);
-          } else if (objValue instanceof ZonedDateTime) {
-            objValue = formatter.format((ZonedDateTime) objValue);
-          } else if (objValue instanceof Enum) {
-            objValue = getTranslation(bundle, getTitle((Enum<?>) objValue));
+            strValue = Joiner.on(EXPORT_COLLECTION_SEPARATOR).join(parts);
+          } else {
+            if (objValue instanceof Map) {
+              objValue = ((Map<String, Object>) objValue).get(getMapper(mapper, field).getNameField().getName());
+            }
+            strValue = format(objValue, translatableNames, formatter, names, index, bundle, selection);
           }
-          String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
-          line.add(strValue);
+
+          line.add(escapeCsv(strValue.toString()));
           ++index;
         }
         writer.write("\n");
@@ -912,13 +908,60 @@ public class Resource<T extends Model> {
       }
 
       offset += limit;
-      data = selector.values(nextLimit, offset);
+      data = selector.fetch(nextLimit, offset);
     }
 
     Response response = new Response();
     response.setTotal(count);
 
     return count;
+  }
+
+  private String format(Object objValue, Set<String> translatableNames, L10n formatter, List<String> names, int index, ResourceBundle bundle, Map<Integer, Map<String, String>> selection) {
+    if (selection.containsKey(index)) {
+      final Map sel = selection.get(index);
+      objValue =
+              Arrays.stream(objValue.toString().split("\\s*,\\s*"))
+                      .map(
+                              part -> {
+                                Object val = sel.get(part);
+                                return ObjectUtils.isEmpty(val) ? part : val;
+                              })
+                      .filter(java.util.Objects::nonNull)
+                      .map(String::valueOf)
+                      .collect(Collectors.joining(", "));
+    }
+
+    if (objValue instanceof String) {
+      if (translatableNames.contains(names.get(index))) {
+        objValue = getValueTranslation(bundle, (String) objValue);
+      }
+    } else if (objValue instanceof Number) {
+      objValue = formatter.format((Number) objValue, false);
+    } else if (objValue instanceof LocalDate) {
+      objValue = formatter.format((LocalDate) objValue);
+    } else if (objValue instanceof LocalTime) {
+      objValue = formatter.format((LocalTime) objValue);
+    } else if (objValue instanceof LocalDateTime) {
+      objValue = formatter.format((LocalDateTime) objValue);
+    } else if (objValue instanceof ZonedDateTime) {
+      objValue = formatter.format((ZonedDateTime) objValue);
+    } else if (objValue instanceof Enum) {
+      objValue = getTranslation(bundle, getTitle((Enum<?>) objValue));
+    }
+    return objValue == null ? "" : objValue.toString();
+  }
+
+  private Mapper getMapper(Mapper mapper, String field) {
+    if (field == null || "".equals(field.trim())) return null;
+    Iterator<String> names = Splitter.on(".").split(field).iterator();
+    while (names.hasNext()) {
+      Property property = mapper.getProperty(names.next());
+      if (property == null) return null;
+      if (property.getTarget() == null) return null;
+      mapper = Mapper.of(property.getTarget());
+    }
+    return mapper;
   }
 
   private String getTranslation(ResourceBundle bundle, String text) {

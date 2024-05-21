@@ -97,6 +97,8 @@ public interface AvailableAppSettings {
   String DATA_EXPORT_ENCODING = "data.export.encoding";
   String DATA_EXPORT_LOCALE = "data.export.locale";
   String DATA_EXPORT_SEPARATOR = "data.export.separator";
+  String DATA_EXPORT_COLLECTIONS_ENABLED = "data.export.collections.enabled";
+  String DATA_EXPORT_COLLECTIONS_SEPARATOR = "data.export.collections.separator";
 
   String DATA_IMPORT_DEMO_DATA = "data.import.demo-data";
 

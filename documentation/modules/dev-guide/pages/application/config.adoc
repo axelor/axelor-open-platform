@@ -252,6 +252,8 @@ db.default.password = secret
 | `data.export.max-size` | maximum number of records to export, -1 means unlimited | -1
 | `data.export.fetch-size` | export fetch size | 500
 | `data.export.separator` | default export separator | ';'
+| `data.export.collections.enabled` | whether to export collections fields | false
+| `data.export.collections.separator` | export separator for collections fields | ' | '
 | `data.export.locale` | define a fixed locale for all exports |
 | `data.import.demo-data` | whether to import demo data for the application | true
 | `template.search-dir` | template storage path for groovy template | \{user.home}/.axelor/templates
