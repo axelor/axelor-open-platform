@@ -765,15 +765,26 @@ public class Resource<T extends Model> {
 
     final ResourceBundle bundle = I18n.getBundle(locale);
 
+    fieldsLoop:
     for (String field : fields) {
       Iterator<String> iter = Splitter.on(".").split(field).iterator();
       Property prop = mapper.getProperty(iter.next());
 
+      if (prop == null) {
+        continue;
+      }
+
+      if (!perms.canExport(AuthUtils.getUser(), getModel().getName(), prop.getName())) {
+        continue;
+      }
+
       while (iter.hasNext() && prop != null && !prop.isJson()) {
         prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
+        if (prop == null || !perms.canExport(AuthUtils.getUser(), prop.getEntity().getName(), prop.getName())) {
+          continue fieldsLoop;
+        }
       }
-      if (prop == null
-          || prop.isTransient()
+      if (prop.isTransient()
           || (prop.isCollection() && !EXPORT_COLLECTION_ENABLED)
           || prop.getType() == PropertyType.BINARY) {
         continue;
@@ -784,13 +795,6 @@ public class Resource<T extends Model> {
 
       String name = prop.getName();
       String title = prop.getTitle();
-      String model = getModel().getName();
-      if (prop.isReference() || prop.isCollection()) {
-        model = prop.getTarget().getName();
-      }
-      if (!perms.canExport(AuthUtils.getUser(), model, name)) {
-        continue;
-      }
       if (iter != null) {
         name = field;
       }
