@@ -193,7 +193,7 @@ export class DataSource {
 
   async export(options: SearchOptions): Promise<ExportResult> {
     const url = `ws/rest/${this.model}/export`;
-    const { filter: data, ...rest } = options;
+    const { filter: data, translate: _translate, ...rest } = options;
     const resp = await request({
       url,
       method: "POST",

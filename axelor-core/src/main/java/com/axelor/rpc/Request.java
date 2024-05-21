@@ -233,4 +233,8 @@ public class Request {
   public boolean isTranslate() {
     return translate;
   }
+
+  public void setTranslate(boolean translate) {
+    this.translate = translate;
+  }
 }

@@ -373,36 +373,33 @@ export function AdvanceSearch({
 
   const handleExport = useCallback(
     (exportFull?: boolean) => {
-      dataStore
-        .export(
-          exportFull
-            ? { fields: [] }
-            : items
-              ? {
-                  fields: items
-                    ?.filter(
-                      (item) =>
-                        item.name &&
-                        (item as GridColumn).visible !== false &&
-                        (item as GridColumn).searchable !== false,
-                    )
-                    .map((item) => item.name) as string[],
-                }
-              : {},
-        )
-        .then(({ exportSize, fileName }) => {
-          if ((dataStore.page?.totalCount ?? 0) > exportSize) {
-            alerts.warn({
-              title: i18n.get("Warning"),
-              message: i18n.get("{0} records exported.", exportSize),
-            });
-          }
+      const options: SearchOptions = {};
+      if (exportFull) {
+        options.fields = [];
+      } else if (items) {
+        options.fields = items
+          ?.filter(
+            (item) =>
+              item.name &&
+              (item as GridColumn).visible !== false &&
+              (item as GridColumn).searchable !== false,
+          )
+          .map((item) => item.name) as string[];
+      }
 
-          download(
-            `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
-            fileName,
-          );
-        });
+      dataStore.export(options).then(({ exportSize, fileName }) => {
+        if ((dataStore.page?.totalCount ?? 0) > exportSize) {
+          alerts.warn({
+            title: i18n.get("Warning"),
+            message: i18n.get("{0} records exported.", exportSize),
+          });
+        }
+
+        download(
+          `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
+          fileName,
+        );
+      });
     },
     [dataStore, items],
   );

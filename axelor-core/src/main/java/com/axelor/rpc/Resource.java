@@ -863,6 +863,7 @@ public class Resource<T extends Model> {
     int offset = 0;
     int count = 0;
 
+    request.setTranslate(false);
     Query<?> query = getQuery(request);
     Query<?>.Selector selector = query.select(names.toArray(new String[0]));
 
