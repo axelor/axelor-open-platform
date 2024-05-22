@@ -1339,7 +1339,13 @@
             </xsd:choice>
           </xsd:sequence>
         </xsd:choice>
-        <xsd:attribute name="widget" type="xsd:string" />
+        <xsd:attribute name="widget" use="optional">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="expandable" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="sortable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
@@ -1429,7 +1435,6 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

@@ -523,7 +523,7 @@ export interface GridView extends View {
   hilites?: Hilite[];
   items?: (Field | Button)[];
   summaryView?: string;
-  widget?: "master-detail" | "expandable" | "tree-grid";
+  widget?: "expandable";
   widgetAttrs?: Record<string, any>;
 }
 

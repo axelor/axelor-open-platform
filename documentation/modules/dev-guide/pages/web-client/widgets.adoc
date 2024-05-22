@@ -399,7 +399,7 @@ Example:
 Attributes:
 
 * `summary-view` - (optional) used to define the expandable form view. If not specified, the view specified by `form-view` attribute is used instead.
-* `x-expand-all` - (optional) to enable expand all feature, you have to specify comma-separated list of nested expandable collection fields if any. Supported on form field only, not on top-level grid.
+* `x-expand-all` - (optional) to enable expand all feature, you have to specify a comma-separated list of nested expandable collection fields, if any. Supported on form field only, not on top-level grid.
 
 == TreeGrid
 

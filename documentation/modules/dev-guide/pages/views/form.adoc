@@ -193,7 +193,7 @@ A `panel-related` includes the following attributes:
 | `height` | number of rows (not pixel height)
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 | `edit-window` | display mode of edit window for relational fields. Can be `self`, `blank` or `popup` (default value).
-| `widget` | name of the widget to be used in the grid: `master-detail`, `expandable`, `tree-grid`
+| `widget` | name of the widget to be used on the collection field: `tag-select`, `master-detail`, `expandable`, `tree-grid`
 
 |===
 
@@ -207,7 +207,7 @@ On one-to-many/many-to-many grids, `orderBy` is required with `canMove`, except 
 </panel-related>
 -----
 
-NOTE: See widgets xref:web-client/widgets.adoc#masterdetail[MasterDetail], xref:web-client/widgets.adoc#expandable[Expandable] and xref:web-client/widgets.adoc#treegrid[TreeGrid] for usage and available widget attributes.
+NOTE: See widgets xref:web-client/widgets.adoc#tagselect[TagSelect], xref:web-client/widgets.adoc#masterdetail[MasterDetail], xref:web-client/widgets.adoc#expandable[Expandable] and xref:web-client/widgets.adoc#treegrid[TreeGrid] for usage and available widget attributes.
 
 === Panel Include
 

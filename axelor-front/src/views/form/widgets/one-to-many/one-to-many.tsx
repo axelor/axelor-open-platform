@@ -198,22 +198,10 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
     };
   }, [schema, model]);
 
-  const mergedSchema = useMemo(
-    () => ({
-      ...schema,
-      widget: schema.widgetAttrs.widget ?? data?.view.widget ?? schema.widget,
-      widgetAttrs: {
-        ...data?.view.widgetAttrs,
-        ...schema.widgetAttrs,
-      },
-    }),
-    [data?.view.widget, data?.view.widgetAttrs, schema],
-  );
-
   if (state !== "hasData") return null;
 
   const hasExpandable =
-    isExpandableWidget(mergedSchema) ||
+    isExpandableWidget(schema) ||
     (data?.view && isExpandableWidget(data?.view as Schema));
   const isRootTreeGrid = hasExpandable && isRootCollection;
 
@@ -221,7 +209,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
     return (
       <OneToManyInner
         {...props}
-        schema={mergedSchema}
+        schema={schema}
         viewData={data}
         isRootTreeGrid={isRootTreeGrid}
       />
