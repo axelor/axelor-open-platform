@@ -3,7 +3,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import clsx from "clsx";
 import { useAtomCallback } from "jotai/utils";
 import { ReactElement, useCallback, useRef } from "react";
-import { ScopeProvider } from "bunshi/react";
+import { ScopeProvider } from "jotai-molecules";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
