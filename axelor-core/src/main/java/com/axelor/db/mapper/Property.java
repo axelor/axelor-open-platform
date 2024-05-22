@@ -44,6 +44,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Id;
@@ -367,21 +368,26 @@ public class Property {
 
     Mapper mapper = Mapper.of(target);
     Property nameField = mapper.getNameField();
-    Property codeField = mapper.getProperty("code");
 
     String targetName = null;
     Set<String> targetSearch = new LinkedHashSet<>();
 
+    Consumer<String> targetSearchConsumer =
+        field -> {
+          Property fieldProperty = mapper.getProperty(field);
+          if (fieldProperty != null && fieldProperty.getType() == PropertyType.STRING) {
+            targetSearch.add(field);
+          }
+        };
+
     if (nameField != null) {
       targetName = nameField.getName();
-      targetSearch.add(targetName);
+      targetSearchConsumer.accept(targetName);
       if (nameField.getNameSearch() != null) {
-        targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
+        Arrays.asList(nameField.getNameSearch()).forEach(targetSearchConsumer);
       }
     }
-    if (codeField != null && codeField.getType() == PropertyType.STRING) {
-      targetSearch.add(codeField.getName());
-    }
+    targetSearchConsumer.accept("code");
 
     this.targetName = targetName;
     this.targetSearch = new ArrayList<>(targetSearch);
