@@ -1,0 +1,3 @@
+---
+title: Disable progress when taskProgress is not defined in gantt view
+type: fix

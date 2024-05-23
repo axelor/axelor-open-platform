@@ -388,6 +388,16 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     [],
   );
 
+  const config = useMemo(
+    () => ({
+      progress: Boolean(view.taskProgress),
+      duration: Boolean(view.taskDuration),
+      startDate: Boolean(view.taskStart),
+      endDate: Boolean(view.taskEnd),
+    }),
+    [view],
+  );
+
   return (
     <Box d="flex" className={styles.container} flex={1} flexDirection="column">
       <ViewToolBar
@@ -425,6 +435,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           <GanttComponent
             className={styles.gantt}
             view={type}
+            config={config}
             items={ganttItems}
             records={ganttRecords}
             onRecordView={handleRecordEdit}
