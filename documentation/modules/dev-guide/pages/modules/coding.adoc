@@ -143,7 +143,7 @@ public class HelloController {
 <8> free form controller method
 
 The `ActionRequest` and `ActionResponse` are special classes to deal with
-action requests and responses. For more details see the {url-apidoc}.
+action requests and responses. For more details see the {url-apidoc}[API documentation].
 
 === Response Signals
 `ActionResponse.setSignal(signal, data)` is used to send any arbitrary signal to the client. Here are a couple of them that might be of interest:
