@@ -9,6 +9,7 @@ export function useCompletion(options: {
   target: string;
   targetName?: string;
   targetSearch?: string[];
+  fetchFields?: string[];
   limit?: number;
   sortBy?: string;
 }) {
@@ -16,6 +17,7 @@ export function useCompletion(options: {
     target,
     targetName,
     targetSearch,
+    fetchFields,
     sortBy,
     limit = DEFAULT_COMPLETION_PAGE_SIZE,
   } = options;
@@ -43,7 +45,7 @@ export function useCompletion(options: {
         translate: true,
         sortBy: sortBy?.split?.(","),
         limit,
-        fields: uniq(["id", ...names]),
+        fields: uniq(["id", ...(fetchFields || []), ...names]),
         filter: {
           _domain,
           _domainContext,
@@ -60,7 +62,7 @@ export function useCompletion(options: {
         },
       });
     },
-    [dataSource, sortBy, limit, names],
+    [dataSource, sortBy, limit, names, fetchFields],
   );
 
   return search;

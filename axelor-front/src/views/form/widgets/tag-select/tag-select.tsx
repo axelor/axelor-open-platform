@@ -38,7 +38,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     name,
     target,
     targetName,
-    targetSearch: _targetSearch,
+    targetSearch,
     colorField,
     canSuggest = true,
     placeholder,
@@ -72,9 +72,10 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   const showEditor = useEditor();
   const showEditorInTab = useEditorInTab(schema);
   const showCreator = useCreateOnTheFly(schema);
-  const targetSearch = useMemo<string[]>(
-    () => [...(_targetSearch || [])].concat(colorField ? [colorField] : []),
-    [_targetSearch, colorField],
+
+  const fetchFields = useMemo<string[]>(
+    () => (colorField ? [colorField] : []),
+    [colorField],
   );
 
   const search = useCompletion({
@@ -83,6 +84,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     target,
     targetName,
     targetSearch,
+    fetchFields,
   });
 
   const handleChange = useCallback(
@@ -127,7 +129,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const ensureRelated = useCallback(
     async (value: DataRecord[]) => {
-      const names = [targetName, colorField].filter(Boolean);
+      const names = [targetName, ...fetchFields].filter(Boolean);
       const ids = value
         .filter((v) => names.some((name) => getObjValue(v, name) === undefined))
         .map((v) => v.id);
@@ -173,7 +175,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       }
       return value;
     },
-    [targetName, colorField, target, name, parentId, parentModel],
+    [targetName, fetchFields, target, name, parentId, parentModel],
   );
 
   const ensureRelatedValues = useCallback(
@@ -367,7 +369,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         optionLabel={getOptionLabel}
         optionEqual={getOptionEqual}
         optionMatch={getOptionMatch}
-        value={ready ? (value ?? EMPTY) : EMPTY}
+        value={ready ? value ?? EMPTY : EMPTY}
         placeholder={placeholder}
         onChange={handleChange}
         onOpen={onMenuOpen}
