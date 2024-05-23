@@ -1,6 +1,7 @@
 = {page-component-title} {page-component-version} Documentation
 :toc:
 :toc-title:
+:url-apidoc: http://docs.axelor.com/{page-component-name}/{page-component-version}/javadoc
 
 Welcome to the {page-component-title} Documentation. Here you will find information
 and resources to help you learn about {page-component-title}.
@@ -16,5 +17,5 @@ xref:tutorial:index.adoc[Quick Tutorial]::
   to create your first application.
 xref:dev-guide:index.adoc[Developer Guide]::
   These topics describe how to use {page-component-title} as a developer.
-xref:javadoc[API Documentation]::
-  The {page-component-title} {page-component-version} javadoc api documentation.
+{url-apidoc}[API Documentation]::
+  The {page-component-title} {page-component-version} javadoc API documentation.
