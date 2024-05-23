@@ -627,7 +627,7 @@ public class Resource<T extends Model> {
 
   private static final int DEFAULT_EXPORT_MAX_SIZE = -1;
   private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
-  private static final boolean DEFAULT_EXPORT_COLLECTIONS_ENABLED =  false;
+  private static final boolean DEFAULT_EXPORT_COLLECTIONS_ENABLED = false;
   private static final String DEFAULT_EXPORT_COLLECTIONS_SEPARATOR = " | ";
 
   private static final int EXPORT_MAX_SIZE =
@@ -636,10 +636,15 @@ public class Resource<T extends Model> {
       AppSettings.get()
           .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
   private static final boolean EXPORT_COLLECTION_ENABLED =
-          AppSettings.get().getBoolean(AvailableAppSettings.DATA_EXPORT_COLLECTIONS_ENABLED, DEFAULT_EXPORT_COLLECTIONS_ENABLED);
+      AppSettings.get()
+          .getBoolean(
+              AvailableAppSettings.DATA_EXPORT_COLLECTIONS_ENABLED,
+              DEFAULT_EXPORT_COLLECTIONS_ENABLED);
   private static final String EXPORT_COLLECTION_SEPARATOR =
-          AppSettings.get()
-                  .get(AvailableAppSettings.DATA_EXPORT_COLLECTIONS_SEPARATOR, DEFAULT_EXPORT_COLLECTIONS_SEPARATOR);
+      AppSettings.get()
+          .get(
+              AvailableAppSettings.DATA_EXPORT_COLLECTIONS_SEPARATOR,
+              DEFAULT_EXPORT_COLLECTIONS_SEPARATOR);
 
   public Response export(Request request, Charset charset) {
     return export(request, charset, AppFilter.getLocale(), ';');
@@ -780,7 +785,8 @@ public class Resource<T extends Model> {
 
       while (iter.hasNext() && prop != null && !prop.isJson()) {
         prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
-        if (prop == null || !perms.canExport(AuthUtils.getUser(), prop.getEntity().getName(), prop.getName())) {
+        if (prop == null
+            || !perms.canExport(AuthUtils.getUser(), prop.getEntity().getName(), prop.getName())) {
           continue fieldsLoop;
         }
       }
@@ -850,8 +856,8 @@ public class Resource<T extends Model> {
       names.add(name);
       header.add(escapeCsv(title));
 
-      if (prop.isTranslatable() || (prop.isCollection()
-              && Mapper.of(prop.getTarget()).getNameField().isTranslatable())) {
+      if (prop.isTranslatable()
+          || (prop.isCollection() && Mapper.of(prop.getTarget()).getNameField().isTranslatable())) {
         translatableNames.add(name);
       }
     }
@@ -885,14 +891,25 @@ public class Resource<T extends Model> {
             List<String> parts = new ArrayList<>();
             String nameField = getMapper(mapper, field).getNameField().getName();
             for (Map<String, Object> itemVal : (List<Map<String, Object>>) objValue) {
-              parts.add(format(itemVal.get(nameField), translatableNames, formatter, names, index, bundle, selection));
+              parts.add(
+                  format(
+                      itemVal.get(nameField),
+                      translatableNames,
+                      formatter,
+                      names,
+                      index,
+                      bundle,
+                      selection));
             }
             strValue = Joiner.on(EXPORT_COLLECTION_SEPARATOR).join(parts);
           } else {
             if (objValue instanceof Map) {
-              objValue = ((Map<String, Object>) objValue).get(getMapper(mapper, field).getNameField().getName());
+              objValue =
+                  ((Map<String, Object>) objValue)
+                      .get(getMapper(mapper, field).getNameField().getName());
             }
-            strValue = format(objValue, translatableNames, formatter, names, index, bundle, selection);
+            strValue =
+                format(objValue, translatableNames, formatter, names, index, bundle, selection);
           }
 
           line.add(escapeCsv(strValue.toString()));
@@ -922,19 +939,26 @@ public class Resource<T extends Model> {
     return count;
   }
 
-  private String format(Object objValue, Set<String> translatableNames, L10n formatter, List<String> names, int index, ResourceBundle bundle, Map<Integer, Map<String, String>> selection) {
+  private String format(
+      Object objValue,
+      Set<String> translatableNames,
+      L10n formatter,
+      List<String> names,
+      int index,
+      ResourceBundle bundle,
+      Map<Integer, Map<String, String>> selection) {
     if (selection.containsKey(index)) {
       final Map sel = selection.get(index);
       objValue =
-              Arrays.stream(objValue.toString().split("\\s*,\\s*"))
-                      .map(
-                              part -> {
-                                Object val = sel.get(part);
-                                return ObjectUtils.isEmpty(val) ? part : val;
-                              })
-                      .filter(java.util.Objects::nonNull)
-                      .map(String::valueOf)
-                      .collect(Collectors.joining(", "));
+          Arrays.stream(objValue.toString().split("\\s*,\\s*"))
+              .map(
+                  part -> {
+                    Object val = sel.get(part);
+                    return ObjectUtils.isEmpty(val) ? part : val;
+                  })
+              .filter(java.util.Objects::nonNull)
+              .map(String::valueOf)
+              .collect(Collectors.joining(", "));
     }
 
     if (objValue instanceof String) {
