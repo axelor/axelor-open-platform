@@ -28,8 +28,12 @@ import { FieldViewer } from "./form-viewers";
 import { useWidget } from "./hooks";
 import { useFormScope } from "./scope";
 import {
-  FieldProps, FormState,
-  FormStateUpdater, ValueAtom, WidgetAtom, WidgetProps
+  FieldProps,
+  FormState,
+  FormStateUpdater,
+  ValueAtom,
+  WidgetAtom,
+  WidgetProps,
 } from "./types";
 
 type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
@@ -496,7 +500,8 @@ function useExpressions({
   ]);
 }
 
-function processSchema(schema: Schema) {
+function processSchema(_schema: Schema) {
+  const schema = { ..._schema };
   const {
     jsonField,
     contextField,
@@ -507,6 +512,10 @@ function processSchema(schema: Schema) {
     hideIf,
     requiredIf,
   } = schema;
+
+  if (jsonField && schema.valueExpr) {
+    schema.bind = schema.valueExpr;
+  }
 
   if (
     !jsonField ||
