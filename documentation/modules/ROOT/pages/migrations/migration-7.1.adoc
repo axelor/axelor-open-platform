@@ -161,5 +161,19 @@ should be migrated in React template :
 </Box>
 ----
 
+== `Model#cid`
+
+We added support to identify collection items from save/action response. In order to achieve this, we
+added an `cid` field in base abstract model class `Model`. This will cause conflicts with any entities already having an `cid` field. Update your entities if this is the case.
+
+== Others Notable Changes
+
+- Exclude archived M2O from selection : when M2O is used as a selection (`NavSelect` widget or in `Kanban#columnBy`), archived records are now excluded.
+- Move view collaboration to Axelor Enterprise Edition
+- Move SSO authentications to Axelor Enterprise Edition
+- Remove deprecated AppInfo in favor of InfoService
+
+Check the {product-version-changelog}[change log] for detailed list.
+
 
 
