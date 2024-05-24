@@ -5,6 +5,26 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 7.1
+
+The main highlights are :
+
+- Introduce Axelor Enterprise Edition containing SSO authentications and view collaboration features
+- Implement Drawing widget (ie Signature Pad)
+- Add support to expandable and tree-grid for collection fields or grid views
+- Allow to export collection fields when exporting lists
+- Add area/scatter/radar charts support
+- Add OpenAPI v3 specifications and embedded Swagger UI
+- Add support to search on collection fields in grid views
+- Add support to calendar event popover template
+- Add flags support on phone widgets (ie internationalization)
+- Improve phone/url/password/email widgets with quick actions icons
+- Add support to collapsed Kanban columns
+- Add support to hilite elements on calendar views
+
+Please check the {github-repo-url}/blob/7.1/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-7.1.adoc[7.1 migration guide].
+
 == 7.0
 
 The main highlights are :
