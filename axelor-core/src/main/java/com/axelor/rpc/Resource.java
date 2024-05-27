@@ -271,11 +271,6 @@ public class Resource<T extends Model> {
     return response;
   }
 
-  @Deprecated
-  public Response perms(Long id, String perm) {
-    return perms(perm, id);
-  }
-
   public Response perms(String perm, Long... ids) {
     Response response = new Response();
 
