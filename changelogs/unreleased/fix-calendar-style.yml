@@ -1,3 +1,6 @@
 ---
-title: Fix calendar chevrons on year dropdown
+title: Fix calendar year dropdown
 type: fix
+description: |
+  This add support to scrollable year dropdown (+/- 50 years) 
+  and display the upcoming/previous arrows.
