@@ -1,0 +1,6 @@
+---
+title: Merge response values from actions
+type: fix
+description: |
+  When a group of actions return values, instead of using 
+  the last action result, merge the values.

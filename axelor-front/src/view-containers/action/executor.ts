@@ -12,6 +12,8 @@ import { getActivePopups, getActiveTabId } from "@/layout/nav-tabs/utils";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as actionRequest } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
+import { DataRecord } from "@/services/client/data.types";
+import { updateRecord } from "@/services/client/data-utils";
 import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
@@ -33,12 +35,18 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
   const actionAttrResult: ActionResult["attrs"] = {};
   const otherResults: ActionResult[] = [];
 
+  function setValues(values: Partial<DataRecord>) {
+    actionValueResult = updateRecord(actionValueResult!, values);
+  }
+
   result.forEach((res) => {
     const { attrs, values, ...rest } = res;
     if (attrs) {
       Object.entries(attrs).forEach(([k, v]) => {
         if (v && typeof v === "object" && "value" in v) {
-          actionValueResult![k] = v.value;
+          setValues({
+            [k]: v.value,
+          });
         } else {
           actionAttrResult![k] = {
             ...actionAttrResult?.[k],
@@ -47,9 +55,11 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
         }
       });
     }
+
     if (values) {
-      actionValueResult = { ...actionValueResult, ...values };
+      setValues(values);
     }
+    
     if (!isEmpty(rest)) {
       otherResults.push(rest);
     }
