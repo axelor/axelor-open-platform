@@ -104,7 +104,14 @@ public class TenantFilter implements Filter {
     final Optional<String> sessionTenant =
         Optional.ofNullable(httpSession)
             .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
-    final String tenant = sessionTenant.or(() -> getRequestTenant(req)).orElse(null);
+    final String tenant =
+        sessionTenant
+            .or(() -> getRequestTenant(req))
+            .orElseGet(
+                () -> {
+                  final Map<String, String> tenants = TenantResolver.getTenants();
+                  return tenants.size() == 1 ? tenants.keySet().iterator().next() : null;
+                });
 
     final String target =
         isTenantRequest(req)
