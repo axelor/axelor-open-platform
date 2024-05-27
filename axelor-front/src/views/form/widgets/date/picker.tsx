@@ -89,7 +89,15 @@ export const Picker = forwardRef<
   );
 
   if (loaded) {
-    return <ReactDatePicker {...props} ref={ref} locale={locale} />;
+    return (
+      <ReactDatePicker
+        {...props}
+        ref={ref}
+        locale={locale}
+        yearDropdownItemNumber={50}
+        scrollableYearDropdown
+      />
+    );
   }
 
   return <ViewerInput value={textValue || ""} />;
