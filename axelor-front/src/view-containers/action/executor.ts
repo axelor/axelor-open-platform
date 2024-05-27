@@ -12,6 +12,7 @@ import { getActivePopups, getActiveTabId } from "@/layout/nav-tabs/utils";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as actionRequest } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
+import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
@@ -28,17 +29,49 @@ const executeAction: typeof actionRequest = async (options) => {
   return block(() => actionRequest(options).then(processActionResult));
 };
 
+function mergeValues(
+  prevValues: Partial<DataRecord>,
+  newValues: Partial<DataRecord>,
+) {
+  function merge(prev: any, curr: any): any {
+    if (Array.isArray(curr)) {
+      return curr.map((v: DataRecord) =>
+        merge(
+          prev?.find?.((p: DataRecord) => p.id === v.id),
+          v,
+        ),
+      );
+    }
+    if (curr && prev && typeof curr === "object") {
+      return {
+        ...Object.keys(curr).reduce(
+          (rec, k) => ({ ...rec, [k]: merge(prev[k], curr[k]) }),
+          prev as DataRecord,
+        ),
+      };
+    }
+    return curr;
+  }
+  return merge(prevValues, newValues);
+}
+
 const processActionResult = (result: ActionResult[]): ActionResult[] => {
   let actionValueResult: ActionResult["values"] = {};
   const actionAttrResult: ActionResult["attrs"] = {};
   const otherResults: ActionResult[] = [];
+
+  function setValues(values: Partial<DataRecord>) {
+    actionValueResult = mergeValues(actionValueResult!, values);
+  }
 
   result.forEach((res) => {
     const { attrs, values, ...rest } = res;
     if (attrs) {
       Object.entries(attrs).forEach(([k, v]) => {
         if (v && typeof v === "object" && "value" in v) {
-          actionValueResult![k] = v.value;
+          setValues({
+            [k]: v.value,
+          });
         } else {
           actionAttrResult![k] = {
             ...actionAttrResult?.[k],
@@ -47,9 +80,11 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
         }
       });
     }
+
     if (values) {
-      actionValueResult = { ...actionValueResult, ...values };
+      setValues(values);
     }
+
     if (!isEmpty(rest)) {
       otherResults.push(rest);
     }
