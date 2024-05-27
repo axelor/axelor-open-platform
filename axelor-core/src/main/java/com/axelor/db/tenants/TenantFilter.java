@@ -20,6 +20,7 @@ package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Singleton;
@@ -32,12 +33,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.shiro.web.util.WebUtils;
 
 @Singleton
 public class TenantFilter implements Filter {
 
   private static final String TENANT_COOKIE_NAME = "TENANT-ID";
+
+  private static final String TENANT_ATTRIBUTE_NAME = TENANT_COOKIE_NAME;
 
   private static final String TENANT_HEADER_NAME = "X-Tenant-ID";
 
@@ -83,21 +87,30 @@ public class TenantFilter implements Filter {
     }
   }
 
+  // When tenant comes from header/cookie, need to check it.
+  private Optional<String> getRequestTenant(HttpServletRequest req) {
+    return Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
+        .filter(StringUtils::notBlank)
+        .or(
+            () ->
+                Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
+                    .map(Cookie::getValue)
+                    .filter(StringUtils::notBlank))
+        .filter(tenant -> TenantResolver.getTenants().containsKey(tenant));
+  }
+
   private String currentTenant(HttpServletRequest req, HttpServletResponse res) {
-    final String tenant =
-        Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
-            .filter(StringUtils::notBlank)
-            .orElseGet(
-                () ->
-                    Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
-                        .map(Cookie::getValue)
-                        .filter(StringUtils::notBlank)
-                        .orElse(null));
+    final HttpSession httpSession = req.getSession(false);
+    final Optional<String> sessionTenant =
+        Optional.ofNullable(httpSession)
+            .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
+    final String tenant = sessionTenant.or(() -> getRequestTenant(req)).orElse(null);
 
     final String target =
         isTenantRequest(req)
             ? Optional.ofNullable(req.getParameter(TENANT_PARAM_NAME))
                 .filter(StringUtils::notBlank)
+                .filter(TenantResolver.getTenants()::containsKey)
                 .orElse(tenant)
             : tenant;
 
@@ -106,6 +119,10 @@ public class TenantFilter implements Filter {
     // is login or switch to another tenant
     if (isLoginSubmit(req) || switched) {
       setCookie(req, res, TENANT_COOKIE_NAME, target);
+    }
+
+    if (httpSession != null && (sessionTenant.isEmpty() && target != null || switched)) {
+      httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, target);
     }
 
     // redirect to home
