@@ -49,9 +49,8 @@ export function String({
 
   const [trValue, setTranslateValue] = useTranslationValue(props);
 
-  const endAdornment = useMemo(() => {
-    const elements = [
-      inputEndAdornment,
+  const translatableAdornment = useMemo(
+    () =>
       translatable && !readonly ? (
         <Translatable
           value={text}
@@ -59,7 +58,11 @@ export function String({
           onUpdate={setTranslateValue}
         />
       ) : undefined,
-    ].filter(Boolean);
+    [readonly, setTranslateValue, setValue, text, translatable],
+  );
+
+  const endAdornment = useMemo(() => {
+    const elements = [inputEndAdornment, translatableAdornment].filter(Boolean);
     return elements.length ? (
       <>
         {elements.map((element, index) => (
@@ -67,14 +70,7 @@ export function String({
         ))}
       </>
     ) : undefined;
-  }, [
-    inputEndAdornment,
-    readonly,
-    setTranslateValue,
-    setValue,
-    text,
-    translatable,
-  ]);
+  }, [inputEndAdornment, translatableAdornment]);
 
   return (
     <FieldControl {...props} className={clsx(styles.container)}>
@@ -83,6 +79,7 @@ export function String({
           name={schema.name}
           {...(inputProps?.type === "password" && { type: "password" })}
           value={trValue ?? text}
+          endAdornment={translatableAdornment}
         />
       ) : (
         <AdornedInput
