@@ -1,3 +1,28 @@
+## 7.0.8 (2024-05-27)
+
+#### Fix
+
+* Fix link button rendering styles
+* Fix update time in date-time widget
+* Fix icon position on form button widget
+* Fix check edit permission in grid details view
+* Fix refresh panel-dashlet on record navigation
+* Fix reset tree-view on reload
+* Fix trigger onChange on enter key in date picker
+* Fix missing colOffset support on form field
+* Fix set value on date field through action
+
+  <details>
+  
+  When user cleared the value manually through backspace/delete
+  After that if value is set through action then it should use/display
+  that value in date/datetime input.
+  
+  </details>
+
+* Fix dotted field target-name in tag-select widget
+* Fix fetch dotted fields in grid details view
+
 ## 7.0.7 (2024-04-08)
 
 #### Fix
