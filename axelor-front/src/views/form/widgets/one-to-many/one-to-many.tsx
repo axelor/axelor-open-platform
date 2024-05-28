@@ -517,8 +517,8 @@ function OneToManyInner({
   const orderBy = schema.orderBy ?? viewData?.view?.orderBy;
   const editable =
     !readonly &&
-    canEdit &&
     (schema.editable ?? widgetAttrs?.editable ?? viewData?.view?.editable);
+  const editableAndCanEdit = editable && canEdit;
 
   const formFields = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.fields), [formAtom]),
@@ -1260,7 +1260,10 @@ function OneToManyInner({
   const hasRowSelected = !!selectedRows?.length;
   const hasMasterDetails = toKebabCase(widget) === "master-detail";
   const editRecord =
-    editable && hasMasterDetails && editRow && rows?.[editRow?.[0]]?.record;
+    editableAndCanEdit &&
+    hasMasterDetails &&
+    editRow &&
+    rows?.[editRow?.[0]]?.record;
   const selected =
     editRecord ||
     ((selectedRows?.length ?? 0) > 0
@@ -1671,7 +1674,7 @@ function OneToManyInner({
               iconProps: {
                 icon: "add",
               },
-              onClick: editable && canEdit ? onAddInGrid : onAdd,
+              onClick: editable ? onAddInGrid : onAdd,
               hidden: !canNew,
             },
             {
@@ -1750,7 +1753,7 @@ function OneToManyInner({
                 showDeleteIcon: canDelete,
               })}
               readonly={readonly || !canEdit}
-              editable={editable && canEdit}
+              editable={editable && (canEdit || canNew)}
               records={records}
               expandable={expandable}
               expandableView={expandableView}
@@ -1773,13 +1776,13 @@ function OneToManyInner({
               onRowReorder={onRowReorder}
               onRowSelectionChange={onRowSelectionChange}
               {...(canNew && {
-                onNew: editable && canEdit ? handleAddInGrid : onAdd,
+                onNew: editableAndCanEdit ? handleAddInGrid : onAdd,
               })}
               {...(canDelete && {
                 onDelete: onDelete,
               })}
               {...(!canNew &&
-                editable && {
+                editableAndCanEdit && {
                   onRecordAdd: undefined,
                 })}
               {...(hasMasterDetails &&
@@ -1801,11 +1804,11 @@ function OneToManyInner({
         </GridExpandableContext.Provider>
         {hasMasterDetails && detailMeta ? (
           <Box d="flex" flexDirection="column" p={2}>
-            {(!editable || selected) && (
+            {(!editableAndCanEdit || selected) && (
               <ScopeProvider scope={MetaScope} value={detailMeta}>
                 <DetailsForm
                   meta={detailMeta}
-                  readonly={readonly || editable}
+                  readonly={readonly || editableAndCanEdit}
                   parent={formAtom}
                   record={detailRecord}
                   formAtom={gridRef.current?.form?.current?.formAtom}
