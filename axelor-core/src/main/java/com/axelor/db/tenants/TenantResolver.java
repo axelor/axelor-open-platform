@@ -62,7 +62,7 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
       final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
       for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
         if (!Boolean.FALSE.equals(config.getActive())
-                && (!onlyVisible || !Boolean.FALSE.equals(config.getVisible()))) {
+            && (!onlyVisible || !Boolean.FALSE.equals(config.getVisible()))) {
           map.put(config.getTenantId(), config.getTenantName());
         }
       }
