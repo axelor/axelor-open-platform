@@ -363,7 +363,7 @@ export const Grid = forwardRef<
   // cache expadable form in advance
   const { data: expandViewMeta } = useAsync(async () => {
     if (expandable) {
-      return typeof expandableView === "object"
+      return expandableView && typeof expandableView === "object"
         ? expandableView
         : await findView<FormView>({
             type: "form",
