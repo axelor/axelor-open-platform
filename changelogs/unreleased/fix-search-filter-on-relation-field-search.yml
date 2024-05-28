@@ -1,6 +1,0 @@
----
-title: Fix search filter on relation field search
-type: fix
-description: |
-  Search filter should exclude searching on `id` field.
-  Even if it's mentioned in targetSearch, it should be excluded.

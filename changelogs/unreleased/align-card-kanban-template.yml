@@ -1,7 +1,0 @@
----
-title: Align rendering and styles between card and kanban views
-type: change
-description: |
-  This align rendering and styles between card and kanban views. 
-  Mostly impact kanban views, some predefined styles as been removed 
-  in react template (img, h4). See migration notes.

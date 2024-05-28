@@ -1,3 +1,0 @@
----
-title: Don't add CSRF token header/cookie for native clients
-type: feature

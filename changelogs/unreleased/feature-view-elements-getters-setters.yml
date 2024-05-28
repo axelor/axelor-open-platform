@@ -1,6 +1,0 @@
----
-title: Add missing getters and setters for view element attributes
-type: feature
-description: |
-  Add missing getters and setters for view element attributes
-  in package `com.axelor.meta.schema.views`.

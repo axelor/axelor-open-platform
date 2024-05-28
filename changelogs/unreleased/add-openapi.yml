@@ -1,6 +1,0 @@
----
-title: Add OpenAPI v3 specifications and Swagger UI
-type: feature
-description: |
-  OpenAPI v3 specifications are available at `%URL%/ws/openapi`
-  Swagger UI is available at `%URL%/#/api-documentation`

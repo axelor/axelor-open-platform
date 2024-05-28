@@ -1,8 +1,0 @@
----
-title: Add support to export collections fields
-type: feature
-description: |
-  Collection fields can now be exported. This can be enabled using 
-  `data.export.collections.enabled` property. The default separator 
-  used is ` | `. This can be changed using `data.export.collections.separator` 
-  property.

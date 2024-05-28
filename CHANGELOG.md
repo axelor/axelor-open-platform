@@ -1,3 +1,510 @@
+## 7.1.0 (2024-05-28)
+
+#### Feature
+
+* Don't add CSRF token header/cookie for native clients
+* Implement phone widget with react-international-phone
+
+  <details>
+  
+  Widget is supported on form and grid view.
+  The phone widget renders the field as a phone number link in readonly mode,
+  and as a phone number input with a country/region selector in edit mode.
+  
+  Compared to implementation in previous front-end,
+  `x-custom-placeholder` option is no longer supported.
+  
+  </details>
+
+* Improve email pattern
+
+  <details>
+  
+  Allow to use any printable characters in local part.
+  Also remove upper limit on domain tld size.
+  
+  </details>
+
+* Disabled autocapitalize, autocorrect and spellcheck on login fields
+* Add view processors for processing views
+
+  <details>
+  
+  View processors allow to programmatically add view widgets.
+  They are automatically discovered on application startup,
+  and they are executed in module resolution order,
+  after finding view in `MetaService::findView`,
+  which is used by `view` API endpoint.
+  
+  Example:
+  
+  ```java
+  public class MyViewProcessor implements ViewProcessor {
+  
+    @Override
+    public void process(AbstractView view) {
+      // Do something to the `view`.
+    }
+  
+  }
+  ```
+  
+  </details>
+
+* Allow send emails in edit mode
+* Add prompt support on button link variant
+* Support calendar event popover template
+
+  <details>
+  
+  Example:
+  
+  ```xml
+    <calendar name="sales-timeline" title="Sales Timeline" model="com.axelor.sale.db.Order" editable="true"
+      eventStart="orderDate"
+      eventStop="confirmDate"
+      eventLength="8"
+      colorBy="customer">
+      <!-- All fields that should be fetched, ie. used in template -->
+      <field name="name" />
+      <field name="customer" />
+      <field name="orderDate" />
+      <field name="confirmDate" />
+      <!-- The template that will be displayed in the event popover -->
+      <template>
+        <![CDATA[
+        <>
+         <ul>
+           <li>{$fmt("customer")}</li>
+           <li>{$fmt("orderDate")}</li>
+           <li>{$fmt("confirmDate")}</li>
+         </ul>
+        </>
+        ]]>
+      </template>
+    </calendar>
+  ```
+  
+  </details>
+
+* Add search support on collection field in grid view
+
+  <details>
+  
+  This adds support to search if the target model as a target name available 
+  (ie namecolumn). Multi values search is also supported using ` | ` separator.
+  
+  </details>
+
+* Add attach files button in popup forms footer
+* Add support to use domain with custom fields on level >= 1
+
+  <details>
+  
+  This adds support to use following domain : `self.myM2O.attrs.myCustomFied = 'some'`. 
+  It was restricted to first level only.
+  
+  </details>
+
+* Add link action attrs support for button
+* Add expandable grid support
+
+  <details>
+  
+  Two types of expandable widgets are supported with collection field/grid view
+  
+  1.tree-grid (widget="tree-grid") (only supported on form collection field)
+  
+  ```xml
+    <panel-related
+      title="Items (Tree)"
+      readonlyIf="confirmed"
+      field="items"
+      form-view="order-line-form"
+      grid-view="order-line-grid"
+      editable="true"
+      onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+      widget="tree-grid"
+      x-tree-field="items"
+      x-tree-limit="2"
+      x-tree-field-title="Add new item"
+    >
+      <field name="product" onChange="action-order-line-change-product"/>
+      <field name="price" width="200" />
+      <field name="quantity" width="150" />
+    </panel-related>
+  ```
+  Options:
+  
+  - x-tree-field: used to define nested o2m field of order-line model (currently it's same as order object i.e. items)
+  - x-tree-limit (optional): used to specify limit to support nested tree structure.
+  - x-tree-field-title (optional): by default it uses main title for sub items heading (title will only display when item contains no-sub items)
+  - x-expand-all: in case of tree-grid, it's enabled by default, it uses x-tree-field value as x-expand-all value. To disable it, we can pass `x-expand-all="false"`
+  
+  Note: onChange action will only work on top-level collection grid, while other actions defined like onNew/onLoad will work on nested editable grid line as well.
+  
+  2.expandable (widget="expandable")
+  ```xml
+  <panel-related
+    title="Items (Expandable)"
+    readonlyIf="confirmed"
+    field="items"
+    form-view="order-line-form"
+    grid-view="order-line-grid"
+    editable="true"
+    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
+    widget="expandable"
+    summary-view="order-line-nested"
+    x-expand-all="items"
+  /> 
+  ```
+  
+  Options:
+  
+  - summary-view: used to define expandable form-view, if not specified then by default it will use form-view attribute.
+  - x-expand-all: to enable expand all feature, you have to specify comma-separated list of nested expandable collection field if any.
+  
+  Notes:
+  
+  Actions like onChange, onNew, onLoad will work as per schema definition defined in order-form or order-line-nested form.
+  Options like `x-tree-field`, `x-tree-limit`, `x-tree-field-title` have no impact in case of expandable widget.
+  If `widget`/`summary-view` are defined in specified grid-view, then it will automatically be used in panel-related, we don't need it to specify.
+  To disable it we can pass widget="one-to-many/many-to-many" depending on type of field.
+  
+  </details>
+
+* Allow open urls in edit mode
+* Don't store session for direct basic auth
+* Add support to fetch graph with save and fetch requests
+
+  <details>
+  
+  We can now pass `select` map to the `save` and `fetch` requests
+  to return object graph. If `fields` and `related` options are also
+  given, they will be merged with the graph.
+  
+  The format of the `select` map is as follow:
+  
+  ```json
+  {
+   ...
+   "select": {
+     "name": true,
+     "customer": {
+       "name": true
+     },
+     "items": {
+       "product": {
+         "name": true
+       },
+       "quantity": true
+       "price": true
+     }
+   }
+  }
+  ```
+  
+  </details>
+
+* Add scatter chart support
+* Add area chart support
+* Support hilites on calendar view
+
+  <details>
+  
+  Support <hilite> elements on calendar view to define hiliting rules.
+  
+  The hilite attributes are:
+    - if: boolean expression condition
+    - styles: comma-separated list of styles: fill (default), outline, stripe, strike, fade
+  
+  </details>
+
+* Add toggle password visibility feature
+
+  <details>
+  
+  On password fields, this add a toggle icon at the end of the input 
+  in order to effortlessly hides/reveals password for enhanced security 
+  and convenience.
+  
+  </details>
+
+* Add support to export collections fields
+
+  <details>
+  
+  Collection fields can now be exported. This can be enabled using 
+  `data.export.collections.enabled` property. The default separator 
+  used is ` | `. This can be changed using `data.export.collections.separator` 
+  property.
+  
+  </details>
+
+* Add call button link in phone widget edit mode
+* Add missing getters and setters for view element attributes
+
+  <details>
+  
+  Add missing getters and setters for view element attributes
+  in package `com.axelor.meta.schema.views`.
+  
+  </details>
+
+* Add support to identify collection items from save/action response
+
+  <details>
+  
+  The client can now set `cid` (collection id) to unsaved collection
+  items to identify the same from the `save` and `action` responses.
+  
+  </details>
+
+* Improve kanban UI/UX
+
+  <details>
+  
+  Kanban columns can now be collapsed. An 'x-collapse-columns' property
+  has been added, accepting a comma-separated list of column names that
+  should be collapsed by default (reference fields not supported). This 
+  comes with other visual changes such as pagination and minor fixes.
+  
+  </details>
+
+* Add radar chart support
+* Add drawing widget
+* Add OpenAPI v3 specifications and Swagger UI
+
+  <details>
+  
+  OpenAPI v3 specifications are available at `%URL%/ws/openapi`
+  Swagger UI is available at `%URL%/#/api-documentation`
+  
+  </details>
+
+#### Change
+
+* Upgrade Jackson from 2.15.3 to 2.17.1
+* Upgrade Guava from 32.1.3 to 33.2.0
+* Upgrade Gradle from 7.5.1 to 8.7
+
+  <details>
+  
+  This upgrade Gradle from 7.5.1 to 8.7.
+  
+  Upgrade the Gradle Wrapper to benefit from new features and improvements : 
+  `./gradlew wrapper --gradle-version 8.7`
+  
+  This also include upgrade of Gradle plugins used.
+  
+  </details>
+
+* Move view collaboration to Axelor Enterprise Edition
+* Upgrade Undertow from 2.2.28 to 2.2.32
+* Upgrade Woodstox from 6.5.1 to 6.6.2
+* Load Monaco editor resources from local instead of from CDN
+* Upgrade Redisson from 3.19.3 to 3.29.0
+* Re-introduce multi-tenancy support
+
+  <details>
+  
+  Clients without session support (e.g. basic auth) should provide `X-Tenant-ID` header
+  with every requests to select a tenant.
+  
+  Clients with session support should send `X-Tenant-ID` header with login request.
+  
+  </details>
+
+* Upgrade PostgreSQL JDBC from 42.7.2 to 42.7.3
+* Upgrade ASM from 9.6 to 9.7
+* Upgrade Apache Commons CLI from 1.6.0 to 1.7.0
+* Upgrade Apache Commons CSV from 1.10.0 to 1.11.0
+* Update fullcalendar from v6.1.9 to v6.1.11
+* copyWebapp Gradle task excludes hidden files only
+
+  <details>
+  
+  copyWebapp Gradle task used to exclude development files used by previous axelor-web front-end.
+  Now, it excludes hidden files only.
+  
+  </details>
+
+* Upgrade Junit5 from 5.10.1 to 5.10.2
+* Upgrade Apache Commons IO from 2.15.1 to 2.16.1
+* Upgrade Jsoup from 1.17.1 to 1.17.2
+* Upgrade pac4j from 5.7.2 to 5.7.4
+* Upgrade SLF4J from 2.0.9 to 2.0.13
+* Move SSO authentications to Axelor Enterprise Edition
+* Upgrade Apache Tika from 2.9.1 to 2.9.2
+* Upgrade Tomcat from 9.0.84 to 9.0.88
+* Upgrade Groovy from 3.0.20 to 3.0.21
+* Upgrade Byte Buddy from 1.14.11 to 1.14.14
+* Upgrade Hazelcast from 5.3.6 to 5.3.7
+* Upgrade Infinispan from 13.0.21 to 13.0.22
+* Upgrade Ldaptive from 2.2.0 to 2.3.2
+* Upgrade Snakeyaml from 1.33 to 2.2
+* Align rendering and styles between card and kanban views
+
+  <details>
+  
+  This align rendering and styles between card and kanban views. 
+  Mostly impact kanban views, some predefined styles as been removed 
+  in react template (img, h4). See migration notes.
+  
+  </details>
+
+#### Remove
+
+* Remove ability to switch tenants after authentication
+
+  <details>
+  
+  At the initial stage of the multi-tenant implementation, it was allowed 
+  for a user to switch tenant. It was a convenient for testing and debugging.
+  At this point it doesn't seems to good option anymore, due to security risk 
+  and goal of multi-tenant. So the feature has been removed and no replacement 
+  is expected. `db.%tenant%.roles` property has been removed.
+  
+  </details>
+
+* Remove deprecated AppInfo in favor of InfoService
+* Remove unused expandable attribute from grid view
+
+#### Fix
+
+* Fix search filter on relation field search
+
+  <details>
+  
+  Search filter should exclude searching on `id` field.
+  Even if it's mentioned in targetSearch, it should be excluded.
+  
+  </details>
+
+* Fix mass update on selection fields
+* Fix link button rendering styles
+* Fix valueExpr support for custom field
+* Fix update time in date-time widget
+* Fix icon position on form button widget
+* Fix calendar popover and mail message title locale time formatting
+* Fix generateCode circular dependency on self
+* Fix check edit permission in grid details view
+* Fix refresh panel-dashlet on record navigation
+* Fix reset tree-view on reload
+* Fix exclude colorField for search criteria in tag-select widget
+* Fix missing html support on form field title
+* Fix trigger onChange on enter key in date picker
+* Fix missing colOffset support on form field
+* Fix relation field popup selection conflicts in popper
+
+  <details>
+  
+  When relational field is searched using popup in advanced search
+  or in mass update popper, the popper should remain open and should
+  not affect any click event happens in selector popup wizard.
+  
+  </details>
+
+* Fix technical information support on dashlet
+* Exclude non string type fields from search fields
+* Fix grid view search on limit change in pagination
+
+  <details>
+  
+  When we have already search on some columns in grid view then
+  if try to change limit in pagination(pager) then it is sending
+  payload without searched criteria.
+  
+  </details>
+
+* Fix set value on date field through action
+
+  <details>
+  
+  When user cleared the value manually through backspace/delete
+  After that if value is set through action then it should use/display
+  that value in date/datetime input.
+  
+  </details>
+
+* Fix update gantt taskEnd when it's defined
+* Exclude archived M2O from selection
+
+  <details>
+  
+  When M2O is used as a selection (`NavSelect` widget or in `Kanban#columnBy`), exclude archived records.
+  
+  </details>
+
+* Fix select input text on focus attribute in form field
+
+  <details>
+  
+  When focus is set through action-attrs, select input text.
+  
+  </details>
+
+* Add missing customize feature on collection fields
+* Allow saving new record if user has create but no write permission
+* Disable progress when taskProgress is not defined in gantt view
+* Fix parent support in form field tooltip
+* Fix dirty form handling after grid button action
+
+  <details>
+  
+  This fixes dirty form handling for both editable and non-editable grid.
+  
+  </details>
+
+* Fix button colors in view toolbar
+* Add missing tooltip on wkf widget
+* Fix calendar year dropdown
+
+  <details>
+  
+  This add support to scrollable year dropdown (+/- 50 years) 
+  and display the upcoming/previous arrows.
+  
+  </details>
+
+* Fix dotted field target-name in tag-select widget
+* Fix fetch dotted fields in grid details view
+* Fix dragging grid row with parent container scroll
+
+  <details>
+  
+  If parent container has a scroll, it create dragging row issue : 
+  the dragging element isn't at the right position. wheel scroll is 
+  now disabled to avoid unexpected behavior.
+  
+  </details>
+
+* Fix relation field multiple selection in advanced search
+* Fix perms endpoint without id
+
+  <details>
+  
+  If permission is found, access should be granted in case of no id.
+  Without id, `AuthSecurity::isPermitted` had ids `[null]` and access was granted
+  if permission filter result count happened to equal 1.
+  
+  </details>
+
+#### Security
+
+* Fix links to cross-origin destinations
+* Fix checking permissions on export
+
+  <details>
+  
+  When exporting data, it should check permissions on each fields. 
+  For example, when exporting `currency.symbol`, it should first check 
+  if user can export `currency` field in `Order` entity, then if user 
+  can export `symbol` field on `Currency` entity.
+  
+  </details>
+
+
 ## 7.0.6 (2024-04-05)
 
 #### Fix

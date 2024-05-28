@@ -1,8 +1,0 @@
----
-title: Fix checking permissions on export
-type: security
-description: |
-  When exporting data, it should check permissions on each fields. 
-  For example, when exporting `currency.symbol`, it should first check 
-  if user can export `currency` field in `Order` entity, then if user 
-  can export `symbol` field on `Currency` entity.

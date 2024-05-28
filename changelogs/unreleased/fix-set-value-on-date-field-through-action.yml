@@ -1,7 +1,0 @@
----
-title: Fix set value on date field through action
-type: fix
-description: |
-  When user cleared the value manually through backspace/delete
-  After that if value is set through action then it should use/display
-  that value in date/datetime input.

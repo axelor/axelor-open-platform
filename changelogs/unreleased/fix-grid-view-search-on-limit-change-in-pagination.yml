@@ -1,7 +1,0 @@
----
-title: Fix grid view search on limit change in pagination
-type: fix
-description: |
-  When we have already search on some columns in grid view then
-  if try to change limit in pagination(pager) then it is sending
-  payload without searched criteria.
