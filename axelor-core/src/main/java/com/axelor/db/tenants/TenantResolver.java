@@ -18,8 +18,6 @@
  */
 package com.axelor.db.tenants;
 
-import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.User;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
@@ -58,14 +56,11 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
     final Map<String, String> map = new LinkedHashMap<>();
     if (enabled) {
       final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
-      final User user = AuthUtils.getUser();
       for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
         if (Boolean.FALSE.equals(config.getActive()) || Boolean.FALSE.equals(config.getVisible())) {
           continue;
         }
-        if (user == null || provider.hasAccess(user, config)) {
-          map.put(config.getTenantId(), config.getTenantName());
-        }
+        map.put(config.getTenantId(), config.getTenantName());
       }
     }
     return map;

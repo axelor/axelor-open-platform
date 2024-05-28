@@ -21,7 +21,6 @@ package com.axelor.db.tenants;
 import com.axelor.common.StringUtils;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
@@ -34,7 +33,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.shiro.web.util.WebUtils;
+import org.pac4j.core.context.HttpConstants;
 
 @Singleton
 public class TenantFilter implements Filter {
@@ -45,11 +44,7 @@ public class TenantFilter implements Filter {
 
   private static final String TENANT_HEADER_NAME = "X-Tenant-ID";
 
-  private static final String TENANT_PARAM_NAME = "id";
-
   private static final String PATH_CALLBACK = "/callback";
-
-  private static final String PATH_TENANT = "/tenant";
 
   private boolean enabled;
 
@@ -78,9 +73,12 @@ public class TenantFilter implements Filter {
     final HttpServletResponse res = (HttpServletResponse) response;
 
     TenantResolver.CURRENT_HOST.set(req.getHeader("Host"));
-    TenantResolver.CURRENT_TENANT.set(currentTenant(req, res));
+
     try {
+      TenantResolver.CURRENT_TENANT.set(currentTenant(req, res));
       chain.doFilter(request, response);
+    } catch (MissingTenantException e) {
+      res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     } finally {
       TenantResolver.CURRENT_HOST.remove();
       TenantResolver.CURRENT_TENANT.remove();
@@ -99,7 +97,8 @@ public class TenantFilter implements Filter {
         .filter(tenant -> TenantResolver.getTenants().containsKey(tenant));
   }
 
-  private String currentTenant(HttpServletRequest req, HttpServletResponse res) {
+  private String currentTenant(HttpServletRequest req, HttpServletResponse res)
+      throws MissingTenantException {
     final HttpSession httpSession = req.getSession(false);
     final Optional<String> sessionTenant =
         Optional.ofNullable(httpSession)
@@ -112,44 +111,21 @@ public class TenantFilter implements Filter {
                   final Map<String, String> tenants = TenantResolver.getTenants();
                   return tenants.size() == 1 ? tenants.keySet().iterator().next() : null;
                 });
+    final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
 
-    final String target =
-        isTenantRequest(req)
-            ? Optional.ofNullable(req.getParameter(TENANT_PARAM_NAME))
-                .filter(StringUtils::notBlank)
-                .filter(TenantResolver.getTenants()::containsKey)
-                .orElse(tenant)
-            : tenant;
-
-    final boolean switched = !Objects.equals(target, tenant);
-
-    // is login or switch to another tenant
-    if (isLoginSubmit(req) || switched) {
-      setCookie(req, res, TENANT_COOKIE_NAME, target);
+    if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
+      throw new MissingTenantException();
     }
 
-    if (httpSession != null && (sessionTenant.isEmpty() && target != null || switched)) {
-      httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, target);
+    if (isLogin) {
+      setCookie(req, res, TENANT_COOKIE_NAME, tenant);
     }
 
-    // redirect to home
-    if (switched) {
-      try {
-        WebUtils.issueRedirect(req, res, "/");
-      } catch (IOException e) {
-      }
+    if (httpSession != null && sessionTenant.isEmpty() && tenant != null) {
+      httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
     }
 
-    return target;
-  }
-
-  private boolean isTenantRequest(HttpServletRequest request) {
-    return PATH_TENANT.equals(request.getServletPath());
-  }
-
-  private boolean isLoginSubmit(HttpServletRequest request) {
-    return PATH_CALLBACK.equals(request.getServletPath())
-        && "POST".equalsIgnoreCase(request.getMethod());
+    return tenant;
   }
 
   private Cookie getCookie(HttpServletRequest request, String name) {

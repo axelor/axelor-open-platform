@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-The {page-component-title} v5 has added https://en.wikipedia.org/wiki/Multitenancy[multi-tenancy] support.
+{page-component-title} has https://en.wikipedia.org/wiki/Multitenancy[multi-tenancy] support.
 The term multi-tenancy refers to a software architecture in which a single instance of software runs
 on a server and serves multiple tenants. A tenant is a group of users who share common access with
 specific privileges to the software instance.
@@ -31,21 +31,20 @@ db.default.password =
 
 db.db1.name = DB1 <4>
 db.db1.hosts = host1,host1:8080 <5>
-db.db1.roles = admin <6>
 db.db1.driver = org.postgresql.Driver
 db.db1.url = jdbc:postgresql://localhost:5432/open-platform-demo-db1
 db.db1.user = axelor
 db.db1.password =
 
 db.db2.name = DB2
-db.db2.hosts = host1,host1:8080
+db.db2.hosts = host2,host2:8080
 db.db2.driver = org.postgresql.Driver
 db.db2.url = jdbc:postgresql://localhost:5432/open-platform-demo-db2
 db.db2.user = axelor
 db.db2.password =
 
 db.db3.name = DB3
-db.db3.hosts = host1,host1:8080,host2,host2:8080
+db.db3.hosts = host3,host3:8080
 db.db3.driver = org.postgresql.Driver
 db.db3.url = jdbc:postgresql://localhost:5432/open-platform-demo-db3
 db.db3.user = axelor
@@ -55,11 +54,9 @@ db.db3.password =
 <2> the default database should be invisible as it's a fallback
 <3> only default database supports DDL operations, schema for other tenants should be created manually
 <4> display name of the tenant
-<5> roles filter, only users with those roles can access these tenants
-<6> host name based filter, the tenant is accessible from those hosts only
+<5> host name based filter, users can only access one tenant in case of hosts match
 
-The default tenant is required and will be used in case the app is unable to resolve tenant id
-for some reason. So the default tenant should not be used for anything but demo/fallback purpose.
+The default tenant is required and used for all unauthenticated requests.
 
 == Customization
 

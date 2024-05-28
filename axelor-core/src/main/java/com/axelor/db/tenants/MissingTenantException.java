@@ -18,19 +18,11 @@
  */
 package com.axelor.db.tenants;
 
-import com.axelor.app.AppSettings;
-import java.util.List;
+public class MissingTenantException extends Exception {
 
-/** The default {@link TenantConfigProvider} implementation. */
-public class TenantConfigProviderImpl implements TenantConfigProvider {
+  private static final long serialVersionUID = 8196156624484011220L;
 
-  @Override
-  public TenantConfig find(String tenantId) {
-    return TenantConfigImpl.findById(AppSettings.get().getProperties(), tenantId);
-  }
-
-  @Override
-  public List<TenantConfig> findAll(String host) {
-    return TenantConfigImpl.findByHost(AppSettings.get().getProperties(), host);
+  public MissingTenantException() {
+    super("Tenant identifier is missing from request");
   }
 }

@@ -1,0 +1,9 @@
+---
+title: Remove ability to switch tenants after authentication
+type: remove
+description: |
+  At the initial stage of the multi-tenant implementation, it was allowed 
+  for a user to switch tenant. It was a convenient for testing and debugging.
+  At this point it doesn't seems to good option anymore, due to security risk 
+  and goal of multi-tenant. So the feature has been removed and no replacement 
+  is expected. `db.%tenant%.roles` property has been removed.

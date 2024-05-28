@@ -278,44 +278,6 @@ function FarItems() {
 
   const showEditor = useEditor();
 
-  const tenantItems = useMemo(() => {
-    const current = data?.authentication?.tenant;
-    const tenants = Object.entries(data?.authentication?.tenants ?? {}).map(
-      ([name, title]) => ({
-        name,
-        title,
-      }),
-    );
-
-    const tenant = tenants.find((x) => x.name === current);
-    const items: CommandItemProps[] = [
-      {
-        key: "tenant",
-        text: tenant?.title,
-      },
-    ];
-
-    if (tenants.length > 1) {
-      items[0].items = tenants.map((x) => ({
-        key: x.name,
-        text: x.title,
-        disabled: x.name === current,
-        onClick: () => {
-          window.location.href = `tenant?id=${x.name}`;
-        },
-      }));
-
-      items.push({
-        key: "d-tenant",
-        divider: true,
-      });
-
-      return items;
-    }
-
-    return [];
-  }, [data?.authentication?.tenant, data?.authentication?.tenants]);
-
   const showPreferences = useCallback(() => {
     showEditor({
       model: "com.axelor.auth.db.User",
@@ -426,7 +388,6 @@ function FarItems() {
               key: "d-person",
               divider: true,
             },
-            ...tenantItems,
             {
               key: "shortcuts",
               text: i18n.get("Shortcuts"),

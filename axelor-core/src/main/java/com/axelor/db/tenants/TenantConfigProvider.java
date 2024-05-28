@@ -18,7 +18,6 @@
  */
 package com.axelor.db.tenants;
 
-import com.axelor.auth.db.User;
 import com.google.inject.ImplementedBy;
 import java.util.List;
 
@@ -41,13 +40,4 @@ public interface TenantConfigProvider {
    * @return list of all {@link TenantConfig} matching the given hostname
    */
   List<TenantConfig> findAll(String host);
-
-  /**
-   * Check whether the user has permission to use given tenant.
-   *
-   * @param user the user to check
-   * @param config the tenant configuration to check
-   * @return true if user can user this tenant false otherwise
-   */
-  boolean hasAccess(User user, TenantConfig config);
 }
