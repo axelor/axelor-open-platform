@@ -27,6 +27,7 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
@@ -122,8 +123,14 @@ public class InfoService extends AbstractService {
         tenantIds.contains(tenantId) ? tenantId : tenantIds.stream().findFirst().orElse(null);
 
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());
-    map.put("tenants", tenants);
-    map.put("tenant", tenant);
+
+    if (ObjectUtils.notEmpty(tenants)) {
+      map.put("tenants", tenants);
+    }
+
+    if (StringUtils.notBlank(tenant)) {
+      map.put("tenant", tenant);
+    }
 
     return map;
   }

@@ -97,7 +97,7 @@ public class TenantFilter implements Filter {
                     : Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
                         .map(Cookie::getValue)
                         .filter(StringUtils::notBlank))
-        .filter(tenant -> TenantResolver.getTenants().containsKey(tenant));
+        .filter(tenant -> TenantResolver.getTenants(false).containsKey(tenant));
   }
 
   private String currentTenant(HttpServletRequest req, HttpServletResponse res)
@@ -112,7 +112,7 @@ public class TenantFilter implements Filter {
             .or(() -> getRequestTenant(req, isLogin))
             .orElseGet(
                 () -> {
-                  final Map<String, String> tenants = TenantResolver.getTenants();
+                  final Map<String, String> tenants = TenantResolver.getTenants(false);
                   return tenants.size() == 1 ? tenants.keySet().iterator().next() : null;
                 });
 

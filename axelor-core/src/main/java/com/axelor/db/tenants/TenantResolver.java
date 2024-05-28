@@ -53,14 +53,18 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
   }
 
   public static Map<String, String> getTenants() {
+    return getTenants(true);
+  }
+
+  public static Map<String, String> getTenants(boolean onlyVisible) {
     final Map<String, String> map = new LinkedHashMap<>();
     if (enabled) {
       final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
       for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
-        if (Boolean.FALSE.equals(config.getActive()) || Boolean.FALSE.equals(config.getVisible())) {
-          continue;
+        if (!Boolean.FALSE.equals(config.getActive())
+                && (!onlyVisible || !Boolean.FALSE.equals(config.getVisible()))) {
+          map.put(config.getTenantId(), config.getTenantName());
         }
-        map.put(config.getTenantId(), config.getTenantName());
       }
     }
     return map;

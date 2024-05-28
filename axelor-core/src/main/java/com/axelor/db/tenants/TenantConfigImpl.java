@@ -22,6 +22,7 @@ import com.axelor.common.StringUtils;
 import com.google.common.base.MoreObjects;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,9 +86,14 @@ public class TenantConfigImpl implements TenantConfig {
     for (String key : props.keySet()) {
       Matcher matcher = PATTERN_DB_NAME.matcher(key);
       if (matcher.matches()) {
-        String tenantId = matcher.group(1);
-        if (matches(props, tenantId, host)) {
-          all.add(findById(props, matcher.group(1)));
+        final String tenantId = matcher.group(1);
+        final String hosts = getHosts(props, tenantId);
+
+        if (StringUtils.isBlank(hosts)) {
+          all.add(findById(props, tenantId));
+        } else if (Arrays.asList(hosts.split("\\s*,\\s*")).contains(host)) {
+          // Resolve single tenant in case of hosts match.
+          return Collections.singletonList(findById(props, tenantId));
         }
       }
     }
@@ -141,10 +147,14 @@ public class TenantConfigImpl implements TenantConfig {
     return cfg;
   }
 
-  private static boolean matches(Map<String, String> props, String tenantId, String host) {
+  private static String getHosts(Map<String, String> props, String tenantId) {
     final String key = "db." + tenantId + ".hosts";
-    final String hosts = props.getOrDefault(key, "");
-    return StringUtils.isBlank(hosts) || Arrays.asList(hosts.split(",")).contains(host);
+    return props.getOrDefault(key, "");
+  }
+
+  private static boolean matches(Map<String, String> props, String tenantId, String host) {
+    final String hosts = getHosts(props, tenantId);
+    return StringUtils.isBlank(hosts) || Arrays.asList(hosts.split("\\s*,\\s*")).contains(host);
   }
 
   private static String get(Map<String, String> props, String prefix, String name) {
