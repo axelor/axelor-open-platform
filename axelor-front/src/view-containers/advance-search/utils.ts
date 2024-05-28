@@ -467,3 +467,16 @@ export function prepareAdvanceSearchQuery(
     },
   };
 }
+
+export function getExportFieldNames(items?: (Widget | GridColumn)[]) {
+  return (
+    items
+      ?.filter(
+        (item) =>
+          item.name &&
+          (item as GridColumn).visible !== false &&
+          (item as GridColumn).searchable !== false,
+      )
+      .map((item) => item.name!) ?? []
+  );
+}

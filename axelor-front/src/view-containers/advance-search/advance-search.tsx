@@ -45,6 +45,7 @@ import { FilterList } from "./filter-list";
 import { AdvancedSearchState } from "./types";
 import {
   findContextField,
+  getExportFieldNames,
   getFreeSearchCriteria,
   prepareAdvanceSearchQuery,
 } from "./utils";
@@ -377,14 +378,7 @@ export function AdvanceSearch({
       if (exportFull) {
         options.fields = [];
       } else if (items) {
-        options.fields = items
-          ?.filter(
-            (item) =>
-              item.name &&
-              (item as GridColumn).visible !== false &&
-              (item as GridColumn).searchable !== false,
-          )
-          .map((item) => item.name) as string[];
+        options.fields = getExportFieldNames(items);
       }
 
       dataStore.export(options).then(({ exportSize, fileName }) => {

@@ -11,13 +11,14 @@ import { i18n } from "@/services/client/i18n";
 import { CardsView, ChartView, GridView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { download } from "@/utils/download";
+import { getExportFieldNames } from "@/view-containers/advance-search/utils";
 import {
   DashletHandler,
   useDashletHandlerAtom,
 } from "@/view-containers/view-dashlet/handler";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { useViewTabRefresh } from "@/view-containers/views/scope";
-import { useFormRefresh, useFormActiveHandler } from "../../builder/scope";
+import { useFormActiveHandler, useFormRefresh } from "../../builder/scope";
 
 import classes from "./dashlet-actions.module.scss";
 
@@ -196,9 +197,7 @@ function DashletListMenu(
         const options: SearchOptions = {};
         if (gridStateAtom) {
           const { columns } = get(gridStateAtom);
-          options.fields = columns
-            .filter((c) => c.type === "field" && c.visible !== false)
-            .map((c) => c.name);
+          options.fields = getExportFieldNames(columns);
         }
         const { fileName } = await dataStore.export(options);
         download(

@@ -53,6 +53,7 @@ import {
 import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
+import { getExportFieldNames } from "@/view-containers/advance-search/utils";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
 import { Grid as GridComponent, GridHandler } from "@/views/grid/builder";
@@ -807,9 +808,7 @@ function OneToManyInner({
           (column) => `${column.order === "desc" ? "-" : ""}${column.name}`,
         ),
       }),
-      fields: state.columns
-        .filter((c) => c.type === "field" && c.visible !== false)
-        .map((c) => c.name),
+      fields: getExportFieldNames(state.columns),
     });
     download(
       `ws/rest/${dataStore.model}/export/${fileName}?fileName=${fileName}`,
