@@ -38,9 +38,9 @@ import org.pac4j.core.context.HttpConstants;
 @Singleton
 public class TenantFilter implements Filter {
 
-  private static final String TENANT_COOKIE_NAME = "TENANT-ID";
+  private static final String TENANT_COOKIE_NAME = "LAST-TENANT-ID";
 
-  private static final String TENANT_ATTRIBUTE_NAME = TENANT_COOKIE_NAME;
+  private static final String TENANT_ATTRIBUTE_NAME = "TENANT-ID";
 
   private static final String TENANT_HEADER_NAME = "X-Tenant-ID";
 
@@ -86,14 +86,17 @@ public class TenantFilter implements Filter {
   }
 
   // When tenant comes from header/cookie, need to check it.
-  private Optional<String> getRequestTenant(HttpServletRequest req) {
+  // For login, consider header only.
+  private Optional<String> getRequestTenant(HttpServletRequest req, boolean isLogin) {
     return Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
         .filter(StringUtils::notBlank)
         .or(
             () ->
-                Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
-                    .map(Cookie::getValue)
-                    .filter(StringUtils::notBlank))
+                isLogin
+                    ? Optional.empty()
+                    : Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
+                        .map(Cookie::getValue)
+                        .filter(StringUtils::notBlank))
         .filter(tenant -> TenantResolver.getTenants().containsKey(tenant));
   }
 
@@ -103,15 +106,15 @@ public class TenantFilter implements Filter {
     final Optional<String> sessionTenant =
         Optional.ofNullable(httpSession)
             .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
+    final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
     final String tenant =
         sessionTenant
-            .or(() -> getRequestTenant(req))
+            .or(() -> getRequestTenant(req, isLogin))
             .orElseGet(
                 () -> {
                   final Map<String, String> tenants = TenantResolver.getTenants();
                   return tenants.size() == 1 ? tenants.keySet().iterator().next() : null;
                 });
-    final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
 
     if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
       throw new MissingTenantException();

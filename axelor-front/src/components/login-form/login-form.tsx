@@ -72,7 +72,9 @@ export function LoginForm({
   const handleTenantChange = useCallback(
     (value?: { name: string; title: string } | null) => {
       const id = value?.name ?? "";
-      setTenantId(id);
+      if (id) {
+        setTenantId(id);
+      }
     },
     [],
   );
@@ -221,6 +223,7 @@ export function LoginForm({
                 optionKey={(x) => x.name}
                 optionLabel={(x) => x.title}
                 onChange={handleTenantChange}
+                clearIcon={false}
               />
             </Box>
           )}
