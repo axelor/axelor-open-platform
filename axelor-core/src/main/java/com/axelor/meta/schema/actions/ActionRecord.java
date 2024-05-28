@@ -21,11 +21,13 @@ package com.axelor.meta.schema.actions;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
+import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Context;
 import com.axelor.rpc.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,8 +120,17 @@ public class ActionRecord extends Action {
     if (StringUtils.isBlank(getName())) {
       result = evaluate(handler, map);
     } else {
-      handler.checkPermission(
-          hasRealFields() ? JpaSecurity.CAN_WRITE : JpaSecurity.CAN_READ, getModel());
+      final AccessType accessType;
+      if (hasRealFields()) {
+        final Context context = handler.getContext();
+        accessType =
+            context != null && context.get("id") != null
+                ? JpaSecurity.CAN_WRITE
+                : JpaSecurity.CAN_CREATE;
+      } else {
+        accessType = JpaSecurity.CAN_READ;
+      }
+      handler.checkPermission(accessType, getModel());
       handler.firePreEvent(getName());
       result = evaluate(handler, map);
       handler.firePostEvent(getName(), result instanceof ActionResponse ? result : map);
