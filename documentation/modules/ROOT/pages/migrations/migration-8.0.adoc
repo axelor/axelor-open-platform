@@ -733,6 +733,31 @@ What this means:
 - Any remaining Angular-based templates or evaluations will stop working once this removal takes place.
 - To ensure a smooth upgrade path, please migrate your codebase to React as soon as possible.
 
+== Remove $record support for custom field expression like showIf/hideIf etc
+
+Previously, for custom fields we used the `$record` prefix to access form fields (e.g., `$record.name`) in `showIf`/`hideIf` expressions.
+Now, form fields are directly accessible without the prefix, as `$record` support has been removed.
+
+Also, scoped fields are not directly accessible. For example, if you have a custom field named `test` inside `attrs` and want to use it in an expression for another field within the `attrs` scope,
+you need to reference it as `$attrs.test`.
+
+**Before:**
+```jsx
+<field name="attrs.test" showIf="$record.id && $record.name" />
+<field name="attrs.testFrom" showIf="test" /> // showIf attrs.test is set
+```
+
+**Now:**
+```jsx
+<field name="attrs.test" showIf="id && name" />
+<field name="attrs.testFrom" showIf="$attrs.test" />
+```
+
+**Key changes:**
+
+* Removed support for the `$record` prefix usage in custom field expression.
+* Expressions are now unified and work consistently across both form fields and custom fields.
+
 == Dropped deprecated features
 
 Some features that were marked as deprecated in previous versions are now dropped :

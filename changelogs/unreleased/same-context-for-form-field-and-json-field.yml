@@ -1,0 +1,7 @@
+---
+title: Same context for form field and json field
+type: fix
+description: |
+  With this change custom field and form field are accessible through
+  same way i.e. form field can be directly be access and custom field are 
+  accessed like $attr.customFieldName in both kind of fields.

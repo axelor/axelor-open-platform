@@ -876,6 +876,22 @@ export function FormRecordUpdates({
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
+  const jsonModel = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(
+          formAtom,
+          (form) => form.model === "com.axelor.meta.db.MetaJsonRecord",
+        ),
+      [formAtom],
+    ),
+  );
+  const json = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (form) => form.meta?.view?.json),
+      [formAtom],
+    ),
+  );
   const { action } = useViewTab();
 
   const getFormState = useAtomCallback(
@@ -898,7 +914,15 @@ export function FormRecordUpdates({
         {
           ...processContextValues(action.context ?? {}),
           ...treeFormRecord,
-          ...record,
+          ...(json
+            ? (() => {
+                if (jsonModel) {
+                  const { $record, ...jsonRecord } = record;
+                  return { ...$record, ...jsonRecord };
+                }
+                return record.$record;
+              })()
+            : record),
         },
         {
           fields: fields as unknown as EvalContextOptions["fields"],
@@ -906,7 +930,16 @@ export function FormRecordUpdates({
         },
       ),
     );
-  }, [action.context, treeFormRecord, fields, readonly, record, recordHandler]);
+  }, [
+    action.context,
+    treeFormRecord,
+    json,
+    jsonModel,
+    fields,
+    readonly,
+    record,
+    recordHandler,
+  ]);
 
   const notify = useAfterActions(
     useCallback(async () => {
