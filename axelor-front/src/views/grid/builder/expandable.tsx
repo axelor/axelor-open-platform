@@ -15,11 +15,13 @@ import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+import { usePerms } from "@/hooks/use-perms";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { diff, extractDummy } from "@/services/client/data-utils";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 
@@ -75,6 +77,8 @@ export function ExpandableFormView({
   const { selectAtom: selectStateAtom } = useGridExpandableContext();
   const { id: tabId } = useViewTab();
   const setSelectState = useSetAtom(selectStateAtom);
+
+  const { hasButton } = usePerms(meta.view, meta.perms);
 
   const ds = useMemo(
     () => new DataStore(meta.view.model!, {}),
@@ -453,7 +457,22 @@ export function ExpandableFormView({
     }
   }, [formSelect, setSelectState]);
 
-  const formReadonly = !edit && readonly;
+  const [readonlyExclusive, setReadonlyExclusive] = useState(
+    Boolean(schema.readonlyIf),
+  );
+
+  useEffect(() => {
+    const readonlyIf = schema.readonlyIf;
+    if (!readonlyIf) return;
+    return recordHandler.subscribe((rec) => {
+      const value = Boolean(parseExpression(readonlyIf)(rec));
+      setReadonlyExclusive(() => value);
+    });
+  }, [recordHandler, schema.readonlyIf]);
+
+  const canSave = hasButton("save");
+  const canEdit = hasButton("edit") && !readonlyExclusive;
+  const formReadonly = !canEdit || (!edit && readonly);
 
   const { id } = record;
   useAsyncEffect(async () => {
@@ -520,7 +539,26 @@ export function ExpandableFormView({
                 w={100}
                 mt={2}
               >
-                {readonly ? (
+                {canEdit && !readonly ? (
+                  <>
+                    <Button size="sm" variant="danger" onClick={doCancel}>
+                      {i18n.get("Cancel")}
+                    </Button>
+                    {canSave && (
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() =>
+                          doSave?.({
+                            shouldClose: isCollection,
+                          })
+                        }
+                      >
+                        {i18n.get("Update")}
+                      </Button>
+                    )}
+                  </>
+                ) : (
                   <>
                     <Button
                       size="sm"
@@ -529,7 +567,7 @@ export function ExpandableFormView({
                     >
                       {i18n.get("Close")}
                     </Button>
-                    {!isCollection && (
+                    {!isCollection && canEdit && canSave && (
                       <Button
                         size="sm"
                         variant="primary"
@@ -544,23 +582,6 @@ export function ExpandableFormView({
                         {edit ? i18n.get("Save") : i18n.get("Edit")}
                       </Button>
                     )}
-                  </>
-                ) : (
-                  <>
-                    <Button size="sm" variant="danger" onClick={doCancel}>
-                      {i18n.get("Cancel")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="primary"
-                      onClick={() =>
-                        doSave?.({
-                          shouldClose: isCollection,
-                        })
-                      }
-                    >
-                      {i18n.get("Update")}
-                    </Button>
                   </>
                 )}
               </Box>
