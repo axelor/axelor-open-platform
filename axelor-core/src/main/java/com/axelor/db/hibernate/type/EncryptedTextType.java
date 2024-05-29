@@ -18,21 +18,75 @@
  */
 package com.axelor.db.hibernate.type;
 
-import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
+import com.axelor.db.converters.EncryptedStringConverter;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.usertype.UserType;
 
-public class EncryptedTextType extends AbstractSingleColumnStandardBasicType<String> {
+import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
-  private static final long serialVersionUID = 9188706701624913239L;
+public class EncryptedTextType implements UserType<String> {
 
-  public static final EncryptedTextType INSTANCE = new EncryptedTextType();
+  private static final EncryptedStringConverter CONVERTER = new EncryptedStringConverter();
 
   public EncryptedTextType() {
-    super(LongVarcharTypeDescriptor.INSTANCE, EncryptedStringTypeDescriptor.INSTANCE);
   }
 
   @Override
-  public String getName() {
-    return "encrypted_text";
+  public int getSqlType() {
+    return Types.LONGVARCHAR;
+  }
+
+  @Override
+  public Class<String> returnedClass() {
+    return String.class;
+  }
+
+  @Override
+  public boolean equals(String x, String y) {
+    return (x == y) || (x != null && x.equals(y));
+  }
+
+  @Override
+  public int hashCode(String x) {
+    return x.hashCode();
+  }
+
+  @Override
+  public String nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner) throws SQLException {
+    String value = rs.getString(position);
+    return (value == null || value.isEmpty()) ? null : CONVERTER.convertToEntityAttribute(value);
+  }
+
+  @Override
+  public void nullSafeSet(PreparedStatement st, String value, int index, SharedSessionContractImplementor session) throws SQLException {
+    if (value == null) {
+      st.setNull(index, Types.VARCHAR);
+    } else {
+      st.setString(index, CONVERTER.convertToDatabaseColumn(value));
+    }
+  }
+
+  @Override
+  public String deepCopy(String value) {
+    return value;
+  }
+
+  @Override
+  public boolean isMutable() {
+    return false;
+  }
+
+  @Override
+  public Serializable disassemble(String value) {
+    return value;
+  }
+
+  @Override
+  public String assemble(Serializable cached, Object owner) {
+    return (String) cached;
   }
 }
