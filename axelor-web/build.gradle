@@ -12,7 +12,7 @@ dependencies {
   testImplementation project(":axelor-test")
   implementation project(":axelor-core")
 
-  compileOnly libs.javax_servlet
+  compileOnly libs.jakarta_servlet
   compileOnly libs.websocket_api
 
   implementation libs.resteasy

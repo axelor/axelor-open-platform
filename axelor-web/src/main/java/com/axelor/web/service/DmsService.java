@@ -68,7 +68,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;

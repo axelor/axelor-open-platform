@@ -45,7 +45,7 @@ dependencies {
   api libs.xstream
   api libs.commons_csv
 
-  api libs.javax_servlet
+  api libs.jakarta_servlet
   api libs.jakarta_mail
   api libs.javax_jaxb
   api libs.graal_js

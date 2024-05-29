@@ -10,9 +10,9 @@ versions.hibernate_validator = "7.0.5.Final"
 versions.groovy = "3.0.24"
 versions.resteasy = "4.7.9.Final"
 versions.jackson = "2.18.3"
-versions.shiro = "1.13.0"
+versions.shiro = "1.13.0:jakarta"
 versions.buji_pac4j = "8.1.1"
-versions.javaee_pac4j = "7.1.0"
+versions.jakartaee_pac4j = "7.1.0"
 versions.pac4j = "5.7.7"
 versions.ldaptive = "2.3.2"
 
@@ -82,7 +82,7 @@ libs.graal_js = "org.graalvm.js:js:22.3.5"
 
 // javax libs
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
-libs.javax_servlet = "javax.servlet:javax.servlet-api:4.0.1"
+libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:5.0.0"
 libs.jakarta_mail = [
     "com.sun.mail:jakarta.mail:2.0.1",
     "jakarta.activation:jakarta.activation-api:2.0.1"
@@ -213,8 +213,14 @@ libs.apache_shiro = [
 ]
 
 libs.pac4j = [
-  "io.buji:buji-pac4j:${versions.buji_pac4j}",
-  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+    "org.pac4j:jakartaee-pac4j:7.1.0",
+    dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
+        exclude group: 'org.mockito', module: 'mockito-core'
+    },
+    dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
+        exclude group: 'org.apache.shiro', module: 'shiro-web'
+    },
+  "org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}",
   dependencies.create("org.pac4j:pac4j-http:${versions.pac4j}") {
       exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
   },
@@ -225,8 +231,12 @@ libs.pac4j = [
 ]
 
 libs.buji_pac4j = [
-  "io.buji:buji-pac4j:${versions.buji_pac4j}",
-  "org.pac4j:javaee-pac4j:${versions.javaee_pac4j}",
+    dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
+        exclude group: 'org.apache.shiro', module: 'shiro-web'
+    },
+    dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
+        exclude group: 'org.mockito', module: 'mockito-core'
+    },
 ]
 
 // UnboundID LDAP SDK (for testing only)

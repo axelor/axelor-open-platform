@@ -18,7 +18,7 @@ dependencies {
   implementation libs.jakarta_el
 
   compileOnly libs.jakarta_el
-  compileOnly libs.javax_servlet
+  compileOnly libs.jakarta_servlet
   api libs.websocket_api
 
   implementation libs.resteasy

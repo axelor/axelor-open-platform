@@ -21,7 +21,7 @@ dependencies {
 
   tomcat project(":axelor-tomcat")
 
-  provided libs.javax_servlet
+  provided libs.jakarta_servlet
 }
 
 gradlePlugin {
