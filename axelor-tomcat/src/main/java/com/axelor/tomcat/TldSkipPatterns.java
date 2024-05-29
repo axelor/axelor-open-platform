@@ -118,10 +118,10 @@ public final class TldSkipPatterns {
     patterns.add("jandex-*.jar");
     patterns.add("jansi-*.jar");
     patterns.add("javassist-*.jar");
-    patterns.add("javax.inject-*.jar");
-    patterns.add("javax.json-*.jar");
-    patterns.add("javax.mail-*.jar");
-    patterns.add("javax.servlet-api-*.jar");
+    patterns.add("jakarta.inject-*.jar");
+    patterns.add("jakarta.json-*.jar");
+    patterns.add("jakarta.mail-*.jar");
+    patterns.add("jakarta.servlet-api-*.jar");
     patterns.add("javax.wsdl-*.jar");
     patterns.add("javax.xml.stream-*.jar");
     patterns.add("jaxb-*.jar");
