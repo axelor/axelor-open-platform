@@ -87,7 +87,7 @@ public class AxelorLoginFilter implements Filter {
     final JEEContext context =
         new JEEContext((HttpServletRequest) request, (HttpServletResponse) response);
     final ProfileManager profileManager =
-        profileManagerFactory.apply(context, JEESessionStore.INSTANCE);
+        profileManagerFactory.apply(context, new JEESessionStore());
     return profileManager.getProfile();
   }
 }
