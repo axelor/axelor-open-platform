@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Query;
-import org.hibernate.transform.BasicTransformerAdapter;
+import org.hibernate.query.TupleTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -654,14 +654,13 @@ public class MetaService {
     return response;
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("unchecked")
   private void transformQueryResult(Query query) {
-    // TODO: fix deprecation when new transformer api is implemented in hibernate
-    query.unwrap(org.hibernate.query.Query.class).setResultTransformer(new DataSetTransformer());
+    query.unwrap(org.hibernate.query.Query.class).setTupleTransformer(new DataSetTransformer());
   }
 
   @SuppressWarnings("serial")
-  private static final class DataSetTransformer extends BasicTransformerAdapter {
+  private static final class DataSetTransformer implements TupleTransformer {
 
     @Override
     public Object transformTuple(Object[] tuple, String[] aliases) {
