@@ -140,4 +140,8 @@ public class JavaAnnotation implements JavaElement {
       writer.newLine().unindent().emit(")");
     }
   }
+
+  public boolean hasParams() {
+    return !params.isEmpty();
+  }
 }

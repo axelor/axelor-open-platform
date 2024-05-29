@@ -1138,14 +1138,6 @@ public abstract class Property {
       throw new IllegalArgumentException("Invalid use of an SQL keyword: " + col);
     }
 
-    if (column == null
-        && unique == null
-        && nullable == null
-        && insertable == null
-        && updatable == null) {
-      return null;
-    }
-
     JavaAnnotation res =
         new JavaAnnotation(
             isReference() ? "jakarta.persistence.JoinColumn" : "jakarta.persistence.Column");
@@ -1174,7 +1166,7 @@ public abstract class Property {
       res.param("length", "{0:m}", "org.hibernate.Length.LOB_DEFAULT");
     }
 
-    return res;
+    return res.hasParams() ? res : null;
   }
 
   private JavaAnnotation $one2one() {
