@@ -99,7 +99,7 @@ public class TestJavaField {
   @Test
   public void testAnnotation() {
     JavaField field = new JavaField("message", "String", Modifier.PRIVATE);
-    JavaAnnotation annotation = new JavaAnnotation("javax.validation.constraints.NotNull");
+    JavaAnnotation annotation = new JavaAnnotation("jakarta.validation.constraints.NotNull");
     field.annotation(annotation);
     String code = writer.emit(field).toString();
     assertTrue(code.contains("@NotNull"));

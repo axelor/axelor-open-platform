@@ -20,7 +20,7 @@ package com.axelor.i18n;
 
 import com.axelor.app.internal.AppFilter;
 import java.util.Locale;
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
 /**

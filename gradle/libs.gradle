@@ -5,7 +5,7 @@ def versions = ext.libsVersions = [:]
 versions.guice = "5.1.0"
 versions.guava = "33.3.1-jre"
 versions.hibernate = "5.6.15.Final"
-versions.hibernate_validator = "6.2.5.Final"
+versions.hibernate_validator = "7.0.5.Final"
 
 versions.groovy = "3.0.24"
 versions.resteasy = "4.7.9.Final"
@@ -80,7 +80,6 @@ libs.graal_js = "org.graalvm.js:js:22.3.5"
 // javax libs
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:4.0.1"
-libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.jakarta_mail = [
     "com.sun.mail:jakarta.mail:2.0.1",
     "jakarta.activation:jakarta.activation-api:2.0.1"
@@ -97,7 +96,7 @@ libs.jdbc_mysql = "com.mysql:mysql-connector-j:8.4.0"
 
 // Hibernate
 libs.hibernate = [
-  "org.hibernate:hibernate-core:${versions.hibernate}",
+  "org.hibernate:hibernate-core-jakarta:${versions.hibernate}",
   "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate.validator:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}"

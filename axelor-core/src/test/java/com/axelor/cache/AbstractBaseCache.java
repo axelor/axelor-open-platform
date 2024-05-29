@@ -44,7 +44,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.PersistenceException;
 import javax.persistence.SharedCacheMode;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.access.AccessType;

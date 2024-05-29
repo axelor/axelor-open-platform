@@ -34,7 +34,7 @@ import javax.crypto.BadPaddingException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;

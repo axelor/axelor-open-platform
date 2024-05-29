@@ -26,7 +26,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "CONTACT_ADDRESS")

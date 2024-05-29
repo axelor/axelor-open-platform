@@ -1048,7 +1048,7 @@ public abstract class Property {
   }
 
   private JavaAnnotation $required() {
-    return isTrue(required) ? new JavaAnnotation("javax.validation.constraints.NotNull") : null;
+    return isTrue(required) ? new JavaAnnotation("jakarta.validation.constraints.NotNull") : null;
   }
 
   private List<JavaAnnotation> $size() {
@@ -1062,11 +1062,11 @@ public abstract class Property {
     if (type == PropertyType.DECIMAL) {
       if (notBlank(min))
         all.add(
-            new JavaAnnotation("javax.validation.constraints.DecimalMin")
+            new JavaAnnotation("jakarta.validation.constraints.DecimalMin")
                 .param("value", "{0:s}", min));
       if (notBlank(max))
         all.add(
-            new JavaAnnotation("javax.validation.constraints.DecimalMax")
+            new JavaAnnotation("jakarta.validation.constraints.DecimalMax")
                 .param("value", "{0:s}", max));
       return all;
     }
@@ -1076,16 +1076,16 @@ public abstract class Property {
         throw new IllegalArgumentException("Encrypted field size should be more than 255.");
       }
       all.add(
-          new JavaAnnotation("javax.validation.constraints.Size")
+          new JavaAnnotation("jakarta.validation.constraints.Size")
               .param("min", min)
               .param("max", max));
       return all;
     }
 
     if (notBlank(min))
-      all.add(new JavaAnnotation("javax.validation.constraints.Min").param("value", min));
+      all.add(new JavaAnnotation("jakarta.validation.constraints.Min").param("value", min));
     if (notBlank(max))
-      all.add(new JavaAnnotation("javax.validation.constraints.Max").param("value", max));
+      all.add(new JavaAnnotation("jakarta.validation.constraints.Max").param("value", max));
 
     return all;
   }
@@ -1111,7 +1111,7 @@ public abstract class Property {
           "Invalid 'scale' value, should be less than 'precision' on field: " + name);
     }
 
-    return new JavaAnnotation("javax.validation.constraints.Digits")
+    return new JavaAnnotation("jakarta.validation.constraints.Digits")
         .param("integer", "{0:l}", precision - scale)
         .param("fraction", "{0:l}", scale);
   }

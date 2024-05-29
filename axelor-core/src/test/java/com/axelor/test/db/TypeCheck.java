@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.Digits;
+import jakarta.validation.constraints.Digits;
 
 @Entity
 @Table(name = "CONTACT_TYPE_CHECK")

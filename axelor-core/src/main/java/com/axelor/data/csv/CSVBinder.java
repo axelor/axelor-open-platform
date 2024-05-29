@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

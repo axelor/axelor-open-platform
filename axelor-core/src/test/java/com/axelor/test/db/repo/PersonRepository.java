@@ -20,7 +20,7 @@ package com.axelor.test.db.repo;
 
 import com.axelor.db.JpaRepository;
 import com.axelor.test.db.Person;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 
 public class PersonRepository extends JpaRepository<Person> {
 

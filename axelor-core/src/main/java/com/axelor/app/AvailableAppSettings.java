@@ -145,7 +145,7 @@ public interface AvailableAppSettings {
   String HIBERNATE_CACHE_REGION_FACTORY = Environment.CACHE_REGION_FACTORY;
   String HIBERNATE_JAVAX_CACHE_PROVIDER = ConfigSettings.PROVIDER;
 
-  String JAVAX_PERSISTENCE_SHARED_CACHE_MODE = Environment.JPA_SHARED_CACHE_MODE;
+  String JAVAX_PERSISTENCE_SHARED_CACHE_MODE = Environment.JAKARTA_JPA_SHARED_CACHE_MODE;
 
   String MAIL_SMTP_HOST = "mail.smtp.host";
   String MAIL_SMTP_PORT = "mail.smtp.port";

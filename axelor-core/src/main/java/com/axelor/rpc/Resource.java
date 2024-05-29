@@ -113,7 +113,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
-import javax.validation.ValidationException;
+import jakarta.validation.ValidationException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;

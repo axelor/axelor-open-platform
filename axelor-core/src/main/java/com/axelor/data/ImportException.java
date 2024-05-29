@@ -18,8 +18,8 @@
  */
 package com.axelor.data;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 
 public class ImportException extends Exception {
