@@ -21,11 +21,11 @@ package com.axelor.mail;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 /** The default implementation of {@link MailAccount} for SMPT accounts. */
 public class SmtpAccount implements MailAccount {

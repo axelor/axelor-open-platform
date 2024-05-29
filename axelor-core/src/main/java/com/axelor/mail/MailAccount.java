@@ -19,7 +19,7 @@
 package com.axelor.mail;
 
 import java.util.Properties;
-import javax.mail.Session;
+import jakarta.mail.Session;
 
 /**
  * The {@link MailAccount} provides a single definition {@link #getSession()} to create account

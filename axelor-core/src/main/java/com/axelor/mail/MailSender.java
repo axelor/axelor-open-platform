@@ -19,10 +19,10 @@
 package com.axelor.mail;
 
 import java.io.IOException;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 
 /** The {@link MailSender} provides features to send mails. */
 public final class MailSender {

@@ -24,7 +24,7 @@ import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailMessage;
 import com.google.inject.ImplementedBy;
 import java.util.List;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.internet.InternetAddress;
 
 /** The mail service defines interface for sending/reading mails. */
 @ImplementedBy(MailServiceImpl.class)

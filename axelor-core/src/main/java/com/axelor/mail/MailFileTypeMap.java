@@ -20,7 +20,7 @@ package com.axelor.mail;
 
 import com.axelor.common.MimeTypesUtils;
 import java.io.File;
-import javax.activation.FileTypeMap;
+import jakarta.activation.FileTypeMap;
 
 /**
  * Custom {@link FileTypeMap} implementation.

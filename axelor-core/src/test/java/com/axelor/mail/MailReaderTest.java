@@ -21,9 +21,9 @@ package com.axelor.mail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import javax.mail.Folder;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Folder;
+import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 
 public class MailReaderTest extends AbstractMailTest {

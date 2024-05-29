@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.internet.InternetAddress;
 import javax.persistence.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

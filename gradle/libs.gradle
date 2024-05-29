@@ -81,8 +81,11 @@ libs.graal_js = "org.graalvm.js:js:22.3.5"
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:4.0.1"
 libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
-libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
-libs.greenmail = "com.icegreen:greenmail-junit5:1.6.15"
+libs.jakarta_mail = [
+    "com.sun.mail:jakarta.mail:2.0.1",
+    "jakarta.activation:jakarta.activation-api:2.0.1"
+]
+libs.greenmail = "com.icegreen:greenmail-junit5:2.0.1"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 

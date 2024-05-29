@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.ResourceUtils;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.Message.RecipientType;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.Multipart;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

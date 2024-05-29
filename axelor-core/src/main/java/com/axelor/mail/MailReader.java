@@ -18,11 +18,11 @@
  */
 package com.axelor.mail;
 
-import javax.mail.AuthenticationFailedException;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
+import jakarta.mail.AuthenticationFailedException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.NoSuchProviderException;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
 
 /** The {@link MailReader} provides features to read mails. */
 public class MailReader {

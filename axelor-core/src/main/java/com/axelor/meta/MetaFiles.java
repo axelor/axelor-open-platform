@@ -53,8 +53,8 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 

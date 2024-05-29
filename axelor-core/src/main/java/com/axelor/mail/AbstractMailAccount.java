@@ -19,9 +19,9 @@
 package com.axelor.mail;
 
 import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
 
 public abstract class AbstractMailAccount implements MailAccount {
 
