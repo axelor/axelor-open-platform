@@ -18,6 +18,7 @@
  */
 package com.axelor.db;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.rpc.ContextEntity;
@@ -185,6 +186,8 @@ public class QueryBinder {
           // special variable
           value = bindings.get(expr);
         }
+      }  else if (value instanceof Collection) {
+        value = fixCollections((Collection<?>) value);
       }
       try {
         param = query.getParameter(pos);
@@ -199,6 +202,10 @@ public class QueryBinder {
     }
 
     return this;
+  }
+
+  private Object fixCollections(Collection<?> value) {
+    return value.stream().map(o -> ObjectUtils.isEmpty(o) ? null : o).collect(Collectors.toList());
   }
 
   private Object getDottedValue(ScriptBindings bindings, String dottedName) {
@@ -258,6 +265,8 @@ public class QueryBinder {
       value = ((Model) value).getId();
     } else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
       value = adapt(value, parameter);
+    } else if (value instanceof Collection) {
+      value = fixCollections((Collection<?>) value);
     }
 
     try {
