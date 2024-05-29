@@ -983,12 +983,16 @@ public abstract class Property {
     }
 
     if (isTrue(large) && type == PropertyType.STRING) {
-      return List.of(
-          new JavaAnnotation("jakarta.persistence.Lob"),
+      List<JavaAnnotation> annotations = new ArrayList<>();
+      annotations.add(
           new JavaAnnotation("jakarta.persistence.Basic")
-              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
-          new JavaAnnotation("org.hibernate.annotations.Type")
-              .param("type", "{0:s}", isTrue(encrypted) ? "encrypted_text" : "text"));
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
+
+      if (isTrue(encrypted)) {
+        annotations.add(new JavaAnnotation("org.hibernate.annotations.Type")
+                .param("type", "{0:s}", "encrypted_text"));
+      }
+      return annotations;
     }
 
     if (isTrue(large) || type == PropertyType.BINARY) {
@@ -1164,6 +1168,10 @@ public abstract class Property {
 
     if (updatable != null) {
       res.param("updatable", "{0:l}", updatable);
+    }
+
+    if (isTrue(large) && !isTrue(encrypted) && type == PropertyType.STRING) {
+      res.param("length", "{0:m}", "org.hibernate.Length.LOB_DEFAULT");
     }
 
     return res;
