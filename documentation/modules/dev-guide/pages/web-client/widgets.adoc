@@ -115,27 +115,116 @@ is `1`, the last is the one defined in `max` attribute. By clicking on the last 
 
 Widget support partial rating on decimal fields but only for display purpose (for example, an average).
 
-== DateTime
+== Date
 
-The datetime widgets is used for `date` and `datetime` fields.
+The date widget is used for `Date` data fields.
+The field provides the ability to select a date with a calendar popover in edit mode.
 
 [source,xml]
 ----
-<field name="date" widget="date" />
-<field name="time" widget="time" />
-<field name="dateTime" widget="date-time" />
+<field name="orderDate" widget="Date" />
 ----
 
-Two more widgets `relative-time` and `duration` can be used with `DateTime` and
-`Integer` fields respectively.
+== Time
 
-- `relative-time` - shows relative time from now
-- `duration` - shows numeric value in seconds as time duration
+The time widget is used for `Time` data fields.
 
-The `duration` widget can have following extra attributes:
+Time widget supports following attribute:
 
-- `x-big=true` - if expected duration is more than 100 hours
-- `x-seconds=true` - show seconds
+* `x-seconds`: Show seconds. Default to false.
+
+[source,xml]
+----
+<field name="time" widget="Time" />
+----
+
+== DateTime
+
+The date time widget is used for `DateTime` data fields.
+The field is rendered as a `Date` widget but also accepts hours and minutes.
+
+Date time widget supports following attribute:
+
+* `x-seconds`: Show seconds. Default to false.
+
+[source,xml]
+----
+<field name="updatedOn" widget="DateTime" />
+----
+
+== RelativeTime
+ 
+The relative time widget is used for `Date` and `DateTime` data fields.
+
+The field renders relative time from now.
+
+[source,xml]
+----
+<field name="orderDate" widget="RelativeTime" />
+<field name="updatedOn" widget="RelativeTime" />
+----
+
+On a `datetime` field type, here is the output depending on the range :
+
+|===
+|Range |Sample Output
+
+|0 to 44 seconds
+|`A few seconds ago`
+
+|45 to 89 seconds
+|`A minute ago`
+
+|90 seconds to 44 minutes
+|`2 minutes ago ... 44 minutes ago`
+
+|45 to 89 minutes
+|`An hour ago`
+
+|90 minutes to 21 hours
+|`2 hours ago ... 21 hours ago`
+
+|22 to 35 hours
+|`A day ago`
+
+|36 hours to 25 days
+|`2 days ago ... 25 days ago`
+
+|26 to 45 days
+|`A month ago`
+
+|46 days to 10 months
+|`2 months ago ... 10 months ago`
+
+|11 months to 17months
+|`A year ago`
+
+|18 months+
+|`2 years ago ... 20 years ago`
+|===
+
+
+On a `date` field type, it will handle special cases depending on following conditions :
+
+* if date is today : `Today`
+* if date is tomorrow : `Tomorrow`
+* if date is yesterday : `Yesterday`
+* if date is within next week : `Monday ... Sunday` (name of the day of the week)
+* if date is within last week : `Last Monday ... Sunday` (name of the day of the week)
+
+== Duration
+
+The duration widget is used for `integer`/`long` data fields.
+
+Duration widget supports following attributes:
+
+* `x-big`: If expected duration is more than 100 hours. Default to false.
+* `x-seconds`: Show seconds. Default to false.
+
+[source,xml]
+----
+<field name="taskDuration" widget="Duration" />
+----
 
 == Boolean
 

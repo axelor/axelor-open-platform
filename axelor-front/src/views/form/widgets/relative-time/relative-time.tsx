@@ -1,15 +1,19 @@
 import { useAtomValue } from "jotai";
 
-import { moment } from "@/services/client/l10n";
+import format from "@/utils/format";
+
 import { FieldControl, FieldProps } from "../../builder";
 import { ViewerInput } from "../string/viewer";
 
 export function RelativeTime(props: FieldProps<string>) {
   const { schema, valueAtom } = props;
+
   const value = useAtomValue(valueAtom);
   const $value = (() => {
     try {
-      return value ? moment(value).fromNow() : "";
+      return format(value, {
+        props: schema as any,
+      });
     } catch {
       return "";
     }

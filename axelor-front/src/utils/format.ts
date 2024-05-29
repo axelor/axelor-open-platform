@@ -1,6 +1,7 @@
 import _ from "lodash";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { l10n, moment } from "@/services/client/l10n";
 import { Field, JsonField } from "@/services/client/meta.types";
 import { getMultiValues } from "@/views/form/widgets/selection/utils";
@@ -59,6 +60,29 @@ const formatDuration: Formatter = (value, opts = {}) => {
   }
 
   return text;
+};
+
+const formatRelativeTime: Formatter = (value, opts = {}) => {
+  let result = "";
+  const { props } = opts;
+  const { serverType, type } = props ?? {};
+
+  if (!value) return "";
+
+  result = moment(value).fromNow();
+
+  if ((serverType ?? type)?.toUpperCase() === "DATE") {
+    result = moment(value).calendar(null, {
+      sameDay: `[${i18n.get("Today")}]`,
+      nextDay: `[${i18n.get("Tomorrow")}]`,
+      nextWeek: "dddd",
+      lastDay: `[${i18n.get("Yesterday")}]`,
+      lastWeek: i18n.get("[Last] dddd"),
+      sameElse: `[${result}]`,
+    });
+  }
+
+  return result[0].toLocaleUpperCase() + result.slice(1);
 };
 
 const formatDate: Formatter = (value, opts = {}) => {
@@ -267,6 +291,7 @@ export const Formatters = {
   date: formatDate,
   time: formatTime,
   datetime: formatDateTime,
+  "relative-time": formatRelativeTime,
   duration: formatDuration,
   selection: formatSelection,
   enumeration: formatSelection,
@@ -283,6 +308,7 @@ const format: Formatter = (value, opts = {}) => {
 
   if (type === "enum") type = "enumeration";
   if (props?.widget === "duration") type = "duration";
+  if (props?.widget === "relative-time") type = "relative-time";
   if (props?.selection) type = "selection";
 
   let val = value;

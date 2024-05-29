@@ -7,6 +7,8 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import weekOfYear from "dayjs/plugin/weekOfYear";
+import calendar from "dayjs/plugin/calendar";
+import updateLocale from "dayjs/plugin/updateLocale";
 
 import { limitScale } from "@/utils/format";
 import { toKebabCase } from "@/utils/names";
@@ -19,6 +21,8 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
+dayjs.extend(calendar);
+dayjs.extend(updateLocale);
 
 const DEFAULT_LANGUAGE = "en";
 const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
