@@ -86,7 +86,7 @@ libs.jakarta_mail = [
     "jakarta.activation:jakarta.activation-api:2.0.1"
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.0.1"
-libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
+libs.jakarta_el = "org.glassfish:jakarta.el:4.0.2"
 libs.websocket_api = "jakarta.websocket:jakarta.websocket-api:2.0.0"
 
 // jdbc
@@ -286,7 +286,7 @@ libs.tomcat_embed = [
   "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
   "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
   "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcat_embed}",
-  libs.javax_el
+  libs.jakarta_el
 ]
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
