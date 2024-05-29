@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /** The tenant connection provider. */
 public class TenantConnectionProvider
-    extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl
+    extends AbstractDataSourceBasedMultiTenantConnectionProviderImpl<String>
     implements ServiceRegistryAwareService, Stoppable {
 
   private static final long serialVersionUID = 1L;
@@ -59,7 +59,7 @@ public class TenantConnectionProvider
   }
 
   @Override
-  protected final DataSource selectDataSource(String tenantIdentifier) {
+  protected DataSource selectDataSource(String tenantIdentifier) {
     if (configProvider.find(tenantIdentifier) == null) {
       dataSourceMap().remove(tenantIdentifier);
       LOGGER.debug("no such tenant found: {}", tenantIdentifier);
