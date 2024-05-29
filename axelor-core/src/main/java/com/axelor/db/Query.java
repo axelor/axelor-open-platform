@@ -390,7 +390,6 @@ public class Query<T extends Model> {
 
   private TypedQuery<T> fetchQuery(int limit, int offset) {
     final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
-    query.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
     if (limit > 0) {
       query.setMaxResults(limit);
     }
@@ -432,7 +431,6 @@ public class Query<T extends Model> {
    */
   public long count() {
     final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
-    query.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
     this.bind(query).setCacheable(cacheable).setFlushMode(flushMode).setReadOnly();
     return query.getSingleResult();
   }
