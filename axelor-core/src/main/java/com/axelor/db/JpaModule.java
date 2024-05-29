@@ -38,7 +38,6 @@ import java.util.Properties;
 
 import com.google.inject.persist.jpa.JpaPersistOptions;
 import jakarta.inject.Inject;
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
@@ -206,7 +205,6 @@ public class JpaModule extends AbstractModule {
   private void configureMultiTenancy(final AppSettings settings, final Properties properties) {
     // multi-tenancy support
     if (TenantModule.isEnabled()) {
-      properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
       properties.put(
           Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
       properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
