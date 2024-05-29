@@ -112,7 +112,6 @@ public class JpaModule extends AbstractModule {
     }
 
     properties.put(Environment.INTERCEPTOR, AuditInterceptor.class.getName());
-    properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
     properties.put(
         Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
     properties.put(
