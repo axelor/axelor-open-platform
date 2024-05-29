@@ -109,7 +109,7 @@ libs.hibernate = [
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.8"
 libs.redisson = [
-    dependencies.create("org.redisson:redisson-hibernate-53:3.38.1") {
+    dependencies.create("org.redisson:redisson-hibernate-6:3.38.1") {
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
