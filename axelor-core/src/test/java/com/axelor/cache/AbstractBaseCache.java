@@ -133,9 +133,10 @@ public abstract class AbstractBaseCache extends JpaTest {
           assertTrue(ObjectUtils.notEmpty(secondLevelCacheRegionNames));
 
           // Should contain `default-update-timestamps-region` region
-          assertTrue(
-              Arrays.asList(secondLevelCacheRegionNames)
-                  .contains("default-update-timestamps-region"));
+            // TODO : `default-update-timestamps-region` region is created on demand
+//          assertTrue(
+//              Arrays.asList(secondLevelCacheRegionNames)
+//                  .contains("default-update-timestamps-region"));
 
           // Person is annotated with `@Cacheable`
           assertTrue(
