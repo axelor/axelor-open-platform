@@ -21,8 +21,8 @@ package com.axelor.web.socket;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import java.io.IOException;
-import javax.websocket.EncodeException;
-import javax.websocket.Session;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Session;
 import org.apache.shiro.subject.Subject;
 
 public abstract class Channel {

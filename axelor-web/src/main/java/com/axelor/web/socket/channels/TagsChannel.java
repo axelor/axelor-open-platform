@@ -30,8 +30,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
-import javax.websocket.EncodeException;
-import javax.websocket.Session;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Session;
 import org.slf4j.Logger;
 
 @Singleton

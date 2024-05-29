@@ -87,7 +87,7 @@ libs.jakarta_mail = [
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.0.1"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
-libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
+libs.websocket_api = "jakarta.websocket:jakarta.websocket-api:2.0.0"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
