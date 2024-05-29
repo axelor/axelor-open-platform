@@ -18,7 +18,7 @@
  */
 package com.axelor.meta.schema.actions.validate.validator;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 public class Info extends Validator {

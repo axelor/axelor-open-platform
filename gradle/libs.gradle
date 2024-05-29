@@ -81,7 +81,7 @@ libs.byte_buddy = "net.bytebuddy:byte-buddy:1.15.10"
 libs.graal_js = "org.graalvm.js:js:22.3.5"
 
 // javax libs
-libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
+libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:3.0.1"
 libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:5.0.0"
 libs.jakarta_mail = [
     "com.sun.mail:jakarta.mail:2.0.1",
@@ -140,7 +140,7 @@ libs.flywaydb = [
 ]
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.15"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:3.0.3"
 
 // groovy
 libs.groovy = [

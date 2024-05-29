@@ -36,7 +36,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import jakarta.inject.Inject;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

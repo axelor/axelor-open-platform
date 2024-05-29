@@ -18,7 +18,7 @@
  */
 package com.axelor.tools.code.entity.model;
 
-import javax.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnum;
 
 @XmlEnum
 public enum TrackEvent {

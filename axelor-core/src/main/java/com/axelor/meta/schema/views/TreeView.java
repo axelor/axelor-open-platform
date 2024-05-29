@@ -26,10 +26,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("tree")

@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import jakarta.inject.Inject;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -19,9 +19,9 @@
 package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType

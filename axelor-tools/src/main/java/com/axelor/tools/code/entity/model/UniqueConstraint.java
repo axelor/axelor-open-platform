@@ -22,7 +22,7 @@ import static com.axelor.tools.code.entity.model.Utils.*;
 
 import com.axelor.tools.code.JavaAnnotation;
 import com.axelor.tools.code.JavaCode;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 public class UniqueConstraint extends Index {

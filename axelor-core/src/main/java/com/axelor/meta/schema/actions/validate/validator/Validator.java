@@ -23,7 +23,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.actions.Action;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 public abstract class Validator extends Action.Element {
 

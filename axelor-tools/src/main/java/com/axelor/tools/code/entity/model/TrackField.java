@@ -21,8 +21,8 @@ package com.axelor.tools.code.entity.model;
 import static com.axelor.tools.code.entity.model.Utils.*;
 
 import com.axelor.tools.code.JavaAnnotation;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 public class TrackField {

@@ -16,13 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
-@javax.xml.bind.annotation.XmlSchema(
+@jakarta.xml.bind.annotation.XmlAccessorType(jakarta.xml.bind.annotation.XmlAccessType.FIELD)
+@jakarta.xml.bind.annotation.XmlSchema(
     namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
     xmlns = {
-      @javax.xml.bind.annotation.XmlNs(
+      @jakarta.xml.bind.annotation.XmlNs(
           namespaceURI = com.axelor.meta.schema.ObjectViews.NAMESPACE,
           prefix = ""),
     },
-    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+    elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package com.axelor.meta.schema;

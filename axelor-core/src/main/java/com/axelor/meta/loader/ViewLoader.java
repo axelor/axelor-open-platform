@@ -81,7 +81,7 @@ import java.util.function.Consumer;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

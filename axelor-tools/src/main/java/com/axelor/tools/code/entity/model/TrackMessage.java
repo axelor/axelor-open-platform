@@ -22,9 +22,9 @@ import static com.axelor.tools.code.entity.model.Utils.*;
 
 import com.axelor.tools.code.JavaAnnotation;
 import com.axelor.tools.code.JavaCode;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 
 @XmlType
 public class TrackMessage {

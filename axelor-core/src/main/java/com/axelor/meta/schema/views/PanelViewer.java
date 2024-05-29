@@ -33,9 +33,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
