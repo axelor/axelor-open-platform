@@ -805,6 +805,7 @@ public class Entity implements BaseType<Entity> {
           new JavaField("selected", "boolean", Modifier.PRIVATE | Modifier.TRANSIENT);
       JavaField archived = new JavaField("archived", "Boolean", Modifier.PRIVATE);
 
+      cid.annotation(new JavaAnnotation("javax.persistence.Transient"));
       version.annotation(new JavaAnnotation("javax.persistence.Version"));
       selected.annotation(new JavaAnnotation("javax.persistence.Transient"));
       archived.annotation(

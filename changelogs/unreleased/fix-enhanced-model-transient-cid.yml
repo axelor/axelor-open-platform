@@ -1,0 +1,6 @@
+---
+title: Add missing transient annotation on cid field of enhanced Model
+type: fix
+description: |
+  This fixes cid field not marked as transient when Model class is enhanced.
+  It was notably breaking advanced search export all.
