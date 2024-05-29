@@ -50,34 +50,28 @@ public class CustomDialectResolver implements DialectResolver {
 
   private Dialect resolveDialect(String databaseName, int majorVersion, int minorVersion) {
     if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
-      if (majorVersion >= 10) {
+      if (majorVersion >= 12) {
         return new AxelorPostgreSQL10Dialect();
       }
 
-      log.error("PostgreSQL 10 or later is required.");
+      log.error("PostgreSQL 12 or later is required.");
       return null;
     }
 
     if (TargetDatabase.MYSQL.equals(databaseName)) {
-      // There is no MySQL 6 or 7, only MySQL 8.
       if (majorVersion >= 8) {
         return new AxelorMySQL8Dialect();
       }
 
-      // Don't support version < 5.7
-      if (majorVersion == 5 && minorVersion >= 7) {
-        return new AxelorMySQL57Dialect();
-      }
-
-      log.error("MySQL 5.7 or later is required.");
+      log.error("MySQL 8.0 or later is required.");
       return null;
     }
 
     if (TargetDatabase.ORACLE.equals(databaseName)) {
-      if (majorVersion >= 12) {
+      if (majorVersion >= 19) {
         return new AxelorOracle12cDialect();
       }
-      log.error("Oracle 12c or later is required.");
+      log.error("Oracle 19 or later is required.");
       return null;
     }
 
