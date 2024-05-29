@@ -4,8 +4,8 @@ def versions = ext.libsVersions = [:]
 // versions
 versions.guice = "7.0.0"
 versions.guava = "33.3.1-jre"
-versions.hibernate = "5.6.15.Final"
-versions.hibernate_validator = "7.0.5.Final"
+versions.hibernate = "6.5.2.Final"
+versions.hibernate_validator = "8.0.1.Final"
 
 versions.groovy = "3.0.24"
 versions.resteasy = "6.2.9.Final"
@@ -102,10 +102,10 @@ libs.jdbc_mysql = "com.mysql:mysql-connector-j:8.4.0"
 
 // Hibernate
 libs.hibernate = [
-  "org.hibernate:hibernate-core-jakarta:${versions.hibernate}",
-  "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
+  "org.hibernate.orm:hibernate-core:${versions.hibernate}",
+  "org.hibernate.orm:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate.validator:hibernate-validator:${versions.hibernate_validator}",
-  "org.hibernate:hibernate-jcache:${versions.hibernate}"
+  "org.hibernate.orm:hibernate-jcache:${versions.hibernate}"
 ]
 
 // Caching libs
