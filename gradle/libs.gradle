@@ -43,9 +43,9 @@ libs.slf4j_base = [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-  "ch.qos.logback:logback-core:1.3.15",
-  "ch.qos.logback:logback-classic:1.3.15",
-  "org.fusesource.jansi:jansi:2.4.1"
+  "ch.qos.logback:logback-core:1.4.14",
+  "ch.qos.logback:logback-classic:1.4.14",
+  "org.fusesource.jansi:jansi:2.4.0"
 ]
 
 // Guava
