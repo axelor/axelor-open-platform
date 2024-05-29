@@ -18,18 +18,76 @@
  */
 package com.axelor.db.hibernate.type;
 
-import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.descriptor.java.StringTypeDescriptor;
+import com.axelor.db.ValueEnum;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.jdbc.CharacterStream;
+import org.hibernate.engine.jdbc.internal.CharacterStreamImpl;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.type.descriptor.java.DataHelper;
+import org.hibernate.usertype.UserType;
 
-public class JsonType extends AbstractSingleColumnStandardBasicType<String> {
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.Clob;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 
-  private static final long serialVersionUID = -2510546264526737635L;
+public class JsonType implements UserType<String> {
 
-  public JsonType(JsonSqlTypeDescriptor descriptor) {
-    super(descriptor, StringTypeDescriptor.INSTANCE);
+  public JsonType() {
+
   }
 
-  public String getName() {
-    return "json";
+  @Override
+  public int getSqlType() {
+    return Types.LONGVARCHAR;
+  }
+
+  @Override
+  public Class<String> returnedClass() {
+    return String.class;
+  }
+
+  @Override
+  public boolean equals(String x, String y) {
+    return (x == y) || (x != null && x.equals(y));
+  }
+
+  @Override
+  public int hashCode(String x) {
+    return x.hashCode();
+  }
+
+  @Override
+  public String nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner) throws SQLException {
+    return rs.getString(position);
+  }
+
+  @Override
+  public void nullSafeSet(PreparedStatement st, String value, int index, SharedSessionContractImplementor session) throws SQLException {
+    st.setString(index, value);
+  }
+
+  @Override
+  public String deepCopy(String value) {
+    return value;
+  }
+
+  @Override
+  public boolean isMutable() {
+    return false;
+  }
+
+  @Override
+  public Serializable disassemble(String value) {
+    return value;
+  }
+
+  @Override
+  public String assemble(Serializable cached, Object owner) {
+    return (String) cached;
   }
 }
