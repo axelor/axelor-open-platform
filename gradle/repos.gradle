@@ -14,6 +14,7 @@ def repos = {
   maven {
     url 'https://repository.axelor.com/nexus/repository/maven-public/'
   }
+
 }
 
 ext.repos = repos

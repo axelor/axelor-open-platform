@@ -27,8 +27,8 @@ import com.axelor.rpc.Response;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
 import org.junit.jupiter.api.Test;
 
 public class ResourceTest extends AbstractTest {

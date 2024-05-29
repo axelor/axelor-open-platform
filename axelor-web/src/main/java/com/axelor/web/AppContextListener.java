@@ -27,14 +27,16 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import java.util.Map;
+import java.util.Map;
+
+import dev.resteasy.guice.GuiceResourceFactory;
+import dev.resteasy.guice.ModuleProcessor;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.SessionCookieConfig;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
 import org.jboss.resteasy.core.ResteasyContext;
 import org.jboss.resteasy.core.SynchronousDispatcher;
-import org.jboss.resteasy.plugins.guice.GuiceResourceFactory;
-import org.jboss.resteasy.plugins.guice.ModuleProcessor;
 import org.jboss.resteasy.plugins.server.servlet.ListenerBootstrap;
 import org.jboss.resteasy.spi.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
@@ -96,7 +98,7 @@ public class AppContextListener extends GuiceServletContextListener {
     final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
     cookieConfig.setHttpOnly(true);
     cookieConfig.setSecure(
-        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
+            AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
   }
 
   private void beforeStart(ServletContextEvent servletContextEvent) {

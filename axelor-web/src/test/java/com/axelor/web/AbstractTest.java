@@ -19,8 +19,8 @@
 package com.axelor.web;
 
 import com.axelor.test.WebServer;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 

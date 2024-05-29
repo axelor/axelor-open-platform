@@ -85,21 +85,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import jakarta.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.DatatypeConverter;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -448,7 +448,7 @@ public class RestService extends ResourceService {
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
   @SuppressWarnings("all")
-  private javax.ws.rs.core.Response download(
+  private jakarta.ws.rs.core.Response download(
       MetaFile metaFile, String fileName, boolean checkOnly) {
     if (StringUtils.isBlank(fileName)) {
       fileName = (String) metaFile.getFileName();
@@ -456,14 +456,14 @@ public class RestService extends ResourceService {
     final String filePath = (String) metaFile.getFilePath();
     final File inputFile = MetaFiles.getPath(filePath).toFile();
     if (!inputFile.exists()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     if (checkOnly) {
-      return javax.ws.rs.core.Response.ok().build();
+      return jakarta.ws.rs.core.Response.ok().build();
     }
 
-    return javax.ws.rs.core.Response.ok(
+    return jakarta.ws.rs.core.Response.ok(
             new StreamingOutput() {
 
               @Override
@@ -478,7 +478,7 @@ public class RestService extends ResourceService {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private javax.ws.rs.core.Response download(
+  private jakarta.ws.rs.core.Response download(
       Long id,
       String field,
       boolean isImage,
@@ -501,11 +501,11 @@ public class RestService extends ResourceService {
     }
 
     if (!permitted && !getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
-      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+      return jakarta.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
     if (bean == null) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     if (bean instanceof MetaFile) {
@@ -523,7 +523,7 @@ public class RestService extends ResourceService {
 
     if (isImage) {
       if (checkOnly) {
-        return javax.ws.rs.core.Response.ok().build();
+        return jakarta.ws.rs.core.Response.ok().build();
       }
       String base64 = BLANK_IMAGE;
       if (data instanceof byte[]) {
@@ -534,21 +534,21 @@ public class RestService extends ResourceService {
         data = DatatypeConverter.parseBase64Binary(base64);
       } catch (Exception e) {
       }
-      return javax.ws.rs.core.Response.ok(data).build();
+      return jakarta.ws.rs.core.Response.ok(data).build();
     }
 
     fileName = fileName.replaceAll("\\s", "") + "_" + id;
     fileName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fileName);
 
     if (data == null) {
-      return javax.ws.rs.core.Response.noContent().build();
+      return jakarta.ws.rs.core.Response.noContent().build();
     }
 
     if (checkOnly) {
-      return javax.ws.rs.core.Response.ok().build();
+      return jakarta.ws.rs.core.Response.ok().build();
     }
 
-    return javax.ws.rs.core.Response.ok(data)
+    return jakarta.ws.rs.core.Response.ok(data)
         .header(
             "Content-Disposition",
             ContentDisposition.attachment().filename(fileName).build().toString())
@@ -558,7 +558,7 @@ public class RestService extends ResourceService {
   @HEAD
   @Path("{id}/{field}/download")
   @Hidden
-  public javax.ws.rs.core.Response downloadCheck(
+  public jakarta.ws.rs.core.Response downloadCheck(
       @PathParam("id") Long id,
       @PathParam("field") String field,
       @QueryParam("image") boolean isImage,
@@ -574,7 +574,7 @@ public class RestService extends ResourceService {
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @SuppressWarnings("all")
   @Hidden
-  public javax.ws.rs.core.Response download(
+  public jakarta.ws.rs.core.Response download(
       @PathParam("id") Long id,
       @PathParam("field") String field,
       @QueryParam("image") boolean isImage,
@@ -771,10 +771,10 @@ public class RestService extends ResourceService {
   @HEAD
   @Path("export/{name}")
   @Hidden
-  public javax.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
+  public jakarta.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
     return Files.exists(MetaFiles.findTempFile(name))
-        ? javax.ws.rs.core.Response.ok().build()
-        : javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+        ? jakarta.ws.rs.core.Response.ok().build()
+        : jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
   }
 
   @GET

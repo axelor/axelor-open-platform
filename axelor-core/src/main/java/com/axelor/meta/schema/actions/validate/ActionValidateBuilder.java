@@ -23,7 +23,7 @@ import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.axelor.rpc.ActionResponse;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * The {@link ActionValidateBuilder} can be used to quickly define {@link ActionValidate} manually,

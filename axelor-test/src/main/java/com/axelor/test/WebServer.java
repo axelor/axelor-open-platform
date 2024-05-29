@@ -24,6 +24,7 @@ import com.google.inject.Module;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
+import dev.resteasy.guice.GuiceResteasyBootstrapServletContextListener;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.servlet.Servlets;
@@ -36,10 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
 public final class WebServer {

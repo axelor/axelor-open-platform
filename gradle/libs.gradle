@@ -8,7 +8,7 @@ versions.hibernate = "5.6.15.Final"
 versions.hibernate_validator = "7.0.5.Final"
 
 versions.groovy = "3.0.24"
-versions.resteasy = "4.7.9.Final"
+versions.resteasy = "6.2.9.Final"
 versions.jackson = "2.18.3"
 versions.shiro = "1.13.0:jakarta"
 versions.buji_pac4j = "8.1.1"
@@ -156,11 +156,9 @@ libs.groovy = [
 def resteasy_module = { name ->
     dependencies.create("org.jboss.resteasy:${name}:${versions.resteasy}") {
         exclude module: "smallrye-config"
-        exclude module: "resteasy-jaxb-provider"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-core"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
-        exclude group: "com.fasterxml.jackson.jaxrs", module: "jackson-jaxrs-json-provider"
+        exclude module: "jackson-jakarta-rs-base"
+        exclude module: "jackson-module-jakarta-xmlbind-annotations"
+        exclude module: "jackson-jakarta-rs-json-provider"
         exclude module: "mail", group: "javax.mail"
     }
 }
@@ -168,17 +166,26 @@ def resteasy_module = { name ->
 // jax-rs
 libs.resteasy = [
     resteasy_module("resteasy-core"),
-    resteasy_module("resteasy-jackson2-provider"),
+    resteasy_module("resteasy-client"),
+    "org.jboss.resteasy:resteasy-jaxb-provider:${versions.resteasy}",
+    "org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
     "io.smallrye.config:smallrye-config:1.13.1"
 ]
 
 libs.resteasy_multipart = resteasy_module("resteasy-multipart-provider")
-libs.resteasy_guice = resteasy_module("resteasy-guice")
+libs.resteasy_guice = dependencies.create("dev.resteasy.guice:resteasy-guice:1.0.0.Alpha1") {
+    exclude module: "smallrye-config"
+    exclude module: "resteasy-jaxb-provider"
+    exclude module: "jackson-jakarta-rs-base"
+    exclude module: "jackson-module-jakarta-xmlbind-annotations"
+    exclude module: "jackson-jakarta-rs-json-provider"
+    exclude module: "mail", group: "javax.mail"
+}
 libs.resteasy_client = resteasy_module("resteasy-client")
 libs.resteasy_server = [
   "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
-  "io.undertow:undertow-core:2.2.37.Final",
-  "io.undertow:undertow-servlet:2.2.37.Final"
+  "io.undertow:undertow-core:2.3.13.Final",
+  "io.undertow:undertow-servlet:2.3.13.Final"
 ]
 
 libs.swagger_jaxrs2 = [
@@ -198,7 +205,7 @@ libs.jackson_libs = [
   "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
   "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
   "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
-  "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
+  "com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:${versions.jackson}",
   "com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
   "com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
   "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",

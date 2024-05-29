@@ -41,18 +41,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import jakarta.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
 
 @RequestScoped
 @Path("/files")
@@ -64,15 +64,15 @@ public class FileService extends AbstractService {
   @GET
   @Path("data-export")
   @Hidden
-  public javax.ws.rs.core.Response downloadExportFile(@QueryParam("fileName") final String name) {
+  public jakarta.ws.rs.core.Response downloadExportFile(@QueryParam("fileName") final String name) {
     if (StringUtils.isBlank(name)) {
-      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
     final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
     if (!file.isFile()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
-    return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+    return jakarta.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header(
             "Content-Disposition",
             ContentDisposition.attachment().filename(file.getName()).build().toString())
@@ -84,17 +84,17 @@ public class FileService extends AbstractService {
   @Path("data-export/{name:.*}")
   @Hidden
   @Deprecated(forRemoval = true)
-  public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
+  public jakarta.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
     return downloadExportFile(name);
   }
 
   @GET
   @Path("report")
   @Hidden
-  public javax.ws.rs.core.Response downloadReportFile(
+  public jakarta.ws.rs.core.Response downloadReportFile(
       @QueryParam("link") final String link, @QueryParam("name") final String name) {
     if (StringUtils.isBlank(link)) {
-      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
 
     final java.nio.file.Path file = MetaFiles.findTempFile(link);
@@ -112,7 +112,7 @@ public class FileService extends AbstractService {
     if (name.endsWith(".webp")) type = new MediaType("image", "webp");
 
     final String fileName = name == null ? file.toFile().getName() : name;
-    final ResponseBuilder builder = javax.ws.rs.core.Response.ok(file.toFile(), type);
+    final ResponseBuilder builder = jakarta.ws.rs.core.Response.ok(file.toFile(), type);
 
     if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
       return builder
@@ -134,7 +134,7 @@ public class FileService extends AbstractService {
   @Path("report/{link:.*}")
   @Hidden
   @Deprecated(forRemoval = true)
-  public javax.ws.rs.core.Response reportFile(
+  public jakarta.ws.rs.core.Response reportFile(
       @PathParam("link") final String link, @QueryParam("name") final String name) {
     return downloadReportFile(link, name);
   }
@@ -143,12 +143,12 @@ public class FileService extends AbstractService {
   @Path("upload/{fileId}")
   @Produces(MediaType.APPLICATION_JSON)
   @Hidden
-  public javax.ws.rs.core.Response clean(@PathParam("fileId") String fileId) {
+  public jakarta.ws.rs.core.Response clean(@PathParam("fileId") String fileId) {
     try {
       files.clean(fileId);
     } catch (IOException e) {
     }
-    return javax.ws.rs.core.Response.ok().build();
+    return jakarta.ws.rs.core.Response.ok().build();
   }
 
   @POST
@@ -160,7 +160,7 @@ public class FileService extends AbstractService {
       summary = "File upload",
       description =
           "The upload service doesn’t include file to DMS directly, but creates MetaFile records pointing to the uploaded file. The MetaFile record can be used later to create a DMSFile record (normal or attachment).")
-  public javax.ws.rs.core.Response upload(
+  public jakarta.ws.rs.core.Response upload(
       @HeaderParam("X-File-Id") String fileId,
       @HeaderParam("X-File-Name") String fileName,
       @HeaderParam("X-File-Type") String fileType,
@@ -169,13 +169,13 @@ public class FileService extends AbstractService {
       InputStream stream) {
 
     if (fileName == null || fileSize == null || fileOffset == null) {
-      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
     if (fileId == null && fileOffset == 0L) {
       fileId = UUID.randomUUID().toString();
     }
     if (fileId == null) {
-      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
 
     final Map<String, Object> data = new HashMap<>();
@@ -196,25 +196,25 @@ public class FileService extends AbstractService {
         files.upload(file, meta);
         // Keep original file name
         meta.setFileName(fileName);
-        return javax.ws.rs.core.Response.ok(meta).build();
+        return jakarta.ws.rs.core.Response.ok(meta).build();
       }
     } catch (IllegalArgumentException e) {
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
       data.putAll(validateBuilder.build());
-      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
+      return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
     } catch (Exception e) {
       LOG.error("Error when uploading file:", e);
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
       data.putAll(validateBuilder.build());
-      return javax.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).entity(data).build();
+      return jakarta.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).entity(data).build();
     }
 
     if (fileOffset == 0L) {
       data.put("fileId", fileId);
     }
 
-    return javax.ws.rs.core.Response.ok(data).build();
+    return jakarta.ws.rs.core.Response.ok(data).build();
   }
 }

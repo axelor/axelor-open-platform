@@ -50,8 +50,8 @@ import com.google.inject.servlet.ServletModule;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.Provider;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 
 /** The main application module. */

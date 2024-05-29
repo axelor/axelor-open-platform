@@ -69,21 +69,21 @@ import java.util.zip.ZipOutputStream;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.persistence.annotations.Transformation;
 
@@ -296,22 +296,22 @@ public class DmsService {
   @HEAD
   @Path("offline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
+  public jakarta.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
     final DMSFile file = repository.find(id);
     return !hasFile(file)
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+        ? jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+        : jakarta.ws.rs.core.Response.ok().build();
   }
 
   @GET
   @Path("offline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
+  public jakarta.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
     final DMSFile file = repository.find(id);
     final File path = getFile(file);
     if (path == null) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final StreamingOutput so =
@@ -330,24 +330,24 @@ public class DmsService {
   @POST
   @Path("download/batch")
   @Hidden
-  public javax.ws.rs.core.Response onDownload(Request request) {
+  public jakarta.ws.rs.core.Response onDownload(Request request) {
 
     final List<Object> ids = request.getRecords();
 
     if (ids == null || ids.isEmpty()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final List<DMSFile> records =
         repository.all().filter("self.id in :ids").bind("ids", ids).fetch();
 
     if (records.size() != ids.size()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     if (records.stream()
         .anyMatch(dmsFile -> !Boolean.TRUE.equals(dmsFile.getIsDirectory()) && !hasFile(dmsFile))) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final String batchId = UUID.randomUUID().toString();
@@ -366,7 +366,7 @@ public class DmsService {
       session.setAttribute(batchId, ids);
     }
 
-    return javax.ws.rs.core.Response.ok(data).build();
+    return jakarta.ws.rs.core.Response.ok(data).build();
   }
 
   private boolean hasBatchIds(String batchIds) {
@@ -393,13 +393,13 @@ public class DmsService {
   @Operation(
       summary = "Check file existence",
       description = "Check that the specified DMS file exists.")
-  public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
     if (!hasBatchIds(batchOrId) && !hasFile(repository.find(Longs.tryParse(batchOrId)))) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
     return findBatchIds(batchOrId) == null
-        ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
-        : javax.ws.rs.core.Response.ok().build();
+        ? jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+        : jakarta.ws.rs.core.Response.ok().build();
   }
 
   @GET
@@ -409,21 +409,21 @@ public class DmsService {
       summary = "File download",
       description =
           "This service can be used to download a file. It should be used as normal http request.")
-  public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, false);
   }
 
   @GET
   @Path("inline/{id}")
   @Hidden
-  public javax.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
+  public jakarta.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, true);
   }
 
-  private javax.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
+  private jakarta.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
     final List<?> ids = findBatchIds(batchOrId);
     if (ids == null) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     final Long[] idArray =
@@ -434,14 +434,14 @@ public class DmsService {
             .toArray(Long[]::new);
 
     if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {
-      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+      return jakarta.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
     final List<DMSFile> records =
         repository.all().filter("self.id in :ids").bind("ids", ids).fetch();
 
     if (records.size() != ids.size()) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
     // if file
@@ -451,7 +451,7 @@ public class DmsService {
       if (file != null && Files.exists(file.toPath())) {
         return stream(file, getFileName(record), inline);
       } else {
-        return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+        return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
       }
     }
 
@@ -471,7 +471,7 @@ public class DmsService {
     try {
       return stream(so, batchName, inline);
     } catch (Exception e) {
-      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+      return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
   }
 
@@ -607,7 +607,7 @@ public class DmsService {
     }
   }
 
-  private javax.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
+  private jakarta.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
     MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
 
     if (inline) {
@@ -621,7 +621,7 @@ public class DmsService {
       if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");
     }
 
-    final ResponseBuilder builder = javax.ws.rs.core.Response.ok(content, type);
+    final ResponseBuilder builder = jakarta.ws.rs.core.Response.ok(content, type);
 
     if (inline && type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
       return builder
