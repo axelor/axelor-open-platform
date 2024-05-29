@@ -972,14 +972,14 @@ public abstract class Property {
       return List.of(
           new JavaAnnotation("jakarta.persistence.Basic")
               .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
-          new JavaAnnotation("org.hibernate.annotations.Type").param("type", "{0:s}", "json"));
+          new JavaAnnotation("org.hibernate.annotations.Type").param("value", "{0:m}", "com.axelor.db.hibernate.type.JsonType.class"));
     }
 
     if (type == PropertyType.ENUM) {
       return List.of(
           new JavaAnnotation("jakarta.persistence.Basic"),
           new JavaAnnotation("org.hibernate.annotations.Type")
-              .param("type", "{0:s}", "com.axelor.db.hibernate.type.ValueEnumType"));
+              .param("value", "{0:m}", "com.axelor.db.hibernate.type.ValueEnumType.class"));
     }
 
     if (isTrue(large) && type == PropertyType.STRING) {
@@ -990,7 +990,7 @@ public abstract class Property {
 
       if (isTrue(encrypted)) {
         annotations.add(new JavaAnnotation("org.hibernate.annotations.Type")
-                .param("type", "{0:s}", "encrypted_text"));
+                .param("value", "{0:m}", "com.axelor.db.hibernate.type.EncryptedTextType.class"));
       }
       return annotations;
     }

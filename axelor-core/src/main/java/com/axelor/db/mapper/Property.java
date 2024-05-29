@@ -26,6 +26,8 @@ import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.converters.AbstractEncryptedConverter;
+import com.axelor.db.hibernate.type.EncryptedTextType;
+import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -62,6 +64,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.usertype.UserType;
 
 public class Property {
 
@@ -270,9 +273,9 @@ public class Property {
       }
 
       if (annotation instanceof org.hibernate.annotations.Type) {
-        json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
-        encrypted =
-            "encrypted_text".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+        Class<? extends UserType<?>> userType = ((org.hibernate.annotations.Type) annotation).value();
+        json = JsonType.class.isAssignableFrom(userType);
+        encrypted = EncryptedTextType.class.isAssignableFrom(userType);
       }
 
       // encrypted
