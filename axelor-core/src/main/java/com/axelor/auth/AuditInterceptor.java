@@ -32,11 +32,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import jakarta.persistence.PersistenceException;
 import org.hibernate.EmptyInterceptor;
+import org.hibernate.Interceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
 
-@SuppressWarnings("serial")
-public class AuditInterceptor extends EmptyInterceptor {
+public class AuditInterceptor implements Interceptor {
 
   private final ThreadLocal<User> currentUser = new ThreadLocal<User>();
   private final ThreadLocal<AuditTracker> tracker = new ThreadLocal<>();
@@ -143,7 +143,7 @@ public class AuditInterceptor extends EmptyInterceptor {
   @Override
   public boolean onFlushDirty(
       Object entity,
-      Serializable id,
+      Object id,
       Object[] currentState,
       Object[] previousState,
       String[] propertyNames,
@@ -183,7 +183,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
   @Override
   public boolean onSave(
-      Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+      Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
 
     boolean changed = updateSequence(entity, propertyNames, state);
 
@@ -216,7 +216,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
   @Override
   public void onDelete(
-      Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+      Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
     if (!canDelete(entity)) {
       throw new PersistenceException(
           String.format("You can't delete: %s#%s", entity.getClass().getName(), id));
