@@ -1,4 +1,0 @@
-<% pojo.importStatements.each { %>\
-${it}
-<% } %>\
-${pojo.extraImports}

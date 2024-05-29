@@ -1,4 +1,0 @@
-<% repo.importStatements.each { %>\
-${it}
-<% } %>\
-${repo.extraImports}

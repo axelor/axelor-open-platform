@@ -1,4 +1,0 @@
-package ${repo.namespace};
-
-${imports}\
-${body}
