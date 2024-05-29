@@ -18,26 +18,22 @@
  */
 package com.axelor.db.hibernate.dialect;
 
-import com.axelor.db.hibernate.type.EncryptedTextType;
-import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
-import com.axelor.db.hibernate.type.JsonType;
-import java.sql.Types;
-import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.HSQLDialect;
-import org.hibernate.service.ServiceRegistry;
+
+import static org.hibernate.type.SqlTypes.OTHER;
 
 public class AxelorHSQLDialect extends HSQLDialect {
 
   public AxelorHSQLDialect() {
     super();
-    registerColumnType(Types.OTHER, "clob");
   }
 
   @Override
-  public void contributeTypes(
-      TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-    super.contributeTypes(typeContributions, serviceRegistry);
-    typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
-    typeContributions.contributeType(EncryptedTextType.INSTANCE);
+  protected String columnType(int sqlTypeCode) {
+      if (sqlTypeCode == OTHER) {
+          return "clob";
+      }
+      return super.columnType(sqlTypeCode);
   }
+
 }

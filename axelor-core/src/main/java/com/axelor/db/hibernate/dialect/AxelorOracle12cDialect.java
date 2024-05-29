@@ -19,40 +19,42 @@
 package com.axelor.db.hibernate.dialect;
 
 import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
-import com.axelor.db.hibernate.type.EncryptedTextType;
-import com.axelor.db.hibernate.type.JsonTextSqlTypeDescriptor;
-import com.axelor.db.hibernate.type.JsonType;
-import java.sql.Types;
-import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.dialect.Oracle12cDialect;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.boot.model.FunctionContributions;
+import org.hibernate.dialect.DatabaseVersion;
+import org.hibernate.dialect.OracleDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorOracle12cDialect extends Oracle12cDialect {
+import static org.hibernate.type.SqlTypes.LONGVARCHAR;
 
-  public AxelorOracle12cDialect() {
-    super();
-    registerColumnType(Types.LONGVARCHAR, "clob");
-    registerFunction(
-        "json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_boolean",
-        new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
-    registerFunction(
-        "json_extract_integer",
-        new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
-    registerFunction(
-        "json_extract_decimal",
-        new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
+
+public class AxelorOracle12cDialect extends OracleDialect {
+
+  public AxelorOracle12cDialect(DatabaseVersion info) {
+    super(info);
   }
 
   @Override
-  public void contributeTypes(
-      TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-    super.contributeTypes(typeContributions, serviceRegistry);
-    typeContributions.contributeType(new JsonType(JsonTextSqlTypeDescriptor.INSTANCE));
-    typeContributions.contributeType(EncryptedTextType.INSTANCE);
+  protected String columnType(int sqlTypeCode) {
+    if (sqlTypeCode == LONGVARCHAR) {
+      return "clob";
+    }
+    return super.columnType(sqlTypeCode);
   }
+
+  @Override
+  public void initializeFunctionRegistry(FunctionContributions functionContributions) {
+    super.initializeFunctionRegistry(functionContributions);
+
+    functionContributions.getFunctionRegistry().register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_boolean", new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_integer", new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_decimal",
+            new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
+  }
+
 }

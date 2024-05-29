@@ -20,38 +20,42 @@ package com.axelor.db.hibernate.dialect;
 
 import com.axelor.db.hibernate.dialect.function.MySQLJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.MySQLJsonSetFunction;
-import com.axelor.db.hibernate.type.EncryptedTextType;
-import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
-import com.axelor.db.hibernate.type.JsonType;
-import java.sql.Types;
-import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.dialect.MySQL8Dialect;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.boot.model.FunctionContributions;
+import org.hibernate.dialect.DatabaseVersion;
+import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorMySQL8Dialect extends MySQL8Dialect {
+import static org.hibernate.type.SqlTypes.OTHER;
 
-  public AxelorMySQL8Dialect() {
-    super();
-    registerColumnType(Types.OTHER, "json");
-    registerFunction("json_set", new MySQLJsonSetFunction());
-    registerFunction("json_extract", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_text", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_boolean", new MySQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
-    registerFunction(
-        "json_extract_integer", new MySQLJsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
-    registerFunction(
-        "json_extract_decimal",
-        new MySQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
+public class AxelorMySQL8Dialect extends MySQLDialect {
+
+  public AxelorMySQL8Dialect(DatabaseVersion info) {
+    super(info);
   }
 
   @Override
-  public void contributeTypes(
-      TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-    super.contributeTypes(typeContributions, serviceRegistry);
-    typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
-    typeContributions.contributeType(EncryptedTextType.INSTANCE);
+  protected String columnType(int sqlTypeCode) {
+    if (sqlTypeCode == OTHER) {
+      return "json";
+    }
+    return super.columnType(sqlTypeCode);
   }
+
+  @Override
+  public void initializeFunctionRegistry(FunctionContributions functionContributions) {
+    super.initializeFunctionRegistry(functionContributions);
+
+    functionContributions.getFunctionRegistry().register("json_set", new MySQLJsonSetFunction());
+    functionContributions.getFunctionRegistry().register("json_extract", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_text", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_boolean", new MySQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_integer", new MySQLJsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_decimal",
+            new MySQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
+  }
+
 }

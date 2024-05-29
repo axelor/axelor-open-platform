@@ -18,43 +18,44 @@
  */
 package com.axelor.db.hibernate.dialect;
 
-import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
-import com.axelor.db.hibernate.type.EncryptedTextType;
-import com.axelor.db.hibernate.type.JsonType;
-import com.axelor.db.hibernate.type.JsonbSqlTypeDescriptor;
-import java.sql.Types;
-import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.dialect.PostgreSQL10Dialect;
-import org.hibernate.service.ServiceRegistry;
+import org.hibernate.boot.model.FunctionContributions;
+import org.hibernate.dialect.DatabaseVersion;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorPostgreSQL10Dialect extends PostgreSQL10Dialect {
+import static org.hibernate.type.SqlTypes.OTHER;
 
-  public AxelorPostgreSQL10Dialect() {
-    super();
-    registerColumnType(Types.OTHER, "jsonb");
-    registerFunction("json_set", new PostgreSQLJsonSetFunction());
-    registerFunction(
-        "json_extract", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_text", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction(
-        "json_extract_boolean",
-        new PostgreSQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
-    registerFunction(
-        "json_extract_integer",
-        new PostgreSQLJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
-    registerFunction(
-        "json_extract_decimal",
-        new PostgreSQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
+
+  public AxelorPostgreSQL10Dialect(DatabaseVersion version) {
+    super(version);
   }
 
   @Override
-  public void contributeTypes(
-      TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-    super.contributeTypes(typeContributions, serviceRegistry);
-    typeContributions.contributeType(new JsonType(JsonbSqlTypeDescriptor.INSTANCE));
-    typeContributions.contributeType(EncryptedTextType.INSTANCE);
+  protected String columnType(int sqlTypeCode) {
+    if (sqlTypeCode == OTHER) {
+      return "jsonb";
+    }
+    return super.columnType(sqlTypeCode);
   }
+
+  @Override
+  public void initializeFunctionRegistry(FunctionContributions functionContributions) {
+    super.initializeFunctionRegistry(functionContributions);
+
+    functionContributions.getFunctionRegistry().register("json_set", new PostgreSQLJsonSetFunction());
+    functionContributions.getFunctionRegistry().register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_boolean", new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_integer", new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+    functionContributions.getFunctionRegistry().register(
+            "json_extract_decimal",
+            new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+  }
+
 }
