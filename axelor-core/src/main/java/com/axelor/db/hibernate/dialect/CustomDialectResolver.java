@@ -54,19 +54,7 @@ public class CustomDialectResolver implements DialectResolver {
         return new AxelorPostgreSQL10Dialect();
       }
 
-      // Don't support version < 9.4
-      if (majorVersion == 9) {
-        log.warn(
-            "Consider upgrading to 'PostgreSQL >= 10' for better performance and functionality.");
-        if (minorVersion >= 5) {
-          return new AxelorPostgreSQL95Dialect();
-        }
-        if (minorVersion == 4) {
-          return new AxelorPostgreSQL94Dialect();
-        }
-      }
-
-      log.error("PostgreSQL 9.4 or later is required.");
+      log.error("PostgreSQL 10 or later is required.");
       return null;
     }
 
