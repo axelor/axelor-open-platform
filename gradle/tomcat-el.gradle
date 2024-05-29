@@ -31,7 +31,7 @@ task relocateTomcatEl(type: ShadowJar) {
     exclude 'META-INF/web-fragment.xml'
     exclude 'module-info.class'
 
-    relocate "javax.el", "com.axelor.shading.javax.el"
+    relocate "jakarta.el", "com.axelor.shading.jakarta.el"
     relocate "org.apache.el", "com.axelor.shading.org.apache.el"
 }
 
