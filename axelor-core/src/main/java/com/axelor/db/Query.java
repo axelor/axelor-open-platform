@@ -55,7 +55,6 @@ import java.util.stream.Stream;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
-import org.hibernate.jpa.QueryHints;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.Parameter;
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 
 /**
  * The query binder class provides the helper methods to bind query parameters and mark the query
@@ -77,7 +77,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setCacheable(boolean cacheable) {
-    query.setHint(QueryHints.HINT_CACHEABLE, cacheable);
+    query.setHint(AvailableHints.HINT_CACHEABLE, cacheable);
     return this;
   }
 
@@ -99,7 +99,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setReadOnly(boolean readOnly) {
-    query.setHint(QueryHints.HINT_READONLY, readOnly);
+    query.setHint(AvailableHints.HINT_READ_ONLY, readOnly);
     return this;
   }
 
