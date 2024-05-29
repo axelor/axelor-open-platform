@@ -39,6 +39,7 @@ import java.util.Properties;
 import com.google.inject.persist.jpa.JpaPersistOptions;
 import jakarta.inject.Inject;
 import org.hibernate.cache.jcache.ConfigSettings;
+import org.hibernate.cfg.CacheSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
@@ -162,10 +163,10 @@ public class JpaModule extends AbstractModule {
     final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
     keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
-    keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
-    keys.put("db.%s.url", Environment.JPA_JDBC_URL);
-    keys.put("db.%s.user", Environment.JPA_JDBC_USER);
-    keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
+    keys.put("db.%s.driver", Environment.JAKARTA_JDBC_DRIVER);
+    keys.put("db.%s.url", Environment.JAKARTA_JDBC_URL);
+    keys.put("db.%s.user", Environment.JAKARTA_JDBC_USER);
+    keys.put("db.%s.password", Environment.JAKARTA_JDBC_PASSWORD);
 
     for (String key : keys.keySet()) {
       String name = keys.get(key);
@@ -181,7 +182,7 @@ public class JpaModule extends AbstractModule {
       return;
     }
 
-    properties.put(Environment.JPA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
+    properties.put(CacheSettings.JAKARTA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
     properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
     properties.put(Environment.USE_QUERY_CACHE, "true");
 
