@@ -82,14 +82,17 @@ libs.graal_js = "org.graalvm.js:js:22.3.5"
 
 // javax libs
 libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:3.0.1"
-libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:5.0.0"
+libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:6.0.0"
 libs.jakarta_mail = [
     "com.sun.mail:jakarta.mail:2.0.1",
     "jakarta.activation:jakarta.activation-api:2.0.1"
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.0.1"
-libs.jakarta_el = "org.glassfish:jakarta.el:4.0.2"
-libs.websocket_api = "jakarta.websocket:jakarta.websocket-api:2.0.0"
+libs.jakarta_el = "jakarta.el:jakarta.el-api:5.0.1"
+libs.websocket_api = [
+    "jakarta.websocket:jakarta.websocket-api:2.1.0",
+    "jakarta.websocket:jakarta.websocket-client-api:2.1.0"
+]
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
