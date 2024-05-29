@@ -28,7 +28,7 @@ import com.axelor.test.db.Invoice;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

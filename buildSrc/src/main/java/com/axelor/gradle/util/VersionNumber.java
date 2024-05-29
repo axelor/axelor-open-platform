@@ -20,7 +20,7 @@ package com.axelor.gradle.util;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Ordering;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Represents, parses, and compares version numbers. Supports a couple of different schemes:

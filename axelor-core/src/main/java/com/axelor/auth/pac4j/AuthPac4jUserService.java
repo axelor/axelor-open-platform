@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;

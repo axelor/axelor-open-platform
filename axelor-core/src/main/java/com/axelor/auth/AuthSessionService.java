@@ -19,7 +19,7 @@
 package com.axelor.auth;
 
 import java.time.LocalDateTime;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 

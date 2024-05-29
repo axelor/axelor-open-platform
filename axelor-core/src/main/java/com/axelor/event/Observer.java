@@ -31,7 +31,7 @@ import java.lang.reflect.WildcardType;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Priority;
+import jakarta.annotation.Priority;
 import jakarta.inject.Qualifier;
 
 class Observer implements Comparable<Observer> {

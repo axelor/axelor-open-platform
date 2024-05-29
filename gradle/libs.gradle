@@ -49,10 +49,7 @@ libs.slf4j_logback = libs.slf4j_base + [
 ]
 
 // Guava
-libs.guava = [
-  "com.google.guava:guava:${versions.guava}",
-  "com.google.code.findbugs:jsr305:3.0.2"
-]
+libs.guava = "com.google.guava:guava:${versions.guava}"
 
 // yaml
 libs.snakeyaml = "org.yaml:snakeyaml:2.3"
@@ -93,6 +90,7 @@ libs.websocket_api = [
     "jakarta.websocket:jakarta.websocket-api:2.1.0",
     "jakarta.websocket:jakarta.websocket-client-api:2.1.0"
 ]
+libs.jakarta_annotation = "jakarta.annotation:jakarta.annotation-api:2.1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
@@ -219,7 +217,9 @@ libs.jackson_libs = [
 libs.apache_shiro = [
   "org.apache.shiro:shiro-core:${versions.shiro}",
   "org.apache.shiro:shiro-web:${versions.shiro}",
-  "org.apache.shiro:shiro-guice:${versions.shiro}"
+  dependencies.create("org.apache.shiro:shiro-guice:${versions.shiro}") {
+      exclude group: 'javax.annotation', module: 'javax.annotation-api'
+  }
 ]
 
 libs.pac4j = [
