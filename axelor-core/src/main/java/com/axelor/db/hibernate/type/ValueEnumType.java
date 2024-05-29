@@ -19,50 +19,49 @@
 package com.axelor.db.hibernate.type;
 
 import com.axelor.db.ValueEnum;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.usertype.DynamicParameterizedType;
+import org.hibernate.usertype.UserType;
+
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.usertype.DynamicParameterizedType;
-import org.hibernate.usertype.UserType;
 
-@SuppressWarnings({"unchecked", "serial"})
-public class ValueEnumType implements DynamicParameterizedType, UserType, Serializable {
+public class ValueEnumType implements UserType<Object>, DynamicParameterizedType {
 
   private int sqlType;
+  private Class<?> clazz;
 
-  private Class<? extends ValueEnum<?>> enumType;
+  @Override
+  public int getSqlType() {
+    return sqlType;
+  }
+
+  @Override
+  public Class<Object> returnedClass() {
+    return (Class<Object>) clazz;
+  }
 
   @Override
   public void setParameterValues(Properties parameters) {
     ParameterType params = (ParameterType) parameters.get(PARAMETER_TYPE);
-    enumType = params.getReturnedClass();
-    if (!enumType.isEnum()) {
-      throw new RuntimeException("Not enum type " + enumType.getName());
+    clazz = params.getReturnedClass();
+    if (!clazz.isEnum()) {
+      throw new RuntimeException("Not enum type " + clazz.getName());
     }
-    final ValueEnum<?>[] enums = enumType.getEnumConstants();
+    final ValueEnum<?>[] enums = (ValueEnum<?>[]) clazz.getEnumConstants();
     if (enums == null || enums.length == 0) {
-      throw new RuntimeException("Invalid enum type " + enumType.getName());
+      throw new RuntimeException("Invalid enum type " + clazz.getName());
     }
     if (enums[0].getValue() instanceof Integer) {
       sqlType = Types.INTEGER;
     } else {
       sqlType = Types.VARCHAR;
     }
-  }
-
-  @Override
-  public int[] sqlTypes() {
-    return new int[] {sqlType};
-  }
-
-  @Override
-  public Class<? extends ValueEnum<?>> returnedClass() {
-    return enumType;
   }
 
   @Override
@@ -76,10 +75,8 @@ public class ValueEnumType implements DynamicParameterizedType, UserType, Serial
   }
 
   @Override
-  public Object nullSafeGet(
-      ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner)
-      throws HibernateException, SQLException {
-    final Object value = rs.getObject(names[0]);
+  public Object nullSafeGet(ResultSet rs, int i, SharedSessionContractImplementor session, Object owner) throws SQLException {
+    final Object value = rs.getObject(i);
     return rs.wasNull() ? null : ValueEnum.of(returnedClass().asSubclass(Enum.class), value);
   }
 
