@@ -165,7 +165,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
 
 function OneToManyInner({
   schema,
-  valueAtom,
+  valueAtom: _valueAtom,
   widgetAtom,
   formAtom,
   viewData,
@@ -195,6 +195,7 @@ function OneToManyInner({
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
+  const serverSelectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridHandler>(null);
@@ -228,6 +229,7 @@ function OneToManyInner({
     ),
   );
 
+  const lastUpdatedValueRef = useRef<DataRecord[] | null>();
   const lastValueRef = useRef<DataRecord[] | null>();
   const lastItemsRef = useRef<DataRecord[]>([]);
   const getItems = useCallback((value: DataRecord[] | null | undefined) => {
@@ -244,6 +246,26 @@ function OneToManyInner({
     );
     return lastItemsRef.current;
   }, []);
+
+  const valueAtom = useMemo(
+    () =>
+      atom(
+        (get) => get(_valueAtom),
+        (
+          get,
+          set,
+          setter: SetStateAction<DataRecord[]>,
+          callOnChange: boolean = true,
+          markDirty: boolean = true,
+        ) => {
+          const values =
+            typeof setter === "function" ? setter(get(valueAtom)!) : setter;
+          lastUpdatedValueRef.current = values;
+          set(_valueAtom, values, callOnChange, markDirty);
+        },
+      ),
+    [_valueAtom],
+  );
 
   const [value, setValue] = useAtom(
     useMemo(
@@ -476,44 +498,51 @@ function OneToManyInner({
 
         const next = items.map((x) => ({
           ...x,
-          selected: ids.includes(x.id!),
+          selected:
+            ids.includes(x.id!) || serverSelectedIdsRef.current.includes(x.id!),
         }));
 
         shouldSyncSelect.current = false;
+        valueRef.current = next;
         set(valueAtom, next, false, false);
       },
       [getItems, state.rows, valueAtom],
     ),
   );
 
-  const syncSelection = useAfterActions(
-    useCallback(async () => {
-      const items = value ?? [];
-      const ids = items
-        .filter((x) => x.selected)
-        .map((x) => x.id!)
-        .filter(Boolean);
-      const selectedRows = state.rows
+  const syncSelection = useCallback(async () => {
+    const ids = serverSelectedIdsRef.current;
+
+    setState((draft) => {
+      draft.selectedRows = state.rows
         .map((row, i) => {
-          if (ids.includes(row.record?.id)) {
+          if (row.record?.selected || ids.includes(row.record?.id)) {
             return i;
           }
           return undefined;
         })
         .filter((x) => x !== undefined) as number[];
+    });
 
-      setState((draft) => {
-        draft.selectedRows = selectedRows;
-      });
-    }, [setState, state.rows, value]),
-  );
+    serverSelectedIdsRef.current = [];
+  }, [setState, state.rows]);
 
   useEffect(() => {
-    if (shouldSyncSelect.current) {
+    if (shouldSyncSelect.current || serverSelectedIdsRef.current.length > 0) {
       syncSelection();
     }
     shouldSyncSelect.current = true;
   }, [syncSelection]);
+
+  const rawValue = useAtomValue(valueAtom);
+  useEffect(() => {
+    if (!isEqual(rawValue, lastUpdatedValueRef.current)) {
+      const selectedIds = getItems(rawValue)
+        .filter((item) => item.selected)
+        .map((item) => item.id!);
+      serverSelectedIdsRef.current = selectedIds;
+    }
+  }, [getItems, rawValue]);
 
   const columnNames = useGridColumnNames({
     view: viewData?.view ?? schema,
@@ -666,13 +695,13 @@ function OneToManyInner({
   useEffect(() => {
     const last = valueRef.current ?? [];
     const next = value ?? [];
-
+    
     if (
       forceRefreshRef.current ||
       last.length !== next.length ||
       last.some((x) => {
         const y = next.find((d) => d.id === x.id);
-        return y === undefined || !equals(x, y);
+        return y === undefined || !equals(x, y) || x.selected !== y.selected;
       })
     ) {
       forceRefreshRef.current = false;
