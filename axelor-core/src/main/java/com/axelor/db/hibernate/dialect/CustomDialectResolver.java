@@ -35,23 +35,25 @@ public class CustomDialectResolver implements DialectResolver {
 
   @Override
   public Dialect resolveDialect(DialectResolutionInfo info) {
-    final String databaseName = info.getDatabaseName();
-    final int majorVersion = info.getDatabaseMajorVersion();
-    final int minorVersion = info.getDatabaseMinorVersion();
-    final Dialect dialect = resolveDialect(databaseName, majorVersion, minorVersion);
+
+    final Dialect dialect = findDialect(info);
 
     if (dialect != null) {
-      log.info("Database engine: {} {}.{}", databaseName, majorVersion, minorVersion);
+      log.info("Database engine: {} {}.{}", info.getDatabaseName(), info.getDatabaseMajorVersion(), info.getDatabaseMinorVersion());
       log.debug("Database dialect: {}", dialect);
     }
 
     return dialect;
   }
 
-  private Dialect resolveDialect(String databaseName, int majorVersion, int minorVersion) {
+  private Dialect findDialect(DialectResolutionInfo info) {
+    final String databaseName = info.getDatabaseName();
+    final int majorVersion = info.getDatabaseMajorVersion();
+    final int minorVersion = info.getDatabaseMinorVersion();
+
     if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
       if (majorVersion >= 12) {
-        return new AxelorPostgreSQL10Dialect();
+        return new AxelorPostgreSQL10Dialect(info);
       }
 
       log.error("PostgreSQL 12 or later is required.");
@@ -60,7 +62,7 @@ public class CustomDialectResolver implements DialectResolver {
 
     if (TargetDatabase.MYSQL.equals(databaseName)) {
       if (majorVersion >= 8) {
-        return new AxelorMySQL8Dialect();
+        return new AxelorMySQL8Dialect(info);
       }
 
       log.error("MySQL 8.0 or later is required.");
@@ -69,7 +71,7 @@ public class CustomDialectResolver implements DialectResolver {
 
     if (TargetDatabase.ORACLE.equals(databaseName)) {
       if (majorVersion >= 19) {
-        return new AxelorOracle12cDialect();
+        return new AxelorOracle12cDialect(info);
       }
       log.error("Oracle 19 or later is required.");
       return null;
