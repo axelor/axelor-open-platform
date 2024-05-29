@@ -19,6 +19,7 @@
 package com.axelor.test.db;
 
 import com.axelor.db.JpaModel;
+import com.axelor.db.hibernate.type.ValueEnumType;
 import com.google.common.base.MoreObjects;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
@@ -36,7 +37,7 @@ public class EnumCheck extends JpaModel {
   private EnumStatus status;
 
   @Basic
-  @Type(type = "com.axelor.db.hibernate.type.ValueEnumType")
+  @Type(ValueEnumType.class)
   private EnumStatusNumber statusNumber;
 
   public EnumStatus getStatus() {

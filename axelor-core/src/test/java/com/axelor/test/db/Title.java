@@ -20,6 +20,7 @@ package com.axelor.test.db;
 
 import com.axelor.db.Model;
 import com.axelor.db.annotations.Widget;
+import com.axelor.db.hibernate.type.JsonType;
 import com.google.common.base.MoreObjects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,7 +53,7 @@ public class Title extends Model {
   private String name;
 
   @Widget(title = "Attributes")
-  @Type(type = "json")
+  @Type(JsonType.class)
   private String attrs;
 
   public Long getId() {

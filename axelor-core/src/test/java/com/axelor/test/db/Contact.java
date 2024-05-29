@@ -24,6 +24,8 @@ import com.axelor.db.annotations.EqualsInclude;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
+import com.axelor.db.hibernate.type.JsonType;
+import com.axelor.db.hibernate.type.ValueEnumType;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -102,7 +104,7 @@ public class Contact extends JpaModel {
   private String contactType;
 
   @Basic
-  @Type(type = "com.axelor.db.hibernate.type.ValueEnumType")
+  @Type(ValueEnumType.class)
   private EnumStatusNumber contactStatus;
 
   @Transient
@@ -123,11 +125,11 @@ public class Contact extends JpaModel {
   private Set<Contact> relatedContacts;
 
   @Widget(title = "Attributes")
-  @Type(type = "json")
+  @Type(JsonType.class)
   private String attrs;
 
   @Widget(title = "Another Attributes")
-  @Type(type = "json")
+  @Type(JsonType.class)
   private String anotherAttrs;
 
   public Contact() {}
