@@ -20,11 +20,13 @@ package com.axelor.db.hibernate.dialect.function;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.hibernate.type.BasicTypeReference;
 import org.hibernate.type.Type;
 
 public class MySQLJsonExtractFunction extends AbstractJsonExtractFunction {
 
-  public MySQLJsonExtractFunction(Type type, String cast) {
+  public MySQLJsonExtractFunction(BasicTypeReference<?> type, String cast) {
     super("json_extract", type, cast);
   }
 

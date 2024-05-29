@@ -20,11 +20,13 @@ package com.axelor.db.hibernate.dialect.function;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.hibernate.type.BasicTypeReference;
 import org.hibernate.type.Type;
 
 public class OracleJsonExtractFunction extends AbstractJsonExtractFunction {
 
-  public OracleJsonExtractFunction(Type type, String cast) {
+  public OracleJsonExtractFunction(BasicTypeReference<?> type, String cast) {
     super("json_value", type, cast);
   }
 

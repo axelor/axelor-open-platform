@@ -21,39 +21,20 @@ package com.axelor.db.hibernate.dialect.function;
 import java.util.List;
 import java.util.regex.Pattern;
 import jakarta.persistence.PersistenceException;
-import org.hibernate.QueryException;
-import org.hibernate.dialect.function.SQLFunction;
-import org.hibernate.engine.spi.Mapping;
+import org.hibernate.dialect.function.StandardSQLFunction;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.query.ReturnableType;
+import org.hibernate.sql.ast.SqlAstTranslator;
+import org.hibernate.sql.ast.spi.SqlAppender;
+import org.hibernate.sql.ast.tree.SqlAstNode;
 import org.hibernate.type.Type;
 
-public abstract class AbstractJsonSetFunction implements SQLFunction {
+public abstract class AbstractJsonSetFunction extends StandardSQLFunction {
 
   private static final Pattern PATH_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
 
-  private String name;
-
   public AbstractJsonSetFunction(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public boolean hasArguments() {
-    return true;
-  }
-
-  @Override
-  public boolean hasParenthesesIfNoArguments() {
-    return true;
-  }
-
-  @Override
-  public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-    return firstArgumentType;
+    super(name);
   }
 
   protected abstract String transformPath(String path);
@@ -67,24 +48,24 @@ public abstract class AbstractJsonSetFunction implements SQLFunction {
     throw new PersistenceException("Invalid json path: " + name);
   }
 
-  @Override
-  @SuppressWarnings("rawtypes")
-  public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-    if (arguments.size() != 3) {
-      throw new PersistenceException("Invalid use of 'json_set', requires 3 arguments.");
-    }
-
-    final StringBuilder buf = new StringBuilder();
-    final String field = (String) arguments.get(0);
-    final String path = (String) arguments.get(1);
-    final Object value = arguments.get(2);
-
-    buf.append(getName()).append("(");
-    buf.append(validatePath(field)).append(", ");
-    buf.append(transformPath(validatePath(path.substring(1, path.length() - 1)))).append(", ");
-    buf.append(transformValue(value));
-    buf.append(")");
-
-    return buf.toString();
-  }
+//  @Override
+//  @SuppressWarnings("rawtypes")
+//  public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
+//    if (arguments.size() != 3) {
+//      throw new PersistenceException("Invalid use of 'json_set', requires 3 arguments.");
+//    }
+//
+//    final StringBuilder buf = new StringBuilder();
+//    final String field = (String) arguments.get(0);
+//    final String path = (String) arguments.get(1);
+//    final Object value = arguments.get(2);
+//
+//    buf.append(getName()).append("(");
+//    buf.append(validatePath(field)).append(", ");
+//    buf.append(transformPath(validatePath(path.substring(1, path.length() - 1)))).append(", ");
+//    buf.append(transformValue(value));
+//    buf.append(")");
+//
+//    return buf.toString();
+//  }
 }
