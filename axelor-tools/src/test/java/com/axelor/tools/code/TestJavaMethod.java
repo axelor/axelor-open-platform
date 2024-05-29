@@ -68,7 +68,7 @@ public class TestJavaMethod {
   public void testThrows() {
     JavaMethod method = new JavaMethod("hello", "void", Modifier.PUBLIC);
     method.throwable("java.io.IOException");
-    method.throwable("javax.persistence.PersistenceException");
+    method.throwable("jakarta.persistence.PersistenceException");
     String code = writer.emit(method).toString();
     assertEquals(
         "public void hello() throws IOException, PersistenceException {}",

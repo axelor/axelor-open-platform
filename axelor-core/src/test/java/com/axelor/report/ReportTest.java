@@ -30,7 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.junit.jupiter.api.Test;

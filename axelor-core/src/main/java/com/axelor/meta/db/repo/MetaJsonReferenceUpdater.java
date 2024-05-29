@@ -39,9 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.Query;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.persistence.Query;
 
 @Singleton
 public class MetaJsonReferenceUpdater {

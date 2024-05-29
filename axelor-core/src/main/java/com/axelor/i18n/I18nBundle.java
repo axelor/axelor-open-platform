@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.persistence.FlushModeType;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.TypedQuery;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {

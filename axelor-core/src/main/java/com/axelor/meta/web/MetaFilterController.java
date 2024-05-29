@@ -24,8 +24,8 @@ import com.axelor.meta.service.MetaFilterService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.ResponseException;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 
 public class MetaFilterController {
 

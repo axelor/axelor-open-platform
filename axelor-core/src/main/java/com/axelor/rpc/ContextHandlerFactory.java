@@ -37,7 +37,7 @@ import com.google.common.cache.LoadingCache;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;

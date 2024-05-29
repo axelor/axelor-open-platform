@@ -30,7 +30,7 @@ import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;

@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.SharedCacheMode;
+import jakarta.persistence.SharedCacheMode;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.xpath.XPath;
@@ -62,13 +62,13 @@ public class DBHelper {
   private static final String XPATH_SHARED_CACHE_MODE = "shared-cache-mode";
 
   private static final String XPATH_PERSISTENCE_DRIVER =
-      "properties/property[@name='javax.persistence.jdbc.driver']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.driver']/@value";
   private static final String XPATH_PERSISTENCE_URL =
-      "properties/property[@name='javax.persistence.jdbc.url']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.url']/@value";
   private static final String XPATH_PERSISTENCE_USER =
-      "properties/property[@name='javax.persistence.jdbc.user']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.user']/@value";
   private static final String XPATH_PERSISTENCE_PASSWORD =
-      "properties/property[@name='javax.persistence.jdbc.password']/@value";
+      "properties/property[@name='jakarta.persistence.jdbc.password']/@value";
 
   private static final String XPATH_BATCH_SIZE =
       "properties/property[@name='hibernate.jdbc.batch_size']/@value";
@@ -233,7 +233,7 @@ public class DBHelper {
   /**
    * Returns the shared cache mode (ie second-level cache).<br/>
    * <br/>
-   * The result of this method corresponds to the <code>javax.persistence.sharedCache.mode</code>
+   * The result of this method corresponds to the <code>jakarta.persistence.sharedCache.mode</code>
    * property in <code>axelor-config.properties<code/> if defined, else to the <code>shared-cache-mode</code>
    * element in the <code>persistence.xml</code> file.
    *

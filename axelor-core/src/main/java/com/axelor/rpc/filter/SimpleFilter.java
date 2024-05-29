@@ -22,7 +22,7 @@ import com.axelor.db.hibernate.type.JsonFunction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 class SimpleFilter extends Filter {
 

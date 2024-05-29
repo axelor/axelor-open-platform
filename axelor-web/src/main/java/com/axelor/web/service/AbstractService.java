@@ -19,7 +19,7 @@
 package com.axelor.web.service;
 
 import com.google.inject.Injector;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;

@@ -37,7 +37,7 @@ import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

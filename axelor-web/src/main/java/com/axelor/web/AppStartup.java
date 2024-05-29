@@ -26,10 +26,10 @@ import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 import org.slf4j.Logger;
 
 @Singleton

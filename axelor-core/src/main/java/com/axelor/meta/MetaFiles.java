@@ -55,8 +55,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import jakarta.activation.MimeType;
 import jakarta.activation.MimeTypeParseException;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 
 /** This class provides some helper methods to deal with files. */
 public class MetaFiles {

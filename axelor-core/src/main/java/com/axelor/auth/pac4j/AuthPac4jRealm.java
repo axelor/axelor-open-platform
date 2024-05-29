@@ -29,7 +29,7 @@ import io.buji.pac4j.realm.Pac4jRealm;
 import io.buji.pac4j.token.Pac4jToken;
 import java.util.List;
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.pac4j.core.profile.CommonProfile;

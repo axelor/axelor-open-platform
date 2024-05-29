@@ -30,7 +30,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSequence;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;

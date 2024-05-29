@@ -35,7 +35,9 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import javax.inject.Inject;
+
+import com.google.inject.persist.jpa.JpaPersistOptions;
+import jakarta.inject.Inject;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.Environment;
@@ -144,7 +146,8 @@ public class JpaModule extends AbstractModule {
     }
 
     install(new TenantModule());
-    install(new JpaPersistModule(jpaUnit).properties(properties));
+    JpaPersistOptions jpaPersistOpts = JpaPersistOptions.builder().setAutoBeginWorkOnEntityManagerCreation(true).build();
+    install(new JpaPersistModule(jpaUnit, jpaPersistOpts).properties(properties));
     if (this.autostart) {
       bind(Initializer.class).asEagerSingleton();
     }

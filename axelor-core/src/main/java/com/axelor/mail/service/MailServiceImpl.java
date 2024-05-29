@@ -82,7 +82,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import jakarta.activation.DataSource;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import jakarta.mail.FetchProfile;
 import jakarta.mail.Flags;
 import jakarta.mail.Folder;

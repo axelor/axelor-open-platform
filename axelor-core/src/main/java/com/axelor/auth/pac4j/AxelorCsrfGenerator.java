@@ -19,7 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import java.util.Optional;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.matching.matcher.csrf.DefaultCsrfTokenGenerator;

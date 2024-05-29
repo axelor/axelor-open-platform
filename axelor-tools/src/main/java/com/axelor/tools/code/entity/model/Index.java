@@ -85,7 +85,7 @@ public class Index {
 
   public JavaAnnotation toJavaAnnotation(Entity entity) {
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.Index")
+        new JavaAnnotation("jakarta.persistence.Index")
             .param("columnList", "{0:s}", getColumnList(entity));
     if (notBlank(name)) {
       annotation.param("name", "{0:s}", name);

@@ -22,7 +22,7 @@ import com.axelor.JpaTest;
 import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStreamReader;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 abstract class RpcTest extends JpaTest {
 

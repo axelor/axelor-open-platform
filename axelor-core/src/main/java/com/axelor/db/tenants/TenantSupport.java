@@ -18,8 +18,8 @@
  */
 package com.axelor.db.tenants;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /** Provides configured {@link TenantConfigProvider}. */
 @Singleton

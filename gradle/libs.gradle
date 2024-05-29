@@ -2,7 +2,7 @@ def libs = ext.libs = [:]
 def versions = ext.libsVersions = [:]
 
 // versions
-versions.guice = "5.1.0"
+versions.guice = "7.0.0"
 versions.guava = "33.3.1-jre"
 versions.hibernate = "5.6.15.Final"
 versions.hibernate_validator = "7.0.5.Final"
@@ -58,7 +58,10 @@ libs.guava = [
 libs.snakeyaml = "org.yaml:snakeyaml:2.3"
 
 // Guice
-libs.guice = "com.google.inject:guice:${versions.guice}"
+libs.guice = [
+    "com.google.inject:guice:${versions.guice}",
+    "jakarta.inject:jakarta.inject-api:2.0.1"
+]
 libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guice}"
 libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
 
@@ -115,7 +118,9 @@ libs.redisson = [
     "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
 libs.hazelcast = "com.hazelcast:hazelcast:5.3.8"
-libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.6"
+libs.caffeine = dependencies.create("com.github.ben-manes.caffeine:jcache:3.1.6") {
+    exclude module: "javax.inject", group: "javax.inject"
+}
 libs.infinispan = [
     "org.infinispan:infinispan-hibernate-cache-v53:13.0.22.Final",
     "org.infinispan:infinispan-core:13.0.22.Final",

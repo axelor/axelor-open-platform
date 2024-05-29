@@ -37,9 +37,9 @@ These events are fired during user login process.
 import com.axelor.event.Observes;
 import com.axelor.events.PostLogin;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RequestScoped
 public class LoginObserver {
@@ -81,7 +81,7 @@ Observer methods may use the `@Named` qualifier with the name of the action to o
 import com.axelor.event.Observes;
 import com.axelor.events.PostAction;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 public class SaleOrderObserver {
 
@@ -131,7 +131,7 @@ import com.axelor.events.PostRequest;
 import com.axelor.events.RequestEvent;
 import com.axelor.events.qualifiers.EntityType;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 public class ContactObserver {
 
@@ -200,7 +200,7 @@ A service firing an event is an event source. To fire an event, a service needs 
 [source,java]
 -----
 import com.axelor.event.Event;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ContactService {
 
@@ -240,7 +240,7 @@ When firing your events, you can also `select` your own qualifiers in order to n
 -----
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class ContactService {
 

@@ -30,8 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.persistence.FlushModeType;
-import javax.persistence.Parameter;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Parameter;
 import org.hibernate.jpa.QueryHints;
 
 /**
@@ -40,14 +40,14 @@ import org.hibernate.jpa.QueryHints;
  */
 public class QueryBinder {
 
-  private final javax.persistence.Query query;
+  private final jakarta.persistence.Query query;
 
   /**
    * Create a new query binder for the given query instance.
    *
    * @param query the query instance
    */
-  private QueryBinder(javax.persistence.Query query) {
+  private QueryBinder(jakarta.persistence.Query query) {
     this.query = query;
   }
 
@@ -57,7 +57,7 @@ public class QueryBinder {
    * @param query the query instance
    * @return a new query binder instance
    */
-  public static QueryBinder of(javax.persistence.Query query) {
+  public static QueryBinder of(jakarta.persistence.Query query) {
     return new QueryBinder(query);
   }
 
@@ -274,7 +274,7 @@ public class QueryBinder {
    *
    * @return the query instance
    */
-  public javax.persistence.Query getQuery() {
+  public jakarta.persistence.Query getQuery() {
     return query;
   }
 

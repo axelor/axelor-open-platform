@@ -892,19 +892,19 @@ public abstract class Property {
 
     if (isFalse(entity.getSequential()) || isTrue(entity.getMappedSuperClass())) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Id"),
-          new JavaAnnotation("javax.persistence.GeneratedValue")
-              .param("strategy", "{0:m}", "javax.persistence.GenerationType.AUTO"));
+          new JavaAnnotation("jakarta.persistence.Id"),
+          new JavaAnnotation("jakarta.persistence.GeneratedValue")
+              .param("strategy", "{0:m}", "jakarta.persistence.GenerationType.AUTO"));
     }
 
     String name = entity.getTable() + "_SEQ";
 
     return List.of(
-        new JavaAnnotation("javax.persistence.Id"),
-        new JavaAnnotation("javax.persistence.GeneratedValue")
-            .param("strategy", "{0:m}", "javax.persistence.GenerationType.SEQUENCE")
+        new JavaAnnotation("jakarta.persistence.Id"),
+        new JavaAnnotation("jakarta.persistence.GeneratedValue")
+            .param("strategy", "{0:m}", "jakarta.persistence.GenerationType.SEQUENCE")
             .param("generator", "{0:s}", name),
-        new JavaAnnotation("javax.persistence.SequenceGenerator")
+        new JavaAnnotation("jakarta.persistence.SequenceGenerator")
             .param("name", "{0:s}", name)
             .param("sequenceName", "{0:s}", name)
             .param("allocationSize", "{0:l}", 1));
@@ -970,32 +970,32 @@ public abstract class Property {
                 "Encryption is not supported on json field: %s.%s", entity.getName(), name));
       }
       return List.of(
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"),
+          new JavaAnnotation("jakarta.persistence.Basic")
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
           new JavaAnnotation("org.hibernate.annotations.Type").param("type", "{0:s}", "json"));
     }
 
     if (type == PropertyType.ENUM) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Basic"),
+          new JavaAnnotation("jakarta.persistence.Basic"),
           new JavaAnnotation("org.hibernate.annotations.Type")
               .param("type", "{0:s}", "com.axelor.db.hibernate.type.ValueEnumType"));
     }
 
     if (isTrue(large) && type == PropertyType.STRING) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Lob"),
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"),
+          new JavaAnnotation("jakarta.persistence.Lob"),
+          new JavaAnnotation("jakarta.persistence.Basic")
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
           new JavaAnnotation("org.hibernate.annotations.Type")
               .param("type", "{0:s}", isTrue(encrypted) ? "encrypted_text" : "text"));
     }
 
     if (isTrue(large) || type == PropertyType.BINARY) {
       return List.of(
-          new JavaAnnotation("javax.persistence.Lob"),
-          new JavaAnnotation("javax.persistence.Basic")
-              .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY"));
+          new JavaAnnotation("jakarta.persistence.Lob"),
+          new JavaAnnotation("jakarta.persistence.Basic")
+              .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
     }
 
     return null;
@@ -1040,8 +1040,8 @@ public abstract class Property {
               .param("value", "{0:l}", text));
     } else {
       all.add(
-          new JavaAnnotation("javax.persistence.Access")
-              .param("value", "{0:m}", "javax.persistence.AccessType.PROPERTY"));
+          new JavaAnnotation("jakarta.persistence.Access")
+              .param("value", "{0:m}", "jakarta.persistence.AccessType.PROPERTY"));
     }
 
     return all;
@@ -1117,7 +1117,7 @@ public abstract class Property {
   }
 
   private JavaAnnotation $transient() {
-    return isTrue(getTransient()) ? new JavaAnnotation("javax.persistence.Transient") : null;
+    return isTrue(getTransient()) ? new JavaAnnotation("jakarta.persistence.Transient") : null;
   }
 
   private JavaAnnotation $column() {
@@ -1144,7 +1144,7 @@ public abstract class Property {
 
     JavaAnnotation res =
         new JavaAnnotation(
-            isReference() ? "javax.persistence.JoinColumn" : "javax.persistence.Column");
+            isReference() ? "jakarta.persistence.JoinColumn" : "jakarta.persistence.Column");
 
     if (column != null) {
       res.param("name", "{0:s}", column);
@@ -1173,20 +1173,20 @@ public abstract class Property {
     if (type != PropertyType.ONE_TO_ONE) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.OneToOne")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.OneToOne")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
     }
 
     if (isTrue(getOrphanRemoval())) {
-      annotation.param("cascade", "{0:m}", "javax.persistence.CascadeType.ALL");
+      annotation.param("cascade", "{0:m}", "jakarta.persistence.CascadeType.ALL");
       annotation.param("orphanRemoval", "true");
     } else {
       annotation.param(
           "cascade",
-          List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+          List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
     return annotation;
@@ -1195,11 +1195,11 @@ public abstract class Property {
   private JavaAnnotation $many2one() {
     if (type != PropertyType.MANY_TO_ONE) return null;
 
-    return new JavaAnnotation("javax.persistence.ManyToOne")
-        .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY")
+    return new JavaAnnotation("jakarta.persistence.ManyToOne")
+        .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY")
         .param(
             "cascade",
-            List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+            List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
             t -> new JavaCode("{0:m}", t));
   }
 
@@ -1207,20 +1207,20 @@ public abstract class Property {
     if (type != PropertyType.ONE_TO_MANY) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.OneToMany")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.OneToMany")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
     }
 
     if (isTrue(getOrphanRemoval())) {
-      annotation.param("cascade", "{0:m}", "javax.persistence.CascadeType.ALL");
+      annotation.param("cascade", "{0:m}", "jakarta.persistence.CascadeType.ALL");
       annotation.param("orphanRemoval", "true");
     } else {
       annotation.param(
           "cascade",
-          List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+          List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
 
@@ -1231,8 +1231,8 @@ public abstract class Property {
     if (type != PropertyType.MANY_TO_MANY) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.ManyToMany")
-            .param("fetch", "{0:m}", "javax.persistence.FetchType.LAZY");
+        new JavaAnnotation("jakarta.persistence.ManyToMany")
+            .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY");
 
     if (mappedBy != null) {
       annotation.param("mappedBy", "{0:s}", mappedBy);
@@ -1240,7 +1240,7 @@ public abstract class Property {
 
     annotation.param(
         "cascade",
-        List.of("javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"),
+        List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
         t -> new JavaCode("{0:m}", t));
 
     return annotation;
@@ -1257,18 +1257,18 @@ public abstract class Property {
     }
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.JoinTable").param("name", "{0:s}", joinTable);
+        new JavaAnnotation("jakarta.persistence.JoinTable").param("name", "{0:s}", joinTable);
 
     if (fk1 != null) {
       annotation.param(
           "joinColumns",
-          new JavaAnnotation("javax.persistence.JoinColumn").param("name", "{0:s}", fk1));
+          new JavaAnnotation("jakarta.persistence.JoinColumn").param("name", "{0:s}", fk1));
     }
 
     if (fk2 != null) {
       annotation.param(
           "inverseJoinColumns",
-          new JavaAnnotation("javax.persistence.JoinColumn").param("name", "{0:s}", fk2));
+          new JavaAnnotation("jakarta.persistence.JoinColumn").param("name", "{0:s}", fk2));
     }
 
     return annotation;
@@ -1277,7 +1277,7 @@ public abstract class Property {
   private JavaAnnotation $orderBy() {
     if (isBlank(orderBy)) return null;
 
-    return new JavaAnnotation("javax.persistence.OrderBy")
+    return new JavaAnnotation("jakarta.persistence.OrderBy")
         .param("value", "{0:s}", orderBy.replaceAll("-\\s*(\\w+)", "$1 DESC"));
   }
 
@@ -1295,7 +1295,7 @@ public abstract class Property {
         isBinary()
             ? "com.axelor.db.converters.EncryptedBytesConverter"
             : "com.axelor.db.converters.EncryptedStringConverter";
-    return new JavaAnnotation("javax.persistence.Convert")
+    return new JavaAnnotation("jakarta.persistence.Convert")
         .param("converter", "{0:t}.class", converter);
   }
 
@@ -1469,7 +1469,7 @@ public abstract class Property {
       doc.line("</p>");
       doc.line("<p>");
       doc.line("If you have to query {@link {0:t}} records in same transaction, make", target);
-      doc.line("sure to call {@link javax.persistence.EntityManager#flush() } to avoid");
+      doc.line("sure to call {@link jakarta.persistence.EntityManager#flush() } to avoid");
       doc.line("unexpected errors.");
       doc.line("</p>");
     }

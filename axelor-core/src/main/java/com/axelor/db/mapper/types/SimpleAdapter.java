@@ -24,7 +24,7 @@ import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import javax.persistence.Column;
+import jakarta.persistence.Column;
 
 public class SimpleAdapter implements TypeAdapter<Object> {
 

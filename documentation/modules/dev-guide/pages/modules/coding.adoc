@@ -90,7 +90,7 @@ The controllers are intermediary between views & service layer.
 -----
 package com.axelor.contact.web;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
 
 import com.axelor.contact.db.Contact;

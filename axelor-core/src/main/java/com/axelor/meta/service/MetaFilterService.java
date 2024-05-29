@@ -27,7 +27,7 @@ import com.axelor.meta.db.repo.MetaFilterRepository;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 import java.util.List;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.shiro.authz.AuthorizationException;
 
 public class MetaFilterService {

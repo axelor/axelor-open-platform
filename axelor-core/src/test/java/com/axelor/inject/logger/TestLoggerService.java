@@ -18,7 +18,7 @@
  */
 package com.axelor.inject.logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 
 public class TestLoggerService {

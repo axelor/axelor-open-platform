@@ -28,7 +28,7 @@ import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.junit.jupiter.api.BeforeEach;

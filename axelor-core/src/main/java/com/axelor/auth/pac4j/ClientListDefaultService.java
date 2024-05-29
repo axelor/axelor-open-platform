@@ -18,8 +18,8 @@
  */
 package com.axelor.auth.pac4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.pac4j.http.client.indirect.FormClient;
 
 @Singleton

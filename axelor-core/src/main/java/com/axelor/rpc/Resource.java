@@ -108,11 +108,11 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.persistence.EntityTransaction;
-import javax.persistence.OptimisticLockException;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ValidationException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.hibernate.StaleObjectStateException;
@@ -581,7 +581,7 @@ public class Resource<T extends Model> {
         .append(" AS _parent ")
         .append("WHERE _parent.id IN (:ids) GROUP BY _parent");
 
-    javax.persistence.Query q = JPA.em().createQuery(builder.toString());
+    jakarta.persistence.Query q = JPA.em().createQuery(builder.toString());
     q.setParameter("ids", ids);
 
     QueryBinder.of(q).setReadOnly();
@@ -1634,7 +1634,7 @@ public class Resource<T extends Model> {
           String.format(
               "SELECT %s FROM %s self WHERE self.id = :id", selectName, model.getSimpleName());
 
-      javax.persistence.Query query = JPA.em().createQuery(qs);
+      jakarta.persistence.Query query = JPA.em().createQuery(qs);
       QueryBinder.of(query).setCacheable().setReadOnly().bind(data);
 
       Object value = query.getSingleResult();

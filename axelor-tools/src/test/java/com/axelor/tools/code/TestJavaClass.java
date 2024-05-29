@@ -116,7 +116,7 @@ public class TestJavaClass {
   @Test
   public void testAnnotation() {
     JavaType pojo = JavaType.newClass("Person", Modifier.PUBLIC);
-    JavaAnnotation annotation = new JavaAnnotation("javax.persistence.Entity");
+    JavaAnnotation annotation = new JavaAnnotation("jakarta.persistence.Entity");
     pojo.annotation(annotation);
     String code = writer.emit(pojo).toString();
     assertTrue(code.contains("@Entity"));

@@ -29,7 +29,7 @@ public class UniqueConstraint extends Index {
 
   @Override
   public JavaAnnotation toJavaAnnotation(Entity entity) {
-    JavaAnnotation annotation = new JavaAnnotation("javax.persistence.UniqueConstraint");
+    JavaAnnotation annotation = new JavaAnnotation("jakarta.persistence.UniqueConstraint");
     if (notBlank(getName())) {
       annotation.param("name", "{0:s}", getName());
     }

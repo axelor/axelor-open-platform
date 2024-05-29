@@ -571,14 +571,14 @@ public class Entity implements BaseType<Entity> {
   }
 
   private JavaAnnotation $entity() {
-    return isTrue(mappedSuperClass) ? null : new JavaAnnotation("javax.persistence.Entity");
+    return isTrue(mappedSuperClass) ? null : new JavaAnnotation("jakarta.persistence.Entity");
   }
 
   private JavaAnnotation $table() {
     if (isBlank(table) || isTrue(mappedSuperClass)) return null;
 
     JavaAnnotation annotation =
-        new JavaAnnotation("javax.persistence.Table").param("name", "{0:s}", table);
+        new JavaAnnotation("jakarta.persistence.Table").param("name", "{0:s}", table);
 
     List<Index> indexes = new ArrayList<>(getIndexes());
 
@@ -593,17 +593,17 @@ public class Entity implements BaseType<Entity> {
   private JavaAnnotation $cacheable() {
     if (isModelClass() || cacheable == null) return null;
     if (isTrue(cacheable)) {
-      return new JavaAnnotation("javax.persistence.Cacheable");
+      return new JavaAnnotation("jakarta.persistence.Cacheable");
     }
     if (isFalse(cacheable)) {
-      return new JavaAnnotation("javax.persistence.Cacheable").param("value", "false");
+      return new JavaAnnotation("jakarta.persistence.Cacheable").param("value", "false");
     }
     return null;
   }
 
   private JavaAnnotation $mappedSuperClass() {
     return isTrue(mappedSuperClass)
-        ? new JavaAnnotation("javax.persistence.MappedSuperclass")
+        ? new JavaAnnotation("jakarta.persistence.MappedSuperclass")
         : null;
   }
 
@@ -614,13 +614,13 @@ public class Entity implements BaseType<Entity> {
     if (strategy.equals("JOINED")) type = "JOINED";
     if (strategy.equals("CLASS")) type = "TABLE_PER_CLASS";
 
-    return new JavaAnnotation("javax.persistence.Inheritance")
-        .param("strategy", "{0:m}", "javax.persistence.InheritanceType." + type);
+    return new JavaAnnotation("jakarta.persistence.Inheritance")
+        .param("strategy", "{0:m}", "jakarta.persistence.InheritanceType." + type);
   }
 
   private JavaAnnotation $listeners() {
     if (listeners == null || listeners.isEmpty()) return null;
-    return new JavaAnnotation("javax.persistence.EntityListeners")
+    return new JavaAnnotation("jakarta.persistence.EntityListeners")
         .param("value", listeners, t -> new JavaCode("{0:t}.class", t.getClazz()));
   }
 
@@ -817,9 +817,9 @@ public class Entity implements BaseType<Entity> {
           new JavaField("selected", "boolean", Modifier.PRIVATE | Modifier.TRANSIENT);
       JavaField archived = new JavaField("archived", "Boolean", Modifier.PRIVATE);
 
-      cid.annotation(new JavaAnnotation("javax.persistence.Transient"));
-      version.annotation(new JavaAnnotation("javax.persistence.Version"));
-      selected.annotation(new JavaAnnotation("javax.persistence.Transient"));
+      cid.annotation(new JavaAnnotation("jakarta.persistence.Transient"));
+      version.annotation(new JavaAnnotation("jakarta.persistence.Version"));
+      selected.annotation(new JavaAnnotation("jakarta.persistence.Transient"));
       archived.annotation(
           new JavaAnnotation("com.axelor.db.annotations.Widget").param("massUpdate", "true"));
 

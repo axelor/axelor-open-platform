@@ -19,7 +19,7 @@
 package com.axelor.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;

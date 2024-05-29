@@ -24,7 +24,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
 import io.buji.pac4j.token.Pac4jToken;
 import java.util.Collections;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;

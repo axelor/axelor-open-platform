@@ -23,10 +23,10 @@ import com.axelor.web.service.RestService;
 import com.axelor.web.service.ViewService;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 
 public class WebTestModule extends ServletModule {
 

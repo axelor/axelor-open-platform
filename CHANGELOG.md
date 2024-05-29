@@ -5054,7 +5054,7 @@
 
   <details>
   
-  `javax.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
+  `jakarta.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
   to overwrite the `shared-cache-mode` from `persistence.xml`. It allow to enable/disable
   the shared cache mode (ie second-level cache).
   

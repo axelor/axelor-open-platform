@@ -43,7 +43,7 @@ import com.axelor.web.socket.inject.WebSocketSecurity;
 import com.axelor.web.socket.inject.WebSocketSecurityInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
-import com.google.inject.matcher.AbstractMatcher;
+import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
@@ -143,7 +143,7 @@ public class AppServletModule extends ServletModule {
     // intercept request accepting methods
     bindInterceptor(
         Matchers.annotatedWith(Path.class),
-        new AbstractMatcher<Method>() {
+        new Matcher<Method>() {
           @Override
           public boolean matches(Method t) {
             for (Class<?> c : t.getParameterTypes()) {

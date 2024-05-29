@@ -23,7 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import javax.persistence.Column;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Digits;
 
 public class DecimalAdapter implements TypeAdapter<BigDecimal> {

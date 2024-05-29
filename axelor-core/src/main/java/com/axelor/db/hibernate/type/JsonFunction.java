@@ -20,7 +20,7 @@ package com.axelor.db.hibernate.type;
 
 import com.google.common.base.Preconditions;
 import java.util.regex.Pattern;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 public final class JsonFunction {
 

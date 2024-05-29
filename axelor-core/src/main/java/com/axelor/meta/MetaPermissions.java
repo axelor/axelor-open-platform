@@ -33,7 +33,7 @@ import com.axelor.meta.schema.views.SimpleWidget;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class MetaPermissions {

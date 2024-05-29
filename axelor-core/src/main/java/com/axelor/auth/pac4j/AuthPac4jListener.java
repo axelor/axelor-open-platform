@@ -27,7 +27,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.LogoutEvent;
 import com.axelor.events.PostLogin;
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;

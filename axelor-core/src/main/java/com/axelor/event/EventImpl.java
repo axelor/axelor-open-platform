@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 class EventImpl<T> implements Event<T> {
 

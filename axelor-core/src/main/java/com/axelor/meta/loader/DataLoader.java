@@ -35,7 +35,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

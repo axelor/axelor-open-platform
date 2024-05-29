@@ -22,7 +22,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.common.crypto.Encryptor;
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 public abstract class AbstractEncryptedConverter<T, R> implements AttributeConverter<T, R> {
 

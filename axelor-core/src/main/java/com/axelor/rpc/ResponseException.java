@@ -25,7 +25,7 @@ import com.axelor.db.Model;
 import com.google.common.base.Throwables;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.StaleObjectStateException;
 

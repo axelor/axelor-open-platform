@@ -26,7 +26,7 @@ import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.team.db.Team;
 import java.util.Map;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 
 public class TeamRepository extends JpaRepository<Team> {
 

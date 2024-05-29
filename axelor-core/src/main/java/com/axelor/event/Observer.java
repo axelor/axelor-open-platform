@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Priority;
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 class Observer implements Comparable<Observer> {
   public final Method method;

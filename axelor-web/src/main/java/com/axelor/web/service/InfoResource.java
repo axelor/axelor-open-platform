@@ -39,7 +39,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;

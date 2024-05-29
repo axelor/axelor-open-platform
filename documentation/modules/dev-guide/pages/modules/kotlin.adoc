@@ -103,7 +103,7 @@ import com.axelor.hello.db.Hello
 import com.axelor.hello.service.HelloService
 import com.axelor.rpc.ActionRequest
 import com.axelor.rpc.ActionResponse
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 open class HelloController @Inject constructor(val service: HelloService) {
 

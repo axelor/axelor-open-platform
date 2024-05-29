@@ -358,7 +358,7 @@ All others `hibernate.*` properties are also passed to Hibernate.
 
 == Cache Configuration
 
-Property `javax.persistence.sharedCache.mode` can be used to enable or disable second level caching.
+Property `jakarta.persistence.sharedCache.mode` can be used to enable or disable second level caching.
 
 Following keys can be used :
 

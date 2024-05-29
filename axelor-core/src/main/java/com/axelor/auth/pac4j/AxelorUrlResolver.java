@@ -19,7 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.WebContextHelper;

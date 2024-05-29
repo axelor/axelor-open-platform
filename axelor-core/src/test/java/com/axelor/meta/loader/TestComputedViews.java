@@ -35,7 +35,7 @@ import com.axelor.meta.schema.views.Hilite;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

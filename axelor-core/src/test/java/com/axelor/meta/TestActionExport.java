@@ -29,7 +29,7 @@ import com.google.common.collect.Maps;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestActionExport extends MetaTest {

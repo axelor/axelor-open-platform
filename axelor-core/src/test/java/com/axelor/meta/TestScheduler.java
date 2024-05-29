@@ -29,7 +29,7 @@ import com.axelor.quartz.JobRunner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.quartz.Job;

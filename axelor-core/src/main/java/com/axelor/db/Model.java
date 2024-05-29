@@ -19,10 +19,10 @@
 package com.axelor.db;
 
 import com.axelor.db.annotations.Widget;
-import javax.persistence.GeneratedValue;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
 
 /**
  * The base abstract model class to extend all domain objects.

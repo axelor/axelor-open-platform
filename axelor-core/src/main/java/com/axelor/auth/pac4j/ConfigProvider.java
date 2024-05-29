@@ -19,8 +19,8 @@
 package com.axelor.auth.pac4j;
 
 import com.google.inject.Provider;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 

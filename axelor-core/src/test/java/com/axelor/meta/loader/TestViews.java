@@ -38,7 +38,7 @@ import com.google.inject.persist.Transactional;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Map;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestViews extends MetaTest {

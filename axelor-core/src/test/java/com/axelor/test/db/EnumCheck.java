@@ -20,11 +20,11 @@ package com.axelor.test.db;
 
 import com.axelor.db.JpaModel;
 import com.google.common.base.MoreObjects;
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import jakarta.persistence.Basic;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.Type;
 
 @Entity

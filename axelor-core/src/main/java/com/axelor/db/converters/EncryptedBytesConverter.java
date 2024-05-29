@@ -19,7 +19,7 @@
 package com.axelor.db.converters;
 
 import com.axelor.common.crypto.BytesEncryptor;
-import javax.persistence.Converter;
+import jakarta.persistence.Converter;
 
 @Converter
 public class EncryptedBytesConverter extends AbstractEncryptedConverter<byte[], byte[]> {

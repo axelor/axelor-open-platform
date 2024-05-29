@@ -27,7 +27,7 @@ import com.axelor.rpc.Response;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.TypedQuery;
 
 public class TaskController extends JpaSupport {
 

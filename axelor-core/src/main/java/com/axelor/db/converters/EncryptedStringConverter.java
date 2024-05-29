@@ -19,7 +19,7 @@
 package com.axelor.db.converters;
 
 import com.axelor.common.crypto.StringEncryptor;
-import javax.persistence.Converter;
+import jakarta.persistence.Converter;
 
 @Converter
 public class EncryptedStringConverter extends AbstractEncryptedConverter<String, String> {

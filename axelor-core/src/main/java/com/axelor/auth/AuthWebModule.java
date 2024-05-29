@@ -18,7 +18,7 @@
  */
 package com.axelor.auth;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 
 public abstract class AuthWebModule extends ShiroWebModule {

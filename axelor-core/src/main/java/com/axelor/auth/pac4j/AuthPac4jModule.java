@@ -34,7 +34,7 @@ import com.google.inject.multibindings.Multibinder;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.guice.web.ShiroWebModule;

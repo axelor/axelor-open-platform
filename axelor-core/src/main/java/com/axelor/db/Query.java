@@ -52,9 +52,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.TypedQuery;
 import org.hibernate.jpa.QueryHints;
 
 /**
@@ -540,7 +540,7 @@ public class Query<T extends Model> {
     int limit = 1000;
 
     TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
-    javax.persistence.Query uq = em().createQuery(updateQuery);
+    jakarta.persistence.Query uq = em().createQuery(updateQuery);
 
     QueryBinder.of(sq).bind(namedParams, this.params);
     QueryBinder.of(uq).bind(namedParams, this.params);
@@ -574,7 +574,7 @@ public class Query<T extends Model> {
    * Bulk delete all the matched records. <br>
    * <br>
    * This method uses <code>DELETE</code> query and performs {@link
-   * javax.persistence.Query#executeUpdate()}.
+   * jakarta.persistence.Query#executeUpdate()}.
    *
    * @see #remove()
    * @return total number of records affected.
@@ -585,7 +585,7 @@ public class Query<T extends Model> {
         updateQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that");
 
     if (notMySQL) {
-      javax.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
+      jakarta.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
       this.bind(q);
       return q.executeUpdate();
     }
@@ -594,7 +594,7 @@ public class Query<T extends Model> {
     // support JOIN with DELETE query so we have to update in batch.
 
     TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
-    javax.persistence.Query dq = em().createQuery(deleteQuery("self.id IN (:ids)"));
+    jakarta.persistence.Query dq = em().createQuery(deleteQuery("self.id IN (:ids)"));
 
     this.bind(sq);
     this.bind(dq);
@@ -690,7 +690,7 @@ public class Query<T extends Model> {
     return sb.toString();
   }
 
-  protected QueryBinder bind(javax.persistence.Query query) {
+  protected QueryBinder bind(jakarta.persistence.Query query) {
     return QueryBinder.of(query).bind(namedParams, params);
   }
 
@@ -837,7 +837,7 @@ public class Query<T extends Model> {
 
     @SuppressWarnings("all")
     public List<List> values(int limit, int offset) {
-      javax.persistence.Query q = em().createQuery(query);
+      jakarta.persistence.Query q = em().createQuery(query);
       if (limit > 0) {
         q.setMaxResults(limit);
       }

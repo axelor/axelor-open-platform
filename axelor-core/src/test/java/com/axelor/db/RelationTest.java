@@ -31,8 +31,8 @@ import com.axelor.test.db.repo.MoveRepository;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 import java.math.BigDecimal;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

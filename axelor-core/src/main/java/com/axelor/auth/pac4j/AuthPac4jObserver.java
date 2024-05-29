@@ -24,8 +24,8 @@ import com.axelor.event.Observes;
 import com.axelor.events.PreLogin;
 import java.util.Optional;
 import java.util.function.Consumer;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton

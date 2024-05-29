@@ -33,7 +33,7 @@ import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import javax.script.Bindings;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;

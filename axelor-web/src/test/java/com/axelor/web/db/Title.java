@@ -19,7 +19,7 @@
 package com.axelor.web.db;
 
 import com.axelor.db.JpaModel;
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 

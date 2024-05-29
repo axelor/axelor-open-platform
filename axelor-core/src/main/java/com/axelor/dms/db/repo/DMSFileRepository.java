@@ -61,8 +61,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import org.apache.shiro.authz.UnauthorizedException;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {

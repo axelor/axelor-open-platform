@@ -20,7 +20,7 @@ package com.axelor.db.tenants;
 
 import java.util.Collections;
 import java.util.Map;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 public class TenantInfo {
 

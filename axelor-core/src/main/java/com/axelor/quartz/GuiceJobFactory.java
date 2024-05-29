@@ -19,7 +19,7 @@
 package com.axelor.quartz;
 
 import com.axelor.inject.Beans;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
