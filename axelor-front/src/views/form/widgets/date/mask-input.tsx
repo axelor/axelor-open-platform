@@ -9,7 +9,7 @@ function moveCaretToStart(el: HTMLInputElement) {
     ind > -1 && (el.selectionStart = el.selectionEnd = ind);
   } else if (typeof (el as any).createTextRange != "undefined") {
     el.focus();
-    var range = (el as any).createTextRange();
+    const range = (el as any).createTextRange();
     range.collapse(true);
     range.select();
   }

@@ -1,8 +1,7 @@
-import { forwardRef, useEffect } from "react";
+import { AdornedInput, Box } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { Box } from "@axelor/ui";
+import { forwardRef, useEffect } from "react";
 import { MaskedInput } from "./mask-input";
-import classes from "./date-input.module.scss";
 
 const CHAR_MASK: Record<string, RegExp> = {
   M: /[0-1]/,
@@ -73,26 +72,27 @@ export const DateInput = forwardRef<any, any>(
     }, [name, inputValue, onChange]);
 
     return (
-      <Box className={classes.inputWrapper}>
-        <MaskedInput
-          {...props}
-          data-input
-          className={
-            open
-              ? className
-              : className &&
-                className.replace("react-datepicker-ignore-onclickoutside", "")
-          }
-          onKeyDown={open ? onKeyDown : handleKeyDown}
-          onFocus={onFocus}
-          onBlur={handleBlur}
-          mask={getMaskFromFormat(format)}
-          ref={ref}
-        />
-        <Box className={classes.inputIcon} onClick={open ? onClose : onOpen}>
-          <MaterialIcon icon="calendar_today" variant="outlined" />
-        </Box>
-      </Box>
+      <AdornedInput
+        {...props}
+        data-input
+        className={
+          open
+            ? className
+            : className &&
+              className.replace("react-datepicker-ignore-onclickoutside", "")
+        }
+        onKeyDown={open ? onKeyDown : handleKeyDown}
+        onFocus={onFocus}
+        onBlur={handleBlur}
+        mask={getMaskFromFormat(format)}
+        ref={ref}
+        InputComponent={MaskedInput}
+        endAdornment={
+          <Box onClick={open ? onClose : onOpen}>
+            <MaterialIcon icon="calendar_today" variant="outlined" />
+          </Box>
+        }
+      />
     );
   },
 );
