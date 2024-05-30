@@ -214,9 +214,9 @@ export function LoginForm({
           </Box>
           {tenants.length > 1 && (
             <Box mb={4}>
-              <InputLabel htmlFor="database">{i18n.get("Database")}</InputLabel>
+              <InputLabel htmlFor="teannt">{i18n.get("Tenant")}</InputLabel>
               <Select
-                id="database"
+                id="teannt"
                 multiple={false}
                 value={tenant}
                 options={tenants}
