@@ -412,7 +412,7 @@ export function ExpandableFormView({
           if (await ds.verify({ id, version })) return;
           throw new Error(
             i18n.get(
-              "The record has been updated or delete by another action.",
+              "The record has been updated or deleted by another action.",
             ),
           );
         },
