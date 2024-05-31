@@ -1,0 +1,6 @@
+---
+title: Set AJAX resolver on all indirect clients
+type: fix
+description: |
+  This fixes default SSO authentication request blocked
+  because of CORS policy.

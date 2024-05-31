@@ -61,6 +61,7 @@ import javax.inject.Singleton;
 import org.jasig.cas.client.util.PrivateKeyUtils;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
@@ -354,10 +355,19 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     final Map<Boolean, List<Client>> groupedClients =
         clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
+
+    final List<IndirectClient> indirectClients =
+        groupedClients.getOrDefault(true, Collections.emptyList()).stream()
+            .map(IndirectClient.class::cast)
+            .collect(Collectors.toList());
+
+    final AjaxRequestResolver ajaxRequestResolver = Beans.get(AjaxRequestResolver.class);
+    indirectClients.forEach(client -> client.setAjaxRequestResolver(ajaxRequestResolver));
+
     indirectClientNames =
         Collections.unmodifiableSet(
             (Set<String>)
-                groupedClients.getOrDefault(true, Collections.emptyList()).stream()
+                indirectClients.stream()
                     .map(Client::getName)
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
     if (!indirectClientNames.isEmpty()) {
