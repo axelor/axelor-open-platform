@@ -49,7 +49,7 @@ const FIELD_WIDGETS: Record<string, string[]> = {
   integer: ["Duration", "Progress", "Rating"],
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
-  "many-to-one": ["BinaryLink", "Image", "SuggestBox"],
+  "many-to-one": ["BinaryLink", "Image", "SuggestBox", "Drawing"],
   "many-to-many": ["TagSelect"],
 };
 
