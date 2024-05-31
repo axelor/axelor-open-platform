@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
@@ -79,10 +80,18 @@ public abstract class ClientListService implements Provider<List<Client>> {
     final Map<Boolean, List<Client>> grouped =
         clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
 
+    final List<IndirectClient> indirectCients =
+        grouped.getOrDefault(true, Collections.emptyList()).stream()
+            .map(IndirectClient.class::cast)
+            .collect(Collectors.toList());
+
+    final AjaxRequestResolver ajaxRequestResolver = Beans.get(AjaxRequestResolver.class);
+    indirectCients.forEach(client -> client.setAjaxRequestResolver(ajaxRequestResolver));
+
     indirectClientNames =
         Collections.unmodifiableSet(
             (Set<String>)
-                grouped.getOrDefault(true, Collections.emptyList()).stream()
+                indirectCients.stream()
                     .map(Client::getName)
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 

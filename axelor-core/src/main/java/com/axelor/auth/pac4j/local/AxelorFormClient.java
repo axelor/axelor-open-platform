@@ -39,7 +39,6 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.http.HttpAction;
-import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.http.client.indirect.FormClient;
@@ -58,7 +57,6 @@ public class AxelorFormClient extends FormClient {
       setLoginUrl(LOGIN_URL);
       defaultAuthenticator(authPac4jInfo.getAuthenticator());
       setCredentialsExtractor(Beans.get(FormExtractor.class));
-      setAjaxRequestResolver(Beans.get(AjaxRequestResolver.class));
       setUrlResolver(new AxelorUrlResolver());
     }
 
