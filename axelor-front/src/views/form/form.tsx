@@ -695,7 +695,9 @@ const FormContainer = memo(function FormContainer({
         );
 
         if (callOnRead) {
+          const savedResult = res;
           res = res.id ? await doRead(res.id, select) : res;
+          res = res.id ? fillRecordWithCid(savedResult, res) : res;
           res = { ...dummy, ...res }; // restore dummy values
           doEdit(res, {
             callAction: false,
@@ -1517,6 +1519,32 @@ const compact = (rec: any) => {
   });
   return res;
 };
+
+function fillRecordWithCid(savedRecord: DataRecord, fetchedRecord: DataRecord) {
+  function fillCid(prev: any, curr: any): any {
+    if (Array.isArray(curr)) {
+      return curr.map((v: DataRecord) =>
+        fillCid(
+          prev?.find?.((p: DataRecord) => p.id === v.id),
+          v,
+        ),
+      );
+    }
+    if (curr && prev && typeof curr === "object") {
+      return {
+        ...Object.keys(curr).reduce(
+          (rec, k) => ({ ...rec, [k]: fillCid(prev[k], curr[k]) }),
+          {} as DataRecord,
+        ),
+        ...(prev.cid && {
+          cid: prev.cid,
+        }),
+      };
+    }
+    return curr;
+  }
+  return fillCid(savedRecord, fetchedRecord);
+}
 
 function useCheckVersion(
   formAtom: FormAtom,
