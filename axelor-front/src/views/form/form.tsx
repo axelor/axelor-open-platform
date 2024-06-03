@@ -28,10 +28,7 @@ import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import {
-  diff,
-  extractDummy,
-} from "@/services/client/data-utils";
+import { diff, extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -698,7 +695,7 @@ const FormContainer = memo(function FormContainer({
         );
 
         if (callOnRead) {
-          // res = res.id ? await doRead(res.id, select) : res;
+          res = res.id ? await doRead(res.id, select) : res;
           res = { ...dummy, ...res }; // restore dummy values
           doEdit(res, {
             callAction: false,
@@ -720,7 +717,7 @@ const FormContainer = memo(function FormContainer({
         handleOnSaveErrors,
         dataStore,
         actionExecutor,
-        // doRead,
+        doRead,
         doEdit,
         readonly,
       ],
