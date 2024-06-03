@@ -22,18 +22,20 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
-import com.axelor.inject.Beans;
+import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaMenu;
-import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.service.tags.TagsService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.persistence.TypedQuery;
+import org.hibernate.jpa.QueryHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,17 +111,25 @@ public class MenuService {
   }
 
   private Map<String, String> getHelps() {
-    final MetaHelpRepository helpRepo = Beans.get(MetaHelpRepository.class);
-    final String lang = AppFilter.getLocale().getLanguage();
-    return helpRepo
-        .all()
-        .filter("self.menu is not null and self.language = :lang")
-        .bind("lang", lang)
-        .cacheable()
-        .select("menu", "help")
-        .fetch(-1, 0)
-        .stream()
-        .collect(Collectors.toMap(s -> (String) s.get("menu"), s -> (String) s.get("help")));
+    final Locale locale = AppFilter.getLocale();
+    final String lang = locale.toLanguageTag();
+    final String baseLang = locale.getLanguage();
+
+    final TypedQuery<Object[]> query =
+        JPA.em()
+            .createQuery(
+                "SELECT self.menu, MAX(CASE WHEN self.language = :lang THEN self.help ELSE base.help END) "
+                    + "FROM MetaHelp self "
+                    + "LEFT JOIN MetaHelp base ON base.menu = self.menu AND base.language = :baseLang "
+                    + "WHERE self.menu IS NOT NULL AND self.language IN (:lang, :baseLang) "
+                    + "GROUP BY self.menu",
+                Object[].class)
+            .setParameter("lang", lang)
+            .setParameter("baseLang", baseLang)
+            .setHint(QueryHints.HINT_CACHEABLE, true);
+
+    return query.getResultList().stream()
+        .collect(Collectors.toMap(a -> (String) a[0], a -> (String) a[1]));
   }
 
   /**

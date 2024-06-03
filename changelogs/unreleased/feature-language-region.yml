@@ -1,0 +1,3 @@
+---
+title: Support localization with IETF BCP 47 language tags and fall back to primary language subtags
+type: feature

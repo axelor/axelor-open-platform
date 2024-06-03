@@ -87,7 +87,7 @@ public class InfoService extends AbstractService {
     map.put("theme", getTheme());
     map.put("logo", getLogo());
     map.put("icon", getIcon());
-    map.put("lang", AppFilter.getLocale().getLanguage());
+    map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     if (AuthUtils.getUser() == null) {
       return map;
@@ -151,7 +151,7 @@ public class InfoService extends AbstractService {
     map.put("login", user.getCode());
     map.put("name", nameValue);
     map.put("nameField", nameField.getName());
-    map.put("lang", AppFilter.getLocale().getLanguage());
+    map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     if (user.getImage() != null) {
       map.put("image", getLink(user, null));

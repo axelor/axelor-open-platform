@@ -287,7 +287,7 @@ public class MetaController {
     }
 
     Path path = Paths.get(EXPORT_DIR, "i18n");
-    String lang = name.substring(9, name.length() - 4);
+    String lang = StringUtils.normalizeLanguageTag(name.substring(9, name.length() - 4));
     Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
 
     final List<String[]> items = new ArrayList<>();

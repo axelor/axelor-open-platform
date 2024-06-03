@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -1109,22 +1110,30 @@ public class Query<T extends Model> {
       return prefix + "." + variable;
     }
 
+    private String getTranslationJoin(String joinName, String from, String variable, String lang) {
+      return String.format(
+          "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'",
+          joinName, joinName, from, variable, joinName, lang);
+    }
+
     private String translate(Property property, String prefix) {
-      String variable = property.getName();
-      String language = I18n.getBundle().getLocale().getLanguage();
-      String joinName =
+      final String variable = property.getName();
+      final Locale locale = I18n.getBundle().getLocale();
+      final String lang = locale.toLanguageTag();
+      final String baseLang = locale.getLanguage();
+      final String joinName =
           prefix == null
               ? String.format("_meta_translation_%s", variable)
               : String.format("_meta_translation%s_%s", prefix, variable);
-      String from = prefix == null ? "self" : prefix;
-      String join =
-          String.format(
-              "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'",
-              joinName, joinName, from, variable, joinName, language);
+      final String baseJoinName = joinName + "_base";
+      final String from = prefix == null ? "self" : prefix;
 
-      translationJoins.add(join);
+      translationJoins.add(getTranslationJoin(joinName, from, variable, lang));
+      translationJoins.add(getTranslationJoin(baseJoinName, from, variable, baseLang));
 
-      return String.format("COALESCE(NULLIF(%s.message, ''), %s.%s)", joinName, from, variable);
+      return String.format(
+          "COALESCE(NULLIF(%s.message, ''), NULLIF(%s.message, ''), %s.%s)",
+          joinName, baseJoinName, from, variable);
     }
 
     public String joinName(String name) {

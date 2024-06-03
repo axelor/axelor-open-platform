@@ -45,7 +45,7 @@ public class AppFilter implements Filter {
   public void init(FilterConfig filterConfig) throws ServletException {
     try {
       final String appLocale = AppSettings.get().get(AvailableAppSettings.APPLICATION_LOCALE, null);
-      APP_LOCALE = appLocale == null ? null : new Locale(appLocale);
+      APP_LOCALE = appLocale == null ? null : Locale.forLanguageTag(appLocale);
     } catch (Exception e) {
     }
   }
@@ -57,7 +57,7 @@ public class AppFilter implements Filter {
   public static Locale getLocale() {
     User user = AuthUtils.getUser();
     if (user != null && user.getLanguage() != null) {
-      return new Locale(user.getLanguage());
+      return Locale.forLanguageTag(user.getLanguage());
     }
     if (user != null && APP_LOCALE != null) {
       return APP_LOCALE;

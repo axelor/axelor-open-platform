@@ -21,6 +21,7 @@ package com.axelor.common;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -241,5 +242,15 @@ public final class StringUtils {
       }
     }
     return parts.toArray(new String[0]);
+  }
+
+  /**
+   * Normalizes a language tag to a valid IETF BCP 47 language tag. For example: "fr_fr" -> "fr-FR".
+   *
+   * @param languageTag the language tag to normalize
+   * @return the normalized language tag
+   */
+  public static String normalizeLanguageTag(String languageTag) {
+    return Locale.forLanguageTag(languageTag.replace('_', '-')).toLanguageTag();
   }
 }

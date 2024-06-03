@@ -20,11 +20,10 @@ package com.axelor.meta.schema.views;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
+import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
-import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaView;
-import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,10 +37,20 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.persistence.TypedQuery;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.hibernate.jpa.QueryHints;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
@@ -267,22 +276,49 @@ public abstract class AbstractView {
 
   @XmlTransient
   @JsonProperty("helpOverride")
-  public List<?> getHelpOverride() {
+  @Nullable
+  public Collection<Map<String, Object>> getHelpOverride() {
     if (AuthUtils.getUser() != null && Boolean.TRUE.equals(AuthUtils.getUser().getNoHelp())) {
       return null;
     }
-    final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
-    final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
-    List<?> found =
-        repo.all()
-            .filter(
-                "self.model = :model AND self.language = :lang and (self.view = :view OR self.view IS NULL)")
-            .bind("model", getModel())
-            .bind("lang", lang)
-            .bind("view", getName())
-            .order("-view")
-            .select("field", "type", "help", "style")
-            .fetch(-1, 0);
-    return found.isEmpty() ? null : found;
+    final Locale locale = AppFilter.getLocale();
+    final String lang = locale.toLanguageTag();
+    final String baseLang = locale.getLanguage();
+
+    final TypedQuery<Object[]> query =
+        JPA.em()
+            .createQuery(
+                "SELECT self.field, self.type, self.help, self.style "
+                    + "FROM MetaHelp self "
+                    + "WHERE self.model = :model AND (self.view = :view OR self.view IS NULL) AND self.language IN (:lang, :baseLang) "
+                    + "ORDER BY self.view ASC, self.language DESC",
+                Object[].class)
+            .setParameter("lang", lang)
+            .setParameter("baseLang", baseLang)
+            .setParameter("model", getModel())
+            .setParameter("view", getName())
+            .setHint(QueryHints.HINT_CACHEABLE, true);
+
+    final List<Object[]> found = query.getResultList();
+
+    return found.isEmpty()
+        ? null
+        : found.stream()
+            .map(
+                a -> {
+                  final Map<String, Object> map = new HashMap<>();
+                  map.put("field", a[0]);
+                  map.put("type", a[1]);
+                  map.put("help", a[2]);
+                  map.put("style", a[3]);
+                  return map;
+                })
+            .collect(
+                Collectors.toMap(
+                    item -> (String) item.get("field"),
+                    Function.identity(),
+                    (existing, replacement) -> existing,
+                    LinkedHashMap::new))
+            .values();
   }
 }

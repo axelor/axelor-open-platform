@@ -453,7 +453,7 @@ public class I18nExtractor {
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
               throws IOException {
             final String name = file.getFileName().toString();
-            final Pattern pattern = Pattern.compile("messages_([a-zA-Z_]+)\\.csv");
+            final Pattern pattern = Pattern.compile("messages_([a-zA-Z_-]+)\\.csv");
             final Matcher matcher = pattern.matcher(name);
             if (matcher.matches()) {
               log.info("updating: " + file);

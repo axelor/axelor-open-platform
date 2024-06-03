@@ -52,7 +52,7 @@ public class I18nLoader extends AbstractParallelLoader {
 
   @Inject private MetaTranslationRepository translations;
 
-  private static final String FILE_PATTERN = ".*(?:messages_|custom_)([a-zA-Z_]+)\\.csv$";
+  private static final String FILE_PATTERN = ".*(?:messages_|custom_)([a-zA-Z_-]+)\\.csv$";
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
@@ -112,7 +112,9 @@ public class I18nLoader extends AbstractParallelLoader {
             return;
           }
 
-          map.computeIfAbsent(matcher.group(1), k -> new LinkedList<>()).add(o);
+          map.computeIfAbsent(
+                  StringUtils.normalizeLanguageTag(matcher.group(1)), k -> new LinkedList<>())
+              .add(o);
         });
     return map.values();
   }
@@ -126,7 +128,7 @@ public class I18nLoader extends AbstractParallelLoader {
       return;
     }
 
-    final String language = matcher.group(1);
+    final String language = StringUtils.normalizeLanguageTag(matcher.group(1));
     final CSVFile csv = CSVFile.DEFAULT.withFirstRecordAsHeader();
 
     try (CSVParser csvParser = csv.parse(stream, StandardCharsets.UTF_8)) {

@@ -20,15 +20,16 @@ package com.axelor.i18n;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.Query;
-import com.axelor.meta.db.MetaTranslation;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.persistence.FlushModeType;
+import javax.persistence.TypedQuery;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {
@@ -81,28 +82,35 @@ public class I18nBundle extends ResourceBundle {
       return messages;
     }
 
-    final String lang = locale.getLanguage();
-    final Query<MetaTranslation> query =
-        Query.of(MetaTranslation.class)
-            .filter("self.language = :lang AND self.message IS NOT NULL")
-            .order("id")
-            .bind("lang", lang)
-            .autoFlush(false);
+    final String lang = locale.toLanguageTag();
+    final String baseLang = locale.getLanguage();
+    final int limit = 100;
+    final TypedQuery<Object[]> query =
+        JPA.em()
+            .createQuery(
+                "SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END) "
+                    + "FROM MetaTranslation self "
+                    + "LEFT JOIN MetaTranslation base ON base.key = self.key AND base.language = :baseLang "
+                    + "WHERE self.message IS NOT NULL AND self.language IN (:lang, :baseLang) "
+                    + "GROUP BY self.key "
+                    + "ORDER BY self.key",
+                Object[].class)
+            .setParameter("lang", lang)
+            .setParameter("baseLang", baseLang)
+            .setFlushMode(FlushModeType.COMMIT)
+            .setMaxResults(limit);
 
-    if (query.count() == 0 && lang.length() > 2) {
-      query.bind("lang", lang.substring(0, 2));
-    }
-
-    long total = query.count();
     int offset = 0;
-    int limit = 100;
+    List<Object[]> results;
 
-    while (offset < total) {
-      for (MetaTranslation tr : query.fetch(limit, offset)) {
-        messages.put(tr.getKey(), tr.getMessage());
+    do {
+      query.setFirstResult(offset);
+      results = query.getResultList();
+      for (final Object[] result : results) {
+        messages.put((String) result[0], (String) result[1]);
       }
       offset += limit;
-    }
+    } while (results.size() >= limit);
 
     this.loaded = true;
     return messages;
