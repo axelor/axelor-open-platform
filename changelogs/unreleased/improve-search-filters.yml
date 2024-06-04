@@ -1,0 +1,6 @@
+---
+title: Improve advance search filters UI
+type: feature
+description: |
+  Add search input to hide non matching filters. This will 
+  provides better usage of filters in case many are displayed.

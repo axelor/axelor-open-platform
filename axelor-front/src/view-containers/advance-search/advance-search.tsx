@@ -423,6 +423,48 @@ export function AdvanceSearch({
     [handleOpen, handleClear, handleFreeSearch],
   );
 
+  const [searchText, setSearchText] = useState("");
+
+  const domainsFiltered = useMemo(() => {
+    if (domains && searchText) {
+      return domains.filter(
+        (item) =>
+          (item.title &&
+            item.title.toLowerCase().includes(searchText.toLowerCase())) ||
+          item.checked,
+      );
+    }
+    return domains;
+  }, [domains, searchText]);
+
+  const filtersFiltered = useMemo(() => {
+    if (filters && searchText) {
+      return filters.filter(
+        (item) =>
+          (item.title &&
+            item.title.toLowerCase().includes(searchText.toLowerCase())) ||
+          item.checked,
+      );
+    }
+    return filters;
+  }, [filters, searchText]);
+
+  const handleFilterSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchText(e.target.value);
+    },
+    [],
+  );
+
+  const handleFilterSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Escape") {
+        setSearchText("");
+      }
+    },
+    [],
+  );
+
   return (
     <Box className={styles.root} ref={containerRef}>
       <SearchInput
@@ -449,10 +491,17 @@ export function AdvanceSearch({
         >
           <FocusTrap initialFocus={false} enabled={open}>
             <Box d="flex" flexDirection="column">
-              <Box d="flex" alignItems="center">
-                <Box as="p" mb={0} p={1} flex={1} fontWeight="bold">
+              <Box d="flex" alignItems="flex-start">
+                <Box as="p" mb={0} me={1} p={1} fontWeight="bold">
                   {i18n.get("Advanced Search")}
                 </Box>
+                <TextField
+                  placeholder={i18n.get("Search in filters...")}
+                  onChange={handleFilterSearchChange}
+                  onKeyDown={handleFilterSearchKeyDown}
+                  value={searchText}
+                  className={styles.searchFiltersInput}
+                />
                 <Box as="span" className={styles.icon} onClick={handleClose}>
                   <MaterialIcon icon="close" />
                 </Box>
@@ -467,7 +516,7 @@ export function AdvanceSearch({
                 {(domains || []).length > 0 && (
                   <FilterList
                     title={i18n.get("Filters")}
-                    items={domains}
+                    items={domainsFiltered}
                     disabled={filterType === "single"}
                     onFilterCheck={handleDomainCheck}
                   />
@@ -475,7 +524,7 @@ export function AdvanceSearch({
                 {(filters || []).length > 0 && (
                   <FilterList
                     title={i18n.get("My Filters")}
-                    items={filters}
+                    items={filtersFiltered}
                     disabled={filterType === "single"}
                     onFilterCheck={handleFilterCheck}
                   />
