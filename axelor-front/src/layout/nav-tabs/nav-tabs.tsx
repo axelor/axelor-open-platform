@@ -19,6 +19,7 @@ import {
   Portal,
   NavTabs as Tabs,
 } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { Tooltip } from "@/components/tooltip";
@@ -33,10 +34,10 @@ import { session } from "@/services/client/session";
 import { PopupViews } from "@/view-containers/view-popup";
 import { Views } from "@/view-containers/views";
 import { isProduction } from "@/utils/app-settings.ts";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Icon } from "@/components/icon";
 import styles from "./nav-tabs.module.scss";
+import colors from "@/styles/legacy/_colors.module.scss";
 
 const tabContainerSizeAtom = atom<string | undefined>(undefined);
 
@@ -282,7 +283,7 @@ function useItems(
 
       return {
         icon,
-        iconColor,
+        iconColor: iconColor && (colors[iconColor] || iconColor),
       };
     },
     [map, menus],

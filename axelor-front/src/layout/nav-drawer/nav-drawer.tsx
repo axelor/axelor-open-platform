@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { Badge, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Icon } from "@/components/icon";
 import { useMenu } from "@/hooks/use-menu";
@@ -11,14 +12,13 @@ import { useTagsList } from "@/hooks/use-tags";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem, Tag } from "@/services/client/meta.types";
 import { sanitize, unaccent } from "@/utils/sanitize";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
 import { useSidebar } from "./hook";
 
 import AppIcon from "../../assets/axelor-icon.svg?react";
 import AppLogo from "../../assets/axelor.svg?react";
 
 import styles from "./nav-drawer.module.scss";
+import colors from "@/styles/legacy/_colors.module.scss";
 
 const TagStyle: Record<string, TBackground> = {
   default: "secondary",
@@ -66,12 +66,13 @@ function load(res: MenuItem[], tags: Tag[]) {
       hasTag,
       tagStyle: tagColor,
       icon,
-      iconBackground: iconColor,
+      iconBackground,
     } = item;
     const items = action
       ? undefined
       : menus.filter((x) => x.parent === name).map(toNavItemProps);
-
+    
+    const iconColor = iconBackground && (colors[iconBackground] || iconBackground);
     const props: NavMenuItem = {
       id: name,
       title,
