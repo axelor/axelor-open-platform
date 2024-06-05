@@ -7,7 +7,7 @@ import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box } from "@axelor/ui";
-import { GridProps, GridRow } from "@axelor/ui/grid";
+import { GridProps, GridRow, GridState } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
@@ -80,12 +80,19 @@ function GridInner(props: ViewProps<GridView>) {
   const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
   const saveIdRef = useRef<number | null>();
+  const saveGridStateRef = useRef(0);
   const initDetailsRef = useRef(false);
   const reorderRef = useRef(false);
   const [massUpdatePopperEl, setMassUpdatePopperEl] =
     useState<HTMLElement | null>();
   const [viewProps, setViewProps] = useViewProps();
-  const { action, dashlet, popup, popupOptions } = useViewTab();
+  const {
+    action,
+    dashlet,
+    popup,
+    popupOptions,
+    state: tabStateAtom,
+  } = useViewTab();
   const [dirty, setDirty] = useAtom(useViewDirtyAtom());
   const [detailsRecord, setDetailsRecord] = useState<DataRecord | null>(null);
 
@@ -110,12 +117,11 @@ function GridInner(props: ViewProps<GridView>) {
     ),
   );
 
-  const viewSelectedCell = viewProps?.selectedCell;
-  const viewSelectedRows = viewProps?.selectedRows?.slice?.(0, 1);
+  const viewSelectedRows = viewProps?.gridState?.selectedRows?.slice?.(0, 1);
   const [state, setState, gridStateAtom] = useGridState({
+    ...viewProps?.gridState,
     view,
     params: action.params,
-    selectedCell: viewSelectedCell,
     selectedRows: viewSelectedRows,
   });
 
@@ -731,24 +737,48 @@ function GridInner(props: ViewProps<GridView>) {
     updatePage(nextPage);
   }, [popup, currentPage, limit, offset, updatePage, totalCount]);
 
+  const saveGridStateToViewProps = useAtomCallback(
+    useCallback(
+      (get, set, gridState: GridState) => {
+        const tab = get(tabStateAtom);
+        set(tabStateAtom, {
+          ...tab,
+          props: {
+            ...tab.props,
+            grid: {
+              ...tab.props?.grid,
+              gridState,
+            },
+          },
+        });
+      },
+      [tabStateAtom],
+    ),
+  );
+
+  useEffect(() => {
+    // timeout is used in order to save grid state only on unmount
+    clearTimeout(saveGridStateRef.current);
+    return () => {
+      saveGridStateRef.current = window.setTimeout(() => {
+        saveGridStateToViewProps(state);
+      }, 100);
+    };
+  }, [state, saveGridStateToViewProps]);
+
   useEffect(() => {
     setViewProps((viewProps) => {
-      if (
-        viewProps?.selectedCell !== selectedCell ||
-        viewProps?.selectedRows !== selectedRows
-      ) {
-        const selectedId = selectedRows
-          ? rows[selectedRows?.[0]]?.record.id
-          : undefined;
+      const selectedId = selectedRows
+        ? rows[selectedRows?.[0]]?.record.id
+        : undefined;
+      if (viewProps?.selectedId !== selectedId) {
         return {
           selectedId,
-          selectedCell: selectedCell,
-          selectedRows: selectedRows,
         };
       }
       return viewProps;
     });
-  }, [setViewProps, selectedCell, selectedRows, rows]);
+  }, [setViewProps, selectedRows, rows]);
 
   useEffect(() => {
     selectedIdsRef.current = (state.selectedRows || []).map(

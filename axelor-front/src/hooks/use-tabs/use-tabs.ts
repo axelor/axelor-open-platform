@@ -9,6 +9,8 @@ import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNil, omitBy } from "lodash";
 import { useCallback } from "react";
 
+import { GridState } from "@axelor/ui/grid";
+
 import { dialogs } from "@/components/dialogs";
 import { findActionView } from "@/services/client/meta-cache";
 import {
@@ -40,14 +42,13 @@ export type TabRoute = {
 export type TabProps = {
   scrollY?: number;
   scrollX?: number;
-  selectedCell?: null | number[];
-  selectedRows?: null | number[];
   selectedId?: number;
   name?: string;
   readonly?: boolean;
   recordId?: boolean;
   showSingle?: boolean;
   dataStore?: DataStore;
+  gridState?: GridState;
 };
 
 /**
