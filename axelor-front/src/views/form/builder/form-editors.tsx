@@ -580,13 +580,13 @@ function useItemsFamily({
         itemsFamily.remove(record);
         const items = get(itemsAtom);
         const next = items.filter((x) => x.id !== record.id);
-        if (next.length === 0 && canShowNew) {
-          next.push({ id: nextId() });
-          itemsFamily(next[0]);
-        }
         set(itemsAtom, next);
+
+        if (next.length === 0 && canShowNew) {
+          addItem();
+        }
       },
-      [canShowNew, itemsAtom, itemsFamily],
+      [itemsAtom, itemsFamily, canShowNew, addItem],
     ),
   );
 
@@ -604,20 +604,30 @@ function useItemsFamily({
     ),
   );
 
+  const items = useAtomValue(itemsAtom);
+  const isCleanInitial = !!initialItem && isClean(initialItem);
+
   const ensureValid = useAtomCallback(
     useCallback(
       (get) => {
-        if (initialItem) return;
-        const items = get(itemsAtom);
-        const invalid = items.map((x) => errors[x.id!]).some((x) => x);
+        if (initialItem || items?.length === 0) {
+          return setInvalid(widgetAtom, false);
+        }
+        const currItems = get(itemsAtom);
+        const invalid = currItems.map((x) => errors[x.id!]).some((x) => x);
         setInvalid(widgetAtom, invalid || initialInvalid);
       },
-      [errors, initialInvalid, initialItem, itemsAtom, setInvalid, widgetAtom],
+      [
+        errors,
+        initialInvalid,
+        initialItem,
+        itemsAtom,
+        setInvalid,
+        widgetAtom,
+        items?.length,
+      ],
     ),
   );
-
-  const items = useAtomValue(itemsAtom);
-  const isCleanInitial = !!initialItem && isClean(initialItem);
 
   useEffect(() => ensureValid(), [ensureValid]);
   useEffect(() => {
