@@ -21,6 +21,8 @@ package com.axelor.web.socket;
 import com.axelor.common.StringUtils;
 import com.axelor.web.socket.inject.WebSocketConfigurator;
 import com.axelor.web.socket.inject.WebSocketSecurity;
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -85,8 +87,12 @@ public class WebSocketEndpoint {
       log.trace(thr.getMessage(), thr);
       return;
     }
-
-    log.error(thr.getMessage(), thr);
+    if (thr instanceof IOException) {
+      // usually indicates a disconnected client
+      log.trace(thr.getMessage(), thr);
+    } else {
+      log.error("Websocket error", thr);
+    }
   }
 
   @OnMessage
