@@ -14,22 +14,36 @@ import { download } from "@/utils/download";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { Grid as GridComponent } from "@/views/grid/builder";
-import { useGridState } from "@/views/grid/builder/utils";
+import {
+  getFieldSortValue,
+  useGridSortHandler,
+  useGridState,
+} from "@/views/grid/builder/utils";
 import format from "@/utils/format";
 import { i18n } from "@/services/client/i18n";
+import { getFieldValue } from "@/utils/data-record";
 
-function formatter(column: Field, value: any, record: any) {
+function formatRecord(column: Field, value: any, record: any) {
   if (column.translatable && toKebabCase(column.type) === "string") {
     const trKey = "value:" + value;
     const trValue = i18n.get(trKey);
     if (trValue !== trKey) {
-      record = { ...record, ["$t:" + column.name]: trValue };
+      return { ...record, ["$t:" + column.name]: trValue };
     }
   }
+  return record;
+}
+
+function formatter(column: Field, value: any, record: any) {
   return format(value, {
     props: column,
-    context: record,
+    context: formatRecord(column, value, record),
   });
+}
+
+function getSortValue(column: Field, record: DataRecord) {
+  const value = getFieldValue(record, column);
+  return getFieldSortValue(column, formatRecord(column, value, record));
 }
 
 export const ReportTable = forwardRef(function ReportTable(
@@ -44,7 +58,7 @@ export const ReportTable = forwardRef(function ReportTable(
     columns?: string;
     sums?: string;
   },
-  ref
+  ref,
 ) {
   const [state, setState] = useGridState();
   const records = useMemo(() => context.data || [], [context]);
@@ -53,8 +67,7 @@ export const ReportTable = forwardRef(function ReportTable(
 
   const defaultColumnNames = useMemo<string[]>(() => {
     const [first] = records || [];
-    return Object.keys(first || {})
-      .filter((name) => name !== "$$hashKey")
+    return Object.keys(first || {}).filter((name) => name !== "$$hashKey");
   }, [records]);
 
   const { view: gridView, fields } = useMemo(() => {
@@ -70,8 +83,12 @@ export const ReportTable = forwardRef(function ReportTable(
         const col = Object.assign({}, item, item.widgetAttrs, {
           name: name,
           title: item.title || item.autoTitle || toTitleCase(name),
-          type: toKebabCase((item as Field).serverType || "STRING").toUpperCase(),
-          serverType: toKebabCase((item as Field).serverType || "STRING").toUpperCase(),
+          type: toKebabCase(
+            (item as Field).serverType || "STRING",
+          ).toUpperCase(),
+          serverType: toKebabCase(
+            (item as Field).serverType || "STRING",
+          ).toUpperCase(),
           ...(sumCols.includes(name) && { aggregate: "sum" }),
         });
         fields[name] = col as Property;
@@ -118,6 +135,8 @@ export const ReportTable = forwardRef(function ReportTable(
     }));
   }, [gridView, setDashletHandlers, onExport]);
 
+  const sortHandler = useGridSortHandler(fields, getSortValue);
+
   return (
     <GridComponent
       showEditIcon={false}
@@ -127,6 +146,7 @@ export const ReportTable = forwardRef(function ReportTable(
       fields={fields}
       state={state}
       setState={setState}
+      sortHandler={sortHandler}
       allowCheckboxSelection={false}
       columnFormatter={formatter}
       onSearch={onSearch as any}

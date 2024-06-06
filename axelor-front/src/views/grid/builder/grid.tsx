@@ -51,7 +51,11 @@ import { findView } from "@/services/client/meta-cache";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
 import { useViewAction } from "@/view-containers/views/scope";
 
-import { getWidget, isValidSequence } from "../builder/utils";
+import {
+  getWidget,
+  isValidSequence,
+  useGridSortHandler,
+} from "../builder/utils";
 import { Cell as CellRenderer } from "../renderers/cell";
 import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
@@ -182,6 +186,7 @@ export const Grid = forwardRef<
     view,
     fields,
   });
+  const sortHandler = useGridSortHandler(fields);
 
   const viewItems = useMemo(
     () =>
@@ -431,6 +436,7 @@ export const Grid = forwardRef<
         orderBy,
         groupBy,
         records: newRecords,
+        sortFn: sortHandler,
       });
 
       draft.rows = newRows.map((row) => {
@@ -444,7 +450,7 @@ export const Grid = forwardRef<
         null,
       ];
     });
-  }, [fields, records, setState, view.items]);
+  }, [fields, records, setState, view.items, sortHandler]);
 
   const isPermitted = usePermitted(model, perms);
 
@@ -641,6 +647,7 @@ export const Grid = forwardRef<
           })}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
+          sortHandler={sortHandler}
           state={state!}
           setState={setState!}
           records={records!}
