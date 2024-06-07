@@ -1,3 +1,55 @@
+## 7.1.1 (2024-06-07)
+
+#### Fix
+
+* Implement client side sorting in grid
+* Remove button on M2M only rely on canRemove attribute (not on the permission)
+* Fix nav menu/tabs pre-build color names
+
+  <details>
+  
+  This use pre-build color names hexadecimal code from `axelor-front` 
+  instead of the ones defined in `axelor-ui`. Also provide sass variables 
+  for all colors in order to re-use them.
+  
+  </details>
+
+* Add missing widgets on custom fields widget selection
+* Set AJAX resolver on all indirect clients
+
+  <details>
+  
+  This fixes default SSO authentication request blocked
+  because of CORS policy.
+  
+  </details>
+
+* Fix calendar icon overlap on date
+* Fix adding a row in editable grid with create permission only
+* Check create permission in action if no id instead of write
+* Merge response values from actions
+
+  <details>
+  
+  When a group of actions return values, instead of using 
+  the last action result, merge the values.
+  
+  </details>
+
+* Fix export of custom fields on one-to-many and dashlet
+* Fix processing view widgets (not recognized some widgets depending on view)
+* Add missing transient annotation on cid field of enhanced Model
+
+  <details>
+  
+  This fixes cid field not marked as transient when Model class is enhanced.
+  It was notably breaking advanced search export all.
+  
+  </details>
+
+* Fix o2m editor validation issue
+* Fix fetch record after save in form view
+
 ## 7.1.0 (2024-05-28)
 
 #### Feature

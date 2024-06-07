@@ -1,7 +1,0 @@
----
-title: Fix nav menu/tabs pre-build color names
-type: fix
-description: |
-  This use pre-build color names hexadecimal code from `axelor-front` 
-  instead of the ones defined in `axelor-ui`. Also provide sass variables 
-  for all colors in order to re-use them.
