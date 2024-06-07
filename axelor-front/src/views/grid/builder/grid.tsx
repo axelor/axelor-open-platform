@@ -179,6 +179,7 @@ export const Grid = forwardRef<
   const { data: user } = useSession();
   const allowCheckboxSelection =
     (view.selector ?? user?.view?.grid?.selection ?? "checkbox") === "checkbox";
+  const hasClientSideSort = (gridProps?.sortType || "state") === "state";
 
   const { commit: commitTreeForm } = useCollectionTreeEditable();
 
@@ -259,7 +260,7 @@ export const Grid = forwardRef<
         columnProps.searchable = false;
       }
 
-      if (!searchable || isCollection) {
+      if ((!searchable || isCollection) && !hasClientSideSort) {
         columnProps.sortable = false;
       }
 
@@ -353,6 +354,7 @@ export const Grid = forwardRef<
     viewItems,
     view.sortable,
     view.editIcon,
+    hasClientSideSort,
     showAsTree,
     showEditIcon,
     showNewIcon,
