@@ -1,7 +1,6 @@
 import _ from "lodash";
 
 import { toKebabCase } from "@/utils/names";
-import { normalizeWidget } from "@/views/form/builder/utils";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
 import { ActionView, Field, Property, Schema } from "./meta.types";
@@ -632,8 +631,12 @@ export function processView(
     }
   });
 
-  // include json fields in grid
+  
   if (view.type === "grid") {
+    if (view.widget) {
+      view.widget = toKebabCase(view.widget);
+    }
+    // include json fields in grid
     let items: Schema[] = [];
     _.forEach(view.items, (item) => {
       if (item.jsonFields) {
@@ -719,11 +722,6 @@ export function processWidgets(schema: Schema, parent?: Schema) {
     if (!parent) {
       schema.colSpan = schema.colSpan ?? 12;
     }
-  }
-
-  if (schema.widget) {
-    const widget = normalizeWidget(schema.widget);
-    schema.widget = widget && toKebabCase(widget);
   }
 
   return schema;
