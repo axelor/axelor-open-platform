@@ -26,23 +26,6 @@ dayjs.extend(updateLocale);
 
 const DEFAULT_LANGUAGE = "en";
 const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
-const DEFAULT_CURRENCY_CODE = "EUR";
-
-// prettier-ignore
-const SUPPORTED_CURRENCY_CODES: Record<string, string> = {
-  "en-au": "AUD",
-  "en-ca": "CAD",
-  "en-gb": "GBP",
-  "en-in": "INR",
-  "en-us": "USD",
-  "fr-ca": "CAD",
-  "fr-ch": "CHF",
-  "fr-ma": "MAD",
-  "hi": "INR",
-  "ja": "JPY",
-  "ru": "RUB",
-  "zh": "CNY",
-};
 
 const getNormalizedLocale = (locale: string) => toKebabCase(locale);
 const getShortLocale = (locale: string) => toKebabCase(locale).split("-")[0];
@@ -50,7 +33,6 @@ const getCountry = (locale: string) => toKebabCase(locale).split("-")[1];
 
 let locale = "";
 let dateFormat = "";
-let currency = "";
 
 /*
   en -> EUR, DD/MM/YYYY (defaults)
@@ -61,7 +43,6 @@ let currency = "";
 */
 async function init() {
   locale = findLocale();
-  currency = findCurrencyCode();
 
   const dayjsLocale = await initDayjs();
   dateFormat = findDateFormat(dayjsLocale);
@@ -105,11 +86,6 @@ export function _findLocale(
   }
 
   return null;
-}
-
-function findCurrencyCode() {
-  const found = _findLocale(Object.keys(SUPPORTED_CURRENCY_CODES), locale);
-  return found ? SUPPORTED_CURRENCY_CODES[found] : DEFAULT_CURRENCY_CODE;
 }
 
 function findDateFormat(data: any) {
@@ -171,32 +147,5 @@ export namespace l10n {
       minimumFractionDigits,
       maximumFractionDigits,
     }).format(value);
-  }
-
-  export function formatCurrency(
-    value: number,
-    options?: Intl.NumberFormatOptions,
-  ) {
-    return new Intl.NumberFormat(getLocale(), {
-      style: "currency",
-      currency,
-      ...options,
-    }).format(value);
-  }
-
-  export function formatDateTime(
-    date: number | Date,
-    options?: Intl.DateTimeFormatOptions,
-  ) {
-    return new Intl.DateTimeFormat(getLocale(), {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
-      ...options,
-    }).format(date);
   }
 }
