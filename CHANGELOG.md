@@ -1,3 +1,40 @@
+## 7.0.9 (2024-06-07)
+
+#### Fix
+
+* Remove button on M2M only rely on canRemove attribute (not on the permission)
+* Fix valueExpr support for custom field
+* Set AJAX resolver on all indirect clients
+
+  <details>
+  
+  This fixes default SSO authentication request blocked
+  because of CORS policy.
+  
+  </details>
+
+* Merge response values from actions
+
+  <details>
+  
+  When a group of actions return values, instead of using 
+  the last action result, merge the values.
+  
+  </details>
+
+* Allow saving new record if user has create but no write permission
+* Fix o2m editor validation issue
+* Fix perms endpoint without id
+
+  <details>
+  
+  If permission is found, access should be granted in case of no id.
+  Without id, `AuthSecurity::isPermitted` had ids `[null]` and access was granted
+  if permission filter result count happened to equal 1.
+  
+  </details>
+
+
 ## 7.0.8 (2024-05-27)
 
 #### Fix
