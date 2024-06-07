@@ -676,7 +676,7 @@ const FormContainer = memo(function FormContainer({
 
         if (!shouldSave) return record;
 
-        const { record: rec, original = {}, select } = get(formAtom); // record may have changed by actions
+        const { record: rec, original = {}, select, model } = get(formAtom); // record may have changed by actions
         const vals = diff(rec, original);
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
 
@@ -696,9 +696,25 @@ const FormContainer = memo(function FormContainer({
 
         if (callOnRead) {
           const savedResult = res;
+          const restoreDummyValues =
+            model === "com.axelor.auth.db.User"
+              ? Object.keys(dummy).reduce((values, key) => {
+                  return [
+                    "change",
+                    "oldPassword",
+                    "newPassword",
+                    "chkPassword",
+                  ].indexOf(key) === -1
+                    ? { ...values, [key]: dummy[key] }
+                    : values;
+                }, {})
+              : dummy;
           res = res.id ? await doRead(res.id, select) : res;
           res = res.id ? fillRecordWithCid(savedResult, res) : res;
-          res = { ...dummy, ...res }; // restore dummy values
+          res = {
+            ...restoreDummyValues,
+            ...res,
+          }; // restore dummy values
           doEdit(res, {
             callAction: false,
             callOnLoad,
