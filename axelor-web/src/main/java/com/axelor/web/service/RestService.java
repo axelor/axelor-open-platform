@@ -76,7 +76,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -86,7 +85,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -117,8 +115,6 @@ public class RestService extends ResourceService {
   @Inject private MailMessageRepository messages;
 
   @Inject private MailFollowerRepository followers;
-
-  @Inject private HttpServletRequest httpRequest;
 
   private static final Charset CSV_CHARSET;
   private static final Locale CSV_LOCALE;
@@ -817,27 +813,8 @@ public class RestService extends ResourceService {
     updateContext(request);
 
     // ServletRequest#getLocale() returns server locale if no Accept-Language header is set.
-    final Locale locale = CSV_LOCALE != null ? CSV_LOCALE : getPreferredLocale();
+    final Locale locale = CSV_LOCALE != null ? CSV_LOCALE : AppFilter.getLocale();
     return getResource().export(request, CSV_CHARSET, locale, CSV_SEPARATOR);
-  }
-
-  /**
-   * Gets locale based on user language and request locales
-   *
-   * @return preferred locale
-   */
-  private Locale getPreferredLocale() {
-    final Locale locale = AppFilter.getLocale();
-    if (StringUtils.isBlank(locale.getCountry())) {
-      final Enumeration<Locale> requestLocales = httpRequest.getLocales();
-      while (requestLocales.hasMoreElements()) {
-        final Locale requestLocale = requestLocales.nextElement();
-        if (Objects.equals(locale.getLanguage(), requestLocale.getLanguage())) {
-          return requestLocale;
-        }
-      }
-    }
-    return locale;
   }
 
   @GET

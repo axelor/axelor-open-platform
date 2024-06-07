@@ -28,7 +28,6 @@ const DEFAULT_LANGUAGE = "en";
 const DEFAULT_DATE_FORMAT = "DD/MM/YYYY";
 
 const getNormalizedLocale = (locale: string) => toKebabCase(locale);
-const getShortLocale = (locale: string) => toKebabCase(locale).split("-")[0];
 const getCountry = (locale: string) => toKebabCase(locale).split("-")[1];
 
 let locale = "";
@@ -107,14 +106,7 @@ function findDateFormat(data: any) {
 }
 
 function findLocale() {
-  const userLang = session.info?.user?.lang;
-  if (userLang?.includes("-")) {
-    return userLang;
-  }
-
-  const found =
-    userLang && _findLocale(navigator.languages, userLang, getShortLocale);
-  return found || userLang || navigator.language || DEFAULT_LANGUAGE;
+  return session.info?.user?.lang || navigator.language || DEFAULT_LANGUAGE;
 }
 
 export const moment = dayjs;
