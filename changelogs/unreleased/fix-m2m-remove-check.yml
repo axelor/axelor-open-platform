@@ -1,0 +1,3 @@
+---
+title: Remove button on M2M only rely on canRemove attribute (not on the permission)
+type: fix
