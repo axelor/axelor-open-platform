@@ -383,7 +383,9 @@ function OneToManyInner({
   const canNew = !readonly && hasButton("new");
   const canEdit = !readonly && hasButton("edit");
   const canView = hasButton("view");
-  const canDelete = !readonly && hasButton("remove");
+  const canDelete =
+    !readonly &&
+    (isManyToMany ? attrs.canRemove !== false : hasButton("remove"));
   const canSelect =
     !readonly && hasButton("select") && (isManyToMany || attrs.canSelect);
   const canDuplicate = canNew && canCopy && selectedRows?.length === 1;
@@ -695,7 +697,7 @@ function OneToManyInner({
   useEffect(() => {
     const last = valueRef.current ?? [];
     const next = value ?? [];
-    
+
     if (
       forceRefreshRef.current ||
       last.length !== next.length ||
