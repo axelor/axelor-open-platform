@@ -146,7 +146,7 @@ public class I18nLoader extends AbstractParallelLoader {
         String key = map.get("key");
         String message = map.get("message");
 
-        if (StringUtils.isBlank(key)) {
+        if (StringUtils.isBlank(key) || StringUtils.isEmpty(message)) {
           continue;
         }
 
