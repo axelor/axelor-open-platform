@@ -1,9 +1,10 @@
 import parsePhoneNumber from "libphonenumber-js/max";
+import { useMemo } from "react";
 import { defaultCountries } from "react-international-phone";
 
 import flags from "@/assets/flags.svg";
 import { i18n } from "@/services/client/i18n";
-import { _findLocale, l10n } from "@/services/client/l10n";
+import { l10n } from "@/services/client/l10n";
 
 // Fallback country codes when country is not found in language code
 export const FALLBACK_COUNTRIES: Record<string, string> = {
@@ -67,28 +68,34 @@ export function useDefaultCountry(
   initialCountry?: string,
   onlyCountries?: string[],
 ) {
-  let defaultCountry = initialCountry;
+  return useMemo(() => {
+    let defaultCountry = initialCountry;
 
-  if (!defaultCountry) {
-    const locale = l10n.getLocale();
+    if (!defaultCountry) {
+      const locale = l10n.getLocale();
+      const [language, country] = locale
+        .split("-")
+        .map((item) => item.toLowerCase());
 
-    // If user locale has no country code, look for a match in `navigator.languages`.
-    const [
-      language,
-      country = _findLocale(
-        navigator.languages.filter((language) => language.split("-")[1]),
-        locale,
-        (language) => language.split("-")[0],
-      )
-        ?.split("-")[1]
-        ?.toLowerCase(),
-    ] = locale.split("-").map((value) => value.toLowerCase());
-    defaultCountry = country ?? FALLBACK_COUNTRIES[language] ?? language;
-  }
+      // If user locale has no country code, look for a match in `navigator.languages`.
+      defaultCountry =
+        country ??
+        l10n
+          .findLocale(
+            navigator.languages.filter((lang) => lang.split("-")[1]),
+            locale,
+            (lang) => lang.split("-")[0],
+          )
+          ?.split("-")[1]
+          ?.toLowerCase() ??
+        FALLBACK_COUNTRIES[language] ??
+        language;
+    }
 
-  if (onlyCountries?.length && !onlyCountries.includes(defaultCountry)) {
-    defaultCountry = onlyCountries[0];
-  }
+    if (onlyCountries?.length && !onlyCountries.includes(defaultCountry)) {
+      defaultCountry = onlyCountries[0];
+    }
 
-  return defaultCountry;
+    return defaultCountry;
+  }, [initialCountry, onlyCountries]);
 }

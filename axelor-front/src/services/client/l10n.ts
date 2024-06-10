@@ -70,7 +70,7 @@ await init();
 // listen for session change
 session.subscribe(init);
 
-export function _findLocale(
+function _findLocale(
   locales: readonly string[],
   locale: string,
   tr = getNormalizedLocale,
@@ -119,8 +119,12 @@ export namespace l10n {
     return locale;
   }
 
-  export function findLocale(locales: string[], locale: string) {
-    return _findLocale(locales, locale);
+  export function findLocale(
+    locales: string[],
+    locale: string,
+    tr?: (locale: string) => string,
+  ) {
+    return _findLocale(locales, locale, tr);
   }
 
   export function getDateFormat() {
