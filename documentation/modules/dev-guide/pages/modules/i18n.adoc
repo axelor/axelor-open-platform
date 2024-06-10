@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-Internationalization, often referred as i18n, is a very important feature
+Internationalization, often referred to as i18n, is a very important feature
 of any business application in today's globalized economy.
 
 The {page-component-title} provides a very efficient way to make your application multilingual.
@@ -10,11 +10,11 @@ The {page-component-title} provides a very efficient way to make your applicatio
 == Translations
 
 Unlike the standard Java practice to provide translations catalogs with
-properties files, the translations are stored in CSV files per language bases.
-This is because, {page-component-title} stores and loads translations from database
+properties files, the translations are stored in separate CSV files for each language.
+This is because the {page-component-title} stores and loads translations from database
 to allow live update of translations by end-users.
 
-The structure of the translation files in an axelor module looks like this:
+The structure of the translation files in an Axelor module looks like this:
 
 -----
 src/main/resources/i18n/messages.csv
@@ -26,14 +26,19 @@ The `messages.csv` is the template from which we have to create language specifi
 `messages_<language>.csv` files. The template should not be updated manually as
 it's automatically generated using the string extraction utility.
 
-The following gradle task can be used to extract and update message files:
+The language part in the filename should follow the https://datatracker.ietf.org/doc/html/rfc5646[IETF BCP 47 language tag] standard (eg. `en`, `en-US`, `fr`, `fr-CA`). The language tags are case insensitive, but it is recommended to use the canonical form (eg. `en-US` instead of `en-us`). Once loaded into the database, the language tags are normalized to the canonical form.
+
+The following Gradle task can be used to extract and update message files:
 
 [source,sh]
 ----
-  $ ./gradlew i18n [--with-context]
+  $ ./gradlew i18n [--with-context] [--languages <comma-separated language tags>]
 ----
 
-The CSV files now has four columns:
+By default, initial messages files are generated for `en` and `fr` languages.
+Use the `--languages` option to generate messages for additional languages.
+
+The CSV files have four columns:
 
 * `key` - the original string
 * `message` - the translated string
@@ -45,7 +50,7 @@ The `context` column is populated only if `--with-context` option is used.
 The translation messages are imported in database during the db initialization.
 The corresponding database table only stores `key` and `message`.
 
-The key is original text extracted from the java, groovy or xml files. In case
+The key is original text extracted from the Java, Groovy or XML files. In case
 of fields where title is not given, the field name is automatically converted to
 human-readable form.
 
@@ -74,22 +79,38 @@ main/java/com/axelor/contact/controller/HelloController.java:57
 
 It means the key is found in those files on the given line. This allows
 translators to locate the text and understand the context to provide correct
-translation or suggest changes in case of conflicting meanings. In that case we
+translation or suggest changes in case of conflicting meanings. In that case, we
 can choose to use some logical non-human readable keys and provide readable text
 from the translation.
 
-Because of the context column begin multiline values, it's difficult to edit
-the csv files in plain text editors. So always prefer editing with some
-spreadsheet editors (excel or libreoffice).
+Because of the context column being a multiline value, it's difficult to edit
+the CSV files in plain text editors. So always prefer editing with some
+spreadsheet editors (Excel or LibreOffice).
+
+== Supported Languages
+
+Default supported languages are `en` and `fr`. To add more languages, you need to enrich the `select.language` selection.
+
+Example:
+
+[source,xml]
+----
+  <!-- This adds options to the default language selection of "en", "fr" -->
+  <selection name="select.language" id="select.language.extra">
+    <option value="en-US">English (United States)</option>
+    <option value="en-GB">English (United Kingdom)</option>
+    <option value="fr-CA">French (Canada)</option>
+  </selection>
+----
 
 == Strings
 
-The string values from xml sources don't require any special treatments but
+The string values from XML sources don't require any special treatment, but
 translatable strings in you code must be wrapped with a special method `I18n.get(...)`.
 
 The `I18n` is defined under `com.axelor.i18n` package and provides static
 methods to get translations and custom ResourceBundle which can be used with
-standard java translation API.
+standard Java translation API.
 
 [source,java]
 -----
@@ -104,15 +125,23 @@ I18n.get("{0} record selected.", "{0} records selected.", selected.size());
 -----
 
 The `I18n.get` only works when JPA context is started as the translation is
-loaded from the database table (which is imported from the csv files during
+loaded from the database table (which is imported from the CSV files during
 database initialization).
 
 So the `I18n.get` should not be called if the code is executed before the
 JPA context is initialized (like static variables).
 
+== Translation Fallback
+
+There is a translation fallback mechanism that ensures that if an exact match for a translation is not found, the translation for the primary language is used instead. This is particularly useful for avoiding duplicate translation effort for languages with regional variations, as well as for maintaining a consistent user experience even when some translations are missing.
+
+For example, if a user selects `fr-CA` (Canadian French) as their language and a specific translation is not available in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not found, original translation key is used, which is typically the message for the default language, `en` (English).
+
+This fallback mechanism is used in translated messages, as well as in translated search results.
+
 == Value Translation
 
-Value translation feature allows us to translate record values.
+The value translation feature allows to translate record values.
 
 [source,xml]
 ----
