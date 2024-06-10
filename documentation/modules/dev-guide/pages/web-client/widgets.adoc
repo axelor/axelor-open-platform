@@ -820,41 +820,42 @@ the button attributes without impact on the bound field.
 In addition to the common properties, widgets supports the following extra properties
 depending on the widget/type.
 
-[cols="2,8"]
+[cols="3,7,2"]
 |===
-| Attribute | Description
+| Attribute | Description | Default
 
-| `x-bind` | expression to bind to the field value
-| `x-related` | specify related field for `ref-select` widget
-| `x-create` | the names of required fields to be used for quick record creation from `select` widget
-| `x-icon` | specify an icon
-| `x-icon-hover` | specify an icon for hover state
-| `x-icon-active` | specify an icon for active state (used with `toggle` widget)
-| `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive
-| `x-show-icons` | comma-separated list of names of icons to show, or `false` to hide them all
+| `x-bind` | expression to bind to the field value |
+| `x-dirty` | whether the field contributes to the record dirty check | `true`
+| `x-related` | specify related field for `ref-select` widget |
+| `x-create` | the names of required fields to be used for quick record creation from `select` widget |
+| `x-icon` | specify an icon |
+| `x-icon-hover` | specify an icon for hover state |
+| `x-icon-active` | specify an icon for active state (used with `toggle` widget) |
+| `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive | `false`
+| `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all :
 
 * editor: `edit`, `view`, `select`, `clear`
-* multirelational field: `select`, `new`, `edit`, `view`, `remove`
-| `x-can-copy` | whether to allow copy of o2m/m2m field items
-| `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`)
-| `x-code-syntax` | syntax highlighting for the code editor widget
-| `x-code-theme` | color scheme for the code editor
-| `x-lite` | whether to use compact version of the widget (used with `html` widget)
-| `x-labels` | whether to show label in `image-select` widget
-| `x-order` | specify the order of suggest box list
-| `x-limit` | specify the maximum number of items in suggest box list
-| `x-search-limit` | specify the default page limit of search popup
-| `x-precision` | precision of the decimal value (total number of digits)
+* multirelational field: `select`, `new`, `edit`, `view`, `remove` |
+| `x-can-copy` | whether to allow copy of o2m/m2m field items | `false`
+| `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`) | `horizontal`
+| `x-code-syntax` | syntax highlighting for the code editor widget |
+| `x-code-theme` | color scheme for the code editor |
+| `x-lite` | whether to use compact version of the widget (used with `html` widget) | `false`
+| `x-labels` | whether to show label in `image-select` widget | `true`
+| `x-order` | specify the order of suggest box list |
+| `x-limit` | specify the maximum number of items in suggest box list | `10`
+| `x-search-limit` | specify the default page limit of search popup | `40`
+| `x-precision` | precision of the decimal value (total number of digits) |
 | `x-scale` | scale of the decimal value (total number of digits in decimal part).
 
-It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
-| `x-true-text` | the display value for "true" state of a boolean widget
-| `x-false-text` | specify the display value for "false" state of a boolean widget
-| `x-big` | allow duration of more than 100 hours in a duration widget
-| `x-seconds` | show seconds in a duration widget
-| `x-accept` | specify the file types the file input should accept
-| `x-color-field` | specify the color field to use with `tag-select` widget
-| `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized
+It accepts an integer for a fix scale, or a field name for a dynamic evaluation. | `2`
+| `x-true-text` | the display value for "true" state of a boolean widget |
+| `x-false-text` | specify the display value for "false" state of a boolean widget |
+| `x-big` | allow duration of more than 100 hours in a duration widget | `false`
+| `x-seconds` | show seconds in a duration widget | `false`
+| `x-accept` | specify the file types the file input should accept |
+| `x-color-field` | specify the color field to use with `tag-select` widget |
+| `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized |
 |===
 
 == Expressions

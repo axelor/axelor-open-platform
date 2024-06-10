@@ -304,8 +304,24 @@ Dummy fields can be specified like:
   x-target-name="fullName" />
 ----
 
-Dummy field names can be prefixed with `$` to avoid dirty flag on the form when
-that field is updated. The context still gets value without the `$` prefix.
+Dummy field can also have `x-dirty="false` attribute to avoid dirty flag on the form when
+that field is updated.
+
+The legacy way is to prefix field name with `$`. The rules are :
+
+* in server side, setting the dummy field value, use `$` prefix but when accessing the dummy field value,
+don't use `$` prefix.
+* in client side, always accessing the dummy field value with the `$` prefix.
+
+[source,xml]
+----
+<!-- avoid dirty flag, using `x-dirty="false"` attribute
+or prefix the field name with `$` -->
+<field name="some" x-dirty="false"/>
+<field name="$another" type="integer"/>
+----
+
+NOTE: The legacy dirty checking behavior of the `$` prefixed fields is now deprecated and is scheduled to be removed.
 
 == Field editor
 
