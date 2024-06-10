@@ -21,7 +21,7 @@ export function isDummy(name: string, fieldNames: string[]) {
       .map((key) => key.split(".")[0])
       .includes(name) &&
     // id and version may not be in fieldNames
-    !["id", "version"].includes(name) &&
+    !["id", "version", "$version"].includes(name) &&
     // special case for enum fields
     !(name.endsWith("$value") && fieldNames.includes(name.slice(0, -6))) &&
     // extra data
