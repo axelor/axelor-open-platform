@@ -855,7 +855,7 @@ function GridInner(props: ViewProps<GridView>) {
           isEqual(currOptions[k as keyof SearchOptions], v),
         )
       ) {
-        return;
+        return (cacheDataRef.current = false);
       }
       return (onSearchRef.current = onSearch)(options);
     },
