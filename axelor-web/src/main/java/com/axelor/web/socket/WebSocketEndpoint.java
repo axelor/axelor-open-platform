@@ -21,7 +21,6 @@ package com.axelor.web.socket;
 import com.axelor.common.StringUtils;
 import com.axelor.web.socket.inject.WebSocketConfigurator;
 import com.axelor.web.socket.inject.WebSocketSecurity;
-
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
