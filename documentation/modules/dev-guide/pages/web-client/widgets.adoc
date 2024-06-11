@@ -1135,6 +1135,7 @@ depending on the widget/type.
 | `x-icon-hover` | specify an icon for hover state |
 | `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive | `false`
 | `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all :
+| `x-reset-state` | whether to reset dummy field value on form save | `false`
 
 * editor: `edit`, `view`, `select`, `clear`
 * multirelational field: `select`, `new`, `edit`, `view`, `remove` |

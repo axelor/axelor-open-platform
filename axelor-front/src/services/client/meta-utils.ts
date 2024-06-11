@@ -103,6 +103,7 @@ function processWidgetAttrs(field: Schema) {
         "selectionShowCheckbox",
         "ratingFill",
         "ratingHighlightSelected",
+        "resetState"
       ].indexOf(name) !== -1
     ) {
       val = String(value)?.toLowerCase?.() === "true";

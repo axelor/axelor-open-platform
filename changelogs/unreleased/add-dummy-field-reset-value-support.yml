@@ -1,0 +1,7 @@
+---
+title: Add support to reset dummy field value on save
+type: feature
+description: |
+  By default all dummy fields values are retain on save in form view,
+  now with this option we can set x-reset-state="true" on dummy field 
+  in order to reset it's value on save. By default it's false.

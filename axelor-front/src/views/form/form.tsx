@@ -28,7 +28,7 @@ import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { diff, extractDummy } from "@/services/client/data-utils";
+import { diff, extractDummy, isDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -41,6 +41,7 @@ import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
+  findViewItem,
   useSelectViewState,
   useViewAction,
   useViewConfirmDirty,
@@ -454,7 +455,24 @@ const FormContainer = memo(function FormContainer({
         set(formAtom, {
           ...prev,
           dirty,
-          ...(keepStates ? null : { states: {}, statesByName: {} }),
+          ...(keepStates
+            ? (() => {
+                // reset dummy fields state
+                // only keep real fields state
+                const fieldNames = Object.keys(meta.fields ?? {});
+                return {
+                  statesByName: Object.keys(prev.statesByName)
+                    .filter((key) => !isDummy(key, fieldNames))
+                    .reduce(
+                      (state, key) => ({
+                        ...state,
+                        [key]: prev.statesByName[key],
+                      }),
+                      {},
+                    ),
+                };
+              })()
+            : { states: {}, statesByName: {} }),
           record,
           original: { ...record },
         });
@@ -498,6 +516,7 @@ const FormContainer = memo(function FormContainer({
         }
       },
       [
+        meta,
         formAtom,
         readonly,
         onNewAction,
@@ -702,19 +721,31 @@ const FormContainer = memo(function FormContainer({
 
         if (callOnRead) {
           const savedResult = res;
-          const restoreDummyValues =
-            model === "com.axelor.auth.db.User"
-              ? Object.keys(dummy).reduce((values, key) => {
-                  return [
+          const restoreDummyValues = Object.keys(dummy).reduce(
+            (values, key) => {
+              // special case for user model
+              // in future, this code should be deprecated as
+              // fields should be migrate with x-reset-state="true"
+              if (model === "com.axelor.auth.db.User") {
+                if (
+                  [
                     "change",
                     "oldPassword",
                     "newPassword",
                     "chkPassword",
-                  ].indexOf(key) === -1
-                    ? { ...values, [key]: dummy[key] }
-                    : values;
-                }, {})
-              : dummy;
+                  ].includes(key)
+                ) {
+                  return values;
+                }
+              }
+
+              const viewItem = findViewItem(meta, key);
+              return viewItem?.resetState === true
+                ? values
+                : { ...values, [key]: dummy[key] };
+            },
+            {},
+          );
           res = res.id ? await doRead(res.id, select) : res;
           res = res.id ? fillRecordWithCid(savedResult, res) : res;
           res = {
@@ -733,10 +764,9 @@ const FormContainer = memo(function FormContainer({
         return res;
       },
       [
+        meta,
         formAtom,
         getErrors,
-        meta.fields,
-        meta.related,
         onSaveAction,
         handleOnSaveErrors,
         dataStore,

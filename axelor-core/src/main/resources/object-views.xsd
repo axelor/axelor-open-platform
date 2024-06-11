@@ -875,6 +875,11 @@
         <xsd:documentation>Specify the name of icons to show on nested editor.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-reset-state" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>whether to reset dummy field value on form save.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-show-bars" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
