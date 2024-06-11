@@ -140,6 +140,13 @@ export function Kanban(props: ViewProps<KanbanView>) {
     );
   }, [view, dataStore, columnBy, fields]);
 
+  const searchFieldNames = useMemo(() => {
+    const names = Object.keys(fields ?? {});
+    return uniq(
+      [...names, columnBy, sequenceBy].filter((name) => name),
+    ) as string[];
+  }, [fields, columnBy, sequenceBy]);
+
   const fetchRecords = useAtomCallback(
     useCallback(
       (
@@ -149,7 +156,6 @@ export function Kanban(props: ViewProps<KanbanView>) {
         options: Partial<SearchOptions> = {},
       ) => {
         const { query = null } = searchAtom ? get(searchAtom) : {};
-        const names = Object.keys(fields ?? {});
 
         let filter: SearchOptions["filter"] = {
           criteria: [
@@ -186,19 +192,17 @@ export function Kanban(props: ViewProps<KanbanView>) {
           ...(sequenceBy && { sortBy: [sequenceBy] }),
           filter,
           limit,
-          fields: uniq(
-            [...names, columnBy, sequenceBy].filter((name) => name),
-          ) as string[],
+          fields: searchFieldNames,
           ...options,
         });
       },
       [
         dashlet,
-        fields,
         searchAtom,
         limit,
         columnBy,
         sequenceBy,
+        searchFieldNames,
         getViewContext,
         getColumnByValue,
       ],
@@ -529,7 +533,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
       ];
 
       try {
-        const res = await column.dataStore.save(updatedRecords);
+        const res = await column.dataStore.save(updatedRecords, {
+          fields: searchFieldNames,
+        });
 
         records.splice(index, res.length, ...(res as KanbanRecord[]));
 
@@ -552,6 +558,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
       columnBy,
       sequenceBy,
       columns,
+      searchFieldNames,
       actionExecutor,
       fields,
       getColumnByValue,
