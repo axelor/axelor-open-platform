@@ -67,7 +67,7 @@ public class DatabaseTask extends AbstractRunTask {
     this.encrypt = encrypt;
   }
 
-  @Option(option = "modules", description = "comma separate list of modules to update")
+  @Option(option = "modules", description = "comma-separated list of modules to update")
   public void setModules(String modules) {
     this.modules = modules;
   }

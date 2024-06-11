@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.SAXParser;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -375,6 +377,11 @@ public class I18nExtractor {
   }
 
   public void extract(Path srcPath, Path destPath, boolean update, boolean withContext) {
+    extract(srcPath, destPath, update, withContext, Collections.emptyList());
+  }
+
+  public void extract(
+      Path srcPath, Path destPath, boolean update, boolean withContext, List<String> languages) {
     if (Files.notExists(srcPath)) {
       return;
     }
@@ -427,12 +434,14 @@ public class I18nExtractor {
     }
 
     try {
-      update(destPath, values, update);
+      update(destPath, values, update, languages);
     } catch (IOException e) {
     }
   }
 
-  private void update(Path destPath, final List<String[]> lines, boolean all) throws IOException {
+  private void update(
+      Path destPath, final List<String[]> lines, boolean all, List<String> languages)
+      throws IOException {
 
     // first save the template
     Path template = destPath.resolve(Paths.get("i18n", "messages.csv"));
@@ -463,8 +472,12 @@ public class I18nExtractor {
           }
         });
 
-    // generate initial templates for some languages
-    String[] langs = {"en", "fr"};
+    // Generate initial templates for specified languages.
+    final List<String> langs =
+        Stream.concat(Stream.of("en", "fr"), languages.stream())
+            .distinct()
+            .collect(Collectors.toUnmodifiableList());
+
     for (String lang : langs) {
       Path target = template.resolveSibling("messages_" + lang + ".csv");
       if (!Files.exists(target)) {

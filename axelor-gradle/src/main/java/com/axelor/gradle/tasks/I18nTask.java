@@ -18,12 +18,16 @@
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.common.StringUtils;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.I18nExtension;
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
@@ -36,9 +40,21 @@ public class I18nTask extends DefaultTask {
 
   private boolean withContext;
 
+  private List<String> languages = Collections.emptyList();
+
   @Option(option = "with-context", description = "Specify whether to include context details.")
   public void setWithContext(boolean withContext) {
     this.withContext = withContext;
+  }
+
+  @Option(
+      option = "languages",
+      description = "comma-separated list of additional languages files to create")
+  public void setLanguages(String languages) {
+    this.languages =
+        Arrays.stream(languages.split("\\s*,\\s*"))
+            .map(StringUtils::normalizeLanguageTag)
+            .collect(Collectors.toUnmodifiableList());
   }
 
   @TaskAction
@@ -49,7 +65,7 @@ public class I18nTask extends DefaultTask {
     final Path dest = src.resolve("resources");
     final boolean update = true;
 
-    extractor.extract(src, dest, update, withContext);
+    extractor.extract(src, dest, update, withContext, languages);
 
     final I18nExtension extension = getProject().getExtensions().findByType(I18nExtension.class);
 
@@ -61,7 +77,7 @@ public class I18nTask extends DefaultTask {
 
     if (extraSources != null) {
       for (final Path extraSource : extraSources) {
-        extractor.extract(base.resolve(extraSource), dest, update, withContext);
+        extractor.extract(base.resolve(extraSource), dest, update, withContext, languages);
       }
     }
   }
