@@ -1,0 +1,11 @@
+---
+title: Login page layout changes
+type: change
+description: |
+  Login page has been reworked with the following changes:
+
+  * Move tenant selection to top
+  * Translatable copyright
+  * Login button renamed to Sign in
+  * Add "or" separator before SSO buttons
+  * Remove unimplemented "Remember me" button"

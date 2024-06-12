@@ -1,7 +1,6 @@
-import { Link, LinkProps } from "@axelor/ui";
-import { StyledComponentProps } from "@axelor/ui/core/styled";
+import { Link } from "@axelor/ui";
 
-export function TextLink(props: StyledComponentProps<"a", LinkProps>) {
+export function TextLink(props: React.ComponentProps<typeof Link>) {
   const { children, target = "_blank" } = props;
 
   return (

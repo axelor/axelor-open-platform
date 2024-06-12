@@ -1,0 +1,38 @@
+---
+title: Implement login customization
+type: feature
+description: |
+  Add support for customizing the login page.
+
+  application.sign-in.logo = url # absolute or relative url, to have a login logo different from `application.logo`
+  application.sign-in.title = html # translatable sanitized html, shown after logo in form login panel
+  application.sign-in.footer = html # translatable sanitized html, shown after form login panel
+
+  application.sign-in.fields.username.show-title = true (default) | false
+  application.sign-in.fields.username.title = translatable text # `Username` (default)
+  application.sign-in.fields.username.placeholder = translatable text # default is empty
+  application.sign-in.fields.username.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment
+
+  application.sign-in.fields.password.show-title = true (default) | false
+  application.sign-in.fields.password.title = translatable text # `Password` (default)
+  application.sign-in.fields.password.placeholder = translatable text # default is empty
+  application.sign-in.fields.password.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment
+
+  application.sign-in.fields.tenant.show-title = true (default) | false
+  application.sign-in.fields.tenant.title = translatable text # `Tenant` (default)
+
+  # Extra buttons inside form login panel using custom button names
+  application.sign-in.buttons.<button-name>.title = text
+  application.sign-in.buttons.<button-name>.type = button (default) | link # use Button or Link component
+  application.sign-in.buttons.<button-name>.variant = primary|secondary|success|danger|info|warning|light|dark # for button only
+  application.sign-in.buttons.<button-name>.icon = icon_name # Bootstrap or Material icon name, shown before title
+  application.sign-in.buttons.<button-name>.link = url # absolute or relative url with `:username` support
+  application.sign-in.buttons.<button-name>.order = order # number relative to Login button (< 0 for before, >= 0 for after)
+
+  # Use `submit` button name to customize Login submit button
+  application.sign-in.buttons.submit.title = Sign in
+  application.sign-in.buttons.submit.type = button
+  application.sign-in.buttons.submit.variant = primary
+  application.sign-in.buttons.submit.icon = none
+
+  For translatable texts, you can add your translations to `custom_<language>.csv` files.

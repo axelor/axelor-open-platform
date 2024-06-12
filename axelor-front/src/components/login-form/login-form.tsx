@@ -1,4 +1,4 @@
-import { FormEventHandler, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -6,7 +6,6 @@ import {
   Alert,
   Box,
   Button,
-  Input,
   InputLabel,
   Select,
 } from "@axelor/ui";
@@ -14,16 +13,18 @@ import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
-import { i18n } from "@/services/client/i18n";
-import { SessionInfo } from "@/services/client/session";
-
 import {
   CLIENT_NAME_PARAM,
   FORM_CLIENT_NAME,
   requestLogin,
 } from "@/routes/login";
+import { i18n } from "@/services/client/i18n";
+import { SessionInfo, SignInButtonType } from "@/services/client/session";
+import { SanitizedContent } from "@/utils/sanitize";
+import { Icon } from "../icon";
+import { TextLink as Link } from "../text-link";
 
-import logo from "@/assets/axelor.svg";
+import defaultLogo from "@/assets/axelor.svg";
 import styles from "./login-form.module.scss";
 
 const YEAR = new Date().getFullYear();
@@ -52,18 +53,20 @@ export function LoginForm({
 
   const session = useSession();
   const appInfo = session.data;
+  const { authentication, application } = appInfo ?? {};
+  const { signIn } = application ?? {};
 
-  const defaultClient = appInfo?.authentication?.defaultClient;
+  const defaultClient = authentication?.defaultClient;
 
-  const [tenantId, setTenantId] = useState(appInfo?.authentication?.tenant);
+  const [tenantId, setTenantId] = useState(authentication?.tenant);
 
   const tenants = useMemo(() => {
-    const val = appInfo?.authentication?.tenants ?? {};
+    const val = authentication?.tenants ?? {};
     return Object.entries(val).map(([name, title]) => ({
       name,
       title,
     }));
-  }, [appInfo?.authentication?.tenants]);
+  }, [authentication?.tenants]);
 
   const tenant = useMemo(() => {
     return tenants?.find((x) => x.name === tenantId) ?? tenants?.[0];
@@ -79,53 +82,102 @@ export function LoginForm({
     [],
   );
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
-    async (event) => {
-      event.preventDefault();
+  const handleSubmit: (event: React.SyntheticEvent) => Promise<void> =
+    useCallback(
+      async (event) => {
+        event.preventDefault();
 
-      // Need to specify client if default client is not form client.
-      const params =
-        defaultClient && defaultClient !== FORM_CLIENT_NAME
-          ? new URLSearchParams({
-              [CLIENT_NAME_PARAM]: FORM_CLIENT_NAME,
-            })
-          : undefined;
+        // Need to specify client if default client is not form client.
+        const params =
+          defaultClient && defaultClient !== FORM_CLIENT_NAME
+            ? new URLSearchParams({
+                [CLIENT_NAME_PARAM]: FORM_CLIENT_NAME,
+              })
+            : undefined;
 
-      try {
-        const info = await session.login(
-          { username, password },
-          { params, tenant: tenantId },
-        );
-        const { user, route } = info;
+        try {
+          const info = await session.login(
+            { username, password },
+            { params, tenant: tenantId },
+          );
+          const { user, route } = info;
 
-        if (route) {
-          const { path, state } = route;
-          navigate(path, {
-            state: {
-              ...locationState,
-              route: { ...state, username, password },
-            },
-          });
-        } else if (user) {
-          onSuccess?.(info);
-        } else {
+          if (route) {
+            const { path, state } = route;
+            navigate(path, {
+              state: {
+                ...locationState,
+                route: { ...state, username, password },
+              },
+            });
+          } else if (user) {
+            onSuccess?.(info);
+          } else {
+            setShowError(true);
+          }
+        } catch (e) {
           setShowError(true);
         }
-      } catch (e) {
-        setShowError(true);
-      }
-    },
-    [
-      defaultClient,
-      session,
-      username,
-      password,
-      tenantId,
-      navigate,
-      locationState,
-      onSuccess,
-    ],
-  );
+      },
+      [
+        defaultClient,
+        session,
+        username,
+        password,
+        tenantId,
+        navigate,
+        locationState,
+        onSuccess,
+      ],
+    );
+
+  const { logo: appLogo = defaultLogo, name: appName = "Axelor" } =
+    appInfo?.application || {};
+  const {
+    logo: signInLogo = appLogo,
+    title: signInTitle,
+    footer: signInFooter,
+    fields: signInFields,
+    buttons: signInButtons,
+  } = signIn ?? {};
+
+  const {
+    username: usernameField = {},
+    password: passwordField = {},
+    tenant: tenantField = {},
+  } = signInFields ?? {};
+
+  const usernameFieldIcon =
+    usernameField.icon !== "none" ? usernameField.icon : undefined;
+  const passwordFieldIcon =
+    passwordField.icon !== "none" ? passwordField.icon : undefined;
+
+  const usernameRef = useRef<HTMLInputElement>(null);
+
+  const formButtons = useMemo(() => {
+    const { submit, ...buttonsRest } = signInButtons ?? {};
+
+    return Object.values({
+      submit: {
+        title: i18n.get("Sign in"),
+        order: 0,
+        onSubmit: handleSubmit,
+        ...submit,
+      },
+      ...buttonsRest,
+    })
+      .map((button) => {
+        const { link, ...buttonRest } = button;
+        return {
+          ...(link?.includes(":username") && {
+            usernameRef,
+          }),
+          link,
+          ...buttonRest,
+        };
+      })
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [signInButtons, handleSubmit]);
 
   if (session.state === "loading" || session.state === "hasError") {
     return null;
@@ -138,8 +190,6 @@ export function LoginForm({
     return <Reconnecting />;
   }
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
-    appInfo?.application || {};
   const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
   const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
     "All Rights Reserved",
@@ -167,15 +217,44 @@ export function LoginForm({
       >
         <img
           className={styles.logo}
-          src={appLogo}
+          src={signInLogo}
           alt={appName}
           onError={(e) => {
-            e.currentTarget.src = logo;
+            e.currentTarget.src = defaultLogo;
           }}
         />
+        {signInTitle && (
+          <Box d="flex" justifyContent={"center"}>
+            <SanitizedContent content={signInTitle} />
+          </Box>
+        )}
         <Box as="form" w={100} onSubmit={handleSubmit}>
-          <InputLabel htmlFor="username">{i18n.get("Username")}</InputLabel>
-          <Input
+          {tenants.length > 1 && (
+            <Box mb={4}>
+              {tenantField.showTitle !== false && (
+                <InputLabel htmlFor="tenant">
+                  {tenantField.title ? tenantField.title : i18n.get("Tenant")}
+                </InputLabel>
+              )}
+              <Select
+                id="tenant"
+                multiple={false}
+                value={tenant}
+                options={tenants}
+                optionKey={(x) => x.name}
+                optionLabel={(x) => x.title}
+                onChange={handleTenantChange}
+                clearIcon={false}
+              />
+            </Box>
+          )}
+          {usernameField.showTitle !== false && (
+            <InputLabel htmlFor="username">
+              {usernameField.title ? usernameField.title : i18n.get("Username")}
+            </InputLabel>
+          )}
+          <AdornedInput
+            ref={usernameRef}
             id="username"
             name="username"
             autoComplete="username"
@@ -186,8 +265,16 @@ export function LoginForm({
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck="false"
+            placeholder={usernameField.placeholder}
+            startAdornment={
+              usernameFieldIcon ? <Icon icon={usernameFieldIcon} /> : undefined
+            }
           />
-          <InputLabel htmlFor="password">{i18n.get("Password")}</InputLabel>
+          {passwordField.showTitle !== false && (
+            <InputLabel htmlFor="password">
+              {passwordField.title ? passwordField.title : i18n.get("Password")}
+            </InputLabel>
+          )}
           <Box d="flex" position="relative">
             <AdornedInput
               name="password"
@@ -198,6 +285,12 @@ export function LoginForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               spellCheck="false"
+              placeholder={passwordField.placeholder}
+              startAdornment={
+                passwordFieldIcon ? (
+                  <Icon icon={passwordFieldIcon} />
+                ) : undefined
+              }
               endAdornment={
                 <Button
                   onClick={() => setShowPassword((value) => !value)}
@@ -212,31 +305,21 @@ export function LoginForm({
               }
             />
           </Box>
-          {tenants.length > 1 && (
-            <Box mb={4}>
-              <InputLabel htmlFor="teannt">{i18n.get("Tenant")}</InputLabel>
-              <Select
-                id="teannt"
-                multiple={false}
-                value={tenant}
-                options={tenants}
-                optionKey={(x) => x.name}
-                optionLabel={(x) => x.title}
-                onChange={handleTenantChange}
-                clearIcon={false}
-              />
-            </Box>
-          )}
           {errorText && (
             <Alert mt={3} mb={1} p={2} variant="danger">
               {errorText}
             </Alert>
           )}
-          <Button type="submit" variant="primary" mt={3} w={100}>
-            {i18n.get("Log in")}
-          </Button>
+          {formButtons.map((button, index) => (
+            <LoginFormButton key={index} {...button} />
+          ))}
         </Box>
       </Box>
+      {signInFooter && (
+        <Box d="flex" justifyContent={"center"}>
+          <SanitizedContent content={signInFooter} />
+        </Box>
+      )}
       {children}
       <Box as="p" textAlign="center">
         {copyright}
@@ -260,5 +343,71 @@ function Reconnecting() {
         </Box>
       </Box>
     </Box>
+  );
+}
+
+function LoginFormButton({
+  type,
+  title,
+  icon,
+  link,
+  variant,
+  onSubmit,
+  usernameRef,
+}: SignInButtonType & {
+  onSubmit?: (e: React.SyntheticEvent) => Promise<void>;
+  usernameRef?: React.RefObject<HTMLInputElement>;
+}) {
+  const handleClick = useCallback(
+    (e: React.SyntheticEvent) => {
+      if (onSubmit) {
+        return onSubmit(e);
+      }
+
+      if (link) {
+        e.preventDefault();
+        const username = usernameRef?.current?.value;
+        window.location.href = username
+          ? link.replace(/:username\b/, encodeURIComponent(username))
+          : link;
+      }
+    },
+    [onSubmit, link, usernameRef],
+  );
+
+  if (type === "link") {
+    // Submit button is needed for submitting the form on Enter.
+    return (
+      <>
+        {onSubmit && <Button type="submit" style={{ display: "none" }} />}
+        <Link
+          href="#"
+          onClick={handleClick}
+          d="flex"
+          justifyContent="center"
+          underline={false}
+          mt={2}
+          w={100}
+        >
+          {icon && <Icon icon={icon} className={styles.icon} />}
+          {title}
+        </Link>
+      </>
+    );
+  }
+
+  return (
+    <Button
+      type={onSubmit ? "submit" : "button"}
+      onClick={handleClick}
+      variant={variant ?? "primary"}
+      d="flex"
+      justifyContent="center"
+      mt={2}
+      w={100}
+    >
+      {icon && <Icon icon={icon} className={styles.icon} />}
+      {title}
+    </Button>
   );
 }

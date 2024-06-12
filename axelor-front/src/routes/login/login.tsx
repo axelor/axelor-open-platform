@@ -63,7 +63,7 @@ export function Login() {
   const { state, data, redirectUrl } = useSession();
   const queryParams = useMemo(
     () => new URLSearchParams(window.location.search),
-    []
+    [],
   );
   const clientNameParam = queryParams.get(CLIENT_NAME_PARAM);
   const clientName =
@@ -129,16 +129,23 @@ export function Login() {
 
 function CentralClients({ clients }: { clients: ClientInfo[] }) {
   return clients.length > 0 ? (
-    <Box as="form" w={100} className={styles.clients}>
-      {clients.map((client) => (
-        <CentralClient
-          key={client.name}
-          name={client.name}
-          title={client.title}
-          icon={client.icon}
-        />
-      ))}
-    </Box>
+    <>
+      <Box d="flex" alignItems="center">
+        <Box as="hr" flexGrow={1} />
+        <Box mx={3}>{i18n.get("or sign in with")}</Box>
+        <Box as="hr" flexGrow={1} />
+      </Box>
+      <Box as="form" w={100} className={styles.clients}>
+        {clients.map((client) => (
+          <CentralClient
+            key={client.name}
+            name={client.name}
+            title={client.title}
+            icon={client.icon}
+          />
+        ))}
+      </Box>
+    </>
   ) : null;
 }
 
@@ -151,7 +158,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
       e.preventDefault();
       requestLogin(name);
     },
-    [name]
+    [name],
   );
 
   return (
@@ -167,7 +174,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
         onClick={handleClick}
       >
         {icon && <Image className={styles.socialLogo} src={icon} alt={title} />}
-        <Box>{i18n.get("Log in with {0}", title)}</Box>
+        <Box>{title}</Box>
       </Button>
     </Box>
   );
@@ -175,7 +182,8 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 
 function ServerError({ error }: { error: string }) {
   const { data } = useSession();
-  const { logo: appLogo = logo, name: appName = "Axelor" } = data?.application ?? {};
+  const { logo: appLogo = logo, name: appName = "Axelor" } =
+    data?.application ?? {};
 
   return (
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>
@@ -204,7 +212,7 @@ function removeErrorParam() {
     window.history.replaceState(
       {},
       document.title,
-      `?${queryParams}${window.location.hash}`
+      `?${queryParams}${window.location.hash}`,
     );
   }
 }

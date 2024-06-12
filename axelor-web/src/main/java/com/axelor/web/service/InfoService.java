@@ -33,6 +33,7 @@ import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.tenants.TenantResolver;
+import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -82,14 +84,20 @@ public class InfoService extends AbstractService {
 
     map.put("name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
     map.put("author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
-    map.put("description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
-    map.put("copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("description", I18n.get(SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION)));
+    map.put("copyright", I18n.get(SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT)));
     map.put("theme", getTheme());
     map.put("logo", getLogo());
     map.put("icon", getIcon());
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     if (AuthUtils.getUser() == null) {
+      final Map<String, Object> signIn = signInInfo();
+
+      if (ObjectUtils.notEmpty(signIn)) {
+        map.put("signIn", signIn);
+      }
+
       return map;
     }
 
@@ -112,6 +120,50 @@ public class InfoService extends AbstractService {
     final boolean allowTryItOut =
         SETTINGS.getBoolean(AvailableAppSettings.APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT, false);
     return Map.of("enabled", enabled, "allowTryItOut", allowTryItOut);
+  }
+
+  private Map<String, Object> signInInfo() {
+    final String keyPrefix = AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX;
+    final Map<String, String> config = SETTINGS.getPropertiesStartingWith(keyPrefix);
+    return buildMap(config, keyPrefix);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Map<String, Object> buildMap(Map<String, String> config, String keyPrefix) {
+    return config.entrySet().stream()
+        .collect(
+            HashMap::new,
+            (map, entry) -> {
+              final String key =
+                  inflector.camelize(entry.getKey().substring(keyPrefix.length()), true);
+              final String str = entry.getValue();
+
+              final String[] keys = key.split("\\.");
+              Map<String, Object> currentMap = map;
+
+              for (int i = 0; i < keys.length - 1; ++i) {
+                currentMap =
+                    (Map<String, Object>) currentMap.computeIfAbsent(keys[i], k -> new HashMap<>());
+              }
+
+              final String currentKey = keys[keys.length - 1];
+              Object value = str;
+
+              if (Stream.of("title", "placeholder", "footer").anyMatch(k -> k.equals(currentKey))) {
+                value = I18n.get(str);
+              } else if ("true".equalsIgnoreCase(str) || "false".equalsIgnoreCase(str)) {
+                value = Boolean.parseBoolean(str);
+              } else {
+                try {
+                  value = Long.parseLong(str);
+                } catch (NumberFormatException e) {
+                  // Ignore
+                }
+              }
+
+              currentMap.put(currentKey, value);
+            },
+            Map::putAll);
   }
 
   protected Map<String, Object> authInfo(HttpServletRequest request, HttpServletResponse response) {

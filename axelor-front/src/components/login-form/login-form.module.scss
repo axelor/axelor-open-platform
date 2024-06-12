@@ -19,3 +19,10 @@
   background-color: #f2dede;
   border: 1px solid #ebccd1;
 }
+
+button,
+a {
+  & .icon {
+    margin-right: 0.25rem;
+  }
+}

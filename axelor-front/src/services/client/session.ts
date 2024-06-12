@@ -1,12 +1,24 @@
+import { ButtonProps } from "@axelor/ui";
+import { ComponentProps } from "react";
+
+import { IconProps } from "@/components/icon";
 import { request } from "./client";
 import { i18n } from "./i18n";
 import { SelectorType } from "./meta.types";
-
 export interface ClientInfo {
   name: string;
   icon?: string;
   title?: string;
 }
+
+export type SignInButtonType = {
+  type?: "button" | "link";
+  title?: string;
+  variant?: ButtonProps["variant"];
+  icon?: IconProps["icon"];
+  link?: ComponentProps<"a">["href"];
+  order?: number;
+};
 
 export interface SessionInfo {
   application: {
@@ -28,6 +40,22 @@ export interface SessionInfo {
     swaggerUI?: {
       enabled?: boolean;
       allowTryItOut?: boolean;
+    };
+    signIn?: {
+      logo?: string;
+      title?: string;
+      footer?: string;
+      fields?: {
+        [key in "username" | "password" | "tenant"]: {
+          showTitle?: boolean;
+          title?: string;
+          placeholder?: string;
+          icon?: string;
+        };
+      };
+      buttons?: {
+        [key in "submit" | string]: SignInButtonType;
+      };
     };
   };
   authentication?: {
