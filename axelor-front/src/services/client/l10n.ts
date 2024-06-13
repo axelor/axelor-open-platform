@@ -95,7 +95,7 @@ function findDateFormat(data: any) {
         .replace(/MMM/g, "MM") // Don't support MMM
         .replace(/\bD\b/g, "DD") // D -> DD
         .replace(/\bM\b/g, "MM"); // M -> MM
-    } else if (getCountry(locale) === "us") {
+    } else if (locale == "en" || getCountry(locale) === "us") {
       // dayjs has no locale "en-us", and locale "en" has undefined formats
       return "MM/DD/YYYY";
     }
