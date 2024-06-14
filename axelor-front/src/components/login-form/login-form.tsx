@@ -20,7 +20,7 @@ import {
 } from "@/routes/login";
 import { i18n } from "@/services/client/i18n";
 import { SessionInfo, SignInButtonType } from "@/services/client/session";
-import { SanitizedContent } from "@/utils/sanitize";
+import { sanitize } from "@/utils/sanitize";
 import { Icon } from "../icon";
 import { TextLink as Link } from "../text-link";
 
@@ -224,9 +224,14 @@ export function LoginForm({
           }}
         />
         {signInTitle && (
-          <Box d="flex" justifyContent={"center"}>
-            <SanitizedContent content={signInTitle} />
-          </Box>
+          <Box
+            d="flex"
+            justifyContent={"center"}
+            mt={3}
+            dangerouslySetInnerHTML={{
+              __html: sanitize(signInTitle),
+            }}
+          />
         )}
         <Box as="form" w={100} onSubmit={handleSubmit}>
           {tenants.length > 1 && (
@@ -316,9 +321,11 @@ export function LoginForm({
         </Box>
       </Box>
       {signInFooter && (
-        <Box d="flex" justifyContent={"center"}>
-          <SanitizedContent content={signInFooter} />
-        </Box>
+        <Box
+          d="flex"
+          justifyContent={"center"}
+          dangerouslySetInnerHTML={{ __html: sanitize(signInFooter) }}
+        ></Box>
       )}
       {children}
       <Box as="p" textAlign="center">
@@ -384,7 +391,6 @@ function LoginFormButton({
           href="#"
           onClick={handleClick}
           d="flex"
-          justifyContent="center"
           underline={false}
           mt={2}
           w={100}
