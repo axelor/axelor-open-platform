@@ -1802,12 +1802,29 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
+          <xsd:element name="search-fields" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                Defines the fields to be used as context.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="field" type="tns:BaseSearchField" maxOccurs="unbounded"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
           <xsd:element name="dashlet" type="tns:Dashlet" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Specify an action view as a dashlet.</xsd:documentation>
             </xsd:annotation>
           </xsd:element>
         </xsd:sequence>
+        <xsd:attribute name="onInit" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Call an action when dashboard is initialized.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1921,12 +1938,21 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
-          <xsd:element name="column" type="tns:BaseSearchField" maxOccurs="unbounded">
+          <xsd:element name="column" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Define a tree column.
               </xsd:documentation>
             </xsd:annotation>
+            <xsd:complexType>
+              <xsd:complexContent>
+                <xsd:extension base="tns:BaseSearchField">
+                  <xsd:attribute name="multiple" use="prohibited"/>
+                  <xsd:attribute name="colSpan" use="prohibited"/>
+                  <xsd:attribute name="required" use="prohibited"/>
+                </xsd:extension>
+              </xsd:complexContent>
+            </xsd:complexType>
           </xsd:element>
           <xsd:element name="node" maxOccurs="unbounded">
             <xsd:complexType>
@@ -2471,9 +2497,22 @@
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
           <xsd:element name="search-fields" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                Defines the fields to be used as context.
+              </xsd:documentation>
+            </xsd:annotation>
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="field" type="tns:ChartSearchField" maxOccurs="2" />
+                <xsd:element name="field" maxOccurs="2">
+                  <xsd:complexType>
+                    <xsd:complexContent>
+                      <xsd:extension base="tns:BaseSearchField">
+                        <xsd:attribute name="colSpan" use="prohibited"/>
+                      </xsd:extension>
+                    </xsd:complexContent>
+                  </xsd:complexType>
+                </xsd:element>
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2689,13 +2728,22 @@
           <xsd:element name="search-fields">
             <xsd:annotation>
               <xsd:documentation>
-                Defines the fields to be used to provide search criteria (inputs).
+                Defines the fields to be used in the search context.
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="field" type="tns:BaseSearchField"
-                  maxOccurs="unbounded" />
+                <xsd:element name="field" maxOccurs="unbounded">
+                  <xsd:complexType>
+                    <xsd:complexContent>
+                      <xsd:extension base="tns:BaseSearchField">
+                        <xsd:attribute name="colSpan" use="prohibited"/>
+                        <xsd:attribute name="multiple" use="prohibited"/>
+                        <xsd:attribute name="required" use="prohibited"/>
+                      </xsd:extension>
+                    </xsd:complexContent>
+                  </xsd:complexType>
+                </xsd:element>
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -4174,14 +4222,9 @@
             </xsd:annotation>
           </xsd:element>
         </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="ChartSearchField">
-    <xsd:complexContent>
-      <xsd:extension base="tns:BaseSearchField">
-        <xsd:attribute name="multiple" type="xsd:boolean" />
+        <xsd:attribute name="colSpan" use="prohibited"/>
+        <xsd:attribute name="multiple" use="prohibited"/>
+        <xsd:attribute name="required" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -4209,6 +4252,15 @@
     <xsd:attribute name="domain" type="xsd:string" />
     <xsd:attribute name="selection" type="xsd:string" />
     <xsd:attribute name="widget" type="xsd:string" />
+    <xsd:attribute name="colSpan" type="tns:ResponsiveNumber">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the number of columns taken by the widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="multiple" type="xsd:boolean" />
+    <xsd:attribute name="required" type="xsd:boolean" />
     <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 

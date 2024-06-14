@@ -20,7 +20,9 @@ package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
@@ -28,10 +30,14 @@ import javax.xml.bind.annotation.XmlType;
 @JsonTypeName("dashboard")
 public class Dashboard extends AbstractView implements ContainerView {
 
-  @XmlElements({
-    @XmlElement(name = "dashlet", type = Dashlet.class),
-  })
+  @XmlElement(name = "field")
+  @XmlElementWrapper(name = "search-fields")
+  private List<BaseSearchField> searchFields;
+
+  @XmlElements({@XmlElement(name = "dashlet", type = Dashlet.class)})
   private List<AbstractWidget> items;
+
+  @XmlAttribute private String onInit;
 
   @Override
   public List<AbstractWidget> getItems() {
@@ -40,5 +46,21 @@ public class Dashboard extends AbstractView implements ContainerView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public String getOnInit() {
+    return onInit;
+  }
+
+  public void setOnInit(String onInit) {
+    this.onInit = onInit;
+  }
+
+  public List<BaseSearchField> getSearchFields() {
+    return searchFields;
+  }
+
+  public void setSearchFields(List<BaseSearchField> searchFields) {
+    this.searchFields = searchFields;
   }
 }

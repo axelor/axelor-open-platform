@@ -36,9 +36,9 @@ public class ChartView extends AbstractView {
 
   @XmlAttribute private String onInit;
 
-  @XmlElement(name = "field", type = ChartSearchField.class)
+  @XmlElement(name = "field", type = BaseSearchField.class)
   @XmlElementWrapper(name = "search-fields")
-  private List<ChartSearchField> searchFields;
+  private List<BaseSearchField> searchFields;
 
   @JsonIgnore
   @XmlElement(name = "dataset")
@@ -70,11 +70,11 @@ public class ChartView extends AbstractView {
     this.onInit = onInit;
   }
 
-  public List<ChartSearchField> getSearchFields() {
+  public List<BaseSearchField> getSearchFields() {
     return searchFields;
   }
 
-  public void setSearchFields(List<ChartSearchField> searchFields) {
+  public void setSearchFields(List<BaseSearchField> searchFields) {
     this.searchFields = searchFields;
   }
 

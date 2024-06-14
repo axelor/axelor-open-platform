@@ -28,16 +28,27 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonInclude(Include.NON_NULL)
 public class BaseSearchField extends Field {
 
+  @XmlAttribute private Boolean multiple;
+
   @JsonGetter("type")
   @Override
   public String getServerType() {
     return super.getServerType();
+  }
+
+  public Boolean getMultiple() {
+    return multiple;
+  }
+
+  public void setMultiple(Boolean multiple) {
+    this.multiple = multiple;
   }
 
   public static Map<String, Class<?>> getTypes() {
