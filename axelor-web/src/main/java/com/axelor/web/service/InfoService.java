@@ -85,7 +85,16 @@ public class InfoService extends AbstractService {
     map.put("name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
     map.put("author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
     map.put("description", I18n.get(SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION)));
-    map.put("copyright", I18n.get(SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT)));
+    map.put(
+        "copyright",
+        SETTINGS.format(
+            I18n.get(
+                SETTINGS
+                    .getPropertiesStartingWith(AvailableAppSettings.APPLICATION_COPYRIGHT)
+                    .values()
+                    .stream()
+                    .findFirst()
+                    .orElse(null))));
     map.put("theme", getTheme());
     map.put("logo", getLogo());
     map.put("icon", getIcon());

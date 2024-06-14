@@ -48,7 +48,7 @@ public final class AppSettings {
   }
 
   public String get(String key) {
-    return sub(properties.get(key));
+    return format(properties.get(key));
   }
 
   public String get(String key, String defaultValue) {
@@ -56,7 +56,7 @@ public final class AppSettings {
     if (StringUtils.isBlank(value)) {
       value = defaultValue;
     }
-    return sub(value);
+    return format(value);
   }
 
   public List<String> getList(String key) {
@@ -88,10 +88,16 @@ public final class AppSettings {
     if (path == null) {
       return null;
     }
-    return sub(path);
+    return format(path);
   }
 
-  private String sub(String value) {
+  /**
+   * Format the property value. Variables in the format <code>${}</code> format will be substituted.
+   *
+   * @param value the property value
+   * @return the formatted property value
+   */
+  public String format(String value) {
     if (value == null) {
       return null;
     }
