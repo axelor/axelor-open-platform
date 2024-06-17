@@ -20,6 +20,7 @@ package com.axelor.db.hibernate.dialect;
 
 import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
+import com.axelor.db.internal.DBHelper;
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.PostgreSQLDialect;
@@ -56,6 +57,17 @@ public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
     functionContributions.getFunctionRegistry().register(
             "json_extract_decimal",
             new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+
+    if (DBHelper.isUnaccentEnabled()) {
+      functionContributions
+          .getFunctionRegistry()
+          .registerNamed(
+              "unaccent",
+              functionContributions
+                  .getTypeConfiguration()
+                  .getBasicTypeRegistry()
+                  .resolve(StandardBasicTypes.STRING));
+    }
   }
 
 }
