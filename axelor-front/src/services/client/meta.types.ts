@@ -283,6 +283,7 @@ export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   limit?: number;
   searchLimit?: number;
   colorField?: string;
+  imageField?: string;
   accept?: string;
   popupMaximized?: string;
   jsonModel?: string;

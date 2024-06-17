@@ -1,0 +1,5 @@
+.image {
+  height: var(--ax-relation-image-height, 1.25rem);
+  width: var(--ax-relation-image-width, 1.25rem);
+  border-radius: var(--ax-relation-image-border-radius, 0.25rem);
+}

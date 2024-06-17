@@ -1,9 +1,15 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
+import { Box } from "@axelor/ui";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { Select, SelectIcon, SelectValue } from "@/components/select";
+import {
+  Select,
+  SelectIcon,
+  SelectOptionProps,
+  SelectValue,
+} from "@/components/select";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePermitted } from "@/hooks/use-permitted";
 import {
@@ -26,6 +32,9 @@ import { FieldProps } from "../../builder/types";
 import { removeVersion } from "../../builder/utils";
 import { ViewerInput, ViewerLink } from "../string/viewer";
 import { useOptionLabel } from "./utils";
+import { Schema } from "@/services/client/meta.types";
+import { makeImageURL } from "../image/utils";
+import styles from "./many-to-one.module.css";
 
 export function ManyToOne(
   props: FieldProps<DataRecord> & { isSuggestBox?: boolean },
@@ -51,6 +60,7 @@ export function ManyToOne(
     limit,
     searchLimit,
     perms,
+    imageField,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const [hasSearchMore, setSearchMore] = useState(false);
@@ -292,6 +302,26 @@ export function ManyToOne(
   // register form:refresh
   useFormRefresh(onRefSelectRefresh);
 
+  const selectPropsWithImage = {
+    inputStartAdornment: useMemo(
+      () =>
+        value && (
+          <RelationalValueImage
+            field={imageField}
+            model={target}
+            value={value}
+          />
+        ),
+      [value, target, imageField],
+    ),
+    renderOption: useCallback(
+      ({ option }: SelectOptionProps<DataRecord>) => (
+        <RelationalValue schema={schema} value={option} />
+      ),
+      [schema],
+    ),
+  };
+
   if (hidden) {
     return null;
   }
@@ -300,7 +330,9 @@ export function ManyToOne(
     <FieldControl {...props}>
       {readonly &&
         (value && hasButton("view") ? (
-          <ViewerLink onClick={handleView}>{getOptionLabel(value)}</ViewerLink>
+          <ViewerLink onClick={handleView}>
+            <RelationalValue schema={schema} value={value} />
+          </ViewerLink>
         ) : (
           <ViewerInput name={schema.name} value={getOptionLabel(value)} />
         ))}
@@ -332,8 +364,42 @@ export function ManyToOne(
           icons={icons}
           clearIcon={false}
           toggleIcon={isSuggestBox ? undefined : false}
+          {...(imageField && selectPropsWithImage)}
         />
       )}
     </FieldControl>
+  );
+}
+
+function RelationalValueImage({
+  field,
+  model,
+  value,
+}: {
+  field?: string;
+  model?: string;
+  value?: null | DataRecord;
+}) {
+  const src = makeImageURL(value, model, field);
+  return <img className={styles.image} src={src} />;
+}
+
+export function RelationalValue({
+  value,
+  schema,
+}: {
+  schema: Schema;
+  value?: null | DataRecord;
+}) {
+  const { target, imageField } = schema;
+  const getOptionLabel = useOptionLabel(schema);
+
+  return (
+    <Box d="flex" gap={4} alignItems="center">
+      {imageField && (
+        <RelationalValueImage value={value} field={imageField} model={target} />
+      )}
+      {getOptionLabel(value)}
+    </Box>
   );
 }

@@ -172,6 +172,9 @@ public class Field extends SimpleWidget {
   @XmlAttribute(name = "x-color-field")
   private String colorField;
 
+  @XmlAttribute(name = "x-image-field")
+  private String imageField;
+
   @XmlAttribute(name = "x-accept")
   private String accept;
 
@@ -580,6 +583,14 @@ public class Field extends SimpleWidget {
 
   public void setColorField(String colorField) {
     this.colorField = colorField;
+  }
+
+  public String getImageField() {
+    return imageField;
+  }
+
+  public void setImageField(String imageField) {
+    this.imageField = imageField;
   }
 
   public String getAccept() {

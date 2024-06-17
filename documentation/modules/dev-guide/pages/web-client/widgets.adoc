@@ -959,6 +959,7 @@ It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
 | `x-seconds` | show seconds in a duration widget | `false`
 | `x-accept` | specify the file types the file input should accept |
 | `x-color-field` | specify the color field to use with `tag-select` widget |
+| `x-image-field` | specify the image field to use with `m2o` and `tag-select` widget |
 | `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized |
 |===
 

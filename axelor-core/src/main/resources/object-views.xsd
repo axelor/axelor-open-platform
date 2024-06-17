@@ -1267,6 +1267,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-image-field" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          specify the image field to use with `m2o` and `tag-select` widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-popup-maximized">
       <xsd:annotation>
         <xsd:documentation>

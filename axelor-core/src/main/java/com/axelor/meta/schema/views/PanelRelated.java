@@ -62,6 +62,9 @@ public class PanelRelated extends AbstractPanel {
   @XmlAttribute(name = "x-selector")
   private String selector;
 
+  @XmlAttribute(name = "x-image-field")
+  private String imageField;
+
   @XmlAttribute private Boolean editable;
 
   @XmlAttribute private Boolean required;
@@ -341,6 +344,14 @@ public class PanelRelated extends AbstractPanel {
 
   public void setWidget(String widget) {
     this.widget = widget;
+  }
+
+  public String getImageField() {
+    return imageField;
+  }
+
+  public void setImageField(String imageField) {
+    this.imageField = imageField;
   }
 
   public List<AbstractWidget> getItems() {
