@@ -18,20 +18,12 @@
  */
 package com.axelor.db.hibernate.dialect.function;
 
-import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.type.BasicTypeReference;
 
 public class OracleJsonExtractFunction extends AbstractJsonExtractFunction {
 
   public OracleJsonExtractFunction(BasicTypeReference<?> type, String cast) {
-    super("json_value", type, cast);
-  }
-
-  @Override
-  protected String transformPath(List<String> path) {
-    return path.stream()
-        .map(item -> item.substring(1, item.length() - 1))
-        .collect(Collectors.joining(".", "'$.", "'"));
+    super("json_value", type, cast, null, Collectors.joining(".", "'$.", "'"));
   }
 }

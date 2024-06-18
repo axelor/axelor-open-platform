@@ -28,9 +28,4 @@ public class MySQLJsonSetFunction extends AbstractJsonSetFunction {
   protected String transformPath(String path) {
     return "'$." + path + "'";
   }
-
-  @Override
-  protected Object transformValue(Object value) {
-    return value;
-  }
 }

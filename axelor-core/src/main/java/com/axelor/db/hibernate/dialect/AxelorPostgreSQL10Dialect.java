@@ -20,7 +20,7 @@ package com.axelor.db.hibernate.dialect;
 
 import static org.hibernate.type.SqlTypes.OTHER;
 
-import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
 import com.axelor.db.internal.DBHelper;
 import org.hibernate.boot.model.FunctionContributions;
@@ -51,26 +51,28 @@ public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
         .register("json_set", new PostgreSQLJsonSetFunction());
     functionContributions
         .getFunctionRegistry()
-        .register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+        .register(
+            "json_extract", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
-            "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+            "json_extract_text",
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_boolean",
-            new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_integer",
-            new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_decimal",
-            new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
 
     if (DBHelper.isUnaccentEnabled()) {
       functionContributions

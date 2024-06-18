@@ -21,16 +21,11 @@ package com.axelor.db.hibernate.dialect.function;
 public class PostgreSQLJsonSetFunction extends AbstractJsonSetFunction {
 
   public PostgreSQLJsonSetFunction() {
-    super("jsonb_set");
+    super("jsonb_set", "to_jsonb");
   }
 
   @Override
   protected String transformPath(String path) {
     return "'{" + path.replace('.', ',') + "}'";
-  }
-
-  @Override
-  protected Object transformValue(Object value) {
-    return String.format("to_jsonb(%s)", value);
   }
 }

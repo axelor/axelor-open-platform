@@ -18,25 +18,12 @@
  */
 package com.axelor.db.hibernate.dialect.function;
 
-import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.type.BasicTypeReference;
 
 public class MySQLJsonExtractFunction extends AbstractJsonExtractFunction {
 
   public MySQLJsonExtractFunction(BasicTypeReference<?> type, String cast) {
-    super("json_extract", type, cast);
-  }
-
-  @Override
-  public String transformPath(List<String> path) {
-    return path.stream()
-        .map(item -> item.substring(1, item.length() - 1))
-        .collect(Collectors.joining(".", "'$.", "'"));
-  }
-
-  @Override
-  protected String transformFunction(String func) {
-    return String.format("json_unquote(%s)", func);
+    super("json_extract", type, cast, "json_unquote", Collectors.joining(".", "'$.", "'"));
   }
 }
