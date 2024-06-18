@@ -224,37 +224,42 @@ export function Calendar(props: ViewProps<CalendarView>) {
         };
       });
 
-      const filters = colorField
-        ? events.reduce((acc, event) => {
-            const { name, target, targetName, selectionList } = colorField;
-            const getValue = (record: DataRecord) => {
-              const value = deepGet(record, name);
-              return target ? value?.id : value;
-            };
-            const getTitle = (record: DataRecord) => {
-              const value = deepGet(record, name);
-              return target && targetName
-                ? deepGet(value, targetName)
-                : selectionList?.find((x) => x.value == value)?.title ?? value;
-            };
-            const record = event.data!;
-            const value = getValue(record);
-            if ((value || value === 0) && !acc.some((x) => x.value === value)) {
-              const color = getColor(value);
-              const title = getTitle(record);
-              acc.push({
-                value,
-                title,
-                color,
-                match: (event) => getValue(event.data!) === value,
-              });
-            }
-            return acc;
-          }, [] as Filter[])
-        : [];
-
       setEvents(events);
-      setFilters(filters);
+      setFilters((_filters) => {
+        return colorField
+          ? events.reduce((acc, event) => {
+              const { name, target, targetName, selectionList } = colorField;
+              const getValue = (record: DataRecord) => {
+                const value = deepGet(record, name);
+                return target ? value?.id : value;
+              };
+              const getTitle = (record: DataRecord) => {
+                const value = deepGet(record, name);
+                return target && targetName
+                  ? deepGet(value, targetName)
+                  : selectionList?.find((x) => x.value == value)?.title ??
+                      value;
+              };
+              const record = event.data!;
+              const value = getValue(record);
+              if (
+                (value || value === 0) &&
+                !acc.some((x) => x.value === value)
+              ) {
+                const color = getColor(value);
+                const title = getTitle(record);
+                acc.push({
+                  value,
+                  title,
+                  color,
+                  match: (e) => getValue(e.data!) === value,
+                  checked: _filters.find(f => f.value === value)?.checked,
+                });
+              }
+              return acc;
+            }, [] as Filter[])
+          : [];
+      });
     });
   }, [
     colorField,
