@@ -263,6 +263,8 @@ export function ToolbarActions({
         {...(responsive && {
           style: {
             visibility: "hidden",
+            left: '-1000%',
+            position: "absolute",
           },
         })}
       >
