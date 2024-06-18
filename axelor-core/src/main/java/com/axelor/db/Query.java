@@ -623,7 +623,15 @@ public class Query<T extends Model> {
    * @return total number of records removed.
    */
   public long remove() {
-    return fetchStream().peek(JPA::remove).count();
+    try (final Stream<T> stream = fetchStream()) {
+      return stream
+          .map(
+              item -> {
+                JPA.remove(item);
+                return item;
+              })
+          .count();
+    }
   }
 
   protected String selectQuery(boolean update) {

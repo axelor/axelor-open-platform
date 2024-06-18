@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -138,20 +139,21 @@ public class ComputedViewProcessor {
     }
 
     final MetaView computedView;
-    final Iterator<MetaView> computedViewIt =
-        computedViewQuery.order("xmlId").fetchStream().iterator();
-    if (computedViewIt.hasNext()) {
-      computedView = computedViewIt.next();
-      while (computedViewIt.hasNext()) {
-        metaViewRepo.remove(computedViewIt.next());
+    try (final Stream<MetaView> stream = computedViewQuery.order("xmlId").fetchStream()) {
+      final Iterator<MetaView> computedViewIt = stream.iterator();
+      if (computedViewIt.hasNext()) {
+        computedView = computedViewIt.next();
+        while (computedViewIt.hasNext()) {
+          metaViewRepo.remove(computedViewIt.next());
+        }
+      } else {
+        final MetaView copy = metaViewRepo.copy(baseView, false);
+        final String xmlId =
+            MoreObjects.firstNonNull(baseView.getXmlId(), baseView.getName()) + "__computed__";
+        copy.setXmlId(xmlId);
+        copy.setComputed(true);
+        computedView = metaViewRepo.save(copy);
       }
-    } else {
-      final MetaView copy = metaViewRepo.copy(baseView, false);
-      final String xmlId =
-          MoreObjects.firstNonNull(baseView.getXmlId(), baseView.getName()) + "__computed__";
-      copy.setXmlId(xmlId);
-      copy.setComputed(true);
-      computedView = metaViewRepo.save(copy);
     }
 
     computedView.setPriority(baseView.getPriority() + 1);

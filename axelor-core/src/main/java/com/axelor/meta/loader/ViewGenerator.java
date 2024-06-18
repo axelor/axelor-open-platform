@@ -46,6 +46,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
@@ -147,18 +148,21 @@ public class ViewGenerator {
     select.add("self.model = :model");
     select.add("self.type = :type");
 
-    return metaViewRepo
-        .all()
-        .filter(Joiner.on(" AND ").join(select))
-        .bind("name", view.getName())
-        .bind("model", view.getModel())
-        .bind("type", view.getType())
-        .cacheable()
-        .order("-priority")
-        .order("id")
-        .fetchStream()
-        .filter(extView -> Objects.equals(extView.getGroups(), view.getGroups()))
-        .collect(Collectors.toList());
+    try (final Stream<MetaView> stream =
+        metaViewRepo
+            .all()
+            .filter(Joiner.on(" AND ").join(select))
+            .bind("name", view.getName())
+            .bind("model", view.getModel())
+            .bind("type", view.getType())
+            .cacheable()
+            .order("-priority")
+            .order("id")
+            .fetchStream()) {
+      return stream
+          .filter(extView -> Objects.equals(extView.getGroups(), view.getGroups()))
+          .collect(Collectors.toList());
+    }
   }
 
   private MetaView getOriginalView(MetaView view) {

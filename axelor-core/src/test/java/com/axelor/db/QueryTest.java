@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 public class QueryTest extends ScriptTest {
@@ -151,7 +152,10 @@ public class QueryTest extends ScriptTest {
   public void testStream() {
     final Query<Contact> q = all(Contact.class);
     final List<?> first = q.fetch();
-    final List<?> second = q.fetchStream().collect(Collectors.toList());
+    final List<?> second;
+    try (final Stream<?> stream = q.fetchStream()) {
+      second = stream.collect(Collectors.toList());
+    }
     assertEquals(first.size(), second.size());
   }
 
