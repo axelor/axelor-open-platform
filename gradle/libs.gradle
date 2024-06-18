@@ -222,15 +222,17 @@ libs.apache_shiro = [
   }
 ]
 
-libs.pac4j = [
-    "org.pac4j:jakartaee-pac4j:7.1.0",
-    dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
-        exclude group: 'org.mockito', module: 'mockito-core'
-    },
-    dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
-        exclude group: 'org.apache.shiro', module: 'shiro-web'
-    },
+libs.buji_pac4j = [
+  dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
+      exclude group: 'org.apache.shiro', module: 'shiro-web'
+  },
   "org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}",
+  dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
+      exclude group: 'org.mockito', module: 'mockito-core'
+  }
+]
+
+libs.pac4j = libs.buji_pac4j + [
   dependencies.create("org.pac4j:pac4j-http:${versions.pac4j}") {
       exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
   },
@@ -238,15 +240,6 @@ libs.pac4j = [
       exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
   },
   "org.ldaptive:ldaptive:${versions.ldaptive}"
-]
-
-libs.buji_pac4j = [
-    dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
-        exclude group: 'org.apache.shiro', module: 'shiro-web'
-    },
-    dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
-        exclude group: 'org.mockito', module: 'mockito-core'
-    },
 ]
 
 // UnboundID LDAP SDK (for testing only)
