@@ -161,6 +161,7 @@ def resteasy_module = { name ->
         exclude module: "jackson-module-jakarta-xmlbind-annotations"
         exclude module: "jackson-jakarta-rs-json-provider"
         exclude module: "mail", group: "javax.mail"
+        exclude module: "jandex", group: "org.jboss"
     }
 }
 
@@ -168,8 +169,12 @@ def resteasy_module = { name ->
 libs.resteasy = [
     resteasy_module("resteasy-core"),
     resteasy_module("resteasy-client"),
-    "org.jboss.resteasy:resteasy-jaxb-provider:${versions.resteasy}",
-    "org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
+    dependencies.create("org.jboss.resteasy:resteasy-jaxb-provider:${versions.resteasy}") {
+      exclude module: "jandex", group: "org.jboss"
+    },
+    dependencies.create("org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}") {
+      exclude module: "jandex", group: "org.jboss"
+    },
     "io.smallrye.config:smallrye-config:1.13.1"
 ]
 
@@ -181,10 +186,13 @@ libs.resteasy_guice = dependencies.create("dev.resteasy.guice:resteasy-guice:1.0
     exclude module: "jackson-module-jakarta-xmlbind-annotations"
     exclude module: "jackson-jakarta-rs-json-provider"
     exclude module: "mail", group: "javax.mail"
+    exclude module: "jandex", group: "org.jboss"
 }
 libs.resteasy_client = resteasy_module("resteasy-client")
 libs.resteasy_server = [
-  "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
+  dependencies.create("org.jboss.resteasy:resteasy-undertow:${versions.resteasy}") {
+    exclude module: "jandex", group: "org.jboss"
+  },
   "io.undertow:undertow-core:2.3.13.Final",
   "io.undertow:undertow-servlet:2.3.13.Final"
 ]
