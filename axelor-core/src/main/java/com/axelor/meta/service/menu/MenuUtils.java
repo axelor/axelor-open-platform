@@ -21,6 +21,7 @@ package com.axelor.meta.service.menu;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.db.MetaMenu;
+import jakarta.persistence.TypedQuery;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import jakarta.persistence.TypedQuery;
 
 public class MenuUtils {
 

@@ -19,12 +19,12 @@
 package com.axelor.test.db;
 
 import com.axelor.db.JpaModel;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "CONTACT_TYPE_CHECK")

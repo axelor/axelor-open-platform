@@ -19,10 +19,10 @@
 package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import jakarta.xml.bind.annotation.XmlTransient;
 
 public interface ContainerView {
   List<AbstractWidget> getItems();

@@ -33,13 +33,13 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.api.ListenerInfo;
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
+import java.util.ArrayList;
+import java.util.List;
 import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 
 public final class WebServer {

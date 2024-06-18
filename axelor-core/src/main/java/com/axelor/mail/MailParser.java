@@ -18,10 +18,6 @@
  */
 package com.axelor.mail;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.Message.RecipientType;
@@ -35,6 +31,10 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimePart;
 import jakarta.mail.internet.MimePartDataSource;
 import jakarta.mail.internet.ParseException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;

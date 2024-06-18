@@ -18,11 +18,11 @@
  */
 package com.axelor.mail;
 
-import java.io.IOException;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
+import java.io.IOException;
 
 /** The {@link MailSender} provides features to send mails. */
 public final class MailSender {

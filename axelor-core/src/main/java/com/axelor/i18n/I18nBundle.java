@@ -20,6 +20,8 @@ package com.axelor.i18n;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.TypedQuery;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -28,8 +30,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import jakarta.persistence.FlushModeType;
-import jakarta.persistence.TypedQuery;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {

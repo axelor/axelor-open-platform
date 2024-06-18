@@ -30,9 +30,9 @@ import com.axelor.test.db.repo.InvoiceRepository;
 import com.axelor.test.db.repo.MoveRepository;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
-import java.math.BigDecimal;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

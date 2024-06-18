@@ -24,7 +24,6 @@ import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
-import java.util.Map;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -32,6 +31,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

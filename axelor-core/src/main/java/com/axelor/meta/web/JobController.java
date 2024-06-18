@@ -24,6 +24,7 @@ import com.axelor.meta.db.MetaSchedule;
 import com.axelor.quartz.JobRunner;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import jakarta.inject.Inject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
 import org.quartz.CronExpression;
 
 public class JobController {

@@ -31,6 +31,7 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import jakarta.persistence.Query;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import jakarta.persistence.Query;
 
 /** Defined the {@link MetaMenu} policies */
 public class MenuChecker {

@@ -18,9 +18,9 @@
  */
 package com.axelor.db.hibernate.dialect;
 
-import org.hibernate.dialect.HSQLDialect;
-
 import static org.hibernate.type.SqlTypes.OTHER;
+
+import org.hibernate.dialect.HSQLDialect;
 
 public class AxelorHSQLDialect extends HSQLDialect {
 
@@ -30,10 +30,9 @@ public class AxelorHSQLDialect extends HSQLDialect {
 
   @Override
   protected String columnType(int sqlTypeCode) {
-      if (sqlTypeCode == OTHER) {
-          return "clob";
-      }
-      return super.columnType(sqlTypeCode);
+    if (sqlTypeCode == OTHER) {
+      return "clob";
+    }
+    return super.columnType(sqlTypeCode);
   }
-
 }

@@ -19,12 +19,12 @@
 package com.axelor.db.mapper.types;
 
 import com.axelor.db.mapper.TypeAdapter;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Digits;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Digits;
 
 public class DecimalAdapter implements TypeAdapter<BigDecimal> {
 

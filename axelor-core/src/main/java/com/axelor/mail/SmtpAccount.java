@@ -20,12 +20,12 @@ package com.axelor.mail;
 
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
-import java.util.Properties;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
+import java.util.Properties;
 
 /** The default implementation of {@link MailAccount} for SMPT accounts. */
 public class SmtpAccount implements MailAccount {

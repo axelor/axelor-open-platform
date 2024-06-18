@@ -32,12 +32,11 @@ import com.axelor.db.tenants.TenantResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
+import com.google.inject.persist.jpa.JpaPersistOptions;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import com.google.inject.persist.jpa.JpaPersistOptions;
-import jakarta.inject.Inject;
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.CacheSettings;
 import org.hibernate.cfg.Environment;
@@ -145,7 +144,8 @@ public class JpaModule extends AbstractModule {
     }
 
     install(new TenantModule());
-    JpaPersistOptions jpaPersistOpts = JpaPersistOptions.builder().setAutoBeginWorkOnEntityManagerCreation(true).build();
+    JpaPersistOptions jpaPersistOpts =
+        JpaPersistOptions.builder().setAutoBeginWorkOnEntityManagerCreation(true).build();
     install(new JpaPersistModule(jpaUnit, jpaPersistOpts).properties(properties));
     if (this.autostart) {
       bind(Initializer.class).asEagerSingleton();

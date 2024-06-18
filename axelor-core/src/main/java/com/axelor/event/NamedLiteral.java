@@ -18,9 +18,9 @@
  */
 package com.axelor.event;
 
+import jakarta.inject.Named;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import jakarta.inject.Named;
 
 @SuppressWarnings("all")
 public class NamedLiteral implements Named, Serializable {

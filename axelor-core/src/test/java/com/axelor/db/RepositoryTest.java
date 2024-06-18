@@ -32,10 +32,10 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.ContactRepositoryEx;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 @GuiceModules(RepositoryTest.MyModule.class)

@@ -32,13 +32,13 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @XmlType(propOrder = {"views", "params", "domain", "contexts"})
 public class ActionView extends Action {

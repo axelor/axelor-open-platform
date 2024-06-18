@@ -18,10 +18,10 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlType
 public abstract class AbstractPanel extends AbstractContainer {

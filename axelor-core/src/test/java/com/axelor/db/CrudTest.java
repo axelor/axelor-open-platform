@@ -35,9 +35,9 @@ import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
-import java.util.HashSet;
 import jakarta.inject.Inject;
 import jakarta.persistence.OptimisticLockException;
+import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

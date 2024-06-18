@@ -30,10 +30,10 @@ import com.axelor.meta.db.MetaPermission;
 import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.SimpleWidget;
+import jakarta.inject.Singleton;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class MetaPermissions {

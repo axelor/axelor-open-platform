@@ -23,10 +23,10 @@ import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.google.common.base.Throwables;
-import java.util.HashMap;
-import java.util.Map;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 import org.hibernate.StaleObjectStateException;
 
 public class ResponseException extends RuntimeException {

@@ -25,6 +25,7 @@ import com.axelor.meta.MetaScanner;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -35,7 +36,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
-import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

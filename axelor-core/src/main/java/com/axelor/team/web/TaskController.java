@@ -24,10 +24,10 @@ import com.axelor.db.JpaSupport;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
+import jakarta.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.persistence.TypedQuery;
 
 public class TaskController extends JpaSupport {
 

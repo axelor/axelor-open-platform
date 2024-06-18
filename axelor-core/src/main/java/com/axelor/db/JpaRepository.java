@@ -22,12 +22,12 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
+import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import jakarta.persistence.EntityManager;
 
 /**
  * The JPA implementation of the {@link Repository}.

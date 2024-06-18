@@ -27,6 +27,10 @@ import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaField;
 import com.axelor.tools.code.JavaMethod;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -45,10 +49,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlTransient;
-import jakarta.xml.bind.annotation.XmlType;
-import jakarta.xml.bind.annotation.XmlValue;
 
 @XmlType
 public abstract class Property {
@@ -972,7 +972,8 @@ public abstract class Property {
       return List.of(
           new JavaAnnotation("jakarta.persistence.Basic")
               .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"),
-          new JavaAnnotation("org.hibernate.annotations.Type").param("value", "{0:m}", "com.axelor.db.hibernate.type.JsonType.class"));
+          new JavaAnnotation("org.hibernate.annotations.Type")
+              .param("value", "{0:m}", "com.axelor.db.hibernate.type.JsonType.class"));
     }
 
     if (type == PropertyType.ENUM) {
@@ -989,7 +990,8 @@ public abstract class Property {
               .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
 
       if (isTrue(encrypted)) {
-        annotations.add(new JavaAnnotation("org.hibernate.annotations.Type")
+        annotations.add(
+            new JavaAnnotation("org.hibernate.annotations.Type")
                 .param("value", "{0:m}", "com.axelor.db.hibernate.type.EncryptedTextType.class"));
       }
       return annotations;
@@ -1186,7 +1188,8 @@ public abstract class Property {
     } else {
       annotation.param(
           "cascade",
-          List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
+          List.of(
+              "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
     return annotation;
@@ -1199,7 +1202,8 @@ public abstract class Property {
         .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY")
         .param(
             "cascade",
-            List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
+            List.of(
+                "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
             t -> new JavaCode("{0:m}", t));
   }
 
@@ -1220,7 +1224,8 @@ public abstract class Property {
     } else {
       annotation.param(
           "cascade",
-          List.of("jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
+          List.of(
+              "jakarta.persistence.CascadeType.PERSIST", "jakarta.persistence.CascadeType.MERGE"),
           t -> new JavaCode("{0:m}", t));
     }
 

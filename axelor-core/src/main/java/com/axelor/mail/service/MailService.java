@@ -23,8 +23,8 @@ import com.axelor.db.Model;
 import com.axelor.mail.MailException;
 import com.axelor.mail.db.MailMessage;
 import com.google.inject.ImplementedBy;
-import java.util.List;
 import jakarta.mail.internet.InternetAddress;
+import java.util.List;
 
 /** The mail service defines interface for sending/reading mails. */
 @ImplementedBy(MailServiceImpl.class)

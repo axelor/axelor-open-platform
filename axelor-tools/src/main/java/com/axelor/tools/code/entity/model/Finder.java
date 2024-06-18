@@ -28,13 +28,13 @@ import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaCodeUtils;
 import com.axelor.tools.code.JavaMethod;
 import com.axelor.tools.code.JavaParam;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlType;
 
 @XmlType
 public class Finder {

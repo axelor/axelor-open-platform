@@ -36,13 +36,13 @@ import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
 import com.axelor.team.db.Team;
 import com.axelor.team.db.repo.TeamRepository;
+import jakarta.inject.Inject;
+import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jakarta.inject.Inject;
-import jakarta.persistence.TypedQuery;
 
 public class MailController extends JpaSupport {
 

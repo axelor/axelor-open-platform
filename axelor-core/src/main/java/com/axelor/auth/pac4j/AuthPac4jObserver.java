@@ -22,10 +22,10 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.event.Observes;
 import com.axelor.events.PreLogin;
-import java.util.Optional;
-import java.util.function.Consumer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton

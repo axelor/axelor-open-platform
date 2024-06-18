@@ -20,6 +20,8 @@ package com.axelor.event;
 
 import com.axelor.inject.Beans;
 import com.google.common.reflect.TypeToken;
+import jakarta.annotation.Priority;
+import jakarta.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,8 +33,6 @@ import java.lang.reflect.WildcardType;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import jakarta.annotation.Priority;
-import jakarta.inject.Qualifier;
 
 class Observer implements Comparable<Observer> {
   public final Method method;

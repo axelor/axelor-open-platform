@@ -19,8 +19,8 @@
 package com.axelor.mail;
 
 import com.axelor.common.MimeTypesUtils;
-import java.io.File;
 import jakarta.activation.FileTypeMap;
+import java.io.File;
 
 /**
  * Custom {@link FileTypeMap} implementation.

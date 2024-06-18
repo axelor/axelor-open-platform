@@ -36,10 +36,10 @@ import com.axelor.test.db.EnumStatusNumber;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
-import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class EnumTest extends JpaTest {

@@ -22,10 +22,6 @@ import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Optional;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -38,6 +34,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.core.HttpHeaders;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.Optional;
 import org.pac4j.core.context.HttpConstants;
 
 @Singleton

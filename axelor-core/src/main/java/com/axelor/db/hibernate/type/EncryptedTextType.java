@@ -19,21 +19,19 @@
 package com.axelor.db.hibernate.type;
 
 import com.axelor.db.converters.EncryptedStringConverter;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.usertype.UserType;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.usertype.UserType;
 
 public class EncryptedTextType implements UserType<String> {
 
   private static final EncryptedStringConverter CONVERTER = new EncryptedStringConverter();
 
-  public EncryptedTextType() {
-  }
+  public EncryptedTextType() {}
 
   @Override
   public int getSqlType() {
@@ -56,13 +54,17 @@ public class EncryptedTextType implements UserType<String> {
   }
 
   @Override
-  public String nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner) throws SQLException {
+  public String nullSafeGet(
+      ResultSet rs, int position, SharedSessionContractImplementor session, Object owner)
+      throws SQLException {
     String value = rs.getString(position);
     return (value == null || value.isEmpty()) ? null : CONVERTER.convertToEntityAttribute(value);
   }
 
   @Override
-  public void nullSafeSet(PreparedStatement st, String value, int index, SharedSessionContractImplementor session) throws SQLException {
+  public void nullSafeSet(
+      PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
+      throws SQLException {
     if (value == null) {
       st.setNull(index, Types.VARCHAR);
     } else {

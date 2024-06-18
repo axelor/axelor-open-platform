@@ -30,13 +30,13 @@ import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.rpc.RequestUtils;
 import com.google.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 @Singleton
 public class ViewObserver {

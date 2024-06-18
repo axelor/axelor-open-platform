@@ -36,6 +36,10 @@ import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.google.common.base.Preconditions;
 import com.google.inject.persist.Transactional;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,10 +57,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import jakarta.activation.MimeType;
-import jakarta.activation.MimeTypeParseException;
-import jakarta.inject.Inject;
-import jakarta.persistence.PersistenceException;
 
 /** This class provides some helper methods to deal with files. */
 public class MetaFiles {

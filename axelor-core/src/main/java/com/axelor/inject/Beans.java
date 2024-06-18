@@ -20,9 +20,9 @@ package com.axelor.inject;
 
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import java.lang.annotation.Annotation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.lang.annotation.Annotation;
 
 /**
  * A singleton class that can be used to get instances of injetable services where injection is not

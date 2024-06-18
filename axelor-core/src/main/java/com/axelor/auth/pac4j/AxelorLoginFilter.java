@@ -19,8 +19,6 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.auth.AuthUtils;
-import java.io.IOException;
-import java.util.Optional;
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -29,6 +27,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Optional;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.client.Clients;

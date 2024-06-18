@@ -27,11 +27,11 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestFiles extends MetaTest {

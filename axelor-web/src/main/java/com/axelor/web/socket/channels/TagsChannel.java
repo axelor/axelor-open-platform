@@ -25,13 +25,13 @@ import com.axelor.rpc.Response;
 import com.axelor.team.web.TaskController;
 import com.axelor.web.socket.Channel;
 import com.axelor.web.socket.Message;
-import java.io.IOException;
-import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 import jakarta.websocket.EncodeException;
 import jakarta.websocket.Session;
+import java.io.IOException;
+import java.util.List;
 import org.slf4j.Logger;
 
 @Singleton

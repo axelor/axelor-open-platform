@@ -29,13 +29,13 @@ import com.axelor.script.JavaScriptScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.persist.Transactional;
-import javax.script.Bindings;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.XmlValue;
+import javax.script.Bindings;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 

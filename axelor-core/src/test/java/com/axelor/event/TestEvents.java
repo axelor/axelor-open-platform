@@ -25,11 +25,11 @@ import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Invoice;
+import jakarta.annotation.Priority;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import jakarta.annotation.Priority;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 

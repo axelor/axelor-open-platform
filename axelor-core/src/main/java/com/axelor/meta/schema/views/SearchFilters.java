@@ -25,11 +25,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Maps;
-import java.util.List;
-import java.util.Map;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.List;
+import java.util.Map;
 
 @XmlType
 @JsonTypeName("search-filters")

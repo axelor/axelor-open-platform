@@ -29,14 +29,14 @@ import com.axelor.meta.schema.actions.validate.validator.Alert;
 import com.axelor.meta.schema.actions.validate.validator.Error;
 import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.actions.validate.validator.Notify;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import jakarta.annotation.Nullable;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

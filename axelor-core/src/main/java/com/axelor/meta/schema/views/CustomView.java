@@ -20,9 +20,9 @@ package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.List;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType

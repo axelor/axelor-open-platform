@@ -36,11 +36,11 @@ import com.axelor.meta.service.menu.MenuService;
 import com.axelor.meta.service.tags.TagItem;
 import com.axelor.meta.service.tags.TagsService;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import jakarta.inject.Inject;
-import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -36,6 +36,7 @@ import com.axelor.test.db.repo.TitleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class ScriptTest extends JpaTest {

@@ -35,10 +35,10 @@ import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Map;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 public class TestViews extends MetaTest {

@@ -32,10 +32,10 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.PanelMailDisplay;
 import com.google.common.base.Objects;
+import jakarta.persistence.EntityManager;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.persistence.EntityManager;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 

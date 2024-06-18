@@ -47,11 +47,11 @@ import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.ext.Provider;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 
 /** The main application module. */

@@ -48,14 +48,14 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import groovy.lang.GString;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {

@@ -22,8 +22,8 @@ import com.axelor.db.Model;
 import com.axelor.rpc.Resource;
 import com.google.inject.Key;
 import com.google.inject.util.Types;
-import java.lang.reflect.Type;
 import jakarta.ws.rs.PathParam;
+import java.lang.reflect.Type;
 
 public abstract class ResourceService extends AbstractService {
 

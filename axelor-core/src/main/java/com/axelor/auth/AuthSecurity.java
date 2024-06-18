@@ -29,11 +29,11 @@ import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 import org.apache.shiro.authz.UnauthorizedException;
 
 @Singleton

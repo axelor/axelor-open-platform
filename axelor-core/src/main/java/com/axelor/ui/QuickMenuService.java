@@ -19,13 +19,13 @@
 package com.axelor.ui;
 
 import com.axelor.common.ObjectUtils;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class QuickMenuService {

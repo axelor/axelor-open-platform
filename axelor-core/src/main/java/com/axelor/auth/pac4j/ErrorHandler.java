@@ -19,9 +19,9 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.common.UriBuilder;
-import java.lang.invoke.MethodHandles;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.lang.invoke.MethodHandles;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;

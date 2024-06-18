@@ -20,9 +20,9 @@ package com.axelor.web.socket;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import java.io.IOException;
 import jakarta.websocket.EncodeException;
 import jakarta.websocket.Session;
+import java.io.IOException;
 import org.apache.shiro.subject.Subject;
 
 public abstract class Channel {

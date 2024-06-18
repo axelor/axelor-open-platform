@@ -19,9 +19,7 @@
 package com.axelor.db.hibernate.dialect.function;
 
 import java.util.List;
-
 import org.hibernate.type.BasicTypeReference;
-import org.hibernate.type.Type;
 
 public class PostgreSQLJsonExtractFunction extends AbstractJsonExtractFunction {
 

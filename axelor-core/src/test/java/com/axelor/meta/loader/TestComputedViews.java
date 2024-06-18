@@ -32,11 +32,11 @@ import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.Hilite;
+import jakarta.inject.Inject;
+import jakarta.xml.bind.JAXBException;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-import jakarta.inject.Inject;
-import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

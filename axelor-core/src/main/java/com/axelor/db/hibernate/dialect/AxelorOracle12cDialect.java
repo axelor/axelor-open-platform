@@ -18,14 +18,13 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import static org.hibernate.type.SqlTypes.LONGVARCHAR;
+
 import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.OracleDialect;
 import org.hibernate.type.StandardBasicTypes;
-
-import static org.hibernate.type.SqlTypes.LONGVARCHAR;
-
 
 public class AxelorOracle12cDialect extends OracleDialect {
 
@@ -45,16 +44,27 @@ public class AxelorOracle12cDialect extends OracleDialect {
   public void initializeFunctionRegistry(FunctionContributions functionContributions) {
     super.initializeFunctionRegistry(functionContributions);
 
-    functionContributions.getFunctionRegistry().register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    functionContributions.getFunctionRegistry().register(
+    functionContributions
+        .getFunctionRegistry()
+        .register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
             "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    functionContributions.getFunctionRegistry().register(
-            "json_extract_boolean", new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
-    functionContributions.getFunctionRegistry().register(
-            "json_extract_integer", new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
-    functionContributions.getFunctionRegistry().register(
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_boolean",
+            new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_integer",
+            new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
             "json_extract_decimal",
             new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
   }
-
 }

@@ -24,10 +24,6 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import jakarta.inject.Inject;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.ws.rs.Consumes;
@@ -38,6 +34,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)

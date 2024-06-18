@@ -22,6 +22,11 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Singleton;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -31,11 +36,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.zip.GZIPOutputStream;
-import jakarta.inject.Singleton;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Singleton
 public class I18nServlet extends HttpServlet {

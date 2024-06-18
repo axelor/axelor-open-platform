@@ -19,12 +19,12 @@
 package com.axelor.test.db;
 
 import com.axelor.db.JpaModel;
-import java.time.LocalDate;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "TEST_INVOICE")

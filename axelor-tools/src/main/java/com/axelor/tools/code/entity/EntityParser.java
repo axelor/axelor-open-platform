@@ -22,13 +22,13 @@ import com.axelor.tools.code.entity.model.BaseType;
 import com.axelor.tools.code.entity.model.DomainModels;
 import com.axelor.tools.code.entity.model.Entity;
 import com.axelor.tools.code.entity.model.EnumType;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 
 public class EntityParser {
 

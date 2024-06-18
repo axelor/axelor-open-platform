@@ -25,9 +25,9 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

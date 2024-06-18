@@ -21,11 +21,11 @@ package com.axelor.tools.code.entity.model;
 import static com.axelor.tools.code.entity.model.Utils.isTrue;
 
 import com.axelor.tools.code.JavaAnnotation;
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlType
 public class Track {

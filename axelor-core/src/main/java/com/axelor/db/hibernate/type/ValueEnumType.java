@@ -19,17 +19,16 @@
 package com.axelor.db.hibernate.type;
 
 import com.axelor.db.ValueEnum;
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.usertype.DynamicParameterizedType;
-import org.hibernate.usertype.UserType;
-
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.usertype.DynamicParameterizedType;
+import org.hibernate.usertype.UserType;
 
 public class ValueEnumType implements UserType<Object>, DynamicParameterizedType {
 
@@ -75,7 +74,9 @@ public class ValueEnumType implements UserType<Object>, DynamicParameterizedType
   }
 
   @Override
-  public Object nullSafeGet(ResultSet rs, int i, SharedSessionContractImplementor session, Object owner) throws SQLException {
+  public Object nullSafeGet(
+      ResultSet rs, int i, SharedSessionContractImplementor session, Object owner)
+      throws SQLException {
     final Object value = rs.getObject(i);
     return rs.wasNull() ? null : ValueEnum.of(returnedClass().asSubclass(Enum.class), value);
   }

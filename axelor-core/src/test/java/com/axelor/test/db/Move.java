@@ -19,13 +19,13 @@
 package com.axelor.test.db;
 
 import com.axelor.db.JpaModel;
-import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "TEST_MOVE")

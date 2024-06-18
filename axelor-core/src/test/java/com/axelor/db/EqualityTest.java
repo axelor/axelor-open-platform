@@ -28,6 +28,7 @@ import com.axelor.JpaTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableList;
+import jakarta.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 

@@ -20,9 +20,9 @@ package com.axelor.auth.pac4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Objects;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.util.Objects;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;

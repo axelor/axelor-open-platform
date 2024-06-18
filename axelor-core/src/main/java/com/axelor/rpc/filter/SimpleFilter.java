@@ -19,10 +19,10 @@
 package com.axelor.rpc.filter;
 
 import com.axelor.db.hibernate.type.JsonFunction;
+import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import jakarta.persistence.PersistenceException;
 
 class SimpleFilter extends Filter {
 

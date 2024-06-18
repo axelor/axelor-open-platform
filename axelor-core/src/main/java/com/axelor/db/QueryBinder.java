@@ -26,13 +26,13 @@ import com.axelor.script.ScriptBindings;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Parameter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import jakarta.persistence.FlushModeType;
-import jakarta.persistence.Parameter;
 import org.hibernate.jpa.AvailableHints;
 
 /**
@@ -186,7 +186,7 @@ public class QueryBinder {
           // special variable
           value = bindings.get(expr);
         }
-      }  else if (value instanceof Collection) {
+      } else if (value instanceof Collection) {
         value = fixCollections((Collection<?>) value);
       }
       try {

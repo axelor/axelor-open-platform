@@ -21,8 +21,8 @@ package com.axelor.rpc;
 import com.axelor.JpaTest;
 import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStreamReader;
 import jakarta.inject.Inject;
+import java.io.InputStreamReader;
 
 abstract class RpcTest extends JpaTest {
 

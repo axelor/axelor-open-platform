@@ -20,13 +20,13 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.servlet.http.HttpSessionListener;
 
 /** The {@link AppSessionListener} configures the session timeout. */
 public final class AppSessionListener implements HttpSessionListener {

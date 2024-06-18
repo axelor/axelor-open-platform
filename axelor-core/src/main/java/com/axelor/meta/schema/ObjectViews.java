@@ -47,11 +47,11 @@ import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.meta.schema.views.TreeView;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElements;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.List;
 
 @XmlType
 @XmlRootElement(name = "object-views")

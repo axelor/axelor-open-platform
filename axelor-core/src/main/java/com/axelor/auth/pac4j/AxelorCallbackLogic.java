@@ -20,10 +20,10 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
-import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;

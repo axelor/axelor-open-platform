@@ -34,6 +34,7 @@ import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Inject;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -43,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

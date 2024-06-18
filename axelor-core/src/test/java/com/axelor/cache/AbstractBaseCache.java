@@ -40,11 +40,11 @@ import com.axelor.test.db.Product;
 import com.axelor.test.db.ProductConfig;
 import com.axelor.test.db.repo.PersonRepository;
 import com.google.inject.persist.UnitOfWork;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicLong;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.SharedCacheMode;
 import jakarta.validation.ValidationException;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicLong;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cache.spi.access.AccessType;
@@ -133,10 +133,10 @@ public abstract class AbstractBaseCache extends JpaTest {
           assertTrue(ObjectUtils.notEmpty(secondLevelCacheRegionNames));
 
           // Should contain `default-update-timestamps-region` region
-            // TODO : `default-update-timestamps-region` region is created on demand
-//          assertTrue(
-//              Arrays.asList(secondLevelCacheRegionNames)
-//                  .contains("default-update-timestamps-region"));
+          // TODO : `default-update-timestamps-region` region is created on demand
+          //          assertTrue(
+          //              Arrays.asList(secondLevelCacheRegionNames)
+          //                  .contains("default-update-timestamps-region"));
 
           // Person is annotated with `@Cacheable`
           assertTrue(

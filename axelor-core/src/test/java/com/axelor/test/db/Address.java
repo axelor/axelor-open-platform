@@ -20,13 +20,13 @@ package com.axelor.test.db;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
-import java.util.Objects;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "CONTACT_ADDRESS")

@@ -33,6 +33,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,9 +55,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.FlushModeType;
-import jakarta.persistence.TypedQuery;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.
@@ -582,7 +582,8 @@ public class Query<T extends Model> {
         updateQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that");
 
     if (notMySQL) {
-      jakarta.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
+      jakarta.persistence.Query q =
+          em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
       this.bind(q);
       return q.executeUpdate();
     }

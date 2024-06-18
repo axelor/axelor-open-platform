@@ -22,7 +22,6 @@ import com.axelor.db.JpaModel;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
-import java.util.List;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.CascadeType;
@@ -31,6 +30,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 public class Contact extends JpaModel {

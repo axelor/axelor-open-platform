@@ -19,10 +19,10 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.inject.Beans;
-import java.util.Enumeration;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 public class AxelorLogoutFilterConfig implements FilterConfig {
 

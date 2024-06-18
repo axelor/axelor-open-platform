@@ -18,10 +18,10 @@
  */
 package com.axelor.mail;
 
-import java.util.Properties;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
+import java.util.Properties;
 
 public abstract class AbstractMailAccount implements MailAccount {
 

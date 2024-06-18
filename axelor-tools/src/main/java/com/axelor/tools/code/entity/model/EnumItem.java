@@ -26,12 +26,12 @@ import com.axelor.tools.code.JavaAnnotation;
 import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaEnumConstant;
-import java.util.HashMap;
-import java.util.Map;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.HashMap;
+import java.util.Map;
 
 @XmlType
 public class EnumItem {

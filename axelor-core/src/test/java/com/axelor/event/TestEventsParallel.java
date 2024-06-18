@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 

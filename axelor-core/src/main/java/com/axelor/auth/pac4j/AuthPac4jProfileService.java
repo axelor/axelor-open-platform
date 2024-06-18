@@ -28,6 +28,9 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectRepository;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +47,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import jakarta.annotation.Nullable;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton

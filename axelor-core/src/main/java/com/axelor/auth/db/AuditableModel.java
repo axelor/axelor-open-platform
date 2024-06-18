@@ -20,13 +20,13 @@ package com.axelor.auth.db;
 
 import com.axelor.db.Model;
 import com.axelor.db.annotations.Widget;
-import java.time.LocalDateTime;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
+import java.time.LocalDateTime;
 
 /**
  * The base abstract class with update logging feature.

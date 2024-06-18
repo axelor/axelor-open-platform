@@ -26,6 +26,7 @@ import com.axelor.tools.code.entity.model.EnumType;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,7 +46,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import jakarta.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

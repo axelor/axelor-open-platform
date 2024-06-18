@@ -32,11 +32,11 @@ import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 
 public class TestJsonContext extends ScriptTest {

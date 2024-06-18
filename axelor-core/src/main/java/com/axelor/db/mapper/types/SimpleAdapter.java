@@ -19,12 +19,12 @@
 package com.axelor.db.mapper.types;
 
 import com.axelor.db.mapper.TypeAdapter;
+import jakarta.persistence.Column;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import jakarta.persistence.Column;
 
 public class SimpleAdapter implements TypeAdapter<Object> {
 

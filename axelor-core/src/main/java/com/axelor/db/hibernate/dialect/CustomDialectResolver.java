@@ -39,7 +39,11 @@ public class CustomDialectResolver implements DialectResolver {
     final Dialect dialect = findDialect(info);
 
     if (dialect != null) {
-      log.info("Database engine: {} {}.{}", info.getDatabaseName(), info.getDatabaseMajorVersion(), info.getDatabaseMinorVersion());
+      log.info(
+          "Database engine: {} {}.{}",
+          info.getDatabaseName(),
+          info.getDatabaseMajorVersion(),
+          info.getDatabaseMinorVersion());
       log.debug("Database dialect: {}", dialect);
     }
 

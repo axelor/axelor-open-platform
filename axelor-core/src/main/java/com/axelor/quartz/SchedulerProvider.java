@@ -20,10 +20,10 @@ package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import java.util.Properties;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import java.util.Properties;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;

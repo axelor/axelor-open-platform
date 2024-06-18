@@ -27,12 +27,6 @@ import com.axelor.db.annotations.Widget;
 import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.db.hibernate.type.ValueEnumType;
 import com.google.common.collect.Lists;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -47,6 +41,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import org.hibernate.annotations.Type;
 
 @Entity

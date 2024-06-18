@@ -33,15 +33,15 @@ import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Request;
 import com.google.inject.persist.Transactional;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import jakarta.persistence.Query;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-import jakarta.persistence.Query;
 
 @Singleton
 public class MetaJsonReferenceUpdater {

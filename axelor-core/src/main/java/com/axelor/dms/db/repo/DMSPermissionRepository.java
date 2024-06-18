@@ -32,6 +32,8 @@ import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +45,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import jakarta.inject.Inject;
-import jakarta.persistence.PersistenceException;
 
 public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 

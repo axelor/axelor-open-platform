@@ -18,11 +18,11 @@
  */
 package com.axelor.tools.code.entity.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 @XmlType
 @XmlRootElement(name = "domain-models")

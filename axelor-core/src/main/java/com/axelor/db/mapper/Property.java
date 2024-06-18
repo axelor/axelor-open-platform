@@ -31,22 +31,6 @@ import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Id;
@@ -64,6 +48,22 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import org.hibernate.usertype.UserType;
 
 public class Property {
@@ -273,7 +273,8 @@ public class Property {
       }
 
       if (annotation instanceof org.hibernate.annotations.Type) {
-        Class<? extends UserType<?>> userType = ((org.hibernate.annotations.Type) annotation).value();
+        Class<? extends UserType<?>> userType =
+            ((org.hibernate.annotations.Type) annotation).value();
         json = JsonType.class.isAssignableFrom(userType);
         encrypted = EncryptedTextType.class.isAssignableFrom(userType);
       }

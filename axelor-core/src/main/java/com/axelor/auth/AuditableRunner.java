@@ -21,8 +21,8 @@ package com.axelor.auth;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
 import com.google.common.base.Preconditions;
-import java.util.concurrent.Callable;
 import jakarta.inject.Inject;
+import java.util.concurrent.Callable;
 
 /** This class can be used to run batch jobs that requires to keep track of audit logs. */
 public class AuditableRunner {

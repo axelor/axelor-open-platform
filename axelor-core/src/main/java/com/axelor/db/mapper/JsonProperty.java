@@ -24,6 +24,7 @@ import com.axelor.db.Model;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
+import jakarta.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import jakarta.annotation.Nullable;
 
 public class JsonProperty extends Property {
 

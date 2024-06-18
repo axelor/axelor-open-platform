@@ -21,9 +21,9 @@ package com.axelor.tools.code.entity.model;
 import static com.axelor.tools.code.entity.model.Utils.*;
 
 import com.axelor.tools.code.JavaAnnotation;
-import java.util.stream.Collectors;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.stream.Collectors;
 
 @XmlType
 public class Index {

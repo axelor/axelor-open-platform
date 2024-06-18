@@ -23,11 +23,11 @@ import static org.pac4j.core.context.WebContextHelper.isPatch;
 import static org.pac4j.core.context.WebContextHelper.isPost;
 import static org.pac4j.core.context.WebContextHelper.isPut;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import org.pac4j.core.authorization.authorizer.CsrfAuthorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;

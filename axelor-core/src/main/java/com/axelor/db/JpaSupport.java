@@ -19,10 +19,10 @@
 package com.axelor.db;
 
 import com.axelor.db.JPA.JDBCWork;
-import java.sql.Connection;
-import java.sql.SQLException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * This class provides some useful methods in JPA context, can be used as a base class for services

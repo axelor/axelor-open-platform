@@ -19,8 +19,6 @@
 package com.axelor.web.servlet;
 
 import com.axelor.common.StringUtils;
-import java.io.IOException;
-import java.util.function.Supplier;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -29,6 +27,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import java.io.IOException;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

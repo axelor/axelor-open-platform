@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.axelor.AbstractTest;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.test.db.Contact;
-import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.xml.bind.JAXBException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class TestLoader extends AbstractTest {

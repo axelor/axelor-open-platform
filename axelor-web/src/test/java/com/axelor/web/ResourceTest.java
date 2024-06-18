@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.collect.ImmutableMap;
-import java.util.List;
-import java.util.Map;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class ResourceTest extends AbstractTest {

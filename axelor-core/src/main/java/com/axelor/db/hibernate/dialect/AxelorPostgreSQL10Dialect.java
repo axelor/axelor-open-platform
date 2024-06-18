@@ -18,6 +18,8 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import static org.hibernate.type.SqlTypes.OTHER;
+
 import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
 import com.axelor.db.internal.DBHelper;
@@ -25,8 +27,6 @@ import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.type.StandardBasicTypes;
-
-import static org.hibernate.type.SqlTypes.OTHER;
 
 public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
 
@@ -46,15 +46,29 @@ public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
   public void initializeFunctionRegistry(FunctionContributions functionContributions) {
     super.initializeFunctionRegistry(functionContributions);
 
-    functionContributions.getFunctionRegistry().register("json_set", new PostgreSQLJsonSetFunction());
-    functionContributions.getFunctionRegistry().register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    functionContributions.getFunctionRegistry().register(
+    functionContributions
+        .getFunctionRegistry()
+        .register("json_set", new PostgreSQLJsonSetFunction());
+    functionContributions
+        .getFunctionRegistry()
+        .register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
             "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
-    functionContributions.getFunctionRegistry().register(
-            "json_extract_boolean", new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
-    functionContributions.getFunctionRegistry().register(
-            "json_extract_integer", new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
-    functionContributions.getFunctionRegistry().register(
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_boolean",
+            new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_integer",
+            new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
             "json_extract_decimal",
             new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
 
@@ -69,5 +83,4 @@ public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
                   .resolve(StandardBasicTypes.STRING));
     }
   }
-
 }

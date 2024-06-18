@@ -18,6 +18,7 @@
  */
 package com.axelor.event;
 
+import jakarta.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -25,7 +26,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import jakarta.inject.Inject;
 
 class EventImpl<T> implements Event<T> {
 

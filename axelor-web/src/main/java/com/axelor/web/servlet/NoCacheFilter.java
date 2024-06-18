@@ -22,11 +22,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -36,6 +31,11 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Singleton
 public class NoCacheFilter implements Filter {
