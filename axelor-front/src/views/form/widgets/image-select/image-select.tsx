@@ -7,7 +7,6 @@ import { ImageSelectIcon, ImageSelectValue } from "./image-select-value";
 
 import { SelectOptionProps } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
-import { Icon } from "@/components/icon";
 
 export function ImageSelect(props: FieldProps<string | number | null>) {
   const { schema, valueAtom } = props;
@@ -37,11 +36,15 @@ export function ImageSelect(props: FieldProps<string | number | null>) {
       ),
     [selectedOption, labels],
   );
-  
+
   return (
     <Selection
       {...props}
-      inputStartAdornment={adornment}
+      {...labels ? {
+        inputStartAdornment: adornment
+      } : {
+        autoComplete: false
+      }}
       renderValue={renderValue}
       renderOption={({ option }) => (
         <ImageSelectValue option={option} showLabel={labels} />
