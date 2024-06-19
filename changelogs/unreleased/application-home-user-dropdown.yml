@@ -1,0 +1,6 @@
+---
+title: Add application.home link in user dropdown
+type: change
+description: |
+  Starting from v7, the header logo doesn't rely on the `application.home` link anymore but on the user home 
+  action if configured. `application.home` link is now added in the user dropdown menu as `Home page` item.

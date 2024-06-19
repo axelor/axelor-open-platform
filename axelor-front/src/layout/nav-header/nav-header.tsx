@@ -388,6 +388,15 @@ function FarItems() {
               key: "d-person",
               divider: true,
             },
+            ...(!data?.application.home
+              ? []
+              : [
+                  {
+                    key: "homepage",
+                    text: i18n.get("Home page"),
+                    onClick: () => openHomePage(data.application.home),
+                  },
+                ]),
             {
               key: "shortcuts",
               text: i18n.get("Shortcuts"),
@@ -423,6 +432,12 @@ function showShortcuts() {
     title: i18n.get("Keyboard Shortcuts"),
     content: <Shortcuts />,
   });
+}
+
+function openHomePage(homePage: string | undefined) {
+  if (homePage) {
+    window.open(homePage, "_blank", "noopener,noreferrer");
+  }
 }
 
 export function NavHeader() {

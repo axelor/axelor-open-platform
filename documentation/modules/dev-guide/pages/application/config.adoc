@@ -204,7 +204,7 @@ db.default.password = secret
 | `application.copyright` | application copyright |
 | `application.logo` | header logo. Should be 40px in height with transparent background | img/axelor.png
 | `application.icon` | website icon. Must be a multiple of 48px square for favicon compatibility | ico/favicon.ico
-| `application.home` | home website. Link to be used with header logo |
+| `application.home` | home website. Link to be used as home page link in user dropdown menu |
 | `application.help` | online help. Link to be used in About page |
 | `application.mode` | application deployment mode. Can be `prod` or `dev` | dev
 | `application.theme` | CSS theme | default theme

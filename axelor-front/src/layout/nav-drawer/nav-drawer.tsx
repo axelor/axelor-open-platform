@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { Badge, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
+import { Badge, clsx, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Icon } from "@/components/icon";
@@ -71,8 +71,9 @@ function load(res: MenuItem[], tags: Tag[]) {
     const items = action
       ? undefined
       : menus.filter((x) => x.parent === name).map(toNavItemProps);
-    
-    const iconColor = iconBackground && (colors[iconBackground] || iconBackground);
+
+    const iconColor =
+      iconBackground && (colors[iconBackground] || iconBackground);
     const props: NavMenuItem = {
       id: name,
       title,
@@ -195,7 +196,12 @@ function Header() {
       <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
         <MaterialIcon className={styles.toggleIcon} icon="menu" />
       </div>
-      <div className={styles.appLogo} onClick={onLogoClick}>
+      <div
+        className={clsx(styles.appLogo, {
+          [styles.appLogoAction]: appHome,
+        })}
+        onClick={onLogoClick}
+      >
         {appLogo ? <img src={appLogo} alt={appName} /> : <AppLogo />}
       </div>
     </div>

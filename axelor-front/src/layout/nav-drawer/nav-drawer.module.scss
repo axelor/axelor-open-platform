@@ -19,7 +19,6 @@
 }
 
 .appLogo {
-  cursor: pointer;
   user-select: none;
   height: 32px !important;
   svg {
@@ -32,6 +31,10 @@
     max-height: 100%;
     vertical-align: middle;
   }
+}
+
+.appLogoAction {
+  cursor: pointer;
 }
 
 .appIcon {

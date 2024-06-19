@@ -51,7 +51,7 @@ export function About() {
         </p>
         <p>{app.copyright}</p>
         <Box d="flex" g={1} flexDirection="column">
-          {app.home && <Link href={app.home}>{app.home}</Link>}
+          {app.home && <Link href={app.home}>{i18n.get("Home page")}</Link>}
           {app.help && <Link href={app.help}>{i18n.get("Documentation")}</Link>}
           <Link href="http://www.gnu.org/licenses/agpl.html">
             {i18n.get("License")}
