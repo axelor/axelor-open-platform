@@ -20,24 +20,23 @@ package com.axelor.db.hibernate.dialect;
 
 import static org.hibernate.type.SqlTypes.OTHER;
 
-import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
-import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
-import com.axelor.db.internal.DBHelper;
+import com.axelor.db.hibernate.dialect.function.MySQLJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.MySQLJsonSetFunction;
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
-import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
+public class AxelorMySQLDialect extends MySQLDialect {
 
-  public AxelorPostgreSQL10Dialect(DatabaseVersion version) {
-    super(version);
+  public AxelorMySQLDialect(DatabaseVersion info) {
+    super(info);
   }
 
   @Override
   protected String columnType(int sqlTypeCode) {
     if (sqlTypeCode == OTHER) {
-      return "jsonb";
+      return "json";
     }
     return super.columnType(sqlTypeCode);
   }
@@ -46,43 +45,27 @@ public class AxelorPostgreSQL10Dialect extends PostgreSQLDialect {
   public void initializeFunctionRegistry(FunctionContributions functionContributions) {
     super.initializeFunctionRegistry(functionContributions);
 
+    functionContributions.getFunctionRegistry().register("json_set", new MySQLJsonSetFunction());
     functionContributions
         .getFunctionRegistry()
-        .register("json_set", new PostgreSQLJsonSetFunction());
-    functionContributions
-        .getFunctionRegistry()
-        .register(
-            "json_extract", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+        .register("json_extract", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
-            "json_extract_text",
-            new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+            "json_extract_text", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
-            "json_extract_boolean",
-            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+            "json_extract_boolean", new MySQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_integer",
-            new PostgreSQLJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+            new MySQLJsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_decimal",
-            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
-
-    if (DBHelper.isUnaccentEnabled()) {
-      functionContributions
-          .getFunctionRegistry()
-          .registerNamed(
-              "unaccent",
-              functionContributions
-                  .getTypeConfiguration()
-                  .getBasicTypeRegistry()
-                  .resolve(StandardBasicTypes.STRING));
-    }
+            new MySQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
   }
 }

@@ -18,24 +18,26 @@
  */
 package com.axelor.db.hibernate.dialect;
 
-import static org.hibernate.type.SqlTypes.LONGVARCHAR;
+import static org.hibernate.type.SqlTypes.OTHER;
 
-import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
+import com.axelor.db.internal.DBHelper;
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
-import org.hibernate.dialect.OracleDialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorOracle12cDialect extends OracleDialect {
+public class AxelorPostgreSQLDialect extends PostgreSQLDialect {
 
-  public AxelorOracle12cDialect(DatabaseVersion info) {
-    super(info);
+  public AxelorPostgreSQLDialect(DatabaseVersion version) {
+    super(version);
   }
 
   @Override
   protected String columnType(int sqlTypeCode) {
-    if (sqlTypeCode == LONGVARCHAR) {
-      return "clob";
+    if (sqlTypeCode == OTHER) {
+      return "jsonb";
     }
     return super.columnType(sqlTypeCode);
   }
@@ -46,25 +48,41 @@ public class AxelorOracle12cDialect extends OracleDialect {
 
     functionContributions
         .getFunctionRegistry()
-        .register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+        .register("json_set", new PostgreSQLJsonSetFunction());
     functionContributions
         .getFunctionRegistry()
         .register(
-            "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+            "json_extract", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_text",
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_boolean",
-            new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_integer",
-            new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_decimal",
-            new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
+            new PostgreSQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+
+    if (DBHelper.isUnaccentEnabled()) {
+      functionContributions
+          .getFunctionRegistry()
+          .registerNamed(
+              "unaccent",
+              functionContributions
+                  .getTypeConfiguration()
+                  .getBasicTypeRegistry()
+                  .resolve(StandardBasicTypes.STRING));
+    }
   }
 }

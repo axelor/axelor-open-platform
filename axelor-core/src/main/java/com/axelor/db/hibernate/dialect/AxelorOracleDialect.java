@@ -18,25 +18,24 @@
  */
 package com.axelor.db.hibernate.dialect;
 
-import static org.hibernate.type.SqlTypes.OTHER;
+import static org.hibernate.type.SqlTypes.LONGVARCHAR;
 
-import com.axelor.db.hibernate.dialect.function.MySQLJsonExtractFunction;
-import com.axelor.db.hibernate.dialect.function.MySQLJsonSetFunction;
+import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.DatabaseVersion;
-import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.OracleDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class AxelorMySQL8Dialect extends MySQLDialect {
+public class AxelorOracleDialect extends OracleDialect {
 
-  public AxelorMySQL8Dialect(DatabaseVersion info) {
+  public AxelorOracleDialect(DatabaseVersion info) {
     super(info);
   }
 
   @Override
   protected String columnType(int sqlTypeCode) {
-    if (sqlTypeCode == OTHER) {
-      return "json";
+    if (sqlTypeCode == LONGVARCHAR) {
+      return "clob";
     }
     return super.columnType(sqlTypeCode);
   }
@@ -45,27 +44,27 @@ public class AxelorMySQL8Dialect extends MySQLDialect {
   public void initializeFunctionRegistry(FunctionContributions functionContributions) {
     super.initializeFunctionRegistry(functionContributions);
 
-    functionContributions.getFunctionRegistry().register("json_set", new MySQLJsonSetFunction());
     functionContributions
         .getFunctionRegistry()
-        .register("json_extract", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
-    functionContributions
-        .getFunctionRegistry()
-        .register(
-            "json_extract_text", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
+        .register("json_extract", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
     functionContributions
         .getFunctionRegistry()
         .register(
-            "json_extract_boolean", new MySQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
+            "json_extract_text", new OracleJsonExtractFunction(StandardBasicTypes.STRING, null));
+    functionContributions
+        .getFunctionRegistry()
+        .register(
+            "json_extract_boolean",
+            new OracleJsonExtractFunction(StandardBasicTypes.BOOLEAN, "number"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_integer",
-            new MySQLJsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
+            new OracleJsonExtractFunction(StandardBasicTypes.INTEGER, "number"));
     functionContributions
         .getFunctionRegistry()
         .register(
             "json_extract_decimal",
-            new MySQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
+            new OracleJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "number"));
   }
 }
