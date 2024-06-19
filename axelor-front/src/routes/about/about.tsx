@@ -53,7 +53,7 @@ export function About() {
         <Box d="flex" g={1} flexDirection="column">
           {app.home && <Link href={app.home}>{i18n.get("Home page")}</Link>}
           {app.help && <Link href={app.help}>{i18n.get("Documentation")}</Link>}
-          <Link href="http://www.gnu.org/licenses/agpl.html">
+          <Link href="https://www.gnu.org/licenses/agpl.html">
             {i18n.get("License")}
           </Link>
         </Box>
@@ -74,9 +74,9 @@ export function About() {
 
         <p>Copyright (c) 2005-{year} Axelor. All Rights Reserved.</p>
         <Box d="flex" g={1} flexDirection="column">
-          <Link href="http://www.axelor.com">http://www.axelor.com</Link>
+          <Link href="https://axelor.com">https://axelor.com</Link>
           <Link
-            href={`http://docs.axelor.com/adk/${app.aopVersion?.substring(
+            href={`https://docs.axelor.com/adk/${app.aopVersion?.substring(
               0,
               app.aopVersion?.lastIndexOf("."),
             )}`}
@@ -88,7 +88,7 @@ export function About() {
               {i18n.get("API Documentation")}
             </Button>
           )}
-          <Link href="http://www.gnu.org/licenses/agpl.html">
+          <Link href="https://www.gnu.org/licenses/agpl.html">
             {i18n.get("License")}
           </Link>
         </Box>
