@@ -578,8 +578,23 @@ The `InlineCheckbox` is same as the default boolean widget but with title on rig
 
 == ImageSelect
 
-The `ImageSelect` widget can be used with a selection field where selection values are either
-image urls or font icons.
+The `ImageSelect` widget can be used with a selection field where selection `icon` is either
+image urls or font icons. If no `icon` is provided, it uses the value as icon.
+
+`x-labels` attribute can be provided to show or not the selection text (default to `true`).
+
+[source,xml]
+----
+<field name="IconSelect" selection="my.social.network.selection" widget="ImageSelect" title="Social network"/>
+
+<selection name="my.social.network.selection">
+   <option value="1" icon="discord">Discord</option>
+   <option value="2" icon="facebook">Facebook</option>
+   <option value="3" icon="instagram">Instagram</option>
+   <option value="4" icon="linkedin">Linkedin</option>
+   <option value="5" icon="twitter-x">X</option>
+</selection>
+----
 
 == MultiSelect
 
