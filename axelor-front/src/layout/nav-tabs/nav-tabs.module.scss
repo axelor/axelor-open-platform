@@ -34,7 +34,7 @@
 }
 
 .tabContent {
-  display: none;
+  display: flex;
   flex: 1;
   overflow: auto;
   min-height: 0;
@@ -46,7 +46,15 @@
 }
 
 .tabContent.active {
-  display: flex;
+  visibility: visible;
+}
+
+.tabContent:not(.active) {
+  visibility: hidden;
+  position: absolute;
+  left: -1000%;
+  width: 100%;
+  height: 100%;
 }
 
 // XXX: Chrome overlapped rendering
