@@ -1,13 +1,20 @@
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
+import { useAtomValue } from "jotai";
 
 import { Alert } from "@axelor/ui";
 
 import { WidgetProps } from "../../builder";
-import { SanitizedContent } from "@/utils/sanitize";
+import { useTemplate } from "@/hooks/use-parser";
 
 import styles from "./help.module.scss";
 
-export function HelpComponent({ css, text }: { text?: string; css?: string }) {
+export function HelpComponent({
+  css,
+  text,
+}: {
+  text?: ReactNode;
+  css?: string;
+}) {
   const variant = useMemo(() => {
     const cssClass = css || "";
     if (cssClass.includes("alert-warning")) return "warning";
@@ -15,15 +22,20 @@ export function HelpComponent({ css, text }: { text?: string; css?: string }) {
     if (cssClass.includes("alert-success")) return "success";
     return "info";
   }, [css]);
+
   return (
     <Alert className={styles.alert} variant={variant}>
-      {text && <SanitizedContent content={text} />}
+      {text}
     </Alert>
   );
 }
 
 export function Help(props: WidgetProps) {
-  const { schema } = props;
+  const { schema, formAtom } = props;
   const { text } = schema;
-  return <HelpComponent text={text} css={schema.css} />;
+  const { record } = useAtomValue(formAtom);
+  const Template = useTemplate(text);
+  return (
+    <HelpComponent text={<Template context={record} />} css={schema.css} />
+  );
 }
