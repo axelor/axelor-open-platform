@@ -83,7 +83,6 @@ function computeLayout(schema: Schema) {
 }
 
 function layoutClassName(item: Schema) {
-  if (item.type === 'help') return;
   const css: string = item.css || "";
   const names = css
     .split(" ")
