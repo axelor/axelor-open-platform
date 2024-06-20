@@ -1,6 +1,7 @@
 export * from "./boolean";
 export * from "./binary-link";
 export * from "./button";
+export * from "./color-picker";
 export * from "./new-icon";
 export * from "./edit-icon";
 export * from "./delete-icon";

@@ -101,6 +101,34 @@ The following attributes are supported:
 for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
 
+[source,xml]
+----
+<field name="integer" widget="Integer"/>
+<field name="decimal" widget="Decimal" x-scale="2" x-precision="18"/>
+<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
+----
+
+== ColorPicker
+
+The color picker widget is used for `string` data fields. It provides the ability to pick a color in a popper.
+The value is stored in hexadecimal.
+
+[source,xml]
+----
+<field name="color" widget="ColorPicker"/>
+<field name="color" widget="ColorPicker" x-lite="true"/>
+----
+
+[frame=none,grid=none,cols="1,1"]
+|===
+a|image::widgets/color-picker.png[]
+a|image::widgets/color-picker-2.png[]
+|===
+
+The following attribute is supported:
+
+* `x-lite`: change color picker popper to a basic palette. Default to `false`.
+
 == Rating
 
 The rating widget is used for `integer`/`long`/`decimal` data fields. It provides ability to collect measurable

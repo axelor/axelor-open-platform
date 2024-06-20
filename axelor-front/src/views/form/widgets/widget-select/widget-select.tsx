@@ -9,6 +9,7 @@ const NAMES = [
   "BooleanSwitch",
   "CheckboxSelect",
   "CodeEditor",
+  "ColorPicker",
   "Drawing",
   "Duration",
   "Email",

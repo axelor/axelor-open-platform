@@ -1,0 +1,6 @@
+---
+title: Add color picker widget
+type: feature
+description: |
+  This provides the ability to pick a color in a color picker popover for string data fields.
+  Add attribute `x-lite` to change the color picker to a basic color palette.

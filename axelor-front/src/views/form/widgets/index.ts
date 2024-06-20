@@ -8,6 +8,7 @@ export * from "./button";
 export * from "./button-group";
 export * from "./checkbox-select";
 export * from "./code-editor";
+export * from "./color-picker";
 export * from "./dashlet";
 export * from "./date";
 export * from "./datetime";

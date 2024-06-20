@@ -1,0 +1,24 @@
+$size: 2rem;
+
+.colorContainer {
+  width: fit-content;
+
+  &:hover > .closeBtn {
+    opacity: 1;
+  }
+}
+
+.colorPreview {
+  width: $size;
+  height: $size;
+}
+
+.checkerboard {
+  background: repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 50% /
+    20px 20px;
+}
+
+.closeBtn {
+  opacity: 0;
+  transition: all 0.25s ease-in-out;
+}
