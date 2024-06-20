@@ -164,17 +164,17 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
   return (
     <Box d="flex" flexDirection="column">
       <Button
+        className={styles.socialButton}
         d="flex"
         alignItems="center"
         justifyContent="center"
-        type="submit"
-        variant="secondary"
+        border={true}
         mt={2}
         w={100}
         onClick={handleClick}
       >
         {icon && <Image className={styles.socialLogo} src={icon} alt={title} />}
-        <Box>{title}</Box>
+        {title}
       </Button>
     </Box>
   );
