@@ -5,6 +5,8 @@ import { Alert } from "@axelor/ui";
 import { WidgetProps } from "../../builder";
 import { SanitizedContent } from "@/utils/sanitize";
 
+import styles from "./help.module.scss";
+
 export function HelpComponent({ css, text }: { text?: string; css?: string }) {
   const variant = useMemo(() => {
     const cssClass = css || "";
@@ -14,7 +16,7 @@ export function HelpComponent({ css, text }: { text?: string; css?: string }) {
     return "info";
   }, [css]);
   return (
-    <Alert variant={variant}>
+    <Alert className={styles.alert} variant={variant}>
       {text && <SanitizedContent content={text} />}
     </Alert>
   );
