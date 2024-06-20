@@ -3,21 +3,7 @@
   margin: 0 auto;
 }
 
-.paper {
-  margin-bottom: 1rem;
-  form {
-    margin-top: 1rem;
-  }
-}
-
 .logo {
   max-height: 96px;
   max-width: 368px;
-}
-
-button,
-a {
-  & .icon {
-    margin-right: 0.25rem;
-  }
 }

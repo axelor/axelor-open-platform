@@ -218,6 +218,7 @@ export function LoginForm({
         flexDirection="column"
         alignItems="center"
         p={3}
+        mb={3}
       >
         <img
           className={styles.logo}
@@ -237,7 +238,7 @@ export function LoginForm({
             }}
           />
         )}
-        <Box as="form" w={100} onSubmit={handleSubmit}>
+        <Box as="form" w={100} onSubmit={handleSubmit} mt={3}>
           {isPage && tenants.length > 1 && (
             <Box mb={4}>
               {tenantField.showTitle !== false && (
@@ -398,6 +399,7 @@ function LoginFormButton({
           underline={false}
           mt={2}
           w={100}
+          gap={4}
         >
           {icon && <Icon icon={icon} className={styles.icon} />}
           {title}
@@ -415,6 +417,7 @@ function LoginFormButton({
       justifyContent="center"
       mt={2}
       w={100}
+      gap={4}
     >
       {icon && <Icon icon={icon} className={styles.icon} />}
       {title}

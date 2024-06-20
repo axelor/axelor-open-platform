@@ -135,7 +135,7 @@ function CentralClients({ clients }: { clients: ClientInfo[] }) {
         <Box mx={3}>{i18n.get("or sign in with")}</Box>
         <Box as="hr" flexGrow={1} />
       </Box>
-      <Box as="form" w={100} className={styles.clients}>
+      <Box as="form" w={100} mb={3}>
         {clients.map((client) => (
           <CentralClient
             key={client.name}
@@ -172,6 +172,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
         mt={2}
         w={100}
         onClick={handleClick}
+        gap={4}
       >
         {icon && <Image className={styles.socialLogo} src={icon} alt={title} />}
         {title}
