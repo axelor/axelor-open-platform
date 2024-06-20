@@ -38,12 +38,13 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -94,13 +95,13 @@ public class InfoService extends AbstractService {
     map.put("icon", getIcon());
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
+    final Map<String, Object> signIn = signInInfo();
+
+    if (ObjectUtils.notEmpty(signIn)) {
+      map.put("signIn", signIn);
+    }
+
     if (AuthUtils.getUser() == null) {
-      final Map<String, Object> signIn = signInInfo();
-
-      if (ObjectUtils.notEmpty(signIn)) {
-        map.put("signIn", signIn);
-      }
-
       return map;
     }
 
@@ -126,13 +127,14 @@ public class InfoService extends AbstractService {
   }
 
   private Map<String, Object> signInInfo() {
-    final String keyPrefix = AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX;
-    final Map<String, String> config = SETTINGS.getPropertiesStartingWith(keyPrefix);
-    return buildMap(config, keyPrefix);
+    return buildMap(
+        AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX, List.of("title", "placeholder", "footer"));
   }
 
   @SuppressWarnings("unchecked")
-  private static Map<String, Object> buildMap(Map<String, String> config, String keyPrefix) {
+  private static Map<String, Object> buildMap(
+      String keyPrefix, Collection<String> translatableKeys) {
+    final Map<String, String> config = SETTINGS.getPropertiesStartingWith(keyPrefix);
     return config.entrySet().stream()
         .collect(
             HashMap::new,
@@ -152,7 +154,7 @@ public class InfoService extends AbstractService {
               final String currentKey = keys[keys.length - 1];
               Object value = str;
 
-              if (Stream.of("title", "placeholder", "footer").anyMatch(k -> k.equals(currentKey))) {
+              if (translatableKeys.contains(currentKey)) {
                 value = I18n.get(str);
               } else if ("true".equalsIgnoreCase(str) || "false".equalsIgnoreCase(str)) {
                 value = Boolean.parseBoolean(str);

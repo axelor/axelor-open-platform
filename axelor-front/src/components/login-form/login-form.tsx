@@ -47,6 +47,7 @@ export function LoginForm({
   const [showError, setShowError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const isPage = !onSuccess;
   const location = useLocation();
   const locationState = location.state;
   const { navigate } = useRoute();
@@ -156,8 +157,7 @@ export function LoginForm({
 
   const formButtons = useMemo(() => {
     const { submit, ...buttonsRest } = signInButtons ?? {};
-
-    return Object.values({
+    const buttons = {
       submit: {
         title: i18n.get("Sign in"),
         order: 0,
@@ -165,19 +165,23 @@ export function LoginForm({
         ...submit,
       },
       ...buttonsRest,
-    })
-      .map((button) => {
-        const { link, ...buttonRest } = button;
-        return {
-          ...(link?.includes(":username") && {
-            usernameRef,
-          }),
-          link,
-          ...buttonRest,
-        };
-      })
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  }, [signInButtons, handleSubmit]);
+    };
+
+    return isPage
+      ? Object.values(buttons)
+          .map((button) => {
+            const { link, ...buttonRest } = button;
+            return {
+              ...(link?.includes(":username") && {
+                usernameRef,
+              }),
+              link,
+              ...buttonRest,
+            };
+          })
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      : [buttons.submit];
+  }, [signInButtons, handleSubmit, isPage]);
 
   if (session.state === "loading" || session.state === "hasError") {
     return null;
@@ -223,7 +227,7 @@ export function LoginForm({
             e.currentTarget.src = defaultLogo;
           }}
         />
-        {signInTitle && (
+        {isPage && signInTitle && (
           <Box
             d="flex"
             justifyContent={"center"}
@@ -234,7 +238,7 @@ export function LoginForm({
           />
         )}
         <Box as="form" w={100} onSubmit={handleSubmit}>
-          {tenants.length > 1 && (
+          {isPage && tenants.length > 1 && (
             <Box mb={4}>
               {tenantField.showTitle !== false && (
                 <InputLabel htmlFor="tenant">
@@ -320,7 +324,7 @@ export function LoginForm({
           ))}
         </Box>
       </Box>
-      {signInFooter && (
+      {isPage && signInFooter && (
         <Box
           d="flex"
           justifyContent={"center"}
