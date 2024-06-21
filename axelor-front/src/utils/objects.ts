@@ -103,13 +103,17 @@ export function deepGet<T = any>(
 ): T | undefined {
   const props = toPath(path);
   let target: object | undefined = obj;
+
+  const getDefaultValue = () =>
+    (defaultValue !== undefined ? defaultValue : target) as T;
+
   while (props.length) {
     const prop = props.shift();
-    if (target === null || target === undefined) return defaultValue;
+    if (target === null || target === undefined) return getDefaultValue();
     if (prop === undefined) continue;
     target = Reflect.get(target, prop);
   }
-  return (target as T) ?? defaultValue;
+  return (target as T) ?? getDefaultValue();
 }
 
 /**
