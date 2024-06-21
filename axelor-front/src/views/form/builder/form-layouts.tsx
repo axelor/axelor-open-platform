@@ -83,7 +83,6 @@ function computeLayout(schema: Schema) {
 }
 
 function layoutClassName(item: Schema) {
-  if (item.type === 'help') return;
   const css: string = item.css || "";
   const names = css
     .split(" ")
@@ -92,6 +91,7 @@ function layoutClassName(item: Schema) {
     .filter((name) => {
       if (/^span\d+/.test(name)) return false;
       if (/^btn-?/.test(name)) return false;
+      if (item.type === 'help' && /^alert?/.test(name)) return false;
       return true;
     });
   return legacyClassNames(names);
