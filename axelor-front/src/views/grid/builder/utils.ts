@@ -163,7 +163,7 @@ export function getFieldSortValue(column: Field, record: DataRecord) {
 }
 
 export function useGridSortHandler(
-  fields: MetaData["fields"] = {},
+  fields?: MetaData["fields"],
   getSortValue: (column: Field, record: DataRecord) => any = getFieldSortValue,
 ) {
   return useCallback(
