@@ -17,33 +17,39 @@ fields.
 
 [source,xml]
 ----
-<field name="string"/>
+<field name="code"/>
 ----
+
+image::widgets/string.png[]
 
 == Email
 
-This widget can be used for string fields to enter email address.
+This widget can be used for `string` fields to enter email address. The input value will be validated to ensure user
+provides a valid email id. Clicking on the icon opens your default email client with the destination email pre-filled.
 
 [source,xml]
 ----
 <field name="email" widget="email" />
 ----
 
-The input value will be validated to ensure user provides valid email id.
+image::widgets/email.png[]
 
 == Url
 
-This widget can be used for string fields to enter url value.
+This widget can be used for `string` fields to enter url value. The input value will be validated to ensure user
+provides a valid url. Clicking on the icon opens the url on a new tab.
 
 [source,xml]
 ----
-<field name="website" widget="url" />
+<field name="url" widget="url" />
 ----
+
+image::widgets/url.png[]
 
 == Phone
 
-The phone widget formats phone numbers. It renders the field as a phone number link in readonly mode,
-and as a phone number input with a country/region selector in edit mode.
+The phone widget can be used for `string` fields to enter and formats phone numbers.
+It renders the field as a phone number link in readonly mode, and as a phone number input with a country/region selector in edit mode.
 
 The default country is locale aware and is based on user language. If user language doesn't contain country code,
 a matching country is searched in user's browser locales. In case of no country match in browser locales, there is some fallback behavior. For example, if user language is `fr`, and browser locales are `fr`, `fr-CA`, `en`, `en-US`, then country would be `ca`. if user language is `ja`, country would fallback to `jp`.
@@ -53,27 +59,41 @@ a matching country is searched in user's browser locales. In case of no country 
 <field name="phone" widget="phone" />
 ----
 
+image::widgets/phone.png[]
+
 The following attributes are supported:
 
-* `x-placeholder-number-type` - country-dependent number type to use for the placeholder: `FIXED_LINE` (default) or `MOBILE`
-* `x-initial-country` - initial country selection by specifying its two-letter country code (defaults to user/browser locale)
-* `x-preferred-countries` - countries to appear at the top of the list (comma-separated list of two-letter country codes) (defaults to user/browser locales)
-* `x-only-countries` - in the country dropdown, only display the specified countries (comma-separated list of two-letter country codes)
+* `x-placeholder-number-type`: country-dependent number type to use for the placeholder: `FIXED_LINE` (default) or `MOBILE`
+* `x-initial-country`: initial country selection by specifying its two-letter country code (defaults to user/browser locale)
+* `x-preferred-countries`: countries to appear at the top of the list (comma-separated list of two-letter country codes) (defaults to user/browser locales)
+* `x-only-countries`: in the country dropdown, only display the specified countries (comma-separated list of two-letter country codes)
 
 == Password
 
-This widget can be used for string fields to enter password values.
+This widget can be used for `string` fields to securely enter password values. It replaces each character with a dot symbol
+unless you click on the eye icon which toggles field input visibility.
 
 [source,xml]
 ----
 <field name="password" widget="password" />
 ----
 
+image::widgets/password.png[]
+
 == Number
 
 The number widget is used for `integer` and `decimal` data fields.
 
-Number widget has specials attributes:
+[source,xml]
+----
+<field name="integer" widget="Integer"/>
+<field name="price" widget="Decimal" x-scale="2" x-precision="18"/>
+<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
+----
+
+image::widgets/number.png[]
+
+The following attributes are supported:
 
 * `min`: lowest bound of the value
 * `max`: upper bound of the value
@@ -81,19 +101,29 @@ Number widget has specials attributes:
 for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
 
-[source,xml]
-----
-<field name="integer" widget="Integer"/>
-<field name="decimal" widget="Decimal" x-scale="2" x-precision="18"/>
-<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
-----
-
 == Rating
 
 The rating widget is used for `integer`/`long`/`decimal` data fields. It provides ability to collect measurable
 opinions/experiences/feedbacks/...
 
-Rating widget supports following attributes :
+By default, `star` icon will be colored in yellow when checked and `heart` in pink. The record value of the first icon
+is `1`, the last is the one defined in `max` attribute. By clicking on the last checked icon, it reset the value to `0`.
+
+Widget support partial rating on decimal fields but only for display purpose (for example, an average).
+
+[source,xml]
+----
+<field name="fidelity" type="Integer" widget="Rating"/>
+<field name="myRating" type="Integer" widget="Rating" x-rating-icon="heart"/>
+<field name="myRating" type="Integer" widget="Rating" max="8" x-rating-icon="airplane"/>
+<field name="myRating" type="Integer" widget="Rating" x-rating-icon="1-square,2-square,3-square,4-square,5-square"/>
+<field name="satisfaction" type="Integer" widget="Rating" x-rating-icon="emoji-angry,emoji-frown,emoji-neutral,emoji-smile,emoji-laughing" x-rating-color="#d32f2f,#d32f2f,#ed6c02,#2e7d32,#2e7d32" x-rating-highlight-selected="true" x-rating-fill="false"/>
+----
+
+image::widgets/rating.png[]
+image::widgets/rating-2.png[]
+
+The following attributes are supported:
 
 * `max`: the number of icon to display. Default to `5`.
 * `x-rating-icon`: https://icons.getbootstrap.com/[Bootstrap] icon to use. It also supports comma-separated list of icons. Default to `star`.
@@ -101,68 +131,58 @@ Rating widget supports following attributes :
 * `x-rating-fill`: whether the icon should use fill style when checked. Defaults to `true`.
 * `x-rating-highlight-selected`: whether to highlight only the selected icon. Defaults to `false`.
 
-[source,xml]
-----
-<field name="myRating" type="Integer" widget="Rating"/>
-<field name="myRating" type="Integer" widget="Rating" x-rating-icon="heart"/>
-<field name="myRating" type="Integer" widget="Rating" max="8" x-rating-icon="airplane"/>
-<field name="myRating" type="Integer" widget="Rating" x-rating-icon="1-square,2-square,3-square,4-square,5-square"/>
-<field name="myRating" type="Integer" widget="Rating" x-rating-icon="emoji-angry,emoji-frown,emoji-neutral,emoji-smile,emoji-laughing" x-rating-color="#d32f2f,#d32f2f,#ed6c02,#2e7d32,#2e7d32" x-rating-highlight-selected="true" x-rating-fill="false"/>
-----
-
-By default, `star` icon will be colored in yellow when checked and `heart` in pink. The record value of the first icon
-is `1`, the last is the one defined in `max` attribute. By clicking on the last checked icon, it reset the value to `0`.
-
-Widget support partial rating on decimal fields but only for display purpose (for example, an average).
-
 == Date
 
-The date widget is used for `Date` data fields.
-The field provides the ability to select a date with a calendar popover in edit mode.
+The date widget is used for `Date` data fields. Clicking on the icon opens a calendar popper to select a date easily in edit mode.
 
 [source,xml]
 ----
-<field name="orderDate" widget="Date" />
+<field name="date" widget="Date" />
 ----
+
+image::widgets/date.png[]
 
 == Time
 
 The time widget is used for `Time` data fields.
-
-Time widget supports following attribute:
-
-* `x-seconds`: Show seconds. Default to false.
 
 [source,xml]
 ----
 <field name="time" widget="Time" />
 ----
 
+image::widgets/time.png[]
+
+The following attribute is supported:
+
+* `x-seconds`: Show seconds. Default to false.
+
 == DateTime
 
 The date time widget is used for `DateTime` data fields.
 The field is rendered as a `Date` widget but also accepts hours and minutes.
 
-Date time widget supports following attribute:
+[source,xml]
+----
+<field name="dateTime" widget="DateTime" />
+----
+
+image::widgets/date-time.png[]
+
+The following attribute is supported:
 
 * `x-seconds`: Show seconds. Default to false.
 
-[source,xml]
-----
-<field name="updatedOn" widget="DateTime" />
-----
-
 == RelativeTime
- 
-The relative time widget is used for `Date` and `DateTime` data fields.
 
-The field renders relative time from now.
+The relative time widget is used for `Date` and `DateTime` data fields. The field renders relative time from now.
 
 [source,xml]
 ----
-<field name="orderDate" widget="RelativeTime" />
 <field name="updatedOn" widget="RelativeTime" />
 ----
+ 
+image::widgets/relative-time.png[]
 
 On a `datetime` field type, here is the output depending on the range :
 
@@ -216,15 +236,17 @@ On a `date` field type, it will handle special cases depending on following cond
 
 The duration widget is used for `integer`/`long` data fields.
 
-Duration widget supports following attributes:
+[source,xml]
+----
+<field name="duration" widget="Duration" />
+----
+
+image::widgets/duration.png[]
+
+The following attributes are supported:
 
 * `x-big`: If expected duration is more than 100 hours. Default to false.
 * `x-seconds`: Show seconds. Default to false.
-
-[source,xml]
-----
-<field name="taskDuration" widget="Duration" />
-----
 
 == Boolean
 
@@ -232,8 +254,10 @@ The widget is used for `boolean` data fields.
 
 [source,xml]
 ----
-<field name="confirmed" widget="boolean" />
+<field name="boolean" widget="boolean" />
 ----
+
+image::widgets/boolean.png[]
 
 == BooleanSelect
 
@@ -241,16 +265,16 @@ The widget is used for `boolean` data fields. The field is rendered as a combo b
 
 [source,xml]
 ----
-<field name="confirmed" widget="boolean-select" />
+<field name="booleanSelect" widget="BooleanSelect" />
+<field name="booleanSelect" widget="BooleanSelect" x-true-text="On" x-false-text="Off" />
 ----
 
-The yes/no text can be configured with `x-true-text` and `x-false-text` attributes:
+image::widgets/boolean-select.png[]
 
-[source,xml]
-----
-<field name="confirmed" widget="boolean-select" x-true-text="Yes" x-false-text="No" />
-<field name="confirmed" widget="boolean-select" x-true-text="On" x-false-text="Off" />
-----
+The following attributes are supported:
+
+* `x-true-text`: Change true text. Default to "Yes".
+* `x-false-text`: Change false text. Default to "No".
 
 == BooleanRadio
 
@@ -259,18 +283,17 @@ yes/no text.
 
 [source,xml]
 ----
-<field name="confirmed" widget="boolean-radio" />
+<field name="booleanRadio" widget="boolean-radio" />
+<field name="booleanRadio" widget="boolean-radio" x-true-text="On" x-false-text="Off" />
 ----
 
-The yes/no text can be configured with `x-true-text` and `x-false-text` attributes:
+image::widgets/boolean-radio.png[]
 
-[source,xml]
-----
-<field name="confirmed" widget="boolean-radio" x-true-text="Yes" x-false-text="No" />
-<field name="confirmed" widget="boolean-radio" x-true-text="On" x-false-text="Off" />
-----
+The following attributes are supported:
 
-The radio list is rendered horizontally but can be changed to vertical with `x-direction="vertical"` attribute.
+* `x-true-text`: Change true text. Default to "Yes".
+* `x-false-text`: Change false text. Default to "No".
+* `x-direction`: If value is "vertical", renders the radio list vertically. Default to horizontal.
 
 == BooleanSwitch
 
@@ -278,29 +301,30 @@ The widget is used for `boolean` data fields. The field is rendered as a switchi
 
 [source,xml]
 ----
-<field name="confirmed" widget="boolean-switch" />
+<field name="booleanSwitch" widget="boolean-switch" />
 ----
+
+image::widgets/boolean-switch.png[]
 
 == Toggle
 
 The widget is used for `boolean` data fields. The field is rendered as a two state toggle button.
+By default, the toggle button icon is a `square` for unchecked state and `square-fill` for checked state.
 
 [source,xml]
 ----
 <field name="confirmed" widget="toggle" />
+<field name="confirmed" type="Boolean" widget="Toggle" x-icon="star" x-icon-active="star-fill"/>
 ----
 
-By default, the toggle button icon is a `square` for unchecked state and `square-fill` for checked state. It can be
-configured with following attributes :
+image::widgets/toggle.png[]
+image::widgets/toggle-2.png[]
 
-- `x-icon` - specify an icon for unchecked state
-- `x-icon-hover` - specify an icon for hover state
-- `x-icon-active` - specify an icon for checked state
+The following attributes are supported:
 
-[source,xml]
-----
-<field name="some" type="Boolean" widget="Toggle" x-icon="star" x-icon-active="star-fill"/>
-----
+- `x-icon`: specify an icon for unchecked state
+- `x-icon-hover`: specify an icon for hover state
+- `x-icon-active`: specify an icon for checked state
 
 == InlineCheckbox
 
@@ -309,19 +333,25 @@ the title on right.
 
 [source,xml]
 ----
-<field name="confirmed" widget="inline-checkbox" />
+<field name="inlineCheckbox" widget="InlineCheckbox" />
 ----
+
+image::widgets/inline-checkbox.png[]
 
 == Text
 
 The text widget is used for multiline or large `string` data fields.
 
-The `height` attribute define the number of rows takes by the widget.
-
 [source,xml]
 ----
-<field name="notes" widget="Text"/>
+<field name="description" widget="Text"/>
 ----
+
+image::widgets/text.png[]
+
+The following attribute is supported:
+
+* `height`: specify the visible height of the text area, in lines. Default to 5.
 
 == Help
 
@@ -329,12 +359,14 @@ This widget is used to show static help information in form view.
 
 [source,xml]
 ----
-<help css="alert-info">
+<help>
 <![CDATA[
 Some help text goes here....
 ]]>
 </help>
 ----
+
+image::widgets/help.png[]
 
 == Static
 
@@ -349,17 +381,21 @@ Some static text goes here....
 </static>
 ----
 
+image::widgets/static.png[]
+
 == ManyToOne
 
 The widget is used for `many-to-one` fields.
 
 [source,xml]
 ----
-<field name="contact" /> <!-- assuming it's m2o field -->
+<field name="customer" /> <!-- assuming it's m2o field -->
 <field name="some" x-type="many-to-one"
   x-target="com.axelor.contact.db.Contact"
   x-target-name="fullName" /> <!-- dummy m2o field -->
 ----
+
+image::widgets/many-to-one.png[]
 
 The `viewer` and `editor` for this field refers to the linked record.
 
@@ -368,7 +404,9 @@ The `viewer` and `editor` for this field refers to the linked record.
 <field name="contact">
   <viewer>
   <![CDATA[
-  <strong>{{fullName}}</strong>
+    <>
+      <strong>{fullName}</strong>
+    </>
   ]]>
   </viewer>
   <editor>
@@ -377,6 +415,8 @@ The `viewer` and `editor` for this field refers to the linked record.
   </editor>
 </field>
 ----
+
+image::widgets/many-to-one-2.png[]
 
 == OneToOne
 
@@ -388,49 +428,53 @@ The widget is used for `one-to-many` fields.
 
 [source,xml]
 ----
-<panel-related field="orderItems" /> <!-- assuming it's o2m field -->
+<panel-related field="items" /> <!-- assuming it's o2m field -->
 <panel-related field="some" x-type="one-to-many"
   x-target="com.axelor.sale.db.OrderItem" /> <!-- dummy o2m field -->
 ----
+
+image::widgets/one-to-many.png[]
 
 The default widget uses a grid widget to show linked records. You can specify
 field names to show in the list:
 
 [source,xml]
 ----
-<panel-related field="orderItems">
+<panel-related field="items">
   <field name="product" />
   <field name="quantity" />
   <field name="price" />
+  <field name="taxes" />
 </panel-related>
 ----
+
+image::widgets/one-to-many-2.png[]
 
 You can also display the values as repeated `viewer` or `editor` using normal
 `field` widget:
 
 [source,xml]
 ----
-<field name="addresses" colSpan="12" css="address-list">
+<field name="addresses" colSpan="12">
   <viewer><![CDATA[
-  <address>
-  {{record.street}} {{record.area}}<br>
-  {{record.city}}, {{record.state}} - {{record.zip}}<br>
-  {{record.country.name}}
-  </address>
-  ]]></viewer>
+  <>
+    <Box>{street} {area}</Box>
+    <Box>{city}, {state} - {zip}</Box>
+    <Box>{country.name}</Box>
+  </>
+]]></viewer>
   <editor x-show-titles="false">
-    <field name="street" colSpan="12"/>
-    <field name="area" colSpan="12"/>
-    <field name="city" colSpan="4"/>
-    <field name="state" colSpan="4"/>
-    <field name="zip" colSpan="4"/>
-    <field name="country" colSpan="12" />
+    <field name="street" colSpan="12" />
+    <field name="area" colSpan="12" />
+    <field name="city" colSpan="4" />
+    <field name="state" colSpan="4" />
+    <field name="zip" colSpan="4" />
+    <field name="country" colSpan="12" widget="SuggestBox" />
   </editor>
 </field>
 ----
 
-When using `viewer` with `one-to-many` fields, values should be referenced with
-`record.<fieldName>`.
+image::widgets/one-to-many-3.png[]
 
 == ManyToMany
 
@@ -439,62 +483,64 @@ but one additional icon to select existing records.
 
 == MasterDetail
 
-This widget is supported on one-to-many and many-to-many fields. It allows to show a form view below the grid view for the currently selected row.
-
-Example:
+This widget is supported on `one-to-many` and `many-to-many` fields. It allows to show a form view below the grid view for the currently selected row.
 
 [source,xml]
 ----
-  <panel-related
-    title="Items (MasterDetail)"
-    readonlyIf="confirmed"
-    field="items"
-    form-view="order-line-form"
-    grid-view="order-line-grid"
-    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
-    widget="master-detail"
-    summary-view="order-line-nested"
-  />
+<panel-related
+  field="items"
+  readonlyIf="confirmed"
+  editable="true"
+  orderBy="sequence"
+  onChange="com.axelor.sale.web.SaleOrderController:calculate"
+  widget="MasterDetail"
+>
+  <field name="product" onChange="action-order-line-change-product" />
+  <field name="price" />
+  <field name="quantity" />
+  <field name="taxes" />
+</panel-related>
 ----
 
-Attribute:
+image::widgets/master-detail.png[]
 
-* `summary-view` - (optional) used to define the form view shown below the grid view. If not specified, the view specified by `form-view` attribute is used instead.
+The following attribute is supported:
+
+* `summary-view`: (optional) used to define the form view shown below the grid view. If not specified, the view specified by `form-view` attribute is used instead.
 
 NOTE: If grid is editable, summary form view stays readonly.
 
 == Expandable
 
-This widget is supported on one-to-many fields and top-level grids. It allows to show an expandable form view below each row.
-
-Example:
+This widget is supported on `one-to-many` fields and top-level grids. It allows to show an expandable form view below each row.
 
 [source,xml]
 ----
-  <panel-related
-    title="Items (Expandable)"
-    readonlyIf="confirmed"
-    field="items"
-    form-view="order-line-form"
-    grid-view="order-line-grid"
-    editable="true"
-    onChange="com.axelor.sale.web.SaleOrderController:computeItems"
-    widget="expandable"
-    summary-view="order-line-nested"
-    x-expand-all="items"
-  />
+<panel-related
+  field="items"
+  readonlyIf="confirmed"
+  editable="true"
+  orderBy="sequence"
+  onChange="com.axelor.sale.web.SaleOrderController:calculate"
+  widget="Expandable"
+>
+  <field name="product" onChange="action-order-line-change-product"/>
+  <field name="price"/>
+  <field name="quantity"/>
+  <field name="taxes"/>
+</panel-related>
 ----
 
-Attributes:
+image::widgets/expandable.png[]
 
-* `summary-view` - (optional) used to define the expandable form view. If not specified, the view specified by `form-view` attribute is used instead.
-* `x-expand-all` - (optional) to enable expand all feature, you have to specify a comma-separated list of nested expandable collection fields, if any. Supported on form field only, not on top-level grid.
+The following attributes are supported:
+
+* `summary-view`: (optional) used to define the expandable form view. If not specified, the view specified by `form-view` attribute is used instead.
+* `x-expand-all`: (optional) to enable expand all feature, you have to specify a comma-separated list of nested expandable collection fields, if any. Supported on form field only, not on top-level grid.
 
 == TreeGrid
 
-This widget is supported on one-to-many fields. It allows to show a tree-like structure in a grid view.
-
-Example:
+This widget is supported on `one-to-many` fields. It allows to show a tree-like structure in a grid view.
 
 [source,xml]
 ----
@@ -506,7 +552,7 @@ Example:
       grid-view="order-line-grid"
       editable="true"
       onChange="com.axelor.sale.web.SaleOrderController:computeItems"
-      widget="tree-grid"
+      widget="TreeGrid"
       x-tree-field="items"
       x-tree-limit="2"
       x-tree-field-title="Add new item"
@@ -517,12 +563,14 @@ Example:
     </panel-related>
 ----
 
-Attributes:
+image::widgets/tree-grid.png[]
 
-* `x-tree-field` - used to define the nested o2m field.
-* `x-tree-limit` - (optional) used to specify limit to support nested tree structure.
-* `x-tree-field-title` - (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
-* `x-expand-all` - (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`
+The following attributes are supported:
+
+* `x-tree-field`: used to define the nested o2m field.
+* `x-tree-limit`: (optional) used to specify limit to support nested tree structure.
+* `x-tree-field-title`: (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
+* `x-expand-all`: (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`
 
 NOTE: Only `onChange` action on root collection is performed. Actions defined on sub-items are not supported.
 
@@ -530,59 +578,58 @@ NOTE: Only `onChange` action on root collection is performed. Actions defined on
 
 The binary widget is file upload widget used with `binary` fields.
 
-Binary widget has specials attributes:
+[source,xml]
+----
+<field name="file" widget="binary" />
+----
+
+image::widgets/binary.png[]
+
+The following attribute is supported:
 
 * `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
 (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
 
-[source,xml]
-----
-<field name="content" widget="binary" />
-----
 
 == BinaryLink
 
 This widget can be used with `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records. It allows
 single click download and upload.
 
-BinaryLink widget has specials attributes:
-
-* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
-(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
-
 [source,xml]
 ----
 <field name="metaFile" widget="binary-link" />
 ----
+
+image::widgets/binary-link.png[]
+
+The following attribute is supported:
+
+* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
+(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
 
 == Image
 
 The image widget is used with `binary` fields that stores image data or
 `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records.
 
-Image widget has specials attributes:
-
-* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
-(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
-
 [source,xml]
 ----
 <field name="picture" widget="image" />
-<field name="metaFile" widget="image" />
 ----
+
+image::widgets/image.png[]
+
+The following attribute is supported:
+
+* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
+(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
 
 == Drawing
 
 The drawing widget is used to freely draw on a pop-up canvas.
 It uses `binary` fields that stores image data or `many-to-one`
 fields referencing `com.axelor.meta.db.MetaFile` records.
-
-Drawing widget supports following attributes :
-
-* `x-stroke-width`: The stroke width. Default to 0.5.
-* `x-stroke-color`: The stroke color. Can be any color name. Default to black.
-* `x-drawing-height`: The drawing height in px. Default to 200.
-* `x-drawing-width`: The drawing width in px. Default to 500.
 
 [source,xml]
 ----
@@ -591,11 +638,32 @@ Drawing widget supports following attributes :
 <field name="signature" widget="drawing" x-stroke-width="1.5" x-stroke-color="aqua" x-drawing-height="800" x-drawing-width="700" />
 ----
 
+image::widgets/drawing.png[]
+image::widgets/drawing-2.png[]
+
+The following attributes are supported:
+
+* `x-stroke-width`: The stroke width. Default to 0.5.
+* `x-stroke-color`: The stroke color. Can be any color name. Default to black.
+* `x-drawing-height`: The drawing height in px. Default to 200.
+* `x-drawing-width`: The drawing width in px. Default to 500.
+
 == Button
 
 The button widget is used to show a clickable button on a form.
 
-Button widget has specials attributes:
+[source,xml]
+----
+<button name="customBtn" title="Click Me!" onClick="actions"
+  prompt="This is a confirmation message."
+  icon="fa-check-square-o" />
+<button name="customBtn" title="Button" link="https://axelor.com" />
+----
+
+image::widgets/button.png[]
+image::widgets/button-2.png[]
+
+The following attributes are supported:
 
 * `onClick`: action to execute on click event
 * `prompt`: confirmation message before performing client action
@@ -604,28 +672,23 @@ Use empty value if you only need a link effect and perform actual action with on
 * `icon`: button icon (an image or an icon)
 * `iconHover`: button icon on mouse hover (an image or an icon)
 
-[source,xml]
-----
-<button name="customBtn" title="Click Me!" onClick="actions"
-  prompt="This is a confirmation message."
-  icon="fa-check-square-o" />
-----
-
 == Progress
 
 The `Progress` widget is used to show a progress bar.
-
-Progress widget supports following attributes:
-
-* `min`: number value to specify minimum range for progress (default to `0`)
-* `max`: number value to specify maximum range for progress (default to `100`)
-* `x-colors`: color options to configure the bar color (default to `r:24,y:49,b:74,g:100`)
 
 [source,xml]
 ----
 <field name="progress" title="Progress" widget="Progress"
   x-colors="r:24,y:49,b:74,g:100" />
 ----
+
+image::widgets/progress.png[]
+
+Progress widget supports following attributes:
+
+* `min`: number value to specify minimum range for progress (default to `0`)
+* `max`: number value to specify maximum range for progress (default to `100`)
+* `x-colors`: color options to configure the bar color (default to `r:24,y:49,b:74,g:100`)
 
 Using the `x-colors` options, you can configure the bar color. Four colors can be configured. With `r:24,y:49,b:74,g:100`,
 following colors will be used depending on the percentage value :
@@ -640,9 +703,30 @@ following colors will be used depending on the percentage value :
 Similar to the `Progress` widget, the `SelectProgress` widget can be used with a selection field to show selection in
 editable mode and for readonly mode it will display as progress widget.
 
+[source,xml]
+----
+<selection name="select.progress.selection">
+  <option value="0">None</option>
+  <option value="50">Half</option>
+  <option value="100">Full</option>
+</selection>
+
+<field name="selectProgress" widget="SelectProgress" selection="select.progress.selection"/>
+----
+
+image::widgets/select-progress.png[]
+image::widgets/select-progress-2.png[]
+
 == NavSelect
 
 The `NavSelect` widget is a breadcrumb like widget and can be used with selection fields.
+
+[source,xml]
+----
+<field name="status" widget="NavSelect" />
+----
+
+image::widgets/nav-select.png[]
 
 == RadioSelect
 
@@ -651,19 +735,29 @@ as radio selection list.
 
 [source,xml]
 ----
-<field name="language" selection="language-selection" widget="RadioSelect" />
+<field name="status" widget="RadioSelect" />
 ----
 
-The radio list is rendered horizontally but can be changed to vertical with
-`x-direction="vertical"` attribute.
+image::widgets/radio-select.png[]
+
+The following attribute is supported:
+
+* `x-direction`: If value is "vertical", renders the radio list vertically. Default to horizontal.
 
 == CheckboxSelect
 
 The `CheckboxSelect` is same as `RadioSelect` but uses checkbox list.
 
-== InlineCheckbox
+[source,xml]
+----
+<field name="status" widget="CheckboxSelect" />
+----
 
-The `InlineCheckbox` is same as the default boolean widget but with title on right.
+image::widgets/checkbox-select.png[]
+
+The following attribute is supported:
+
+* `x-direction`: If value is "vertical", renders the checkbox list vertically. Default to horizontal.
 
 == ImageSelect
 
@@ -685,23 +779,81 @@ image urls or font icons. If no `icon` is provided, it uses the value as icon.
 </selection>
 ----
 
+image::widgets/image-select.png[]
+
 == MultiSelect
 
 The `MultiSelect` widget can be used with a selection field to select multiple values displayed as tags. Tag colors can be defined in the selection options via the `color` attribute.
 
-It also supports `x-selection-show-checkbox` attribute to show checkbox on options.
+[source,xml]
+----
+<selection name="product.color.selection">
+  <option value="black" color="black ">Black</option>
+  <option value="white" color="white">White</option>
+  <option value="gray" color="grey">Gray</option>
+  <option value="red" color="red">Red</option>
+  <option value="green" color="green">Green</option>
+  <option value="blue" color="blue">Blue</option>
+  <option value="yellow" color="yellow">Yellow</option>
+  <option value="chocolate" color="brown">Brown</option>
+  <option value="orange" color="orange">Orange</option>
+  <option value="purple" color="purple">Purple</option>
+  <option value="pink" color="pink">Pink</option>
+</selection>
+
+<field name="colorVariants" widget="MultiSelect" selection="product.color.selection" />
+----
+
+image::widgets/multi-select.png[]
+
+The following attribute is supported:
+
+* `x-selection-show-checkbox`: Show checkbox. Default to false.
 
 == SingleSelect
 
 The `SingleSelect` widget can be used with a selection field to select a single value displayed as a tag. Tag colors can be defined in the selection options via the `color` attribute.
 
+[source,xml]
+----
+<selection name="order.status.selection">
+  <option value="DRAFT" color="blue">Draft</option>
+  <option value="OPEN" color="yellow">Open</option>
+  <option value="CANCELED" color="red">Canceled</option>
+  <option value="CLOSED" color="green">Closed</option>
+</selection>
+
+<field name="orderStatus" widget="SingleSelect" selection="order.status.selection"/>
+----
+
+image::widgets/single-select.png[]
+
 == SuggestBox
 
-The `SuggestBox` widget can be used with a many-to-one or one-to-one field to show suggestion list of matching records (similar to selection fields).
+The `SuggestBox` widget can be used with a `many-to-one` or `one-to-one` field to show suggestion list of matching records (similar to selection fields).
+
+[source,xml]
+----
+<field name="title" widget="SuggestBox"/>
+----
+
+image::widgets/suggest-box.png[]
 
 == TagSelect
 
-The `TagSelect` widget can be used with a many-to-many field to select multiple values displayed as tags. Use `x-color-field` to specify the tag color field that should use selection `color.name.selection`.
+The `TagSelect` widget can be used with a `many-to-many` field to select multiple values displayed as tags.
+
+[source,xml]
+----
+<field name="circles" widget="TagSelect"/>
+----
+
+image::widgets/tag-select.png[]
+
+The following attributes are supported:
+
+* `x-color-field`: specify the tag color field that should use selection `color.name.selection`.
+* `x-image-field`: specify the image field to use.
 
 Available tag color values for `MultiSelect`, `SingleSelect`, and `TagSelect`:
 
@@ -777,28 +929,50 @@ and we can use the reference widget like this:
 </form>
 ----
 
+image::widgets/ref-select.png[]
+image::widgets/ref-select-2.png[]
+
+The following attribute is supported:
+
+* `x-related`: specify related field. Default to fieldName + "Id" concatenated (reference => referenceId).
+
 NOTE: Use `data-grid` or `data-form` attributes to specify different views
 
 == RefLink
 
 In edit mode, this widget is the same as `<<RefSelect>>`. But in readonly mode, it only displays the link to the record (the type is not displayed).
 
+image::widgets/ref-link.png[]
+
 Example usage from `TeamTask`:
 [source,xml]
 ----
 <field name="relatedModel"
   title="Link"
-  colSpan="12"
-  widget="ref-link"
+  widget="RefLink"
   selection="team.task.links"
   x-related="relatedId" />
 ----
 
+The following attribute is supported:
+
+* `x-related`: specify related field. Default to fieldName + "Id" concatenated (reference => referenceId).
+
 == ImageLink
 
-In edit mode, this widget is used as string field input and we can enter interpolate string value. But in readonly mode, it displayed as Image widget with src link to that input value.
+In edit mode, this widget is used as `string` field input and we can enter interpolate string value. But in readonly mode, it displayed as Image widget with src link to that input value.
+
+[source,xml]
+----
+<field name="imageLink" widget="ImageLink" />
+----
+
+image::widgets/image-link.png[]
+image::widgets/image-link-2.png[]
 
 == EvalRefSelect
+
+image::widgets/eval-ref-select.png[]
 
 This widget can be used to select reference value depending
 on dynamic target model value. The following attributes should be
@@ -821,6 +995,8 @@ Example usage from `MetaJsonField`:
 ----
 
 == RefText
+
+image::widgets/ref-text.png[]
 
 This widget can be used to select string field value of a record.
 
@@ -852,15 +1028,17 @@ Example where we select name of meta view, add module name in selection list, an
 The CodeEditor widget is a special widget for string data fields to use a code
 editor to input the source code text.
 
-CodeEditor widget has two specials attributes:
-
-* `x-code-syntax`: syntax highlighting
-* `x-code-theme`: theme to style the editor. If not defined, use the default theme.
-
 [source,xml]
 ----
 <field name="script" widget="code-editor" x-code-syntax="xml"/>
 ----
+
+image::widgets/code-editor.png[]
+
+The following attributes are supported:
+
+* `x-code-syntax`: syntax highlighting
+* `x-code-theme`: theme to style the editor. If not defined, use the default theme.
 
 WARNING: As part of the new v7 front-end built on top of React, `x-code-theme` is no more supported. It will be
 re-added in a future version.
@@ -876,30 +1054,15 @@ little version of the widget.
 [source,xml]
 ----
 <field name="note" widget="html"/>
-
-<!-- or use compact version of the widget -->
 <field name="note" widget="html" x-lite="true"/>
 ----
 
-== Markdown
+image::widgets/html.png[]
+image::widgets/html-2.png[]
 
-The Markdown widget is implemented with https://github.com/nhn/tui.editor[TOAST UI Editor]
-and supports https://commonmark.org/[CommonMark] and https://github.github.com/gfm/[GFM] specifications.
+The following attribute is supported:
 
-[source,xml]
-----
-<field name="comment" widget="markdown"/>
-----
-
-[cols="2,8"]
-|===
-| Attribute            | Description
-
-|`x-lite`              | Enable lite toolbar (defaults to `false`)
-|`x-preview-style`     | Markdown editor's preview style: `tab` (default), `vertical`
-|`x-initial-edit-type` | Initial editor type: `markdown` (default), `wysiwyg`
-|`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`)
-|===
+* `x-lite`: Show a lighter version of the widget. Default to false.
 
 == InfoButton
 
@@ -914,10 +1077,19 @@ the button attributes without impact on the bound field.
 [source,xml]
 ----
 <panel>
-  <button name="amountBtn" title="Amount" widget="info-button" x-field="amount" onClick="my-action"/>
-  <field name="amount" hidden="true"/>
+  <button
+    name="btnTotalAmount"
+    title="Total amount"
+    icon="fa-bar-chart"
+    onClick="check-order-dates,com.axelor.sale.web.SaleOrderController:calculate,save"
+    widget="info-button"
+    x-field="totalAmount"
+  />
+  <field name="totalAmount" hidden="true"/>
 </panel>
 ----
+
+image::widgets/info-button.png[]
 
 == Extra Attributes
 
@@ -930,11 +1102,9 @@ depending on the widget/type.
 
 | `x-bind` | expression to bind to the field value |
 | `x-dirty` | whether the field contributes to the record dirty check | `true`
-| `x-related` | specify related field for `ref-select` widget |
 | `x-create` | the names of required fields to be used for quick record creation from `select` widget |
 | `x-icon` | specify an icon |
 | `x-icon-hover` | specify an icon for hover state |
-| `x-icon-active` | specify an icon for active state (used with `toggle` widget) |
 | `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive | `false`
 | `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all :
 
@@ -943,9 +1113,6 @@ depending on the widget/type.
 | `x-can-copy` | whether to allow copy of o2m/m2m field items | `false`
 | `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`) | `horizontal`
 | `x-code-syntax` | syntax highlighting for the code editor widget |
-| `x-code-theme` | color scheme for the code editor |
-| `x-lite` | whether to use compact version of the widget (used with `html` widget) | `false`
-| `x-labels` | whether to show label in `image-select` widget | `true`
 | `x-order` | specify the order of suggest box list |
 | `x-limit` | specify the maximum number of items in suggest box list | `10`
 | `x-search-limit` | specify the default page limit of search popup | `40`
@@ -953,12 +1120,7 @@ depending on the widget/type.
 | `x-scale` | scale of the decimal value (total number of digits in decimal part).
 
 It accepts an integer for a fix scale, or a field name for a dynamic evaluation. | `2`
-| `x-true-text` | the display value for "true" state of a boolean widget |
-| `x-false-text` | specify the display value for "false" state of a boolean widget |
-| `x-big` | allow duration of more than 100 hours in a duration widget | `false`
-| `x-seconds` | show seconds in a duration widget | `false`
 | `x-accept` | specify the file types the file input should accept |
-| `x-color-field` | specify the color field to use with `tag-select` widget |
 | `x-image-field` | specify the image field to use with `m2o` and `tag-select` widget |
 | `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized |
 |===

@@ -8,43 +8,21 @@ Views collaboration allows to see users that are seeing/editing/updating the cur
 
 == Overview
 
-When you open a record, you can quickly see users that are on the same record. The number of current users
-is displayed on the right side of the record toolbar : `2 users`. Click on it will show the list of them :
+If you open a record at the same time as another user, their profile picture will appear to the right
+of the record's toolbar.
 
-image::listing-users-collaboration.png[]
+By default, a green border surrounds the profile picture. This means that the user is simply consulting the record.
 
-The details of each user are as :
+image::collaboration-user-idle.png[]
 
-- The first icon is the current state of the user.
-+
---
-It can be one of the 3 states :
+If the user is editing the record, the border turns orange.
 
-** Watching : The user is only watching the record and didn't make any changes.
+image::collaboration-user-edit.png[]
 
-image::collaboration-user-view-state.png[]
+If the user saves their changes, the border turns red: the data on your page is no longer
+up to date with the database and you may need to refresh your page.
 
-** Editing : The user is doing change on the record.
-
-image::collaboration-user-edit-state.png[]
-
-** Saved : The user updated and saved the record.
-
-image::collaboration-user-save-state.png[]
-
---
-+
-- The second is the user profile picture
-- Last one is the username. `Me` is displayed for the current connected user.
-
-Whenever a user is editing or saved the record, it will be displayed on the record toolbar,
-below the number of users :
-
-[frame=none,grid=none,cols="1,1"]
-|===
-a|image::collaboration-user-edit.png[]
-a|image::collaboration-user-save.png[]
-|===
+image::collaboration-user-save.png[]
 
 == Options
 
