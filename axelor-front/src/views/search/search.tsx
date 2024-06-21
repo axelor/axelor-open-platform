@@ -5,6 +5,7 @@ import { atom, useAtom } from "jotai";
 import { useLocation } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
+import clone from "lodash/clone";
 
 import {
   ActionView,
@@ -29,12 +30,18 @@ import { useGridState } from "../grid/builder/utils";
 import { useViewTab } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
-import { isLegacyExpression, parseAngularExp, parseExpression } from "@/hooks/use-parser/utils";
+import {
+  isLegacyExpression,
+  parseAngularExp,
+  parseExpression,
+} from "@/hooks/use-parser/utils";
 import { DEFAULT_SEARCH_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { toKebabCase } from "@/utils/names";
 import { searchData } from "./utils";
-import styles from "./search.module.scss";
 import { getFieldServerType, getWidget } from "@/views/form/builder/utils";
+import { processView } from "@/services/client/meta-utils";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import styles from "./search.module.scss";
 
 function prepareFields(fields: SearchView["searchFields"]) {
   return (fields || []).reduce((fields, _field) => {
@@ -47,7 +54,8 @@ function prepareFields(fields: SearchView["searchFields"]) {
       field.widget = "Selection";
     }
 
-    field.serverType = getFieldServerType({...field, type: "field"}, field) ?? "STRING";
+    field.serverType =
+      getFieldServerType({ ...field, type: "field" }, field) ?? "STRING";
     field.widget = getWidget(field, null);
 
     if (["INTEGER", "LONG", "DECIMAL"].includes(field.serverType)) {
@@ -57,7 +65,7 @@ function prepareFields(fields: SearchView["searchFields"]) {
     return field.name
       ? {
           ...fields,
-          [field.name]: { ...field, type: "field", canDirty: false },
+          [field.name]: { ...field, type: "field" },
         }
       : fields;
   }, {}) as Record<string, Property>;
@@ -96,48 +104,74 @@ export function Search(props: ViewProps<SearchView>) {
     [action],
   );
 
-  const formMeta = useMemo(() => {
-    const { view } = meta;
-    const { title, name, selects, searchFields } = view;
+  const { formMeta, formView } = useMemo(() => {
+    const { view, searchForm } = meta as ViewData<SearchView> & {
+      searchForm: FormView;
+    };
+    const { title, name, searchFields = [], selects } = view;
     const fields = prepareFields(searchFields);
     const model = meta.model || selects?.find((s) => s.model)?.model;
 
-    function process(item: SearchField) {
-      const $item = (fields[item.name] || {}) as Schema;
-      switch (toKebabCase($item.widget ?? $item.serverType ?? "")) {
+    function process(item: Schema) {
+      if ((item as Schema).items) {
+        (item as Schema).items?.forEach(process);
+      } else {
+        (item as Schema).canDirty = false;
+      }
+
+      const type = toKebabCase(item.widget ?? item.serverType ?? item.type);
+
+      switch (type) {
         case "many-to-one":
         case "one-to-one":
         case "suggest-box":
-          $item.canNew = false;
-          $item.canEdit = false;
+          item.canNew = false;
+          item.canEdit = false;
           break;
         case "one-to-many":
         case "many-to-many":
         case "master-detail":
-          $item.hidden = true;
+          item.hidden = true;
           break;
       }
-      return $item;
+    }
+
+    const formView = clone(searchForm);
+
+    if (formView) {
+      const formViewMeta = { fields, view: formView } as ViewData<FormView>;
+      processView(formViewMeta, formView);
+      process(formView as unknown as SearchField);
     }
 
     return {
-      ...meta,
-      model,
-      view: {
-        type: "form",
+      formMeta: {
+        ...meta,
         model,
-        items: [
-          {
-            colSpan: 12,
-            name,
-            type: "panel",
-            title,
-            items: searchFields?.map(process),
-          },
-        ],
-      },
-      fields: fields as Record<string, Property>,
-    } as unknown as ViewData<FormView>;
+        view: {
+          type: "form",
+          model,
+          items: formView?.items ?? [
+            {
+              colSpan: 12,
+              name,
+              type: "panel",
+              title,
+              items: (() => {
+                const items = searchFields.map((field) => ({
+                  ...field,
+                  ...fields[field.name ?? ""],
+                }));
+                items.forEach(process);
+                return items;
+              })(),
+            },
+          ],
+        },
+        fields: fields as Record<string, Property>,
+      } as unknown as ViewData<FormView>,
+      formView,
+    };
   }, [meta]);
 
   const gridView = useMemo(() => {
@@ -177,6 +211,16 @@ export function Search(props: ViewProps<SearchView>) {
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(formMeta, record);
 
+  const handleExecute = useCallback(
+    (actionName: "onLoad" | "onNew") => {
+      if (formView) {
+        const action = formView[actionName];
+        return action && actionExecutor.execute(action);
+      }
+    },
+    [formView, actionExecutor],
+  );
+
   const onEdit = useAtomCallback(
     useCallback(
       (get, set, record: DataRecord, readonly: boolean = false) => {
@@ -191,10 +235,12 @@ export function Search(props: ViewProps<SearchView>) {
 
         const title =
           (viewTitle
-            ? (isLegacyExpression(viewTitle) ? parseAngularExp(viewTitle) : parseExpression(viewTitle))({
-              ...record,
-              id: $$id,
-            })
+            ? (isLegacyExpression(viewTitle)
+                ? parseAngularExp(viewTitle)
+                : parseExpression(viewTitle))({
+                ...record,
+                id: $$id,
+              })
             : "") || _modelTitle;
 
         openTab({
@@ -249,8 +295,9 @@ export function Search(props: ViewProps<SearchView>) {
           limit,
         });
         const records = recordList.map((record: DataRecord, ind: number) => {
-          const selectFields = selects?.find((s) => s.model === record._model)
-            ?.fields;
+          const selectFields = selects?.find(
+            (s) => s.model === record._model,
+          )?.fields;
           selectFields?.forEach((field) => {
             if (field.as && field.selectionList && record[field.as]) {
               record[field.as] = record[field.as]
@@ -280,8 +327,19 @@ export function Search(props: ViewProps<SearchView>) {
         } else if (options?.showSingle && records.length === 1) {
           onEdit(records[0], !options?.forceEdit);
         }
+
+        handleExecute("onLoad");
       },
-      [formAtom, searchObjectsAtom, setRecords, selects, name, limit, onEdit],
+      [
+        formAtom,
+        searchObjectsAtom,
+        setRecords,
+        selects,
+        name,
+        limit,
+        onEdit,
+        handleExecute,
+      ],
     ),
   );
 
@@ -294,8 +352,9 @@ export function Search(props: ViewProps<SearchView>) {
           dirty: false,
         });
         setRecords([]);
+        handleExecute("onNew");
       },
-      [formAtom, setRecords],
+      [formAtom, setRecords, handleExecute],
     ),
   );
 
@@ -386,6 +445,11 @@ export function Search(props: ViewProps<SearchView>) {
 
     setFormValues(values);
   }, [queryString, formMeta, setFormValues]);
+
+  useAsyncEffect(async () => {
+    // initial onNew
+    handleExecute("onNew");
+  }, [handleExecute]);
 
   return (
     <Box
