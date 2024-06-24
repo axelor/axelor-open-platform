@@ -61,8 +61,11 @@
 }
 
 .grid {
-  height: 100%;
   overflow: unset;
+}
+
+.grid:not(.hasDetails) {
+  height: 100%;
 }
 
 .tree:not(.rootTreeGrid) .grid {

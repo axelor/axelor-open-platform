@@ -1315,6 +1315,10 @@ function OneToManyInner({
     });
     return {
       ...meta,
+      view: {
+        ...meta.view,
+        width: "*",
+      },
       widgetSchema: schema,
     };
   }, [model, detailFormName]);
@@ -1665,6 +1669,7 @@ function OneToManyInner({
               name: treeField,
             },
           ],
+          width: "*",
         },
       } as ViewData<FormView>;
     }
@@ -1790,6 +1795,7 @@ function OneToManyInner({
             <GridComponent
               className={clsx(styles["grid"], {
                 [styles.noRecords]: records.length === 0,
+                [styles.hasDetails]: hasMasterDetails,
               })}
               ref={gridRef}
               allowGrouping={allowGrouping}

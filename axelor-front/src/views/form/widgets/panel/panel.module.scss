@@ -11,7 +11,7 @@
   border: 0;
 }
 
-.panel .panel:not(.hasFrame) {
+.panel:not(.hasFrame) {
   border: 0;
   &.hasHeader {
     > div:first-child > div,

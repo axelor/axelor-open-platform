@@ -449,6 +449,9 @@ export function processView(
   })();
 
   _.forEach(view.items, (item, itemIndex) => {
+    if (['panel', 'panel-related'].includes(item.type ?? '') && !parent) {
+      item.showFrame = item.showFrame ?? true;
+    }
     processWidget(item);
     processSelection(item, meta?.view?.editable);
 
