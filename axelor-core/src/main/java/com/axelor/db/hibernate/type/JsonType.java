@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Objects;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
@@ -42,7 +43,7 @@ public class JsonType implements UserType<String> {
 
   @Override
   public boolean equals(String x, String y) {
-    return (x == y) || (x != null && x.equals(y));
+    return Objects.equals(x, y);
   }
 
   @Override
