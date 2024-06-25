@@ -16,6 +16,8 @@ dependencies {
 
   api project(":axelor-common")
 
+  api libs.slf4j_api
+
   api libs.groovy
 
   api libs.guava
