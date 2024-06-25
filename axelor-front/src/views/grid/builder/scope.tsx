@@ -7,11 +7,19 @@ import {
   useMolecule,
 } from "bunshi/react";
 import { atomFamily, useAtomCallback } from "jotai/utils";
-import { createContext, useCallback, useContext, useMemo } from "react";
+import {
+  Dispatch,
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import uniq from "lodash/uniq";
 
 import { JsonField, Property, Schema } from "@/services/client/meta.types";
 import { parseOrderBy } from "./utils";
+import { Attrs } from "@/views/form/builder";
 
 export type GridHandler = {
   readonly?: boolean;
@@ -88,6 +96,8 @@ export interface CollectionState {
   expand: PrimitiveAtom<boolean>;
   items: PrimitiveAtom<ItemState[]>;
   getItem: (id: number, model: string) => ItemAtom;
+  columnAttrs?: Record<string, Partial<Attrs>>;
+  setColumnAttrs?: Dispatch<SetStateAction<Record<string, Partial<Attrs>>>>;
   enabled?: boolean;
   waitForActions?: () => Promise<void>;
 }
@@ -159,6 +169,9 @@ function CollectionRoot({
   enabled?: boolean;
   waitForActions?: () => Promise<void>;
 }) {
+  const [columnAttrs, setColumnAttrs] = useState<
+    Record<string, Partial<Attrs>>
+  >({});
   const commitAtom = useMemo(() => atom<any>(null), []);
   const expandAtom = useMemo(() => atom(false), []);
   const itemsAtom = useMemo(() => {
@@ -233,6 +246,8 @@ function CollectionRoot({
         getItem,
         enabled,
         waitForActions,
+        columnAttrs,
+        setColumnAttrs,
       }}
     >
       <ScopeProvider

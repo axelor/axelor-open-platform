@@ -70,6 +70,7 @@ import {
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 
 import {
+  Attrs,
   FieldError,
   FieldLabel,
   FieldProps,
@@ -78,7 +79,6 @@ import {
 } from "../../builder";
 import {
   useActionExecutor,
-  useAfterActions,
   useFormActiveHandler,
   useFormRefresh,
   useFormScope,
@@ -284,6 +284,8 @@ function OneToManyInner({
     items: itemsAtom,
     expand: expandAtom,
     getItem,
+    columnAttrs: treeColumnAttrs,
+    setColumnAttrs,
     enabled: isCollectionTree,
     waitForActions: waitForCollectionActions,
   } = useCollectionTree();
@@ -1603,6 +1605,23 @@ function OneToManyInner({
   }, [isRootTreeGrid, expandable, records, syncRecordsToTree]);
 
   useEffect(() => {
+    if (isRootTreeGrid) {
+      const _columnAttrs = (state.columns ?? []).reduce(
+        (colsAttrs, col) => {
+          if (col.visible === false) {
+            colsAttrs[col.name] = { hidden: true };
+          }
+          return colsAttrs;
+        },
+        {} as Record<string, Partial<Attrs>>,
+      );
+      setColumnAttrs?.((_attrs) =>
+        isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
+      );
+    }
+  }, [isRootTreeGrid, state.columns, setColumnAttrs]);
+
+  useEffect(() => {
     const fieldsSelect = gridViewData?.items
       ?.filter((item) => item.type === "field" && item.name)
       .reduce((_select: Record<string, any>, item) => {
@@ -1790,7 +1809,7 @@ function OneToManyInner({
               view={gridViewData}
               fields={gridViewFields}
               perms={perms}
-              columnAttrs={columnAttrs}
+              columnAttrs={isRootTreeGrid ? columnAttrs : treeColumnAttrs}
               state={state}
               setState={setState}
               actionExecutor={actionExecutor}
