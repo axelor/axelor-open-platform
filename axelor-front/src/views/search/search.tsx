@@ -75,7 +75,7 @@ export function Search(props: ViewProps<SearchView>) {
   const location = useLocation();
   const recordsAtom = useMemo(() => atom<DataRecord[]>([]), []);
   const [records, setRecords] = useAtom(recordsAtom);
-  const [state, setState] = useGridState();
+  const [state, setState, gridAtom] = useGridState();
   const searchObjectsAtom = useMemo(
     () =>
       atom<SearchObjectsState>({
@@ -359,16 +359,61 @@ export function Search(props: ViewProps<SearchView>) {
     ),
   );
 
-  const { rows, selectedRows } = state;
-  const selected = rows?.[selectedRows?.[0] ?? -1]?.record;
-
   const onGo = useAtomCallback(
     useCallback(
       async (get) => {
         const { action } = get(searchObjectsAtom);
+        const { record: context } = get(formAtom);
         const actionName = action?.action;
+
         if (actionName) {
-          const actionView = await findActionView(actionName);
+          const { rows, selectedRows } = get(gridAtom);
+          const selected = rows?.[selectedRows?.[0] ?? -1]?.record;
+
+          const _searchContext = (() => {
+            const searchFields = Object.keys(context).reduce((obj, key) => {
+              const value = context[key];
+              return value === null ? obj : { ...obj, [key]: value };
+            }, {});
+
+            const modelByIds = (selectedRows ?? [])
+              .map((ind) => rows[ind])
+              .filter((row) => row.type === "row")
+              .map((row) => row.record)
+              .reduce(
+                (modelIds, { _model, id }) => ({
+                  ...modelIds,
+                  [_model]: [...(modelIds[_model] ?? []), id],
+                }),
+                {} as Record<string, number[]>,
+              );
+
+            const _results = Object.keys(modelByIds).map((model) => ({
+              model,
+              ids: modelByIds[model],
+            }));
+
+            const {
+              model: _model,
+              view: { name: _viewName, type: _viewType },
+            } = meta;
+
+            return {
+              ...searchFields,
+              _results,
+              _model,
+              _action: actionName,
+              _source: "go",
+              _viewName,
+              _viewType,
+              _views: [{ name: _viewName, type: _viewType }],
+            };
+          })();
+
+          const actionView = await findActionView(actionName, {
+            _searchContext,
+          });
+
           openTab({
             ...actionView,
             name: uniqueId("$act"),
@@ -378,12 +423,13 @@ export function Search(props: ViewProps<SearchView>) {
             }),
             context: {
               ...actionView.context,
+              _searchContext,
               _ref: { ...(selected ?? {}), _action: actionName },
             },
           });
         }
       },
-      [selected, searchObjectsAtom],
+      [meta, gridAtom, searchObjectsAtom, formAtom],
     ),
   );
 
@@ -466,13 +512,12 @@ export function Search(props: ViewProps<SearchView>) {
       <Box onKeyDown={handleFormKeyDown}>
         <Form
           schema={formMeta.view}
-          fields={formMeta.fields}
+          fields={formMeta.fields!}
           readonly={false}
           formAtom={formAtom}
           actionHandler={actionHandler}
           actionExecutor={actionExecutor}
           recordHandler={recordHandler}
-          {...({} as any)}
         />
       </Box>
       <SearchObjects
@@ -487,10 +532,10 @@ export function Search(props: ViewProps<SearchView>) {
       <Box d="flex" flex={1}>
         <GridComponent
           showEditIcon
-          allowCheckboxSelection={false}
           readonly={false}
           records={records}
           view={gridView}
+          fields={meta.fields}
           state={state}
           setState={setState}
           actionExecutor={gridActionExecutor}

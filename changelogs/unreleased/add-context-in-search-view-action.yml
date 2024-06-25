@@ -1,0 +1,34 @@
+---
+title: Add context in search view action
+type: feature
+description: |
+  Now in search-view, when click on go button to execute the action,
+  _searchContext is passed into action data context.
+
+  Example : 
+  _searchContext: {
+
+    //All not null search fields
+    code: 'A',
+    product: {
+     id: 1,
+     name: 'P1',
+     version: 1
+    },
+
+    //Selected search result ids group by model
+    _results: [
+      {
+        model: 'com.axelor.contact.db.Contact'
+        ids: [1, 2, 3]
+      },
+      {
+       model: 'com.axelor.sale.db.Product'
+       ids: [1, 2, 3]
+      }
+    ],
+
+    //Context params: _view, _source, _action, ...
+  }
+
+
