@@ -1839,6 +1839,9 @@ function OneToManyInner({
                 !detailRecord && {
                   onRowClick,
                 })}
+              {...(isRootTreeGrid && {
+                allowColumnResize: false,
+              })}
               {...(isSubTreeGrid && {
                 headerRowRenderer: HideGridHeaderRow,
                 allowColumnCustomize: false,
