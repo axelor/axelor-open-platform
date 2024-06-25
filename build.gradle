@@ -29,8 +29,24 @@ def gitGitRevision(p) {
 
   if(isCommit) return head[0].trim()
 
-  def refHead = new File(gitFolder + head[1].trim())
-  return refHead.text.trim()
+  def refPath = head[1].trim()
+  def refHead = new File(gitFolder + refPath)
+
+  if (refHead.exists()) {
+    return refHead.text.trim()
+  }
+
+  def packedRefsFile = new File(gitFolder + "packed-refs")
+
+  if (packedRefsFile.exists()) {
+    def packedRefs = packedRefsFile.text
+    def matcher = packedRefs =~ /(?m)^([0-9a-f]+) ${refPath}$/
+    if (matcher.find()) {
+      return matcher.group(1)
+    }
+  }
+
+  return null
 }
 
 configure(subprojects - project(':axelor-front')) {
