@@ -77,9 +77,12 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
     const model = "com.axelor.script.ScriptBindings";
     const fields: Record<string, Property> = (view.search || []).reduce(
       (fields, _item) => {
-        const item = { ..._item, widget: getWidget(_item, null) };
+        const item = { ..._item };
         processSelection(item, true);
         processWidget(item);
+
+        item.widget = getWidget(item, null);
+
         let type = item.type?.toUpperCase() || "STRING";
         if (type?.toLowerCase() === "reference") {
           type = "MANY_TO_ONE";
@@ -139,10 +142,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const getErrors = useGetErrors();
 
   const getRecordContext = useAtomCallback(
-    useCallback(
-      (get) => get(formAtom).record,
-      [formAtom],
-    ),
+    useCallback((get) => get(formAtom).record, [formAtom]),
   );
 
   const actionExecutor = useMemo(() => {
