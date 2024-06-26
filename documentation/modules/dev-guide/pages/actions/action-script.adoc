@@ -51,7 +51,7 @@ Following variables are available in script execution context:
 |===
 | Name | Description
 | `$request` | the `ActionRequest`
-| `$response` | the `ActionReponse`
+| `$response` | the `ActionResponse`
 | `$em` | the `EntityManager` if script is `transactional`
 | `$json` | instance of `MetaJsonRecordRepository` to work with xref:models/custom-models.adoc[custom models]
 |===
@@ -88,3 +88,5 @@ The `action-script` can be used for custom models too. Here is an example:
 <3> find a `world` model record by field `name`
 <4> record(s) intended for relational field values must be saved manually
 <5> set relational value (m2o)
+
+See available helper functions in xref:dev-guide:actions/index.adoc#helper-functions[script helper functions documentation].

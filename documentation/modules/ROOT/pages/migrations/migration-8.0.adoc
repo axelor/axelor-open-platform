@@ -574,6 +574,53 @@ Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] 
 
 i18n exports are now downloaded as zip archive, instead of being created in `data.export.dir` directory.
 
+== Scripting Policy
+
+A scripting policy has been introduced to control which Java classes are accessible from scripts (Groovy, Expression Language, JavaScript). By default, access to most application classes is now restricted.
+
+If your application uses scripts that call custom services or other classes, you will need to explicitly allow them. You can do this in two ways:
+
+*  Add the `@com.axelor.script.ScriptAllowed` annotation to your service interfaces or classes.
+*  Implement the `com.axelor.script.ScriptPolicyConfigurator` interface to programmatically define allowed/denied packages and classes.
+
+Additionally, a script execution timeout has been introduced to prevent infinite loops, which defaults to 5 minutes. This can be configured globally or per script execution.
+
+`doInJpa` helper has been removed, as it allowed unrestricted database access.
+To get a bean instance with policy check, `\\__bean__(Class<T>)` helper has been introduced to replace unrestricted `com.axelor.inject.Beans.get(Class<T>)` usage.
+
+Some migration examples:
+
+[source,groovy]
+----
+// ❌ Old code
+doInJPA({ em -> em.find(Contact, id) }) // unrestricted database access
+com.axelor.inject.Beans.get(SaleOrderService).validate(order) // unrestricted instanciation of all services
+com.axelor.app.AppSettings.get().get('application.mode') != 'prod' // unrestricted access to all app settings
+
+// ✅ New code
+__repo__(Contact).find(id) // repositories are allowed by default
+__bean__(SaleOrderService).validate(order) // checks scripting policy
+__bean__(com.axelor.app.script.ScriptAppSettings).getApplicationMode() != 'prod' // you need to write your own script-allowed app settings helper
+----
+
+Note that the scripting policy is also applied to Groovy template engines by using the same class scanner
+and compiler configuration as for Groovy scripts. A side effect is that Groovy templates now use the same JPA class scanner.
+Unqualified classes are resolved and you can't override them in context:
+
+[source,java]
+----
+// ❌ Old code putting "Invoice" in Groovy template context
+var templates = new GroovyTemplates();
+templates.fromText("${Invoice.printingSettings?.addressPositionSelect}").make(Map.of("Invoice", invoice))).render()
+
+// ✅ New code putting "invoice" (lowercase) in Groovy template context
+// "Invoice" would resolve as the entity class, i.e. `com.axelor.apps.account.db.Invoice`
+var templates = new GroovyTemplates();
+templates.fromText("${invoice.printingSettings?.addressPositionSelect}").make(Map.of("invoice", invoice))).render()
+----
+
+For a detailed explanation of the new policy, default rules, and configuration options, please refer to the xref:dev-guide:application/scripting-policy.adoc[Scripting Policy Documentation].
+
 == BIRT 4.4.2 to BIRT 4.21.0
 
 http://www.eclipse.org/birt[BIRT] reporting engine 4.21.0 includes _numerous_ improvements/changes.

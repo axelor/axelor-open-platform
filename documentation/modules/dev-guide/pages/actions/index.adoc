@@ -85,13 +85,19 @@ The rules in details:
 * `if="select: ..."` - use EL
 * `if="..."` - use groovy
 
-The EL expressions can use following predefined helper functions:
+=== Helper functions
+
+The following helper functions are available in all supported scripting languages:
+
+* `\\__repo__(modelClass)` - Get a repository for a given model class.
+* `\\__bean__(beanClass)` - Get a bean instance of a given type.
+
+Additionally, the following are available in EL:
 
 * `is(Object, Class)` - check whether the given object is instance of the class
 * `as(Object, Class)` - cast the object as the given class (generally, casting is automatic in EL but useful to convert context to a model class)
 * `str(Object)` - convert object to string (if null, returns empty string "")
 * `imp(String)` - import a class by name
-* `\\__repo__(Class)` - get the repository of the given model class
 * `fmt:text(String, Object...)` - string format helper
 
 Some examples:

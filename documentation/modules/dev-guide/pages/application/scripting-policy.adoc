@@ -1,0 +1,211 @@
+= Scripting Security Policy
+:toc:
+:toc-title:
+
+== Overview
+
+The Scripting Security Policy provides control over Java class accessibility
+from scripts.
+This prevents unauthorized access to sensitive operations while allowing
+necessary business logic execution.
+
+The policy is applied to all supported scripting engines: Groovy, JavaScript,
+and Expression Language. It is also applied to Groovy template engines.
+
+== Policy Configuration
+
+You can configure the policy using either annotation-based whitelisting
+and/or via programmatic configuration.
+
+For best practice, you should prefer applying the rules on service
+interfaces, not implementations.
+
+Also note that if you aim for consistency across Groovy, Expression
+Language, and JavaScript, you should apply your rules on top-level classes
+and interfaces only (avoid rules on inner classes).
+Groovy and Expression Language can look up rules directly for the requested
+type, but JavaScript looks up the outer class only.
+
+=== Annotation-based Whitelisting
+
+Use `@com.axelor.script.ScriptAllowed` annotation to allow script access.
+
+[source,java]
+----
+@ScriptAllowed
+public interface SaleOrderService {
+
+  void validate(Order order);
+
+  // Other methods
+}
+----
+
+[source,java]
+----
+public class SaleOrderService implements SaleOrderService {
+
+  @Override
+  public void validate(Order order) {
+    // Business code
+  }
+
+  // Other implemented methods
+}
+----
+
+=== Programmatic Configuration
+
+Create a class that implements `com.axelor.script.ScriptPolicyConfigurator`
+interface.
+The application will scan for all classes implementing this interface and
+will call them in module resolution order to configure the scripting policy.
+
+[source,java]
+----
+public class CustomPolicy implements ScriptPolicyConfigurator {
+
+  @Override
+  public void configure(List<String> allowPackages,
+                        List<Class<?>> allowClasses,
+                        List<String> denyPackages,
+                        List<Class<?>> denyClasses) {
+    allowPackages.add("com.axelor.sale.service.*");
+    allowClasses.add(PaymentService.class);
+    denyClasses.add(PaymentValidationService.class);
+  }
+}
+----
+
+The package name pattern can be like:
+
+- `java.time` - match all classes in this package
+- `java.time.*` - match all classes in this package and its immediate
+  sub-packages
+
+NOTE: Denied classes/packages take precedence over allowed classes/packages.
+
+== Core Security Rules
+
+These rules are added after any custom configuration.
+
+=== Allowed
+
+- Java Core
+  ** `java.lang`
+  ** `java.util`
+  ** `java.time.*`
+  ** `java.text`
+  ** `java.math`
+
+- Java Persistence
+  ** `jakarta.persistence.Query`
+
+- Hibernate
+  ** `org.hibernate.proxy.HibernateProxy`,
+  ** `org.hibernate.collection.spi.PersistentCollection`,
+  ** `org.hibernate.collection.spi.LazyInitializable`,
+
+- Axelor Common
+  ** `com.axelor.common.StringUtils`,
+  ** `com.axelor.common.ObjectUtils`,
+  ** `com.axelor.common.HtmlUtils`,
+  ** `com.axelor.common.Inflections`,
+  ** `com.axelor.common.Inflector`,
+
+- Axelor DB
+  ** `com.axelor.db.Model`,
+  ** `com.axelor.db.Query`,
+  ** `com.axelor.db.Repository`,
+  ** `com.axelor.db.ValueEnum`,
+  ** `com.axelor.db.EntityHelper`,
+
+- Axelor i18n
+  ** `com.axelor.i18n.I18n`,
+  ** `com.axelor.i18n.L10n`,
+
+- Axelor Context
+  ** `com.axelor.rpc.Context`,
+  ** `com.axelor.rpc.JsonContext`
+
+=== Denied (cannot be overridden)
+
+- `java.lang.Class`
+- `java.lang.System`
+- `java.lang.Process`
+- `java.lang.ProcessBuilder`
+- `java.lang.Thread`
+- `java.util.Properties`
+
+== `\\__bean__` Helper
+
+The `\\__bean__(Class<T>)` is a script safe alternative to `com.axelor.inject.Beans.get(Class<T>)`.
+It ensures that the requested bean class complies with the scripting policy.
+If the class is not allowed by the policy, `IllegalArgumentException` is thrown.
+
+Example:
+
+[source,groovy]
+----
+def service = __bean__(com.example.MyService)
+def result = service.myMethod()
+----
+
+== Application Settings
+
+`com.axelor.app.AppSettings` is forbidden to scripts, as it allows unrestricted access to all application settings, which can include sensitive data.
+
+You need to write your own script-allowed helper to selectively allow access to application properties.
+
+.Example Java helper
+[source,java]
+----
+package com.axelor.app.script;
+
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
+import com.axelor.script.ScriptAllowed;
+
+@ScriptAllowed
+public class ScriptAppSettings {
+  private final AppSettings settings = AppSettings.get();
+
+  public String getApplicationMode() {
+    return settings.get(AvailableAppSettings.APPLICATION_MODE, "dev");
+  }
+}
+----
+
+.Example usage in script
+[source,groovy]
+----
+def mode = __bean__(com.axelor.app.script.ScriptAppSettings).getApplicationMode()
+----
+
+== Execution Timeouts
+
+Prevent infinite loops with script execution timeouts.
+
+Application-wide script timeout configuration:
+
+[source,properties]
+----
+# Groovy/JavaScript scripts execution timeout (in milliseconds)
+# Defaults to 300000 ms (5 minutes)
+application.script.timeout = 300000
+----
+
+Programmatic timeout configuration per script:
+
+[source,java]
+----
+// Set 500 ms timeout (locally overrides application-wide script timeout configuration)
+ScriptHelper helper = new GroovyScriptHelper(context).withTimeout(500);
+Object result = helper.eval("while (true) { /* infinite loop */ }");
+----
+
+The way timeout check is performed depends on the script type:
+
+- Groovy: checked in loop statements only.
+- JavaScript: checked before every statement.
+- Expression Language: not checked, as loops are not supported.

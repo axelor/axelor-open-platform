@@ -6,6 +6,8 @@ package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
@@ -96,12 +98,56 @@ public class TestJavaScript extends ScriptTest {
   }
 
   @Test
-  public void doJpaTest() {
-    final ScriptHelper helper = new JavaScriptScriptHelper(context());
-    final Object bean = helper.eval("doInJPA(em => __repo__(Contact).find(id))");
+  public void testSecurity() {
+    ScriptHelper helper = new JavaScriptScriptHelper(context());
+    // classes from java.lang should be allowed
+    assertTrue((Boolean) helper.eval("java.lang.Boolean.TRUE"));
 
-    assertNotNull(bean);
-    assertTrue(bean instanceof Contact);
+    // but java.lang.{System,Process,Thread} are not allowed
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("java.lang.System.currentTimeMillis()"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("java.lang.System.exit(-1)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("java.lang.Thread.sleep(1000)"));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "new java.lang.ProcessBuilder().command('ls', '-l').inheritIO().start().waitFor()"));
+
+    // allow models
+    assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));
+
+    // app settings not allowed
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("com.axelor.app.AppSettings.get().get('db.test.url')"));
+
+    // app settings not allowed through __config__
+    assertNull(helper.eval("__config__.get('db.test.url')"));
+
+    // only custom settings helper allowed
+    assertNull(helper.eval("__config__.get('application.mode')"));
+    assertNotNull(
+        helper.eval("__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()"));
+
+    // trying to access a file
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("new java.io.File('/tmp')"));
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("java.nio.file.Paths.get('/tmp')"));
+
+    // even try with reflection
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "java.lang.Class.forName('java.io.File').getConstructor(java.lang.String).newInstance('/some/file')"));
+  }
+
+  @Test
+  public void testTimeout() {
+    final ScriptHelper helper = new JavaScriptScriptHelper(context()).withTimeout(100);
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("while (true) { ;; }"));
   }
 
   @Test

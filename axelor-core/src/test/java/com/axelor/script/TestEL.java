@@ -5,6 +5,9 @@
 package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
@@ -118,5 +121,40 @@ public class TestEL extends ScriptTest {
     Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
 
     assertTrue((Boolean) result);
+  }
+
+  @Test
+  public void testSecurity() {
+    ScriptHelper helper = new ELScriptHelper(context());
+
+    // classes from java.lang should be allowed
+    assertTrue((Boolean) helper.eval("Boolean.TRUE"));
+
+    // but java.lang.{System,Process,Thread} are not allowed
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+
+    // allow models
+    assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));
+
+    // app settings not allowed
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("imp('com.axelor.app.AppSettings').get().get('db.test.url')"));
+
+    // app settings not allowed through __config__
+    assertNull(helper.eval("__config__.get('db.test.url')"));
+
+    // only custom settings helper allowed
+    assertNull(helper.eval("__config__.get('application.mode')"));
+    assertNotNull(
+        helper.eval(
+            "__bean__(T('com.axelor.script.policy.ScriptAppSettings')).getApplicationMode()"));
+
+    // trying to access a file
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("T('java.nio.file.Paths').get('/tmp')"));
   }
 }

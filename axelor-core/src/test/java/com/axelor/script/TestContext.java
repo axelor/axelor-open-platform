@@ -21,6 +21,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+@ScriptAllowed
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestContext extends ScriptTest {
 

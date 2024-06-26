@@ -18,6 +18,7 @@ import com.axelor.meta.service.ViewProcessor;
 import com.axelor.meta.theme.MetaThemeService;
 import com.axelor.meta.theme.MetaThemeServiceImpl;
 import com.axelor.report.ReportEngineProvider;
+import com.axelor.script.ScriptPolicyConfigurator;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -62,10 +63,6 @@ public class AppModule extends AbstractModule {
     // Hibernate listener configurator binder
     Multibinder.newSetBinder(binder(), HibernateListenerConfigurator.class);
 
-    // View processor binder
-    final Multibinder<ViewProcessor> viewProcessorBinder =
-        Multibinder.newSetBinder(binder(), ViewProcessor.class);
-
     bind(AppSettingsObserver.class);
     bind(ViewWatcherObserver.class);
 
@@ -76,27 +73,36 @@ public class AppModule extends AbstractModule {
             .flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
             .collect(Collectors.toList());
 
-    if (moduleClasses.isEmpty()) {
-      return;
-    }
+    if (!moduleClasses.isEmpty()) {
+      log.info("Configuring app modules...");
 
-    log.info("Configuring app modules...");
-
-    for (Class<? extends AxelorModule> module : moduleClasses) {
-      try {
-        log.debug("Configure module: {}", module.getName());
-        install(module.getDeclaredConstructor().newInstance());
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+      for (Class<? extends AxelorModule> module : moduleClasses) {
+        try {
+          log.debug("Configure module: {}", module.getName());
+          install(module.getDeclaredConstructor().newInstance());
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
       }
     }
 
     // Configure view processors
+    configureViewProcessors();
 
-    final List<Class<? extends ViewProcessor>> viewProcessorClasses =
+    // Configure script policy
+    configureScriptPolicy();
+
+    var cacheProviderInfo = CacheBuilder.getCacheProviderInfo();
+    log.info("Cache provider: {}", cacheProviderInfo.getProvider());
+  }
+
+  private void configureViewProcessors() {
+    Multibinder<ViewProcessor> viewProcessorBinder =
+        Multibinder.newSetBinder(binder(), ViewProcessor.class);
+    List<Class<? extends ViewProcessor>> viewProcessorClasses =
         ModuleManager.getResolution().stream()
             .flatMap(name -> MetaScanner.findSubTypesOf(name, ViewProcessor.class).find().stream())
-            .collect(Collectors.toList());
+            .toList();
 
     if (!viewProcessorClasses.isEmpty()) {
       log.atInfo()
@@ -104,14 +110,40 @@ public class AppModule extends AbstractModule {
           .addArgument(
               () ->
                   viewProcessorClasses.stream()
-                      .map(Class::getSimpleName)
+                      .map(Class::getName)
                       .collect(Collectors.joining(", ")))
           .log();
+
       viewProcessorClasses.forEach(
           viewProcessor -> viewProcessorBinder.addBinding().to(viewProcessor));
     }
+  }
 
-    var cacheProviderInfo = CacheBuilder.getCacheProviderInfo();
-    log.info("Cache provider: {}", cacheProviderInfo.getProvider());
+  private void configureScriptPolicy() {
+    Multibinder<ScriptPolicyConfigurator> scriptPolicyConfiguratorBinder =
+        Multibinder.newSetBinder(binder(), ScriptPolicyConfigurator.class);
+
+    List<Class<? extends ScriptPolicyConfigurator>> configuratorClasses =
+        ModuleManager.getResolution().stream()
+            .flatMap(
+                name ->
+                    MetaScanner.findSubTypesOf(name, ScriptPolicyConfigurator.class)
+                        .find()
+                        .stream())
+            .toList();
+
+    if (!configuratorClasses.isEmpty()) {
+      log.atInfo()
+          .setMessage("Script policy configurators: {}")
+          .addArgument(
+              () ->
+                  configuratorClasses.stream()
+                      .map(Class::getName)
+                      .collect(Collectors.joining(", ")))
+          .log();
+
+      configuratorClasses.forEach(
+          configurator -> scriptPolicyConfiguratorBinder.addBinding().to(configurator));
+    }
   }
 }

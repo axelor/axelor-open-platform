@@ -1,0 +1,18 @@
+---
+title: Implement scripting policy check support
+type: feature
+description: |
+  A scripting policy has been introduced to control which Java classes are accessible from scripts (Groovy, Expression Language, JavaScript). By default, access to most application classes is now restricted.
+
+  If your application uses scripts that call custom services or other classes, you will need to explicitly allow them. You can do this in two ways:
+
+  *  Add the `@com.axelor.script.ScriptAllowed` annotation to your service interfaces or classes.
+  *  Implement the `com.axelor.script.ScriptPolicyConfigurator` interface to programmatically define allowed/denied packages and classes.
+
+  Additionally, a script execution timeout has been introduced to prevent infinite loops, which defaults to 5 minutes. This can be configured globally or per script execution.
+
+  `doInJpa` helper has been removed, as it allowed unrestricted database access.
+  To get a bean instance with policy check, `\\__bean__` helper has been introduced to replace unrestricted `com.axelor.inject.Beans.get` usage.
+
+  Note that the scripting policy is also applied to Groovy template engines by using the same class scanner
+  and compiler configuration as for Groovy scripts. A side effect is that Groovy templates now use the same JPA class scanner.

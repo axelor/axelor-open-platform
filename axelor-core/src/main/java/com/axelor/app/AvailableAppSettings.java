@@ -37,6 +37,7 @@ public interface AvailableAppSettings {
 
   String APPLICATION_SCRIPT_CACHE_SIZE = "application.script.cache.size";
   String APPLICATION_SCRIPT_CACHE_EXPIRE_TIME = "application.script.cache.expire-time";
+  String APPLICATION_SCRIPT_TIMEOUT = "application.script.timeout";
 
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 

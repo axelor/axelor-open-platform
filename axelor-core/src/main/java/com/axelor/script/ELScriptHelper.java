@@ -8,6 +8,7 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
 import com.axelor.db.ValueEnum;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.google.common.primitives.Ints;
@@ -27,6 +28,8 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
   private ELProcessor processor;
 
+  private static final ScriptPolicy SCRIPT_POLICY = ScriptPolicy.getInstance();
+
   class ClassResolver extends MapELResolver {
 
     private static final String FIELD_CLASS = "class";
@@ -39,8 +42,10 @@ public class ELScriptHelper extends AbstractScriptHelper {
     public Object getValue(ELContext context, Object base, Object property) {
 
       if (base instanceof ELClass elClass && FIELD_CLASS.equals(property)) {
+        Class<?> cls = elClass.getKlass();
+        SCRIPT_POLICY.check(cls);
         context.setPropertyResolved(true);
-        return elClass.getKlass();
+        return cls;
       }
 
       if (base != null) {
@@ -59,7 +64,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
         return null;
       }
 
+      SCRIPT_POLICY.check(cls);
       context.setPropertyResolved(true);
+
       return cls;
     }
 
@@ -84,6 +91,8 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
       final ImportHandler handler = context.getImportHandler();
       Object value = handler.resolveClass(name);
+
+      if (value instanceof Class) SCRIPT_POLICY.check((Class<?>) value);
       if (value == null) {
         value = handler.resolveStatic(name);
       }
@@ -103,10 +112,37 @@ public class ELScriptHelper extends AbstractScriptHelper {
         context.setPropertyResolved(true);
         return map.get(property);
       }
-      if (base instanceof Class<?> && ((Class<?>) base).isEnum()) {
-        context.setPropertyResolved(true);
-        return ValueEnum.of((Class) base, property);
+
+      if (base instanceof Class<?> cls) {
+        // is value enum?
+        if (ValueEnum.class.isAssignableFrom(cls)) {
+          context.setPropertyResolved(true);
+          return ValueEnum.of((Class) base, property);
+        }
+
+        // access static member
+        if (property instanceof String propName) {
+          try {
+            Object value = SCRIPT_POLICY.check(cls).getField(propName).get(cls);
+            context.setPropertyResolved(true);
+            return value;
+          } catch (Exception e) {
+            return null;
+          }
+        }
       }
+
+      // access instance member
+      if (base != null && property instanceof String propName) {
+        try {
+          Object value = SCRIPT_POLICY.check(base.getClass()).getField(propName).get(base);
+          context.setPropertyResolved(true);
+          return value;
+        } catch (Exception e) {
+          return null;
+        }
+      }
+
       return null;
     }
 
@@ -117,7 +153,8 @@ public class ELScriptHelper extends AbstractScriptHelper {
         Object method,
         Class<?>[] paramTypes,
         Object[] params) {
-      if (base instanceof Class<?> klass) {
+      if (base instanceof Class<?> clazz) {
+        final Class<?> klass = SCRIPT_POLICY.check(clazz);
         try {
           final Method staticMethod = klass.getMethod(method.toString(), paramTypes);
           context.setPropertyResolved(true);
@@ -136,7 +173,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
   public static final class Helpers {
 
-    private static Class<?> typeClass(Object type) {
+    private static Class<?> typeClass1(Object type) {
       if (type instanceof Class<?> klass) return klass;
       if (type instanceof String)
         try {
@@ -146,6 +183,10 @@ public class ELScriptHelper extends AbstractScriptHelper {
         }
       if (type instanceof ELClass elClass) return elClass.getKlass();
       throw new IllegalArgumentException("Invalid type: " + type);
+    }
+
+    private static Class<?> typeClass(Object type) {
+      return SCRIPT_POLICY.check(typeClass1(type));
     }
 
     public static Object as(Object base, Object type) {
@@ -166,14 +207,18 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
     public static Class<?> importClass(String name) {
       try {
-        return Class.forName(name);
+        return SCRIPT_POLICY.check(Class.forName(name));
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException(e);
       }
     }
 
     public static <T extends Model> JpaRepository<T> repo(Class<T> model) {
-      return JpaRepository.of(model);
+      return JpaRepository.of(SCRIPT_POLICY.check(model));
+    }
+
+    public static <T> T bean(Class<T> type) {
+      return Beans.get(SCRIPT_POLICY.check(type));
     }
 
     public static Integer toInt(Object value) {
@@ -219,16 +264,13 @@ public class ELScriptHelper extends AbstractScriptHelper {
       this.processor.defineFunction("", "imp", className, "importClass");
       this.processor.defineFunction("", "T", className, "importClass");
       this.processor.defineFunction("", "__repo__", className, "repo");
+      this.processor.defineFunction("", "__bean__", className, "bean");
       this.processor.defineFunction("fmt", "text", className, "formatText");
     } catch (Exception e) {
     }
 
     final String[] packages = {
-      "java.util",
-      "java.time",
-      "com.axelor.common",
-      "com.axelor.script.util",
-      "com.axelor.apps.tool"
+      "java.util", "java.time",
     };
 
     for (String pkg : packages) {

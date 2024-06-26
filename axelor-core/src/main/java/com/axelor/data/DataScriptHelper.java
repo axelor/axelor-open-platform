@@ -5,7 +5,7 @@
 package com.axelor.data;
 
 import com.axelor.db.JpaScanner;
-import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.GroovyScriptSupport;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import groovy.lang.Binding;
@@ -43,7 +43,7 @@ public final class DataScriptHelper {
     final ImportCustomizer importCustomizer = new ImportCustomizer();
 
     importCustomizer.addStaticImport(
-        "__repo__", GroovyScriptHelper.Helpers.class.getName(), "repoOf");
+        "__repo__", GroovyScriptSupport.Helpers.class.getName(), "getRepo");
 
     configIndy.getOptimizationOptions().put("indy", true);
     configIndy.getOptimizationOptions().put("int", false);

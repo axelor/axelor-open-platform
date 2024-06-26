@@ -5,11 +5,11 @@
 package com.axelor.script;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.db.EntityHelper;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
@@ -37,16 +37,6 @@ public class TestGroovy extends ScriptTest {
   // false all, to evaluate all conditions
   private static final String EXPR_CONDITION =
       "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
-
-  @Test
-  public void doJpaTest() {
-    final ScriptHelper helper = new GroovyScriptHelper(context());
-    final Object bean = helper.eval("doInJPA({ em -> em.find(Contact, id) })");
-    assertNotNull(bean);
-    assertTrue(bean instanceof Contact);
-    assertEquals(contact.getId(), ((Contact) bean).getId());
-    assertFalse(EntityHelper.isUninitialized((Contact) bean));
-  }
 
   @Test
   public void testImport() {
@@ -162,5 +152,92 @@ public class TestGroovy extends ScriptTest {
 
     // Fixed in Groovy 4.0.0, 3.0.21: https://issues.apache.org/jira/browse/GROOVY-6837
     assertTrue((Boolean) result);
+  }
+
+  @Test
+  public void testSecurity() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+
+    // classes from java.lang should be allowed
+    assertTrue((Boolean) helper.eval("Boolean.TRUE"));
+
+    // but java.lang.{System,Process,Thread} are not allowed
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.currentTimeMillis()"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("System.exit(-1)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("Thread.sleep(1000)"));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval("new ProcessBuilder().command('ls', '-l').inheritIO().start().waitFor()"));
+
+    // allow models
+    assertNotNull(helper.eval("__repo__(Title).all().fetchOne().name"));
+
+    // app settings not allowed
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("com.axelor.app.AppSettings.get().get('db.test.url')"));
+
+    // app settings not allowed through __config__
+    assertNull(helper.eval("__config__.get('db.test.url')"));
+
+    // only custom settings helper allowed
+    assertNull(helper.eval("__config__.get('application.mode')"));
+    assertNotNull(
+        helper.eval("__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()"));
+
+    // also keys prefixed with `context.*` (without `context.`)
+    assertNotNull(helper.eval("__config__.get('string')"));
+    assertNotNull(helper.eval("__config__.string"));
+
+    // should work with safe navigation operator
+    assertNotNull(
+        helper.eval(
+            "__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()?.length()"));
+
+    // trying to access a file
+    assertThrows(IllegalArgumentException.class, () -> helper.eval("new java.io.File('/tmp')"));
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("java.nio.file.Paths.get('/tmp')"));
+
+    // even try with reflection
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            helper.eval(
+                "String.class.forName('java.io.File').getConstructor(String.class).newInstance('/some/file')"));
+
+    // GString template
+    assertEquals(
+        "dev",
+        String.valueOf(
+            helper.eval(
+                "\"${__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()}\"")),
+        "Should allow custom helper in GString");
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("\"${com.axelor.app.AppSettings.get().get('db.test.url')}\""),
+        "Should not allow unrestricted AppSettings in GString");
+
+    // Closure
+    assertEquals(
+        "dev",
+        String.valueOf(
+            helper.eval(
+                "{\"${__bean__(com.axelor.script.policy.ScriptAppSettings).getApplicationMode()}\"}()")),
+        "Should allow custom helper in Closure");
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> helper.eval("{\"${com.axelor.app.AppSettings.get().get('db.test.url')}\"}()"),
+        "Should not allow unrestricted AppSettings in Closure");
+  }
+
+  @Test
+  public void testTimeout() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context()).withTimeout(100);
+    assertThrows(
+        IllegalArgumentException.class, () -> helper.eval("while (true) { println('hello!') }"));
   }
 }

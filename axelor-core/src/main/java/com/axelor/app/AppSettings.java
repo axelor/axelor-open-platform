@@ -64,6 +64,15 @@ public final class AppSettings {
     return defaultValue;
   }
 
+  public long getLong(String key, long defaultValue) {
+    try {
+      return Long.parseLong(get(key));
+    } catch (Exception e) {
+      // ignore
+    }
+    return defaultValue;
+  }
+
   public boolean getBoolean(String key, boolean defaultValue) {
     final String value = get(key);
     return StringUtils.notBlank(value) ? Boolean.parseBoolean(value) : defaultValue;

@@ -10,10 +10,15 @@ import java.util.Map;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.management.ExecutionListener;
 
 public class JavaScriptScriptHelper extends AbstractScriptHelper {
 
   private org.graalvm.polyglot.Context context;
+
+  private long timeout;
+
+  private static final ScriptPolicy SCRIPT_POLICY = ScriptPolicy.getInstance();
 
   public JavaScriptScriptHelper(Bindings bindings) {
     this.setBindings(bindings);
@@ -24,17 +29,27 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
     this(new ScriptBindings(context));
   }
 
+  private boolean lookup(String className) {
+    try {
+      Class<?> klass = Class.forName(className);
+      return SCRIPT_POLICY.allowed(klass);
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   private org.graalvm.polyglot.Context createContext(Bindings bindings) {
     org.graalvm.polyglot.Context ctx =
         org.graalvm.polyglot.Context.newBuilder()
             .allowExperimentalOptions(true)
             .allowAllAccess(true)
+            .allowHostClassLookup(this::lookup)
             .option("engine.WarnInterpreterOnly", "false")
             .option("js.nashorn-compat", "true")
             .option("js.ecmascript-version", "latest")
             .build();
 
-    ctx.getBindings("js").putMember("__scope", new JavaScriptScope(bindings));
+    ctx.getBindings("js").putMember("__scope", new JavaScriptScope(bindings, SCRIPT_POLICY));
     ctx.eval(
         "js",
         """
@@ -50,8 +65,35 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
     return ctx;
   }
 
+  public JavaScriptScriptHelper withTimeout(long timeout) {
+    this.timeout = timeout;
+    return this;
+  }
+
   @Override
   public Object eval(String expr, Bindings bindings) throws ScriptException {
+    long start = System.currentTimeMillis();
+    long timeout = this.timeout > 0 ? this.timeout : SCRIPT_POLICY.getTimeout();
+
+    ExecutionListener listener =
+        ExecutionListener.newBuilder()
+            .onEnter(
+                e -> {
+                  long time = System.currentTimeMillis();
+                  if (time - start > timeout) {
+                    throw new ScriptTimeoutException();
+                  }
+                })
+            .statements(true)
+            .attach(context.getEngine());
+    try {
+      return doEval(expr, bindings);
+    } finally {
+      listener.close();
+    }
+  }
+
+  public Object doEval(String expr, Bindings bindings) throws ScriptException {
     if (getBindings() != bindings) {
       throw new IllegalArgumentException(
           "Evaluating JavaScript with different bindings is not supported.");

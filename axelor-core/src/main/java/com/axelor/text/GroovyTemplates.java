@@ -12,16 +12,11 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
-import com.axelor.meta.MetaStore;
+import com.axelor.script.GroovyScriptSupport;
+import com.axelor.script.GroovyScriptSupport.PolicyChecker;
 import com.axelor.script.ScriptBindings;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
-import groovy.text.GStringTemplateEngine;
-import groovy.text.StreamingTemplateEngine;
 import groovy.text.TemplateEngine;
-import groovy.xml.XmlUtil;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -30,18 +25,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** The implementation of {@link Templates} for groovy string template support. */
 public class GroovyTemplates implements Templates {
 
-  private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
-  private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
+  private static final TemplateEngine GSTRING_ENGINE =
+      GroovyScriptSupport.createStringTemplateEngine();
+
+  private static final TemplateEngine STREAMING_ENGINE =
+      GroovyScriptSupport.createStreamingTemplateEngine();
 
   private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
   private static final String TEMPLATE_DIR =
@@ -124,6 +119,7 @@ public class GroovyTemplates implements Templates {
       final TemplateEngine engine = isWordTemplate(text) ? STREAMING_ENGINE : GSTRING_ENGINE;
 
       bindings.put("__fmt__", new FormatHelper());
+      bindings.put(PolicyChecker.NAME, new PolicyChecker());
 
       try {
         final groovy.text.Template template = engine.createTemplate(text);
@@ -158,80 +154,6 @@ public class GroovyTemplates implements Templates {
             }
           };
       return make(ctx);
-    }
-  }
-
-  class FormatHelper {
-
-    private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
-
-    public Object escape(Object value) {
-      if (value == null) {
-        return "";
-      }
-      return XmlUtil.escapeXml(value.toString());
-    }
-
-    public String text(Object bean, String expr) {
-      if (bean == null) {
-        return "";
-      }
-      expr = expr.replaceAll("\\?", "");
-      return getTitle(EntityHelper.getEntityClass(bean), expr, getValue(bean, expr));
-    }
-
-    private String getTitle(Class<?> klass, String expr, Object value) {
-      if (value == null) {
-        return "";
-      }
-      final Property property = this.getProperty(klass, expr);
-      final String val = value == null ? "" : value.toString();
-      try {
-        return MetaStore.getSelectionItem(property.getSelection(), val).getLocalizedTitle();
-      } catch (Exception e) {
-      }
-      return val;
-    }
-
-    private Property getProperty(Class<?> beanClass, String name) {
-      Iterator<String> iter = Splitter.on(".").split(name).iterator();
-      Property p = Mapper.of(beanClass).getProperty(iter.next());
-      while (iter.hasNext() && p != null) {
-        p = Mapper.of(p.getTarget()).getProperty(iter.next());
-      }
-      return p;
-    }
-
-    @SuppressWarnings("all")
-    private Object getValue(Object bean, String expr) {
-      if (bean == null) return null;
-      Iterator<String> iter = Splitter.on(".").split(expr).iterator();
-      Object obj = null;
-      if (bean instanceof Map map) {
-        obj = map.get(iter.next());
-      } else {
-        obj = Mapper.of(EntityHelper.getEntityClass(bean)).get(bean, iter.next());
-      }
-      if (iter.hasNext() && obj != null) {
-        return getValue(obj, Joiner.on(".").join(iter));
-      }
-      return obj;
-    }
-
-    public void info(String text, Object... params) {
-      log.info(text, params);
-    }
-
-    public void debug(String text, Object... params) {
-      log.debug(text, params);
-    }
-
-    public void error(String text, Object... params) {
-      log.error(text, params);
-    }
-
-    public void trace(String text, Object... params) {
-      log.trace(text, params);
     }
   }
 

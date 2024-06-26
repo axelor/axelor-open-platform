@@ -4,104 +4,16 @@
  */
 package com.axelor.script;
 
-import com.axelor.app.AvailableAppSettings;
-import com.axelor.db.JPA;
-import com.axelor.db.JpaRepository;
-import com.axelor.db.JpaScanner;
-import com.axelor.db.Model;
 import com.axelor.rpc.Context;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.axelor.script.GroovyScriptSupport.PolicyChecker;
 import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
-import jakarta.persistence.EntityManager;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import javax.script.Bindings;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.customizers.ImportCustomizer;
 
 public class GroovyScriptHelper extends AbstractScriptHelper {
 
-  private static final CompilerConfiguration config = new CompilerConfiguration();
-
-  private static final int DEFAULT_CACHE_SIZE = 500;
-  private static final int DEFAULT_CACHE_EXPIRE_TIME = 60;
-
-  private static int cacheSize;
-  private static int cacheExpireTime;
-
-  private static final GroovyClassLoader GCL;
-  private static final LoadingCache<String, Class<?>> SCRIPT_CACHE;
-
-  public static class Helpers {
-
-    @SuppressWarnings("unchecked")
-    public static <T> T doInJPA(Function<EntityManager, T> task) {
-      final Object[] result = {null};
-      JPA.runInTransaction(() -> result[0] = task.apply(JPA.em()));
-      return (T) result[0];
-    }
-
-    public static JpaRepository<? extends Model> repoOf(Class<?> klass) {
-      Class<?> k =
-          Model.class.isAssignableFrom(klass) ? klass : JpaScanner.findModel(klass.getSimpleName());
-      return JpaRepository.of(k.asSubclass(Model.class));
-    }
-  }
-
-  static {
-    config.getOptimizationOptions().put("indy", Boolean.TRUE);
-    config.getOptimizationOptions().put("int", Boolean.FALSE);
-
-    final ImportCustomizer importCustomizer = new ImportCustomizer();
-
-    importCustomizer.addStaticImport("__repo__", Helpers.class.getName(), "repoOf");
-    importCustomizer.addStaticImport(Helpers.class.getName(), "doInJPA");
-
-    importCustomizer.addImports("java.time.ZonedDateTime");
-    importCustomizer.addImports("java.time.LocalDateTime");
-    importCustomizer.addImports("java.time.LocalDate");
-    importCustomizer.addImports("java.time.LocalTime");
-
-    config.addCompilationCustomizers(importCustomizer);
-
-    try {
-      cacheSize =
-          Integer.parseInt(System.getProperty(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_SIZE));
-    } catch (Exception e) {
-    }
-    try {
-      cacheExpireTime =
-          Integer.parseInt(
-              System.getProperty(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_EXPIRE_TIME));
-    } catch (Exception e) {
-    }
-
-    if (cacheSize <= 0) {
-      cacheSize = DEFAULT_CACHE_SIZE;
-    }
-    if (cacheExpireTime <= 0) {
-      cacheExpireTime = DEFAULT_CACHE_EXPIRE_TIME;
-    }
-
-    GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
-
-    SCRIPT_CACHE =
-        Caffeine.newBuilder()
-            .maximumSize(cacheSize)
-            .expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
-            .build(
-                code -> {
-                  try {
-                    return GCL.parseClass(code);
-                  } finally {
-                    GCL.clearCache();
-                  }
-                });
-  }
+  private long timeout;
 
   public GroovyScriptHelper(Bindings bindings) {
     this.setBindings(bindings);
@@ -111,22 +23,31 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
     this(new ScriptBindings(context));
   }
 
+  public GroovyScriptHelper withTimeout(long timeout) {
+    this.timeout = timeout;
+    return this;
+  }
+
   @Override
   public Object eval(String expr, Bindings bindings) throws Exception {
-    Class<?> klass = SCRIPT_CACHE.get(expr);
-    Script script = (Script) klass.getDeclaredConstructor().newInstance();
+    Script script = GroovyScriptSupport.createScript(expr);
+    PolicyChecker checker = timeout > 0 ? new PolicyChecker(timeout) : new PolicyChecker();
+
     script.setBinding(
         new Binding(bindings) {
 
           @Override
           public Object getVariable(String name) {
+            if (PolicyChecker.NAME.equals(name)) return checker;
             try {
               return super.getVariable(name);
             } catch (MissingPropertyException e) {
               if (name.startsWith("_") || name.startsWith("$")) {
                 return null;
               }
-              log.warn("No such field in: {} -- ({})", expr, name);
+              if (!"out".equals(name)) {
+                log.warn("No such field in: {} -- ({})", expr, name);
+              }
               return null;
             }
           }
