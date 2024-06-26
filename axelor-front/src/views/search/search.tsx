@@ -288,7 +288,7 @@ export function Search(props: ViewProps<SearchView>) {
           data: {
             ...record,
             __name: name,
-            __selected: selectValue.length
+            __selected: selectValue?.length
               ? selectValue.map((x) => x.model)
               : null,
           },
