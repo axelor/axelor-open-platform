@@ -27,7 +27,7 @@ import { Grid as GridComponent } from "@/views/grid/builder";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { useGridState } from "../grid/builder/utils";
-import { useViewTab } from "@/view-containers/views/scope";
+import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 import { findActionView } from "@/services/client/meta-cache";
 import { i18n } from "@/services/client/i18n";
 import {
@@ -450,6 +450,9 @@ export function Search(props: ViewProps<SearchView>) {
     // initial onNew
     handleExecute("onNew");
   }, [handleExecute]);
+
+  // register tab:refresh
+  useViewTabRefresh("search", onSearch);
 
   return (
     <Box
