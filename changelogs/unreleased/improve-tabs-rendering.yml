@@ -1,8 +1,0 @@
----
-title: Improve tabs rendering
-type: fix
-description: |
-  Instead of hiding tab on unselect or deactivate by seleting different tab,
-  Then it will use visibility:hidden style instead of display: none.
-  Visibility will keep container height/width, so no re-calculation of style
-  on select or activate.

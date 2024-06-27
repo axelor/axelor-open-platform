@@ -1,6 +1,0 @@
----
-title: Fix restore filter on search in calendar view
-type: fix
-description: |
-  In calendar view, when we select some user filters, then
-  on change of month/week/day, it should be restored.

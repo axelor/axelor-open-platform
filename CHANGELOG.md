@@ -1,3 +1,55 @@
+## 7.1.2 (2024-07-01)
+
+#### Change
+
+* Add application.home link in user dropdown
+
+  <details>
+  
+  Starting from v7, the header logo doesn't rely on the `application.home` link anymore but on the user home 
+  action if configured. `application.home` link is now added in the user dropdown menu as `Home page` item.
+  
+  </details>
+
+#### Fix
+
+* Fix reset some user dummy fields on save
+* Fix zoom(scale) issue on mobile device
+* Fix null operator on collection field in advance search
+* Fix call search in search-view on tab refresh
+* Fix disable dashboard customize for mobile
+* Fix help widget display
+* Fix selection search field in chart view
+* Skip writing websocket IOException to log
+* Fix collection master-details widget styles
+* Add search-form support in search-view
+* Fix remove on form image widget
+* Fix dotted field lost on move in kanban view
+* Fix restore filter on search in calendar view
+
+  <details>
+  
+  In calendar view, when we select some user filters, then
+  on change of month/week/day, it should be restored.
+  
+  </details>
+
+* Improve tabs rendering
+
+  <details>
+  
+  Instead of hiding tab on unselect or deactivate by seleting different tab,
+  Then it will use visibility:hidden style instead of display: none.
+  Visibility will keep container height/width, so no re-calculation of style
+  on select or activate.
+  
+  </details>
+
+* Fix handle error in action response
+* Fix show/hide columns in tree grid
+* Fix search view rendering performance issue
+* Fix advance search bar position in toolbar
+
 ## 7.1.1 (2024-06-07)
 
 #### Fix
