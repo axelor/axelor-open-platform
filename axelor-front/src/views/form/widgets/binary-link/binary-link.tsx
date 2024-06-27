@@ -1,4 +1,4 @@
-import { clsx } from "@axelor/ui";
+import { ButtonGroup, clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { ChangeEvent, useMemo, useRef } from "react";
@@ -63,7 +63,7 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
 
   function handleDownload() {
     const { target, name } = schema;
-    const fileURL = makeImageURL(value, target, name, parent);
+    const fileURL = makeImageURL(value, target, name, parent, true);
     download(fileURL, value?.fileName || name);
   }
 
@@ -102,11 +102,7 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
     <FieldControl {...props}>
       <Box d="flex">
         {!readonly && (
-          <Box
-            d="flex"
-            justifyContent="center"
-            className={clsx(styles.container, { [styles.invalid]: invalid })}
-          >
+          <>
             <form ref={formRef}>
               <Box
                 as={"input"}
@@ -117,37 +113,44 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
                 accept={accept}
               />
             </form>
-            <Button
-              variant="light"
-              size="sm"
+            <Box
               d="flex"
               alignItems="center"
-              title={i18n.get("Upload")}
+              className={clsx(styles.container, { [styles.invalid]: invalid })}
             >
-              <MaterialIcon icon="upload" onClick={handleUpload} />
-            </Button>
-            <Button
-              variant="light"
-              size="sm"
-              d="flex"
-              alignItems="center"
-              title={i18n.get("Remove")}
-            >
-              <MaterialIcon icon="close" onClick={handleRemove} />
-            </Button>
-          </Box>
+              <ButtonGroup border className={styles.btns}>
+                <Button
+                  variant="light"
+                  d="flex"
+                  alignItems="center"
+                  title={i18n.get("Upload")}
+                  onClick={handleUpload}
+                >
+                  <MaterialIcon icon="upload" />
+                </Button>
+                <Button
+                  variant="light"
+                  d="flex"
+                  alignItems="center"
+                  title={i18n.get("Remove")}
+                  onClick={handleRemove}
+                >
+                  <MaterialIcon icon="close" />
+                </Button>
+              </ButtonGroup>
+            </Box>
+          </>
         )}
-        <Box>
-          {text && (
-            <Button
-              variant="link"
-              title={name}
-              onClick={() => handleDownload()}
-            >
-              {text}
-            </Button>
-          )}
-        </Box>
+        {text && (
+          <Button
+            textAlign="start"
+            variant="link"
+            title={name}
+            onClick={() => handleDownload()}
+          >
+            {text}
+          </Button>
+        )}
       </Box>
     </FieldControl>
   );

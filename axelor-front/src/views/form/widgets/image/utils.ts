@@ -24,6 +24,7 @@ export function makeImageURL(
   model?: string,
   field?: string,
   parent?: DataRecord | null,
+  binary?: boolean,
 ): string {
   if (!value) return BLANK;
 
@@ -35,7 +36,7 @@ export function makeImageURL(
 
   const url = `ws/rest/${model || parent?._model || META_FILE_MODEL}/${id}/${
     image ? field : "content"
-  }/download?${image ? "image=true&" : ""}v=${ver}`;
+  }/download?${image && !binary ? "image=true&" : ""}v=${ver}`;
 
   if (parent) {
     const { id: parentId, _model: parentModel } = parent;

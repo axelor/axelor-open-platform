@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { selectAtom } from "jotai/utils";
-import { ChangeEvent, useMemo, useRef } from "react";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { ChangeEvent, useCallback, useMemo, useRef } from "react";
 
 import { Box, Button, ButtonGroup } from "@axelor/ui";
 
@@ -8,12 +8,15 @@ import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { i18n } from "@/services/client/i18n";
 import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import {
   META_FILE_MODEL,
   makeImageURL,
   validateFileSize,
 } from "../image/utils";
+import { useViewDirtyAtom } from "@/view-containers/views/scope";
+import { formDirtyUpdater } from "../../builder/atoms";
 
 function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
   return useSetAtom(
@@ -33,11 +36,13 @@ function useFormFieldSetter(formAtom: FormAtom, fieldName: string) {
 export function Binary(
   props: FieldProps<string | DataRecord | undefined | null>,
 ) {
-  const { schema, readonly, formAtom } = props;
+  const { schema, readonly, valueAtom, formAtom } = props;
   const { name, accept } = schema;
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
+  const setValue = useSetAtom(valueAtom);
+  const dirtyAtom = useViewDirtyAtom();
   const parentId = useAtomValue(
     useMemo(() => selectAtom(formAtom, (o) => o.record.id), [formAtom]),
   );
@@ -76,18 +81,29 @@ export function Binary(
 
   function handleDownload() {
     const { target, name } = schema;
-    const imageURL = makeImageURL(record, target, name, record);
+    const imageURL = makeImageURL(record, target, name, record, true);
     download(imageURL, record?.fileName || name);
   }
 
   function handleRemove() {
     const input = inputRef.current;
     input && (input.value = "");
-    setUpload(null);
-    setFileSize(null);
-    setFileType(null);
-    isMetaModel && setFileName(null);
+    setUpload(undefined);
+    setFileSize(undefined);
+    setFileType(undefined);
+    isMetaModel && setFileName(undefined);
+    setValue(null);
   }
+
+  const setDirty = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        set(formAtom, formDirtyUpdater);
+        set(dirtyAtom, true);
+      },
+      [formAtom, dirtyAtom],
+    ),
+  );
 
   async function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e?.target?.files?.[0];
@@ -102,6 +118,7 @@ export function Binary(
       setFileSize(file.size);
       setFileType(file.type);
       isMetaModel && setFileName(file.name);
+      setDirty();
     }
   }
 
@@ -118,20 +135,38 @@ export function Binary(
             accept={accept}
           />
         </form>
-        <ButtonGroup>
+        <ButtonGroup border>
           {!readonly && (
-            <Button variant="secondary" outline d="flex" alignItems="center">
-              <MaterialIcon icon="upload" onClick={handleUpload} />
+            <Button
+              title={i18n.get("Upload")}
+              variant="light"
+              d="flex"
+              alignItems="center"
+              onClick={handleUpload}
+            >
+              <MaterialIcon icon="upload" />
             </Button>
           )}
           {canDownload() && (
-            <Button variant="secondary" outline d="flex" alignItems="center">
-              <MaterialIcon icon="download" onClick={handleDownload} />
+            <Button
+              title={i18n.get("Download")}
+              variant="light"
+              d="flex"
+              alignItems="center"
+              onClick={handleDownload}
+            >
+              <MaterialIcon icon="download" />
             </Button>
           )}
           {!readonly && (
-            <Button variant="secondary" outline d="flex" alignItems="center">
-              <MaterialIcon icon="close" onClick={handleRemove} />
+            <Button
+              title={i18n.get("Remove")}
+              variant="light"
+              d="flex"
+              alignItems="center"
+              onClick={handleRemove}
+            >
+              <MaterialIcon icon="close" />
             </Button>
           )}
         </ButtonGroup>

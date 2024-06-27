@@ -27,11 +27,11 @@ export async function download(url: string, fileName?: string) {
     method: "HEAD",
   });
 
-  if (res.status === 404) {
+  if (res.status !== 200) {
     const message = fileName
       ? i18n.get("File {0} does not exist.", fileName)
       : i18n.get("File does not exist.");
-    alerts.error({ message });
+    return alerts.error({ message });
   }
 
   if (res.ok) {
