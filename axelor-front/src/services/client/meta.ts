@@ -374,17 +374,26 @@ export type ActionResult = {
   };
 };
 
-function prepareActionResult(data: any): ActionResult[] {
+function prepareActionResult(
+  data: any,
+  errors?: ActionResult["errors"],
+): ActionResult[] {
+  const res = errors ? [{ errors }] : ([] as ActionResult[]);
+
   if (Array.isArray(data)) {
-    return data.map((item) => {
-      const { "signal-data": signalData, ...rest } = item;
-      return {
-        ...rest,
-        ...(signalData && { signalData }),
-      };
-    });
+    return [
+      ...res,
+      ...data.map((item) => {
+        const { "signal-data": signalData, ...rest } = item;
+        return {
+          ...rest,
+          ...(signalData && { signalData }),
+        };
+      }),
+    ];
   }
-  return [];
+
+  return res;
 }
 
 export async function action(options: ActionOptions): Promise<ActionResult[]> {
@@ -396,8 +405,8 @@ export async function action(options: ActionOptions): Promise<ActionResult[]> {
   });
 
   if (resp.ok) {
-    const { status, data } = await resp.json();
-    return status === 0 ? prepareActionResult(data) : reject(data);
+    const { status, data, errors } = await resp.json();
+    return status === 0 ? prepareActionResult(data, errors) : reject(data);
   }
 
   return Promise.reject(resp.status);
