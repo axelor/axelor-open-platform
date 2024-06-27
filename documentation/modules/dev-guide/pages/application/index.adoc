@@ -166,7 +166,7 @@ In order to avoid using an AOP version coming from transitive dependencies (sele
 and thus using the AOP version defined in the project itself, apply the `DependenciesSupport`
 plugin on the root project:
 
-.settings.gradle
+.build.gradle
 [source,gradle]
 ----
 apply plugin: com.axelor.gradle.support.DependenciesSupport
