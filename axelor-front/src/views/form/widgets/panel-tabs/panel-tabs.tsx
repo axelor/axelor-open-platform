@@ -82,7 +82,11 @@ export function PanelTabs(props: WidgetProps) {
         .map((item) => {
           // remove showIf/hideIf to avoid double evaluation
           const { showIf, hideIf, title, ...rest } = item;
-          return { ...rest, title: tabTitles[item.id] || title } as Schema;
+          return {
+            ...rest,
+            title: tabTitles[item.id] || title,
+            panelTabSchema: item,
+          } as Schema;
         }),
     [hiddenTabs, tabs, tabTitles],
   );

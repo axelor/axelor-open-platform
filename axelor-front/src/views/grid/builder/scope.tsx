@@ -19,7 +19,9 @@ import uniq from "lodash/uniq";
 
 import { JsonField, Property, Schema } from "@/services/client/meta.types";
 import { parseOrderBy } from "./utils";
-import { Attrs } from "@/views/form/builder";
+import { Attrs, FormAtom } from "@/views/form/builder";
+import { useFormScope } from "@/views/form/builder/scope";
+import { fallbackFormAtom } from "@/views/form/builder/atoms";
 
 export type GridHandler = {
   readonly?: boolean;
@@ -96,6 +98,7 @@ export interface CollectionState {
   expand: PrimitiveAtom<boolean>;
   items: PrimitiveAtom<ItemState[]>;
   getItem: (id: number, model: string) => ItemAtom;
+  formAtom: FormAtom;
   columnAttrs?: Record<string, Partial<Attrs>>;
   setColumnAttrs?: Dispatch<SetStateAction<Record<string, Partial<Attrs>>>>;
   enabled?: boolean;
@@ -114,6 +117,7 @@ const FALLBACK_STATE: CollectionState = {
     () => false,
     () => {},
   ),
+  formAtom: fallbackFormAtom,
   items: atom<ItemState[]>([]),
   getItem: (id: number, model: string) =>
     atom<ItemState>({ record: { id }, model }),
@@ -154,8 +158,9 @@ export function CollectionTree(props: {
   waitForActions?: () => Promise<void>;
 }) {
   const isRootTree = useIsRootCollectionTree();
+  const { formAtom } = useFormScope();
   if (isRootTree) {
-    return <CollectionRoot {...props} />;
+    return <CollectionRoot {...props} formAtom={formAtom} />;
   }
   return props.children;
 }
@@ -163,9 +168,11 @@ export function CollectionTree(props: {
 function CollectionRoot({
   children,
   enabled,
+  formAtom,
   waitForActions,
 }: {
   children: JSX.Element;
+  formAtom: FormAtom;
   enabled?: boolean;
   waitForActions?: () => Promise<void>;
 }) {
@@ -243,6 +250,7 @@ function CollectionRoot({
       value={{
         expand: expandAtom,
         items: itemsAtom,
+        formAtom,
         getItem,
         enabled,
         waitForActions,

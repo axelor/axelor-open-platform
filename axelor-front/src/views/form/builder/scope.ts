@@ -1,6 +1,6 @@
+import { createScope, molecule, useMolecule } from "bunshi/react";
 import { produce } from "immer";
 import { atom, useAtomValue } from "jotai";
-import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,6 +26,7 @@ import {
 } from "@/view-containers/action";
 
 import { useViewMeta, useViewTab } from "@/view-containers/views/scope";
+import { useCollectionTree } from "@/views/grid/builder/scope";
 import { fallbackFormAtom } from "./atoms";
 import {
   FormAtom,
@@ -842,6 +843,13 @@ export function FormRecordUpdates({
   recordHandler: RecordHandler;
 }) {
   const recordRef = useRef<DataRecord | undefined | null>();
+  const { formAtom: treeFormAtom } = useCollectionTree();
+  const treeFormRecord = useAtomValue(
+    useMemo(
+      () => selectAtom(treeFormAtom, (form) => form.record),
+      [treeFormAtom],
+    ),
+  );
   const record = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.record), [formAtom]),
   );
@@ -866,6 +874,7 @@ export function FormRecordUpdates({
       createEvalContext(
         {
           ...action.context,
+          ...treeFormRecord,
           ...record,
         },
         {
@@ -874,7 +883,7 @@ export function FormRecordUpdates({
         },
       ),
     );
-  }, [action.context, fields, readonly, record, recordHandler]);
+  }, [action.context, treeFormRecord, fields, readonly, record, recordHandler]);
 
   const notify = useAfterActions(
     useCallback(async () => {

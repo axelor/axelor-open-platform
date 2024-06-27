@@ -1684,6 +1684,7 @@ function OneToManyInner({
           model: model,
           items: [
             {
+              ...schema.panelTabSchema,
               ...schema,
               onChange: undefined,
               title: treeFieldTitle,
