@@ -1,0 +1,3 @@
+---
+title: Fix null operator on collection field in advance search
+type: fix

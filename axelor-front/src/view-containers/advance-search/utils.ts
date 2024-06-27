@@ -193,6 +193,9 @@ export function getCriteria(
           if (!value) return null;
           fieldName = `${jsonField ? fieldName : field.name}.id`;
           value = value && value.map((v: DataRecord) => v.id);
+        } else if (["isNull", "notNull"].includes(operator)) {
+          fieldName = `${jsonField ? fieldName : field.name}.id`;
+          value = undefined;
         }
         break;
       }
