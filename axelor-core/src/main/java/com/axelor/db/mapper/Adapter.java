@@ -76,7 +76,10 @@ public class Adapter {
     if (value instanceof Collection) {
       Collection<Object> all = value instanceof Set ? new HashSet<>() : new ArrayList<>();
       for (Object item : (Collection<?>) value) {
-        all.add(adapt(item, type, genericType, annotations));
+        final Object adaptedValue = adapt(item, type, genericType, annotations);
+        if (adaptedValue != null) {
+          all.add(adaptedValue);
+        }
       }
       return all;
     }

@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
@@ -39,6 +40,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.hibernate.jpa.AvailableHints;
 import org.junit.jupiter.api.Test;
 
 public class QueryTest extends ScriptTest {
@@ -243,5 +246,85 @@ public class QueryTest extends ScriptTest {
             }
           }
         });
+  }
+
+  @Test
+  void testFilterAdaptSingle() {
+    var filter = "self.credit = :credit";
+    var credit = "2.5";
+    var results = all(Contact.class).filter(filter).bind("credit", credit).fetch();
+    assertEquals(1, results.size());
+  }
+
+  @Test
+  void testFilterAdaptCollection() {
+    var filter = "self.credit IN :credits";
+    var credits = new ArrayList<String>();
+    credits.add(null);
+    credits.add("");
+    credits.add("2.5");
+    var results = all(Contact.class).filter(filter).bind("credits", credits).fetch();
+    assertEquals(1, results.size());
+  }
+
+  @Test
+  void testFilterNullKeyInCollection() {
+    var filter = "self.id IN :ids";
+    var ids = new ArrayList<Object>();
+    ids.add(null);
+    ids.add("");
+    ids.add(1L);
+    ids.add("2");
+
+    // Null values are filtered out, otherwise they cause AssertionError when caching is enabled.
+    var results = all(Contact.class).filter(filter).bind("ids", ids).cacheable().fetch();
+
+    assertEquals(2, results.size());
+  }
+
+  @Test
+  void testQueryAdaptSingle() {
+    var qlString = "SELECT self FROM Contact self WHERE self.credit = :credit";
+    var credit = "2.5";
+    var query = JPA.em().createQuery(qlString, Contact.class);
+
+    // Hibernate 5 throws IllegalArgumentException.
+    // Hibernate 6 can coerce single value.
+    query.setParameter("credit", credit);
+
+    var results = query.getResultList();
+    assertEquals(1, results.size());
+  }
+
+  @Test
+  void testQueryAdaptCollection() {
+    var qlString = "SELECT self FROM Contact self WHERE self.credit IN :credits";
+    var credits = new ArrayList<String>();
+    credits.add(null);
+    credits.add("");
+    credits.add("2.5");
+    var query = JPA.em().createQuery(qlString, Contact.class);
+
+    // Hibernate 5 throws IllegalArgumentException.
+    // Hibernate 6 cannot coerce multi value and does not throw IllegalArgumentException.
+    query.setParameter("credits", credits);
+
+    assertThrows(NumberFormatException.class, () -> query.getResultList());
+  }
+
+  @Test
+  void testQueryNullKeyInCollection() {
+    var qlString = "SELECT self FROM Contact self WHERE self.id IN :ids";
+    var ids = new ArrayList<Long>();
+    ids.add(null);
+    ids.add(1L);
+    ids.add(2L);
+    var query = JPA.em().createQuery(qlString, Contact.class);
+    query.setHint(AvailableHints.HINT_CACHEABLE, true);
+    query.setParameter("ids", ids);
+
+    // Hibernate 5 doesn't fail because of null in collection.
+    // Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
+    assertThrows(AssertionError.class, () -> query.getResultList());
   }
 }

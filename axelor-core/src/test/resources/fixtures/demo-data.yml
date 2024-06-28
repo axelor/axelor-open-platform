@@ -77,6 +77,7 @@
   lastName: Smith
   email: jsmith@gmail.com
   dateOfBirth: 1979-11-01
+  credit: "2.5"
   circles:
     - *friends
     - *business

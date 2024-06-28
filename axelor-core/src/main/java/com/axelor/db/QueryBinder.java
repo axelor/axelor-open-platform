@@ -31,6 +31,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.hibernate.jpa.AvailableHints;
 
@@ -191,10 +194,15 @@ public class QueryBinder {
       } catch (Exception e) {
         continue;
       }
-      try {
-        query.setParameter(pos, value);
-      } catch (IllegalArgumentException e) {
-        query.setParameter(pos, adapt(value, param));
+
+      if (value instanceof Collection) {
+        query.setParameter(pos, adaptCollection((Collection<?>) value, param));
+      } else {
+        try {
+          query.setParameter(pos, value);
+        } catch (IllegalArgumentException e) {
+          query.setParameter(pos, adapt(value, param));
+        }
       }
     }
 
@@ -260,10 +268,14 @@ public class QueryBinder {
       value = adapt(value, parameter);
     }
 
-    try {
-      query.setParameter(name, value);
-    } catch (IllegalArgumentException e) {
-      query.setParameter(name, adapt(value, parameter));
+    if (value instanceof Collection) {
+      query.setParameter(name, adaptCollection((Collection<?>) value, parameter));
+    } else {
+      try {
+        query.setParameter(name, value);
+      } catch (IllegalArgumentException e) {
+        query.setParameter(name, adapt(value, parameter));
+      }
     }
 
     return this;
@@ -278,12 +290,30 @@ public class QueryBinder {
     return query;
   }
 
-  private Object adapt(Object value, Parameter<?> param) {
+  private Collection<?> adaptCollection(Collection<?> value, Parameter<?> param) {
     final Class<?> type = param.getParameterType();
+
     if (type == null) {
       return value;
     }
 
+    final Collector<Object, ?, ? extends Collection<?>> collector =
+        value instanceof Set ? Collectors.toUnmodifiableSet() : Collectors.toUnmodifiableList();
+
+    return value.stream().map(v -> adapt(v, type)).filter(Objects::nonNull).collect(collector);
+  }
+
+  private Object adapt(Object value, Parameter<?> param) {
+    final Class<?> type = param.getParameterType();
+
+    if (type == null) {
+      return value;
+    }
+
+    return adapt(value, type);
+  }
+
+  private Object adapt(Object value, Class<?> type) {
     value = Adapter.adapt(value, type, type, null);
 
     if (value instanceof Number && Model.class.isAssignableFrom(type)) {
