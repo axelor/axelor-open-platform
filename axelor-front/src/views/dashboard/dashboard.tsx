@@ -15,6 +15,7 @@ import { ViewProps } from "../types";
 import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { useViewContext } from "@/view-containers/views/scope";
+import { useDevice } from "@/hooks/use-responsive";
 
 import "react-grid-layout/css/styles.css";
 import "./react-grid-layout.css";
@@ -83,12 +84,13 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const { items = [] } = view;
   const [layouts, setLayouts] = useState<Layouts | null>(null);
   const { ref, width } = useResizeDetector();
+  const { isMobile } = useDevice();
   const saved = useRef(false);
   const getContext = useViewContext();
 
   const isRTL = useTheme().dir === "rtl";
 
-  const hasViewCustomize = isUserAllowedCustomizeViews();
+  const hasViewCustomize = isUserAllowedCustomizeViews() && !isMobile;
 
   const updateLayout = useCallback(
     (updater: (key: MEDIA_TYPE, layouts?: Layout[]) => Layout[]) => {
