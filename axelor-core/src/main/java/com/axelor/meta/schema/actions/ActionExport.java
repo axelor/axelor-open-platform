@@ -24,6 +24,8 @@ import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.tenants.TenantResolver;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
@@ -58,6 +60,10 @@ public class ActionExport extends Action {
   private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
   private static final String DEFAULT_DIR = "${date}/${name}";
 
+  private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
+  private static final String TEMPLATE_DIR =
+      AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
+
   @XmlAttribute(name = "output")
   private String output;
 
@@ -90,12 +96,20 @@ public class ActionExport extends Action {
   }
 
   protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
+    Store store = FileStoreFactory.getStore();
     String templatePath = handler.evaluate(export.template).toString();
+    File template;
+
+    if (store.hasFile(templatePath)) {
+      template = store.getFile(templatePath);
+    } else {
+      // if not found, search the template directory
+      template = FileUtils.getFile(TEMPLATE_DIR, templatePath);
+    }
 
     Reader reader = null;
 
     try {
-      File template = new File(templatePath);
       if (template.isFile()) {
         reader = new FileReader(template);
       }
