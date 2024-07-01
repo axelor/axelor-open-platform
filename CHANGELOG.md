@@ -1,3 +1,9 @@
+## 7.1.3 (2024-07-01)
+
+#### Fix
+
+* Fix padding in panel-tabs content
+
 ## 7.1.2 (2024-07-01)
 
 #### Change
