@@ -240,8 +240,9 @@ public class DBHelper {
    * @return the second-level cache mode used
    */
   public static SharedCacheMode getSharedCacheMode() {
-    return SharedCacheMode.valueOf(
-        AppSettings.get().get(AvailableAppSettings.JAVAX_PERSISTENCE_SHARED_CACHE_MODE, cacheMode));
+    final String mode =
+        AppSettings.get().get(AvailableAppSettings.JAVAX_PERSISTENCE_SHARED_CACHE_MODE, cacheMode);
+    return StringUtils.isBlank(mode) ? SharedCacheMode.NONE : SharedCacheMode.valueOf(mode);
   }
 
   /** Whether using oracle database. */
