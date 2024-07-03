@@ -67,6 +67,7 @@ import {
 import { createWidgetAtom } from "./builder/atoms";
 import {
   FormEditableScope,
+  FormReadyScope,
   FormValidityHandler,
   FormValidityScope,
   useAfterActions,
@@ -1279,31 +1280,33 @@ const FormContainer = memo(function FormContainer({
         </ViewToolBar>
       )}
       <div className={styles.formViewScroller} ref={containerRef}>
-        <ScopeProvider
-          scope={FormEditableScope}
-          value={{
-            add: handleAddEditableWidget,
-            commit: handleCommitEditableWidgets,
-          }}
-        >
+        <ScopeProvider scope={FormReadyScope} value={readyAtom}>
           <ScopeProvider
-            scope={FormValidityScope}
+            scope={FormEditableScope}
             value={{
-              add: handleAddWidgetValidator,
+              add: handleAddEditableWidget,
+              commit: handleCommitEditableWidgets,
             }}
           >
-            <FormComponent
-              className={styles.formView}
-              readonly={readonly}
-              schema={meta.view}
-              fields={meta.fields!}
-              formAtom={formAtom}
-              recordHandler={recordHandler}
-              actionHandler={actionHandler}
-              actionExecutor={actionExecutor}
-              layout={Layout}
-              widgetAtom={widgetAtom}
-            />
+            <ScopeProvider
+              scope={FormValidityScope}
+              value={{
+                add: handleAddWidgetValidator,
+              }}
+            >
+              <FormComponent
+                className={styles.formView}
+                readonly={readonly}
+                schema={meta.view}
+                fields={meta.fields!}
+                formAtom={formAtom}
+                recordHandler={recordHandler}
+                actionHandler={actionHandler}
+                actionExecutor={actionExecutor}
+                layout={Layout}
+                widgetAtom={widgetAtom}
+              />
+            </ScopeProvider>
           </ScopeProvider>
         </ScopeProvider>
       </div>

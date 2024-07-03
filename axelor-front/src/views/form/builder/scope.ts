@@ -3,7 +3,15 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -285,6 +293,23 @@ export const FormTabScope = createScope<{ active: boolean }>({ active: true });
 const formTabMolecule = molecule((getMol, getScope) => {
   return atom(getScope(FormTabScope));
 });
+
+export const FormReadyScope = createScope(
+  atom(
+    () => true,
+    () => {},
+  ),
+);
+
+const formReadyMolecule = molecule((getMol, getScope) => {
+  return atom(getScope(FormReadyScope));
+});
+
+export function useFormReady() {
+  const scopeAtom = useMolecule(formReadyMolecule);
+  const loadingAtom = useAtomValue(scopeAtom);
+  return useAtomValue(loadingAtom);
+}
 
 export function useFormTabScope() {
   const scopeAtom = useMolecule(formTabMolecule);

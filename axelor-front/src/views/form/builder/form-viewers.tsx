@@ -12,7 +12,7 @@ import { MetaScope } from "@/view-containers/views/scope";
 
 import { useFormHandlers } from "./form";
 import { FieldControl } from "./form-field";
-import { FormScope } from "./scope";
+import { FormScope, useFormReady } from "./scope";
 import { FieldProps } from "./types";
 import { isReferenceField } from "./utils";
 
@@ -31,11 +31,14 @@ export function FieldViewer(props: FieldViewerProps) {
     [formAtom],
   );
 
+  const formReady = useFormReady();
   const formFields = useAtomValue(fieldsAtom);
   const fields = useMemo(
     () => schema.viewer.fields ?? schema.fields ?? formFields,
     [formFields, schema.fields, schema.viewer],
   );
+
+  if (!formReady) return null;
 
   const { template } = schema.viewer!;
 
