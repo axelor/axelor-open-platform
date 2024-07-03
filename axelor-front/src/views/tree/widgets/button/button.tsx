@@ -1,39 +1,19 @@
 import { Link, clsx } from "@axelor/ui";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import { Icon } from "@/components/icon";
 import { Field } from "@/services/client/meta.types";
 import { dialogs } from "@/components/dialogs";
-import { createScriptContext } from "@/hooks/use-parser/context";
-import { parseExpression } from "@/hooks/use-parser/utils";
-import { useViewAction } from "@/view-containers/views/scope";
 
 import { WidgetProps } from "../../types";
+import { useButtonProps } from "@/views/grid/widgets/button/utils";
 import styles from "./button.module.scss";
 
 export function Button({ field, node, record, actionExecutor }: WidgetProps) {
   const { name, icon, onClick, title, prompt, help: _help } = field;
   const help = _help || title;
 
-  const { context } = useViewAction();
-
-  const { hidden, readonly } = useMemo(() => {
-    const { showIf, hideIf, readonlyIf } = field as Field;
-    const ctx = createScriptContext({ ...context, ...record });
-
-    let { hidden: _hidden, readonly: _readonly } = field as Field;
-
-    if (showIf) {
-      _hidden = !parseExpression(showIf)(ctx);
-    } else if (hideIf) {
-      _hidden = !!parseExpression(hideIf)(ctx);
-    }
-
-    if (readonlyIf) {
-      _readonly = !!parseExpression(readonlyIf)(ctx);
-    }
-    return { hidden: _hidden, readonly: _readonly };
-  }, [field, record, context]);
+  const { hidden, readonly } = useButtonProps(field as Field, record);
 
   const handleClick = useCallback(
     async (event: React.MouseEvent<HTMLElement>) => {
