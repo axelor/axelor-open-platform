@@ -41,6 +41,10 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
 
   @XmlAttribute private String onNew;
 
+  @XmlAttribute private String onDelete;
+
+  @XmlAttribute private String onCopy;
+
   @XmlAttribute private String readonlyIf;
 
   @XmlAttribute private String canNew;
@@ -110,6 +114,22 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
 
   public void setOnNew(String onNew) {
     this.onNew = onNew;
+  }
+
+  public String getOnDelete() {
+    return onDelete;
+  }
+
+  public void setOnDelete(String onDelete) {
+    this.onDelete = onDelete;
+  }
+
+  public String getOnCopy() {
+    return onCopy;
+  }
+
+  public void setOnCopy(String onCopy) {
+    this.onCopy = onCopy;
   }
 
   public String getReadonlyIf() {

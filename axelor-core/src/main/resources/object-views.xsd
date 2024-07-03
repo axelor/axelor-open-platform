@@ -1901,6 +1901,18 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onDelete" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on delete event.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="onCopy" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on copy event.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="readonlyIf" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Readonly if the given JavaScript expression is true.
