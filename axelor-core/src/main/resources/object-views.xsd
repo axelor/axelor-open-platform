@@ -2503,7 +2503,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
-          <xsd:element name="field" type="tns:Field" minOccurs="0" maxOccurs="unbounded">
+          <xsd:element name="field" type="tns:BaseField" minOccurs="0" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Define a dataset field</xsd:documentation>
             </xsd:annotation>
@@ -3342,6 +3342,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
   <xsd:complexType name="Field">
     <xsd:complexContent>
       <xsd:extension base="tns:BaseField">
