@@ -33,18 +33,18 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="forcePasswordChange"/>
-      <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
+      <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean" x-reset-state="true" />
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your current password" placeholder="your current password" help="Current password of the logged in user" widget="password" requiredIf="change || !id"/>
+        <field name="oldPassword" title="Your current password" placeholder="your current password" help="Current password of the logged in user" widget="password" requiredIf="change || !id"  x-reset-state="true"/>
         <panel itemSpan="12" showIf="id">
           <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
-            onChange="action-condition-user-password"/>
-          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
+            onChange="action-condition-user-password" x-reset-state="true"/>
+          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"  x-reset-state="true"/>
         </panel>
         <panel itemSpan="12" hideIf="id">
           <field name="newPassword" title="Password" placeholder="password" help="Password of the new user" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
-            onChange="action-condition-user-password"/>
-          <field name="chkPassword" title="Confirm password" placeholder="confirm password" help="Confirm password of the new user (must be identical to the password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
+            onChange="action-condition-user-password" x-reset-state="true"/>
+          <field name="chkPassword" title="Confirm password" placeholder="confirm password" help="Confirm password of the new user (must be identical to the password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword" x-reset-state="true"/>
         </panel>
         <help>user.password.pattern-title</help>
       </panel>

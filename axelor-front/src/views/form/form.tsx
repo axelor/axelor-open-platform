@@ -723,22 +723,6 @@ const FormContainer = memo(function FormContainer({
           const savedResult = res;
           const restoreDummyValues = Object.keys(dummy).reduce(
             (values, key) => {
-              // special case for user model
-              // in future, this code should be deprecated as
-              // fields should be migrate with x-reset-state="true"
-              if (model === "com.axelor.auth.db.User") {
-                if (
-                  [
-                    "change",
-                    "oldPassword",
-                    "newPassword",
-                    "chkPassword",
-                  ].includes(key)
-                ) {
-                  return values;
-                }
-              }
-
               const viewItem = findViewItem(meta, key);
               return viewItem?.resetState === true
                 ? values
