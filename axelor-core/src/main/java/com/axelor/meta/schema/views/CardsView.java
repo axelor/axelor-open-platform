@@ -61,6 +61,8 @@ public class CardsView extends AbstractView implements ContainerView {
   @XmlAttribute(name = "edit-window")
   private String editWindow;
 
+  @XmlAttribute private String onDelete;
+
   public String getOrderBy() {
     return orderBy;
   }
@@ -172,5 +174,13 @@ public class CardsView extends AbstractView implements ContainerView {
 
   public void setEditWindow(String editWindow) {
     this.editWindow = editWindow;
+  }
+
+  public String getOnDelete() {
+    return onDelete;
+  }
+
+  public void setOnDelete(String onDelete) {
+    this.onDelete = onDelete;
   }
 }
