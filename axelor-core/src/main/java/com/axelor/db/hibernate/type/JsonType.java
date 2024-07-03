@@ -18,6 +18,7 @@
  */
 package com.axelor.db.hibernate.type;
 
+import com.axelor.db.internal.DBHelper;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,15 +26,17 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Objects;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.usertype.UserType;
 
 public class JsonType implements UserType<String> {
 
-  public JsonType() {}
+  private static JsonTypeBase type =
+      DBHelper.isHSQL() ? new JsonTypeLongVarChar() : new JsonTypeJson();
 
   @Override
   public int getSqlType() {
-    return Types.LONGVARCHAR;
+    return type.getSqlType();
   }
 
   @Override
@@ -62,7 +65,7 @@ public class JsonType implements UserType<String> {
   public void nullSafeSet(
       PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
       throws SQLException {
-    st.setString(index, value);
+    type.nullSafeSet(st, value, index, session);
   }
 
   @Override
@@ -83,5 +86,45 @@ public class JsonType implements UserType<String> {
   @Override
   public String assemble(Serializable cached, Object owner) {
     return (String) cached;
+  }
+
+  private interface JsonTypeBase {
+    int getSqlType();
+
+    void nullSafeSet(
+        PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
+        throws SQLException;
+  }
+
+  private static class JsonTypeLongVarChar implements JsonTypeBase {
+    @Override
+    public int getSqlType() {
+      return Types.LONGVARCHAR;
+    }
+
+    @Override
+    public void nullSafeSet(
+        PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
+        throws SQLException {
+      st.setString(index, value);
+    }
+  }
+
+  private static class JsonTypeJson implements JsonTypeBase {
+    @Override
+    public int getSqlType() {
+      return SqlTypes.JSON;
+    }
+
+    @Override
+    public void nullSafeSet(
+        PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
+        throws SQLException {
+      if (value == null) {
+        st.setNull(index, Types.OTHER);
+      } else {
+        st.setObject(index, value, Types.OTHER);
+      }
+    }
   }
 }

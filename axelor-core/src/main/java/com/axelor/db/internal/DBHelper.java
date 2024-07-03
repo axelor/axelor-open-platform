@@ -260,6 +260,11 @@ public class DBHelper {
     return isEngine(TargetDatabase.POSTGRESQL);
   }
 
+  /** Whether using HSQL database. */
+  public static boolean isHSQL() {
+    return isEngine(TargetDatabase.HSQLDB.split("\\s+")[0]);
+  }
+
   private static boolean isEngine(String engine) {
     return jdbcDriver != null && jdbcDriver.toLowerCase().contains(engine.toLowerCase());
   }
