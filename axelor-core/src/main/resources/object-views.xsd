@@ -2190,6 +2190,11 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onDelete" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on delete event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="colorBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>

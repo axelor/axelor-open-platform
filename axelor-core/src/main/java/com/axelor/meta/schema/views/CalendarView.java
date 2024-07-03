@@ -39,6 +39,8 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   @XmlAttribute private String onChange;
 
+  @XmlAttribute private String onDelete;
+
   @XmlAttribute private String eventStart;
 
   @XmlAttribute private String eventStop;
@@ -93,6 +95,14 @@ public class CalendarView extends AbstractView implements ContainerView {
 
   public void setOnChange(String onChange) {
     this.onChange = onChange;
+  }
+
+  public String getOnDelete() {
+    return onDelete;
+  }
+
+  public void setOnDelete(String onDelete) {
+    this.onDelete = onDelete;
   }
 
   public String getEventStart() {
