@@ -1,0 +1,40 @@
+= 7.2 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.2/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 7.1 to 7.2.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 7.2
+
+== Region support added on translations
+
+Similar to the current translation behavior, you can now provide translation per region : `fr-FR`, `fr-CA`, ...
+
+To add more languages, you need to enrich the `select.language` selection. Then you can provide translations files per
+region : `messages_fr-FR.csv`, `messages_fr-CA.csv`, ...
+
+NOTE: Translations in CSV without values are not loaded anymore.
+
+There is a translation fallback mechanism that ensures that if an exact match for a translation is not found, the
+translation for the primary language is used instead. This is particularly useful for avoiding duplicate translation
+effort for languages with regional variations, as well as for maintaining a consistent user experience even when some
+translations are missing.
+
+For example, if a user selects `fr-CA` (Canadian French) as their language and a specific translation is not available
+in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not
+found, original translation key is used, which is typically the message for the default language, `en` (English).
+
+== Dependencies upgrade
+
+Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
+list.
+
+== Others Notable Changes
+
+- Some layout changes in the login page as part of customizations (xref:dev-guide:application/config.adoc#custom-login-page[doc])
+
+
+

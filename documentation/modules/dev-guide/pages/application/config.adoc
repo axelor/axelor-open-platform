@@ -490,6 +490,7 @@ public class AppService {
 If return value is null, it will show default logo/icon specified
 with `application.logo` and `application.icon` in configuration file.
 
+[#custom-login-page]
 == Custom Login Page
 
 You can customize the login page via the properties `application.sign-in.*`.
@@ -505,36 +506,63 @@ You can customize the login page via the properties `application.sign-in.*`.
 
 [source,properties]
 ----
-application.sign-in.logo = url # Absolute or relative URL to have a login logo different from `application.logo`.
-application.sign-in.title = html # Translatable sanitized HTML, shown after the logo in the form login panel.
-application.sign-in.footer = html # Translatable sanitized HTML, shown after the form login panel.
+# Absolute or relative URL to have a login logo different from `application.logo`.
+application.sign-in.logo = url
+# Translatable sanitized HTML, shown after the logo in the form login panel.
+application.sign-in.title = html
+# Translatable sanitized HTML, shown after the form login panel.
+application.sign-in.footer = html
 
-application.sign-in.fields.username.show-title = true (default) | false # Show or hide the username field title.
-application.sign-in.fields.username.title = translatable text # Title for the username field, default is `Username`.
-application.sign-in.fields.username.placeholder = translatable text # Placeholder text for the username field, default is empty.
-application.sign-in.fields.username.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment.
+# Show or hide the username field title.
+application.sign-in.fields.username.show-title = true (default) | false
+# Title for the username field, default is `Username`.
+application.sign-in.fields.username.title = translatable text
+# Placeholder text for the username field, default is empty.
+application.sign-in.fields.username.placeholder = translatable text
+# Bootstrap or Material icon name or `none` to disable, shown as start adornment.
+application.sign-in.fields.username.icon = none (default)
 
-application.sign-in.fields.password.show-title = true (default) | false # Show or hide the password field title.
-application.sign-in.fields.password.title = translatable text # Title for the password field, default is `Password`.
-application.sign-in.fields.password.placeholder = translatable text # Placeholder text for the password field, default is empty.
-application.sign-in.fields.password.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment.
+# Show or hide the password field title.
+application.sign-in.fields.password.show-title = true (default) | false
+# Title for the password field, default is `Password`.
+application.sign-in.fields.password.title = translatable text
+# Placeholder text for the password field, default is empty.
+application.sign-in.fields.password.placeholder = translatable text
+# Bootstrap or Material icon name or `none` to disable, shown as start adornment.
+application.sign-in.fields.password.icon = none (default)
 
-application.sign-in.fields.tenant.show-title = true (default) | false # Show or hide the tenant field title.
-application.sign-in.fields.tenant.title = translatable text # Title for the tenant field, default is `Tenant`.
+# Show or hide the tenant field title.
+application.sign-in.fields.tenant.show-title = true (default) | false
+# Title for the tenant field, default is `Tenant`.
+application.sign-in.fields.tenant.title = translatable text
 
+##
 # Extra buttons inside the form login panel using custom button names.
-application.sign-in.buttons.<button-name>.title = text # Title for the custom button.
-application.sign-in.buttons.<button-name>.type = button (default) | link # Use Button or Link component.
-application.sign-in.buttons.<button-name>.variant = primary|secondary|success|danger|info|warning|light|dark # Variant for button styling.
-application.sign-in.buttons.<button-name>.icon = icon_name # Bootstrap or Material icon name, shown before the title.
-application.sign-in.buttons.<button-name>.link = url # Absolute or relative URL with `:username` support.
-application.sign-in.buttons.<button-name>.order = order # Number relative to the Login button (< 0 for before, >= 0 for after).
+##
+# Title for the custom button.
+application.sign-in.buttons.<button-name>.title = text
+# Use Button or Link component.
+application.sign-in.buttons.<button-name>.type = button (default) | link
+# Variant for button styling.
+application.sign-in.buttons.<button-name>.variant = primary|secondary|success|danger|info|warning|light|dark
+# Bootstrap or Material icon name, shown before the title.
+application.sign-in.buttons.<button-name>.icon = icon_name
+# Absolute or relative URL with `:username` support.
+application.sign-in.buttons.<button-name>.link = url
+# Number relative to the Login button (< 0 for before, >= 0 for after).
+application.sign-in.buttons.<button-name>.order = order
 
+##
 # Use `submit` button name to customize the Login submit button.
-application.sign-in.buttons.submit.title = Sign in # Title for the submit button.
-application.sign-in.buttons.submit.type = button # Type of the submit button.
-application.sign-in.buttons.submit.variant = primary # Variant for the submit button styling.
-application.sign-in.buttons.submit.icon = none # Icon for the submit button, default is none.
+##
+# Title for the submit button.
+application.sign-in.buttons.submit.title = Sign in
+# Type of the submit button.
+application.sign-in.buttons.submit.type = button
+# Variant for the submit button styling.
+application.sign-in.buttons.submit.variant = primary
+# Icon for the submit button, default is none.
+application.sign-in.buttons.submit.icon = none
 ----
 
 Note that the properties file is not a source for extracting translations. So, for your translatable texts, you can add your translations to `custom_<language>.csv` files.
