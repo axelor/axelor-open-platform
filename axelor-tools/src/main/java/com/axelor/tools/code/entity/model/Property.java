@@ -1164,7 +1164,7 @@ public abstract class Property {
       res.param("updatable", "{0:l}", updatable);
     }
 
-    if (isTrue(large) && !isTrue(encrypted) && type == PropertyType.STRING) {
+    if (isTrue(large) && type == PropertyType.STRING) {
       res.param("length", "{0:m}", "org.hibernate.Length.LOB_DEFAULT");
     }
 
