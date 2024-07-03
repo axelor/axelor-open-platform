@@ -557,6 +557,7 @@ export interface TreeField extends Field {
   as?: string;
   selection?: string;
   onClick?: string;
+  prompt?: string;
 }
 
 export interface TreeColumn extends SearchField {}

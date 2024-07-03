@@ -1,0 +1,5 @@
+---
+title: Add expression attribute support in tree view button
+type: fix
+description: |
+  Add support of readonly, hidden, hideIf, showIf, readonlyIf on tree-view button.
