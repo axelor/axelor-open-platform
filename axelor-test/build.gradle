@@ -16,6 +16,7 @@ dependencies {
   implementation libs.jdbc_postgres
   implementation libs.hibernate
   implementation libs.jakarta_el
+  implementation libs.tomcat_embed_el
 
   compileOnly libs.jakarta_el
   compileOnly libs.jakarta_servlet

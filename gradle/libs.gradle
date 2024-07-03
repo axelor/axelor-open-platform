@@ -313,5 +313,6 @@ libs.tomcat_embed = [
   "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcat_embed}",
   libs.jakarta_el
 ]
+libs.tomcat_embed_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcat_embed}"
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
