@@ -157,6 +157,7 @@ export function Search(props: ViewProps<SearchView>) {
               name,
               type: "panel",
               title,
+              showFrame: true,
               items: (() => {
                 const items = searchFields.map((field) => ({
                   ...field,
