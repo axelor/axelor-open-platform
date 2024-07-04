@@ -1,0 +1,128 @@
+= Search View
+:toc:
+:toc-title:
+
+The Search view can be used to search on multiple objects:
+
+[source,xml]
+-----
+  <search name="sale-order-search" title="Sales Search" limit="100">
+
+    <search-fields>
+      <field name="partner" type="reference" target="com.axelor.contact.db.Contact"/>
+      <field name="product" type="reference" target="com.axelor.sale.db.Product" widget="SuggestBox"/>
+      <field name="customer" type="string" />
+      <field name="date" type="date"/>
+      <field name="value" type="decimal" />
+      <field name="orderStatus" type="string" widget="single-select" selection="order.status.selection"/>
+    </search-fields>
+
+    <result-fields>
+      <hilite if="value &gt; 100" color="red"/>
+      <field name="customer" type="string">
+        <hilite if="_model == 'com.axelor.contact.db.Contact'" color="brown"/>
+      </field>
+      <field name="product" type="string"/>
+      <field name="date" type="date"/>
+      <field name="value" type="decimal"/>
+      <field name="state" title="Status" type="string" widget="single-select" selection="order.status.selection"/>
+      <field name="color" type="string"/>
+      <button name="showMeBtn" onClick="call-an-action" title="Show me" icon="fa-question-circle"/>
+    </result-fields>
+
+    <select model="com.axelor.contact.db.Contact" orderBy="company.name" limit="5">
+      <field name="fullName" as="customer"/>
+      <field name="dateOfBirth" as="date"/>
+      <where match="any">
+        <input name="customer" field="fullName" matchStyle="contains"/>
+        <input name="partner.fullName" field="fullName"/>
+        <input name="date" field="dateOfBirth"/>
+      </where>
+    </select>
+
+    <select model="com.axelor.sale.db.Order" title="Sale Order" orderBy="orderDate,-amount" distinct="true">
+      <field name="customer.fullName" as="customer"/>
+      <field name="items.product.name" as="product"/>
+      <field name="items.product.color" as="color" selection="product.color.selection"/>
+      <field name="orderDate" as="date"/>
+      <field name="amount" as="value"/>
+      <field name="status" as="state"/>
+      <where>
+        <input name="orderStatus" field="status"/>
+        <where match="any">
+          <input name="customer" field="customer.fullName" matchStyle="contains"/>
+          <input name="partner" field="customer"/>
+          <input name="date" field="orderDate"/>
+          <input name="value" field="amount" matchStyle="greaterOrEqual"/>
+          <input name="product" field="items.product"/>
+        </where>
+      </where>
+    </select>
+
+  </search>
+-----
+
+The `<search-fields>` defines fields to be used to provide search criteria (inputs).
+
+The `<result-fields>` defines the possible result fields which can be mapped with actual object fields.
+
+The `<select>` tag defines search criteria per object and maps the object fields to the result fields.
+
+The `<where>` tag defines the conditions (it can be recursive). You can use FQN to match against any field value from the object graph.
+
+The matchStyle can be used to tell how to match the inputs. Possible value can be:
+
+* `contains` - if the field value contains the given input value
+* `startsWith` - if field value starts with the given input value
+* `endsWith` - if the field value ends with the given input value
+* `equals` - if the field value equals the input value (default matchStyle)
+* `notEquals` - if the field value is not equal to the input value
+* `lessThan` - if field value is less than the input value
+* `lessOrEqual` - if field value is less then or equal to the input value
+* `greaterOrEqual` - if field value is greater than or equal to the input value
+
+The select and input tags can have optional `if` condition taking any boolean expression in Groovy that evaluates
+against the input values. If the result of the expression is false then those elements are skipped.
+
+The `where` condition is determined from `match="any|all"` attribute that corresponds to the `OR` and `AND`
+respectively.
+
+By default, the search is done on all objects (defined by the `<select>` tags). It is possible to select on which the
+search is carried out.
+
+Some `<action-menu>` can be defined in order to run quick actions. The `Launch` button with trigger the given
+`action-menu#action` with the given context :
+
+[source,json]
+-----
+{
+    "_searchContext": {
+
+        <1>
+        "code": "A",
+        "product": {
+          "id": 1,
+          "name": "P1",
+          "version": 1
+        },
+
+        <2>
+        "_results": [
+          {
+            "model": "com.axelor.contact.db.Contact",
+            "ids": [1, 2, 3]
+          },
+          {
+           "model": "com.axelor.sale.db.Product",
+           "ids": [1, 2, 3]
+          }
+        ]
+    }
+}
+-----
+<1> : All not null search fields
+<2> : Selected search result ids group by model
+
+a special `__ref__` built-in variable can be used in expression. It will refer to the first selected record in
+multi-object search view.
+

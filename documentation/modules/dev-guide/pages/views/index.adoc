@@ -16,6 +16,7 @@ The {page-component-title} support several kind of views for an object. This inc
 * xref:views/cards.adoc[Cards] - shows data list as cards
 * xref:views/custom.adoc[Custom] - shows data using custom templates
 * xref:views/gantt.adoc[Gantt] - shows data using a Gantt chart
+* xref:views/search.adoc[Search] - shows multi-object search view
 
 The xref:views/grid.adoc[Grid] & xref:views/form.adoc[Form] views are the main views. If these
 views are not provided for model, a set of default views are generated automatically.
