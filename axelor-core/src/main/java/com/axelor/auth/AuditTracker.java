@@ -418,6 +418,8 @@ final class AuditTracker {
    */
   public void clear() {
     STORE.remove();
+    DELETED.remove();
+    UPDATED.remove();
   }
 
   /**
@@ -433,9 +435,7 @@ final class AuditTracker {
       this.processTracks(tx, user);
       this.processDelete(tx, user);
     } finally {
-      STORE.remove();
-      DELETED.remove();
-      UPDATED.remove();
+      clear();
       JPA.em().flush();
     }
   }
