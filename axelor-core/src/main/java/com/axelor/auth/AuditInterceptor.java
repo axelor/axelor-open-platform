@@ -149,34 +149,39 @@ public class AuditInterceptor extends EmptyInterceptor {
       String[] propertyNames,
       Type[] types) {
 
-    if (!(entity instanceof AuditableModel)) {
-      return false;
+    boolean changed = false;
+
+    if (entity instanceof AuditableModel) {
+      final User user = this.getUser();
+      for (int i = 0; i < propertyNames.length; i++) {
+        if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
+          throw new PersistenceException(
+              String.format(
+                  "You can't update: %s#%s, values (%s=%s)",
+                  entity.getClass().getName(), id, propertyNames[i], currentState[i]));
+        }
+        if (UPDATED_ON.equals(propertyNames[i])) {
+          currentState[i] = LocalDateTime.now();
+          changed = true;
+        }
+        if (UPDATED_BY.equals(propertyNames[i]) && user != null) {
+          currentState[i] = user;
+          changed = true;
+        }
+      }
+
+      if (tracker.get() != null) {
+        // change tracking
+        tracker.get().track((AuditableModel) entity, propertyNames, currentState, previousState);
+      }
     }
 
-    final User user = this.getUser();
-    for (int i = 0; i < propertyNames.length; i++) {
-      if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
-        throw new PersistenceException(
-            String.format(
-                "You can't update: %s#%s, values (%s=%s)",
-                entity.getClass().getName(), id, propertyNames[i], currentState[i]));
-      }
-      if (UPDATED_ON.equals(propertyNames[i])) {
-        currentState[i] = LocalDateTime.now();
-      }
-      if (UPDATED_BY.equals(propertyNames[i]) && user != null) {
-        currentState[i] = user;
-      }
-    }
-
-    if (tracker.get() != null) {
-      // change tracking
-      tracker.get().track((AuditableModel) entity, propertyNames, currentState, previousState);
+    if (entity instanceof Model && tracker.get() != null) {
       // for before completion event
-      tracker.get().updated((AuditableModel) entity);
+      tracker.get().updated((Model) entity);
     }
 
-    return true;
+    return changed;
   }
 
   @Override
@@ -184,31 +189,35 @@ public class AuditInterceptor extends EmptyInterceptor {
       Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
 
     boolean changed = updateSequence(entity, propertyNames, state);
-    if (!(entity instanceof AuditableModel)) {
-      return changed;
+
+    if (entity instanceof AuditableModel) {
+      final User user = this.getUser();
+      for (int i = 0; i < propertyNames.length; i++) {
+        if (state[i] != null) {
+          continue;
+        }
+        if (CREATED_ON.equals(propertyNames[i])) {
+          state[i] = LocalDateTime.now();
+          changed = true;
+        }
+        if (CREATED_BY.equals(propertyNames[i]) && user != null) {
+          state[i] = user;
+          changed = true;
+        }
+      }
+
+      if (tracker.get() != null) {
+        // change tracking
+        tracker.get().track((AuditableModel) entity, propertyNames, state, null);
+      }
     }
 
-    final User user = this.getUser();
-    for (int i = 0; i < propertyNames.length; i++) {
-      if (state[i] != null) {
-        continue;
-      }
-      if (CREATED_ON.equals(propertyNames[i])) {
-        state[i] = LocalDateTime.now();
-      }
-      if (CREATED_BY.equals(propertyNames[i]) && user != null) {
-        state[i] = user;
-      }
-    }
-
-    if (tracker.get() != null) {
-      // change tracking
-      tracker.get().track((AuditableModel) entity, propertyNames, state, null);
+    if (entity instanceof Model && tracker.get() != null) {
       // for before completion event
-      tracker.get().updated((AuditableModel) entity);
+      tracker.get().updated((Model) entity);
     }
 
-    return true;
+    return changed;
   }
 
   @Override
