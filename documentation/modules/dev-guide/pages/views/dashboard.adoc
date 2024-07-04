@@ -2,12 +2,15 @@
 :toc:
 :toc-title:
 
-The dashboard is used to provide overviews. The dashboard view is composed of
-dashlets.
+The dashboard is used to provide overviews. The dashboard view is composed of dashlets and optional search fields.
 
 [source,xml]
 -----
 <dashboard name="welcome.dashboard" title="Welcome!">
+  <search-fields>
+    <field name="fromDate" type="Date" title="From date"/>
+    <field name="toDate" type="Date" title="To date"/>
+  </search-fields>
   <dashlet action="chart:chart.sales.per.month"/>
   <dashlet action="chart:chart.sales.per.month.pie"/>
   <dashlet colSpan="12" action="sale.orders"/>
@@ -25,3 +28,7 @@ and `<view-name>`, the name of the view.
 
 The recommended way is to use an `action-view` instead of `<view-type>:<view-name>`. It 
 provides more controls and configuration of what is displayed.
+
+The search fields will be added on top of the dashboard. They can be filled with `onInit` event
+on dashboard. As soon they are filled or/and changed, dashboard dashlets will use the values
+in their respective context.

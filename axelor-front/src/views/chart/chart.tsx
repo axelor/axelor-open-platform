@@ -37,7 +37,7 @@ import classes from "./chart.module.scss";
 export function Chart(props: ViewProps<ChartView>) {
   const { meta } = props;
   const chartName = meta.view.name!;
-  const getContext = useViewContext();
+  const getContext = useViewContext({ dashboard: false });
   const [view, setView] = useState<ChartView>();
 
   useAsyncEffect(async () => {

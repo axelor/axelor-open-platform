@@ -1,0 +1,7 @@
+.form {
+  --ax-theme-panel-border: none;
+  height: fit-content;
+  & > * {
+    flex: 1;
+  }
+}

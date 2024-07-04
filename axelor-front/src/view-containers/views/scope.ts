@@ -32,6 +32,7 @@ import {
   useFormScope,
 } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
+import { useDashboardContext } from "@/views/dashboard/scope";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -89,14 +90,21 @@ export function useViewAction() {
   return tab.action;
 }
 
+const DEFAULT_CONTEXT = {};
+
 /**
  * This scoped hook can be used to access view context.
  *
  * @returns Context
  */
-export function useViewContext() {
+export function useViewContext({
+  dashboard = true,
+}: { dashboard?: boolean } = {}) {
   const { action, dashlet } = useViewTab();
   const { formAtom } = useFormScope();
+  const _dashboardContext = useDashboardContext();
+  const dashboardContext = dashboard ? _dashboardContext : DEFAULT_CONTEXT;
+
   const setState = useFormActiveHandler();
 
   const getFormContext = usePrepareContext(formAtom);
@@ -122,14 +130,16 @@ export function useViewContext() {
           ? {
               ...action.context,
               _parent,
+              ...dashboardContext,
             }
           : {
               ..._parent,
               ...action.context,
+              ...dashboardContext,
             },
       );
     },
-    [dashlet, recordId, action.context, getFormContext],
+    [dashlet, recordId, dashboardContext, action.context, getFormContext],
   );
 }
 

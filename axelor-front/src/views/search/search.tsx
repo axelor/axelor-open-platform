@@ -37,39 +37,15 @@ import {
 } from "@/hooks/use-parser/utils";
 import { DEFAULT_SEARCH_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { toKebabCase } from "@/utils/names";
-import { searchData } from "./utils";
-import { getFieldServerType, getWidget } from "@/views/form/builder/utils";
+import {
+  prepareSearchFields,
+  prepareSearchFormMeta,
+  processSearchField,
+  searchData,
+} from "./utils";
 import { processView } from "@/services/client/meta-utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import styles from "./search.module.scss";
-
-function prepareFields(fields: SearchView["searchFields"]) {
-  return (fields || []).reduce((fields, _field) => {
-    const field = { ..._field, type: _field.type?.toUpperCase?.() };
-
-    if (field.type === "REFERENCE") {
-      field.type = "MANY_TO_ONE";
-    }
-    if ((field.selection || field.selectionList) && !field.widget) {
-      field.widget = "Selection";
-    }
-
-    field.serverType =
-      getFieldServerType({ ...field, type: "field" }, field) ?? "STRING";
-    field.widget = getWidget(field, null);
-
-    if (["INTEGER", "LONG", "DECIMAL"].includes(field.serverType)) {
-      field.nullable = true;
-    }
-
-    return field.name
-      ? {
-          ...fields,
-          [field.name]: { ...field, type: "field" },
-        }
-      : fields;
-  }, {}) as Record<string, Property>;
-}
 
 export function Search(props: ViewProps<SearchView>) {
   const location = useLocation();
@@ -105,79 +81,43 @@ export function Search(props: ViewProps<SearchView>) {
   );
 
   const { formMeta, formView } = useMemo(() => {
-    const { view, searchForm } = meta as ViewData<SearchView> & {
+    const { searchForm } = meta as ViewData<SearchView> & {
       searchForm: FormView;
     };
-    const { title, name, searchFields = [], selects } = view;
-    const fields = prepareFields(searchFields);
-    const model = meta.model || selects?.find((s) => s.model)?.model;
 
-    function process(item: Schema) {
-      if ((item as Schema).items) {
-        (item as Schema).items?.forEach(process);
-      } else {
-        (item as Schema).canDirty = false;
-      }
-
-      const type = toKebabCase(item.widget ?? item.serverType ?? item.type);
-
-      switch (type) {
-        case "many-to-one":
-        case "one-to-one":
-        case "suggest-box":
-          item.canNew = false;
-          item.canEdit = false;
-          break;
-        case "one-to-many":
-        case "many-to-many":
-        case "master-detail":
-          item.hidden = true;
-          break;
-      }
-    }
+    const model = meta.model || meta.view.selects?.find((s) => s.model)?.model;
+    const searchFormMeta = prepareSearchFormMeta({
+      ...meta,
+      model,
+    });
 
     const formView = clone(searchForm);
-
     if (formView) {
-      const formViewMeta = { fields, view: formView } as ViewData<FormView>;
+      const formViewMeta = {
+        fields: searchFormMeta.fields,
+        view: formView,
+      } as ViewData<FormView>;
       processView(formViewMeta, formView);
-      process(formView as unknown as SearchField);
+      processSearchField(formView as unknown as SearchField);
     }
 
     return {
-      formMeta: {
-        ...meta,
-        model,
-        view: {
-          type: "form",
-          model,
-          items: formView?.items ?? [
-            {
-              colSpan: 12,
-              name,
-              type: "panel",
-              title,
-              showFrame: true,
-              items: (() => {
-                const items = searchFields.map((field) => ({
-                  ...field,
-                  ...fields[field.name ?? ""],
-                }));
-                items.forEach(process);
-                return items;
-              })(),
+      formMeta: formView?.items
+        ? {
+            ...searchFormMeta,
+            view: {
+              ...searchFormMeta.view,
+              items: formView?.items,
             },
-          ],
-        },
-        fields: fields as Record<string, Property>,
-      } as unknown as ViewData<FormView>,
+          }
+        : searchFormMeta,
       formView,
     };
   }, [meta]);
 
   const gridView = useMemo(() => {
     const { name, hilites, buttons, resultFields } = view;
-    const fields = prepareFields(
+    const fields = prepareSearchFields(
       resultFields,
     ) as unknown as SearchResultField[];
     const items = [...(Object.values(fields) || [])];

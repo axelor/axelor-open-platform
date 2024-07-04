@@ -1,0 +1,7 @@
+---
+title: Add search-field support in dashboard
+type: feature
+description: |
+  This allow to add search fields on top of the dashboard. Fields 
+  can be filled when the dashboard loads with `onInit` event. Fields
+  values will be add in context of all dashlets.

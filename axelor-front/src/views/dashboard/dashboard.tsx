@@ -16,10 +16,14 @@ import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { useViewContext } from "@/view-containers/views/scope";
 import { useDevice } from "@/hooks/use-responsive";
+import { DataRecord } from "@/services/client/data.types";
 
 import "react-grid-layout/css/styles.css";
 import "./react-grid-layout.css";
 
+import { DashboardContext } from "./scope";
+import { prepareSearchFormMeta } from "../search/utils";
+import { DashboardSearch } from "./dashboard-search";
 import dashletStyles from "../form/widgets/dashlet/dashlet.module.scss";
 import styles from "./dashboard.module.scss";
 
@@ -88,9 +92,29 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const saved = useRef(false);
   const getContext = useViewContext();
 
+  // dashboard context
+  const [context, setContext] = useState({} as DataRecord);
+  const [isFormInit, setFormInit] = useState(!view.onInit);
+
   const isRTL = useTheme().dir === "rtl";
 
   const hasViewCustomize = isUserAllowedCustomizeViews() && !isMobile;
+
+  const searchFormMeta = useMemo(
+    () =>
+      meta.view.searchFields?.length
+        ? prepareSearchFormMeta({
+            ...meta,
+            view: {
+              ...meta.view,
+              name: "__search-fields-view__",
+              title: "",
+            },
+            model: "com.axelor.meta.db.MetaAction",
+          })
+        : null,
+    [meta],
+  );
 
   const updateLayout = useCallback(
     (updater: (key: MEDIA_TYPE, layouts?: Layout[]) => Layout[]) => {
@@ -135,7 +159,7 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
     [],
   );
 
-  const handleDashletViewLoad = useCallback(
+  const handleItemViewLoad = useCallback(
     (schema: Schema, viewId?: number, viewType?: string) => {
       const viewItems = items;
       updateLayout((type: MEDIA_TYPE, items?: Layout[]) => {
@@ -245,6 +269,14 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
     }
   }, [ref, width]);
 
+  const onSearchValueChanged = useCallback((values: DataRecord) => {
+    setContext((vals) => ({ ...vals, ...values }));
+  }, []);
+
+  const onInitCompleted = useCallback(() => {
+    setFormInit(true);
+  }, []);
+
   const children = useMemo(
     () =>
       items.map((item, index) => (
@@ -256,13 +288,15 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             })}
             schema={item}
             viewId={index}
-            onViewLoad={handleDashletViewLoad}
+            onViewLoad={handleItemViewLoad}
             getContext={getContext}
           />
         </Box>
       )),
-    [items, hasViewCustomize, handleDashletViewLoad, getContext],
+    [items, hasViewCustomize, handleItemViewLoad, getContext],
   );
+
+  const isReady = searchFormMeta ? isFormInit : true;
 
   return (
     <Box
@@ -275,26 +309,38 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
       flexGrow={1}
     >
       <Box w={100}>
-        {layouts && (
-          <GridLayout
-            isBounded={true}
-            isDraggable={hasViewCustomize}
-            className={styles.layout}
-            layouts={layouts}
-            rowHeight={CARD_HEIGHT}
-            resizeHandles={["se"]}
-            breakpoints={BREAKPOINTS}
-            cols={COLS}
-            draggableHandle={`.${dashletStyles.header}`}
-            onLayoutChange={handleLayoutChange}
-            onDragStart={handleDragStart}
-            onDragStop={handleDragStop}
-            onResizeStart={handleInit}
-            onResizeStop={handleResize}
-          >
-            {children}
-          </GridLayout>
+        {searchFormMeta && (
+          <Box d="flex" m={2} border roundedTop>
+            <DashboardSearch
+              meta={searchFormMeta}
+              onInit={view.onInit}
+              onInitCompleted={onInitCompleted}
+              onChange={onSearchValueChanged}
+            />
+          </Box>
         )}
+        <DashboardContext.Provider value={context}>
+          {isReady && layouts && (
+            <GridLayout
+              isBounded={true}
+              isDraggable={hasViewCustomize}
+              className={styles.layout}
+              layouts={layouts}
+              rowHeight={CARD_HEIGHT}
+              resizeHandles={["se"]}
+              breakpoints={BREAKPOINTS}
+              cols={COLS}
+              draggableHandle={`.${dashletStyles.header}`}
+              onLayoutChange={handleLayoutChange}
+              onDragStart={handleDragStart}
+              onDragStop={handleDragStop}
+              onResizeStart={handleInit}
+              onResizeStop={handleResize}
+            >
+              {children}
+            </GridLayout>
+          )}
+        </DashboardContext.Provider>
       </Box>
     </Box>
   );
