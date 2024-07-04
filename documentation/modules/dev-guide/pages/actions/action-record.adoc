@@ -7,8 +7,8 @@ The `<action-record>` can be used to construct an object with some values.
 [source,xml]
 -----
 <action-record name="default-order-record" model="com.axelor.sale.db.Order">
-  <field name="customer" expr="action:default-customer-record" if="!(__ref__ instanceof Contact)"/>
-  <field name="customer" expr="eval: __ref__" if="__ref__ instanceof Contact"/>
+  <field name="customer" expr="action:default-customer-record" if="!_contact"/>
+  <field name="customer" expr="eval: _contact" if="_contact"/>
   <field name="orderDate" expr="eval: __date__"/>
   <field name="createDate" expr="eval: __date__"/>
   <field name="items" expr="action:default-orderline-record"/>

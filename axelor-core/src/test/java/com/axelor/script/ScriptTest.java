@@ -382,7 +382,15 @@ public abstract class ScriptTest extends JpaTest {
     parent.put("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
     values.put("_parent", parent);
-    values.put("_ref", parent);
+
+    final Map<String, Object> searchResultContext = new HashMap<>();
+    searchResultContext.put("model", Contact.class.getName());
+    searchResultContext.put("ids", List.of(contact.getId()));
+
+    final Map<String, Object> searchContext = new HashMap<>();
+    searchContext.put("_mySearchField", "Some");
+    searchContext.put("_results", List.of(searchResultContext));
+    values.put("_searchContext", searchContext);
 
     return values;
   }

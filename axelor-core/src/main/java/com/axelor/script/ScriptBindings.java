@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.script.SimpleBindings;
@@ -115,9 +116,9 @@ public class ScriptBindings extends SimpleBindings {
         if (bean == null || bean.getId() == null) return null;
         return JPA.em().getReference(EntityHelper.getEntityClass(bean), bean.getId());
       case "__ref__":
-        Map values = (Map) variables.get("_ref");
-        Class<?> klass = Class.forName((String) values.get("_model"));
-        return JPA.em().getReference(klass, Long.parseLong(values.get("id").toString()));
+        Map values = (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).get(0);
+        Class<?> klass = Class.forName((String) values.get("model"));
+        return JPA.em().getReference(klass, Long.parseLong(((List) values.get("ids")).get(0).toString()));
     }
     return null;
   }

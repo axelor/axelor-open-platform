@@ -124,7 +124,7 @@ Some built-in variables are available to be used with expressions. This includes
 * `\\__this__` - the record being edited (representing form values)
 * `\\__self__` - the corresponding record from the database
 * `\\__parent__` - the parent record
-* `\\__ref__` - the selected record in multi-object search view
+* `\\__ref__` - the first selected record in multi-object search view
 * `\\__id__` - ID of the current record
 * `\\__ids__` - list of IDs of the selected records
 * `\\__config__` - xref:../application/config.adoc#global-context-configuration[global context configuration]

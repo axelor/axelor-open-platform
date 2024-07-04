@@ -424,7 +424,6 @@ export function Search(props: ViewProps<SearchView>) {
             context: {
               ...actionView.context,
               _searchContext,
-              _ref: { ...(selected ?? {}), _action: actionName },
             },
           });
         }
