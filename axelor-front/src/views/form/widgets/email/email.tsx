@@ -8,20 +8,15 @@ import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { String } from "../string";
+import { Validators } from "@/utils/validate";
+import { Field } from "@/services/client/meta.types";
 
 import styles from "./email.module.scss";
 
 export function Email(props: FieldProps<string>) {
-  const { readonly, valueAtom, schema } = props;
-  const { pattern } = schema;
+  const { schema, readonly, valueAtom } = props;
   const value = useAtomValue(valueAtom);
   const [email, setEmail] = useState(value);
-
-  const regexp = useMemo(() => new RegExp(pattern ?? "", "i"), [pattern]);
-
-  const isValidEmail = useMemo(() => {
-    return email && regexp.test(email);
-  }, [email, regexp]);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -30,6 +25,18 @@ export function Email(props: FieldProps<string>) {
   const handleOpenEmailLink = useCallback(() => {
     window.location.href = `mailto:${email}`;
   }, [email]);
+
+  // to live validate email on input change
+  // instead of on input blur through invalid prop
+  const canOpenEmail = useMemo(
+    () =>
+      email &&
+      !Validators.string(email, {
+        props: schema as Field,
+        context: { [schema.name]: email },
+      }),
+    [email, schema],
+  );
 
   useEffect(() => {
     setEmail(value);
@@ -46,6 +53,7 @@ export function Email(props: FieldProps<string>) {
       </FieldControl>
     );
   }
+
   return (
     <String
       {...props}
@@ -54,7 +62,7 @@ export function Email(props: FieldProps<string>) {
       inputEndAdornment={
         <Button
           onClick={handleOpenEmailLink}
-          disabled={!isValidEmail}
+          disabled={!canOpenEmail}
           title={i18n.get("Write an email")}
         >
           <BootstrapIcon icon={"envelope"} />
