@@ -27,6 +27,23 @@ For example, if a user selects `fr-CA` (Canadian French) as their language and a
 in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not
 found, original translation key is used, which is typically the message for the default language, `en` (English).
 
+== String pattern validation set to be case-sensitive
+
+String pattern validation, through the attribute `pattern`, is now case-sensitive. To manage case-insensitive, it
+should be managed in regex expression itself.
+
+Example :
+
+- `^Foo`      : it matches string starts with `Foo`.
+- `^(F|f)oo`  : it matches string starts with `foo` or `Foo`.
+
+Note that it doesn't match the entire value but any subset. In order to match the entire value, add `^` at the start of
+the pattern and a `$` at the end.
+
+If coming from an older version (< v7),  `x-pattern` attribute was commonly used (due to historical reasons). This is
+no more recommended and this attribute has no more effect. Migrate from `x-pattern` to `pattern` and adjust your regex
+according. Note that `x-pattern` was matching the entire value whereas `pattern` don't.
+
 == Dependencies upgrade
 
 Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
@@ -35,6 +52,5 @@ list.
 == Others Notable Changes
 
 - Some layout changes in the login page as part of customizations (xref:dev-guide:application/config.adoc#custom-login-page[doc])
-
 
 

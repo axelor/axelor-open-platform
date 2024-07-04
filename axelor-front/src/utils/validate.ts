@@ -34,7 +34,7 @@ const validatePattern: Validate = (value, { props }) => {
     typeof value === "string" &&
     value &&
     ((["duration", "time"].includes(widget ?? "") && value?.includes?.("_")) ||
-      (pattern && !new RegExp(pattern, "i").test(value)))
+      (pattern && !new RegExp(pattern).test(value)))
   ) {
     return { pattern: i18n.get("{0} is not in proper format", title) };
   }
