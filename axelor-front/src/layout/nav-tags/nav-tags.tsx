@@ -1,12 +1,17 @@
 import { useEffect } from "react";
 import { useTags } from "@/hooks/use-tags";
-
-const POLL_INTERVAL = 10000;
+import { getPollingInterval } from "@/utils/app-settings.ts";
 
 export function NavTags() {
   const { fetchTags } = useTags();
+  const pollingInterval = getPollingInterval();
 
   useEffect(() => {
+    
+    if (pollingInterval < 1000) {
+      return;
+    }
+    
     let pollPromise: NodeJS.Timeout | null = null;
     let pollIdle: NodeJS.Timeout | null = null;
 
@@ -29,9 +34,9 @@ export function NavTags() {
 
     var pending = false;
     var pendingReset = () => {
-      pollPromise = setTimeout(findTags, POLL_INTERVAL);
+      pollPromise = setTimeout(findTags, pollingInterval);
       if (pollIdle === null) {
-        pollIdle = setTimeout(cancelPolling, POLL_INTERVAL * 2);
+        pollIdle = setTimeout(cancelPolling, pollingInterval * 2);
       }
       pending = false;
     };
@@ -67,7 +72,7 @@ export function NavTags() {
       window.removeEventListener("touchmove", startPolling, false);
       window.removeEventListener("MSPointerMove", startPolling, false);
     };
-  }, [fetchTags]);
+  }, [fetchTags, pollingInterval]);
 
   return null;
 }

@@ -37,6 +37,7 @@ export interface SessionInfo {
     aopVersion?: string;
     aopBuildDate?: string;
     aopGitHash?: string;
+    pollingInterval?: number;
     swaggerUI?: {
       enabled?: boolean;
       allowTryItOut?: boolean;

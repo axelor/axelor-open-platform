@@ -112,6 +112,8 @@ public class InfoService extends AbstractService {
     map.put("aopVersion", VersionUtils.getVersion().version);
     map.put("aopBuildDate", VersionUtils.getBuildDate());
     map.put("aopGitHash", VersionUtils.getGitHash());
+    map.put(
+        "pollingInterval", SETTINGS.getInt(AvailableAppSettings.APPLICATION_POLLING_INTERVAL, 10));
 
     map.put("swaggerUI", swaggerUIInfo());
 

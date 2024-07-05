@@ -1,0 +1,8 @@
+---
+title: Allow to configure client polling interval
+type: feature
+description: |
+  Client poll menu tags each 10 seconds. On application with a large number of active users 
+  and number of tags, this interval can lead to a number of performance issues.
+  `application.polling-interval` property can be configured to define how often the client polls 
+  in seconds. This isn't recommended to set a value lower than 10 seconds.

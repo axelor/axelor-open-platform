@@ -210,6 +210,7 @@ db.default.password = secret
 | `application.theme` | CSS theme | default theme
 | `application.locale` | default locale | system default
 | `application.base-url` | base url of the application |
+| `application.polling-interval` | how often client polls in seconds (ie, menu tags fetch), < 1 means disabled | 10
 | `application.multi-tenancy` | enable multi-tenancy | false
 | `application.config-provider` | `if-feature` custom class |
 | `application.domain-blocklist-pattern` | pattern to validate domain expressions |

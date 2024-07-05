@@ -12,6 +12,8 @@ export const DEFAULT_SEARCH_PAGE_SIZE = 80;
 export const DEFAULT_MESSAGE_PAGE_SIZE = 80;
 // Default number of items to display on completion
 export const DEFAULT_COMPLETION_PAGE_SIZE = 10;
+// Default polling interval in seconds
+export const DEFAULT_POLLING_INTERVAL = 10;
 
 /**
  * Checks if the application is running in a production mode
@@ -56,5 +58,15 @@ export function isUserAllowedCustomizeViews(): boolean {
   return Boolean(
     session.info?.view?.allowCustomization !== false &&
       session.info?.user?.viewCustomizationPermission,
+  );
+}
+
+/**
+ * Get the polling interval in ms.
+ */
+export function getPollingInterval(): number {
+  return (
+    (session.info?.application?.pollingInterval ?? DEFAULT_POLLING_INTERVAL) *
+    1000
   );
 }
