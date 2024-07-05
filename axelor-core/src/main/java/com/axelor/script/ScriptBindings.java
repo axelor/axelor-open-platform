@@ -118,7 +118,8 @@ public class ScriptBindings extends SimpleBindings {
       case "__ref__":
         Map values = (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).get(0);
         Class<?> klass = Class.forName((String) values.get("model"));
-        return JPA.em().getReference(klass, Long.parseLong(((List) values.get("ids")).get(0).toString()));
+        return JPA.em()
+            .getReference(klass, Long.parseLong(((List) values.get("ids")).get(0).toString()));
     }
     return null;
   }
