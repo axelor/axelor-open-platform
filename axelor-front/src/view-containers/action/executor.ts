@@ -60,6 +60,15 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
   const actionAttrResult: ActionResult["attrs"] = {};
   const otherResults: ActionResult[] = [];
 
+  function setAttrs(key: string, values: Record<string, any>) {
+    if (Object.keys(values).length > 0) {
+      actionAttrResult![key] = {
+        ...actionAttrResult?.[key],
+        ...values,
+      };
+    }
+  }
+
   function setValues(values: Partial<DataRecord>) {
     actionValueResult = mergeValues(actionValueResult!, values);
   }
@@ -69,14 +78,13 @@ const processActionResult = (result: ActionResult[]): ActionResult[] => {
     if (attrs) {
       Object.entries(attrs).forEach(([k, v]) => {
         if (v && typeof v === "object" && "value" in v) {
+          const { value, ...other } = v;
           setValues({
-            [k]: v.value,
+            [k]: value,
           });
+          setAttrs(k, other);
         } else {
-          actionAttrResult![k] = {
-            ...actionAttrResult?.[k],
-            ...v,
-          };
+          setAttrs(k, v);
         }
       });
     }
