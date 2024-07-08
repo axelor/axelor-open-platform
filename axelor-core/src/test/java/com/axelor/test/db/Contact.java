@@ -34,7 +34,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -96,7 +95,6 @@ public class Contact extends JpaModel {
   private Set<Circle> circles;
 
   @Widget(title = "Photo", help = "Max size 4MB.")
-  @Lob
   @Basic(fetch = FetchType.LAZY)
   private byte[] image;
 

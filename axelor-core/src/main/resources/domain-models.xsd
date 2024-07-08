@@ -464,7 +464,7 @@
         <xsd:attribute name="large" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              Whether the text value is large (CLOB in database).
+              Whether the text value is large (use default LOB length).
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

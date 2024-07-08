@@ -34,7 +34,6 @@ import com.google.common.base.Preconditions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -64,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.hibernate.Length;
 import org.hibernate.usertype.UserType;
 
 public class Property {
@@ -167,11 +167,6 @@ public class Property {
 
     for (Annotation annotation : annotations) {
 
-      if (annotation instanceof Lob) {
-        if (type == PropertyType.STRING) type = PropertyType.TEXT;
-        else if (type != PropertyType.TEXT) type = PropertyType.BINARY;
-      }
-
       if (javaType == BigDecimal.class) {
         type = PropertyType.DECIMAL;
       }
@@ -215,8 +210,13 @@ public class Property {
       }
 
       if (annotation instanceof Column) {
-        unique = ((Column) annotation).unique();
-        nullable = ((Column) annotation).nullable();
+        final Column column = (Column) annotation;
+        unique = column.unique();
+        nullable = column.nullable();
+
+        if (column.length() >= Length.LOB_DEFAULT && type == PropertyType.STRING) {
+          type = PropertyType.TEXT;
+        }
       }
 
       // Give javax.validators precedence

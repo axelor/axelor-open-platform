@@ -999,7 +999,6 @@ public abstract class Property {
 
     if (isTrue(large) || type == PropertyType.BINARY) {
       return List.of(
-          new JavaAnnotation("jakarta.persistence.Lob"),
           new JavaAnnotation("jakarta.persistence.Basic")
               .param("fetch", "{0:m}", "jakarta.persistence.FetchType.LAZY"));
     }
