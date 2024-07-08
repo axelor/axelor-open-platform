@@ -798,6 +798,11 @@
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="data-description" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Specify description of the step under the label for Stepper widget.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:anyAttribute processContents="skip" />
             </xsd:extension>
           </xsd:simpleContent>
@@ -1106,6 +1111,27 @@
     <xsd:attribute name="x-drawing-width" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>The drawing width in px, default to 500</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-stepper-type">
+      <xsd:annotation>
+        <xsd:documentation>The stepper type to change step indicator. `icon` only works on `selection` fields. Default to `numeric`</xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="numeric" />
+          <xsd:enumeration value="icon" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="x-stepper-show-description" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>Whether to show step description below step label. Only works on `selection` fields with `data-description`. Default to `false`</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-stepper-completed" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>Display current step as validated instead of in process (fully colored instead of having a simple border). Default to `true`</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />

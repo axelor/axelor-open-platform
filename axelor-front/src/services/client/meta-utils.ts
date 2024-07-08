@@ -103,6 +103,8 @@ function processWidgetAttrs(field: Schema) {
         "selectionShowCheckbox",
         "ratingFill",
         "ratingHighlightSelected",
+        "stepperCompleted",
+        "stepperShowDescription",
         "resetState"
       ].indexOf(name) !== -1
     ) {

@@ -380,7 +380,9 @@ public class Field extends SimpleWidget {
     }
 
     String widget = getWidget();
-    if ("NavSelect".equals(widget) || "nav-select".equals(widget)) {
+    if ("NavSelect".equalsIgnoreCase(widget)
+        || "nav-select".equals(widget)
+        || "stepper".equalsIgnoreCase(widget)) {
       Class<?> targetClass = getTargetClass();
       Integer limit = getLimit();
       if (targetClass != null) {

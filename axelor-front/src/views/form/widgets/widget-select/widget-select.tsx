@@ -34,6 +34,7 @@ const NAMES = [
   "RelativeTime",
   "SelectProgress",
   "SingleSelect",
+  "Stepper",
   "SuggestBox",
   "TagSelect",
   "Text",

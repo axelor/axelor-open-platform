@@ -56,6 +56,7 @@ export * from "./separator";
 export * from "./single-select";
 export * from "./spacer";
 export * from "./static";
+export * from "./stepper";
 export * from "./string";
 export * from "./suggest-box";
 export * from "./tag-select";

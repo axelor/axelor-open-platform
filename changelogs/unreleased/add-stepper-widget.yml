@@ -1,0 +1,6 @@
+---
+title: Add stepper widget
+type: feature
+description: |
+  This provides the ability to indicate progress through a multi-step process similarly to `NavSelect`.
+  It can be used on `selection`, `enum` and `many-to-one` fields.

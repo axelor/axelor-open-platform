@@ -756,6 +756,26 @@ The `NavSelect` widget is a breadcrumb like widget and can be used with selectio
 
 image::widgets/nav-select.png[]
 
+== Stepper
+
+The `Stepper` widget works on `selection`, `enum` and `many-to-one` fields. It is used to indicate progress
+through a multi-step process.
+
+[source,xml]
+----
+<field name="status" widget="Stepper" />
+<field name="stepper" widget="Stepper" x-stepper-show-description="true" x-stepper-type="icon" x-stepper-completed="false" selection="stepper.process.selection"/>
+----
+
+image::widgets/stepper.png[]
+image::widgets/stepper-2.png[]
+
+The following attributes are supported:
+
+* `x-stepper-show-description`: If true, display description below label. Works only for `selection` fields with `data-description` attribute. Default to `false`.
+* `x-stepper-type`: If value is "icon", display icon instead of numeric indicator. Works only for `selection` fields with `icon` attribute. Default to `numeric`.
+* `x-stepper-completed`: If true, the current step indicator is fully colored instead of having a simple border. Default to `true`.
+
 == RadioSelect
 
 The `RadioSelect` widget can be used with selection fields. The field is rendered

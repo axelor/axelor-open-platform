@@ -104,6 +104,7 @@ public class I18nExtractor {
           "placeholder",
           "x-true-text",
           "x-false-text",
+          "data-description",
           "confirm-btn-title",
           "cancel-btn-title");
 
