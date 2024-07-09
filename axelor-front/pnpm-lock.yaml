@@ -104,8 +104,8 @@ dependencies:
     specifier: 1.4.3
     version: 1.4.3(react-dom@18.3.1)(react@18.3.1)
   react-international-phone:
-    specifier: ^4.2.6
-    version: 4.2.6(react@18.3.1)
+    specifier: ^4.3.0
+    version: 4.3.0(react@18.3.1)
   react-router-dom:
     specifier: ^6.22.3
     version: 6.22.3(react-dom@18.3.1)(react@18.3.1)
@@ -6691,8 +6691,8 @@ packages:
       react: 18.3.1
     dev: false
 
-  /react-international-phone@4.2.6(react@18.3.1):
-    resolution: {integrity: sha512-El/ZVYmov5uGuk07nrfxe7M3/4Y8HhA9c3aCpAwilbPU8DekISwNSZMplqxzvxS+TIavIh28ZMDDx1u/4GqULg==}
+  /react-international-phone@4.3.0(react@18.3.1):
+    resolution: {integrity: sha512-lIntIkwq2j0m3j4RsRiGJl/buHMLBd+mQ9S9RfiX3KbiUCUtbawoPCV2r8BvyeRMZI0cDtovoukBCuZ+70QzJA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
