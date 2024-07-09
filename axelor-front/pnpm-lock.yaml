@@ -68,11 +68,11 @@ dependencies:
     specifier: ^10.1.1
     version: 10.1.1
   jotai:
-    specifier: ^2.7.1
-    version: 2.7.2(@types/react@18.3.3)(react@18.3.1)
+    specifier: ^2.9.0
+    version: 2.9.0(@types/react@18.3.3)(react@18.3.1)
   jotai-immer:
-    specifier: ^0.3.0
-    version: 0.3.0(immer@10.1.1)(jotai@2.7.2)(react@18.3.1)
+    specifier: ^0.4.1
+    version: 0.4.1(immer@10.1.1)(jotai@2.9.0)
   jsdom:
     specifier: ^24.0.0
     version: 24.0.0
@@ -5714,20 +5714,18 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /jotai-immer@0.3.0(immer@10.1.1)(jotai@2.7.2)(react@18.3.1):
-    resolution: {integrity: sha512-k+o4rWfWWLyHfucHAdoiN+l8flxMrKC/bEFvJA98znj+kbPW5R90EPa1u8mhWLJTABW3xjAp7Z3kyD3FVi0Hgw==}
+  /jotai-immer@0.4.1(immer@10.1.1)(jotai@2.9.0):
+    resolution: {integrity: sha512-nQTt1HBKie/5OJDck1qLpV1PeBA6bjJLAczEYAx70PD8R4Mbu7gtexfBUCzJh6W6ecsOfwHksAYAesVth6SN9A==}
     peerDependencies:
-      immer: '*'
+      immer: '>=9.0.0'
       jotai: '>=2.0.0'
-      react: '>=17.0.0'
     dependencies:
       immer: 10.1.1
-      jotai: 2.7.2(@types/react@18.3.3)(react@18.3.1)
-      react: 18.3.1
+      jotai: 2.9.0(@types/react@18.3.3)(react@18.3.1)
     dev: false
 
-  /jotai@2.7.2(@types/react@18.3.3)(react@18.3.1):
-    resolution: {integrity: sha512-6Ft5kpNu8p93Ssf1Faoza3hYQZRIYp7rioK8MwTTFnbQKwUyZElwquPwl1h6U0uo9hC0jr+ghO3gcSjc6P35/Q==}
+  /jotai@2.9.0(@types/react@18.3.3)(react@18.3.1):
+    resolution: {integrity: sha512-MioTpMvR78IGfJ+W8EwQj3kwTkb+u0reGnTyg3oJZMWK9rK9v8NBSC9Rhrg9jrrFYA6bGZtzJa96zsuAYF6W3w==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=17.0.0'
