@@ -3,15 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
@@ -20,7 +12,7 @@ import {
 } from "@/hooks/use-parser/context";
 import { isCleanDummy, updateRecord } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { Schema, View } from "@/services/client/meta.types";
+import { JsonField, Schema, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import {
   ActionAttrsData,
@@ -31,7 +23,11 @@ import {
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-import { useViewMeta, useViewTab } from "@/view-containers/views/scope";
+import {
+  findViewItem,
+  useViewMeta,
+  useViewTab,
+} from "@/view-containers/views/scope";
 
 import { fallbackFormAtom } from "./atoms";
 import {
@@ -656,6 +652,85 @@ const updateJsonAtom = atom(
   },
 );
 
+const updateJsonFieldsAtom = atom(
+  null,
+  (get, set, formAtom: FormAtom, values?: DataRecord) => {
+    const { meta, fields } = get(formAtom);
+    const jsonFields: Record<string, Record<string, any>> = {};
+    const otherValues: Partial<DataRecord> = {};
+    const cacheViewItems: Record<string, any> = {};
+
+    // collect json fields
+    for (const [key, value] of Object.entries(values ?? {})) {
+      if (key.includes(".")) {
+        const [jsonField, ...fieldParts] = key.split(".");
+        const subField = fieldParts.join(".");
+
+        const hasExplictDefined = fields[key]?.jsonField;
+        const isDefineInJsonFields = () => {
+          const itemSchema =
+            cacheViewItems[jsonField] ??
+            (cacheViewItems[jsonField] = findViewItem(meta, jsonField) ?? {});
+          return (itemSchema?.jsonFields ?? []).some(
+            (f: JsonField) => f.name === subField,
+          );
+        };
+
+        if (hasExplictDefined || isDefineInJsonFields()) {
+          jsonFields[jsonField] = {
+            ...jsonFields[jsonField],
+            [subField]: value,
+          };
+          continue;
+        }
+      }
+      otherValues[key] = value;
+    }
+
+    if (Object.keys(jsonFields).length) {
+      const formState = get(formAtom);
+      let { record } = formState;
+      let dirty = false;
+
+      for (const [jsonField, jsonValues] of Object.entries(jsonFields)) {
+        const _values = (() => {
+          try {
+            const value = record[jsonField];
+            return value && typeof value === "string"
+              ? JSON.parse(value)
+              : value;
+          } catch (err) {
+            // handle error
+          }
+          return {};
+        })();
+
+        const jsonFieldValue = {
+          ..._values,
+          ...jsonValues,
+        };
+
+        if (!isEqual(_values, jsonFieldValue)) {
+          dirty = true;
+          record = {
+            ...record,
+            [jsonField]: JSON.stringify(jsonFieldValue),
+          };
+        }
+      }
+
+      dirty &&
+        set(formAtom, {
+          ...formState,
+          dirty,
+          record,
+        });
+    }
+
+    return Object.keys(otherValues).length ? otherValues : null;
+  },
+);
+
 function useActionRecord({
   formAtom,
   actionHandler,
@@ -665,6 +740,7 @@ function useActionRecord({
 }) {
   const canDirty = useCanDirty();
   const updateJson = useSetAtom(updateJsonAtom);
+  const updateJsonFields = useSetAtom(updateJsonFieldsAtom);
   const { findItem } = useViewMeta();
 
   useActionData<ActionValueData>(
@@ -672,13 +748,20 @@ function useActionRecord({
     useAtomCallback(
       useCallback(
         (get, set, data) => {
+          const formState = get(formAtom);
+          const updateFormAtom = formState.meta.view?.json
+            ? formState.parent!
+            : formAtom;
+
+          const values = updateJsonFields(updateFormAtom, data.value);
+          if (!values) return;
+
           // json field values?
-          if (updateJson(formAtom, data.value)) {
+          if (updateJson(formAtom, values)) {
             return;
           }
 
           const { record, fields } = get(formAtom);
-          const values = (data.value ?? {}) as DataRecord;
           const result = updateRecord(record, values, fields, { findItem });
           const isDirty = () =>
             result._dirty &&
@@ -691,7 +774,7 @@ function useActionRecord({
             record: result,
           }));
         },
-        [canDirty, formAtom, updateJson, findItem],
+        [canDirty, formAtom, updateJson, updateJsonFields, findItem],
       ),
     ),
     actionHandler,
