@@ -51,7 +51,7 @@ public class AppSettingsMergedTest {
     public void testMergedSettings() {
       AppSettings setting = AppSettings.get();
 
-      assertEquals(21, setting.getInternalProperties().size());
+      assertEquals(22, setting.getInternalProperties().size());
       assertEquals("3", setting.get("quartz.thread-count"));
       assertEquals("Tests", setting.get("application.name"));
 
@@ -78,7 +78,7 @@ public class AppSettingsMergedTest {
     public void testMergedSettings() {
       AppSettings setting = AppSettings.get();
 
-      assertEquals(23, setting.getInternalProperties().size());
+      assertEquals(24, setting.getInternalProperties().size());
       assertEquals("3", setting.get("quartz.thread-count"));
 
       // external config should get preference
