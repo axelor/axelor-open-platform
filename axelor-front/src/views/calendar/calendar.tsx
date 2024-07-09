@@ -403,8 +403,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     setMode(() => "day");
   }, []);
 
-  const onDateChange = useCallback((date: Date) => {
-    setDate(() => date);
+  const onDateChange = useCallback((date: Date | null) => {
+    setDate(() => date ?? new Date());
   }, []);
 
   const onFilterChange = useCallback((index: number) => {
