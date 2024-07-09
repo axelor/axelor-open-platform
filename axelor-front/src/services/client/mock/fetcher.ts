@@ -46,7 +46,7 @@ const handleFilters: Handler = () => async (input, init) => {
   const json = await bodyJson(init);
   const {
     context: { filterView },
-  } = json;
+  } = json.data;
   const module = await import(`./data/filters/${filterView}.json`);
   return respond(module);
 };
@@ -154,7 +154,7 @@ const handleCopy: Handler = (model, id) => async (input, init) => {
 const handlers: Record<string, Handler> = {
   "/callback": handleLogin,
   "/logout": handleLogout,
-  "/ws/app/info": handleInfo,
+  "ws/public/app/info": handleInfo,
   "/ws/action/menu/(?<type>[^/]+)": handleMenu,
   "/ws/action/com.axelor.meta.web.MetaFilterController:findFilters":
     handleFilters,
