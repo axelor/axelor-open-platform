@@ -38,6 +38,7 @@ import com.axelor.meta.schema.views.AbstractWidget;
 import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.ContainerView;
 import com.axelor.meta.schema.views.Dashboard;
+import com.axelor.meta.schema.views.Dashlet;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
@@ -360,13 +361,12 @@ public class ViewService extends AbstractService {
   @Hidden
   public Response save(Request request) {
     final Map<String, Object> data = request.getData();
-    final ObjectMapper om = Beans.get(ObjectMapper.class);
     try {
       final String type = (String) data.get("type");
       AbstractView view = null;
       switch (type) {
         case "dashboard":
-          view = om.readValue(om.writeValueAsString(data), Dashboard.class);
+          view = saveDashboard(data);
           break;
         case "grid":
           view = saveGridView(data);
@@ -385,6 +385,39 @@ public class ViewService extends AbstractService {
       throw new RuntimeException(e);
     }
     return null;
+  }
+
+  private AbstractView saveDashboard(Map<String, Object> json) {
+    final Object viewId = json.get("viewId");
+    final Object customViewId = json.get("customViewId");
+
+    final ObjectMapper om = Beans.get(ObjectMapper.class);
+    final Dashboard originalView =
+        viewId != null ? (Dashboard) XMLViews.findView(Long.parseLong(viewId.toString())) : null;
+    final Dashboard view =
+        customViewId == null
+            ? originalView
+            : (Dashboard) XMLViews.findCustomView(Long.parseLong(customViewId.toString()));
+
+    if (view == null) {
+      throw new IllegalArgumentException("Trying to save invalid view schema.");
+    }
+
+    final List<AbstractWidget> items = new ArrayList<>();
+
+    for (Object item : (List<?>) json.get("items")) {
+      final Map<Object, Object> map = (Map<Object, Object>) item;
+
+      try {
+        items.add(om.readValue(om.writeValueAsString(map), Dashlet.class));
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Trying to save invalid view schema.");
+      }
+    }
+
+    view.setItems(items);
+
+    return view;
   }
 
   private AbstractView saveGridView(Map<String, Object> json) {
