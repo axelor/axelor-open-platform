@@ -62,6 +62,12 @@ export function prepareSearchFields(fields?: SearchField[]) {
 
     if (field.type === "REFERENCE") {
       field.type = "MANY_TO_ONE";
+      field.canNew = "false";
+      field.canEdit = "false";
+      if(field.multiple) {
+        field.type = "ONE_TO_MANY";
+        field.widget = "tag-select";
+      }
     }
     if ((field.selection || field.selectionList) && !field.widget) {
       field.widget = "Selection";
