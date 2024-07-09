@@ -30,7 +30,7 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.ValueEnum;
-import com.axelor.db.annotations.Widget;
+import com.axelor.db.annotations.EnumWidget;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -58,7 +58,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -476,22 +475,34 @@ public final class MetaStore {
       final String name = item.name();
 
       option.setValue(name);
+      Map<String, Object> data = new HashMap<>();
+      option.setData(data);
 
       if (item instanceof ValueEnum<?>) {
         Object value = ((ValueEnum<?>) item).getValue();
         if (!Objects.equal(name, value)) {
-          Map<String, Object> data = new HashMap<>();
           data.put("value", value);
-          option.setData(data);
         }
       }
 
       try {
         final Field field = enumType.getDeclaredField(name);
-        final Widget widget = field.getAnnotation(Widget.class);
+        final EnumWidget widget = field.getAnnotation(EnumWidget.class);
+
+        if (widget.hidden()) {
+          continue;
+        }
+
         if (StringUtils.notBlank(widget.title())) {
           option.setTitle(widget.title());
         }
+        if (StringUtils.notBlank(widget.description())) {
+          data.put("description", widget.description());
+        }
+        if (StringUtils.notBlank(widget.icon())) {
+          option.setIcon(widget.icon());
+        }
+        option.setOrder(widget.order());
       } catch (Exception e) {
       }
 
@@ -501,6 +512,26 @@ public final class MetaStore {
 
       all.add(option);
     }
+
+    if (all.isEmpty()) {
+      return null;
+    }
+
+    return sortSelectionOptions(all);
+  }
+
+  private static List<Selection.Option> sortSelectionOptions(List<Selection.Option> all) {
+    all.sort(
+        (o1, o2) -> {
+          Integer n = o1.getOrder();
+          Integer m = o2.getOrder();
+
+          if (n == null) n = 0;
+          if (m == null) m = 0;
+
+          return Integer.compare(n, m);
+        });
+
     return all;
   }
 
@@ -551,23 +582,7 @@ public final class MetaStore {
       return null;
     }
 
-    final List<Selection.Option> values = new ArrayList<>(all.values());
-    Collections.sort(
-        values,
-        new Comparator<Selection.Option>() {
-          @Override
-          public int compare(Selection.Option o1, Selection.Option o2) {
-            Integer n = o1.getOrder();
-            Integer m = o2.getOrder();
-
-            if (n == null) n = 0;
-            if (m == null) m = 0;
-
-            return Integer.compare(n, m);
-          }
-        });
-
-    return values;
+    return sortSelectionOptions(new ArrayList<>(all.values()));
   }
 
   public static Selection.Option getSelectionItem(String selection, String value) {

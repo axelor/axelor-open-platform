@@ -1115,7 +1115,7 @@
     </xsd:attribute>
     <xsd:attribute name="x-stepper-type">
       <xsd:annotation>
-        <xsd:documentation>The stepper type to change step indicator. `icon` only works on `selection` fields. Default to `numeric`</xsd:documentation>
+        <xsd:documentation>The stepper type to change step indicator. Not supported on reference fields. Default to `numeric`</xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
@@ -1126,7 +1126,7 @@
     </xsd:attribute>
     <xsd:attribute name="x-stepper-show-description" type="xsd:boolean" default="false">
       <xsd:annotation>
-        <xsd:documentation>Whether to show step description below step label. Only works on `selection` fields with `data-description`. Default to `false`</xsd:documentation>
+        <xsd:documentation>Whether to show step description below step label. Not supported on reference fields. Default to `false`</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-stepper-completed" type="xsd:boolean" default="true">

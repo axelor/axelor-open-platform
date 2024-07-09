@@ -26,6 +26,8 @@ import com.axelor.tools.code.JavaAnnotation;
 import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaEnumConstant;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -45,6 +47,18 @@ public class EnumItem {
 
   @XmlAttribute(name = "help")
   private String help;
+
+  @XmlAttribute(name = "data-description")
+  private String description;
+
+  @XmlAttribute(name = "icon")
+  private String icon;
+
+  @XmlAttribute(name = "hidden")
+  private Boolean hidden;
+
+  @XmlAttribute(name = "order")
+  private Integer order;
 
   @XmlTransient private boolean numeric;
 
@@ -85,6 +99,38 @@ public class EnumItem {
     this.help = value;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
+
+  public Boolean getHidden() {
+    return hidden;
+  }
+
+  public void setHidden(Boolean hidden) {
+    this.hidden = hidden;
+  }
+
+  public Integer getOrder() {
+    return order;
+  }
+
+  public void setOrder(Integer order) {
+    this.order = order;
+  }
+
   public JavaEnumConstant toJavaEnumConstant() {
     JavaEnumConstant constant = new JavaEnumConstant(name);
     if (notBlank(value)) {
@@ -92,9 +138,28 @@ public class EnumItem {
       constant.arg(arg);
     }
 
+    JavaAnnotation enumAnnotation = new JavaAnnotation("com.axelor.db.annotations.EnumWidget");
+    Map<String, JavaCode> params = new HashMap<>();
+
     if (notBlank(title)) {
-      constant.annotation(
-          new JavaAnnotation("com.axelor.db.annotations.Widget").param("title", "{0:s}", title));
+      params.put("title", new JavaCode("{0:s}", title));
+    }
+    if (notBlank(description)) {
+      params.put("description", new JavaCode("{0:s}", description));
+    }
+    if (notBlank(icon)) {
+      params.put("icon", new JavaCode("{0:s}", icon));
+    }
+    if (order != null) {
+      params.put("order", new JavaCode("{0:l}", order));
+    }
+    if (hidden != null) {
+      params.put("hidden", new JavaCode("{0:l}", hidden));
+    }
+
+    if (!params.isEmpty()) {
+      params.forEach(enumAnnotation::param);
+      constant.annotation(enumAnnotation);
     }
 
     if (notBlank(help)) {

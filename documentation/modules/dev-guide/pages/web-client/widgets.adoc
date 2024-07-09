@@ -772,8 +772,8 @@ image::widgets/stepper-2.png[]
 
 The following attributes are supported:
 
-* `x-stepper-show-description`: If true, display description below label. Works only for `selection` fields with `data-description` attribute. Default to `false`.
-* `x-stepper-type`: If value is "icon", display icon instead of numeric indicator. Works only for `selection` fields with `icon` attribute. Default to `numeric`.
+* `x-stepper-show-description`: If true, display description below label. Not supported on reference fields. Default to `false`.
+* `x-stepper-type`: If value is "icon", display icon instead of numeric indicator. Not supported on reference fields. Default to `numeric`.
 * `x-stepper-completed`: If true, the current step indicator is fully colored instead of having a simple border. Default to `true`.
 
 == RadioSelect

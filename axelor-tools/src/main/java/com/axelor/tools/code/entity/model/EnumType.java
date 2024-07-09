@@ -110,6 +110,16 @@ public class EnumType implements BaseType<EnumType> {
     merge(existing.getName(), "title", existing.getTitle(), item.getTitle(), existing::setTitle);
     dontMerge(existing.getName(), "value", existing.getValue(), item.getValue());
     merge(existing.getName(), "help", existing.getHelp(), item.getHelp(), existing::setHelp);
+    merge(existing.getName(), "icon", existing.getIcon(), item.getIcon(), existing::setIcon);
+    merge(
+        existing.getName(),
+        "description",
+        existing.getDescription(),
+        item.getDescription(),
+        existing::setDescription);
+    merge(
+        existing.getName(), "hidden", existing.getHidden(), item.getHidden(), existing::setHidden);
+    merge(existing.getName(), "order", existing.getOrder(), item.getOrder(), existing::setOrder);
     logger.trace("Merged {}.{}", getName(), existing.getName());
   }
 

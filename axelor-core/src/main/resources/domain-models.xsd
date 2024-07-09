@@ -1194,6 +1194,30 @@
         <xsd:documentation>Help string.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="data-description" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify description of the step under the label for Stepper widget.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="icon" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Image icon to show for this item.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="order" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the sequence number to order the enum.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="hidden" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify whether to hide this option from enum.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="EnumType" mixed="true">
