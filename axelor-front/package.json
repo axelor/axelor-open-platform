@@ -33,7 +33,7 @@
     "dompurify": "^3.1.6",
     "echarts": "^5.5.1",
     "font-awesome": "^4.7.0",
-    "immer": "^10.0.4",
+    "immer": "^10.1.1",
     "jotai": "^2.7.1",
     "jotai-immer": "^0.3.0",
     "jsdom": "^24.0.0",
