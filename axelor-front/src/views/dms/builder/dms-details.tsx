@@ -216,11 +216,10 @@ function TagsForm({ meta, record, onSave }: TagFormProps) {
         actionHandler={actionHandler}
         actionExecutor={actionExecutor}
         recordHandler={recordHandler}
-        {...({} as any)}
       />
       <Box px={1} d="flex" alignItems="center">
         <MaterialIcon
-          icon="done"
+          icon="check"
           fill
           className={styles.icon}
           onClick={handleSave}

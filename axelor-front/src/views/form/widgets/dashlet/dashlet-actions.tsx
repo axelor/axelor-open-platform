@@ -219,7 +219,7 @@ function DashletListMenu(
           {
             key: "prev",
             iconProps: {
-              icon: "navigate_before",
+              icon: "chevron_backward",
             },
             className: clsx(classes.itemAction, {
               [classes.itemActionEnabled]: canPrev,
@@ -231,7 +231,7 @@ function DashletListMenu(
             key: "next",
             iconSide: "end",
             iconProps: {
-              icon: "navigate_next",
+              icon: "chevron_forward",
             },
             className: clsx(classes.itemAction, {
               [classes.itemActionEnabled]: canNext,

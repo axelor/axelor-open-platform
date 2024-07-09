@@ -191,7 +191,7 @@ function Header({
       {HeaderComp && <HeaderComp close={close} />}
       <Box d="flex" alignItems="center">
         <MaterialIcon
-          icon={expanded ? "expand_less" : "expand_more"}
+          icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
           className={styles.icon}
           onClick={() => setExpanded((prev) => !prev)}
         />

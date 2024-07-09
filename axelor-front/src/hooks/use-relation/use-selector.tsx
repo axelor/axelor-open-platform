@@ -168,7 +168,7 @@ function SelectorHeader({
         key: "prev",
         iconOnly: true,
         iconProps: {
-          icon: "navigate_before",
+          icon: "chevron_backward",
         },
         disabled: offset === 0,
         onClick: onPrev,
@@ -177,7 +177,7 @@ function SelectorHeader({
         key: "next",
         iconOnly: true,
         iconProps: {
-          icon: "navigate_next",
+          icon: "chevron_forward",
         },
         disabled: offset + limit >= totalCount,
         onClick: onNext,

@@ -469,7 +469,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
             {
               key: "prev",
               iconProps: {
-                icon: "navigate_before",
+                icon: "chevron_backward",
               },
               disabled: !canPrev,
               onClick: handlePrev,
@@ -478,7 +478,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               key: "next",
               iconSide: "end",
               iconProps: {
-                icon: "navigate_next",
+                icon: "chevron_forward",
               },
               disabled: !canNext,
               onClick: handleNext,
