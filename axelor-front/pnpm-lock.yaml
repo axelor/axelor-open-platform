@@ -47,8 +47,8 @@ dependencies:
     specifier: 2.3.2
     version: 2.3.2(patch_hash=7jwz2hglnrq3hxry2suq775qi4)
   bunshi:
-    specifier: ^2.1.4
-    version: 2.1.4(react@18.3.1)
+    specifier: ^2.1.5
+    version: 2.1.5(react@18.3.1)
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0
@@ -4213,8 +4213,8 @@ packages:
     dev: false
     optional: true
 
-  /bunshi@2.1.4(react@18.3.1):
-    resolution: {integrity: sha512-8kHpSsfFQu3Dj6nuVP5qr6wwqeXHbdu/hqrT1hdv6N4KcIQ0amHJYR0iSgjYhxazS6NlQb6JacP1/A7EJ+ZRAg==}
+  /bunshi@2.1.5(react@18.3.1):
+    resolution: {integrity: sha512-zO+qxwd2aBV+XUIf7LjL1G3lx5CtvbtXZD+WMkM9KD+RN0iFtitDVX2QDu/wzdQIj8hyXJlGDfVEfeoqhAVEfA==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16'
