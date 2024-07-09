@@ -50,7 +50,7 @@
     "react-router-dom": "^6.24.1",
     "react-text-mask": "^5.5.0",
     "react-transition-group": "^4.4.5",
-    "signature_pad": "^4.2.0",
+    "signature_pad": "^5.0.2",
     "swagger-ui-react": "^5.13.0"
   },
   "devDependencies": {
