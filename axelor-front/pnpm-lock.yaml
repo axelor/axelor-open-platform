@@ -56,8 +56,8 @@ dependencies:
     specifier: ^1.11.11
     version: 1.11.11
   dompurify:
-    specifier: ^3.0.11
-    version: 3.0.11
+    specifier: ^3.1.6
+    version: 3.1.6
   echarts:
     specifier: ^5.5.0
     version: 5.5.0
@@ -4710,6 +4710,10 @@ packages:
 
   /dompurify@3.0.11:
     resolution: {integrity: sha512-Fan4uMuyB26gFV3ovPoEoQbxRRPfTu3CvImyZnhGq5fsIEO+gEFLp45ISFt+kQBWsK5ulDdT0oV28jS1UrwQLg==}
+    dev: false
+
+  /dompurify@3.1.6:
+    resolution: {integrity: sha512-cTOAhc36AalkjtBpfG6O8JimdTMWNXjiePT2xQH/ppBGi/4uIpmj8eKyIkMJErXWARyINV/sB38yf8JCLF5pbQ==}
     dev: false
 
   /domutils@3.1.0:
