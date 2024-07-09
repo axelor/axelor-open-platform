@@ -113,11 +113,11 @@ export function DateComponent({
   }, []);
 
   const handleBlur = useCallback(
-    (e?: FocusEvent<HTMLInputElement>) => {
+    (e?: FocusEvent<HTMLElement>) => {
       if (changed) {
         let val = value ?? null;
         if (e) {
-          const targetValue = e.target?.value ?? null;
+          const targetValue = (e.target as HTMLInputElement)?.value ?? null;
           val =
             targetValue && moment(targetValue, format).isValid()
               ? (() => {

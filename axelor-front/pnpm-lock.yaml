@@ -92,8 +92,8 @@ dependencies:
     specifier: ^18.3.1
     version: 18.3.1
   react-datepicker:
-    specifier: ^6.6.0
-    version: 6.6.0(react-dom@18.3.1)(react@18.3.1)
+    specifier: ^7.3.0
+    version: 7.3.0(react-dom@18.3.1)(react@18.3.1)
   react-dom:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
@@ -2228,6 +2228,7 @@ packages:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       tabbable: 6.2.0
+    dev: true
 
   /@floating-ui/utils@0.1.6:
     resolution: {integrity: sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A==}
@@ -6559,13 +6560,13 @@ packages:
       react: 18.3.1
     dev: false
 
-  /react-datepicker@6.6.0(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-ERC0/Q4pPC9bNIcGUpdCbHc+oCxhkU3WI3UOGHkyJ3A9fqALCYpEmLc5S5xvAd7DuCDdbsyW97oRPM6pWWwjww==}
+  /react-datepicker@7.3.0(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-EqRKLAtLZUTztiq6a+tjSjQX9ES0Xd229JPckAtyZZ4GoY3rtvNWAzkYZnQUf6zTWT50Ki0+t+W9VRQIkSJLfg==}
     peerDependencies:
       react: ^16.9.0 || ^17 || ^18
       react-dom: ^16.9.0 || ^17 || ^18
     dependencies:
-      '@floating-ui/react': 0.26.4(react-dom@18.3.1)(react@18.3.1)
+      '@floating-ui/react': 0.26.10(react-dom@18.3.1)(react@18.3.1)
       clsx: 2.1.0
       date-fns: 3.6.0
       prop-types: 15.8.1

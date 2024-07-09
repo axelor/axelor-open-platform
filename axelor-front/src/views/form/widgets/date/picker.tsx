@@ -1,6 +1,6 @@
 import { forwardRef, useState } from "react";
 import ReactDatePicker, {
-  ReactDatePickerProps,
+  DatePickerProps,
   getDefaultLocale,
   registerLocale,
   setDefaultLocale,
@@ -66,7 +66,7 @@ const load = async (locale: string) => {
 
 export const Picker = forwardRef<
   any,
-  ReactDatePickerProps & {
+  DatePickerProps & {
     textValue?: string;
   }
 >(({ textValue, ...props }, ref) => {
