@@ -1164,7 +1164,7 @@ public abstract class Property {
     }
 
     if (isTrue(large) && type == PropertyType.STRING) {
-      res.param("length", "{0:m}", "org.hibernate.Length.LOB_DEFAULT");
+      res.param("length", "{0:m}", "org.hibernate.Length.LONG32");
     }
 
     return res.hasParams() ? res : null;

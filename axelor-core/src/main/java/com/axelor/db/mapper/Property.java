@@ -214,7 +214,7 @@ public class Property {
         unique = column.unique();
         nullable = column.nullable();
 
-        if (column.length() >= Length.LOB_DEFAULT && type == PropertyType.STRING) {
+        if (column.length() >= Length.LONG32 && type == PropertyType.STRING) {
           type = PropertyType.TEXT;
         }
       }
