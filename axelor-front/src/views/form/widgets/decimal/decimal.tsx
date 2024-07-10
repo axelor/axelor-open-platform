@@ -188,7 +188,7 @@ export function Decimal(props: FieldProps<string | number>) {
       {readonly || (
         <div className={styles.container}>
           <Input
-            {...(focus && { key: "focused" })}
+            key={focus ? "focused" : "normal"}
             data-input
             className={styles.numberInput}
             autoFocus={focus}

@@ -316,8 +316,8 @@ export function Phone({
         ) : (
           <Box className={styles.inputWrapper}>
             <AdornedInput
+              key={focus ? "focused" : "normal"}
               ref={inputRef}
-              {...(focus && { key: "focused" })}
               data-input
               type="tel"
               id={uid}

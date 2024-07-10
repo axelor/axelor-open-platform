@@ -22,7 +22,7 @@ export function Boolean(props: FieldProps<boolean>) {
   return (
     <FieldControl {...props} className={className}>
       <Input
-        {...(focus && { key: "focused" })}
+        key={focus ? "focused" : "normal"}
         data-input
         autoFocus={focus}
         m={0}

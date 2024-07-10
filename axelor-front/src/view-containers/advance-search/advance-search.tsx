@@ -402,24 +402,21 @@ export function AdvanceSearch({
     () =>
       [
         {
-          key: "open",
           icon: "arrow_drop_down",
           className: styles.icon,
           onClick: () => handleOpen(),
         },
         {
-          key: "clear",
           icon: "clear",
           className: styles.icon,
           onClick: () => handleClear(),
         },
         {
-          key: "search",
           icon: "search",
           className: styles.icon,
           onClick: () => handleFreeSearch(),
         },
-      ] as SearchInputIconProps[],
+      ] as MaterialIconProps[],
     [handleOpen, handleClear, handleFreeSearch],
   );
 
@@ -564,10 +561,6 @@ export function AdvanceSearch({
   );
 }
 
-interface SearchInputIconProps extends MaterialIconProps {
-  key: string;
-}
-
 function SearchInput({
   readonly,
   label,
@@ -579,7 +572,7 @@ function SearchInput({
 }: {
   readonly?: boolean;
   label?: string;
-  icons?: SearchInputIconProps[];
+  icons?: MaterialIconProps[];
   focusTabIdAtom: PrimitiveAtom<string | undefined | null>;
   valueAtom: PrimitiveAtom<string | undefined>;
   onClear?: () => void;
@@ -626,12 +619,12 @@ function SearchInput({
           alignItems="center"
           position="relative"
         >
-          {icons?.map((icon, ind) => (
+          {icons?.map(({ icon, onClick, className }) => (
             <MaterialIcon
-              key={ind}
-              icon={icon.icon}
-              onClick={icon.onClick}
-              className={icon.className}
+              key={icon}
+              icon={icon}
+              onClick={onClick}
+              className={className}
             />
           ))}
         </Box>
@@ -650,7 +643,9 @@ function SearchInput({
       {...(readonly
         ? {
             onClick: (e) =>
-              icons?.find(({ key }) => key === "open")?.onClick?.(e),
+              icons
+                ?.find(({ icon }) => icon === "arrow_drop_down")
+                ?.onClick?.(e),
           }
         : {
             onKeyDown: handleKeyDown,

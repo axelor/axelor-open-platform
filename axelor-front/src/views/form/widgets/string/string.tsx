@@ -83,7 +83,7 @@ export function String({
         />
       ) : (
         <AdornedInput
-          {...(focus && { key: "focused" })}
+          key={focus ? "focused" : "normal"}
           data-input
           type="text"
           id={uid}

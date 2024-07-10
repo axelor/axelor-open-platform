@@ -88,7 +88,7 @@ export function Duration(props: FieldProps<string | number>) {
       {readonly && <ViewerInput name={schema.name} value={displayText} />}
       {readonly || (
         <MaskedInput
-          {...(focus && { key: "focused" })}
+          key={focus ? "focused" : "normal"}
           data-input
           type="text"
           id={uid}

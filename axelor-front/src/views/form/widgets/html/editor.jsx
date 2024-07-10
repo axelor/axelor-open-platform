@@ -64,9 +64,9 @@ function HTMLEditor({
   lite,
   translatable,
   height,
-  placeholder,
-  hijackMenu,
-  value,
+  placeholder = "",
+  hijackMenu = false,
+  value = "",
   autoFocus,
   onChange,
   onTranslate,
@@ -454,20 +454,5 @@ function HTMLEditor({
     </div>
   );
 }
-
-// HTMLEditor.propTypes = {
-//   actions: PropTypes.array,
-//   placeholder: PropTypes.string,
-//   hijackMenu: PropTypes.bool,
-//   value: PropTypes.string,
-//   onChange: PropTypes.func,
-// };
-
-HTMLEditor.defaultProps = {
-  actions: [],
-  placeholder: "",
-  hijackMenu: false,
-  value: "",
-};
 
 export default HTMLEditor;

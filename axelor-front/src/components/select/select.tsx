@@ -218,7 +218,7 @@ export const Select = forwardRef(function Select<
 
   return (
     <AxSelect
-      {...(autoFocus && { key: "focused" })}
+      key={autoFocus ? "focused" : "normal"}
       clearOnBlur
       clearOnEscape
       {...selectProps}

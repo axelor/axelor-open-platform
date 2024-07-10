@@ -15,7 +15,7 @@ export function BooleanSwitch(props: FieldProps<boolean>) {
   return (
     <FieldControl {...props}>
       <Switch
-        {...(focus && { key: "focused" })}
+        key={focus ? "focused" : "normal"}
         data-input
         autoFocus={focus}
         id={uid}
