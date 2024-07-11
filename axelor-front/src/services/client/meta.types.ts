@@ -643,6 +643,7 @@ export interface KanbanView extends View {
   limit?: number;
   columns?: Selection[];
   hilites?: Hilite[];
+  onDelete?: string;
 }
 
 export type CalendarModeType = "month" | "week" | "day";

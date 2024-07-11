@@ -80,6 +80,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
   const {
     columnBy,
     editWindow,
+    onDelete: onDeleteAction,
     limit = +params?.limit || DEFAULT_KANBAN_PAGE_SIZE,
     sequenceBy,
   } = view;
@@ -266,6 +267,11 @@ export function Kanban(props: ViewProps<KanbanView>) {
     return onSearch({ offset: 0 });
   }, [onSearch]);
 
+  const actionExecutor = useActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh,
+  });
+
   const onCollapse = useCallback(
     (column: KanbanColumn) => {
       setColumns((draft) => {
@@ -311,6 +317,11 @@ export function Kanban(props: ViewProps<KanbanView>) {
         yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
+        if (onDeleteAction) {
+          await actionExecutor.execute(onDeleteAction, {
+            context: record as DataRecord,
+          });
+        }
         const { id, version } = record as DataRecord;
         try {
           const removed = await column.dataStore.delete([
@@ -327,7 +338,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
         }
       }
     },
-    [setColumns],
+    [onDeleteAction, actionExecutor, setColumns],
   );
 
   const onEdit = useCallback(
@@ -374,11 +385,6 @@ export function Kanban(props: ViewProps<KanbanView>) {
       ? onEditInPopup({ record: {} as KanbanRecord })
       : onEdit({ record: {} as KanbanRecord });
   }, [hasAddPopup, onEdit, onEditInPopup]);
-
-  const actionExecutor = useActionExecutor(view, {
-    getContext: getActionContext,
-    onRefresh,
-  });
 
   const onCreate = useCallback(
     async ({
