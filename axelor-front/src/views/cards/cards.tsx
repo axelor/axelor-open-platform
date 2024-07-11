@@ -45,6 +45,8 @@ export function Cards(props: ViewProps<CardsView>) {
   const switchTo = useViewSwitch();
   const { hasButton } = usePerms(meta.view, meta.perms);
   const getViewContext = useViewContext();
+
+  const { onDelete: onDeleteAction } = view;
   const hasEditPopup = dashlet || view.editWindow === "popup";
   const hasAddPopup = hasEditPopup || view.editWindow === "popup-new";
 
@@ -161,6 +163,11 @@ export function Cards(props: ViewProps<CardsView>) {
         yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
+        if (onDeleteAction) {
+          await actionExecutor.execute(onDeleteAction, {
+            context: record,
+          });
+        }
         try {
           await dataStore.delete([
             { id: record.id!, version: record.version! },
@@ -170,7 +177,7 @@ export function Cards(props: ViewProps<CardsView>) {
         }
       }
     },
-    [dataStore],
+    [onDeleteAction, actionExecutor, dataStore],
   );
 
   const onEdit = useCallback(

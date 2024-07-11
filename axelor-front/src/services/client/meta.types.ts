@@ -544,6 +544,7 @@ export interface CardsView extends View {
   canEdit?: boolean;
   canDelete?: boolean;
   editWindow?: string;
+  onDelete?: string;
 }
 
 export interface TreeNode {
