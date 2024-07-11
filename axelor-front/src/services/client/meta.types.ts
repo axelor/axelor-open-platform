@@ -660,6 +660,7 @@ export interface CalendarView extends View {
   hilites?: CalendarEventHilite[];
   items?: Widget[];
   template?: string;
+  onDelete?: string;
 }
 
 export type GanttModeType = "year" | CalendarModeType;

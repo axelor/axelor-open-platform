@@ -51,6 +51,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     colorBy,
     editable = true,
     mode: initialMode = "month",
+    onDelete: onDeleteAction,
     onChange,
     hilites,
     template = "",
@@ -253,7 +254,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
                   title,
                   color,
                   match: (e) => getValue(e.data!) === value,
-                  checked: _filters.find(f => f.value === value)?.checked,
+                  checked: _filters.find((f) => f.value === value)?.checked,
                 });
               }
               return acc;
@@ -276,6 +277,21 @@ export function Calendar(props: ViewProps<CalendarView>) {
       await fetchItems(searchStart, searchEnd);
     }
   }, [fetchItems, searchEnd, searchStart]);
+
+  const formAtom = useMemo(
+    () =>
+      createFormAtom({
+        meta: meta as any,
+        record: {},
+      }),
+    [meta],
+  );
+
+  const actionExecutor = useActionExecutor(meta.view, {
+    formAtom,
+    getContext: getViewContext,
+    onRefresh,
+  });
 
   useEffect(() => {
     const { start, end } = getTimes(date, "month");
@@ -304,12 +320,17 @@ export function Calendar(props: ViewProps<CalendarView>) {
         yesTitle: i18n.get("Delete"),
       });
       if (confirmed) {
+        if (onDeleteAction) {
+          await actionExecutor.execute(onDeleteAction, {
+            context: record,
+          });
+        }
         await dataStore.delete({ id, version });
         await onRefresh();
       }
       return confirmed;
     },
-    [dataStore, onRefresh],
+    [onDeleteAction, actionExecutor, dataStore, onRefresh],
   );
 
   const [popover, setPopover] = useState<{
@@ -438,21 +459,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
     },
     [eventStart, eventStop, hasPermission, showRecord],
   );
-
-  const formAtom = useMemo(
-    () =>
-      createFormAtom({
-        meta: meta as any,
-        record: {},
-      }),
-    [meta],
-  );
-
-  const actionExecutor = useActionExecutor(meta.view, {
-    formAtom,
-    getContext: getViewContext,
-    onRefresh,
-  });
 
   const onEventChange = useAtomCallback(
     useCallback(
