@@ -44,9 +44,9 @@ public @interface TrackField {
   String condition() default "";
 
   /**
-   * Specify the events on which to track.
+   * Specify the event on which to track.
    *
-   * @return the list of events
+   * @return the event
    */
-  TrackEvent[] on() default {};
+  TrackEvent on() default TrackEvent.DEFAULT;
 }

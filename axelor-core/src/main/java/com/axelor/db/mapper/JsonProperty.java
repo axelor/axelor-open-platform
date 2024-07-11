@@ -58,6 +58,8 @@ public class JsonProperty extends Property {
     this.jsonField = jsonField;
     this.fieldName = fieldName;
     this.subFieldName = subFieldName;
+
+    setTarget(computeTarget());
   }
 
   @Nullable
@@ -113,8 +115,7 @@ public class JsonProperty extends Property {
     return PropertyType.get(getJsonType().replace("-", "_").toUpperCase());
   }
 
-  @Override
-  public Class<?> getTarget() {
+  private Class<?> computeTarget() {
     if (!isReference() && !isCollection()) {
       return null;
     }
@@ -217,6 +218,11 @@ public class JsonProperty extends Property {
   @Override
   public String getName() {
     return String.format("%s.%s", fieldName, subFieldName);
+  }
+
+  @Override
+  public String getTitle() {
+    return (String) jsonField.getOrDefault("title", null);
   }
 
   @Override

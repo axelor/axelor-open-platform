@@ -169,14 +169,11 @@ public class AuditInterceptor extends EmptyInterceptor {
           changed = true;
         }
       }
-
-      if (tracker.get() != null) {
-        // change tracking
-        tracker.get().track((AuditableModel) entity, propertyNames, currentState, previousState);
-      }
     }
 
     if (entity instanceof Model && tracker.get() != null) {
+      // change tracking
+      tracker.get().track((Model) entity, propertyNames, currentState, previousState);
       // for before completion event
       tracker.get().updated((Model) entity);
     }
@@ -205,14 +202,11 @@ public class AuditInterceptor extends EmptyInterceptor {
           changed = true;
         }
       }
-
-      if (tracker.get() != null) {
-        // change tracking
-        tracker.get().track((AuditableModel) entity, propertyNames, state, null);
-      }
     }
 
     if (entity instanceof Model && tracker.get() != null) {
+      // change tracking
+      tracker.get().track((Model) entity, propertyNames, state, null);
       // for before completion event
       tracker.get().updated((Model) entity);
     }

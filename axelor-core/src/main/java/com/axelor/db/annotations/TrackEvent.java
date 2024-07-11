@@ -22,5 +22,6 @@ package com.axelor.db.annotations;
 public enum TrackEvent {
   ALWAYS,
   CREATE,
-  UPDATE
+  UPDATE,
+  DEFAULT
 }

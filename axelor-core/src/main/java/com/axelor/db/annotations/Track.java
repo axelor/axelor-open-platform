@@ -18,16 +18,14 @@
  */
 package com.axelor.db.annotations;
 
-import com.axelor.auth.db.AuditableModel;
+import com.axelor.db.Model;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * This annotation can be used on {@link AuditableModel} classes to provide change track details.
- */
+/** This annotation can be used on {@link Model} classes to provide change track details. */
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -69,9 +67,9 @@ public @interface Track {
   boolean files() default false;
 
   /**
-   * Specify the events on which to track.
+   * Specify the event on which to track.
    *
-   * @return the list of events
+   * @return the event
    */
-  TrackEvent[] on() default TrackEvent.ALWAYS;
+  TrackEvent on() default TrackEvent.ALWAYS;
 }

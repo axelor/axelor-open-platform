@@ -1,13 +1,14 @@
-import { Formatters } from "@/utils/format";
-import { toKebabCase } from "@/utils/names";
 import { i18n } from "@/services/client/i18n";
-import { Property } from "@/services/client/meta.types";
-import { MessageTrack } from "./types";
-import { Box } from "@axelor/ui";
-import { FormProps } from "@/views/form/builder";
 import { moment } from "@/services/client/l10n";
-import { getDateFormat, getDateTimeFormat } from "@/utils/format";
+import { MetaData } from "@/services/client/meta.ts";
+import { Property } from "@/services/client/meta.types";
+import { Formatters, getDateFormat, getDateTimeFormat } from "@/utils/format";
+import { toKebabCase, toSnakeCase } from "@/utils/names";
 import { sanitize } from "@/utils/sanitize.ts";
+import { FormProps } from "@/views/form/builder";
+import { Box } from "@axelor/ui";
+import { useMemo } from "react";
+import { MessageTrack } from "./types";
 
 import styles from "./message-track.module.scss";
 
@@ -18,14 +19,14 @@ export function formatter(_item: MessageTrack, field?: Property) {
     if (!value) {
       return value;
     }
-    
+
     if (value.toLowerCase() === "true") return i18n.get("True");
     if (value.toLowerCase() === "false") return i18n.get("False");
-    
+
     if (
       field &&
       !["MANY_TO_ONE", "ONE_TO_MANY", "ONE_TO_ONE", "MANY_TO_MANY"].includes(
-        field.type
+        toSnakeCase(field.type).toUpperCase(),
       )
     ) {
       const formatter = (Formatters as any)[toKebabCase(field.type)];
@@ -62,14 +63,21 @@ export function formatter(_item: MessageTrack, field?: Property) {
 function MessageTrackComponent({
   track,
   fields,
+  jsonFields,
 }: {
   track: MessageTrack;
   fields?: FormProps["fields"];
+  jsonFields?: MetaData["jsonFields"];
 }) {
-  const { title, displayValue } = formatter(
-    track,
-    fields && fields[track?.name]
-  );
+  const field = useMemo(() => {
+    const parts = track?.name.split(".");
+    const jsonField = jsonFields?.[parts[0]];
+    if (jsonField) {
+      return jsonField[parts[1]] as unknown as Property;
+    }
+    return fields?.[track?.name];
+  }, [track, fields, jsonFields]);
+  const { title, displayValue } = formatter(track, field);
   return (
     <li className={styles["track-field"]}>
       <Box d="flex" alignItems="center">
@@ -87,14 +95,21 @@ function MessageTrackComponent({
 export function MessageTracks({
   data,
   fields,
+  jsonFields,
 }: {
   data: MessageTrack[];
   fields?: FormProps["fields"];
+  jsonFields?: MetaData["jsonFields"];
 }) {
   return (
     <Box as="ul" m={0} p={0} pe={1}>
       {data.map((track, index) => (
-        <MessageTrackComponent key={index} track={track} fields={fields} />
+        <MessageTrackComponent
+          key={index}
+          track={track}
+          fields={fields}
+          jsonFields={jsonFields}
+        />
       ))}
     </Box>
   );

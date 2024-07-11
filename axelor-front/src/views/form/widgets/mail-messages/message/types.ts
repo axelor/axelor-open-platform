@@ -1,3 +1,4 @@
+import { MetaData } from "@/services/client/meta.ts";
 import { FormProps } from "@/views/form/builder";
 
 export type MessageAuthor = {
@@ -100,6 +101,7 @@ export interface MessageProps {
   parentId?: number;
   data: Message;
   fields?: FormProps["fields"];
+  jsonFields?: MetaData["jsonFields"];
   onComment?: (data: Message) => Promise<Message>;
   onRemove?: (data: Message) => Promise<Message | void>;
   onAction?: (

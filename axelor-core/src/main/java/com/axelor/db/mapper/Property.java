@@ -342,6 +342,10 @@ public class Property {
     return target;
   }
 
+  protected void setTarget(Class<?> target) {
+    this.target = target;
+  }
+
   public String getTargetName() {
     if (targetName == null) {
       findTargetName();

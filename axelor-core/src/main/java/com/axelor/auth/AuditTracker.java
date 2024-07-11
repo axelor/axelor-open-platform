@@ -20,18 +20,20 @@ package com.axelor.auth;
 
 import static com.axelor.common.StringUtils.isBlank;
 
-import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
-import com.axelor.db.annotations.TrackField;
 import com.axelor.db.annotations.TrackMessage;
+import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.tracking.FieldTracking;
+import com.axelor.db.tracking.ModelTracking;
 import com.axelor.event.Event;
 import com.axelor.events.internal.BeforeTransactionComplete;
 import com.axelor.inject.Beans;
@@ -41,12 +43,16 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaJsonField;
+import com.axelor.rpc.Context;
+import com.axelor.rpc.JsonContext;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -57,12 +63,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This class provides change tracking for auditing and notifications. */
 final class AuditTracker {
+
+  private static final Logger log = LoggerFactory.getLogger(AuditTracker.class);
 
   private static final ThreadLocal<Map<String, EntityState>> STORE =
       ThreadLocal.withInitial(HashMap::new);
@@ -72,13 +83,13 @@ final class AuditTracker {
 
   private static class EntityState {
 
-    private AuditableModel entity;
+    private Model entity;
 
     private Map<String, Object> values;
     private Map<String, Object> oldValues;
 
     public static void create(
-        AuditableModel entity, Map<String, Object> values, Map<String, Object> oldValues) {
+        Model entity, Map<String, Object> values, Map<String, Object> oldValues) {
       String key = entity.getClass().getName() + ":" + entity.getId();
       EntityState state = STORE.get().get(key);
       if (state == null) {
@@ -106,40 +117,47 @@ final class AuditTracker {
     return null;
   }
 
-  private Track getTrack(AuditableModel entity) {
+  public List<FieldTracking> getTrackedCustomFields(Model model) {
+    List<MetaJsonField> fields =
+        Query.of(MetaJsonField.class)
+            .filter("self.model = :model AND self.tracked IS TRUE")
+            .bind("model", model.getClass().getName())
+            .cacheable()
+            .autoFlush(false)
+            .fetch();
+
+    return fields.stream().map(FieldTracking::new).collect(Collectors.toUnmodifiableList());
+  }
+
+  private ModelTracking getTrack(Model entity) {
     if (entity == null) {
       return null;
     }
-    return entity.getClass().getAnnotation(Track.class);
-  }
-
-  private boolean hasEvent(TrackEvent[] events, TrackEvent event) {
-    for (TrackEvent e : events) {
-      if (e == event || e == TrackEvent.ALWAYS) {
-        return true;
-      }
+    Track track = entity.getClass().getAnnotation(Track.class);
+    List<FieldTracking> trackedCustomFields = getTrackedCustomFields(entity);
+    if (track == null && trackedCustomFields.isEmpty()) {
+      return null;
     }
-    return false;
+    return ModelTracking.create(track, trackedCustomFields);
   }
 
-  private boolean hasEvent(Track track, TrackField field, TrackEvent event) {
-    return hasEvent(field.on(), event) || (field.on().length == 0 && hasEvent(track.on(), event));
+  private boolean hasEvent(TrackEvent event, TrackEvent targetEvent) {
+    return event == targetEvent || event == TrackEvent.ALWAYS;
   }
 
-  private boolean hasEvent(Track track, TrackMessage message, TrackEvent event) {
+  private boolean hasEvent(ModelTracking track, FieldTracking field, TrackEvent event) {
+    return hasEvent(field.getOn(), event)
+        || ((field.getOn() == TrackEvent.DEFAULT) && hasEvent(track.getOn(), event));
+  }
+
+  private boolean hasEvent(ModelTracking track, TrackMessage message, TrackEvent event) {
     return hasEvent(message.on(), event)
-        || (message.on().length == 0 && hasEvent(track.on(), event));
+        || (message.on() == TrackEvent.DEFAULT && hasEvent(track.getOn(), event));
   }
 
   private String format(Property property, Object value) {
     if (value == null) {
       return "";
-    }
-    if (Boolean.TRUE.equals(value)) {
-      return "True";
-    }
-    if (Boolean.FALSE.equals(value)) {
-      return "False";
     }
     switch (property.getType()) {
       case MANY_TO_ONE:
@@ -154,6 +172,9 @@ final class AuditTracker {
         return "N/A";
       default:
         break;
+    }
+    if (value instanceof Boolean) {
+      return Boolean.TRUE.equals(value) ? "True" : "False";
     }
     if (value instanceof BigDecimal) {
       return ((BigDecimal) value).toPlainString();
@@ -178,9 +199,9 @@ final class AuditTracker {
    * @param state current values
    * @param previousState old values
    */
-  public void track(AuditableModel entity, String[] names, Object[] state, Object[] previousState) {
+  public void track(Model entity, String[] names, Object[] state, Object[] previousState) {
 
-    final Track track = getTrack(entity);
+    final ModelTracking track = getTrack(entity);
     if (track == null) {
       return;
     }
@@ -210,8 +231,8 @@ final class AuditTracker {
   }
 
   private String findMessage(
-      Track track,
-      TrackMessage[] messages,
+      ModelTracking track,
+      List<TrackMessage> messages,
       Map<String, Object> values,
       Map<String, Object> oldValues,
       ScriptHelper scriptHelper) {
@@ -246,11 +267,11 @@ final class AuditTracker {
 
   private void process(EntityState state, User user) {
 
-    final AuditableModel entity = state.entity;
+    final Model entity = state.entity;
     final Mapper mapper = Mapper.of(entity.getClass());
     final MailMessage message = new MailMessage();
 
-    final Track track = getTrack(entity);
+    final ModelTracking track = getTrack(entity);
 
     final Map<String, Object> values = state.values;
     final Map<String, Object> oldValues = state.oldValues;
@@ -263,13 +284,16 @@ final class AuditTracker {
     final List<Map<String, String>> tracks = new ArrayList<>();
     final Set<String> tagFields = new HashSet<>();
 
+    final Context newCtx = new Context(values, entity.getClass());
+    final Context oldCtx = new Context(oldValues, entity.getClass());
+
     // find matched message
-    String msg = findMessage(track, track.messages(), values, oldValues, scriptHelper);
+    String msg = findMessage(track, track.getMessages(), values, oldValues, scriptHelper);
 
     // find matched content message
-    String content = findMessage(track, track.contents(), values, oldValues, scriptHelper);
+    String content = findMessage(track, track.getContents(), values, oldValues, scriptHelper);
 
-    for (TrackField field : track.fields()) {
+    for (FieldTracking field : track.getFields()) {
 
       if (!hasEvent(track, field, TrackEvent.ALWAYS)
           && !hasEvent(
@@ -277,20 +301,24 @@ final class AuditTracker {
         continue;
       }
 
-      if (!isBlank(field.condition()) && !scriptHelper.test(field.condition())) {
+      if (!isBlank(field.getCondition()) && !scriptHelper.test(field.getCondition())) {
         continue;
       }
 
-      final String name = field.name();
-      final Property property = mapper.getProperty(name);
+      final String name = field.getFieldName();
+      final Property property = mapper.getProperty(entity, field.getName());
+      if (property == null) {
+        log.debug("{} field not found", field.getName());
+        continue;
+      }
 
       String title = property.getTitle();
       if (isBlank(title)) {
         title = Inflector.getInstance().humanize(name);
       }
 
-      final Object value = values.get(name);
-      final Object oldValue = oldValues.get(name);
+      final Object value = getValue(newCtx, field, property);
+      final Object oldValue = getValue(oldCtx, field, property);
 
       if (Objects.equal(value, oldValue)) {
         continue;
@@ -311,7 +339,7 @@ final class AuditTracker {
     }
 
     // find matched tags
-    for (TrackMessage tm : track.messages()) {
+    for (TrackMessage tm : track.getMessages()) {
       boolean canTag =
           tm.fields().length == 0 || (tm.fields().length == 1 && isBlank(tm.fields()[0]));
       for (String name : tm.fields()) {
@@ -368,13 +396,40 @@ final class AuditTracker {
     } catch (Exception e) {
     }
 
-    if (previousState == null && track.subscribe()) {
+    if (previousState == null && track.isSubscribe()) {
       final MailFollower follower = new MailFollower();
       follower.setRelatedId(entity.getId());
       follower.setRelatedModel(entity.getClass().getName());
       follower.setUser(user);
       follower.setArchived(false);
       Beans.get(MailFollowerRepository.class).save(follower);
+    }
+  }
+
+  private Object getValue(Context context, FieldTracking field, Property property) {
+    if (!field.isCustomField()) {
+      return context.get(field.getName());
+    }
+
+    Object jsonContext = context.get("$" + field.getJsonFieldName());
+    if (!(jsonContext instanceof JsonContext)) {
+      return null;
+    }
+    Object value = ((JsonContext) jsonContext).get(field.getFieldName());
+
+    switch (property.getType()) {
+      case BOOLEAN:
+        return Adapter.adapt(value, Boolean.class, null, null);
+      case INTEGER:
+        return Adapter.adapt(value, Integer.class, null, null);
+      case DECIMAL:
+        return Adapter.adapt(value, BigDecimal.class, null, null);
+      case DATE:
+        return Adapter.adapt(value, LocalDate.class, null, null);
+      case DATETIME:
+        return Adapter.adapt(value, LocalDateTime.class, null, null);
+      default:
+        return value;
     }
   }
 

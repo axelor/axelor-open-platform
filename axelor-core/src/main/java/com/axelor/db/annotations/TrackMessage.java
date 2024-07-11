@@ -44,11 +44,11 @@ public @interface TrackMessage {
   String condition();
 
   /**
-   * Specify the events on which to use this message.
+   * Specify the event on which to use this message.
    *
-   * @return the events
+   * @return the event
    */
-  TrackEvent[] on() default {};
+  TrackEvent on() default TrackEvent.DEFAULT;
 
   /**
    * Provide tag style if this message is a tag.

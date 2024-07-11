@@ -1,17 +1,17 @@
-import { useAtom, useAtomValue } from "jotai";
-import { selectAtom } from "jotai/utils";
+import { useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabs } from "@/hooks/use-tabs";
 import { useTags, useTagsMail } from "@/hooks/use-tags";
+import { findFields } from "@/services/client/meta-cache.ts";
 import { DEFAULT_MESSAGE_PAGE_SIZE } from "@/utils/app-settings.ts";
 import {
   useViewAction,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
-
 import { focusAtom } from "@/utils/atoms";
 import { FormAtom, WidgetProps } from "../../builder";
 import { useAfterActions, useFormRefresh } from "../../builder/scope";
@@ -22,7 +22,13 @@ import { DataSource } from "./utils";
 async function findMessages(
   id: number,
   model: string,
-  { parent, folder, type, offset = 0, limit = DEFAULT_MESSAGE_PAGE_SIZE }: MessageFetchOptions,
+  {
+    parent,
+    folder,
+    type,
+    offset = 0,
+    limit = DEFAULT_MESSAGE_PAGE_SIZE,
+  }: MessageFetchOptions,
 ) {
   const { total = 0, data = [] } = await (parent
     ? DataSource.replies(parent)
@@ -53,9 +59,7 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
 
   const [filter, setFilter] = useState<string | undefined>(schema.filter);
 
-  const fields = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (o) => o.fields), [formAtom]),
-  );
+  const { data: meta } = useAsync(async () => await findFields(model), [model]);
   const isMessageBox = model === "com.axelor.mail.db.MailMessage";
   const folder = isMessageBox ? name.split(".").pop() : "";
   const hasMessages = isMessageBox || (recordId ?? 0) > 0;
@@ -336,7 +340,8 @@ export function MailMessages({ formAtom, schema }: WidgetProps) {
       )}
       {(!isMessageBox || total > 0) && (
         <MessageBox
-          fields={fields}
+          fields={meta?.fields}
+          jsonFields={meta?.jsonFields}
           data={messages}
           isMail={isMessageBox}
           filter={filter}

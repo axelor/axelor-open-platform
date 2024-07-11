@@ -56,6 +56,10 @@
     <string name="onChange" />
     <string name="onClick" />
 
+    <boolean name="tracked" title="Track change ?"/>
+    <string name="trackEvent" selection="json.field.track.event" title="Event"/>
+    <string name="trackCondition" title="Condition"/>
+
     <string name="widgetAttrs" json="true" />
 
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />

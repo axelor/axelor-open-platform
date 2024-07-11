@@ -25,6 +25,12 @@
     <option value="json-one-to-many">Custom-OneToMany</option>
   </selection>
 
+  <selection name="json.field.track.event">
+    <option value="ALWAYS">Always</option>
+    <option value="CREATE">On create</option>
+    <option value="UPDATE">On update</option>
+  </selection>
+
   <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField" groupBy="model">
     <field name="name" />
     <field name="type" />
@@ -109,7 +115,13 @@
     <panel title="Widget Attributes" sidebar="true">
       <field name="widgetAttrs" widget="json-raw" />
     </panel>
+    <panel title="Tracking" sidebar="true" itemSpan="12">
+      <field name="tracked" widget="inline-checkbox" />
+      <field name="trackEvent"  showIf="tracked === true"/>
+      <field name="trackCondition" showIf="tracked === true"/>
+    </panel>
   </form>
+
   <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
     <panel title="Overview">
       <field name="name" pattern="^[a-zA-Z][a-zA-Z0-9_\\$]+$"/>
@@ -130,6 +142,7 @@
     </panel>
     <panel-include view="json-field-form-base" />
   </form>
+
   <form name="json-field-form-2" title="Custom field" model="com.axelor.meta.db.MetaJsonField"
     onNew="action-json-field-defaults">
     <panel title="Overview">

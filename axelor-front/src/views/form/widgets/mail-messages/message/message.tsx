@@ -8,6 +8,7 @@ import { useEditor } from "@/hooks/use-relation";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
+import { MetaData } from "@/services/client/meta.ts";
 import { SanitizedContent } from "@/utils/sanitize.ts";
 import { FormProps } from "@/views/form/builder";
 
@@ -86,8 +87,16 @@ export function MessageUser({
 
 export const Message = React.memo(function Message(props: MessageProps) {
   const [input, setInput] = useState(false);
-  const { parentId, data, fields, onComment, onFetch, onAction, onRemove } =
-    props;
+  const {
+    parentId,
+    data,
+    fields,
+    jsonFields,
+    onComment,
+    onFetch,
+    onAction,
+    onRemove,
+  } = props;
   const {
     subject,
     relatedId,
@@ -102,6 +111,7 @@ export const Message = React.memo(function Message(props: MessageProps) {
     $author,
     $authorModel,
   } = data;
+
   const body = useMemo<TYPES.MessageBody | null>(() => {
     let body: string | null = data.body || "{}";
     try {
@@ -232,12 +242,18 @@ export const Message = React.memo(function Message(props: MessageProps) {
           )}
           <Box pt={1} ps={4} pe={4}>
             {body?.tracks && (
-              <MessageTracks fields={fields} data={body.tracks} />
+              <MessageTracks
+                fields={fields}
+                jsonFields={jsonFields}
+                data={body.tracks}
+              />
             )}
 
-            {body && body.content && <SanitizedContent content={body.content}/>}
+            {body && body.content && (
+              <SanitizedContent content={body.content} />
+            )}
             {!body && (
-              <SanitizedContent content={(summary || data.body) as string}/>
+              <SanitizedContent content={(summary || data.body) as string} />
             )}
 
             {body?.files && <MessageFiles data={body.files} />}
@@ -298,6 +314,7 @@ export function MessageBox({
   inputProps: MessageInputProps,
   data,
   fields,
+  jsonFields,
   filter,
   onFilterChange,
   onFetch,
@@ -309,6 +326,7 @@ export function MessageBox({
   isMail?: boolean;
   data: TYPES.Message[];
   fields?: FormProps["fields"];
+  jsonFields?: MetaData["jsonFields"];
   inputProps?: MessageInputProps;
   filter?: string;
   onFilterChange?: (filter?: string) => void;
@@ -365,6 +383,7 @@ export function MessageBox({
           <Message
             key={index}
             fields={fields}
+            jsonFields={jsonFields}
             data={message}
             onComment={onComment}
             onAction={onAction}
