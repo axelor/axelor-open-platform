@@ -80,12 +80,19 @@
     <string name="menuBackground" />
     <integer name="menuOrder" />
     <string name="menuTitle" />
+    <enum name="panelMailDisplay" ref="PanelMailDisplay" title="Messaging panel" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />
     <many-to-one name="formView" ref="MetaView" copy="false" />
     <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" orderBy="sequence,id" />
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
+
+  <enum name="PanelMailDisplay" numeric="true">
+    <item name="NO_MESSAGES" value="0" title="No messages" />
+    <item name="MESSAGES" value="1" title="Display messages" />
+    <item name="MESSAGES_AND_FOLLOWERS" value="2" title="Display messages and followers" />
+  </enum>
 
   <entity name="MetaJsonRecord" table="META_JSON_RECORD" repository="none">
     <string name="jsonModel" required="true" />

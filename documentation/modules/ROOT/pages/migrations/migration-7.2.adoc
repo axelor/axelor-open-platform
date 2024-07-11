@@ -64,6 +64,24 @@ create index auth_password_reset_token_user_id_idx on auth_password_reset_token 
 create sequence auth_password_reset_token_seq;
 ----
 
+== Add support to track custom fields
+
+This adds support to track custom fields. On each custom field, you can specify if the field should be tracked, but
+also the associated event and track condition.
+
+You need execute this SQL statement for migration :
+
+[source,sql]
+----
+ALTER TABLE meta_json_field ADD tracked boolean;
+ALTER TABLE meta_json_field ADD track_condition varchar(255);
+ALTER TABLE meta_json_field ADD track_event varchar(255);
+UPDATE meta_json_field SET tracked = false;
+
+ALTER TABLE meta_json_model ADD panel_mail_display integer;
+UPDATE meta_json_model SET panel_mail_display = 0;
+----
+
 == String pattern validation set to be case-sensitive
 
 String pattern validation, through the attribute `pattern`, is now case-sensitive. To manage case-insensitive, it

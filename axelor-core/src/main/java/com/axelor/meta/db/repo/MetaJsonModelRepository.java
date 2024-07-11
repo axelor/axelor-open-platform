@@ -30,6 +30,7 @@ import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.PanelMailDisplay;
 import com.google.common.base.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -178,8 +179,20 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     xml.append(">\n")
         .append("  <panel title=\"Overview\" itemSpan=\"12\">\n")
         .append("    <field name=\"attrs\" x-json-model=\"" + jsonModel.getName() + "\"/>\n")
-        .append("  </panel>\n")
-        .append("</form>\n");
+        .append("  </panel>\n");
+
+    PanelMailDisplay panelMailDisplay = jsonModel.getPanelMailDisplay();
+    if (panelMailDisplay != null
+        && panelMailDisplay.getValue() >= PanelMailDisplay.MESSAGES.getValue()) {
+      xml.append("  <panel-mail>\n");
+      xml.append("    <mail-messages/>\n");
+      if (panelMailDisplay.getValue() >= PanelMailDisplay.MESSAGES_AND_FOLLOWERS.getValue()) {
+        xml.append("    <mail-followers/>\n");
+      }
+      xml.append("  </panel-mail>\n");
+    }
+
+    xml.append("</form>\n");
 
     formView.setXml(xml.toString());
 
