@@ -1,0 +1,5 @@
+---
+title: Add onDelete action support in panel-related
+type: feature
+description: |
+  This action will be call when removing record in o2m/m2m grid.

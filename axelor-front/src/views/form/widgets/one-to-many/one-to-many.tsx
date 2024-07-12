@@ -279,6 +279,7 @@ function OneToManyInner({
     toolbar = viewData?.view?.toolbar,
     menubar = viewData?.view?.menubar,
     onCopy: onCopyAction,
+    onDelete: onDeleteAction = viewData?.view?.onDelete,
     target: model,
     fields,
     formView,
@@ -1329,13 +1330,22 @@ function OneToManyInner({
       });
       if (confirmed) {
         const ids = records.map((r) => r.id);
+
+        if (onDeleteAction) {
+          await actionExecutor.execute(onDeleteAction, {
+            context: {
+              _ids: ids,
+            },
+          });
+        }
+
         setValue((value) =>
           reorderItems((value || []).filter(({ id }) => !ids.includes(id))),
         );
         clearSelection();
       }
     },
-    [setValue, clearSelection, reorderItems],
+    [onDeleteAction, setValue, clearSelection, reorderItems, actionExecutor],
   );
 
   const updateViewDirty = useUpdateViewDirty(formAtom);

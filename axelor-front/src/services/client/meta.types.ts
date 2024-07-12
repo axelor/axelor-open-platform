@@ -349,6 +349,7 @@ export interface PanelRelated extends Omit<Panel, "type"> {
   onCopy?: string;
   onChange?: string;
   onSelect?: string;
+  onDelete?: string;
   canSelect?: string;
   canNew?: string;
   canView?: string;

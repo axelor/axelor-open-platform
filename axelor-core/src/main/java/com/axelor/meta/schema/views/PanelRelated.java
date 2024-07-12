@@ -104,6 +104,8 @@ public class PanelRelated extends AbstractPanel {
 
   @XmlAttribute private String onCopy;
 
+  @XmlAttribute private String onDelete;
+
   @XmlAttribute(name = "edit-window")
   private String editWindow;
 
@@ -322,6 +324,14 @@ public class PanelRelated extends AbstractPanel {
 
   public void setOnCopy(String onCopy) {
     this.onCopy = onCopy;
+  }
+
+  public String getOnDelete() {
+    return onDelete;
+  }
+
+  public void setOnDelete(String onDelete) {
+    this.onDelete = onDelete;
   }
 
   public String getCanSelect() {

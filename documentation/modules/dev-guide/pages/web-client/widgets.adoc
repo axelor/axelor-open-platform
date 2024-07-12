@@ -1161,6 +1161,7 @@ depending on the widget/type.
 * multirelational field: `select`, `new`, `edit`, `view`, `remove` |
 | `x-can-copy` | whether to allow copy of o2m/m2m field items | `false`
 | `onCopy` | action to be call after duplicating record in o2m/m2m grid, used when `x-can-copy` is `true`
+| `onDelete` | action to be call when deleting record in o2m/m2m grid
 | `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`) | `horizontal`
 | `x-code-syntax` | syntax highlighting for the code editor widget |
 | `x-order` | specify the order of suggest box list |

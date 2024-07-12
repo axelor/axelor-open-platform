@@ -1651,6 +1651,12 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="onDelete" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>action to be call when removing record in o2m/m2m grid
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="canMove" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.
