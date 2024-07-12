@@ -319,6 +319,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         parent,
         states: initFormFieldsStates,
       });
+    const onSaveAction =
+      (view as Schema).serverType !== "ONE_TO_MANY" && view.onSave;
     const onNewAction =
       (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
 
@@ -378,6 +380,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           await actionExecutor.waitFor();
           await actionExecutor.wait();
 
+          if (onSaveAction) {
+            await actionExecutor.execute(onSaveAction);
+          }
+
           const formState = get(formAtom);
 
           // check record changes
@@ -419,6 +425,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           formAtom,
           record,
           getErrors,
+          onSaveAction,
           onSave,
           rowIndex,
           cellIndex,

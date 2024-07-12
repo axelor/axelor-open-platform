@@ -1,0 +1,5 @@
+---
+title: Add onSave action support in editable grid view
+type: feature
+description: |
+  This will support onSave for top level grid views and m2m collection grid only.
