@@ -528,6 +528,7 @@ export interface GridView extends View {
   summaryView?: string;
   widget?: "expandable";
   widgetAttrs?: Record<string, any>;
+  onDelete?: string;
 }
 
 export interface CardsView extends View {

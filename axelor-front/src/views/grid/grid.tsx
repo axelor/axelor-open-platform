@@ -143,7 +143,7 @@ function GridInner(props: ViewProps<GridView>) {
   const hasPopupMaximize = popupOptions?.fullScreen;
   const cacheDataRef = useRef(!action.params?.["reload-dotted"]);
 
-  const { editable: _editable, inlineHelp } = view;
+  const { editable: _editable, onDelete: onDeleteAction, inlineHelp } = view;
   const canShowHelp = !sessionData?.user?.noHelp && inlineHelp;
 
   const showEditor = useManyEditor(action, dashlet);
@@ -307,28 +307,6 @@ function GridInner(props: ViewProps<GridView>) {
       getSearchOptions,
       onSearch,
     ],
-  );
-
-  const onDelete = useCallback(
-    async (records: GridRow["record"][]) => {
-      const confirmed = await dialogs.confirm({
-        content: i18n.get(
-          "Do you really want to delete the selected record(s)?",
-        ),
-        yesTitle: i18n.get("Delete"),
-      });
-      if (confirmed) {
-        try {
-          await dataStore.delete(
-            records.map(({ id, version }) => ({ id, version })),
-          );
-          clearSelection();
-        } catch {
-          // Ignore
-        }
-      }
-    },
-    [dataStore, clearSelection],
   );
 
   const onEditInPopup = useCallback(
@@ -947,6 +925,36 @@ function GridInner(props: ViewProps<GridView>) {
 
   const canDelete = hasButton("delete");
   const deleteEnabled = editEnabled;
+
+  const onDelete = useCallback(
+    async (records: GridRow["record"][]) => {
+      const confirmed = await dialogs.confirm({
+        content: i18n.get(
+          "Do you really want to delete the selected record(s)?",
+        ),
+        yesTitle: i18n.get("Delete"),
+      });
+      if (confirmed) {
+        if (onDeleteAction) {
+          await actionExecutor.execute(onDeleteAction, {
+            context: {
+              _ids: records.map((r) => r.id),
+            },
+          });
+        }
+        try {
+          await dataStore.delete(
+            records.map(({ id, version }) => ({ id, version })),
+          );
+          clearSelection();
+        } catch {
+          // Ignore
+        }
+      }
+    },
+    [onDeleteAction, actionExecutor, dataStore, clearSelection],
+  );
+
   const handleDelete = useCallback(() => {
     void (async () => {
       await onDelete(selectedRows!.map((ind) => rows[ind]?.record));
