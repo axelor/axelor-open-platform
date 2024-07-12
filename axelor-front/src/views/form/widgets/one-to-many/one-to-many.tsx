@@ -278,6 +278,7 @@ function OneToManyInner({
     groupBy = viewData?.view?.groupBy,
     toolbar = viewData?.view?.toolbar,
     menubar = viewData?.view?.menubar,
+    onCopy: onCopyAction,
     target: model,
     fields,
     formView,
@@ -1448,8 +1449,31 @@ function OneToManyInner({
 
   const onDuplicate = useCallback(async () => {
     if (selected?.id) {
-      const rec =
-        selected.id < 0 ? { ...selected } : await dataStore.copy(selected.id);
+      const isNew = selected.id < 0;
+      let rec = isNew
+        ? { ...selected }
+        : await dataStore.copy(selected.id);
+
+      if (onCopyAction) {
+        const result = await actionExecutor.execute(onCopyAction, {
+          context: {
+            ...rec,
+            ...(isNew && { id: null }),
+          },
+        });
+        // only extract values from onCopy action result
+        rec = {
+          ...rec,
+          ...result?.reduce?.(
+            (obj, { values }) => ({
+              ...obj,
+              ...values,
+            }),
+            {},
+          ),
+        };
+      }
+
       const newId = nextId();
       const maxOrder = orderField
         ? records
@@ -1462,12 +1486,21 @@ function OneToManyInner({
           ...rec,
           _dirty: true,
           id: newId,
+          cid: newId,
           ...(orderField && maxOrder != null && { [orderField]: maxOrder + 1 }),
         },
       ]);
       saveIdRef.current = newId;
     }
-  }, [dataStore, orderField, records, selected, setValue]);
+  }, [
+    dataStore,
+    orderField,
+    records,
+    selected,
+    onCopyAction,
+    setValue,
+    actionExecutor,
+  ]);
 
   const onSaveRecord = useCallback(
     async (record: DataRecord) => {

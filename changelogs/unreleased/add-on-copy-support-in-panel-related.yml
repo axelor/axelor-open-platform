@@ -1,0 +1,6 @@
+---
+title: Add onCopy action support in panel-related
+type: feature
+description: |
+  This action will be call after duplicating record in o2m/m2m grid,
+  It will be used along with x-can-copy="true".
