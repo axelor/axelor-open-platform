@@ -7,6 +7,7 @@ import {
   CommandItemProps,
   Input,
   MenuItem,
+  RenderCommandItemProps,
 } from "@axelor/ui";
 import {
   MaterialIcon,
@@ -61,7 +62,7 @@ function BadgeIcon({
   );
 }
 
-function FavoriteItem(props: CommandItemProps) {
+function FavoriteItem(props: RenderCommandItemProps) {
   const { open: openTab, active } = useTabs();
   const { navigate } = useRoute();
   const { data: session } = useSession();
@@ -251,7 +252,7 @@ function QuickMenuBar() {
           return {
             key,
             text: item.title,
-            render: (props: CommandItemProps) => (
+            render: (props: RenderCommandItemProps) => (
               <QuickMenuItem
                 key={key}
                 data={item}

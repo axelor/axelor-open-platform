@@ -2,7 +2,13 @@ import { useAtom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Box, CommandBar, CommandItem, CommandItemProps } from "@axelor/ui";
+import {
+  Box,
+  CommandBar,
+  CommandItem,
+  CommandItemProps,
+  RenderCommandItemProps,
+} from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
@@ -79,7 +85,7 @@ function ActionCommandItem({
   recordHandler,
   schema,
   ...props
-}: CommandItemProps &
+}: RenderCommandItemProps &
   Pick<ViewToolBarProps, "formAtom" | "recordHandler"> & {
     schema: Schema;
   }) {
