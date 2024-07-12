@@ -270,6 +270,7 @@ const FormContainer = memo(function FormContainer({
   const {
     onNew: onNewAction,
     onLoad: onLoadAction,
+    onDelete: onDeleteAction,
     onSave: onSaveAction,
   } = schema;
 
@@ -883,6 +884,11 @@ const FormContainer = memo(function FormContainer({
             yesTitle: i18n.get("Delete"),
           });
           if (confirmed) {
+            if (onDeleteAction) {
+              await actionExecutor.execute(onDeleteAction, {
+                context: record,
+              });
+            }
             await dataStore.delete({ id, version });
             if (prevType) {
               switchTo(prevType);
@@ -892,7 +898,15 @@ const FormContainer = memo(function FormContainer({
           }
         }
       },
-      [dataStore, formAtom, onNew, prevType, switchTo],
+      [
+        dataStore,
+        formAtom,
+        onDeleteAction,
+        onNew,
+        prevType,
+        switchTo,
+        actionExecutor,
+      ],
     ),
   );
 

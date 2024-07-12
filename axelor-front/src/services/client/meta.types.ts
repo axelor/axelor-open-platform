@@ -477,6 +477,7 @@ export interface FormView extends View, LayoutContainer {
   onLoad?: string;
   onSave?: string;
   onNew?: string;
+  onDelete?: string;
   showOnNew?: boolean;
   readonlyIf?: string;
   canNew?: string;
