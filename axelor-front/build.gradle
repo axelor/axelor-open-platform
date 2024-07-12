@@ -12,7 +12,7 @@ apply plugin: 'com.github.node-gradle.node'
 
 node {
     version = '20.15.1'
-    pnpmVersion = '8.15.5'
+    pnpmVersion = '9.5.0'
     download = true
 }
 

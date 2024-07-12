@@ -5,7 +5,7 @@ The next generation web frontend of Axelor.
 ## Pre-requisites
 
 - node >= v20
-- pnpm >= 8
+- pnpm >= 9
 
 ```bash
 # Nodejs
@@ -19,7 +19,7 @@ $ nvm install 20
 
 # pnpm
 $ corepack enable
-$ corepack prepare pnpm@latest-8 --activate
+$ corepack prepare pnpm@latest-9 --activate
 ```
 
 See more installation methods:
