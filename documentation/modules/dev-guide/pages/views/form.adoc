@@ -78,6 +78,8 @@ Form view can have the following attributes:
 | `readonlyIf` | boolean expression to make form readonly
 | `onNew` | action to be called on creating new record
 | `onLoad` | action to be called when record is loaded
+| `onCopy` | action to be called when record is copied
+| `onDelete` | action to call when deleting record
 | `onSave` | action to be called on saving this form
 | `canNew` | boolean expression to the 'New' button
 | `canEdit` | boolean expression to the 'Edit' button

@@ -41,6 +41,7 @@ The cards view attributes are:
 | *`model`*   | fully qualified name of the domain model
 | `orderBy`   | a field to use to order cards
 | `cardWidth` | specify the widget of a card (default 33.33%)
+| `onDelete` | action to call when deleting a card
 |===
 
 You can use `ui-action-click` directive in template to execute any action on click event.

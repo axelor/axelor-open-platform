@@ -49,6 +49,8 @@ The grid view has the following attributes:
 | `widget` | name of the widget to be used in the grid: `expandable`
 | `x-no-fetch` | whether to fetch initial records
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
+| `onSave` | action to be called on saving form in editable grid
+| `onDelete` | action to be called when selected records are deleting
 |===
 
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.

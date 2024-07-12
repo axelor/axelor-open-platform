@@ -49,6 +49,7 @@ The kanban view attributes are:
 | *`sequenceBy`* | a field to use to re-order the cards (numeric fields only)
 | `onNew` | a field to use when creating record on the fly
 | `onMove` | action to call when moving a kanban card
+| `onDelete` | action to call when deleting a card
 | `limit` | pagination limit per column
 | `x-collapse-columns` | comma-separated list of column names that should be collapsed by default (reference fields not supported)
 |===
