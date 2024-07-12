@@ -1,0 +1,5 @@
+---
+title: Add onCopy action support in form-view
+type: feature
+description: |
+  This action will be execute after record is copied same as onLoad action in existing record.

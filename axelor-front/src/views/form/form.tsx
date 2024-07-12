@@ -270,6 +270,7 @@ const FormContainer = memo(function FormContainer({
   const {
     onNew: onNewAction,
     onLoad: onLoadAction,
+    onCopy: onCopyAction,
     onDelete: onDeleteAction,
     onSave: onSaveAction,
   } = schema;
@@ -914,9 +915,14 @@ const FormContainer = memo(function FormContainer({
     if (record.id) {
       const rec = await dataStore.copy(record.id);
       rec && (copyRecordRef.current = true);
-      doEdit(rec, { dirty: true, readonly: false, isNew: true });
+      
+      await doEdit(rec, { dirty: true, readonly: false, isNew: true });
+
+      if (onCopyAction) {
+        await actionExecutor.execute(onCopyAction);
+      }
     }
-  }, [dataStore, doEdit, record.id]);
+  }, [dataStore, onCopyAction, actionExecutor, doEdit, record.id]);
 
   const openProcess = useCallback(async () => {
     if (record.id && record.$processInstanceId) {
