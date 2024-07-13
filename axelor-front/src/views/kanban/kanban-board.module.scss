@@ -1,13 +1,13 @@
 .board {
   padding: 0.5rem 0;
   gap: 0.5rem;
+  overflow: auto;
   & > * {
     max-width: 100%;
   }
   &.responsive {
     flex-direction: column;
   }
-  overflow: auto;
 }
 
 .column-wrapper {

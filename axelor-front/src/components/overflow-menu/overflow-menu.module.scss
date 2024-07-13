@@ -3,10 +3,11 @@
 }
 
 .menu {
-  & > * {
-    pointer-events: none;
-  }
   max-height: 300px;
   max-width: 600px;
   overflow: auto;
+
+  & > * {
+    pointer-events: none;
+  }
 }
