@@ -231,7 +231,7 @@ export function LoginForm({
         {isPage && signInTitle && (
           <Box
             d="flex"
-            justifyContent={"center"}
+            justifyContent="center"
             mt={3}
             dangerouslySetInnerHTML={{
               __html: sanitize(signInTitle),
@@ -285,36 +285,32 @@ export function LoginForm({
               {passwordField.title ? passwordField.title : i18n.get("Password")}
             </InputLabel>
           )}
-          <Box d="flex" position="relative">
-            <AdornedInput
-              name="password"
-              type={showPassword ? "text" : "password"}
-              id="password"
-              autoComplete="current-password"
-              mb={3}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              spellCheck="false"
-              placeholder={passwordField.placeholder}
-              startAdornment={
-                passwordFieldIcon ? (
-                  <Icon icon={passwordFieldIcon} />
-                ) : undefined
-              }
-              endAdornment={
-                <Button
-                  onClick={() => setShowPassword((value) => !value)}
-                  title={
-                    showPassword
-                      ? i18n.get("Hide password")
-                      : i18n.get("Show password")
-                  }
-                >
-                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
-                </Button>
-              }
-            />
-          </Box>
+          <AdornedInput
+            name="password"
+            type={showPassword ? "text" : "password"}
+            id="password"
+            autoComplete="current-password"
+            mb={3}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            spellCheck="false"
+            placeholder={passwordField.placeholder}
+            startAdornment={
+              passwordFieldIcon ? <Icon icon={passwordFieldIcon} /> : undefined
+            }
+            endAdornment={
+              <Button
+                onClick={() => setShowPassword((value) => !value)}
+                title={
+                  showPassword
+                    ? i18n.get("Hide password")
+                    : i18n.get("Show password")
+                }
+              >
+                <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+              </Button>
+            }
+          />
           {errorText && (
             <Alert mt={3} mb={1} p={2} variant="danger">
               {errorText}
@@ -328,7 +324,7 @@ export function LoginForm({
       {isPage && signInFooter && (
         <Box
           d="flex"
-          justifyContent={"center"}
+          justifyContent="center"
           dangerouslySetInnerHTML={{ __html: sanitize(signInFooter) }}
         ></Box>
       )}
