@@ -8,7 +8,7 @@ import {
 import {
   MaterialIcon,
   MaterialIconProps,
-  materialIconNames
+  materialIconNames,
 } from "@axelor/ui/icons/material-icon";
 import { forwardRef } from "react";
 
@@ -697,6 +697,39 @@ const fa: Record<string, BootstrapIconProps["icon"]> = {
   //"fa-meetup": ""
 };
 
+/**
+ * Map removed material icons with their equivalency in order to maintained compatibility
+ * From 2024-05-14 to 2024-07-11 : see https://material-symbols-changelog.vercel.app/
+ */
+const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
+  // 2024-05-14
+  arrow_back_ios_new: "arrow_back_ios",
+  done: "check",
+  expand_less: "keyboard_arrow_up",
+  expand_more: "keyboard_arrow_down",
+  file_download_done: "download_done",
+  navigate_before: "chevron_left",
+  navigate_next: "chevron_right",
+  // 2024-05-30
+  cut: "content_cut",
+  emoji_flags: "flag",
+  feed: "description",
+  monetization_on: "paid",
+  // 2024-06-06
+  wifi_calling_1: "wifi_calling_bar_3",
+  wifi_calling_2: "wifi_calling_bar_2",
+  wifi_calling_3: "wifi_calling_bar_3",
+  // 2024-07-02
+  airplanemode_active: "flight",
+  clear_night: "bedtime",
+  device_reset: "history",
+  flightsmode: "travel",
+  lens: "circle",
+  panorama_fish_eye: "circle",
+  quiet_time: "bedtime",
+  quiet_time_active: "bedtime_off",
+};
+
 export type IconProps = {
   icon: string;
 } & Pick<
@@ -743,6 +776,16 @@ const findMaterialIcon = (icon: string) => {
 
   if (materialIconNames.has(icon)) found = icon as MaterialIconName;
   if (materialIconNames.has(name)) found = name as MaterialIconName;
+  if (materialIconsRemoved[name]) {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      !logsMissingIcons.includes(name)
+    ) {
+      console.log("Deprecated icon : " + name);
+      logsMissingIcons.push(name);
+    }
+    found = materialIconsRemoved[name];
+  }
 
   return found;
 };
