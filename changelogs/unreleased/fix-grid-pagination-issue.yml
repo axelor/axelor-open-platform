@@ -1,0 +1,6 @@
+---
+title: Fix grid view pagination
+type: fix
+description: |
+  When we switch between grid to form and form back to grid, 
+  first time prev/next was having no effect.

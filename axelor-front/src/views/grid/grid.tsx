@@ -219,16 +219,8 @@ function GridInner(props: ViewProps<GridView>) {
   }, [dataStore, getSearchOptions]);
 
   const doSearch = useCallback(
-    (options: SearchOptions = {}) => {
-      if (cacheDataRef.current) {
-        cacheDataRef.current = false;
-        const { records, page } = dataStore;
-        if (isEqual(dataStore.options?.fields, options.fields)) {
-          return Promise.resolve({ records, page } as SearchResult);
-        }
-      }
-      return dataStore.search(getSearchOptions(options));
-    },
+    (options: SearchOptions = {}) =>
+      dataStore.search(getSearchOptions(options)),
     [dataStore, getSearchOptions],
   );
 
@@ -810,6 +802,16 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onGridSearch = useCallback(
     (options?: SearchOptions) => {
+      if (cacheDataRef.current) {
+        cacheDataRef.current = false;
+        if (isEqual(dataStore.options?.fields, options?.fields)) {
+          return Promise.resolve({
+            records: dataStore.records,
+            page: dataStore.page,
+          } as SearchResult);
+        }
+      }
+
       const hasOnSearchChanged = onSearchRef.current !== onSearch;
 
       const currOptions = dataStore.options || {};
