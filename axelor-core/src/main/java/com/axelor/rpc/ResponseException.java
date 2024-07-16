@@ -19,6 +19,7 @@
 package com.axelor.rpc;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.google.common.base.Throwables;
@@ -56,13 +57,21 @@ public class ResponseException extends RuntimeException {
     Throwable cause = getCause();
     String message = getMessage();
 
-    if (message == null) message = cause.getMessage();
-    if (message != null) report.put("message", this.getMessage());
-    if (title != null) report.put("title", title);
+    if (message == null && cause != null) {
+      message = cause.getMessage();
+    }
+    if (message != null) {
+      report.put("message", this.getMessage());
+    }
+    if (title != null) {
+      report.put("title", title);
+    }
+
+    User user = AuthUtils.getUser();
 
     if (cause != null
-        && (AuthUtils.isAdmin(AuthUtils.getUser())
-            || AuthUtils.isTechnicalStaff(AuthUtils.getUser()))) {
+        && user != null
+        && (AuthUtils.isAdmin(user) || AuthUtils.isTechnicalStaff(user))) {
       report.put("causeClass", cause.getClass().getName());
       report.put("causeStack", Throwables.getStackTraceAsString(cause));
       report.put("causeString", cause.toString());
