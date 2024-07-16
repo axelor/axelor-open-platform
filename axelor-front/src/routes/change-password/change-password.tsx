@@ -19,7 +19,17 @@ import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "../login";
 import logo from "@/assets/axelor.svg";
 import styles from "./change-password.module.scss";
 
-export function ChangePassword() {
+export function ChangePassword({
+  onSubmit,
+  error: propsErrorMessage,
+  passwordPattern: propsPasswordPattern,
+  passwordPatternTitle: propsPasswordPatternTitle,
+}: {
+  onSubmit?: FormEventHandler<HTMLFormElement>;
+  error?: string;
+  passwordPattern?: string;
+  passwordPatternTitle?: string;
+}) {
   const session = useSession();
   const appInfo = session.data;
   const defaultClient = appInfo?.authentication?.defaultClient;
@@ -27,12 +37,18 @@ export function ChangePassword() {
   const { navigate } = useRoute();
   const location = useLocation();
   const { route, ...locationState } = location.state ?? {};
-  const { username, password, error, passwordPattern, passwordPatternTitle } =
-    route ?? {};
+  const {
+    username,
+    password,
+    error,
+    passwordPattern = propsPasswordPattern,
+    passwordPatternTitle = propsPasswordPatternTitle,
+  } = route ?? {};
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(error);
+  const [_errorMessage, setErrorMessage] = useState(error);
+  const errorMessage = propsErrorMessage || _errorMessage;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -47,6 +63,10 @@ export function ChangePassword() {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
+      if (onSubmit) {
+        return onSubmit(event);
+      }
+
       event.preventDefault();
 
       // Need to specify client if default client is not form client.
@@ -107,6 +127,7 @@ export function ChangePassword() {
       newPassword,
       navigate,
       locationState,
+      onSubmit,
     ],
   );
 
@@ -158,7 +179,7 @@ export function ChangePassword() {
     confirmPasswordInputRef.current?.setCustomValidity(confirmPasswordValidity);
   }, [confirmPasswordValidity]);
 
-  if (!username) {
+  if (!username && !onSubmit) {
     return <Navigate to={"/"} />;
   }
 
@@ -181,8 +202,9 @@ export function ChangePassword() {
               e.currentTarget.src = logo;
             }}
           />
-          <Box as="legend">{i18n.get("Change your password")}</Box>
-
+          <Box as="legend" style={{ textWrap: "balance" }}>
+            {i18n.get("Change your password")}
+          </Box>
           <Box
             as="form"
             w={100}

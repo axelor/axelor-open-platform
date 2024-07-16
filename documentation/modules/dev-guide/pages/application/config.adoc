@@ -569,3 +569,25 @@ application.sign-in.buttons.submit.icon = none
 Note that the properties file is not a source for extracting translations. So, for your translatable texts, you can add your translations to `custom_<language>.csv` files.
 
 For links, you may use `:username` in the URL to have the username as a parameter (eg. `public/forgot-password.html?username=:username`).
+
+== Password Reset
+
+There is built-in support for password reset functionality. This allows users to request a password reset link if they have forgotten their password. This feature can be configured using the following properties:
+
+[cols="4,8,1"]
+|===
+| Property                             | Description                                                      | Default
+| `application.reset-password.enabled` | Whether to enable the password reset feature from the login page | true
+| `application.reset-password.max-age` | Maximum validity period of password reset tokens in hours        | 24
+|===
+
+=== User Experience
+
+When enabled, a "Forgot password?" link appears on the login page. Users can click this link to enter their email address and request a password reset link. The link remains valid for the duration specified by `application.reset-password.max-age`.
+
+=== Security Considerations
+
+In production mode, to prevent host injection attacks, the password reset feature requires a configured application host. It will not use the request host to determine the application's base URL when creating password reset links. This means:
+
+- The `application.base-url` configuration is required in most cases.
+- Exception: When multi-tenancy is enabled, the system uses the first host in the `hosts` configuration for each tenant instead.

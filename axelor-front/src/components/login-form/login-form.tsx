@@ -83,6 +83,8 @@ export function LoginForm({
     [],
   );
 
+  const hasTenantSelect = tenants.length > 1;
+
   const handleSubmit: (event: React.SyntheticEvent) => Promise<void> =
     useCallback(
       async (event) => {
@@ -99,7 +101,7 @@ export function LoginForm({
         try {
           const info = await session.login(
             { username, password },
-            { params, tenant: tenantId },
+            { params, tenant: hasTenantSelect ? tenantId : undefined },
           );
           const { user, route } = info;
 
@@ -125,6 +127,7 @@ export function LoginForm({
         session,
         username,
         password,
+        hasTenantSelect,
         tenantId,
         navigate,
         locationState,
@@ -132,8 +135,11 @@ export function LoginForm({
       ],
     );
 
-  const { logo: appLogo = defaultLogo, name: appName = "Axelor" } =
-    appInfo?.application || {};
+  const {
+    logo: appLogo = defaultLogo,
+    name: appName = "Axelor",
+    resetPasswordEnabled,
+  } = appInfo?.application || {};
   const {
     logo: signInLogo = appLogo,
     title: signInTitle,
@@ -182,6 +188,17 @@ export function LoginForm({
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       : [buttons.submit];
   }, [signInButtons, handleSubmit, isPage]);
+
+  const handleForgotPassword = useCallback<
+    React.MouseEventHandler<HTMLAnchorElement>
+  >(
+    (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      navigate("/forgot-password", { state: { tenantId } });
+    },
+    [tenantId, navigate],
+  );
 
   if (session.state === "loading" || session.state === "hasError") {
     return null;
@@ -239,7 +256,7 @@ export function LoginForm({
           />
         )}
         <Box as="form" w={100} onSubmit={handleSubmit} mt={3}>
-          {isPage && tenants.length > 1 && (
+          {isPage && hasTenantSelect && (
             <Box mb={4}>
               {tenantField.showTitle !== false && (
                 <InputLabel htmlFor="tenant">
@@ -258,67 +275,86 @@ export function LoginForm({
               />
             </Box>
           )}
-          {usernameField.showTitle !== false && (
-            <InputLabel htmlFor="username">
-              {usernameField.title ? usernameField.title : i18n.get("Username")}
-            </InputLabel>
-          )}
-          <AdornedInput
-            ref={usernameRef}
-            id="username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-            mb={3}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
-            placeholder={usernameField.placeholder}
-            startAdornment={
-              usernameFieldIcon ? <Icon icon={usernameFieldIcon} /> : undefined
-            }
-          />
-          {passwordField.showTitle !== false && (
-            <InputLabel htmlFor="password">
-              {passwordField.title ? passwordField.title : i18n.get("Password")}
-            </InputLabel>
-          )}
-          <AdornedInput
-            name="password"
-            type={showPassword ? "text" : "password"}
-            id="password"
-            autoComplete="current-password"
-            mb={3}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            spellCheck="false"
-            placeholder={passwordField.placeholder}
-            startAdornment={
-              passwordFieldIcon ? <Icon icon={passwordFieldIcon} /> : undefined
-            }
-            endAdornment={
-              <Button
-                onClick={() => setShowPassword((value) => !value)}
-                title={
-                  showPassword
-                    ? i18n.get("Hide password")
-                    : i18n.get("Show password")
-                }
-              >
-                <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
-              </Button>
-            }
-          />
+          <Box>
+            {usernameField.showTitle !== false && (
+              <InputLabel htmlFor="username">
+                {usernameField.title
+                  ? usernameField.title
+                  : i18n.get("Username")}
+              </InputLabel>
+            )}
+            <AdornedInput
+              ref={usernameRef}
+              id="username"
+              name="username"
+              autoComplete="username"
+              autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+              placeholder={usernameField.placeholder}
+              startAdornment={
+                usernameFieldIcon ? (
+                  <Icon icon={usernameFieldIcon} />
+                ) : undefined
+              }
+            />
+          </Box>
+          <Box mt={3}>
+            {passwordField.showTitle !== false && (
+              <InputLabel htmlFor="password">
+                {passwordField.title
+                  ? passwordField.title
+                  : i18n.get("Password")}
+              </InputLabel>
+            )}
+            <AdornedInput
+              name="password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              spellCheck="false"
+              placeholder={passwordField.placeholder}
+              startAdornment={
+                passwordFieldIcon ? (
+                  <Icon icon={passwordFieldIcon} />
+                ) : undefined
+              }
+              endAdornment={
+                <Button
+                  onClick={() => setShowPassword((value) => !value)}
+                  title={
+                    showPassword
+                      ? i18n.get("Hide password")
+                      : i18n.get("Show password")
+                  }
+                >
+                  <BootstrapIcon icon={showPassword ? "eye-slash" : "eye"} />
+                </Button>
+              }
+            />
+            {isPage && resetPasswordEnabled && (
+              <Box d="flex" justifyContent="flex-end" mt={1} mb={1}>
+                <Link href="#" onClick={handleForgotPassword} underline={false}>
+                  {i18n.get("Forgot password?")}
+                </Link>
+              </Box>
+            )}
+          </Box>
           {errorText && (
             <Alert mt={3} mb={1} p={2} variant="danger">
               {errorText}
             </Alert>
           )}
-          {formButtons.map((button, index) => (
-            <LoginFormButton key={index} {...button} />
-          ))}
+          <Box mt={4}>
+            {formButtons.map((button, index) => (
+              <LoginFormButton key={index} {...button} />
+            ))}
+          </Box>
         </Box>
       </Box>
       {isPage && signInFooter && (

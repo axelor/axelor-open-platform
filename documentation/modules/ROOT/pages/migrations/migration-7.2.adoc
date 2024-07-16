@@ -27,6 +27,43 @@ For example, if a user selects `fr-CA` (Canadian French) as their language and a
 in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not
 found, original translation key is used, which is typically the message for the default language, `en` (English).
 
+== User email now has unique constraint
+
+There is now a unique constraint on the `User` `email` field. You may execute this SQL statement for migration:
+
+[source,sql]
+----
+UPDATE auth_user SET email = lower(email);
+ALTER TABLE auth_user ADD CONSTRAINT uk_auth_user_email UNIQUE (email);
+----
+
+== Password reset flow
+
+Users have now ability to reset their password through the "Forgot password" flow available on the login page.
+
+You need execute this SQL statement for migration :
+
+[source,sql]
+----
+create table auth_password_reset_token (
+    id         bigint       not null primary key,
+    archived   boolean,
+    version    integer,
+    created_on timestamp,
+    updated_on timestamp,
+    consumed   boolean,
+    expire_at  timestamp    not null,
+    token      varchar(255) not null constraint uk_btb4g1e6nvrwsmphnw0k43icg unique,
+    created_by bigint constraint fk_g21jxbwc75y8f79lf94qu1lmx references auth_user,
+    updated_by bigint constraint fk_n5d2audpih6fy2eruodkcu2ib references auth_user,
+    user_id    bigint       not null constraint fk_4i2jo1snnd87krhdt4kt5j09h references auth_user
+);
+
+create index auth_password_reset_token_user_id_idx on auth_password_reset_token (user_id);
+
+create sequence auth_password_reset_token_seq;
+----
+
 == String pattern validation set to be case-sensitive
 
 String pattern validation, through the attribute `pattern`, is now case-sensitive. To manage case-insensitive, it
@@ -62,17 +99,6 @@ change over upgrades, we strongly encourage you to update them.
 Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
 list.
 
-== Others Notable Changes
+== Other Notable Changes
 
 - Some layout changes in the login page as part of customizations (xref:dev-guide:application/config.adoc#custom-login-page[doc])
-
-
-== User email now has unique constraint
-
-There is now a unique constraint on the `User` `email` field. You may execute this SQL statement for migration:
-
-[source,sql]
-----
-UPDATE auth_user SET email = lower(email);
-ALTER TABLE auth_user ADD CONSTRAINT uk_auth_user_email UNIQUE (email);
-----

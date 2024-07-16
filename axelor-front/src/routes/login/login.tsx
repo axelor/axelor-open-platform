@@ -1,8 +1,9 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Image } from "@axelor/ui";
 
+import { alerts, AlertsProvider } from "@/components/alerts";
 import { LoginForm } from "@/components/login-form";
 import { useAppHead } from "@/hooks/use-app-head";
 import { useSession } from "@/hooks/use-session";
@@ -60,6 +61,8 @@ export function requestLogin(client?: string) {
 
 export function Login() {
   const location = useLocation();
+  const { state: locationState } = location ?? {};
+
   const { state, data, redirectUrl } = useSession();
   const queryParams = useMemo(
     () => new URLSearchParams(window.location.search),
@@ -80,6 +83,13 @@ export function Login() {
       );
     }
   }, [queryParams]);
+
+  useEffect(() => {
+    if (locationState?.message) {
+      alerts.info({ message: locationState.message });
+      delete locationState.message;
+    }
+  }, [locationState?.message]);
 
   if (state === "loading") return null;
 
@@ -123,6 +133,7 @@ export function Login() {
       <LoginForm error={errorMessage} shadow>
         <CentralClients clients={clients} />
       </LoginForm>
+      <AlertsProvider />
     </Box>
   );
 }

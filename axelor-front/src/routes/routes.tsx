@@ -10,7 +10,9 @@ import { Swagger } from "@/routes/swagger";
 
 import { ChangePassword } from "./change-password";
 import { ErrorPage } from "./error";
+import { ForgotPassword } from "./forgot-password";
 import { Login } from "./login";
+import { ResetPassword } from "./reset-password";
 import { Root } from "./root";
 import { View } from "./view";
 
@@ -32,6 +34,14 @@ const router = createHashRouter([
   {
     path: "/change-password",
     element: <ChangePassword />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
   {
     path: "/",

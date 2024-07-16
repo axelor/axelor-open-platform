@@ -58,6 +58,9 @@ public interface AvailableAppSettings {
 
   String APPLICATION_SIGN_IN_PREFIX = "application.sign-in.";
 
+  String APPLICATION_RESET_PASSWORD_ENABLED = "application.reset-password.enabled";
+  String APPLICATION_RESET_PASSWORD_MAX_AGE = "application.reset-password.max-age";
+
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";

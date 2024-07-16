@@ -58,6 +58,7 @@ export interface SessionInfo {
         [key in "submit" | string]: SignInButtonType;
       };
     };
+    resetPasswordEnabled?: boolean;
   };
   authentication?: {
     callbackUrl?: string;

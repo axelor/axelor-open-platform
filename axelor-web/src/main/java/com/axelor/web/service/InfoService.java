@@ -21,6 +21,7 @@ package com.axelor.web.service;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthPasswordResetService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -34,6 +35,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -100,6 +102,8 @@ public class InfoService extends AbstractService {
     if (ObjectUtils.notEmpty(signIn)) {
       map.put("signIn", signIn);
     }
+
+    map.put("resetPasswordEnabled", Beans.get(AuthPasswordResetService.class).isEnabled());
 
     if (AuthUtils.getUser() == null) {
       return map;
