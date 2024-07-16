@@ -5,7 +5,7 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="User" cacheable="true">
+  <entity name="User" cacheable="true" repository="abstract">
     <![CDATA[
     This object stores the users.
     ]]>
@@ -17,7 +17,7 @@
     <boolean name="forcePasswordChange" help="Force the user to change their password at next login."/>
 
     <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
-    <string name="email"/>
+    <string name="email" unique="true"/>
     <string name="language" selection="select.language"/>
     <string name="homeAction"/>
     <string name="theme" />

@@ -67,3 +67,12 @@ list.
 - Some layout changes in the login page as part of customizations (xref:dev-guide:application/config.adoc#custom-login-page[doc])
 
 
+== User email now has unique constraint
+
+There is now a unique constraint on the `User` `email` field. You may execute this SQL statement for migration:
+
+[source,sql]
+----
+UPDATE auth_user SET email = lower(email);
+ALTER TABLE auth_user ADD CONSTRAINT uk_auth_user_email UNIQUE (email);
+----
