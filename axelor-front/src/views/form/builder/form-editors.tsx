@@ -879,7 +879,9 @@ const RecordEditor = memo(function RecordEditor({
           ...state.original,
           ...(Array.isArray(parentOriginal)
             ? parentOriginal.find((x) => x.id === record.id)
-            : parentOriginal),
+            : typeof parentOriginal === "string" && currentState.meta.view?.json
+              ? JSON.parse(parentOriginal ?? "{}")
+              : parentOriginal),
         };
         const dirty = parentState.dirty;
 
