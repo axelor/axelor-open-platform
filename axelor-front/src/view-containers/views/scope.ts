@@ -22,7 +22,12 @@ import {
 import { SearchOptions } from "@/services/client/data";
 import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { ViewData } from "@/services/client/meta";
-import { Property, Schema, ViewType } from "@/services/client/meta.types";
+import {
+  JsonField,
+  Property,
+  Schema,
+  ViewType,
+} from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { FormAtom, usePrepareContext } from "@/views/form/builder";
 import {
@@ -399,6 +404,28 @@ export function findViewItem<T extends ViewType>(
       };
     }
   });
+}
+
+export function findJsonFieldItem<T extends ViewType>(
+  meta: ViewData<T>,
+  fieldName: string,
+) {
+  const { view } = meta;
+  function findItem(schema: Schema): JsonField | undefined {
+    const jsonField = (schema.jsonFields ?? []).find(
+      (item: JsonField) => item.jsonField && item.jsonPath === fieldName,
+    );
+    return (
+      jsonField ??
+      (() => {
+        for (const item of schema.items ?? []) {
+          const jsonItem = findItem(item);
+          if (jsonItem) return jsonItem;
+        }
+      })()
+    );
+  }
+  return findItem(view);
 }
 
 function findSchemaItems(schema: Schema): Schema[] {

@@ -12,7 +12,7 @@ import {
 } from "@/hooks/use-parser/context";
 import { isCleanDummy, updateRecord } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { JsonField, Schema, View } from "@/services/client/meta.types";
+import { Schema, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import {
   ActionAttrsData,
@@ -24,6 +24,7 @@ import {
   DefaultActionHandler,
 } from "@/view-containers/action";
 import {
+  findJsonFieldItem,
   findViewItem,
   useViewMeta,
   useViewTab,
@@ -606,131 +607,6 @@ function useActionValue({
   );
 }
 
-const updateJsonAtom = atom(
-  null,
-  (get, set, formAtom: FormAtom, values: DataRecord) => {
-    const { meta, fields, parent: parentAtom } = get(formAtom);
-    const isJson = Boolean(meta.view.json);
-    if (isJson) {
-      const parentState = parentAtom ? get(parentAtom) : null;
-      const parentFields = parentState?.fields ?? {};
-      const isOwn = (key: string) => key in fields || !(key in parentFields);
-      const isJson = (key: string) => parentFields[key]?.json;
-      const toJson = (value: unknown) =>
-        value && typeof value !== "string" ? JSON.stringify(value) : value;
-
-      const update = (targetAtom: FormAtom, vals: DataRecord) => {
-        const record = get(targetAtom).record;
-        const { _dirty, ...result } = updateRecord(record, vals) ?? {};
-        if (_dirty) {
-          set(targetAtom, (prev) => {
-            return {
-              ...prev,
-              dirty: prev.dirty || _dirty,
-              record: result ?? {},
-            };
-          });
-        }
-      };
-
-      const ownValues: DataRecord = {};
-      const topValues: DataRecord = {};
-
-      for (const [key, value] of Object.entries(values)) {
-        if (isOwn(key)) {
-          ownValues[key] = value;
-        } else {
-          topValues[key] = isJson(key) ? toJson(value) : value;
-        }
-      }
-
-      if (formAtom) update(formAtom, ownValues);
-      if (parentAtom) update(parentAtom, topValues);
-
-      return true;
-    }
-  },
-);
-
-const updateJsonFieldsAtom = atom(
-  null,
-  (get, set, formAtom: FormAtom, values?: DataRecord) => {
-    const { meta, fields } = get(formAtom);
-    const jsonFields: Record<string, Record<string, any>> = {};
-    const otherValues: Partial<DataRecord> = {};
-    const cacheViewItems: Record<string, any> = {};
-
-    // collect json fields
-    for (const [key, value] of Object.entries(values ?? {})) {
-      if (key.includes(".")) {
-        const [jsonField, ...fieldParts] = key.split(".");
-        const subField = fieldParts.join(".");
-
-        const hasExplictDefined = fields[key]?.jsonField;
-        const isDefineInJsonFields = () => {
-          const itemSchema =
-            cacheViewItems[jsonField] ??
-            (cacheViewItems[jsonField] = findViewItem(meta, jsonField) ?? {});
-          return (itemSchema?.jsonFields ?? []).some(
-            (f: JsonField) => f.name === subField,
-          );
-        };
-
-        if (hasExplictDefined || isDefineInJsonFields()) {
-          jsonFields[jsonField] = {
-            ...jsonFields[jsonField],
-            [subField]: value,
-          };
-          continue;
-        }
-      }
-      otherValues[key] = value;
-    }
-
-    if (Object.keys(jsonFields).length) {
-      const formState = get(formAtom);
-      let { record } = formState;
-      let dirty = false;
-
-      for (const [jsonField, jsonValues] of Object.entries(jsonFields)) {
-        const _values = (() => {
-          try {
-            const value = record[jsonField];
-            return value && typeof value === "string"
-              ? JSON.parse(value)
-              : value;
-          } catch (err) {
-            // handle error
-          }
-          return {};
-        })();
-
-        const jsonFieldValue = {
-          ..._values,
-          ...jsonValues,
-        };
-
-        if (!isEqual(_values, jsonFieldValue)) {
-          dirty = true;
-          record = {
-            ...record,
-            [jsonField]: JSON.stringify(jsonFieldValue),
-          };
-        }
-      }
-
-      dirty &&
-        set(formAtom, {
-          ...formState,
-          dirty,
-          record,
-        });
-    }
-
-    return Object.keys(otherValues).length ? otherValues : null;
-  },
-);
-
 function useActionRecord({
   formAtom,
   actionHandler,
@@ -739,9 +615,6 @@ function useActionRecord({
   actionHandler: ActionHandler;
 }) {
   const canDirty = useCanDirty();
-  const updateJson = useSetAtom(updateJsonAtom);
-  const updateJsonFields = useSetAtom(updateJsonFieldsAtom);
-  const { findItem } = useViewMeta();
 
   useActionData<ActionValueData>(
     useCallback((x) => x.type === "record" && Boolean(x.value), []),
@@ -749,32 +622,54 @@ function useActionRecord({
       useCallback(
         (get, set, data) => {
           const formState = get(formAtom);
-          const updateFormAtom = formState.meta.view?.json
-            ? formState.parent!
-            : formAtom;
+          const isJsonScope = formState.meta.view?.json;
 
-          const values = updateJsonFields(updateFormAtom, data.value);
-          if (!values) return;
+          const updateFormAtom = isJsonScope ? formState.parent! : formAtom;
+          const updateFormState = get(updateFormAtom);
+          const cacheJsonFields: Record<string, any> = {};
+          const getJsonField = (key: string) => {
+            // skip in case of record field
+            if (key in updateFormState.fields) return;
+            if (cacheJsonFields[key] !== undefined) return cacheJsonFields[key];
+            return (
+              (isJsonScope && formState.fields[key]) ??
+              (cacheJsonFields[key] =
+                findJsonFieldItem(updateFormState.meta, key) || null)
+            );
+          };
 
-          // json field values?
-          if (updateJson(formAtom, values)) {
-            return;
-          }
+          const values = (() => {
+            return Object.keys(data.value).reduce((vals, key) => {
+              const value = data.value[key];
+              const field = getJsonField(key);
+              return {
+                ...vals,
+                [field ? `${field.jsonField}.${key}` : key]: value,
+              };
+            }, {});
+          })();
 
-          const { record, fields } = get(formAtom);
-          const result = updateRecord(record, values, fields, { findItem });
+          const { record, fields } = get(updateFormAtom);
+
+          const result = updateRecord(record, values, fields, {
+            findJsonItem: getJsonField,
+            findItem: (fieldName: string) =>
+              findViewItem(updateFormState.meta, fieldName),
+          });
+
           const isDirty = () =>
             result._dirty &&
             Object.entries(values).some(
               ([k, v]) => record[k] !== v && canDirty(k),
             );
-          set(formAtom, (prev) => ({
+
+          set(updateFormAtom, (prev) => ({
             ...prev,
             dirty: prev.dirty || isDirty(),
             record: result,
           }));
         },
-        [canDirty, formAtom, updateJson, updateJsonFields, findItem],
+        [canDirty, formAtom],
       ),
     ),
     actionHandler,

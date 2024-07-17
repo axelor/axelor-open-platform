@@ -4,7 +4,7 @@ import { produce } from "immer";
 
 import { compactJson, isReferenceField } from "@/views/form/builder/utils";
 import { DataRecord } from "./data.types";
-import { Property, Schema } from "./meta.types";
+import { JsonField, Property, Schema } from "./meta.types";
 
 /**
  * Checks if the given name is the name of a dummy field.
@@ -144,13 +144,27 @@ function updateItem(item: DataRecord) {
   return item;
 }
 
+function toJSON(value?: string | null) {
+  try {
+    return JSON.parse(value ?? "{}");
+  } catch (err) {
+    // handle error
+  }
+  return {};
+}
+
 export function updateRecord(
   target: DataRecord,
   source: DataRecord,
   fields?: Record<string, Property>,
-  options?: { findItem?: (fieldName: string) => Schema | undefined },
+  options?: {
+    findItem?: (fieldName: string) => Schema | undefined;
+    findJsonItem?: (fieldName: string) => Schema | undefined;
+  },
 ) {
-  const { findItem } = options || {};
+  const jsonFieldsValue: Record<string, Record<string, any>> = {};
+
+  const { findItem, findJsonItem } = options || {};
 
   source = updateItem(source);
 
@@ -168,6 +182,32 @@ export function updateRecord(
       continue;
     }
 
+    // to set values of json fields
+    if (key.includes(".")) {
+      const [jsonField, ...fieldParts] = key.split(".");
+      const subField = fieldParts.join(".");
+      const hasExplictDefined = fields?.[key]?.jsonField;
+      const hasDefinedInJsonItems = () => {
+        const jsonItem = findJsonItem?.(subField);
+        return jsonItem?.jsonField === jsonField;
+      };
+
+      if (hasExplictDefined || hasDefinedInJsonItems()) {
+        const _values =
+          jsonFieldsValue[jsonField] ??
+          (jsonFieldsValue[jsonField] = toJSON(result[jsonField]));
+
+        if (!equals(_values[subField], value)) {
+          changed = true;
+          jsonFieldsValue[jsonField] = {
+            ..._values,
+            [subField]: value,
+          };
+        }
+        continue;
+      }
+    }
+
     // to set values of editor dotted fields
     if (key.includes(".")) {
       // get parentField
@@ -183,7 +223,8 @@ export function updateRecord(
     }
 
     if (fields?.[key]?.json) {
-      newValue = newValue && compactJson(JSON.parse(newValue));
+      delete jsonFieldsValue[key];
+      newValue = newValue && compactJson(toJSON(newValue));
     }
 
     let isSelectedChanged = false;
@@ -235,7 +276,25 @@ export function updateRecord(
   }
 
   const id = result.id || _id;
-  return changed ? { ...result, _dirty: true, ...(id && { id }) } : result;
+  return changed
+    ? {
+        ...result,
+        _dirty: true,
+        ...(id && { id }),
+        // stringify json fields
+        ...Object.keys(jsonFieldsValue).reduce(
+          (vals, key) => ({
+            ...vals,
+            [key]: JSON.stringify({
+              // check json field is explicitly set, then retains the value
+              ...(key in source && toJSON(result[key])),
+              ...jsonFieldsValue[key],
+            }),
+          }),
+          {},
+        ),
+      }
+    : result;
 }
 
 const IGNORE_FIELDS = ["_dirty", "_fetched"];

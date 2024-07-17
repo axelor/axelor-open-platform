@@ -1,3 +1,12 @@
 ---
-title: Fix update json fields through action-attrs
+title: Fix update custom fields
 type: fix
+description: |
+  This fixes updating custom fields in views. 
+  Custom field that are part of the default `attrs` json field can be updated either without prefix 
+  (`<attribute for="test" name="value" expr="eval: "some""/>`) or without prefix 
+  (`<attribute for="attrs.test" name="value" expr="eval: "some""/>`), no matter where the action is triggered in the 
+  view. This means that whether the action is triggered from a field event or a button in the main form or from a field 
+  event or button inside a json field, it works same. For custom fields that are part of other json fields, they have 
+  to be updated with their respective prefix : `<attribute for="myOtherJsonField.test" name="value" expr="eval: "some""/>`.
+  Both `action-attrs` and `action-record` are supported.
