@@ -384,35 +384,47 @@ public class I18nExtractor {
 
   public void extract(
       Path srcPath, Path destPath, boolean update, boolean withContext, List<String> languages) {
-    if (Files.notExists(srcPath)) {
-      return;
-    }
+    extract(List.of(srcPath), destPath, update, withContext, languages);
+  }
+
+  public void extract(
+      List<Path> srcPaths,
+      Path destPath,
+      boolean update,
+      boolean withContext,
+      List<String> languages) {
 
     log.info("extracting: {}", "translatable strings...");
 
     final Multimap<String, String> items = HashMultimap.create();
 
-    final I18nTextVisitor visitor =
-        new I18nTextVisitor(srcPath) {
+    for (final Path srcPath : srcPaths) {
+      if (Files.notExists(srcPath)) {
+        continue;
+      }
 
-          @Override
-          protected void accept(I18nItem item) {
-            if (StringUtils.isBlank(item.text)) return;
-            String location = null;
-            if (item.file != null) {
-              location = "" + srcPath.relativize(item.file) + ":" + item.line;
-            }
-            if (item.text.length() != item.text.trim().length()) {
-              log.warn(
-                  "Remove leading/trailing white spaces from '{}', of the following text: '{}'",
-                  location,
-                  item.text);
-            }
-            items.put(item.text.trim(), location);
-          }
-        };
+      final I18nTextVisitor visitor =
+          new I18nTextVisitor(srcPath) {
 
-    visitor.walk();
+            @Override
+            protected void accept(I18nItem item) {
+              if (StringUtils.isBlank(item.text)) return;
+              String location = null;
+              if (item.file != null) {
+                location = "" + srcPath.relativize(item.file) + ":" + item.line;
+              }
+              if (item.text.length() != item.text.trim().length()) {
+                log.warn(
+                    "Remove leading/trailing white spaces from '{}', of the following text: '{}'",
+                    location,
+                    item.text);
+              }
+              items.put(item.text.trim(), location);
+            }
+          };
+
+      visitor.walk();
+    }
 
     // don't generate empty templates
     if (items.isEmpty()) {

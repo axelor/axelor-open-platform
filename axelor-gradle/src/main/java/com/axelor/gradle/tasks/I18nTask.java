@@ -24,6 +24,7 @@ import com.axelor.gradle.I18nExtension;
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -65,20 +66,19 @@ public class I18nTask extends DefaultTask {
     final Path dest = src.resolve("resources");
     final boolean update = true;
 
-    extractor.extract(src, dest, update, withContext, languages);
+    final List<Path> srcList = new ArrayList<>();
+    srcList.add(src);
 
     final I18nExtension extension = getProject().getExtensions().findByType(I18nExtension.class);
-
-    if (extension == null) {
-      return;
-    }
-
-    final List<Path> extraSources = extension.getExtraSources();
-
-    if (extraSources != null) {
-      for (final Path extraSource : extraSources) {
-        extractor.extract(base.resolve(extraSource), dest, update, withContext, languages);
+    if (extension != null) {
+      final List<Path> extraSources = extension.getExtraSources();
+      if (extraSources != null) {
+        for (final Path extraSource : extraSources) {
+          srcList.add(base.resolve(extraSource));
+        }
       }
     }
+
+    extractor.extract(srcList, dest, update, withContext, languages);
   }
 }
