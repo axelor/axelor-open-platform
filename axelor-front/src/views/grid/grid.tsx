@@ -552,7 +552,8 @@ function GridInner(props: ViewProps<GridView>) {
       : null;
   const selectedDetail =
     selectedRow?.type !== "row" ? null : selectedRow?.record;
-
+  const hasManySelected = (selectedRows?.length ?? 0) > 1;
+  
   const onLoadDetails = useCallback(
     (e: any, row: GridRow) => {
       selectedDetail?.id === row?.record?.id &&
@@ -572,6 +573,7 @@ function GridInner(props: ViewProps<GridView>) {
 
   useAsyncEffect(async () => {
     if (!detailsMeta) return;
+    if (hasManySelected) return fetchAndSetDetailsRecord(null);
     const record = selectedDetail?.id ? selectedDetail : null;
     if (record && hasRowSelectedFromState.current) {
       hasRowSelectedFromState.current = false;
@@ -579,7 +581,7 @@ function GridInner(props: ViewProps<GridView>) {
     }
     initDetailsRef.current && fetchAndSetDetailsRecord(record);
     initDetailsRef.current = true;
-  }, [selectedDetail?.id, detailsMeta, dataStore]);
+  }, [hasManySelected, selectedDetail?.id, detailsMeta, dataStore]);
 
   useAsyncEffect(async () => {
     if (
@@ -878,10 +880,11 @@ function GridInner(props: ViewProps<GridView>) {
           }),
       }
     : {};
+
   const detailsProps: Partial<GridProps> = hasDetailsView
     ? {
         ...(detailsViewOverlay && { onView: undefined }),
-        ...(!detailsRecord && {
+        ...(!detailsRecord && !hasManySelected && {
           onRowClick: detailsViewOverlay
             ? onShowDetails
             : selectedDetail

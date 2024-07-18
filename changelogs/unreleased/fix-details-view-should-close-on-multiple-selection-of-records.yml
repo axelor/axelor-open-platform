@@ -1,0 +1,6 @@
+---
+title: Fix details view should close on multiple selection of record
+type: fix
+description: |
+  When multiple records are selected in grid view then
+  details view should be not open and should be close if opened.
