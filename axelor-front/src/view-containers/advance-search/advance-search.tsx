@@ -232,7 +232,6 @@ export function AdvanceSearch({
           ...state,
           query: {
             _archived,
-            _searchText: searchText,
             operator: "or",
             criteria: getFreeSearchCriteria(searchText, viewItems, fields),
           },

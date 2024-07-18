@@ -129,10 +129,6 @@ public interface AvailableAppSettings {
   String ENCRYPTION_OLD_ALGORITHM = "encryption.old-algorithm";
   String ENCRYPTION_OLD_PASSWORD = "encryption.old-password";
 
-  String HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER =
-      "hibernate.search.default.directory_provider";
-  String HIBERNATE_SEARCH_DEFAULT_INDEX_BASE = "hibernate.search.default.indexBase";
-
   String HIBERNATE_HIKARI_MINIMUM_IDLE = "hibernate.hikari.minimumIdle";
   String HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE = "hibernate.hikari.maximumPoolSize";
   String HIBERNATE_HIKARI_IDLE_TIMEOUT = "hibernate.hikari.idleTimeout";

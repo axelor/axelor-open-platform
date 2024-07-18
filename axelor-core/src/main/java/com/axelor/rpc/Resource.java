@@ -45,7 +45,6 @@ import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.axelor.db.search.SearchService;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostRequest;
@@ -391,27 +390,8 @@ public class Resource<T extends Model> {
   }
 
   private Query<?> getSearchQuery(Request request, Filter filter) {
-    final SearchService searchService = Beans.get(SearchService.class);
-    if (request.getData() == null || !searchService.isEnabled()) {
-      return getQuery(request, filter);
-    }
-
-    final Map<String, Object> data = request.getData();
-    final String searchText = (String) data.get("_searchText");
-
-    // try full-text search
-    if (!StringUtils.isEmpty(searchText)) {
-      try {
-        final List<Long> ids = searchService.fullTextSearch(model, searchText, request.getLimit());
-        if (ids.size() > 0) {
-          return JPA.all(model).filter("self.id in :ids").bind("ids", ids);
-        }
-      } catch (Exception e) {
-        // just log and fallback to default search
-        LOG.error("Unable to do full-text search: " + e.getMessage(), e);
-      }
-    }
-    return filter == null ? getQuery(request) : getQuery(request, filter);
+    if (filter == null) return getQuery(request);
+    return getQuery(request, filter);
   }
 
   @Nullable

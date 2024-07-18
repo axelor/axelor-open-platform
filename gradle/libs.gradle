@@ -6,7 +6,6 @@ versions.guice = "5.1.0"
 versions.guava = "33.2.1-jre"
 versions.hibernate = "5.6.15.Final"
 versions.hibernate_validator = "6.2.5.Final"
-versions.hibernate_search = "5.11.12.Final"
 
 versions.groovy = "3.0.22"
 versions.resteasy = "4.7.9.Final"
@@ -120,9 +119,6 @@ libs.infinispan = [
     "org.infinispan:infinispan-core:13.0.22.Final",
     "org.infinispan:infinispan-jcache:13.0.22.Final"
 ]
-
-// Hibernate search
-libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
 libs.apache_tika_core = "org.apache.tika:tika-core:2.9.2"

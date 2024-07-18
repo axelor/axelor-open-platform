@@ -218,10 +218,10 @@ export function Dms(props: ViewProps<GridView>) {
           return Promise.resolve(undefined);
         }
 
-        const { query = {} } = searchAtom ? get(searchAtom) : {};
+        const { query = {}, searchText = "" } = searchAtom ? get(searchAtom) : {};
 
         let domain: string;
-        if (query._searchText?.trim()) {
+        if (searchText?.trim()) {
           domain = `self.isDirectory = FALSE${
             root.id ? ` AND self.parent.id = ${root.id}` : ""
           }`;

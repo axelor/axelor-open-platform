@@ -20,7 +20,6 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.db.search.SearchService;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
@@ -44,8 +43,6 @@ public class AppStartup extends HttpServlet {
 
   @Inject private JobRunner jobRunner;
 
-  @Inject private SearchService searchService;
-
   @Inject private Event<StartupEvent> startupEvent;
 
   @Inject private Event<ShutdownEvent> shutdownEvent;
@@ -58,15 +55,6 @@ public class AppStartup extends HttpServlet {
           false, AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
-    }
-
-    // initialize search index
-    if (searchService.isEnabled()) {
-      try {
-        searchService.createIndex(false);
-      } catch (InterruptedException e) {
-        log.error(e.getMessage(), e);
-      }
     }
 
     try {

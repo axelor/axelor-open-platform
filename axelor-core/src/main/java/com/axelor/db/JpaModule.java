@@ -26,8 +26,6 @@ import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
 import com.axelor.db.hibernate.naming.PhysicalNamingStrategyImpl;
 import com.axelor.db.internal.DBHelper;
-import com.axelor.db.search.SearchMappingFactory;
-import com.axelor.db.search.SearchModule;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
@@ -139,14 +137,12 @@ public class JpaModule extends AbstractModule {
 
     configureCache(settings, properties);
     configureMultiTenancy(settings, properties);
-    configureSearch(settings, properties);
 
     try {
       configureConnection(settings, properties);
     } catch (Exception e) {
     }
 
-    install(new SearchModule());
     install(new TenantModule());
     install(new JpaPersistModule(jpaUnit).properties(properties));
     if (this.autostart) {
@@ -211,31 +207,6 @@ public class JpaModule extends AbstractModule {
       properties.put(
           Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
       properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
-    }
-  }
-
-  private void configureSearch(final AppSettings settings, final Properties properties) {
-    // hibernate-search support
-    if (!SearchModule.isEnabled()) {
-      properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
-      properties.remove(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER);
-    } else {
-      if (properties.getProperty(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER)
-          == null) {
-        properties.setProperty(
-            AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER,
-            SearchModule.DEFAULT_DIRECTORY_PROVIDER);
-      }
-      if (properties.getProperty(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE)
-          == null) {
-        properties.setProperty(
-            AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE,
-            settings.getPath(
-                AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE,
-                SearchModule.DEFAULT_INDEX_BASE));
-      }
-      properties.put(
-          org.hibernate.search.cfg.Environment.MODEL_MAPPING, SearchMappingFactory.class.getName());
     }
   }
 

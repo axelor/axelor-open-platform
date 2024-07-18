@@ -33,9 +33,7 @@ dependencies {
 
   api libs.hibernate
 
-  implementation libs.hibernate_search
   implementation libs.caffeine
-
   implementation libs.flywaydb
 
   api libs.resteasy

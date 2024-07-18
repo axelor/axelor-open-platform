@@ -1,0 +1,16 @@
+---
+title: Remove hibernate search support
+type: remove
+description: |
+  We removed Hibernate search support (Full text search). The implementation was very basic and haven't
+  been followed and improved since the initial implementation.
+
+  Following properties aren't used anymore and can be deleted from properties file :
+  
+  * `hibernate.search.default.directory_provider`
+  * `hibernate.search.default.indexBase`
+  
+  We are actively working on a new integration that will provide much more power and a better integration 
+  in daily usage. Stay updated for the announcement in a future version.
+  
+  There is no replacement. Advance search feature can be used in order to achieve same goal.

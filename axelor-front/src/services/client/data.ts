@@ -17,7 +17,6 @@ export type SearchOptions = {
     _domainContext?: DataContext;
     _domainAction?: string;
     _archived?: boolean;
-    _searchText?: string;
   };
 };
 
