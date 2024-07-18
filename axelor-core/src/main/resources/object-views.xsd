@@ -2053,6 +2053,11 @@
                   </xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="onMove" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Comma separate list of actions to execute on move event.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:attribute name="draggable" type="xsd:boolean">
                 <xsd:annotation>
                   <xsd:documentation>

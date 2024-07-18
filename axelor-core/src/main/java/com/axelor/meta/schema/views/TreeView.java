@@ -81,6 +81,8 @@ public class TreeView extends AbstractView {
 
     @XmlAttribute private String onClick;
 
+    @XmlAttribute private String onMove;
+
     @XmlAttribute private Boolean draggable;
 
     @XmlAttribute private String domain;
@@ -115,6 +117,14 @@ public class TreeView extends AbstractView {
 
     public void setOnClick(String onClick) {
       this.onClick = onClick;
+    }
+
+    public String getOnMove() {
+      return onMove;
+    }
+
+    public void setOnMove(String onMove) {
+      this.onMove = onMove;
     }
 
     public Boolean getDraggable() {
