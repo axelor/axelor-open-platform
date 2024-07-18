@@ -1,6 +1,0 @@
----
-title: Fix flashing issue on viewer in form view
-type: fix
-description: |
-  Viewers are rendered when the form is ready, means that record is fetched. 
-  This avoids flashing issue, especially with `Image` inside viewers.

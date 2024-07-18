@@ -1,3 +1,54 @@
+## 7.1.4 (2024-07-18)
+
+#### Fix
+
+* Fix flashing issue on viewer in form view
+
+  <details>
+  
+  Viewers are rendered when the form is ready, means that record is fetched. 
+  This avoids flashing issue, especially with `Image` inside viewers.
+  
+  </details>
+
+* Fix update custom fields
+
+  <details>
+  
+  This fixes updating custom fields in views. 
+  Custom field that are part of the default `attrs` json field can be updated either without prefix 
+  (`<attribute for="test" name="value" expr="eval: "some""/>`) or without prefix 
+  (`<attribute for="attrs.test" name="value" expr="eval: "some""/>`), no matter where the action is triggered in the 
+  view. This means that whether the action is triggered from a field event or a button in the main form or from a field 
+  event or button inside a json field, it works same. For custom fields that are part of other json fields, they have 
+  to be updated with their respective prefix : `<attribute for="myOtherJsonField.test" name="value" expr="eval: "some""/>`.
+  Both `action-attrs` and `action-record` are supported.
+  
+  </details>
+
+* Fix grid view pagination
+
+  <details>
+  
+  When we switch between grid to form and form back to grid, 
+  first time prev/next was having no effect.
+  
+  </details>
+
+* Fix search-fields panel frame in search view
+* Fix set action attrs value with attribute
+* Fix original value for json field in form view
+* Fix popup should not open on click of expand in tree-grid/expandable
+* Add expression attribute support in tree view button
+
+  <details>
+  
+  Add support of readonly, hidden, hideIf, showIf, readonlyIf on tree-view button.
+  
+  </details>
+
+* Fix entities updated/deleted in BeforeTransactionComplete observer
+
 ## 7.1.3 (2024-07-01)
 
 #### Fix
