@@ -1074,7 +1074,6 @@ function OneToManyInner({
                     _original: options?.record || {},
                   }),
                 }),
-              checkDirty: false,
             }),
         ...options,
       });

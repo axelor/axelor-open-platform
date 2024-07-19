@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { uniqueId } from "lodash";
+import { isEqual, uniqueId } from "lodash";
 import { useCallback, useEffect, useRef } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
@@ -30,7 +30,6 @@ export type EditorOptions = {
   viewName?: string;
   context?: DataContext;
   canSave?: boolean;
-  checkDirty?: boolean;
   params?: ActionView["params"];
   header?: PopupProps["header"];
   footer?: PopupProps["footer"];
@@ -101,7 +100,6 @@ export function useEditor() {
       readonly,
       maximize,
       canSave = true,
-      checkDirty = true,
       params,
       header,
       footer,
@@ -146,7 +144,6 @@ export function useEditor() {
           onClose={close}
           onSave={onSave}
           onSelect={onSelect}
-          checkDirty={checkDirty}
         />
       ),
       buttons: [],
@@ -161,14 +158,12 @@ function Footer({
   onClose,
   onSave,
   onSelect,
-  checkDirty = true,
 }: {
   hasOk?: boolean;
   footer?: EditorOptions["footer"];
   onClose: (result: boolean) => void;
   onSave?: EditorOptions["onSave"];
   onSelect?: EditorOptions["onSelect"];
-  checkDirty?: EditorOptions["checkDirty"];
   params?: ActionView["params"];
 }) {
   const popupCanConfirm = params?.["show-confirm"] !== false;
@@ -196,10 +191,13 @@ function Footer({
           await handler.actionExecutor?.wait();
 
           const state = handler.getState();
-          const record = state.record;
+          const { original, record } = state;
+
+          const hasRecordChanged = () => !isEqual(original, record);
+
           const dirtyAtom = handler.dirtyAtom;
           const dirty = (dirtyAtom && get(dirtyAtom)) || state.dirty;
-          const canSave = !checkDirty || dirty || !record.id;
+          const canSave = dirty || !record.id || hasRecordChanged();
 
           try {
             const errors = handler.getErrors?.();
@@ -227,7 +225,7 @@ function Footer({
             console.error(e);
           }
         },
-        [checkDirty, handler, onClose, onSave, onSelect],
+        [handler, onClose, onSave, onSelect],
       ),
     ),
   );
