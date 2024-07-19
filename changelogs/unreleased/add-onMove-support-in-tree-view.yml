@@ -1,0 +1,6 @@
+---
+title: Add onMove node action support in tree-view
+type: feature
+description: |
+  This action can be used to stop moving operation in tree view through sending errors or
+  it can be useful to set some values before saving the node move modification.

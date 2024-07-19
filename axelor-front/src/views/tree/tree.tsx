@@ -53,11 +53,15 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       const ctx = getViewContext(actions);
       return {
         ...ctx,
+        _viewName: view.name,
+        _viewType: view.type,
+        _views: action.views,
         _model: ctx?._model || view.nodes?.[0]?.model,
       } as DataContext;
     },
-    [getViewContext, view],
+    [getViewContext, action, view],
   );
+
   // check parent/child is of same model
   const isSameModelTree = useMemo(() => {
     const model = view?.nodes?.[0]?.model;
@@ -184,6 +188,13 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     await onSearch({});
   }, [doReset, onSearch]);
 
+  const getActionContext = useCallback(() => getContext(true), [getContext]);
+
+  const actionExecutor = useActionExecutor(view, {
+    getContext: getActionContext,
+    onRefresh,
+  });
+
   const onSearchNode = useCallback(
     async (treeNode: TreeRecord) => {
       const node = getNodeOfTreeRecord(view, treeNode, true);
@@ -233,8 +244,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
         items = [],
       } = node;
 
-      const ds = new DataStore(model!);
-      const result = await ds.save({
+      let saveData = {
         id: data.id,
         version: data.version,
         ...(parent && {
@@ -245,7 +255,27 @@ export function Tree({ meta }: ViewProps<TreeView>) {
               }
             : null,
         }),
-      });
+      };
+
+      if (node?.onMove) {
+        const res = await actionExecutor.execute(node?.onMove, {
+          context: { ...saveData, _model: node.model },
+        });
+        // save any value changes through action
+        saveData = {
+          ...saveData,
+          ...res?.reduce?.(
+            (obj, { values }) => ({
+              ...obj,
+              ...values,
+            }),
+            {},
+          ),
+        };
+      }
+
+      const ds = new DataStore(model!);
+      const result = await ds.save(saveData);
 
       if (result) {
         return {
@@ -259,7 +289,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
       }
       return record;
     },
-    [view, isSameModelTree],
+    [view, isSameModelTree, actionExecutor],
   );
 
   const handleSort = useCallback((cols?: TreeSortColumn[]) => {
@@ -316,13 +346,6 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   } = dataStore?.page || {};
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
-
-  const getActionContext = useCallback(() => getContext(true), [getContext]);
-
-  const actionExecutor = useActionExecutor(view, {
-    getContext: getActionContext,
-    onRefresh,
-  });
 
   const nodeRenderer = useMemo(
     () => (props: NodeProps) => (

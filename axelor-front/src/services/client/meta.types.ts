@@ -550,6 +550,7 @@ export interface TreeNode {
   model?: string;
   parent?: string;
   onClick?: string;
+  onMove?: string;
   draggable?: boolean;
   domain?: string;
   orderBy?: string;
