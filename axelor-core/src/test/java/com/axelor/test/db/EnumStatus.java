@@ -18,13 +18,13 @@
  */
 package com.axelor.test.db;
 
-import com.axelor.db.annotations.Widget;
+import com.axelor.db.annotations.EnumWidget;
 
 public enum EnumStatus {
   DRAFT,
 
   OPEN,
 
-  @Widget(title = "Close")
+  @EnumWidget(title = "Close")
   CLOSED
 }
