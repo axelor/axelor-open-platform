@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { isEqual, isNumber, set as setDeep } from "lodash";
@@ -642,9 +642,21 @@ function useActionRecord({
             return Object.keys(data.value).reduce((vals, key) => {
               const value = data.value[key];
               const field = getJsonField(key);
+              const getKey = () => {
+                if (field && !key.startsWith(field.jsonField)) {
+                  // only support attrs field to be set without prefix
+                  if (
+                    field.jsonField === "attrs" ||
+                    (isJsonScope && formState.fields[key])
+                  ) {
+                    return `${field.jsonField}.${key}`;
+                  }
+                }
+                return key;
+              };
               return {
                 ...vals,
-                [field ? `${field.jsonField}.${key}` : key]: value,
+                [getKey()]: value,
               };
             }, {});
           })();
