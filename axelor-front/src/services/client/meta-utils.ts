@@ -3,7 +3,7 @@ import _ from "lodash";
 import { toKebabCase } from "@/utils/names";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
-import { ActionView, Field, Property, Schema } from "./meta.types";
+import { ActionView, Field, JsonField, Property, Schema } from "./meta.types";
 
 function processJsonForm(view: Schema) {
   if (view.type !== "form") return view;
@@ -449,7 +449,7 @@ export function processView(
   })();
 
   _.forEach(view.items, (item, itemIndex) => {
-    if (['panel', 'panel-related'].includes(item.type ?? '') && !parent) {
+    if (["panel", "panel-related"].includes(item.type ?? "") && !parent) {
       item.showFrame = item.showFrame ?? true;
     } else if (item.type === "panel-tabs") {
       item.items?.forEach((sub) => {
@@ -549,6 +549,16 @@ export function processView(
         return x.sequence - y.sequence;
       });
       item.jsonFields.forEach((field: Schema) => {
+        // pre-fill json fields in meta
+        // this can help in processing json field meta in action
+        if (field.name && item.name && item.json) {
+          !meta.jsonFields && (meta.jsonFields = {});
+          meta.jsonFields[item.name] = {
+            ...meta.jsonFields[item.name],
+            [field.name]: field as JsonField,
+          };
+        }
+
         if (field.widgetAttrs) {
           if (typeof field.widgetAttrs === "string") {
             field.widgetAttrs = JSON.parse(field.widgetAttrs);
@@ -639,7 +649,6 @@ export function processView(
     }
   });
 
-  
   if (view.type === "grid") {
     if (view.widget) {
       view.widget = toKebabCase(view.widget);

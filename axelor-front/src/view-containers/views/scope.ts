@@ -410,22 +410,26 @@ export function findJsonFieldItem<T extends ViewType>(
   meta: ViewData<T>,
   fieldName: string,
 ) {
-  const { view } = meta;
-  function findItem(schema: Schema): JsonField | undefined {
-    const jsonField = (schema.jsonFields ?? []).find(
-      (item: JsonField) => item.jsonField && item.jsonPath === fieldName,
-    );
-    return (
-      jsonField ??
-      (() => {
-        for (const item of schema.items ?? []) {
-          const jsonItem = findItem(item);
-          if (jsonItem) return jsonItem;
-        }
-      })()
-    );
+  const { jsonFields } = meta;
+  const [jsonField, ...jsonParts] = fieldName.split(".");
+
+  if (jsonParts.length > 0) {
+    const jsonPath = jsonParts.join(".");
+    const fieldInfo =
+      jsonFields?.[jsonField]?.[jsonPath] ??
+      jsonFields?.[jsonField]?.[jsonParts[0]];
+
+    if (fieldInfo) return fieldInfo;
   }
-  return findItem(view);
+
+  for (const [modelField, _fields] of Object.entries(jsonFields ?? {})) {
+    if (jsonField !== modelField && _fields[jsonField]) {
+      return _fields[jsonField];
+    }
+    if (_fields[fieldName]) {
+      return _fields[fieldName];
+    }
+  }
 }
 
 function findSchemaItems(schema: Schema): Schema[] {
