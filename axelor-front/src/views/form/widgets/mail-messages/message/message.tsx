@@ -8,6 +8,7 @@ import { useEditor } from "@/hooks/use-relation";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { findView } from "@/services/client/meta-cache";
+import { SanitizedContent } from "@/utils/sanitize.ts";
 import { FormProps } from "@/views/form/builder";
 
 import Avatar from "../avatar";
@@ -28,10 +29,6 @@ const TagStyle: Record<TYPES.MessageBodyTag["style"], TBackground> = {
   success: "success",
   inverse: "dark",
 };
-
-function MessageHTMLContent({ html: __html }: { html: string }) {
-  return <div dangerouslySetInnerHTML={{ __html }} />;
-}
 
 function MessageEvent({ data }: { data: TYPES.Message }) {
   const { $eventText, $eventTime } = data;
@@ -238,9 +235,9 @@ export const Message = React.memo(function Message(props: MessageProps) {
               <MessageTracks fields={fields} data={body.tracks} />
             )}
 
-            {body && body.content && <MessageHTMLContent html={body.content} />}
+            {body && body.content && <SanitizedContent content={body.content}/>}
             {!body && (
-              <MessageHTMLContent html={(summary || data.body) as string} />
+              <SanitizedContent content={(summary || data.body) as string}/>
             )}
 
             {body?.files && <MessageFiles data={body.files} />}

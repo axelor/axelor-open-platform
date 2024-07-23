@@ -7,6 +7,7 @@ import { Box } from "@axelor/ui";
 import { FormProps } from "@/views/form/builder";
 import { moment } from "@/services/client/l10n";
 import { getDateFormat, getDateTimeFormat } from "@/utils/format";
+import { sanitize } from "@/utils/sanitize.ts";
 
 import styles from "./message-track.module.scss";
 
@@ -76,7 +77,7 @@ function MessageTrackComponent({
           {i18n.get(title)} {" : "}
         </Box>
         {displayValue && (
-          <span dangerouslySetInnerHTML={{ __html: displayValue }} />
+          <span dangerouslySetInnerHTML={{ __html: sanitize(displayValue) }} />
         )}
       </Box>
     </li>
