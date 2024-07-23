@@ -1,7 +1,7 @@
-import { clsx } from "@axelor/ui";
+import { useMemo } from "react";
 import { useAtom } from "jotai";
 
-import { Box } from "@axelor/ui";
+import { clsx, Box } from "@axelor/ui";
 
 import { Selection as TSelection } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
@@ -9,19 +9,24 @@ import {
   getMultiValues,
   joinMultiValues,
 } from "@/views/form/widgets/selection/utils";
+import { useSelectionList } from "../selection/hooks";
 
 import { FieldControl, FieldProps } from "../../builder";
 
 import styles from "./radio-select.module.scss";
 
 export function RadioSelect(props: FieldProps<string | number | null>) {
-  const { schema, readonly, valueAtom } = props;
+  const { schema, readonly, widgetAtom, valueAtom } = props;
   const { direction, nullable, widget } = schema;
   const [value, setValue] = useAtom(valueAtom);
-  const selectionList = (schema.selectionList as TSelection[]) ?? [];
+
+  const values = useMemo(
+    () => (value != null ? getMultiValues(value).filter((x) => x) : []),
+    [value],
+  );
+  const selectionList = useSelectionList({ value: values, widgetAtom, schema });
 
   const isRadio = toKebabCase(widget) === "radio-select";
-  const values = value != null ? getMultiValues(value).filter((x) => x) : [];
 
   function handleClick({ value }: TSelection, checked: boolean) {
     if (readonly) return;

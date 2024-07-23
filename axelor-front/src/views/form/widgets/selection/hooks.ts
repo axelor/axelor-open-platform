@@ -70,7 +70,10 @@ export function useSelectionList({
     return filterList
       ? selectionList.filter(
           (item) =>
-            (value !== undefined && String(value) === String(item.value)) ||
+            (value !== undefined &&
+              (Array.isArray(value)
+                ? value.some((v) => String(v) === String(item.value))
+                : String(value) === String(item.value))) ||
             filterList.some((x) => String(x) === String(item.value)),
         )
       : selectionList;
