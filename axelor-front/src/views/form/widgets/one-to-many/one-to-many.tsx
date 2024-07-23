@@ -1814,7 +1814,7 @@ function OneToManyInner({
               view={gridViewData}
               fields={gridViewFields}
               perms={perms}
-              columnAttrs={isRootTreeGrid ? columnAttrs : treeColumnAttrs}
+              columnAttrs={isSubTreeGrid ? treeColumnAttrs : columnAttrs}
               state={state}
               setState={setState}
               actionExecutor={actionExecutor}
