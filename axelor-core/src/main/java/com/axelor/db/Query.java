@@ -35,6 +35,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1018,7 +1019,13 @@ public class Query<T extends Model> {
           }
 
           if (property.isJson()) {
-            String jsonPath = i == 0 ? name : String.join(".", item, path[i + 1]);
+            String jsonPath =
+                i == 0
+                    ? name
+                    : String.join(
+                        ".",
+                        item,
+                        Arrays.stream(path).skip(i + 1).collect(Collectors.joining(".")));
             return JsonFunction.fromPath(i == 0 ? "self" : prefix, jsonPath).toString();
           }
 

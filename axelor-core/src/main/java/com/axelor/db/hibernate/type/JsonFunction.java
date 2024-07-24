@@ -71,7 +71,7 @@ public final class JsonFunction {
     Preconditions.checkArgument(path != null, "name cannot be null");
     Preconditions.checkArgument(path.indexOf('.') > -1, "not a json path");
 
-    final int dot = path.lastIndexOf('.');
+    final int dot = path.indexOf('.');
     final int col = path.indexOf("::");
 
     final String type = col == -1 ? DEFAULT_TYPE : path.substring(col + 2);
