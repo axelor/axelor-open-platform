@@ -174,7 +174,6 @@ export interface MetaData {
 
 export interface ViewData<T> extends Partial<MetaData> {
   view: T;
-  jsonAttrs?: JsonField[];
   helps?: Record<string, Record<string, HelpOverride>>;
   related?: Record<string, string[]>; // additional fields after view processing
   widgetSchema?: Schema;

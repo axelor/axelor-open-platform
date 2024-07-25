@@ -19,6 +19,7 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
@@ -73,6 +74,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -270,7 +272,8 @@ public class ViewService extends AbstractService {
   public Response view(
       @QueryParam("model") String model,
       @QueryParam("name") String name,
-      @QueryParam("type") String type) {
+      @QueryParam("type") String type,
+      @QueryParam("jsonModel") String jsonModel) {
 
     final Response response = service.findView(model, name, type);
     final AbstractView view = (AbstractView) response.getData();
@@ -288,17 +291,30 @@ public class ViewService extends AbstractService {
     if (view instanceof AbstractView && modelClass != null) {
       final Set<String> names = findNames(view);
       Mapper mapper = Mapper.of(modelClass);
-      boolean hasJson =
+      List<Property> jsonFields =
           names.stream()
+              .map(i -> i.split("\\.")[0])
               .map(mapper::getProperty)
               .filter(Objects::nonNull)
-              .anyMatch(Property::isJson);
-      if (!hasJson && mapper.getProperty("attrs") != null) {
-        Map<String, Object> jsonAttrs = MetaStore.findJsonFields(model, "attrs");
-        if (jsonAttrs != null && jsonAttrs.size() > 0) {
-          names.add("attrs");
-          data.put("jsonAttrs", jsonAttrs.values());
+              .filter(Property::isJson)
+              .collect(Collectors.toList());
+      if (ObjectUtils.isEmpty(jsonFields) && mapper.getProperty("attrs") != null) {
+        jsonFields.add(mapper.getProperty("attrs"));
+        names.add("attrs");
+      }
+
+      final Map<String, Object> jsonFieldsMap = Maps.newHashMap();
+      for (Property jsonField : jsonFields) {
+        Map<String, Object> jsonFieldMap =
+            MetaJsonRecord.class.getName().equals(model) && ObjectUtils.notEmpty(jsonModel)
+                ? MetaStore.findJsonFields(jsonModel)
+                : MetaStore.findJsonFields(model, jsonField.getName());
+        if (ObjectUtils.notEmpty(jsonFieldMap)) {
+          jsonFieldsMap.put(jsonField.getName(), jsonFieldMap);
         }
+      }
+      if (ObjectUtils.notEmpty(jsonFieldsMap)) {
+        data.put("jsonFields", jsonFieldsMap);
       }
       if (MetaJsonRecord.class.getName().equals(model)) {
         names.add("name");
@@ -320,8 +336,14 @@ public class ViewService extends AbstractService {
     final Map<String, Object> data = request.getData();
     final String name = (String) data.get("name");
     final String type = (String) data.get("type");
+    String jsonModel = null;
+    try {
+      jsonModel = (String) ((Map<?, ?>) data.get("context")).get("jsonModel");
+    } catch (Exception e) {
+      // ignore
+    }
 
-    return view(request.getModel(), name, type);
+    return view(request.getModel(), name, type, jsonModel);
   }
 
   @POST
