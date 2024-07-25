@@ -626,16 +626,8 @@ function useActionRecord({
 
           const updateFormAtom = isJsonScope ? formState.parent! : formAtom;
           const updateFormState = get(updateFormAtom);
-          const cacheJsonFields: Record<string, any> = {};
           const getJsonField = (key: string) => {
-            // skip in case of record field
-            if (key in updateFormState.fields) return;
-            if (cacheJsonFields[key] !== undefined) return cacheJsonFields[key];
-            return (
-              (isJsonScope && formState.fields[key]) ??
-              (cacheJsonFields[key] =
-                findJsonFieldItem(updateFormState.meta, key) || null)
-            );
+            return findJsonFieldItem(updateFormState.meta, key);
           };
 
           const values = (() => {
@@ -643,7 +635,11 @@ function useActionRecord({
               const value = data.value[key];
               const field = getJsonField(key);
               const getKey = () => {
-                if (field && !key.startsWith(field.jsonField)) {
+                if (
+                  field &&
+                  field.jsonField &&
+                  !key.startsWith(field.jsonField)
+                ) {
                   // only support attrs field to be set without prefix
                   if (
                     field.jsonField === "attrs" ||

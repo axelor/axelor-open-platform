@@ -183,29 +183,22 @@ export function updateRecord(
     }
 
     // to set values of json fields
-    if (key.includes(".")) {
+    if (key.includes(".") && findJsonItem?.(key)) {
       const [jsonField, ...fieldParts] = key.split(".");
       const subField = fieldParts.join(".");
-      const hasExplictDefined = fields?.[key]?.jsonField;
-      const hasDefinedInJsonItems = () => {
-        const jsonItem = findJsonItem?.(subField);
-        return jsonItem?.jsonField === jsonField;
-      };
 
-      if (hasExplictDefined || hasDefinedInJsonItems()) {
-        const _values =
-          jsonFieldsValue[jsonField] ??
-          (jsonFieldsValue[jsonField] = toJSON(result[jsonField]));
+      const _values =
+        jsonFieldsValue[jsonField] ??
+        (jsonFieldsValue[jsonField] = toJSON(result[jsonField]));
 
-        if (!equals(_values[subField], value)) {
-          changed = true;
-          jsonFieldsValue[jsonField] = {
-            ..._values,
-            [subField]: value,
-          };
-        }
-        continue;
+      if (!equals(_values[subField], value)) {
+        changed = true;
+        jsonFieldsValue[jsonField] = {
+          ..._values,
+          [subField]: value,
+        };
       }
+      continue;
     }
 
     // to set values of editor dotted fields
