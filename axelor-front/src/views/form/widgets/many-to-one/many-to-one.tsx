@@ -13,6 +13,7 @@ import {
   useEditor,
   useEditorInTab,
   useEnsureRelated,
+  useFieldRelated,
   useSelector,
 } from "@/hooks/use-relation";
 import { DataContext, DataRecord } from "@/services/client/data.types";
@@ -159,10 +160,12 @@ export function ManyToOne(
     getContext,
   );
 
+  const related = useFieldRelated({ field: schema });
   const { ensureRelated, updateRelated, valueRef } = useEnsureRelated({
     field: schema,
     formAtom,
     valueAtom,
+    related,
   });
 
   const showSelect = useCallback(async () => {

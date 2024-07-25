@@ -52,19 +52,15 @@ async function fetchRelated({
   return value;
 }
 
-export function useEnsureRelated({
+export function useFieldRelated({
   field,
-  formAtom,
-  valueAtom,
   dottedOnly,
 }: {
   field: Schema;
-  formAtom: FormAtom;
-  valueAtom: ValueAtom<DataRecord>;
   dottedOnly?: boolean;
 }) {
-  const { name = "", targetName, depends } = field;
   const { findItems } = useViewMeta();
+  const { name = "", targetName, depends } = field;
 
   const related = useMemo(() => {
     const prefix = `${name}.`;
@@ -82,6 +78,22 @@ export function useEnsureRelated({
 
     return [...new Set(names)] as string[];
   }, [depends, dottedOnly, findItems, name, targetName]);
+
+  return related;
+}
+
+export function useEnsureRelated({
+  field,
+  formAtom,
+  valueAtom,
+  related,
+}: {
+  field: Schema;
+  formAtom: FormAtom;
+  valueAtom: ValueAtom<DataRecord>;
+  related: string[];
+}) {
+  const { name = "" } = field;
 
   const valueRef = useRef<DataRecord>();
   const mountRef = useRef(false);
