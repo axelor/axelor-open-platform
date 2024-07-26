@@ -66,7 +66,7 @@ export const MetaScope = createScope<ViewData<ViewType>>({
 
 const metaMolecule = molecule((getMol, getScope) => {
   const meta = getScope(MetaScope);
-  return atom(meta);
+  return atom<{ meta: typeof meta; items?: Schema[] }>({ meta });
 });
 
 /**
@@ -351,7 +351,9 @@ export function useViewConfirmDirty() {
  */
 export function useViewMeta() {
   const metaAtom = useMolecule(metaMolecule);
-  const meta = useAtomValue(metaAtom);
+  const meta = useAtomValue(
+    useMemo(() => selectAtom(metaAtom, (s) => s.meta), [metaAtom]),
+  );
 
   const findField = useCallback((name: string) => meta.fields?.[name], [meta]);
 
@@ -360,19 +362,24 @@ export function useViewMeta() {
     [meta],
   );
 
-  const findItems = useMemo(() => {
-    return (() => {
-      let items: Schema[] | null = null;
-      return (): Schema[] => {
-        if (items === null) {
-          items = findSchemaItems(meta.view).map((item) =>
-            item.name ? findItem(item.name) ?? { ...item } : { ...item },
-          );
-        }
-        return items;
-      };
-    })();
-  }, [findItem, meta.view]);
+  const findItems = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const { items } = get(metaAtom);
+        return (
+          items ??
+          (() => {
+            const viewItems = findSchemaItems(meta.view).map((item) =>
+              item.name ? findItem(item.name) ?? { ...item } : { ...item },
+            );
+            set(metaAtom, (prev) => ({ ...prev, items: viewItems }));
+            return viewItems;
+          })()
+        );
+      },
+      [metaAtom, findItem, meta.view],
+    ),
+  );
 
   return {
     meta,
