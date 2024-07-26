@@ -12,9 +12,9 @@ import {
 } from "react";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
-import { BaseHilite, Hilite, Schema } from "@/services/client/meta.types";
+import { BaseHilite, Schema } from "@/services/client/meta.types";
+import { findViewItem } from "@/utils/schema";
 import {
-  findViewItem,
   useViewAction,
   useViewMeta,
 } from "@/view-containers/views/scope";

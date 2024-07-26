@@ -14,6 +14,7 @@ import { isCleanDummy, updateRecord } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Schema, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
+import { findJsonFieldItem, findViewItem } from "@/utils/schema";
 import {
   ActionAttrsData,
   ActionData,
@@ -23,13 +24,8 @@ import {
   DefaultActionExecutor,
   DefaultActionHandler,
 } from "@/view-containers/action";
-import {
-  findJsonFieldItem,
-  findViewItem,
-  useViewMeta,
-  useViewTab,
-} from "@/view-containers/views/scope";
 
+import { useViewMeta, useViewTab } from "@/view-containers/views/scope";
 import { fallbackFormAtom } from "./atoms";
 import {
   FormAtom,

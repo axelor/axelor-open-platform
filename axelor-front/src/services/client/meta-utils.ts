@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import { toKebabCase } from "@/utils/names";
-import { findViewItem } from "@/view-containers/views/scope.ts";
+import { findViewItem } from "@/utils/schema";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
 import { ActionView, Field, Property, Schema } from "./meta.types";
@@ -329,10 +329,16 @@ export function processView(
   meta = meta || {};
   view = view || {};
 
-  if (meta.jsonFields && meta.jsonFields["attrs"] && Object.keys(meta.jsonFields["attrs"]).length > 0 && view && view.items) {
-    const hasCustomAttrsField = Object.values(meta.fields ?? {}).some(
-      (f) => f.jsonField === "attrs",
-    ) || findViewItem(meta, "attrs") != null;
+  if (
+    meta.jsonFields &&
+    meta.jsonFields["attrs"] &&
+    Object.keys(meta.jsonFields["attrs"]).length > 0 &&
+    view &&
+    view.items
+  ) {
+    const hasCustomAttrsField =
+      Object.values(meta.fields ?? {}).some((f) => f.jsonField === "attrs") ||
+      findViewItem(meta, "attrs") != null;
 
     if (view.type === "grid" && !hasCustomAttrsField) {
       const findLast = (
@@ -450,7 +456,7 @@ export function processView(
   })();
 
   _.forEach(view.items, (item, itemIndex) => {
-    if (['panel', 'panel-related'].includes(item.type ?? '') && !parent) {
+    if (["panel", "panel-related"].includes(item.type ?? "") && !parent) {
       item.showFrame = item.showFrame ?? true;
     } else if (item.type === "panel-tabs") {
       item.items?.forEach((sub) => {
@@ -640,7 +646,6 @@ export function processView(
     }
   });
 
-  
   if (view.type === "grid") {
     if (view.widget) {
       view.widget = toKebabCase(view.widget);

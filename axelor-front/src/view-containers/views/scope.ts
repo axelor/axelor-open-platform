@@ -22,13 +22,9 @@ import {
 import { SearchOptions } from "@/services/client/data";
 import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { ViewData } from "@/services/client/meta";
-import {
-  JsonField,
-  Property,
-  Schema,
-  ViewType,
-} from "@/services/client/meta.types";
+import { Schema, ViewType } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
+import { findViewItem } from "@/utils/schema";
 import { FormAtom, usePrepareContext } from "@/views/form/builder";
 import {
   useCanDirty,
@@ -386,95 +382,8 @@ export function useViewMeta() {
   } as const;
 }
 
-export function findViewItem<T extends ViewType>(
-  meta: ViewData<T>,
-  fieldName: string,
-) {
-  const { view, fields = {} } = meta;
-  return walkSchema(view, fields, [], ({ path, schema, field }) => {
-    const name = path.join(".");
-    if (name === fieldName) {
-      const serverType = schema?.serverType || field?.type;
-      const more = serverType ? { serverType } : {};
-      return {
-        ...field,
-        ...schema,
-        ...schema?.widgetAttrs,
-        ...more,
-      };
-    }
-  });
-}
-
-export function findJsonFieldItem<T extends ViewType>(
-  meta: ViewData<T>,
-  fieldName: string,
-) {
-  const { jsonFields } = meta;
-  const [jsonField, ...jsonParts] = fieldName.split(".");
-
-  if (jsonParts.length > 0) {
-    const jsonPath = jsonParts.join(".");
-    const fieldInfo =
-      jsonFields?.[jsonField]?.[jsonPath] ??
-      jsonFields?.[jsonField]?.[jsonParts[0]];
-
-    if (fieldInfo) return fieldInfo;
-  }
-
-  for (const [modelField, _fields] of Object.entries(jsonFields ?? {})) {
-    if (jsonField !== modelField && _fields[jsonField]) {
-      return _fields[jsonField];
-    }
-    if (_fields[fieldName]) {
-      return _fields[fieldName];
-    }
-  }
-}
-
 function findSchemaItems(schema: Schema): Schema[] {
   const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
   const nested = items.flatMap((item) => findSchemaItems(item));
   return [...items, ...nested];
-}
-
-function findFields(schema: Schema) {
-  const fields: Record<string, Property> =
-    schema.fields ?? schema.editor?.fields ?? {};
-  return fields;
-}
-
-function walkSchema(
-  schema: Schema,
-  schemaFields: Record<string, Property>,
-  schemaPath: string[],
-  callback: (params: {
-    path: string[];
-    name: string;
-    schema: Schema;
-    field?: Schema;
-  }) => Schema | undefined,
-): Schema | undefined {
-  const name = schema.name;
-  const items = schema.items ?? schema.editor?.items ?? [];
-  const path = name ? [...schemaPath, ...name.split(".")] : schemaPath;
-
-  if (name) {
-    const res = callback({
-      path,
-      name,
-      schema,
-      field: schemaFields[name],
-    });
-    if (res) return res;
-  }
-
-  const isRelation = schema.fields ?? schema.editor?.fields;
-  const parentPath = isRelation ? path : schemaPath;
-  const parentFields = isRelation ? findFields(schema) : schemaFields;
-
-  for (const item of items) {
-    const res = walkSchema(item, parentFields, parentPath, callback);
-    if (res) return res;
-  }
 }
