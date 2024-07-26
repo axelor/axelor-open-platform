@@ -626,24 +626,24 @@ function useActionRecord({
 
           const updateFormAtom = isJsonScope ? formState.parent! : formAtom;
           const updateFormState = get(updateFormAtom);
-          const getJsonField = (key: string) => {
-            return findJsonFieldItem(updateFormState.meta, key);
-          };
+          const findJsonItem = (key: string) =>
+            findJsonFieldItem(updateFormState.meta, key);
 
           const values = (() => {
             return Object.keys(data.value).reduce((vals, key) => {
               const value = data.value[key];
-              const field = getJsonField(key);
+
+              // if field in form fields, it takes preference over custom field
+              const field = !updateFormState.fields[key]
+                ? findJsonItem(key)
+                : null;
+
               const getKey = () => {
-                if (
-                  field &&
-                  field.jsonField &&
-                  !key.startsWith(field.jsonField)
-                ) {
-                  // only support attrs field to be set without prefix
+                // if it is a custom field without prefix
+                if (field?.jsonField && !key.startsWith(field.jsonField)) {
                   if (
-                    field.jsonField === "attrs" ||
-                    (isJsonScope && formState.fields[key])
+                    field.jsonField === "attrs" || // only support attrs field to be set without prefix
+                    (isJsonScope && formState.fields[key]) // allow setting without prefix in json scope
                   ) {
                     return `${field.jsonField}.${key}`;
                   }
@@ -660,7 +660,7 @@ function useActionRecord({
           const { record, fields } = get(updateFormAtom);
 
           const result = updateRecord(record, values, fields, {
-            findJsonItem: getJsonField,
+            findJsonItem,
             findItem: (fieldName: string) =>
               findViewItem(updateFormState.meta, fieldName),
           });
