@@ -333,9 +333,12 @@ public final class MetaStore {
     for (MetaJsonField record : jsonFields) {
       final Map<String, Object> attrs = new HashMap<>();
       final String name = record.getName();
+      boolean hasAccess = true;
 
       // check permissions
-      if (record.getRoles() != null && !record.getRoles().isEmpty()) {
+      if ((user != null && !AuthUtils.isAdmin(user))
+          && record.getRoles() != null
+          && !record.getRoles().isEmpty()) {
         final Set<Role> roles = new HashSet<>();
         if (user.getRoles() != null) {
           roles.addAll(user.getRoles());
@@ -344,17 +347,17 @@ public final class MetaStore {
           roles.addAll(user.getGroup().getRoles());
         }
         if (Collections.disjoint(roles, record.getRoles())) {
-          continue;
+          hasAccess = false;
         }
       }
 
       // check server condition
-      if (StringUtils.notBlank(record.getIncludeIf())) {
+      if (hasAccess && StringUtils.notBlank(record.getIncludeIf())) {
         if (scriptHelper == null) {
           scriptHelper = new CompositeScriptHelper(null);
         }
-        if (scriptHelper == null || !scriptHelper.test(record.getIncludeIf())) {
-          continue;
+        if (!scriptHelper.test(record.getIncludeIf())) {
+          hasAccess = false;
         }
       }
 
@@ -449,6 +452,12 @@ public final class MetaStore {
       attrs.put("jsonPath", record.getName());
       if (type.matches("integer|decimal|boolean")) {
         attrs.put("jsonType", type);
+      }
+
+      if (!hasAccess) {
+        attrs.put("hidden", true);
+        attrs.put("hideIf", "true");
+        attrs.remove("showIf");
       }
 
       fields.put(record.getName(), attrs);
