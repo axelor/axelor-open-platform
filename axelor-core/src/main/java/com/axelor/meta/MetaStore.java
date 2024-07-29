@@ -458,6 +458,7 @@ public final class MetaStore {
         attrs.put("hidden", true);
         attrs.put("hideIf", "true");
         attrs.remove("showIf");
+        attrs.put("forceHidden", true);
       }
 
       fields.put(record.getName(), attrs);

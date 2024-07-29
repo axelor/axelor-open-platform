@@ -428,6 +428,8 @@ export interface JsonField extends Omit<Field, "type"> {
   contextFieldTargetName?: string;
   contextFieldValue?: string;
   contextFieldTitle?: string;
+  
+  forceHidden?: boolean;
 }
 
 export interface Selection {

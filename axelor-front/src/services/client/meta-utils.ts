@@ -4,7 +4,7 @@ import { toKebabCase } from "@/utils/names";
 import { findViewItem } from "@/utils/schema";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
-import { ActionView, Field, Property, Schema } from "./meta.types";
+import { ActionView, Field, JsonField, Property, Schema } from "./meta.types";
 
 function processJsonForm(view: Schema) {
   if (view.type !== "form") return view;
@@ -455,6 +455,19 @@ export function processView(
     }
   })();
 
+  if (view.items) {
+    // Skip custom fields added in view with forceHidden
+    view.items = view.items.filter((x) => {
+      if (x.name?.includes(".") && x.jsonField) {
+        const jsonField = (view.fields ?? meta.fields ?? {})?.[x.name] ?? {};
+        if (jsonField.forceHidden) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
   _.forEach(view.items, (item, itemIndex) => {
     if (["panel", "panel-related"].includes(item.type ?? "") && !parent) {
       item.showFrame = item.showFrame ?? true;
@@ -552,6 +565,9 @@ export function processView(
       };
       let panel: Schema | null = null;
       let panelTab: Schema | null = null;
+      item.jsonFields = item.jsonFields.filter(
+        (x: JsonField) => !(x as JsonField).forceHidden,
+      );
       item.jsonFields.sort((x: Schema, y: Schema) => {
         return x.sequence - y.sequence;
       });
@@ -656,7 +672,11 @@ export function processView(
       if (item.jsonFields) {
         _.forEach(item.jsonFields, (field) => {
           const type = field.type || "text";
-          if (type.indexOf("-to-many") === -1 && field.visibleInGrid) {
+          if (
+            type.indexOf("-to-many") === -1 &&
+            field.visibleInGrid &&
+            !field.forceHidden
+          ) {
             items.push({ ...field, name: item.name + "." + field.name });
           }
         });
