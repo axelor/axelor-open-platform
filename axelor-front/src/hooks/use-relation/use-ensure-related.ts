@@ -60,24 +60,29 @@ export function useFieldRelated({
   dottedOnly?: boolean;
 }) {
   const { findItems } = useViewMeta();
-  const { name = "", targetName, depends } = field;
+  const { name = "", targetName } = field;
 
   const related = useMemo(() => {
     const prefix = `${name}.`;
     const items = findItems();
-    const dotted =
-      name &&
-      items
-        .filter((x) => x.name?.startsWith(prefix))
-        .map((x) => x.name as string)
-        .map((x) => x.substring(prefix.length));
+    const dotted = items
+      .filter((x) => x.name?.startsWith(prefix))
+      .map((x) => x.name as string)
+      .map((x) => x.substring(prefix.length));
+
+    const relatedFields = items
+      .map((x) => [x.depends?.split(","), x.viewer?.depends?.split(",")].flat())
+      .flat()
+      .filter(Boolean)
+      .filter((x) => x.startsWith(prefix))
+      .map((x) => x.substring(prefix.length));
 
     const names = dottedOnly
       ? [...dotted].filter(Boolean)
-      : [...dotted, targetName, depends?.split(",")].flat().filter(Boolean);
+      : [...dotted, targetName, ...relatedFields].flat().filter(Boolean);
 
     return [...new Set(names)] as string[];
-  }, [depends, dottedOnly, findItems, name, targetName]);
+  }, [dottedOnly, findItems, name, targetName]);
 
   return related;
 }

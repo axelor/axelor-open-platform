@@ -16,21 +16,29 @@ export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
     const items = findItems();
     const mapping: Record<string, { schema: Schema; related: string[] }> = {};
     for (const item of items) {
-      const { name, targetName, depends } = item;
+      const { name, targetName } = item;
 
       if (name?.includes(".")) continue;
       if (name && isReferenceField(item)) {
         const field = meta.fields?.[name];
         const prefix = `${name}.`;
 
-        const dotted =
-          name &&
-          items
-            .filter((x) => x.name?.startsWith(prefix))
-            .map((x) => x.name as string)
-            .map((x) => x.substring(prefix.length));
+        // TODO: `useFieldRelated` code is quite related. can be merged.
+        const dotted = items
+          .filter((x) => x.name?.startsWith(prefix))
+          .map((x) => x.name as string)
+          .map((x) => x.substring(prefix.length));
 
-        const names = [...dotted, depends?.split(",")].flat().filter(Boolean);
+        const relatedFields = items
+          .map((x) =>
+            [x.depends?.split(","), x.viewer?.depends?.split(",")].flat(),
+          )
+          .flat()
+          .filter(Boolean)
+          .filter((x) => x.startsWith(prefix))
+          .map((x) => x.substring(prefix.length));
+
+        const names = [...dotted, ...relatedFields].flat().filter(Boolean);
 
         const shouldFetchTargetName =
           item.targetName &&
