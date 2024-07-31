@@ -4,7 +4,7 @@ import { produce } from "immer";
 
 import { compactJson, isReferenceField } from "@/views/form/builder/utils";
 import { DataRecord } from "./data.types";
-import { JsonField, Property, Schema } from "./meta.types";
+import { Property, Schema } from "./meta.types";
 
 /**
  * Checks if the given name is the name of a dummy field.
@@ -178,7 +178,11 @@ export function updateRecord(
 
   for (const [key, value] of Object.entries(source)) {
     let newValue = value;
-    if (newValue === result[key]) {
+    if (
+      newValue === result[key] ||
+      // check for numeric values
+      (!isNaN(result[key]) && +newValue === +result[key])
+    ) {
       continue;
     }
 
