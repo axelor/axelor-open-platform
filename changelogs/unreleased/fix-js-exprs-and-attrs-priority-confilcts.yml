@@ -1,0 +1,5 @@
+---
+title: Fix js expressions and attrs priority
+type: fix
+description: |
+  js expressions have the priority over attributes set with action-attrs.

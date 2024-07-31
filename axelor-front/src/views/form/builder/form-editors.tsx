@@ -752,14 +752,14 @@ const ItemEditor = memo(function ItemEditor({
 const setInvalidAtom = atom(
   null,
   (get, set, widgetAtom: WidgetAtom, invalid: boolean) => {
-    const prev = get(widgetAtom);
+    const state = get(widgetAtom);
     const errors = invalid
       ? {
-          invalid: i18n.get("{0} is invalid", prev.attrs.title),
+          invalid: i18n.get("{0} is invalid", state.attrs.title),
         }
       : {};
-    if (isEqual(errors, prev.errors ?? {})) return;
-    set(widgetAtom, { ...prev, errors });
+    if (isEqual(errors, state.errors ?? {})) return;
+    set(widgetAtom, (prev) => ({ ...prev, errors }));
   },
 );
 

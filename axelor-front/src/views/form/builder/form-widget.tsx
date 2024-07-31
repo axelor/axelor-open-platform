@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isUndefined from "lodash/isUndefined";
+import pick from "lodash/pick";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -378,27 +379,30 @@ function useExpressions({
       ) => {
         const { negate = false, updater } = options ?? {};
         const value = Boolean(parseExpression(expr)(context));
-        const state = get(widgetAtom);
-        const attrs = state.attrs ?? {};
-        const prev = attrs[attr as keyof typeof attrs];
-        const next = negate ? !value : value;
-        if (next !== prev) {
-          updater?.((formState: FormState) => {
-            const { states } = formState;
-            const { uid } = schema;
-            const state = formState?.states[uid];
-            return {
-              ...formState,
-              states: {
-                ...states,
-                [uid]: {
-                  ...state,
-                  attrs: { ...state?.attrs, [attr]: next },
-                },
+        const restoreState = pick(get(widgetAtom), ["name", "parent"]);
+
+        updater?.((formState: FormState) => {
+          const { states } = formState;
+          const { uid } = schema;
+          const state = formState?.states[uid];
+          const attrs = state?.attrs ?? {};
+          const prev = attrs[attr as keyof typeof attrs];
+          const next = negate ? !value : value;
+
+          if (next === prev) return formState;
+
+          return {
+            ...formState,
+            states: {
+              ...states,
+              [uid]: {
+                ...restoreState,
+                ...state,
+                attrs: { ...state?.attrs, [attr]: next },
               },
-            };
-          });
-        }
+            },
+          };
+        });
       },
       [schema, widgetAtom],
     ),
@@ -415,7 +419,7 @@ function useExpressions({
         };
         if (value) Reflect.deleteProperty(errors, "invalid");
         if (!isEqual(state.errors, errors)) {
-          set(widgetAtom, { ...state, errors });
+          set(widgetAtom, (prev) => ({ ...prev, errors }));
         }
       },
       [widgetAtom],

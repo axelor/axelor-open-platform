@@ -6,7 +6,7 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
-import { deepEqual, deepGet, deepMerge, deepSet } from "@/utils/objects";
+import { deepEqual, deepGet, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
 
 import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
@@ -62,11 +62,31 @@ export function createWidgetAtom(props: {
   const defaultAttrs = getDefaultAttrs(schema);
   const defaultState: WidgetState = { name, parent, attrs: {} };
 
+  let currentState: WidgetState;
+
   const widgetAtom = focusAtom(
     formAtom,
-    ({ states = {}, statesByName = {} }) => {
+    ({ states = {} }) => {
       const stateById = states[uid] ?? defaultState;
+      return {
+        name,
+        parent,
+        ...stateById,
+      } as WidgetState;
+    },
+    (state, slice) => ({ ...state, states: { ...state.states, [uid]: slice } }),
+  );
+
+  const derivedWidgetAtom = atom(
+    (get) => {
+      const { statesByName = {} } = get(formAtom);
       const stateByName = statesByName[name] ?? defaultState;
+
+      const {
+        attrs: attrsById,
+        errors: errorsById,
+        ...restById
+      } = get(widgetAtom);
 
       const {
         attrs: attrsByName,
@@ -75,22 +95,10 @@ export function createWidgetAtom(props: {
         ...restByName
       } = stateByName;
 
-      const {
-        attrs: attrsById,
-        errors: errorsById,
-        columns: columnsById,
-        ...restById
-      } = stateById;
-
-      const columns =
-        columnsByName && columnsById
-          ? deepMerge(columnsByName, columnsById)
-          : columnsById || columnsByName;
-
-      const nextState: WidgetState = {
+      const nextState = {
         ...restByName,
         ...restById,
-        columns,
+        columns: columnsByName,
         errors: {
           ...errorsByName,
           ...errorsById,
@@ -100,19 +108,16 @@ export function createWidgetAtom(props: {
           ...attrsByName,
           ...attrsById,
         },
-        name,
-        parent,
-      };
+      } as WidgetState;
 
-      return nextState;
+      return currentState && deepEqual(currentState, nextState)
+        ? currentState
+        : (currentState = nextState);
     },
-    (state, slice) => {
-      return { ...state, states: { ...state.states, [uid]: slice } };
-    },
-    deepEqual,
+    (get, set, value: SetStateAction<WidgetState>) => set(widgetAtom, value),
   );
 
-  return widgetAtom;
+  return derivedWidgetAtom;
 }
 
 export function formDirtyUpdater(prev: FormState) {
