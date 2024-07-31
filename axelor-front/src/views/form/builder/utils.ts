@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import { uniqueId, isUndefined } from "lodash";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -298,9 +298,9 @@ export function processView(
 
   res.serverType = getFieldServerType(res, field);
   res.uid = res.uid ?? uniqueId("w");
-  
+
   if (res.widget) {
-    res.widgetAttrs = ({ ...res.widgetAttrs, widget: res.widget });
+    res.widgetAttrs = { ...res.widgetAttrs, widget: res.widget };
   }
 
   res.widget = getWidget(res, field);
@@ -327,6 +327,10 @@ export function processView(
 
   if ((res.showIf || res.hideIf) && !isCollectionItem && !isPanelTabs) {
     res.hidden = true;
+    // custom json fields when showIf/hideIf is defined
+    if (!isUndefined(res.widgetAttrs?.hidden)) {
+      res.widgetAttrs.hidden = true;
+    }
   }
 
   // for editable grid case : avoid fields blinking
@@ -348,7 +352,7 @@ export function processView(
 
   if (res.widget === "email") {
     res.pattern =
-      "^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,}$";
+      "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9]{2,}$";
   }
 
   if (res.items) {

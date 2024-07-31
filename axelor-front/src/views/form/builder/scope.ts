@@ -422,24 +422,62 @@ function useActionAttrs({
   formAtom: FormAtom;
   actionHandler: ActionHandler;
 }) {
-  const { findItem } = useViewMeta();
   useActionData<ActionAttrsData>(
     useCallback((x) => x.type === "attrs", []),
     useAtomCallback(
       useCallback(
         (get, set, { attrs }) => {
-          let { statesByName, states } = get(formAtom);
+          const formState = get(formAtom);
+          const isJsonScope = formState.meta.view?.json;
+          const updateFormAtom = isJsonScope ? formState.parent! : formAtom;
+          const updateFormState = isJsonScope ? get(updateFormAtom) : formState;
+
+          let { statesByName } = updateFormState;
 
           attrs.forEach((attr) => {
-            const { target, name, value } = attr;
+            const { name, value } = attr;
+
+            const jsonItem = findJsonFieldItem(
+              updateFormState.meta,
+              attr.target,
+            );
+
+            const [target, targetFieldName] = (() => {
+              const { target } = attr;
+
+              const isFormField = updateFormState.fields[jsonItem?.name ?? ""];
+              const isOwnJsonField =
+                isJsonScope && formState.fields[jsonItem?.name ?? ""];
+
+              if (
+                !isFormField &&
+                jsonItem &&
+                (jsonItem.modelField === "attrs" ||
+                  target.startsWith(jsonItem.modelField) ||
+                  isOwnJsonField)
+              ) {
+                const { modelField } = jsonItem;
+                return target.startsWith(modelField!)
+                  ? [target, target.slice(modelField!.length + 1)]
+                  : [`${modelField}.${target}`, target];
+              }
+              return [target, target];
+            })();
 
             // collection field column ?
-            if (target.includes(".")) {
-              const fieldName = target.split(".")[0];
-              const field = findItem(fieldName);
+            if (targetFieldName.includes(".")) {
+              const fieldName = targetFieldName.split(".")[0];
+              const field = findViewItem(updateFormState.meta, fieldName);
+              const stateName =
+                target !== targetFieldName && jsonItem
+                  ? `${jsonItem.modelField}.${fieldName}`
+                  : fieldName;
+
               if (field && isCollection(field) && !field.editor) {
-                const state = statesByName[fieldName] ?? {};
-                const column = target.substring(target.indexOf(".") + 1);
+                const state = statesByName[stateName] ?? {};
+                const column = targetFieldName.substring(
+                  targetFieldName.indexOf(".") + 1,
+                );
                 const columns = state.columns ?? {};
                 const newState = {
                   ...state,
@@ -453,7 +491,7 @@ function useActionAttrs({
                 };
                 return (statesByName = {
                   ...statesByName,
-                  [fieldName]: newState,
+                  [stateName]: newState,
                 });
               }
             }
@@ -478,13 +516,12 @@ function useActionAttrs({
             statesByName = { ...statesByName, [target]: newState };
           });
 
-          set(formAtom, (prev) => ({
+          set(updateFormAtom, (prev) => ({
             ...prev,
             statesByName,
-            states,
           }));
         },
-        [findItem, formAtom],
+        [formAtom],
       ),
     ),
     actionHandler,
