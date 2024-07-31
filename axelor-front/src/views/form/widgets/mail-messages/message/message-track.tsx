@@ -1,13 +1,18 @@
+import { useMemo } from "react";
+
+import { Box } from "@axelor/ui";
+
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { MetaData } from "@/services/client/meta.ts";
 import { Property } from "@/services/client/meta.types";
-import { Formatters, getDateFormat, getDateTimeFormat } from "@/utils/format";
-import { toKebabCase, toSnakeCase } from "@/utils/names";
+import { getDateFormat, getDateTimeFormat } from "@/utils/format";
+import { toSnakeCase } from "@/utils/names";
 import { sanitize } from "@/utils/sanitize.ts";
 import { FormProps } from "@/views/form/builder";
-import { Box } from "@axelor/ui";
-import { useMemo } from "react";
+
+import { Field } from "@/services/client/meta.types";
+import format from "@/utils/format";
 import { MessageTrack } from "./types";
 
 import styles from "./message-track.module.scss";
@@ -15,7 +20,7 @@ import styles from "./message-track.module.scss";
 export function formatter(_item: MessageTrack, field?: Property) {
   const item = { ..._item };
 
-  function format(value?: MessageTrack["value"]) {
+  function formatValue(value?: MessageTrack["value"]) {
     if (!value) {
       return value;
     }
@@ -29,12 +34,13 @@ export function formatter(_item: MessageTrack, field?: Property) {
         toSnakeCase(field.type).toUpperCase(),
       )
     ) {
-      const formatter = (Formatters as any)[toKebabCase(field.type)];
-      if (formatter) {
-        return formatter(value, {
-          props: field,
-          context: { [field.name]: value },
-        });
+      const formattedValue = format(value, {
+        props: field as unknown as Field,
+        context: { [field.name]: value },
+      });
+
+      if (formattedValue !== value) {
+        return formattedValue;
       }
     }
 
@@ -47,8 +53,8 @@ export function formatter(_item: MessageTrack, field?: Property) {
     if (value === "0E-10") value = "0.000000000000";
     return value;
   }
-  item.displayValue = item.displayValue || format(item.value);
-  item.oldDisplayValue = item.oldDisplayValue || format(item.oldValue);
+  item.displayValue = item.displayValue || formatValue(item.value);
+  item.oldDisplayValue = item.oldDisplayValue || formatValue(item.oldValue);
   if (item.oldDisplayValue !== undefined) {
     item.displayValue =
       item.oldDisplayValue +
