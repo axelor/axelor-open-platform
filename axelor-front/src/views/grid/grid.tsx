@@ -210,13 +210,13 @@ function GridInner(props: ViewProps<GridView>) {
     ),
   );
 
-  const getActionData = useCallback(() => {
-    if (selectedIdsRef.current?.length) return;
-    return {
+  const getActionData = useCallback(
+    () => ({
       ...dataStore.options?.filter,
       ...getSearchOptions().filter,
-    };
-  }, [dataStore, getSearchOptions]);
+    }),
+    [dataStore, getSearchOptions],
+  );
 
   const doSearch = useCallback(
     (options: SearchOptions = {}) =>
@@ -553,7 +553,7 @@ function GridInner(props: ViewProps<GridView>) {
   const selectedDetail =
     selectedRow?.type !== "row" ? null : selectedRow?.record;
   const hasManySelected = (selectedRows?.length ?? 0) > 1;
-  
+
   const onLoadDetails = useCallback(
     (e: any, row: GridRow) => {
       selectedDetail?.id === row?.record?.id &&
@@ -884,13 +884,14 @@ function GridInner(props: ViewProps<GridView>) {
   const detailsProps: Partial<GridProps> = hasDetailsView
     ? {
         ...(detailsViewOverlay && { onView: undefined }),
-        ...(!detailsRecord && !hasManySelected && {
-          onRowClick: detailsViewOverlay
-            ? onShowDetails
-            : selectedDetail
-              ? onLoadDetails
-              : undefined,
-        }),
+        ...(!detailsRecord &&
+          !hasManySelected && {
+            onRowClick: detailsViewOverlay
+              ? onShowDetails
+              : selectedDetail
+                ? onLoadDetails
+                : undefined,
+          }),
       }
     : {};
 
