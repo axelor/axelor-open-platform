@@ -631,7 +631,6 @@ export function processView(
           field.type === "separator" ||
           (field.type === "many-to-many" && !field.widget)
         ) {
-          field.showTitle = false;
           field.colSpan = colSpan || 12;
         }
         if (panel) {
