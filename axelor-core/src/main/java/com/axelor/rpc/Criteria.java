@@ -99,7 +99,7 @@ public class Criteria {
 
     final List<Map<String, Object>> items = new ArrayList<>();
     for (String key : request.getData().keySet()) {
-      if (!key.matches("^[a-zA-Z].*$")) {
+      if (!key.matches("^[a-zA-Z].*$") || "context".equals(key)) {
         continue;
       }
       final Map<String, Object> criterion = new HashMap<String, Object>();
