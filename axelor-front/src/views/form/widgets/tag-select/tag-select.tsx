@@ -120,8 +120,8 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
   );
 
   const canNew = hasButton("new");
-  const canView = readonly && hasButton("view");
-  const canEdit = !readonly && hasButton("edit") && attrs.canEdit !== false;
+  const canView = hasButton("view");
+  const canEdit = hasButton("edit") && attrs.canEdit !== false;
   const canSelect = hasButton("select");
   const canRemove = !readonly && attrs.canRemove !== false;
 
@@ -198,7 +198,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const handleEdit = useCallback(
     async (record?: DataContext) => {
-      if (showEditorInTab && (record?.id ?? 0) > 0) {
+      if (canEdit && showEditorInTab && (record?.id ?? 0) > 0) {
         return showEditorInTab(record!, readonly);
       }
       showEditor({
@@ -206,7 +206,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         model: target,
         viewName: formView,
         record,
-        readonly,
+        readonly: readonly || !canEdit,
         context: {
           _parent: getContext(),
         },
@@ -220,6 +220,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
       target,
       formView,
       readonly,
+      canEdit,
       getContext,
       handleSelect,
     ],
@@ -334,7 +335,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
           record={option}
           colorField={colorField}
           optionLabel={getOptionLabel}
-          onClick={canView || canEdit ? handleEdit : undefined}
+          onClick={canView ? handleEdit : undefined}
           onRemove={canRemove ? handleRemove : undefined}
         />
       );
