@@ -487,7 +487,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
           ?.records || []),
       ];
       const previousRecord = records[index - 1];
-      const updatedRecord = getRecord(
+      let updatedRecord = getRecord(
         records[index] as DataRecord,
         column.name,
         Number(
@@ -503,12 +503,23 @@ export function Kanban(props: ViewProps<KanbanView>) {
             ...getContext(),
             ...updatedRecord,
           };
-          await actionExecutor.execute(view.onMove, {
+          const res = await actionExecutor.execute(view.onMove, {
             context: ctx,
             data: {
               _domainContext: ctx,
             },
           });
+          // save any value changes through action
+          updatedRecord = {
+            ...updatedRecord,
+            ...res?.reduce?.(
+              (obj, { values }) => ({
+                ...obj,
+                ...values,
+              }),
+              {},
+            ),
+          };
         } catch {
           // reset columns to last state
           return setColumns(
