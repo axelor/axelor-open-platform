@@ -101,10 +101,11 @@ function ActionCommandItem({
     const updateAttrs = (record: DataRecord) => {
       (showIf || hideIf) &&
         setHidden((hidden) => {
-          if (showIf) {
+          if (hideIf) {
+            hidden = !!parseExpression(hideIf)(record);
+          }
+          if ((!hidden || !hideIf) && showIf) {
             hidden = !parseExpression(showIf)(record);
-          } else if (hideIf) {
-            hidden = parseExpression(hideIf)(record);
           }
           return hidden;
         });
@@ -263,7 +264,7 @@ export function ToolbarActions({
         {...(responsive && {
           style: {
             visibility: "hidden",
-            left: '-1000%',
+            left: "-1000%",
             position: "absolute",
           },
         })}

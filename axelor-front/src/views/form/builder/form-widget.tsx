@@ -403,6 +403,8 @@ function useExpressions({
             },
           };
         });
+
+        return value;
       },
       [schema, widgetAtom],
     ),
@@ -474,9 +476,12 @@ function useExpressions({
           return handleCondition(ctx, attr, expr, { negate, updater });
         };
 
+        let hidden = false;
+
+        if (hideIf) hidden = handleIf("hidden", hideIf);
+        if (!hidden && showIf) handleIf("hidden", showIf, true);
+
         if (bind) handleBind(ctx, bind);
-        if (showIf) handleIf("hidden", showIf, true);
-        if (hideIf) handleIf("hidden", hideIf);
         if (readonlyIf) handleIf("readonly", readonlyIf);
         if (requiredIf) handleIf("required", requiredIf);
         if (collapseIf) handleIf("collapse", collapseIf);

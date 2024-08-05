@@ -13,10 +13,11 @@ export function useButtonProps(field: Field, record: DataRecord) {
 
     let { hidden, readonly } = field;
 
-    if (showIf) {
-      hidden = !parseExpression(showIf)(ctx);
-    } else if (hideIf) {
+    if (hideIf) {
       hidden = !!parseExpression(hideIf)(ctx);
+    }
+    if ((!hidden || !hideIf) && showIf) {
+      hidden = !parseExpression(showIf)(ctx);
     }
 
     if (readonlyIf) {
