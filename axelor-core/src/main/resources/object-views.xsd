@@ -123,7 +123,7 @@
         <xsd:attribute name="groups" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Comma separated list of authorized groups.
+              Comma-separated list of authorized groups.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -256,7 +256,7 @@
         </xsd:attribute>
         <xsd:attribute name="action" type="xsd:string" use="required">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on click event.
+            <xsd:documentation>Comma-separated list of actions to execute on click event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -275,7 +275,7 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Specify comma separated list of field names on which this widget
+              Specify comma-separated list of field names on which this widget
               depends.
             </xsd:documentation>
           </xsd:annotation>
@@ -307,7 +307,7 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Specify comma separated list of field names on which this widget
+              Specify comma-separated list of field names on which this widget
               depends.
             </xsd:documentation>
           </xsd:annotation>
@@ -379,7 +379,7 @@
     <xsd:attribute name="groups" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          Comma separated list of authorized groups.
+          Comma-separated list of authorized groups.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -447,7 +447,7 @@
   <xsd:simpleType name="ResponsiveNumber">
     <xsd:annotation>
       <xsd:documentation>
-        A number or comma separated list of numbers for responsive layout. The list
+        A number or comma-separated list of numbers for responsive layout. The list
         values are for large, medium and small sizes in that order.
       </xsd:documentation>
     </xsd:annotation>
@@ -466,7 +466,7 @@
   <xsd:simpleType name="ResponsiveSize">
     <xsd:annotation>
       <xsd:documentation>
-        A number or comma separated list of sizes for responsive layout. The list
+        A number or comma-separated list of sizes for responsive layout. The list
         values are for large, medium and small sizes in that order.
       </xsd:documentation>
     </xsd:annotation>
@@ -583,7 +583,7 @@
         <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Specify comma separated list of field names on which this widget
+              Specify comma-separated list of field names on which this widget
               depends.
             </xsd:documentation>
           </xsd:annotation>
@@ -602,7 +602,7 @@
     </xsd:attribute>
     <xsd:attribute name="colWidths">
       <xsd:annotation>
-        <xsd:documentation>Comma separated list of column widths</xsd:documentation>
+        <xsd:documentation>Comma-separated list of column widths</xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
@@ -1388,7 +1388,7 @@
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              List of comma separated field names optionally
+              List of comma-separated field names optionally
               prefix with `-` to
               order by DESC.
 
@@ -1401,7 +1401,7 @@
         <xsd:attribute name="groupBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              List of comma separated field names to group the data items.
+              List of comma-separated field names to group the data items.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1438,7 +1438,7 @@
         </xsd:attribute>
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on new event.
+            <xsd:documentation>Comma-separated list of actions to execute on new event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1873,19 +1873,19 @@
         </xsd:choice>
         <xsd:attribute name="onLoad" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on load event.
+            <xsd:documentation>Comma-separated list of actions to execute on load event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onSave" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on save event.
+            <xsd:documentation>Comma-separated list of actions to execute on save event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onNew" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on new event.
+            <xsd:documentation>Comma-separated list of actions to execute on new event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2055,7 +2055,7 @@
               </xsd:attribute>
               <xsd:attribute name="onMove" type="xsd:string">
                 <xsd:annotation>
-                  <xsd:documentation>Comma separate list of actions to execute on move event.</xsd:documentation>
+                  <xsd:documentation>Comma-separated list of actions to execute on move event.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
               <xsd:attribute name="draggable" type="xsd:boolean">
@@ -2381,7 +2381,7 @@
         <xsd:attribute name="orderBy" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              List of comma separated field names optionally
+              List of comma-separated field names optionally
               prefix with `-` to
               order by DESC.
 
@@ -2465,7 +2465,7 @@
         </xsd:attribute>
         <xsd:attribute name="x-collapse-columns" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separated list of columns that are collapsed by default (reference fields not supported).</xsd:documentation>
+            <xsd:documentation>Comma-separated list of columns that are collapsed by default (reference fields not supported).</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -2914,7 +2914,7 @@
       <xsd:annotation>
         <xsd:documentation>
           <![CDATA[
-          List of comma separated field names (from the object graph)
+          List of comma-separated field names (from the object graph)
           optionally prefix with `-` to order by DESC.
 
           For example:
@@ -3664,7 +3664,7 @@
         <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Comma separated list of field names
+              Comma-separated list of field names
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3691,7 +3691,7 @@
         <xsd:attribute name="for" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Comma separated list of field names.
+              Comma-separated list of field names.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
