@@ -683,8 +683,13 @@ const FormContainer = memo(function FormContainer({
 
         let res = await dataStore.save(
           {
-            ...processSaveValues(dummyVals, formState.fields),
-            ...processSaveValues(vals, formState.fields),
+            ...processSaveValues(
+              {
+                ...dummyVals,
+                ...vals,
+              },
+              formState.meta,
+            ),
             _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
           },
           {

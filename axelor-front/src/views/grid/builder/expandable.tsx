@@ -310,8 +310,7 @@ export function ExpandableFormView({
           const vals = diff(rec, original);
 
           const updated = await onSave?.({
-            ...processSaveValues(dummyVals, formState.fields),
-            ...processSaveValues(vals, formState.fields),
+            ...processSaveValues({ ...dummyVals, ...vals }, formState.meta),
             _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
           });
 

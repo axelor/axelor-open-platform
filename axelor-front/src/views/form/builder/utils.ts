@@ -1,8 +1,11 @@
-import { uniqueId, isUndefined } from "lodash";
+import uniqueId from "lodash/uniqueId";
+import isUndefined from "lodash/isUndefined";
+import pick from "lodash/pick";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   Field,
+  JsonField,
   Panel,
   Property,
   Schema,
@@ -140,7 +143,7 @@ export function isIntegerField(schema: Schema) {
 }
 
 export function isReferenceField(schema: Schema) {
-  const type = toKebabCase(schema.serverType ?? schema.widget);
+  const type = toKebabCase(schema.serverType ?? schema.widget ?? schema.type);
   return Boolean(type?.endsWith("-to-one"));
 }
 
@@ -165,7 +168,10 @@ export function defaultAttrs(schema: Schema): Attrs {
   return attrs;
 }
 
-export function processContextValues(context: DataContext) {
+export function processContextValues(
+  context: DataContext,
+  meta?: FormState["meta"],
+) {
   const IGNORE = [
     "$attachments",
     "$processInstanceId",
@@ -209,36 +215,44 @@ export function processContextValues(context: DataContext) {
     return value;
   }
 
-  return process(context);
-}
+  const values = process(context);
 
-export function processSaveValues(
-  record: DataRecord,
-  fields: FormState["fields"],
-) {
-  const values = processContextValues(record);
+  if (meta) {
+    const { fields = {}, jsonFields } = meta;
 
-  Object.keys(values).forEach((fieldName) => {
-    const field = fields[fieldName];
-    if (field?.json) {
-      let value = values[fieldName];
-      if (value && typeof value === "string") {
-        try {
-          value = JSON.parse(value);
-        } catch {
-          // handle error
+    Object.keys(values).forEach((fieldName) => {
+      const isJson =
+        fields[fieldName]?.json || Boolean(jsonFields?.[fieldName]);
+      if (isJson) {
+        let value = values[fieldName];
+        if (value && typeof value === "string") {
+          try {
+            value = JSON.parse(value);
+          } catch {
+            // handle error
+          }
         }
+        values[fieldName] = value
+          ? compactJson(value, jsonFields?.[fieldName])
+          : value;
       }
-      values[fieldName] = value ? compactJson(value) : value;
-    }
-  });
+    });
+  }
 
   return values;
 }
 
-export function compactJson(record: DataRecord) {
+export function processSaveValues(record: DataRecord, meta: FormState["meta"]) {
+  return processContextValues(record, meta);
+}
+
+export function compactJson(
+  record: DataRecord,
+  fields?: Record<string, JsonField>,
+) {
   const rec: DataRecord = {};
   Object.entries(record).forEach(([k, v]) => {
+    const field = fields?.[k];
     if (k.indexOf("$") === 0 || v === null || v === undefined) return;
     if (typeof v === "string" && v.trim() === "") return;
     if (Array.isArray(v)) {
@@ -246,6 +260,13 @@ export function compactJson(record: DataRecord) {
       v = v.map(function (x) {
         return x.id ? { id: x.id } : x;
       });
+    } else if (v && typeof v === "object" && field && isReferenceField(field)) {
+      const { targetName } = field;
+      v = {
+        id: v.id,
+        $version: v.version ?? v.$version,
+        [targetName!]: v[targetName!],
+      };
     }
     rec[k] = v;
   });
@@ -458,6 +479,10 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
 export function removeVersion(record: DataRecord) {
   const { version, $version, ...rest } = record;
   return { ...rest, $version: version ?? $version } as DataRecord;
+}
+
+export function processM2OValue(record: DataRecord, targetName: string) {
+  return pick(removeVersion(record), ["id", "$version", targetName]);
 }
 
 // Types that are saved independently from main record

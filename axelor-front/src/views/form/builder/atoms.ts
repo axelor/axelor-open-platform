@@ -247,6 +247,7 @@ export const contextAtom = atom(
   (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
       const {
+        meta,
         model,
         record,
         context: _context,
@@ -273,7 +274,7 @@ export const contextAtom = atom(
         }
       }
 
-      context = processContextValues(context);
+      context = processContextValues(context, meta);
 
       if (parent) {
         context._parent = prepare(parent);
