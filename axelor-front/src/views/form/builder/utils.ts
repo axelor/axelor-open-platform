@@ -1,6 +1,7 @@
 import uniqueId from "lodash/uniqueId";
 import isUndefined from "lodash/isUndefined";
 import pick from "lodash/pick";
+import uniq from "lodash/uniq";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -233,7 +234,36 @@ export function processContextValues(
           }
         }
         values[fieldName] = value
-          ? compactJson(value, jsonFields?.[fieldName])
+          ? compactJson(value, {
+              findItem: (jsonPath: string) => {
+                function findTargetNames(schema: Schema): Schema[] {
+                  const items =
+                    schema.type !== "panel-related" ? schema.items ?? [] : [];
+                  const nested = items.flatMap((item) => findTargetNames(item));
+                  return [
+                    ...items
+                      .filter((item) => item.json && item.name === fieldName)
+                      .map(
+                        (item) =>
+                          item.jsonFields?.find(
+                            (jsonItem: JsonField) => jsonItem.name === jsonPath,
+                          )?.targetName,
+                      ),
+                    ...nested,
+                  ];
+                }
+                const field = jsonFields?.[fieldName]?.[jsonPath];
+                return {
+                  name: jsonPath,
+                  ...field,
+                  targetNames: uniq(
+                    [field?.targetName, ...findTargetNames(meta.view)].filter(
+                      Boolean,
+                    ),
+                  ),
+                } as Schema;
+              },
+            })
           : value;
       }
     });
@@ -248,11 +278,11 @@ export function processSaveValues(record: DataRecord, meta: FormState["meta"]) {
 
 export function compactJson(
   record: DataRecord,
-  fields?: Record<string, JsonField>,
+  { findItem }: { findItem?: (name: string) => Schema } = {},
 ) {
   const rec: DataRecord = {};
   Object.entries(record).forEach(([k, v]) => {
-    const field = fields?.[k];
+    const field = findItem?.(k);
     if (k.indexOf("$") === 0 || v === null || v === undefined) return;
     if (typeof v === "string" && v.trim() === "") return;
     if (Array.isArray(v)) {
@@ -261,11 +291,17 @@ export function compactJson(
         return x.id ? { id: x.id } : x;
       });
     } else if (v && typeof v === "object" && field && isReferenceField(field)) {
-      const { targetName } = field;
+      const { targetNames = [] } = field;
       v = {
         id: v.id,
         $version: v.version ?? v.$version,
-        [targetName!]: v[targetName!],
+        ...(targetNames as string[]).reduce(
+          (vals, name) => ({
+            ...vals,
+            [name]: v[name],
+          }),
+          {},
+        ),
       };
     }
     rec[k] = v;
