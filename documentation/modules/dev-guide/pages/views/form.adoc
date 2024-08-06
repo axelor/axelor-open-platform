@@ -76,11 +76,11 @@ Form view can have the following attributes:
 | `id` | If overriding some existing one, provide a unique id to identify this one.
 | `editable` | whether the form is editable
 | `readonlyIf` | boolean expression to make form readonly
-| `onNew` | action to be called on creating new record
-| `onLoad` | action to be called when record is loaded
-| `onCopy` | action to be called when record is copied
+| `onNew` | action to call on creating new record
+| `onLoad` | action call when record is loaded
+| `onCopy` | action call when record is copied
 | `onDelete` | action to call when deleting record
-| `onSave` | action to be called on saving this form
+| `onSave` | action to call on saving this form
 | `canNew` | boolean expression to the 'New' button
 | `canEdit` | boolean expression to the 'Edit' button
 | `canDelete` | boolean expression to the 'Delete' button
@@ -189,8 +189,8 @@ A `panel-related` includes the following attributes:
 | *`field`* | title of the panel
 | `editable` | whether the grid is inline editable
 | `orderBy` | comma-separated list of field names to sort the records
-| `onNew` | action to be called on creating new record
-| `onChange` | action to be called when field value is changed
+| `onNew` | action to call on creating new record
+| `onChange` | action to call when field value is changed
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `height` | number of rows (not pixel height)
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.

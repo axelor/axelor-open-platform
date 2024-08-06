@@ -1647,13 +1647,13 @@
         <xsd:attribute name="onChange" type="xsd:string" />
         <xsd:attribute name="onCopy" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>action to be call after duplicating record in o2m/m2m grid
+            <xsd:documentation>action to call after duplicating record in o2m/m2m grid
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>action to be call when removing record in o2m/m2m grid
+            <xsd:documentation>action to call when removing record in o2m/m2m grid
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

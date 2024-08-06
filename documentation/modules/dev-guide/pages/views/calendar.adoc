@@ -49,8 +49,8 @@ The calendar view attributes are:
 | `dayLength` | working hours per day (default is 8)
 | `colorBy` | name of the field to be used to colorize the events (colors are used consistently according to the field and there is a maximum of 30 different colors)
 | `mode` | default view mode (month, week or day)
-| `onChange` | an action to call when event is changed (with drag or resize)
-| `onDelete` | an action to call when event is deleting
+| `onChange` | action to call when event is changed (with drag or resize)
+| `onDelete` | action to call when deleting an event
 |===
 
 The calendar data shows records as events.

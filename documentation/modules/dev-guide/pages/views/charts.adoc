@@ -69,7 +69,7 @@ A chart view requires following information:
 * `name` - unique name for the chart
 * `title` - chart title
 * `stacked` - whether to create stacked chart
-* `onInit` - an action to be called during chart init
+* `onInit` - action to call during chart init
 * `<dataset>` - JPQL/SQL select query with select name aliases
 * `<category>` - defines the X-Axis of the chart with
 ** `key` - the dataset field to be used to categorize the data (used as X-Axis data points)
