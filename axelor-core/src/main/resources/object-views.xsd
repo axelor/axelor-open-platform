@@ -1444,13 +1444,13 @@
         </xsd:attribute>
         <xsd:attribute name="onSave" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on save event.
+            <xsd:documentation>Comma-separated list of actions to execute on save event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on delete event.
+            <xsd:documentation>Comma-separated list of actions to execute on delete event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1915,13 +1915,13 @@
         </xsd:attribute>
         <xsd:attribute name="onDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on delete event.
+            <xsd:documentation>Comma-separated list of actions to execute on delete event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="onCopy" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on copy event.
+            <xsd:documentation>Comma-separated list of actions to execute on copy event.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2204,7 +2204,7 @@
         </xsd:attribute>
         <xsd:attribute name="onDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on delete event.</xsd:documentation>
+            <xsd:documentation>Comma-separated list of actions to execute on delete event.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="colorBy" type="xsd:string">
@@ -2454,7 +2454,7 @@
         </xsd:attribute>
         <xsd:attribute name="onDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Comma separate list of actions to execute on delete event.</xsd:documentation>
+            <xsd:documentation>Comma-separated list of actions to execute on delete event.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
