@@ -123,8 +123,8 @@ public class TenantConfigImpl implements TenantConfig {
     final String active = get(props, prefix, "active");
     final String visible = get(props, prefix, "visible");
 
-    cfg.active = active == null || active == "true";
-    cfg.visible = visible == null || visible == "true";
+    cfg.active = active == null || "true".equalsIgnoreCase(active);
+    cfg.visible = visible == null || "true".equalsIgnoreCase(visible);
 
     cfg.tenantId = tenantId;
     cfg.tenantName = get(props, prefix, "name");
