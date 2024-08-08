@@ -1,0 +1,3 @@
+---
+title: Fix reload not triggered after notify if pending actions
+type: fix

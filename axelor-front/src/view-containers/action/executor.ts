@@ -274,8 +274,13 @@ export class DefaultActionExecutor implements ActionExecutor {
       } else {
         alerts.info(data.notify);
       }
-      if (data.pending) {
-        return this.#execute(data.pending, options);
+      if (data.reload || data.pending) {
+        if (data.reload) {
+          await this.#handler.refresh();
+        }
+        if (data.pending) {
+          return this.#execute(data.pending, options);
+        }
       }
     }
 
