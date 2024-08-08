@@ -44,6 +44,7 @@ import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.script.CompositeScriptHelper;
@@ -118,15 +119,19 @@ final class AuditTracker {
   }
 
   public List<FieldTracking> getTrackedCustomFields(Model model) {
-    List<MetaJsonField> fields =
-        Query.of(MetaJsonField.class)
-            .filter("self.model = :model AND self.tracked IS TRUE")
-            .bind("model", model.getClass().getName())
-            .cacheable()
-            .autoFlush(false)
-            .fetch();
+    Query<MetaJsonField> query = Query.of(MetaJsonField.class).cacheable().autoFlush(false);
 
-    return fields.stream().map(FieldTracking::new).collect(Collectors.toUnmodifiableList());
+    if (model instanceof MetaJsonRecord) {
+      query
+          .filter("self.jsonModel.name = :name AND self.tracked IS TRUE")
+          .bind("name", ((MetaJsonRecord) model).getJsonModel());
+    } else {
+      query
+          .filter("self.model = :model AND self.tracked IS TRUE")
+          .bind("model", model.getClass().getName());
+    }
+
+    return query.fetch().stream().map(FieldTracking::new).collect(Collectors.toUnmodifiableList());
   }
 
   private ModelTracking getTrack(Model entity) {
