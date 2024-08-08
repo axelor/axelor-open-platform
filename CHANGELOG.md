@@ -1,3 +1,114 @@
+## 7.1.5 (2024-08-08)
+
+#### Change
+
+* Always retain filters in grid view action context
+
+  <details>
+  
+  On actions executed from grid views, we can fetch current filters applied 
+  on the view using `request.getCriteria()`. it was initially only available if 
+  there are no records selected. To be consistent, it should also be available 
+  whatever records are selected or not. This shouldn't have any impact. Selected 
+  records are available thought `_ids` in context, the current filter through 
+  `request.getCriteria()`.
+  
+  </details>
+
+* Model field preferred over custom field when setting value
+
+  <details>
+  
+  When a custom field has same name of model field, action called from 
+  form view was updating field in form but action called from json editor 
+  was updating field in the json editor. This was creating confusion 
+  depending on where the action was called. To uniformize behavior, form 
+  field gets preference over custom field (if same name). This can be 
+  breaking change, but use a custom field name same as the model field one 
+  isn't recommended.
+  
+  </details>
+
+#### Fix
+
+* Fix title not displayed on custom collection fields
+* Fix reload not triggered after notify if pending actions
+* Improve reference field data for json fields
+* Fix auto add new row in editable grid
+* Fix prefer hideIf over showIf in expression evaluation
+
+  <details>
+  
+  When widget defines both expression i.e. showIf and hideIf then 
+  it will first eval hideIf expression, if it returns true then
+  it is considered to be hidden true else it will take and eval result of showIf expression.
+  
+  </details>
+
+* Fix set custom fields attributes
+
+  <details>
+  
+  This fixes updating custom fields attributes in views. 
+  
+  Custom field that are part of the default `attrs` json field, attributes can be updated either without prefix 
+  (`<attribute for="test" name="hidden" expr="eval: true"/>`) or without prefix 
+  (`<attribute for="attrs.test" name="hidden" expr="eval: true"/>`), no matter where the action is triggered in the 
+  view. This means that whether the action is triggered from a field event or a button in the main form or from a field 
+  event or button inside a json field, it works same.
+  
+  For custom fields that are part of other json fields, attributes have to be updated with their respective prefix 
+  (`<attribute for="myOtherJsonField.test" name="hidden" expr="eval: true"/>`) or if the action is executed inside the 
+  json field, attributes can also be updated without prefix (`<attribute for="test" name="hidden" expr="eval: true"/>`).
+  
+  </details>
+
+* Fix query domain on relational custom fields
+* Fix call save only when record is changed in popup editor
+
+  <details>
+  
+  When form contains dummy fields or x-dirty="false" items then when record is saved
+  by clicking on ok, it should save record when those fields get changed regardless of
+  form is not dirty.
+  
+  </details>
+
+* Fix dirty issue for non-changed number value through action
+* Fix js expressions and attributes priority
+
+  <details>
+  
+  js expressions have the priority over attributes set with action-attrs.
+  
+  </details>
+
+* Fix selection-in support for radio/checkbox select
+* Fix hide columns through action-attrs in collection
+* Fix ensure m2o value for json fields
+* Fix kanban column title writing mode
+
+  <details>
+  
+  When written vertically, multiline text should grow from right to left.
+  
+  </details>
+
+* Fix details view should close on multiple selection of record
+
+  <details>
+  
+  When multiple records are selected in grid view then
+  details view should be not open and should be close if opened.
+  
+  </details>
+
+* Fix canEdit/canView on TagSelect widget
+
+#### Security
+
+* Fix XSS vulnerability with message thread
+
 ## 7.1.4 (2024-07-18)
 
 #### Fix

@@ -1,7 +1,0 @@
----
-title: Fix prefer hideIf over showIf in expression evaluation
-type: fix
-description: |
-  When widget defines both expression i.e. showIf and hideIf then 
-  it will first eval hideIf expression, if it return true then
-  it is considered to be hidden true else it will take and eval result of showIf expression.

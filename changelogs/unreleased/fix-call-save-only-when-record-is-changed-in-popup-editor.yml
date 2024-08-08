@@ -1,7 +1,0 @@
----
-title: Fix call save only when record is changed in popup editor
-type: fix
-description: |
-  When form contains dummy fields or x-dirty="false" items then when record is save
-  by clicking on ok, it should save record when those fields get changed regardless of
-  form is not dirty.

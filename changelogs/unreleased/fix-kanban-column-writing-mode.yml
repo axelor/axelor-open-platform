@@ -1,5 +1,0 @@
----
-title: Fix kanban column title writing mode
-type: fix
-description: |
-  When written vertically, multiline text should grow from right to left.
