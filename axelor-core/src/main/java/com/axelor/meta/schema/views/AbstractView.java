@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.hibernate.jpa.QueryHints;
 
 @XmlType
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
+@JsonTypeInfo(use = Id.NAME, include = As.EXISTING_PROPERTY, property = "type")
 @JsonInclude(Include.NON_NULL)
 @JsonSubTypes({
   @Type(GridView.class),
