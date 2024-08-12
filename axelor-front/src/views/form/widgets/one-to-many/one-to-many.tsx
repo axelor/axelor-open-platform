@@ -1555,31 +1555,39 @@ function OneToManyInner({
   const hasRowExpanded = useAtomCallback(
     useCallback(
       (get, set, { record }: GridRow) => {
-        if (isTreeLimitExceed) return null;
+        if (isTreeLimitExceed) return { expand: false, disable: true };
 
         const isNew = (record.id ?? 0) < 0;
         const itemState = get(itemsAtom).find(
           (item) =>
             item.record.id === record.cid || item.record.id === record.id,
         );
-        if (isNew || itemState?.expanded === false)
-          return Boolean(itemState?.expanded);
 
         const noChildren =
           expandFieldList.length > 0 &&
-          expandFieldList.every(
-            (field) =>
-              record[field] !== undefined && record[field]?.length === 0,
+          expandFieldList.every((field) =>
+            isNew
+              ? (record[field]?.length ?? 0) === 0
+              : record[field] !== undefined && record[field]?.length === 0,
           );
 
-        if (readonly && noChildren) {
-          return null;
+        if (isNew || itemState?.expanded === false)
+          return {
+            expand: Boolean(itemState?.expanded),
+            ...(noChildren && { children: false }),
+          };
+
+        if (noChildren) {
+          return {
+            expand: itemState?.expanded,
+            disable: readonly,
+            children: false,
+          };
         }
 
-        if (expandAll && noChildren) {
-          return itemState?.expanded ?? false;
-        }
-        return expandAll || itemState?.expanded;
+        return {
+          expand: expandAll || itemState?.expanded,
+        };
       },
       [isTreeLimitExceed, expandAll, itemsAtom, expandFieldList, readonly],
     ),
@@ -1943,7 +1951,7 @@ const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
       title={expandAll ? i18n.get("Collapse All") : i18n.get("Expand All")}
       onClick={() => handleClick(!expandAll)}
     >
-      <ExpandIcon expand={expandAll} />
+      <ExpandIcon expand={expandAll} children={false} />
     </GridHeaderCell>
   );
 });
