@@ -1627,18 +1627,21 @@ function OneToManyInner({
     if (isRootTreeGrid) {
       const _columnAttrs = (state.columns ?? []).reduce(
         (colsAttrs, col) => {
-          if (col.visible === false) {
-            colsAttrs[col.name] = { hidden: true };
-          }
-          return colsAttrs;
+          return {
+            ...colsAttrs,
+            [col.name]: {
+              ...colsAttrs[col.name],
+              visible: col.visible,
+            },
+          };
         },
-        {} as Record<string, Partial<Attrs>>,
+        columnAttrs ?? ({} as Record<string, Partial<Attrs>>),
       );
       setColumnAttrs?.((_attrs) =>
         isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
       );
     }
-  }, [isRootTreeGrid, state.columns, setColumnAttrs]);
+  }, [isRootTreeGrid, state.columns, columnAttrs, setColumnAttrs]);
 
   useEffect(() => {
     const fieldsSelect = gridViewData?.items
