@@ -97,13 +97,17 @@ export const FormLayoutComponent = ({
   schema,
   formAtom,
   readonly,
-  expand,
+  expandState,
   onExpand,
   onCancel,
   onCellClick,
   columns = [],
 }: LayoutProps & {
-  expand?: boolean;
+  expandState: {
+    expand: boolean;
+    disable?: boolean;
+    children?: boolean;
+  };
   onCellClick?: (
     e: React.SyntheticEvent,
     col: GridColumn,
@@ -172,7 +176,7 @@ export const FormLayoutComponent = ({
           >
             {!item && column === expandColumn && (
               <Box d="flex" onClick={() => onExpand?.()}>
-                <ExpandIcon expand={expand} />
+                <ExpandIcon {...expandState} />
               </Box>
             )}
             {!item && column === undoColumn && (
@@ -265,6 +269,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       fields,
       className,
       columns,
+      hasExpanded,
       data: gridRow,
       index: rowIndex,
       editCell: cellIndex,
@@ -305,6 +310,14 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         };
       }
     }, [editColumnName, view.items]);
+
+    const expandState = useMemo(
+      () =>
+        hasExpanded
+          ? hasExpanded(gridRow)
+          : { expand: Boolean(gridRow.expand) },
+      [gridRow, hasExpanded],
+    );
 
     const { add: addWidgetValidator } = useFormValidityScope();
     const { add: addEditableWidget } = useFormEditableScope();
@@ -499,7 +512,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       () => (props: LayoutProps) => (
         <FormLayoutComponent
           {...props}
-          expand={expand}
+          expandState={expandState}
           onCellClick={handleCellClick}
           onExpand={handleExpand}
           onSave={handleSave}
@@ -507,21 +520,17 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         />
       ),
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [expand, handleSave, handleCancel],
+      [expandState, handleSave, handleCancel],
     );
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          formAtom,
-          invalid: checkInvalid,
-          onSave: handleSave,
-          onCancel: handleCancel,
-        };
-      },
-      [checkInvalid, formAtom, handleSave, handleCancel],
-    );
+    useImperativeHandle(ref, () => {
+      return {
+        formAtom,
+        invalid: checkInvalid,
+        onSave: handleSave,
+        onCancel: handleCancel,
+      };
+    }, [checkInvalid, formAtom, handleSave, handleCancel]);
 
     useEffect(() => {
       return addWidgetValidator(checkInvalid);

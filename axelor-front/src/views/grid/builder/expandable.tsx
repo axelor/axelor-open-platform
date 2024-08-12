@@ -41,7 +41,14 @@ import { useGridExpandableContext, useGridContext } from "./scope";
 import formStyles from "@/views/form/form.module.scss";
 import styles from "./expandable.module.scss";
 
-export function ExpandIcon({ expand }: { expand?: boolean }) {
+export function ExpandIcon({
+  expand,
+  children,
+}: {
+  expand?: boolean;
+  disable?: boolean;
+  children?: boolean;
+}) {
   return (
     <Box
       as="span"
@@ -50,7 +57,9 @@ export function ExpandIcon({ expand }: { expand?: boolean }) {
         [styles.expanded]: expand,
       })}
     >
-      <MaterialIcon icon={"keyboard_arrow_down"} />
+      <MaterialIcon
+        icon={children ? "keyboard_double_arrow_down" : "keyboard_arrow_down"}
+      />
     </Box>
   );
 }

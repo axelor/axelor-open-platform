@@ -1555,33 +1555,54 @@ function OneToManyInner({
   const hasRowExpanded = useAtomCallback(
     useCallback(
       (get, set, { record }: GridRow) => {
-        if (isTreeLimitExceed) return null;
+        if (isTreeLimitExceed) return { expand: false, disable: true };
 
         const isNew = (record.id ?? 0) < 0;
         const itemState = get(itemsAtom).find(
           (item) =>
             item.record.id === record.cid || item.record.id === record.id,
         );
-        if (isNew || itemState?.expanded === false)
-          return Boolean(itemState?.expanded);
 
-        const noChildren =
-          expandFieldList.length > 0 &&
-          expandFieldList.every(
-            (field) =>
-              record[field] !== undefined && record[field]?.length === 0,
+        if (isExpandable) {
+          return {
+            expand: expandAll || itemState?.expanded,
+          };
+        }
+
+        const children =
+          expandFieldList.length === 0 ||
+          expandFieldList.some((field) =>
+            isNew
+              ? (record[field]?.length ?? 0) > 0
+              : record[field] === undefined || record[field]?.length > 0,
           );
 
-        if (readonly && noChildren) {
-          return null;
+        if (isNew || itemState?.expanded === false)
+          return {
+            expand: Boolean(itemState?.expanded),
+            children,
+          };
+
+        if (!children) {
+          return {
+            expand: itemState?.expanded,
+            disable: readonly,
+          };
         }
 
-        if (expandAll && noChildren) {
-          return itemState?.expanded ?? false;
-        }
-        return expandAll || itemState?.expanded;
+        return {
+          expand: expandAll || itemState?.expanded,
+          children,
+        };
       },
-      [isTreeLimitExceed, expandAll, itemsAtom, expandFieldList, readonly],
+      [
+        isTreeLimitExceed,
+        expandAll,
+        itemsAtom,
+        expandFieldList,
+        readonly,
+        isExpandable,
+      ],
     ),
   );
 
