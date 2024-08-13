@@ -368,7 +368,7 @@ export const Grid = forwardRef<
 
   const model = view.model ?? (view as unknown as Property)?.target ?? "";
 
-  // cache expadable form in advance
+  // cache expandable form in advance
   const { data: expandViewMeta } = useAsync(async () => {
     if (expandable) {
       return expandableView && typeof expandableView === "object"

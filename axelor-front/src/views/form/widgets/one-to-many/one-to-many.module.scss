@@ -1,3 +1,5 @@
+$treeNodePadding: 1.175rem;
+
 .container {
   --ax-panel-body-padding: 0;
   --ax-panel-header-border: 0;
@@ -22,9 +24,9 @@
 
 .tree {
   border-radius: 0;
-  --ax-expandable-form-view-padding: 0 0 0 1.175rem;
+  --ax-expandable-form-view-padding: 0 0 0 #{$treeNodePadding};
   [dir="rtl"] & {
-    --ax-expandable-form-view-padding: 0 1.175rem 0 0;
+    --ax-expandable-form-view-padding: 0 #{$treeNodePadding} 0 0;
   }
 }
 
@@ -64,6 +66,10 @@
   overflow: unset;
 }
 
+.subTreeGrid .grid {
+  overflow: hidden !important;
+}
+
 .grid:not(.hasDetails) {
   height: 100%;
 }
@@ -90,4 +96,8 @@
 .titleText {
   display: flex;
   flex: 1;
+}
+
+:export {
+  treeNodePadding: $treeNodePadding;
 }

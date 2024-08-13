@@ -74,9 +74,9 @@ import {
   FieldError,
   FieldLabel,
   FieldProps,
+  ValueAtom,
   usePermission,
   usePrepareWidgetContext,
-  ValueAtom,
 } from "../../builder";
 import {
   useActionExecutor,
@@ -156,6 +156,22 @@ function flattenItems(record: DataRecord, name: string) {
 function isExpandableWidget(schema: Schema) {
   return ["tree-grid", "expandable"].includes(schema.widget ?? "");
 }
+
+const getTreeNodePadding = (() => {
+  let paddingValue: number;
+  return () =>
+    paddingValue ??
+    (() => {
+      const BORDER = 1;
+      const fontSize = parseFloat(
+        getComputedStyle(document.body).getPropertyValue(
+          "--bs-body-font-size",
+        ) ?? 16,
+      );
+      const padding = fontSize * parseFloat(styles.treeNodePadding);
+      return (paddingValue = padding + BORDER);
+    })();
+})();
 
 export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { schema } = props;
@@ -284,7 +300,7 @@ function OneToManyInner({
     items: itemsAtom,
     expand: expandAtom,
     getItem,
-    columnAttrs: treeColumnAttrs,
+    columnAttrs: _treeColumnAttrs,
     setColumnAttrs,
     enabled: isCollectionTree,
     waitForActions: waitForCollectionActions,
@@ -1627,17 +1643,59 @@ function OneToManyInner({
     }
   }, [isRootTreeGrid, expandable, records, syncRecordsToTree]);
 
+  const treeColumnAttrs = useMemo(() => {
+    return isSubTreeGrid
+      ? Object.keys(_treeColumnAttrs ?? {}).reduce((obj, key) => {
+          const { $adjustColumnWidth, ...colAttrs } = _treeColumnAttrs?.[key] as any;
+          return {
+            ...obj,
+            [key]: {
+              ...colAttrs,
+              ...($adjustColumnWidth && {
+                width: colAttrs.width - getTreeNodePadding() * expandLevel,
+                computed: true,
+              }),
+            },
+          };
+        }, {})
+      : {};
+  }, [isSubTreeGrid, _treeColumnAttrs, expandLevel]);
+
   useEffect(() => {
     if (isRootTreeGrid) {
+      let hasSetAdjustColumnWidth = false;
       const _columnAttrs = (state.columns ?? []).reduce(
         (colsAttrs, col) => {
-          return {
+          colsAttrs = {
             ...colsAttrs,
             [col.name]: {
               ...colsAttrs[col.name],
               visible: col.visible,
-            },
+            } as any,
           };
+
+          if (col.width) {
+            colsAttrs[col.name] = {
+              ...colsAttrs[col.name],
+              computed: true,
+              width: col.width,
+            } as any;
+          }
+
+          if (
+            !hasSetAdjustColumnWidth &&
+            !col.action &&
+            col.visible !== false &&
+            (col.width ?? 0) > 50
+          ) {
+            hasSetAdjustColumnWidth = true;
+            colsAttrs[col.name] = {
+              ...colsAttrs[col.name],
+              $adjustColumnWidth: true,
+            } as any;
+          }
+
+          return colsAttrs;
         },
         columnAttrs ?? ({} as Record<string, Partial<Attrs>>),
       );
@@ -1867,9 +1925,6 @@ function OneToManyInner({
                 !detailRecord && {
                   onRowClick,
                 })}
-              {...(isRootTreeGrid && {
-                allowColumnResize: false,
-              })}
               {...(isSubTreeGrid && {
                 headerRowRenderer: HideGridHeaderRow,
                 allowColumnCustomize: false,
