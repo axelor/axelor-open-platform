@@ -43,6 +43,8 @@ export function DashletActions({
     getContext,
     dataStore,
     gridStateAtom,
+    onAdd,
+    onDelete,
     onAction,
     onLegendShowHide,
     onRefresh,
@@ -79,12 +81,15 @@ export function DashletActions({
           actionExecutor={actionExecutor}
         />
       )}
+
       {dataStore && hasPagination ? (
         <DashletListMenu
           view={view}
           viewType={viewType}
           dataStore={dataStore}
           gridStateAtom={gridStateAtom}
+          onAdd={onAdd}
+          onDelete={onDelete}
           onAction={onAction}
           onRefresh={onRefresh}
         />
@@ -92,6 +97,8 @@ export function DashletActions({
         <DashletMenu
           view={view}
           viewType={viewType}
+          onAdd={onAdd}
+          onDelete={onDelete}
           onAction={onAction}
           onLegendShowHide={onLegendShowHide}
           onRefresh={onRefresh}
@@ -186,7 +193,8 @@ function DashletListMenu(
     gridStateAtom?: DashletHandler["gridStateAtom"];
   },
 ) {
-  const { dataStore, gridStateAtom, viewType, ...menuProps } = props;
+  const { dataStore, gridStateAtom, viewType, onAdd, onDelete, ...menuProps } =
+    props;
   const page = useDataStore(dataStore, (store) => store.page);
   const { offset = 0, limit = DEFAULT_PAGE_SIZE, totalCount = 0 } = page;
   const canPrev = offset > 0;
@@ -239,6 +247,26 @@ function DashletListMenu(
             }),
             disabled: !canNext,
             onClick: () => dataStore.search({ offset: offset + limit }),
+          },
+          {
+            key: "new",
+            text: i18n.get("New"),
+            hidden: !onAdd,
+            iconProps: {
+              icon: "add",
+            },
+            iconOnly: true,
+            onClick: onAdd,
+          },
+          {
+            key: "delete",
+            text: i18n.get("Delete"),
+            hidden: !onDelete,
+            iconProps: {
+              icon: "delete",
+            },
+            iconOnly: true,
+            onClick: onDelete,
           },
         ]}
       />

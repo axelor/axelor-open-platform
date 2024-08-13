@@ -789,28 +789,6 @@ function GridInner(props: ViewProps<GridView>) {
   }, [state, records, onSearch, popup, dataStore, setPopupHandlers]);
 
   useEffect(() => {
-    if (dashlet) {
-      setDashletHandlers({
-        dataStore,
-        view,
-        actionExecutor,
-        gridStateAtom,
-        getContext,
-        onRefresh: () => doSearch({}),
-      });
-    }
-  }, [
-    getContext,
-    dashlet,
-    view,
-    gridStateAtom,
-    dataStore,
-    actionExecutor,
-    doSearch,
-    setDashletHandlers,
-  ]);
-
-  useEffect(() => {
     if (popup) return;
     let nextPage = currentPage;
     if (offset > totalCount) {
@@ -1096,6 +1074,43 @@ function GridInner(props: ViewProps<GridView>) {
     }, [setState]),
   });
 
+  useEffect(() => {
+    if (dashlet) {
+      setDashletHandlers({
+        dataStore,
+        view,
+        actionExecutor,
+        gridStateAtom,
+        getContext,
+        ...(canNew &&
+          !readonly && {
+            onAdd: handleNew,
+          }),
+        ...(canDelete &&
+          !readonly &&
+          deleteEnabled && {
+            onDelete: handleDelete,
+          }),
+        onRefresh: () => doSearch({}),
+      });
+    }
+  }, [
+    readonly,
+    canNew,
+    canDelete,
+    deleteEnabled,
+    dashlet,
+    view,
+    gridStateAtom,
+    dataStore,
+    actionExecutor,
+    getContext,
+    doSearch,
+    handleNew,
+    handleDelete,
+    setDashletHandlers,
+  ]);
+
   // register tab:refresh
   useViewTabRefresh("grid", onSearch);
 
@@ -1324,7 +1339,7 @@ function GridInner(props: ViewProps<GridView>) {
               state={state}
               setState={setState}
               sortType={"live"}
-              editable={dashlet || selector ? false : editable}
+              editable={!selector && !readonly && editable}
               {...((isExpandable || isTreeGrid) && {
                 gridContext,
                 showAsTree: isTreeGrid,

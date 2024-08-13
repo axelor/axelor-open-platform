@@ -6,7 +6,6 @@ import { createScope, molecule, useMolecule } from "bunshi/react";
 
 import { DataContext } from "@/services/client/data.types";
 import { SearchOptions } from "@/services/client/data";
-import { ActionOptions } from "@/services/client/meta";
 import { ActionExecutor } from "../action";
 
 export type DashletHandler = {
@@ -17,6 +16,8 @@ export type DashletHandler = {
   searchAtom?: AdvancedSearchAtom;
   gridStateAtom?: PrimitiveAtom<GridState>;
   getContext?: () => DataContext;
+  onAdd?: () => void; // add new record in grid
+  onDelete?: () => void; // remove records in grid
   onAction?: (action: string, context?: DataContext) => Promise<any>;
   onLegendShowHide?: (show: boolean) => void;
   onExport?: () => Promise<void>;
