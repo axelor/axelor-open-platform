@@ -69,7 +69,9 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const chartName = meta.view.name!;
   const { dashlet } = useViewTab();
   const [records, setRecords] = useState<ChartDataRecord[]>([]);
-  const [legend, showLegend] = useState(true);
+  const [legend, showLegend] = useState(
+    () => String(view.config?.hideLegend) !== "true",
+  );
   const fetched = useRef(false);
   const isRTL = useTheme().dir === "rtl";
 

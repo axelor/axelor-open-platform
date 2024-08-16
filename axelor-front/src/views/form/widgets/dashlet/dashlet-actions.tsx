@@ -1,7 +1,7 @@
 import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { PageText } from "@/components/page-text";
 import { useDataStore } from "@/hooks/use-data-store";
@@ -111,24 +111,6 @@ function DashletMenu({
 }: DashletMenuProps) {
   const [legend, showLegend] = useState(true);
 
-  function getViewOptions() {
-    const hideLegend =
-      viewType === "chart" && ((view as ChartView)?.config?.hideLegend ?? true);
-    if (hideLegend) {
-      return [
-        {
-          key: "show-hide-legend",
-          text: legend ? i18n.get("Hide legend") : i18n.get("Show legend"),
-          onClick: () => {
-            showLegend(!legend);
-            onLegendShowHide?.(!legend);
-          },
-        },
-      ];
-    }
-    return [];
-  }
-
   function getViewActions() {
     const actions =
       (viewType === "chart" && (view as ChartView)?.actions) || [];
@@ -147,6 +129,15 @@ function DashletMenu({
     return [];
   }
 
+  useEffect(() => {
+    if (
+      viewType === "chart" &&
+      String((view as ChartView)?.config?.hideLegend) === "true"
+    ) {
+      showLegend(false);
+    }
+  }, [viewType, view]);
+
   return (
     <CommandBar
       items={[
@@ -163,7 +154,15 @@ function DashletMenu({
               text: i18n.get("Refresh"),
               onClick: () => onRefresh?.(),
             },
-            ...getViewOptions(),
+            {
+              key: "show-hide-legend",
+              hidden: viewType !== "chart",
+              text: legend ? i18n.get("Hide legend") : i18n.get("Show legend"),
+              onClick: () => {
+                showLegend(!legend);
+                onLegendShowHide?.(!legend);
+              },
+            },
             {
               key: "export",
               text: i18n.get("Export"),
