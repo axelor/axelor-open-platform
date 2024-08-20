@@ -791,9 +791,16 @@ function OneToManyInner({
         setRecords((records) => {
           const newRecords = newItems.map((item, index) => {
             return unfetchedItems[index]
-              ? nestedToDotted({ ...records[index], ...item, cid: item.cid })
+              ? nestedToDotted({
+                  ...records[index],
+                  ...item,
+                  version: item.version,
+                  $version: item.$version ?? item.version,
+                  cid: item.cid,
+                })
               : item;
           });
+
           const newIds = newRecords.map((r) => r.id);
           const recIds = records.map((r) => r.id);
           const ids = [
