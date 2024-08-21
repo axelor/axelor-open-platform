@@ -108,9 +108,11 @@ public class JobRunner {
   }
 
   private void configure(String group, List<MetaSchedule> schedules) {
-    schedules.forEach(schedule -> this.configure(group, schedule));
-    long count = schedules.stream().filter(x -> Boolean.TRUE.equals(x.getActive())).count();
-    log.info("Configured total jobs: {}, group: {}", count, group);
+    if (schedules != null) {
+      schedules.forEach(schedule -> this.configure(group, schedule));
+      long count = schedules.stream().filter(x -> Boolean.TRUE.equals(x.getActive())).count();
+      log.info("Configured total jobs: {}, group: {}", count, group);
+    }
   }
 
   /**
