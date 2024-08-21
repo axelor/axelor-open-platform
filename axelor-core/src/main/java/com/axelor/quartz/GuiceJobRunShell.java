@@ -36,9 +36,13 @@ import org.quartz.core.JobRunShell;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
 import org.quartz.spi.TriggerFiredBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Custom {@link JobRunShell} to ensure {@link Job} can use {@link RequestScoped} services. */
 public class GuiceJobRunShell extends JobRunShell {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GuiceJobRunShell.class);
 
   private QuartzScheduler sched;
   private QuartzSchedulerResources resources;
@@ -66,8 +70,26 @@ public class GuiceJobRunShell extends JobRunShell {
   private void run(String tenantId) {
     final TenantConfig config = Beans.get(TenantConfigProvider.class).find(tenantId);
     if (Boolean.TRUE.equals(config.getActive())) {
-      new TenantAware(super::run).tenantId(tenantId).withTransaction(false).run();
+      // JobRunShell may re-use same thread from the pool, so run the task in a new
+      // thread to ensure the task is always run with a proper tenant id.
+      TenantAware task = new TenantAware(super::run).tenantId(tenantId).withTransaction(false);
+      task.start();
+      try {
+        task.join();
+      } catch (InterruptedException e) {
+        handleError(e);
+      }
     }
+  }
+
+  private void handleError(Throwable e) {
+    LOG.error("Job failed with error!", e);
+    resources
+        .getJobStore()
+        .triggeredJobComplete(
+            this.firedTriggerBundle.getTrigger(),
+            this.firedTriggerBundle.getJobDetail(),
+            CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
   }
 
   @Override
@@ -78,12 +100,7 @@ public class GuiceJobRunShell extends JobRunShell {
         super.initialize(this.sched);
         this.doRun();
       } catch (SchedulerException e) {
-        resources
-            .getJobStore()
-            .triggeredJobComplete(
-                this.firedTriggerBundle.getTrigger(),
-                this.firedTriggerBundle.getJobDetail(),
-                CompletedExecutionInstruction.SET_ALL_JOB_TRIGGERS_ERROR);
+        handleError(e);
       }
     }
   }
