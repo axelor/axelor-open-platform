@@ -34,8 +34,8 @@ import {
   RecordHandler,
   RecordListener,
   WidgetErrors,
-  WidgetState,
 } from "./types";
+import { nextId } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -647,7 +647,19 @@ function useActionRecord({
 
           const values = (() => {
             return Object.keys(data.value).reduce((vals, key) => {
-              const value = data.value[key];
+              let value = data.value[key];
+
+              // pre-fill cid for new item from server
+              if (Array.isArray(value)) {
+                value = value.map((v) =>
+                  v.id === null && !v.cid
+                    ? {
+                        ...v,
+                        cid: nextId(),
+                      }
+                    : v,
+                );
+              }
 
               // if field in form fields, it takes preference over custom field
               const field = !updateFormState.fields[key]
@@ -687,8 +699,30 @@ function useActionRecord({
               ([k, v]) => record[k] !== v && canDirty(k),
             );
 
+          function syncSelection(state: FormState) {
+            const updates: Partial<FormState> = {};
+            for (const [key, value] of Object.entries(values)) {
+              if (
+                Array.isArray(value) &&
+                value.some((x) => x.selected !== undefined)
+              ) {
+                updates.statesByName = {
+                  ...state.statesByName,
+                  [key]: {
+                    ...state.statesByName[key],
+                    selected: value
+                      .filter((x) => (x.id || x.cid) && x.selected)
+                      .map((x) => x.id ?? x.cid),
+                  },
+                };
+              }
+            }
+            return updates;
+          }
+
           set(updateFormAtom, (prev) => ({
             ...prev,
+            ...syncSelection(prev),
             dirty: prev.dirty || isDirty(),
             record: result,
           }));
@@ -714,7 +748,7 @@ export function useActionExecutor(
   const formAtom =
     options?.formAtom === undefined
       ? formScope.formAtom
-      : options?.formAtom ?? fallbackFormAtom;
+      : (options?.formAtom ?? fallbackFormAtom);
 
   const actionHandler = useMemo(() => {
     const actionHandler = new FormActionHandler(() => ({

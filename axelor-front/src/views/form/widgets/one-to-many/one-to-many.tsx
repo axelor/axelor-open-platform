@@ -269,7 +269,6 @@ function OneToManyInner({
   // use ref to avoid onSearch call
   const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
-  const serverSelectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
   const recordsSyncRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -324,7 +323,7 @@ function OneToManyInner({
     () =>
       focusAtom(
         formAtom,
-        ({ statesByName = {} }) => statesByName[name],
+        ({ statesByName = {} }) => statesByName?.[name],
         ({ statesByName = {}, ...rest }, value) => ({
           ...rest,
           statesByName: { ...statesByName, [name]: value },
@@ -338,13 +337,13 @@ function OneToManyInner({
       () =>
         atom(null, (get, set, selectedIds: number[]) => {
           const state = get(widgetState);
-          set(widgetState, { ...state, selected: selectedIds });
+          if (isEqual(state?.selected, selectedIds.sort())) return;
+          set(widgetState, { ...state, selected: selectedIds.sort() });
         }),
       [widgetState],
     ),
   );
 
-  const lastUpdatedValueRef = useRef<DataRecord[] | null>();
   const lastValueRef = useRef<DataRecord[] | null>();
   const lastItemsRef = useRef<DataRecord[]>([]);
   const getItems = useCallback((value: DataRecord[] | null | undefined) => {
@@ -382,7 +381,6 @@ function OneToManyInner({
         ) => {
           const values =
             typeof setter === "function" ? setter(get(_valueAtom)!) : setter;
-          lastUpdatedValueRef.current = values;
           return set(_valueAtom, values, callOnChange, markDirty);
         },
       ),
@@ -631,16 +629,33 @@ function OneToManyInner({
     });
   }, [setState]);
 
-  const shouldSyncSelect = useRef(true);
-  const onRowSelectionChange = useAtomCallback(
+  const selectedIdsByServer = useAtomValue(
+    useMemo(
+      () => selectAtom(widgetState, (s) => s?.selected || []),
+      [widgetState],
+    ),
+  );
+
+  const selectedIds = useMemo(
+    () =>
+      (state.selectedRows ?? [])
+        .map(
+          (ind) =>
+            state.rows[ind]?.type === "row" && state.rows[ind]?.record?.id,
+        )
+        .sort(),
+    [state.rows, state.selectedRows],
+  );
+
+  const lastSelectedIds = useRef<number[]>([]);
+  const lastSelectedIdsByServer = useRef<number[]>([]);
+  const serverSelectedIds = useRef<number[] | null>(null);
+
+  const syncSelection = useAtomCallback(
     useCallback(
-      (get, set, selection: number[]) => {
+      (get, set, ids: number[]) => {
         const items = getItems(get(valueAtom));
         if (items.length === 0) return;
-
-        const ids = selection
-          .map((x) => state.rows[x]?.record?.id as number)
-          .filter(Boolean);
 
         const cur = items
           .filter((x) => x.selected)
@@ -656,51 +671,50 @@ function OneToManyInner({
 
         const next = items.map((x) => ({
           ...x,
-          selected:
-            ids.includes(x.id!) || serverSelectedIdsRef.current.includes(x.id!),
+          selected: ids.includes(x.id!),
         }));
 
-        shouldSyncSelect.current = false;
         valueRef.current = next;
         set(valueAtom, next, false, false);
       },
-      [getItems, state.rows, valueAtom],
+      [getItems, valueAtom],
     ),
   );
 
-  const syncSelection = useCallback(async () => {
-    const ids = serverSelectedIdsRef.current;
-
+  const syncServerSelection = useCallback(() => {
     setState((draft) => {
-      draft.selectedRows = state.rows
-        .map((row, i) => {
-          if (row.record?.selected || ids.includes(row.record?.id)) {
-            return i;
-          }
-          return undefined;
-        })
-        .filter((x) => x !== undefined) as number[];
+      draft.selectedRows = draft.rows
+        .map((row, ind) =>
+          row.type === "row" &&
+          serverSelectedIds.current?.includes(row.record?.id)
+            ? ind
+            : null,
+        )
+        .filter((ind) => ind !== null);
     });
-
-    serverSelectedIdsRef.current = [];
-  }, [setState, state.rows]);
+    serverSelectedIds.current = null;
+  }, [state.rows]);
 
   useEffect(() => {
-    if (shouldSyncSelect.current || serverSelectedIdsRef.current.length > 0) {
-      syncSelection();
-    }
-    shouldSyncSelect.current = true;
-  }, [syncSelection]);
+    if (isEqual(selectedIds, lastSelectedIds.current)) return;
+    setSelection(selectedIds);
+    syncSelection(selectedIds);
+    serverSelectedIds.current = selectedIds;
+    lastSelectedIds.current = selectedIds;
+  }, [selectedIds, setSelection, syncSelection]);
 
-  const rawValue = useAtomValue(valueAtom);
   useEffect(() => {
-    if (!isEqual(rawValue, lastUpdatedValueRef.current)) {
-      const selectedIds = getItems(rawValue)
-        .filter((item) => item.selected)
-        .map((item) => item.id!);
-      serverSelectedIdsRef.current = selectedIds;
+    if (isEqual(selectedIdsByServer, lastSelectedIdsByServer.current)) return;
+
+    lastSelectedIdsByServer.current = selectedIdsByServer;
+    serverSelectedIds.current = selectedIdsByServer?.slice().sort() as number[];
+  }, [selectedIdsByServer]);
+
+  useEffect(() => {
+    if (serverSelectedIds.current) {
+      syncServerSelection();
     }
-  }, [getItems, rawValue]);
+  }, [syncServerSelection]);
 
   const columnNames = useGridColumnNames({
     view: viewData?.view ?? schema,
@@ -1344,16 +1358,6 @@ function OneToManyInner({
   }, [selectedRows, rows, setState]);
 
   useEffect(() => {
-    const selectedIds = (selectedRows ?? []).map(
-      (ind) => rows[ind]?.record?.id,
-    );
-    if (isEqual(selectedIdsRef.current, selectedIds)) return;
-
-    selectedIdsRef.current = selectedIds;
-    setSelection(selectedIds);
-  }, [selectedRows, rows, setSelection]);
-
-  useEffect(() => {
     if (reorderRef.current) {
       // For dummy fields, so that internal value change is detected
       if (!orderField) {
@@ -1847,7 +1851,6 @@ function OneToManyInner({
               onDiscard={onDiscard}
               onRowExpand={onRowExpand}
               onRowReorder={onRowReorder}
-              onRowSelectionChange={onRowSelectionChange}
               {...(canNew && {
                 onNew: editableAndCanEdit ? handleAddInGrid : onAdd,
               })}

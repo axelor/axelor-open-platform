@@ -262,18 +262,6 @@ export const contextAtom = atom(
         _model: model,
       };
 
-      // set selected flag for o2m/m2m fields
-      for (let name in statesByName) {
-        const { selected } = statesByName[name];
-        if (selected && Array.isArray(context[name])) {
-          context[name] = context[name].map((value: DataRecord) =>
-            value.id && selected.includes(value.id)
-              ? { ...value, selected: true }
-              : value,
-          );
-        }
-      }
-
       context = processContextValues(context, meta);
 
       if (parent) {
