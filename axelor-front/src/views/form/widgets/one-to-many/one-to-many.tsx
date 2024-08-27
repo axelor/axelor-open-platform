@@ -305,6 +305,8 @@ function OneToManyInner({
     enabled: isCollectionTree,
     waitForActions: waitForCollectionActions,
   } = useCollectionTree();
+  const toggleTreeGridCollapse = useTreeGridToggleCollapseHandler();
+  const [updateExpand, refreshExpandCallback] = useReducer(() => ({}), {});
 
   const isExpandable = widget === "expandable";
   const isTreeGrid = widget === "tree-grid";
@@ -1572,6 +1574,11 @@ function OneToManyInner({
     ),
   );
 
+  const collapseAllRows = useCallback(() => {
+    toggleTreeGridCollapse(false);
+    refreshExpandCallback();
+  }, [toggleTreeGridCollapse, refreshExpandCallback]);
+
   const hasRowExpanded = useAtomCallback(
     useCallback(
       (get, set, { record }: GridRow) => {
@@ -1609,7 +1616,15 @@ function OneToManyInner({
           expand: expandAll || itemState?.expanded,
         };
       },
-      [isTreeLimitExceed, expandAll, itemsAtom, expandFieldList, readonly],
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [
+        isTreeLimitExceed,
+        updateExpand,
+        expandAll,
+        itemsAtom,
+        expandFieldList,
+        readonly,
+      ],
     ),
   );
 
@@ -1646,7 +1661,9 @@ function OneToManyInner({
   const treeColumnAttrs = useMemo(() => {
     return isSubTreeGrid
       ? Object.keys(_treeColumnAttrs ?? {}).reduce((obj, key) => {
-          const { $adjustColumnWidth, ...colAttrs } = _treeColumnAttrs?.[key] as any;
+          const { $adjustColumnWidth, ...colAttrs } = _treeColumnAttrs?.[
+            key
+          ] as any;
           return {
             ...obj,
             [key]: {
@@ -1925,6 +1942,9 @@ function OneToManyInner({
                 !detailRecord && {
                   onRowClick,
                 })}
+              {...(isRootTreeGrid && {
+                onBeforeColumnResize: collapseAllRows,
+              })}
               {...(isSubTreeGrid && {
                 headerRowRenderer: HideGridHeaderRow,
                 allowColumnCustomize: false,
@@ -1981,14 +2001,10 @@ const GridHeaderCell = forwardRef(function GridHeaderCell(
   );
 });
 
-const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
-  props: GridHeaderCellProps,
-  ref: GridHeaderCellRef,
-) {
+function useTreeGridToggleCollapseHandler() {
   const { items: itemsAtom, expand: expandAtom } = useCollectionTree();
 
-  const expandAll = useAtomValue(expandAtom);
-  const handleClick = useAtomCallback(
+  return useAtomCallback(
     useCallback(
       (get, set, expanded: boolean) => {
         const items = get(itemsAtom).map((item) =>
@@ -2005,13 +2021,23 @@ const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
       [expandAtom, itemsAtom],
     ),
   );
+}
+
+const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
+  props: GridHeaderCellProps,
+  ref: GridHeaderCellRef,
+) {
+  const { expand: expandAtom } = useCollectionTree();
+
+  const expandAll = useAtomValue(expandAtom);
+  const handleToggle = useTreeGridToggleCollapseHandler();
 
   return (
     <GridHeaderCell
       ref={ref}
       {...props}
       title={expandAll ? i18n.get("Collapse All") : i18n.get("Expand All")}
-      onClick={() => handleClick(!expandAll)}
+      onClick={() => handleToggle(!expandAll)}
     >
       <ExpandIcon expand={expandAll} children={false} />
     </GridHeaderCell>
