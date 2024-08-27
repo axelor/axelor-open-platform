@@ -44,6 +44,7 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
+import { ExpandIcon } from "@/views/grid/builder/expandable";
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
@@ -69,6 +70,10 @@ export function Grid(props: ViewProps<GridView>) {
   }
   return <GridInner {...props} />;
 }
+
+const GridViewExpandIcon: GridProps["rowDetailsExpandIcon"] = (props) => {
+  return <ExpandIcon {...props} children={false} />;
+};
 
 function GridInner(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom } = props;
@@ -1111,7 +1116,10 @@ function GridInner(props: ViewProps<GridView>) {
                 ? false
                 : editable
             }
-            expandable={view.widget === "expandable"}
+            {...(view.widget === "expandable" && {
+              expandable: true,
+              rowDetailsExpandIcon: GridViewExpandIcon,
+            })}
             expandableView={view.summaryView ?? formViewName}
             showEditIcon={canEdit}
             searchOptions={searchOptions}
