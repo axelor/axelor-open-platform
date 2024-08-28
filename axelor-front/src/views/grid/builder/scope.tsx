@@ -33,13 +33,16 @@ export function useGridContext() {
   return useContext(GridContext);
 }
 
+export type GridExpandableEvents = Record<string, Record<number, boolean>>;
 export type GridExpandableHandler = {
   selectAtom: PrimitiveAtom<Record<string, any>>;
+  eventsAtom: PrimitiveAtom<GridExpandableEvents>;
   level?: number;
 };
 
 export const GridExpandableContext = createContext<GridExpandableHandler>({
   level: 0,
+  eventsAtom: atom({}),
   selectAtom: atom({}),
 });
 

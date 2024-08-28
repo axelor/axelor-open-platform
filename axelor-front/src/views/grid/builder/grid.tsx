@@ -130,6 +130,7 @@ export const Grid = forwardRef<
     onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onNew?: (record: GridRow["record"]) => any;
+    onAddSubLine?: (parent: DataRecord) => any;
     onEdit?: (record: GridRow["record"]) => any;
     onDelete?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
@@ -161,6 +162,7 @@ export const Grid = forwardRef<
     onFormInit,
     onSearch,
     onNew,
+    onAddSubLine,
     onEdit,
     onDelete,
     onUpdate,
@@ -536,10 +538,11 @@ export const Grid = forwardRef<
         {...props}
         view={formView}
         fields={fields}
+        onAddSubLine={onAddSubLine}
         onInit={onFormInit}
       />
     );
-  }, [onFormInit, view, columns, fields]);
+  }, [onFormInit, onAddSubLine, view, columns, fields]);
 
   const detailsProps = useMemo(
     () => ({

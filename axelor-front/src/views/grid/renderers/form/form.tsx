@@ -54,6 +54,7 @@ import styles from "./form.module.scss";
 export interface GridFormRendererProps extends GridRowProps {
   view: FormView;
   fields?: MetaData["fields"];
+  onAddSubLine?: (parent: DataRecord) => void;
   onInit?: () => void;
 }
 
@@ -276,6 +277,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onCellClick,
       onExpand,
       onInit,
+      onAddSubLine,
       onSave,
       onCancel,
     } = props;
@@ -439,22 +441,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       ),
     );
 
-    const handleKeyDown = useCallback(
-      function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-        if (e.defaultPrevented && e.detail !== 1) return;
-        if (e.key === `Escape`) {
-          return handleCancel?.(findColumnIndexByNode(e.target as HTMLElement));
-        }
-        if (e.key === `Enter`) {
-          return handleSave?.(
-            expand ? true : undefined,
-            findColumnIndexByNode(e.target as HTMLElement),
-          );
-        }
-      },
-      [expand, handleSave, handleCancel],
-    );
-
     const handleRecordCommit = useAtomCallback(
       useCallback(
         (get, set) => {
@@ -486,6 +472,28 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       await handleRecordCommit();
       onExpand?.(gridRow, !gridRow.expand);
     }, [gridRow, onExpand, handleRecordCommit]);
+
+    const handleKeyDown = useCallback(
+      function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+        if (e.defaultPrevented && e.detail !== 1) return;
+        if (e.key === `Escape`) {
+          return handleCancel?.(findColumnIndexByNode(e.target as HTMLElement));
+        }
+        if (e.key === `Enter`) {
+          const shouldAddSubLine = e.ctrlKey && onAddSubLine;
+          return handleSave?.(
+            expand || shouldAddSubLine ? true : undefined,
+            findColumnIndexByNode(e.target as HTMLElement),
+          ).then(async () => {
+            if (shouldAddSubLine) {
+              !expand && (await handleExpand());
+              onAddSubLine(record);
+            }
+          });
+        }
+      },
+      [expand, record, onAddSubLine, handleExpand, handleSave, handleCancel],
+    );
 
     const handleClickOutside = useCallback(
       (e: Event) => {

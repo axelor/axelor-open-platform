@@ -61,6 +61,7 @@ import { ExpandIcon } from "@/views/grid/builder/expandable";
 import {
   CollectionTree,
   GridExpandableContext,
+  GridExpandableEvents,
   useCollectionTree,
   useGridColumnNames,
   useGridExpandableContext,
@@ -90,6 +91,8 @@ import { DetailsForm } from "./one-to-many.details";
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
+
+const NEW_SUBLINE = "add:new:subline";
 
 function equals(v1: DataRecord, v2: DataRecord) {
   const _version = v1.version ?? v1.$version;
@@ -296,11 +299,17 @@ function OneToManyInner({
   const gridRef = useRef<GridHandler>(null);
   const saveIdRef = useRef<number | null>();
 
+  const eventsAtom = useMemo(() => atom<GridExpandableEvents>({}), []);
+
+  const setEvents = useSetAtom(eventsAtom);
   const [records, setRecords] = useState<DataRecord[]>([]);
   const [detailRecord, setDetailRecord] = useState<DataRecord | null>(null);
   const [, forceUpdate] = useReducer(() => ({}), {});
 
-  const { level: expandLevel = 0 } = useGridExpandableContext();
+  const { level: expandLevel = 0, eventsAtom: parentEventsAtom } =
+    useGridExpandableContext();
+  const [initRecords, setInitRecords] = useState(false);
+
   const {
     items: itemsAtom,
     expand: expandAtom,
@@ -506,6 +515,16 @@ function OneToManyInner({
   );
   const parentModel = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
+  );
+
+  const shouldAddSubLine = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(parentEventsAtom, (e) =>
+          Boolean(e[NEW_SUBLINE]?.[parentId!]),
+        ),
+      [parentEventsAtom, parentId],
+    ),
   );
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
@@ -852,6 +871,7 @@ function OneToManyInner({
             .filter((rec) => rec) as DataRecord[];
         });
 
+        setInitRecords(true);
         return {
           page,
           records,
@@ -1651,6 +1671,19 @@ function OneToManyInner({
     ),
   );
 
+  const onAddSubLine = useCallback(
+    (parent: DataRecord) => {
+      setEvents((draft) => ({
+        ...draft,
+        [NEW_SUBLINE]: {
+          ...draft[NEW_SUBLINE],
+          [parent.id!]: true,
+        },
+      }));
+    },
+    [setEvents],
+  );
+
   useEffect(() => {
     if (recordsSyncRef.current) {
       recordsSyncRef.current = false;
@@ -1737,9 +1770,38 @@ function OneToManyInner({
     setSelectFields((state: any) => ({ ...state, ...fieldsSelect }));
   }, [setSelectFields, gridViewData?.items]);
 
+  const addNewSubLine = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const events = get(parentEventsAtom);
+        if (!events[NEW_SUBLINE]) return;
+
+        set(parentEventsAtom, {
+          ...events,
+          [NEW_SUBLINE]: {
+            ...events[NEW_SUBLINE],
+            [parentId!]: false,
+          },
+        });
+        await handleAddInGrid();
+      },
+      [parentEventsAtom, parentId, handleAddInGrid],
+    ),
+  );
+
+  useAsyncEffect(async () => {
+    if (initRecords && shouldAddSubLine) {
+      addNewSubLine();
+    }
+  }, [initRecords, shouldAddSubLine, addNewSubLine]);
+
   const expandableContext = useMemo(
-    () => ({ selectAtom: selectFieldsAtom, level: expandLevel + 1 }),
-    [expandLevel, selectFieldsAtom],
+    () => ({
+      selectAtom: selectFieldsAtom,
+      eventsAtom,
+      level: expandLevel + 1,
+    }),
+    [expandLevel, eventsAtom, selectFieldsAtom],
   );
 
   const expandableView = useMemo(() => {
@@ -1939,6 +2001,10 @@ function OneToManyInner({
               {...(canNew && {
                 onNew: editableAndCanEdit ? handleAddInGrid : onAdd,
               })}
+              {...(isTreeGrid &&
+                canNew && {
+                  onAddSubLine,
+                })}
               {...(canDelete && {
                 onDelete: onDelete,
               })}
