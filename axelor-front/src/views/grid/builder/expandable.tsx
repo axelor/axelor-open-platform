@@ -37,7 +37,11 @@ import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
 import { useViewConfirmDirty, useViewTab } from "@/view-containers/views/scope";
-import { useGridExpandableContext, useGridContext, useCollectionTree } from "./scope";
+import {
+  useGridExpandableContext,
+  useGridContext,
+  useCollectionTree,
+} from "./scope";
 import formStyles from "@/views/form/form.module.scss";
 import styles from "./expandable.module.scss";
 
@@ -58,7 +62,7 @@ export function ExpandIcon({
       })}
     >
       <MaterialIcon
-        icon={children === false ? "keyboard_arrow_down" : "keyboard_double_arrow_down"}
+        icon={children ? "keyboard_double_arrow_down" : "keyboard_arrow_down"}
       />
     </Box>
   );

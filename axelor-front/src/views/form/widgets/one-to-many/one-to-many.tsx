@@ -1590,30 +1590,36 @@ function OneToManyInner({
             item.record.id === record.cid || item.record.id === record.id,
         );
 
-        const noChildren =
-          expandFieldList.length > 0 &&
-          expandFieldList.every((field) =>
+        if (isExpandable) {
+          return {
+            expand: expandAll || itemState?.expanded,
+          };
+        }
+
+        const children =
+          expandFieldList.length === 0 ||
+          expandFieldList.some((field) =>
             isNew
-              ? (record[field]?.length ?? 0) === 0
-              : record[field] !== undefined && record[field]?.length === 0,
+              ? (record[field]?.length ?? 0) > 0
+              : record[field] === undefined || record[field]?.length > 0,
           );
 
         if (isNew || itemState?.expanded === false)
           return {
             expand: Boolean(itemState?.expanded),
-            ...(noChildren && { children: false }),
+            children,
           };
 
-        if (noChildren) {
+        if (!children) {
           return {
             expand: itemState?.expanded,
             disable: readonly,
-            children: false,
           };
         }
 
         return {
           expand: expandAll || itemState?.expanded,
+          children,
         };
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1624,6 +1630,7 @@ function OneToManyInner({
         itemsAtom,
         expandFieldList,
         readonly,
+        isExpandable,
       ],
     ),
   );
@@ -2039,7 +2046,7 @@ const ExpandHeaderCell = forwardRef(function ExpandHeaderCell(
       title={expandAll ? i18n.get("Collapse All") : i18n.get("Expand All")}
       onClick={() => handleToggle(!expandAll)}
     >
-      <ExpandIcon expand={expandAll} children={false} />
+      <ExpandIcon expand={expandAll} />
     </GridHeaderCell>
   );
 });
