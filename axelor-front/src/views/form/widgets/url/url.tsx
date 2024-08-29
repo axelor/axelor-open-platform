@@ -8,40 +8,34 @@ import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { String } from "../string";
+import { isValidUrl } from "./utils";
 
 import styles from "./url.module.scss";
 
 export function Url(props: FieldProps<string>) {
   const { readonly, valueAtom } = props;
   const value = useAtomValue(valueAtom);
-  const [url, setUrl] = useState(value);
+  const [inputValue, setInputValue] = useState(value);
 
-  const isValidUrl = useMemo(() => {
-    try {
-      new URL(url ?? "");
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }, [url]);
+  const validUrl = useMemo(() => isValidUrl(inputValue), [inputValue]);
 
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
+    setInputValue(e.target.value);
   }, []);
 
   const handleOpenUrl = useCallback(() => {
-    window.open(url as string, "_blank", "noopener,noreferrer");
-  }, [url]);
+    window.open(inputValue as string, "_blank", "noopener,noreferrer");
+  }, [inputValue]);
 
   useEffect(() => {
-    setUrl(value);
+    setInputValue(value);
   }, [value]);
 
   if (readonly) {
     return (
       <FieldControl {...props}>
         {value && (
-          <TextLink href={value} className={styles.link}>
+          <TextLink href={validUrl ? value : undefined} className={styles.link}>
             {value}
           </TextLink>
         )}
@@ -56,7 +50,7 @@ export function Url(props: FieldProps<string>) {
       inputEndAdornment={
         <Button
           onClick={handleOpenUrl}
-          disabled={!isValidUrl}
+          disabled={!validUrl}
           title={i18n.get("Open URL")}
         >
           <BootstrapIcon icon="globe" />
