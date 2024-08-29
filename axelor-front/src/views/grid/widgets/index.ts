@@ -11,6 +11,7 @@ export * from "./image";
 export * from "./image-select";
 export * from "./multi-select";
 export * from "./many-to-one";
+export * from "./email";
 export * from "./phone";
 export * from "./progress";
 export * from "./rating";
