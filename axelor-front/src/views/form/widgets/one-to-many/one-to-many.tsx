@@ -37,7 +37,6 @@ import {
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
@@ -91,6 +90,12 @@ import { DetailsForm } from "./one-to-many.details";
 import styles from "./one-to-many.module.scss";
 
 const noop = () => {};
+
+function equals(v1: DataRecord, v2: DataRecord) {
+  const _version = v1.version ?? v1.$version;
+  const version = v2.version ?? v2.$version;
+  return v1.id === v2.id && _version === version;
+}
 
 /**
  * Update dotted values from nested values.
