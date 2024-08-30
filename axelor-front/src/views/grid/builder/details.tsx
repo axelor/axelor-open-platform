@@ -13,6 +13,7 @@ import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
 import { MetaScope } from "@/view-containers/views/scope";
+import { ToolbarActions } from "@/view-containers/view-toolbar";
 import {
   Layout,
   showErrors,
@@ -52,12 +53,14 @@ export function Details({
   onSave,
   onCancel,
 }: DetailsProps) {
+  const { view, perms } = meta;
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
-  const { hasButton } = usePerms(meta.view, meta.perms);
+
+  const { hasButton } = usePerms(view, perms);
   const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
 
-  const { onSave: onSaveAction } = meta.view;
+  const { toolbar, menubar, onSave: onSaveAction } = view;
   const isNew = (record?.id ?? -1) < 0;
   const attachmentItem = useFormAttachment(formAtom);
 
@@ -121,12 +124,12 @@ export function Details({
   );
 
   useAsyncEffect(async () => {
-    const { onLoad: _onLoad, onNew: _onNew } = meta.view;
+    const { onLoad: _onLoad, onNew: _onNew } = view;
     if (record) {
       const action = (record?.id ?? 0) > 0 ? _onLoad : _onNew;
       action && (await actionExecutor.execute(action));
     }
-  }, [record, meta.view, actionExecutor]);
+  }, [record, view, actionExecutor]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -135,6 +138,11 @@ export function Details({
   const canEdit = hasButton("edit");
 
   const handleRefresh = isNew ? onNew : onRefresh;
+
+  useEffect(() => {
+    actionHandler.setRefreshHandler(async () => handleRefresh?.());
+    actionHandler.setSaveHandler(handleSave);
+  }, [actionHandler, handleSave, handleRefresh]);
 
   useShortcuts({
     viewType: relatedViewType,
@@ -200,6 +208,15 @@ export function Details({
             ]}
             iconOnly
           />
+          <Box d="flex" className={styles.actions}>
+            {(toolbar || menubar) && (
+              <ToolbarActions
+                buttons={toolbar}
+                menus={menubar}
+                actionExecutor={actionExecutor}
+              />
+            )}
+          </Box>
           <Box
             flex={1}
             d="flex"

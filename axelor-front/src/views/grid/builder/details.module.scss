@@ -22,3 +22,8 @@
 .close {
   cursor: pointer;
 }
+
+.actions > div > div {
+  display: flex;
+  flex: 1;
+}
