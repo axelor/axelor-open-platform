@@ -1912,6 +1912,7 @@ function OneToManyInner({
               ref={gridRef}
               allowGrouping={allowGrouping}
               allowSorting={allowSorting}
+              allowRowDND={canMove}
               allowRowReorder={allowRowReorder}
               showEditIcon={canEdit || canView}
               {...(isTreeGrid && {
