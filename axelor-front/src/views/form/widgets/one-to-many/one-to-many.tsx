@@ -1653,7 +1653,9 @@ function OneToManyInner({
   const expandableView = useMemo(() => {
     if (isTreeGrid) {
       const treeField = schema.widgetAttrs?.treeField;
-      const treeFieldTitle = schema.widgetAttrs?.treeFieldTitle ?? schema.title;
+      const treeFieldTitle = i18n.get(
+        schema.widgetAttrs?.treeFieldTitle ?? schema.title,
+      );
       return {
         model,
         fields: {
