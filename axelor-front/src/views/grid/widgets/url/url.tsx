@@ -10,6 +10,11 @@ export function Url(props: GridColumnProps) {
   const validUrl = useMemo(() => isValidUrl(value), [value]);
 
   return value ? (
-    <TextLink href={validUrl ? value : undefined}>{value}</TextLink>
+    <TextLink
+      href={validUrl ? value : undefined}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {value}
+    </TextLink>
   ) : null;
 }
