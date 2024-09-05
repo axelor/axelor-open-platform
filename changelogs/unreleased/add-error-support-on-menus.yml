@@ -1,0 +1,5 @@
+---
+title: Add error support on menus response
+type: feature
+description: |
+  Beside notify and info response, this also add error response support on menus actions.

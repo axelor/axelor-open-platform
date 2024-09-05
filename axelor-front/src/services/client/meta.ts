@@ -1,5 +1,6 @@
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
+import { i18n } from "@/services/client/i18n.ts";
 
 import { RequestOptions, request } from "./client";
 import { Criteria, DataContext, DataRecord } from "./data.types";
@@ -32,6 +33,15 @@ export async function menus(type: MenuType): Promise<MenuItem[]> {
 }
 
 async function processActionResult(data: ActionResult) {
+  if (data.error) {
+    await dialogs.box({
+      title: data.error.title ?? i18n.get("Error"),
+      content: data.error.message,
+      yesTitle: data.error.confirmBtnTitle,
+      yesNo: false,
+    });
+  }
+  
   if (data.info) {
     await dialogs.box({
       title: data.info.title,
@@ -70,7 +80,7 @@ export async function actionView(
     const { status, data } = await resp.json();
     if (status === 0) {
       const [{ view }] = data || [{ view: null }];
-      !view && data?.map?.(processActionResult);
+      !view && !options?.silent && data?.map?.(processActionResult);
       return view ?? null;
     }
     return reject(options?.silent ? null : data);
