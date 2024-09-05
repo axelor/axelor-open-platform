@@ -106,7 +106,8 @@ public class I18nExtractor {
           "x-false-text",
           "data-description",
           "confirm-btn-title",
-          "cancel-btn-title");
+          "cancel-btn-title",
+          "x-tree-field-title");
 
   private static final Set<String> TEXT_NODES =
       Sets.newHashSet("option", "message", "static", "help");
