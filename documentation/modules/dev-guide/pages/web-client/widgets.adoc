@@ -595,7 +595,7 @@ image::widgets/tree-grid.png[]
 
 The following attributes are supported:
 
-* `x-tree-field`: used to define the nested o2m field.
+* `x-tree-field`: (optional) used to define the nested o2m field, defaults to panel-related/field name.
 * `x-tree-limit`: (optional) used to specify limit to support nested tree structure.
 * `x-tree-field-title`: (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
 * `x-expand-all`: (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`

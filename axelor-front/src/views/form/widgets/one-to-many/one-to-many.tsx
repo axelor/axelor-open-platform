@@ -322,10 +322,14 @@ function OneToManyInner({
     return isTreeGrid && (treeLimit ?? 0) > 0 && expandLevel >= treeLimit!;
   }, [isTreeGrid, widgetAttrs?.treeLimit, expandLevel]);
 
+  const treeField = isTreeGrid ? (widgetAttrs?.treeField ?? schema.name) : null;
+  const treeFieldTitle = isTreeGrid
+    ? i18n.get(schema.widgetAttrs?.treeFieldTitle ?? schema.title)
+    : null;
+
   const expandAll = useAtomValue(expandAtom);
   const expandFieldList = useMemo<string[]>(() => {
-    const expandAll =
-      (isTreeGrid && widgetAttrs?.treeField) || widgetAttrs?.expandAll;
+    const expandAll = treeField || widgetAttrs?.expandAll;
     if (isCollectionTree && expandAll) {
       const value = expandAll;
       if (!["true", "false"].includes(value?.toLowerCase())) {
@@ -333,12 +337,7 @@ function OneToManyInner({
       }
     }
     return [];
-  }, [
-    isCollectionTree,
-    isTreeGrid,
-    widgetAttrs?.treeField,
-    widgetAttrs?.expandAll,
-  ]);
+  }, [isCollectionTree, treeField, widgetAttrs?.expandAll]);
 
   const widgetState = useMemo(
     () =>
@@ -1745,10 +1744,6 @@ function OneToManyInner({
 
   const expandableView = useMemo(() => {
     if (isTreeGrid) {
-      const treeField = schema.widgetAttrs?.treeField;
-      const treeFieldTitle = i18n.get(
-        schema.widgetAttrs?.treeFieldTitle ?? schema.title,
-      );
       return {
         model,
         fields: {
@@ -1777,7 +1772,15 @@ function OneToManyInner({
       } as ViewData<FormView>;
     }
     return summaryView ?? formView;
-  }, [schema, model, summaryView, formView, isTreeGrid]);
+  }, [
+    schema,
+    model,
+    summaryView,
+    formView,
+    isTreeGrid,
+    treeFieldTitle,
+    treeField,
+  ]);
 
   return (
     <>
