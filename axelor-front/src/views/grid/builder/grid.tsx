@@ -279,8 +279,9 @@ export const Grid = forwardRef<
         columnProps.$css = clsx(styles["multi-line-text"]);
       }
 
-      if (extraAttrs?.hidden ?? item.hidden) {
-        columnProps.visible = false;
+      const hidden = extraAttrs?.hidden ?? item.hidden;
+      if (hidden !== undefined) {
+        columnProps.visible = !hidden;
       }
 
       const { contextField, contextFieldValue } = item as Record<string, any>;
