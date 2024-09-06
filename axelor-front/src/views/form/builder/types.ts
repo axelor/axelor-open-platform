@@ -47,6 +47,7 @@ export type WidgetErrors = {
   min?: string;
   max?: string;
   pattern?: string;
+  errors?: string[]; // for custom fields
 };
 
 export interface WidgetState {

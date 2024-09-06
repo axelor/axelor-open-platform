@@ -31,13 +31,14 @@ import { createFormAtom, formDirtyUpdater } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { useAfterActions, useFormScope } from "./scope";
+import { useAfterActions, useFormReady, useFormScope } from "./scope";
 import {
   FieldProps,
   FormLayout,
   FormState,
   ValueAtom,
   WidgetAtom,
+  WidgetErrors,
   WidgetState,
 } from "./types";
 import {
@@ -467,7 +468,7 @@ function useItemsFamily({
         if (items.length === 1 && isInitial(items[0]) && isClean(items[0])) {
           return;
         }
-        const next = multiple ? items : items[0] ?? null;
+        const next = multiple ? items : (items[0] ?? null);
         set(valueAtom, next, fireOnChange, markDirty);
         setInitialItem(undefined);
       },
@@ -751,10 +752,16 @@ const ItemEditor = memo(function ItemEditor({
 
 const setInvalidAtom = atom(
   null,
-  (get, set, widgetAtom: WidgetAtom, invalid: boolean) => {
+  (
+    get,
+    set,
+    widgetAtom: WidgetAtom,
+    invalid: boolean,
+    widgetErrors?: WidgetErrors | null,
+  ) => {
     const state = get(widgetAtom);
     const errors = invalid
-      ? {
+      ? widgetErrors || {
           invalid: i18n.get("{0} is invalid", state.attrs.title),
         }
       : {};
@@ -837,7 +844,11 @@ const RecordEditor = memo(function RecordEditor({
 }: FormEditorProps & {
   model: string;
   layout?: FormLayout;
-  setInvalid: (value: DataRecord, invalid: boolean) => void;
+  setInvalid: (
+    value: DataRecord,
+    invalid: boolean,
+    errors?: string[],
+  ) => void;
 }) {
   const meta: ViewData<FormView> = useMemo(
     () => ({
@@ -1006,9 +1017,20 @@ const RecordEditor = memo(function RecordEditor({
     useCallback(
       (get) => {
         const value = get(valueAtom);
-        setInvalid(value, invalid);
+        let errors;
+
+        if (invalid && editor.json) {
+          const state = get(editorAtom);
+          errors = getErrors(state)?.reduce(
+            (errorList, error) =>
+              errorList.concat(Object.values(error) as string[]),
+            [] as string[],
+          );
+        }
+
+        setInvalid(value, invalid, errors);
       },
-      [invalid, setInvalid, valueAtom],
+      [invalid, setInvalid, editorAtom, editor.json, getErrors, valueAtom],
     ),
   );
 
@@ -1090,6 +1112,8 @@ function JsonEditor({
   valueAtom,
   readonly,
 }: FormEditorProps) {
+  const formReady = useFormReady();
+
   const modelAtom = useMemo(
     () => selectAtom(formAtom, (x) => x.model),
     [formAtom],
@@ -1164,10 +1188,12 @@ function JsonEditor({
 
   const setInvalid = useSetAtom(setInvalidAtom);
   const handleInvalid = useCallback(
-    (value: DataRecord, invalid: boolean) => {
-      setInvalid(widgetAtom, invalid);
+    (value: DataRecord, invalid: boolean, errors?: string[]) => {
+      if (formReady) {
+        setInvalid(widgetAtom, invalid, errors?.length ? { errors } : null);
+      }
     },
-    [setInvalid, widgetAtom],
+    [setInvalid, widgetAtom, formReady],
   );
 
   return (
