@@ -96,7 +96,13 @@ export const fetchRecord = async (
 };
 
 export const showErrors = (errors: WidgetErrors[]) => {
-  const titles = uniq(Object.values(errors).flatMap((e) => Object.values(e)));
+  const titles = uniq(
+    Object.values(errors).flatMap((e) =>
+      Object.values(e)
+        .filter(Boolean)
+        .flatMap((v) => (typeof v === "object" ? Object.values(v) : v)),
+    ),
+  );
   titles.length &&
     alerts.error({
       message: (

@@ -20,14 +20,13 @@ import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
 import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
-import { alerts } from "@/components/alerts";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
-import { useGetErrors, useHandleFocus } from "@/views/form";
+import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
 import {
   FormAtom,
   Form as FormComponent,
@@ -62,19 +61,6 @@ type LayoutProps = Omit<WidgetProps, "widgetAtom"> &
     onSave?: () => void;
     onCancel?: () => void;
   };
-
-const showErrors = (errors: WidgetErrors[]) => {
-  const titles = Object.values(errors).flatMap((e) => Object.values(e));
-  alerts.error({
-    message: (
-      <ul>
-        {titles.map((title, i) => (
-          <li key={i}>{title}</li>
-        ))}
-      </ul>
-    ),
-  });
-};
 
 const findColumnIndexByNode = (ele: HTMLElement) => {
   function getParent(ele: HTMLElement): string {
