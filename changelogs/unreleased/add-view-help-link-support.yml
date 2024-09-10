@@ -1,0 +1,8 @@
+---
+title: Add views help link support
+type: feature
+description: |
+  Add view help link support (based on `helpLink` attribute). This feature was present 
+  on former version, but wasn't added during React migration.
+  
+  The help link button is now placed on end right side of the toolbar.

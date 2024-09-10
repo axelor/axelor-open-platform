@@ -301,7 +301,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     } = {},
   } = props;
   const { view } = meta;
-  const { toolbar, menubar } = view;
+  const { toolbar, menubar, helpLink } = view;
   const pageActions = onPrev || onNext || paginationActions;
 
   const showConfirmDirty = useViewConfirmDirty();
@@ -498,6 +498,18 @@ export function ViewToolBar(props: ViewToolBarProps) {
       )}
       {sessionInfo?.user?.technical && (
         <CommandBar items={farItems} className={styles.farItems} />
+      )}
+      {Boolean(helpLink) && (
+        <CommandBar items={[
+          {
+            key: "helpLink",
+            description: i18n.get("Show help"),
+            iconProps: {
+              icon: "help",
+            },
+            onClick: () => window.open(helpLink, "_blank", "noopener,noreferrer"),
+          },
+        ]} className={styles.helpLink} />
       )}
     </Box>
   );
