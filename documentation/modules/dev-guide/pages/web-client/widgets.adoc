@@ -599,6 +599,7 @@ The following attributes are supported:
 * `x-tree-limit`: (optional) used to specify limit to support nested tree structure.
 * `x-tree-field-title`: (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
 * `x-expand-all`: (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`
+* `summary-view`: (optional) used to define the extended form view, which will be displayed along with sub-lines view.
 
 NOTE: Only `onChange` action on root collection is performed. Actions defined on sub-items are not supported.
 

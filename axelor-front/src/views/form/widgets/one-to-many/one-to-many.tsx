@@ -69,6 +69,7 @@ import {
 } from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 import { equals } from "@/services/client/data-utils";
+import { findViewItem } from "@/utils/schema";
 
 import {
   Attrs,
@@ -511,15 +512,16 @@ function OneToManyInner({
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
 
-  const shouldAddSubLine = useAtomValue(
-    useMemo(
-      () =>
-        selectAtom(parentEventsAtom, (e) =>
-          Boolean(e[NEW_SUBLINE]?.[parentId!]),
-        ),
-      [parentEventsAtom, parentId],
-    ),
-  );
+  const shouldAddSubLine =
+    useAtomValue(
+      useMemo(
+        () =>
+          selectAtom(parentEventsAtom, (e) =>
+            Boolean(e[NEW_SUBLINE]?.[parentId!]),
+          ),
+        [parentEventsAtom, parentId],
+      ),
+    ) && isSubTreeGrid;
 
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
   const { title, domain } = attrs;
@@ -1836,11 +1838,31 @@ function OneToManyInner({
     [expandLevel, eventsAtom, selectFieldsAtom],
   );
 
+  const { data: expandableSummaryMeta } = useAsync(async () => {
+    if (!isTreeGrid || !summaryView) return null;
+    return await findView<FormView>({
+      type: "form",
+      name: summaryView,
+      model,
+    });
+  }, [isTreeGrid, summaryView, model]);
+
   const expandableView = useMemo(() => {
     if (isTreeGrid) {
+      const summaryFields = expandableSummaryMeta?.fields ?? {};
+      // only considered defined fields of view for tree grid
+      const subFields = Object.keys(summaryFields).reduce(
+        (_fields, fieldName) =>
+          expandableSummaryMeta &&
+          findViewItem(expandableSummaryMeta, fieldName)
+            ? { ..._fields, [fieldName]: summaryFields[fieldName] }
+            : _fields,
+        {},
+      );
       return {
         model,
         fields: {
+          ...subFields,
           [treeField]: {
             ...pick(schema, ["target", "targetName"]),
             type: schema.serverType,
@@ -1860,6 +1882,9 @@ function OneToManyInner({
               uid: uniqueId("w"),
               name: treeField,
             },
+            ...(expandableSummaryMeta?.view?.items ?? []).filter(
+              (item) => item.name !== "$wkfStatus", // skip wkf status
+            ),
           ],
           width: "*",
         },
@@ -1867,6 +1892,7 @@ function OneToManyInner({
     }
     return summaryView ?? formView;
   }, [
+    expandableSummaryMeta,
     schema,
     model,
     summaryView,

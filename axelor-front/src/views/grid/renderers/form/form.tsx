@@ -315,6 +315,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { add: addEditableWidget } = useFormEditableScope();
     const { enabled: isCollectionTree } = useCollectionTree();
     const { setCommit } = useCollectionTreeEditable();
+    const isTreeGrid =
+      isCollectionTree && (view as Schema).widget === "tree-grid";
 
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
@@ -414,7 +416,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
             {
               ...formState.record,
               _dirty: formState.dirty,
-              ...(isCollectionTree && {
+              ...(isTreeGrid && {
                 ...(isLastRow &&
                   !saveFromEdit && {
                     selected: false,
@@ -441,7 +443,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           onSave,
           rowIndex,
           cellIndex,
-          isCollectionTree,
+          isTreeGrid,
         ],
       ),
     );
