@@ -447,7 +447,10 @@ function useActionAttrs({
 
               const isFormField = updateFormState.fields[jsonItem?.name ?? ""];
               const isOwnJsonField =
-                isJsonScope && formState.fields[jsonItem?.name ?? ""];
+                isJsonScope &&
+                updateFormState.meta?.jsonFields?.[jsonItem?.jsonField ?? ""]?.[
+                  jsonItem?.name ?? ""
+                ];
 
               if (
                 !isFormField &&
@@ -659,7 +662,10 @@ function useActionRecord({
                 if (field?.jsonField && !key.startsWith(field.jsonField)) {
                   if (
                     field.jsonField === "attrs" || // only support attrs field to be set without prefix
-                    (isJsonScope && formState.fields[key]) // allow setting without prefix in json scope
+                    (isJsonScope &&
+                      updateFormState.meta?.jsonFields?.[field.jsonField]?.[
+                        key
+                      ]) // allow setting without prefix in json scope
                   ) {
                     return `${field.jsonField}.${key}`;
                   }
