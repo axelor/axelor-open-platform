@@ -1460,9 +1460,7 @@ function OneToManyInner({
   const onDuplicate = useCallback(async () => {
     if (selected?.id) {
       const isNew = selected.id < 0;
-      let rec = isNew
-        ? { ...selected }
-        : await dataStore.copy(selected.id);
+      let rec = isNew ? { ...selected } : await dataStore.copy(selected.id);
 
       if (onCopyAction) {
         const result = await actionExecutor.execute(onCopyAction, {
@@ -1652,7 +1650,9 @@ function OneToManyInner({
 
         if (isExpandable) {
           return {
-            expand: expandAll || itemState?.expanded,
+            expand: expandAll
+              ? itemState?.expanded !== false
+              : itemState?.expanded,
           };
         }
 
