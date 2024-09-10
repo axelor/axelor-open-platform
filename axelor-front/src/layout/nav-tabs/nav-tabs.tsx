@@ -47,6 +47,7 @@ export function useNavTabsSize() {
 
 export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const { active, items: tabs, popups, open, close } = useTabs();
+  const { data: sessionInfo } = useSession();
   const value = active?.id;
 
   const [menuTarget, setMenuTarget] = useState<HTMLElement | null>(null);
@@ -63,11 +64,19 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
     [setTabContainerSize, containerSize],
   );
 
+  const isHomeAction = useCallback(
+    (tabName: string | undefined) => {
+      const userAction = sessionInfo?.user?.action;
+      return !!userAction && tabName === userAction;
+    },
+    [sessionInfo],
+  );
+
   const doClose = useAtomCallback(
     useCallback(
       (get, set, tab: string) => {
         const found = tabs.find((x) => x.id === tab);
-        if (found) {
+        if (found && !isHomeAction(found.id)) {
           const {
             state,
             action: { params },
@@ -80,7 +89,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         }
         return Promise.resolve(true);
       },
-      [close, tabs],
+      [close, isHomeAction, tabs],
     ),
   );
 
@@ -216,15 +225,19 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           {i18n.get("Refresh")}
         </AxMenuItem>
         <AxMenuDivider />
-        <AxMenuItem data-action="close" onClick={handleContextClick}>
-          {i18n.get("Close")}
-        </AxMenuItem>
+        {!isHomeAction(value) && (
+          <AxMenuItem data-action="close" onClick={handleContextClick}>
+            {i18n.get("Close")}
+          </AxMenuItem>
+        )}
         <AxMenuItem data-action="close-others" onClick={handleContextClick}>
           {i18n.get("Close Others")}
         </AxMenuItem>
-        <AxMenuItem data-action="close-all" onClick={handleContextClick}>
-          {i18n.get("Close All")}
-        </AxMenuItem>
+        {!isHomeAction(value) && (
+          <AxMenuItem data-action="close-all" onClick={handleContextClick}>
+            {i18n.get("Close All")}
+          </AxMenuItem>
+        )}
       </AxMenu>
     </div>
   );
