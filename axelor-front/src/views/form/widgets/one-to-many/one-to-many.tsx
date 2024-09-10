@@ -1536,9 +1536,8 @@ function OneToManyInner({
           );
         }
       }
-      updateViewDirty();
     },
-    [isCollectionTree, updateViewDirty],
+    [isCollectionTree],
   );
 
   const hasActions = showBars && (toolbar?.length || menubar?.length);
