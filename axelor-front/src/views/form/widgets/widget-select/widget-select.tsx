@@ -36,6 +36,7 @@ const NAMES = [
   "SingleSelect",
   "Stepper",
   "SuggestBox",
+  "SwitchSelect",
   "TagSelect",
   "Text",
   "Toggle",

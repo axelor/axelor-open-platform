@@ -1,0 +1,60 @@
+$borderThickness: 2px;
+$borderRadius: 0.5rem;
+$animationDuration: 300ms;
+
+.item {
+  position: relative;
+  cursor: pointer;
+  border-top: $borderThickness solid var(--bs-border-color);
+  border-bottom: $borderThickness solid var(--bs-border-color);
+  padding-top: $paddingVertical;
+  padding-bottom: $paddingVertical;
+
+  &.first {
+    border-top-left-radius: $borderRadius;
+    border-bottom-left-radius: $borderRadius;
+    border-left: $borderThickness solid var(--bs-border-color);
+  }
+
+  &.last {
+    border-top-right-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
+    border-right: $borderThickness solid var(--bs-border-color);
+  }
+
+  &.active {
+    color: var(--bs-primary);
+  }
+
+  &.readonly {
+    cursor: default;
+  }
+
+  &:not(.first)::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    background-color: var(--bs-border-color);
+    width: 1px;
+    height: 1.5rem;
+    transition: opacity 0s;
+  }
+
+  &.active::before,
+  &.active + *::before {
+    opacity: 0;
+    transition-delay: $animationDuration;
+  }
+
+  &:not(.readonly):hover {
+    color: var(--bs-primary);
+  }
+}
+
+.activeBorder {
+  z-index: 1;
+  position: absolute;
+  border-radius: $borderRadius;
+  border: $borderThickness solid var(--bs-primary);
+  transition: all $animationDuration ease;
+}

@@ -59,6 +59,7 @@ export * from "./static";
 export * from "./stepper";
 export * from "./string";
 export * from "./suggest-box";
+export * from "./switch-select";
 export * from "./tag-select";
 export * from "./text";
 export * from "./theme-select";

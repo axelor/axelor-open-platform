@@ -756,6 +756,24 @@ The `NavSelect` widget is a breadcrumb like widget and can be used with selectio
 
 image::widgets/nav-select.png[]
 
+== SwitchSelect
+
+The `SwitchSelect` widget works on `selection`, `enum` and `many-to-one` fields. It is used to pick a choice from a multiple-choice list.
+
+[source,xml]
+----
+<field name="status" widget="SwitchSelect" />
+<field name="businessSector" widget="SwitchSelect" />
+<field name="businessSector" widget="SwitchSelect" x-labels="false" />
+----
+
+image::widgets/switch-select.png[]
+image::widgets/switch-select-2.png[]
+
+The following attribute is supported:
+
+* `x-labels`: Whether to display labels. Default to `true`.
+
 == Stepper
 
 The `Stepper` widget works on `selection`, `enum` and `many-to-one` fields. It is used to indicate progress
