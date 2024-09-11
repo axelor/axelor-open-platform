@@ -227,6 +227,7 @@ export const Grid = forwardRef<
       let widget;
       if (item.type === "field") {
         widget = getWidget(item, field);
+        columnProps.help = item.help;
       }
 
       if (view.sortable === false) {
