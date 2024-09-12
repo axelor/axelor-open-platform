@@ -136,7 +136,7 @@ export function ForgotPassword() {
           {
             <Box as="form" w={100} onSubmit={handleSubmit}>
               {alertMessage ? (
-                <Alert mt={3} mb={1} p={2} variant="info">
+                <Alert mb={1} p={2} variant="info">
                   {alertMessage}
                 </Alert>
               ) : (

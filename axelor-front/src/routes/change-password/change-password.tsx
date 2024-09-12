@@ -281,7 +281,6 @@ export function ChangePassword({
 
             {errorMessage && (
               <Alert
-                mt={3}
                 mb={1}
                 p={2}
                 variant="danger"
