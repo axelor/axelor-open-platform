@@ -39,18 +39,21 @@ export function ChangePassword({
   const { route, ...locationState } = location.state ?? {};
   const {
     username,
-    password,
     error,
     passwordPattern = propsPasswordPattern,
     passwordPatternTitle = propsPasswordPatternTitle,
   } = route ?? {};
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [_errorMessage, setErrorMessage] = useState(error);
   const errorMessage = propsErrorMessage || _errorMessage;
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const requireCurrentPassword = Boolean(username);
 
   const { logo: appLogo = logo, name: appName = "Axelor" } =
     appInfo?.application || {};
@@ -79,7 +82,7 @@ export function ChangePassword({
 
       try {
         const info = await session.login(
-          { username, password, newPassword },
+          { username, password: currentPassword, newPassword },
           { params },
         );
 
@@ -97,7 +100,7 @@ export function ChangePassword({
             navigate(path, {
               state: {
                 ...locationState,
-                route: { ...state, username, password, newPassword },
+                route: { ...state, username },
               },
             });
             return;
@@ -123,7 +126,7 @@ export function ChangePassword({
       defaultClient,
       session,
       username,
-      password,
+      currentPassword,
       newPassword,
       navigate,
       locationState,
@@ -140,7 +143,7 @@ export function ChangePassword({
     (value: string) => {
       let validity = "";
       if (value) {
-        if (value === password) {
+        if (requireCurrentPassword && value === currentPassword) {
           validity = i18n.get("New password must be different.");
         } else if (!passwordPatternExp.test(value)) {
           validity = passwordPatternTitle;
@@ -148,7 +151,12 @@ export function ChangePassword({
       }
       return validity;
     },
-    [password, passwordPatternExp, passwordPatternTitle],
+    [
+      currentPassword,
+      passwordPatternExp,
+      passwordPatternTitle,
+      requireCurrentPassword,
+    ],
   );
 
   const newPasswordValidity = useMemo(() => {
@@ -168,6 +176,7 @@ export function ChangePassword({
     return getConfirmPasswordValidity(confirmPassword);
   }, [getConfirmPasswordValidity, confirmPassword]);
 
+  const currentPasswordInputRef = useRef<HTMLInputElement>(null);
   const newPasswordInputRef = useRef<HTMLInputElement>(null);
   const confirmPasswordInputRef = useRef<HTMLInputElement>(null);
 
@@ -211,6 +220,39 @@ export function ChangePassword({
             onSubmit={handleSubmit}
             onInput={() => setErrorMessage("")}
           >
+            {requireCurrentPassword && (
+              <Box className={styles.inputContainer}>
+                <InputLabel htmlFor="password">
+                  {i18n.get("Current password")}
+                </InputLabel>
+                <AdornedInput
+                  ref={currentPasswordInputRef}
+                  id="password"
+                  name="password"
+                  type={showCurrentPassword ? "text" : "password"}
+                  autoFocus
+                  mb={3}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  spellCheck="false"
+                  endAdornment={
+                    <Button
+                      as="span"
+                      onClick={() => setShowCurrentPassword((value) => !value)}
+                      title={
+                        showPassword
+                          ? i18n.get("Hide password")
+                          : i18n.get("Show password")
+                      }
+                    >
+                      <BootstrapIcon
+                        icon={showPassword ? "eye-slash" : "eye"}
+                      />
+                    </Button>
+                  }
+                />
+              </Box>
+            )}
             <Box className={styles.inputContainer}>
               <InputLabel htmlFor="newPassword">
                 {i18n.get("New password")}
@@ -220,7 +262,7 @@ export function ChangePassword({
                 id="newPassword"
                 name="newPassword"
                 type={showPassword ? "text" : "password"}
-                autoFocus
+                autoFocus={!requireCurrentPassword}
                 mb={3}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -280,12 +322,7 @@ export function ChangePassword({
             </Box>
 
             {errorMessage && (
-              <Alert
-                mb={1}
-                p={2}
-                variant="danger"
-                className={styles.error}
-              >
+              <Alert mb={1} p={2} variant="danger" className={styles.error}>
                 {errorMessage}
               </Alert>
             )}
@@ -295,7 +332,11 @@ export function ChangePassword({
               variant="primary"
               mt={3}
               w={100}
-              disabled={Boolean(!newPassword || !confirmPassword)}
+              disabled={
+                (requireCurrentPassword && !currentPassword) ||
+                !newPassword ||
+                !confirmPassword
+              }
             >
               {i18n.get("Change password")}
             </Button>
