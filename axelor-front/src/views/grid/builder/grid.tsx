@@ -539,11 +539,12 @@ export const Grid = forwardRef<
         {...props}
         view={formView}
         fields={fields}
+        isLastRow={(state?.rows?.length ?? 0) - 1 === props.index}
         onAddSubLine={onAddSubLine}
         onInit={onFormInit}
       />
     );
-  }, [onFormInit, onAddSubLine, view, columns, fields]);
+  }, [onFormInit, onAddSubLine, view, state?.rows.length, columns, fields]);
 
   const detailsProps = useMemo(
     () => ({

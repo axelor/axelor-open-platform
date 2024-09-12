@@ -53,6 +53,7 @@ import styles from "./form.module.scss";
 export interface GridFormRendererProps extends GridRowProps {
   view: FormView;
   fields?: MetaData["fields"];
+  isLastRow?: boolean;
   onAddSubLine?: (parent: DataRecord) => void;
   onInit?: () => void;
 }
@@ -260,6 +261,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       data: gridRow,
       index: rowIndex,
       editCell: cellIndex,
+      isLastRow,
       onCellClick,
       onExpand,
       onInit,
@@ -409,6 +411,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
               ...formState.record,
               _dirty: formState.dirty,
               ...(isCollectionTree && {
+                ...(isLastRow &&
+                  !saveFromEdit && {
+                    selected: false,
+                  }),
                 _changed: true,
                 _original: formState.original,
               }),
@@ -421,6 +427,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         },
         [
           expand,
+          isLastRow,
           actionExecutor,
           formAtom,
           record,
