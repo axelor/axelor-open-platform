@@ -68,6 +68,7 @@ import {
   useIsRootCollectionTree,
 } from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
+import { equals } from "@/services/client/data-utils";
 
 import {
   Attrs,
@@ -93,12 +94,6 @@ import styles from "./one-to-many.module.scss";
 const noop = () => {};
 
 const NEW_SUBLINE = "add:new:subline";
-
-function equals(v1: DataRecord, v2: DataRecord) {
-  const _version = v1.version ?? v1.$version;
-  const version = v2.version ?? v2.$version;
-  return v1.id === v2.id && _version === version;
-}
 
 /**
  * Update dotted values from nested values.
@@ -292,8 +287,6 @@ function OneToManyInner({
     perms,
   } = schema;
 
-  // use ref to avoid onSearch call
-  const shouldSearch = useRef(true);
   const selectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
   const recordsSyncRef = useRef(false);
@@ -431,7 +424,6 @@ function OneToManyInner({
             markDirty: boolean = true,
             resetRecords: boolean = false,
           ) => {
-            shouldSearch.current = false;
             const values = (
               typeof setter === "function"
                 ? setter(getItems(get(valueAtom)!))
@@ -464,7 +456,7 @@ function OneToManyInner({
 
             const result = await set(
               valueAtom,
-              values,
+              (valueRef.current = values),
               callOnChange,
               markDirty,
             );
@@ -502,7 +494,7 @@ function OneToManyInner({
                 }
                 draft.map(process);
               });
-              set(valueAtom, updatedValues, false, false);
+              set(valueAtom, (valueRef.current = updatedValues), false, false);
             }
           },
         ),
@@ -715,8 +707,7 @@ function OneToManyInner({
           selected: ids.includes(x.id!),
         }));
 
-        valueRef.current = next;
-        set(valueAtom, next, false, false);
+        set(valueAtom, (valueRef.current = next), false, false);
       },
       [getItems, valueAtom],
     ),
@@ -765,11 +756,6 @@ function OneToManyInner({
   const onSearch = useAtomCallback(
     useCallback(
       async (get, set, options?: SearchOptions) => {
-        // avoid search for internal value changes
-        if (!shouldSearch.current) {
-          shouldSearch.current = true;
-          return;
-        }
         const items = getItems(get(valueAtom));
         let names = options?.fields ?? dataStore.options.fields ?? columnNames;
 
@@ -931,9 +917,12 @@ function OneToManyInner({
   // between setting initial value and value change.
   useEffect(resetValue, [formRecordId, resetValue]);
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     const last = valueRef.current ?? [];
     const next = value ?? [];
+
+    // avoid searching for internal value changes
+    if (last === next) return;
 
     if (
       forceRefreshRef.current ||
@@ -989,8 +978,7 @@ function OneToManyInner({
             nextItems.map((x) => x[orderField]),
           )
         ) {
-          valueRef.current = nextItems;
-          set(valueAtom, nextItems);
+          set(valueAtom, (valueRef.current = nextItems));
           setRecords((prevRecords) =>
             nextItems.map((item) =>
               nestedToDotted({
