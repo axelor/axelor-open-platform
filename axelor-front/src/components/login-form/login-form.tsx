@@ -103,7 +103,7 @@ export function LoginForm({
           navigate(path, {
             state: {
               ...locationState,
-              route: { ...state, username, password },
+              route: { ...state, username },
             },
           });
         } else if (user) {
