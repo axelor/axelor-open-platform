@@ -334,10 +334,12 @@ function OneToManyInner({
 
   const expandAll = useAtomValue(expandAtom);
   const expandFieldList = useMemo<string[]>(() => {
-    const expandAll = treeField || widgetAttrs?.expandAll;
+    const expandAll = widgetAttrs?.expandAll || treeField;
     if (isCollectionTree && expandAll) {
       const value = expandAll;
-      if (!["true", "false"].includes(value?.toLowerCase())) {
+      if (["true", "false"].includes(value?.toLowerCase())) {
+        return [treeField];
+      } else {
         return uniq(value.split(","));
       }
     }
