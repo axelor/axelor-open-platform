@@ -1,0 +1,8 @@
+---
+title: Fix editor icons
+type: fix
+description: |
+  Display edit icon only if `canEdit="true"` is explicitly defined in field (default m2o behavior).
+  So the view icon will only be displayed if edit icon is not there.
+    
+  Also add tooltip on each button that describe the related action.

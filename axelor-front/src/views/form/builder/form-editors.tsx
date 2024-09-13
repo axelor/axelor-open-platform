@@ -1,4 +1,4 @@
-import { clsx } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
@@ -228,9 +228,9 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 
   const canNew = hasButton("new") && attrs.canNew;
   const canRemove = hasValue && _canRemove;
-  const canEdit = hasValue && hasButton("edit");
+  const canEdit = hasValue && hasButton("edit") && attrs.canEdit;
   const canSelect = hasButton("select");
-  const canView = hasValue && hasButton("view") && !hasButton("edit");
+  const canView = hasValue && hasButton("view");
 
   const [shouldSyncVersion, syncVersion] = useAtom(
     useMemo(
@@ -341,16 +341,24 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const titleActions = !readonly && (
     <div className={styles.actions}>
       {canEdit && canShowIcon("edit") && (
-        <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
+        <Box d="flex" alignItems="center" title={i18n.get("Edit")}>
+          <MaterialIcon icon="edit" onClick={() => handleEdit(false)}/>
+        </Box>
       )}
-      {canView && canShowIcon("view") && (
-        <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
+      {canView && !canEdit && canShowIcon("view") && (
+        <Box d="flex" alignItems="center" title={i18n.get("View")}>
+          <MaterialIcon icon="description" onClick={() => handleEdit(true)}/>
+        </Box>
       )}
       {canSelect && canShowIcon("select") && (
-        <MaterialIcon icon="search" onClick={handleSelect} />
+        <Box d="flex" alignItems="center" title={i18n.get("Select")}>
+          <MaterialIcon icon="search" onClick={handleSelect}/>
+        </Box>
       )}
       {canRemove && canShowIcon("clear") && (
-        <MaterialIcon icon="delete" onClick={handleDelete} />
+        <Box d="flex" alignItems="center" title={i18n.get("Clear")}>
+          <MaterialIcon icon="cancel" onClick={handleDelete}/>
+        </Box>
       )}
     </div>
   );
