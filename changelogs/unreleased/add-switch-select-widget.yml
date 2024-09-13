@@ -3,4 +3,5 @@ title: Add switch select widget
 type: feature
 description: |
   This provides the ability to pick a choice from a multiple-choice list.
-  It can be used on `selection`, `enum` and `many-to-one` fields. It supports icons and `x-labels` option for hiding labels.
+  It can be used on `selection`, `enum` and `many-to-one` fields.
+  It supports icons, `x-direction` and `x-labels` for hiding labels.

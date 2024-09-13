@@ -28,7 +28,7 @@ export function SwitchSelect(
   props: FieldProps<string | number | Record<string, number>>,
 ) {
   const { schema, readonly, widgetAtom, valueAtom } = props;
-  const { labels = true } = schema;
+  const { labels = true, direction = "horizontal" } = schema;
   const [value, setValue] = useAtom(valueAtom);
 
   const [borderStyles, setBorderStyles] = useState<ButtonSize>();
@@ -86,8 +86,15 @@ export function SwitchSelect(
   );
 
   return (
-    <FieldControl {...props}>
-      <Box d="flex" position="relative" flexDirection="row" flex={1}>
+    <FieldControl
+      {...props}
+      className={direction === "vertical" ? styles.inlineBlock : styles.flex}
+    >
+      <Box
+        d={direction === "vertical" ? "inline-block" : "flex"}
+        overflow={direction === "vertical" ? "auto" : "scroll"}
+        position="relative"
+      >
         {borderStyles && (
           <Box className={styles.activeBorder} style={borderStyles} />
         )}
@@ -99,11 +106,14 @@ export function SwitchSelect(
             title={item.selection.data?.description || (!labels && item.selection.title)}
             d="flex"
             textWrap={false}
+            alignItems="center"
             justifyContent="center"
             g={2}
+            py={direction === "vertical" ? 2 : 1}
             px={3}
             className={clsx(styles.item, [
               {
+                [styles.vertical]: direction === "vertical",
                 [styles.active]: isSelected(item.selection),
                 [styles.readonly]: readonly,
                 [styles.first]: index === 0,

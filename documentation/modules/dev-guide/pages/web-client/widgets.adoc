@@ -762,7 +762,7 @@ The `SwitchSelect` widget works on `selection`, `enum` and `many-to-one` fields.
 
 [source,xml]
 ----
-<field name="status" widget="SwitchSelect" />
+<field name="status" widget="SwitchSelect" x-direction="vertical" />
 <field name="businessSector" widget="SwitchSelect" />
 <field name="businessSector" widget="SwitchSelect" x-labels="false" />
 ----
@@ -770,9 +770,10 @@ The `SwitchSelect` widget works on `selection`, `enum` and `many-to-one` fields.
 image::widgets/switch-select.png[]
 image::widgets/switch-select-2.png[]
 
-The following attribute is supported:
+The following attributes are supported:
 
 * `x-labels`: Whether to display labels. Default to `true`.
+* `x-direction`: If value is "vertical", renders the list vertically. Default to horizontal.
 
 == Stepper
 
