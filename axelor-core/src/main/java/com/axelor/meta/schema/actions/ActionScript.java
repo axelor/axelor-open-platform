@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 
 public class ActionScript extends Action {
 
@@ -108,13 +109,21 @@ public class ActionScript extends Action {
   }
 
   @XmlType
-  public static class ActScript {
+  public static class ActScript extends Action.Element {
 
     @XmlAttribute private String language;
 
     @XmlAttribute private Boolean transactional;
 
-    @XmlCDATA @XmlValue public String code;
+    @XmlCDATA @XmlValue @XmlValueExtension private String code;
+
+    public String getCode() {
+      return code;
+    }
+
+    public void setCode(String code) {
+      this.code = code;
+    }
 
     public String getLanguage() {
       return language;

@@ -49,6 +49,10 @@ public class ActionRecord extends Action {
     public Boolean getCanCopy() {
       return canCopy;
     }
+
+    public void setCanCopy(Boolean canCopy) {
+      this.canCopy = canCopy;
+    }
   }
 
   @XmlAttribute private String search;

@@ -61,18 +61,16 @@ public class ActionView extends Action {
   public static class Context extends ActionRecord.RecordField {}
 
   @XmlType
-  public static class Param {
-
-    @XmlAttribute private String name;
+  public static class Param extends Action.Element {
 
     @XmlAttribute private String value;
 
-    public String getName() {
-      return name;
-    }
-
     public String getValue() {
       return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
     }
   }
 
@@ -111,12 +109,24 @@ public class ActionView extends Action {
     return icon;
   }
 
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
+
   public Boolean getHome() {
     return home;
   }
 
+  public void setHome(Boolean home) {
+    this.home = home;
+  }
+
   public String getDomain() {
     return domain;
+  }
+
+  public void setDomain(String domain) {
+    this.domain = domain;
   }
 
   public List<View> getViews() {
@@ -138,6 +148,15 @@ public class ActionView extends Action {
 
   public void setParams(List<ActionView.Param> params) {
     this.params = params;
+  }
+
+  @JsonIgnore
+  public List<Context> getContexts() {
+    return contexts;
+  }
+
+  public void setContexts(List<Context> contexts) {
+    this.contexts = contexts;
   }
 
   @Override
@@ -213,7 +232,7 @@ public class ActionView extends Action {
         Object value = param.value;
         if ("false".equals(value)) value = false;
         if ("true".equals(value)) value = true;
-        viewParams.put(param.name, value);
+        viewParams.put(param.getName(), value);
       }
     }
 
@@ -331,8 +350,8 @@ public class ActionView extends Action {
 
     public ActionViewBuilder param(String key, String value) {
       Param item = new Param();
-      item.name = key;
-      item.value = value;
+      item.setName(key);
+      item.setValue(value);
       view.params.add(item);
       return this;
     }
@@ -374,10 +393,10 @@ public class ActionView extends Action {
       }
 
       for (Param param : view.params) {
-        Object value = param.value;
+        Object value = param.getValue();
         if ("false".equals(value)) value = false;
         if ("true".equals(value)) value = true;
-        params.put(param.name, value);
+        params.put(param.getName(), value);
       }
 
       result.put("title", view.title);
