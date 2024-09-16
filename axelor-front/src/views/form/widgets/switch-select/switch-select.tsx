@@ -103,7 +103,7 @@ export function SwitchSelect(
             key={index}
             {...(!readonly && { onClick: () => onItemClick(item) })}
             ref={buttonRefs}
-            title={item.selection.data?.description || (!labels && item.selection.title)}
+            title={item.selection.data?.description || (!labels ? item.selection.title : undefined)}
             d="flex"
             textWrap={false}
             alignItems="center"
