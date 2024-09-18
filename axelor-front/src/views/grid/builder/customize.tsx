@@ -137,6 +137,7 @@ function CustomizeDialog({
             type: "field",
             name: "label",
             title: "Title",
+            sortable: false,
           },
           {
             type: "field",
@@ -147,18 +148,16 @@ function CustomizeDialog({
       } as unknown as GridView,
       viewParams: {
         "selector.grid.getExtraRecords": (search?: Record<string, string>) => {
-          if (search && search.name) {
-            return extraFields?.filter((f) => f.name?.includes(search.name));
+          if (search && (search.name || search.label)) {
+            return extraFields?.filter(
+              (f) =>
+                (search.name ? f.name?.includes(search.name) : true) &&
+                (search.label ? f.label?.includes(search.label) : true),
+            );
           }
           return extraFields;
         },
         "selector.grid.props": {
-          columnAttrs: {
-            label: {
-              searchable: false,
-              sortable: false,
-            },
-          },
           columnFormatter: (column: Field, value: any, record: DataRecord) => {
             if (column.name === "label") {
               return (
