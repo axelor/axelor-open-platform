@@ -241,6 +241,7 @@ function CustomizeDialog({
           <Grid
             allowRowReorder
             allowSelection
+            allowCheckboxSelection
             allowCellSelection
             selectionType="multiple"
             records={records as DataRecord[]}
