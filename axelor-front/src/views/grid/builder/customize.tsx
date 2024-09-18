@@ -111,6 +111,7 @@ function CustomizeDialog({
         id: nextId(),
         name: item.name,
         label: item.title,
+        $title: item.title,
       }));
     showSelector({
       model: "com.axelor.meta.db.MetaField",
@@ -160,7 +161,10 @@ function CustomizeDialog({
           },
           columnFormatter: (column: Field, value: any, record: DataRecord) => {
             if (column.name === "label") {
-              return value || toTitleCase(record.name ?? "");
+              return (
+                record.$title ||
+                i18n.get(value || toTitleCase(record.name ?? ""))
+              );
             }
             return value;
           },
@@ -180,12 +184,14 @@ function CustomizeDialog({
             .filter((s) => !records.find((r) => r.name === s.name))
             .map((record) => ({
               ...record,
-              title: record.title ?? toTitleCase(record.name),
+              title:
+                record.$title ||
+                i18n.get(record.label || toTitleCase(record.name ?? "")),
             })),
         ]);
       },
     });
-  }, [showSelector, view, fields]);
+  }, [showSelector, view]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
