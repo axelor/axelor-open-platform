@@ -98,6 +98,10 @@ $treeNodePadding: 1.175rem;
   flex: 1;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 :export {
   treeNodePadding: $treeNodePadding;
 }

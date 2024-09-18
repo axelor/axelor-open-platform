@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 
-import { Box, Panel, clsx } from "@axelor/ui";
+import { Badge, Box, Panel, clsx } from "@axelor/ui";
 import { GridColumnProps, GridRow } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";
@@ -1893,13 +1893,24 @@ function OneToManyInner({
         header={
           <div className={styles.title}>
             <div className={styles.titleText}>
-              {canShowTitle && (
-                <FieldLabel
-                  schema={schema}
-                  formAtom={formAtom}
-                  widgetAtom={widgetAtom}
-                />
-              )}
+              {canShowTitle &&
+                (isSubTreeGrid && schema.title && rows.length === 0 ? (
+                  <Badge
+                    variant="primary"
+                    className={styles.clickable}
+                    {...(canNew && {
+                      onClick: editable ? onAddInGrid : onAdd,
+                    })}
+                  >
+                    {schema.title}
+                  </Badge>
+                ) : (
+                  <FieldLabel
+                    schema={schema}
+                    formAtom={formAtom}
+                    widgetAtom={widgetAtom}
+                  />
+                ))}
             </div>
             {hasActions && (
               <ToolbarActions
@@ -1929,7 +1940,9 @@ function OneToManyInner({
                 icon: "add",
               },
               onClick: editable ? onAddInGrid : onAdd,
-              hidden: !canNew,
+              hidden:
+                !canNew ||
+                Boolean(isSubTreeGrid && schema.title && rows.length === 0),
             },
             {
               key: "edit",
