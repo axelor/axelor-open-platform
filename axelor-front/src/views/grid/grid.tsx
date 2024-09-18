@@ -137,7 +137,7 @@ function GridInner(props: ViewProps<GridView>) {
         }
         return dsRecords;
       },
-      [popupOptions, dsRecords, searchAtom, dataStore.page],
+      [dsRecords],
     ),
   );
   const records = useMemo(() => getRecords(), [getRecords]);
@@ -146,6 +146,9 @@ function GridInner(props: ViewProps<GridView>) {
     view,
     fields,
     stateAtom: gridStateAtom,
+    allowCustomization: Boolean(
+      action.params?.["_can-customize-popup"] ?? true,
+    ),
   });
 
   const { orderBy, rows, selectedRows, selectedCell } = state;

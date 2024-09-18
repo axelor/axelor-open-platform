@@ -148,6 +148,9 @@ function CustomizeDialog({
           },
         ],
       } as unknown as GridView,
+      viewParams: {
+        "_can-customize-popup": false,
+      },
       domain:
         "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames",
       context: {
@@ -281,12 +284,15 @@ export function useCustomizePopup({
   view,
   fields,
   stateAtom,
+  allowCustomization = true,
 }: {
   view?: GridView;
   fields?: Record<string, Property>;
   stateAtom: WritableAtom<GridState, any, any>;
+  allowCustomization?: boolean;
 }) {
-  const canCustomize = view?.name && isUserAllowedCustomizeViews();
+  const canCustomize =
+    allowCustomization && view?.name && isUserAllowedCustomizeViews();
 
   const showCustomizeDialog = useAtomCallback(
     useCallback(
