@@ -54,6 +54,7 @@ export * from "./relative-time";
 export * from "./selection";
 export * from "./separator";
 export * from "./single-select";
+export * from "./slider";
 export * from "./spacer";
 export * from "./static";
 export * from "./stepper";

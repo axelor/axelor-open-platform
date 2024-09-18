@@ -963,6 +963,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-step" type="xsd:decimal">
+      <xsd:annotation>
+        <xsd:documentation>
+          The value of each step. Default to `1` for integer fields type, depending on the scale for decimal fields type.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-currency" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
@@ -1132,6 +1139,11 @@
     <xsd:attribute name="x-stepper-completed" type="xsd:boolean" default="true">
       <xsd:annotation>
         <xsd:documentation>Display current step as validated instead of in process (fully colored instead of having a simple border). Default to `true`</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-slider-show-min-max" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>Display min/max values below the slider. Default to `false`</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />

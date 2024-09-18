@@ -1,0 +1,6 @@
+---
+title: Add slider widget
+type: feature
+description: |
+  This provides the ability to select a value within a range.
+  It can be used on `integer` and `decimal` fields.

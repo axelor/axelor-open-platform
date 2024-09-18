@@ -108,6 +108,24 @@ for a fix scale, or a field name for a dynamic evaluation.
 <field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
 ----
 
+== Slider
+
+The `Slider` widget works on `integer` and `decimal` fields. It provides the ability to select a value within a range.
+
+[source,xml]
+----
+<field name="price" widget="Slider" x-step="10" />
+<field name="price" widget="Slider" min="1" max="10" x-scale="currency.decimalPlaces" x-slider-show-min-max="true" />
+----
+
+image::widgets/slider.png[]
+image::widgets/slider-2.png[]
+
+The following attributes are supported:
+
+* `x-step`: slider's step value. Default to `1` for `integer` fields type and to scale value for `decimal` fields type.
+* `x-slider-show-min-max`: display min and max values below slider. Default to `false`.
+
 == ColorPicker
 
 The color picker widget is used for `string` data fields. It provides the ability to pick a color in a popper.

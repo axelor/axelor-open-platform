@@ -1,6 +1,4 @@
 import { useAtomValue } from "jotai";
-import { selectAtom } from "jotai/utils";
-import get from "lodash/get";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Input } from "@axelor/ui";
@@ -8,12 +6,13 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
-import format, { DEFAULT_SCALE } from "@/utils/format";
+import format from "@/utils/format";
 import { useViewContext } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { ViewerInput } from "../string/viewer";
+import { useScale } from "./hooks";
 
 import styles from "./decimal.module.scss";
 
@@ -25,39 +24,11 @@ export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
   const { uid, minSize: min, maxSize: max, placeholder } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { focus, required, scale: scaleAttr } = attrs;
+  const { focus, required } = attrs;
+
+  const scale = useScale(widgetAtom, formAtom, schema);
 
   const getViewContext = useViewContext();
-
-  const isDecimal =
-    schema.widget === "decimal" || schema.serverType === "DECIMAL";
-
-  const scaleNum = useMemo(() => {
-    if (!isDecimal) {
-      return 0;
-    }
-    if (typeof scaleAttr === "number") {
-      return Math.floor(scaleAttr);
-    }
-    if (scaleAttr == null || scaleAttr === "") {
-      return DEFAULT_SCALE;
-    }
-    return parseInt(scaleAttr);
-  }, [isDecimal, scaleAttr]);
-
-  const scale = useAtomValue(
-    useMemo(
-      () =>
-        selectAtom(formAtom, (form) => {
-          if (!isNaN(scaleNum)) {
-            return scaleNum;
-          }
-          const value = parseInt(get(form.record, scaleAttr ?? ""));
-          return isNaN(value) ? DEFAULT_SCALE : value;
-        }),
-      [formAtom, scaleAttr, scaleNum],
-    ),
-  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<number>();

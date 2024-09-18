@@ -1,0 +1,46 @@
+$height: 10px;
+$sliderSize: $height * 2;
+
+.trackWrapper {
+  display: flex;
+  flex: 1;
+  border-inline-start: solid $height;
+  padding-right: $height;
+
+  .track {
+    height: $height;
+    user-select: none;
+
+    &:not(.readonly) {
+      cursor: pointer;
+    }
+
+    .cursor {
+      position: absolute;
+      transform: translate(-50%, -25%);
+      width: $sliderSize;
+      height: $sliderSize;
+    }
+  }
+}
+
+.tooltip {
+  position: absolute;
+  top: -45px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 20px;
+  transform: translateX(-50%);
+
+  &::after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    content: "";
+    bottom: -3px;
+    left: calc(50% - 5px);
+    rotate: 45deg;
+    background-color: var(--bs-primary);
+  }
+}
