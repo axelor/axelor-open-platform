@@ -23,6 +23,8 @@ import { session } from "@/services/client/session";
 import { device } from "@/utils/device";
 
 import { useRoute } from "../use-route";
+import { DataRecord } from "@/services/client/data.types";
+import { SearchPage } from "@/services/client/data";
 
 /**
  * The route state of a specific view type.
@@ -177,6 +179,15 @@ export type Tab = {
      *
      */
     multiSelect?: boolean;
+
+    /**
+     * The method called after grid search request
+     */
+    onGridSearch?: (
+      records: DataRecord[],
+      page: SearchPage,
+      search?: Record<string, string>,
+    ) => DataRecord[];
   };
 
   /**
@@ -309,9 +320,19 @@ export async function initTab(
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
     tab?: boolean;
+    onGridSearch?: (
+      records: DataRecord[],
+      page: SearchPage,
+      search?: Record<string, string>,
+    ) => DataRecord[];
   },
 ) {
-  const { route: initRoute, props, tab: initAsTab } = options ?? {};
+  const {
+    route: initRoute,
+    props,
+    tab: initAsTab,
+    onGridSearch,
+  } = options ?? {};
   const actionName = viewName(view);
   const actionView =
     typeof view === "object" && view.views?.length
@@ -358,6 +379,7 @@ export async function initTab(
       showToolbar: actionView.params?.["show-toolbar"] !== false,
       showEditIcon: actionView.params?.["_popup-edit-icon"] !== false,
       multiSelect: actionView.params?.["_popup-multi-select"] !== false,
+      onGridSearch,
     };
 
     const tab: Tab = {

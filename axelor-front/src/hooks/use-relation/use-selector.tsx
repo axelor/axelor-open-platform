@@ -15,7 +15,7 @@ import { i18n } from "@/services/client/i18n";
 import { useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
-import { SearchOptions } from "@/services/client/data";
+import { SearchOptions, SearchPage } from "@/services/client/data";
 import { ActionView, GridView } from "@/services/client/meta.types";
 
 export type SelectorOptions = {
@@ -31,6 +31,7 @@ export type SelectorOptions = {
   limit?: number;
   onClose?: () => void;
   onCreate?: () => void | Promise<void>;
+  onGridSearch?: (records: DataRecord[], page: SearchPage, search?: Record<string, string>) => DataRecord[];
   onSelect?: (records: DataRecord[]) => void;
 };
 
@@ -48,6 +49,7 @@ export function useSelector() {
       context,
       limit,
       onClose,
+      onGridSearch,
       onCreate,
       onSelect,
     } = options;
@@ -80,6 +82,8 @@ export function useSelector() {
       },
       domain,
       context,
+    }, {
+      onGridSearch,
     });
 
     if (!tab) return;

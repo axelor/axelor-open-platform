@@ -131,15 +131,13 @@ function GridInner(props: ViewProps<GridView>) {
   const getRecords = useAtomCallback(
     useCallback(
       (get) => {
-        const getExtraRecords =
-          action.params?.["selector.grid.getExtraRecords"];
-        if (selector && getExtraRecords && dataStore.page.offset === 0) {
+        if (popupOptions?.onGridSearch) {
           const { search } = get(searchAtom!);
-          return [...dsRecords, ...getExtraRecords(search)];
+          return popupOptions?.onGridSearch(dsRecords, dataStore.page, search);
         }
         return dsRecords;
       },
-      [selector, dsRecords, dataStore.page.offset, action.params, searchAtom],
+      [popupOptions, dsRecords, searchAtom, dataStore.page],
     ),
   );
   const records = useMemo(() => getRecords(), [getRecords]);
@@ -1148,9 +1146,6 @@ function GridInner(props: ViewProps<GridView>) {
             onRowReorder={onRowReorder}
             noRecordsText={i18n.get("No records found.")}
             onColumnCustomize={onColumnCustomize}
-            {...(selector && {
-              ...action.params?.["selector.grid.props"],
-            })}
             {...(dashlet ? {} : searchProps)}
             {...dashletProps}
             {...popupProps}

@@ -16,8 +16,10 @@ import { useSelector } from "@/hooks/use-relation";
 import { nextId } from "@/views/form/builder/utils";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { toTitleCase } from "@/utils/names";
+import { unaccent } from "@/utils/sanitize.ts";
 
 import styles from "./customize.module.scss";
+import _ from "lodash";
 
 const reload = () => window.location.reload();
 
@@ -110,8 +112,7 @@ function CustomizeDialog({
       .map((item) => ({
         id: nextId(),
         name: item.name,
-        label: item.title,
-        $title: item.title,
+        label: item.title || item.autoTitle,
       }));
     showSelector({
       model: "com.axelor.meta.db.MetaField",
@@ -138,6 +139,7 @@ function CustomizeDialog({
             name: "label",
             title: "Title",
             sortable: false,
+            searchable: false,
           },
           {
             type: "field",
@@ -146,35 +148,36 @@ function CustomizeDialog({
           },
         ],
       } as unknown as GridView,
-      viewParams: {
-        "selector.grid.getExtraRecords": (search?: Record<string, string>) => {
-          if (search && (search.name || search.label)) {
-            return extraFields?.filter(
-              (f) =>
-                (search.name ? f.name?.includes(search.name) : true) &&
-                (search.label ? f.label?.includes(search.label) : true),
-            );
-          }
-          return extraFields;
-        },
-        "selector.grid.props": {
-          columnFormatter: (column: Field, value: any, record: DataRecord) => {
-            if (column.name === "label") {
-              return (
-                record.$title ||
-                i18n.get(value || toTitleCase(record.name ?? ""))
-              );
-            }
-            return value;
-          },
-        },
-      },
       domain:
         "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames",
       context: {
         _excludedFieldNames: ["id", "version"],
         _model: "com.axelor.meta.db.MetaField",
         _modelName: view.model,
+      },
+      onGridSearch: (records, page, search) => {
+        let recs: DataRecord[] = [];
+        _.forEach(records, (rec) => {
+          recs.push({
+            ...rec,
+            label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
+          });
+        });
+        if (page.offset === 0) {
+          // add the extra fields at the end of the first page only
+          let extra = extraFields;
+          if (search && search.name) {
+            extra = extraFields?.filter(
+              (f) =>
+                f.name &&
+                unaccent(f.name.toLowerCase()).includes(
+                  unaccent(search.name.toLowerCase()),
+                ),
+            );
+          }
+          extra?.forEach((i) => recs.push(i));
+        }
+        return recs;
       },
       onSelect: (selected) => {
         setRecords((records) => [
@@ -183,9 +186,7 @@ function CustomizeDialog({
             .filter((s) => !records.find((r) => r.name === s.name))
             .map((record) => ({
               ...record,
-              title:
-                record.$title ||
-                i18n.get(record.label || toTitleCase(record.name ?? "")),
+              title: record.label,
             })),
         ]);
       },
