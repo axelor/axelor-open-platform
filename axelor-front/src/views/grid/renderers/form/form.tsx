@@ -85,12 +85,14 @@ export const FormLayoutComponent = ({
   schema,
   formAtom,
   readonly,
+  hasSaved,
   expandState,
   onExpand,
   onCancel,
   onCellClick,
   columns = [],
 }: LayoutProps & {
+  hasSaved?: boolean;
   expandState: {
     expand: boolean;
     disable?: boolean;
@@ -194,7 +196,7 @@ export const FormLayoutComponent = ({
                 alignItems="center"
                 onClick={async (e) => {
                   onCancel?.();
-                  onCellClick?.(e, column, ind);
+                  hasSaved && onCellClick?.(e, column, ind);
                 }}
               >
                 <MaterialIcon icon="delete" />
@@ -331,6 +333,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     );
     const dirtyAtom = useViewDirtyAtom();
     const setDirty = useSetAtom(dirtyAtom);
+    const hasSaved = _record._dirty || _record.id > 0;
 
     useEffect(() => {
       formDirty !== undefined && setDirty(formDirty);
@@ -520,6 +523,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       () => (props: LayoutProps) => (
         <FormLayoutComponent
           {...props}
+          hasSaved={hasSaved}
           expandState={expandState}
           onCellClick={handleCellClick}
           onExpand={handleExpand}
