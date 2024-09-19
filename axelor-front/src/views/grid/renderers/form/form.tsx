@@ -392,7 +392,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           const formState = get(formAtom);
 
           // check record changes
-          if (isEqual(record, formState.record)) {
+          // if saved record is same then discard the editing
+          if (isEqual(record, formState.record) && hasSaved) {
             return onSave?.(
               record,
               rowIndex,
@@ -430,6 +431,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         },
         [
           expand,
+          hasSaved,
           isLastRow,
           actionExecutor,
           formAtom,
