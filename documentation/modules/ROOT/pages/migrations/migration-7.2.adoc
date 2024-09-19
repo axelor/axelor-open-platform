@@ -109,8 +109,8 @@ smooth migrations, icons that don't exist anymore has been mapped with their equ
 `arrow_back_ios_new`, `done`, `expand_less`, `expand_more`, `file_download_done`, `navigate_before`, `navigate_next`,
 `cut`, `emoji_flags`, `feed`, `monetization_on`, `wifi_calling_1`, `wifi_calling_2`, `wifi_calling_3`,
 `airplanemode_active`, `clear_night`, `device_reset`, `flightsmode`, `lens`, `panorama_fish_eye`, `quiet_time`,
-`quiet_time_active`. Deprecated icons will be logged in console in non production mode. This mapping is susceptible to
-change over upgrades, we strongly encourage you to update them.
+`quiet_time_active`, `restaurant_menu`, `ev_charger`. Deprecated icons will be logged in console in non production
+mode. This mapping is susceptible to change over upgrades, we strongly encourage you to update them.
 
 == Dependencies upgrade
 

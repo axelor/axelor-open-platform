@@ -699,7 +699,7 @@ const fa: Record<string, BootstrapIconProps["icon"]> = {
 
 /**
  * Map removed material icons with their equivalency in order to maintained compatibility
- * From 2024-05-14 to 2024-07-11 : see https://material-symbols-changelog.vercel.app/
+ * From 2024-05-14 to 2024-09-06 : see https://material-symbols-changelog.vercel.app/
  */
 const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   // 2024-05-14
@@ -728,6 +728,10 @@ const materialIconsRemoved: Record<string, MaterialIconProps["icon"]> = {
   panorama_fish_eye: "circle",
   quiet_time: "bedtime",
   quiet_time_active: "bedtime_off",
+  // 2024-08-08
+  restaurant_menu: "restaurant",
+  // 2024-09-06
+  ev_charger: "ev_station",
 };
 
 export type IconProps = {
