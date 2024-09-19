@@ -11,6 +11,12 @@
   margin: 1rem;
 }
 
+/* Avoid empty bottom space on record validation errors */
+.alert ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .item-enter {
   opacity: 0;
 }
