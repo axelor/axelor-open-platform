@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: ^0.2.7
-        version: 0.2.7(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+        specifier: ^0.2.8
+        version: 0.2.8(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
       '@babel/standalone':
         specifier: ^7.24.8
         version: 7.24.8
@@ -233,8 +233,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@axelor/ui@0.2.7':
-    resolution: {integrity: sha512-n5X2tp9R+wsW6N1Mq3Khu9MWXbKbwBUS9w+7O4Pw93VPt8Q36WhB4yDyH/nlSjCr3KxvVBPHZ8I7TJ4mBC8JGg==}
+  '@axelor/ui@0.2.8':
+    resolution: {integrity: sha512-XHgnlF/g/5LBAVJn5n/BcGYAFU5Gi4yxJLVK9qYD2x+MjoyRDqy9Xnq0i2xqyAMaFs2eqNvBV6X/eUXc8FgU2A==}
     peerDependencies:
       react: ^18.3.1-0
       react-dom: ^18.3.1-0
@@ -1307,11 +1307,11 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@material-symbols/font-400@0.21.1':
-    resolution: {integrity: sha512-i0ygXzqKu0hN4WIzsJArxJATCOTVVFpmOxI/Qu2en3mh7eZs2iL04dUb97ltDDnjXZaTrzJZDRxHklAbalvxJg==}
+  '@material-symbols/font-400@0.23.0':
+    resolution: {integrity: sha512-sAkBNo8npezd+GDOH/EO5TecwmKx6Ojv2SQ3RpINZTZGtJpNSygfzptlbJ4Ti0xOvET9bmpFVYK44RFBLy8CQg==}
 
-  '@material-symbols/metadata@0.21.1':
-    resolution: {integrity: sha512-vwnDz8fC+96WvO7apvF6Wfp6zHHlQxWUcb0tj7yLBwIR0EwovhMs48KcIR+gB6C7+iEBp6sKfqpZD0/FgUWW6g==}
+  '@material-symbols/metadata@0.23.0':
+    resolution: {integrity: sha512-NSvVHM2eqH5UzGAbEJbPDlHFveLDIbKs+TbZHrR7BU4r5J61tQ091zeynbJ5buk5RxcK6kMVDWL7IEN5BXO4jg==}
 
   '@monaco-editor/loader@1.4.0':
     resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==}
@@ -4039,14 +4039,14 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@axelor/ui@0.2.7(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
+  '@axelor/ui@0.2.8(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@floating-ui/react': 0.26.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@fluentui/priority-overflow': 9.1.13
       '@fluentui/react-context-selector': 9.1.63(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
-      '@material-symbols/font-400': 0.21.1
-      '@material-symbols/metadata': 0.21.1
+      '@material-symbols/font-400': 0.23.0
+      '@material-symbols/metadata': 0.23.0
       '@popperjs/core': 2.11.8
       bootstrap: 5.3.3(@popperjs/core@2.11.8)
       bootstrap-icons: 1.11.3
@@ -5337,9 +5337,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@material-symbols/font-400@0.21.1': {}
+  '@material-symbols/font-400@0.23.0': {}
 
-  '@material-symbols/metadata@0.21.1': {}
+  '@material-symbols/metadata@0.23.0': {}
 
   '@monaco-editor/loader@1.4.0(monaco-editor@0.50.0)':
     dependencies:
