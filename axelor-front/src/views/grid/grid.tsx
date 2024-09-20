@@ -56,6 +56,7 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
+import { Attrs } from "../form/builder";
 import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
@@ -65,7 +66,7 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { useCustomizePopup } from "./builder/customize";
 import { Details } from "./builder/details";
 import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
-import { CollectionTree } from "./builder/scope";
+import { CollectionTree, useCollectionTree } from "./builder/scope";
 import { getSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
@@ -80,15 +81,76 @@ export function Grid(props: ViewProps<GridView>) {
   return <GridInner {...props} />;
 }
 
+function GridSizingWrapper({
+  state,
+  children,
+}: {
+  state: GridState;
+  children: ReactElement;
+}) {
+  const { setColumnAttrs } = useCollectionTree();
+
+  useEffect(() => {
+    let hasSetAdjustColumnWidth = false;
+    const _columnAttrs = (state.columns ?? []).reduce(
+      (colsAttrs, col) => {
+        colsAttrs = {
+          ...colsAttrs,
+          [col.name]: {
+            ...colsAttrs[col.name],
+            visible: col.visible,
+          } as any,
+        };
+
+        if (col.width) {
+          colsAttrs[col.name] = {
+            ...colsAttrs[col.name],
+            computed: true,
+            width: col.width,
+          } as any;
+        }
+
+        if (
+          !hasSetAdjustColumnWidth &&
+          !col.action &&
+          col.visible !== false &&
+          (col.width ?? 0) > 50
+        ) {
+          hasSetAdjustColumnWidth = true;
+          colsAttrs[col.name] = {
+            ...colsAttrs[col.name],
+            $padding: 8.125,
+            $adjustColumnWidth: true,
+          } as any;
+        }
+
+        return colsAttrs;
+      },
+      {} as Record<string, Partial<Attrs>>,
+    );
+    setColumnAttrs?.((_attrs) =>
+      isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
+    );
+  }, [state.columns, setColumnAttrs]);
+
+  return children;
+}
+
 function GridWrapper({
   children,
+  state,
   isTreeGrid,
 }: {
   children: ReactElement;
+  state: GridState;
   isTreeGrid?: boolean;
 }) {
   if (isTreeGrid) {
-    return <CollectionTree enabled>{children}</CollectionTree>;
+    return (
+      <CollectionTree enabled>
+        <GridSizingWrapper state={state}>{children}</GridSizingWrapper>
+      </CollectionTree>
+    );
   }
   return children;
 }
@@ -1257,7 +1319,7 @@ function GridInner(props: ViewProps<GridView>) {
       )}
       <div className={styles.views}>
         <div className={styles["grid-view"]} style={gridViewStyles}>
-          <GridWrapper isTreeGrid={Boolean(isTreeGrid)}>
+          <GridWrapper state={state} isTreeGrid={Boolean(isTreeGrid)}>
             <GridComponent
               className={styles.grid}
               ref={gridRef}

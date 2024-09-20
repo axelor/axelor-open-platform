@@ -1735,15 +1735,16 @@ function OneToManyInner({
   const treeColumnAttrs = useMemo(() => {
     return isSubTreeGrid
       ? Object.keys(_treeColumnAttrs ?? {}).reduce((obj, key) => {
-          const { $adjustColumnWidth, ...colAttrs } = _treeColumnAttrs?.[
-            key
-          ] as any;
+          const { $adjustColumnWidth, $padding = 0, ...colAttrs } =
+            _treeColumnAttrs?.[key] as any;
           return {
             ...obj,
             [key]: {
               ...colAttrs,
               ...($adjustColumnWidth && {
-                width: colAttrs.width - getTreeNodePadding() * expandLevel,
+                width:
+                  colAttrs.width -
+                  ($padding + getTreeNodePadding() * expandLevel),
                 computed: true,
               }),
             },
