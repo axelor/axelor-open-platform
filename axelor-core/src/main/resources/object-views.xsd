@@ -1146,7 +1146,7 @@
     </xsd:attribute>
     <xsd:attribute name="x-tree-field-title" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>Specify sub-field title to be used for nested tree level.
+        <xsd:documentation>Specify sub-field title to be used for nested tree level (defaults to "Add subitem").
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1380,7 +1380,7 @@
         <xsd:attribute name="widget" use="optional">
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="expandable" />
+              <xsd:pattern value="[Ee]xpandable|[Tt]ree-?[Gg]rid" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
@@ -1485,6 +1485,7 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

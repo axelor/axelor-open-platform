@@ -569,6 +569,7 @@ The following attributes are supported:
 == TreeGrid
 
 This widget is supported on `one-to-many` fields. It allows to show a tree-like structure in a grid view.
+With `editable="true"` (inline edit), when you edit a row at any nesting level, you can press `Ctrl+Enter` to add a subitem.
 
 [source,xml]
 ----

@@ -4,7 +4,14 @@ import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isString from "lodash/isString";
 import uniqueId from "lodash/uniqueId";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Box } from "@axelor/ui";
 import { GridProps, GridRow, GridState } from "@axelor/ui/grid";
@@ -24,11 +31,13 @@ import { request } from "@/services/client/client";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
+import { ViewData } from "@/services/client/meta";
 import { findActionView, findView } from "@/services/client/meta-cache";
 import { FormView, GridView, Widget } from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
+import { toKebabCase } from "@/utils/names";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -55,6 +64,7 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { useCustomizePopup } from "./builder/customize";
 import { Details } from "./builder/details";
 import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
+import { CollectionTree } from "./builder/scope";
 import { getSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
@@ -67,6 +77,19 @@ export function Grid(props: ViewProps<GridView>) {
     return <Dms {...props} />;
   }
   return <GridInner {...props} />;
+}
+
+function GridWrapper({
+  children,
+  isTreeGrid,
+}: {
+  children: ReactElement;
+  isTreeGrid?: boolean;
+}) {
+  if (isTreeGrid) {
+    return <CollectionTree enabled>{children}</CollectionTree>;
+  }
+  return children;
 }
 
 function GridInner(props: ViewProps<GridView>) {
@@ -1026,6 +1049,82 @@ function GridInner(props: ViewProps<GridView>) {
   const massUpdateFields = useMassUpdateFields(allFields, view.items);
   const canMassUpdate = hasButton("edit") && massUpdateFields.length > 0;
 
+  const { treeLimit, treeField, treeFieldTitle } = view;
+  const widget = toKebabCase(view.widget ?? "");
+  const isExpandable = widget === "expandable";
+  const isTreeGrid = treeField && widget === "tree-grid";
+
+  const expandableView = useMemo(() => {
+    const { model } = view;
+    const treeFieldMeta = meta.fields?.[treeField!];
+    if (isTreeGrid) {
+      const field = {
+        type: "ONE_TO_MANY", // default type to ONE_TO_MANY
+        ...treeFieldMeta,
+        target: model,
+        name: treeField,
+        title:
+          (treeFieldTitle && i18n.get(treeFieldTitle)) ||
+          i18n.get("Add subitem"),
+      };
+      return {
+        model,
+        fields: {
+          [treeField]: field,
+        },
+        view: {
+          type: "form",
+          model: model,
+          items: [
+            {
+              ...field,
+              editable,
+              colSpan: 12,
+              canNew,
+              canEdit,
+              canRemove: canDelete,
+              canView: true,
+              editIcon: true,
+              onDelete: view.onDelete,
+              onNew: view.onNew,
+              onSave: view.onSave,
+              summaryView: view.summaryView,
+              fields: meta.fields,
+              items: view.items,
+              uid: uniqueId("w"),
+              type: "panel-related",
+              formView: formViewName,
+              widget,
+              widgetAttrs: {
+                treeField,
+                treeFieldTitle,
+                ...(treeLimit && {
+                  treeLimit: treeLimit - 1, // as grid itself occupy 1 level
+                }),
+              },
+              serverType: field.type,
+            },
+          ],
+          width: "*",
+        } as any,
+      } as ViewData<FormView>;
+    }
+    return view.summaryView ?? formViewName;
+  }, [
+    view,
+    editable,
+    formViewName,
+    meta,
+    widget,
+    canNew,
+    canEdit,
+    canDelete,
+    isTreeGrid,
+    treeLimit,
+    treeField,
+    treeFieldTitle,
+  ]);
+
   const gridViewStyles =
     detailsMeta && !detailsViewOverlay && gridWidth
       ? { minWidth: gridWidth, maxWidth: gridWidth }
@@ -1132,39 +1231,52 @@ function GridInner(props: ViewProps<GridView>) {
       )}
       <div className={styles.views}>
         <div className={styles["grid-view"]} style={gridViewStyles}>
-          <GridComponent
-            className={styles.grid}
-            ref={gridRef}
-            records={records}
-            view={view}
-            fields={fields}
-            perms={perms}
-            state={state}
-            setState={setState}
-            sortType={"live"}
-            editable={!dashlet && !selector && editable}
-            expandable={view.widget === "expandable"}
-            expandableView={view.summaryView ?? formViewName}
-            showEditIcon={canEdit}
-            searchOptions={searchOptions}
-            searchAtom={searchAtom}
-            actionExecutor={actionExecutor}
-            onEdit={readonly === true ? onView : onEdit}
-            onView={onView}
-            onSearch={onGridSearch}
-            onSave={onSave}
-            onDiscard={onDiscard}
-            onRowReorder={onRowReorder}
-            noRecordsText={i18n.get("No records found.")}
-            onColumnCustomize={onColumnCustomize}
-            {...(dashlet ? {} : searchProps)}
-            {...dashletProps}
-            {...popupProps}
-            {...detailsProps}
-            {...(!canNew && {
-              onRecordAdd: undefined,
-            })}
-          />
+          <GridWrapper isTreeGrid={Boolean(isTreeGrid)}>
+            <GridComponent
+              className={styles.grid}
+              ref={gridRef}
+              records={records}
+              view={view}
+              fields={fields}
+              perms={perms}
+              state={state}
+              setState={setState}
+              sortType={"live"}
+              editable={
+                dashlet || action?.name?.startsWith("$selector")
+                  ? false
+                  : editable
+              }
+              {...((isExpandable || isTreeGrid) && {
+                showAsTree: isTreeGrid,
+                showNewIcon: canNew,
+                showDeleteIcon: canDelete,
+                expandable: true,
+                expandableView,
+                onNew: handleNew,
+                onDelete,
+              })}
+              showEditIcon={canEdit}
+              searchOptions={searchOptions}
+              searchAtom={searchAtom}
+              actionExecutor={actionExecutor}
+              onEdit={readonly === true ? onView : onEdit}
+              onView={onView}
+              onSearch={onGridSearch}
+              onSave={onSave}
+              onDiscard={onDiscard}
+              onRowReorder={onRowReorder}
+              noRecordsText={i18n.get("No records found.")}
+              onColumnCustomize={onColumnCustomize}
+              {...(dashlet ? {} : searchProps)}
+              {...dashletProps}
+              {...popupProps}
+              {...detailsProps}
+              {...(!canNew && {
+                onRecordAdd: undefined,
+              })}
+            />
+          </GridWrapper>
           {hasDetailsView && dirty && (
             <Box bg="light" className={styles.overlay} />
           )}

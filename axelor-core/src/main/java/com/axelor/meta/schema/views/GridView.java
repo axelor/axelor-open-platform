@@ -89,6 +89,15 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
   @XmlAttribute(name = "x-selector")
   private String selector;
 
+  @XmlAttribute(name = "x-tree-field")
+  private String treeField;
+
+  @XmlAttribute(name = "x-tree-field-title")
+  private String treeFieldTitle;
+
+  @XmlAttribute(name = "x-tree-limit")
+  private Integer treeLimit;
+
   @JsonIgnore @XmlAnyAttribute private Map<QName, String> otherAttributes;
 
   @XmlElement(name = "help")
@@ -276,6 +285,30 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
     this.selector = selector;
   }
 
+  public String getTreeField() {
+    return treeField;
+  }
+
+  public void setTreeField(String treeField) {
+    this.treeField = treeField;
+  }
+
+  public String getTreeFieldTitle() {
+    return treeFieldTitle;
+  }
+
+  public void setTreeFieldTitle(String treeFieldTitle) {
+    this.treeFieldTitle = treeFieldTitle;
+  }
+
+  public Integer getTreeLimit() {
+    return treeLimit;
+  }
+
+  public void setTreeLimit(Integer treeLimit) {
+    this.treeLimit = treeLimit;
+  }
+
   public Map<QName, String> getOtherAttributes() {
     return otherAttributes;
   }
@@ -375,7 +408,9 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
 
   @Override
   public Set<String> getExtraNames() {
-    return Stream.of(getOrderBy()).filter(n -> !StringUtils.isBlank(n)).collect(Collectors.toSet());
+    return Stream.of(getOrderBy(), getTreeField())
+        .filter(n -> !StringUtils.isBlank(n))
+        .collect(Collectors.toSet());
   }
 
   @Override

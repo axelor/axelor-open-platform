@@ -96,7 +96,6 @@ export function ExpandableFormView({
   const schema = meta.view!;
   const isCollection = (gridView as Schema)?.serverType?.endsWith("_TO_MANY");
   const isTreeGrid =
-    isCollection &&
     toKebabCase((gridView as Schema)?.widget ?? "") === "tree-grid";
   const hasSummaryView = Boolean((gridView as Schema)?.summaryView);
   const isO2M = (gridView as Schema)?.serverType === "ONE_TO_MANY";
@@ -459,7 +458,7 @@ export function ExpandableFormView({
   }, [doRefresh]);
 
   useEffect(() => {
-    if (formReady && !isCollection) {
+    if (formReady && !isCollection && !isTreeGrid) {
       if ("requestIdleCallback" in window) {
         const id = window.requestIdleCallback(() => scrollToForm());
         return () => window.cancelIdleCallback(id);
@@ -468,7 +467,7 @@ export function ExpandableFormView({
         return () => clearTimeout(timer);
       }
     }
-  }, [formReady, scrollToForm, isCollection]);
+  }, [formReady, scrollToForm, isCollection, isTreeGrid]);
 
   useEffect(() => {
     if (formSelect) {

@@ -328,7 +328,7 @@ function OneToManyInner({
     const treeLimit = isNaN(widgetAttrs?.treeLimit)
       ? null
       : +widgetAttrs.treeLimit;
-    return isTreeGrid && (treeLimit ?? 0) > 0 && expandLevel >= treeLimit!;
+    return isTreeGrid && (treeLimit ?? -1) >= 0 && expandLevel >= treeLimit!;
   }, [isTreeGrid, widgetAttrs?.treeLimit, expandLevel]);
 
   const treeField = isTreeGrid ? (widgetAttrs?.treeField ?? schema.name) : null;

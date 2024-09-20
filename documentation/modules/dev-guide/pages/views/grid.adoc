@@ -46,7 +46,7 @@ The grid view has the following attributes:
 | `canSave` | whether to allow saving records
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `canArchive` | whether to allow archiving/unarchiving records
-| `widget` | name of the widget to be used in the grid: `expandable`
+| `widget` | name of the widget to be used in the grid: `expandable`/`tree-grid`
 | `x-no-fetch` | whether to fetch initial records
 | `x-selector` | specify the row selection control: `checkbox` (default) to show checkbox selection, `none` to disable it.
 | `onSave` | action to call on saving form in editable grid
@@ -56,7 +56,16 @@ The grid view has the following attributes:
 IMPORTANT: With `canMove`, sequencing is done on field specified by `orderBy`, and it must be only one integer field. If not specified, not sequencing is done.
 On top-level grid, `orderBy` is required with `canMove`.
 
-NOTE: See xref:web-client/widgets.adoc#expandable[Expandable] for usage and available widget attributes. It's the only widget supported on top-level grid.
+NOTE: With `editable="true"` (inline edit), pressing `Enter` commits the current row, but when it is the last row of the grid, it will also add a new row.
+
+See xref:web-client/widgets.adoc#expandable[Expandable] and xref:web-client/widgets.adoc#treegrid[TreeGrid] for usage and available widget attributes.
+On top-level grid, `x-expand-all` is not supported.
+
+With TreeGrid widget, there are some additional limitations:
+
+* On first-level rows, you can add a row to the bottom only, not between existing rows.
+* On first-level rows, `Ctrl+Enter` to add subitem is not supported.
+* On subitems, grid `onSave` is not supported.
 
 The grid view has the following child items:
 

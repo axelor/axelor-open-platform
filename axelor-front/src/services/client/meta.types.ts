@@ -530,10 +530,13 @@ export interface GridView extends View {
   hilites?: Hilite[];
   items?: (Field | Button)[];
   summaryView?: string;
-  widget?: "expandable";
+  widget?: "expandable" | "tree-grid";
   widgetAttrs?: Record<string, any>;
   onDelete?: string;
   onSave?: string;
+  treeLimit?: number;
+  treeField?: string;
+  treeFieldTitle?: string;
 }
 
 export interface CardsView extends View {
