@@ -725,7 +725,8 @@ function OneToManyInner({
         .filter((ind) => ind !== null);
     });
     serverSelectedIds.current = null;
-  }, [state.rows]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.rows, setState]);
 
   useEffect(() => {
     if (isEqual(selectedIds, lastSelectedIds.current)) return;
