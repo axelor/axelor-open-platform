@@ -38,6 +38,7 @@ import { commonClassNames } from "@/styles/common";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
 import { toKebabCase } from "@/utils/names";
+import { findViewItem } from "@/utils/schema";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
@@ -1054,10 +1055,30 @@ function GridInner(props: ViewProps<GridView>) {
   const isExpandable = widget === "expandable";
   const isTreeGrid = treeField && widget === "tree-grid";
 
+  const { data: expandableSummaryMeta } = useAsync(async () => {
+    const { summaryView, model } = view;
+    if (!isTreeGrid || !summaryView) return;
+    return await findView<FormView>({
+      type: "form",
+      name: summaryView,
+      model,
+    });
+  }, [isTreeGrid, view]);
+
   const expandableView = useMemo(() => {
     const { model } = view;
     const treeFieldMeta = meta.fields?.[treeField!];
     if (isTreeGrid) {
+      const summaryFields = expandableSummaryMeta?.fields ?? {};
+      // only considered defined fields of view for tree grid
+      const subFields = Object.keys(summaryFields).reduce(
+        (_fields, fieldName) =>
+          expandableSummaryMeta &&
+          findViewItem(expandableSummaryMeta, fieldName)
+            ? { ..._fields, [fieldName]: summaryFields[fieldName] }
+            : _fields,
+        {},
+      );
       const field = {
         type: "ONE_TO_MANY", // default type to ONE_TO_MANY
         ...treeFieldMeta,
@@ -1070,6 +1091,7 @@ function GridInner(props: ViewProps<GridView>) {
       return {
         model,
         fields: {
+          ...subFields,
           [treeField]: field,
         },
         view: {
@@ -1104,6 +1126,9 @@ function GridInner(props: ViewProps<GridView>) {
               },
               serverType: field.type,
             },
+            ...(expandableSummaryMeta?.view?.items ?? []).filter(
+              (item) => item.name !== "$wkfStatus", // skip wkf status
+            ),
           ],
           width: "*",
         } as any,
@@ -1111,6 +1136,7 @@ function GridInner(props: ViewProps<GridView>) {
     }
     return view.summaryView ?? formViewName;
   }, [
+    expandableSummaryMeta,
     view,
     editable,
     formViewName,
