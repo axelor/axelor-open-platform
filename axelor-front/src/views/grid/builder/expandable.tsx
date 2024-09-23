@@ -1,4 +1,4 @@
-import { Box, Button, clsx } from "@axelor/ui";
+import { Box, Button, clsx, useTheme } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import {
   KeyboardEvent,
@@ -37,11 +37,7 @@ import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
 import { useViewConfirmDirty, useViewTab } from "@/view-containers/views/scope";
-import {
-  useGridExpandableContext,
-  useGridContext,
-  useCollectionTree,
-} from "./scope";
+import { useGridExpandableContext, useGridContext } from "./scope";
 import formStyles from "@/views/form/form.module.scss";
 import styles from "./expandable.module.scss";
 
@@ -102,6 +98,7 @@ export function ExpandableFormView({
   const isTreeGrid =
     isCollection &&
     toKebabCase((gridView as Schema)?.widget ?? "") === "tree-grid";
+  const hasSummaryView = Boolean((gridView as Schema)?.summaryView);
   const isO2M = (gridView as Schema)?.serverType === "ONE_TO_MANY";
 
   const {
@@ -511,6 +508,7 @@ export function ExpandableFormView({
       alignItems="center"
       className={clsx(formStyles.formViewScroller, styles.formViewScroller, {
         [styles.collection]: isCollection,
+        [styles.summaryView]: isTreeGrid && hasSummaryView,
       })}
       ref={containerRef}
       onKeyDown={handleKeyDown}
