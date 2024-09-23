@@ -1175,13 +1175,13 @@ depending on the widget/type.
 | `x-icon-hover` | specify an icon for hover state |
 | `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive | `false`
 | `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all :
-| `x-reset-state` | whether to reset dummy field value on form save | `false`
 
 * editor: `edit`, `view`, `select`, `clear`
 * multirelational field: `select`, `new`, `edit`, `view`, `remove` |
+| `x-reset-state` | whether to reset dummy field value on form save | `false`
 | `x-can-copy` | whether to allow copy of o2m/m2m field items | `false`
-| `onCopy` | action to call after duplicating record in o2m/m2m grid, used when `x-can-copy` is `true`
-| `onDelete` | action to call when deleting record in o2m/m2m grid
+| `onCopy` | action to call after duplicating record in o2m/m2m grid, used when `x-can-copy` is `true` |
+| `onDelete` | action to call when deleting record in o2m/m2m grid |
 | `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`) | `horizontal`
 | `x-code-syntax` | syntax highlighting for the code editor widget |
 | `x-order` | specify the order of suggest box list |
