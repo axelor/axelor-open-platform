@@ -1218,6 +1218,8 @@ function GridInner(props: ViewProps<GridView>) {
       ? { minWidth: gridWidth, maxWidth: gridWidth }
       : undefined;
 
+  const gridContext = useMemo(() => ({ newIcon: false }), []);
+
   return (
     <div className={styles.container}>
       {showToolbar && (
@@ -1336,6 +1338,7 @@ function GridInner(props: ViewProps<GridView>) {
                   : editable
               }
               {...((isExpandable || isTreeGrid) && {
+                gridContext,
                 showAsTree: isTreeGrid,
                 showNewIcon: canNew,
                 showDeleteIcon: canDelete,

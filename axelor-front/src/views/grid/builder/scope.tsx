@@ -25,6 +25,9 @@ import { fallbackFormAtom } from "@/views/form/builder/atoms";
 
 export type GridHandler = {
   readonly?: boolean;
+  newIcon?: boolean;
+  editIcon?: boolean;
+  deleteIcon?: boolean;
 };
 
 export const GridContext = createContext<GridHandler>({});

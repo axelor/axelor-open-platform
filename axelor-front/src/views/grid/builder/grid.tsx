@@ -61,6 +61,7 @@ import { Form as FormRenderer, GridFormHandler } from "../renderers/form";
 import { Row as RowRenderer } from "../renderers/row";
 import {
   GridContext,
+  GridHandler as GridContextType,
   useCollectionTreeEditable,
   useGridColumnNames,
 } from "./scope";
@@ -127,6 +128,7 @@ export const Grid = forwardRef<
     columnAttrs?: Record<string, Partial<Attrs>>;
     columnFormatter?: (column: Field, value: any, record: DataRecord) => string;
     actionExecutor?: ActionExecutor;
+    gridContext?: GridContextType;
     onFormInit?: () => void;
     onSearch?: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onNew?: (record: GridRow["record"]) => any;
@@ -143,6 +145,7 @@ export const Grid = forwardRef<
     view,
     expandable,
     expandableView,
+    gridContext: _gridContext,
     fields,
     perms,
     searchOptions,
@@ -614,8 +617,8 @@ export const Grid = forwardRef<
   }, [readonly, view, fields]);
 
   const gridContext = useMemo(
-    () => ({ readonly: !editable && readonly }),
-    [editable, readonly],
+    () => ({ ..._gridContext, readonly: !editable && readonly }),
+    [editable, readonly, _gridContext],
   );
 
   if (init.state === "loading") return null;
