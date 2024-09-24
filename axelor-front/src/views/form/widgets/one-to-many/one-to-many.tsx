@@ -1910,8 +1910,6 @@ function OneToManyInner({
         ref={panelRef}
         className={clsx(styles.container, {
           [styles.toolbar]: hasActions,
-          [styles.rootTreeGrid]: isRootTreeGrid,
-          [styles.subTreeGrid]: isSubTreeGrid,
           [styles.tree]: isTreeGrid,
           [styles.hasHeader]: !isRootTreeGrid && canShowHeader,
           [styles.hasNewHeader]: isTreeGrid && !state.rows?.length,
@@ -2039,7 +2037,11 @@ function OneToManyInner({
           <ScopeProvider scope={MetaScope} value={viewMeta}>
             <GridComponent
               className={clsx(styles["grid"], {
-                [styles.noRecords]: records.length === 0,
+                [styles["tree-grid"]]: isTreeGrid,
+                [styles["sub-tree-grid"]]: isSubTreeGrid,
+                [styles["tree-grid-empty"]]:
+                  isTreeGrid && noHeader && records.length === 0,
+                [styles["no-border-grid"]]: isTreeGrid && !isRootTreeGrid,
                 [styles.hasDetails]: hasMasterDetails,
               })}
               ref={gridRef}
