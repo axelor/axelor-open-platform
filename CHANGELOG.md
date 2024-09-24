@@ -1,3 +1,49 @@
+## 7.1.6 (2024-09-24)
+
+#### Feature
+
+* Add views help link support
+
+  <details>
+  
+  Add view help link support (based on `helpLink` attribute). This feature was present 
+  on former version, but wasn't added during React migration.
+  
+  The help link button is now placed on end right side of the toolbar.
+  
+  </details>
+
+#### Fix
+
+* Validate URL without escaping it on grid
+* Prevent going into edit mode when clicking on an URL on editable grid
+* Change expand icon in tree-grid widget
+
+  <details>
+  
+  - Use `>>` for items which contains children items
+  - Use `>` for items which doesn't have any children
+  
+  </details>
+
+* Fix updating custom fields having roles
+* Fix action-attrs column attributes for tree-grid widget
+* Fix show errors for custom fields
+* Fix translation and extraction of x-tree-field-title attribute
+* Fix o2m items version conflict when duplicating record
+
+#### Security
+
+* Ask to retype current password on change password page
+
+  <details>
+  
+  Instead of passing current password in state after login, ask to 
+  retype current password on change password page.
+  
+  </details>
+
+
 ## 7.1.5 (2024-08-08)
 
 #### Change
