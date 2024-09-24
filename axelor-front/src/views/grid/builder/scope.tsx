@@ -28,6 +28,7 @@ export type GridHandler = {
   newIcon?: boolean;
   editIcon?: boolean;
   deleteIcon?: boolean;
+  type?: "grid" | "panel-related";
 };
 
 export const GridContext = createContext<GridHandler>({});

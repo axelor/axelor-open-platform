@@ -1218,7 +1218,7 @@ function GridInner(props: ViewProps<GridView>) {
       ? { minWidth: gridWidth, maxWidth: gridWidth }
       : undefined;
 
-  const gridContext = useMemo(() => ({ newIcon: false }), []);
+  const gridContext = useMemo(() => ({ type: "grid", newIcon: false }), []);
 
   return (
     <div className={styles.container}>

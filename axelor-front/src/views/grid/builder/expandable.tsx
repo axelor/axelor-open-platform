@@ -81,7 +81,7 @@ export function ExpandableFormView({
   onSave?: (record: DataRecord) => void | Promise<void> | undefined;
   onClose?: () => void;
 }) {
-  const { readonly } = useGridContext();
+  const { readonly, type: parentType } = useGridContext();
   const { formAtom: parentFormAtom } = useFormScope();
   const { selectAtom: selectStateAtom } = useGridExpandableContext();
   const { id: tabId } = useViewTab();
@@ -98,6 +98,7 @@ export function ExpandableFormView({
   const isTreeGrid =
     toKebabCase((gridView as Schema)?.widget ?? "") === "tree-grid";
   const hasSummaryView = Boolean((gridView as Schema)?.summaryView);
+  const isTopGridTree = parentType === "grid" && isTreeGrid;
   const isO2M = (gridView as Schema)?.serverType === "ONE_TO_MANY";
 
   const {
@@ -388,9 +389,16 @@ export function ExpandableFormView({
         const formState = get(formAtom)!;
         if (!formState.dirty || getErrors(formState)) return;
         set(formAtom, { ...formState, dirty: false });
-        await onSave?.({ ...record, ...formState.record, _dirty: true });
+        await onSave?.({ ...record, ...formState.record, _dirty: true })?.then(
+          (result) => {
+            const savedRecord = result as unknown as DataRecord;
+            if (savedRecord && isTopGridTree) {
+              doOnLoad(savedRecord);
+            }
+          },
+        );
       },
-      [formAtom, getErrors, onSave],
+      [formAtom, getErrors, onSave, isTopGridTree, doOnLoad],
     ),
   );
 
