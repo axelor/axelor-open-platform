@@ -268,7 +268,12 @@ function QuickMenuBar() {
     [menus, actionExecutor, refresh],
   );
 
-  return <CommandBar items={items} />;
+  return (
+    <CommandBar
+      items={items}
+      menuProps={{ contentClassName: styles.quickMenus }}
+    />
+  );
 }
 
 function FarItems() {
