@@ -8,6 +8,7 @@ import {
   Input,
   MenuItem,
   RenderCommandItemProps,
+  TextField,
 } from "@axelor/ui";
 import {
   MaterialIcon,
@@ -33,6 +34,7 @@ import {
 } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
 import { commonClassNames } from "@/styles/common";
+import { unaccent } from "@/utils/sanitize.ts";
 import {
   ActionExecutor,
   DefaultActionExecutor,
@@ -228,6 +230,8 @@ function QuickMenuItem({
 
 function QuickMenuBar() {
   const [menus, setMenus] = useState<QuickMenu[]>([]);
+  const [searchText, setSearchText] = useState("");
+
   const refresh = useCallback(async () => {
     setMenus(await quick());
   }, []);
@@ -238,6 +242,20 @@ function QuickMenuBar() {
 
   const actionExecutor = useMemo(
     () => new DefaultActionExecutor(new DefaultActionHandler()),
+    [],
+  );
+
+  const handleFilterChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value),
+    [],
+  );
+
+  const handleFilterSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Escape") {
+        setSearchText("");
+      }
+    },
     [],
   );
 
@@ -253,19 +271,41 @@ function QuickMenuBar() {
             key,
             text: item.title,
             render: (props: RenderCommandItemProps) => (
-              <QuickMenuItem
-                key={key}
-                data={item}
-                menu={menu}
-                actionExecutor={actionExecutor}
-                onClick={props.onClick}
-                onRefresh={refresh}
-              />
+              <>
+                {(menu?.items?.length ?? 0) >= 10 && index === 0 && (
+                  <TextField
+                    placeholder={i18n.get("Search...")}
+                    onChange={handleFilterChange}
+                    onKeyDown={handleFilterSearchKeyDown}
+                    value={searchText}
+                    className={styles.searchFiltersInput}
+                  />
+                )}
+                {unaccent(item.title)
+                  .toLowerCase()
+                  .includes(unaccent(searchText).toLowerCase()) && (
+                  <QuickMenuItem
+                    key={key}
+                    data={item}
+                    menu={menu}
+                    actionExecutor={actionExecutor}
+                    onClick={props.onClick}
+                    onRefresh={refresh}
+                  />
+                )}
+              </>
             ),
           };
         }),
       })),
-    [menus, actionExecutor, refresh],
+    [
+      menus,
+      handleFilterChange,
+      handleFilterSearchKeyDown,
+      searchText,
+      actionExecutor,
+      refresh,
+    ],
   );
 
   return (

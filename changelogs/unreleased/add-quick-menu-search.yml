@@ -1,0 +1,6 @@
+---
+title: Provide ability to search/filter items in quick menus
+type: feature
+description: |
+  When there are more than 10 items in quick menus, a search 
+  input is display on top in order to search/filter the items.
