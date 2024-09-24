@@ -13,7 +13,6 @@ import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useDataStore } from "@/hooks/use-data-store";
 import { usePerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useDevice } from "@/hooks/use-responsive";
@@ -127,20 +126,29 @@ function GridInner(props: ViewProps<GridView>) {
 
   const selector = action?.name?.startsWith("$selector");
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
-  const dsRecords = useDataStore(dataStore, (ds) => ds.records);
-  const getRecords = useAtomCallback(
+  const [records, setRecords] = useState(dataStore.records);
+
+  const processSearchResult = useAtomCallback(
     useCallback(
-      (get) => {
-        if (popupOptions?.onGridSearch) {
-          const { search } = get(searchAtom!);
-          return popupOptions?.onGridSearch(dsRecords, dataStore.page, search);
+      (get, set, { records, page }: SearchResult) => {
+        const { onGridSearch } = popupOptions ?? {};
+        if (onGridSearch) {
+          const { search } = (searchAtom && get(searchAtom)) ?? {};
+          return onGridSearch(records, page, search);
         }
-        return dsRecords;
+        return records;
       },
-      [dsRecords],
+      [popupOptions, searchAtom],
     ),
   );
-  const records = useMemo(() => getRecords(), [getRecords]);
+
+  useEffect(
+    () =>
+      dataStore.subscribe((ds) => {
+        setRecords(processSearchResult(ds));
+      }),
+    [dataStore, processSearchResult],
+  );
 
   const onColumnCustomize = useCustomizePopup({
     view,
