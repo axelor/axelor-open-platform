@@ -5,6 +5,28 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 7.2
+
+The main highlights are :
+
+- Region support added on translations : `fr-FR`, `fr-CA`, ...
+- Implement password reset flow
+- Add support to track custom fields/models
+- String pattern validation set to be case-sensitive
+- Customize the login page via the properties `application.sign-in.*`
+- Add color picker widget
+- Add Stepper widget
+- Add SwitchSelect widget
+- Enhance relative time widget display
+- Add image field support on relational fields
+- Allow to configure client polling interval
+- Add more events to views (`onDelete`, `onCopy`, ...)
+- Add support to reset dummy field value on save
+- Enhance TreeGrid widget
+
+Please check the {github-repo-url}/blob/7.2/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-7.2.adoc[7.2 migration guide].
+
 == 7.1
 
 The main highlights are :
