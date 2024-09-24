@@ -583,7 +583,7 @@ This widget is supported on `one-to-many` fields. It allows to show a tree-like 
       widget="TreeGrid"
       x-tree-field="items"
       x-tree-limit="2"
-      x-tree-field-title="Add new item"
+      x-tree-field-title="Add subline"
     >
       <field name="product" onChange="action-order-line-change-product"/>
       <field name="price" width="200" />
@@ -597,7 +597,7 @@ The following attributes are supported:
 
 * `x-tree-field`: (optional) used to define the nested o2m field, defaults to panel-related/field name.
 * `x-tree-limit`: (optional) used to specify limit to support nested tree structure.
-* `x-tree-field-title`: (optional) by default, it uses main title for sub-items heading (title will only display when item contains no-sub items).
+* `x-tree-field-title`: (optional) title used for add subitem button, defaults to "Add subitem" (button is shown only when item contains no subitems).
 * `x-expand-all`: (optional) it's enabled by default with tree-grid, it uses `x-tree-field` value as `x-expand-all` value. To disable it, we can set it to `"false"`
 * `summary-view`: (optional) used to define the extended form view, which will be displayed along with sub-lines view.
 

@@ -330,7 +330,7 @@ function OneToManyInner({
 
   const treeField = isTreeGrid ? (widgetAttrs?.treeField ?? schema.name) : null;
   const treeFieldTitle = isTreeGrid
-    ? i18n.get(schema.widgetAttrs?.treeFieldTitle ?? schema.title)
+    ? i18n.get(schema.widgetAttrs?.treeFieldTitle) || i18n.get("Add subitem")
     : null;
 
   const expandAll = useAtomValue(expandAtom);
