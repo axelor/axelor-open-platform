@@ -66,8 +66,12 @@ $treeNodePadding: 1.175rem;
   overflow: unset;
 }
 
-.subTreeGrid .grid {
-  overflow: hidden !important;
+.subTreeGrid {
+  background-color: var(--bs-table-bg);
+
+  .grid {
+    overflow: hidden !important;
+  }
 }
 
 .grid:not(.hasDetails) {
@@ -86,6 +90,9 @@ $treeNodePadding: 1.175rem;
 
 .tree.hasNewHeader {
   border: none;
+  & > div > div {
+    background-color: unset;
+  }
 }
 
 .title {
@@ -98,10 +105,20 @@ $treeNodePadding: 1.175rem;
   flex: 1;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
 :export {
   treeNodePadding: $treeNodePadding;
+}
+
+.addTextBtn {
+  --bs-border-radius: 1rem;
+  --bs-btn-padding-y: 0.0625rem;
+  --bs-btn-padding-x: 0.5rem;
+  --bs-btn-font-weight: 700;
+  --bs-btn-font-size: 0.75rem;
+}
+[dir="ltr"] .addTextIcon {
+  margin-left: -0.25rem;
+}
+[dir="rtl"] .addTextIcon {
+  margin-right: -0.25rem;
 }

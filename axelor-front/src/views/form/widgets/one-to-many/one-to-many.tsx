@@ -21,8 +21,9 @@ import {
   useState,
 } from "react";
 
-import { Badge, Box, Panel, clsx } from "@axelor/ui";
+import { Box, Button, Panel, clsx } from "@axelor/ui";
 import { GridColumnProps, GridRow } from "@axelor/ui/grid";
+import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
@@ -37,6 +38,7 @@ import {
 } from "@/hooks/use-relation";
 import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
+import { equals } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, ViewData } from "@/services/client/meta";
@@ -52,6 +54,7 @@ import {
 import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { toKebabCase } from "@/utils/names";
+import { findViewItem } from "@/utils/schema";
 import { getExportFieldNames } from "@/view-containers/advance-search/utils";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import { MetaScope, useUpdateViewDirty } from "@/view-containers/views/scope";
@@ -68,8 +71,6 @@ import {
   useIsRootCollectionTree,
 } from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
-import { equals } from "@/services/client/data-utils";
-import { findViewItem } from "@/utils/schema";
 
 import {
   Attrs,
@@ -729,7 +730,7 @@ function OneToManyInner({
         .filter((ind) => ind !== null);
     });
     serverSelectedIds.current = null;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.rows, setState]);
 
   useEffect(() => {
@@ -1922,15 +1923,19 @@ function OneToManyInner({
             <div className={styles.titleText}>
               {canShowTitle &&
                 (isSubTreeGrid && schema.title && rows.length === 0 ? (
-                  <Badge
+                  <Button
+                    d="flex"
+                    rounded
+                    size="sm"
                     variant="primary"
-                    className={styles.clickable}
+                    className={styles.addTextBtn}
                     {...(canNew && {
                       onClick: editable ? onAddInGrid : onAdd,
                     })}
                   >
+                    <MaterialIcon className={styles.addTextIcon} icon="add" />{" "}
                     {schema.title}
-                  </Badge>
+                  </Button>
                 ) : (
                   <FieldLabel
                     schema={schema}
