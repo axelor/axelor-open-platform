@@ -13,6 +13,8 @@ import { toKebabCase } from "@/utils/names.ts";
 import { isValidWidget, normalizeWidget } from "@/views/form/builder/utils";
 import { getFieldValue } from "@/utils/data-record";
 
+export const AUTO_ADD_ROW = Symbol("AUTO_ADD_ROW");
+
 export function useGridState(
   initialState?: Partial<GridState> & {
     view?: GridView;

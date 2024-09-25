@@ -24,6 +24,7 @@ import { diff, extractDummy } from "@/services/client/data-utils";
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
+import { SaveOptions } from "@/services/client/data";
 
 import {
   FormEditableScope,
@@ -78,7 +79,10 @@ export function ExpandableFormView({
   readonly?: boolean;
   onDiscard?: (record: DataRecord) => void;
   onUpdate?: (record: DataRecord) => void | Promise<void> | undefined;
-  onSave?: (record: DataRecord) => void | Promise<void> | undefined;
+  onSave?: (
+    record: DataRecord,
+    options?: SaveOptions<DataRecord>,
+  ) => void | Promise<void> | undefined;
   onClose?: () => void;
 }) {
   const { readonly, type: parentType } = useGridContext();
@@ -389,16 +393,17 @@ export function ExpandableFormView({
         const formState = get(formAtom)!;
         if (!formState.dirty || getErrors(formState)) return;
         set(formAtom, { ...formState, dirty: false });
-        await onSave?.({ ...record, ...formState.record, _dirty: true })?.then(
-          (result) => {
-            const savedRecord = result as unknown as DataRecord;
-            if (savedRecord && isTopGridTree) {
-              doOnLoad(savedRecord);
-            }
-          },
-        );
+        await onSave?.(
+          { ...record, ...formState.record, _dirty: true },
+          isTopGridTree ? { select: get(selectStateAtom) } : {},
+        )?.then((result) => {
+          const savedRecord = result as unknown as DataRecord;
+          if (savedRecord && isTopGridTree) {
+            doOnLoad(savedRecord);
+          }
+        });
       },
-      [formAtom, getErrors, onSave, isTopGridTree, doOnLoad],
+      [formAtom, selectStateAtom, getErrors, onSave, isTopGridTree, doOnLoad],
     ),
   );
 

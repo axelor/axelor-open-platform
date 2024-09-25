@@ -1,5 +1,5 @@
 import { clsx } from "@axelor/ui";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import isString from "lodash/isString";
@@ -28,7 +28,11 @@ import { useSession } from "@/hooks/use-session";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { request } from "@/services/client/client";
-import { SearchOptions, SearchResult } from "@/services/client/data";
+import {
+  SaveOptions,
+  SearchOptions,
+  SearchResult,
+} from "@/services/client/data";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -66,8 +70,12 @@ import { Grid as GridComponent, GridHandler } from "./builder";
 import { useCustomizePopup } from "./builder/customize";
 import { Details } from "./builder/details";
 import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
-import { CollectionTree, useCollectionTree } from "./builder/scope";
-import { getSortBy, useGridState } from "./builder/utils";
+import {
+  CollectionTree,
+  GridExpandableContext,
+  useCollectionTree,
+} from "./builder/scope";
+import { AUTO_ADD_ROW, getSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
 import { getSearchFilter } from "./renderers/search/utils";
 
@@ -145,10 +153,21 @@ function GridWrapper({
   state: GridState;
   isTreeGrid?: boolean;
 }) {
+  const expandableContext = useMemo(
+    () => ({
+      level: 0,
+      eventsAtom: atom({}),
+      selectAtom: atom({}),
+    }),
+    [],
+  );
+
   if (isTreeGrid) {
     return (
       <CollectionTree enabled>
-        <GridSizingWrapper state={state}>{children}</GridSizingWrapper>
+        <GridExpandableContext.Provider value={expandableContext}>
+          <GridSizingWrapper state={state}>{children}</GridSizingWrapper>
+        </GridExpandableContext.Provider>
       </CollectionTree>
     );
   }
@@ -529,14 +548,14 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onSave = useCallback(
-    async (record: DataRecord) => {
+    async (record: DataRecord, options?: SaveOptions<DataRecord>) => {
       const fields = Object.keys(meta.fields ?? {});
       const saved = await dataStore.save(
         {
           ...record,
           ...((record.id || -1) < 0 && { id: undefined }),
         },
-        fields.length ? { fields } : {},
+        { ...options, ...(fields.length ? { fields } : {}) },
       );
       saved && setDirty(false);
       return saved;
@@ -1187,6 +1206,7 @@ function GridInner(props: ViewProps<GridView>) {
                 }),
               },
               serverType: field.type,
+              [AUTO_ADD_ROW]: false,
             },
             ...(expandableSummaryMeta?.view?.items ?? []).filter(
               (item) => item.name !== "$wkfStatus", // skip wkf status

@@ -309,10 +309,12 @@ function OneToManyInner({
   const { level: expandLevel = 0, eventsAtom: parentEventsAtom } =
     useGridExpandableContext();
   const [initRecords, setInitRecords] = useState(false);
+  const [newLineRef, setNewLineRef] = useState<DataRecord | null>(null);
 
   const {
     items: itemsAtom,
     expand: expandAtom,
+    newItem: newItemAtom,
     getItem,
     columnAttrs: _treeColumnAttrs,
     setColumnAttrs,
@@ -838,6 +840,7 @@ function OneToManyInner({
           }
         }
         recordsSyncRef.current = true;
+
         setRecords((records) => {
           const newRecords = newItems.map((item, index) => {
             return unfetchedItems[index]
@@ -869,6 +872,17 @@ function OneToManyInner({
         });
 
         setInitRecords(true);
+
+        if (isCollectionTree) {
+          const { refId, data: newData } = get(newItemAtom);
+          const refRecord = newItems.find(
+            (item) => item.id === refId || item.cid === refId,
+          );
+          if (refId && refRecord) {
+            set(newItemAtom, { refId: null });
+            setNewLineRef(refRecord);
+          }
+        }
         return {
           page,
           records,
@@ -878,6 +892,7 @@ function OneToManyInner({
         getItems,
         valueAtom,
         gridAtom,
+        newItemAtom,
         dataStore,
         columnNames,
         orderBy,
@@ -1735,8 +1750,11 @@ function OneToManyInner({
   const treeColumnAttrs = useMemo(() => {
     return isSubTreeGrid
       ? Object.keys(_treeColumnAttrs ?? {}).reduce((obj, key) => {
-          const { $adjustColumnWidth, $padding = 0, ...colAttrs } =
-            _treeColumnAttrs?.[key] as any;
+          const {
+            $adjustColumnWidth,
+            $padding = 0,
+            ...colAttrs
+          } = _treeColumnAttrs?.[key] as any;
           return {
             ...obj,
             [key]: {
@@ -1834,6 +1852,13 @@ function OneToManyInner({
       addNewSubLine();
     }
   }, [initRecords, shouldAddSubLine, addNewSubLine]);
+
+  useAsyncEffect(async () => {
+    if (initRecords && newLineRef) {
+      setNewLineRef(null);
+      handleAddInGrid(newLineRef);
+    }
+  }, [initRecords, newLineRef, handleAddInGrid]);
 
   const expandableContext = useMemo(
     () => ({

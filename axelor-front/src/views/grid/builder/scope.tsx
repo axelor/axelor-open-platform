@@ -99,11 +99,17 @@ export interface ItemState {
   rootCollectionAtom?: CollectionAtom;
 }
 
+export interface NewItemState {
+  data?: DataRecord;
+  refId?: null | number;
+}
+
 export type ItemAtom = PrimitiveAtom<ItemState>;
 
 export interface CollectionState {
   expand: PrimitiveAtom<boolean>;
   items: PrimitiveAtom<ItemState[]>;
+  newItem: PrimitiveAtom<NewItemState>; // add new row for top level tree-grid
   getItem: (id: number, model: string) => ItemAtom;
   formAtom: FormAtom;
   columnAttrs?: Record<string, Partial<Attrs>>;
@@ -124,6 +130,7 @@ const FALLBACK_STATE: CollectionState = {
     () => false,
     () => {},
   ),
+  newItem: atom<NewItemState>({ refId: null }),
   formAtom: fallbackFormAtom,
   items: atom<ItemState[]>([]),
   getItem: (id: number, model: string) =>
@@ -186,6 +193,7 @@ function CollectionRoot({
   const [columnAttrs, setColumnAttrs] = useState<
     Record<string, Partial<Attrs>>
   >({});
+  const newItemAtom = useMemo(() => atom<NewItemState>({ refId: null }), []);
   const commitAtom = useMemo(() => atom<any>(null), []);
   const expandAtom = useMemo(() => atom(false), []);
   const itemsAtom = useMemo(() => {
@@ -257,6 +265,7 @@ function CollectionRoot({
       value={{
         expand: expandAtom,
         items: itemsAtom,
+        newItem: newItemAtom,
         formAtom,
         getItem,
         enabled,

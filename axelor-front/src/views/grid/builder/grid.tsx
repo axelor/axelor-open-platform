@@ -29,7 +29,11 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePermitted } from "@/hooks/use-permitted";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSession } from "@/hooks/use-session";
-import { SearchOptions, SearchResult } from "@/services/client/data";
+import {
+  SaveOptions,
+  SearchOptions,
+  SearchResult,
+} from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData, ViewData } from "@/services/client/meta";
@@ -137,7 +141,10 @@ export const Grid = forwardRef<
     onDelete?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
     onUpdate?: (record: GridRow["record"]) => void;
-    onSave?: (record: GridRow["record"]) => void;
+    onSave?: (
+      record: GridRow["record"],
+      options?: SaveOptions<GridRow["record"]>,
+    ) => void;
     onDiscard?: (record: GridRow["record"]) => void;
   }
 >(function Grid(props, ref) {
@@ -463,6 +470,11 @@ export const Grid = forwardRef<
 
   const isPermitted = usePermitted(model, perms);
 
+  const handleRecordSave = useCallback(
+    (record: GridRow["record"]) => onSave?.(record),
+    [onSave],
+  );
+
   const handleRecordAdd = useCallback(async () => {
     setEvent("editable:add-new");
     return true;
@@ -647,7 +659,7 @@ export const Grid = forwardRef<
             !isMobile && {
               editable,
               editRowRenderer: CustomFormRenderer,
-              onRecordSave: onSave,
+              onRecordSave: handleRecordSave,
               onRecordAdd: handleRecordAdd,
               onRecordEdit: handleRecordEdit,
               onRecordDiscard: handleRecordDiscard,

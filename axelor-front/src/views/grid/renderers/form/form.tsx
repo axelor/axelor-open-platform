@@ -47,6 +47,7 @@ import {
   useCollectionTreeEditable,
 } from "../../builder/scope";
 import { ExpandIcon } from "../../builder/expandable";
+import { AUTO_ADD_ROW } from "../../builder/utils";
 
 import styles from "./form.module.scss";
 
@@ -284,6 +285,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       }),
       [view, fields],
     );
+    const { newItem: newItemAtom } = useCollectionTree();
+
     const editColumnName = columns?.[cellIndex ?? -1]?.name;
     const initFormFieldsStates = useMemo(() => {
       const defaultColumnName = view.items?.find(isFocusableField)?.name;
@@ -317,6 +320,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { setCommit } = useCollectionTreeEditable();
     const isTreeGrid =
       isCollectionTree && (view as Schema).widget === "tree-grid";
+    const autoAddNewRow = (view as any)[AUTO_ADD_ROW] ?? true;
 
     const { formAtom: parent, actionHandler: parentActionHandler } =
       useFormScope();
@@ -374,6 +378,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       [onCancel, record, rowIndex, cellIndex],
     );
 
+    const isRecordSavable = useAtomCallback(
+      useCallback(
+        (get) => {
+          const formState = get(formAtom);
+          return !isEqual(record, formState.record) || !hasSaved;
+        },
+        [formAtom, record, hasSaved],
+      ),
+    );
+
     const handleSave = useAtomCallback(
       useCallback(
         async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
@@ -395,7 +409,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
           // check record changes
           // if saved record is same then discard the editing
-          if (isEqual(record, formState.record) && hasSaved) {
+          if (!isRecordSavable()) {
             return onSave?.(
               record,
               rowIndex,
@@ -433,7 +447,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         },
         [
           expand,
-          hasSaved,
           isLastRow,
           actionExecutor,
           formAtom,
@@ -444,6 +457,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           rowIndex,
           cellIndex,
           isTreeGrid,
+          isRecordSavable,
         ],
       ),
     );
@@ -480,26 +494,46 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       onExpand?.(gridRow, !gridRow.expand);
     }, [gridRow, onExpand, handleRecordCommit]);
 
-    const handleKeyDown = useCallback(
-      function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-        if (e.defaultPrevented && e.detail !== 1) return;
-        if (e.key === `Escape`) {
-          return handleCancel?.(findColumnIndexByNode(e.target as HTMLElement));
-        }
-        if (e.key === `Enter`) {
-          const shouldAddSubLine = e.ctrlKey && onAddSubLine;
-          return handleSave?.(
-            expand || shouldAddSubLine ? true : undefined,
-            findColumnIndexByNode(e.target as HTMLElement),
-          ).then(async () => {
-            if (shouldAddSubLine) {
-              !expand && (await handleExpand());
-              onAddSubLine(record);
-            }
-          });
-        }
-      },
-      [expand, record, onAddSubLine, handleExpand, handleSave, handleCancel],
+    const handleKeyDown = useAtomCallback(
+      useCallback(
+        function handleKeyDown(get, set, e: KeyboardEvent<HTMLDivElement>) {
+          if (e.defaultPrevented && e.detail !== 1) return;
+          if (e.key === `Escape`) {
+            return handleCancel?.(
+              findColumnIndexByNode(e.target as HTMLElement),
+            );
+          }
+          if (e.key === `Enter`) {
+            const shouldAddSubLine = e.ctrlKey && onAddSubLine;
+            const savable = isRecordSavable();
+            return handleSave?.(
+              (!autoAddNewRow && savable) || expand || shouldAddSubLine
+                ? true
+                : undefined,
+              findColumnIndexByNode(e.target as HTMLElement),
+            ).then(async () => {
+              if (shouldAddSubLine) {
+                !expand && (await handleExpand());
+                onAddSubLine(record);
+              } else if (!autoAddNewRow && isLastRow && savable) {
+                set(newItemAtom, { refId: record.id });
+              }
+            });
+          }
+        },
+        [
+          expand,
+          record,
+          autoAddNewRow,
+          newItemAtom,
+          isLastRow,
+          isRecordSavable,
+          onAddSubLine,
+          handleExpand,
+          handleSave,
+          handleCancel,
+        ],
+      ),
     );
 
     const handleClickOutside = useCallback(
@@ -518,9 +552,17 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const handleCellClick = useCallback(
       (e: SyntheticEvent, col: GridColumn, colIndex: number) => {
-        onCellClick?.(e, col, colIndex, gridRow, rowIndex);
+        const shouldCommitAndAdd = !autoAddNewRow && (record.id ?? 0) <= 0;
+        if (shouldCommitAndAdd && (col as Schema).widget === "new-icon") {
+          // handle same way as saved with enter key press
+          handleKeyDown({
+            key: "Enter",
+          } as KeyboardEvent<HTMLDivElement>);
+        } else {
+          onCellClick?.(e, col, colIndex, gridRow, rowIndex);
+        }
       },
-      [onCellClick, gridRow, rowIndex],
+      [onCellClick, handleKeyDown, gridRow, rowIndex, autoAddNewRow, record.id],
     );
 
     const CustomLayout = useMemo(
