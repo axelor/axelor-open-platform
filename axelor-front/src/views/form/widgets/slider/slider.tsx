@@ -1,7 +1,14 @@
 import { useAtom } from "jotai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { Box, clsx } from "@axelor/ui";
+import { Box, clsx, Portal } from "@axelor/ui";
 
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
@@ -32,6 +39,7 @@ export function Slider(props: FieldProps<string | number>) {
   const [isDragging, setIsDragging] = useState(false);
   const [currentValue, setCurrentValue] = useState(value ?? min);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
 
   const sliderRef = useRef<HTMLDivElement | null>(null);
 
@@ -92,6 +100,10 @@ export function Slider(props: FieldProps<string | number>) {
       newValue = +(Math.round(newValue / step) * step);
 
       setCurrentValue(parse(newValue));
+      setTooltipPosition({
+        left: Math.min(Math.max(clientX, rect.left), rect.left + rect.width),
+        top: rect.top - 45,
+      });
     },
     [max, min, parse, step],
   );
@@ -147,7 +159,17 @@ export function Slider(props: FieldProps<string | number>) {
 
   useEffect(() => {
     setCurrentValue(value);
-  }, [value]);
+
+    if (!sliderRef.current || value === undefined || value === null) return;
+
+    const rect = sliderRef.current.getBoundingClientRect();
+    const clampedValue = Math.min(Math.max(Number(value), min), max);
+
+    setTooltipPosition({
+      left: rect.left + (clampedValue / max) * rect.width,
+      top: rect.top - 45,
+    });
+  }, [max, min, parse, value]);
 
   return (
     <FieldControl {...props} titleActions={<>{displayedValue}</>}>
@@ -179,16 +201,13 @@ export function Slider(props: FieldProps<string | number>) {
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           />
-          {((showTooltip || isDragging) && displayedValue) && (
-            <Box
-              className={styles.tooltip}
-              bgColor="primary"
-              color="white"
-              style={{ left: thumbPosition }}
-            >
-              {displayedValue}
-            </Box>
-          )}
+
+          <SliderTooltip
+            position={tooltipPosition}
+            isVisible={(showTooltip || isDragging) && !!displayedValue}
+          >
+            {displayedValue}
+          </SliderTooltip>
         </Box>
       </Box>
       {sliderShowMinMax && (
@@ -198,5 +217,31 @@ export function Slider(props: FieldProps<string | number>) {
         </Box>
       )}
     </FieldControl>
+  );
+}
+
+function SliderTooltip({
+  children,
+  position,
+  isVisible,
+}: PropsWithChildren<{
+  position: { left: number; top: number };
+  isVisible: boolean;
+}>) {
+  return (
+    <Portal container={document.body}>
+      <Box
+        className={styles.tooltip}
+        bgColor="primary"
+        color="white"
+        style={{
+          left: position.left,
+          top: position.top,
+          opacity: isVisible ? 1 : 0,
+        }}
+      >
+        {children}
+      </Box>
+    </Portal>
   );
 }
