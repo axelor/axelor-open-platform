@@ -1223,6 +1223,10 @@ function OneToManyInner({
         // clear sorting if applied
         setState((draft) => {
           draft.orderBy = null;
+          // clear selection when record is added through `+` add icon
+          if (record) {
+            draft.selectedRows = null;
+          }
         });
 
         const newRecord = {
