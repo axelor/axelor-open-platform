@@ -23,7 +23,7 @@ import {
 } from "react";
 
 import { Box, Button, Panel, clsx } from "@axelor/ui";
-import { GridColumnProps, GridRow } from "@axelor/ui/grid";
+import { GridColumnProps, GridRow, GridState } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
@@ -67,9 +67,11 @@ import {
   GridExpandableContext,
   GridExpandableEvents,
   useCollectionTree,
+  useCollectionTreeColumnAttrs,
   useGridColumnNames,
   useGridExpandableContext,
   useIsRootCollectionTree,
+  useSetRootCollectionTreeColumnAttrs,
 } from "@/views/grid/builder/scope";
 import { isValidSequence, useGridState } from "@/views/grid/builder/utils";
 
@@ -317,7 +319,6 @@ function OneToManyInner({
     newItem: newItemAtom,
     getItem,
     columnAttrs: _treeColumnAttrs,
-    setColumnAttrs,
     enabled: isCollectionTree,
     waitForActions: waitForCollectionActions,
   } = useCollectionTree();
@@ -1751,73 +1752,10 @@ function OneToManyInner({
     }
   }, [isRootTreeGrid, expandable, records, syncRecordsToTree]);
 
-  const treeColumnAttrs = useMemo(() => {
-    return isSubTreeGrid
-      ? Object.keys(_treeColumnAttrs ?? {}).reduce((obj, key) => {
-          const {
-            $adjustColumnWidth,
-            $padding = 0,
-            ...colAttrs
-          } = _treeColumnAttrs?.[key] as any;
-          return {
-            ...obj,
-            [key]: {
-              ...colAttrs,
-              ...($adjustColumnWidth && {
-                width:
-                  colAttrs.width -
-                  ($padding + getTreeNodePadding() * expandLevel),
-                computed: true,
-              }),
-            },
-          };
-        }, {})
-      : {};
-  }, [isSubTreeGrid, _treeColumnAttrs, expandLevel]);
-
-  useEffect(() => {
-    if (isRootTreeGrid) {
-      let hasSetAdjustColumnWidth = false;
-      const _columnAttrs = (state.columns ?? []).reduce(
-        (colsAttrs, col) => {
-          colsAttrs = {
-            ...colsAttrs,
-            [col.name]: {
-              ...colsAttrs[col.name],
-              visible: col.visible,
-            } as any,
-          };
-
-          if (col.width) {
-            colsAttrs[col.name] = {
-              ...colsAttrs[col.name],
-              computed: true,
-              width: col.width,
-            } as any;
-          }
-
-          if (
-            !hasSetAdjustColumnWidth &&
-            !col.action &&
-            col.visible !== false &&
-            (col.width ?? 0) > 50
-          ) {
-            hasSetAdjustColumnWidth = true;
-            colsAttrs[col.name] = {
-              ...colsAttrs[col.name],
-              $adjustColumnWidth: true,
-            } as any;
-          }
-
-          return colsAttrs;
-        },
-        columnAttrs ?? ({} as Record<string, Partial<Attrs>>),
-      );
-      setColumnAttrs?.((_attrs) =>
-        isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
-      );
-    }
-  }, [isRootTreeGrid, state.columns, columnAttrs, setColumnAttrs]);
+  const treeColumnAttrs = useCollectionTreeColumnAttrs({
+    enabled: isSubTreeGrid,
+    padding: getTreeNodePadding(),
+  });
 
   useEffect(() => {
     const fieldsSelect = gridViewData?.items
@@ -1939,6 +1877,9 @@ function OneToManyInner({
 
   return (
     <>
+      {isRootTreeGrid && (
+        <RootTreeGridInit state={state} columnAttrs={columnAttrs} />
+      )}
       <Panel
         ref={panelRef}
         className={clsx(styles.container, {
@@ -2236,5 +2177,16 @@ const CustomGridHeaderCell = forwardRef(function CustomGridHeaderCell(
 });
 
 function HideGridHeaderRow() {
+  return null;
+}
+
+function RootTreeGridInit({
+  state,
+  columnAttrs,
+}: {
+  state: GridState;
+  columnAttrs?: Record<string, Partial<Attrs>>;
+}) {
+  useSetRootCollectionTreeColumnAttrs(state, { defaultAttrs: columnAttrs });
   return null;
 }

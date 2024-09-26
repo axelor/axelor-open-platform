@@ -12,9 +12,11 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
+import isEqual from "lodash/isEqual";
 import uniq from "lodash/uniq";
 
 import { JsonField, Property, Schema } from "@/services/client/meta.types";
@@ -22,6 +24,7 @@ import { parseOrderBy } from "./utils";
 import { Attrs, FormAtom } from "@/views/form/builder";
 import { useFormScope } from "@/views/form/builder/scope";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
+import { GridState } from "@axelor/ui/grid";
 
 export type GridHandler = {
   readonly?: boolean;
@@ -164,6 +167,94 @@ export function useIsRootCollectionTree() {
   const collectionAtom = useMolecule(collectionMolecule);
   const collectionState = useAtomValue(collectionAtom);
   return collectionState === FALLBACK_STATE;
+}
+
+const ADJUST_COLUMN_WIDTH = "ADJUST_COLUMN_WIDTH";
+const ADJUST_COLUMN_PADDING = "ADJUST_COLUMN_PADDING";
+
+export function useSetRootCollectionTreeColumnAttrs(
+  state: GridState,
+  options: {
+    defaultAttrs?: Record<string, Partial<Attrs>>;
+    padding?: number;
+  } = {},
+) {
+  const { defaultAttrs, padding = 0 } = options;
+  const { setColumnAttrs } = useCollectionTree();
+
+  useEffect(() => {
+    let hasSetAdjustColumnWidth = false;
+    const _columnAttrs = (state.columns ?? []).reduce(
+      (colsAttrs, col) => {
+        colsAttrs = {
+          ...colsAttrs,
+          [col.name]: {
+            ...colsAttrs[col.name],
+            visible: col.visible,
+          } as any,
+        };
+
+        if (col.width) {
+          colsAttrs[col.name] = {
+            ...colsAttrs[col.name],
+            computed: true,
+            width: col.width,
+          } as any;
+        }
+
+        if (
+          !hasSetAdjustColumnWidth &&
+          !col.action &&
+          col.visible !== false &&
+          (col.width ?? 0) > 50
+        ) {
+          hasSetAdjustColumnWidth = true;
+          colsAttrs[col.name] = {
+            ...colsAttrs[col.name],
+            [ADJUST_COLUMN_PADDING]: padding,
+            [ADJUST_COLUMN_WIDTH]: true,
+          } as any;
+        }
+
+        return colsAttrs;
+      },
+      defaultAttrs ?? ({} as Record<string, Partial<Attrs>>),
+    );
+    setColumnAttrs?.((_attrs) =>
+      isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
+    );
+  }, [state.columns, setColumnAttrs, padding, defaultAttrs]);
+}
+
+export function useCollectionTreeColumnAttrs(
+  { enabled, padding: nodePadding } = { enabled: true, padding: 0 },
+) {
+  const { columnAttrs } = useCollectionTree();
+  const { level: expandLevel = 0 } = useGridExpandableContext();
+
+  return useMemo(() => {
+    return enabled
+      ? Object.keys(columnAttrs ?? {}).reduce((obj, key) => {
+          const {
+            [ADJUST_COLUMN_WIDTH]: $adjustColumnWidth,
+            [ADJUST_COLUMN_PADDING]: $adjustColumnPadding = 0,
+            ...colAttrs
+          } = columnAttrs?.[key] as any;
+          return {
+            ...obj,
+            [key]: {
+              ...colAttrs,
+              ...($adjustColumnWidth && {
+                width:
+                  colAttrs.width -
+                  ($adjustColumnPadding + nodePadding * expandLevel),
+                computed: true,
+              }),
+            },
+          };
+        }, {})
+      : {};
+  }, [enabled, nodePadding, columnAttrs, expandLevel]);
 }
 
 export function CollectionTree(props: {

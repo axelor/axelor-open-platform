@@ -60,7 +60,6 @@ import {
 
 import { Dms } from "../dms";
 import { fetchRecord } from "../form";
-import { Attrs } from "../form/builder";
 import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
 import { nextId } from "../form/builder/utils";
@@ -73,7 +72,7 @@ import { MassUpdater, useMassUpdateFields } from "./builder/mass-update";
 import {
   CollectionTree,
   GridExpandableContext,
-  useCollectionTree,
+  useSetRootCollectionTreeColumnAttrs,
 } from "./builder/scope";
 import { AUTO_ADD_ROW, getSortBy, useGridState } from "./builder/utils";
 import { SearchColumn } from "./renderers/search";
@@ -96,51 +95,7 @@ function GridSizingWrapper({
   state: GridState;
   children: ReactElement;
 }) {
-  const { setColumnAttrs } = useCollectionTree();
-
-  useEffect(() => {
-    let hasSetAdjustColumnWidth = false;
-    const _columnAttrs = (state.columns ?? []).reduce(
-      (colsAttrs, col) => {
-        colsAttrs = {
-          ...colsAttrs,
-          [col.name]: {
-            ...colsAttrs[col.name],
-            visible: col.visible,
-          } as any,
-        };
-
-        if (col.width) {
-          colsAttrs[col.name] = {
-            ...colsAttrs[col.name],
-            computed: true,
-            width: col.width,
-          } as any;
-        }
-
-        if (
-          !hasSetAdjustColumnWidth &&
-          !col.action &&
-          col.visible !== false &&
-          (col.width ?? 0) > 50
-        ) {
-          hasSetAdjustColumnWidth = true;
-          colsAttrs[col.name] = {
-            ...colsAttrs[col.name],
-            $padding: 8.125,
-            $adjustColumnWidth: true,
-          } as any;
-        }
-
-        return colsAttrs;
-      },
-      {} as Record<string, Partial<Attrs>>,
-    );
-    setColumnAttrs?.((_attrs) =>
-      isEqual(_attrs, _columnAttrs) ? _attrs : _columnAttrs,
-    );
-  }, [state.columns, setColumnAttrs]);
-
+  useSetRootCollectionTreeColumnAttrs(state, { padding: 8.125 });
   return children;
 }
 
