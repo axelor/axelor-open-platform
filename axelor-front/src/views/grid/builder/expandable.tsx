@@ -13,6 +13,7 @@ import { ScopeProvider } from "bunshi/react";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
+import isEqual from "lodash/isEqual";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
@@ -481,10 +482,13 @@ export function ExpandableFormView({
       }
     }
   }, [formReady, scrollToForm, isCollection, isTreeGrid]);
-
+  
   useEffect(() => {
     if (formSelect) {
-      setSelectState((state) => merge(cloneDeep(state), cloneDeep(formSelect)));
+      setSelectState((state) => {
+        const newState = merge(cloneDeep(state), cloneDeep(formSelect));
+        return isEqual(state, newState) ? state : newState;
+      });
     }
   }, [formSelect, setSelectState]);
 
