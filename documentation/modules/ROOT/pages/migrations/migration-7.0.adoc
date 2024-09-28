@@ -18,6 +18,9 @@ Here are the following changes due to this change :
 - `npm-install` Gradle task has been removed.
 - input values aren't trimmed anymore : leading and trailing whitespaces are preserved.
 
+CAUTION: Due to the nature of the changes, some urls doesn't exist anymore :  `/login.jsp` -> `/#/login`.
+Make sure to update your browsers favorites links.
+
 == Font Awesome icons deprecated
 
 Font Awesome icons was used as main icons library. Now two library are used :
