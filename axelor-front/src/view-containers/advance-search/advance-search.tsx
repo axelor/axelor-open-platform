@@ -33,6 +33,7 @@ import {
 } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
+import { unaccent } from "@/utils/sanitize.ts";
 import { focusAndSelectInput } from "@/views/form";
 import { SelectionTag } from "@/views/form/widgets";
 
@@ -427,7 +428,9 @@ export function AdvanceSearch({
       return domains.filter(
         (item) =>
           (item.title &&
-            item.title.toLowerCase().includes(searchText.toLowerCase())) ||
+            unaccent(item.title.toLowerCase()).includes(
+              unaccent(searchText.toLowerCase()),
+            )) ||
           item.checked,
       );
     }
