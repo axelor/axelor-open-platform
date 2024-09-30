@@ -238,7 +238,7 @@ export function processContextValues(
               findItem: (jsonPath: string) => {
                 function findTargetNames(schema: Schema): Schema[] {
                   const items =
-                    schema.type !== "panel-related" ? schema.items ?? [] : [];
+                    schema.type !== "panel-related" ? (schema.items ?? []) : [];
                   const nested = items.flatMap((item) => findTargetNames(item));
                   return [
                     ...items
@@ -519,6 +519,10 @@ export function removeVersion(record: DataRecord) {
 
 export function processM2OValue(record: DataRecord, targetName: string) {
   return pick(removeVersion(record), ["id", "$version", targetName]);
+}
+
+export function isExpandableWidget(schema: Schema) {
+  return ["tree-grid", "expandable"].includes(schema.widget ?? "");
 }
 
 // Types that are saved independently from main record

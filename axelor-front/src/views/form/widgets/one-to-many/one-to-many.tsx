@@ -9,6 +9,7 @@ import uniq from "lodash/uniq";
 import uniqueId from "lodash/uniqueId";
 import {
   ForwardedRef,
+  Fragment,
   HTMLAttributes,
   SetStateAction,
   SyntheticEvent,
@@ -87,7 +88,11 @@ import {
   useFormRefresh,
   useFormScope,
 } from "../../builder/scope";
-import { getDefaultValues, nextId } from "../../builder/utils";
+import {
+  getDefaultValues,
+  isExpandableWidget,
+  nextId,
+} from "../../builder/utils";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
 
@@ -158,10 +163,6 @@ function flattenItems(record: DataRecord, name: string) {
   );
 }
 
-function isExpandableWidget(schema: Schema) {
-  return ["tree-grid", "expandable"].includes(schema.widget ?? "");
-}
-
 const getTreeNodePadding = (() => {
   let paddingValue: number;
   return () =>
@@ -179,10 +180,12 @@ const getTreeNodePadding = (() => {
 })();
 
 export function OneToMany(props: FieldProps<DataRecord[]>) {
-  const { schema } = props;
+  const { schema, widgetAtom } = props;
   const { target: model, gridView } = schema;
   const { actionExecutor } = useFormScope();
   const isRootCollection = useIsRootCollectionTree();
+
+  const hidden = useAtomValue(widgetAtom).attrs?.hidden;
 
   const waitForActions = useCallback(async () => {
     await actionExecutor.waitFor();
@@ -247,7 +250,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
           waitForActions,
         })}
       >
-        {render()}
+        {hidden ? <Fragment /> : render()}
       </CollectionTree>
     );
   }

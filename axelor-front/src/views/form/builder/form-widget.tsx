@@ -36,6 +36,7 @@ import {
   WidgetAtom,
   WidgetProps,
 } from "./types";
+import { isExpandableWidget } from "./utils";
 
 type FormWidgetProps = Omit<WidgetProps, "widgetAtom"> & {
   render?: (props: WidgetProps) => React.ReactNode;
@@ -124,7 +125,14 @@ export function FormWidget(props: FormWidgetProps) {
   // special cases
   // 1. show/hide of panel-tabs loses active tab of it.
   // always mount panel-tabs to persist it's state.
-  if (hidden && schema.type === "panel-tabs") {
+  // 2. collection grid (o2m/m2m) with expandable/tree-grid widget
+  // to persist expandable state of rows
+  if (
+    hidden &&
+    (schema.type === "panel-tabs" ||
+      (schema.serverType?.endsWith("TO_MANY") &&
+        isExpandableWidget(schema)))
+  ) {
     return (
       <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />
     );
