@@ -213,8 +213,18 @@ export function ExpandableFormView({
           const missing = fields.filter((field) => rec[field] === undefined);
           if (missing.length === 0) return rec;
 
+          if (rec._dirty && fetchedRef.current) {
+            return {
+              ...fetchedRef.current,
+              ...rec,
+            };
+          }
+
           hasFetched = true;
-          return fetchRecord(meta, ds, rec.id!);
+          return fetchRecord(meta, ds, rec.id!).then((fetchedRecord) => ({
+            ...fetchedRecord,
+            ...(rec._dirty && { ...rec }),
+          }));
         })();
 
         const record: DataRecord = (fetchedRef.current = {
