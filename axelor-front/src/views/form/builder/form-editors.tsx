@@ -32,7 +32,12 @@ import { createFormAtom, formDirtyUpdater } from "./atoms";
 import { Form, useFormHandlers, usePermission } from "./form";
 import { FieldControl } from "./form-field";
 import { GridLayout } from "./form-layouts";
-import { useAfterActions, useFormReady, useFormScope } from "./scope";
+import {
+  useAfterActions,
+  useCanDirty,
+  useFormReady,
+  useFormScope,
+} from "./scope";
 import {
   FieldProps,
   FormLayout,
@@ -208,6 +213,7 @@ function SimpleEditor({ editor, fields, ...props }: FormEditorProps) {
 function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
   const {
+    name,
     orderBy,
     searchLimit,
     formView: formViewName,
@@ -332,6 +338,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
   );
 
   const { itemsFamily, items, isCleanInitial, setInvalid } = useItemsFamily({
+    name,
     widgetAtom,
     valueAtom,
     required,
@@ -399,6 +406,7 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
 const IS_INITIAL = Symbol();
 
 function useItemsFamily({
+  name: fieldName,
   widgetAtom,
   valueAtom,
   exclusive,
@@ -406,6 +414,7 @@ function useItemsFamily({
   multiple = true,
   canShowNew = true,
 }: {
+  name: string;
   widgetAtom: WidgetAtom;
   valueAtom: ValueAtom<DataRecord | DataRecord[]>;
   exclusive?: string;
@@ -418,16 +427,22 @@ function useItemsFamily({
     [],
   );
 
-  const isClean = useCallback((item: DataRecord | null) => {
-    if (!item) return true;
-    const values = filter(item, function (value, name) {
-      return (
-        (name !== "id" || value > 0) &&
-        !(/[$_]/.test(name) || value === null || value === undefined)
-      );
-    });
-    return values.length === 0;
-  }, []);
+  const canDirty = useCanDirty();
+
+  const isClean = useCallback(
+    (item: DataRecord | null) => {
+      if (!item) return true;
+      const values = filter(item, function (value, name) {
+        return (
+          (name !== "id" || value > 0) &&
+          canDirty(`${fieldName}.${name}`) &&
+          value != null
+        );
+      });
+      return values.length === 0;
+    },
+    [canDirty, fieldName],
+  );
 
   const makeArray = useCallback((value: unknown): DataRecord[] => {
     if (Array.isArray(value)) return value;
@@ -664,7 +679,7 @@ function useItemsFamily({
 
 function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
   const { schema, formAtom, widgetAtom, valueAtom, readonly } = props;
-  const { perms } = schema;
+  const { name, perms } = schema;
   const model = schema.target!;
 
   const exclusive = useMemo(() => {
@@ -686,6 +701,7 @@ function CollectionEditor({ editor, fields, ...props }: FormEditorProps) {
     removeItem,
     setInvalid,
   } = useItemsFamily({
+    name,
     widgetAtom,
     valueAtom,
     exclusive,
