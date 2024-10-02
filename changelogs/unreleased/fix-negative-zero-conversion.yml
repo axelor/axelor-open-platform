@@ -1,0 +1,6 @@
+---
+title: Fix negative zero conversion
+type: fix
+description: |
+  Decimal values between 0 and -1 do not become absolute.
+  For example, -0.5 is no longer converted to 0.5
