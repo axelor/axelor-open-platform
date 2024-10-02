@@ -20,7 +20,6 @@ package com.axelor.db;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuditInterceptor;
 import com.axelor.cache.CacheConfig;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
@@ -113,7 +112,6 @@ public class JpaModule extends AbstractModule {
       properties.put(Environment.SCANNER, JpaScanner.class.getName());
     }
 
-    properties.put(Environment.INTERCEPTOR, AuditInterceptor.class.getName());
     properties.put(
         Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
     properties.put(
