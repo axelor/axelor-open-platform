@@ -1,4 +1,5 @@
 import _ from "lodash";
+import uniqueId from "lodash/uniqueId";
 
 import { toKebabCase } from "@/utils/names";
 import { findViewItem } from "@/utils/schema";
@@ -132,7 +133,7 @@ function processWidgetAttrs(field: Schema) {
 
 export function processWidget(field: Schema) {
   if (!field.uid) {
-    field.uid = _.uniqueId("w");
+    field.uid = uniqueId("w");
   }
   if (field.widget) {
     field.widget = _.kebabCase(field.widget);
