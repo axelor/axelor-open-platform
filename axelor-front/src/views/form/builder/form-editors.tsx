@@ -5,6 +5,7 @@ import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import isNumber from "lodash/isNumber";
+import filter from "lodash/filter";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -342,22 +343,22 @@ function ReferenceEditor({ editor, fields, ...props }: FormEditorProps) {
     <div className={styles.actions}>
       {canEdit && canShowIcon("edit") && (
         <Box d="flex" alignItems="center" title={i18n.get("Edit")}>
-          <MaterialIcon icon="edit" onClick={() => handleEdit(false)}/>
+          <MaterialIcon icon="edit" onClick={() => handleEdit(false)} />
         </Box>
       )}
       {canView && !canEdit && canShowIcon("view") && (
         <Box d="flex" alignItems="center" title={i18n.get("View")}>
-          <MaterialIcon icon="description" onClick={() => handleEdit(true)}/>
+          <MaterialIcon icon="description" onClick={() => handleEdit(true)} />
         </Box>
       )}
       {canSelect && canShowIcon("select") && (
         <Box d="flex" alignItems="center" title={i18n.get("Select")}>
-          <MaterialIcon icon="search" onClick={handleSelect}/>
+          <MaterialIcon icon="search" onClick={handleSelect} />
         </Box>
       )}
       {canRemove && canShowIcon("clear") && (
         <Box d="flex" alignItems="center" title={i18n.get("Clear")}>
-          <MaterialIcon icon="cancel" onClick={handleDelete}/>
+          <MaterialIcon icon="cancel" onClick={handleDelete} />
         </Box>
       )}
     </div>
@@ -417,10 +418,16 @@ function useItemsFamily({
     [],
   );
 
-  const isClean = useCallback(
-    (item: DataRecord | null) => item && Object.keys(item).length === 1,
-    [],
-  );
+  const isClean = useCallback((item: DataRecord | null) => {
+    if (!item) return true;
+    const values = filter(item, function (value, name) {
+      return (
+        (name !== "id" || value > 0) &&
+        !(/[$_]/.test(name) || value === null || value === undefined)
+      );
+    });
+    return values.length === 0;
+  }, []);
 
   const makeArray = useCallback((value: unknown): DataRecord[] => {
     if (Array.isArray(value)) return value;
@@ -852,11 +859,7 @@ const RecordEditor = memo(function RecordEditor({
 }: FormEditorProps & {
   model: string;
   layout?: FormLayout;
-  setInvalid: (
-    value: DataRecord,
-    invalid: boolean,
-    errors?: string[],
-  ) => void;
+  setInvalid: (value: DataRecord, invalid: boolean, errors?: string[]) => void;
 }) {
   const meta: ViewData<FormView> = useMemo(
     () => ({
