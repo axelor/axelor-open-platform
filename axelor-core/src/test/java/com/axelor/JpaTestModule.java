@@ -36,6 +36,7 @@ public class JpaTestModule extends AbstractModule {
         new JpaModule("testUnit")
             .scan("com.axelor.auth.db")
             .scan("com.axelor.meta.db")
+            .scan("com.axelor.mail.db")
             .scan("com.axelor.dms.db")
             .scan("com.axelor.test.db"));
     install(new AuthModule());
