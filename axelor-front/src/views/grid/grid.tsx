@@ -212,7 +212,6 @@ function GridInner(props: ViewProps<GridView>) {
 
   const onColumnCustomize = useCustomizePopup({
     view,
-    fields,
     stateAtom: gridStateAtom,
     allowCustomization: Boolean(
       action.params?.["_can-customize-popup"] ?? true,

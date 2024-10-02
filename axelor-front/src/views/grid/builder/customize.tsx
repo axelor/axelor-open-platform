@@ -28,13 +28,11 @@ type ViewHandler = (state?: GridState) => GridView | undefined;
 function CustomizeDialog({
   title = i18n.get("Columns"),
   view,
-  fields,
   canShare,
   onUpdate,
 }: {
   title?: string;
   view: GridView;
-  fields?: Record<string, Property>;
   canShare?: boolean;
   onUpdate?: (fn: ViewHandler) => void;
 }) {
@@ -283,12 +281,10 @@ function CustomizeDialog({
 
 export function useCustomizePopup({
   view,
-  fields,
   stateAtom,
   allowCustomization = true,
 }: {
   view?: GridView;
-  fields?: Record<string, Property>;
   stateAtom: WritableAtom<GridState, any, any>;
   allowCustomization?: boolean;
 }) {
@@ -360,7 +356,6 @@ export function useCustomizePopup({
           content: (
             <CustomizeDialog
               view={view}
-              fields={fields}
               title={title}
               canShare={canShare}
               onUpdate={(fn) => {
@@ -373,7 +368,7 @@ export function useCustomizePopup({
           onClose: () => {},
         });
       },
-      [view, fields, stateAtom],
+      [view, stateAtom],
     ),
   );
 
