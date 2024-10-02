@@ -1,0 +1,13 @@
+---
+title: Re-implemented audit traking/fields support
+type: change
+description: |
+  The old Interceptor based implementation has several limitations and couldn't work
+  in cases where persistence session is created manually.
+
+  The new implementation uses event listener api and thus can have access to the session
+  for which the events are fired. Fixing, issues caused by persistent session created
+  manually.
+  
+  Also, new api handles multi-threading cases more effectively.
+
