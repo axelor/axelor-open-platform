@@ -38,8 +38,10 @@ export const convertDecimal: Converter<string> = (value, { props } = {}) => {
   const dec = parseFloat(`0.${nums[1] || 0}`).toFixed(limitedScale);
   // increment the integer part if decimal part is greater than 0 (due to rounding)
   const num = BigInt(nums[0]) + BigInt(parseInt(dec));
+  // add "-" to avoid -0.x becoming 0.x because of BigInt
+  const isZeroNegative = nums[0].startsWith("-0");
   // append the decimal part
-  return num + dec.substring(1);
+  return (isZeroNegative ? `-${num}` : num) + dec.substring(1);
 };
 
 export const convertInteger: Converter<number> = (value, { props } = {}) => {
