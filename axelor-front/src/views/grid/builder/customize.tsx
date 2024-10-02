@@ -110,6 +110,7 @@ function CustomizeDialog({
       .map((item) => ({
         id: nextId(),
         name: item.name,
+        type: "field",
         label: item.title || item.autoTitle,
       }));
     showSelector({
@@ -187,6 +188,7 @@ function CustomizeDialog({
             .filter((s) => !records.find((r) => r.name === s.name))
             .map((record) => ({
               ...record,
+              type: "field",
               title: record.label,
             })),
         ]);
