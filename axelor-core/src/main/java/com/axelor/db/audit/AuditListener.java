@@ -18,8 +18,6 @@
  */
 package com.axelor.db.audit;
 
-import com.axelor.auth.AuditableRunner;
-import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -31,9 +29,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaSequence;
 import jakarta.persistence.PersistenceException;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.PreDeleteEvent;
 import org.hibernate.event.spi.PreDeleteEventListener;
@@ -57,33 +52,7 @@ public class AuditListener
   private static final String ADMIN_GROUP = "admins";
   private static final String ADMIN_CHECK_FIELD = "code";
 
-  private User findUser(SessionImplementor session, String code) {
-    return session
-        .createQuery("SELECT self FROM User self WHERE self.code = :code", User.class)
-        .setParameter("code", code)
-        .setHibernateFlushMode(FlushMode.MANUAL)
-        .setCacheMode(CacheMode.NORMAL)
-        .uniqueResult();
-  }
-
-  private User currentUser(SessionImplementor session) {
-    User user = AuditableRunner.batchUser();
-    if (user == null) {
-      String code =
-          Optional.ofNullable(AuthUtils.getSubject())
-              .map(x -> x.getPrincipal())
-              .map(x -> x.toString())
-              .orElse(null);
-      user = findUser(session, code);
-    }
-
-    if (user == null) return null;
-    if (session.contains(user)) {
-      return user;
-    }
-
-    return findUser(session, user.getCode());
-  }
+  final AuditTrail auditTrail = new AuditTrail();
 
   private boolean canUpdate(PreUpdateEvent event) {
     final Object id = event.getId();
@@ -181,7 +150,7 @@ public class AuditListener
 
     if (entity instanceof AuditableModel) {
       final LocalDateTime now = LocalDateTime.now();
-      final User user = currentUser(session);
+      final User user = AuditUtils.currentUser(session);
 
       final EntityPersister persister = event.getPersister();
       final String[] names = persister.getPropertyNames();
@@ -194,6 +163,9 @@ public class AuditListener
     // set sequence field if any
     setSequenceProperty(event);
 
+    // handle tracks
+    auditTrail.onPreInsert(event);
+
     return false;
   }
 
@@ -204,7 +176,7 @@ public class AuditListener
 
     if (entity instanceof AuditableModel && canUpdate(event)) {
       final LocalDateTime now = LocalDateTime.now();
-      final User user = currentUser(session);
+      final User user = AuditUtils.currentUser(session);
 
       final EntityPersister persister = event.getPersister();
       final String[] names = persister.getPropertyNames();
@@ -213,6 +185,9 @@ public class AuditListener
       setProperty(persister, entity, names, state, UPDATED_ON, now);
       setProperty(persister, entity, names, state, UPDATED_BY, user);
     }
+
+    // handle tracks
+    auditTrail.onPreUpdate(event);
 
     return false;
   }
@@ -227,6 +202,9 @@ public class AuditListener
           String.format(
               "You can't delete: %s#%s", EntityHelper.getEntityClass(entity).getName(), id));
     }
+
+    // handle delete
+    auditTrail.onPreDelete(event);
 
     return false;
   }

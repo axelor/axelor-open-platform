@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.axelor.auth;
+package com.axelor.db.audit;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
@@ -71,46 +73,26 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import org.hibernate.Transaction;
+import org.hibernate.FlushMode;
+import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** This class provides change tracking for auditing and notifications. */
-final class AuditTracker {
+public class AuditTracker implements BeforeTransactionCompletionProcess {
 
   private static final Logger log = LoggerFactory.getLogger(AuditTracker.class);
 
-  private static final ThreadLocal<Map<String, EntityState>> STORE =
-      ThreadLocal.withInitial(HashMap::new);
+  private final Map<String, Map<Long, EntityState>> store = new HashMap<>();
+  private final Set<Model> updated = new HashSet<>();
+  private final Set<Model> deleted = new HashSet<>();
 
-  private static final ThreadLocal<Set<Model>> UPDATED = ThreadLocal.withInitial(HashSet::new);
-  private static final ThreadLocal<Set<Model>> DELETED = ThreadLocal.withInitial(HashSet::new);
-  private static final ThreadLocal<User> CURRENT_USER = new ThreadLocal<>();
-
-  private static class EntityState {
-
-    private Model entity;
-
-    private Map<String, Object> values;
-    private Map<String, Object> oldValues;
-
-    public static void create(
-        Model entity, Map<String, Object> values, Map<String, Object> oldValues) {
-      String key = entity.getClass().getName() + ":" + entity.getId();
-      EntityState state = STORE.get().get(key);
-      if (state == null) {
-        state = new EntityState();
-        state.entity = entity;
-        state.values = values;
-        state.oldValues = oldValues;
-        STORE.get().put(key, state);
-      } else {
-        state.values.putAll(values);
-      }
-    }
-  }
-
+  private User currentUser;
   private ObjectMapper objectMapper;
+
+  private MailMessageRepository mailMessageRepository;
+  private MailFollowerRepository mailFollowerRepository;
 
   private String toJSON(Object value) {
     if (objectMapper == null) {
@@ -229,15 +211,32 @@ final class AuditTracker {
       }
     }
 
-    EntityState.create(entity, values, oldValues);
+    final Long id = entity.getId();
+    final String key = EntityHelper.getEntityClass(entity).getName();
+    final Map<Long, EntityState> entityStates = store.computeIfAbsent(key, key_ -> new HashMap<>());
+
+    final EntityState entityState =
+        entityStates.computeIfAbsent(
+            id,
+            id_ -> {
+              EntityState newEntityState = new EntityState();
+              newEntityState.entity = entity;
+              newEntityState.values = values;
+              newEntityState.oldValues = oldValues;
+              return newEntityState;
+            });
+
+    if (entityState.values != values) {
+      entityState.values.putAll(values);
+    }
   }
 
-  public void delete(Model entity) {
-    DELETED.get().add(entity);
+  public void deleted(Model entity) {
+    deleted.add(entity);
   }
 
   public void updated(Model entity) {
-    UPDATED.get().add(entity);
+    updated.add(entity);
   }
 
   private String findMessage(
@@ -428,7 +427,7 @@ final class AuditTracker {
     message.setRelatedModel(entity.getClass().getName());
     message.setType(MailConstants.MESSAGE_TYPE_NOTIFICATION);
 
-    Beans.get(MailMessageRepository.class).save(message);
+    getMailMessageRepository().save(message);
 
     try {
       message.setRelatedName(mapper.getNameField().get(entity).toString());
@@ -441,8 +440,22 @@ final class AuditTracker {
       follower.setRelatedModel(entity.getClass().getName());
       follower.setUser(user);
       follower.setArchived(false);
-      Beans.get(MailFollowerRepository.class).save(follower);
+      getMailFollowerRepository().save(follower);
     }
+  }
+
+  private MailMessageRepository getMailMessageRepository() {
+    if (mailMessageRepository == null) {
+      mailMessageRepository = Beans.get(MailMessageRepository.class);
+    }
+    return mailMessageRepository;
+  }
+
+  private MailFollowerRepository getMailFollowerRepository() {
+    if (mailFollowerRepository == null) {
+      mailFollowerRepository = Beans.get(MailFollowerRepository.class);
+    }
+    return mailFollowerRepository;
   }
 
   private Object getValue(
@@ -482,84 +495,57 @@ final class AuditTracker {
     }
   }
 
-  private void processTracks(Transaction tx) {
-    final Map<String, EntityState> store = STORE.get();
-    if (store.isEmpty()) {
-      return;
-    }
+  private void processTracks() {
+    var count = 0;
 
-    // prevent concurrent update
-    STORE.remove();
+    for (var states : store.values()) {
+      for (var state : states.values()) {
+        process(state, currentUser);
 
-    int count = 0;
-    for (EntityState state : store.values()) {
-      User user = CURRENT_USER.get();
-      process(state, user);
+        if (++count % DBHelper.getJdbcBatchSize() == 0) {
+          JPA.flush();
+          JPA.clear();
 
-      if (++count % DBHelper.getJdbcBatchSize() == 0) {
-        JPA.flush();
-        JPA.clear();
-
-        if (user != null) {
-          CURRENT_USER.set(AuthUtils.getUser(user.getCode()));
+          if (currentUser != null) {
+            currentUser = AuthUtils.getUser(currentUser.getCode());
+          }
         }
       }
     }
   }
 
-  private void processDelete(Transaction tx) {
-    final Set<Model> deleted = DELETED.get();
-    if (deleted.isEmpty()) {
-      return;
-    }
+  private void processDelete() {
     final MetaFiles files = Beans.get(MetaFiles.class);
-
-    // prevent concurrent delete
-    DELETED.remove();
-
     for (Model entity : deleted) {
       files.deleteAttachments(entity);
     }
   }
 
   private void fireBeforeCompleteEvent() {
-    final Set<Model> updated = UPDATED.get();
-    final Set<Model> deleted = DELETED.get();
-    if (updated.isEmpty() && deleted.isEmpty()) {
+    if (!updated.isEmpty() || !deleted.isEmpty()) {
+      Beans.get(BeforeTransactionCompleteService.class).fire(updated, deleted);
+    }
+  }
+
+  @Override
+  public void doBeforeTransactionCompletion(SessionImplementor session) {
+    fireBeforeCompleteEvent();
+
+    currentUser = AuditUtils.currentUser(session);
+    processTracks();
+    processDelete();
+
+    if (session.getHibernateFlushMode() == FlushMode.MANUAL || session.isClosed()) {
       return;
     }
-    Beans.get(BeforeTransactionCompleteService.class).fire(updated, deleted);
+
+    session.flush();
   }
 
-  /**
-   * This method should be called from {@link
-   * AuditInterceptor#afterTransactionCompletion(Transaction)} method to clear the change recording.
-   */
-  public void clear() {
-    STORE.remove();
-    DELETED.remove();
-    UPDATED.remove();
-    CURRENT_USER.remove();
-  }
-
-  /**
-   * This method should be called from {@link
-   * AuditInterceptor#beforeTransactionCompletion(Transaction)} method to finish change recording.
-   *
-   * @param tx the transaction in which the change tracking is being done
-   * @param user the session user
-   */
-  public void onComplete(Transaction tx, User user) {
-    try {
-      this.fireBeforeCompleteEvent();
-
-      CURRENT_USER.set(user);
-      this.processTracks(tx);
-      this.processDelete(tx);
-    } finally {
-      clear();
-      JPA.em().flush();
-    }
+  private static class EntityState {
+    private Model entity;
+    private Map<String, Object> values;
+    private Map<String, Object> oldValues;
   }
 
   @Singleton
