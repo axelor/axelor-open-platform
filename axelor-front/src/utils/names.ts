@@ -1,11 +1,9 @@
-import {
-  camelCase,
-  capitalize,
-  kebabCase,
-  snakeCase,
-  startCase,
-  upperFirst,
-} from "lodash";
+import camelCase from "lodash/camelCase";
+import capitalize from "lodash/capitalize";
+import kebabCase from "lodash/kebabCase";
+import snakeCase from "lodash/snakeCase";
+import startCase from "lodash/startCase";
+import upperFirst from "lodash/upperFirst";
 
 export function toCamelCase(name: string): string;
 export function toCamelCase(name: string, firstUpper: boolean): string;

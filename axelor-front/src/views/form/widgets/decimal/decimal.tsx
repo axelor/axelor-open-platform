@@ -1,6 +1,6 @@
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { get } from "lodash";
+import get from "lodash/get";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { Input } from "@axelor/ui";

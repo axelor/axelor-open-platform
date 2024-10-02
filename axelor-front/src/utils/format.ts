@@ -1,4 +1,5 @@
-import _ from "lodash";
+import get from "lodash/get";
+import padStart from "lodash/padStart";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -49,9 +50,9 @@ const formatDuration: Formatter = (value, opts = {}) => {
   let m = "" + Math.floor((value % 3600) / 60);
   let s = "" + Math.floor((value % 3600) % 60);
 
-  h = _.padStart(h, props?.big ? 3 : 2, "0");
-  m = _.padStart(m, 2, "0");
-  s = _.padStart(s, 2, "0");
+  h = padStart(h, props?.big ? 3 : 2, "0");
+  m = padStart(m, 2, "0");
+  s = padStart(s, 2, "0");
 
   let text = h + ":" + m;
 
@@ -164,7 +165,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
   if ((serverType ?? type)?.toUpperCase() === "DECIMAL") {
     // referencing another field in the context?
     if (typeof scale === "string") {
-      scale = +((_.get(context, scale) as number) ?? scale);
+      scale = +((get(context, scale) as number) ?? scale);
     }
 
     if (typeof scale !== "number" || isNaN(scale)) {
@@ -176,7 +177,7 @@ const formatNumber: Formatter = (value, opts = {}) => {
 
   if (currency) {
     // referencing another field in the context?
-    currency = _.get(context, currency) as string;
+    currency = get(context, currency) as string;
   } else if (currencyText) {
     // else it is the currency text (legacy angular filter)
     currency = currencyText;
@@ -222,7 +223,7 @@ const formatPercent: Formatter = (value, opts = {}) => {
 
   // referencing another field in the context?
   if (typeof scale === "string") {
-    scale = (_.get(context, scale) as number) ?? scale;
+    scale = (get(context, scale) as number) ?? scale;
   }
 
   let num = +value;
@@ -267,7 +268,7 @@ const formatOne: Formatter = (value, opts = {}) => {
 
   function getValue(val: DataRecord, name: string) {
     const key = `$t:${name}`;
-    return val[key] ?? _.get(val, name);
+    return val[key] ?? get(val, name);
   }
 
   return (
@@ -317,12 +318,9 @@ const format: Formatter = (value, opts = {}) => {
   if (context && val === undefined) {
     if (props && (props as JsonField).jsonField) {
       const { jsonField, jsonPath } = props as JsonField;
-      val = _.get(
-        getJSON(_.get(context, jsonField as string)),
-        jsonPath as string,
-      );
+      val = get(getJSON(get(context, jsonField as string)), jsonPath as string);
     } else if (name?.includes(".") && value === undefined) {
-      val = _.get(context, name);
+      val = get(context, name);
     }
   }
 

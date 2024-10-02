@@ -6,7 +6,7 @@ import {
 } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { ActionView } from "@/services/client/meta.types";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 
 const openView: typeof openTab = (view, options) => {
   if (view && typeof view !== "string" && !view.name) {

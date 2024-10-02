@@ -2,7 +2,7 @@ import { clsx } from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { useAtomCallback } from "jotai/utils";
-import { uniq } from "lodash";
+import uniq from "lodash/uniq";
 import {
   SyntheticEvent,
   useCallback,

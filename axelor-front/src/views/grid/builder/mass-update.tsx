@@ -1,5 +1,6 @@
-import _ from "lodash";
+
 import { useMemo, useState, useId } from "react";
+import forEach from "lodash/forEach";
 
 import {
   Box,
@@ -54,7 +55,7 @@ export function useMassUpdateFields(
         placeholder: item.placeholder ?? item?.title ?? field.title,
       });
     };
-    _.each(items, (item) => {
+    forEach(items, (item) => {
       if (item.type === "field") {
         accept(fields?.[item.name!], item as Field);
       }

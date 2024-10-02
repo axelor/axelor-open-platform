@@ -3,6 +3,7 @@ import { Grid, GridProvider, GridState } from "@axelor/ui/grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WritableAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
+import forEach from "lodash/forEach";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
@@ -19,7 +20,6 @@ import { toTitleCase } from "@/utils/names";
 import { unaccent } from "@/utils/sanitize.ts";
 
 import styles from "./customize.module.scss";
-import _ from "lodash";
 
 const reload = () => window.location.reload();
 
@@ -160,7 +160,7 @@ function CustomizeDialog({
       },
       onGridSearch: (records, page, search) => {
         let recs: DataRecord[] = [];
-        _.forEach(records, (rec) => {
+        forEach(records, (rec) => {
           recs.push({
             ...rec,
             label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),

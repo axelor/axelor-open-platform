@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect, useMemo } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";

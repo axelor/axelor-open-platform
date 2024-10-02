@@ -1,6 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import { isEqual, uniqueId } from "lodash";
+import isEqual from "lodash/isEqual";
+import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect, useRef } from "react";
 
 import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";

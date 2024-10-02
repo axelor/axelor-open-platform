@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai";
-import { uniq } from "lodash";
+import uniq from "lodash/uniq";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 
 import {

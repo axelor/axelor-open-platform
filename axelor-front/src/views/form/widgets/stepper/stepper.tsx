@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { useCallback, useMemo } from "react";
 
 import { Box, Button, clsx, OverflowList } from "@axelor/ui";

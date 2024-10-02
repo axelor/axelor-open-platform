@@ -6,7 +6,9 @@ import {
   useSetAtom,
 } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual, isNil, omitBy } from "lodash";
+import isEqual from "lodash/isEqual";
+import isNil from "lodash/isNil";
+import omitBy from "lodash/omitBy";
 import { useCallback } from "react";
 
 import { GridState } from "@axelor/ui/grid";

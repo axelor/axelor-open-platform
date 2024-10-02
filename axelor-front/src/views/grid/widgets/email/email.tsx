@@ -1,4 +1,4 @@
-import { escape } from "lodash";
+import escape from "lodash/escape";
 
 import { TextLink } from "@/components/text-link";
 import { GridColumnProps } from "@axelor/ui/grid";

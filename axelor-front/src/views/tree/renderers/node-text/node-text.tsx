@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { TreeNode } from "@axelor/ui";
-import { get } from "lodash";
+import get from "lodash/get";
 
 import {
   Field,

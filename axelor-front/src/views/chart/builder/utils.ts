@@ -1,4 +1,10 @@
-import _, { isString, isNumber, sortBy, each, map, difference } from "lodash";
+import chain from "lodash/chain";
+import difference from "lodash/difference";
+import forEach from "lodash/forEach";
+import isNumber from "lodash/isNumber";
+import isString from "lodash/isString";
+import map from "lodash/map";
+import sortBy from "lodash/sortBy";
 
 import { moment } from "@/services/client/l10n";
 import { ChartDataRecord, ChartType } from "./types";
@@ -378,16 +384,16 @@ export function PlusData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = _.chain(dataset)
+  const types = chain(dataset)
     .map(series.groupBy || xAxis)
     .uniq()
     .value();
 
-  const result = _.chain(dataset)
+  const result = chain(dataset)
     .groupBy(xAxis)
     .map((group, name) => {
       let value = 0;
-      each(group, (item) => {
+      forEach(group, (item) => {
         value += $conv(item[series.key]);
       });
       if (!series.groupBy && xAxis) series.groupBy = xAxis;
@@ -427,14 +433,14 @@ export function PlotData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = _.chain(dataset)
+  const types = chain(dataset)
     .map(xAxis)
     .uniq()
     .map((v) => $conv(v, data.xType))
     .value();
   const { groupBy } = series;
 
-  const result = _.chain(dataset)
+  const result = chain(dataset)
     .groupBy(groupBy)
     .map((group: any, groupName: string) => {
       const name = groupBy ? groupName : null;

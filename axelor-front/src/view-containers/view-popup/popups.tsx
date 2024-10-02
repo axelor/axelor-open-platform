@@ -1,5 +1,5 @@
 import { Provider, atom, createStore, useAtomValue } from "jotai";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { Fragment } from "react";
 
 import { Portal } from "@axelor/ui";

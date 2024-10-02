@@ -1,4 +1,8 @@
-import _ from "lodash";
+import camelCase from "lodash/camelCase";
+import forEach from "lodash/forEach";
+import isArray from "lodash/isArray";
+import isString from "lodash/isString";
+import startsWith from "lodash/startsWith";
 import uniqueId from "lodash/uniqueId";
 
 import { toKebabCase } from "@/utils/names";
@@ -29,8 +33,8 @@ function processJsonForm(view: Schema) {
 
 export function processFields(fields: Property[] | Record<string, Property>) {
   let result: Record<string, Property> = {};
-  if (_.isArray(fields)) {
-    _.forEach(fields, (field) => {
+  if (isArray(fields)) {
+    forEach(fields, (field) => {
       field.type = field.type || "STRING";
       field.title = field.title || field.autoTitle;
       if (field.name) {
@@ -58,8 +62,8 @@ export function processSelection(field: Schema, editable?: boolean) {
   if ((field.selection || field.selectionList) && !field.widget) {
     field.widget = "selection";
   }
-  _.each(field.selectionList, (item) => {
-    if (_.isString(item.data)) {
+  forEach(field.selectionList, (item) => {
+    if (isString(item.data)) {
       item.data = JSON.parse(item.data);
     }
   });
@@ -68,10 +72,10 @@ export function processSelection(field: Schema, editable?: boolean) {
 function processWidgetAttrs(field: Schema) {
   const attrs: Record<string, any> = {};
 
-  _.each(field.widgetAttrs || {}, (value, name) => {
+  forEach(field.widgetAttrs || {}, (value, name) => {
     let val = value;
     if (value === "null") val = null;
-    if (name === "widget" && value) val = _.kebabCase(value);
+    if (name === "widget" && value) val = toKebabCase(value);
     else if (
       [
         "exclusive",
@@ -106,7 +110,7 @@ function processWidgetAttrs(field: Schema) {
         "ratingHighlightSelected",
         "stepperCompleted",
         "stepperShowDescription",
-        "resetState"
+        "resetState",
       ].indexOf(name) !== -1
     ) {
       val = String(value)?.toLowerCase?.() === "true";
@@ -128,7 +132,7 @@ function processWidgetAttrs(field: Schema) {
     ) {
       val = +value;
     }
-    attrs[_.camelCase(name)] = val;
+    attrs[camelCase(name)] = val;
   });
 
   return attrs;
@@ -139,7 +143,7 @@ export function processWidget(field: Schema) {
     field.uid = uniqueId("w");
   }
   if (field.widget) {
-    field.widget = _.kebabCase(field.widget);
+    field.widget = toKebabCase(field.widget);
   }
   field.widgetAttrs = processWidgetAttrs(field);
 }
@@ -167,7 +171,7 @@ function UseIncluded(view: Schema) {
 
   let items: Schema[] = [];
 
-  _.each(view.items, (item) => {
+  forEach(view.items, (item) => {
     if (item.type === "include") {
       if (item.view) {
         items = items.concat(UseItems(item.view));
@@ -216,7 +220,7 @@ export async function findViewFields(
       editor.fields = processFields(editor.fields);
     }
     const acceptItems = (items: Schema[] = []) => {
-      _.each(items, (child) => {
+      forEach(items, (child) => {
         if (child.name && child.type === "field") {
           pushIn(child.name, collect);
           const targetName = getNonDefaultTargetName(child, editor.fields);
@@ -246,7 +250,7 @@ export async function findViewFields(
     if (item.name && item.target) {
       collect = result.related[item.name] || (result.related[item.name] = []);
     }
-    _.each(viewer.fields, (item) => {
+    forEach(viewer.fields, (item) => {
       pushIn(item.name, collect);
     });
     if (viewer.fields) {
@@ -427,7 +431,7 @@ export function processView(
     const placeholder: Schema = helps.placeholder ?? {};
     const inline: Schema = helps.inline ?? {};
 
-    _.forEach(view.items, (item) => {
+    forEach(view.items, (item) => {
       if (item.name && help[item.name]) {
         item.help = help[item.name].help;
       }
@@ -448,7 +452,7 @@ export function processView(
       items.push(item);
     });
 
-    _.forEach(view.toolbar, (item) => {
+    forEach(view.toolbar, (item) => {
       if (help[item.name]) {
         item.help = help[item.name].help;
       }
@@ -472,7 +476,7 @@ export function processView(
     });
   }
 
-  _.forEach(view.items, (item, itemIndex) => {
+  forEach(view.items, (item, itemIndex) => {
     if (["panel", "panel-related"].includes(item.type ?? "") && !parent) {
       item.showFrame = item.showFrame ?? true;
     } else if (item.type === "panel-tabs") {
@@ -493,7 +497,7 @@ export function processView(
 
     if (item.name) {
       const field = fields[item.name];
-      _.forEach(fields[item.name], (value, key) => {
+      forEach(fields[item.name], (value, key) => {
         if (!Object.hasOwn(item, key)) {
           item[key] = value;
         }
@@ -592,7 +596,7 @@ export function processView(
 
           // remove x- prefix from all widget attributes
           for (const key in field.widgetAttrs) {
-            if (_.startsWith(key, "x-")) {
+            if (startsWith(key, "x-")) {
               field.widgetAttrs[key.substring(2)] = field.widgetAttrs[key];
               delete field.widgetAttrs[key];
             }
@@ -659,7 +663,7 @@ export function processView(
   });
 
   // process view boolean attributes starts with can
-  _.each(view, (value, key) => {
+  forEach(view, (value, key) => {
     if (key.startsWith("can") && ["false", "true"].includes(value)) {
       view[key] = value === "true";
     }
@@ -671,9 +675,9 @@ export function processView(
     }
     // include json fields in grid
     let items: Schema[] = [];
-    _.forEach(view.items, (item) => {
+    forEach(view.items, (item) => {
       if (item.jsonFields) {
-        _.forEach(item.jsonFields, (field) => {
+        forEach(item.jsonFields, (field) => {
           const type = field.type || "text";
           if (
             type.indexOf("-to-many") === -1 &&

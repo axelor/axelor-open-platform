@@ -1,4 +1,5 @@
-import { isArrayLikeObject, isPlainObject } from "lodash";
+import isArrayLikeObject from "lodash/isArrayLikeObject";
+import isPlainObject from "lodash/isPlainObject";
 import { $request, $use } from "../http";
 
 export const CSRF_HEADER_NAME = "X-CSRF-Token";

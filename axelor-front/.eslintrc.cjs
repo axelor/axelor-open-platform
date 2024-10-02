@@ -26,5 +26,16 @@ module.exports = {
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "warn",
     "prefer-const": "warn",
+    "no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          {
+            name: "lodash",
+            message: "Import [module] from lodash/[module] instead",
+          },
+        ],
+      },
+    ],
   },
 };

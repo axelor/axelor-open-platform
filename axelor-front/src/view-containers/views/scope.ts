@@ -1,7 +1,7 @@
 import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 import {
   SetStateAction,
   useCallback,

@@ -2,7 +2,7 @@ import { Box, Panel, Popper, clsx } from "@axelor/ui";
 import { useAtom, useSetAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useAtomCallback } from "jotai/utils";
-import { uniq } from "lodash";
+import uniq from "lodash/uniq";
 import getValue from "lodash/get";
 import isObject from "lodash/isObject";
 import setValue from "lodash/set";

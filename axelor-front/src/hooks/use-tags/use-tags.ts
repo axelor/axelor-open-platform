@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { selectAtom } from "jotai/utils";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 
 import { Tag } from "@/services/client/meta.types";
 import { SocketChannel } from "@/services/client/socket";

@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import pick from "lodash/pick";
 
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";

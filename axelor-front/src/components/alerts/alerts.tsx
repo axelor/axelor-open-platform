@@ -1,6 +1,6 @@
 import { clsx } from "@axelor/ui";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
-import { uniqueId } from "lodash";
+import uniqueId from "lodash/uniqueId";
 import { createRef, useEffect } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 

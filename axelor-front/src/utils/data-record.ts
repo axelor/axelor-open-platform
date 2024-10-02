@@ -1,6 +1,6 @@
 import { DataRecord } from "@/services/client/data.types.ts";
 import { Field, JsonField } from "@/services/client/meta.types.ts";
-import _ from "lodash";
+import get from "lodash/get";
 
 /**
  * Extract the field value from the given DataRecord
@@ -16,10 +16,10 @@ export function getFieldValue(
   let data = record;
   if ((field as JsonField)?.jsonField) {
     const { jsonField, jsonPath } = field as JsonField;
-    data = getJSON(_.get(record, jsonField as string));
+    data = getJSON(get(record, jsonField as string));
     fieldName = jsonPath as string;
   }
-  return _.get(data, fieldName);
+  return get(data, fieldName);
 }
 
 /**

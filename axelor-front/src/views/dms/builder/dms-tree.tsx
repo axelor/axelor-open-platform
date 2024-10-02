@@ -1,6 +1,6 @@
 import { Fragment, memo, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 import { clsx } from "@axelor/ui";
 
 import { Box, useDrop } from "@axelor/ui";

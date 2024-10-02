@@ -2,7 +2,9 @@ import { createScope, molecule, useMolecule } from "bunshi/react";
 import { produce } from "immer";
 import { atom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { isEqual, isNumber, set as setDeep } from "lodash";
+import isEqual from "lodash/isEqual";
+import isNumber from "lodash/isNumber";
+import setDeep from "lodash/set";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
