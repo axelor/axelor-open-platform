@@ -27,7 +27,7 @@ import java.util.concurrent.Callable;
 /** This class can be used to run batch jobs that requires to keep track of audit logs. */
 public class AuditableRunner {
 
-  static ThreadLocal<User> batchUser = new ThreadLocal<>();
+  static final ThreadLocal<User> batchUser = new ThreadLocal<>();
 
   private static final String DEFAULT_BATCH_USER = "admin";
 
@@ -36,6 +36,15 @@ public class AuditableRunner {
   @Inject
   public AuditableRunner(UserRepository users) {
     this.users = users;
+  }
+
+  /**
+   * Get the batch user.
+   *
+   * @return current user
+   */
+  public static User batchUser() {
+    return batchUser.get();
   }
 
   /**
