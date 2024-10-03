@@ -17,6 +17,6 @@
   padding: 1rem;
 }
 
-.tooltip[data-popper-placement^="bottom"] [data-popper-arrow]::before {
+.tooltip[data-popper-placement^="bottom"] :global(.AxPopper_arrow) {
   background-color: var(--bs-tertiary-bg);
 }
