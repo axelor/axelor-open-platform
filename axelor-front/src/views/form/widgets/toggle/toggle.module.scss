@@ -3,6 +3,12 @@
   opacity: 0.4;
 }
 
+.readonlyIcon {
+  display: inline-flex;
+  padding: var(--ax-theme-btn-padding-x) var(--ax-theme-btn-padding-y);
+  opacity: 0.4;
+}
+
 .active {
   opacity: 1;
 }

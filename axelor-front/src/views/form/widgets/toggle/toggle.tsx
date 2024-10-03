@@ -20,13 +20,25 @@ export function Toggle(props: FieldProps<boolean>) {
 
   const ico = value ? (iconActive ?? icon ?? "square-fill") : (icon ?? "square");
 
+  if (readonly) {
+    return (
+      <FieldControl {...props} className={styles.container}>
+        <Icon
+          icon={ico}
+          className={clsx(styles.readonlyIcon, {
+            [styles.active]: !!value,
+          })}
+        />
+      </FieldControl>
+    );
+  }
+
   return (
     <FieldControl {...props} className={styles.container}>
       <Button
         id={uid}
         variant="light"
         className={styles.toggle}
-        disabled={readonly}
         onClick={handleClick}
       >
         <Icon
