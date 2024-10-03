@@ -1,20 +1,21 @@
-import { clsx } from "@axelor/ui";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { CSSProperties, useCallback, useMemo } from "react";
-import { selectAtom } from "jotai/utils";
 
-import { Box } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 import {
   BootstrapIcon,
   BootstrapIconName,
 } from "@axelor/ui/icons/bootstrap-icon";
+
 import { Field } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { FieldControl, FieldProps } from "@/views/form/builder";
+import { useFormReady } from "../../builder/scope";
+
 import styles from "./rating.module.scss";
 
 export function Rating(props: FieldProps<number>) {
-  const { schema, readonly, valueAtom, formAtom } = props;
+  const { schema, readonly, valueAtom } = props;
   const { maxSize = 5, widgetAttrs, required } = schema;
   const {
     ratingIcon = "star",
@@ -23,9 +24,7 @@ export function Rating(props: FieldProps<number>) {
     ratingHighlightSelected = false,
   } = widgetAttrs || {};
 
-  const ready = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (form) => form.ready), [formAtom]),
-  );
+  const ready = useFormReady();
   const [value, setValue] = useAtom(valueAtom);
 
   const handleClick = useCallback(
