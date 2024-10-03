@@ -5,7 +5,6 @@ import { useAtomCallback } from "jotai/utils";
 import { ReactElement, useCallback, useEffect, useRef } from "react";
 import { ScopeProvider } from "bunshi/react";
 
-import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
@@ -26,6 +25,7 @@ import {
   Layout,
   showErrors,
   useFormAttachment,
+  useFormPerms,
   useGetErrors,
   useHandleFocus,
   usePrepareSaveRecord,
@@ -64,11 +64,12 @@ export function Details({
   onSave,
   onCancel,
 }: DetailsProps) {
-  const { view, perms } = meta;
+  const { view } = meta;
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
-
-  const { hasButton } = usePerms(view, perms);
+  const { hasButton, attrs } = useFormPerms(meta.view, meta.perms, {
+    recordHandler,
+  });
 
   const widgetHandler = useRef<FormWidgetsHandler | null>(null);
   const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
@@ -200,7 +201,7 @@ export function Details({
 
   const canNew = hasButton("new");
   const canSave = hasButton("save");
-  const canEdit = hasButton("edit");
+  const canEdit = hasButton("edit") && !attrs?.readonly;
 
   const doRefresh = useAtomCallback(
     useCallback(

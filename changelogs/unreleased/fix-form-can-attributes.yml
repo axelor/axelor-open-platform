@@ -1,0 +1,6 @@
+---
+title: Fix can* attributes evaluation on form view
+type: fix
+description: |
+  can* attributes (`canNew`, `canEdit`, ...) on form view allow javascript 
+  expressions and should be evaluated against the associated context.

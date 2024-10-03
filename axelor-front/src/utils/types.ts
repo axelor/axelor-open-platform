@@ -75,6 +75,16 @@ export function isNil(value: any): value is null | undefined {
 }
 
 /**
+ * Check whether the value is boolean.
+ *
+ * @param value the value to check
+ */
+export function isBoolean(value: any): value is boolean {
+  const val = String(value).toLowerCase();
+  return ["true", "false"].includes(val);
+}
+
+/**
  * Check whether the value is empty.
  *
  * @param value the value to check

@@ -38,7 +38,10 @@ import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
-import { usePopupHandlerAtom, useSetPopupHandlers } from "@/view-containers/view-popup/handler";
+import {
+  usePopupHandlerAtom,
+  useSetPopupHandlers,
+} from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
@@ -52,15 +55,18 @@ import {
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
 import { useSingleClickHandler } from "@/hooks/use-button";
+import { toCamelCase } from "@/utils/names";
 
 import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
 import {
+  Attrs,
   FormAtom,
   Form as FormComponent,
   FormLayout,
   FormState,
   FormWidget,
+  RecordHandler,
   WidgetErrors,
   WidgetState,
   useFormHandlers,
@@ -78,6 +84,7 @@ import {
   resetFormDummyFieldsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
+import { isUndefined, isBoolean } from "@/utils/types";
 
 import styles from "./form.module.scss";
 
@@ -233,6 +240,80 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
   }
 };
 
+export const useFormPerms = (
+  schema: Schema,
+  perms?: Perms,
+  { recordHandler }: { recordHandler?: RecordHandler } = {},
+) => {
+  const { hasPermission, hasButton: hasButtonPerm } = usePerms(schema, perms);
+  const exprList = useMemo(
+    () => [
+      "canNew",
+      "canEdit",
+      "canDelete",
+      "canCopy",
+      "canSave",
+      "canAttach",
+      "canArchive",
+    ],
+    [],
+  );
+
+  const [widgetAttrs, setWidgetAttrs] = useState<Attrs>({
+    readonly: !!schema.readonlyIf,
+    ...exprList.reduce((attrs, name) => {
+      const attr = schema[name];
+      return !isUndefined(attr)
+        ? {
+            ...attrs,
+            [name]: isBoolean(attr)
+              ? String(attr).toLowerCase() === "true"
+              : false,
+          }
+        : attrs;
+    }, {}),
+  });
+
+  const hasButton = useCallback(
+    (key: string) => {
+      const perm = hasButtonPerm(key);
+      const value =
+        widgetAttrs[toCamelCase(`can-${key}`, false) as keyof Attrs];
+      return perm && (typeof value === "boolean" ? value : true);
+    },
+    [hasButtonPerm, widgetAttrs],
+  );
+
+  useEffect(() => {
+    const { readonlyIf } = schema;
+    const hasExpr = readonlyIf || exprList.some((expr) => schema[expr]);
+    if (!hasExpr) return;
+
+    return recordHandler?.subscribe((ctx) => {
+      const updateAttrs: Record<string, boolean> = {};
+
+      if (readonlyIf) {
+        updateAttrs.readonly = Boolean(parseExpression(readonlyIf)(ctx));
+      }
+
+      function checkAndUpdateExpr(key: string) {
+        const expr = schema[key];
+        if (expr && !isBoolean(expr)) {
+          updateAttrs[key] = Boolean(parseExpression(expr)(ctx));
+        }
+      }
+
+      exprList.forEach((key) => checkAndUpdateExpr(key));
+
+      if (Object.keys(updateAttrs).length) {
+        setWidgetAttrs((_attrs) => ({ ..._attrs, ...(updateAttrs as Attrs) }));
+      }
+    });
+  }, [recordHandler, exprList, schema, setWidgetAttrs]);
+
+  return { hasPermission, hasButton, attrs: widgetAttrs } as const;
+};
+
 const timeSymbol = Symbol("$$time");
 const defaultSymbol = Symbol("$$default");
 
@@ -347,7 +428,6 @@ const FormContainer = memo(function FormContainer({
   const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
 
   const showConfirmDirty = useViewConfirmDirty();
-  const { hasButton } = usePerms(meta.view, perms ?? meta.perms);
   const attachmentItem = useFormAttachment(formAtom);
 
   const readyAtom = useMemo(
@@ -395,16 +475,12 @@ const FormContainer = memo(function FormContainer({
   const { attrs } = useAtomValue(widgetAtom);
   const setAttrs = useSetAtom(widgetAtom);
 
-  const [readonlyExclusive, setReadonlyExclusive] = useState(false);
-
-  useEffect(() => {
-    const readonlyIf = schema.readonlyIf;
-    if (!readonlyIf) return;
-    return recordHandler.subscribe((record) => {
-      const value = Boolean(parseExpression(readonlyIf)(record));
-      setReadonlyExclusive((prev) => value);
-    });
-  }, [recordHandler, schema.readonlyIf]);
+  const {
+    hasButton,
+    attrs: { readonly: readonlyExclusive },
+  } = useFormPerms(schema, perms ?? meta.perms, {
+    recordHandler,
+  });
 
   const canNew = hasButton("new");
   const canSaveNew = canNew && !record.id;
