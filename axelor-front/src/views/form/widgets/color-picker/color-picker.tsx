@@ -37,7 +37,7 @@ export function ColorPicker(props: FieldProps<string>) {
   const handleOnChange = useCallback(
     (color: any) => {
       setHsvaValue(color.hsva);
-      setValue(color.hex);
+      setValue(color.hex, true);
     },
     [setValue],
   );
@@ -89,7 +89,7 @@ export function ColorPicker(props: FieldProps<string>) {
             p={1}
             border={false}
             onClick={() => {
-              setValue("");
+              setValue("", true);
             }}
             title={i18n.get("Remove color")}
           >
