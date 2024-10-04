@@ -12,18 +12,21 @@ import { FieldControl, FieldProps } from "../../builder";
 import colors from "@/styles/legacy/_colors.module.scss";
 import styles from "./color-picker.module.scss";
 
+const DEFAULT_COLOR = { h: 0, s: 0, v: 0, a: 1 };
+
 export function ColorPicker(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
   const { lite } = schema;
 
   const [value, setValue] = useAtom(valueAtom);
-  const [hsvaValue, setHsvaValue] = useState(null);
+  const [color, setColor] = useState<any>({});
 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [element, setElement] = useState<EventTarget | null>(null);
 
   const handleShowColorPicker = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setColor({});
       setShowColorPicker(true);
       setElement(e.target);
     },
@@ -31,16 +34,21 @@ export function ColorPicker(props: FieldProps<string>) {
   );
 
   const handleCloseColorPicker = useCallback(() => {
+    if (color?.hexa) {
+      setValue(lite ? color.hex : color.hexa, true);
+    }
+
     setShowColorPicker(false);
+  }, [color.hex, color.hexa, lite, setValue]);
+
+  const handleOnChange = useCallback((newColor: any) => {
+    setColor(newColor);
   }, []);
 
-  const handleOnChange = useCallback(
-    (color: any) => {
-      setHsvaValue(color.hsva);
-      setValue(color.hex, true);
-    },
-    [setValue],
-  );
+  const handleResetColor = useCallback(() => {
+    setColor({});
+    setValue("", true);
+  }, [setValue]);
 
   const colorPalette = useMemo(() => {
     return [
@@ -54,7 +62,7 @@ export function ColorPicker(props: FieldProps<string>) {
       "red",
       "pink",
       "purple",
-    ].map((color) => colors[color]);
+    ].map((colorName) => colors[colorName]);
   }, []);
 
   return (
@@ -67,19 +75,18 @@ export function ColorPicker(props: FieldProps<string>) {
       >
         <Box
           rounded={1}
-          className={styles.colorPreview}
-          style={{
-            backgroundColor: value as any,
-            cursor: readonly ? "default" : "pointer",
-          }}
-          {...(!readonly && { onClick: handleShowColorPicker })}
+          overflow="hidden"
+          w={100}
+          h={100}
+          {...(!value && { className: styles.checkerboard })}
         >
           <Box
-            rounded={1}
-            w={100}
-            h={100}
-            className={styles.checkerboard}
-            opacity={!value ? 100 : 0}
+            className={styles.colorPreview}
+            style={{
+              backgroundColor: showColorPicker ? (color?.hexa ?? value) : value,
+              cursor: readonly ? "default" : "pointer",
+            }}
+            {...(!readonly && { onClick: handleShowColorPicker })}
           />
         </Box>
         {!readonly && value && (
@@ -88,9 +95,7 @@ export function ColorPicker(props: FieldProps<string>) {
             d="flex"
             p={1}
             border={false}
-            onClick={() => {
-              setValue("", true);
-            }}
+            onClick={handleResetColor}
             title={i18n.get("Remove color")}
           >
             <MaterialIcon icon="close" />
@@ -110,7 +115,7 @@ export function ColorPicker(props: FieldProps<string>) {
               {lite ? (
                 <Block
                   colors={colorPalette}
-                  color={hsvaValue ?? value ?? ""}
+                  color={color?.hsva ?? value ?? DEFAULT_COLOR}
                   onChange={handleOnChange}
                 />
               ) : (
@@ -118,7 +123,7 @@ export function ColorPicker(props: FieldProps<string>) {
                   inputType={"hexa" as any}
                   showEyeDropper={false}
                   showColorPreview={false}
-                  color={hsvaValue ?? value ?? ""}
+                  color={color?.hsva ?? value ?? DEFAULT_COLOR}
                   onChange={handleOnChange}
                 />
               )}
