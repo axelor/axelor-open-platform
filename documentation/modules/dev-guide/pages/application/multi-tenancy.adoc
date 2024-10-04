@@ -88,6 +88,77 @@ public class DemoModule extends AxelorModule {
 It's up to the `MyTenantConfigProvider` to decide how to resolve tenants (may be using jdbc connection
 to some external database).
 
+== Multi-threading
+
+Any multi-threaded or multi-process task, should run with a special helper `com.axelor.db.tenants.TenantAware`.
+
+Suppose you have following code that executes a task using a separate background process:
+
+[source,java]
+.process task
+----
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(() -> {
+  // work with database
+});
+----
+
+It will not work as as expected as the current tenant context is not available outside current thread.
+It can be fixed with following changes:
+
+[source,java]
+.tenant aware process task
+-----
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(new TenantAware(() -> {
+  // work with database
+}));
+-----
+
+Now the task will have the current tenant context.
+
+However, if the process is not started from a web request (directly or indirectly),
+you have to pass desired tenant id manually. Otherwise, it will assume default tenant.
+
+[source,java]
+.tenant aware process task
+-----
+final ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+executor.submit(new TenantAware(() -> {
+  // work with database
+})
+.tenantId("some-tenant"));
+-----
+
+Same way, you have to change and tasks running in different threads:
+
+[source,java]
+.threaded task
+-----
+Thread task = new Thread(() -> {
+  // do something here
+});
+
+task.start();
+-----
+
+should be changed to:
+
+[source,java]
+.tenant aware threaded task
+-----
+Thread task = new TenantAware(() -> {
+  // do something here
+});
+
+task.start();
+-----
+
+The `TenantAware` is a subclass of `java.lang.Thread`.
+
+IMPORTANT: if the thread or process is not started from a web request, we have to
+set the tenant id manually some how using `TenantAware#tenantId(String)` method.
+
 == Authentication
 
 Clients without session support (e.g. direct basic auth) should provide `X-Tenant-ID` header
