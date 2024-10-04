@@ -245,7 +245,8 @@ public final class StringUtils {
   }
 
   /**
-   * Normalizes a language tag to a valid IETF BCP 47 language tag. For example: "fr_fr" -> "fr-FR".
+   * Normalizes a language tag to a valid IETF BCP 47 language tag. For example: <code>fr_fr"</code>
+   * will be normalized to <code>"fr-FR"</code>.
    *
    * @param languageTag the language tag to normalize
    * @return the normalized language tag
