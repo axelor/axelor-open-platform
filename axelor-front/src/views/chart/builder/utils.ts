@@ -1,15 +1,17 @@
-import chain from "lodash/chain";
 import difference from "lodash/difference";
+import filter from "lodash/filter";
 import forEach from "lodash/forEach";
+import groupCollectionBy from "lodash/groupBy";
 import isNumber from "lodash/isNumber";
 import isString from "lodash/isString";
 import map from "lodash/map";
 import sortBy from "lodash/sortBy";
+import uniq from "lodash/uniq";
 
 import { moment } from "@/services/client/l10n";
-import { ChartDataRecord, ChartType } from "./types";
-import { Formatters } from "@/utils/format";
 import { ChartView, Field } from "@/services/client/meta.types";
+import { Formatters } from "@/utils/format";
+import { ChartDataRecord, ChartType } from "./types";
 
 const ChartColors = [
   [
@@ -384,14 +386,11 @@ export function PlusData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = chain(dataset)
-    .map(series.groupBy || xAxis)
-    .uniq()
-    .value();
+  const types = uniq(map(dataset, series.groupBy || xAxis));
 
-  const result = chain(dataset)
-    .groupBy(xAxis)
-    .map((group, name) => {
+  const result = map(
+    groupCollectionBy(dataset, xAxis),
+    (group: any[], name: string) => {
       let value = 0;
       forEach(group, (item) => {
         value += $conv(item[series.key]);
@@ -414,8 +413,9 @@ export function PlusData(data: any) {
         x: name,
         y: value.toString(),
       };
-    })
-    .value();
+    },
+  );
+
   return {
     types,
     data: result,
@@ -433,47 +433,48 @@ export function PlotData(data: any) {
     scale,
   } = data;
   const dataset = getDataset(data);
-  const types = chain(dataset)
-    .map(xAxis)
-    .uniq()
-    .map((v) => $conv(v, data.xType))
-    .value();
+  const types = map(uniq(map(dataset, xAxis)), (v) => $conv(v, data.xType));
+
   const { groupBy } = series;
 
-  const result = chain(dataset)
-    .groupBy(groupBy)
-    .map((group: any, groupName: string) => {
-      const name = groupBy ? groupName : null;
-      let values = types.map((t) => {
-        const item = group.find((x: any) => x[xAxis] === t);
-        if (!item) return { x: 0, y: 0 };
-        const x = $conv(item[data.xAxis], data.xType) || 0;
-        const y = $conv(
-          item[series.key] !== undefined ? item[series.key] : name || 0,
-        );
-        const sort =
-          $conv(item._original?.[data.xAxis] ?? item[data.xAxis], data.xType) ||
-          0;
-        return { x, y, item, sort };
-      });
+  const result = filter(
+    map(
+      groupCollectionBy(dataset, groupBy),
+      (group: any, groupName: string) => {
+        const name = groupBy ? groupName : null;
+        let values = types.map((t) => {
+          const item = group.find((x: any) => x[xAxis] === t);
+          if (!item) return { x: 0, y: 0 };
+          const x = $conv(item[data.xAxis], data.xType) || 0;
+          const y = $conv(
+            item[series.key] !== undefined ? item[series.key] : name || 0,
+          );
+          const sort =
+            $conv(
+              item._original?.[data.xAxis] ?? item[data.xAxis],
+              data.xType,
+            ) || 0;
+          return { x, y, item, sort };
+        });
 
-      const my = map(values, "x");
-      const missing = difference(types, my);
+        const my = map(values, "x");
+        const missing = difference(types, my);
 
-      if (types.length === missing.length) {
-        return null;
-      }
+        if (types.length === missing.length) {
+          return null;
+        }
 
-      values = sortBy(values, "sort");
+        values = sortBy(values, "sort");
 
-      return {
-        key: name || series.title,
-        type: series.type,
-        values: values,
-      } as any;
-    })
-    .filter((x) => x)
-    .value();
+        return {
+          key: name || series.title,
+          type: series.type,
+          values: values,
+        } as any;
+      },
+    ),
+    (x) => x,
+  );
 
   return {
     types,
