@@ -1,0 +1,5 @@
+---
+title: Add maven group id to module meta data
+type: feature
+description: |
+  The maven group id of the module is now stored in axelor-module.properties.

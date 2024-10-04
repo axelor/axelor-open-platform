@@ -34,6 +34,8 @@ final class Module {
 
   private List<Module> depends = new ArrayList<>();
 
+  private String mavenGroup;
+
   private String version;
 
   private boolean application = false;
@@ -68,6 +70,14 @@ final class Module {
 
   public List<Module> getDepends() {
     return depends;
+  }
+
+  public String getMavenGroup() {
+    return mavenGroup;
+  }
+
+  public void setMavenGroup(String mavenGroup) {
+    this.mavenGroup = mavenGroup;
   }
 
   public String getVersion() {

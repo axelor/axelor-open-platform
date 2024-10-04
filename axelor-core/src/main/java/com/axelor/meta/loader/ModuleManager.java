@@ -189,6 +189,10 @@ public class ModuleManager {
     return RESOLVER.all();
   }
 
+  static Module getModule(String name) {
+    return RESOLVER.get(name);
+  }
+
   private void doCleanUp() {
     doCleanUp(0);
   }

@@ -48,6 +48,7 @@ final class ModuleResolver {
       String[] depends = props.getProperty("depends", "").trim().split("\\s*,\\s*");
       String title = props.getProperty("title");
       String description = props.getProperty("description");
+      String mavenGroup = props.getProperty("mavenGroup");
       String version = props.getProperty("version");
       boolean application = "true".equals(props.getProperty("application"));
 
@@ -55,6 +56,7 @@ final class ModuleResolver {
 
       module.setTitle(title);
       module.setDescription(description);
+      module.setMavenGroup(mavenGroup);
       module.setVersion(version);
       module.setApplication(application);
     }
