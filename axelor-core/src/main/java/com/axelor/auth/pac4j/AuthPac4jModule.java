@@ -32,8 +32,11 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
@@ -152,5 +155,16 @@ public class AuthPac4jModule extends ShiroWebModule {
       return new BasicAuthCallbackClientFinder(clientName.get());
     }
     return new AxelorCallbackClientFinder();
+  }
+
+  /**
+   * Disable global filters due to impact on some web services (ex: <code>ws/files/data-export
+   * </code>). See issue #1193.
+   *
+   * @return empty list
+   */
+  @Override
+  public List<FilterConfig<? extends Filter>> globalFilters() {
+    return Collections.emptyList();
   }
 }
