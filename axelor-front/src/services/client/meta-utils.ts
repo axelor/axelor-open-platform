@@ -108,6 +108,7 @@ function processWidgetAttrs(field: Schema) {
         "selectionShowCheckbox",
         "ratingFill",
         "ratingHighlightSelected",
+        "sliderShowMinMax",
         "stepperCompleted",
         "stepperShowDescription",
         "resetState",
