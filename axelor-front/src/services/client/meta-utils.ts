@@ -111,6 +111,7 @@ function processWidgetAttrs(field: Schema) {
         "sliderShowMinMax",
         "stepperCompleted",
         "stepperShowDescription",
+        "colorPickerShowAlpha",
         "resetState",
       ].indexOf(name) !== -1
     ) {

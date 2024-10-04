@@ -16,7 +16,8 @@ const DEFAULT_COLOR = { h: 0, s: 0, v: 0, a: 1 };
 
 export function ColorPicker(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
-  const { lite } = schema;
+  const { lite, widgetAttrs } = schema;
+  const { colorPickerShowAlpha = true } = widgetAttrs;
 
   const [value, setValue] = useAtom(valueAtom);
   const [color, setColor] = useState<any>({});
@@ -35,11 +36,11 @@ export function ColorPicker(props: FieldProps<string>) {
 
   const handleCloseColorPicker = useCallback(() => {
     if (color?.hexa) {
-      setValue(lite ? color.hex : color.hexa, true);
+      setValue(lite || !colorPickerShowAlpha ? color.hex : color.hexa, true);
     }
 
     setShowColorPicker(false);
-  }, [color.hex, color.hexa, lite, setValue]);
+  }, [color, colorPickerShowAlpha, lite, setValue]);
 
   const handleOnChange = useCallback((newColor: any) => {
     setColor(newColor);
@@ -121,6 +122,7 @@ export function ColorPicker(props: FieldProps<string>) {
               ) : (
                 <Chrome
                   inputType={"hexa" as any}
+                  showAlpha={colorPickerShowAlpha}
                   showEyeDropper={false}
                   showColorPreview={false}
                   color={color?.hsva ?? value ?? DEFAULT_COLOR}

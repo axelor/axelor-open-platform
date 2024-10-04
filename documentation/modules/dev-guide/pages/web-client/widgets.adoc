@@ -143,9 +143,14 @@ a|image::widgets/color-picker.png[]
 a|image::widgets/color-picker-2.png[]
 |===
 
-The following attribute is supported:
+The following attributes are supported:
 
 * `x-lite`: change color picker popper to a basic palette. Default to `false`.
+* `x-color-picker-show-alpha`: whether to accept color with alpha (ie, opacity). Not supported with `x-lite` attribute.
+Default to `true`.
+
+By default, it returns hex code format `#RRGGBB`. When alpha is enabled, it returns hex code format `#RRGGBBAA`, where
+alpha is `A`.
 
 == Rating
 

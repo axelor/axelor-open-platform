@@ -1146,6 +1146,11 @@
         <xsd:documentation>Display min/max values below the slider. Default to `false`</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-color-picker-show-alpha" type="xsd:boolean" default="true">
+      <xsd:annotation>
+        <xsd:documentation>Whether to accept color with opacity. Not supported with `x-lite` attribute. Default to `true`</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attributeGroup ref="tns:ExtraCollectionAttributes" />
   </xsd:attributeGroup>
 
