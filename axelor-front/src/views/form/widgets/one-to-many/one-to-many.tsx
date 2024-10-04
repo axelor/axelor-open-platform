@@ -323,6 +323,9 @@ function OneToManyInner({
     waitForActions: waitForCollectionActions,
   } = useCollectionTree();
 
+  const isManyToMany =
+    toKebabCase(schema.serverType || widget) === "many-to-many";
+
   const isExpandable = widget === "expandable";
   const isTreeGrid = widget === "tree-grid";
   const isSubTreeGrid = isTreeGrid && !isRootTreeGrid;
@@ -438,7 +441,17 @@ function OneToManyInner({
               typeof setter === "function"
                 ? setter(getItems(get(valueAtom)!))
                 : setter
-            )?.map((record) => nestedToDotted(record));
+            )
+              ?.map((record) => nestedToDotted(record))
+              ?.map((rec) =>
+                isManyToMany
+                  ? {
+                      ...rec,
+                      version: undefined,
+                      $version: rec.version ?? rec.$version,
+                    }
+                  : rec,
+              );
             const valIds = (values || []).map((v) => v.id);
 
             setRecords((records) => {
@@ -461,6 +474,11 @@ function OneToManyInner({
                     : null;
                   return val ? nestedToDotted({ ...rec, ...val }, rec) : rec;
                 })
+                .map((rec) =>
+                  isManyToMany
+                    ? { ...rec, version: rec.version ?? rec.$version }
+                    : rec,
+                )
                 .concat(newRecords);
             });
 
@@ -508,7 +526,7 @@ function OneToManyInner({
             }
           },
         ),
-      [getItems, valueAtom, schema.name, isRootTreeGrid],
+      [getItems, valueAtom, schema.name, isManyToMany, isRootTreeGrid],
     ),
   );
 
@@ -535,9 +553,6 @@ function OneToManyInner({
   const { attrs, columns: columnAttrs } = useAtomValue(widgetAtom);
   const { title, domain } = attrs;
   const readonly = props.readonly || attrs.readonly;
-
-  const isManyToMany =
-    toKebabCase(schema.serverType || widget) === "many-to-many";
 
   const gridViewData = useMemo(
     () => ({ ...(viewData?.view || schema), widget, widgetAttrs }) as GridView,
@@ -1056,12 +1071,7 @@ function OneToManyInner({
             const record = items.find((r) => r.id === item.id);
             return record ? { ...item, ...record } : item;
           }),
-          ...newItems.map((item) => {
-            if (isManyToMany && (item.id ?? 0) > 0) {
-              return { ...item, version: undefined };
-            }
-            return item;
-          }),
+          ...newItems,
         ]);
 
         const changed =
@@ -1533,7 +1543,7 @@ function OneToManyInner({
       const res = await dataStore.save(record, {
         fields: fieldList,
       });
-      return res && onSave(res);
+      return res && onSave(res, { dirty: false });
     },
     [viewData?.fields, fields, dataStore, onSave],
   );
