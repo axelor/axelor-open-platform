@@ -103,7 +103,8 @@ executor.submit(() -> {
 });
 ----
 
-It will not work as as expected as the current tenant context is not available outside current thread.
+It will not work as expected as the current tenant context is not available outside the current thread.
+
 It can be fixed with following changes:
 
 [source,java]
@@ -118,7 +119,7 @@ executor.submit(new TenantAware(() -> {
 Now the task will have the current tenant context.
 
 However, if the process is not started from a web request (directly or indirectly),
-you have to pass desired tenant id manually. Otherwise, it will assume default tenant.
+you have to pass the desired tenant id manually. Otherwise, it will assume a default tenant.
 
 [source,java]
 .tenant aware process task
@@ -136,7 +137,7 @@ Same way, you have to change and tasks running in different threads:
 .threaded task
 -----
 Thread task = new Thread(() -> {
-  // do something here
+  // work with database
 });
 
 task.start();
@@ -148,7 +149,7 @@ should be changed to:
 .tenant aware threaded task
 -----
 Thread task = new TenantAware(() -> {
-  // do something here
+  // work with database
 });
 
 task.start();
@@ -157,7 +158,7 @@ task.start();
 The `TenantAware` is a subclass of `java.lang.Thread`.
 
 IMPORTANT: if the thread or process is not started from a web request, we have to
-set the tenant id manually some how using `TenantAware#tenantId(String)` method.
+set the tenant id manually somehow using `TenantAware#tenantId(String)` method.
 
 == Authentication
 
