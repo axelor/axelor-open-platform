@@ -1,3 +1,32 @@
+## 7.1.7 (2024-10-07)
+
+#### Change
+
+* Fix customize columns in grid view
+
+  <details>
+  
+  When we do customize in grid view then 
+  by default hidden columns should be excluded from the columns display list.
+  
+  </details>
+
+#### Fix
+
+* Fix inline o2m widget
+* Fix duplicate widget ids that could cause RangeError
+* Fix web services that can have request URI containing non-ASCII characters
+* Fix negative zero conversion
+
+  <details>
+  
+  Decimal values between 0 and -1 do not become absolute.
+  For example, -0.5 is no longer converted to 0.5
+  
+  </details>
+
+
+
 ## 7.1.6 (2024-09-24)
 
 #### Feature
