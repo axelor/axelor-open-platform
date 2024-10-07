@@ -364,6 +364,7 @@ public class Field extends SimpleWidget {
     this.selectionIn = selectionIn;
   }
 
+  @JsonProperty(access = Access.READ_ONLY)
   public List<?> getSelectionList() {
     final String typeName =
         StringUtils.isBlank(enumType) && "enum".equals(serverType) ? target : enumType;
