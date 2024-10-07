@@ -1,8 +1,0 @@
----
-title: Implement tree-grid widget support for grid view
-type: feature
-description: |
-  Add tree-grid widget support for grid view with some limitations that apply to first-level rows:
-
-  - You can add a row to the bottom only, not between existing rows.
-  - `Ctrl+Enter` to add subitem is not supported.

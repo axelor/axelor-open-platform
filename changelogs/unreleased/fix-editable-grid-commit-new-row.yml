@@ -1,6 +1,0 @@
----
-title: Fix commit new record on save in editable grid
-type: fix
-description: |
-  When we create new edit row and commiting record directly through enter press,
-  then it should commit row instead of discarding row.

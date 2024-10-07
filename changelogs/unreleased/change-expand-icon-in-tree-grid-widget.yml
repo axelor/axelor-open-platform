@@ -1,6 +1,0 @@
----
-title: Change expand icon in tree-grid widget
-type: fix
-description: |
-  - Use `>>` for items which contains children items
-  - Use `>` for items which doesn't have any children

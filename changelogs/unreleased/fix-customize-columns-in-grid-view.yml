@@ -1,6 +1,0 @@
----
-title: Fix customize columns in grid view
-type: change
-description: |
-  When we do customize in grid view then 
-  by default hidden columns should be exclude from the columns display list.

@@ -1,8 +1,0 @@
----
-title: Fix binary widget issues
-type: fix
-description: |
-  - set form dirty on upload
-  - uniform styles for binary and binary-link widgets
-  - add title on button for native tooltip
-  - check http code 200 on download and also remove image=true from url

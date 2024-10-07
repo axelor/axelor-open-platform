@@ -1,7 +1,0 @@
----
-title: Fix eval expression on tree-grid collection widget
-type: fix
-description: |
-  When we used showIf, hideIf, readonlyIf expression on tree-grid widget,
-  so on sub line context evaluation parent context should be merged in order
-  to evaluate those expression correctly.

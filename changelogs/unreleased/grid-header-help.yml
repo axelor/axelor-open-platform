@@ -1,6 +1,0 @@
----
-title: Add support to display help or title on grid header column
-type: feature
-description: |
-  On grid header columns, the field help (fallback to column title) will be displayed 
-  as tooltip on mouse over. This is convenient for column with long title but low width.

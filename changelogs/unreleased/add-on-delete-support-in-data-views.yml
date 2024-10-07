@@ -1,8 +1,0 @@
----
-title: Add onDelete action support in data views
-type: feature
-description: |
-  This will allow to define onDelete action support in grid, form, cards,
-  kanban and calendar views.
-  This will trigger actions before the delete process. Any errors or validations
-  return during these actions should stop or/and suspend the execution.

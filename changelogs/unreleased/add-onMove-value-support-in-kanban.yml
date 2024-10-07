@@ -1,6 +1,0 @@
----
-title: Allow kanban onMove action to set values
-type: feature
-description: |
-  In order to align with tree view node onMove action behavior,
-  kanban onMove action values are now taken into account.

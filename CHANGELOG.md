@@ -1,3 +1,511 @@
+## 7.2.0 (2024-10-07)
+
+#### Feature
+
+* Add email widget support in grid view
+* Add onDelete action support in panel-related
+
+  <details>
+  
+  This action will be call when removing record in o2m/m2m grid.
+  
+  </details>
+
+* Add summary view support in tree-grid
+* Add error support on menus response
+
+  <details>
+  
+  Beside notify and info response, this also add error response support on menus actions.
+  
+  </details>
+
+* Support localization with IETF BCP 47 language tags and fall back to primary language subtags
+* Add slider widget
+
+  <details>
+  
+  This provides the ability to select a value within a range.
+  It can be used on `integer` and `decimal` fields.
+  
+  </details>
+
+* Add image field support in relational field
+
+  <details>
+  
+  Now we can use x-image-field="fieldName" attribute to show image in
+  m2o (selection) and m2m (tag-select) for both grid and form views.
+  
+  </details>
+
+* Add onSave action support in editable grid view
+
+  <details>
+  
+  This will support onSave for top level grid views and m2m collection grid only.
+  
+  </details>
+
+* Add search support in image-select widget
+* Add onCopy action support in form-view
+
+  <details>
+  
+  This action will be execute after record is copied same as onLoad action in existing record.
+  
+  </details>
+
+* Allow to configure client polling interval
+
+  <details>
+  
+  Client poll menu tags each 10 seconds. On application with a large number of active users 
+  and number of tags, this interval can lead to a number of performance issues.
+  `application.polling-interval` property can be configured to define how often the client polls 
+  in seconds. This isn't recommended to set a value lower than 10 seconds.
+  
+  </details>
+
+* Set quick menus height to fix value
+* Add stepper widget
+
+  <details>
+  
+  This provides the ability to indicate progress through a multi-step process similarly to `NavSelect`.
+  It can be used on `selection`, `enum` and `many-to-one` fields.
+  
+  </details>
+
+* Improve advance search filters UI
+
+  <details>
+  
+  Add search input to hide non matching filters. This will 
+  provides better usage of filters in case many are displayed.
+  
+  </details>
+
+* Add onCopy action support in panel-related
+
+  <details>
+  
+  This action will be call after duplicating record in o2m/m2m grid,
+  It will be used along with x-can-copy="true".
+  
+  </details>
+
+* Add context in search view action
+
+  <details>
+  
+  Now in search-view, when click on go button to execute the action,
+  _searchContext is passed into action data context.
+  
+  Example : 
+  _searchContext: {
+  
+    //All not null search fields
+    code: 'A',
+    product: {
+     id: 1,
+     name: 'P1',
+     version: 1
+    },
+  
+    //Selected search result ids group by model
+    _results: [
+      {
+        model: 'com.axelor.contact.db.Contact'
+        ids: [1, 2, 3]
+      },
+      {
+       model: 'com.axelor.sale.db.Product'
+       ids: [1, 2, 3]
+      }
+    ],
+  
+    //Context params: _view, _source, _action, ...
+  }
+  
+  </details>
+
+* Add react template support on Help widget
+* Allow kanban onMove action to set values
+
+  <details>
+  
+  In order to align with tree view node onMove action behavior,
+  kanban onMove action values are now taken into account.
+  
+  </details>
+
+* Add search-field support in dashboard
+
+  <details>
+  
+  This allow to add search fields on top of the dashboard. Fields 
+  can be filled when the dashboard loads with `onInit` event. Fields
+  values will be add in context of all dashlets.
+  
+  </details>
+
+* Enhance relative time widget display
+
+  <details>
+  
+  Relative time widget now displays `Date` data fields in a more
+  readable format: 'Today' if date is today, 'Tomorrow' if date is tomorrow,
+  'Yesterday' if date is yesterday, 'dddd' (day name) if date is within next week,
+  'Last dddd' if date is within last week, and as `DateTime` otherwise.
+  
+  Also provide support in grid/tree views as well as in formatter.
+  
+  </details>
+
+* Add onDelete action support in data views
+
+  <details>
+  
+  This will allow to define onDelete action support in grid, form, cards,
+  kanban and calendar views.
+  This will trigger actions before the delete process. Any errors or validations
+  return during these actions should stop or/and suspend the execution.
+  
+  </details>
+
+* Add shortcut to create new sub line in tree-grid
+
+  <details>
+  
+  When line is in edit mode, we can create new sub-line through
+  ctrl + enter to commit current row and add new sub line to it.
+  
+  </details>
+
+* Add support to display help or title on grid header column
+
+  <details>
+  
+  On grid header columns, the field help (fallback to column title) will be displayed 
+  as tooltip on mouse over. This is convenient for column with long title but low width.
+  
+  </details>
+
+* Save/Restore grid view state
+
+  <details>
+  
+  When view is switched from grid, again back to grid then
+  state should be restored.
+  
+  </details>
+
+* Add color picker widget
+
+  <details>
+  
+  This provides the ability to pick a color in a color picker popover for string data fields.
+  Supports attributes `x-lite` to change the color picker to a basic color palette and `x-color-picker-show-alpha`.
+  
+  </details>
+
+* Password reset functionality
+
+  <details>
+  
+  Added built-in support for password reset functionality,
+  allowing users to request a password reset link if they have forgotten their password.
+  
+  Available new properties:
+  
+  ```properties
+  application.reset-password.enabled = true # (enabled by default)
+  application.reset-password.max-age = 24 # (24 hours by default)
+  ```
+  
+  </details>
+
+* Add switch select widget
+
+  <details>
+  
+  This provides the ability to pick a choice from a multiple-choice list.
+  It can be used on `selection`, `enum` and `many-to-one` fields.
+  It supports icons, `x-direction` and `x-labels` for hiding labels.
+  
+  </details>
+
+* Add support to reset dummy field value on save
+
+  <details>
+  
+  By default all dummy fields values are retain on save in form view,
+  now with this option we can set x-reset-state="true" on dummy field 
+  in order to reset it's value on save. By default it's false.
+  
+  </details>
+
+* Implement tree-grid widget support for grid view
+
+  <details>
+  
+  Add tree-grid widget support for grid view with some limitations that apply to first-level rows:
+  
+  - You can add a row to the bottom only, not between existing rows.
+  - `Ctrl+Enter` to add subitem is not supported.
+  
+  </details>
+
+* Provide ability to search/filter items in quick menus
+
+  <details>
+  
+  When there are more than 10 items in quick menus, a search 
+  input is display on top in order to search/filter the items.
+  
+  </details>
+
+* Add support to display mail messages and followers on custom model
+* Enhance toggle widget display in readonly
+* Add views help link support
+
+  <details>
+  
+  Add view help link support (based on `helpLink` attribute). This feature was present 
+  on former version, but wasn't added during React migration.
+  
+  The help link button is now placed on end right side of the toolbar.
+  
+  </details>
+
+* Add onMove node action support in tree-view
+
+  <details>
+  
+  This action can be used to stop moving operation in tree view through sending errors or
+  it can be useful to set some values before saving the node move modification.
+  
+  </details>
+
+* Implement login customization
+
+  <details>
+  
+  Add support for customizing the login page.
+  
+  application.sign-in.logo = url # absolute or relative url, to have a login logo different from `application.logo`
+  application.sign-in.title = html # translatable sanitized html, shown after logo in form login panel
+  application.sign-in.footer = html # translatable sanitized html, shown after form login panel
+  
+  application.sign-in.fields.username.show-title = true (default) | false
+  application.sign-in.fields.username.title = translatable text # `Username` (default)
+  application.sign-in.fields.username.placeholder = translatable text # default is empty
+  application.sign-in.fields.username.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment
+  
+  application.sign-in.fields.password.show-title = true (default) | false
+  application.sign-in.fields.password.title = translatable text # `Password` (default)
+  application.sign-in.fields.password.placeholder = translatable text # default is empty
+  application.sign-in.fields.password.icon = none (default) # Bootstrap or Material icon name or `none` to disable, shown as start adornment
+  
+  application.sign-in.fields.tenant.show-title = true (default) | false
+  application.sign-in.fields.tenant.title = translatable text # `Tenant` (default)
+  
+  # Extra buttons inside form login panel using custom button names
+  application.sign-in.buttons.<button-name>.title = text
+  application.sign-in.buttons.<button-name>.type = button (default) | link # use Button or Link component
+  application.sign-in.buttons.<button-name>.variant = primary|secondary|success|danger|info|warning|light|dark # for button only
+  application.sign-in.buttons.<button-name>.icon = icon_name # Bootstrap or Material icon name, shown before title
+  application.sign-in.buttons.<button-name>.link = url # absolute or relative url with `:username` support
+  application.sign-in.buttons.<button-name>.order = order # number relative to Login button (< 0 for before, >= 0 for after)
+  
+  # Use `submit` button name to customize Login submit button
+  application.sign-in.buttons.submit.title = Sign in
+  application.sign-in.buttons.submit.type = button
+  application.sign-in.buttons.submit.variant = primary
+  application.sign-in.buttons.submit.icon = none
+  
+  For translatable texts, you can add your translations to `custom_<language>.csv` files.
+  
+  </details>
+
+* Add support for tracking custom fields
+* Add icon, order, hidden and description support on enumeration.
+
+#### Change
+
+* Upgrade Guava from 33.2.0 to 33.2.1
+* Upgrade Undertow from 2.2.32 to 2.2.33
+* Login page layout changes
+
+  <details>
+  
+  Login page has been reworked with the following changes:
+  
+  * Move tenant selection to top
+  * Translatable copyright
+  * Login button renamed to Sign in
+  * Add "or" separator before SSO buttons
+  * Remove unimplemented "Remember me" button"
+  
+  </details>
+
+* Translations in CSV without values are not loaded anymore
+* Upgrade Hsqldb from 2.7.2 to 2.7.3
+* Upgrade Junit from 5.10.2 to 5.10.3
+* Upgrade EclipseLink Moxy from 2.7.14 to 2.7.15
+* Fix customize columns in grid view
+
+  <details>
+  
+  When we do customize in grid view then 
+  by default hidden columns should be exclude from the columns display list.
+  
+  </details>
+
+* Update string validation pattern to be case sensitive
+* Upgrade Pac4j from 5.7.4 to 5.7.5
+* Use "Add subitem" as default tree field title
+* Click on subline title to add new row
+* User email now has unique constraint
+
+  <details>
+  
+  You may execute this SQL statement for migration:
+  
+  ```sql
+  UPDATE auth_user SET email = lower(email);
+  ALTER TABLE auth_user ADD CONSTRAINT uk_auth_user_email UNIQUE (email);
+  ```
+  
+  </details>
+
+* Upgrade Tomcat from 9.0.88 to 9.0.90
+* Upgrade Groovy from 3.0.21 to 3.0.22
+* Upgrade Byte Buddy from 1.14.14 to 1.14.17
+
+#### Remove
+
+* Remove hibernate search support
+
+  <details>
+  
+  We removed Hibernate search support (Full text search). The implementation was very basic and haven't
+  been followed and improved since the initial implementation.
+  
+  Following properties aren't used anymore and can be deleted from properties file :
+  
+  * `hibernate.search.default.directory_provider`
+  * `hibernate.search.default.indexBase`
+  
+  We are actively working on a new integration that will provide much more power and a better integration 
+  in daily usage. Stay updated for the announcement in a future version.
+  
+  There is no replacement. Advance search feature can be used in order to achieve same goal.
+  
+  </details>
+
+#### Fix
+
+* Fix web services that can have request URI containing non-ASCII characters
+* Fix commit new record on save in editable grid
+
+  <details>
+  
+  When we create new edit row and commiting record directly through enter press,
+  then it should commit row instead of discarding row.
+  
+  </details>
+
+* Validate URL without escaping it on grid
+* Fix formatting of enumerations in tracking messages
+* Prevent going into edit mode when clicking on an URL on editable grid
+* Fix add extra fields in customize dialog select
+* Change expand icon in tree-grid widget
+
+  <details>
+  
+  - Use `>>` for items which contains children items
+  - Use `>` for items which doesn't have any children
+  
+  </details>
+
+* Fix inline o2m widget
+* Fix column sizing in tree-grid widget
+* Fix delete confirmation on unsaved row in tree-grid
+* Expose SLF4J API as Gradle api dependency
+* Fix grid constraints on customize grid popup
+* Fix eval expression on tree-grid collection widget
+
+  <details>
+  
+  When we used showIf, hideIf, readonlyIf expression on tree-grid widget,
+  so on sub line context evaluation parent context should be merged in order
+  to evaluate those expression correctly.
+  
+  </details>
+
+* Fix binary widget issues
+
+  <details>
+  
+  - set form dirty on upload
+  - uniform styles for binary and binary-link widgets
+  - add title on button for native tooltip
+  - check http code 200 on download and also remove image=true from url
+  
+  </details>
+
+* Fix updating custom fields having roles
+* Fix expand all in expandable grid widget
+* Fix auto add new row in editable tree-grid
+* Fix editor icons
+
+  <details>
+  
+  Display edit icon only if `canEdit="true"` is explicitly defined in field (default m2o behavior).
+  So the view icon will only be displayed if edit icon is not there.
+  
+  Also add tooltip on each button that describe the related action.
+  
+  </details>
+
+* Fix preserve expandable state in collection field
+* Improve expanded node behavior in tree-grid widget
+* Fix action-attrs column attributes for tree-grid widget
+* Fix hideLegend in chart view
+* Fix show errors for custom fields
+* Fix negative zero conversion
+
+  <details>
+  
+  Decimal values between 0 and -1 do not become absolute.
+  For example, -0.5 is no longer converted to 0.5
+  
+  </details>
+
+* Fix sync values on refresh in collection grid
+* Fix sync editable grid values with expandable form
+* Fix use field name as default for x-tree-field in tree-grid
+* Fix sync selection in duplicate collection field
+* Fix duplicate widget ids that could cause RangeError
+* Fix Rating widget on custom fields
+* Fix translation and extraction of x-tree-field-title attribute
+* Fix skip undirty check on collection line discard
+* Fix o2m items version conflict when duplicating record
+
+#### Security
+
+* Ask to retype current password on change password page
+
+  <details>
+  
+  Instead of passing current password in state after login, ask to 
+  retype current password on change password page.
+  
+  </details>
+
+
 ## 7.1.5 (2024-08-08)
 
 #### Change

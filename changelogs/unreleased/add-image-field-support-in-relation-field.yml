@@ -1,6 +1,0 @@
----
-title: Add image field support in relational field
-type: feature
-description: |
-  Now we can use x-image-field="fieldName" attribute to show image in
-  m2o (selection) and m2m (tag-select) for both grid and form views.

@@ -1,6 +1,0 @@
----
-title: Add shortcut to create new sub line in tree-grid
-type: feature
-description: |
-  When line is in edit mode, we can create new sub-line through
-  ctrl + enter to commit current row and add new sub line to it.

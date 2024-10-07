@@ -1,6 +1,0 @@
----
-title: Save/Restore grid view state
-type: feature
-description: |
-  When view is switched from grid, again back to grid then
-  state should be restored.
