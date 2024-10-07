@@ -1767,7 +1767,12 @@ function OneToManyInner({
 
   useEffect(() => {
     const fieldsSelect = gridViewData?.items
-      ?.filter((item) => item.type === "field" && item.name)
+      ?.filter(
+        (item) =>
+          item.type === "field" &&
+          item.name &&
+          !["id", "version"].includes(item.name),
+      )
       .reduce((_select: Record<string, any>, item) => {
         const { target, targetName } = item as Field;
         return {
