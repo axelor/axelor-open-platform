@@ -11,9 +11,6 @@ import { Schema } from "@/services/client/meta.types";
 import { toCamelCase } from "@/utils/names";
 import { ValueAtom } from "./types";
 
-import { isCleanDummy } from "@/services/client/data-utils";
-import { useViewDirtyAtom, useViewMeta } from "@/view-containers/views/scope";
-import { useAtomCallback } from "jotai/utils";
 import * as WIDGETS from "../widgets";
 
 export function useWidget(schema: Schema) {
@@ -27,7 +24,9 @@ export function useWidget(schema: Schema) {
   const type = toCamelCase(schema.serverType) as keyof typeof WIDGETS;
 
   const Comp =
-    (schema.inGridEditor && WIDGETS[editName]) || WIDGETS[name] || WIDGETS[type];
+    (schema.inGridEditor && WIDGETS[editName]) ||
+    WIDGETS[name] ||
+    WIDGETS[type];
 
   compRef.current = Comp as React.ElementType;
 
@@ -96,46 +95,13 @@ export function useInput<T>(
     validate = defaultValidator,
     format = defaultFormatter,
     parse = defaultConverter,
-    schema,
   } = options ?? {};
   const [value = defaultValue, setValue] = useAtom(valueAtom);
   const valueText = useMemo(() => format(value) ?? "", [format, value]);
   const [changed, setChanged] = useState(false);
   const [text, setText] = useState(valueText);
 
-  const dirtyAtom = useViewDirtyAtom();
   const dirtyRef = useRef<boolean>();
-
-  const { name, canDirty: _canDirty } = schema ?? {};
-
-  const {
-    meta: { widgetSchema },
-  } = useViewMeta();
-
-  const canDirty = useMemo(() => {
-    const { canDirty: widgetCanDirty, name: widgetName } = widgetSchema ?? {};
-
-    return (
-      widgetCanDirty !== false &&
-      widgetName &&
-      !isCleanDummy(widgetName) &&
-      _canDirty !== false &&
-      name &&
-      !isCleanDummy(name)
-    );
-  }, [_canDirty, name, widgetSchema]);
-
-  const setDirty = useAtomCallback(
-    useCallback(
-      (get, set, dirty: boolean) => {
-        if (dirtyRef.current === undefined) {
-          dirtyRef.current = get(dirtyAtom);
-        }
-        set(dirtyAtom, dirty ? true : dirtyRef.current);
-      },
-      [dirtyAtom],
-    ),
-  );
 
   const update = useCallback(
     (text: string, fireOnChange: boolean) => {
@@ -152,14 +118,11 @@ export function useInput<T>(
     (event) => {
       setChanged(event.target.value !== valueText);
       setText(event.target.value);
-      if (canDirty) {
-        setDirty(event.target.value !== valueText);
-      }
       if (onChangeTrigger === "change") {
         update(event.target.value, true);
       }
     },
-    [onChangeTrigger, canDirty, setDirty, update, valueText],
+    [onChangeTrigger, update, valueText],
   );
 
   const onBlur = useCallback<

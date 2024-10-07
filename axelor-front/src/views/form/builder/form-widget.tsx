@@ -17,11 +17,7 @@ import { i18n } from "@/services/client/i18n";
 import { Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { validate } from "@/utils/validate";
-import {
-  useViewAction,
-  useViewDirtyAtom,
-  useViewMeta,
-} from "@/view-containers/views/scope";
+import { useViewAction, useViewDirtyAtom } from "@/view-containers/views/scope";
 
 import { createValueAtom, createWidgetAtom } from "./atoms";
 import { FieldEditor } from "./form-editors";
@@ -53,10 +49,6 @@ export function FormWidget(props: FormWidgetProps) {
   const dirtyAtom = useViewDirtyAtom();
   const { actionExecutor } = useFormScope();
 
-  const {
-    meta: { widgetSchema },
-  } = useViewMeta();
-
   const valueAtom = useMemo(
     () =>
       isField(schema)
@@ -65,10 +57,9 @@ export function FormWidget(props: FormWidgetProps) {
             formAtom,
             dirtyAtom,
             actionExecutor,
-            widgetSchema,
           })
         : undefined,
-    [actionExecutor, dirtyAtom, formAtom, schema, widgetSchema],
+    [actionExecutor, dirtyAtom, formAtom, schema],
   );
 
   const hidden = useAtomValue(
@@ -130,8 +121,7 @@ export function FormWidget(props: FormWidgetProps) {
   if (
     hidden &&
     (schema.type === "panel-tabs" ||
-      (schema.serverType?.endsWith("TO_MANY") &&
-        isExpandableWidget(schema)))
+      (schema.serverType?.endsWith("TO_MANY") && isExpandableWidget(schema)))
   ) {
     return (
       <FormItem {...props} widgetAtom={widgetAtom} valueAtom={valueAtom} />

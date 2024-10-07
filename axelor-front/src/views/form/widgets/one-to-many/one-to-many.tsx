@@ -567,7 +567,6 @@ function OneToManyInner({
         fields,
         model,
       }),
-      widgetSchema: schema,
     };
   }, [fields, model, schema, viewData]);
 
@@ -1418,7 +1417,6 @@ function OneToManyInner({
         ...meta.view,
         width: "*",
       },
-      widgetSchema: schema,
     };
   }, [model, detailFormName]);
 

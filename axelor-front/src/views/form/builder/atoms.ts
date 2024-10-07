@@ -129,13 +129,11 @@ export function createValueAtom({
   formAtom,
   dirtyAtom,
   actionExecutor,
-  widgetSchema,
 }: {
   schema: Schema;
   formAtom: FormAtom;
   dirtyAtom: PrimitiveAtom<boolean>;
   actionExecutor: ActionExecutor;
-  widgetSchema?: Schema;
 }) {
   const { name, readonly, onChange, inGridEditor } = schema;
 
@@ -199,12 +197,14 @@ export function createValueAtom({
       const dirty =
         markDirty &&
         schema.canDirty !== false &&
-        Boolean(name && !isCleanDummy(name)) &&
-        canDirty(widgetSchema);
+        Boolean(name && !isCleanDummy(name));
 
       if (dirty) {
         set(formAtom, formDirtyUpdater);
-        set(dirtyAtom, true);
+        // skip view dirty atom update in editable grid changes
+        if (!schema.inGridEditor) {
+          set(dirtyAtom, true);
+        }
       }
 
       set(lensAtom, next);

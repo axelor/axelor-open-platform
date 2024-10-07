@@ -186,7 +186,6 @@ export interface ViewData<T> extends Partial<MetaData> {
   view: T;
   helps?: Record<string, Record<string, HelpOverride>>;
   related?: Record<string, string[]>; // additional fields after view processing
-  widgetSchema?: Schema;
 }
 
 export async function fields(

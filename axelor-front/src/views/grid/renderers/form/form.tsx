@@ -320,6 +320,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const { setCommit } = useCollectionTreeEditable();
     const isTreeGrid =
       isCollectionTree && (view as Schema).widget === "tree-grid";
+    const isManyToMany = (view as Schema).serverType === "MANY_TO_MANY";
     const autoAddNewRow = (view as any)[AUTO_ADD_ROW] ?? true;
 
     const { formAtom: parent, actionHandler: parentActionHandler } =
@@ -342,8 +343,8 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const hasSaved = _record._dirty || _record.id > 0;
 
     useEffect(() => {
-      formDirty !== undefined && setDirty(formDirty);
-    }, [formDirty, setDirty]);
+      !isManyToMany && formDirty !== undefined && setDirty(formDirty);
+    }, [isManyToMany, formDirty, setDirty]);
 
     useEffect(() => {
       actionHandler.setRefreshHandler(
