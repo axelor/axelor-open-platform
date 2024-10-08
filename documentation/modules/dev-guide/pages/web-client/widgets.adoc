@@ -80,18 +80,34 @@ unless you click on the eye icon which toggles field input visibility.
 
 image::widgets/password.png[]
 
-== Number
+== Integer
 
-The number widget is used for `integer` and `decimal` data fields.
+The `Integer` widget is used for `integer` data fields.
 
 [source,xml]
 ----
-<field name="integer" widget="Integer"/>
-<field name="price" widget="Decimal" x-scale="2" x-precision="18"/>
-<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
+<field name="quantity" widget="Integer"/>
 ----
 
-image::widgets/number.png[]
+image::widgets/integer.png[]
+
+The following attributes are supported:
+
+* `min`: lowest bound of the value
+* `max`: upper bound of the value
+* `x-step`: amount to increment or decrement on each step. Accept negative and integer values. Default to `1`.
+
+== Decimal
+
+The `Decimal` widget is used for `decimal` data fields and works similarly to `Integer` widget.
+
+[source,xml]
+----
+<field name="price" widget="Decimal" x-scale="2" x-precision="18"/>
+<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18" x-step="2.5" />
+----
+
+image::widgets/decimal.png[]
 
 The following attributes are supported:
 
@@ -100,13 +116,8 @@ The following attributes are supported:
 * `x-scale`: scale of the decimal value (total number of digits in decimal part). It accepts an integer
 for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
-
-[source,xml]
-----
-<field name="integer" widget="Integer"/>
-<field name="decimal" widget="Decimal" x-scale="2" x-precision="18"/>
-<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
-----
+* `x-step`: amount to increment or decrement on each step. Accept negative and decimal values. Default
+value is determined by the scale attribute if it exists, otherwise it is set to `1`.
 
 == Slider
 

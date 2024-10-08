@@ -1,0 +1,6 @@
+---
+title: Add x-step to Integer and Decimal widgets
+type: feature
+description: |
+  Add the ability to customize the increment and decrement amount using `x-step` attribute.
+  Decimal and negative values are accepted. The default value is determined by the scale attribute if it exists, otherwise it is set to 1.

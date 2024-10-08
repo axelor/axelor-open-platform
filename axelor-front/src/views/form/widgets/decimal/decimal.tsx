@@ -22,13 +22,25 @@ const isNumberLike = (text: string) => NUM_PATTERN.test(text);
 
 export function Decimal(props: FieldProps<string | number>) {
   const { schema, readonly, invalid, widgetAtom, valueAtom, formAtom } = props;
-  const { uid, minSize: min, maxSize: max, placeholder } = schema;
+  const { uid, minSize: min, maxSize: max, placeholder, widgetAttrs } = schema;
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
+  const { step: stepAttrs } = widgetAttrs;
 
   const scale = useScale(widgetAtom, formAtom, schema);
 
   const getViewContext = useViewContext();
+
+  const step = useMemo(
+    () =>
+      stepAttrs
+        ? Number(stepAttrs)
+        : scale > 0
+          ? Math.pow(10, -Math.floor(scale))
+          : 1,
+
+    [scale, stepAttrs],
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<number>();
@@ -62,17 +74,59 @@ export function Decimal(props: FieldProps<string | number>) {
   }, []);
 
   const increment = useCallback(
-    (step: bigint, useTextRef?: boolean) => {
+    (amount: number, useTextRef?: boolean) => {
       const text = String(
         (useTextRef ? textRef.current : textValue) ?? 0,
       ).trim();
-      const nums = text.split(".");
+      const nums = text.replace("-", "").split(".");
+      const amounts = String(amount).replace("-", "").split(".");
 
-      const int = nums[0];
-      const dec = nums[1] || "";
+      const valueInt = BigInt(nums[0]);
+      const valueDec = Number(nums[1] ? `0.${nums[1]}` : "0");
 
-      const bigInt = BigInt(int) + step;
-      const num = dec ? `${bigInt}.${dec}` : `${bigInt}`;
+      const amountInt = BigInt(amounts[0]);
+      const amountDec = Number(amounts[1] ? `0.${amounts[1]}` : "0");
+
+      const isValueNegative = text.startsWith("-");
+      const isAmountNegative = amount < 0;
+
+      let isResultNegative = isValueNegative;
+      let resultInt;
+      let resultDec;
+
+      if (
+        (isValueNegative && isAmountNegative) ||
+        (!isValueNegative && !isAmountNegative)
+      ) {
+        resultInt = valueInt + amountInt;
+        resultDec = valueDec + amountDec;
+
+        if (resultDec >= 1) {
+          resultInt += 1n;
+          resultDec %= 1;
+        }
+      } else {
+        resultInt = valueInt - amountInt;
+        resultDec = valueDec - amountDec;
+
+        if (resultDec < 0) {
+          resultInt -= 1n;
+          resultDec += 1;
+        }
+
+        if (resultInt < 0n) {
+          resultInt = (resultInt + 1n) * -1n;
+          resultDec = 1 - resultDec;
+          isResultNegative = !isResultNegative;
+        }
+      }
+
+      if (resultInt == 0n && resultDec == 0) isResultNegative = false;
+
+      const num = resultDec
+        ? `${isResultNegative ? "-" : ""}${resultInt}.${resultDec.toString().slice(2)}`
+        : `${isResultNegative ? "-" : ""}${resultInt}`;
+
       const res = checkRange(num, min, max);
 
       setChanged(true);
@@ -86,11 +140,11 @@ export function Decimal(props: FieldProps<string | number>) {
   >(
     (e) => {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
-      if (e.key === "ArrowUp") increment(1n);
-      if (e.key === "ArrowDown") increment(-1n);
+      if (e.key === "ArrowUp") increment(step);
+      if (e.key === "ArrowDown") increment(-step);
       onKeyDown(e);
     },
-    [increment, onKeyDown],
+    [increment, onKeyDown, step],
   );
 
   const setTimer = useCallback((fn: () => void) => {
@@ -113,10 +167,10 @@ export function Decimal(props: FieldProps<string | number>) {
         return;
       }
       if (inputRef.current) inputRef.current.focus();
-      increment(1n);
-      setTimer(() => increment(1n, true));
+      increment(step);
+      setTimer(() => increment(step, true));
     },
-    [increment, setTimer, clearTimer],
+    [increment, step, setTimer, clearTimer],
   );
 
   const handleDown = useCallback(
@@ -127,10 +181,10 @@ export function Decimal(props: FieldProps<string | number>) {
         return;
       }
       if (inputRef.current) inputRef.current.focus();
-      increment(-1n);
-      setTimer(() => increment(-1n, true));
+      increment(-step);
+      setTimer(() => increment(-step, true));
     },
-    [increment, setTimer, clearTimer],
+    [increment, step, setTimer, clearTimer],
   );
 
   const text = useMemo(
@@ -142,11 +196,6 @@ export function Decimal(props: FieldProps<string | number>) {
           })
         : "",
     [value, scale, schema, getViewContext],
-  );
-
-  const step = useMemo(
-    () => (scale > 0 ? Math.pow(10, -Math.floor(scale)).toFixed(scale) : 1),
-    [scale],
   );
 
   useEffect(() => {
