@@ -228,7 +228,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
   async #handle(data: ActionResult, options?: ActionOptions) {
     if (data.exportFile) {
-      const link = "ws/files/data-export/" + data.exportFile;
+      const link = "ws/files/data-export";
       await download(link, data.exportFile);
     }
 
@@ -403,7 +403,7 @@ export class DefaultActionExecutor implements ActionExecutor {
       }
 
       if (data.reportLink) {
-        const url = `ws/files/report/${data.reportLink}?name=${data.reportFile}`;
+        const url = `ws/files/report?link=${data.reportLink}&name=${data.reportFile}`;
         if (data.reportFormat) {
           await this.#openView({
             title: data.reportFile!,

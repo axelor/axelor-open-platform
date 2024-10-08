@@ -19,6 +19,7 @@
 package com.axelor.web.service;
 
 import com.axelor.common.FileUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
@@ -61,9 +62,12 @@ public class FileService extends AbstractService {
   @Inject private MetaFiles files;
 
   @GET
-  @Path("data-export/{name:.*}")
+  @Path("data-export")
   @Hidden
-  public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
+  public javax.ws.rs.core.Response downloadExportFile(@QueryParam("fileName") final String name) {
+    if (StringUtils.isBlank(name)) {
+      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+    }
     final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
     if (!file.isFile()) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
@@ -77,10 +81,21 @@ public class FileService extends AbstractService {
   }
 
   @GET
-  @Path("report/{link:.*}")
+  @Path("data-export/{name:.*}")
   @Hidden
-  public javax.ws.rs.core.Response reportFile(
-      @PathParam("link") final String link, @QueryParam("name") final String name) {
+  @Deprecated(forRemoval = true)
+  public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
+    return downloadExportFile(name);
+  }
+
+  @GET
+  @Path("report")
+  @Hidden
+  public javax.ws.rs.core.Response downloadReportFile(
+      @QueryParam("link") final String link, @QueryParam("name") final String name) {
+    if (StringUtils.isBlank(link)) {
+      return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
+    }
 
     final java.nio.file.Path file = MetaFiles.findTempFile(link);
     if (file == null || !file.toFile().isFile()) {
@@ -113,6 +128,15 @@ public class FileService extends AbstractService {
             ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
+  }
+
+  @GET
+  @Path("report/{link:.*}")
+  @Hidden
+  @Deprecated(forRemoval = true)
+  public javax.ws.rs.core.Response reportFile(
+      @PathParam("link") final String link, @QueryParam("name") final String name) {
+    return downloadReportFile(link, name);
   }
 
   @DELETE
