@@ -33,6 +33,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.HttpHeaders;
 import org.pac4j.core.context.HttpConstants;
 
 @Singleton
@@ -147,16 +148,37 @@ public class TenantFilter implements Filter {
   private void setCookie(
       HttpServletRequest request, HttpServletResponse response, String name, String value) {
     Cookie cookie = getCookie(request, name);
+
     if (cookie == null) {
       cookie = new Cookie(name, value);
-      if (request.isSecure()) {
-        cookie.setSecure(true);
-      }
     } else {
       cookie.setValue(value);
     }
+
     cookie.setHttpOnly(true);
     cookie.setMaxAge(60 * 60 * 24 * 7);
+
+    if (request.isSecure()) {
+      cookie.setSecure(true);
+      // With Jakarta Servlet API, we'll be able to use Cookie#setAttribute to set SameSite=None
+    }
+
     response.addCookie(cookie);
+
+    if (cookie.getSecure()) {
+      // Add SameSite=None attribute manually for now
+      boolean first = true;
+      for (String cookieString : response.getHeaders(HttpHeaders.SET_COOKIE)) {
+        if (StringUtils.notEmpty(cookieString) && cookieString.startsWith(name)) {
+          cookieString += "; SameSite=None";
+        }
+        if (first) {
+          response.setHeader(HttpHeaders.SET_COOKIE, cookieString);
+          first = false;
+        } else {
+          response.addHeader(HttpHeaders.SET_COOKIE, cookieString);
+        }
+      }
+    }
   }
 }
