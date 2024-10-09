@@ -1,0 +1,3 @@
+---
+title: Fix ColorPicker popper to work even with invalid values
+type: fix

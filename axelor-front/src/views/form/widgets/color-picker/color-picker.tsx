@@ -25,6 +25,11 @@ export function ColorPicker(props: FieldProps<string>) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [element, setElement] = useState<EventTarget | null>(null);
 
+  const isValueHex = useMemo(
+    () => /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(value ?? ""),
+    [value],
+  );
+
   const handleShowColorPicker = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       setColor({});
@@ -116,7 +121,7 @@ export function ColorPicker(props: FieldProps<string>) {
               {lite ? (
                 <Block
                   colors={colorPalette}
-                  color={color?.hsva ?? value ?? DEFAULT_COLOR}
+                  color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
                   onChange={handleOnChange}
                 />
               ) : (
@@ -125,7 +130,7 @@ export function ColorPicker(props: FieldProps<string>) {
                   showAlpha={colorPickerShowAlpha}
                   showEyeDropper={false}
                   showColorPreview={false}
-                  color={color?.hsva ?? value ?? DEFAULT_COLOR}
+                  color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
                   onChange={handleOnChange}
                 />
               )}
