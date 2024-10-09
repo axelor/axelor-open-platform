@@ -1,0 +1,6 @@
+---
+title: Fix tenant selection at login when hosts are not specified
+type: fix
+description: |
+  Session may exist even if user is not logged in.
+  Tenant specified from login request should override any session tenant.

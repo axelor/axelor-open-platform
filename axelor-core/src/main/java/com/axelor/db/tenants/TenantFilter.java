@@ -109,6 +109,7 @@ public class TenantFilter implements Filter {
     final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
     final String tenant =
         sessionTenant
+            .filter(t -> !isLogin)
             .or(() -> getRequestTenant(req, isLogin))
             .orElseGet(
                 () -> {
@@ -124,7 +125,7 @@ public class TenantFilter implements Filter {
       setCookie(req, res, TENANT_COOKIE_NAME, tenant);
     }
 
-    if (httpSession != null && sessionTenant.isEmpty() && tenant != null) {
+    if (httpSession != null && tenant != null && (sessionTenant.isEmpty() || isLogin)) {
       httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
     }
 
