@@ -739,6 +739,21 @@ The following attributes are supported:
 * `x-barcode-display-value`: Whether to display the value under the barcode. Default to `true`.
 * `x-barcode-format`: The barcode format. Accepted formats are: `CODE128`, `EAN13`, `EAN8`, `UPC`, `CODE39`, `ITF14`, `Codabar`. Default to `CODE128`.
 
+== QrCode
+
+The `QrCode` widget is used on `string` data field and display them as a QR Code in readonly mode.
+
+[source,xml]
+----
+<field name="url" widget="QrCode" height="200" />
+----
+
+image::widgets/qrcode.png[]
+
+The following attribute is supported:
+
+* `height`: The QR Code height in px. Default to 140.
+
 == Button
 
 The button widget is used to show a clickable button on a form.

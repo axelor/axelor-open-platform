@@ -47,6 +47,7 @@ export * from "./panel-tabs";
 export * from "./password";
 export * from "./phone";
 export * from "./progress";
+export * from "./qr-code";
 export * from "./radio-select";
 export * from "./rating";
 export * from "./ref-select";
