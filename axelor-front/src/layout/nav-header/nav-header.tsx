@@ -230,10 +230,11 @@ function QuickMenuItem({
 
 function QuickMenuBar() {
   const [menus, setMenus] = useState<QuickMenu[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState<Record<number, string>>({});
 
   const refresh = useCallback(async () => {
     setMenus(await quick());
+    setSearchText("");
   }, []);
 
   useAsyncEffect(async () => {
@@ -246,14 +247,22 @@ function QuickMenuBar() {
   );
 
   const handleFilterChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.target.value),
+    (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchText((prevItems) => ({
+        ...prevItems,
+        [index]: e.target.value,
+      }));
+    },
     [],
   );
 
   const handleFilterSearchKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
+    (index: number, e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === "Escape") {
-        setSearchText("");
+        setSearchText((prevItems) => ({
+          ...prevItems,
+          [index]: "",
+        }));
       }
     },
     [],
@@ -275,15 +284,17 @@ function QuickMenuBar() {
                 {(menu?.items?.length ?? 0) >= 10 && index === 0 && (
                   <TextField
                     placeholder={i18n.get("Search...")}
-                    onChange={handleFilterChange}
-                    onKeyDown={handleFilterSearchKeyDown}
-                    value={searchText}
+                    onChange={(e) => handleFilterChange(ind, e)}
+                    onKeyDown={(e) => handleFilterSearchKeyDown(ind, e)}
+                    value={searchText?.[ind] ?? ""}
                     className={styles.searchFiltersInput}
                   />
                 )}
                 {unaccent(item.title)
                   .toLowerCase()
-                  .includes(unaccent(searchText).toLowerCase()) && (
+                  .includes(
+                    unaccent(searchText?.[ind] ?? "").toLowerCase(),
+                  ) && (
                   <QuickMenuItem
                     key={key}
                     data={item}
