@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: ^0.2.10
-        version: 0.2.10(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+        specifier: ^0.2.11
+        version: 0.2.11(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
       '@babel/standalone':
         specifier: ^7.24.8
         version: 7.24.8
@@ -233,8 +233,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@axelor/ui@0.2.10':
-    resolution: {integrity: sha512-hwff1T3YLNWlA1uyyjbRq/5er4WjSNPUwgDO5LwzkwhM3ZJzqQu40n0fASsNkCXBECJFDWEoOFqxnJ21v8ilBw==}
+  '@axelor/ui@0.2.11':
+    resolution: {integrity: sha512-2z98Uvo05WfcjWoSV7aLW4DTpF9aEH0+AbevVMJzW/jIWVo0cq42tGikWOhSnCEN1bRfGBSqIRSueoZ3EEh8lw==}
     peerDependencies:
       react: ^18.3.1-0
       react-dom: ^18.3.1-0
@@ -4054,7 +4054,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@axelor/ui@0.2.10(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
+  '@axelor/ui@0.2.11(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@floating-ui/react': 0.26.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
