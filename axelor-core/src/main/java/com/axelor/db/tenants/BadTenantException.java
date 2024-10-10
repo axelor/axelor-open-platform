@@ -18,11 +18,11 @@
  */
 package com.axelor.db.tenants;
 
-public class MissingTenantException extends Exception {
+public class BadTenantException extends Exception {
 
   private static final long serialVersionUID = 8196156624484011220L;
 
-  public MissingTenantException() {
-    super("Tenant identifier is missing from request");
+  public BadTenantException() {
+    super("Tenant identifier from request is invalid or missing");
   }
 }

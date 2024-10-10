@@ -19,7 +19,10 @@
 package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Singleton;
@@ -78,8 +81,12 @@ public class TenantFilter implements Filter {
     try {
       TenantResolver.CURRENT_TENANT.set(currentTenant(req, res));
       chain.doFilter(request, response);
-    } catch (MissingTenantException e) {
-      res.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    } catch (BadTenantException e) {
+      res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      res.setContentType(HttpConstants.APPLICATION_JSON);
+      response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+      final ObjectMapper mapper = Beans.get(ObjectMapper.class);
+      res.getWriter().write(mapper.writeValueAsString(Map.of("status", 1)));
     } finally {
       TenantResolver.CURRENT_HOST.remove();
       TenantResolver.CURRENT_TENANT.remove();
@@ -88,7 +95,8 @@ public class TenantFilter implements Filter {
 
   // When tenant comes from header/cookie, need to check it.
   // For login, consider header only.
-  private Optional<String> getRequestTenant(HttpServletRequest req, boolean isLogin) {
+  private Optional<String> getRequestTenant(
+      HttpServletRequest req, boolean isLogin, Map<String, String> tenants) {
     return Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
         .filter(StringUtils::notBlank)
         .or(
@@ -98,36 +106,38 @@ public class TenantFilter implements Filter {
                     : Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
                         .map(Cookie::getValue)
                         .filter(StringUtils::notBlank))
-        .filter(tenant -> TenantResolver.getTenants(false).containsKey(tenant));
+        .filter(tenants::containsKey);
   }
 
   private String currentTenant(HttpServletRequest req, HttpServletResponse res)
-      throws MissingTenantException {
+      throws BadTenantException {
     final HttpSession httpSession = req.getSession(false);
     final Optional<String> sessionTenant =
         Optional.ofNullable(httpSession)
             .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
     final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
+    final Map<String, String> tenants = TenantResolver.getTenants(false);
     final String tenant =
         sessionTenant
             .filter(t -> !isLogin)
-            .or(() -> getRequestTenant(req, isLogin))
-            .orElseGet(
-                () -> {
-                  final Map<String, String> tenants = TenantResolver.getTenants(false);
-                  return tenants.size() == 1 ? tenants.keySet().iterator().next() : null;
-                });
+            .or(() -> getRequestTenant(req, isLogin, tenants))
+            .orElseGet(() -> tenants.size() == 1 ? tenants.keySet().iterator().next() : null);
 
     if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
-      throw new MissingTenantException();
+      throw new BadTenantException();
+    }
+
+    if (httpSession != null && tenant != null) {
+      if (!tenants.containsKey(tenant)) {
+        httpSession.invalidate();
+        throw new BadTenantException();
+      } else if ((sessionTenant.isEmpty() || isLogin)) {
+        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
+      }
     }
 
     if (isLogin) {
       setCookie(req, res, TENANT_COOKIE_NAME, tenant);
-    }
-
-    if (httpSession != null && tenant != null && (sessionTenant.isEmpty() || isLogin)) {
-      httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
     }
 
     return tenant;

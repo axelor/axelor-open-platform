@@ -32,6 +32,14 @@ export function useHttpWatch() {
         const res = await next();
         if (res instanceof Response) {
           if (res.status === 401) {
+            if (res.headers.get("Content-Type")?.includes("application/json")) {
+              const content = await res.json();
+              // Reload page on any non-zero status.
+              if (content.status) {
+                window.location.reload();
+                return;
+              }
+            }
             setCount((count) => count - 1);
             return new Promise((resolve, reject) => {
               setPending((pending) => [
