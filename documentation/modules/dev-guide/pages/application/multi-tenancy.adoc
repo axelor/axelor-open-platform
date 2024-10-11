@@ -69,7 +69,6 @@ The `TenantConfigProvider` defines following methods to implement:
 
 * `TenantConfig find(String tenantId)` - find a TenantConfig instance for the given tenant id
 * `List<TenantConfig> findAll(String host)` - find all the TenantConfig for the given hostname
-* `boolean hasAccess(User user, TenantConfig config)` - check whether the given authenticated user can use the tenant
 
 The custom implementation should be integrated from application module like this:
 
