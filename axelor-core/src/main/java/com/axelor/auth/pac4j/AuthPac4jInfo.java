@@ -94,4 +94,8 @@ public class AuthPac4jInfo {
   public static boolean isNativeClient(WebContext context) {
     return context.getRequestHeader("Origin").isEmpty();
   }
+
+  public static boolean isWebSocket(HttpServletRequest request) {
+    return "websocket".equals(request.getHeader("Upgrade"));
+  }
 }

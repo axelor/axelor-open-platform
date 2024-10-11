@@ -83,7 +83,7 @@ export function LoginForm({
     [],
   );
 
-  const hasTenantSelect = tenants.length > 1;
+  const hasTenantSelect = tenants.length > 0;
 
   const handleSubmit: (event: React.SyntheticEvent) => Promise<void> =
     useCallback(

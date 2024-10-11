@@ -18,6 +18,7 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -82,11 +83,29 @@ public class TenantFilter implements Filter {
       TenantResolver.CURRENT_TENANT.set(currentTenant(req, res));
       chain.doFilter(request, response);
     } catch (BadTenantException e) {
-      res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      res.setContentType(HttpConstants.APPLICATION_JSON);
-      response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-      final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-      res.getWriter().write(mapper.writeValueAsString(Map.of("status", 1)));
+
+      // Only HTTP requests are intercepted in front-end.
+      if (AuthPac4jInfo.isWebSocket(req)) {
+        res.sendError(HttpServletResponse.SC_FORBIDDEN);
+      } else {
+        final HttpSession httpSession = req.getSession(false);
+
+        if (httpSession != null) {
+          httpSession.invalidate();
+        }
+
+        if (AuthPac4jInfo.isXHR(req)) {
+          // Ajax request
+          res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          res.setContentType(HttpConstants.APPLICATION_JSON);
+          response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+          final ObjectMapper mapper = Beans.get(ObjectMapper.class);
+          res.getWriter().write(mapper.writeValueAsString(Map.of("status", 1)));
+        } else {
+          // Full page load
+          res.sendRedirect(".");
+        }
+      }
     } finally {
       TenantResolver.CURRENT_HOST.remove();
       TenantResolver.CURRENT_TENANT.remove();
@@ -111,17 +130,28 @@ public class TenantFilter implements Filter {
 
   private String currentTenant(HttpServletRequest req, HttpServletResponse res)
       throws BadTenantException {
+    final TenantInfo tenantInfo = TenantResolver.getTenantInfo(false);
+    final String hostTenant = tenantInfo.getHostTenant();
+
     final HttpSession httpSession = req.getSession(false);
     final Optional<String> sessionTenant =
         Optional.ofNullable(httpSession)
             .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
+
+    if (hostTenant != null) {
+      if (httpSession != null && sessionTenant.isEmpty()) {
+        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, hostTenant);
+      }
+      return hostTenant;
+    }
+
     final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
-    final Map<String, String> tenants = TenantResolver.getTenants(false);
+    final Map<String, String> tenants = tenantInfo.getTenants();
     final String tenant =
         sessionTenant
             .filter(t -> !isLogin)
             .or(() -> getRequestTenant(req, isLogin, tenants))
-            .orElseGet(() -> tenants.size() == 1 ? tenants.keySet().iterator().next() : null);
+            .orElse(null);
 
     if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
       throw new BadTenantException();
@@ -129,7 +159,6 @@ public class TenantFilter implements Filter {
 
     if (httpSession != null && tenant != null) {
       if (!tenants.containsKey(tenant)) {
-        httpSession.invalidate();
         throw new BadTenantException();
       } else if ((sessionTenant.isEmpty() || isLogin)) {
         httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
@@ -170,24 +199,28 @@ public class TenantFilter implements Filter {
 
     if (request.isSecure()) {
       cookie.setSecure(true);
-      // With Jakarta Servlet API, we'll be able to use Cookie#setAttribute to set SameSite=None
     }
 
     response.addCookie(cookie);
 
     if (cookie.getSecure()) {
-      // Add SameSite=None attribute manually for now
-      boolean first = true;
-      for (String cookieString : response.getHeaders(HttpHeaders.SET_COOKIE)) {
-        if (StringUtils.notEmpty(cookieString) && cookieString.startsWith(name)) {
-          cookieString += "; SameSite=None";
-        }
-        if (first) {
-          response.setHeader(HttpHeaders.SET_COOKIE, cookieString);
-          first = false;
-        } else {
-          response.addHeader(HttpHeaders.SET_COOKIE, cookieString);
-        }
+      addSameSite(response, name);
+    }
+  }
+
+  // With Jakarta Servlet API, we'll be able to use Cookie#setAttribute to set SameSite=None
+  // Add SameSite=None attribute manually for now
+  private void addSameSite(HttpServletResponse response, String name) {
+    boolean first = true;
+    for (String cookieString : response.getHeaders(HttpHeaders.SET_COOKIE)) {
+      if (StringUtils.notEmpty(cookieString) && cookieString.startsWith(name)) {
+        cookieString += "; SameSite=None";
+      }
+      if (first) {
+        response.setHeader(HttpHeaders.SET_COOKIE, cookieString);
+        first = false;
+      } else {
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieString);
       }
     }
   }

@@ -18,8 +18,11 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.common.StringUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 /** The tenant identifier resolver. */
@@ -57,17 +60,51 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
   }
 
   public static Map<String, String> getTenants(boolean onlyVisible) {
-    final Map<String, String> map = new LinkedHashMap<>();
+    return configsToNames(getTenantConfigs(onlyVisible));
+  }
+
+  public static TenantInfo getTenantInfo() {
+    return getTenantInfo(true);
+  }
+
+  public static TenantInfo getTenantInfo(boolean onlyVisible) {
+    final Map<String, TenantConfig> configs = getTenantConfigs(onlyVisible);
+
+    // Check if a single tenant was host-resolved.
+    if (configs.size() == 1) {
+      final TenantConfig config = configs.values().iterator().next();
+      if (StringUtils.notBlank(config.getTenantHosts())) {
+        return TenantInfo.single(config.getTenantId());
+      }
+    }
+
+    // User-selectabled tenants
+    return TenantInfo.multiple(configsToNames(configs));
+  }
+
+  private static Map<String, TenantConfig> getTenantConfigs(boolean onlyVisible) {
+    final Map<String, TenantConfig> map = new LinkedHashMap<>();
     if (enabled) {
       final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
       for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
         if (!Boolean.FALSE.equals(config.getActive())
             && (!onlyVisible || !Boolean.FALSE.equals(config.getVisible()))) {
-          map.put(config.getTenantId(), config.getTenantName());
+          map.put(config.getTenantId(), config);
         }
       }
     }
     return map;
+  }
+
+  private static Map<String, String> configsToNames(Map<String, TenantConfig> configs) {
+    return configs.values().stream()
+        .collect(
+            Collectors.toMap(
+                TenantConfig::getTenantId,
+                config ->
+                    Optional.ofNullable(config.getTenantName()).orElseGet(config::getTenantId),
+                (existing, replacement) -> existing,
+                LinkedHashMap::new));
   }
 
   @Override

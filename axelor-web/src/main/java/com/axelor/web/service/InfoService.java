@@ -33,6 +33,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.db.tenants.TenantInfo;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
@@ -179,11 +180,16 @@ public class InfoService extends AbstractService {
 
   protected Map<String, Object> authInfo(HttpServletRequest request, HttpServletResponse response) {
     final Map<String, Object> map = new HashMap<>();
-    final Map<String, String> tenants = TenantResolver.getTenants();
-    final Set<String> tenantIds = tenants.keySet();
-    final String tenantId = TenantResolver.currentTenantIdentifier();
-    final String tenant =
-        tenantIds.contains(tenantId) ? tenantId : tenantIds.stream().findFirst().orElse(null);
+    final TenantInfo tenantInfo = TenantResolver.getTenantInfo();
+    final Map<String, String> tenants = tenantInfo.getTenants();
+    String tenant = tenantInfo.getHostTenant();
+
+    if (tenant == null) {
+      final Set<String> tenantIds = tenants.keySet();
+      final String tenantId = TenantResolver.currentTenantIdentifier();
+      tenant =
+          tenantIds.contains(tenantId) ? tenantId : tenantIds.stream().findFirst().orElse(null);
+    }
 
     map.put("callbackUrl", pac4jInfo.getCallbackUrl());
 
