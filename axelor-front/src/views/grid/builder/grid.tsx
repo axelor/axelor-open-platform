@@ -550,12 +550,12 @@ export const Grid = forwardRef<
       if (found) return found;
       return item;
     });
-    const formView = { ...view, type: "form", items } as FormView;
+    const gridView = { ...view, items } as GridView;
     return (props: GridRowProps) => (
       <FormRenderer
         ref={formRef}
         {...props}
-        view={formView}
+        view={gridView}
         fields={fields}
         isLastRow={(state?.rows?.length ?? 0) - 1 === props.index}
         onAddSubLine={onAddSubLine}

@@ -24,7 +24,7 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
-import { FormView, Schema } from "@/services/client/meta.types";
+import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { showErrors, useGetErrors, useHandleFocus } from "@/views/form";
 import {
@@ -52,7 +52,7 @@ import { AUTO_ADD_ROW } from "../../builder/utils";
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
-  view: FormView;
+  view: GridView;
   fields?: MetaData["fields"];
   isLastRow?: boolean;
   onAddSubLine?: (parent: DataRecord) => void;
