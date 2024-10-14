@@ -114,18 +114,25 @@ export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
           return contextRef.current;
         }
 
-        const json = meta.view.json ?? false;
+        const { view } = meta;
+        const json = view.json ?? false;
         const ctxAtom = json && parent ? parent : formAtom;
 
         const { context, views } = actionView;
-        const ctx: DataContext = parent
-          ? {}
-          : {
-              ...context,
-              _viewType: meta.view.type,
-              _viewName: meta.view.name,
-              _views: views?.map((x) => ({ name: x.name, type: x.type })),
-            };
+
+        const ctx: DataContext = {
+          ...((!parent || json) && context),
+          _viewType: view.type,
+          _viewName:
+            view.name ??
+            (() => {
+              if (json) {
+                return views?.find((v) => v.type === view.type)?.name;
+              }
+              return undefined;
+            })(),
+          _views: views?.map((x) => ({ name: x.name, type: x.type })),
+        };
         const res = set(contextAtom, ctxAtom, {
           ...ctx,
           ...options,
