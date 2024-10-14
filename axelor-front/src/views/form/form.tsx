@@ -37,7 +37,7 @@ import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
-import { findViewItem } from "@/utils/schema";
+import { findViewItem, findViewItems } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -75,6 +75,7 @@ import {
 } from "./builder/scope";
 import {
   getDefaultValues,
+  isField,
   processOriginal,
   processSaveValues,
 } from "./builder/utils";
@@ -465,12 +466,20 @@ const FormContainer = memo(function FormContainer({
           dirty,
           ...(keepStates
             ? (() => {
-                // reset dummy fields state
-                // only keep real fields state
+                const fieldList = findViewItems(meta, (item: Schema) =>
+                  Boolean(item?.name && isField(item)),
+                ).map((item) => item.name!);
+
                 const fieldNames = Object.keys(meta.fields ?? {});
+
+                // reset dummy fields state only
+                // only keep real fields and non field items like panels state
                 return {
                   statesByName: Object.keys(prev.statesByName)
-                    .filter((key) => !isDummy(key, fieldNames))
+                    .filter(
+                      (key) =>
+                        !fieldList.includes(key) || !isDummy(key, fieldNames),
+                    )
                     .reduce(
                       (state, key) => ({
                         ...state,
@@ -915,7 +924,7 @@ const FormContainer = memo(function FormContainer({
     if (record.id) {
       const rec = await dataStore.copy(record.id);
       rec && (copyRecordRef.current = true);
-      
+
       await doEdit(rec, { dirty: true, readonly: false, isNew: true });
 
       if (onCopyAction) {

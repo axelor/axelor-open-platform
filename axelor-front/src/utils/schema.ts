@@ -21,6 +21,18 @@ export function findViewItem<T extends ViewType>(
   });
 }
 
+export function findViewItems<T extends ViewType>(
+  meta: ViewData<T>,
+  predicate: (item: Schema) => boolean = () => true,
+) {
+  function collectItems(schema: Schema): Schema[] {
+    const items = schema.type !== "panel-related" ? (schema.items ?? []) : [];
+    const nested = items.flatMap((item) => collectItems(item));
+    return [...items.filter(predicate), ...nested];
+  }
+  return collectItems(meta.view);
+}
+
 export function findJsonFieldItem<T extends ViewType>(
   meta: ViewData<T>,
   fieldName: string,

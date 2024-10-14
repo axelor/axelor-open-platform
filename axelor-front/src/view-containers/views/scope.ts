@@ -24,7 +24,7 @@ import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { ViewData } from "@/services/client/meta";
 import { Schema, ViewType } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
-import { findViewItem } from "@/utils/schema";
+import { findViewItem, findViewItems } from "@/utils/schema";
 import { FormAtom, usePrepareContext } from "@/views/form/builder";
 import {
   useCanDirty,
@@ -379,7 +379,7 @@ export function useViewMeta() {
         return (
           items ??
           (() => {
-            const viewItems = findSchemaItems(meta.view).map((item) =>
+            const viewItems = findViewItems(meta).map((item) =>
               item.name ? findItem(item.name) ?? { ...item } : { ...item },
             );
             set(metaAtom, (prev) => ({ ...prev, items: viewItems }));
@@ -387,7 +387,7 @@ export function useViewMeta() {
           })()
         );
       },
-      [metaAtom, findItem, meta.view],
+      [metaAtom, findItem, meta],
     ),
   );
 
@@ -397,10 +397,4 @@ export function useViewMeta() {
     findItem,
     findItems,
   } as const;
-}
-
-function findSchemaItems(schema: Schema): Schema[] {
-  const items = schema.type !== "panel-related" ? schema.items ?? [] : [];
-  const nested = items.flatMap((item) => findSchemaItems(item));
-  return [...items, ...nested];
 }
