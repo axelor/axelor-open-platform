@@ -944,12 +944,8 @@ image::widgets/tag-select.png[]
 
 The following attributes are supported:
 
-<<<<<<< HEAD
-* `x-color-field`: specify the tag color field that should either use selection `color.name.selection`, or be a hexadecimal value.
-=======
 * `x-color-field`: specify the tag color field that should either use selection `color.name.selection`. From version
 _7.2.1_, it also accepts a hexadecimal value.
->>>>>>> 5e8df93c9 (Add hexadecimal support on x-color-field)
 * `x-image-field`: specify the image field to use.
 
 Available tag color values for `MultiSelect`, `SingleSelect`, and `TagSelect`:
