@@ -1,0 +1,6 @@
+---
+title: Fix x-bind string case sensitive issue
+type: fix
+description: |
+  When x-bind output of string field remains same for same field,
+  it should reflect the output value instead of skipping value update.
