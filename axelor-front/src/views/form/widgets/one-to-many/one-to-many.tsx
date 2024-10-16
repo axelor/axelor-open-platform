@@ -1668,6 +1668,7 @@ function OneToManyInner({
   }, [isRootTreeGrid, state.columns, columnAttrs, setColumnAttrs]);
 
   useEffect(() => {
+    if (!isCollectionTree) return;
     const fieldsSelect = gridViewData?.items
       ?.filter((item) => item.type === "field" && item.name)
       .reduce((_select: Record<string, any>, item) => {
@@ -1678,7 +1679,7 @@ function OneToManyInner({
         };
       }, {});
     setSelectFields((state: any) => ({ ...state, ...fieldsSelect }));
-  }, [setSelectFields, gridViewData?.items]);
+  }, [isCollectionTree, setSelectFields, gridViewData?.items]);
 
   const expandableContext = useMemo(
     () => ({ selectAtom: selectFieldsAtom, level: expandLevel + 1 }),
