@@ -63,10 +63,10 @@ public class AuthPac4jUserService {
 
   @Nullable
   public User getUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getUserIdentifier(profile);
+    final String userIdentifier = profileService.getUserIdentifier(profile);
 
-    if (codeOrEmail != null) {
-      return userRepo.findByCodeOrEmail(codeOrEmail);
+    if (userIdentifier != null) {
+      return userRepo.findByCode(userIdentifier);
     }
 
     return null;
