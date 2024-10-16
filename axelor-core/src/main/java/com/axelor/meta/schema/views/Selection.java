@@ -21,6 +21,7 @@ package com.axelor.meta.schema.views;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAnyAttribute;
@@ -146,7 +147,18 @@ public class Selection {
 
     @JsonGetter
     public Map<String, Object> getData() {
-      return data;
+      if (data == null || data.isEmpty()) {
+        return data;
+      }
+      Map<String, Object> _data = new HashMap<>();
+      for (Map.Entry<String, Object> entry : data.entrySet()) {
+        Object val = entry.getValue();
+        if ("description".equals(entry.getKey()) && val != null) {
+          val = I18n.get(val.toString());
+        }
+        _data.put(entry.getKey(), val);
+      }
+      return _data;
     }
 
     public void setData(Map<String, Object> data) {
