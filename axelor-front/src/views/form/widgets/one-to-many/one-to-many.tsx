@@ -1766,6 +1766,7 @@ function OneToManyInner({
   });
 
   useEffect(() => {
+    if (!isCollectionTree) return;
     const fieldsSelect = gridViewData?.items
       ?.filter(
         (item) =>
@@ -1781,7 +1782,7 @@ function OneToManyInner({
         };
       }, {});
     setSelectFields((state: any) => ({ ...state, ...fieldsSelect }));
-  }, [setSelectFields, gridViewData?.items]);
+  }, [isCollectionTree, setSelectFields, gridViewData?.items]);
 
   const addNewSubLine = useAtomCallback(
     useCallback(
