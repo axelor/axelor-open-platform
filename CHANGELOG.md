@@ -1,3 +1,36 @@
+## 6.0.5 (2024-10-17)
+
+#### Fixed
+
+* Fix dirty view when an editor contain a button
+* Fix hidden panels/buttons in editor when the record changes
+* Fix details from view attrs reset when reloading from grid/tab
+* Fix onnew popup actions called with delay
+* Fix tab refresh with HTML dashlet
+* Fix auth provider settings `exclusive` and `absolute-url-required`
+
+#### Security
+
+* Always rely on codes when fetching user from profile
+
+  <details>
+  
+  Any extends of `com.axelor.auth.pac4j.AuthPac4jUserService.getUser` should takes 
+  care to rely on fetch users by code only (instead of fetching by code and email).
+  
+  In case your application use SSO authentication, a carefully review is needed.
+  As we now rely on users codes to retrieve users, make sure the users codes match 
+  the user profile username or email provided by the identity provider (we rely on 
+  pac4j user profile mapping for this). For example, OpenID Connect providers commonly 
+  use `preferred_username` claim as username,but for others such as Azure OpenID Connect 
+  provider, it will use the `upn` claim as username. As fallback is will use the `email` 
+  claim as email. In case of existing users codes not matching identity providers username 
+  or email, it will not retrieve them and users will not be able to log in. Manually change 
+  will be needed, by updating users codes with their email for example.
+  
+  </details>
+
+
 ## 6.0.4 (2022-11-02)
 
 #### Changes
