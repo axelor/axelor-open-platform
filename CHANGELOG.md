@@ -1,3 +1,76 @@
+## 7.2.1 (2024-10-17)
+
+#### Feature
+
+* Fix search bar value duplicated in other quick menus
+* Always show tenant selection for non-hosts resolved tenants
+* TagSelect x-color-field attribute is now compatible with hexadecimal color values
+* Add /files/data-export?fileName and /files/report?link endpoints
+
+  <details>
+  
+  Add files endpoints accepting filename as query param instead of path param.
+  
+  This ensures URIs are ASCII only, complying with Shiro InvalidRequestFilter.
+  
+  Files endpoints using filename as path param are kept for backward compatibility and may be removed
+  in later versions.
+  
+  </details>
+
+#### Change
+
+* Re-enable Shiro global filters
+
+  <details>
+  
+  Shiro global filters are re-enabled, now that our endpoints comply with
+  Shiro InvalidRequestFilter (ASCII-only URIs).
+  
+  User endpoints also need to make sure they use ASCII-only characters in URI.
+  
+  </details>
+
+#### Fix
+
+* Fix version issue in editable m2m grid
+* Fix ColorPicker popper to work even with invalid values
+* Fix tenant selection at login when hosts are not specified
+
+  <details>
+  
+  Session may exist even if user is not logged in.
+  Tenant specified from login request should override any session tenant.
+  
+  </details>
+
+* Fix data-description not translated on enum/selection
+* Fix restore items state on save in form view
+* Invalidate session when tenant becomes inactive
+* Fix skip view dirty on editable m2m grid changes
+
+#### Security
+
+* Always rely on codes when fetching user from profile
+
+  <details>
+  
+  Any extends of `com.axelor.auth.pac4j.AuthPac4jUserService.getUser` should takes 
+  care to rely on fetch users by code only (instead of fetching by code and email).
+  
+  In case your application use SSO authentication, a carefully review is needed.
+  As we now rely on users codes to retrieve users, make sure the users codes match 
+  the user profile username or email provided by the identity provider (we rely on 
+  pac4j user profile mapping for this). For example, OpenID Connect providers commonly 
+  use `preferred_username` claim as username,but for others such as Azure OpenID Connect 
+  provider, it will use the `upn` claim as username. As fallback is will use the `email` 
+  claim as email. In case of existing users codes not matching identity providers username 
+  or email, it will not retrieve them and users will not be able to log in. Manually change 
+  will be needed, by updating users codes with their email for example.
+  
+  </details>
+
+
 ## 7.2.0 (2024-10-07)
 
 #### Feature

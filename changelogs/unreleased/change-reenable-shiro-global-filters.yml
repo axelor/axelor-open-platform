@@ -1,8 +1,0 @@
----
-title: Re-enable Shiro global filters
-type: change
-description: |
-  Shiro global filters are re-enabled, now that our endpoints comply with
-  Shiro InvalidRequestFilter (ASCII-only URIs).
-
-  User endpoints also need to make sure they use ASCII-only characters in URI.
