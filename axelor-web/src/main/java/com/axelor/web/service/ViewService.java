@@ -460,20 +460,21 @@ public class ViewService extends AbstractService {
           names.add(name);
         }
 
-        final Optional<SimpleWidget> existing =
+        final List<SimpleWidget> existing =
             view.getItems().stream()
                 .filter(widget -> widget instanceof SimpleWidget)
                 .map(SimpleWidget.class::cast)
                 .filter(widget -> Objects.equals(widget.getName(), name))
-                .findFirst();
-        if (existing.isPresent()) {
-          final SimpleWidget widget = existing.get();
-          widget.setHidden(null);
-          final Object width = map.get("width");
-          if (width != null) {
-            widget.setWidth(String.valueOf(width));
+                .collect(Collectors.toList());
+        if (!existing.isEmpty()) {
+          for (final SimpleWidget widget : existing) {
+            widget.setHidden(null);
+            final Object width = map.get("width");
+            if (width != null) {
+              widget.setWidth(String.valueOf(width));
+            }
+            items.add(widget);
           }
-          items.add(widget);
           continue;
         }
 

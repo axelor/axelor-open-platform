@@ -1,0 +1,9 @@
+---
+title: Fix grid customization of fields mentioned several times
+type: fix
+description: |
+  On a grid view definition, there may be several instances of the same field
+  with different "if" conditions.
+
+  When saving grid view customization, we need to retrieve all the fields with the same name,
+  not just the first occurrence.
