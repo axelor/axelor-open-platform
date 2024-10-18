@@ -52,6 +52,7 @@ function Translations({
   }
 
   useAsyncEffect(async () => {
+    if (originalValue === null || originalValue.trim() === "") return;
     const key = `value:${originalValue}`;
     const { records = [] } = await ds.search({
       filter: {
