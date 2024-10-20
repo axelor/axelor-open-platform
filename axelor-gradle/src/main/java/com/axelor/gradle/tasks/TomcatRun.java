@@ -51,7 +51,7 @@ public class TomcatRun extends AbstractRunTask {
 
     args.add("--port");
     args.add("" + port);
-    args.add("--config");
+    args.add("--options-from");
     args.add(AxelorUtils.toRelativePath(project, confFile));
 
     return args;

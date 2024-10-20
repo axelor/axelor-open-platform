@@ -1,0 +1,20 @@
+---
+title: Add command line support
+type: feature
+description: |
+  The axelor apps now has command line support.
+  
+  A new gradle task `buildApp` is added to create application bundle
+  with command line support.
+  
+  The bundle will be generated at `build/axelor-app` which includes
+  extracted war application and an executable `axelor.jar` to execute
+  various commands.
+  
+  The app modules can provide additional commands by implementing
+  `com.axelor.app.cli.CliCommand` or more conveniently by extending
+  `com.axelor.app.cli.AbstractCliCommand` which provide helper methods
+  to execute tasks inside container or persistence sessions.
+  
+  The core module includes `run` and `database` commands which can be
+  used to run the application or perform database maintenance tasks.

@@ -4,18 +4,24 @@
  */
 package com.axelor.tomcat;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TomcatOptions {
 
   private int port = 8080;
 
-  private String contextPath = "/";
+  private String contextPath = "";
+
+  private URI proxyUrl;
 
   private Path baseDir;
+
+  private int maxThreads;
 
   private List<Path> roots = new ArrayList<>();
 
@@ -58,14 +64,21 @@ public class TomcatOptions {
     return contextPath;
   }
 
+  public URI getProxyUrl() {
+    return proxyUrl;
+  }
+
+  public void setProxyUrl(URI proxyUrl) {
+    this.proxyUrl = proxyUrl;
+  }
+
   public void setContextPath(String contextPath) {
-    String context = contextPath == null ? "" : contextPath.trim();
-    if (context.isEmpty()) {
-      context = "/";
-    }
-    if (context.charAt(0) != '/') {
-      context = "/" + context;
-    }
+    String context =
+        Optional.ofNullable(contextPath)
+            .map(String::trim)
+            .map(x -> x.startsWith("/") ? x : "/" + x)
+            .map(x -> x.equals("/") ? "" : x)
+            .orElse("");
     this.contextPath = context;
   }
 
@@ -75,6 +88,14 @@ public class TomcatOptions {
 
   public void setBaseDir(Path baseDir) {
     this.baseDir = baseDir;
+  }
+
+  public int getMaxThreads() {
+    return maxThreads;
+  }
+
+  public void setMaxThreads(int maxThreads) {
+    this.maxThreads = maxThreads;
   }
 
   public List<Path> getRoots() {

@@ -3,6 +3,15 @@ description = 'Support for running Axelor in embedded Tomcat server'
 apply plugin: 'java'
 
 dependencies {
-  implementation libs.commons_cli
+  implementation libs.picocli
   implementation libs.tomcat_embed
+}
+
+jar {
+  manifest {
+    attributes(
+        'Main-Class': 'com.axelor.app.Launcher',
+        'Class-Path': configurations.runtimeClasspath.collect { it.getName() }.join(' '),
+        )
+  }
 }

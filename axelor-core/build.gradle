@@ -71,6 +71,8 @@ dependencies {
 
   implementation libs.minio
 
+  implementation libs.picocli
+
   testImplementation libs.greenmail
   testImplementation libs.unboundid_ldapsdk
 

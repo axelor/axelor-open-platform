@@ -1,0 +1,143 @@
+= Command line
+
+:toc:
+:toc-title:
+:uri-picocli: https://picocli.info/
+
+The {page-component-title} can be built as a command line application.
+
+CAUTION: CLI is in beta. Use it with caution till it is promoted GA.
+
+== Command line app
+
+The command line application can be built with the following gradle command:
+
+[source,sh]
+----
+  $ ./gradlew buildApp
+----
+
+The application bundle will be generated at `build/install/{project-name}` folder which includes
+extracted war application in the `app/` directory, launcher script dependencies in the `lib/`
+directory, and executable scripts in the `bin/` directory.
+
+The bundle also includes a `README.txt` file with usage instructions and a `LICENSE` file.
+
+IMPORTANT: Java 21 or higher is required to run the command line application.
+
+== Command line tool
+
+The `axelor` script is an executable command line tool that can be used to execute various commands provided by the app:
+
+[source,sh]
+----
+  $ ./bin/axelor --help
+----
+
+You would see something like this:
+
+----
+Usage: axelor [-hV] [-c=FILE] [COMMAND]
+  -c, --config=FILE   Path to axelor config file.
+  -h, --help          Show this help message and exit.
+  -V, --version       Print version information and exit.
+Commands:
+  run       Run the application.
+  database  Perform database maintenance operations.
+----
+
+To know how to use the supported commands, call the tool like this:
+
+[source,sh]
+----
+  $ ./bin/axelor run --help
+  $ ./bin/axelor database --help
+----
+
+The `-c` option can be used to provide axelor config file.
+
+[source,sh]
+----
+  $ ./bin/axelor -c /path/to/axelor-config.properties run
+----
+
+== Custom commands
+
+The app modules can provide additional commands by implementing
+`com.axelor.app.cli.CliCommand` or more conveniently by extending
+`com.axelor.app.cli.AbstractCliCommand` which provide helper methods
+to execute tasks inside container or persistence sessions.
+
+The custom commands are automatically discovered using the `MetaScanner` 
+that efficiently scans only Axelor modules to find all implementations 
+of `com.axelor.app.cli.CliCommand`.
+
+The commands should use {uri-picocli}[picocli] annotations:
+
+[source,java]
+----
+package com.axelor.some.cli;
+
+import com.axelor.app.cli.AbstractCliCommand;
+import java.util.Optional;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@Command(name = "hello", description = "Show hello message.")
+public class HelloCommand extends AbstractCliCommand {
+
+  @Option(names = "--message", description="Specify alternative message.")
+  private String message;
+
+  public void run() {
+    String msg = Optional.ofNullable(message).orElse("Hello World!!!");
+    System.out.println(msg);
+  }
+}
+----
+
+The `HelloCommand` will be automatically discovered at runtime using the 
+`MetaScanner`. No additional configuration is required - simply 
+implementing the `CliCommand` interface is sufficient.
+
+The `hello` command will be available with the `axelor` tool:
+
+[source,sh]
+----
+  $ ./bin/axelor hello --message "Awesome!"
+----
+
+The `AbstractCliCommand` class provide two helper methods:
+
+- `withContainer(Runnable)` - run the task within the Guice container
+- `withSession(Runnable)` - same as `withContainer` but persistence service is automatically started
+
+[source,java]
+----
+package com.axelor.some.cli;
+
+import com.axelor.app.cli.AbstractCliCommand;
+import com.axelor.inject.Beans;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+@Command(name = "some", description = "Do something.")
+public class SomeCommand extends AbstractCliCommand {
+
+  public void run() {
+    // persistence service is not started automatically
+    withContainer(() -> { //<1>
+      SomeService service = Beans.get(SomeService.class);
+      service.doSomeThing();
+    });
+    
+    // persistence service started automatically
+    withSession(() -> { //<2>
+      AnotherService service = Beans.get(AnotherService.class);
+      service.doSomeThing();
+    });
+  }
+}
+----
+1. use `withContainer` if you need dependency injection support
+2. use `withSession` if you need persistence support

@@ -4,8 +4,10 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.common.PropertiesUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
+import com.axelor.common.YamlUtils;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.io.File;
@@ -13,10 +15,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -46,6 +52,10 @@ public class AxelorUtils {
   private static final String EE_SUFFIX = "enterprise";
   private static final String USE_EE_PLATFORM_PROPERTY = "axelor.platform.ee";
 
+  private static final String CONFIGS_FILES_PATH = "src/main/resources";
+  private static final List<String> CONFIGS_FILES =
+      List.of("axelor-config.properties", "axelor-config.yml", "axelor-config.yaml");
+
   private AxelorUtils() {}
 
   private static LoadingCache<Project, List<Project>> includedBuildRootsCache =
@@ -57,6 +67,28 @@ public class AxelorUtils {
                     .map(b -> b.getMutableModel().getRootProject())
                     .collect(Collectors.toList());
               });
+
+  public static Path findAxelorConfig(Project project) {
+    Path rootPath = project.getRootDir().toPath().resolve(CONFIGS_FILES_PATH);
+    return CONFIGS_FILES.stream()
+        .map(rootPath::resolve)
+        .filter(Files::exists)
+        .findFirst()
+        .orElse(null);
+  }
+
+  public static Map<String, String> parseAxelorConfig(Project project, Path filePath) {
+    try {
+      if (filePath.toString().endsWith(".properties")) {
+        return PropertiesUtils.propertiesToMap(PropertiesUtils.loadProperties(filePath));
+      } else {
+        return YamlUtils.getFlattenedMap(YamlUtils.loadYaml(filePath));
+      }
+    } catch (Exception e) {
+      project.getLogger().error("Unable to open configuration file %s".formatted(filePath));
+    }
+    return new HashMap<>();
+  }
 
   public static String toRelativePath(Project project, File file) {
     return project.getProjectDir().toPath().relativize(file.toPath()).toString();
@@ -233,7 +265,7 @@ public class AxelorUtils {
       return;
     }
 
-    if (shouldUsePlatformEE(project)) {
+    if (usePlatformEE(project)) {
       project
           .getConfigurations()
           .all(
@@ -259,7 +291,7 @@ public class AxelorUtils {
   }
 
   private static void addImplementations(Project project) {
-    final boolean useEE = shouldUsePlatformEE(project);
+    final boolean useEE = usePlatformEE(project);
     final String version = VersionUtils.getVersion().version;
     final String config = JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME;
 
@@ -303,7 +335,7 @@ public class AxelorUtils {
     return module;
   }
 
-  private static boolean shouldUsePlatformEE(Project project) {
+  public static boolean usePlatformEE(Project project) {
     return Boolean.parseBoolean((String) project.findProperty(USE_EE_PLATFORM_PROPERTY));
   }
 

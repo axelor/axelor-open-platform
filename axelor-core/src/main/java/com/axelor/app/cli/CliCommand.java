@@ -1,0 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: Axelor <https://axelor.com>
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+package com.axelor.app.cli;
+
+import picocli.CommandLine.Command;
+
+@Command(mixinStandardHelpOptions = true)
+public interface CliCommand extends Runnable {}

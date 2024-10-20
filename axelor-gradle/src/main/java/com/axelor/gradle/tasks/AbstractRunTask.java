@@ -18,7 +18,6 @@ import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
-import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
@@ -120,7 +119,6 @@ public abstract class AbstractRunTask extends DefaultTask {
 
   @TaskAction
   public void exec() throws Exception {
-    final Project project = getProject();
     execOperations.javaexec(
         task -> {
           task.classpath(createManifestJar());

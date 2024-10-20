@@ -4,12 +4,12 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.gradle.support.CliSupport;
 import com.axelor.gradle.support.DuplicatedClassSupport;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
 import com.axelor.gradle.support.PublishSupport;
-import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
 import com.axelor.gradle.tasks.AbstractEncryptTask;
@@ -81,8 +81,8 @@ public class AxelorPlugin implements Plugin<Project> {
     if (!AxelorUtils.isAxelorApplication(project)) return;
 
     project.getPlugins().apply(WarSupport.class);
-    project.getPlugins().apply(ScriptsSupport.class);
     project.getPlugins().apply(TomcatSupport.class);
+    project.getPlugins().apply(CliSupport.class);
 
     // run generateCode on included builds
     AxelorUtils.findIncludedBuildProjects(project).stream()

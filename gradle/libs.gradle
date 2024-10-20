@@ -289,7 +289,6 @@ libs.pac4j = libs.buji_pac4j + [
 libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:7.0.3'
 
 // commons
-libs.commons_cli = "commons-cli:commons-cli:1.9.0"
 libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.4.0"
 libs.commons_csv = [
   "org.apache.commons:commons-csv:1.14.1",
@@ -383,6 +382,8 @@ libs.tomcat_embed = [
 ]
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
+
+libs.picocli = "info.picocli:picocli:4.7.7"
 
 libs.minio = [
   dependencies.create("io.minio:minio:8.5.17") {

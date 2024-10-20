@@ -1,6 +1,7 @@
 * xref:index.adoc[Developer Guide]
 
 ** xref:application/index.adoc[Application]
+*** xref:application/cli.adoc[Command Line]
 *** xref:application/config.adoc[Configuration]
 *** xref:application/file-storage.adoc[Files storage]
 *** xref:application/multi-tenancy.adoc[Multi-Tenancy]
