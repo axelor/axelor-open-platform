@@ -1,0 +1,8 @@
+---
+title: Fix focused tab with showIf in panel-tabs
+type: fix
+description: |
+  On a form view, when first tab of panel-tabs contains showIf/hideIf expression,
+  so initially it will be hidden and staring focus will be on tab which doesn't contain
+  showIf/hideIf expression.
+  In this case, it should re-focus active tab to starting tab if starting tab is accessible.
