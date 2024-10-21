@@ -317,6 +317,13 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
+  const processInstanceId = useAtomValue(
+    useMemo(
+      () => selectAtom(formAtom, (form) => form.record?.$processInstanceId),
+      [formAtom],
+    ),
+  );
+
   const archived = useAtomValue(
     useMemo(
       () => selectAtom(formAtom, (form) => form.record?.archived),
@@ -934,10 +941,10 @@ const FormContainer = memo(function FormContainer({
   }, [dataStore, onCopyAction, actionExecutor, doEdit, record.id]);
 
   const openProcess = useCallback(async () => {
-    if (record.id && record.$processInstanceId) {
+    if (record.id && processInstanceId) {
       await actionExecutor.execute("wkf-instance-view-from-record");
     }
-  }, [actionExecutor, record.id, record.$processInstanceId]);
+  }, [actionExecutor, record.id, processInstanceId]);
 
   const onArchive = useAtomCallback(
     useCallback(
@@ -1078,7 +1085,7 @@ const FormContainer = memo(function FormContainer({
   const canAudit = hasButton("log") && record.id;
   const canAttach = hasButton("attach") && record.id;
   const canOpenProcess =
-    session.info?.features?.studio && record.id && record.$processInstanceId;
+    session.info?.features?.studio && record.id && processInstanceId;
 
   const handleSave = useCallback(
     async (e?: SyntheticEvent) => {
