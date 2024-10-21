@@ -56,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import javax.xml.XMLConstants;
@@ -483,6 +484,12 @@ public class XMLViews {
       xmlView.setCustomViewId(custom.getId());
       xmlView.setCustomViewShared(custom.getShared());
     }
+
+    if (type != null && !Objects.equals(type, xmlView.getType())) {
+      log.error("Requested view \"{}\" ({}), but found type: {}", name, type, xmlView.getType());
+      return null;
+    }
+
     return xmlView;
   }
 
