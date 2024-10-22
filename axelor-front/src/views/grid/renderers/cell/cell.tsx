@@ -42,6 +42,15 @@ export function Cell(props: GridCellProps) {
       ) {
         return <span>{value}</span>;
       }
+
+      if (
+        children &&
+        !React.isValidElement(children) &&
+        typeof children === "object"
+      ) {
+        return String(children);
+      }
+
       return children;
     }
 
