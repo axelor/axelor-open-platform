@@ -12,10 +12,8 @@
       &:not([class*="hasFrame"]) {
         --ax-panel-border-radius: 0;
       }
-      &:first-child {
-        margin-bottom: -1rem;
-      }
       &:nth-child(2) {
+        margin-top: -1rem;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
       }
