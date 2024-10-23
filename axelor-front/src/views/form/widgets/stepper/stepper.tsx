@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useMemo } from "react";
 
@@ -27,7 +27,7 @@ type SelectItem = {
 export function Stepper(
   props: FieldProps<string | number | Record<string, number>>,
 ) {
-  const { schema, widgetAtom, formAtom, valueAtom } = props;
+  const { schema, readonly, widgetAtom, formAtom, valueAtom } = props;
   const { widgetAttrs } = schema;
   const {
     stepperCompleted = true,
@@ -35,9 +35,6 @@ export function Stepper(
     stepperShowDescription = false,
   } = widgetAttrs;
   const [value, setValue] = useAtom(valueAtom);
-
-  const { attrs } = useAtomValue(widgetAtom);
-  const { readonly } = attrs;
 
   const isReference = isReferenceField(schema);
   const selection = useSelectionList({ value, widgetAtom, schema });
