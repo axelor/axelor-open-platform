@@ -382,7 +382,10 @@ public class Field extends SimpleWidget {
     String widget = getWidget();
     if ("NavSelect".equalsIgnoreCase(widget)
         || "nav-select".equals(widget)
-        || "stepper".equalsIgnoreCase(widget)) {
+        || "stepper".equalsIgnoreCase(widget) 
+        || "SwitchSelect".equalsIgnoreCase(widget)
+        || "switch-select".equals(widget)
+        ) {
       Class<?> targetClass = getTargetClass();
       Integer limit = getLimit();
       if (targetClass != null) {
