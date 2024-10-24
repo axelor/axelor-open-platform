@@ -39,6 +39,7 @@ public abstract class Model {
   @Version private Integer version;
 
   // Represents the collection id of the record in the UI widgets (collection fields)
+  @Widget(copyable = false)
   @Transient private transient Long cid;
 
   // Represents the selected state of the record in the UI widgets

@@ -21,6 +21,7 @@ package com.axelor.rpc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -141,9 +142,11 @@ public class ResourceTest extends RpcTest {
   public void testCopy() {
 
     Contact c = contacts.all().filter("firstName = ?", "James").fetchOne();
+    c.setCid(1L);
     Contact n = contacts.copy(c, true);
 
     assertNotSame(c, n);
+    assertNull(n.getCid());
     assertNotSame(c.getAddresses(), n.getAddresses());
     assertEquals(c.getAddresses().size(), n.getAddresses().size());
 
