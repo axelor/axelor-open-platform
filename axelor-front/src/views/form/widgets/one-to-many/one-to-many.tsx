@@ -781,7 +781,7 @@ function OneToManyInner({
 
   const onSearch = useAtomCallback(
     useCallback(
-      async (get, set, options?: SearchOptions) => {
+      async (get, set, options?: SearchOptions, resetOrder?: boolean) => {
         const items = getItems(get(valueAtom));
         let names = options?.fields ?? dataStore.options.fields ?? columnNames;
 
@@ -847,9 +847,10 @@ function OneToManyInner({
         });
 
         let currNewEditRecord: DataRecord;
+        const gridState = get(gridAtom);
         if (isCollectionTree) {
-          const state = get(gridAtom);
-          const editRecord = state.rows?.[state.editRow?.[0] ?? -1]?.record;
+          const editRecord =
+            gridState.rows?.[gridState.editRow?.[0] ?? -1]?.record;
           if (editRecord && (editRecord.id ?? 0) < 0 && !editRecord._dirty) {
             currNewEditRecord = editRecord;
           }
@@ -869,15 +870,19 @@ function OneToManyInner({
               : item;
           });
 
-          const newIds = newRecords.map((r) => r.id);
-          const recIds = records.map((r) => r.id);
-          const ids = [
-            ...recIds.filter(
-              (id) => newIds.includes(id) || id === currNewEditRecord?.id,
-            ), // preserve existing record order
-            ...newIds.filter((id) => !recIds.includes(id)), // append new record
-          ];
-          return ids
+          let newIds = newRecords.map((r) => r.id);
+
+          if (!resetOrder) {
+            const recIds = gridState.rows.map((r) => r.record?.id);
+            newIds = [
+              ...recIds.filter(
+                (id) => newIds.includes(id) || id === currNewEditRecord?.id,
+              ), // preserve existing record order
+              ...newIds.filter((id) => !recIds.includes(id)), // append new record
+            ];
+          }
+
+          return newIds
             .map((id) =>
               currNewEditRecord?.id === id
                 ? currNewEditRecord
@@ -971,11 +976,12 @@ function OneToManyInner({
         return y === undefined || !equals(x, y) || x.selected !== y.selected;
       })
     ) {
+      const resetOrder = forceRefreshRef.current;
       forceRefreshRef.current = false;
       const prevValue = valueRef.current;
       valueRef.current = value;
       setRefresh(async () => {
-        await onSearch(dataStore.options);
+        await onSearch(dataStore.options, resetOrder);
         if (prevValue && orderField) {
           setShouldReorder(true);
         }
