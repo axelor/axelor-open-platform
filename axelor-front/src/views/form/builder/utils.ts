@@ -6,6 +6,7 @@ import uniq from "lodash/uniq";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
   Field,
+  FormView,
   JsonField,
   Panel,
   Property,
@@ -15,12 +16,13 @@ import {
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 import { getJSON } from "@/utils/data-record";
 
-import { getBaseDummy, isCleanDummy } from "@/services/client/data-utils";
+import { getBaseDummy, isCleanDummy, isDummy } from "@/services/client/data-utils";
 import { moment } from "@/services/client/l10n.ts";
-import { MetaData } from "@/services/client/meta";
+import { MetaData, ViewData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
 import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
+import { findViewItems } from "@/utils/schema";
 
 import * as WIDGETS from "../widgets";
 
@@ -575,4 +577,27 @@ export function createContextParams(schema: Schema) {
     _viewType,
     _views,
   };
+}
+
+export function resetFormDummyFieldsState(
+  meta: ViewData<FormView>,
+  statesByName: FormState["statesByName"],
+) {
+  const fieldList = findViewItems(meta, (item: Schema) =>
+    Boolean(item?.name && isField(item)),
+  ).map((item) => item.name!);
+
+  const fieldNames = Object.keys(meta.fields ?? {});
+
+  // reset dummy fields state only
+  // only keep real fields and non field items like panels state
+  return Object.keys(statesByName)
+    .filter((key) => !fieldList.includes(key) || !isDummy(key, fieldNames))
+    .reduce(
+      (state, key) => ({
+        ...state,
+        [key]: statesByName[key],
+      }),
+      {},
+    );
 }

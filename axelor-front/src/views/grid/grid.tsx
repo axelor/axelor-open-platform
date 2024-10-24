@@ -567,9 +567,19 @@ function GridInner(props: ViewProps<GridView>) {
   }, [view.model, formViewName]);
 
   const fetchAndSetDetailsRecord = useCallback(
-    async (record: DataRecord | null) => {
+    async (
+      record: DataRecord | null,
+      restoreDummyValues?: (
+        saved: DataRecord,
+        fetched: DataRecord,
+      ) => DataRecord,
+    ) => {
       if (detailsMeta && record && (record?.id ?? 0) > 0) {
+        const saved = record;
         record = await fetchRecord(detailsMeta, dataStore, record.id!);
+        if (restoreDummyValues) {
+          record = restoreDummyValues(saved, record);
+        }
       }
       setDirty(false);
       setDetailsRecord(record);
@@ -578,10 +588,16 @@ function GridInner(props: ViewProps<GridView>) {
   );
 
   const onSaveInDetails = useCallback(
-    async (record: DataRecord) => {
+    async (
+      record: DataRecord,
+      restoreDummyValues?: (
+        saved: DataRecord,
+        fetched: DataRecord,
+      ) => DataRecord,
+    ) => {
       const saved = await onSave(record);
       if (saved) {
-        fetchAndSetDetailsRecord(saved);
+        fetchAndSetDetailsRecord(saved, restoreDummyValues);
         if ((record.id ?? 0) < 0) {
           saveIdRef.current = saved.id;
         }

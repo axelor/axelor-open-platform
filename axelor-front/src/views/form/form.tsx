@@ -27,7 +27,7 @@ import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts, useTabShortcut } from "@/hooks/use-shortcut";
 import { DataSource } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
-import { diff, extractDummy, isDummy } from "@/services/client/data-utils";
+import { diff, extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
@@ -36,7 +36,7 @@ import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
-import { findViewItem, findViewItems } from "@/utils/schema";
+import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -74,9 +74,9 @@ import {
 } from "./builder/scope";
 import {
   getDefaultValues,
-  isField,
   processOriginal,
   processSaveValues,
+  resetFormDummyFieldsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
 
@@ -150,6 +150,63 @@ export const useGetErrors = () => {
       return errors.length ? errors : null;
     },
     [store],
+  );
+};
+
+export const usePrepareSaveRecord = (
+  meta: ViewData<FormView>,
+  formAtom: FormAtom,
+) => {
+  return useAtomCallback(
+    useCallback(
+      (get) => {
+        const formState = get(formAtom);
+
+        const { record } = formState;
+        const fieldNames = Object.keys(meta.fields ?? {});
+        const dummy = extractDummy(record, fieldNames);
+        const dummyVals = Object.entries(dummy).reduce((acc, [k, v]) => {
+          return k.startsWith("$")
+            ? { ...acc, [k.substring(1)]: v }
+            : { ...acc, [k]: v };
+        }, {});
+
+        const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
+        const vals = diff(rec, original);
+
+        return [
+          {
+            ...processSaveValues(
+              {
+                ...dummyVals,
+                ...vals,
+              },
+              formState.meta,
+            ),
+            _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
+          } as DataRecord,
+          (res: DataRecord, fetchedRecord: DataRecord) => {
+            const savedResult = res;
+            const restoreDummyValues = Object.keys(dummy).reduce(
+              (values, key) => {
+                const viewItem = findViewItem(meta, key);
+                return viewItem?.resetState === true
+                  ? values
+                  : { ...values, [key]: dummy[key] };
+              },
+              {},
+            );
+            res = res.id ? fetchedRecord : res;
+            res = res.id ? fillRecordWithCid(savedResult, res) : res;
+            return {
+              ...restoreDummyValues,
+              ...res,
+            }; // restore dummy values
+          },
+        ] as const;
+      },
+      [meta, formAtom],
+    ),
   );
 };
 
@@ -288,6 +345,7 @@ const FormContainer = memo(function FormContainer({
     useFormHandlers(meta, defaultRecord, {
       context: action?.context,
     });
+  const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
 
   const showConfirmDirty = useViewConfirmDirty();
   const { hasButton } = usePerms(meta.view, perms ?? meta.perms);
@@ -471,30 +529,12 @@ const FormContainer = memo(function FormContainer({
           ...prev,
           dirty,
           ...(keepStates
-            ? (() => {
-                const fieldList = findViewItems(meta, (item: Schema) =>
-                  Boolean(item?.name && isField(item)),
-                ).map((item) => item.name!);
-
-                const fieldNames = Object.keys(meta.fields ?? {});
-
-                // reset dummy fields state only
-                // only keep real fields and non field items like panels state
-                return {
-                  statesByName: Object.keys(prev.statesByName)
-                    .filter(
-                      (key) =>
-                        !fieldList.includes(key) || !isDummy(key, fieldNames),
-                    )
-                    .reduce(
-                      (state, key) => ({
-                        ...state,
-                        [key]: prev.statesByName[key],
-                      }),
-                      {},
-                    ),
-                };
-              })()
+            ? {
+                statesByName: resetFormDummyFieldsState(
+                  meta,
+                  prev.statesByName,
+                ),
+              }
             : { states: {}, statesByName: {} }),
           record,
           original: { ...record },
@@ -704,66 +744,33 @@ const FormContainer = memo(function FormContainer({
           return Promise.reject();
         }
 
-        const { record } = formState;
-        const fieldNames = Object.keys(meta.fields ?? {});
-        const dummy = extractDummy(record, fieldNames);
-        const dummyVals = Object.entries(dummy).reduce((acc, [k, v]) => {
-          return k.startsWith("$")
-            ? { ...acc, [k.substring(1)]: v }
-            : { ...acc, [k]: v };
-        }, {});
-
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
         }
 
-        if (!shouldSave) return record;
+        if (!shouldSave) return formState.record;
 
-        const { record: rec, original = {}, select, model } = get(formAtom); // record may have changed by actions
-        const vals = diff(rec, original);
+        const [savingRecord, restoreDummyValues] = prepareRecordForSave();
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
+        const { select } = formState;
 
-        let res = await dataStore.save(
-          {
-            ...processSaveValues(
-              {
-                ...dummyVals,
-                ...vals,
-              },
-              formState.meta,
-            ),
-            _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
-          },
-          {
-            ...opts,
-            fields: Object.keys(meta.fields ?? {}),
-            related: meta.related,
-            select,
-          },
-        );
+        let res = await dataStore.save(savingRecord, {
+          ...opts,
+          fields: Object.keys(meta.fields ?? {}),
+          related: meta.related,
+          select: formState.select,
+        });
 
         if (callOnRead) {
-          const savedResult = res;
-          const restoreDummyValues = Object.keys(dummy).reduce(
-            (values, key) => {
-              const viewItem = findViewItem(meta, key);
-              return viewItem?.resetState === true
-                ? values
-                : { ...values, [key]: dummy[key] };
-            },
-            {},
-          );
-          res = res.id ? await doRead(res.id, select) : res;
-          res = res.id ? fillRecordWithCid(savedResult, res) : res;
-          res = {
-            ...restoreDummyValues,
-            ...res,
-          }; // restore dummy values
+          const fetched = res.id ? await doRead(res.id, select) : res;
+
+          res = restoreDummyValues(res, fetched);
+
           doEdit(res, {
             callAction: false,
             callOnLoad,
             readonly,
-            isNew: vals.id !== res.id,
+            isNew: savingRecord.id !== res.id,
             keepStates: true,
           });
         }
@@ -781,6 +788,7 @@ const FormContainer = memo(function FormContainer({
         doRead,
         doEdit,
         readonly,
+        prepareRecordForSave,
       ],
     ),
   );

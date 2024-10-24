@@ -2,7 +2,7 @@ import { clsx, Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAtomCallback } from "jotai/utils";
-import { ReactElement, useCallback, useRef } from "react";
+import { ReactElement, useCallback, useEffect, useRef } from "react";
 import { ScopeProvider } from "bunshi/react";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
@@ -19,8 +19,10 @@ import {
   useFormAttachment,
   useGetErrors,
   useHandleFocus,
+  usePrepareSaveRecord,
 } from "../../form";
-import { Form, useFormHandlers } from "../../form/builder";
+import { Form, FormState, useFormHandlers } from "../../form/builder";
+import { resetFormDummyFieldsState } from "@/views/form/builder/utils";
 
 import styles from "./details.module.scss";
 
@@ -33,7 +35,10 @@ export interface DetailsProps {
   onNew?: () => void;
   onRefresh?: () => void;
   onCancel?: () => void;
-  onSave?: (record: DataRecord) => Promise<void>;
+  onSave?: (
+    record: DataRecord,
+    restoreDummyValues?: (saved: DataRecord, fetched: DataRecord) => DataRecord,
+  ) => Promise<void>;
 }
 
 export function Details({
@@ -50,11 +55,31 @@ export function Details({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
   const { hasButton } = usePerms(meta.view, meta.perms);
+  const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
 
+  const { onSave: onSaveAction } = meta.view;
   const isNew = (record?.id ?? -1) < 0;
   const attachmentItem = useFormAttachment(formAtom);
 
   const getErrors = useGetErrors();
+  const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
+
+  const restoreFormState = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        const statesByName = resetStatesByName.current;
+        if (statesByName) {
+          resetStatesByName.current = null;
+          set(formAtom, (prev) => ({ ...prev, statesByName }));
+        }
+      },
+      [formAtom],
+    ),
+  );
+
+  useEffect(() => {
+    restoreFormState();
+  }, [restoreFormState]);
 
   const handleSave = useAtomCallback(
     useCallback(
@@ -65,9 +90,33 @@ export function Details({
           showErrors(errors);
           return;
         }
-        onSave?.(state.record);
+
+        if (onSaveAction) {
+          await actionExecutor.execute(onSaveAction);
+        }
+
+        const [savingRecord, restoreDummyValues] = prepareRecordForSave();
+
+        resetStatesByName.current = resetFormDummyFieldsState(
+          meta,
+          get(formAtom).statesByName,
+        );
+
+        try {
+          await onSave?.(savingRecord, restoreDummyValues);
+        } catch (err) {
+          resetStatesByName.current = null;
+        }
       },
-      [formAtom, getErrors, onSave],
+      [
+        meta,
+        formAtom,
+        onSaveAction,
+        actionExecutor,
+        getErrors,
+        onSave,
+        prepareRecordForSave,
+      ],
     ),
   );
 
