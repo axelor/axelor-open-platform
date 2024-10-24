@@ -823,7 +823,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     for (String n : fields) {
       Property p = mapper.getProperty(n);
-      if (p == null || p.isPrimary() || p.isVersion()) {
+      if (p == null || p.isPrimary() || p.isVersion() || "cid".equals(p.getName())) {
         continue;
       }
       if (p.isCollection()) {
