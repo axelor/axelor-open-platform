@@ -3,7 +3,7 @@ import { selectAtom } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Box, clsx } from "@axelor/ui";
+import { Box, clsx, SelectRefHandler } from "@axelor/ui";
 
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
 import { Schema } from "@/services/client/meta.types";
@@ -66,6 +66,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
 
+  const selectRef = useRef<SelectRefHandler>(null);
   const valueRef = useRef<DataRecord[]>();
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain } = attrs;
@@ -201,6 +202,9 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
 
   const handleEdit = useCallback(
     async (record?: DataContext) => {
+      // close dropdown selection
+      selectRef.current?.close?.();
+
       if (canEdit && showEditorInTab && (record?.id ?? 0) > 0) {
         return showEditorInTab(record!, readonly);
       }
@@ -336,7 +340,7 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         />
       );
     },
-    [canEdit, canRemove, canView, schema, handleEdit, handleRemove],
+    [canRemove, canView, schema, handleEdit, handleRemove],
   );
 
   useAsyncEffect(ensureRelatedValues, [ensureRelatedValues]);
@@ -352,13 +356,14 @@ export function TagSelect(props: FieldProps<DataRecord[]>) {
         invalid={invalid}
         canSelect={canSelect}
         autoComplete={canSuggest}
+        selectRef={selectRef}
         fetchOptions={fetchOptions}
         options={[] as DataRecord[]}
         optionKey={getOptionKey}
         optionLabel={getOptionLabel}
         optionEqual={getOptionEqual}
         optionMatch={getOptionMatch}
-        value={ready ? value ?? EMPTY : EMPTY}
+        value={ready ? (value ?? EMPTY) : EMPTY}
         placeholder={placeholder}
         onChange={handleChange}
         onOpen={onMenuOpen}
@@ -388,13 +393,10 @@ type TagProps = {
 function Tag(props: TagProps) {
   const { record, schema, onClick, onRemove } = props;
   const { colorField, imageField } = schema;
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      onClick?.(record);
-    },
-    [onClick, record],
-  );
+  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    onClick?.(record);
+  }, [onClick, record]);
 
   const handleRemove = useCallback(() => {
     onRemove?.(record);
