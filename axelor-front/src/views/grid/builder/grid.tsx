@@ -477,8 +477,11 @@ export const Grid = forwardRef<
 
   const handleRecordAdd = useCallback(async () => {
     setEvent("editable:add-new");
+    setState?.((draft) => {
+      draft.orderBy = null;
+    });
     return true;
-  }, []);
+  }, [setState]);
 
   const onRecordAdd = useCallback(async () => {
     await commitForm();
