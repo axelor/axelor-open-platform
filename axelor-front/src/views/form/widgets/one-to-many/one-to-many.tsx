@@ -970,9 +970,13 @@ function OneToManyInner({
         records: DataRecord[],
         {
           select = true,
-          change = true,
+          change,
           dirty: _dirty = true,
-        }: { select?: boolean; change?: boolean; dirty?: boolean } = {},
+        }: {
+          select?: boolean;
+          change?: boolean;
+          dirty?: boolean;
+        } = {},
       ) => {
         const prevItems = getItems(get(valueAtom));
 
@@ -1002,7 +1006,8 @@ function OneToManyInner({
         ]);
 
         const changed =
-          change && (!isManyToMany || prevItems.length !== nextItems.length);
+          change ?? (!isManyToMany || prevItems.length !== nextItems.length);
+
         const dirty =
           _dirty &&
           (prevItems.length !== nextItems.length ||
@@ -1136,7 +1141,7 @@ function OneToManyInner({
   onSaveRef.current = onSave;
 
   const onO2MSave = useCallback((record: DataRecord) => {
-    return onSaveRef.current(record, { select: false });
+    return onSaveRef.current(record, { select: false, change: true });
   }, []);
 
   const onO2MUpdate = useCallback((record: DataRecord) => {
@@ -1256,7 +1261,7 @@ function OneToManyInner({
       }
       openEditor(
         { record, readonly },
-        (record) => handleSelect([record]),
+        (_record) => handleSelect([_record], { change: true }),
         onSave,
       );
     },
@@ -1437,7 +1442,7 @@ function OneToManyInner({
       const res = await dataStore.save(record, {
         fields: fieldList,
       });
-      return res && onSave(res);
+      return res && onSave(res, { change: true });
     },
     [viewData?.fields, fields, dataStore, onSave],
   );
