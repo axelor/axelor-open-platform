@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: ^0.2.11
-        version: 0.2.11(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+        specifier: ^0.2.12
+        version: 0.2.12(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
       '@babel/standalone':
         specifier: ^7.24.8
         version: 7.24.8
@@ -233,8 +233,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@axelor/ui@0.2.11':
-    resolution: {integrity: sha512-2z98Uvo05WfcjWoSV7aLW4DTpF9aEH0+AbevVMJzW/jIWVo0cq42tGikWOhSnCEN1bRfGBSqIRSueoZ3EEh8lw==}
+  '@axelor/ui@0.2.12':
+    resolution: {integrity: sha512-eZVr6RLKv7HNXZ4sLvHe7+G2wQhl8upnyUJPgQd4a40oDtjqh/9jL0xrEGocoM23kUH4a4+XREcD29KhQVtgOQ==}
     peerDependencies:
       react: ^18.3.1-0
       react-dom: ^18.3.1-0
@@ -3268,6 +3268,7 @@ packages:
 
   react-beautiful-dnd@13.1.1:
     resolution: {integrity: sha512-0Lvs4tq2VcrEjEgDXHjT98r+63drkKEgqyxdA7qD3mvKwga6a5SscbdLPO2IExotU1jW8L0Ksdl0Cj2AF67nPQ==}
+    deprecated: 'react-beautiful-dnd is now deprecated. Context and options: https://github.com/atlassian/react-beautiful-dnd/issues/2672'
     peerDependencies:
       react: ^16.8.5 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
@@ -4054,7 +4055,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@axelor/ui@0.2.11(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
+  '@axelor/ui@0.2.12(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@20.14.10)(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
     dependencies:
       '@emotion/is-prop-valid': 1.2.2
       '@floating-ui/react': 0.26.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
