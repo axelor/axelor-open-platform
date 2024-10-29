@@ -145,7 +145,7 @@ export function OneToManyEdit({
               _parent: {
                 id: parentId,
                 _model: parentModel,
-              }
+              },
             },
           },
         });
@@ -224,7 +224,19 @@ export function OneToManyEdit({
     [onEdit],
   );
 
+  const showPopup = useCallback(
+    async (popup: boolean) => {
+      popup && focusInput();
+      popup && (await onSearch({}));
+      setPopup(popup);
+    },
+    [focusInput, onSearch],
+  );
+
   const onAdd = useCallback(() => {
+    if (popup) {
+      showPopup(!popup);
+    }
     if (!isManyToMany) {
       return onEdit({});
     }
@@ -256,28 +268,21 @@ export function OneToManyEdit({
       }),
     });
   }, [
+    popup,
+    isManyToMany,
     onPopupViewInit,
     showSelector,
-    sortBy,
     model,
     gridView,
     domain,
+    sortBy,
+    getContext,
     searchLimit,
     canNew,
-    isManyToMany,
-    setValue,
-    getContext,
+    showPopup,
     onEdit,
+    setValue,
   ]);
-
-  const showPopup = useCallback(
-    async (popup: boolean) => {
-      popup && focusInput();
-      popup && (await onSearch({}));
-      setPopup(popup);
-    },
-    [focusInput, onSearch],
-  );
 
   const onDelete = useCallback(async () => {
     const onClose = onPopupViewInit();
