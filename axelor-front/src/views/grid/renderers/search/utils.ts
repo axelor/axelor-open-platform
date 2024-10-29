@@ -104,13 +104,13 @@ function getSearchCriteria(
   items: GridView["items"],
   values: SearchState,
 ): Filter[] {
-  let options = {};
 
   const getFilterCriteria = (_field: Field, value: any) => {
     const item = (items || []).find((item) => item?.name === _field?.name);
     const field = { ...item, ..._field } as Field;
     let type = toKebabCase(field.type || "");
     let op = "like";
+    let options = {};
     if (field.selection) {
       type = "selection";
     }
