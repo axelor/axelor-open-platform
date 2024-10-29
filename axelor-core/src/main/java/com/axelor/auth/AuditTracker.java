@@ -45,11 +45,13 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.axelor.rpc.Context;
-import com.axelor.rpc.JsonContext;
+import com.axelor.rpc.ContextHandler;
+import com.axelor.rpc.ContextHandlerFactory;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import java.math.BigDecimal;
@@ -59,11 +61,13 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -270,6 +274,35 @@ final class AuditTracker {
     return null;
   }
 
+  private class JsonValues implements Function<String, Map<String, Object>> {
+    private final Map<String, Object> values;
+    private final Map<String, Map<String, Object>> maps = new HashMap<>();
+
+    public JsonValues(Map<String, Object> values) {
+      this.values = values;
+    }
+
+    @Override
+    public Map<String, Object> apply(String jsonFieldName) {
+      return maps.computeIfAbsent(jsonFieldName, k -> fromJSON(values.get(k)));
+    }
+
+    private Map<String, Object> fromJSON(Object value) {
+      if (value != null) {
+        if (objectMapper == null) {
+          objectMapper = Beans.get(ObjectMapper.class);
+        }
+        try {
+          return objectMapper.readValue(
+              value.toString(), new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException e) {
+          log.error(e.getMessage(), e);
+        }
+      }
+      return Collections.emptyMap();
+    }
+  }
+
   private void process(EntityState state, User user) {
 
     final Model entity = state.entity;
@@ -289,8 +322,8 @@ final class AuditTracker {
     final List<Map<String, String>> tracks = new ArrayList<>();
     final Set<String> tagFields = new HashSet<>();
 
-    final Context newCtx = new Context(values, entity.getClass());
-    final Context oldCtx = new Context(oldValues, entity.getClass());
+    final Function<String, Map<String, Object>> jsonValues = new JsonValues(values);
+    final Function<String, Map<String, Object>> oldJsonValues = new JsonValues(oldValues);
 
     // find matched message
     String msg = findMessage(track, track.getMessages(), values, oldValues, scriptHelper);
@@ -322,8 +355,8 @@ final class AuditTracker {
         title = Inflector.getInstance().humanize(name);
       }
 
-      final Object value = getValue(newCtx, field, property);
-      final Object oldValue = getValue(oldCtx, field, property);
+      final Object value = getValue(values, jsonValues, field, property);
+      final Object oldValue = getValue(oldValues, oldJsonValues, field, property);
 
       if (Objects.equal(value, oldValue)) {
         continue;
@@ -411,16 +444,17 @@ final class AuditTracker {
     }
   }
 
-  private Object getValue(Context context, FieldTracking field, Property property) {
+  private Object getValue(
+      Map<String, Object> values,
+      Function<String, Map<String, Object>> jsonValues,
+      FieldTracking field,
+      Property property) {
+
     if (!field.isCustomField()) {
-      return context.get(field.getName());
+      return values.get(field.getFieldName());
     }
 
-    Object jsonContext = context.get("$" + field.getJsonFieldName());
-    if (!(jsonContext instanceof JsonContext)) {
-      return null;
-    }
-    Object value = ((JsonContext) jsonContext).get(field.getFieldName());
+    Object value = jsonValues.apply(field.getJsonFieldName()).get(field.getFieldName());
 
     switch (property.getType()) {
       case BOOLEAN:
@@ -433,6 +467,15 @@ final class AuditTracker {
         return Adapter.adapt(value, LocalDate.class, null, null);
       case DATETIME:
         return Adapter.adapt(value, LocalDateTime.class, null, null);
+      case MANY_TO_ONE:
+      case ONE_TO_ONE:
+        if (value instanceof Map) {
+          @SuppressWarnings("unchecked")
+          Map<String, Object> map = (Map<String, Object>) value;
+          ContextHandler<?> handler = ContextHandlerFactory.newHandler(property.getTarget(), map);
+          return handler.getProxy();
+        }
+        return value;
       default:
         return value;
     }
