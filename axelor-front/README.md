@@ -83,6 +83,15 @@ Make sure to clone `axelor-ui` project next to the `axelor-open-platform` source
 Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui` 
 to use the linked version of the library.
 
+### ENOSPC: System limit for number of file watchers reached
+
+If you encounter this error, means that your system's `fs.inotify.max_user_watches` value is low.
+
+We recommend increasing the value to `524288` by adding the following to your `/etc/sysctl.conf` file: 
+`fs.inotify.max_user_watches = 524288`
+
+Then run this command to apply the change immediately: `sudo sysctl -p`
+
 ### JavaScript heap out of memory
 
 If you encounter the following error:
