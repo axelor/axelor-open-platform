@@ -1,13 +1,19 @@
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import isEqual from "lodash/isEqual";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { parseExpression } from "@/hooks/use-parser/utils";
 import { Schema, Selection } from "@/services/client/meta.types";
 
-import { WidgetAtom } from "../../builder";
+import { FieldProps, WidgetAtom } from "../../builder";
 import { useFormScope } from "../../builder/scope";
-import { isIntegerField } from "../../builder/utils";
+import { isIntegerField, isReferenceField } from "../../builder/utils";
+import convert from "@/utils/convert";
+
+export type SelectItem = {
+  id: string;
+  selection: Selection;
+};
 
 function acceptNumber(value?: unknown) {
   if (value === null || value === undefined) return value;
@@ -108,4 +114,26 @@ export function useSelectionDefault({
     selectionZero,
     selectionDefault,
   };
+}
+
+// single selection values only
+export function useSelectionValue(
+  { valueAtom, schema }: FieldProps<string | number | Record<string, number>>,
+  { disabled }: { disabled?: boolean } = {},
+) {
+  const [value, setValue] = useAtom(valueAtom);
+  const handleChange = useCallback(
+    ({ selection }: SelectItem) => {
+      if (disabled) return;
+      if (isReferenceField(schema)) {
+        const id = +selection.value!;
+        setValue({ id }, true);
+      } else {
+        setValue(convert(selection.value, { props: schema }), true);
+      }
+    },
+    [schema, disabled, setValue],
+  );
+
+  return [value, handleChange] as const;
 }

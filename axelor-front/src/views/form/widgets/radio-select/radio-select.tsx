@@ -10,6 +10,7 @@ import {
   joinMultiValues,
 } from "@/views/form/widgets/selection/utils";
 import { useSelectionList } from "../selection/hooks";
+import convert from "@/utils/convert";
 
 import { FieldControl, FieldProps } from "../../builder";
 
@@ -34,11 +35,16 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
       if (isRadio) {
         nullable && setValue(null, true);
       } else {
-        setValue(joinMultiValues(values.filter((x) => x !== value)), true);
+        setValue(
+          joinMultiValues(values.filter((x) => x !== String(value))),
+          true,
+        );
       }
     } else {
       setValue(
-        isRadio ? value : joinMultiValues([...values, value] as string[]),
+        isRadio
+          ? convert(value, { props: schema })
+          : joinMultiValues([...values, value] as string[]),
         true,
       );
     }
@@ -62,7 +68,7 @@ export function RadioSelect(props: FieldProps<string | number | null>) {
       >
         {selectionList.map((option) => {
           const $values = Array.isArray(values) ? values : `${values ?? ""}`;
-          const checked = $values.includes(option.value!);
+          const checked = $values.includes(String(option.value!));
           return (
             <Box
               key={option.value}

@@ -1,4 +1,3 @@
-import { useAtom } from "jotai";
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useMemo } from "react";
 
@@ -6,23 +5,21 @@ import { Box, Button, clsx, OverflowList } from "@axelor/ui";
 
 import { useResizeDetector } from "@/hooks/use-resize-detector";
 import { DataRecord } from "@/services/client/data.types";
-import { Selection } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps, ValueAtom } from "../../builder";
 import { createWidgetAtom } from "../../builder/atoms";
 import { isReferenceField } from "../../builder/utils";
 import { ManyToOne } from "../many-to-one";
-import { useSelectionList } from "../selection/hooks";
+import {
+  SelectItem,
+  useSelectionList,
+  useSelectionValue,
+} from "../selection/hooks";
 import { Step } from "./step";
 
 import styles from "./step.module.scss";
 
 const STEP_MIN_WIDTH = 100;
-
-type SelectItem = {
-  id: any;
-  selection: Selection;
-};
 
 export function Stepper(
   props: FieldProps<string | number | Record<string, number>>,
@@ -34,14 +31,16 @@ export function Stepper(
     stepperType = "numeric",
     stepperShowDescription = false,
   } = widgetAttrs;
-  const [value, setValue] = useAtom(valueAtom);
+  const [value, handleChange] = useSelectionValue(props, {
+    disabled: readonly,
+  });
 
   const isReference = isReferenceField(schema);
   const selection = useSelectionList({ value, widgetAtom, schema });
   const items: SelectItem[] = useMemo(() => {
     return selection.map((item, i) => {
       return {
-        id: i + 1,
+        id: String(i + 1),
         selection: item,
       };
     });
@@ -57,21 +56,10 @@ export function Stepper(
 
   const selectedIndex = useMemo(() => {
     const val = typeof value === "object" && value ? value.id : value;
-    return items.findIndex((item) => item.selection.value == val) + 1;
+    return (
+      items.findIndex((item) => String(item.selection.value) == String(val)) + 1
+    );
   }, [items, value]);
-
-  const handleOnClick = useCallback(
-    (itemProps: SelectItem) => {
-      if (readonly) return;
-      if (isReference) {
-        const id = +itemProps.selection.value!;
-        setValue({ id }, true);
-      } else {
-        setValue(itemProps.selection.value, true);
-      }
-    },
-    [isReference, readonly, setValue],
-  );
 
   const Item = useCallback(
     (item: SelectItem) => (
@@ -80,7 +68,7 @@ export function Stepper(
         index={
           isReference
             ? selection.findIndex((i) => i.value == item.selection.value) + 1
-            : item.id
+            : Number(item.id)
         }
         selectedIndex={selectedIndex}
         label={item.selection.title}
@@ -136,8 +124,8 @@ export function Stepper(
         {stepWidth === STEP_MIN_WIDTH ? (
           <OverflowList
             items={items}
-            isItemActive={(item) => selectedIndex === item.id}
-            onItemClick={handleOnClick}
+            isItemActive={(item) => selectedIndex.toString() === item.id}
+            onItemClick={handleChange}
             renderItem={({ item }) => <Item {...item} />}
             renderMenuTrigger={({ count }) => (
               <Step
@@ -165,7 +153,7 @@ export function Stepper(
               d="flex"
               p={0}
               border={false}
-              onClick={() => handleOnClick(item)}
+              onClick={() => handleChange(item)}
             >
               <Item {...item} />
             </Button>

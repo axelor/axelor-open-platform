@@ -1,0 +1,7 @@
+---
+title: Fix handle integer value in selection widgets
+type: fix
+description: |
+  When field type is integer/long in case of selection widgets then it should
+  set value in record as integer.
+  

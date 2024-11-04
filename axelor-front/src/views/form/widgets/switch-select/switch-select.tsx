@@ -1,4 +1,3 @@
-import { useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 
 import { Icon } from "@/components/icon";
@@ -7,15 +6,13 @@ import { Box, clsx } from "@axelor/ui";
 import { Selection } from "@/services/client/meta.types";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { isReferenceField } from "../../builder/utils";
-import { useSelectionList } from "../selection/hooks";
+import {
+  SelectItem,
+  useSelectionList,
+  useSelectionValue,
+} from "../selection/hooks";
 
 import styles from "./switch-select.module.scss";
-
-type SelectItem = {
-  id: string;
-  selection: Selection;
-};
 
 type ButtonSize = {
   width: number;
@@ -27,14 +24,15 @@ type ButtonSize = {
 export function SwitchSelect(
   props: FieldProps<string | number | Record<string, number>>,
 ) {
-  const { schema, readonly, widgetAtom, valueAtom } = props;
+  const { schema, readonly, widgetAtom } = props;
   const { labels = true, direction = "horizontal" } = schema;
-  const [value, setValue] = useAtom(valueAtom);
+  const [value, handleChange] = useSelectionValue(props, {
+    disabled: readonly,
+  });
 
   const [borderStyles, setBorderStyles] = useState<ButtonSize>();
   const [buttonsSize, setButtonsSize] = useState<ButtonSize[]>([]);
 
-  const isReference = isReferenceField(schema);
   const selection = useSelectionList({ value, widgetAtom, schema });
 
   const buttonRefs = useCallback((e: HTMLDivElement) => {
@@ -72,19 +70,6 @@ export function SwitchSelect(
     });
   }, [buttonsSize, isSelected, selection]);
 
-  const onItemClick = useCallback(
-    ({ selection }: SelectItem) => {
-      if (readonly) return;
-      if (isReference) {
-        const id = +selection.value!;
-        setValue({ id }, true);
-      } else {
-        setValue(selection.value, true);
-      }
-    },
-    [readonly, isReference, setValue],
-  );
-
   return (
     <FieldControl
       {...props}
@@ -101,9 +86,12 @@ export function SwitchSelect(
         {items.map((item, index) => (
           <Box
             key={index}
-            {...(!readonly && { onClick: () => onItemClick(item) })}
+            {...(!readonly && { onClick: () => handleChange(item) })}
             ref={buttonRefs}
-            title={item.selection.data?.description || (!labels ? item.selection.title : undefined)}
+            title={
+              item.selection.data?.description ||
+              (!labels ? item.selection.title : undefined)
+            }
             d="flex"
             textWrap={false}
             alignItems="center"

@@ -16,14 +16,13 @@ import { FieldControl, FieldProps, ValueAtom } from "../../builder";
 import { createWidgetAtom } from "../../builder/atoms";
 import { isReferenceField } from "../../builder/utils";
 import { ManyToOne } from "../many-to-one";
-import { useSelectionList } from "../selection/hooks";
+import {
+  SelectItem,
+  useSelectionList,
+  useSelectionValue,
+} from "../selection/hooks";
 
 import styles from "./nav-select.module.scss";
-
-type SelectItem = {
-  id: string;
-  selection: Selection;
-};
 
 type ItemProps = OverflowListItemProps<SelectItem> & {
   readonly?: boolean;
@@ -69,12 +68,16 @@ export function NavSelect(
   props: FieldProps<string | number | Record<string, number>>,
 ) {
   const { schema, widgetAtom, formAtom, valueAtom } = props;
-  const [value, setValue] = useAtom(valueAtom);
+  const {
+    attrs: { readonly },
+  } = useAtomValue(widgetAtom);
 
-  const { attrs } = useAtomValue(widgetAtom);
-  const { readonly } = attrs;
+  const [value, handleChange] = useSelectionValue(props, {
+    disabled: readonly,
+  });
 
-  const isReference = isReferenceField(schema);
+  const isReference = useMemo(() => isReferenceField(schema), [schema]);
+
   const selection = useSelectionList({ value, widgetAtom, schema });
   const items: SelectItem[] = useMemo(() => {
     return selection.map((selection, i) => {
@@ -85,19 +88,6 @@ export function NavSelect(
       };
     });
   }, [selection, value]);
-
-  const onItemClick = useCallback(
-    ({ selection }: SelectItem) => {
-      if (readonly) return;
-      if (isReference) {
-        const id = +selection.value!;
-        setValue({ id }, true);
-      } else {
-        setValue(selection.value, true);
-      }
-    },
-    [readonly, isReference, setValue],
-  );
 
   const isItemActive = useCallback(
     ({ selection }: SelectItem) => isSelected(selection, value),
@@ -136,8 +126,8 @@ export function NavSelect(
         className={styles.container}
         items={items}
         isItemActive={isItemActive}
-        onItemClick={onItemClick}
-        renderItem={(props) => <Item {...props} readonly={readonly} />}
+        onItemClick={handleChange}
+        renderItem={(_props) => <Item {..._props} readonly={readonly} />}
         renderMenuTrigger={MenuTrigger}
         renderMenuItem={MenuItem}
       />
