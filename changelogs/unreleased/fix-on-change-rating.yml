@@ -1,0 +1,3 @@
+---
+title: Fix onChange not triggered on Rating widget
+type: fix

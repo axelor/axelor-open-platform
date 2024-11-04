@@ -31,9 +31,9 @@ export function Rating(props: FieldProps<number>) {
     (position: number, checked: boolean) => {
       if (readonly) return;
       if (checked && position === value) {
-        setValue(required ? null : 0);
+        setValue(required ? null : 0, true);
       } else {
-        setValue(position);
+        setValue(position, true);
       }
     },
     [readonly, value, setValue, required],
