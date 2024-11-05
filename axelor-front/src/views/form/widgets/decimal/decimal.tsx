@@ -115,8 +115,12 @@ export function Decimal(props: FieldProps<string | number>) {
         }
 
         if (resultInt < 0n) {
-          resultInt = (resultInt + 1n) * -1n;
-          resultDec = 1 - resultDec;
+          if (resultDec != 0) {
+            resultInt = (resultInt + 1n) * -1n;
+            resultDec = 1 - resultDec;
+          } else {
+            resultInt *= -1n;
+          }
           isResultNegative = !isResultNegative;
         }
       }
