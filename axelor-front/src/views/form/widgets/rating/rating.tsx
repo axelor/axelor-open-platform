@@ -1,18 +1,13 @@
 import { useAtom } from "jotai";
-import { CSSProperties, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import { Box, clsx } from "@axelor/ui";
-import {
-  BootstrapIcon,
-  BootstrapIconName,
-} from "@axelor/ui/icons/bootstrap-icon";
+import { Rating as AxRating } from "@axelor/ui";
 
 import { Field } from "@/services/client/meta.types";
+import convert from "@/utils/convert";
 import format from "@/utils/format";
 import { FieldControl, FieldProps } from "@/views/form/builder";
 import { useFormReady } from "../../builder/scope";
-
-import styles from "./rating.module.scss";
 
 export function Rating(props: FieldProps<number>) {
   const { schema, readonly, valueAtom } = props;
@@ -28,48 +23,15 @@ export function Rating(props: FieldProps<number>) {
   const [value, setValue] = useAtom(valueAtom);
 
   const handleClick = useCallback(
-    (position: number, checked: boolean) => {
+    (position: number) => {
       if (readonly) return;
-      if (checked && position === value) {
-        setValue(required ? null : 0, true);
+      if (position === value) {
+        setValue(required ? null : convert(0, { props: schema }), true);
       } else {
-        setValue(position, true);
+        setValue(convert(position, { props: schema }), true);
       }
     },
-    [readonly, value, setValue, required],
-  );
-
-  const getIcon = useCallback(
-    (position: number): BootstrapIconName => {
-      const icons = ratingIcon.trim().split(/\s*,\s*/);
-      if (icons.length <= 1) {
-        return ratingIcon;
-      }
-      return icons[position - 1];
-    },
-    [ratingIcon],
-  );
-
-  const getColor = useCallback(
-    (position: number): string | null => {
-      const colors = ratingColor ? ratingColor.trim().split(/\s*,\s*/) : [];
-      if (colors.length <= 0) {
-        return null;
-      }
-      return colors[position - 1];
-    },
-    [ratingColor],
-  );
-
-  const getPartialWidth = useCallback(
-    (position: number): number | null => {
-      const intValue = Math.floor(value ?? 0);
-      const decimalValue = (value ?? 0) - intValue;
-      return position === intValue + 1 && decimalValue > 0
-        ? Math.min(Math.max(decimalValue * 100 - 1, 25), 75)
-        : null;
-    },
-    [value],
+    [readonly, value, setValue, required, schema],
   );
 
   const text = useMemo(
@@ -80,100 +42,19 @@ export function Rating(props: FieldProps<number>) {
 
   return (
     <FieldControl {...props}>
-      <Box
-        m={0}
-        d="flex"
-        className={clsx([styles.container], {
-          [styles.pointer]: !readonly,
-        })}
-      >
-        {ready &&
-          Array.from({ length: maxSize }, (v, k) => k + 1).map((position) => {
-            const partialWidth = getPartialWidth(position);
-            const checked = position <= Math.ceil(value ?? 0);
-            const posIcon = getIcon(position);
-            const highlightMe = ratingHighlightSelected
-              ? value === position
-              : true;
-            const color = getColor(position);
-            const style =
-              (color ? { style: { color: color } } : null) ??
-              PREDEFINED_ICONS[posIcon] ??
-              {};
-
-            return (
-              <Box
-                key={position}
-                {...(!readonly && {
-                  onClick: () => handleClick(position, checked),
-                })}
-                style={{ ...(checked && highlightMe ? style.style : {}) }}
-                title={text}
-              >
-                {partialWidth !== null ? (
-                  <Box
-                    style={{
-                      overflow: "hidden",
-                      position: "relative",
-                    }}
-                  >
-                    <Box
-                      style={{
-                        overflow: "hidden",
-                        position: "relative",
-                        width: `${partialWidth}%`,
-                      }}
-                    >
-                      <BootstrapIcon
-                        icon={posIcon}
-                        fill={ratingFill}
-                        className={clsx([styles.icon], {
-                          [styles.iconHover]: !readonly,
-                        })}
-                      />
-                    </Box>
-                    <Box
-                      style={{
-                        position: "absolute",
-                        top: "0",
-                        left: "0",
-                      }}
-                    >
-                      <BootstrapIcon
-                        icon={posIcon}
-                        fill={false}
-                        className={clsx([styles.icon], {
-                          [styles.iconHover]: !readonly,
-                        })}
-                      />
-                    </Box>
-                  </Box>
-                ) : (
-                  <BootstrapIcon
-                    icon={posIcon}
-                    fill={ratingFill && checked}
-                    className={clsx([styles.icon], {
-                      [styles.iconHover]: !readonly,
-                    })}
-                  />
-                )}
-              </Box>
-            );
-          })}
-      </Box>
+      {ready && (
+        <AxRating
+          value={Number(value)}
+          text={text}
+          icon={ratingIcon}
+          color={ratingColor}
+          fill={ratingFill}
+          highlightSelected={ratingHighlightSelected}
+          readonly={!!readonly}
+          max={maxSize}
+          handleClick={handleClick}
+        />
+      )}
     </FieldControl>
   );
 }
-
-const PREDEFINED_ICONS: Record<string, { style: CSSProperties }> = {
-  star: {
-    style: {
-      color: "#faaf00",
-    },
-  },
-  heart: {
-    style: {
-      color: "#ff6d75",
-    },
-  },
-};
