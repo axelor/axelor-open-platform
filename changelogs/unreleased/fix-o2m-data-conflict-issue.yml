@@ -1,0 +1,6 @@
+---
+title: Fix o2m items data conflict issue
+type: fix
+description: |
+  When data is reset through action-record or data is updated through popup
+  then updated data should be merged properly to grid data.

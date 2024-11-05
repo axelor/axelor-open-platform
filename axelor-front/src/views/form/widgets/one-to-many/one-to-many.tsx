@@ -757,22 +757,19 @@ function OneToManyInner({
         }
 
         const fetchedIds = records.map((r) => r.id);
+        const unfetchedItemList: DataRecord[] = [];
 
-        const unfetchedItems = items.reduce((obj, item, index) => {
+        const newItems = records.map((record) => {
+          const item = items.find((item) => item.id === record.id);
+          return item ? nestedToDotted({ ...item, ...record }, record) : record;
+        });
+
+        items.forEach((item, index) => {
           if (!fetchedIds.includes(item.id)) {
-            obj[index] = item;
+            newItems.splice(index, 0, item);
+            unfetchedItemList.push(item);
           }
-          return obj;
         }, {});
-
-        const newItems = records
-          .map((record) => {
-            const item = items.find((item) => item.id === record.id);
-            return item
-              ? nestedToDotted({ ...item, ...record }, record)
-              : record;
-          })
-          .concat(Object.values(unfetchedItems));
 
         // reset orderby on search
         setState((draft) => {
@@ -789,11 +786,16 @@ function OneToManyInner({
           }
         }
         recordsSyncRef.current = true;
-        setRecords((records) => {
+        
+        setRecords((prevRecords) => {
           const newRecords = newItems.map((item, index) => {
-            return unfetchedItems[index]
+            const getId = (_item: DataRecord) =>
+              !_item.id || _item.id < 0 ? null : _item.id;
+
+            return unfetchedItemList.includes(item) &&
+              getId(prevRecords[index]) === getId(item)
               ? nestedToDotted({
-                  ...records[index],
+                  ...prevRecords[index],
                   ...item,
                   version: item.version,
                   $version: item.$version ?? item.version,
@@ -1261,8 +1263,8 @@ function OneToManyInner({
       }
       openEditor(
         { record, readonly },
-        (_record) => handleSelect([_record], { change: true }),
-        onSave,
+        (updated) => handleSelect([{ ...record, ...updated }], { change: true }),
+        (updated) => onSave({ ...record, ...updated }),
       );
     },
     [isPermitted, openEditor, onSave, handleSelect],
