@@ -60,6 +60,10 @@ const FIELD_WIDGETS: Record<string, string[]> = {
 function getDefaultServerType(schema: Schema): string {
   const widget = toKebabCase(normalizeWidget(schema.widget) ?? "");
 
+  if (schema.serverType && SERVER_TYPES.includes(toKebabCase(schema.serverType))) {
+    return schema.serverType;
+  }
+  
   let serverType = schema.serverType ?? "string";
 
   if (SERVER_TYPES.includes(widget)) {
