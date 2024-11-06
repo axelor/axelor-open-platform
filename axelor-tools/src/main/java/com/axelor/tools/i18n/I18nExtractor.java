@@ -70,7 +70,8 @@ public class I18nExtractor {
       Pattern.compile(
           "((\\b_t\\s*\\()|([Ii]18n.get\\s*\\()|(T.apply\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
   private static final Pattern PATTERN_HTML =
-      Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
+      Pattern.compile(
+          "((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<)|(\\<report-box.*?label=[\"'](.*?)[\"']))");
   private static final Pattern PATTERN_EXCLUDE =
       Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)|(\\.test\\.)");
 
@@ -284,6 +285,9 @@ public class I18nExtractor {
         String text = matcher.group(3);
         if (text == null) {
           text = matcher.group(5);
+        }
+        if (text == null) {
+          text = matcher.group(7);
         }
         text = text.trim();
         if (text.startsWith("\\'") && text.endsWith("\\'")) {
