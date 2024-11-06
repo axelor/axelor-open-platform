@@ -40,7 +40,8 @@ public abstract class Model {
 
   // Represents the collection id of the record in the UI widgets (collection fields)
   @Widget(copyable = false)
-  @Transient private transient Long cid;
+  @Transient
+  private transient Long cid;
 
   // Represents the selected state of the record in the UI widgets
   @Transient private transient boolean selected;
