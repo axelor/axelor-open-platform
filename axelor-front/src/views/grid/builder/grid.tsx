@@ -279,7 +279,7 @@ export const Grid = forwardRef<
 
       if (
         ["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "") &&
-        !(item as Field).selection
+        !((item as Field).selection || item.widget == "rating")
       ) {
         columnProps.$css = clsx(styles.number);
         columnProps.$headerCss = clsx(styles.numberHeaderColumn);
