@@ -825,7 +825,8 @@ const findState = (
   const states = Object.entries(parentStates)
     .filter(
       ([key]) =>
-        key.startsWith(prefix) && isJsonField(key.slice(prefix.length)),
+        key.startsWith(prefix) &&
+        (!json || isJsonField(key.slice(prefix.length))),
     )
     .reduce(
       (acc, [key, value]) => {
