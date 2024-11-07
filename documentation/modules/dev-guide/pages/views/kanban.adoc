@@ -19,21 +19,23 @@ The kanban view is a agile dashboard like view.
   <hilite color="info" if="progress &gt;= 50" />
   <hilite color="warning" if="progress &gt; 0" />
   <template><![CDATA[
-    <Box as="strong">
-        {name}
-    </Box>
-    <Box d="flex" mt={2}>
-        {notes}
-    </Box>
-    <Box d="grid" gridTemplateColumns="auto auto" style={{ fontSize: "0.85rem", color: "grey" }} mt={2}>
-        <Box d="flex" g={2}>
-          <Icon icon={"clock"} />
-          {startDate && <span>{$moment(startDate).format('LLL')}</span>}
-        </Box>
-        <Box d="flex" justifyContent="flex-end">
-          {user && <Image src={$image('user', 'image')} style={{ width: "1.5rem", height: "1.5rem", borderRadius: "100%" }}/>}
-        </Box>
-    </Box>
+    <>
+      <Box as="strong">
+          {name}
+      </Box>
+      <Box d="flex" mt={2}>
+          {notes}
+      </Box>
+      <Box d="grid" gridTemplateColumns="auto auto" style={{ fontSize: "0.85rem", color: "grey" }} mt={2}>
+          <Box d="flex" g={2}>
+            <Icon icon={"clock"} />
+            {startDate && <span>{$moment(startDate).format('LLL')}</span>}
+          </Box>
+          <Box d="flex" justifyContent="flex-end">
+            {user && <Image src={$image('user', 'image')} style={{ width: "1.5rem", height: "1.5rem", borderRadius: "100%" }}/>}
+          </Box>
+      </Box>
+    </>
   ]]></template>
 </kanban>
 -----

@@ -14,20 +14,23 @@ a single subject as cards.
   <field name="address" />
   <field name="hasImage" />
   <template><![CDATA[
-  <div class="span4 card-image">
-    <img ng-if="hasImage" ng-src="{{$image(null, 'image')}}">
-    <img ng-if="!hasImage" src="img/user.png">
-    <strong>{{fullName}}</strong>
-  </div>
-  <div class="span8">
-    <address>
-      <strong>{{address.street}} {{address.area}}</strong><br>
-      {{address.city}}<span ng-if="address.state">, {{address.state}}</span><span ng-if="address.zip"> - {{address.zip}}</span><br>
-      {{address.country.name}}<br>
-      <abbr ng-if="phone" title="Phone">P:</abbr> {{phone}}<br>
-      <abbr ng-if="email" title="Email">E:</abbr> {{email}}<br>
-    </address>
-  </div>
+    <>
+      <Box d="flex" flexDirection="row">
+        <Box d="flex" flexDirection="column" alignItems="center" flex={1}>
+          <img src={hasImage ? $image(null, 'image') : "img/user.png"}/>
+          <Box textAlign="center" fontWeight="bold" p={1}>{fullName}</Box>
+        </Box>
+        <Box d="flex" flex={2}>
+          <address>
+            <strong>{address.street} {address.area}</strong><br/>
+            {address.city}{address.state && <span>, {address.state}</span>}{address.zip && <span> - {address.zip}</span>}<br/>
+            {address.country.name}<br/>
+            {phone && <span><abbr title="Phone">P:</abbr> {phone}</span>}<br/>
+            {email && <span><abbr title="Email">E:</abbr> {email}</span>}
+          </address>
+        </Box>
+      </Box>
+    </>
   ]]></template>
 </cards>
 -----
@@ -66,13 +69,13 @@ A template helper function `$image(field, image)` can be used to put an image.
 [source,xml]
 ----
 <!-- if image is binary field -->
-<img ng-src="{{$image(null, 'image')}}">
+<img src={$image(null, 'image')}>
 
 <!-- if image is m2o to MetaFile -->
-<img ng-src="{{$image('image', 'content')}}">
+<img src={$image('image', 'content')}>
 
 <!-- show binary field image of custom in sale order card -->
-<img ng-src="{{$image('customer', 'image')}}">
+<img src={$image('customer', 'image')}>
 ----
 
 The field must be included in card view definition with `<field>` tag.

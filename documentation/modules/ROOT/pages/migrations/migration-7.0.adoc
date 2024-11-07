@@ -138,7 +138,7 @@ inconsistent). So templates should be now :
 <field name="customer">
 <viewer><![CDATA[
 <>
-    <p>{{$get('title.name')}}</p>
+    <p>{$get('title.name')}</p>
 </>
 ]]></viewer>
 </field>

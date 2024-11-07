@@ -28,12 +28,16 @@ A form view is defined like this:
     <field name="dateOfBirth" />
     <field name="email">
       <viewer><![CDATA[ <5>
-      <a href="mailto:{{record.email}}">{{record.email}}</a>
+      <>
+        <a href={`mailto:${email}`}>{email}</a>
+      </>
       ]]></viewer>
     </field>
     <field name="phone">
       <viewer><![CDATA[
-      <a href="tel:{{record.phone}}">{{record.phone}}</a>
+        <>
+          <a href={`tel:${phone}`}>{phone}</a>
+        </>
       ]]></viewer>
     </field>
   </panel>
@@ -394,21 +398,27 @@ We can define custom viewer for fields using `<viewer>` child element on a field
 <!-- custom viewer on a normal field -->
 <field name="customer">
   <viewer><![CDATA[
-  <strong>{{record.fullName|upper}}</strong>
+    <>
+      <strong>{fullName}</strong>
+    </>
   ]]></viewer>
 </field>
 
 <!-- custom viewer on a many-to-one field -->
 <field name="customer">
   <viewer depends="fullName,email"><![CDATA[
-  <a href="mailto:{{record.customer.email}}">{{record.customer.email}}</a>
+    <>
+      <a href=`mailto:${email}`>{email}</a>
+    </>
   ]]></viewer>
 </field>
 
 <!-- customer viewer on a one-to-many field -->
 <field name="emails">
   <viewer><![CDATA[
-  <a href="mailto:{{record.email}}">{{record.email}}</a>
+    <>
+      <a href={`mailto:${email}`}>{email}</a>
+    </>
   ]]></viewer>
 </field>
 ----
@@ -435,7 +445,9 @@ We can define a details template on a field to show extra information about the 
 <field name="customer">
   <tooltip depends="fullName">
   <![CDATA[
-  <strong>Name: </strong><span>{{record.fullName}}</span>
+    <>
+      <strong>Name: </strong><span>{fullName}</span>
+    </>
   ]]>
   </tooltip>
 </field>

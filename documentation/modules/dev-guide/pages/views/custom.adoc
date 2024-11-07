@@ -47,12 +47,17 @@ Example usage with a custom template:
   </dataset>
   <template>
   <![CDATA[
-  <div class="report-data">
-    <h1>{{first.total}}</h1>
-    <small>Total sale</small>
-    <div class="report-percent font-bold text-info pull-right">20% <i class="fa fa-level-up"></i></div>
-    <div class="report-tags"><span class="label label-important">Monthly</span></div>
-  </div>
+  <>
+    <Box d="flex" flexDirection="column" flex={1}>
+        <h1>{first.total}</h1>
+        <Box d="flex" flexDirection="row" justifyContent="space-between">
+            <small>Total sale</small>
+            <Box d="flex" alignItems="center" style={{fontWeight: "bold", color: "red"}}>
+                20% <Icon icon="trending_down"/>
+            </Box>
+        </Box>
+    </Box>
+  </>
   ]]>
   </template>
 </custom>

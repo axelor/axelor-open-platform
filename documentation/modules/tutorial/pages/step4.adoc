@@ -41,12 +41,16 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
       <field name="dateOfBirth" />
       <field name="email">
         <viewer><![CDATA[ <5>
-        <a href="mailto:{{record.email}}">{{record.email}}</a>
+          <>
+            <a href={`mailto:${email}`}>{email}</a>
+          </>
         ]]></viewer>
       </field>
       <field name="phone">
         <viewer><![CDATA[
-        <a href="tel:{{record.phone}}">{{record.phone}}</a>
+          <>
+            <a href={`tel:${phone}`}>{phone}</a>
+          </>
         ]]></viewer>
       </field>
     </panel>
