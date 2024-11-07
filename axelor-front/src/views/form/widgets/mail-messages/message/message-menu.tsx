@@ -95,7 +95,7 @@ export function MessageMenu({
             {isArchived ? _t("Move to inbox") : _t("Move to archive")}
           </MenuItem>
         )}
-        {$canDelete && <MenuItem onClick={onDelete}>Delete</MenuItem>}
+        {$canDelete && <MenuItem onClick={onDelete}>{_t("Delete")}</MenuItem>}
       </Menu>
     </>
   );
