@@ -8,6 +8,8 @@ import { atom, getDefaultStore, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useId, useMemo } from "react";
 import { dialogsActive } from "@/components/dialogs";
 
+import styles from "./view-popper.module.scss";
+
 const popperAtom = atom<Record<string, boolean>>({});
 
 export function handlePopper() {
@@ -68,7 +70,7 @@ export function ViewPopper({
   );
 
   return (
-    <Popper bg="body" {...popperProps}>
+    <Popper bg="body" {...popperProps} className={styles.viewPopper}>
       <ClickAwayListener onClickAway={handleClose}>
         {children}
       </ClickAwayListener>
