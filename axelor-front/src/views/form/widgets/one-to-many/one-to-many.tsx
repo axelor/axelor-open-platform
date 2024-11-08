@@ -1546,13 +1546,14 @@ function OneToManyInner({
     actionExecutor,
   ]);
 
-  const onSaveRecord = useCallback(
+  const onM2MSave = useCallback(
     async (record: DataRecord) => {
+      const isNew = (record.id ?? 0) <= 0;
       const fieldList = Object.keys(viewData?.fields ?? fields);
       const res = await dataStore.save(record, {
         fields: fieldList,
       });
-      return res && onSave(res, { dirty: false, change: true });
+      return res && onSave(res, { dirty: isNew, change: true });
     },
     [viewData?.fields, fields, dataStore, onSave],
   );
@@ -2072,7 +2073,7 @@ function OneToManyInner({
               onView={canView ? (canEdit ? onEdit : onView) : noop}
               onUpdate={isManyToMany ? onSave : onO2MUpdate}
               onDelete={onDelete}
-              onSave={isManyToMany ? onSaveRecord : onO2MSave}
+              onSave={isManyToMany ? onM2MSave : onO2MSave}
               onDiscard={onDiscard}
               onRowExpand={onRowExpand}
               onRowReorder={onRowReorder}
@@ -2119,7 +2120,7 @@ function OneToManyInner({
                   formAtom={gridRef.current?.form?.current?.formAtom}
                   onRefresh={onRefreshDetailsRecord}
                   onClose={onCloseInDetail}
-                  onSave={isManyToMany ? onSaveRecord : onSave}
+                  onSave={isManyToMany ? onM2MSave : onSave}
                   {...(canNew && { onNew: onAddInDetail })}
                 />
               </ScopeProvider>
