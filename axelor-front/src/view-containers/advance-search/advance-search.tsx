@@ -608,7 +608,7 @@ function SearchInput({
   if (label) {
     return (
       <Box rounded border d="flex" p={1} pe={2}>
-        <Box className={styles.chipList} d="flex" flex={1}>
+        <Box d="flex" flex={1}>
           <SelectionTag
             title={label}
             color="primary"
