@@ -112,7 +112,7 @@ libs.redisson = [
     // overrides jackson version used
     "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
-libs.hazelcast = "com.hazelcast:hazelcast:5.3.7"
+libs.hazelcast = "com.hazelcast:hazelcast:5.3.8"
 libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.6"
 libs.infinispan = [
     "org.infinispan:infinispan-hibernate-cache-v53:13.0.22.Final",
