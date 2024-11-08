@@ -55,7 +55,7 @@ libs.guava = [
 ]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:2.2"
+libs.snakeyaml = "org.yaml:snakeyaml:2.3"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
