@@ -6,6 +6,7 @@
 
 NOTE: Please check the {product-changelog}[change log] for detailed list of changes
 
+* xref:migrations/migration-7.3.adoc[Migrate from 7.2 to 7.3]
 * xref:migrations/migration-7.2.adoc[Migrate from 7.1 to 7.2]
 * xref:migrations/migration-7.1.adoc[Migrate from 7.0 to 7.1]
 * xref:migrations/migration-7.0.adoc[Migrate from 6.1 to 7.0]
