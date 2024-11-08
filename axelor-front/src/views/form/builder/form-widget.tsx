@@ -339,8 +339,6 @@ function useExpressions({
     [popup, readonly, required, valid],
   );
 
-  const prevBindValue = useRef();
-
   const handleBind = useAtomCallback(
     useCallback(
       (get, set, context: DataContext, bind: string) => {
@@ -352,8 +350,7 @@ function useExpressions({
           const prevValue = get(valueAtom);
           const value = func(context) ?? null;
 
-          if (value === prevBindValue.current) return;
-          prevBindValue.current = value;
+          if (value === prevValue) return;
 
           // skip dirty for initial value set
           const isDirty = isUndefined(prevValue) ? false : prevValue !== value;
