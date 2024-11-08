@@ -88,8 +88,8 @@ libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
 // jdbc
-libs.jdbc_postgres = "org.postgresql:postgresql:42.7.3"
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.7.4"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.7.4"
 libs.jdbc_mysql = "com.mysql:mysql-connector-j:8.4.0"
 
 // Hibernate
