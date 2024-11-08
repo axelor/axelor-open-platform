@@ -16,6 +16,7 @@ import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { DateComponent } from "@/views/form/widgets";
 import { useCompletion, useSelector } from "@/hooks/use-relation";
+import { parseExpression } from "@/hooks/use-parser/utils";
 import { Field, Property, Schema } from "@/services/client/meta.types";
 import { DataRecord, Filter, FilterOp } from "@/services/client/data.types";
 import { useOptionLabel } from "@/views/form/widgets/many-to-one/utils";
@@ -349,6 +350,20 @@ const getBooleanSelection: () => BooleanSelectType[] = () =>
     { value: false, title: i18n.get("No") },
   ]);
 
+function getSelectionIn(schema: Schema) {
+  let values = schema["selection-in"] || schema.selectionIn;
+
+  if (typeof values === "string") {
+    let expr = values.trim();
+    if (!expr.startsWith("[")) {
+      expr = "[" + expr + "]";
+    }
+    values = parseExpression(expr)({});
+  }
+
+  return Array.isArray(values) && values.length > 0 ? values : null;
+}
+
 export function Widget({
   inputProps,
   field,
@@ -445,12 +460,17 @@ export function Widget({
     case "decimal":
       return <SimpleWidget {...props} component={NumberField} />;
     case "enum": {
-      const options = (field.selectionList ?? []).map(
-        ({ title, value, data }) => ({
+      const selectionIn = getSelectionIn(field as Schema);
+      const options = (field.selectionList ?? [])
+        .filter((item) =>
+          selectionIn
+            ? selectionIn.some((x: any) => String(x) === String(item.value))
+            : true,
+        )
+        .map(({ title, value, data }) => ({
           name: (data && data.value) || value,
           title: title,
-        }),
-      );
+        }));
       return (
         <SimpleWidget
           {...props}
