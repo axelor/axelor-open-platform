@@ -29,7 +29,7 @@
     "bootstrap-sass": "2.3.2",
     "bunshi": "^2.1.5",
     "color": "^4.2.3",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.11",
     "dompurify": "^3.1.6",
     "echarts": "^5.5.1",
