@@ -705,8 +705,6 @@ const FormContainer = memo(function FormContainer({
           },
           {
             ...opts,
-            fields: Object.keys(meta.fields ?? {}),
-            related: meta.related,
             select,
           },
         );
