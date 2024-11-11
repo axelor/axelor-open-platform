@@ -38,7 +38,16 @@ export type FilterOp =
   | "isEmpty"
   | "notEmpty"
   | "between"
-  | "notBetween";
+  | "notBetween"
+  | "$isTrue"
+  | "$isFalse"
+  | "$isEmpty"
+  | "$notEmpty"
+  | "$inPast"
+  | "$inNext"
+  | "$inCurrent"
+  | "$isCurrentUser"
+  | "$isCurrentGroup";
 
 export interface Filter {
   operator?: FilterOp;

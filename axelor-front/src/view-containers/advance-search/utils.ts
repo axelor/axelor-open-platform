@@ -30,13 +30,17 @@ export function isAdvancedSearchView(view?: string) {
   return ADVANCED_SEARCH_VIEWS.has(view ?? "");
 }
 
-export function getCriteria(
+function getCriteria(
   criteria: Filter,
   fields?: MetaData["fields"],
   jsonFields?: MetaData["jsonFields"],
 ) {
-  let { fieldName, timeUnit = "d", value, value2 } = criteria;
-  let operator = criteria.operator as any;
+  const { timeUnit = "d", value2 } = criteria;
+  let { fieldName, operator, value } = criteria;
+
+  // skip empty field or empty operator criteria
+  if (!fieldName || !operator) return;
+
   const jsonField = get(jsonFields || {}, fieldName!);
   const field = fields?.[fieldName!] || jsonField;
   const user = session.info!.user;
