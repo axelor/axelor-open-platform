@@ -754,12 +754,13 @@ const FormContainer = memo(function FormContainer({
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
         const { select } = formState;
 
-        let res = await dataStore.save(savingRecord, {
-          ...opts,
-          fields: Object.keys(meta.fields ?? {}),
-          related: meta.related,
-          select: formState.select,
-        });
+        let res = await dataStore.save(
+          savingRecord,
+          {
+            ...opts,
+            select,
+          },
+        );
 
         if (callOnRead) {
           const fetched = res.id ? await doRead(res.id, select) : res;
