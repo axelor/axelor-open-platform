@@ -1,5 +1,6 @@
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
+import uniqBy from "lodash/uniqBy";
 import isPlainObject from "lodash/isPlainObject";
 
 import { getDefaultPageSize } from "@/utils/app-settings.ts";
@@ -175,7 +176,9 @@ export class DataStore extends DataSource {
 
   async search(options: SearchOptions): Promise<SearchResult> {
     const opts = this.#prepareOption(options);
-    const { page, records = [] } = await super.search(opts);
+    const { page, ...result } = await super.search(opts);
+
+    const records = uniqBy(result.records, 'id');
 
     this.#accept(opts, page, records);
 
