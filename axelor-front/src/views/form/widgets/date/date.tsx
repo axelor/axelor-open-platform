@@ -2,7 +2,6 @@ import { useAtom, useAtomValue } from "jotai";
 import {
   FocusEvent,
   KeyboardEvent,
-  MouseEvent,
   SyntheticEvent,
   useCallback,
   useEffect,
@@ -156,7 +155,7 @@ export function DateComponent({
   );
 
   const handleClickOutSide = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
+    (event: MouseEvent) => {
       const container = boxRef.current;
       if (container && container.contains(event.target as Node)) {
         return;
