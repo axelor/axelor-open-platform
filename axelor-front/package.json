@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@axelor/ui": "^0.3.0",
-    "@babel/standalone": "^7.24.8",
+    "@babel/standalone": "^7.26.2",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
