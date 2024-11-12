@@ -1,3 +1,4 @@
+export * from "./barcode";
 export * from "./binary";
 export * from "./binary-link";
 export * from "./boolean";

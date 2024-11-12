@@ -712,6 +712,33 @@ The following attributes are supported:
 * `x-drawing-height`: The drawing height in px. Default to 200.
 * `x-drawing-width`: The drawing width in px. Default to 500.
 
+== Barcode
+
+The `Barcode` widget is used on `string` data field and display them as a barcode in readonly mode.
+
+[source, xml]
+----
+<field name="name" widget="Barcode" />
+<field name="gtin" widget="Barcode" x-barcode-format="EAN13" />
+<field name="codabar" widget="Barcode" height="50" x-barcode-line-color="red" x-barcode-width="3" x-barcode-background-color="#ccffff" x-barcode-format="codabar" />
+----
+
+[frame=none,grid=none,cols="1,1,1"]
+|===
+a|image::widgets/barcode.png[]
+a|image::widgets/barcode-2.png[]
+a|image::widgets/barcode-3.png[]
+|===
+
+The following attributes are supported:
+
+* `height`: The barcode height in px. Default to `100`.
+* `x-barcode-width`: The bar width in px. Default to `2`.
+* `x-barcode-line-color`: The html color of the bars and the text. Default to `#000000`.
+* `x-barcode-background-color`: The html background color. Default to `#ffffff`.
+* `x-barcode-display-value`: Whether to display the value under the barcode. Default to `true`.
+* `x-barcode-format`: The barcode format. Accepted formats are: `CODE128`, `EAN13`, `EAN8`, `UPC`, `CODE39`, `ITF14`, `Codabar`. Default to `CODE128`.
+
 == Button
 
 The button widget is used to show a clickable button on a form.

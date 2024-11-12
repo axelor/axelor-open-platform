@@ -112,6 +112,7 @@ function processWidgetAttrs(field: Schema) {
         "stepperCompleted",
         "stepperShowDescription",
         "colorPickerShowAlpha",
+        "barcodeDisplayValue",
         "resetState",
       ].indexOf(name) !== -1
     ) {
@@ -130,6 +131,7 @@ function processWidgetAttrs(field: Schema) {
         "minSize",
         "maxSize",
         "step",
+        "barcodeWidth",
       ].indexOf(name) !== -1 &&
       /^(-)?\d+(\.\d+)?$/.test(value)
     ) {
