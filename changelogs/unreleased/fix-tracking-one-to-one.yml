@@ -1,5 +1,0 @@
----
-title: Fix persistence issue during tracking of one-to-one field
-type: fix
-description: |
-  Get new and old values without using context in audit tracker.

@@ -1,3 +1,106 @@
+## 7.2.2 (2024-11-12)
+
+#### Feature
+
+* Expose Rating to be used in template
+
+#### Fix
+
+* Fix set action attrs on editor fields
+* Fix handle integer value in selection widgets
+
+  <details>
+  
+  When field type is integer/long in case of selection widgets then it should
+  set value in record as integer.
+  
+  </details>
+
+* Fix onChange not triggered on Rating widget
+* Fix populate changes should reflect into collection grid
+* Fix pass grid name/type in editable grid action context
+* Fix o2m items data conflict issue
+
+  <details>
+  
+  When data is reset through action-record or data is updated through popup
+  then updated data should be merged properly to grid data.
+  
+  </details>
+
+* Fix show `Display process` option in form toolbar menu
+* Fix x-bind string case sensitive issue
+
+  <details>
+  
+  When x-bind output of string field remains same for same field,
+  it should reflect the output value instead of skipping value update.
+  
+  </details>
+
+* Exclude cid field in default generated views
+* Disable sorting when we add a row
+
+  <details>
+  
+  After manual sort by column, added row could be at the top instead of the bottom.
+  
+  </details>
+
+* Fix tag height in advance search causing toolbar visual effects
+* Close popup when adding records in o2m edit mode
+* Fix tree-grid empty summary view styles
+* Fix handling 0 valued in selection widgets
+* Fix Stepper clickable in read-only mode
+* Fix missing i18n extract of report-box#label attribute
+* Fix skip translations search for empty value
+* Fix grid customization of fields mentioned several times
+
+  <details>
+  
+  On a grid view definition, there may be several instances of the same field
+  with different "if" conditions.
+  
+  When saving grid view customization, we need to retrieve all the fields with the same name,
+  not just the first occurrence.
+  
+  </details>
+
+* Fix orderBy for new rows after save/refresh on o2m grid
+
+  <details>
+  
+  On o2m grid, order is normally preserved after search request.
+  Now, search order is applied in case of form save/refresh.
+  
+  </details>
+
+* Fix mark form dirty on editable m2m add
+* Fix SwitchSelect widget not displaying many-to-one values
+* Fix criteria on grid columns search
+* Fix persistence issue during tracking of one-to-one field
+
+  <details>
+  
+  Get new and old values without using context in audit tracker.
+  
+  </details>
+
+* cid field shouldn't be copyable
+* Fix close dropdown on tag click in tag-select
+* Fix empty criteria in advanced search query
+
+  <details>
+  
+  When field or operator is empty then that criteria should not send in search query.
+  
+  </details>
+
+* Fix call onChange on m2m record change
+* Fix pass view attributes in field action context
+* Fix selection-in attribute support in mass update
+* Fix child dialogs shown behind mass update and advanced search
+
 ## 7.2.1 (2024-10-17)
 
 #### Feature
