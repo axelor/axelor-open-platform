@@ -12,7 +12,7 @@ export function ImageSelect({ field, record }: WidgetProps) {
   if (selectValue?.icon) {
     return (
       <>
-        <Box gap={6} alignItems="center">
+        <Box d="flex" gap={6} alignItems="center">
           {selectValue.icon && !selectValue.icon.includes(".") ? (
             <Icon icon={selectValue.icon} />
           ) : (
