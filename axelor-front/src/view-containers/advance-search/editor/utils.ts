@@ -12,6 +12,7 @@ import {
   Property,
   Schema,
 } from "@/services/client/meta.types";
+import { FilterOp } from "@/services/client/data.types";
 
 type Config = {
   types: string[];
@@ -83,9 +84,9 @@ const types: Record<string, string[]> = typesConfig.reduce(
   {},
 );
 
-let operators: { name: string; title: string }[];
+let operators: { name: FilterOp; title: string }[];
 
-const getOperators: () => { name: string; title: string }[] = () =>
+const getOperators: () => { name: FilterOp; title: string }[] = () =>
   operators ||
   (operators = [
     { name: "=", title: i18n.get("equals") },
