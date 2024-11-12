@@ -1,5 +1,0 @@
----
-title: Fix empty criteria in advanced search query
-type: fix
-description: |
-  When field or operator is empty then that criteria should not send in search query.

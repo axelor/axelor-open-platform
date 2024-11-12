@@ -1,6 +1,0 @@
----
-title: Fix orderBy for new rows after save/refresh on o2m grid
-type: fix
-description: |
-  On o2m grid, order is normally preserved after search request.
-  Now, search order is applied in case of form save/refresh.

@@ -1,3 +1,58 @@
+## 7.1.9 (2024-11-12)
+
+#### Fix
+
+* Fix set action attrs on editor fields
+* Fix onChange not triggered on Rating widget
+* Fix populate changes should reflect into collection grid
+* Fix o2m items data conflict issue
+
+  <details>
+  
+  When data is reset through action-record or data is updated through popup
+  then updated data should be merged properly to grid data.
+  
+  </details>
+
+* Fix x-bind string case sensitive issue
+
+  <details>
+  
+  When x-bind output of string field remains same for same field,
+  it should reflect the output value instead of skipping value update.
+  
+  </details>
+
+* Disable sorting when we add a row
+
+  <details>
+  
+  After manual sort by column, added row could be at the top instead of the bottom.
+  
+  </details>
+
+* Fix handling 0 valued in selection widgets
+* Fix orderBy for new rows after save/refresh on o2m grid
+
+  <details>
+  
+  On o2m grid, order is normally preserved after search request.
+  Now, search order is applied in case of form save/refresh.
+  
+  </details>
+
+* Fix criteria on grid columns search
+* Fix empty criteria in advanced search query
+
+  <details>
+  
+  When field or operator is empty then that criteria should not send in search query.
+  
+  </details>
+
+* Fix call onChange on m2m record change
+* Fix selection-in attribute support in mass update
+
 ## 7.1.8 (2024-10-17)
 
 #### Security

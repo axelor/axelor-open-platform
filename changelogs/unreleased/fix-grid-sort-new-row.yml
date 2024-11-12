@@ -1,5 +1,0 @@
----
-title: Disable sorting when we add a row
-type: fix
-description: |
-  After manual sort by column, added row could be at the top instead of the bottom.
