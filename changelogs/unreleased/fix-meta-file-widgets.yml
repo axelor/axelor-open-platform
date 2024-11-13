@@ -1,0 +1,6 @@
+---
+title: Fix dirty record on MetaFile widgets
+type: fix
+description: |
+  Some MetaFile widgets, ie Image/Drawing/BinaryLink shouldn't mark 
+  the main record dirty when updating an existing associated file.

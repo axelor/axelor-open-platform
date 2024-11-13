@@ -104,7 +104,7 @@ export function Image(
           $upload: { file },
         });
         if (metaFile.id) {
-          setValue(metaFile, true);
+          setValue(metaFile, true, record?.id == null);
         }
       }
     }

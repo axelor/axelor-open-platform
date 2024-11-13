@@ -89,7 +89,7 @@ export function BinaryLink(props: FieldProps<DataRecord | undefined | null>) {
         $upload: { file },
       });
       if (metaFile.id) {
-        setValue(metaFile, true);
+        setValue(metaFile, true, value?.id == null);
       }
     }
   }
