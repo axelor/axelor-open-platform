@@ -1,3 +1,4 @@
+import Color from "color";
 import difference from "lodash/difference";
 import filter from "lodash/filter";
 import forEach from "lodash/forEach";
@@ -280,14 +281,154 @@ const ChartColors = [
   ],
 ];
 
-export function getColor(type: ChartType) {
-  if (["hbar", "bar", "line", "area"].includes(type)) {
-    return ChartColors.reduce(
-      ($colors, set) => $colors.concat([set[5], set[4]]),
-      [],
-    );
+/**
+ * Pre-defined palettes
+ */
+const THEMES: Record<string, string[]> = {
+  /**
+   * Material palette
+   */
+  material: [
+    "#f44336", // Red
+    "#E91E63", // Pink
+    "#9c27b0", // Purple
+    "#673ab7", // Deep Purple
+    "#3f51b5", // Indigo
+    "#2196F3", // Blue
+    "#03a9f4", // Light Blue
+    "#00bcd4", // Cyan
+    "#009688", // Teal
+    "#4caf50", // Green
+    "#8bc34a", // Light Green
+    "#cddc39", // Lime
+    "#ffeb3b", // Yellow
+    "#ffc107", // Amber
+    "#ff9800", // Orange
+    "#ff5722", // Deep Orange
+    "#795548", // Brown
+    "#9e9e9e", // Grey
+    "#607d8b", // Blue Grey
+  ],
+
+  /**
+   * chart.js palette
+   */
+  chartjs: [
+    "#ff6384",
+    "#ff9f40",
+    "#ffcd56",
+    "#4bc0c0",
+    "#36a2eb",
+    "#9966ff",
+    "#c9cbcf",
+  ],
+
+  /**
+   * Echarts roma palette
+   */
+  roma: [
+    "#E01F54",
+    "#001852",
+    "#f5e8c8",
+    "#b8d2c7",
+    "#c6b38e",
+    "#a4d8c2",
+    "#f3d999",
+    "#d3758f",
+    "#dcc392",
+    "#2e4783",
+    "#82b6e9",
+    "#ff6347",
+    "#a092f1",
+    "#0a915d",
+    "#eaf889",
+    "#6699FF",
+    "#ff6666",
+    "#3cb371",
+    "#d5b158",
+    "#38b6b6",
+  ],
+
+  /**
+   * Echarts macarons palette
+   */
+  macarons: [
+    "#2ec7c9",
+    "#b6a2de",
+    "#5ab1ef",
+    "#ffb980",
+    "#d87a80",
+    "#8d98b3",
+    "#e5cf0d",
+    "#97b552",
+    "#95706d",
+    "#dc69aa",
+    "#07a2a4",
+    "#9a7fd1",
+    "#588dd5",
+    "#f5994e",
+    "#c05050",
+    "#59678c",
+    "#c9ab00",
+    "#7eb00a",
+    "#6f5553",
+    "#c14089",
+  ],
+};
+
+/**
+ * Validate that the given string is a valid color. It can be
+ * either a named color (`red`), hex color (`#f44336`),
+ * hsl color (`hsl(194, 53%, 79%)`) or rgb color (`rgb(255, 255, 255)`).
+ *
+ * @param {string} color the color to validate
+ *
+ * @return {boolean} true if it is a valid color, false otherwise.
+ */
+function isValidColor(color?: string | null): boolean {
+  try {
+    return color != null && color !== "" && Color(color) != null;
+  } catch (e) {
+    return false;
   }
-  return ChartColors.map((set) => set[5]);
+}
+
+/**
+ * Build the color palette for the chart
+ *
+ * @param {ChartType} type the chart type
+ * @param {string} colors the colors config value
+ * @param {string} shades the shades config value
+ *
+ * @return {string[]} color palette
+ */
+export function getColor(type: ChartType, colors?: string, shades?: string) {
+  const givenColors =
+    THEMES[colors || ""] ?? colors?.split(/\s*,\s*/).filter(isValidColor) ?? [];
+  const givenShades = Math.max(Number(shades || 1), 1);
+
+  // Use colors from chart config
+  if (givenColors.length) {
+    return givenShades > 1
+      ? givenColors.reduce(
+          (list, color) =>
+            list.concat(
+              new Array(givenShades).fill("").map(
+                (_, ind) =>
+                  Color(color)
+                    .mix(Color("white"), (1 / (givenShades + 1)) * ind)
+                    .hex() as string,
+              ),
+            ),
+          [] as string[],
+        )
+      : givenColors;
+  }
+
+  // Use default colors
+  return ["hbar", "bar", "line", "area"].includes(type)
+    ? ChartColors.reduce(($colors, set) => $colors.concat([set[5], set[4]]), [])
+    : ChartColors.map((set) => set[5]);
 }
 
 const FIELD_FORMATTERS: Record<string, (d: any, config?: any) => any> = {
@@ -518,7 +659,6 @@ export function prepareTheme(type: ChartType) {
   };
 
   return {
-    color: getColor(type),
     backgroundColor: bg,
     textStyle: {},
     line: {

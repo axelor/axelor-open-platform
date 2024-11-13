@@ -94,13 +94,13 @@ export function ECharts({
           ...(!legend && {
             legend: undefined,
           }),
-          color: getColor(type),
+          color: getColor(type, data.config?.colors, data.config?.shades),
         } as echarts.EChartOption,
         !isMerge,
         lazyUpdate,
       );
     }
-  }, [isRTL, type, legend, options, isMerge, lazyUpdate]);
+  }, [isRTL, type, legend, options, isMerge, data.config, lazyUpdate]);
 
   return <div className={classes.echarts} ref={divRef} />;
 }

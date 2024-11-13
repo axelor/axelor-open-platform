@@ -613,6 +613,8 @@ export interface ChartConfig {
   axisScale?: "fixed" | "distinct" | "unique"; // radar chart config
   onClick?: string;
   hideLegend?: boolean;
+  colors?: string;
+  shades?: string;
 }
 
 export interface ChartAction {

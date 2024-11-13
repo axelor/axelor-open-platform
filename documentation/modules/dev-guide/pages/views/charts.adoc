@@ -109,19 +109,26 @@ Most important config values are:
 
 == Colors
 
-Colors can be specified with colors config value (comma-separated). Each color
-is used to provide 4 gradient shades + 20 shades from d3's category20b preset.
+Colors can be specified with `colors` config value. It can be either :
+
+* a pre-defined palette name : `material`, `roma`, `chartjs`, `roma` or `macarons`
+* comma-separated list of named and/or hex colors
+
+If `shades` config value is provided (should be greater than `1`), it will generate a smooth range of variations for
+each color by adjusting the brightness.
 
 [source,xml]
 ----
 <chart ...>
   ...
   ...
-  <!-- html named colors -->
+  <!-- named and/or colors -->
   <config name="colors" value="red,green" />
+  <config name="colors" value="#f44336,#4caf50" />
+  <config name="colors" value="#f44336,green" />
 
-  <!-- or html hex colors -->
-  <config name="colors" value="#31a354,#e6550d" />
+  <!-- or pre-defined palette name -->
+  <config name="colors" value="roma" />
 
   <!-- with custom shades -->
   <config name="shades" value="10" />

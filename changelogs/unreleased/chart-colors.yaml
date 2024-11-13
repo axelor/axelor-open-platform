@@ -1,0 +1,7 @@
+---
+title: Fix missing support of colors and shades config in charts
+type: fix
+description: |
+  Colors and shades config support was not implemented.
+  This also add missing pre-build set of colors : `material`, `roma`, `chartjs`, 
+  `roma`, `macarons`. For example : `<config name="colors" value="roma" />`

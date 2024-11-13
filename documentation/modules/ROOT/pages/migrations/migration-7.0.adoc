@@ -181,3 +181,4 @@ reinstate them in a future version. Concerned features are :
 - Print Gantt view
 - Following chart types : `area`, `radar`, `scatter` (_added in 7.1_)
 - Views help link (_added in 7.1.6 & 7.2_)
+- Chart colors and shades configs (_added in 7.2.4_)
