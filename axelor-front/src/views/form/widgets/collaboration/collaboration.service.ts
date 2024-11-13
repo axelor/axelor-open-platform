@@ -131,7 +131,7 @@ const CollaborationService = () => {
           updateUsers(draft, [user, ...(users ?? [])]);
         });
         break;
-      case "LEFT":
+      case "LEFT": {
         const state = room.states?.[user.code] || {};
         // Keep user if they saved the record.
         if ((state.version ?? 0) > room.recordVersion) {
@@ -147,7 +147,8 @@ const CollaborationService = () => {
           });
         }
         break;
-      case "STATE":
+      }
+      case "STATE": {
         const newState = { ...message } as State;
         if (newState.version != null && newState.dirty == null) {
           newState.dirty = false;
@@ -180,6 +181,7 @@ const CollaborationService = () => {
           updateUsers(draft, [user, ...(users || [])]);
         });
         break;
+      }
     }
   };
 
