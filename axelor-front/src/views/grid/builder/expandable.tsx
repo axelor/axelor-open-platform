@@ -1,4 +1,4 @@
-import { Box, Button, clsx, useTheme } from "@axelor/ui";
+import { Box, Button, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import {
   KeyboardEvent,

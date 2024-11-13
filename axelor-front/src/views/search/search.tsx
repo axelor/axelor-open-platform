@@ -11,8 +11,6 @@ import {
   ActionView,
   FormView,
   GridView,
-  Property,
-  Schema,
   SearchField,
   SearchResultField,
   SearchView,
@@ -36,7 +34,6 @@ import {
   parseExpression,
 } from "@/hooks/use-parser/utils";
 import { DEFAULT_SEARCH_PAGE_SIZE } from "@/utils/app-settings.ts";
-import { toKebabCase } from "@/utils/names";
 import {
   prepareSearchFields,
   prepareSearchFormMeta,

@@ -7,7 +7,7 @@ import forEach from "lodash/forEach";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
-import { Field, GridView, Property } from "@/services/client/meta.types";
+import { Field, GridView } from "@/services/client/meta.types";
 import { useGridState } from "./utils";
 import { DataRecord } from "@/services/client/data.types";
 import { resetView } from "@/services/client/meta";

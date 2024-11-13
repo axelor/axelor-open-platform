@@ -1,4 +1,4 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useMemo } from "react";
 

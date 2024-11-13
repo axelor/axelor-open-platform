@@ -13,7 +13,6 @@ import {
   Perms,
   Property,
   SavedFilter,
-  Schema,
   ViewTypes,
 } from "./meta.types";
 import { rejectAsAlert as reject } from "./reject";

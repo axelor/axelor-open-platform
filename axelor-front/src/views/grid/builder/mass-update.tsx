@@ -16,7 +16,6 @@ import { Select } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { Field, GridView, Property } from "@/services/client/meta.types";
-import { toKebabCase } from "@/utils/names";
 import { Widget } from "@/view-containers/advance-search/editor/components";
 import { ViewPopper } from "@/view-containers/view-popup/view-popper";
 

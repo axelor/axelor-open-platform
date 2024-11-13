@@ -1,5 +1,5 @@
 import { Box } from "@axelor/ui";
-import { FocusEvent, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 
 import { FieldProps } from "../../builder";
