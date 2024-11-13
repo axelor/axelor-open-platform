@@ -1,3 +1,17 @@
+## 7.2.3 (2024-11-13)
+
+#### Fix
+
+* Fix ImageSelect alignment in tree view
+* Fix JS TypeError when action adds rows in one-to-many widget
+
+  <details>
+  
+  Page would crash (error 500) in case an action adds rows in one-to-many widget.
+  
+  </details>
+
+
 ## 7.2.2 (2024-11-12)
 
 #### Feature

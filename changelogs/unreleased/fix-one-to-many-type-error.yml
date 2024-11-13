@@ -1,5 +1,0 @@
----
-title: Fix JS TypeError when action adds rows in one-to-many widget
-type: fix
-description: |
-  Page would crash (error 500) in case an action adds rows in one-to-many widget.
