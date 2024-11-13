@@ -32,8 +32,8 @@ export function NavTags() {
       }
     }
 
-    var pending = false;
-    var pendingReset = () => {
+    let pending = false;
+    const pendingReset = () => {
       pollPromise = setTimeout(findTags, pollingInterval);
       if (pollIdle === null) {
         pollIdle = setTimeout(cancelPolling, pollingInterval * 2);

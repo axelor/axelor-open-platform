@@ -296,8 +296,8 @@ const FIELD_FORMATTERS: Record<string, (d: any, config?: any) => any> = {
     return moment(d).format(f);
   },
   month: function (d: any, config: any) {
-    var v = "" + d;
-    var f = config.xFormat;
+    const v = "" + d;
+    const f = config.xFormat;
 
     if (v.indexOf(".") > -1) return "";
     if (isString(d) && /^(\d+)$/.test(d)) {

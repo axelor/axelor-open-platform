@@ -4,7 +4,7 @@ import { i18n } from "@/services/client/i18n";
 // Gets filename from Content-Disposition
 function getFilename(disposition: string | null) {
   if (disposition === null) return null;
-  var results = /filename\*=UTF-8''(.*)/i.exec(disposition);
+  let results = /filename\*=UTF-8''(.*)/i.exec(disposition);
   if (results) {
     return decodeURIComponent(results[1]);
   }

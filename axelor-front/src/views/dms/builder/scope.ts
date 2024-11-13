@@ -176,7 +176,7 @@ export class Uploader {
 
       function onError(reason?: any) {
         function done() {
-          var message =
+          const message =
             reason && reason.error ? reason.error : i18n.get("Failed");
           reject({ message: message, failed: true });
         }
