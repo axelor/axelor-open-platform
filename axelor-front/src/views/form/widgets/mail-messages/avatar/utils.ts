@@ -65,7 +65,7 @@ const allowedUrls = new Map<string, boolean>();
 const allowedUrlsMaxSize = 1000;
 const fetchingUrls: Record<string, Promise<any>> = {};
 
-function trimMap(map: Map<String, Boolean>, maxSize: number) {
+function trimMap(map: Map<string, boolean>, maxSize: number) {
   if (map.size <= maxSize) return;
   const it = map.keys();
   const half = maxSize / 2;
