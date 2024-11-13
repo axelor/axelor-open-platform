@@ -25,11 +25,10 @@ export type UploadFile = {
 };
 
 function toJson(str: string) {
-  let data = null;
   try {
-    data = JSON.parse(str);
-  } finally {
-    return data;
+    return JSON.parse(str);
+  } catch {
+    return null;
   }
 }
 
