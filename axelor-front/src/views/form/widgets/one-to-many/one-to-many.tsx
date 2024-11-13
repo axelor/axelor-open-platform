@@ -856,8 +856,8 @@ function OneToManyInner({
 
         setRecords((prevRecords) => {
           const newRecords = newItems.map((item, index) => {
-            const getId = (_item: DataRecord) =>
-              !_item.id || _item.id < 0 ? null : _item.id;
+            const getId = (_item?: DataRecord) =>
+              !_item?.id || _item.id < 0 ? null : _item.id;
 
             return unfetchedItemList.includes(item) &&
               getId(prevRecords[index]) === getId(item)
