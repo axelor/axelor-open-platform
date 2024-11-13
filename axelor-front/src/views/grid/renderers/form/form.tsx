@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import clone from "lodash/cloneDeep";
@@ -16,7 +15,7 @@ import {
   useRef,
 } from "react";
 
-import { Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
+import { clsx, Box, ClickAwayListener, FocusTrap } from "@axelor/ui";
 import { GridColumn, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 

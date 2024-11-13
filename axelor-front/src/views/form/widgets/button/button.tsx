@@ -1,10 +1,9 @@
-import { clsx } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import isUndefined from "lodash/isUndefined";
 
-import { Box, Button as Btn, Image } from "@axelor/ui";
+import { clsx, Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Tooltip } from "@/components/tooltip";

@@ -1,10 +1,9 @@
-import { clsx } from "@axelor/ui";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import uniqueId from "lodash/uniqueId";
 import { createRef, useEffect } from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-import { Alert, AlertHeader, Fade, Portal, useTheme } from "@axelor/ui";
+import { clsx, Alert, AlertHeader, Fade, Portal, useTheme } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
 import { SanitizedContent } from "@/utils/sanitize";

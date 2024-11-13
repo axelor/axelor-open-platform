@@ -1,10 +1,12 @@
-import { i18n } from "@/services/client/i18n";
 import { useState } from "react";
-import { Message, MessageFlag } from "./types";
+
+import { clsx, Box, Menu, MenuItem } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { Box, Menu, MenuItem } from "@axelor/ui";
+import { i18n } from "@/services/client/i18n";
+
+import { Message, MessageFlag } from "./types";
+
 import styles from "./message-menu.module.scss";
-import { clsx } from "@axelor/ui";
 
 export function MessageMenu({
   data,

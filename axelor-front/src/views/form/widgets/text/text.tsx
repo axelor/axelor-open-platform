@@ -1,15 +1,15 @@
 import { useAtomValue } from "jotai";
 import React, { useCallback, useState } from "react";
 
-import { Input } from "@axelor/ui";
+import { clsx, Input } from "@axelor/ui";
 
 import { useAppTheme } from "@/hooks/use-app-theme";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { Translatable, useTranslationValue } from "../string/translatable";
+
 import styles from "./text.module.scss";
-import { clsx } from "@axelor/ui";
 
 export function Text({
   inputProps,

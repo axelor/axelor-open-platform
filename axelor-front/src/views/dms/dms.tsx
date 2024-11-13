@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { useAtomCallback } from "jotai/utils";
@@ -12,7 +11,7 @@ import {
   useState,
 } from "react";
 
-import { Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
+import { clsx, Box, DndProvider, Input, Link, useDrag } from "@axelor/ui";
 import { GridColumn, GridRow, GridRowProps } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 

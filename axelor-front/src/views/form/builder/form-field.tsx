@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import {
@@ -10,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
+import { clsx, Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
 import { Icon } from "@/components/icon";

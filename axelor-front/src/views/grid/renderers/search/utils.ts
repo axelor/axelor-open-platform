@@ -1,8 +1,7 @@
 import { Dayjs, ManipulateType, OpUnitType } from "dayjs";
 import { Field, GridView } from "@/services/client/meta.types";
 import { SearchState } from "./types";
-import { Criteria } from "@/services/client/data.types";
-import { Filter } from "@/services/client/data.types";
+import { Criteria, Filter } from "@/services/client/data.types";
 import { toKebabCase } from "@/utils/names";
 import { moment } from "@/services/client/l10n";
 import * as FormatUtils from "@/utils/format";

@@ -1,9 +1,8 @@
 import { Fragment, memo, useMemo, useRef } from "react";
 import { useAtomValue } from "jotai";
 import isEqual from "lodash/isEqual";
-import { clsx } from "@axelor/ui";
 
-import { Box, useDrop } from "@axelor/ui";
+import { clsx, Box, useDrop } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { GridRowProps } from "@axelor/ui/grid";
 

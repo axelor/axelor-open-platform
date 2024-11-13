@@ -1,9 +1,8 @@
-import { clsx } from "@axelor/ui";
 import { useSetAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import { ReactElement, memo, useCallback, useEffect, useState } from "react";
 
-import { Box, Button, Link } from "@axelor/ui";
+import { clsx, Box, Button, Link } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsync } from "@/hooks/use-async";

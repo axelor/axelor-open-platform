@@ -1,6 +1,6 @@
-import { Box, CommandBar } from "@axelor/ui";
+import { clsx, Box, CommandBar } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-import { clsx } from "@axelor/ui";
+
 import { useAtomCallback } from "jotai/utils";
 import { ReactElement, useCallback, useRef } from "react";
 import { ScopeProvider } from "bunshi/react";

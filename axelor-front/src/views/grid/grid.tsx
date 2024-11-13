@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
@@ -13,7 +12,7 @@ import {
   useState,
 } from "react";
 
-import { Box } from "@axelor/ui";
+import { clsx, Box } from "@axelor/ui";
 import { GridProps, GridRow, GridState } from "@axelor/ui/grid";
 
 import { dialogs } from "@/components/dialogs";

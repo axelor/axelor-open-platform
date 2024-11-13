@@ -1,7 +1,6 @@
-import { clsx } from "@axelor/ui";
 import React, { MouseEvent, useMemo, useState } from "react";
 
-import { Badge, Box, Button, Panel, TBackground, useTheme } from "@axelor/ui";
+import { clsx, Badge, Box, Button, Panel, TBackground, useTheme } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useEditor } from "@/hooks/use-relation";

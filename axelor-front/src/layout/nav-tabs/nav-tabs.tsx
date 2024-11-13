@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import {
@@ -11,6 +10,7 @@ import {
 } from "react";
 
 import {
+  clsx,
   Menu as AxMenu,
   MenuDivider as AxMenuDivider,
   MenuItem as AxMenuItem,

@@ -1,7 +1,6 @@
-import { clsx } from "@axelor/ui";
 import { Outlet, useLocation } from "react-router-dom";
 
-import { Box } from "@axelor/ui";
+import { clsx, Box } from "@axelor/ui";
 
 import { AlertsProvider } from "@/components/alerts";
 import { DialogsProvider } from "@/components/dialogs";

@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import { useAtom, useAtomValue, useSetAtom, useStore } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
@@ -15,7 +14,7 @@ import {
 } from "react";
 import uniq from "lodash/uniq";
 
-import { Block, Box, CommandItemProps } from "@axelor/ui";
+import { clsx, Block, Box, CommandItemProps } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";

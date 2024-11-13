@@ -1,4 +1,3 @@
-import { clsx } from "@axelor/ui";
 import {
   ForwardedRef,
   forwardRef,
@@ -10,6 +9,7 @@ import {
 } from "react";
 
 import {
+  clsx,
   Box,
   Select as AxSelect,
   SelectProps as AxSelectProps,

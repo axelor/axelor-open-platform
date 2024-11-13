@@ -1,9 +1,8 @@
-import { ButtonGroup, clsx } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import { ChangeEvent, useMemo, useRef } from "react";
 
-import { Box, Button } from "@axelor/ui";
+import { clsx, Box, Button, ButtonGroup } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { DataStore } from "@/services/client/data-store";

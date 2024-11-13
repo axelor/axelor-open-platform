@@ -1,10 +1,9 @@
-import { clsx } from "@axelor/ui";
 import { useAtomValue } from "jotai";
 import { selectAtom } from "jotai/utils";
 import getValue from "lodash/get";
 import { useCallback, useMemo, useState } from "react";
 
-import { Box, Button } from "@axelor/ui";
+import { clsx, Box, Button } from "@axelor/ui";
 
 import format from "@/utils/format";
 import { dialogs } from "@/components/dialogs";

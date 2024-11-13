@@ -1,7 +1,6 @@
-import { clsx } from "@axelor/ui";
 import { useEffect, useState } from "react";
 
-import { Box, CircularProgress } from "@axelor/ui";
+import { clsx, Box, CircularProgress } from "@axelor/ui";
 
 import styles from "./loader.module.scss";
 import { i18n } from "@/services/client/i18n.ts";

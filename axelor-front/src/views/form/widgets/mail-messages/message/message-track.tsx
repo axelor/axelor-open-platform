@@ -5,14 +5,12 @@ import { Box } from "@axelor/ui";
 import { i18n } from "@/services/client/i18n";
 import { moment } from "@/services/client/l10n";
 import { MetaData } from "@/services/client/meta.ts";
-import { Property } from "@/services/client/meta.types";
-import { getDateFormat, getDateTimeFormat } from "@/utils/format";
+import { Property, Field } from "@/services/client/meta.types";
+import format, { getDateFormat, getDateTimeFormat } from "@/utils/format";
 import { toSnakeCase } from "@/utils/names";
 import { sanitize } from "@/utils/sanitize.ts";
 import { FormProps } from "@/views/form/builder";
 
-import { Field } from "@/services/client/meta.types";
-import format from "@/utils/format";
 import { MessageTrack } from "./types";
 
 import styles from "./message-track.module.scss";
