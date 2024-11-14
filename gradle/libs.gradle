@@ -259,7 +259,7 @@ libs.birt_runtime = [
 ]
 
 // Quartz Scheduler
-libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.3.2") {
+libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.4.0") {
   exclude module: "c3p0"
 }
 

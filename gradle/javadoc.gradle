@@ -39,7 +39,7 @@ task generateDocs(type: Javadoc) {
             'https://google.github.io/guice/api-docs/5.1.0/javadoc/',
             'https://guava.dev/releases/33.3.1-jre/api/docs/',
             'https://docs.jboss.org/hibernate/orm/5.6/javadocs/',
-            'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.3.2'
+            'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.4.0'
     ]
   }
 
