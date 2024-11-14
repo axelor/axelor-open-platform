@@ -27,6 +27,9 @@ export function Decimal(props: FieldProps<string | number>) {
   const { focus, required } = attrs;
   const { step: stepAttrs } = widgetAttrs;
 
+  const isDecimal =
+    schema.widget === "decimal" || schema.serverType === "DECIMAL";
+
   const scale = useScale(widgetAtom, formAtom, schema);
 
   const getViewContext = useViewContext();
@@ -34,12 +37,11 @@ export function Decimal(props: FieldProps<string | number>) {
   const step = useMemo(
     () =>
       stepAttrs
-        ? Number(stepAttrs)
+        ? Number(isDecimal ? stepAttrs : Math.trunc(stepAttrs))
         : scale > 0
           ? Math.pow(10, -Math.floor(scale))
           : 1,
-
-    [scale, stepAttrs],
+    [isDecimal, scale, stepAttrs],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);

@@ -25,10 +25,7 @@ export function Slider(props: FieldProps<string | number>) {
   const isDecimal =
     schema.widget === "decimal" || schema.serverType === "DECIMAL";
   const { minSize: min = 0, maxSize: max = 100, widgetAttrs } = schema;
-  const {
-    step = isDecimal ? Math.pow(10, -scale) : 1,
-    sliderShowMinMax = false,
-  } = widgetAttrs;
+  const { step: stepAttrs, sliderShowMinMax = false } = widgetAttrs;
 
   const [value, setValue] = useAtom(valueAtom);
   const [isDragging, setIsDragging] = useState(false);
@@ -69,6 +66,15 @@ export function Slider(props: FieldProps<string | number>) {
     [getViewContext, scale, schema],
   );
 
+  const step = useMemo(
+    () =>
+      stepAttrs
+        ? Number(isDecimal ? stepAttrs : Math.trunc(stepAttrs))
+        : isDecimal
+          ? Math.pow(10, -scale)
+          : 1,
+    [isDecimal, scale, stepAttrs],
+  );
   const displayedMin = useMemo(
     () => formatText(min, extractScale(min)),
     [formatText, min],
