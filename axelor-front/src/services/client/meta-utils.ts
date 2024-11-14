@@ -129,6 +129,7 @@ function processWidgetAttrs(field: Schema) {
         "itemSpan",
         "minSize",
         "maxSize",
+        "step",
       ].indexOf(name) !== -1 &&
       /^(-)?\d+(\.\d+)?$/.test(value)
     ) {
