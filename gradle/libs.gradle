@@ -156,7 +156,6 @@ libs.groovy = [
 
 def resteasy_module = { name ->
     dependencies.create("org.jboss.resteasy:${name}:${versions.resteasy}") {
-        exclude module: "smallrye-config"
         exclude module: "jackson-jakarta-rs-base"
         exclude module: "jackson-module-jakarta-xmlbind-annotations"
         exclude module: "jackson-jakarta-rs-json-provider"
@@ -175,12 +174,10 @@ libs.resteasy = [
     dependencies.create("org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}") {
       exclude module: "jandex", group: "org.jboss"
     },
-    "io.smallrye.config:smallrye-config:1.13.1"
 ]
 
 libs.resteasy_multipart = resteasy_module("resteasy-multipart-provider")
 libs.resteasy_guice = dependencies.create("dev.resteasy.guice:resteasy-guice:1.0.0.Alpha1") {
-    exclude module: "smallrye-config"
     exclude module: "resteasy-jaxb-provider"
     exclude module: "jackson-jakarta-rs-base"
     exclude module: "jackson-module-jakarta-xmlbind-annotations"
