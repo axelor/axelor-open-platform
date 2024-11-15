@@ -22,13 +22,13 @@ import static org.hibernate.type.SqlTypes.LONGVARCHAR;
 
 import com.axelor.db.hibernate.dialect.function.OracleJsonExtractFunction;
 import org.hibernate.boot.model.FunctionContributions;
-import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.OracleDialect;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.type.StandardBasicTypes;
 
 public class AxelorOracleDialect extends OracleDialect {
 
-  public AxelorOracleDialect(DatabaseVersion info) {
+  public AxelorOracleDialect(DialectResolutionInfo info) {
     super(info);
   }
 

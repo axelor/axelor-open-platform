@@ -40,11 +40,9 @@ public class CustomDialectResolver implements DialectResolver {
 
     if (dialect != null) {
       log.info(
-          "Database engine: {} {}.{}",
-          info.getDatabaseName(),
-          info.getDatabaseMajorVersion(),
-          info.getDatabaseMinorVersion());
-      log.debug("Database dialect: {}", dialect);
+          "Database dialect: {}, version: {}",
+          dialect.getClass().getSimpleName(),
+          dialect.getVersion());
     }
 
     return dialect;
@@ -52,11 +50,9 @@ public class CustomDialectResolver implements DialectResolver {
 
   private Dialect findDialect(DialectResolutionInfo info) {
     final String databaseName = info.getDatabaseName();
-    final int majorVersion = info.getDatabaseMajorVersion();
-    final int minorVersion = info.getDatabaseMinorVersion();
 
     if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
-      if (majorVersion >= 12) {
+      if (info.isSameOrAfter(12)) {
         return new AxelorPostgreSQLDialect(info);
       }
 
@@ -65,7 +61,7 @@ public class CustomDialectResolver implements DialectResolver {
     }
 
     if (TargetDatabase.MYSQL.equals(databaseName)) {
-      if (majorVersion >= 8) {
+      if (info.isSameOrAfter(8)) {
         return new AxelorMySQLDialect(info);
       }
 
@@ -74,7 +70,7 @@ public class CustomDialectResolver implements DialectResolver {
     }
 
     if (TargetDatabase.ORACLE.equals(databaseName)) {
-      if (majorVersion >= 19) {
+      if (info.isSameOrAfter(19)) {
         return new AxelorOracleDialect(info);
       }
       log.error("Oracle 19 or later is required.");
@@ -82,10 +78,10 @@ public class CustomDialectResolver implements DialectResolver {
     }
 
     if (TargetDatabase.HSQLDB.equals(databaseName)) {
-      return new AxelorHSQLDialect();
+      return new AxelorHSQLDialect(info);
     }
 
-    log.error("{} {}.{} is not supported.", databaseName, majorVersion, minorVersion);
+    log.error("{} {} is not supported.", databaseName, info);
     return null;
   }
 }

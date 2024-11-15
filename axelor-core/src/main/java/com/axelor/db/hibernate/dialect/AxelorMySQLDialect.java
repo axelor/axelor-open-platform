@@ -23,13 +23,13 @@ import static org.hibernate.type.SqlTypes.OTHER;
 import com.axelor.db.hibernate.dialect.function.MySQLJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.MySQLJsonSetFunction;
 import org.hibernate.boot.model.FunctionContributions;
-import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.type.StandardBasicTypes;
 
 public class AxelorMySQLDialect extends MySQLDialect {
 
-  public AxelorMySQLDialect(DatabaseVersion info) {
+  public AxelorMySQLDialect(DialectResolutionInfo info) {
     super(info);
   }
 

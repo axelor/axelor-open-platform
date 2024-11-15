@@ -24,14 +24,14 @@ import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
 import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
 import com.axelor.db.internal.DBHelper;
 import org.hibernate.boot.model.FunctionContributions;
-import org.hibernate.dialect.DatabaseVersion;
 import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.type.StandardBasicTypes;
 
 public class AxelorPostgreSQLDialect extends PostgreSQLDialect {
 
-  public AxelorPostgreSQLDialect(DatabaseVersion version) {
-    super(version);
+  public AxelorPostgreSQLDialect(DialectResolutionInfo info) {
+    super(info);
   }
 
   @Override

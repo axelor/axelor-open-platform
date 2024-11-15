@@ -21,11 +21,12 @@ package com.axelor.db.hibernate.dialect;
 import static org.hibernate.type.SqlTypes.OTHER;
 
 import org.hibernate.dialect.HSQLDialect;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 
 public class AxelorHSQLDialect extends HSQLDialect {
 
-  public AxelorHSQLDialect() {
-    super();
+  public AxelorHSQLDialect(DialectResolutionInfo info) {
+    super(info);
   }
 
   @Override
