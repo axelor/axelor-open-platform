@@ -131,7 +131,7 @@ Example usage:
   <dataset type="rpc">com.axelor.sale.web.SaleOrderController:reportMonthly</dataset>
   <template>
   <![CDATA[
-  <report-box icon='fa-search' label='Total sales' value='first.total'
+  <report-box icon='search' label='Total sales' value='first.total'
     percent='first.percent' up='first.up' tag='first.tag' tag-css='first.tagCss'/>
   ]]>
   </template>

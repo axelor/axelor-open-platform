@@ -106,8 +106,8 @@
                     "type": "field",
                     "name": "primary",
                     "widget": "toggle",
-                    "icon": "fa-star-o",
-                    "iconActive": "fa-star",
+                    "icon": "star",
+                    "iconActive": "star-fill",
                     "exclusive": true,
                     "autoTitle": "Primary"
                   },
@@ -115,14 +115,14 @@
                     "type": "field",
                     "name": "optOut",
                     "widget": "toggle",
-                    "icon": "fa-ban",
+                    "icon": "ban",
                     "autoTitle": "Opt out"
                   },
                   {
                     "type": "field",
                     "name": "invalid",
                     "widget": "toggle",
-                    "icon": "fa-exclamation-circle",
+                    "icon": "exclamation-circle-fill",
                     "autoTitle": "Invalid"
                   }
                 ],

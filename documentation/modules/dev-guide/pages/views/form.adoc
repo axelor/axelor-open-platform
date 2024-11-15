@@ -357,9 +357,9 @@ We can define custom editor for fields using `<editor>` child element on a field
 <field name="emails">
   <editor layout="table" onNew="compute-default-email">
     <field name="email" />
-    <field name="primary" widget="toggle" x-icon="fa-star-o" x-icon-active="fa-star" x-exclusive="true" />
-    <field name="optOut" widget="toggle" x-icon="fa-ban" />
-    <field name="invalid" widget="toggle" x-icon="fa-exclamation-circle" />
+    <field name="primary" widget="toggle" x-icon="star" x-icon-active="star-fill" x-exclusive="true" />
+    <field name="optOut" widget="toggle" x-icon="ban" />
+    <field name="invalid" widget="toggle" x-icon="exclamation-circle-fill" />
   </editor>
 </field>
 

@@ -709,7 +709,7 @@ The button widget is used to show a clickable button on a form.
 ----
 <button name="customBtn" title="Click Me!" onClick="actions"
   prompt="This is a confirmation message."
-  icon="fa-check-square-o" />
+  icon="check-square" />
 <button name="customBtn" title="Button" link="https://axelor.com" />
 ----
 
@@ -1173,7 +1173,7 @@ the button attributes without impact on the bound field.
   <button
     name="btnTotalAmount"
     title="Total amount"
-    icon="fa-bar-chart"
+    icon="bar-chart"
     onClick="check-order-dates,com.axelor.sale.web.SaleOrderController:calculate,save"
     widget="info-button"
     x-field="totalAmount"

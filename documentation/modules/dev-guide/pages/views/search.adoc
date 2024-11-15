@@ -27,7 +27,7 @@ The Search view can be used to search on multiple objects:
       <field name="value" type="decimal"/>
       <field name="state" title="Status" type="string" widget="single-select" selection="order.status.selection"/>
       <field name="color" type="string"/>
-      <button name="showMeBtn" onClick="call-an-action" title="Show me" icon="fa-question-circle"/>
+      <button name="showMeBtn" onClick="call-an-action" title="Show me" icon="question-circle-fill"/>
     </result-fields>
 
     <select model="com.axelor.contact.db.Contact" orderBy="company.name" limit="5">
