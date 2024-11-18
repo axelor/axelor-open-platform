@@ -141,7 +141,7 @@ export function Login() {
 function CentralClients({ clients }: { clients: ClientInfo[] }) {
   return clients.length > 0 ? (
     <>
-      <Box d="flex" alignItems="center">
+      <Box d="flex" alignItems="center" mt={3}>
         <Box as="hr" flexGrow={1} />
         <Box mx={3}>{i18n.get("or sign in with")}</Box>
         <Box as="hr" flexGrow={1} />

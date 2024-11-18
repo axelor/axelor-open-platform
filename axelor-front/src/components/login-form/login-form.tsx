@@ -365,7 +365,7 @@ export function LoginForm({
         ></Box>
       )}
       {children}
-      <Box as="p" textAlign="center">
+      <Box mt={3} as="p" textAlign="center">
         {copyright}
       </Box>
     </Box>
