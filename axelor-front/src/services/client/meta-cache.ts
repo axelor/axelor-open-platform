@@ -46,7 +46,8 @@ export async function findView<T extends ViewType>({
   resource?: string;
   context?: DataContext;
 }): Promise<ViewData<T>> {
-  return cache.get(makeKey("view", model, type, name ?? resource), async () => {
+  const key = makeKey("view", model, type, name ?? resource);
+  return cache.get(key, async () => {
     if (type === "html") {
       return Promise.resolve({ view: { name: name ?? resource, type } });
     }
@@ -67,12 +68,16 @@ export async function findView<T extends ViewType>({
       data.fields = processFields(data.fields);
     }
 
-    const { related } = await findViewFields(data.fields ?? {}, data.view);
-    data.related = { ...data.related, ...related };
+    if (data.view) {
+      const { related } = await findViewFields(data.fields ?? {}, data.view);
+      data.related = { ...data.related, ...related };
 
-    // process the meta data
-    processView(data, data.view);
-    processWidgets(data.view);
+      // process the meta data
+      processView(data, data.view);
+      processWidgets(data.view);
+    } else {
+      cache.delete(key); // delete cache when view is null
+    }
 
     return data;
   });
@@ -82,9 +87,14 @@ export async function findFields(
   model: string,
   jsonModel?: string,
 ): Promise<MetaData> {
-  return cache.get(makeKey("meta", model, jsonModel), () =>
-    fetchFields(model, jsonModel),
-  );
+  const key = makeKey("meta", model, jsonModel);
+  return cache.get(key, async () => {
+    try {
+      return await fetchFields(model, jsonModel);
+    } catch (err) {
+      cache.delete(key); // delete cache when error occurs
+    }
+  });
 }
 
 export async function saveView(data: any) {
