@@ -103,7 +103,8 @@ libs.hibernate = [
   "org.hibernate.orm:hibernate-core:${versions.hibernate}",
   "org.hibernate.orm:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate.validator:hibernate-validator:${versions.hibernate_validator}",
-  "org.hibernate.orm:hibernate-jcache:${versions.hibernate}"
+  "org.hibernate.orm:hibernate-jcache:${versions.hibernate}",
+  "com.zaxxer:HikariCP:6.2.1"
 ]
 
 // Caching libs
@@ -284,7 +285,7 @@ libs.birt_runtime = [
 ]
 
 // Quartz Scheduler
-libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.4.0") {
+libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.5.0") {
   exclude module: "c3p0"
 }
 
