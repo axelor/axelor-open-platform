@@ -28,6 +28,7 @@
     "@uiw/react-color-chrome": "^2.3.2",
     "bootstrap-sass": "2.3.2",
     "bunshi": "^2.1.5",
+    "color": "^4.2.3",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "dompurify": "^3.1.6",
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
+    "@types/color": "^4.2.0",
     "@types/dompurify": "^3.0.5",
     "@types/echarts": "^4.9.22",
     "@types/jest": "^29.5.12",
