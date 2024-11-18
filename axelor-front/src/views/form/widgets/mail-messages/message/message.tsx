@@ -1,6 +1,14 @@
 import React, { MouseEvent, useMemo, useState } from "react";
 
-import { clsx, Badge, Box, Button, Panel, TBackground, useTheme } from "@axelor/ui";
+import {
+  clsx,
+  Badge,
+  Box,
+  Button,
+  Panel,
+  TBackground,
+  useTheme,
+} from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useEditor } from "@/hooks/use-relation";
@@ -19,6 +27,7 @@ import { MessageTracks } from "./message-track";
 import * as TYPES from "./types";
 import { MessageInputProps, MessageProps } from "./types";
 import { getUser, getUserName } from "./utils";
+import { isDevelopment } from "@/utils/app-settings";
 
 import styles from "./message.module.scss";
 
@@ -56,10 +65,11 @@ export function MessageUser({
 
   async function handleClick(e: MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
+    const name = "user-info-form";
     try {
       const { view } = await findView({
         type: "form",
-        name: "user-info-form",
+        name,
         model,
       });
       if (view && id) {
@@ -71,9 +81,11 @@ export function MessageUser({
           readonly: true,
           canSave: false,
         });
+      } else if (isDevelopment() && !view) {
+        console.log(`${name} view doesn't exist`);
       }
     } catch (err) {
-      // console.log(err);
+      // handle error
     }
   }
 
