@@ -8,7 +8,7 @@ versions.hibernate = "6.6.2.Final"
 versions.hibernate_validator = "8.0.1.Final"
 
 versions.groovy = "3.0.24"
-versions.resteasy = "6.2.9.Final"
+versions.resteasy = "6.2.11.Final"
 versions.jackson = "2.18.3"
 versions.shiro = "1.13.0:jakarta"
 versions.buji_pac4j = "8.1.1"
@@ -190,8 +190,8 @@ libs.resteasy_server = [
   dependencies.create("org.jboss.resteasy:resteasy-undertow:${versions.resteasy}") {
     exclude module: "jandex", group: "org.jboss"
   },
-  "io.undertow:undertow-core:2.3.13.Final",
-  "io.undertow:undertow-servlet:2.3.13.Final"
+  "io.undertow:undertow-core:2.3.18.Final",
+  "io.undertow:undertow-servlet:2.3.18.Final"
 ]
 
 libs.swagger_jaxrs2 = [
