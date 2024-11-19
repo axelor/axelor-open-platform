@@ -1,0 +1,276 @@
+= 8.0 Migration Guide
+:toc:
+:toc-title:
+
+:url-jakarta-ee: https://jakarta.ee/specifications/platform/10/jakarta-platform-spec-10.0
+:eclipse-transformer: https://github.com/eclipse/transformer
+
+:url-hibernate-migration-6: https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html
+:url-hibernate-migration-6-1: https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html
+:url-hibernate-migration-6-2: https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html
+:url-hibernate-migration-6-3: https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html
+:url-hibernate-migration-6-4: https://docs.jboss.org/hibernate/orm/6.4/migration-guide/migration-guide.html
+:url-hibernate-migration-6-5: https://docs.jboss.org/hibernate/orm/6.5/migration-guide/migration-guide.html
+:url-hibernate-migration-6-6: https://docs.jboss.org/hibernate/orm/6.6/migration-guide/migration-guide.html
+
+:url-tomcat-10: https://tomcat.apache.org/migration-10.html
+:url-tomcat-10-1: https://tomcat.apache.org/migration-10.1.html
+
+:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/21/migrate/index.html
+:url-jdk-features: https://www.oracle.com/java/technologies/javase/21-relnote-issues.html
+
+In this document, we will see the major steps to migrate from 7.x to 8.0.
+
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md[change log] for detailed list of fixes, changes and improvements introduced in 8.0
+
+== Java EE to Jakarta EE
+
+With version 8.0, we are migrating to Jakarta EE 10+, which involves a significant namespace change from `javax.\*` to `jakarta.*`  and an upgrade of all the dependencies to be compliant with the new Jakarta EE namespace. This change affects the entire application and requires careful attention during the migration process.
+
+To migrate your application, you first need to change references in class imports, configuration files, etc.
+For an automated process, one option is to use the {eclipse-transformer}[Eclipse Transformer].
+The most laborious process will then be to update your application to work with the new versions of the dependencies.
+
+See the {url-jakarta-ee}[Jakarta EE Platform Specification] for details.
+
+The following links talk more about the Jakarta EE transition: https://jakarta.ee/blogs/javax-jakartaee-namespace-ecosystem-progress/[Jarkata EE blog post], https://blogs.oracle.com/javamagazine/post/transition-from-java-ee-to-jakarta-ee[Oracle blog post].
+
+== Hibernate 5.6 to Hibernate 6.6
+
+Hibernate 6.6 is compliant with Jakarta Persistence 3.1 and is a major part of the Jakarta EE migration. This will require the most careful attention during the migration process of your application. Here are some of the major changes:
+
+=== Schema Changes
+
+==== Column Types (on PostgreSQL)
+
+[cols="4"]
+|===
+| Column Type | Hibernate 5.x | Hibernate 6.6 | Notes
+| binary | oid | bytea | https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/Hibernate_User_Guide.html#basic-bytearray[`@Lob` not used anymore]
+| decimal | numeric(19, 2) | numeric(38, 2) | Default precision has changed
+| datetime | timestamp | timestamp(6) | Explicit default precision (no difference)
+| datetime (tz) | timestamp | timestamptz(6) | https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html#ddl-timezones[Timezone and offset storage]
+| time | time | time(6) | Explicit default precision (no difference)
+|===
+
+==== https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html#logical-1-1-unique[Hibernate creates a UNIQUE constraint on the database for logical one-to-one associations marked as optional]
+
+==== https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/Hibernate_User_Guide.html#basic-String[@Lob is not used anymore for large strings]
+
+Now using `@Column(length=LONG32)` for text type. See:
+
+* https://docs.jboss.org/hibernate/stable/orm/javadocs/org/hibernate/Length.html#LONG32
+* https://www.postgresql.org/docs/current/datatype-character.html#DATATYPE-CHARACTER-TABLE
+* https://www.postgresql.org/docs/current/storage-toast.html
+
+=== Query Changes
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-pseudo-attr[Special properties on plural attributes have been replaced by function syntax]
+
+.Before
+[source,jpql]
+----
+SELECT p FROM Person p WHERE p.addresses.size > 2
+----
+
+.After
+[source,jpql]
+----
+SELECT p FROM Person p WHERE size(p.addresses) > 2
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-distinct[`DISTINCT` is always passed to the SQL query to filter out parent entity duplicates]
+
+.Before
+[source,jpql]
+----
+SELECT DISTINCT p FROM Person p JOIN FETCH p.addresses
+----
+
+.After
+[source,jpql]
+----
+SELECT p FROM Person p JOIN FETCH p.addresses
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-path-comparison[Comparing an entity directly to a literal is no longer allowed]
+
+.Before
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e = 123
+----
+
+.After
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.id = 123
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-sqm-update-from[The `FROM` token is disallowed in `UPDATE` statements]
+
+.Before
+[source,jpql]
+----
+UPDATE FROM MyEntity e SET e.attr = null
+----
+
+.After
+[source,jpql]
+----
+UPDATE MyEntity e SET e.attr = null
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html#hql-null-literal-comparison[`NULL` comparisons using `=` and `<>`/`!=` have been removed]
+
+.Before
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.attr = NULL
+----
+
+.After
+[source,jpql]
+----
+SELECT e from MyEntity e WHERE e.attr IS NULL
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-ordinal-param[Native query ordinal parameter binding is 1-based instead of 0-based]
+
+.Before
+[source,java]
+----
+s.createQuery("select p from Parent p where id in ?0", Parent.class);
+query.setParameter(0, Arrays.asList(0, 1, 2, 3));
+----
+
+.After
+[source,java]
+----
+s.createQuery("select p from Parent p where id in ?1", Parent.class);
+query.setParameter(1, Arrays.asList(0, 1, 2, 3));
+----
+
+==== https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html#query-stream[Query streams need to be explicitly closed]
+
+.Before
+[source,java]
+----
+Stream<MyEntity> stream = query.stream();
+// Use stream...
+// Stream automatically closed
+----
+
+.After
+[source,java]
+----
+try (Stream<MyEntity> stream = query.stream()) {
+    // Use stream...
+}
+// Stream automatically closed after try block
+----
+
+=== Other Notable Changes
+
+==== Hibernate 6 supports automatic coercion of single-value parameters
+
+[source,java]
+----
+// `credit` is a decimal field.
+var qlString = "SELECT self FROM Contact self WHERE self.credit = :credit";
+var credit = "2.5";
+var query = JPA.em().createQuery(qlString, Contact.class);
+// Hibernate 5 throws IllegalArgumentException.
+// Hibernate 6 can coerce single value.
+query.setParameter("credit", credit);
+// Hibernate 6 will return results.
+var result = query.getResultList();
+----
+
+==== Hibernate 6 changes behavior for multi-value parameter coercion
+
+[source,java]
+----
+// `credit` is a decimal field.
+var qlString = "SELECT self FROM Contact self WHERE self.credit IN :credits";
+var credits = new ArrayList<String>();
+credits.add(null);
+credits.add("");
+credits.add("2.5");
+var query = JPA.em().createQuery(qlString, Contact.class);
+// Hibernate 5 throws IllegalArgumentException.
+// Hibernate 6 cannot coerce multi value and does not throw IllegalArgumentException.
+query.setParameter("credits", credits);
+// Hibernate 6 throws NumberFormatException.
+var result = query.getResultList();
+----
+
+==== Hibernate 6 changes behavior when handling null values in collections for cached queries
+
+[source,java]
+----
+var qlString = "SELECT self FROM Contact self WHERE self.id IN :ids";
+var ids = new ArrayList<Long>();
+ids.add(null);
+ids.add(1L);
+ids.add(2L);
+var query = JPA.em().createQuery(qlString, Contact.class);
+query.setHint(AvailableHints.HINT_CACHEABLE, true);
+query.setParameter("ids", ids);
+// Hibernate 5 doesn't fail because of null in collection.
+// Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
+var result = query.getResultList();
+----
+
+=== Hibernate Migration Guides
+See all the Hibernate 6.x migration guides for detailed information about the migration process:
+
+* {url-hibernate-migration-6}[Hibernate 6.0 Migration Guide]
+* {url-hibernate-migration-6-1}[Hibernate 6.1 Migration Guide]
+* {url-hibernate-migration-6-2}[Hibernate 6.2 Migration Guide]
+* {url-hibernate-migration-6-3}[Hibernate 6.3 Migration Guide]
+* {url-hibernate-migration-6-4}[Hibernate 6.4 Migration Guide]
+* {url-hibernate-migration-6-5}[Hibernate 6.5 Migration Guide]
+* {url-hibernate-migration-6-6}[Hibernate 6.6 Migration Guide]
+
+== Guice 5.1 to Guice 7.0
+
+Guice 7.0 supports the Jakarta EE namespace and is part of the Jakarta EE migration. Compared to previous versions, it has completely dropped support for the `javax.*` namespace.
+
+See the https://github.com/google/guice/wiki/Guice700[Guice 7.0.0 release notes] for details.
+
+== RESTEasy 4.7 to RESTEasy 6.2
+
+RESTEasy 6.2 is compliant with Jakarta RESTful Web Services 3.1 and is part of the Jakarta EE migration.
+
+See the https://docs.resteasy.dev/6.2/userguide/[RESTEasy 6.2 user guide] for details.
+
+== Tomcat 9 to Tomcat 10.1
+
+Apache Tomcat 10.1 is compliant with Jakarta Servlet 6.0 and is part of the Jakarta EE migration. Apache Tomcat version 9 is no longer supported.
+
+See the {url-tomcat-10}[Apache Tomcat 10 migration guide] and {url-tomcat-10-1}[Apache Tomcat 10.1 migration guide] for details.
+
+== Java 11 to Java 21
+
+Java 21 (LTS) is now our minimal version to build and run applications.
+
+Install Java 21 and then increase the Java version number in the `build.gradle` file:
+
+.build.gradle
+[source,gradle]
+----
+allprojects {
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(21)
+    }
+  }
+
+}
+----
+
+Also make sure to use JDK 21 in the IDE as well as in your terminal (if needed).
+
+See the {url-jdk-upgrade}[JDK 21 migration guide] and {url-jdk-features}[JDK 21 release notes] for details.
