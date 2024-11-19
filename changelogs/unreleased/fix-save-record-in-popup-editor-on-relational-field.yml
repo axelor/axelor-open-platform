@@ -1,0 +1,9 @@
+---
+title: Fix save record in popup editor for m2o/o2o/m2m(selection)
+type: fix
+description: |
+  We can edit the record through popup editor, it will save record as following :
+  - m2o/o2o/m2m(selection) : It will only save record when form is dirty
+  - o2m/m2m(grid) : It will save record when any changes (also including non dirty dummy fields) in record
+
+
