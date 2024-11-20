@@ -287,3 +287,7 @@ UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%
 ----
 
 Once users update their passwords, the Argon2id hashing algorithm will automatically be applied.
+
+== Groovy 3 to Groovy 4
+
+Groovy 4 brings improvements in performance, Java compatibility, and language features. Beware of a few breaking changes mentioned in the https://groovy-lang.org/releasenotes/groovy-4.0.html[Groovy 4 release notes].

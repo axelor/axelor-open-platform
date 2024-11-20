@@ -29,6 +29,7 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.CurrencyRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -141,6 +142,39 @@ public class TestGroovy extends ScriptTest {
     GroovyScriptHelper helper = new GroovyScriptHelper(context());
     Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
 
+    assertTrue((Boolean) result);
+  }
+
+  @Test
+  void testIntersect() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("[-2, -3].intersect([1, 2], (a, b) -> a.abs() <=> b.abs())");
+
+    // Fixed in Groovy 4.0.0: https://issues.apache.org/jira/browse/GROOVY-10275
+    assertEquals(List.of(-2), result);
+  }
+
+  @Test
+  void testNegativeZero() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("def a = -0.0f, b = 0.0f; a != b");
+
+    // Fixed in Groovy 4.0.0: https://issues.apache.org/jira/browse/GROOVY-9797
+    assertTrue((Boolean) result);
+  }
+
+  @Test
+  void testReferentialTransparency() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result =
+        helper.eval(
+            """
+            def a = ['a', 'b'] as String[], b = ['c', 'd'] as String[]
+            def c = a + b
+            c instanceof String[]
+            """);
+
+    // Fixed in Groovy 4.0.0, 3.0.21: https://issues.apache.org/jira/browse/GROOVY-6837
     assertTrue((Boolean) result);
   }
 }

@@ -7,7 +7,7 @@ versions.guava = "33.3.1-jre"
 versions.hibernate = "6.6.2.Final"
 versions.hibernate_validator = "8.0.1.Final"
 
-versions.groovy = "3.0.24"
+versions.groovy = "4.0.24"
 versions.resteasy = "6.2.11.Final"
 versions.jackson = "2.18.3"
 versions.shiro = "2.0.2:jakarta"
@@ -146,13 +146,13 @@ libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:4.
 
 // groovy
 libs.groovy = [
-  "org.codehaus.groovy:groovy:${versions.groovy}",
-  "org.codehaus.groovy:groovy-jsr223:${versions.groovy}",
-  "org.codehaus.groovy:groovy-templates:${versions.groovy}",
-  "org.codehaus.groovy:groovy-datetime:${versions.groovy}",
-  "org.codehaus.groovy:groovy-nio:${versions.groovy}",
-  "org.codehaus.groovy:groovy-xml:${versions.groovy}",
-  "org.codehaus.groovy:groovy-json:${versions.groovy}"
+  "org.apache.groovy:groovy:${versions.groovy}",
+  "org.apache.groovy:groovy-jsr223:${versions.groovy}",
+  "org.apache.groovy:groovy-templates:${versions.groovy}",
+  "org.apache.groovy:groovy-datetime:${versions.groovy}",
+  "org.apache.groovy:groovy-nio:${versions.groovy}",
+  "org.apache.groovy:groovy-xml:${versions.groovy}",
+  "org.apache.groovy:groovy-json:${versions.groovy}"
 ]
 
 def resteasy_module = { name ->
