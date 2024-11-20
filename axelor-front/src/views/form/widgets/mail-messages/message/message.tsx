@@ -65,6 +65,9 @@ export function MessageUser({
 
   async function handleClick(e: MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
+    if (model !== "com.axelor.auth.db.User") {
+      return;
+    }
     const name = "user-info-form";
     try {
       const { view } = await findView({
