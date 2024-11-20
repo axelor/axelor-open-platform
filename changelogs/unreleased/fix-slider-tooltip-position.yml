@@ -1,0 +1,5 @@
+---
+title: Fix Slider tooltip position
+type: fix
+description: |
+  The position of the tooltip is now aligned with the slider thumb even after scrolling or zooming.

@@ -1,14 +1,7 @@
 import { useAtom } from "jotai";
-import {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Box, clsx, Portal } from "@axelor/ui";
+import { Box, clsx } from "@axelor/ui";
 
 import { Field } from "@/services/client/meta.types";
 import convert from "@/utils/convert";
@@ -17,6 +10,8 @@ import { useViewContext } from "@/view-containers/views/scope";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useScale } from "../decimal/hooks";
+
+import { SliderTooltip } from "./slider-tooltip";
 
 import styles from "./slider.module.scss";
 
@@ -37,7 +32,7 @@ export function Slider(props: FieldProps<string | number>) {
 
   const [value, setValue] = useAtom(valueAtom);
   const [isDragging, setIsDragging] = useState(false);
-  const [currentValue, setCurrentValue] = useState(value ?? min);
+  const [currentValue, setCurrentValue] = useState(0);
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
 
@@ -87,6 +82,24 @@ export function Slider(props: FieldProps<string | number>) {
     [currentValue, formatText],
   );
 
+  const updateTooltipPosition = useCallback(
+    (updatedValue: number) => {
+      if (!sliderRef.current) return;
+
+      const rect = sliderRef.current.getBoundingClientRect();
+      const sliderWidth = rect.width;
+
+      const clampedValue = Math.min(Math.max(updatedValue, min), max);
+      const thumbOffset = ((clampedValue - min) / (max - min)) * sliderWidth;
+
+      setTooltipPosition({
+        left: rect.left + thumbOffset,
+        top: rect.top - 45,
+      });
+    },
+    [max, min],
+  );
+
   const updateSliderValue = useCallback(
     (clientX: number) => {
       if (!sliderRef.current) return;
@@ -100,12 +113,9 @@ export function Slider(props: FieldProps<string | number>) {
       newValue = +(Math.round(newValue / step) * step);
 
       setCurrentValue(parse(newValue));
-      setTooltipPosition({
-        left: Math.min(Math.max(clientX, rect.left), rect.left + rect.width),
-        top: rect.top - 45,
-      });
+      updateTooltipPosition(newValue);
     },
-    [max, min, parse, step],
+    [max, min, parse, step, updateTooltipPosition],
   );
 
   const handleMouseMove = useCallback(
@@ -158,18 +168,8 @@ export function Slider(props: FieldProps<string | number>) {
   }, [handleMouseMove, handleMouseUp, isDragging, value]);
 
   useEffect(() => {
-    setCurrentValue(value);
-
-    if (!sliderRef.current || value === undefined || value === null) return;
-
-    const rect = sliderRef.current.getBoundingClientRect();
-    const clampedValue = Math.min(Math.max(Number(value), min), max);
-
-    setTooltipPosition({
-      left: rect.left + (clampedValue / max) * rect.width,
-      top: rect.top - 45,
-    });
-  }, [max, min, parse, value]);
+    setCurrentValue(isNaN(Number(value)) ? Number(min) : Number(value));
+  }, [min, value]);
 
   return (
     <FieldControl {...props} titleActions={<>{displayedValue}</>}>
@@ -198,7 +198,10 @@ export function Slider(props: FieldProps<string | number>) {
             borderColor="primary"
             borderWidth={2}
             style={{ left: thumbPosition }}
-            onMouseEnter={() => setShowTooltip(true)}
+            onMouseEnter={() => {
+              setShowTooltip(true);
+              updateTooltipPosition(currentValue);
+            }}
             onMouseLeave={() => setShowTooltip(false)}
           />
 
@@ -217,31 +220,5 @@ export function Slider(props: FieldProps<string | number>) {
         </Box>
       )}
     </FieldControl>
-  );
-}
-
-function SliderTooltip({
-  children,
-  position,
-  isVisible,
-}: PropsWithChildren<{
-  position: { left: number; top: number };
-  isVisible: boolean;
-}>) {
-  return (
-    <Portal container={document.body}>
-      <Box
-        className={styles.tooltip}
-        bgColor="primary"
-        color="white"
-        style={{
-          left: position.left,
-          top: position.top,
-          opacity: isVisible ? 1 : 0,
-        }}
-      >
-        {children}
-      </Box>
-    </Portal>
   );
 }
