@@ -137,9 +137,6 @@ importers:
       '@types/color':
         specifier: ^4.2.0
         version: 4.2.0
-      '@types/dompurify':
-        specifier: ^3.0.5
-        version: 3.0.5
       '@types/echarts':
         specifier: ^4.9.22
         version: 4.9.22
@@ -1686,9 +1683,6 @@ packages:
   '@types/color@4.2.0':
     resolution: {integrity: sha512-6+xrIRImMtGAL2X3qYkd02Mgs+gFGs+WsK0b7VVMaO4mYRISwyTjcqNrO0mNSmYEoq++rSLDB2F5HDNmqfOe+A==}
 
-  '@types/dompurify@3.0.5':
-    resolution: {integrity: sha512-1Wg0g3BtQF7sSb27fJQAKck1HECM6zV1EB66j8JH9i3LCjYabJa0FSdiSgsD5K/RbrsR0SiraKacLB+T8ZVYAg==}
-
   '@types/echarts@4.9.22':
     resolution: {integrity: sha512-7Fo6XdWpoi8jxkwP7BARUOM7riq8bMhmsCtSG8gzUcJmFhLo387tihoBYS/y5j7jl3PENT5RxeWZdN9RiwO7HQ==}
 
@@ -1754,9 +1748,6 @@ packages:
 
   '@types/swagger-ui-react@4.18.3':
     resolution: {integrity: sha512-Mo/R7IjDVwtiFPs84pWvh5pI9iyNGBjmfielxqbOh2Jv+8WVSDVe8Nu25kb5BOuV2xmGS3o33jr6nwDJMBcX+Q==}
-
-  '@types/trusted-types@2.0.7':
-    resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
   '@types/unist@2.0.10':
     resolution: {integrity: sha512-IfYcSBWE3hLpBg8+X2SEa8LVkJdJEkT2Ese2aaLs3ptGdVtABxndrMaxuFlQ1qdFf9Q5rDvDpxI3WwgvKFAsQA==}
@@ -6022,10 +6013,6 @@ snapshots:
     dependencies:
       '@types/color-convert': 2.0.4
 
-  '@types/dompurify@3.0.5':
-    dependencies:
-      '@types/trusted-types': 2.0.7
-
   '@types/echarts@4.9.22':
     dependencies:
       '@types/zrender': 4.0.6
@@ -6114,8 +6101,6 @@ snapshots:
   '@types/swagger-ui-react@4.18.3':
     dependencies:
       '@types/react': 18.3.3
-
-  '@types/trusted-types@2.0.7': {}
 
   '@types/unist@2.0.10': {}
 
