@@ -28,8 +28,7 @@ module.exports = {
         varsIgnorePattern: "^_",
       },
     ],
-    // removed in v8 : https://typescript-eslint.io/blog/announcing-typescript-eslint-v8#replacement-of-ban-types
-    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/no-restricted-types": "warn",
     // Disallow variable declarations from shadowing variables declared in the outer scope
     // https://typescript-eslint.io/rules/no-shadow/
     "no-shadow": "off",
