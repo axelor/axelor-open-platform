@@ -29,16 +29,13 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
-import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
-import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 
 /**
  * The {@link AuthService} class provides various utility services including password encryption,
@@ -50,14 +47,10 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 @Singleton
 public class AuthService {
 
-  private static final String HASH_ALGORITHM = "SHA-512";
-  private static final int HASH_ITERATIONS = 500000;
-
   private final DefaultPasswordService passwordService = new DefaultPasswordService();
 
-  private final DefaultHashService hashService = new DefaultHashService();
-
-  private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
+  private final ParsableHashFormat hashFormat =
+      (ParsableHashFormat) passwordService.getHashFormat();
 
   private static final String PASSWORD_PATTERN;
   private static final String PASSWORD_PATTERN_TITLE;
@@ -72,15 +65,6 @@ public class AuthService {
             AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE,
             AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE);
     passwordPattern = Pattern.compile(PASSWORD_PATTERN);
-  }
-
-  @Inject
-  public AuthService() {
-    this.hashService.setHashAlgorithmName(HASH_ALGORITHM);
-    this.hashService.setHashIterations(HASH_ITERATIONS);
-    this.hashService.setGeneratePublicSalt(true);
-    this.passwordService.setHashService(hashService);
-    this.passwordService.setHashFormat(hashFormat);
   }
 
   /**

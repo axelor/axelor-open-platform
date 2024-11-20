@@ -251,6 +251,19 @@ Apache Tomcat 10.1 is compliant with Jakarta Servlet 6.0 and is part of the Jaka
 
 See the {url-tomcat-10}[Apache Tomcat 10 migration guide] and {url-tomcat-10-1}[Apache Tomcat 10.1 migration guide] for details.
 
+== Shiro 1.13 to Shiro 2.0
+
+As part of the upgrade to Apache Shiro 2, we have transitioned from the SHA-512 password hashing algorithm to the new default, Argon2id. Argon2id is a state-of-the-art password hashing algorithm that offers enhanced protection against modern attack vectors.
+
+Users with SHA-512 hashes will continue to be able to log in. However, to ensure all user passwords are secured with Argon2id, you may want to enforce a password change for users with legacy hashes. The following SQL query marks affected users by setting the `force_password_change` flag:
+
+[source,sql]
+----
+UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
+----
+
+Once users update their passwords, the Argon2id hashing algorithm will automatically be applied.
+
 == Java 11 to Java 21
 
 Java 21 (LTS) is now our minimal version to build and run applications.

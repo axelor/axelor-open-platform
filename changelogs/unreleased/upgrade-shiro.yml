@@ -1,0 +1,14 @@
+---
+title: Upgrade Shiro from 1.13.0 to 2.0.2
+type: change
+description: |
+  Use Shiro 2 default hash algorithm: argon2id
+
+  To migrate passwords to the more secure algorithm, you can force users with old hashes
+  to change their passwords:
+
+  ```sql
+  UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
+  ```
+
+  When users set their new passwords, the new hash algorithm will be used.
