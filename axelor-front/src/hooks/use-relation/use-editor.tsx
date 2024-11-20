@@ -169,6 +169,7 @@ function Footer({
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
 
+  const hasToMany = Boolean(onSave); // o2m, m2m grid
   const handlerAtom = usePopupHandlerAtom();
   const handler = useAtomValue(handlerAtom);
 
@@ -197,7 +198,8 @@ function Footer({
 
           const dirtyAtom = handler.dirtyAtom;
           const dirty = (dirtyAtom && get(dirtyAtom)) || state.dirty;
-          const canSave = dirty || !record.id || hasRecordChanged();
+          const canSave =
+            dirty || !record.id || (hasToMany && hasRecordChanged());
 
           try {
             const errors = handler.getErrors?.();
@@ -225,7 +227,7 @@ function Footer({
             console.error(e);
           }
         },
-        [handler, onClose, onSave, onSelect],
+        [handler, hasToMany, onClose, onSave, onSelect],
       ),
     ),
   );
