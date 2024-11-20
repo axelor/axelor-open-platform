@@ -70,7 +70,7 @@ function trimMap(map: Map<string, boolean>, maxSize: number) {
   const it = map.keys();
   const half = maxSize / 2;
   while (map.size > half) {
-    map.delete(it.next().value);
+    map.delete(it.next().value!);
   }
 }
 
