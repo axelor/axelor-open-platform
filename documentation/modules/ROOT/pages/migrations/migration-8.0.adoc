@@ -2,6 +2,9 @@
 :toc:
 :toc-title:
 
+:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/21/migrate/index.html
+:url-jdk-features: https://www.oracle.com/java/technologies/javase/21-relnote-issues.html
+
 :url-jakarta-ee: https://jakarta.ee/specifications/platform/10/jakarta-platform-spec-10.0
 :eclipse-transformer: https://github.com/eclipse/transformer
 
@@ -16,12 +19,33 @@
 :url-tomcat-10: https://tomcat.apache.org/migration-10.html
 :url-tomcat-10-1: https://tomcat.apache.org/migration-10.1.html
 
-:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/21/migrate/index.html
-:url-jdk-features: https://www.oracle.com/java/technologies/javase/21-relnote-issues.html
-
 In this document, we will see the major steps to migrate from 7.x to 8.0.
 
 NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md[change log] for detailed list of fixes, changes and improvements introduced in 8.0
+
+== Java 11 to Java 21
+
+Java 21 (LTS) is now our minimal version to build and run applications.
+
+Install Java 21 and then increase the Java version number in the `build.gradle` file:
+
+.build.gradle
+[source,gradle]
+----
+allprojects {
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(21)
+    }
+  }
+
+}
+----
+
+Also make sure to use JDK 21 in the IDE as well as in your terminal (if needed).
+
+See the {url-jdk-upgrade}[JDK 21 migration guide] and {url-jdk-features}[JDK 21 release notes] for details.
 
 == Java EE to Jakarta EE
 
@@ -263,27 +287,3 @@ UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%
 ----
 
 Once users update their passwords, the Argon2id hashing algorithm will automatically be applied.
-
-== Java 11 to Java 21
-
-Java 21 (LTS) is now our minimal version to build and run applications.
-
-Install Java 21 and then increase the Java version number in the `build.gradle` file:
-
-.build.gradle
-[source,gradle]
-----
-allprojects {
-
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(21)
-    }
-  }
-
-}
-----
-
-Also make sure to use JDK 21 in the IDE as well as in your terminal (if needed).
-
-See the {url-jdk-upgrade}[JDK 21 migration guide] and {url-jdk-features}[JDK 21 release notes] for details.
