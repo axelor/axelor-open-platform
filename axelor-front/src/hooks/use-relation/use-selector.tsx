@@ -31,7 +31,11 @@ export type SelectorOptions = {
   limit?: number;
   onClose?: () => void;
   onCreate?: () => void | Promise<void>;
-  onGridSearch?: (records: DataRecord[], page: SearchPage, search?: Record<string, string>) => DataRecord[];
+  onGridSearch?: (
+    records: DataRecord[],
+    page: SearchPage,
+    search?: Record<string, string>,
+  ) => DataRecord[];
   onSelect?: (records: DataRecord[]) => void;
 };
 
@@ -55,36 +59,40 @@ export function useSelector() {
     } = options;
 
     async function getViewTitle() {
-      const { view } = await findView({
-        type: "grid",
-        name: viewName,
-        model,
-      });
+      const { view } =
+        (await findView({
+          type: "grid",
+          name: viewName,
+          model,
+        })) || {};
       return view?.title;
     }
 
     const tabTitle = title || (await getViewTitle()) || "";
 
-    const tab = await initTab({
-      name: uniqueId("$selector"),
-      title: tabTitle,
-      model,
-      viewType: "grid",
-      views: [{ type: "grid", name: viewName, ...gridView }],
-      params: {
-        limit,
-        orderBy,
-        "show-toolbar": false,
-        "_popup-edit-icon": false,
-        "_popup-multi-select": multiple,
-        ...viewParams,
-        popup: true,
+    const tab = await initTab(
+      {
+        name: uniqueId("$selector"),
+        title: tabTitle,
+        model,
+        viewType: "grid",
+        views: [{ type: "grid", name: viewName, ...gridView }],
+        params: {
+          limit,
+          orderBy,
+          "show-toolbar": false,
+          "_popup-edit-icon": false,
+          "_popup-multi-select": multiple,
+          ...viewParams,
+          popup: true,
+        },
+        domain,
+        context,
       },
-      domain,
-      context,
-    }, {
-      onGridSearch,
-    });
+      {
+        onGridSearch,
+      },
+    );
 
     if (!tab) return;
 

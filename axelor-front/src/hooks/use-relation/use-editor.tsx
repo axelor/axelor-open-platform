@@ -53,11 +53,12 @@ export function useEditorInTab(schema: Schema) {
   const handleEdit = useCallback(
     async (record: DataRecord, readonly = false) => {
       const model = target;
-      const { view } = await findView<FormView>({
-        type: "form",
-        name: formView,
-        model,
-      });
+      const { view } =
+        (await findView<FormView>({
+          type: "form",
+          name: formView,
+          model,
+        })) || {};
       return openTab({
         title: view?.title || "",
         name: uniqueId("$act"),

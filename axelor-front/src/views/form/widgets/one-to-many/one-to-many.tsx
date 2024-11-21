@@ -197,33 +197,36 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
   const { state, data } = useAsync(async () => {
     const { items, serverType } = schema;
     if ((items || []).length > 0) return;
-    const { view, ...res } = await findView<GridView>({
-      type: "grid",
-      name: gridView,
-      model,
-    });
+    const { view, ...res } =
+      (await findView<GridView>({
+        type: "grid",
+        name: gridView,
+        model,
+      })) || {};
     return {
       ...res,
-      view: view && {
-        serverType,
-        ...view,
-        ...[
-          "canMove",
-          "editable",
-          "selector",
-          "rowHeight",
-          "onNew",
-          "orderBy",
-          "groupBy",
-        ].reduce(
-          (obj, key) => ({
-            ...obj,
-            [key]: schema[key] ?? view[key as keyof GridView],
-          }),
-          {},
-        ),
-      },
-    };
+      view:
+        view &&
+        ({
+          serverType,
+          ...view,
+          ...[
+            "canMove",
+            "editable",
+            "selector",
+            "rowHeight",
+            "onNew",
+            "orderBy",
+            "groupBy",
+          ].reduce(
+            (obj, key) => ({
+              ...obj,
+              [key]: schema[key] ?? view[key as keyof GridView],
+            }),
+            {},
+          ),
+        } as Schema),
+    } as ViewData<GridView>;
   }, [schema, model]);
 
   if (state !== "hasData") return null;
@@ -237,8 +240,8 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
     return (
       <OneToManyInner
         {...props}
+        {...(data && { viewData: data })}
         schema={schema}
-        viewData={data}
         isRootTreeGrid={isRootTreeGrid}
       />
     );
@@ -1344,7 +1347,8 @@ function OneToManyInner({
       }
       openEditor(
         { record, readonly },
-        (updated) => handleSelect([{ ...record, ...updated }], { change: true }),
+        (updated) =>
+          handleSelect([{ ...record, ...updated }], { change: true }),
         (updated) => onSave({ ...record, ...updated }),
       );
     },
@@ -1423,13 +1427,15 @@ function OneToManyInner({
       name: detailFormName,
       model,
     });
-    return {
-      ...meta,
-      view: {
-        ...meta.view,
-        width: "*",
-      },
-    };
+    return (
+      meta && {
+        ...meta,
+        view: {
+          ...meta.view,
+          width: "*",
+        },
+      }
+    );
   }, [model, detailFormName]);
 
   useEffect(() => {

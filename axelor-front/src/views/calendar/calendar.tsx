@@ -238,8 +238,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
                 const value = deepGet(record, name);
                 return target && targetName
                   ? deepGet(value, targetName)
-                  : selectionList?.find((x) => x.value == value)?.title ??
-                      value;
+                  : (selectionList?.find((x) => x.value == value)?.title ??
+                      value);
               };
               const record = event.data!;
               const value = getValue(record);
@@ -364,8 +364,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
       const formView = (action.views?.find((view) => view.type === type) ||
         {}) as FormView;
       const { name, model = action.model ?? "" } = formView;
-      const { view } = await findView({ type, name, model });
-      const { title = "", name: viewName } = view;
+      const { view } = (await findView({ type, name, model })) || {};
+      const { title = "", name: viewName } = view || {};
 
       hidePopover();
       showEditor({

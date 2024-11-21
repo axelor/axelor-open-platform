@@ -70,11 +70,12 @@ export function MessageUser({
     }
     const name = "user-info-form";
     try {
-      const { view } = await findView({
-        type: "form",
-        name,
-        model,
-      });
+      const { view } =
+        (await findView({
+          type: "form",
+          name: "user-info-form",
+          model,
+        })) || {};
       if (view && id) {
         showEditor({
           title: view.title ?? i18n.get("User"),

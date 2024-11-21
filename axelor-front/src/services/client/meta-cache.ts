@@ -45,7 +45,7 @@ export async function findView<T extends ViewType>({
   model?: string;
   resource?: string;
   context?: DataContext;
-}): Promise<ViewData<T>> {
+}): Promise<ViewData<T> | null> {
   const key = makeKey("view", model, type, name ?? resource);
   return cache.get(key, async () => {
     if (type === "html") {
@@ -75,11 +75,13 @@ export async function findView<T extends ViewType>({
       // process the meta data
       processView(data, data.view);
       processWidgets(data.view);
-    } else {
-      cache.delete(key); // delete cache when view is null
+
+      return data;
     }
 
-    return data;
+    // delete cache when view is null
+    cache.delete(key);
+    return null;
   });
 }
 
