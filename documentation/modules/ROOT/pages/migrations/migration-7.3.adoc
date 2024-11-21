@@ -3,19 +3,28 @@
 :toc-title:
 
 :product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.3/CHANGELOG.md
+:gradle-8-0-8-7: https://docs.gradle.org/current/userguide/upgrading_version_8.html
 
 In this document, we will see the major steps to migrate from 7.2 to 7.3.
 
 NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements introduced in 7.3
 
-== Gradle upgrade
+== Dependencies upgrade
 
-The Gradle version has been upgraded from 8.7 to 8.11. This upgrade brings performance improvements and bug fixes.
+Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
+list.
 
-To migrate, run the wrapper update:
-[source,bash]
-----
-./gradlew wrapper --gradle-version 8.11
-----
+Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
+improvements : `./gradlew wrapper --gradle-version 8.11.1`.
+
+[NOTE]
+====
+Note that running the wrapper task once will update `gradle-wrapper.properties` only, but leave the wrapper itself in
+`gradle-wrapper.jar` untouched. This is usually fine as new versions of Gradle can be run even with ancient wrapper
+files. If you nevertheless want all the wrapper files to be completely up-to-date, you’ll need to run the `wrapper`
+task a second time.
+====
+
+Check Gradle migration to update your builds : {gradle-8-0-8-7}[Upgrading your build from Gradle 8.x to the latest]
 
 NOTE: The workaround previously suggested for Gradle issue "javaToolchains incorrectly reports 'does not contain a java executable' on Debian and Ubuntu" (xref:migrations/migration-7.1.adoc#dependencies-upgrade[described in 7.1 migration guide]) is no longer needed since Gradle 8.8. If you had implemented this workaround, you can safely remove it.
