@@ -105,6 +105,26 @@ public class GenerateChangelog extends DefaultTask {
     this.header = header;
   }
 
+  @Input private boolean allowNoEntry;
+
+  public boolean isAllowNoEntry() {
+    return allowNoEntry;
+  }
+
+  public void setAllowNoEntry(boolean allowNoEntry) {
+    this.allowNoEntry = allowNoEntry;
+  }
+
+  @Input private String defaultContent;
+
+  public String getDefaultContent() {
+    return defaultContent;
+  }
+
+  public void setDefaultContent(String defaultContent) {
+    this.defaultContent = defaultContent;
+  }
+
   private boolean preview;
 
   @Option(option = "preview", description = "Don’t actually write/delete anything, just print")
@@ -120,7 +140,7 @@ public class GenerateChangelog extends DefaultTask {
 
     List<ChangelogEntry> entries = getChangelogEntries();
 
-    if (ObjectUtils.isEmpty(entries)) {
+    if (ObjectUtils.isEmpty(entries) && !isAllowNoEntry()) {
       getLogger().lifecycle("No unreleased changelog entries to process");
       return;
     }
@@ -152,7 +172,7 @@ public class GenerateChangelog extends DefaultTask {
 
   private String generate(List<ChangelogEntry> entries) {
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(entries, version, header, types);
+    Release release = processor.process(entries, version, header, types, defaultContent);
 
     ReleaseGenerator generator = new ReleaseGenerator();
     return generator.generate(release);

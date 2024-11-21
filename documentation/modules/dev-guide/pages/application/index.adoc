@@ -211,7 +211,12 @@ To use the plugin, in your `build.gradle`:
 [source,gradle]
 ----
 apply plugin: com.axelor.gradle.support.ChangelogSupport
+----
 
+Plugin can be configured with the following properties set in the `changelog` extension:
+
+[source,gradle]
+----
 changelog {
   version = "${project.version}"
   output.set(file("CHANGELOG.md"))
@@ -220,8 +225,6 @@ changelog {
   header.set("${version.get()} (${new Date().format("yyyy-MM-dd")})")
 }
 ----
-
-Plugin can be configured with the following properties set in the `changelog` extension:
 
 [cols="2,6,2"]
 |===
@@ -232,6 +235,8 @@ Plugin can be configured with the following properties set in the `changelog` ex
 | `inputPath` | Path of the unreleased entries |  changelogs/unreleased/
 | `types` | List of types | ["Feature", "Change", "Deprecate", "Remove", "Fix", "Security"]
 | `header` | Header value when generating changelog for the current version | "${version.get()} (${new Date().format("yyyy-MM-dd")})"
+| `allowNoEntry` | Whether to allow generating changelog without entries | false
+| `defaultContent` | The content of the generated changelog if there is no entries (for example, `No notable changes`) |
 |===
 
 To generate the `CHANGELOG.md` with unreleased entries, run the following Gradle task:

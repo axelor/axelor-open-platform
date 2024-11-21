@@ -37,6 +37,14 @@ public class ReleaseGenerator {
 
     appendHeader(releaseContent, release);
     appendEntries(releaseContent, release);
+    if (ObjectUtils.isEmpty(release.getEntries())) {
+      if (ObjectUtils.notEmpty(release.getDefaultContent())) {
+        if (!endWithEmptyLine(releaseContent.toString())) {
+          releaseContent.append(NEW_LINE);
+        }
+        releaseContent.append(release.getDefaultContent()).append(NEW_LINE);
+      }
+    }
 
     return releaseContent.toString();
   }

@@ -21,7 +21,6 @@ package com.axelor.tools.changelog;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.common.ResourceUtils;
-import com.google.common.collect.Lists;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -32,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,15 +41,12 @@ public class ChangelogTest {
 
   @Test
   public void generateChangelogTest() throws URISyntaxException, IOException {
-    List<String> types =
-        Lists.newArrayList("Feature", "Change", "Deprecate", "Remove", "Fix", "Security");
     String version = "1.0.0";
-    String header =
-        String.format(
-            "%s (%s)", version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+    String header = getHeader(version);
 
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(getEntries(), version, header, types);
+    Release release =
+        processor.process(getEntries(), version, header, ChangelogEntryConstants.TYPES, null);
 
     File outputFile =
         Paths.get(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
@@ -76,5 +73,25 @@ public class ChangelogTest {
               })
           .collect(Collectors.toList());
     }
+  }
+
+  String getHeader(String version) {
+    return String.format(
+        "%s (%s)", version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+  }
+
+  @Test
+  public void generateEmptyReleaseTest() {
+    String version = "1.0.0";
+    String defaultContent = "No Changes";
+    String header = getHeader(version);
+
+    ReleaseProcessor processor = new ReleaseProcessor();
+    Release release =
+        processor.process(Collections.emptyList(), version, header, null, defaultContent);
+
+    assertEquals(
+        "## 1.0.0 (2020-01-10)\n\n" + defaultContent + "\n",
+        new ReleaseGenerator().generate(release));
   }
 }

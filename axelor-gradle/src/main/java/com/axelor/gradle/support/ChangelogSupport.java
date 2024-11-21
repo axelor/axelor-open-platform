@@ -55,6 +55,8 @@ public class ChangelogSupport extends AbstractSupport {
                 task.setInputPath(changelogExtension.getInputPath().get().getAsFile());
                 task.setTypes(changelogExtension.getTypes().get());
                 task.setHeader(changelogExtension.getHeader().get());
+                task.setAllowNoEntry(changelogExtension.getAllowNoEntry().get());
+                task.setDefaultContent(changelogExtension.getDefaultContent().get());
               });
         });
   }

@@ -18,7 +18,7 @@
  */
 package com.axelor.gradle;
 
-import com.google.common.collect.Lists;
+import com.axelor.tools.changelog.ChangelogEntryConstants;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.gradle.api.Project;
@@ -30,25 +30,21 @@ import org.gradle.api.provider.Property;
 public class ChangelogExtension {
 
   public static final String EXTENSION_NAME = "changelog";
-  private static final String DEFAULT_CHANGELOG_FILE = "CHANGELOG.md";
-  private static final String DEFAULT_INPUT_PATH = "changelogs/unreleased";
 
   private Property<String> version;
   private DirectoryProperty inputPath;
-
   private RegularFileProperty output;
-
   private ListProperty<String> types;
-
   private Property<String> header;
+  private Property<Boolean> allowNoEntry;
+  private Property<String> defaultContent;
 
   public ChangelogExtension(Project project) {
     this.version = project.getObjects().property(String.class);
     this.version.convention(project.provider(() -> project.getVersion().toString()));
 
     this.types = project.getObjects().listProperty(String.class);
-    this.types.convention(
-        Lists.newArrayList("Feature", "Change", "Deprecate", "Remove", "Fix", "Security"));
+    this.types.convention(ChangelogEntryConstants.TYPES);
 
     this.header = project.getObjects().property(String.class);
     this.header.convention(
@@ -64,14 +60,25 @@ public class ChangelogExtension {
         project
             .getObjects()
             .fileProperty()
-            .convention(project.getLayout().getProjectDirectory().file(DEFAULT_CHANGELOG_FILE)));
+            .convention(
+                project
+                    .getLayout()
+                    .getProjectDirectory()
+                    .file(ChangelogEntryConstants.CHANGELOG_FILE)));
 
     this.inputPath = project.getObjects().directoryProperty();
     this.inputPath.convention(
         project
             .getObjects()
             .directoryProperty()
-            .convention(project.getLayout().getProjectDirectory().dir(DEFAULT_INPUT_PATH)));
+            .convention(
+                project.getLayout().getProjectDirectory().dir(ChangelogEntryConstants.INPUT_PATH)));
+
+    this.allowNoEntry = project.getObjects().property(Boolean.class);
+    this.allowNoEntry.convention(ChangelogEntryConstants.ALLOW_NO_ENTRY);
+
+    this.defaultContent = project.getObjects().property(String.class);
+    this.defaultContent.convention(ChangelogEntryConstants.DEFAULT_CONTENT);
   }
 
   public Property<String> getVersion() {
@@ -112,5 +119,21 @@ public class ChangelogExtension {
 
   public void setHeader(Property<String> header) {
     this.header = header;
+  }
+
+  public void setAllowNoEntry(Property<Boolean> allowNoEntry) {
+    this.allowNoEntry = allowNoEntry;
+  }
+
+  public Property<Boolean> getAllowNoEntry() {
+    return allowNoEntry;
+  }
+
+  public Property<String> getDefaultContent() {
+    return defaultContent;
+  }
+
+  public void setDefaultContent(Property<String> defaultContent) {
+    this.defaultContent = defaultContent;
   }
 }

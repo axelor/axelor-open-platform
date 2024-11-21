@@ -32,7 +32,8 @@ public class ReleaseProcessor {
       Collection<ChangelogEntry> changelogEntries,
       String version,
       String header,
-      List<String> types) {
+      List<String> types,
+      String defaultContent) {
 
     Objects.requireNonNull(version);
     Objects.requireNonNull(header);
@@ -44,6 +45,7 @@ public class ReleaseProcessor {
     Release release = new Release();
     release.setVersion(version);
     release.setHeader(header);
+    release.setDefaultContent(defaultContent);
 
     LinkedHashMap<String, List<ChangelogEntry>> entriesGroupedByType =
         changelogEntries.stream()

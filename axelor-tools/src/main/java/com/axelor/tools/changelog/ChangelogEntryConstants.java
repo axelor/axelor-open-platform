@@ -19,44 +19,17 @@
 package com.axelor.tools.changelog;
 
 import java.util.List;
-import java.util.Map;
 
-public class Release {
+public final class ChangelogEntryConstants {
 
-  private String version;
-  private String header;
-  private String defaultContent;
-  private Map<String, List<ChangelogEntry>> entries;
+  private ChangelogEntryConstants() {}
 
-  public String getVersion() {
-    return version;
-  }
+  public static final String CHANGELOG_FILE = "CHANGELOG.md";
+  public static final String INPUT_PATH = "changelogs/unreleased";
 
-  public void setVersion(String version) {
-    this.version = version;
-  }
+  public static final List<String> TYPES =
+      List.of("Feature", "Change", "Deprecate", "Remove", "Fix", "Security");
 
-  public String getHeader() {
-    return header;
-  }
-
-  public void setHeader(String header) {
-    this.header = header;
-  }
-
-  public Map<String, List<ChangelogEntry>> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(Map<String, List<ChangelogEntry>> entries) {
-    this.entries = entries;
-  }
-
-  public void setDefaultContent(String defaultContent) {
-    this.defaultContent = defaultContent;
-  }
-
-  public String getDefaultContent() {
-    return defaultContent;
-  }
+  public static final boolean ALLOW_NO_ENTRY = false;
+  public static final String DEFAULT_CONTENT = "";
 }

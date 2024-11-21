@@ -1,0 +1,8 @@
+---
+title: Allow to generate empty changelog release
+type: fix
+description: |
+  If no changelog entries are found, there is no changelog release generated. This 
+  is the default behavior. New properties `allowNoEntry` and `defaultContent` can 
+  be used to determine if it is allowed to generate changelog without entries and 
+  to specify the changelog release content (for example, `No notable changes`).
