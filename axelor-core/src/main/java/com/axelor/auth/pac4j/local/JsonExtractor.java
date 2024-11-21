@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.util.Pac4jConstants;
@@ -36,10 +36,8 @@ public class JsonExtractor extends FormExtractor {
   }
 
   @Override
-  public Optional<Credentials> extract(WebContext context, SessionStore sessionStore) {
-    return AuthPac4jInfo.isXHR(context)
-        ? extractJson(context)
-        : super.extract(context, sessionStore);
+  public Optional<Credentials> extract(CallContext ctx) {
+    return AuthPac4jInfo.isXHR(ctx) ? extractJson(ctx.webContext()) : super.extract(ctx);
   }
 
   private Optional<Credentials> extractJson(WebContext context) {

@@ -21,9 +21,8 @@ package com.axelor.auth.pac4j.local;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.inject.Beans;
 import java.util.Optional;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.HttpConstants;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
@@ -38,25 +37,26 @@ public class AxelorIndirectBasicAuthClient extends IndirectBasicAuthClient {
   protected void internalInit(boolean forceReinit) {
     if (credentialsHandler == null || forceReinit) {
       credentialsHandler = Beans.get(CredentialsHandler.class);
-      defaultAuthenticator(Beans.get(AuthPac4jInfo.class).getAuthenticator());
+      setAuthenticatorIfUndefined(Beans.get(AuthPac4jInfo.class).getAuthenticator());
     }
     super.internalInit(forceReinit);
   }
 
   @Override
-  protected Optional<Credentials> retrieveCredentials(
-      WebContext context, SessionStore sessionStore) {
+  public Optional<Credentials> getCredentials(CallContext ctx) {
+    final var context = ctx.webContext();
+
     if (context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER).isEmpty()) {
       return Optional.empty();
     }
 
-    final Optional<Credentials> credentials = super.retrieveCredentials(context, sessionStore);
+    final Optional<Credentials> credentials = super.getCredentials(ctx);
 
     if (credentials.isEmpty()) {
       Optional<Credentials> credentialsOpt = Optional.empty();
       CredentialsException error;
       try {
-        credentialsOpt = getCredentialsExtractor().extract(context, sessionStore);
+        credentialsOpt = getCredentialsExtractor().extract(ctx);
         error = new BadCredentialsException(AxelorAuthenticator.INCORRECT_CREDENTIALS);
       } catch (CredentialsException e) {
         error = e;

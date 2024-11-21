@@ -139,7 +139,7 @@ public class LdapTest {
 
   void loginFailed() {
     try {
-      authLdap.validate(new UsernamePasswordCredentials("jsmith", "Password"), null, null);
+      authLdap.validate(null, new UsernamePasswordCredentials("jsmith", "Password"));
     } catch (CredentialsException e) {
       // ignore
     }
@@ -151,7 +151,7 @@ public class LdapTest {
     LdapProfile p = authLdap.findById("jsmith");
     assertNotNull(p);
 
-    authLdap.validate(new UsernamePasswordCredentials("jsmith", "password"), null, null);
+    authLdap.validate(null, new UsernamePasswordCredentials("jsmith", "password"));
     LdapProfile profile = authLdap.findById("jsmith");
     userService.saveUser(profile);
 

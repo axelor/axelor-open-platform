@@ -29,8 +29,7 @@ import org.pac4j.jee.filter.SecurityFilter;
 public class AxelorSecurityFilter extends SecurityFilter {
 
   @Inject
-  public AxelorSecurityFilter(Config config, AxelorSecurityLogic securityLogic) {
-    setSecurityLogic(securityLogic);
+  public AxelorSecurityFilter(Config config) {
     setConfig(config);
     setClients(
         config.getClients().getClients().stream()

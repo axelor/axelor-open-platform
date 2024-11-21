@@ -28,6 +28,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectRepository;
+import io.buji.pac4j.realm.Pac4jRealm;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -153,7 +154,12 @@ public class AuthPac4jProfileService {
   }
 
   public Set<Permission> getPermissions(CommonProfile profile) {
-    return profile.getPermissions().stream()
+    Collection<?> permissions =
+        Optional.ofNullable(profile.getAttribute(Pac4jRealm.SHIRO_PERMISSIONS, Collection.class))
+            .orElse(Collections.emptySet());
+
+    return permissions.stream()
+        .map(String::valueOf)
         .map(permissionRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));

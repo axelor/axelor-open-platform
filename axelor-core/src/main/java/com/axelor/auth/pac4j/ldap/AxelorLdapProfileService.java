@@ -62,8 +62,7 @@ import org.ldaptive.ssl.CredentialConfig;
 import org.ldaptive.ssl.KeyStoreCredentialConfig;
 import org.ldaptive.ssl.SslConfig;
 import org.ldaptive.ssl.X509CredentialConfig;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
@@ -284,7 +283,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
   }
 
   @Override
-  public void validate(Credentials credentials, WebContext context, SessionStore sessionStore) {
+  public Optional<Credentials> validate(CallContext ctx, Credentials credentials) {
     if (Optional.ofNullable(credentials)
         .filter(UsernamePasswordCredentials.class::isInstance)
         .map(UsernamePasswordCredentials.class::cast)
@@ -293,7 +292,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
         .isEmpty()) {
       throw new BadCredentialsException("Username cannot be blank.");
     }
-    super.validate(credentials, context, sessionStore);
+    return super.validate(ctx, credentials);
   }
 
   public String getGroupsDn() {

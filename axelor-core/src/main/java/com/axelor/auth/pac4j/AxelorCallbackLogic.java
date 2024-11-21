@@ -27,8 +27,9 @@ import java.lang.invoke.MethodHandles;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
+import org.pac4j.core.context.FrameworkParameters;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultCallbackLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.OkAction;
@@ -36,7 +37,7 @@ import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.core.util.Pac4jConstants;
-import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.JEEFrameworkParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,35 +60,28 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
     this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
     this.pac4jInfo = pac4jInfo;
-    setProfileManagerFactory(AxelorProfileManager::new);
     setClientFinder(clientFinder);
   }
 
   @Override
   public Object perform(
-      WebContext webContext,
-      SessionStore sessionStore,
       Config config,
-      HttpActionAdapter httpActionAdapter,
       String inputDefaultUrl,
       Boolean inputRenewSession,
-      String defaultClient) {
+      String defaultClient,
+      FrameworkParameters parameters) {
+
+    final var jeeParameters = (JEEFrameworkParameters) parameters;
 
     try {
-      final JEEContext context = (JEEContext) webContext;
-      context.getNativeRequest().setCharacterEncoding("UTF-8");
+      jeeParameters.getRequest().setCharacterEncoding("UTF-8");
     } catch (UnsupportedEncodingException e) {
-      return handleException(e, httpActionAdapter, webContext);
+      final var context = config.getWebContextFactory().newContext(parameters);
+      return handleException(e, config.getHttpActionAdapter(), context);
     }
 
     return super.perform(
-        webContext,
-        sessionStore,
-        config,
-        httpActionAdapter,
-        pac4jInfo.getBaseUrl(),
-        inputRenewSession,
-        defaultClient);
+        config, pac4jInfo.getBaseUrl(), inputRenewSession, defaultClient, parameters);
   }
 
   /**
@@ -96,8 +90,10 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
    * @see com.axelor.auth.pac4j.AxelorCallbackClientFinder
    */
   @Override
-  protected void renewSession(
-      final WebContext context, final SessionStore sessionStore, final Config config) {
+  protected void renewSession(CallContext ctx, Config config) {
+    final var context = ctx.webContext();
+    final var sessionStore = ctx.sessionStore();
+
     final var optOldSessionId = sessionStore.getSessionId(context, true);
     if (optOldSessionId.isEmpty()) {
       logger.error(
@@ -122,7 +118,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
               // Don't fail because of any unavailable clients.
               if (baseClient.isInitialized()) {
                 try {
-                  baseClient.notifySessionRenewal(oldSessionId, context, sessionStore);
+                  baseClient.notifySessionRenewal(ctx, oldSessionId);
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
                 }
@@ -137,16 +133,17 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
   }
 
   @Override
-  protected HttpAction redirectToOriginallyRequestedUrl(
-      WebContext context, SessionStore sessionStore, final String defaultUrl) {
-
+  protected HttpAction redirectToOriginallyRequestedUrl(CallContext ctx, String defaultUrl) {
     // Add CSRF token cookie and header
-    csrfMatcher.addResponseCookieAndHeader(context, sessionStore);
+    csrfMatcher.addResponseCookieAndHeader(ctx);
 
     // If XHR, return status code only
-    if (AuthPac4jInfo.isXHR(context)) {
+    if (AuthPac4jInfo.isXHR(ctx)) {
       return new OkAction("{}");
     }
+
+    final var context = ctx.webContext();
+    final var sessionStore = ctx.sessionStore();
 
     final String requestedUrl =
         sessionStore

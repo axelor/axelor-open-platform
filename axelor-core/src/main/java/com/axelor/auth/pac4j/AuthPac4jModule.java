@@ -18,6 +18,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.pac4j.config.BaseConfig;
 import com.axelor.auth.pac4j.ldap.AxelorLdapProfileService;
 import com.axelor.auth.pac4j.local.AxelorAjaxRequestResolver;
 import com.axelor.auth.pac4j.local.AxelorDirectBasicAuthClient;
@@ -95,7 +96,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(ClientListService.class).to(clientListService).asEagerSingleton();
 
     bindAndExpose(Clients.class).toProvider(ClientsProvider.class);
-    bindAndExpose(Config.class).toProvider(ConfigProvider.class);
+    bindAndExpose(Config.class).to(BaseConfig.class);
 
     bindAndExpose(FormClient.class).to(AxelorFormClient.class);
     bindAndExpose(FormExtractor.class).to(JsonExtractor.class);

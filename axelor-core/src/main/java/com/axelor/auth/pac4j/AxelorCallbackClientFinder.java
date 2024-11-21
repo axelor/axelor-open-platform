@@ -22,13 +22,13 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.util.CommonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
     logger.debug("result: {}", result.stream().map(Client::getName).collect(Collectors.toList()));
 
     // fallback: no client found and we have a default client, use it
-    if (result.isEmpty() && CommonHelper.isNotBlank(clientNames)) {
+    if (result.isEmpty() && StringUtils.isNotBlank(clientNames)) {
       clients
           .findClient(clientNames)
           .filter(this::isInitialized)
@@ -86,8 +86,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
   }
 
   private boolean isInitialized(Client client) {
-    if (client instanceof BaseClient) {
-      final BaseClient baseClient = ((BaseClient) client);
+    if (client instanceof BaseClient baseClient) {
       return baseClient.getCredentialsExtractor() != null && baseClient.getAuthenticator() != null;
     }
     return true;

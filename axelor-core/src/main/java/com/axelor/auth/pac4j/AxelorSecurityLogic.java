@@ -21,14 +21,12 @@ package com.axelor.auth.pac4j;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
@@ -46,39 +44,35 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   @Inject
-  public AxelorSecurityLogic(
-      ErrorHandler errorHandler, Config config, ClientListService clientListService) {
+  public AxelorSecurityLogic(ErrorHandler errorHandler, ClientListService clientListService) {
     this.errorHandler = errorHandler;
-    setProfileManagerFactory(AxelorProfileManager::new);
+    defaultClientName = clientListService.getDefaultClientName();
 
-    final List<Authorizer> authorizers =
-        config.getAuthorizers().values().stream().collect(Collectors.toUnmodifiableList());
     setAuthorizationChecker(
         (context, sessionStore, profiles, authorizerNames, authorizersMap, clients) ->
-            authorizers.stream()
+            authorizersMap.values().stream()
                 .allMatch(authorizer -> authorizer.isAuthorized(context, sessionStore, profiles)));
 
-    final List<Matcher> matchers =
-        config.getMatchers().values().stream().collect(Collectors.toUnmodifiableList());
     setMatchingChecker(
-        (context, sessionStore, matcherNames, matchersMap, clients) ->
-            matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
-    defaultClientName = clientListService.getDefaultClientName();
+        (CallContext ctx,
+            String matchersValue,
+            Map<String, Matcher> matchersMap,
+            List<Client> clients) ->
+            matchersMap.values().stream().allMatch(matcher -> matcher.matches(ctx)));
   }
 
   @Override
   protected HttpAction redirectToIdentityProvider(
-      WebContext context, SessionStore sessionStore, List<Client> currentClients) {
-
+      final CallContext ctx, final List<Client> currentClients) {
+    final var context = ctx.webContext();
     final var currentClient = (IndirectClient) findClient(context, currentClients);
 
     if (currentClient.getRedirectionActionBuilder() == null) {
       currentClient.init(true);
     }
 
-    final Optional<RedirectionAction> action =
-        currentClient.getRedirectionAction(context, sessionStore);
-    return action.isPresent() ? action.get() : unauthorized(context, sessionStore, currentClients);
+    final Optional<RedirectionAction> action = currentClient.getRedirectionAction(ctx);
+    return action.isPresent() ? action.get() : unauthorized(ctx, currentClients);
   }
 
   @Override

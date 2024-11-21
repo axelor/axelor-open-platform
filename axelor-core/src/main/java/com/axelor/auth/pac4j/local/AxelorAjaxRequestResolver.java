@@ -21,8 +21,7 @@ package com.axelor.auth.pac4j.local;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import jakarta.inject.Singleton;
 import java.util.Optional;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.UnauthorizedAction;
 import org.pac4j.core.exception.http.WithLocationAction;
@@ -33,30 +32,26 @@ import org.pac4j.core.redirect.RedirectionActionBuilder;
 public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
 
   @Override
-  public boolean isAjax(WebContext context, SessionStore sessionStore) {
-    return super.isAjax(context, sessionStore) || AuthPac4jInfo.isXHR(context);
+  public boolean isAjax(CallContext ctx) {
+    return super.isAjax(ctx) || AuthPac4jInfo.isXHR(ctx);
   }
 
   @Override
   public HttpAction buildAjaxResponse(
-      WebContext context,
-      SessionStore sessionStore,
-      RedirectionActionBuilder redirectionActionBuilder) {
-    if (isAjax(context, sessionStore)
-        && getUrl(context, sessionStore, redirectionActionBuilder)
+      CallContext ctx, RedirectionActionBuilder redirectionActionBuilder) {
+    if (isAjax(ctx)
+        && getUrl(ctx, redirectionActionBuilder)
             .filter(url -> url.endsWith(AxelorFormClient.LOGIN_URL))
             .isPresent()) {
       return new UnauthorizedAction();
     }
-    return super.buildAjaxResponse(context, sessionStore, redirectionActionBuilder);
+    return super.buildAjaxResponse(ctx, redirectionActionBuilder);
   }
 
   protected Optional<String> getUrl(
-      WebContext context,
-      SessionStore sessionStore,
-      RedirectionActionBuilder redirectionActionBuilder) {
+      CallContext ctx, RedirectionActionBuilder redirectionActionBuilder) {
     return redirectionActionBuilder
-        .getRedirectionAction(context, sessionStore)
+        .getRedirectionAction(ctx)
         .filter(WithLocationAction.class::isInstance)
         .map(action -> ((WithLocationAction) action).getLocation());
   }

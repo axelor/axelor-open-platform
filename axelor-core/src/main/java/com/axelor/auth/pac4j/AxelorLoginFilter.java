@@ -25,18 +25,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.pac4j.core.client.Clients;
-import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.core.profile.UserProfile;
-import org.pac4j.core.profile.factory.ProfileManagerFactory;
-import org.pac4j.jee.context.JEEContext;
-import org.pac4j.jee.context.session.JEESessionStore;
 import org.pac4j.jee.filter.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,15 +36,14 @@ import org.slf4j.LoggerFactory;
 public class AxelorLoginFilter implements Filter {
 
   private final SecurityFilter securityFilter;
-  private final ProfileManagerFactory profileManagerFactory;
+  private final AuthPac4jInfo info;
 
   private static final Logger logger = LoggerFactory.getLogger(AxelorLoginFilter.class);
 
   @Inject
-  public AxelorLoginFilter(
-      AxelorSecurityFilter securityFilter, AxelorSecurityLogic securityLogic, Clients clients) {
+  public AxelorLoginFilter(AxelorSecurityFilter securityFilter, AuthPac4jInfo info) {
     this.securityFilter = securityFilter;
-    this.profileManagerFactory = securityLogic.getProfileManagerFactory();
+    this.info = info;
   }
 
   @Override
@@ -66,7 +57,7 @@ public class AxelorLoginFilter implements Filter {
         logger.warn("Authenticated, but no user: {}", subject.getPrincipal());
         subject.logout();
         authenticated = false;
-      } else if (getUserProfile(request, response).isEmpty()) {
+      } else if (info.getUserProfile(request, response).isEmpty()) {
         logger.warn("Authenticated, but no user profile: {}", subject.getPrincipal());
         subject.logout();
         authenticated = false;
@@ -81,13 +72,5 @@ public class AxelorLoginFilter implements Filter {
 
     // When not authenticated, this triggers login process.
     securityFilter.doFilter(request, response, chain);
-  }
-
-  private Optional<UserProfile> getUserProfile(ServletRequest request, ServletResponse response) {
-    final JEEContext context =
-        new JEEContext((HttpServletRequest) request, (HttpServletResponse) response);
-    final ProfileManager profileManager =
-        profileManagerFactory.apply(context, new JEESessionStore());
-    return profileManager.getProfile();
   }
 }

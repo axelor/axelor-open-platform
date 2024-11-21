@@ -11,9 +11,9 @@ versions.groovy = "4.0.24"
 versions.resteasy = "6.2.11.Final"
 versions.jackson = "2.18.3"
 versions.shiro = "2.0.2:jakarta"
-versions.buji_pac4j = "8.1.1"
-versions.jakartaee_pac4j = "7.1.0"
-versions.pac4j = "5.7.7"
+versions.buji_pac4j = "9.0.2"
+versions.jakartaee_pac4j = "8.0.1"
+versions.pac4j = "6.1.0"
 versions.ldaptive = "2.3.2"
 
 versions.junit4 = "4.13.2"
@@ -231,6 +231,7 @@ libs.apache_shiro = [
 libs.buji_pac4j = [
   dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
       exclude group: 'org.apache.shiro', module: 'shiro-web'
+      exclude group: 'org.pac4j', module: 'pac4j-javaee'
   },
   "org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}",
   dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {

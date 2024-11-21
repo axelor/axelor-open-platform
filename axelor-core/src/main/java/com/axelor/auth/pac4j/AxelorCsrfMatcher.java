@@ -21,6 +21,7 @@ package com.axelor.auth.pac4j;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
@@ -48,15 +49,17 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   }
 
   @Override
-  public boolean matches(WebContext context, SessionStore sessionStore) {
+  public boolean matches(CallContext ctx) {
     // No CSRF cookie/header for native clients
-    if (!AuthPac4jInfo.isNativeClient(context)) {
-      addResponseCookieAndHeader(context, sessionStore);
+    if (!AuthPac4jInfo.isNativeClient(ctx.webContext())) {
+      addResponseCookieAndHeader(ctx);
     }
     return true;
   }
 
-  protected void addResponseCookieAndHeader(WebContext context, SessionStore sessionStore) {
+  protected void addResponseCookieAndHeader(CallContext ctx) {
+    final WebContext context = ctx.webContext();
+    final SessionStore sessionStore = ctx.sessionStore();
     final String token = getCsrfTokenGenerator().get(context, sessionStore);
     final JEEContext jeeContext = ((JEEContext) context);
     final HttpServletRequest request = jeeContext.getNativeRequest();

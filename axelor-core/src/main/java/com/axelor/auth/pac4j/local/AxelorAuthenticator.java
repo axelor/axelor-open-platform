@@ -24,8 +24,8 @@ import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import java.util.Objects;
-import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import java.util.Optional;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
@@ -50,8 +50,7 @@ public class AxelorAuthenticator implements Authenticator {
       "New password does not match pattern." /*)*/;
 
   @Override
-  public void validate(
-      Credentials inputCredentials, WebContext context, SessionStore sessionStore) {
+  public Optional<Credentials> validate(CallContext ctx, Credentials inputCredentials) {
     if (inputCredentials == null) {
       throw new BadCredentialsException(NO_CREDENTIALS);
     }
@@ -124,5 +123,7 @@ public class AxelorAuthenticator implements Authenticator {
     profile.setId(username);
     profile.addAttribute(Pac4jConstants.USERNAME, username);
     credentials.setUserProfile(profile);
+
+    return Optional.of(credentials);
   }
 }

@@ -1,0 +1,4 @@
+name: Upgrade pac4j from 5.7.x to 6.1.0
+type: change
+description: |
+  Upgraded pac4j from 5.7.x to 6.1.0, buji-pac4j from 8.1.x to 9.0.2, and jakartaee-pac4j from 7.1.x to 8.0.1.

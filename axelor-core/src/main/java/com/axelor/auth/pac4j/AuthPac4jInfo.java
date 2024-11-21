@@ -25,10 +25,18 @@ import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
 import jakarta.inject.Singleton;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.authenticator.Authenticator;
+import org.pac4j.core.profile.UserProfile;
 import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.JEEFrameworkParameters;
 
 @Singleton
 public class AuthPac4jInfo {
@@ -81,8 +89,28 @@ public class AuthPac4jInfo {
     return authenticator;
   }
 
+  public Optional<UserProfile> getUserProfile(ServletRequest request, ServletResponse response) {
+    final var config = Beans.get(Config.class);
+    final var webContextFactory = config.getWebContextFactory();
+    final var sessionStoreFactory = config.getSessionStoreFactory();
+    final var profileManagerFactory = config.getProfileManagerFactory();
+
+    final var parameters =
+        new JEEFrameworkParameters((HttpServletRequest) request, (HttpServletResponse) response);
+
+    final var context = webContextFactory.newContext(parameters);
+    final var sessionStore = sessionStoreFactory.newSessionStore(parameters);
+    final var profileManager = profileManagerFactory.apply(context, sessionStore);
+
+    return profileManager.getProfile();
+  }
+
+  public static boolean isXHR(CallContext ctx) {
+    return isXHR(ctx.webContext());
+  }
+
   public static boolean isXHR(WebContext context) {
-    return context instanceof JEEContext && isXHR(((JEEContext) context).getNativeRequest());
+    return context instanceof JEEContext jeeContext && isXHR(jeeContext.getNativeRequest());
   }
 
   public static boolean isXHR(HttpServletRequest request) {

@@ -96,7 +96,11 @@ public abstract class ClientListService implements Provider<List<Client>> {
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 
     if (!indirectClientNames.isEmpty()) {
-      logger.info("Indirect clients: {}", indirectClientNames);
+      logger
+          .atInfo()
+          .setMessage("Indirect clients: {}")
+          .addArgument(() -> indirectClientNames.stream().collect(Collectors.joining(", ")))
+          .log();
     }
 
     directClientNames =
@@ -107,7 +111,11 @@ public abstract class ClientListService implements Provider<List<Client>> {
                     .collect(Collectors.toCollection(LinkedHashSet::new)));
 
     if (!directClientNames.isEmpty()) {
-      logger.info("Direct clients: {}", directClientNames);
+      logger
+          .atInfo()
+          .setMessage("Direct clients: {}")
+          .addArgument(() -> directClientNames.stream().collect(Collectors.joining(", ")))
+          .log();
     }
 
     // LDAP

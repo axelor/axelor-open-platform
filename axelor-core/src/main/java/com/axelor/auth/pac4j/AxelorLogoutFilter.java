@@ -21,6 +21,7 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.pac4j.config.LogoutConfig;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.FilterChain;
@@ -32,15 +33,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
 import org.apache.shiro.subject.Subject;
-import org.pac4j.core.config.Config;
 import org.pac4j.jee.filter.LogoutFilter;
 
 @Singleton
 public class AxelorLogoutFilter extends LogoutFilter {
 
   @Inject
-  public AxelorLogoutFilter(
-      Config config, AxelorLogoutLogic logoutLogic, AxelorLogoutFilterConfig filterConfig)
+  public AxelorLogoutFilter(LogoutConfig config, AxelorLogoutFilterConfig filterConfig)
       throws ServletException {
 
     final AppSettings settings = AppSettings.get();
@@ -49,7 +48,6 @@ public class AxelorLogoutFilter extends LogoutFilter {
 
     setConfig(config);
     setLogoutUrlPattern(logoutUrlPattern);
-    setLogoutLogic(logoutLogic);
 
     init(filterConfig);
   }
