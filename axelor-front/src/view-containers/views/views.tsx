@@ -125,9 +125,18 @@ function ViewContainer({
           flex={1}
           style={{ minWidth: 0, minHeight: 0 }}
         >
-          <ScopeProvider scope={MetaScope} value={meta}>
-            <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
-          </ScopeProvider>
+          {meta ? (
+            <ScopeProvider scope={MetaScope} value={meta}>
+              <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
+            </ScopeProvider>
+          ) : (
+            (() => {
+              if (!meta) {
+                throw new Error(`View ${view.name || view.type} doesn't exist`);
+              }
+              return null;
+            })()
+          )}
         </Box>
       </Fade>
     );
