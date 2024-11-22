@@ -77,7 +77,7 @@ export function SwitchSelect(
     >
       <Box
         d={direction === "vertical" ? "inline-block" : "flex"}
-        overflow={direction === "vertical" ? "auto" : "scroll"}
+        overflow={direction === "vertical" ? "visible" : "scroll"}
         position="relative"
       >
         {borderStyles && (
