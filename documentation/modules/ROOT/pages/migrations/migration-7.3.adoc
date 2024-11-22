@@ -28,3 +28,18 @@ task a second time.
 Check Gradle migration to update your builds : {gradle-8-0-8-7}[Upgrading your build from Gradle 8.x to the latest]
 
 NOTE: The workaround previously suggested for Gradle issue "javaToolchains incorrectly reports 'does not contain a java executable' on Debian and Ubuntu" (xref:migrations/migration-7.1.adoc#dependencies-upgrade[described in 7.1 migration guide]) is no longer needed since Gradle 8.8. If you had implemented this workaround, you can safely remove it.
+
+== Help widget variant support
+
+The help variant is extracted from the `css` attributes values. Now, help widget has a new attribute `variant` that
+can be used, `css` attribute usage to determinate the variant is deprecated. Accepted values are `info`, `success`,
+`warning` and `error`. Default value is `info`.
+
+[cols="2"]
+|===
+| Old `css` attribute values | `variant` equivalent
+| `alert-info` | `info`
+| `alert-success` | `success`
+| `alert-warning` | `warning`
+| `alert-danger` | `danger`
+|===

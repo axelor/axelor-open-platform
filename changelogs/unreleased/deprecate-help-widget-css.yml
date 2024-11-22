@@ -1,0 +1,7 @@
+---
+title: Introduce help widget `variant` attribute
+type: deprecate
+description: |
+  The help variant is extracted from the `css` attributes values. Now, help widget has a new attribute `variant` that
+  can be used, `css` attribute usage to determinate the variant is deprecated. Accepted values are `info`, `success`,
+  `warning` and `error`. Default value is `info`.

@@ -421,14 +421,25 @@ This widget is used to show static help information in form view.
 
 [source,xml]
 ----
-<help>
+<help variant="info">
 <![CDATA[
+<>
 Some help text goes here....
+</>
 ]]>
 </help>
 ----
 
 image::widgets/help.png[]
+image::widgets/help-2.png[]
+image::widgets/help-3.png[]
+image::widgets/help-4.png[]
+
+The following attribute is supported:
+
+* `variant`: Style variant. Supported values are `info`, `success`, `warning` and `danger`. Default to `info`.
+
+WARNING: "variant" is replacing "css" attribute, making it deprecated since 7.3.
 
 == Static
 

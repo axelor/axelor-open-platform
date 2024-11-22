@@ -19,8 +19,20 @@
 package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("help")
-public class Help extends Static {}
+public class Help extends Static {
+
+  @XmlAttribute private String variant;
+
+  public String getVariant() {
+    return variant;
+  }
+
+  public void setVariant(String variant) {
+    this.variant = variant;
+  }
+}

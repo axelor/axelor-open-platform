@@ -517,6 +517,19 @@
             <xsd:documentation>Custom css class to apply.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="variant">
+          <xsd:annotation>
+            <xsd:documentation>Variant to use. Accepted values are: `info`, `success`, `warning` and `danger`. Default to `info`.</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="info"></xsd:enumeration>
+              <xsd:enumeration value="success"></xsd:enumeration>
+              <xsd:enumeration value="warning"></xsd:enumeration>
+              <xsd:enumeration value="danger"></xsd:enumeration>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="height">
           <xsd:annotation>
             <xsd:documentation>
