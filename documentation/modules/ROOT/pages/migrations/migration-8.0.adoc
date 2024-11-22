@@ -277,16 +277,17 @@ See the {url-tomcat-10}[Apache Tomcat 10 migration guide] and {url-tomcat-10-1}[
 
 == Shiro 1.13 to Shiro 2.0
 
-As part of the upgrade to Apache Shiro 2, we have transitioned from the SHA-512 password hashing algorithm to the new default, Argon2id. Argon2id is a state-of-the-art password hashing algorithm that offers enhanced protection against modern attack vectors.
+As part of the upgrade to Apache Shiro 2, we have transitioned from the SHA-512 hashing algorithm to the new default, Argon2id. Argon2id is a state-of-the-art password hashing algorithm that offers enhanced protection against modern attack vectors.
 
-Users with SHA-512 hashes will continue to be able to log in. However, to ensure all user passwords are secured with Argon2id, you may want to enforce a password change for users with legacy hashes. The following SQL query marks affected users by setting the `force_password_change` flag:
+Argon2id hashing will be used for new users and for existing users when they change their password. Users with SHA-512 hashes will continue to be able to log in. However, to ensure all user passwords are secured with Argon2id, you may want to enforce a password change for users with legacy hashes:
 
 [source,sql]
 ----
 UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%';
 ----
 
-Once users update their passwords, the Argon2id hashing algorithm will automatically be applied.
+This will prompt affected users to change their password upon their next login.
+Argon2id hashing will automatically be applied to their new password.
 
 == Groovy 3 to Groovy 4
 
