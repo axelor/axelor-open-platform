@@ -40,6 +40,11 @@
 .quickMenus {
   max-height: 380px;
   overflow: scroll;
+  width: 250px;
+
+  > * > button {
+    white-space: wrap;
+  }
 }
 
 .searchFiltersInput {
