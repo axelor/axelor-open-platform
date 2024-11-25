@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, Button, DndProvider } from "@axelor/ui";
+import { Box, DndProvider } from "@axelor/ui";
 import {
   ConnectProps,
   GANTT_TYPES,
@@ -378,15 +378,48 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   // register tab:refresh
   useViewTabRefresh("gantt", onSearch);
 
-  const FILTERS: { key: GanttType; title: string }[] = useMemo(
-    () => [
-      { key: GANTT_TYPES.YEAR, title: i18n.get("Year") },
-      { key: GANTT_TYPES.MONTH, title: i18n.get("Month") },
-      { key: GANTT_TYPES.WEEK, title: i18n.get("Week") },
-      { key: GANTT_TYPES.DAY, title: i18n.get("Day") },
-    ],
-    [],
-  );
+  const actions = useMemo(() => {
+    return [
+      {
+        key: GANTT_TYPES.YEAR,
+        text: i18n.get("Year"),
+        iconOnly: false,
+        checked: type === GANTT_TYPES.YEAR,
+        onClick: () => setType(GANTT_TYPES.YEAR),
+      },
+      {
+        key: GANTT_TYPES.MONTH,
+        text: i18n.get("Month"),
+        iconOnly: false,
+        checked: type === GANTT_TYPES.MONTH,
+        onClick: () => setType(GANTT_TYPES.MONTH),
+      },
+      {
+        key: GANTT_TYPES.WEEK,
+        text: i18n.get("Week"),
+        iconOnly: false,
+        checked: type === GANTT_TYPES.WEEK,
+        onClick: () => setType(GANTT_TYPES.WEEK),
+      },
+      {
+        key: GANTT_TYPES.DAY,
+        text: i18n.get("Day"),
+        iconOnly: false,
+        checked: type === GANTT_TYPES.DAY,
+        onClick: () => setType(GANTT_TYPES.DAY),
+      },
+      {
+        key: "d1",
+        divider: true,
+      },
+      {
+        key: "refresh",
+        text: i18n.get("Refresh"),
+        iconOnly: false,
+        onClick: () => onSearch(),
+      },
+    ];
+  }, [onSearch, type]);
 
   const config = useMemo(
     () => ({
@@ -402,7 +435,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     <Box d="flex" className={styles.container} flex={1} flexDirection="column">
       <ViewToolBar
         meta={meta}
-        actions={[]}
+        actions={actions}
         pagination={{
           canPrev,
           canNext,
@@ -410,26 +443,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           onNext: () => onSearch({ offset: offset + limit }),
           text: () => <PageText dataStore={dataStore} />,
         }}
-      >
-        <Box d="flex" gap={4}>
-          {FILTERS.map((filter) => {
-            const active = type === filter.key;
-            return (
-              <Button
-                key={filter.key}
-                variant="secondary"
-                outline={!active}
-                onClick={() => setType(filter.key)}
-              >
-                {filter.title}
-              </Button>
-            );
-          })}
-          <Button variant="secondary" outline ms={2} onClick={() => onSearch()}>
-            {i18n.get("Refresh")}
-          </Button>
-        </Box>
-      </ViewToolBar>
+      />
       <Box d="flex" flex={1} overflow="auto" px={1}>
         <DndProvider>
           <GanttComponent
