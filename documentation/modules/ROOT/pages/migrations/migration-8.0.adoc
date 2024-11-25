@@ -289,6 +289,13 @@ UPDATE auth_user SET force_password_change = TRUE WHERE password LIKE '$shiro1$%
 This will prompt affected users to change their password upon their next login.
 Argon2id hashing will automatically be applied to their new password.
 
+== S3 compatible Object Storage
+
+We now support S3 compatible object storage service to store upload files.
+
+Default implementation use disk storage using the existing `data.upload.dir` property. Object
+storage can be activated using `data.object-storage.*` properties.
+
 == Groovy 3 to Groovy 4
 
 Groovy 4 brings improvements in performance, Java compatibility, and language features. Beware of a few breaking changes mentioned in the https://groovy-lang.org/releasenotes/groovy-4.0.html[Groovy 4 release notes].
