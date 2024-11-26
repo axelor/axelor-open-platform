@@ -15,6 +15,6 @@
     border-radius: 0;
   }
   > div {
-    --ax-panel-border: 0;
+    border: none !important;
   }
 }
