@@ -79,7 +79,15 @@ export type PopupProps = {
   maximize?: boolean;
 };
 
-export const PopupDialog = memo(function PopupDialog({
+export const PopupDialog = memo(function PopupDialog(props: PopupProps) {
+  return (
+    <ScopeProvider scope={PopupScope} value={{}}>
+      <PopupDialogInner {...props} />
+    </ScopeProvider>
+  );
+});
+
+const PopupDialogInner = memo(function PopupDialog({
   tab,
   open,
   maximize,
@@ -98,42 +106,40 @@ export const PopupDialog = memo(function PopupDialog({
   useEffect(() => handlePopper(), []);
 
   return (
-    <ScopeProvider scope={PopupScope} value={{}}>
-      <ModalDialog
-        open={open}
-        title={title || tab.title}
-        size="xl"
-        closeable={false}
-        classes={{
-          root: clsx({
-            [styles.collapsed]: !expanded,
-          }),
-          footer: styles.footer,
-          content: styles.content,
-        }}
-        content={
-          <>
-            <Views tab={tab} />
-            {handler?.()}
-          </>
-        }
-        header={({ close }) => (
-          <Header
-            header={header}
-            maximized={maximized}
-            expanded={expanded}
-            params={tab.action?.params}
-            close={close}
-            setMaximized={setMaximized}
-            setExpanded={setExpanded}
-          />
-        )}
-        footer={footer}
-        buttons={buttons}
-        onClose={onClose}
-        maximize={maximized}
-      />
-    </ScopeProvider>
+    <ModalDialog
+      open={open}
+      title={title || tab.title}
+      size="xl"
+      closeable={false}
+      classes={{
+        root: clsx({
+          [styles.collapsed]: !expanded,
+        }),
+        footer: styles.footer,
+        content: styles.content,
+      }}
+      content={
+        <>
+          <Views tab={tab} />
+          {handler?.()}
+        </>
+      }
+      header={({ close }) => (
+        <Header
+          header={header}
+          maximized={maximized}
+          expanded={expanded}
+          params={tab.action?.params}
+          close={close}
+          setMaximized={setMaximized}
+          setExpanded={setExpanded}
+        />
+      )}
+      footer={footer}
+      buttons={buttons}
+      onClose={onClose}
+      maximize={maximized}
+    />
   );
 });
 
