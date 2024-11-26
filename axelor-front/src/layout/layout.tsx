@@ -47,11 +47,7 @@ export function Layout() {
   const tabsPortal = isMobile || !tabbable ? null : tabContainer;
 
   return (
-    <div
-      className={clsx(styles.container, {
-        [styles.hasSidebar]: show === "inline" || show === "icons",
-      })}
-    >
+    <div className={clsx(styles.container)}>
       <div className={styles.header}>
         {xs && (
           <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>

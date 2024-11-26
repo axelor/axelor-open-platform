@@ -9,10 +9,6 @@
   background-color: var(--ax-theme-shell-bg);
 }
 
-.container.hasSidebar {
-  column-gap: 0.5rem;
-}
-
 .content {
   grid-area: content;
   display: flex;
