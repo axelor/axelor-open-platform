@@ -188,7 +188,7 @@ function Header({
   return (
     <Box d="flex" g={2}>
       {HeaderComp && <HeaderComp close={close} />}
-      <Box d="flex" alignItems="center">
+      <Box d="flex" g={2} alignItems="center">
         <MaterialIcon
           icon={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
           className={styles.icon}
