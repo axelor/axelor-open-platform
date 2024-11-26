@@ -1960,6 +1960,7 @@ function OneToManyInner({
         }
         toolbar={{
           iconOnly: true,
+          className: styles.bar,
           items: [
             {
               key: "select",

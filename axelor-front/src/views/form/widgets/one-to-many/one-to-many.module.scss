@@ -107,6 +107,10 @@ $treeNodePadding: 1.175rem;
   flex: 1;
 }
 
+.bar {
+  --ax-command-bar-button-padding: 0.25rem;
+}
+
 :export {
   treeNodePadding: $treeNodePadding;
 }
