@@ -44,8 +44,6 @@ import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -150,11 +148,6 @@ public class S3Store implements Store {
   }
 
   @Override
-  public UploadedFile addFile(File file, String fileName) {
-    return addFile(file.toPath(), fileName);
-  }
-
-  @Override
   public UploadedFile addFile(Path path, String fileName) {
     if (hasFile(fileName)) {
       deleteFile(fileName);
@@ -212,19 +205,14 @@ public class S3Store implements Store {
   }
 
   @Override
-  public File getFile(String fileName) {
-    return getFile(fileName, false);
-  }
-
-  @Override
-  public File getFile(String fileName, boolean cache) {
-    File cacheFile = S3Cache.CACHE_ENABLED ? _s3Cache.get(fileName) : null;
-    if (cacheFile != null) {
+  public Path getPath(String fileName, boolean cache) {
+    Path cachePath = S3Cache.CACHE_ENABLED ? _s3Cache.get(fileName) : null;
+    if (cachePath != null) {
       // if in cache, return it
       try {
         Path tempFile = TempFiles.createTempFile();
-        FileUtils.copyFile(cacheFile, tempFile.toFile());
-        return tempFile.toFile();
+        FileUtils.copyPath(cachePath, tempFile);
+        return tempFile;
       } catch (IOException e) {
         throw new UncheckedIOException(e);
       }
@@ -239,15 +227,10 @@ public class S3Store implements Store {
         // put in the cache
         _s3Cache.put(tempFile.toFile(), fileName);
       }
-      return tempFile.toFile();
+      return tempFile;
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
-  }
-
-  @Override
-  public InputStream getStream(String fileName) {
-    return getStream(fileName, false);
   }
 
   @Override
@@ -255,11 +238,11 @@ public class S3Store implements Store {
     if (S3Cache.CACHE_ENABLED) {
       try {
         // if in cache, return it
-        File cacheFile = _s3Cache.get(fileName);
-        if (cacheFile != null) {
-          return new FileInputStream(cacheFile);
+        Path cachePath = _s3Cache.get(fileName);
+        if (cachePath != null) {
+          return Files.newInputStream(cachePath);
         }
-      } catch (Exception e) {
+      } catch (IOException e) {
         throw new RuntimeException(e);
       }
     }

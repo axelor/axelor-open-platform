@@ -34,17 +34,31 @@ public interface Store {
 
   UploadedFile addFile(InputStream inputStream, String fileName);
 
-  UploadedFile addFile(File file, String fileName);
-
   UploadedFile addFile(Path path, String fileName);
+
+  default UploadedFile addFile(File file, String fileName) {
+    return addFile(file.toPath(), fileName);
+  }
 
   void deleteFile(String fileName);
 
-  File getFile(String fileName);
+  default Path getPath(String fileName) {
+    return getPath(fileName, false);
+  }
 
-  File getFile(String fileName, boolean cache);
+  Path getPath(String fileName, boolean cache);
 
-  InputStream getStream(String fileName);
+  default File getFile(String fileName) {
+    return getPath(fileName).toFile();
+  }
+
+  default File getFile(String fileName, boolean cache) {
+    return getPath(fileName, cache).toFile();
+  }
+
+  default InputStream getStream(String fileName) {
+    return getStream(fileName, false);
+  }
 
   InputStream getStream(String fileName, boolean cache);
 

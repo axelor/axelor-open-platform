@@ -93,7 +93,7 @@ public class S3Cache {
     return instance;
   }
 
-  public File get(String fileName) {
+  public Path get(String fileName) {
     clean();
 
     this.lock.readLock().lock();
@@ -104,8 +104,8 @@ public class S3Cache {
         return null;
       }
 
-      File cacheFile = resolveCachePath(fileName).toFile();
-      if (!cacheFile.exists() || isExpired(item.lastAccess)) {
+      Path cacheFile = resolveCachePath(fileName);
+      if (!Files.exists(cacheFile) || isExpired(item.lastAccess)) {
         // if the file doesn't exist or is expired, remove it
         deleteFileAndEntry(item);
         return null;

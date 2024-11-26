@@ -28,9 +28,6 @@ import com.axelor.file.store.Store;
 import com.axelor.file.store.StoreType;
 import com.axelor.file.store.UploadedFile;
 import com.axelor.file.temp.TempFiles;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -100,11 +97,6 @@ public class FileSystemStore implements Store {
   }
 
   @Override
-  public UploadedFile addFile(File file, String fileName) {
-    return addFile(file.toPath(), fileName);
-  }
-
-  @Override
   public UploadedFile addFile(Path path, String fileName) {
     Path targetFile = resolveFilePath(fileName);
     try {
@@ -134,31 +126,21 @@ public class FileSystemStore implements Store {
   }
 
   @Override
-  public File getFile(String fileName) {
-    File file = resolveFilePath(fileName).toFile();
-    if (file.exists()) {
-      return file;
+  public Path getPath(String fileName, boolean cache) {
+    Path path = resolveFilePath(fileName);
+    if (Files.exists(path)) {
+      return path;
     }
     throw new RuntimeException("The file doesn't exist: " + fileName);
   }
 
   @Override
-  public File getFile(String fileName, boolean cache) {
-    return getFile(fileName);
-  }
-
-  @Override
-  public InputStream getStream(String fileName) {
+  public InputStream getStream(String fileName, boolean cache) {
     try {
-      return new FileInputStream(resolveFilePath(fileName).toFile());
-    } catch (FileNotFoundException e) {
+      return Files.newInputStream(resolveFilePath(fileName));
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public InputStream getStream(String fileName, boolean cache) {
-    return getStream(fileName);
   }
 
   @Override

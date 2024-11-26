@@ -104,7 +104,7 @@ public class MetaFiles {
   public static Path getPath(MetaFile file) {
     Preconditions.checkNotNull(file, "file instance can't be null");
     Store store = FileStoreFactory.getStore();
-    return store.getFile(file.getFilePath()).toPath();
+    return store.getPath(file.getFilePath());
   }
 
   /**
@@ -116,7 +116,7 @@ public class MetaFiles {
   public static Path getPath(String filePath) {
     Preconditions.checkNotNull(filePath, "file path can't be null");
     Store store = FileStoreFactory.getStore();
-    return store.getFile(filePath).toPath();
+    return store.getPath(filePath);
   }
 
   /**

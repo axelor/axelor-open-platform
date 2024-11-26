@@ -27,7 +27,6 @@ import com.google.common.base.Preconditions;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
@@ -37,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumSet;
@@ -347,6 +347,14 @@ public final class FileUtils {
     write(destination, new FileInputStream(source));
   }
 
+  public static void copyPath(Path source, Path destination) throws IOException {
+    if (!Files.exists(source)) {
+      return;
+    }
+
+    write(destination, Files.newInputStream(source));
+  }
+
   private static final int BUFFER_SIZE = 4096;
 
   /**
@@ -394,17 +402,16 @@ public final class FileUtils {
   public static void write(Path path, InputStream inputStream, boolean append) throws IOException {
     Files.createDirectories(path.getParent());
 
-    final BufferedOutputStream bos =
-        new BufferedOutputStream(new FileOutputStream(path.toFile(), append));
-    try {
+    try (BufferedOutputStream bos =
+        new BufferedOutputStream(
+            Files.newOutputStream(
+                path, append ? StandardOpenOption.APPEND : StandardOpenOption.CREATE))) {
       int read = 0;
       byte[] bytes = new byte[BUFFER_SIZE];
       while ((read = inputStream.read(bytes)) != -1) {
         bos.write(bytes, 0, read);
       }
       bos.flush();
-    } finally {
-      bos.close();
     }
   }
 
