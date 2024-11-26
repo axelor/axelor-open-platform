@@ -122,8 +122,8 @@ public class MetaFiles {
   /**
    * Check whether the given filePath is valid.
    *
-   * <p>The filePath is valid if it is matches upload file whitelist pattern and doesn't match
-   * upload blacklist pattern.
+   * <p>The filePath is valid if it matches upload file whitelist pattern and doesn't match upload
+   * blacklist pattern.
    *
    * @param filePath the file path to check
    * @throws IllegalArgumentException if the file path to check is not valid

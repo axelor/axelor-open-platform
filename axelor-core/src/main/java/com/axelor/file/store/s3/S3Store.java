@@ -229,7 +229,7 @@ public class S3Store implements Store {
       }
     }
 
-    // fetch stream from s3
+    // fetch stream from S3
     try (InputStream inputStream = _fetchStream(fileName)) {
       // create tmp file from stream
       Path tempFile = TempFiles.createTempFile();
@@ -263,7 +263,7 @@ public class S3Store implements Store {
       }
     }
 
-    // fetch stream from s3
+    // fetch stream from S3
     InputStream inputStream = _fetchStream(fileName);
 
     if (S3Cache.CACHE_ENABLED && cache) {

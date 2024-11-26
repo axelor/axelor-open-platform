@@ -4,19 +4,19 @@
 
 == Upload files
 
-Used to store upload files.
+Used to store uploaded files.
 
 === File System
 
-The filesystem object store is the easiest to get started. This is also the default
-implementation to store upload files.
+The file system object store is the easiest to get started with. This is also the default
+implementation to store uploaded files.
 
 It uses a file system (local or a mounted share) to store files. It can be configured using
-the following property :
+the following property:
 
 [source,properties]
 ----
-# Storage path for upload files
+# Storage path for uploaded files
 data.upload.dir = {user.home}/.axelor/attachments
 ----
 
@@ -24,7 +24,7 @@ data.upload.dir = {user.home}/.axelor/attachments
 
 Simple storage service (S3) is a cloud-based storage solution that can be used to store files.
 
-It can be configured using the following properties :
+It can be configured using the following properties:
 
 [source,properties]
 ----
@@ -56,19 +56,19 @@ data.object-storage.cache.clean-frequency =
 | secure | Set to true to use secure connection (`https`) | true
 | access-key | Access key (aka user ID) of an account in the S3 service |
 | secret-key | Secret key (aka password) of an account in the S3 service |
-| bucket | The bucket name; Should follow following https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html[rules] |
+| bucket | The bucket name; should follow these https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html[rules] |
 | region | S3 region |
-| encryption | Encryption mode : `SSE-S3` or `SSE-KMS` |
+| encryption | Encryption mode: `SSE-S3` or `SSE-KMS` |
 | encryption-kms-key-id | KMS key ID. Only needed when `SSE-KMS` in `encryption` |
-| cache.enabled | Enable or disable s3 cache  | true
+| cache.enabled | Enable or disable S3 cache  | true
 | cache.max-entries | Maximum number of entries in cache, -1 means unlimited  | 2000
 | cache.time-to-live | Time-to-live of a cache entry, in seconds, -1 means unlimited | 600
-| cache.clean-frequency | Number of hits from which the cache is cleaned, -1 means no disabled  | 1000
+| cache.clean-frequency | Number of hits from which the cache is cleaned, -1 means disabled  | 1000
 |===
 
 == Temp files
 
-To deal with temporary files, following property can be configured as a dedicated directory :
+To deal with temporary files, the following property can be configured as a dedicated directory:
 
 [source,properties]
 ----
@@ -76,7 +76,7 @@ To deal with temporary files, following property can be configured as a dedicate
 data.upload.temp-dir = {user.home}/.axelor-temp
 ----
 
-Then use `com.axelor.file.temp.TempFile` to deal with temporary files and directories :
+Then use `com.axelor.file.temp.TempFile` to deal with temporary files and directories:
 
 [source,java]
 ----
@@ -87,5 +87,5 @@ Path tempFile = TempFiles.createTempFile();
 Path tempFile = TempFiles.createTempDir();
 ----
 
-Files will be created under `tmp_files` directory.
+Files will be created under the `tmp_files` directory.
 

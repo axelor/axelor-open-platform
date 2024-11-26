@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A caching when working with s3 as file storage using LRU (Least Recently Used) strategy : the
+ * A caching when working with S3 as file storage using LRU (Least Recently Used) strategy: the
  * element that hasn't been used for the longest time will be evicted from the cache
  */
 public class S3Cache {
@@ -78,7 +78,7 @@ public class S3Cache {
         FileUtils.deleteDirectory(cacheDir);
       }
     } catch (Exception e) {
-      LOG.error("Unable to delete s3 cache directory {} : {}", getCacheDir(), e.getMessage());
+      LOG.error("Unable to delete S3 cache directory {} : {}", getCacheDir(), e.getMessage());
     }
   }
 
@@ -144,7 +144,7 @@ public class S3Cache {
         // check if exceed max entries
         if (MAX_ENTRIES > -1 && cacheEntryMap.size() >= MAX_ENTRIES) {
           LOG.debug(
-              "Maximum number of entries of s3 cache has been reached : {}. Cleaning.",
+              "Maximum number of entries of S3 cache has been reached : {}. Cleaning.",
               MAX_ENTRIES);
           deleteFileAndEntry(head);
         }
@@ -213,10 +213,10 @@ public class S3Cache {
 
       numberOfHit.set(0);
       try {
-        LOG.trace("Cleaning s3 cache directory...");
+        LOG.trace("Cleaning S3 cache directory...");
         clean(getCacheDir(), System.currentTimeMillis());
       } catch (IOException e) {
-        LOG.error("Error when cleaning s3 cache directory " + getCacheDir(), e);
+        LOG.error("Error when cleaning S3 cache directory " + getCacheDir(), e);
       }
     }
   }

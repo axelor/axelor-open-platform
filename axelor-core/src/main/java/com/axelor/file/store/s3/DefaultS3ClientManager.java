@@ -90,7 +90,7 @@ public class DefaultS3ClientManager implements S3ClientManager {
       s3Client.getOkHttpClient().dispatcher().executorService().shutdown();
       s3Client.getOkHttpClient().connectionPool().evictAll();
     } catch (Exception e) {
-      LOG.error("Unable to shutdown s3 connections", e);
+      LOG.error("Unable to shutdown S3 connections", e);
     }
   }
 

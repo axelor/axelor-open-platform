@@ -282,6 +282,12 @@ public class DmsService {
     return response;
   }
 
+  /**
+   * Check if the associated metaFile or content of the given DMSFile exists
+   *
+   * @param file the dmsFile to check
+   * @return true if the file exists, otherwise false
+   */
   private boolean hasFile(DMSFile file) {
     if (file == null) {
       return false;

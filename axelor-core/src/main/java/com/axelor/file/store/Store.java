@@ -25,7 +25,7 @@ import java.nio.file.Path;
 public interface Store {
 
   /**
-   * Check if the file exist
+   * Check if the file exists
    *
    * @param fileName the file's name
    * @return true if the file exists; false otherwise
