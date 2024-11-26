@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,7 +57,7 @@ public class FileSystemStore implements Store {
     try {
       Files.createDirectories(getRootPath());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
@@ -94,7 +95,7 @@ public class FileSystemStore implements Store {
           MimeTypesUtils.getContentType(targetFile),
           getStoreType());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
@@ -119,7 +120,7 @@ public class FileSystemStore implements Store {
           MimeTypesUtils.getContentType(targetFile),
           getStoreType());
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
@@ -128,7 +129,7 @@ public class FileSystemStore implements Store {
     try {
       Files.deleteIfExists(resolveFilePath(fileName));
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 

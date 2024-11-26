@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
@@ -225,7 +226,7 @@ public class S3Store implements Store {
         FileUtils.copyFile(cacheFile, tempFile.toFile());
         return tempFile.toFile();
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new UncheckedIOException(e);
       }
     }
 
@@ -240,7 +241,7 @@ public class S3Store implements Store {
       }
       return tempFile.toFile();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
@@ -272,7 +273,7 @@ public class S3Store implements Store {
       try {
         inputStream.transferTo(baos);
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new UncheckedIOException(e);
       }
       _s3Cache.put(new ByteArrayInputStream(baos.toByteArray()), fileName);
       return new ByteArrayInputStream(baos.toByteArray());

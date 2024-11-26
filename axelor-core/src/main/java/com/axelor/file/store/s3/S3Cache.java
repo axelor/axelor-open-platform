@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -116,7 +117,7 @@ public class S3Cache {
 
       return cacheFile;
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     } finally {
       this.lock.readLock().unlock();
     }
@@ -126,7 +127,7 @@ public class S3Cache {
     try {
       return put(new FileInputStream(file), fileName);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
@@ -158,7 +159,7 @@ public class S3Cache {
       FileUtils.write(tempFile, inputStream);
       return tempFile;
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     } finally {
       this.lock.writeLock().unlock();
     }
@@ -174,7 +175,7 @@ public class S3Cache {
       deleteFileAndEntry(entry);
       return true;
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     } finally {
       this.lock.writeLock().unlock();
     }
