@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2024 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -81,9 +81,15 @@ public class S3Store implements Store {
   }
 
   private void createBucket()
-      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-          NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-          XmlParserException, InternalException {
+      throws ServerException,
+          InsufficientDataException,
+          ErrorResponseException,
+          IOException,
+          NoSuchAlgorithmException,
+          InvalidKeyException,
+          InvalidResponseException,
+          XmlParserException,
+          InternalException {
     boolean isExist =
         getClient().bucketExists(BucketExistsArgs.builder().bucket(getBucketName()).build());
     if (!isExist) {
