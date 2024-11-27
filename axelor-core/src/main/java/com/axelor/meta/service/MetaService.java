@@ -588,7 +588,7 @@ public class MetaService {
       return response;
     }
 
-    CustomView report = (CustomView) XMLViews.findView(viewName, "report");
+    CustomView report = (CustomView) XMLViews.findView(viewName, "custom");
     if (report == null) {
       return response;
     }
