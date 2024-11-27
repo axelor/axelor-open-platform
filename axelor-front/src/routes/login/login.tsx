@@ -63,7 +63,7 @@ export function Login() {
   const location = useLocation();
   const { state: locationState } = location ?? {};
 
-  const { state, data, redirectUrl } = useSession();
+  const { state, data } = useSession();
   const queryParams = useMemo(
     () => new URLSearchParams(window.location.search),
     [],
@@ -92,15 +92,6 @@ export function Login() {
   }, [locationState?.message]);
 
   if (state === "loading") return null;
-
-  if (redirectUrl != null) {
-    if (redirectUrl) {
-      window.location.href = redirectUrl;
-    } else {
-      window.location.reload();
-    }
-    return null;
-  }
 
   const { clients = [], defaultClient, exclusive } = data?.authentication ?? {};
   const client = clientName || defaultClient;

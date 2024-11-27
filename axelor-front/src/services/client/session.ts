@@ -216,16 +216,7 @@ export class Session {
   }
 
   async logout() {
-    const response = await request({ url: "logout" });
-    const { status } = response;
-    const redirectUrl: string | null =
-      status === 200 ? (await response.json()).redirectUrl : null;
-
-    this.#info = null;
-    this.#infoPromise = null;
-    this.#notify();
-
-    return { status, redirectUrl };
+    window.location.href = "logout";
   }
 }
 

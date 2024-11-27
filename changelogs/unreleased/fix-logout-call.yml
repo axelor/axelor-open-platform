@@ -1,0 +1,8 @@
+---
+title: Fix logout with form submission cases
+type: fix
+description: |
+  When extending, some logout (ex, SAML central logout) is typically 
+  not a redirection but returns a form that the front-end needs to submit.
+
+  Fixed by using full page request for logout instead of AJAX.

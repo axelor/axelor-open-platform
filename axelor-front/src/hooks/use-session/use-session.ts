@@ -19,7 +19,6 @@ const login = session.login.bind(session);
 export function useSession() {
   const { state, error } = useAsync(init, []);
   const [data, setData] = useState<SessionInfo | null>(session.info);
-  const [redirectUrl, setRedirectUrl] = useAtom(redirectUrlAtom);
 
   useEffect(() => {
     return session.subscribe((info) => {
@@ -27,14 +26,9 @@ export function useSession() {
     });
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      const { redirectUrl: url } = await session.logout();
-      setRedirectUrl(url ?? "");
-    } catch (e) {
-      console.error(e);
-    }
-  }, [setRedirectUrl]);
+  const logout = useCallback(() => {
+    session.logout();
+  }, []);
 
   return {
     state,
@@ -42,6 +36,5 @@ export function useSession() {
     error,
     login,
     logout,
-    redirectUrl,
   };
 }
