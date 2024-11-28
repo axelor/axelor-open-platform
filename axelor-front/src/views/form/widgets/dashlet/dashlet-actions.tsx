@@ -40,6 +40,7 @@ export function DashletActions({
   const {
     view,
     actionExecutor,
+    getContext,
     dataStore,
     gridStateAtom,
     onAction,
@@ -74,6 +75,7 @@ export function DashletActions({
         <ToolbarActions
           buttons={toolbar}
           menus={menubar}
+          actionContext={getContext?.()}
           actionExecutor={actionExecutor}
         />
       )}

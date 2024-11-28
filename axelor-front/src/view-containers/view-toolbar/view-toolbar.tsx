@@ -13,7 +13,7 @@ import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
 import { DataStore } from "@/services/client/data-store";
 import { toTitleCase } from "@/utils/names";
@@ -84,15 +84,16 @@ function ActionCommandItem({
   formAtom = fallbackFormAtom,
   recordHandler,
   schema,
+  context,
   ...props
 }: RenderCommandItemProps &
   Pick<ViewToolBarProps, "formAtom" | "recordHandler"> & {
     schema: Schema;
+    context?: DataContext;
   }) {
   const { name, showIf, hideIf, readonlyIf } = schema;
   const [hidden, setHidden] = useState<boolean | undefined>(schema.hidden);
   const [readonly, setReadonly] = useState<boolean>(schema.readonly);
-  const { action } = useViewTab();
 
   const attrs = useAtomValue(
     useMemo(
@@ -121,9 +122,9 @@ function ActionCommandItem({
     if (recordHandler) {
       return recordHandler.subscribe(updateAttrs);
     } else {
-      updateAttrs(createScriptContext(action.context ?? {}));
+      updateAttrs(createScriptContext(context ?? {}));
     }
-  }, [showIf, hideIf, readonlyIf, recordHandler, action.context]);
+  }, [showIf, hideIf, readonlyIf, recordHandler, context]);
 
   return (
     <CommandItem
@@ -156,6 +157,7 @@ export function ToolbarActions({
   formAtom,
   getActionData,
   recordHandler,
+  actionContext: _actionContext,
   actionExecutor,
   parentRef,
   parentWidth,
@@ -163,13 +165,16 @@ export function ToolbarActions({
   ViewToolBarProps,
   "formAtom" | "getActionData" | "actionExecutor" | "recordHandler"
 > & {
+  actionContext?: DataContext;
   buttons?: Button[];
   menus?: Menu[];
   parentRef?: React.RefObject<HTMLDivElement>;
   parentWidth?: number;
 }) {
-  const innerRef = useRef<HTMLDivElement | null>(null);
+  const { action } = useViewTab();
+  const actionContext = _actionContext ?? action.context;
 
+  const innerRef = useRef<HTMLDivElement | null>(null);
   const responsive = useMemo(() => {
     // Compute total width of children, excluding responsive dropdown menu.
     let width = innerRef.current?.offsetWidth ?? 0;
@@ -186,7 +191,6 @@ export function ToolbarActions({
   const getItems = useCallback(
     (getText: (item: ToolbarItem) => string = getTextFull) => {
       let ind = 0;
-
       const mapItem = (item: ToolbarItem): CommandItemProps => {
         const action = (item as Button).onClick || (item as MenuItem).action;
         const text = getText(item);
@@ -230,6 +234,7 @@ export function ToolbarActions({
                 render: (props) => (
                   <ActionCommandItem
                     {...props}
+                    context={actionContext}
                     schema={item}
                     formAtom={formAtom}
                     recordHandler={recordHandler}
@@ -248,7 +253,15 @@ export function ToolbarActions({
 
       return [...(buttons || []), ...(menus || [])].map(mapItem);
     },
-    [buttons, menus, formAtom, getActionData, actionExecutor, recordHandler],
+    [
+      buttons,
+      menus,
+      formAtom,
+      getActionData,
+      actionContext,
+      actionExecutor,
+      recordHandler,
+    ],
   );
 
   const [items, responsiveItems] = useMemo(

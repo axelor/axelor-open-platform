@@ -795,10 +795,12 @@ function GridInner(props: ViewProps<GridView>) {
         view,
         actionExecutor,
         gridStateAtom,
+        getContext,
         onRefresh: () => doSearch({}),
       });
     }
   }, [
+    getContext,
     dashlet,
     view,
     gridStateAtom,
@@ -1321,11 +1323,7 @@ function GridInner(props: ViewProps<GridView>) {
               state={state}
               setState={setState}
               sortType={"live"}
-              editable={
-                dashlet || action?.name?.startsWith("$selector")
-                  ? false
-                  : editable
-              }
+              editable={dashlet || selector ? false : editable}
               {...((isExpandable || isTreeGrid) && {
                 gridContext,
                 showAsTree: isTreeGrid,
