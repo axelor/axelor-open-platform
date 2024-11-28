@@ -159,7 +159,7 @@ function HTMLEditor({
     }
 
     function setHTML(html) {
-      getEditor().innerHTML = html || "";
+      if(getEditor()) getEditor().innerHTML = html || "";
     }
 
     function normalize() {

@@ -1,3 +1,4 @@
+import { sanitize } from "@/utils/sanitize";
 import { request } from "./client";
 
 let bundle: Record<string, string> = {};
@@ -9,6 +10,10 @@ export namespace i18n {
     bundle = await request({
       url: "js/messages.js",
     }).then((res) => res.json());
+
+    bundle = Object.fromEntries(
+      Object.entries(bundle).map(([key, value]) => [key, sanitize(value)]),
+    );
   }
   export function get(text: string, ...args: any[]): string {
     let message = bundle[text] || bundle[(text || "").trim()] || text;

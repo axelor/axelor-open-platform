@@ -29,6 +29,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
+import { sanitize } from "@/utils/sanitize.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -445,7 +446,7 @@ export function Dms(props: ViewProps<GridView>) {
             dangerouslySetInnerHTML={{
               __html: i18n.get(
                 "Are you sure you want to delete {0}?",
-                toStrongText(record.fileName),
+                toStrongText(sanitize(record.fileName)),
               ),
             }}
           />

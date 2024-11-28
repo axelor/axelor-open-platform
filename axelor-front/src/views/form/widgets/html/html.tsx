@@ -1,6 +1,7 @@
 import { clsx } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
+import { sanitize } from "@/utils/sanitize";
 
 import { FieldControl, FieldProps } from "../../builder";
 import EditorComponent from "./editor";
@@ -46,7 +47,7 @@ export function Html(props: FieldProps<string>) {
           translatable={translatable}
           lite={Boolean(lite)}
           height={height}
-          value={text}
+          value={sanitize(text)}
           onChange={onChange}
           onBlur={onBlur}
           onKeyDown={onKeyDown}
