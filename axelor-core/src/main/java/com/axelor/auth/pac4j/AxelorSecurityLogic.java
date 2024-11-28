@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import io.buji.pac4j.profile.ShiroProfileManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   public AxelorSecurityLogic(
       ErrorHandler errorHandler, Config config, ClientListService clientListService) {
     this.errorHandler = errorHandler;
-    setProfileManagerFactory(ShiroProfileManager::new);
+    setProfileManagerFactory(AxelorProfileManager::new);
 
     final List<Authorizer> authorizers =
         config.getAuthorizers().values().stream().collect(Collectors.toUnmodifiableList());

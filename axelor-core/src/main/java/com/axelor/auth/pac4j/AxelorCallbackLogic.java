@@ -20,7 +20,6 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
-import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
@@ -60,7 +59,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
     this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
     this.pac4jInfo = pac4jInfo;
-    setProfileManagerFactory(ShiroProfileManager::new);
+    setProfileManagerFactory(AxelorProfileManager::new);
     setClientFinder(clientFinder);
   }
 
