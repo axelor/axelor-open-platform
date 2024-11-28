@@ -9,7 +9,13 @@ import {
   useState,
 } from "react";
 
-import { clsx, Box, ClickAwayListener, InputFeedback, InputLabel } from "@axelor/ui";
+import {
+  clsx,
+  Box,
+  ClickAwayListener,
+  InputFeedback,
+  InputLabel,
+} from "@axelor/ui";
 
 import { Tooltip } from "@/components/tooltip";
 import { Icon } from "@/components/icon";
@@ -332,7 +338,12 @@ function HelpContent(props: WidgetProps) {
 
   return (
     <Box className={styles.tooltip}>
-      {canShowHelp && <Box className={styles.help}>{help}</Box>}
+      {canShowHelp && (
+        <Box
+          className={styles.help}
+          dangerouslySetInnerHTML={{ __html: sanitize(help) }}
+        />
+      )}
       {canShowHelp && technical && <hr />}
       {technical && (
         <dl className={styles.details}>
