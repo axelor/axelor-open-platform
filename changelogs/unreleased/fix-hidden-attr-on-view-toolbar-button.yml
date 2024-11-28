@@ -1,0 +1,7 @@
+---
+title: Fix hidden/readonly attr on view toolbar button
+type: fix
+description: |
+  When hidden="true" is set on menubar item or toolbar button it should hide the item or
+  when readonly="true" is set on item, it should make item readonly.
+  Currently hidden/readonly is only working when any of showIf/hideIf/readonlyIf is also defined on item.

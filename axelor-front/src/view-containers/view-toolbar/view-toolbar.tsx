@@ -91,7 +91,7 @@ function ActionCommandItem({
   }) {
   const { name, showIf, hideIf, readonlyIf } = schema;
   const [hidden, setHidden] = useState<boolean | undefined>(schema.hidden);
-  const [readonly, setReadonly] = useState<boolean>(false);
+  const [readonly, setReadonly] = useState<boolean>(schema.readonly);
   const { action } = useViewTab();
 
   const attrs = useAtomValue(
@@ -143,7 +143,7 @@ function ActionCommandItem({
 type ToolbarItem = Menu | MenuItem | MenuDivider | Button;
 
 function getTextFull(item: ToolbarItem) {
-  return item.showTitle !== false ? item.title ?? "" : "";
+  return item.showTitle !== false ? (item.title ?? "") : "";
 }
 
 function getTextResponsive(item: ToolbarItem) {
@@ -225,16 +225,24 @@ export function ToolbarActions({
           ...((item as Menu).items && {
             items: (item as Menu).items?.map(mapItem),
           }),
-          ...((hasExpr || formAtom) && {
-            render: (props) => (
-              <ActionCommandItem
-                {...props}
-                schema={item}
-                formAtom={formAtom}
-                recordHandler={recordHandler}
-              />
-            ),
-          }),
+          ...(hasExpr || formAtom
+            ? {
+                render: (props) => (
+                  <ActionCommandItem
+                    {...props}
+                    schema={item}
+                    formAtom={formAtom}
+                    recordHandler={recordHandler}
+                  />
+                ),
+              }
+            : {
+                hidden: item.hidden,
+                ...(item.readonly && {
+                  onClick: undefined,
+                  disabled: true,
+                }),
+              }),
         } as CommandItemProps;
       };
 
@@ -501,16 +509,20 @@ export function ViewToolBar(props: ViewToolBarProps) {
         <CommandBar items={farItems} className={styles.farItems} />
       )}
       {Boolean(helpLink) && (
-        <CommandBar items={[
-          {
-            key: "helpLink",
-            description: i18n.get("Show help"),
-            iconProps: {
-              icon: "help",
+        <CommandBar
+          items={[
+            {
+              key: "helpLink",
+              description: i18n.get("Show help"),
+              iconProps: {
+                icon: "help",
+              },
+              onClick: () =>
+                window.open(helpLink, "_blank", "noopener,noreferrer"),
             },
-            onClick: () => window.open(helpLink, "_blank", "noopener,noreferrer"),
-          },
-        ]} className={styles.helpLink} />
+          ]}
+          className={styles.helpLink}
+        />
       )}
     </Box>
   );
