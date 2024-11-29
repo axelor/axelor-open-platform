@@ -591,5 +591,5 @@ export function getActions() {
       image: "\uf121",
       command: "toggleCode",
     },
-  ].map((item) => ({ ...item, title: item.title && _t(item.title) }));
+  ];
 }
