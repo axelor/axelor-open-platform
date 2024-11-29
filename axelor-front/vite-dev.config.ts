@@ -22,6 +22,7 @@ plugins[0] = react({
 const proxyAll: ProxyOptions = {
   target: env.VITE_PROXY_TARGET,
   changeOrigin: true,
+  xfwd: true,
   bypass(req, res, options) {
     if (
       req.url === base ||
