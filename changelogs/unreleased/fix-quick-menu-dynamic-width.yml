@@ -1,5 +1,0 @@
----
-title: Fix Quick Menu dynamic width
-type: fix
-description: |
-  Quick menus no longer have a dynamic width so typing on text input is not flipping the menu anymore.

@@ -1,8 +1,0 @@
----
-title: Fix login popup after expired SSO profile
-type: fix
-description: |
-  SSO profile may expire before the session expires, creating a situation where session exists
-  with no valid profile. In that case, login popup could appear instead of being redirected to SSO.
-
-  Now, log out subject when profile expires.

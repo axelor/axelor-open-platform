@@ -1,7 +1,0 @@
----
-title: Add server-side view type mismatch check
-type: fix
-description: |
-  When a view is requested, check if the requested view type matches.
-  If not, an error message is logged and no view is returned.
-  This prevents front-end from processing views with wrong type and causing unexpected errors.

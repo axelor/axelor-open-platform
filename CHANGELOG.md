@@ -1,3 +1,99 @@
+## 7.2.4 (2024-11-29)
+
+#### Fix
+
+* Fix SwitchSelect widget overflowing in vertical mode
+* Fix untranslated buttons titles in view switcher toolbar
+* Fix missing support of colors and shades config in charts
+
+  <details>
+  
+  Colors and shades config support was not implemented.
+  This also add missing pre-build set of colors : `material`, `roma`, `chartjs`, 
+  `roma`, `macarons`. For example : `<config name="colors" value="roma" />`
+  
+  </details>
+
+* Fix save record in popup editor for m2o/o2o/m2m(selection)
+
+  <details>
+  
+  We can edit the record through popup editor, it will save record as following :
+  - m2o/o2o/m2m(selection) : It will only save record when form is dirty
+  - o2m/m2m(grid) : It will save record when any changes (also including non dirty dummy fields) in record
+  
+  </details>
+
+* Fix exclude duplicate record in data store search
+* Fix cache a view/fields when data is exist
+* Show error when view is not found
+* Allow to generate empty changelog release
+
+  <details>
+  
+  If no changelog entries are found, there is no changelog release generated. This 
+  is the default behavior. New properties `allowNoEntry` and `defaultContent` can 
+  be used to determine if it is allowed to generate changelog without entries and 
+  to specify the changelog release content (for example, `No notable changes`).
+  
+  </details>
+
+* Fix Slider tooltip position
+
+  <details>
+  
+  The position of the tooltip is now aligned with the slider thumb even after scrolling or zooming.
+  
+  </details>
+
+* Add server-side view type mismatch check
+
+  <details>
+  
+  When a view is requested, check if the requested view type matches.
+  If not, an error message is logged and no view is returned.
+  This prevents front-end from processing views with wrong type and causing unexpected errors.
+  
+  </details>
+
+* Fix onSave action in grid details view
+* Fix helper tooltip not accepting html elements
+* Fix Quick Menu dynamic width
+
+  <details>
+  
+  Quick menus no longer have a dynamic width so typing on text input is not flipping the menu anymore.
+  
+  </details>
+
+* Fix rendering of object values in grid
+* Small changes to refine UI
+* Fix dirty record on MetaFile widgets
+
+  <details>
+  
+  Some MetaFile widgets, ie Image/Drawing/BinaryLink shouldn't mark 
+  the main record dirty when updating an existing associated file.
+  
+  </details>
+
+* Fix grid resizing lags
+* Enhance Gantt toolbar actions style
+* Fix login popup after expired SSO profile
+
+  <details>
+  
+  SSO profile may expire before the session expires, creating a situation where session exists
+  with no valid profile. In that case, login popup could appear instead of being redirected to SSO.
+  
+  Now, log out subject when profile expires.
+  
+  </details>
+
+#### Security
+
+* Fix XSS vulnerability
+
 ## 7.2.3 (2024-11-13)
 
 #### Fix
