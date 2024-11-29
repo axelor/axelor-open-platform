@@ -1,0 +1,7 @@
+---
+title: Fix X-Forwarded-Host that may contain port
+type: fix
+description: |
+  X-Forwarded-Host may contain port number, so server name should strip out the port from X-Forwarded-Host.
+  It also means that port can either come from X-Forwarded-Host or X-Forwarded-Port.
+  If both X-Forwarded-Host and X-Forwarded-Port are present, port from X-Forwarded-Port will take precedence.

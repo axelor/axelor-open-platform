@@ -29,6 +29,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrap the request to reflect the original protocol, scheme, Host and prefix using the
@@ -36,6 +38,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 @Singleton
 public class ProxyFilter implements Filter {
+
+  private static final Logger log = LoggerFactory.getLogger(ProxyFilter.class);
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -53,8 +57,8 @@ public class ProxyFilter implements Filter {
     private final Supplier<HttpServletRequest> delegate;
 
     private final String forwardedProto;
-    private final int forwardedPort;
-    private final String forwardedHost;
+    private String forwardedHost;
+    private int forwardedPort = -1;
     private final String forwardedPrefix;
     private final String forwardedFor;
     private final String baseUrl;
@@ -68,8 +72,7 @@ public class ProxyFilter implements Filter {
       this.actualRequestUri = this.delegate.get().getRequestURI();
 
       this.forwardedProto = initForwardedProto(request);
-      this.forwardedPort = initForwardedPort(request);
-      this.forwardedHost = initForwardedHost(request);
+      initForwardedHostPort(request);
       this.forwardedPrefix = initForwardedPrefix(request);
 
       this.baseUrl =
@@ -135,20 +138,28 @@ public class ProxyFilter implements Filter {
       return new StringBuffer(this.requestUrl);
     }
 
-    private String initForwardedHost(HttpServletRequest request) {
+    private void initForwardedHostPort(HttpServletRequest request) {
       String hostHeader = request.getHeader("X-Forwarded-Host");
       if (StringUtils.notBlank(hostHeader)) {
-        return StringUtils.splitToArray(hostHeader, ",")[0];
+        String host = StringUtils.splitToArray(hostHeader, ",")[0];
+        int portSeparatorIdx = host.lastIndexOf(':');
+        int squareBracketIdx = host.lastIndexOf(']');
+        if (portSeparatorIdx > squareBracketIdx) {
+          if (squareBracketIdx == -1 && host.indexOf(':') != portSeparatorIdx) {
+            log.error("Invalid IPv4 address: {}", host);
+          } else {
+            this.forwardedHost = host.substring(0, portSeparatorIdx);
+            this.forwardedPort = Integer.parseInt(host, portSeparatorIdx + 1, host.length(), 10);
+          }
+        } else {
+          this.forwardedHost = host;
+        }
       }
-      return null;
-    }
 
-    private int initForwardedPort(HttpServletRequest request) {
       String portHeader = request.getHeader("X-Forwarded-Port");
       if (StringUtils.notBlank(portHeader)) {
-        return Integer.parseInt(StringUtils.splitToArray(portHeader, ",")[0]);
+        this.forwardedPort = Integer.parseInt(StringUtils.splitToArray(portHeader, ",")[0]);
       }
-      return -1;
     }
 
     private String initForwardedProto(HttpServletRequest request) {
