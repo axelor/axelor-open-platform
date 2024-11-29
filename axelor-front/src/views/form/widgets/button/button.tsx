@@ -7,15 +7,16 @@ import isUndefined from "lodash/isUndefined";
 import { Box, Button as Btn, Image } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { Icon } from "@/components/icon";
 import { Tooltip } from "@/components/tooltip";
 import { useSession } from "@/hooks/use-session";
 import { Schema } from "@/services/client/meta.types";
+import { sanitize } from "@/utils/sanitize.ts";
 
 import { WidgetControl, WidgetProps } from "../../builder";
 import { useFormEditableScope, useFormScope } from "../../builder/scope";
 import { useReadonly } from "./hooks";
 
-import { Icon } from "@/components/icon";
 import styles from "./button.module.scss";
 
 function ButtonIcon({ schema }: WidgetProps) {
@@ -175,7 +176,16 @@ export function Button(props: WidgetProps) {
     return (
       <>
         {hasHelp && (
-          <Tooltip content={() => <span>{help || titleHelp}</span>}>
+          <Tooltip
+            content={() => (
+              <Box
+                as="span"
+                dangerouslySetInnerHTML={{
+                  __html: sanitize(help || titleHelp),
+                }}
+              ></Box>
+            )}
+          >
             {button}
           </Tooltip>
         )}
