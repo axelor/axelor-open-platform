@@ -1,3 +1,24 @@
+## 7.1.11 (2024-11-29)
+
+#### Fix
+
+* Fix untranslated buttons titles in view switcher toolbar
+* Fix save record in popup editor for m2o/o2o/m2m(selection)
+
+  <details>
+  
+  We can edit the record through popup editor, it will save record as following :
+  - m2o/o2o/m2m(selection) : It will only save record when form is dirty
+  - o2m/m2m(grid) : It will save record when any changes (also including non dirty dummy fields) in record
+  
+  </details>
+
+* Fix helper tooltip not accepting html elements
+
+#### Security
+
+* Fix XSS vulnerability
+
 ## 7.1.10 (2024-11-13)
 
 #### Fix
