@@ -367,7 +367,8 @@ export function ViewToolBar(props: ViewToolBarProps) {
     if (views.length === 1) return;
     return views.map((item) => {
       const key = item.type;
-      const text = toTitleCase(item.type);
+      // view types are already extracted and translated into the core through the `view.type.selection` selection
+      const text = i18n.get(toTitleCase(item.type));
       return {
         key,
         text,
