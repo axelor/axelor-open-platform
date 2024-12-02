@@ -19,6 +19,7 @@
 package com.axelor.file;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.JpaTestModule;
 import com.axelor.app.AppSettings;
@@ -28,8 +29,11 @@ import com.axelor.file.store.Store;
 import com.axelor.file.store.s3.S3Store;
 import com.axelor.test.GuiceModules;
 import io.minio.messages.Bucket;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,6 +44,22 @@ import org.junit.jupiter.api.TestMethodOrder;
 public class S3StoreTest extends AbstractBaseFile {
 
   private static final String BUCKET_NAME = "my-bucket";
+  private static final String ENDPOINT = "127.0.0.1:9000";
+
+  @BeforeAll
+  public static void checkMinioAvailability() {
+    boolean isMinioRunning = isServerRunning(ENDPOINT);
+    assumeTrue(isMinioRunning, "Object storage server is not running on " + ENDPOINT);
+  }
+
+  private static boolean isServerRunning(String endpoint) {
+    EndpointInfo info = EndpointInfo.parse(endpoint);
+    try (Socket socket = new Socket(info.getHost(), info.getPort())) {
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
+  }
 
   public static class S3FileStoreTestModule extends JpaTestModule {
     @Override
@@ -47,7 +67,7 @@ public class S3StoreTest extends AbstractBaseFile {
       resetAllSettings();
       Map<String, String> props = AppSettings.get().getInternalProperties();
       props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_ENABLED, "true");
-      props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_ENDPOINT, "127.0.0.1:9000");
+      props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_ENDPOINT, ENDPOINT);
       props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_PATH_STYLE, "true");
       props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_SECURE, "false");
       props.put(AvailableAppSettings.DATA_OBJECT_STORAGE_ACCESS_KEY, "root");
@@ -59,11 +79,44 @@ public class S3StoreTest extends AbstractBaseFile {
 
   @Test
   @Order(1)
-  public void shouldCreateBucket() throws Exception {
+  void shouldCreateBucket() throws Exception {
     Store store = FileStoreFactory.getStore();
 
     S3Store s3Store = (S3Store) store;
     List<Bucket> buckets = s3Store.getClient().listBuckets();
     assertTrue(buckets.stream().anyMatch(e -> e.name().equals(BUCKET_NAME)));
+  }
+
+  private static class EndpointInfo {
+    private final String host;
+    private final int port;
+
+    public EndpointInfo(String host, int port) {
+      this.host = host;
+      this.port = port;
+    }
+
+    public static EndpointInfo parse(String endpoint) {
+      int portSeparatorIdx = endpoint.lastIndexOf(':');
+      int squareBracketIdx = endpoint.lastIndexOf(']');
+      if (portSeparatorIdx > squareBracketIdx) {
+        if (squareBracketIdx == -1 && endpoint.indexOf(':') != portSeparatorIdx) {
+          throw new IllegalArgumentException();
+        }
+        var host = endpoint.substring(0, portSeparatorIdx);
+        var port = Integer.parseInt(endpoint, portSeparatorIdx + 1, endpoint.length(), 10);
+        return new EndpointInfo(host, port);
+      } else {
+        return new EndpointInfo(endpoint, 9000);
+      }
+    }
+
+    public String getHost() {
+      return host;
+    }
+
+    public int getPort() {
+      return port;
+    }
   }
 }
