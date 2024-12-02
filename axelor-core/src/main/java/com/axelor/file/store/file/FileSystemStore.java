@@ -23,6 +23,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.tenants.TenantConfig;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.file.store.Store;
 import com.axelor.file.store.StoreType;
@@ -65,7 +66,7 @@ public class FileSystemStore implements Store {
 
   private Path getRootPath() {
     String tenantId = TenantResolver.currentTenantIdentifier();
-    if (StringUtils.isBlank(tenantId)) {
+    if (StringUtils.isBlank(tenantId) || TenantConfig.DEFAULT_TENANT_ID.equals(tenantId)) {
       return UPLOAD_PATH;
     }
     return UPLOAD_PATH.resolve(tenantId);

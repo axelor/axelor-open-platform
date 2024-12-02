@@ -34,7 +34,7 @@ public class FileStoreFactory {
       return _store;
     }
 
-    Boolean isObjectStorage =
+    boolean isObjectStorage =
         AppSettings.get().getBoolean(AvailableAppSettings.DATA_OBJECT_STORAGE_ENABLED, false);
     if (isObjectStorage) {
       _store = new S3Store(DefaultS3ClientManager.getInstance());

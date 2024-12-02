@@ -21,6 +21,8 @@ package com.axelor.file.store.s3;
 import com.axelor.common.FileUtils;
 import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.tenants.TenantConfig;
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.file.store.Store;
 import com.axelor.file.store.StoreType;
 import com.axelor.file.store.UploadedFile;
@@ -104,12 +106,25 @@ public class S3Store implements Store {
     return _s3ClientManager.getBucketName();
   }
 
+  private String getRootPath() {
+    final String tenantId = TenantResolver.currentTenantIdentifier();
+    if (StringUtils.isBlank(tenantId) || TenantConfig.DEFAULT_TENANT_ID.equals(tenantId)) {
+      return "";
+    }
+    return tenantId + "/";
+  }
+
+  private String getObjectName(String fileName) {
+    return getRootPath() + fileName;
+  }
+
   @Override
   public boolean hasFile(String fileName) {
     boolean found = false;
+    final String objectName = getObjectName(fileName);
     try {
       getClient()
-          .statObject(StatObjectArgs.builder().bucket(getBucketName()).object(fileName).build());
+          .statObject(StatObjectArgs.builder().bucket(getBucketName()).object(objectName).build());
       found = true;
     } catch (ErrorResponseException e) {
       String code = e.errorResponse().code();
@@ -158,10 +173,11 @@ public class S3Store implements Store {
       if (StringUtils.notBlank(_s3ClientManager.getStorageClass())) {
         headers.put("X-Amz-Storage-Class", _s3ClientManager.getStorageClass());
       }
+      final String objectName = getObjectName(fileName);
       UploadObjectArgs.Builder builder =
           UploadObjectArgs.builder()
               .bucket(getBucketName())
-              .object(fileName)
+              .object(objectName)
               .contentType(contentType)
               .filename(path.toString())
               .headers(headers)
@@ -184,9 +200,10 @@ public class S3Store implements Store {
 
   @Override
   public void deleteFile(String fileName) {
+    final String objectName = getObjectName(fileName);
     try {
       RemoveObjectArgs.Builder builder =
-          RemoveObjectArgs.builder().bucket(getBucketName()).object(fileName);
+          RemoveObjectArgs.builder().bucket(getBucketName()).object(objectName);
       getClient().removeObject(builder.build());
       if (S3Cache.CACHE_ENABLED) {
         _s3Cache.remove(fileName);
@@ -266,9 +283,10 @@ public class S3Store implements Store {
   }
 
   private InputStream _fetchStream(String fileName) {
+    final String objectName = getObjectName(fileName);
     try {
       GetObjectArgs.Builder builder =
-          GetObjectArgs.builder().bucket(getBucketName()).object(fileName);
+          GetObjectArgs.builder().bucket(getBucketName()).object(objectName);
       return getClient().getObject(builder.build());
     } catch (XmlParserException
         | ErrorResponseException
