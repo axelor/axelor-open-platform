@@ -1,0 +1,8 @@
+---
+title: Add support to hide view popup header and footer
+type: feature
+description: |
+  Two new view params are added: `popup.show-header` and `popup.show-footer`.
+  
+  This is for advance use cases where we want to show `custom` views
+  inside a popup with it's own header and footer.

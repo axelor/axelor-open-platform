@@ -59,6 +59,17 @@ export type PopupProps = {
   footer?: DialogOptions["footer"];
 
   /**
+   * Whether to show header.
+   *
+   */
+  showHeader?: DialogOptions["showHeader"];
+
+  /**
+   * Whether to show footer.
+   */
+  showFooter?: DialogOptions["showFooter"];
+
+  /**
    * Additional handler component
    *
    * Generally, it should not render anything but handle
@@ -92,6 +103,8 @@ const PopupDialogInner = memo(function PopupDialog({
   open,
   maximize,
   onClose,
+  showHeader = true,
+  showFooter = true,
   header,
   footer,
   handler,
@@ -124,30 +137,39 @@ const PopupDialogInner = memo(function PopupDialog({
           {handler?.()}
         </>
       }
-      header={({ close }) => (
-        <Header
-          header={header}
-          maximized={maximized}
-          expanded={expanded}
-          params={tab.action?.params}
-          close={close}
-          setMaximized={setMaximized}
-          setExpanded={setExpanded}
-        />
-      )}
-      footer={footer}
-      buttons={buttons}
-      onClose={onClose}
-      maximize={maximized}
-    />
+      showHeader={showHeader}
+        showFooter={showFooter}
+        header={({ close }) => (
+          <Header
+            header={header}
+            maximized={maximized}
+            expanded={expanded}
+            params={tab.action?.params}
+            close={close}
+            setMaximized={setMaximized}
+            setExpanded={setExpanded}
+          />
+        )}
+        footer={footer}
+        buttons={buttons}
+        onClose={onClose}
+        maximize={maximized}
+      />
+    
   );
 });
 
 export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
   const { id, action } = tab;
   const params = action?.params ?? {};
+
+  const showHeader = params["popup.show-header"] !== false;
+  const showFooter = params["popup.show-footer"] !== false;
+  const maximize = params["popup.maximized"];
+
   const { close } = useTabs();
   const handleClose = useCallback(() => close(id), [close, id]);
+
   return (
     <PopupDialog
       tab={tab}
@@ -155,7 +177,9 @@ export const PopupViews = memo(function PopupViews({ tab }: { tab: Tab }) {
       footer={({ close }) => <Footer close={close} params={action.params} />}
       buttons={[]}
       onClose={handleClose}
-      maximize={params["popup.maximized"]}
+      maximize={maximize}
+      showHeader={showHeader}
+      showFooter={showFooter}
     />
   );
 });

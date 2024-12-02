@@ -1,6 +1,13 @@
 import { Provider, atom, createStore, useAtom, useAtomValue } from "jotai";
 import uniqueId from "lodash/uniqueId";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   clsx,
@@ -34,6 +41,8 @@ export type DialogClose = (result: boolean) => void;
 export type DialogOptions = {
   title?: string;
   content: React.ReactNode;
+  showHeader?: boolean;
+  showFooter?: boolean;
   header?: (props: { close: DialogClose }) => React.ReactNode;
   footer?: (props: { close: DialogClose }) => React.ReactNode;
   buttons?: DialogButton[];
@@ -250,6 +259,18 @@ const getDefaultButtons: () => DialogButton[] = () => [
   },
 ];
 
+type DialogContextType = {
+  close: DialogClose;
+};
+
+const DialogContext = createContext<DialogContextType>(
+  undefined as unknown as DialogContextType,
+);
+
+export function useDialogContext() {
+  return useContext(DialogContext);
+}
+
 export function ModalDialog(props: DialogOptions) {
   const {
     open,
@@ -257,6 +278,8 @@ export function ModalDialog(props: DialogOptions) {
     size,
     title,
     content,
+    showHeader = true,
+    showFooter = true,
     header: Header,
     footer: Footer,
     padding,
@@ -305,49 +328,55 @@ export function ModalDialog(props: DialogOptions) {
       <Fade in={canShow} unmountOnExit mountOnEnter>
         <Box className={styles.backdrop}></Box>
       </Fade>
-      <Dialog
-        open={canShow}
-        onHide={onHide}
-        onShow={initialFocus}
-        scrollable
-        fullscreen={maximize}
-        size={size}
-        className={clsx(classes.root, styles.root)}
-        initialFocus={initialFocus}
-        data-dialog="true"
-      >
-        <DialogHeader
-          {...(closeable && {
-            onCloseClick: () => close(false),
-          })}
-          className={classes.header}
+      <DialogContext.Provider value={{ close }}>
+        <Dialog
+          open={canShow}
+          onHide={onHide}
+          onShow={initialFocus}
+          scrollable
+          fullscreen={maximize}
+          size={size}
+          className={clsx(classes.root, styles.root)}
+          initialFocus={initialFocus}
+          data-dialog="true"
         >
-          <DialogTitle className={styles.title}>{title}</DialogTitle>
-          {Header && <Header close={close} />}
-        </DialogHeader>
-        <DialogContent
-          className={clsx(classes.content, styles.content)}
-          style={{ padding }}
-          tabIndex={-1}
-          ref={contentRef}
-        >
-          {content}
-        </DialogContent>
-        <DialogFooter className={classes.footer}>
-          {Footer && <Footer close={close} />}
-          {buttons.map((button) => (
-            <Button
-              autoFocus={button.variant === "primary"}
-              key={button.name}
-              type="button"
-              variant={button.variant}
-              onClick={() => button.onClick(close)}
+          {showHeader && (
+            <DialogHeader
+              {...(closeable && {
+                onCloseClick: () => close(false),
+              })}
+              className={classes.header}
             >
-              {button.title}
-            </Button>
-          ))}
-        </DialogFooter>
-      </Dialog>
+              <DialogTitle className={styles.title}>{title}</DialogTitle>
+              {Header && <Header close={close} />}
+            </DialogHeader>
+          )}
+          <DialogContent
+            className={clsx(classes.content, styles.content)}
+            style={{ padding }}
+            tabIndex={-1}
+            ref={contentRef}
+          >
+            {content}
+          </DialogContent>
+          {showFooter && (
+            <DialogFooter className={classes.footer}>
+              {Footer && <Footer close={close} />}
+              {buttons.map((button) => (
+                <Button
+                  autoFocus={button.variant === "primary"}
+                  key={button.name}
+                  type="button"
+                  variant={button.variant}
+                  onClick={() => button.onClick(close)}
+                >
+                  {button.title}
+                </Button>
+              ))}
+            </DialogFooter>
+          )}
+        </Dialog>
+      </DialogContext.Provider>
     </Portal>
   );
 }
