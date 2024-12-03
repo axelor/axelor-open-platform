@@ -396,3 +396,24 @@ The second binding is applied if the given if condition `email.empty` is
 evaluated to true. In this case, a new record is created with a calculated email address.
 
 The if conditions should be simple groovy expressions.
+
+== JSON models and JSON fields
+
+You can use `json-model` instead of `type` to import json model.
+In bindings, you can use `$<jsonField>.customField` to import a custom field.
+Here is an example :
+
+[source,xml]
+-----
+<input file="data.csv" json-model="ElectricityBillSubscription"
+    search="json_extract_text(self.attrs, 'name') = :name">
+  <bind column="name" to="$attrs.name"/>
+  <bind column="startDate" to="$attrs.startDate" adapter="LocalDate"/>
+  <bind column="endDate" to="$attrs.endDate" adapter="LocalDate"/>
+
+  <bind to="$attrs.billSubscription"
+      search="json_extract_text(self.attrs, 'name') = :billName">
+    <bind column="billName" to="$attrs.name"/>
+  </bind>
+</input>
+-----
