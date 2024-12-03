@@ -417,3 +417,18 @@ Here is an example :
   </bind>
 </input>
 -----
+
+== Data integrity check
+
+For a binding, you can define a boolean expression with `check`.
+You can set a message to display with `check-message` if the check fails.
+Here is an example :
+
+[source,xml]
+-----
+<input file="moveline.csv" separator=";" type="com.axelor.apps.account.db.MoveLine">
+    <bind to="account" column="account_code" check="account != null" check-message="The account :account_code doesn't exist"/>
+    <bind to="origin" column="PieceRef"/>
+    <bind to="description" column="EcritureLib"/>
+  </input>
+-----
