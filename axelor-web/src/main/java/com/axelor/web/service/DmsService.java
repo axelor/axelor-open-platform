@@ -280,12 +280,17 @@ public class DmsService {
     return response;
   }
 
-  private File findFile(DMSFile file) {
-    if (file == null || file.getMetaFile() == null) {
-      return null;
+  private boolean hasFile(DMSFile file) {
+    if (file == null) {
+      return false;
     }
-    final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
-    return path.exists() ? path : null;
+
+    if (file.getMetaFile() != null) {
+      final var path = MetaFiles.getPath(file.getMetaFile());
+      return Files.exists(path);
+    }
+
+    return file.getContent() != null;
   }
 
   @HEAD
@@ -293,7 +298,7 @@ public class DmsService {
   @Hidden
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
     final DMSFile file = repository.find(id);
-    return findFile(file) == null
+    return !hasFile(file)
         ? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
         : javax.ws.rs.core.Response.ok().build();
   }
@@ -304,7 +309,7 @@ public class DmsService {
   public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
     final DMSFile file = repository.find(id);
-    final File path = findFile(file);
+    final File path = getFile(file);
     if (path == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
@@ -341,11 +346,7 @@ public class DmsService {
     }
 
     if (records.stream()
-        .anyMatch(
-            record ->
-                !Boolean.TRUE.equals(record.getIsDirectory())
-                    && (record.getMetaFile() == null
-                        || !Files.exists(MetaFiles.getPath(record.getMetaFile()))))) {
+        .anyMatch(dmsFile -> !Boolean.TRUE.equals(dmsFile.getIsDirectory()) && !hasFile(dmsFile))) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
@@ -393,7 +394,7 @@ public class DmsService {
       summary = "Check file existence",
       description = "Check that the specified DMS file exists.")
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
-    if (!hasBatchIds(batchOrId) && findFile(repository.find(Longs.tryParse(batchOrId))) == null) {
+    if (!hasBatchIds(batchOrId) && !hasFile(repository.find(Longs.tryParse(batchOrId)))) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
     return findBatchIds(batchOrId) == null

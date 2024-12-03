@@ -1,0 +1,5 @@
+---
+title: Fix downloading of DMS file with content instead of meta file
+type: fix
+description: |
+  This fixes downloading of DMS file with string content, that are not associated with a meta file.
