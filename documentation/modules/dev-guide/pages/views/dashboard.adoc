@@ -8,8 +8,8 @@ The dashboard is used to provide overviews. The dashboard view is composed of da
 -----
 <dashboard name="welcome.dashboard" title="Welcome!">
   <search-fields>
-    <field name="fromDate" type="Date" title="From date"/>
-    <field name="toDate" type="Date" title="To date"/>
+    <field name="fromDate" type="date" title="From date"/>
+    <field name="toDate" type="date" title="To date"/>
   </search-fields>
   <dashlet action="chart:chart.sales.per.month"/>
   <dashlet action="chart:chart.sales.per.month.pie"/>
