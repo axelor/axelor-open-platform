@@ -21,7 +21,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useTabShortcut } from "@/hooks/use-shortcut";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { FormView, GridView, Schema } from "@/services/client/meta.types";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
@@ -47,11 +47,13 @@ import {
 } from "../../builder/scope";
 import { ExpandIcon } from "../../builder/expandable";
 import { AUTO_ADD_ROW } from "../../builder/utils";
+import { fallbackFormAtom } from "@/views/form/builder/atoms";
 
 import styles from "./form.module.scss";
 
 export interface GridFormRendererProps extends GridRowProps {
   view: GridView;
+  viewContext?: DataContext;
   fields?: MetaData["fields"];
   isLastRow?: boolean;
   onAddSubLine?: (parent: DataRecord) => void;
@@ -256,6 +258,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
   function Form(props, ref) {
     const {
       view,
+      viewContext,
       fields,
       className,
       columns,
@@ -329,6 +332,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         ...(parent !== fallbackFormAtom && {
           parent,
         }),
+        context: viewContext,
         states: initFormFieldsStates,
       });
     const onSaveAction =

@@ -1318,6 +1318,7 @@ function GridInner(props: ViewProps<GridView>) {
               ref={gridRef}
               records={records}
               view={view}
+              viewContext={action.context}
               fields={fields}
               perms={perms}
               state={state}

@@ -34,7 +34,7 @@ import {
   SearchOptions,
   SearchResult,
 } from "@/services/client/data";
-import { DataRecord } from "@/services/client/data.types";
+import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MetaData, ViewData } from "@/services/client/meta";
 import {
@@ -53,7 +53,6 @@ import { ActionExecutor } from "@/view-containers/action";
 import { Attrs } from "@/views/form/builder";
 import { findView } from "@/services/client/meta-cache";
 import { getDefaultValues, nextId } from "@/views/form/builder/utils";
-import { useViewAction } from "@/view-containers/views/scope";
 
 import {
   getWidget,
@@ -117,6 +116,7 @@ export const Grid = forwardRef<
   GridHandler,
   Partial<GridProps> & {
     view: GridView;
+    viewContext?: DataContext;
     expandable?: boolean;
     expandableView?: string | ViewData<FormView>;
     fields?: MetaData["fields"];
@@ -150,6 +150,7 @@ export const Grid = forwardRef<
 >(function Grid(props, ref) {
   const {
     view,
+    viewContext,
     expandable,
     expandableView,
     gridContext: _gridContext,
@@ -182,8 +183,6 @@ export const Grid = forwardRef<
     className,
     ...gridProps
   } = props;
-
-  const { context: viewContext } = useViewAction();
 
   const formRef = useRef<GridFormHandler>(null);
   const [event, setEvent] = useState("");
@@ -556,13 +555,22 @@ export const Grid = forwardRef<
         ref={formRef}
         {...props}
         view={gridView}
+        viewContext={viewContext}
         fields={fields}
         isLastRow={(state?.rows?.length ?? 0) - 1 === props.index}
         onAddSubLine={onAddSubLine}
         onInit={onFormInit}
       />
     );
-  }, [onFormInit, onAddSubLine, view, state?.rows.length, columns, fields]);
+  }, [
+    onFormInit,
+    onAddSubLine,
+    view,
+    viewContext,
+    state?.rows.length,
+    columns,
+    fields,
+  ]);
 
   const detailsProps = useMemo(
     () => ({
