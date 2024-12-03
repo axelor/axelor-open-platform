@@ -326,7 +326,9 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       useFormScope();
     const { formAtom, actionHandler, recordHandler, actionExecutor } =
       useFormHandlers(meta as unknown as ViewData<FormView>, record, {
-        parent,
+        ...(parent !== fallbackFormAtom && {
+          parent,
+        }),
         states: initFormFieldsStates,
       });
     const onSaveAction =
