@@ -374,14 +374,14 @@ Following keys can be used :
 By default `Caffeine` implementation is used with pre-configured settings. If you need more control on caching,
 add and edit `application.conf`. See `Caffeine` configs and settings.
 
-There is also populars caching libraries such as {url-ehcache}[Ehcache],
+There are also popular caching libraries such as {url-ehcache}[Ehcache],
 {url-hazelcast}[Hazelcast], {url-redis}[Redis] or {url-infinispan}[Infinispan] that can be used instead of
 `Caffeine` by specifying properties `hibernate.cache.region.factory_class` and `hibernate.javax.cache.provider` :
 
 *Infinispan :*
 [source,gradle]
 ----
-implementation "org.infinispan:infinispan-hibernate-cache-v53:${infinispan_version}"
+implementation "org.infinispan:infinispan-hibernate-cache-v62:${infinispan_version}"
 implementation "org.infinispan:infinispan-core:${infinispan_version}"
 implementation "org.infinispan:infinispan-jcache:${infinispan_version}"
 ----
@@ -394,7 +394,7 @@ hibernate.cache.infinispan.cfg = org/infinispan/hibernate/cache/commons/builder/
 *Redis :*
 [source,gradle]
 ----
-implementation "org.redisson:redisson-hibernate-53:${redisson_version}"
+implementation "org.redisson:redisson-hibernate-6:${redisson_version}"
 ----
 [source,properties]
 ----
@@ -423,7 +423,7 @@ implementation "org.ehcache:ehcache:${ehcache_version}"
 hibernate.javax.cache.provider = org.ehcache.jsr107.EhcacheCachingProvider
 ----
 
-Makes sure to add required dependencies if you want to use another caching library. Refer to providers docs for
+Make sure to add required dependencies if you want to use another caching library. Refer to providers docs for
 extensive configuration : all properties prefix by `hibernate.` will be used.
 
 == Global Context Configuration
