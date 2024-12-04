@@ -1,5 +1,7 @@
 import { atom, useAtomValue } from "jotai";
 import { useCallback, useMemo } from "react";
+import deepGet from "lodash/get";
+import deepSet from "lodash/set";
 
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useEnsureRelated } from "@/hooks/use-relation";
@@ -14,7 +16,36 @@ export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
 
   const relations = useMemo(() => {
     const items = findItems();
+
     const mapping: Record<string, { schema: Schema; related: string[] }> = {};
+
+    function getRelatedFieldList(prefix: string) {
+      // TODO: `useFieldRelated` code is quite related. can be merged.
+      const dotted = items
+        .filter((x) => x.name?.startsWith(prefix))
+        .map((x) => x.name as string)
+        .map((x) => x.substring(prefix.length));
+
+      const relatedFields = items
+        .map((x) =>
+          [x.depends?.split(","), x.viewer?.depends?.split(",")].flat(),
+        )
+        .flat()
+        .filter(Boolean)
+        .filter((x) => x.startsWith(prefix))
+        .map((x) => x.substring(prefix.length));
+
+      return [...dotted, ...relatedFields].flat();
+    }
+
+    // pre-process editor items
+    // in order to reduce overload of finding editor item repeatedly
+    const editorItems = items.reduce(
+      (itemSet, item) =>
+        item.name && item.editor ? { ...itemSet, [item.name]: item } : itemSet,
+      {},
+    );
+
     for (const item of items) {
       const { name, targetName } = item;
 
@@ -23,22 +54,36 @@ export function DottedValues({ formAtom }: { formAtom: FormAtom }) {
         const field = meta.fields?.[name];
         const prefix = `${name}.`;
 
-        // TODO: `useFieldRelated` code is quite related. can be merged.
-        const dotted = items
-          .filter((x) => x.name?.startsWith(prefix))
-          .map((x) => x.name as string)
-          .map((x) => x.substring(prefix.length));
+        const editorItem = editorItems[name];
+        const relatedList = getRelatedFieldList(prefix);
+        const relatedFieldsInEditor = editorItem
+          ? relatedList.filter((fieldName) =>
+              Object.keys(editorItem?.editor?.fields ?? {}).some(
+                (editorFieldName) => fieldName.startsWith(editorFieldName),
+              ),
+            )
+          : [];
 
-        const relatedFields = items
-          .map((x) =>
-            [x.depends?.split(","), x.viewer?.depends?.split(",")].flat(),
-          )
-          .flat()
-          .filter(Boolean)
-          .filter((x) => x.startsWith(prefix))
-          .map((x) => x.substring(prefix.length));
+        if (relatedFieldsInEditor.length) {
+          relatedFieldsInEditor.forEach((editFieldName) => {
+            const subFieldName = editFieldName.split(".")[0];
+            const fieldName = `${name}.${subFieldName}`;
+            const subFieldPrefix = `${fieldName}.`;
+            const schema = item?.editor?.fields?.[subFieldName];
+            schema &&
+              (mapping[fieldName] ??= {
+                schema: {
+                  ...schema,
+                  name: fieldName,
+                },
+                related: getRelatedFieldList(subFieldPrefix),
+              });
+          });
+        }
 
-        const names = [...dotted, ...relatedFields].flat().filter(Boolean);
+        const names = relatedList.filter(
+          (x) => x && !relatedFieldsInEditor.includes(x),
+        );
 
         const shouldFetchTargetName =
           item.targetName &&
@@ -78,10 +123,13 @@ function EnsureRelated({
   const valueAtom = useMemo(
     () =>
       atom(
-        (get) => get(formAtom).record[name],
+        (get) => deepGet(get(formAtom).record, name),
         (get, set, value: unknown) => {
           const { record, ...rest } = get(formAtom);
-          set(formAtom, { ...rest, record: { ...record, [name]: value } });
+          set(formAtom, {
+            ...rest,
+            record: deepSet({ ...record }, name, value),
+          });
         },
       ),
     [formAtom, name],
