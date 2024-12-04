@@ -3,6 +3,7 @@ import deepGet from "lodash/get";
 import deepEqual from "lodash/isEqual";
 import deepSet from "lodash/set";
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { produce } from "immer";
 
 import { DataSource } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
@@ -132,8 +133,10 @@ export function useEnsureRelated({
               return;
             }
             const state = get(formAtom);
-            const record = { ...state.record };
-            deepSet(record, name, newValue);
+            const record = produce(state.record, (draft) => {
+              deepSet(draft, name, newValue);
+            })
+
             // updated reference dotted fields in record
             Object.keys(record).forEach((fieldName) => {
               if (fieldName.includes(".") && fieldName.startsWith(name)) {
