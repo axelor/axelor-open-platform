@@ -39,7 +39,7 @@ importers:
         version: 6.1.15(@fullcalendar/core@6.1.15)
       '@monaco-editor/react':
         specifier: ^4.6.0
-        version: 4.6.0(monaco-editor@0.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.6.0(monaco-editor@0.50.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@uiw/react-color-block':
         specifier: ^2.3.2
         version: 2.3.2(@babel/runtime@7.24.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -89,8 +89,8 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       monaco-editor:
-        specifier: ^0.52.0
-        version: 0.52.0
+        specifier: ^0.50.0
+        version: 0.50.0
       parse5:
         specifier: ^7.2.1
         version: 7.2.1
@@ -2811,8 +2811,8 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
-  monaco-editor@0.52.0:
-    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
+  monaco-editor@0.50.0:
+    resolution: {integrity: sha512-8CclLCmrRRh+sul7C08BmPBP3P8wVWfBHomsTcndxg5NRCEPfu/mc2AGU8k37ajjDVXcXFc12ORAMUkmk+lkFA==}
 
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -4911,15 +4911,15 @@ snapshots:
 
   '@material-symbols/metadata@0.27.1': {}
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.0)':
+  '@monaco-editor/loader@1.4.0(monaco-editor@0.50.0)':
     dependencies:
-      monaco-editor: 0.52.0
+      monaco-editor: 0.50.0
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.6.0(monaco-editor@0.52.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@monaco-editor/react@4.6.0(monaco-editor@0.50.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.0)
-      monaco-editor: 0.52.0
+      '@monaco-editor/loader': 1.4.0(monaco-editor@0.50.0)
+      monaco-editor: 0.50.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6883,7 +6883,7 @@ snapshots:
   mkdirp-classic@0.5.3:
     optional: true
 
-  monaco-editor@0.52.0: {}
+  monaco-editor@0.50.0: {}
 
   ms@2.1.2: {}
 
