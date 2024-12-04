@@ -39,7 +39,7 @@
 
 .quickMenus {
   max-height: 380px;
-  overflow: scroll;
+  overflow: auto;
   width: 250px;
 
   > * > button {
