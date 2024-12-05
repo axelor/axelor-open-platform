@@ -1,6 +1,17 @@
 import { Property, Schema, ViewType } from "@/services/client/meta.types";
 import { ViewData } from "@/services/client/meta";
 
+export function processViewItem(schema: Schema, field?: Schema) {
+  const serverType = schema?.serverType || field?.type;
+  const more = serverType ? { serverType } : {};
+  return {
+    ...field,
+    ...schema,
+    ...schema?.widgetAttrs,
+    ...more,
+  };
+}
+
 export function findViewItem<T extends ViewType>(
   meta: ViewData<T>,
   fieldName: string,
@@ -9,14 +20,7 @@ export function findViewItem<T extends ViewType>(
   return walkSchema(view, fields, [], ({ path, schema, field }) => {
     const name = path.join(".");
     if (name === fieldName) {
-      const serverType = schema?.serverType || field?.type;
-      const more = serverType ? { serverType } : {};
-      return {
-        ...field,
-        ...schema,
-        ...schema?.widgetAttrs,
-        ...more,
-      };
+      return processViewItem(schema, field);
     }
   });
 }

@@ -24,7 +24,7 @@ import { equalsIgnoreClean } from "@/services/client/data-utils";
 import { ViewData } from "@/services/client/meta";
 import { Schema, ViewType } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
-import { findViewItem } from "@/utils/schema";
+import { findViewItem, processViewItem } from "@/utils/schema";
 import { FormAtom, usePrepareContext } from "@/views/form/builder";
 import {
   useCanDirty,
@@ -370,14 +370,16 @@ export function useViewMeta() {
           items ??
           (() => {
             const viewItems = findSchemaItems(meta.view).map((item) =>
-              item.name ? findItem(item.name) ?? { ...item } : { ...item },
+              item.name
+                ? processViewItem(item, meta.fields?.[item.name])
+                : item,
             );
             set(metaAtom, (prev) => ({ ...prev, items: viewItems }));
             return viewItems;
           })()
         );
       },
-      [metaAtom, findItem, meta.view],
+      [metaAtom, meta],
     ),
   );
 
