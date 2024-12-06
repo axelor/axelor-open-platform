@@ -184,6 +184,7 @@ export const Grid = forwardRef<
     ...gridProps
   } = props;
 
+  const gridRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<GridFormHandler>(null);
   const [event, setEvent] = useState("");
   const { isMobile } = useDevice();
@@ -510,14 +511,14 @@ export const Grid = forwardRef<
       if ((record.id ?? -1) < 0 && !record._dirty) {
         setState?.((draft) => {
           draft.rows = draft.rows.filter((r) => r?.record?.id !== record.id);
-          draft.selectedCell = null;
-        });
-      } else {
-        setState?.((draft) => {
-          draft.selectedCell = null;
         });
       }
       onDiscard?.(record);
+      // focus was lost due to onDiscard activity
+      // re-focus grid through timeout
+      setTimeout(() => {
+        gridRef?.current?.focus();
+      });
     },
     [onDiscard, setState],
   );
@@ -650,6 +651,7 @@ export const Grid = forwardRef<
     <AxGridProvider>
       <GridContext.Provider value={gridContext}>
         <AxGrid
+          ref={gridRef}
           labels={getLabels()}
           cellRenderer={CustomCellRenderer}
           rowRenderer={CustomRowRenderer}
