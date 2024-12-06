@@ -1,0 +1,5 @@
+---
+title: Fix gantt line alignment
+type: fix
+description: |
+  The gantt line should be aligned to table task row.

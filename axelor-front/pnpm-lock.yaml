@@ -17,8 +17,8 @@ importers:
   .:
     dependencies:
       '@axelor/ui':
-        specifier: ^0.3.2
-        version: 0.3.2(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@22.9.1)(@types/react-dom@18.3.0)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
+        specifier: ^0.3.3
+        version: 0.3.3(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@22.9.1)(@types/react-dom@18.3.0)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
       '@babel/standalone':
         specifier: ^7.26.2
         version: 7.26.2
@@ -229,8 +229,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@axelor/ui@0.3.2':
-    resolution: {integrity: sha512-Lde/FDi7kLRZ5sr/4flZkWXWHsWkuMrB9L2t0Ahe2JSkDpQ/Abuh/Pcp0nSbUX/toA5u0NAcSEQFjbHEXgzSVw==}
+  '@axelor/ui@0.3.3':
+    resolution: {integrity: sha512-B4htHTDx9F0CCUGaMsCYoeO3gm6QCA6/K/Adl4FpyDbCV1WiPFs6mpq8XkZFI1rcK2JBKXOS4gtSPkcnErLyOg==}
     peerDependencies:
       react: ^18.3.1-0
       react-dom: ^18.3.1-0
@@ -1012,8 +1012,8 @@ packages:
   '@fluentui/keyboard-keys@9.0.8':
     resolution: {integrity: sha512-iUSJUUHAyTosnXK8O2Ilbfxma+ZyZPMua5vB028Ys96z80v+LFwntoehlFsdH3rMuPsA8GaC1RE7LMezwPBPdw==}
 
-  '@fluentui/priority-overflow@9.1.13':
-    resolution: {integrity: sha512-yDojVpkhBZTXOYExrCgW1GXbw3x9pYIS617xlNJIc2t06Cd3H32y2p51QXFt94sBmlVyAvPu7UKBHaq1Yw7u+w==}
+  '@fluentui/priority-overflow@9.1.14':
+    resolution: {integrity: sha512-tIH8EhvjZF4MhxSjqrWOyodrQQW+RlVZqxuNFQF5OWRdSqcIK8g+Z+UbC5fYHQooCgVsthk2mFurfGMKFtf9ug==}
 
   '@fluentui/react-context-selector@9.1.69':
     resolution: {integrity: sha512-g29PE3cya7vY85o1ZwYMhPtkUyb7Q14UdrBCeEUr7+KjTPKMbkF27GKh0fAwwFuh9talvmI6fEVkJ9odYI6Dog==}
@@ -1127,11 +1127,11 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@material-symbols/font-400@0.27.1':
-    resolution: {integrity: sha512-aB7VDwrJ2HVaIhc6kgHsSHW00ut8rx1+EpQC6Pj42WWIOzrwJWwplIUoLVVizchZu0IQC2WKzvqCrOekh+Ezsg==}
+  '@material-symbols/font-400@0.27.2':
+    resolution: {integrity: sha512-hXRCp/VZ7l9V5eq9vXeJxTN47B6/ZoHjN7wzRN3T1cL3Mz0VsXs3PvjEN6AZ4EMdXJ5eL4lzeC6tkcudcZ8NSg==}
 
-  '@material-symbols/metadata@0.27.1':
-    resolution: {integrity: sha512-QkTTrSi69Lcb4HLfGZN3NEeRcT1ggSt7Ls/bnHJkgDp558jZexDRIyQ8iIAdXjmQNGNr1NvNxGXx4B3ep5sKRQ==}
+  '@material-symbols/metadata@0.27.2':
+    resolution: {integrity: sha512-pEE6qscCKBUoU8ltpLEY+YeSsmfaoVDBZ4i+bi6054nd4xa/DjD5veJgTfb71dP3XcjnXlwVXk2kImNyfhmI2A==}
 
   '@monaco-editor/loader@1.4.0':
     resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==}
@@ -3867,14 +3867,14 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@axelor/ui@0.3.2(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@22.9.1)(@types/react-dom@18.3.0)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
+  '@axelor/ui@0.3.3(@popperjs/core@2.11.8)(@types/hoist-non-react-statics@3.3.1)(@types/node@22.9.1)(@types/react-dom@18.3.0)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)':
     dependencies:
       '@emotion/is-prop-valid': 1.3.1
       '@floating-ui/react': 0.26.28(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@fluentui/priority-overflow': 9.1.13
+      '@fluentui/priority-overflow': 9.1.14
       '@fluentui/react-context-selector': 9.1.69(@types/react-dom@18.3.0)(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(scheduler@0.23.2)
-      '@material-symbols/font-400': 0.27.1
-      '@material-symbols/metadata': 0.27.1
+      '@material-symbols/font-400': 0.27.2
+      '@material-symbols/metadata': 0.27.2
       '@types/qrcode': 1.5.5
       bootstrap: 5.3.3(@popperjs/core@2.11.8)
       bootstrap-icons: 1.11.3
@@ -4783,7 +4783,7 @@ snapshots:
     dependencies:
       '@swc/helpers': 0.5.2
 
-  '@fluentui/priority-overflow@9.1.13':
+  '@fluentui/priority-overflow@9.1.14':
     dependencies:
       '@swc/helpers': 0.5.2
 
@@ -4907,9 +4907,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
 
-  '@material-symbols/font-400@0.27.1': {}
+  '@material-symbols/font-400@0.27.2': {}
 
-  '@material-symbols/metadata@0.27.1': {}
+  '@material-symbols/metadata@0.27.2': {}
 
   '@monaco-editor/loader@1.4.0(monaco-editor@0.50.0)':
     dependencies:
