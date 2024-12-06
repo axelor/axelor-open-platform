@@ -32,6 +32,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.inject.Singleton;
 import jakarta.servlet.ServletContext;
 import java.util.Collection;
 import java.util.Optional;
@@ -40,6 +41,9 @@ import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.client.Client;
@@ -84,9 +88,9 @@ public class AuthPac4jModule extends ShiroWebModule {
 
     bindRealm().to(AuthPac4jRealm.class);
 
-    final Multibinder<AuthenticationListener> listenerMultibinder =
+    final Multibinder<AuthenticationListener> authListenerMultibinder =
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
-    listenerMultibinder.addBinding().to(AuthPac4jListener.class);
+    authListenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
     final Class<? extends ClientListService> clientListService =
         MetaScanner.findSubTypesOf(ClientListService.class).find().stream()
@@ -106,6 +110,8 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(DirectBasicAuthClient.class).to(AxelorDirectBasicAuthClient.class);
 
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
+
+    bindAndExpose(SessionDAO.class).to(MemorySessionDAO.class).in(Singleton.class);
   }
 
   protected <T> AnnotatedBindingBuilder<T> bindAndExpose(Class<T> cls) {
@@ -121,6 +127,11 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Override
   protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
     bind.to(DefaultWebSecurityManager.class);
+  }
+
+  @Override
+  protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
+    bind.to(AxelorSessionManager.class).asEagerSingleton();
   }
 
   @Provides

@@ -27,20 +27,20 @@ import com.axelor.auth.db.User;
 import com.axelor.inject.Beans;
 import com.axelor.meta.theme.AvailableTheme;
 import com.axelor.meta.theme.MetaThemeService;
-import com.axelor.web.AppSessionListener;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,10 +57,10 @@ public class AboutService extends AbstractService {
 
     if (user != null && AuthUtils.isTechnicalStaff(user)) {
       final Runtime runtime = Runtime.getRuntime();
-      final Set<HttpSession> sessions = AppSessionListener.getSessions();
+      final Collection<Session> sessions = Beans.get(SessionDAO.class).getActiveSessions();
       final List<Map<String, Object>> users = new ArrayList<>();
 
-      for (HttpSession session : sessions) {
+      for (Session session : sessions) {
         try {
           if (session == null
               || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
@@ -74,8 +74,8 @@ public class AboutService extends AbstractService {
         String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
         Map<String, Object> map = new HashMap<>();
         map.put("user", login);
-        map.put("loginTime", session.getCreationTime());
-        map.put("accessTime", session.getLastAccessedTime());
+        map.put("loginTime", session.getStartTimestamp());
+        map.put("accessTime", session.getLastAccessTime());
         users.add(map);
       }
 

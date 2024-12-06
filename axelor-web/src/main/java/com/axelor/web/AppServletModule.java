@@ -167,8 +167,6 @@ public class AppServletModule extends ServletModule {
       bind(type);
     }
 
-    // register the session listener
-    getServletContext().addListener(new AppSessionListener());
     // run additional configuration tasks
     this.afterConfigureServlets();
   }

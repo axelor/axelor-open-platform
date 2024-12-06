@@ -20,18 +20,15 @@ package com.axelor.auth.pac4j;
 
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.function.Supplier;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.subject.PrincipalCollection;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.shiro.lang.codec.Base64;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.SubjectContext;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.servlet.Cookie;
-import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * RememberMe Manager
@@ -41,68 +38,34 @@ import org.apache.shiro.web.util.WebUtils;
  */
 @Singleton
 public class AxelorRememberMeManager extends CookieRememberMeManager {
-  private final Cookie secureCookie;
-  private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
-  public AxelorRememberMeManager() {
-    secureCookie = new SimpleCookie(super.getCookie());
-    secureCookie.setSecure(true);
-    secureCookie.setSameSite(SameSiteOptions.NONE);
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(AxelorRememberMeManager.class);
 
   @Override
-  public PrincipalCollection getRememberedPrincipals(SubjectContext subjectContext) {
-    return withRequest(subjectContext, () -> super.getRememberedPrincipals(subjectContext));
-  }
+  protected void rememberSerializedIdentity(Subject subject, byte[] serialized) {
 
-  @Override
-  public void forgetIdentity(SubjectContext subjectContext) {
-    withRequest(subjectContext, () -> super.forgetIdentity(subjectContext));
-  }
-
-  @Override
-  public void onSuccessfulLogin(
-      Subject subject, AuthenticationToken token, AuthenticationInfo info) {
-    withRequest(subject, () -> super.onSuccessfulLogin(subject, token, info));
-  }
-
-  @Override
-  public void onFailedLogin(
-      Subject subject, AuthenticationToken token, AuthenticationException ae) {
-    withRequest(subject, () -> super.onFailedLogin(subject, token, ae));
-  }
-
-  @Override
-  public void onLogout(Subject subject) {
-    withRequest(subject, () -> super.onLogout(subject));
-  }
-
-  @Override
-  public Cookie getCookie() {
-    final HttpServletRequest request = getRequest();
-    return request != null && request.isSecure() ? secureCookie : super.getCookie();
-  }
-
-  protected HttpServletRequest getRequest() {
-    return currentRequest.get();
-  }
-
-  protected <T> T withRequest(Object requestPairSource, Supplier<T> task) {
-    final HttpServletRequest request = WebUtils.getHttpRequest(requestPairSource);
-    currentRequest.set(request);
-    try {
-      return task.get();
-    } finally {
-      currentRequest.remove();
+    if (!WebUtils.isHttp(subject)) {
+      if (LOGGER.isDebugEnabled()) {
+        String msg =
+            "Subject argument is not an HTTP-aware instance.  This is required to obtain a servlet "
+                + "request and response in order to set the rememberMe cookie. Returning immediately and "
+                + "ignoring rememberMe operation.";
+        LOGGER.debug(msg);
+      }
+      return;
     }
-  }
 
-  protected void withRequest(Object requestPairSource, Runnable task) {
-    withRequest(
-        requestPairSource,
-        () -> {
-          task.run();
-          return null;
-        });
+    HttpServletRequest request = WebUtils.getHttpRequest(subject);
+    HttpServletResponse response = WebUtils.getHttpResponse(subject);
+
+    // base 64 encode it and store as a cookie:
+    String base64 = Base64.encodeToString(serialized);
+
+    // the class attribute is really a template for the outgoing cookies
+    Cookie template = getCookie();
+    Cookie cookie = new SimpleCookie(template);
+    cookie.setValue(base64);
+    AxelorSessionManager.updateCookie(cookie, request); // For secure cookie
+    cookie.saveTo(request, response);
   }
 }

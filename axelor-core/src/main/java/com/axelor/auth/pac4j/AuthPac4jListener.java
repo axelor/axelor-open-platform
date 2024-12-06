@@ -42,7 +42,6 @@ public class AuthPac4jListener implements AuthenticationListener {
   @Inject private Event<PostLogin> postLoginEvent;
   @Inject private Event<LogoutEvent> logoutEvent;
   @Inject private AuthPac4jProfileService profileService;
-  @Inject private AxelorSessionManager sessionManager;
   @Inject private AuthSessionService sessionService;
 
   private static final String UNKNOWN_USER = "User not found: %s";
@@ -53,7 +52,6 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = authenticationInfo.getUser();
 
       if (user != null) {
-        sessionManager.changeSessionId();
         sessionService.updateLoginDate();
         firePostLoginSuccess(token, user);
         return;

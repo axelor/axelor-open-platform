@@ -18,134 +18,108 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import jakarta.ws.rs.core.HttpHeaders;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.AuthorizationException;
+import java.io.Serializable;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.mgt.SessionContext;
-import org.apache.shiro.session.mgt.SessionKey;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
-import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
+import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
+import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Session Manager
  *
- * <p>Lets the Servlet container manage the sessions and uses SameSite attribute for secure
- * requests.
+ * <p>Uses SameSite attribute for secure requests.
  */
 @Singleton
-public class AxelorSessionManager extends ServletContainerSessionManager {
+public class AxelorSessionManager extends DefaultWebSessionManager {
 
-  protected static final String COOKIE_ATTR_SEPARATOR = "; ";
-  private static final Pattern COOKIE_PATH_PATTERN = Pattern.compile("(Path|path)=(.*?);");
+  private static final Logger LOGGER = LoggerFactory.getLogger(AxelorSessionManager.class);
 
-  @Override
-  public Session start(SessionContext context) throws AuthorizationException {
-    final HttpServletRequest request = WebUtils.getHttpRequest(context);
-    return getSession(
-        true,
-        context,
-        request,
-        Optional.ofNullable(context.getHost()).orElseGet(request::getRemoteHost));
+  @Inject
+  public AxelorSessionManager(SessionDAO sessionDAO) {
+    setSessionDAO(sessionDAO);
+
+    // Seconds to milliseconds
+    long sessionTimeout =
+        AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60) * 60_000L;
+    setGlobalSessionTimeout(sessionTimeout);
   }
 
-  @Override
-  public Session getSession(SessionKey key) throws SessionException {
-    final HttpServletRequest request = WebUtils.getHttpRequest(key);
-    return getSession(false, key, request, request.getRemoteHost());
+  /**
+   * Stores session ID in a cookie.
+   *
+   * <p>See {@link org.apache.shiro.web.session.mgt.DefaultWebSessionManager#storeSessionId()}
+   *
+   * @param currentId session id
+   * @param request HTTP request
+   * @param response HTTP response
+   */
+  private void storeSecureSessionId(
+      Serializable currentId, HttpServletRequest request, HttpServletResponse response) {
+    if (currentId == null) {
+      String msg = "sessionId cannot be null when persisting for subsequent requests.";
+      throw new IllegalArgumentException(msg);
+    }
+    Cookie template = getSessionIdCookie();
+    Cookie cookie = new SimpleCookie(template);
+    String idString = currentId.toString();
+    cookie.setValue(idString);
+    updateCookie(cookie, request); // For secure cookie
+    cookie.saveTo(request, response);
+    LOGGER.trace("Set session ID cookie for session with id {}", idString);
   }
 
-  public void changeSessionId() {
-    final Subject subject = SecurityUtils.getSubject();
-    final HttpServletRequest request = WebUtils.getHttpRequest(subject);
-    final HttpServletResponse response = WebUtils.getHttpResponse(subject);
-    final boolean sessionCreationEnabled =
-        !Boolean.FALSE.equals(request.getAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED));
+  /**
+   * Stores the Session's ID, usually as a Cookie, to associate with future requests.
+   *
+   * <p>See {@link org.apache.shiro.web.session.mgt.DefaultWebSessionManager#onStart()}
+   *
+   * @param session the session that was just {@link #createSession created}.
+   */
+  @Override
+  protected void onStart(Session session, SessionContext context) {
+    if (!WebUtils.isHttp(context)) {
+      LOGGER.debug(
+          "SessionContext argument is not HTTP compatible or does not have an HTTP request/response "
+              + "pair. No session ID cookie will be set.");
+      return;
+    }
+    HttpServletRequest request = WebUtils.getHttpRequest(context);
+    HttpServletResponse response = WebUtils.getHttpResponse(context);
 
-    if (subject.getSession(sessionCreationEnabled) != null) {
-      request.changeSessionId();
+    if (isSessionIdCookieEnabled()) {
+      Serializable sessionId = session.getId();
+      storeSecureSessionId(sessionId, request, response); // For secure cookie
+    } else {
+      LOGGER.debug(
+          "Session ID cookie is disabled.  No cookie has been set for new session with id {}",
+          session.getId());
     }
 
+    request.removeAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_SOURCE);
+    request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_IS_NEW, Boolean.TRUE);
+  }
+
+  protected static void updateCookie(Cookie cookie, HttpServletRequest request) {
     if (request.isSecure()) {
-      setSameSiteNone(response);
+      cookie.setSecure(true);
+      cookie.setSameSite(SameSiteOptions.NONE);
     }
 
-    updateCookiePath(response, request.getContextPath());
-  }
-
-  protected Session getSession(
-      boolean create, Object source, HttpServletRequest request, String host) {
-    final HttpSession httpSession = request.getSession(create);
-
-    if (httpSession == null) {
-      return null;
+    if (request.getContextPath().isEmpty()) {
+      cookie.setPath("/");
     }
-
-    final HttpServletResponse response = WebUtils.getHttpResponse(source);
-
-    if (httpSession.isNew() && request.isSecure()) {
-      setSameSiteNone(response);
-    }
-
-    Session session = createSession(httpSession, host);
-
-    updateCookiePath(response, request.getContextPath());
-
-    return session;
-  }
-
-  private void updateCookiePath(HttpServletResponse httpResponse, String contextPath) {
-    final Iterator<String> it = httpResponse.getHeaders(HttpHeaders.SET_COOKIE).iterator();
-
-    if (it.hasNext()) {
-      httpResponse.setHeader(HttpHeaders.SET_COOKIE, updateCookiePath(it.next(), contextPath));
-      while (it.hasNext()) {
-        httpResponse.addHeader(HttpHeaders.SET_COOKIE, updateCookiePath(it.next(), contextPath));
-      }
-    }
-  }
-
-  private String updateCookiePath(String header, String contextPath) {
-    if (contextPath.length() == 0) {
-      contextPath = "/";
-    }
-    return COOKIE_PATH_PATTERN.matcher(header).replaceAll("$1=" + contextPath + ";");
-  }
-
-  protected void setSameSiteNone(HttpServletResponse response) {
-    final Iterator<String> it = response.getHeaders(HttpHeaders.SET_COOKIE).iterator();
-
-    if (it.hasNext()) {
-      addSameSiteCookieHeader(response::setHeader, it.next());
-      while (it.hasNext()) {
-        addSameSiteCookieHeader(response::addHeader, it.next());
-      }
-    }
-  }
-
-  protected void addSameSiteCookieHeader(BiConsumer<String, String> adder, String header) {
-    final List<String> parts = new ArrayList<>();
-    Collections.addAll(parts, header, "SameSite=None");
-    if (header.indexOf(COOKIE_ATTR_SEPARATOR + "Secure") < 0) {
-      parts.add("Secure");
-    }
-
-    adder.accept(
-        HttpHeaders.SET_COOKIE, parts.stream().collect(Collectors.joining(COOKIE_ATTR_SEPARATOR)));
   }
 }
