@@ -175,7 +175,7 @@ libs.resteasy_server = [
 ]
 
 libs.swagger_jaxrs2 = [
-    dependencies.create("io.swagger.core.v3:swagger-jaxrs2:2.2.25") {
+    dependencies.create("io.swagger.core.v3:swagger-jaxrs2:2.2.26") {
         exclude group: "com.fasterxml.jackson.core", module: "jackson-databind"
         exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
         exclude group: "com.fasterxml.jackson.jaxrs", module: "jackson-jaxrs-json-provider"
