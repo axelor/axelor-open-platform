@@ -75,7 +75,7 @@ function FavoriteItem(props: RenderCommandItemProps) {
   const [favorites, setFavorites] = useState<DataRecord[]>([]);
 
   const pathname = location?.pathname;
-  const user = session?.user!;
+  const user = session?.user;
   const tabTitle = active?.action?.title;
 
   const favoriteDataStore = useMemo<DataStore>(
@@ -130,6 +130,9 @@ function FavoriteItem(props: RenderCommandItemProps) {
     });
 
     if (confirmed && inputTitle) {
+      if (!user) {
+        return;
+      }
       const result = await favoriteDataStore.save({
         title: inputTitle,
         link: pathname,

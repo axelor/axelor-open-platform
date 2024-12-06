@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from "react";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function isFunction(value: any): value is Function {
   return typeof value === "function";
 }

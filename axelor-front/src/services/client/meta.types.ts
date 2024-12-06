@@ -574,6 +574,7 @@ export interface TreeField extends Field {
   prompt?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TreeColumn extends SearchField {}
 
 export interface TreeView extends View {
@@ -742,6 +743,7 @@ export interface SearchSelectField {
   selectionList?: Selection[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SearchResultField extends SearchField {}
 
 export interface SearchFilter {

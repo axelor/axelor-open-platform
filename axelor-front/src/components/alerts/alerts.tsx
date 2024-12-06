@@ -47,7 +47,7 @@ const showAlert = (alert: {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-export module alerts {
+export namespace alerts {
   export function info(options: { title?: string; message: React.ReactNode }) {
     showAlert({
       type: "info",
