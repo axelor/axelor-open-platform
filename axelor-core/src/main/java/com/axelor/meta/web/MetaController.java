@@ -18,8 +18,6 @@
  */
 package com.axelor.meta.web;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -47,6 +45,7 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
@@ -278,10 +277,6 @@ public class MetaController {
     }
   }
 
-  private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
-  private static final String EXPORT_DIR =
-      AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
-
   private void exportI18n(String module, URL file) throws IOException {
 
     String name = Paths.get(file.getFile()).getFileName().toString();
@@ -289,7 +284,7 @@ public class MetaController {
       return;
     }
 
-    Path path = Paths.get(EXPORT_DIR, "i18n");
+    Path path = ActionExport.getExportPath().toPath().resolve("i18n");
     String lang = StringUtils.normalizeLanguageTag(name.substring(9, name.length() - 4));
     Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
 
