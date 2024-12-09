@@ -60,8 +60,6 @@ public class AboutService extends AbstractService {
       final Set<HttpSession> sessions = AppSessionListener.getSessions();
       final List<Map<String, Object>> users = new ArrayList<>();
 
-      int mb = 1024;
-
       for (HttpSession session : sessions) {
         try {
           if (session == null
@@ -88,10 +86,9 @@ public class AboutService extends AbstractService {
       info.put("javaRuntime", System.getProperty("java.runtime.name"));
       info.put("javaVersion", System.getProperty("java.runtime.version"));
 
-      info.put("memTotal", (runtime.totalMemory() / mb) + " Kb");
-      info.put("memMax", (runtime.maxMemory() / mb) + " Kb");
-      info.put("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
-      info.put("memFree", (runtime.freeMemory() / mb) + " Kb");
+      info.put("memTotal", runtime.totalMemory());
+      info.put("memMax", runtime.maxMemory());
+      info.put("memFree", runtime.freeMemory());
 
       info.put("users", users);
     }
