@@ -9,7 +9,7 @@ import { PageText } from "@/components/page-text";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useTemplate } from "@/hooks/use-parser";
-import { usePerms } from "@/hooks/use-perms";
+import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useSearchTranslate } from "@/hooks/use-search-translate";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -43,8 +43,12 @@ export function Cards(props: ViewProps<CardsView>) {
   const { action, dashlet, popup, popupOptions } = useViewTab();
 
   const switchTo = useViewSwitch();
-  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { hasButton } = useViewPerms(meta);
   const getViewContext = useViewContext();
+
+  const canNew = hasButton("new");
+  const canEdit = hasButton("edit");
+  const canDelete = hasButton("delete");
 
   const { onDelete: onDeleteAction } = view;
   const hasEditPopup = dashlet || view.editWindow === "popup";
@@ -240,6 +244,9 @@ export function Cards(props: ViewProps<CardsView>) {
         actionExecutor,
         view,
         onRefresh,
+        ...(canNew && canEdit && {
+          onAdd: () => onEditInPopup({}),
+        }),
       });
     }
   }, [
@@ -250,6 +257,9 @@ export function Cards(props: ViewProps<CardsView>) {
     actionExecutor,
     onRefresh,
     setDashletHandlers,
+    canNew,
+    canEdit,
+    onEditInPopup,
   ]);
 
   const showToolbar = popupOptions?.showToolbar !== false;
@@ -261,8 +271,6 @@ export function Cards(props: ViewProps<CardsView>) {
   } = dataStore.page;
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
-
-  const canNew = hasButton("new");
 
   const handlePrev = useCallback(
     () => onSearch({ offset: offset - limit }),
@@ -344,11 +352,10 @@ export function Cards(props: ViewProps<CardsView>) {
               width={width}
               minWidth={minWidth}
               onRefresh={onRefresh}
-              {...(hasButton("edit") && { onEdit })}
-              {...(hasButton("edit") && {
+              {...(canEdit && {
                 onEdit: hasEditPopup ? onEditInPopup : onEdit,
               })}
-              {...(hasButton("delete") && { onDelete })}
+              {...(canDelete && { onDelete })}
             />
           ))}
         </Box>

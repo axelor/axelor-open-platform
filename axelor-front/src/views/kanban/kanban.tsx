@@ -21,7 +21,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { useTemplate } from "@/hooks/use-parser";
 import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { isLegacyTemplate } from "@/hooks/use-parser/utils";
-import { usePerms } from "@/hooks/use-perms";
+import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
@@ -73,7 +73,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     columnsRef.current = columns;
   }, [columns]);
 
-  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { hasButton } = useViewPerms(meta);
   const switchTo = useViewSwitch();
 
   const { params } = action;
@@ -641,6 +641,8 @@ export function Kanban(props: ViewProps<KanbanView>) {
   );
 
   const canNew = hasButton("new");
+  const canEdit = hasButton("edit");
+  const canDelete = hasButton("delete");
 
   useShortcuts({
     viewType: view.type,
@@ -705,9 +707,9 @@ export function Kanban(props: ViewProps<KanbanView>) {
           onLoadMore={onLoadMore}
           onCardMove={onMove}
           onCardClick={onView}
-          {...(hasButton("delete") && { onCardDelete: onDelete })}
-          {...(hasButton("new") && { onCardAdd: onCreate })}
-          {...(hasButton("edit") && {
+          {...(canDelete && { onCardDelete: onDelete })}
+          {...(canNew && { onCardAdd: onCreate })}
+          {...(canEdit && {
             onCardEdit: hasEditPopup ? onEditInPopup : onEdit,
           })}
           {...({} as any)}

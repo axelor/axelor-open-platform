@@ -19,7 +19,7 @@ import { dialogs } from "@/components/dialogs";
 import { PageText } from "@/components/page-text";
 import { useAsync } from "@/hooks/use-async";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { usePerms } from "@/hooks/use-perms";
+import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useDevice } from "@/hooks/use-responsive";
 import { useSearchTranslate } from "@/hooks/use-search-translate";
@@ -131,7 +131,7 @@ function GridWrapper({
 function GridInner(props: ViewProps<GridView>) {
   const { meta, dataStore, searchAtom } = props;
   const { view, perms, fields } = meta;
-  const { hasButton } = usePerms(view, perms);
+  const { hasButton } = useViewPerms(meta);
 
   const viewRoute = useViewRoute();
   const pageSetRef = useRef(false);
@@ -144,6 +144,7 @@ function GridInner(props: ViewProps<GridView>) {
   const [massUpdatePopperEl, setMassUpdatePopperEl] =
     useState<HTMLElement | null>();
   const [viewProps, setViewProps] = useViewProps();
+
   const {
     action,
     dashlet,

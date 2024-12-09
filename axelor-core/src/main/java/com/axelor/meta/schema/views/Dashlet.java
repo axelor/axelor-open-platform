@@ -30,7 +30,11 @@ public class Dashlet extends AbstractPanel {
 
   @XmlAttribute private Boolean canSearch;
 
+  @XmlAttribute private String canNew;
+
   @XmlAttribute private String canEdit;
+
+  @XmlAttribute private String canDelete;
 
   public String getAction() {
     return action;
@@ -48,11 +52,27 @@ public class Dashlet extends AbstractPanel {
     this.canSearch = canSearch;
   }
 
+  public String getCanNew() {
+    return canNew;
+  }
+
+  public void setCanNew(String canNew) {
+    this.canNew = canNew;
+  }
+
   public String getCanEdit() {
     return canEdit;
   }
 
   public void setCanEdit(String canEdit) {
     this.canEdit = canEdit;
+  }
+
+  public String getCanDelete() {
+    return canDelete;
+  }
+
+  public void setCanDelete(String canDelete) {
+    this.canDelete = canDelete;
   }
 }

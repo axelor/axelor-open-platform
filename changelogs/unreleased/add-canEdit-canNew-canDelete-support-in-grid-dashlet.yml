@@ -1,0 +1,11 @@
+---
+title: Add canNew/canEdit/canDelete support for panel-dashlet
+type: feature
+description:
+
+  - canEdit param : canEdit="true" is already working for grid view,
+  which signify editing of dashlet grid is allowed in readonly mode as well.
+  canEdit="false" will disabled creation/editing of row in grid. 
+  For other data views it will enable/disable edit option.
+
+  - canNew/canDelete : it will enable/disable new/delete option for data view.

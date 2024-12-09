@@ -48,6 +48,9 @@ export type TabProps = {
   scrollX?: number;
   selectedId?: number;
   name?: string;
+  canNew?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
   readonly?: boolean;
   recordId?: boolean;
   showSingle?: boolean;

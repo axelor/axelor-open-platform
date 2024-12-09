@@ -3,6 +3,7 @@ import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { produce } from "immer";
 
 import { Box, clsx } from "@axelor/ui";
 
@@ -18,6 +19,7 @@ import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
 import { PopupScope } from "@/view-containers/view-popup/handler";
 import { Views } from "@/view-containers/views";
 import { useViewAction, useViewTab } from "@/view-containers/views/scope";
+import { isUndefined } from "@/utils/types";
 
 import {
   Attrs,
@@ -33,15 +35,17 @@ import {
   useFormTabScope,
 } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
-
-import classes from "./dashlet.module.scss";
 import { createWidgetAtom } from "../../builder/atoms";
+import classes from "./dashlet.module.scss";
 
 interface DashletProps {
   schema: Schema;
   className?: string;
   popup?: boolean;
   readonly?: boolean;
+  canNew?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
   dashboard?: boolean;
   attrs?: Attrs;
   viewContext?: DataContext;
@@ -85,6 +89,9 @@ export function DashletComponent({
   attrs,
   className,
   readonly,
+  canNew,
+  canEdit,
+  canDelete,
   popup,
   viewId,
   viewContext,
@@ -139,28 +146,23 @@ export function DashletComponent({
 
   const setTabViewProps = useAtomCallback(
     useCallback(
-      (
-        get,
-        set,
-        tab: Tab,
-        viewType: string,
-        param: keyof TabProps,
-        value: any,
-      ) => {
-        const { props, ...tabState } = get(tab.state);
-        const viewProps = props?.[viewType];
-        if (viewProps?.[param] !== value) {
-          set(tab.state, {
-            ...tabState,
-            props: {
-              ...props,
-              [viewType]: {
-                ...viewProps,
-                [param]: value,
-              },
-            },
-          });
-        }
+      (get, set, tab: Tab, viewType: string, params: Partial<TabProps>) => {
+        const tabState = get(tab.state);
+        set(
+          tab.state,
+          produce(tabState, (draft) => {
+            if (!draft.props) draft.props = {};
+            if (!draft.props[viewType]) draft.props[viewType] = {};
+            const viewProps = draft.props[viewType];
+
+            for (const [param, value] of Object.entries<any>(params)) {
+              const oldValue = viewProps[param as keyof TabProps];
+              if (oldValue !== value) {
+                viewProps[param as keyof TabProps] = value;
+              }
+            }
+          }),
+        );
       },
       [],
     ),
@@ -168,20 +170,32 @@ export function DashletComponent({
 
   useEffect(() => {
     // for grid view to update readonly to show edit icon
+    const tabProps = { canNew, canEdit, canDelete };
     if (tab && tab?.action?.viewType === "grid") {
-      setTabViewProps(
-        tab,
-        "grid",
-        "readonly",
-        Boolean(readonly || schema.readonly),
-      );
+      setTabViewProps(tab, "grid", {
+        ...tabProps,
+        readonly: Boolean(readonly || schema.readonly),
+      });
+    } else if (
+      tab &&
+      ["cards", "calendar", "kanban"].includes(tab?.action?.viewType)
+    ) {
+      setTabViewProps(tab, tab.action.viewType, tabProps);
     }
-  }, [tab, schema.readonly, readonly, setTabViewProps]);
+  }, [
+    tab,
+    schema.readonly,
+    readonly,
+    canNew,
+    canEdit,
+    canDelete,
+    setTabViewProps,
+  ]);
 
   useEffect(() => {
     // for html view to update url
     if (tab && tab?.action?.viewType === "html") {
-      setTabViewProps(tab, "html", "name", attrs?.url);
+      setTabViewProps(tab, "html", { name: attrs?.url });
     }
   }, [tab, attrs?.url, setTabViewProps]);
 
@@ -328,17 +342,24 @@ function DashletWrapper(props: WidgetProps) {
     } as DataContext;
   }, [tab.action.model, getFormContext]);
 
-  const canEdit = hasButton("edit") && schema.canEdit;
+  const canNew = schema.canNew && hasButton("new");
+  const canEdit = schema.canEdit && hasButton("edit");
+  const canDelete = schema.canDelete && hasButton("delete");
 
   return (
     ready && (
       <DashletComponent
-        schema={schema}
-        attrs={attrs}
+        {...{
+          schema,
+          attrs,
+          getContext,
+          viewContext,
+          canNew,
+          canEdit,
+          canDelete,
+        }}
         popup={tab.popup}
-        readonly={canEdit ? false : readonly}
-        viewContext={viewContext}
-        getContext={getContext}
+        readonly={isUndefined(schema.canEdit) ? readonly : !canEdit}
       />
     )
   );

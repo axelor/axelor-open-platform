@@ -1,5 +1,11 @@
-import { Perms, Schema } from "@/services/client/meta.types";
-import { useCallback } from "react";
+import { useAtomValue } from "jotai";
+
+import { ViewData } from "@/services/client/meta";
+import { Perms, Schema, View } from "@/services/client/meta.types";
+import { useViewTab } from "@/view-containers/views/scope";
+import { selectAtom } from "jotai/utils";
+import { useCallback, useMemo } from "react";
+import { TabProps } from "../use-tabs";
 
 const defaultPerms: Perms = {};
 
@@ -65,7 +71,7 @@ export function usePerms(state: Schema, perms = defaultPerms) {
     (name: PermissionName) => {
       return can(state, perms, name);
     },
-    [perms, state]
+    [perms, state],
   );
 
   const hasButton = useCallback(
@@ -81,7 +87,42 @@ export function usePerms(state: Schema, perms = defaultPerms) {
     (name: string) => {
       return can(state, perms, name as PermissionName) && state[name] !== false;
     },
-    [perms, state]
+    [perms, state],
+  );
+
+  return { hasPermission, hasButton } as const;
+}
+
+/**
+ * This hook can be used to check permissions
+ * and use of a specific action button for main views.
+ *
+ * @param meta the meta data of the view
+ * @returns `{ hasPermission, hasButton }` to check permission and button
+ *
+ */
+export function useViewPerms(meta: ViewData<View>) {
+  const { view, perms } = meta;
+  const tab = useViewTab();
+
+  const { hasPermission, hasButton: hasButtonPerm } = usePerms(view, perms);
+
+  const viewProps = useAtomValue(
+    useMemo(
+      () => selectAtom(tab.state, (state) => state.props?.[view.type]),
+      [tab.state, view.type],
+    ),
+  );
+
+  const hasButton: typeof hasButtonPerm = useCallback(
+    (name: string) => {
+      function hasViewPermission() {
+        const action = ACTIONS[name as PermissionName];
+        return viewProps?.[action as keyof TabProps] !== false;
+      }
+      return hasViewPermission() && hasButtonPerm(name);
+    },
+    [hasButtonPerm, viewProps],
   );
 
   return { hasPermission, hasButton } as const;

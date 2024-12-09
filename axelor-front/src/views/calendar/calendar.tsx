@@ -12,7 +12,7 @@ import {
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useHilites, useTemplate } from "@/hooks/use-parser";
-import { usePerms } from "@/hooks/use-perms";
+import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { SearchOptions } from "@/services/client/data";
@@ -85,7 +85,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const [searchStart, setSearchStart] = useState<Date>();
   const [searchEnd, setSearchEnd] = useState<Date>();
 
-  const { hasButton } = usePerms(meta.view, meta.perms);
+  const { hasButton } = useViewPerms(meta);
 
   const getViewContext = useViewContext();
 
@@ -354,6 +354,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     setPopover(undefined);
   }, []);
 
+  const canNew = hasPermission("new");
   const canEdit = hasPermission("edit");
   const canDelete = canEdit && hasPermission("delete");
 
@@ -447,7 +448,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   const onEventCreate = useCallback(
     ({ start, end }: SchedulerEvent<DataRecord>) => {
-      if (hasPermission("new")) {
+      if (canNew) {
         const record: DataRecord = {
           [eventStart]: start.toISOString(),
         };
@@ -457,7 +458,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         showRecord(record);
       }
     },
-    [eventStart, eventStop, hasPermission, showRecord],
+    [eventStart, eventStop, canNew, showRecord],
   );
 
   const onEventChange = useAtomCallback(
@@ -615,7 +616,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           maxEvents={false}
           moreText={(n) => i18n.get("+{0} more", n)}
           events={filteredEvents}
-          editable={hasPermission("edit")}
+          editable={canEdit}
           editableDuration={Boolean(eventStop)}
           onDayClick={onDayClick}
           onEventClick={onEventClick}
