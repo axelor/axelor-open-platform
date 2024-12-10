@@ -18,7 +18,6 @@
  */
 package com.axelor.web.service;
 
-import static java.lang.Boolean.TRUE;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 
@@ -64,7 +63,7 @@ public class AboutService extends AbstractService {
         try {
           if (session == null
               || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
-              || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+              || !Boolean.TRUE.equals(session.getAttribute(AUTHENTICATED_SESSION_KEY))) {
             continue;
           }
         } catch (IllegalStateException e) {

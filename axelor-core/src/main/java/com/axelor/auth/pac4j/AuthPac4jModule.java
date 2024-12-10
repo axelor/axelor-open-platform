@@ -18,6 +18,8 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.config.BaseConfig;
 import com.axelor.auth.pac4j.ldap.AxelorLdapProfileService;
 import com.axelor.auth.pac4j.local.AxelorAjaxRequestResolver;
@@ -37,12 +39,17 @@ import jakarta.servlet.ServletContext;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.cache.jcache.JCacheManager;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.session.mgt.eis.MemorySessionDAO;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
@@ -56,11 +63,15 @@ import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthPac4jModule extends ShiroWebModule {
 
   public static final String CSRF_HEADER_NAME = "X-CSRF-Token";
   public static final String CSRF_COOKIE_NAME = "CSRF-TOKEN";
+
+  private static final Logger log = LoggerFactory.getLogger(AuthPac4jModule.class);
 
   public AuthPac4jModule(ServletContext servletContext) {
     super(servletContext);
@@ -111,7 +122,7 @@ public class AuthPac4jModule extends ShiroWebModule {
 
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
 
-    bindAndExpose(SessionDAO.class).to(MemorySessionDAO.class).in(Singleton.class);
+    bindAndExpose(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).in(Singleton.class);
   }
 
   protected <T> AnnotatedBindingBuilder<T> bindAndExpose(Class<T> cls) {
@@ -135,14 +146,49 @@ public class AuthPac4jModule extends ShiroWebModule {
   }
 
   @Provides
+  @Singleton
+  public Optional<CachingProvider> cachingProvider() {
+    final var settings = AppSettings.get();
+    final var cachingProviderName = settings.get(AvailableAppSettings.AUTH_CACHE_PROVIDER);
+
+    return Optional.ofNullable(cachingProviderName)
+        .map(
+            name -> {
+              log.info("JCache provider: {}", name);
+              return Caching.getCachingProvider(name);
+            });
+  }
+
+  @Provides
+  @Singleton
+  public CacheManager shiroCacheManager(Optional<CachingProvider> optionalCachingProvider) {
+    return optionalCachingProvider
+        .map(
+            cachingProvider -> {
+              final var cacheManager = cachingProvider.getCacheManager();
+              Runtime.getRuntime().addShutdownHook(new Thread(cacheManager::close));
+
+              final var shiroCacheManager = new JCacheManager();
+              shiroCacheManager.setCacheManager(cacheManager);
+
+              return (CacheManager) shiroCacheManager;
+            })
+        .orElseGet(MemoryConstrainedCacheManager::new);
+  }
+
+  @Provides
+  @Singleton
   public DefaultWebSecurityManager webSecurityManager(
       Collection<Realm> realms,
       Set<AuthenticationListener> authenticationListeners,
       ModularRealmAuthenticator authenticator,
       AxelorSessionManager sessionManager,
-      AxelorRememberMeManager rememberMeManager) {
+      AxelorRememberMeManager rememberMeManager,
+      CacheManager shiroCacheManager) {
+
     final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
+    securityManager.setCacheManager(shiroCacheManager);
     securityManager.setRealms(realms);
     authenticator.setRealms(securityManager.getRealms());
     authenticator.setAuthenticationListeners(authenticationListeners);
@@ -154,6 +200,7 @@ public class AuthPac4jModule extends ShiroWebModule {
   }
 
   @Provides
+  @Singleton
   public DefaultCallbackClientFinder callbackClientFinder(ClientListService clientListService) {
     final Optional<String> clientName =
         clientListService.get().stream()

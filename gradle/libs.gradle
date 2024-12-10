@@ -27,6 +27,8 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
+versions.redisson = "3.46.0"
+
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
@@ -111,14 +113,15 @@ libs.hibernate = [
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.8"
 libs.redisson = [
-    dependencies.create("org.redisson:redisson-hibernate-6:3.46.0") {
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
-        exclude group: "com.fasterxml.jackson.dataformat", module: "jackson-dataformat-yaml"
-    },
-    // overrides jackson version used
-    "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
+  "org.redisson:redisson:${versions.redisson}",
+  dependencies.create("org.redisson:redisson-hibernate-6:${versions.redisson}") {
+    exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+    exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    exclude group: 'com.fasterxml.jackson.core', module: 'jackson-annotations'
+    exclude group: "com.fasterxml.jackson.dataformat", module: "jackson-dataformat-yaml"
+  },
+  // overrides jackson version used
+  "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
 libs.hazelcast = "com.hazelcast:hazelcast:5.5.0"
 libs.caffeine = [
@@ -227,7 +230,8 @@ libs.apache_shiro = [
   "org.apache.shiro:shiro-web:${versions.shiro}:jakarta",
   dependencies.create("org.apache.shiro:shiro-guice:${versions.shiro}:jakarta") {
       exclude group: 'javax.annotation', module: 'javax.annotation-api'
-  }
+  },
+  "org.apache.shiro:shiro-jcache:${versions.shiro}"
 ]
 
 libs.buji_pac4j = [

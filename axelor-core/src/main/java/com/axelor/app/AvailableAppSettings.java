@@ -190,6 +190,8 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
+  String AUTH_CACHE_PROVIDER = "auth.cache.provider";
+
   String AUTH_CALLBACK_URL = "auth.callback-url";
 
   String AUTH_USER_PROVISIONING = "auth.user.provisioning";
