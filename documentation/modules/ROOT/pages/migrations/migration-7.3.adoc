@@ -43,3 +43,8 @@ can be used, `css` attribute usage to determinate the variant is deprecated. Acc
 | `alert-warning` | `warning`
 | `alert-danger` | `danger`
 |===
+
+== Panel-dashlet editable grid support
+
+When grid view with editable="true" is used in panel-dashlet then by default it allows to edit record in dashlet.
+To disable this behavior, you have to pass canEdit="false" to disable editable support for panel-dashlet.
