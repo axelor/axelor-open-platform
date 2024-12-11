@@ -297,7 +297,6 @@ function OneToManyInner({
     perms,
   } = schema;
 
-  const selectedIdsRef = useRef<number[]>([]);
   const reorderRef = useRef(false);
   const recordsSyncRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -1105,8 +1104,8 @@ function OneToManyInner({
     () => ({
       _viewType: "grid",
       _views: [{ type: "grid", name: gridView }],
-      ...(selectedIdsRef.current?.length > 0 && {
-        _ids: selectedIdsRef.current,
+      ...(lastSelectedIds.current?.length > 0 && {
+        _ids: lastSelectedIds.current,
       }),
       _parent: getContext(),
     }),
