@@ -21,6 +21,7 @@ package com.axelor.web.service;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICATED_SESSION_KEY;
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 
+import com.axelor.auth.AuthSessionService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.inject.Beans;
@@ -39,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.eis.SessionDAO;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -56,7 +56,7 @@ public class AboutService extends AbstractService {
 
     if (user != null && AuthUtils.isTechnicalStaff(user)) {
       final Runtime runtime = Runtime.getRuntime();
-      final Collection<Session> sessions = Beans.get(SessionDAO.class).getActiveSessions();
+      final Collection<Session> sessions = Beans.get(AuthSessionService.class).getActiveSessions();
       final List<Map<String, Object>> users = new ArrayList<>();
 
       for (Session session : sessions) {
