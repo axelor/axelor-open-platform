@@ -1,0 +1,6 @@
+---
+title: Fix default min/max size of json fields
+type: fix
+description: |
+  Doesn't provide default min/max size to 0 for json fields. It is up to the user 
+  to define the values.

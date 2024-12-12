@@ -389,12 +389,18 @@ public final class MetaStore {
       }
 
       String type = record.getType() == null ? "" : record.getType();
-      int min = record.getMinSize() == null ? 0 : record.getMinSize();
-      int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
-      if (max <= min) {
-        attrs.remove("maxSize");
+      Integer min = record.getMinSize();
+      Integer max = record.getMaxSize();
+      if (min != null && max != null) {
+        if (max <= min) {
+          attrs.remove("maxSize");
+        }
+        if (max == 0 && min == 0) {
+          attrs.remove("maxSize");
+          attrs.remove("minSize");
+        }
       }
-      if ((min == 0 && max == 0) || type.matches("date|time|datetime|boolean")) {
+      if (type.matches("date|time|datetime|boolean")) {
         attrs.remove("maxSize");
         attrs.remove("minSize");
       }
