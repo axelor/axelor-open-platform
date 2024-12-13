@@ -24,6 +24,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
@@ -55,6 +56,22 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
     long sessionTimeout =
         AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60) * 60_000L;
     setGlobalSessionTimeout(sessionTimeout);
+
+    setupSessionValidationScheduler(sessionTimeout * 2);
+  }
+
+  /**
+   * Sets up session validation scheduler
+   *
+   * <p>Interval should be twice the session timeout. This is consistent with {@see
+   * AbstractValidatingSessionManager.DEFAULT_SESSION_VALIDATION_INTERVAL} being twice the value of
+   * {@see AbstractSessionManager.DEFAULT_SESSION_TIMEOUT}
+   *
+   * @param sessionValidationInterval
+   */
+  private void setupSessionValidationScheduler(long sessionValidationInterval) {
+    setSessionValidationScheduler(new ExecutorServiceSessionValidationScheduler(this));
+    setSessionValidationInterval(sessionValidationInterval);
   }
 
   @Override
