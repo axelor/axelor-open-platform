@@ -1,6 +1,8 @@
 import { atom, useAtomValue } from "jotai";
-import { useEffect, useMemo, useRef } from "react";
-import { generatePath, useParams } from "react-router-dom";
+import { useEffect, useCallback, useMemo, useRef } from "react";
+import { generatePath, useParams, useSearchParams } from "react-router-dom";
+import { useAtomCallback } from "jotai/utils";
+import { produce } from "immer";
 
 import { useRoute } from "@/hooks/use-route";
 import { TabAtom, useTabs } from "@/hooks/use-tabs";
@@ -35,20 +37,53 @@ export function View() {
   );
   const tabState = useAtomValue(tabAtom);
   const tabParams = useMemo(() => {
-    const { action, mode, id } = tabState?.routes?.[tabState.type] ?? {};
-    return { action, mode, id };
+    const { action, mode, id, qs } = tabState?.routes?.[tabState.type] ?? {};
+    return { action, mode, id, qs };
   }, [tabState]);
 
-  const { redirect } = useRoute();
+  const { redirect, location } = useRoute();
+  const [searchParams] = useSearchParams();
 
   const pathRef = useRef<string | null>(null);
   const tabPathRef = useRef<string | null>(null);
   const actionRef = useRef<string>();
-
+  const qsRef = useRef<Record<string, Record<string, string>>>({});
   const homeAction = session.info?.user?.action;
 
+  const updateQueryParamsInTabRoute = useAtomCallback(
+    useCallback(
+      (get, set, queryParams: Record<string, string>) =>
+        set(
+          tabAtom,
+          produce(get(tabAtom), (state) => {
+            if (state.routes?.[state.type]) {
+              state.routes![state.type]!.qs = queryParams;
+            }
+          }),
+        ),
+      [tabAtom],
+    ),
+  );
+
   useEffect(() => {
-    const { action: tabAction, mode: tabMode, id: tabId } = tabParams;
+    const values: Record<string, string> = {};
+    for (const [key, value] of searchParams) {
+      values[key] = value;
+    }
+    qsRef.current[location.pathname] = values;
+    // sync query params with tab route
+    // so when tab is in-active, switching back will open tab
+    // with last searched query parameters
+    updateQueryParamsInTabRoute(values);
+  }, [location, searchParams, updateQueryParamsInTabRoute]);
+
+  useEffect(() => {
+    const {
+      action: tabAction,
+      mode: tabMode,
+      id: tabId,
+      qs: tabQueryString,
+    } = tabParams;
     const { action = homeAction, mode, id } = params;
     const tabPath = getURL(tabAction, tabMode, tabId);
     const path = getURL(action, mode, id);
@@ -57,7 +92,7 @@ export function View() {
       pathRef.current = path;
       queue.add(() =>
         tabs.open(action, {
-          route: { mode, id },
+          route: { mode, id, qs: qsRef.current[path] },
           tab: true,
         }),
       );
@@ -68,7 +103,7 @@ export function View() {
       tabPathRef.current !== tabPath
     ) {
       tabPathRef.current = tabPath;
-      redirect(tabPath);
+      redirect(tabPath, {}, tabQueryString);
     } else if (tabs.items.length === 0) {
       pathRef.current = null;
       tabPathRef.current = null;
