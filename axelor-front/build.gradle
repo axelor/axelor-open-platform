@@ -27,6 +27,8 @@ task buildFront(type: PnpmTask) {
 
     dependsOn 'installFrontDeps'
     args = ["run", "build"]
+
+    environment.put('NODE_OPTIONS', '--max-old-space-size=4096')
 }
 
 task installFrontDeps(type: PnpmTask) {

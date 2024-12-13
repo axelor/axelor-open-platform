@@ -64,7 +64,7 @@ Production build are available under `dist` directory.
 
 ### Developing along with `@axelor/ui`
 
-For development purposes we suggest using `pnpm link` to link `@axelor/ui` library. 
+For development purposes we suggest using `pnpm link` to link `@axelor/ui` library.
 
 Make sure to clone `axelor-ui` project next to the `axelor-open-platform` sources :
 ```
@@ -80,14 +80,14 @@ Make sure to clone `axelor-ui` project next to the `axelor-open-platform` source
 │   ├── axelor-web
 ├── axelor-ui
 ```
-Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui` 
+Then, navigate to `axelor-open-platform/axelor-front/` and run `pnpm link ../../axelor-ui`
 to use the linked version of the library.
 
 ### ENOSPC: System limit for number of file watchers reached
 
 If you encounter this error, means that your system's `fs.inotify.max_user_watches` value is low.
 
-We recommend increasing the value to `524288` by adding the following to your `/etc/sysctl.conf` file: 
+We recommend increasing the value to `524288` by adding the following to your `/etc/sysctl.conf` file:
 `fs.inotify.max_user_watches = 524288`
 
 Then run this command to apply the change immediately: `sudo sysctl -p`
@@ -101,4 +101,4 @@ FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed -
 JavaScript heap out of memory
 ```
 
-you may need to export `NODE_OPTIONS=--max_old_space_size=4096` and build again.
+you may need to export `NODE_OPTIONS=--max-old-space-size=4096` and build again.
