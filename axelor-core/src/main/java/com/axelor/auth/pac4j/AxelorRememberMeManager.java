@@ -20,15 +20,12 @@ package com.axelor.auth.pac4j;
 
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.shiro.lang.codec.Base64;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.util.WebUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * RememberMe Manager
@@ -39,33 +36,40 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class AxelorRememberMeManager extends CookieRememberMeManager {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AxelorRememberMeManager.class);
+  private final Cookie secureCookie;
+  private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
+
+  public AxelorRememberMeManager() {
+    secureCookie = new SimpleCookie(super.getCookie());
+    secureCookie.setSecure(true);
+    secureCookie.setSameSite(SameSiteOptions.NONE);
+  }
 
   @Override
   protected void rememberSerializedIdentity(Subject subject, byte[] serialized) {
+    currentRequest.set(WebUtils.getHttpRequest(subject));
+    try {
+      super.rememberSerializedIdentity(subject, serialized);
+    } finally {
+      currentRequest.remove();
+    }
+  }
 
-    if (!WebUtils.isHttp(subject)) {
-      if (LOGGER.isDebugEnabled()) {
-        String msg =
-            "Subject argument is not an HTTP-aware instance.  This is required to obtain a servlet "
-                + "request and response in order to set the rememberMe cookie. Returning immediately and "
-                + "ignoring rememberMe operation.";
-        LOGGER.debug(msg);
-      }
-      return;
+  @Override
+  public Cookie getCookie() {
+    final var request = currentRequest.get();
+
+    if (request == null) {
+      return super.getCookie();
     }
 
-    HttpServletRequest request = WebUtils.getHttpRequest(subject);
-    HttpServletResponse response = WebUtils.getHttpResponse(subject);
+    var cookie = request.isSecure() ? secureCookie : super.getCookie();
 
-    // base 64 encode it and store as a cookie:
-    String base64 = Base64.encodeToString(serialized);
+    if (request.getContextPath().isEmpty()) {
+      cookie = new SimpleCookie(cookie);
+      cookie.setPath("/");
+    }
 
-    // the class attribute is really a template for the outgoing cookies
-    Cookie template = getCookie();
-    Cookie cookie = new SimpleCookie(template);
-    cookie.setValue(base64);
-    AxelorSessionManager.updateCookie(cookie, request); // For secure cookie
-    cookie.saveTo(request, response);
+    return cookie;
   }
 }
