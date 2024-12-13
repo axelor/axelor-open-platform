@@ -21,8 +21,12 @@ package com.axelor.cache;
 import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.test.GuiceModules;
+import java.io.IOException;
+import java.net.Socket;
 import org.hibernate.cfg.Environment;
 import org.junit.jupiter.api.AfterAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.embedded.RedisServer;
 
 @GuiceModules(RedisTest.RedisTestModule.class)
@@ -30,11 +34,23 @@ public class RedisTest extends AbstractBaseCache {
 
   private static RedisServer redisServer;
 
+  private static final int REDIS_PORT = 6379;
+
+  private static final Logger log = LoggerFactory.getLogger(RedisTest.class);
+
   public static class RedisTestModule extends CacheTestModule {
 
     static void startRedis() {
-      redisServer = new RedisServer(6379);
+      redisServer = new RedisServer(REDIS_PORT);
       redisServer.start();
+    }
+
+    private boolean isServerRunning() {
+      try (final var socket = new Socket("localhost", REDIS_PORT)) {
+        return true;
+      } catch (IOException e) {
+        return false;
+      }
     }
 
     @Override
@@ -42,7 +58,11 @@ public class RedisTest extends AbstractBaseCache {
       TestingHelpers.resetSettings();
 
       // start redis
-      startRedis();
+      if (isServerRunning()) {
+        log.warn("External Redis server is already running on port " + REDIS_PORT);
+      } else {
+        startRedis();
+      }
 
       AppSettings.get()
           .getInternalProperties()
@@ -54,6 +74,8 @@ public class RedisTest extends AbstractBaseCache {
 
   @AfterAll
   static void tearDown() {
-    redisServer.stop();
+    if (redisServer != null) {
+      redisServer.stop();
+    }
   }
 }
