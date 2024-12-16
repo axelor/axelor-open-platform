@@ -1,8 +1,8 @@
 import { Box } from "@axelor/ui";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useAtomCallback } from "jotai/utils";
-import { atom, useAtom } from "jotai";
-import { useLocation } from "react-router-dom";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { atom, useAtom, useAtomValue } from "jotai";
+import { generatePath, useLocation, useSearchParams } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import clone from "lodash/clone";
@@ -45,7 +45,6 @@ import { useAsyncEffect } from "@/hooks/use-async-effect";
 import styles from "./search.module.scss";
 
 export function Search(props: ViewProps<SearchView>) {
-  const location = useLocation();
   const recordsAtom = useMemo(() => atom<DataRecord[]>([]), []);
   const [records, setRecords] = useAtom(recordsAtom);
   const [state, setState, gridAtom] = useGridState();
@@ -63,9 +62,27 @@ export function Search(props: ViewProps<SearchView>) {
   const { meta } = props;
   const { view } = meta;
   const { name, selects, actionMenus, limit = DEFAULT_SEARCH_PAGE_SIZE } = view;
-  const { action } = useViewTab();
+  const { pathname } = useLocation();
+  const { action, state: tabAtom } = useViewTab();
+  const [searchParams] = useSearchParams();
+
   const { params } = action;
-  const queryString = (location.search || "").slice(1);
+  const isViewActive = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(tabAtom, (tabState) => {
+          const { action = "", mode = "" } = tabState.routes?.search ?? {};
+          return (
+            generatePath("/ds/:action/:mode", {
+              action,
+              mode,
+            }) === pathname
+          );
+        }),
+      [tabAtom, pathname],
+    ),
+  );
+  const hasSearchParams = searchParams.size > 0;
 
   const getContext = useCallback<() => DataContext>(
     () => ({
@@ -401,16 +418,16 @@ export function Search(props: ViewProps<SearchView>) {
   });
 
   useEffect(() => {
-    const params: Record<string, string> = queryString
-      ?.split("&")
-      .reduce((obj, str) => {
-        let [key, value] = str.split("=");
-        return { ...obj, [key]: value };
-      }, {});
+    if (!isViewActive) return;
+
+    const queryParams: Record<string, string> = {};
+    for (const [key, value] of searchParams) {
+      queryParams[key] = value;
+    }
 
     const values = Object.keys(formMeta.fields || {}).reduce((values, name) => {
       const field = formMeta.fields?.[name];
-      let value: any = params[name];
+      let value: any = queryParams[name];
       if (!value) return values;
 
       if (field?.targetName) {
@@ -427,9 +444,11 @@ export function Search(props: ViewProps<SearchView>) {
     }, {});
 
     setFormValues(values);
-  }, [queryString, formMeta, setFormValues]);
+  }, [isViewActive, searchParams, formMeta, setFormValues]);
 
   useAsyncEffect(async () => {
+    // skip onNew when query params exist
+    if (!isViewActive || hasSearchParams) return;
     // initial onNew
     handleExecute("onNew");
   }, [handleExecute]);
