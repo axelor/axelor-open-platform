@@ -18,13 +18,12 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.ExecutorServiceSessionValidationScheduler;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
@@ -45,7 +44,9 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
   private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
   @Inject
-  public AxelorSessionManager(SessionDAO sessionDAO) {
+  public AxelorSessionManager(
+      SessionDAO sessionDAO,
+      @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
     secureSessionIdCookie = new SimpleCookie(super.getSessionIdCookie());
     secureSessionIdCookie.setSecure(true);
     secureSessionIdCookie.setSameSite(SameSiteOptions.NONE);
@@ -53,25 +54,11 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
     setSessionDAO(sessionDAO);
 
     // Seconds to milliseconds
-    long sessionTimeout =
-        AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60) * 60_000L;
+    long sessionTimeout = sessionTimeoutMinutes * 60_000L;
     setGlobalSessionTimeout(sessionTimeout);
 
-    setupSessionValidationScheduler(sessionTimeout * 2);
-  }
-
-  /**
-   * Sets up session validation scheduler
-   *
-   * <p>Interval should be twice the session timeout. This is consistent with {@see
-   * AbstractValidatingSessionManager.DEFAULT_SESSION_VALIDATION_INTERVAL} being twice the value of
-   * {@see AbstractSessionManager.DEFAULT_SESSION_TIMEOUT}
-   *
-   * @param sessionValidationInterval
-   */
-  private void setupSessionValidationScheduler(long sessionValidationInterval) {
-    setSessionValidationScheduler(new ExecutorServiceSessionValidationScheduler(this));
-    setSessionValidationInterval(sessionValidationInterval);
+    // Cache is configured with expiry policy, so no session validation scheduler is needed.
+    setSessionValidationSchedulerEnabled(false);
   }
 
   @Override
