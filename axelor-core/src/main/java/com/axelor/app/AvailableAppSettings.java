@@ -20,7 +20,6 @@ package com.axelor.app;
 
 import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.CacheSettings;
-import org.hibernate.cfg.Environment;
 
 public interface AvailableAppSettings {
 
@@ -161,7 +160,8 @@ public interface AvailableAppSettings {
   String HIBERNATE_JDBC_BATCH_SIZE = "hibernate.jdbc.batch_size";
   String HIBERNATE_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
 
-  String HIBERNATE_CACHE_REGION_FACTORY = Environment.CACHE_REGION_FACTORY;
+  String HIBERNATE_CACHE_REGION_FACTORY = CacheSettings.CACHE_REGION_FACTORY;
+  String HIBERNATE_CACHE_REGION_PREFIX = CacheSettings.CACHE_REGION_PREFIX;
   String HIBERNATE_JAVAX_CACHE_PROVIDER = ConfigSettings.PROVIDER;
 
   String JAVAX_PERSISTENCE_SHARED_CACHE_MODE = CacheSettings.JAKARTA_SHARED_CACHE_MODE;

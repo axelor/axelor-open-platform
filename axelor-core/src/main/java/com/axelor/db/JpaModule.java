@@ -190,15 +190,21 @@ public class JpaModule extends AbstractModule {
         settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
     if (StringUtils.isBlank(cacheRegionFactory)
         || cacheRegionFactory.equals(DEFAULT_CACHE_REGION_FACTORY)) {
-      properties.put(Environment.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
+      properties.put(CacheSettings.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
       final String jcacheProvider =
           settings.get(
               AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER, DEFAULT_JCACHE_PROVIDER);
       properties.put(ConfigSettings.PROVIDER, jcacheProvider);
       log.info("JCache provider: {}", jcacheProvider);
     } else {
-      properties.put(Environment.CACHE_REGION_FACTORY, cacheRegionFactory);
+      properties.put(CacheSettings.CACHE_REGION_FACTORY, cacheRegionFactory);
       log.info("Cache region factory: {}", cacheRegionFactory);
+
+    final String cacheRegionPrefix =
+        settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_PREFIX);
+    if (StringUtils.notBlank(cacheRegionPrefix)) {
+      properties.put(CacheSettings.CACHE_REGION_PREFIX, cacheRegionPrefix);
+      log.trace("Cache region prefix: {}", cacheRegionPrefix);
     }
   }
 
