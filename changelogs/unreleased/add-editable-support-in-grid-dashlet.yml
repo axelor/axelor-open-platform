@@ -1,3 +1,6 @@
 ---
 title: Add editable support in grid dashlet
 type: feature
+description: |
+  The linked grid view should have `editable="true"` to allow edit records in
+  grids. To disable this behavior, you have to pass `canEdit="false"`.

@@ -44,7 +44,10 @@ can be used, `css` attribute usage to determinate the variant is deprecated. Acc
 | `alert-danger` | `danger`
 |===
 
-== Panel-dashlet editable grid support
+== Add/edit/delete support in dashlet and panel-dashlet
 
-When grid view with editable="true" is used in panel-dashlet then by default it allows to edit record in dashlet.
-To disable this behavior, you have to pass canEdit="false" to disable editable support for panel-dashlet.
+This adds support for adding and deleting records on dashboard dashlets and panel-dashlet. It is not enable by default :
+specify `canNew` and `canDelete` to `true`.
+
+It also adds support to editable grids. The linked grid view should have `editable="true"` to allow edit records in
+grids. To disable this behavior, you have to pass `canEdit="false"` to disable editable support.
