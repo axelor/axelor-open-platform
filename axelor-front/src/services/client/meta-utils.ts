@@ -520,7 +520,7 @@ export function processView(
       }
     }
 
-    ["canNew", "canView", "canEdit", "canRemove", "canSelect"].forEach(
+    ["canNew", "canView", "canEdit", "canRemove", "canSelect", "canDelete"].forEach(
       (name) => {
         if (item[name] === "false" || item[name] === "true") {
           item[name] = item[name] === "true";

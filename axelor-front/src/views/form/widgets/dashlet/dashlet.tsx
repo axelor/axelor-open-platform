@@ -342,9 +342,11 @@ function DashletWrapper(props: WidgetProps) {
     } as DataContext;
   }, [tab.action.model, getFormContext]);
 
-  const canNew = schema.canNew && hasButton("new");
-  const canEdit = schema.canEdit && hasButton("edit");
-  const canDelete = schema.canDelete && hasButton("delete");
+  // Be able to edit even if readonly mode
+  const canEdit = (isUndefined(schema.canEdit) ? !readonly : schema.canEdit) && hasButton("edit");
+  // Be able to create/delete if explicitly defined and not in readonly mode
+  const canNew = !readonly && schema.canNew && hasButton("new");
+  const canDelete = !readonly && schema.canDelete && hasButton("delete");
 
   return (
     ready && (
@@ -359,7 +361,7 @@ function DashletWrapper(props: WidgetProps) {
           canDelete,
         }}
         popup={tab.popup}
-        readonly={isUndefined(schema.canEdit) ? readonly : !canEdit}
+        readonly={!canEdit}
       />
     )
   );
