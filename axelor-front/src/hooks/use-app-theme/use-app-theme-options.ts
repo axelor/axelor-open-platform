@@ -1,5 +1,6 @@
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
 
+import { validateThemeOptions } from "@/components/theme-builder/utils";
 import { request } from "@/services/client/client";
 import { LoadingCache } from "@/utils/cache";
 
@@ -25,10 +26,10 @@ const load = async (theme: ThemeName) => {
 
 export function useAppThemeOption() {
   const theme = useAppTheme();
-  const { state, data } = useAsync(
-    async () => cache.get(theme, () => load(theme)),
-    [theme],
-  );
+  const { state, data } = useAsync(async () => {
+    const options = await cache.get(theme, () => load(theme));
+    return validateThemeOptions(options);
+  }, [theme]);
 
   return {
     theme,
