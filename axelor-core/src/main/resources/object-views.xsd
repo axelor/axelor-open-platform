@@ -1886,13 +1886,6 @@
             <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="PanelDashlet">
-    <xsd:complexContent>
-      <xsd:extension base="tns:Dashlet">
         <xsd:attribute name="canNew" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify whether to allow to create new record.</xsd:documentation>
@@ -1903,12 +1896,18 @@
             <xsd:documentation>Specify whether to allow to edit the records.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="canDelete" type="xsd:string">
+        <xsd:attribute name="canDelete" type="xsd:string" default="false">
           <xsd:annotation>
             <xsd:documentation>Specify whether to allow to remove the record.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="PanelDashlet">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Dashlet"/>
     </xsd:complexContent>
   </xsd:complexType>
 

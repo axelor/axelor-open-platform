@@ -17,6 +17,8 @@ import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
 import { useViewContext } from "@/view-containers/views/scope";
 import { useDevice } from "@/hooks/use-responsive";
 import { DataRecord } from "@/services/client/data.types";
+import { createScriptContext } from "@/hooks/use-parser/context";
+import { parseExpression } from "@/hooks/use-parser/utils";
 
 import "react-grid-layout/css/styles.css";
 import "./react-grid-layout.css";
@@ -277,6 +279,22 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
     setFormInit(true);
   }, []);
 
+  const evalContext = useMemo(
+    () => createScriptContext(getContext()),
+    [getContext],
+  );
+
+  const getExpressionValue = useCallback(
+    (expr?: string) => {
+      if (!expr) return;
+      if (["true", "false"].includes(expr.toLowerCase())) {
+        return expr.toLowerCase() === "true";
+      }
+      return parseExpression(expr)(evalContext);
+    },
+    [evalContext],
+  );
+
   const children = useMemo(
     () =>
       items.map((item, index) => (
@@ -288,6 +306,9 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             })}
             schema={item}
             viewId={index}
+            canEdit={getExpressionValue(item.canEdit)}
+            canDelete={getExpressionValue(item.canDelete)}
+            canNew={getExpressionValue(item.canNew)}
             onViewLoad={handleItemViewLoad}
             getContext={getContext}
           />

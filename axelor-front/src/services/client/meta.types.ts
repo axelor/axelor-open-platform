@@ -368,6 +368,8 @@ export interface PanelDashlet extends Omit<Panel, "type"> {
   action?: string;
   canSearch?: boolean;
   canEdit?: string;
+  canNew?: string;
+  canDelete?: string;
   showBars?: boolean;
 }
 
