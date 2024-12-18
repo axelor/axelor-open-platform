@@ -25,6 +25,7 @@ import javax.cache.CacheManager;
 import javax.cache.configuration.Configuration;
 import org.apache.shiro.cache.Cache;
 
+/** Shiro JCache Manager where we can pass configuration to created caches. */
 public class AxelorJCacheManager extends JCacheManager {
 
   private final Configuration<?, ?> config;

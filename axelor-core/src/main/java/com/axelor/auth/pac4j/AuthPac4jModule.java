@@ -28,9 +28,14 @@ import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.auth.pac4j.local.AxelorIndirectBasicAuthClient;
 import com.axelor.auth.pac4j.local.BasicAuthCallbackClientFinder;
 import com.axelor.auth.pac4j.local.JsonExtractor;
-import com.axelor.common.ClassUtils;
+import com.axelor.cache.CacheConfig;
+import com.axelor.cache.CacheProvider;
+import com.axelor.cache.redisson.RedissonClientProvider;
+import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
+import com.github.benmanes.caffeine.jcache.configuration.CaffeineConfiguration;
+import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -39,14 +44,14 @@ import com.google.inject.multibindings.Multibinder;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.ServletContext;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
+import javax.cache.configuration.Configuration;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.AccessedExpiryPolicy;
 import javax.cache.expiry.Duration;
@@ -72,8 +77,6 @@ import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
 import org.redisson.jcache.configuration.RedissonConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +138,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
 
     bindAndExpose(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).in(Singleton.class);
-    expose(new TypeLiteral<javax.cache.configuration.Configuration<String, Object>>() {});
+    expose(new TypeLiteral<Configuration<String, Object>>() {});
     expose(new TypeLiteral<Optional<CacheManager>>() {});
   }
 
@@ -166,43 +169,70 @@ public class AuthPac4jModule extends ShiroWebModule {
     return AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
   }
 
+  /** Cache configuration with session timeout */
   @Provides
   @Singleton
-  public RedissonClient redissonClient() {
-    final var file = ClassUtils.getResource("redisson-jcache.yaml");
-    org.redisson.config.Config config;
+  public Configuration<String, Object> cacheConfig(
+      Optional<CachingProvider> optionalCachingProvider,
+      @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
 
-    try {
-      config = org.redisson.config.Config.fromYAML(file);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
+    if (optionalCachingProvider.isEmpty()) {
+      throw new IllegalStateException("Cache provider not configured");
     }
 
-    final var redisson = Redisson.create(config);
-    Runtime.getRuntime().addShutdownHook(new Thread(redisson::shutdown));
+    final var cachingProvider = optionalCachingProvider.get();
+    final Configuration<String, Object> cacheConfig;
 
-    return redisson;
-  }
-
-  @Provides
-  @Singleton
-  public javax.cache.configuration.Configuration<String, Object> cacheConfig(
-      RedissonClient redisson,
-      @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
+    // Generic fallback cache configuration
     final var jCacheConfig = new MutableConfiguration<String, Object>();
     jCacheConfig.setTypes(String.class, Object.class);
     jCacheConfig.setExpiryPolicyFactory(
         AccessedExpiryPolicy.factoryOf(new Duration(TimeUnit.MINUTES, sessionTimeoutMinutes)));
-    return RedissonConfiguration.fromInstance(redisson, jCacheConfig);
+
+    // Specialized cache configuration
+    if (cachingProvider instanceof CaffeineCachingProvider) {
+      // Caffeine specific settings required
+      final var config = new CaffeineConfiguration<String, Object>(jCacheConfig);
+      config.setExpireAfterAccess(OptionalLong.of(sessionTimeoutMinutes * 60_000_000_000L));
+      cacheConfig = config;
+    } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
+      final var configPath = CacheConfig.getShiroCacheProvider().flatMap(CacheProvider::getConfig);
+      final var redisson = RedissonClientProvider.getInstance().get(configPath);
+      cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
+    } else {
+      cacheConfig = jCacheConfig;
+    }
+
+    return cacheConfig;
   }
 
   @Provides
   @Singleton
   public Optional<CachingProvider> cachingProvider() {
-    final var settings = AppSettings.get();
-    final var cachingProviderName = settings.get(AvailableAppSettings.AUTH_CACHE_PROVIDER);
+    return CacheConfig.getShiroCacheProvider()
+        .map(
+            provider -> {
+              final var providerName = provider.getProvider();
+              if ("caffeine".equalsIgnoreCase(providerName)) {
+                return CaffeineCachingProvider.class.getName();
+              } else if ("redisson".equalsIgnoreCase(providerName)) {
+                return org.redisson.jcache.JCachingProvider.class.getName();
+              }
 
-    return Optional.ofNullable(cachingProviderName)
+              Class<?> providerClass;
+              try {
+                providerClass = Class.forName(providerName);
+              } catch (ClassNotFoundException e) {
+                throw new IllegalArgumentException("Unknown cache provider: " + providerName);
+              }
+              if (!CachingProvider.class.isAssignableFrom(providerClass)) {
+                throw new IllegalArgumentException(
+                    "Unsupported cache provider type: " + providerName);
+              }
+
+              return providerName;
+            })
+        .filter(StringUtils::notBlank)
         .map(
             name -> {
               log.info("JCache provider: {}", name);

@@ -21,6 +21,8 @@ package com.axelor.db;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditInterceptor;
+import com.axelor.cache.CacheConfig;
+import com.axelor.cache.redisson.AxelorRedissonRegionFactory;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -29,6 +31,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
+import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -37,7 +40,9 @@ import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import javax.cache.spi.CachingProvider;
 import org.hibernate.cache.jcache.ConfigSettings;
+import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cfg.CacheSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
@@ -55,8 +60,7 @@ public class JpaModule extends AbstractModule {
   private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
   private static final String DEFAULT_CACHE_REGION_FACTORY = "jcache";
-  private static final String DEFAULT_JCACHE_PROVIDER =
-      "com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider";
+  private static final String DEFAULT_JCACHE_PROVIDER = CaffeineCachingProvider.class.getName();
 
   private String jpaUnit;
   private boolean autoscan;
@@ -183,25 +187,63 @@ public class JpaModule extends AbstractModule {
     }
 
     properties.put(CacheSettings.JAKARTA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
-    properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
-    properties.put(Environment.USE_QUERY_CACHE, "true");
+    properties.put(CacheSettings.USE_SECOND_LEVEL_CACHE, "true");
+    properties.put(CacheSettings.USE_QUERY_CACHE, "true");
 
-    final String cacheRegionFactory =
-        settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
+    String cacheRegionFactory = settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
+    String cacheRegionPrefix = settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_PREFIX);
+    String jcacheProvider = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER);
+
+    final var optionalCacheProvider = CacheConfig.getHibernateCacheProvider();
+
+    if (optionalCacheProvider.isPresent()) {
+      final var provider = optionalCacheProvider.get();
+      final var providerName = provider.getProvider();
+
+      if ("caffeine".equalsIgnoreCase(providerName)) {
+        if (StringUtils.isBlank(cacheRegionFactory)) {
+          cacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
+          jcacheProvider = DEFAULT_JCACHE_PROVIDER;
+        }
+      } else if ("redisson".equalsIgnoreCase(providerName)) {
+        if (StringUtils.isBlank(cacheRegionFactory)) {
+          cacheRegionFactory = AxelorRedissonRegionFactory.class.getName();
+        }
+      } else {
+        Class<?> providerClass;
+        try {
+          providerClass = Class.forName(providerName);
+        } catch (ClassNotFoundException e) {
+          throw new IllegalArgumentException("Unknown cache provider: " + providerName);
+        }
+        if (CachingProvider.class.isAssignableFrom(providerClass)) {
+          cacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
+          jcacheProvider = providerName;
+        } else if (RegionFactory.class.isAssignableFrom(providerClass)) {
+          cacheRegionFactory = providerName;
+        } else {
+          throw new IllegalArgumentException("Unsupported cache provider type: " + providerName);
+        }
+      }
+
+      if (StringUtils.isBlank(cacheRegionPrefix)) {
+        cacheRegionPrefix = "hibernate:";
+      }
+    }
+
     if (StringUtils.isBlank(cacheRegionFactory)
-        || cacheRegionFactory.equals(DEFAULT_CACHE_REGION_FACTORY)) {
+        || DEFAULT_CACHE_REGION_FACTORY.equals(cacheRegionFactory)) {
       properties.put(CacheSettings.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
-      final String jcacheProvider =
-          settings.get(
-              AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER, DEFAULT_JCACHE_PROVIDER);
+      if (StringUtils.isBlank(jcacheProvider)) {
+        jcacheProvider = DEFAULT_JCACHE_PROVIDER;
+      }
       properties.put(ConfigSettings.PROVIDER, jcacheProvider);
       log.info("JCache provider: {}", jcacheProvider);
     } else {
       properties.put(CacheSettings.CACHE_REGION_FACTORY, cacheRegionFactory);
       log.info("Cache region factory: {}", cacheRegionFactory);
+    }
 
-    final String cacheRegionPrefix =
-        settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_PREFIX);
     if (StringUtils.notBlank(cacheRegionPrefix)) {
       properties.put(CacheSettings.CACHE_REGION_PREFIX, cacheRegionPrefix);
       log.trace("Cache region prefix: {}", cacheRegionPrefix);

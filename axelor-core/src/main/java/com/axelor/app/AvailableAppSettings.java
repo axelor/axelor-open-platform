@@ -67,6 +67,13 @@ public interface AvailableAppSettings {
   String APPLICATION_RESET_PASSWORD_ENABLED = "application.reset-password.enabled";
   String APPLICATION_RESET_PASSWORD_MAX_AGE = "application.reset-password.max-age";
 
+  String APPLICATION_CACHE_PROVIDER = "application.cache.provider";
+  String APPLICATION_CACHE_CONFIG = "application.cache.config";
+  String APPLICATION_CACHE_HIBERNATE_PROVIDER = "application.cache.hibernate.provider";
+  String APPLICATION_CACHE_HIBERNATE_CONFIG = "application.cache.hibernate.config";
+  String APPLICATION_CACHE_SHIRO_PROVIDER = "application.cache.shiro.provider";
+  String APPLICATION_CACHE_SHIRO_CONFIG = "application.cache.shiro.config";
+
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
   String VIEW_CUSTOMIZATION = "view.allow-customization";
@@ -189,8 +196,6 @@ public interface AvailableAppSettings {
   String LOGGING_CONFIG = "logging.config";
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
-
-  String AUTH_CACHE_PROVIDER = "auth.cache.provider";
 
   String AUTH_CALLBACK_URL = "auth.callback-url";
 
