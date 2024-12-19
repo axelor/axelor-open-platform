@@ -357,7 +357,7 @@ Some JPA/Hibernate configurations can also be set in `axelor-config.properties` 
 
 All others `hibernate.*` properties are also passed to Hibernate.
 
-== Cache Configuration
+== Persistence Cache Configuration
 
 Property `jakarta.persistence.sharedCache.mode` can be used to enable or disable second level caching.
 
@@ -425,6 +425,67 @@ hibernate.javax.cache.provider = org.ehcache.jsr107.EhcacheCachingProvider
 
 Make sure to add required dependencies if you want to use another caching library. Refer to providers docs for
 extensive configuration : all properties prefix by `hibernate.` will be used.
+
+== Global and Component-specific Cache Configurations
+
+The application supports different cache providers that can be configured globally or for specific components (Hibernate, Shiro).
+
+In the default cache configuration, the application uses the following:
+
+[cols="1,3"]
+|===
+| Component           | Cache Provider
+
+| Hibernate           | https://github.com/ben-manes/caffeine[Caffeine]
+| Shiro               | https://shiro.apache.org/caching.html#memoryconstrainedcachemanager[MemoryConstrainedCacheManager]
+| Internal components | https://github.com/ben-manes/caffeine[Caffeine]
+|===
+
+The cache configuration allows to override those defaults, and is done through the following properties:
+
+[source,properties]
+----
+# Global cache configuration applied to Hibernate, Shiro and internal components
+# ~~~~~
+# Global cache provider: default/caffeine/redisson
+application.cache.provider = redisson
+# Global cache configuration for specified provider (if required by provider): either on filesystem or resource in classpath
+application.cache.config = redisson.yaml
+
+# Hibernate-specific cache configuration (takes precedence over global cache configuration)
+# ~~~~~
+#application.cache.hibernate.provider = redisson
+#application.cache.hibernate.config = redisson.yaml
+
+# Shiro-specific cache configuration (takes precedence over global cache configuration)
+# ~~~~~
+#application.cache.shiro.provider = redisson
+#application.cache.shiro.config = redisson.yaml
+----
+
+The cache configuration currently supports three providers:
+
+* `default` - Use default caching implementation that can vary by components
+* `caffeine` - Use Caffeine caching
+* `redisson` - Use Redis/Valkey through Redisson client
+
+For global cache configuration, using one of those names will use the appropriate internal customized providers for each component for optimal usage (such as reusing the same Redisson instance).
+
+In the case of component specific configurations (Hibernate, Shiro), you also have the option to specify the provider as fully-qualified class name in case you have custom requirements. For Hibernate, it can be either a `org.hibernate.cache.spi.RegionFactory` or `javax.cache.spi.CachingProvider` for JCache usage. For Shiro, it should be a `javax.cache.spi.CachingProvider` for JCache usage only.
+
+When using Caffeine, there is no configuration to provide.
+
+When using Redisson, you need to provide a configuration file (e.g. `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details.
+
+Example minimal Redisson configuration file:
+
+[source,yaml]
+----
+singleServerConfig:
+  address: "redis://localhost:6379"
+----
+
+See https://redisson.org/docs/configuration/#using-yaml[Redisson configuration documentation] for details.
 
 == Global Context Configuration
 
