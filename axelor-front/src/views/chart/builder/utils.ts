@@ -675,6 +675,7 @@ export function prepareTheme(type: ChartType) {
     legend: { textStyle: { color } },
     tooltip: {
       backgroundColor: bg,
+      textStyle: { color },
       axisPointer: {
         lineStyle: { color, width: "1" },
         crossStyle: { color, width: "1" },
