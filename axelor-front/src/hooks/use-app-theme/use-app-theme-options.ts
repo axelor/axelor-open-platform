@@ -9,6 +9,7 @@ import { LoadingCache } from "@/utils/cache";
 import { useAsync } from "../use-async";
 import { useAppTheme } from "./use-app-theme";
 import defaultTheme from "./themes/default.json";
+import darkTheme from "./themes/dark.json";
 
 const cache = new LoadingCache<Promise<ThemeOptions>>();
 
@@ -17,25 +18,21 @@ const get = async (url: string) => {
   return res.status === 200 ? res.json() : Promise.reject(res.status);
 };
 
-const load = async (theme: string) => {
-  try {
-    return await get(`ws/public/app/theme?name=${theme}`);
-  } catch {
-    return theme === "light" ? {} : await get(`js/theme/${theme}.json`);
-  }
-};
-
 export function useAppThemeOption() {
   const theme = useAppTheme();
   const { state, data } = useAsync(async () => {
     const options = await cache.get(theme, async () => {
       let themeContent: ThemeOptions = {};
+      let baseTheme = defaultTheme;
       try {
-        themeContent = await load(theme);
+        themeContent = await get(`ws/public/app/theme?name=${theme}`);
       } catch {
         // ignore
       }
-      return merge(cloneDeep(defaultTheme), themeContent);
+      if (theme === "dark" || themeContent?.palette?.mode === "dark") {
+        baseTheme = merge(cloneDeep(defaultTheme), darkTheme);
+      }
+      return merge(cloneDeep(baseTheme), themeContent);
     });
     return validateThemeOptions(options);
   }, [theme]);

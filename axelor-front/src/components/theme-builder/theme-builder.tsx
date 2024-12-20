@@ -91,9 +91,14 @@ function ThemeBuilderInner(
     [invalidProps],
   );
 
+  const themeMode = useMemo(
+    () => theme?.palette?.mode,
+    [theme],
+  );
+
   return (
     <div className={styles.builder}>
-      <Box d="none" ref={setThemeDiv} data-bs-theme="light" />
+      <Box d="none" ref={setThemeDiv} data-bs-theme={themeMode} />
       <DialogHeader className={styles.header}>
         <DialogTitle className={styles.title}>Theme Builder</DialogTitle>
         <div className={styles.buttons}>

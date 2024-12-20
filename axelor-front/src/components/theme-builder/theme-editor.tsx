@@ -1,5 +1,6 @@
+import merge from "lodash/merge";
+import cloneDeep from "lodash/cloneDeep";
 import { produce } from "immer";
-import Chrome from "@uiw/react-color-chrome";
 import Color from "color";
 import React, {
   ChangeEvent,
@@ -20,7 +21,9 @@ import {
 } from "@axelor/ui";
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
-
+import defaultTheme from "@/hooks/use-app-theme/themes/default.json";
+import darkTheme from "@/hooks/use-app-theme/themes/dark.json";
+import Chrome from "@uiw/react-color-chrome";
 import { deepGet, deepSet } from "@/utils/objects";
 
 import { Select } from "../select";
@@ -31,7 +34,7 @@ import {
 } from "./theme-elements";
 import { usePropertiesContext } from "./scope";
 import { isValidCssValue } from "./utils";
-import defaultTheme from "@/hooks/use-app-theme/themes/default.json";
+
 import styles from "./theme-editor.module.scss";
 
 interface ThemeDesignerProps {
@@ -159,9 +162,12 @@ function PropertyEditor(
 
   const { getCssVar, setInvalids } = usePropertiesContext();
   const value = useMemo(() => deepGet(theme, path) ?? "", [path, theme]);
+  const baseTheme = useMemo(() => {
+    return theme?.palette?.mode === "dark" ? merge(cloneDeep(defaultTheme), darkTheme) : defaultTheme;
+  }, [theme?.palette?.mode]);
 
   const placeholder = useMemo(() => {
-    const defaultValue = deepGet(defaultTheme, path);
+    const defaultValue = deepGet(baseTheme, path);
     if (defaultValue) {
       return defaultValue;
     }
@@ -169,7 +175,7 @@ function PropertyEditor(
       return getCssVar?.(cssVariable);
     }
     return property.placeholder ?? "";
-  }, [path, cssVariable, getCssVar, property.placeholder]);
+  }, [baseTheme, path, cssVariable, property.placeholder, getCssVar]);
 
   const invalid = useMemo(
     () =>

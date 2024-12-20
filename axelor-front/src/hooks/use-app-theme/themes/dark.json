@@ -1,6 +1,7 @@
 {
   "palette": {
-    "type": "dark",
+    "mode": "dark",
+    
     "blue": "#666CFF",
     "red": "#E04440",
     "yellow": "#FDB528",
