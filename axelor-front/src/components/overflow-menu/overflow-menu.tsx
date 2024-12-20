@@ -8,10 +8,10 @@ import {
   useIsOverflowItemVisible,
   useOverflowMenu,
   useRefs,
+  useTheme,
 } from "@axelor/ui";
 
 import { SelectionTag } from "@/views/form/widgets";
-import { useAppTheme } from "@/hooks/use-app-theme";
 import styles from "./overflow-menu.module.scss";
 
 const OverflowMenuItem: React.FC<OverflowItemProps> = (props) => {
@@ -34,7 +34,7 @@ export function OverflowMenu<T>({
   items: T[];
   renderItem: (item: T) => JSX.Element;
 }) {
-  const theme = useAppTheme();
+  const { mode: themeMode = 'light' } = useTheme();
   const { ref, overflowCount, isOverflowing } =
     useOverflowMenu<HTMLDivElement>();
 
@@ -60,8 +60,8 @@ export function OverflowMenu<T>({
       <Box ref={iconRef} onMouseEnter={showMenu}>
         <SelectionTag
           title={`+${overflowCount ?? ""}`}
-          color={theme === "dark" ? "gray" : "white"}
-          className={clsx(styles.count, styles[theme])}
+          color={themeMode === "dark" ? "gray" : "white"}
+          className={clsx(styles.count, styles[themeMode])}
         />
       </Box>
       <Menu

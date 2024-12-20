@@ -1,9 +1,7 @@
 import { useAtomValue } from "jotai";
 import React, { useCallback, useState } from "react";
 
-import { clsx, Input } from "@axelor/ui";
-
-import { useAppTheme } from "@/hooks/use-app-theme";
+import { clsx, Input, useTheme } from "@axelor/ui";
 
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
@@ -23,7 +21,7 @@ export function Text({
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, height, placeholder, translatable } = schema;
   const { onBlur } = inputProps || {};
-  const theme = useAppTheme();
+  const { mode: themeMode } = useTheme();
 
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
@@ -70,7 +68,7 @@ export function Text({
       {readonly ? (
         <Input
           as="pre"
-          bg={theme === "dark" ? "body" : "light"}
+          bg={themeMode === "dark" ? "body" : "light"}
           mb={0}
           className={styles.pre}
         >
