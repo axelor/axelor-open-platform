@@ -18,8 +18,13 @@
  */
 package com.axelor.web.service;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaTheme;
+import com.axelor.meta.theme.MetaThemeService;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +42,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,6 +76,24 @@ public class InfoResource {
               + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
   public Map<String, Object> info() {
     return infoService.info(request, response);
+  }
+
+  @GET
+  @Path("theme")
+  @Hidden
+  public Response getTheme(@QueryParam("name") String name) {
+    MetaTheme theme = null;
+    final User user = AuthUtils.getUser();
+    try {
+      theme = Beans.get(MetaThemeService.class).getTheme(name, user);
+    } catch (Exception e) {
+      // ignore
+    }
+    String content = Optional.ofNullable(theme).map(MetaTheme::getContent).orElse(null);
+    if (StringUtils.notBlank(content)) {
+      return Response.ok().entity(content).build();
+    }
+    return Response.noContent().build();
   }
 
   @GET

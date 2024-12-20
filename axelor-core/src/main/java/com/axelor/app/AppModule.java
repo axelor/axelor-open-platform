@@ -27,6 +27,8 @@ import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
 import com.axelor.meta.loader.ViewWatcherObserver;
 import com.axelor.meta.service.ViewProcessor;
+import com.axelor.meta.theme.MetaThemeService;
+import com.axelor.meta.theme.MetaThemeServiceImpl;
 import com.axelor.report.ReportEngineProvider;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
@@ -75,6 +77,8 @@ public class AppModule extends AbstractModule {
 
     bind(AppSettingsObserver.class);
     bind(ViewWatcherObserver.class);
+
+    bind(MetaThemeService.class).to(MetaThemeServiceImpl.class);
 
     final List<Class<? extends AxelorModule>> moduleClasses =
         ModuleManager.getResolution().stream()

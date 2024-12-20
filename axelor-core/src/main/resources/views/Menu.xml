@@ -9,6 +9,7 @@
   <menuitem name="menu-view-management" title="View Management" parent="menu-admin"/>
   <menuitem name="menu-help-management" title="Help Management" parent="menu-admin"/>
   <menuitem name="menu-module-management" title="Module Management" parent="menu-admin" />
+  <menuitem name="menu-theme-management" title="Theme Management" parent="menu-admin" />
   <menuitem name="menu-job-management" title="Job Management" parent="menu-admin" />
 
   <menuitem name="menu-auth-users" parent="menu-auth" title="Users"
@@ -173,6 +174,13 @@
     <view type="grid" name="meta-schedule-grid"/>
     <view type="form" name="meta-schedule-form"/>
     <context name="isServiceEnable" expr="call: com.axelor.quartz.JobRunner:isEnabled()"/>
+  </action-view>
+
+  <menuitem name="menu-theme-all" parent="menu-theme-management" title="All Themes" action="meta.themes" />
+
+  <action-view name="meta.themes" title="All Themes" model="com.axelor.meta.db.MetaTheme">
+    <view type="grid" name="meta-theme-grid" />
+    <view type="form" name="meta-theme-form" />
   </action-view>
 
 </object-views>

@@ -38,6 +38,7 @@ import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -93,7 +94,7 @@ public class InfoService extends AbstractService {
         "copyright",
         SETTINGS.format(
             I18n.get(SETTINGS.getProperties().get(AvailableAppSettings.APPLICATION_COPYRIGHT))));
-    map.put("theme", getTheme());
+    map.put("theme", SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null));
     map.put("logo", getLogo());
     map.put("icon", getIcon());
     map.put("lang", AppFilter.getLocale().toLanguageTag());
@@ -229,7 +230,7 @@ public class InfoService extends AbstractService {
     map.put("action", user.getHomeAction());
     map.put("singleTab", user.getSingleTab());
     map.put("noHelp", Boolean.TRUE.equals(user.getNoHelp()));
-    map.put("theme", user.getTheme());
+    map.put("theme", Beans.get(MetaThemeRepository.class).fromIdentifierToName(user.getTheme()));
 
     if (group != null) {
       if (user.getHomeAction() == null) {
@@ -348,14 +349,6 @@ public class InfoService extends AbstractService {
       }
     }
     return icon;
-  }
-
-  public String getTheme() {
-    final User user = AuthUtils.getUser();
-    if (user == null || StringUtils.isBlank(user.getTheme()) || "default".equals(user.getTheme())) {
-      return SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
-    }
-    return user.getTheme();
   }
 
   public String getLink(Object value, String defaultValue) {

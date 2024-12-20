@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_7.3.xsd">
+
+  <grid title="Themes" name="meta-theme-grid" model="com.axelor.meta.db.MetaTheme">
+    <field name="name" />
+    <field name="label" />
+    <field name="isSelectable" />
+    <button name="design" icon="style" onClick="action-meta-theme-open-builder" help="Open theme designer"/>
+  </grid>
+
+  <form title="Theme" name="meta-theme-form" model="com.axelor.meta.db.MetaTheme">
+    <toolbar>
+      <button name="design" icon="style" onClick="save,action-meta-theme-open-builder" help="Open theme designer"/>
+    </toolbar>
+    <panel title="Overview">
+      <field name="name"/>
+      <field name="label"/>
+      <field name="isSelectable" hidden="true"/>
+    </panel>
+    <panel title="Content">
+      <field name="content" colSpan="12" showTitle="false" widget="CodeEditor" x-code-syntax="json" />
+    </panel>
+    <panel sidebar="true">
+      <panel showIf="!isSelectable" hidden="true" itemSpan="12">
+        <static><![CDATA[
+        <>
+          <Box flexDirection="row" alignItems="baseline" d="flex" g={2}>
+            <Icon icon={"info-circle"} />
+            <Box alignSelf="center">
+              {_t("When making the theme available to users, make sure that the name is unique.")}
+            </Box>
+          </Box>
+        </>
+        ]]></static>
+        <button name="selectableThemeBtn" onClick="save,action-meta-theme-check-unique-name,com.axelor.meta.web.MetaController:setThemeSelectable"
+                prompt="This will make the theme available for users. Are you sure you want to continue?"
+                icon="eye" title="Make theme available"/>
+      </panel>
+      <panel showIf="isSelectable" hidden="true" itemSpan="12">
+        <button name="unselectableThemeBtn" onClick="save,com.axelor.meta.web.MetaController:setThemeUnSelectable" hidden="true"
+                prompt="This will revert any users having this theme with the default theme. Are you sure you want to continue?"
+                icon="eye-slash" showIf="isSelectable" title="Do not make the theme available"/>
+      </panel>
+    </panel>
+  </form>
+
+  <action-validate name="action-meta-theme-check-unique-name">
+    <alert message="A theme with the same name already exist. It may create conflicts. Are you sure you want to continue?"
+           if="eval: __repo__(MetaTheme).all().filter('self.name = :name AND self.id != :id').bind('name', name).bind('id', id).count() >= 1"/>
+  </action-validate>
+
+  <action-view name="action-meta-theme-open-builder" title="Theme Builder" model="com.axelor.meta.db.MetaTheme">
+    <view type="custom" name="theme-builder-custom" />
+    <view-param name="popup" value="true" />
+    <view-param name="popup.show-header" value="false" />
+    <view-param name="popup.show-footer" value="false" />
+    <context name="id" expr="#{id}" />
+    <context name="_model" expr="#{_model}" />
+  </action-view>
+
+  <custom name="theme-builder-custom" title="Theme Builder">
+    <dataset type="rpc">com.axelor.meta.web.MetaController:loadTheme</dataset>
+    <template>
+    <![CDATA[
+      <>
+        <ThemeBuilder data={data} />
+      </>
+    ]]>
+    </template>
+  </custom>
+
+</object-views>

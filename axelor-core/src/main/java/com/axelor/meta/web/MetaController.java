@@ -24,6 +24,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -36,9 +37,11 @@ import com.axelor.meta.db.MetaAttrs;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaModel;
+import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaAttrsRepository;
+import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
@@ -69,6 +72,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -337,5 +341,69 @@ public class MetaController {
       }
     }
     response.setInfo(I18n.get("Export complete."));
+  }
+
+  public void loadTheme(ActionRequest request, ActionResponse response) {
+    Long id =
+        Optional.ofNullable(request.getData().get("id"))
+            .map(Object::toString)
+            .map(Long::parseLong)
+            .orElse(null);
+
+    if (id == null) {
+      return;
+    }
+
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, MetaTheme.class, id);
+
+    MetaTheme theme = Beans.get(MetaThemeRepository.class).find(id);
+    String content = Optional.ofNullable(theme.getContent()).orElse("{}");
+
+    response.setData(
+        Map.of(
+            "id",
+            id,
+            "version",
+            theme.getVersion(),
+            "model",
+            MetaTheme.class.getName(),
+            "content",
+            content));
+  }
+
+  public void setThemeSelectable(ActionRequest request, ActionResponse response) {
+    MetaTheme theme = request.getContext().asType(MetaTheme.class);
+
+    if (theme == null || theme.getId() == null) {
+      return;
+    }
+
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_WRITE, MetaTheme.class, theme.getId());
+
+    try {
+      Beans.get(MetaService.class)
+          .updateSelectableTheme(Beans.get(MetaThemeRepository.class).find(theme.getId()), true);
+      response.setReload(true);
+    } catch (Exception e) {
+      response.setError(e.getMessage());
+    }
+  }
+
+  public void setThemeUnSelectable(ActionRequest request, ActionResponse response) {
+    MetaTheme theme = request.getContext().asType(MetaTheme.class);
+
+    if (theme == null || theme.getId() == null) {
+      return;
+    }
+
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_WRITE, MetaTheme.class, theme.getId());
+
+    try {
+      Beans.get(MetaService.class)
+          .updateSelectableTheme(Beans.get(MetaThemeRepository.class).find(theme.getId()), false);
+      response.setReload(true);
+    } catch (Exception e) {
+      response.setError(e.getMessage());
+    }
   }
 }

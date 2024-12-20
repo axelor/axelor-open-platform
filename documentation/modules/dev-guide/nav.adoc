@@ -73,5 +73,6 @@
 *** xref:web-client/quick-menu.adoc[Quick menus]
 *** xref:web-client/view-processor.adoc[View processors]
 *** xref:web-client/collaboration.adoc[Views collaboration]
+*** xref:web-client/themes.adoc[Themes]
 *** xref:web-client/shortcuts.adoc[Shortcuts]
 *** xref:web-client/advanced.adoc[Advanced Customization]

@@ -1,0 +1,52 @@
+= Themes
+:toc:
+:toc-title:
+
+Custom themes can be defined within the application. You can customize the existing ones but also create new themes
+according to your requirements.
+
+== Overview
+
+Themes can be configured from `Administration → Theme management → All themes` menu. The theme requires:
+
+* *name* - name of the theme
+* *label* - label/description of the theme
+* *content* - the json content (see bellow)
+
+On the toolbar, the designer icon will open theme designer popup allow you to update the base theme through multiple
+properties.
+
+By default, themes aren't available for users. To allow a theme to be selected by users from their preferences, click
+on `Make theme available`. When making the theme available to users, make sure that the name is unique. To undo, click
+on `Do not make the theme available`. This will revert any users having this theme with the default theme
+
+By default, all applications comes with a default theme and a dark mode. There is also a special theme "Auto", that
+will use either the default light or the dark theme depending on your system settings.
+
+== Json content
+
+== Advance configuration
+
+In case of advance requirements, you can provide an implementation of `MetaThemeService`. This will allow to define which
+themes are available for users, by also force the specific theme depending on user context (ie, provides themes by
+companies, themes by groups, ...).
+
+[source,java]
+----
+public class MyMetaThemeService implements MetaThemeService {
+
+  @Override
+  public MetaTheme getTheme(String name, User user) {
+    // Retrieve the theme content depending on the given name.
+    // The current user can be used to retrieve theme depending on user context.
+  }
+
+  @Override
+  public List<MetaTheme> getAvailableThemes(User user) {
+    // Retrieve the available themes for the user.
+  }
+
+}
+----
+
+

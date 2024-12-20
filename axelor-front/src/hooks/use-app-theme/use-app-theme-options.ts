@@ -8,16 +8,26 @@ import { useAppTheme } from "./use-app-theme";
 
 const cache = new LoadingCache<Promise<ThemeOptions>>();
 
-const load = async (theme: "light" | "dark") => {
-  const url = theme === "dark" ? `js/theme/dark.json` : `js/theme/light.json`;
-  return request({ url }).then((resp) => resp.json());
+type ThemeName = "light" | "dark";
+
+const get = async (url: string) => {
+  const res = await request({ url });
+  return res.status === 200 ? res.json() : Promise.reject(res.status);
+};
+
+const load = async (theme: ThemeName) => {
+  try {
+    return await get(`ws/public/app/theme?name=${theme}`);
+  } catch {
+    return await get(`js/theme/${theme}.json`);
+  }
 };
 
 export function useAppThemeOption() {
   const theme = useAppTheme();
   const { state, data } = useAsync(
     async () => cache.get(theme, () => load(theme)),
-    [theme]
+    [theme],
   );
 
   return {

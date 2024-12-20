@@ -33,14 +33,17 @@ import com.axelor.db.Query.Selector;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
@@ -668,6 +671,20 @@ public class MetaService {
         }
       }
       return result;
+    }
+  }
+
+  @Transactional
+  public void updateSelectableTheme(MetaTheme metaTheme, boolean isSelectable) {
+
+    metaTheme.setIsSelectable(isSelectable);
+    Beans.get(MetaThemeRepository.class).save(metaTheme);
+
+    if (!isSelectable) {
+      JPA.em()
+          .createQuery("UPDATE User SET theme = null WHERE theme = :id")
+          .setParameter("id", metaTheme.getId().toString())
+          .executeUpdate();
     }
   }
 }
