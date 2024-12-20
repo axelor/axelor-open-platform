@@ -25,7 +25,7 @@ export function useAppThemeOption() {
       let themeContent: ThemeOptions = {};
       let baseTheme = defaultTheme;
       try {
-        themeContent = await get(`ws/public/app/theme?name=${theme}`);
+        themeContent = await get(`ws/public/app/theme?name=${encodeURIComponent(theme)}`);
       } catch {
         // ignore
       }
