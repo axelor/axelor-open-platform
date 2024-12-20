@@ -5,6 +5,15 @@
     <span>{_t(""The scheduler service is disabled."")}</span>
   </Box>
 </>",,,
+"<>
+  <Box flexDirection=""row"" alignItems=""baseline"" d=""flex"" g={2}>
+    <Icon icon={""info-circle""} />
+    <Box alignSelf=""center"">
+      {_t(""When making the theme available to users, make sure that the name is unique."")}
+    </Box>
+  </Box>
+</>",,,
+"A theme with the same name already exist. It may create conflicts. Are you sure you want to continue?",,,
 "A views restoring is already in progress. Please wait until it ends and try again.",,,
 "Access error",,,
 "Action",,,
@@ -28,6 +37,7 @@
 "All Schedules",,,
 "All Selects",,,
 "All Teams",,,
+"All Themes",,,
 "All Translations",,,
 "All View Help",,,
 "All Views",,,
@@ -35,6 +45,7 @@
 "All the customizations will be lost. Are you sure?",,,
 "All views have been restored (%s).",,,
 "Allow",,,
+"Allow this theme to be used by users",,,
 "Always",,,
 "Amber",,,
 "An unique permission name.",,,
@@ -47,6 +58,7 @@
 "Author",,,
 "Authorization",,,
 "Authorized roles",,,
+"Available for users",,,
 "Black",,,
 "Block the user",,,
 "Block the user for an indefinite period.",,,
@@ -137,6 +149,7 @@
 "Disable the user from the specified date.",,,
 "Display messages",,,
 "Display messages and followers",,,
+"Do not make the theme available",,,
 "Document",,,
 "Documents",,,
 "Domain",,,
@@ -242,6 +255,7 @@
 "Login",,,
 "Low",,,
 "Mail",,,
+"Make theme available",,,
 "ManyToMany",,,
 "ManyToOne",,,
 "Mapped by",,,
@@ -309,6 +323,7 @@
 "Only if",,,
 "Only use this menu-item if the given expression is true (ie `if` condition).",,,
 "Only use this menu-item if the given module is installed (ie `if-module` condition).",,,
+"Open theme designer",,,
 "Options",,,
 "Orange",,,
 "Order by",,,
@@ -441,7 +456,12 @@
 "The select item title",,,
 "The select item value",,,
 "Theme",,,
+"Theme Builder",,,
+"Theme Management",,,
+"Themes",,,
 "This may terminate any running jobs. Are you sure you want to continue?",,,
+"This will make the theme available for users. Are you sure you want to continue?",,,
+"This will revert any users having this theme with the default theme. Are you sure you want to continue?",,,
 "This will update job with current settings. Are you sure you want to continue?",,,
 "Time",,,
 "Title",,,
@@ -489,6 +509,7 @@
 "Visible",,,
 "Visible in grid",,,
 "Warning",,,
+"When making the theme available to users, make sure that the name is unique.",,,
 "Whether to grant create access.",,,
 "Whether to grant export access.",,,
 "Whether to grant read access.",,,

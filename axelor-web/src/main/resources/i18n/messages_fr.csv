@@ -111,6 +111,7 @@
 "Export","Exporter",,
 "Export full","Tout exporter",,
 "Failed","Échec",,
+"Failed to parse the given JSON theme : incorrect syntax was encountered.","Échec de l'analyse du thème JSON : une syntaxe incorrecte a été rencontrée.",,
 "False","Faux",,
 "Favorite","Favori",,
 "Field name","Nom du champ",,
