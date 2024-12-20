@@ -25,7 +25,7 @@ import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaTheme;
+import com.axelor.meta.theme.AvailableTheme;
 import com.axelor.meta.theme.MetaThemeService;
 import com.axelor.web.AppSessionListener;
 import com.google.inject.servlet.RequestScoped;
@@ -102,31 +102,17 @@ public class AboutService extends AbstractService {
   /**
    * Retrieve themes available for users
    *
-   * @return list of themes including the name/title/id
+   * @return list of {@link AvailableTheme}
    */
   @GET
   @Path("themes")
-  public List<Map<String, String>> getThemes() {
-    final List<Map<String, String>> info = new ArrayList<>();
-    final User user = AuthUtils.getUser();
-    List<MetaTheme> availableThemes = new ArrayList<>();
+  public List<AvailableTheme> getThemes() {
+    List<AvailableTheme> availableThemes = new ArrayList<>();
     try {
-      availableThemes = Beans.get(MetaThemeService.class).getAvailableThemes(user);
+      availableThemes = Beans.get(MetaThemeService.class).getAvailableThemes(AuthUtils.getUser());
     } catch (Exception e) {
       // ignore
     }
-    for (MetaTheme availableTheme : availableThemes) {
-      if ("dark".equalsIgnoreCase(availableTheme.getName())
-          || "light".equalsIgnoreCase(availableTheme.getName())) {
-        continue;
-      }
-      Map<String, String> map = new HashMap<>();
-      map.put("name", availableTheme.getName());
-      map.put("title", availableTheme.getName());
-      map.put("id", availableTheme.getId().toString());
-      info.add(map);
-    }
-    return info;
+    return availableThemes;
   }
-
 }

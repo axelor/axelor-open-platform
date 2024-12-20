@@ -12,14 +12,7 @@
       {_t(""When making the theme available to users, make sure that the name is unique."")}
     </Box>
   </Box>
-</>","<>
-  <Box flexDirection=""row"" alignItems=""baseline"" d=""flex"" g={2}>
-    <Icon icon={""info-circle""} />
-    <Box alignSelf=""center"">
-      {_t(""Lorsque vous mettez le thème à disposition des utilisateurs, assurez-vous que le nom est unique."")}
-    </Box>
-  </Box>
-</>",,
+</>",,,
 "A theme with the same name already exist. It may create conflicts. Are you sure you want to continue?","Un thème portant le même nom existe déjà. Cela peut créer des conflits. Êtes-vous sûr de vouloir continuer ?",,
 "A views restoring is already in progress. Please wait until it ends and try again.","Une restauration des vues est déjà en cours. Veuillez patienter jusqu’à la fin et réessayer.",,
 "Access error","Erreur d'accès",,
@@ -65,6 +58,7 @@
 "Author","Auteur",,
 "Authorization","Autorisation",,
 "Authorized roles","Rôles autorisés",,
+"Auto","Auto",,
 "Available for users","Disponible pour les utilisateurs",,
 "Black","Noir",,
 "Block the user","Bloquer l’utilisateur",,
@@ -135,6 +129,7 @@
 "Custom-ManyToOne","Custom-ManyToOne",,
 "Custom-OneToMany","Custom-OneToMany",,
 "Cyan","Cyan",,
+"Dark","Sombre",,
 "Dashboard","Dashboard",,
 "Data","Données",,
 "Date","Date",,
@@ -255,6 +250,7 @@
 "Last modified","Modifié le",,
 "Last password update date","Date de dernière modification du mot de passe",,
 "Left menu","Menu à gauche",,
+"Light","Clair",,
 "Light Blue","Bleu clair",,
 "Light Green","Vert clair",,
 "Lime","Vert citron",,

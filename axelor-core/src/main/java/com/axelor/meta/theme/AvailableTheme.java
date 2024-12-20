@@ -18,28 +18,42 @@
  */
 package com.axelor.meta.theme;
 
-import com.axelor.auth.db.User;
 import com.axelor.meta.db.MetaTheme;
-import java.util.List;
-import javax.annotation.Nullable;
 
-public interface MetaThemeService {
+/** Represent a selectable theme */
+public class AvailableTheme {
 
-  /**
-   * Retrieve the theme content depending on the given name. The current user can be used to
-   * retrieve theme depending on user context.
-   *
-   * @param name the theme name
-   * @param user the current user, or null if not available
-   * @return {@link MetaTheme}
-   */
-  MetaTheme getTheme(String name, @Nullable User user);
+  private String name;
+  private String title;
 
-  /**
-   * Retrieve the available themes for the user.
-   *
-   * @param user the given user
-   * @return list of {@link AvailableTheme}
-   */
-  List<AvailableTheme> getAvailableThemes(User user);
+  public AvailableTheme(MetaTheme metaTheme) {
+    this.name = metaTheme.getId().toString();
+    this.title = metaTheme.getName();
+  }
+
+  public AvailableTheme(String name) {
+    this.name = name;
+    this.title = name;
+  }
+
+  public AvailableTheme(String name, String title) {
+    this.name = name;
+    this.title = title;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
 }
