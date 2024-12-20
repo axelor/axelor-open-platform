@@ -34,7 +34,10 @@ export function isValidCssValue(property?: string, value?: any) {
   if (property === "color" && isThemeColor(value)) {
     return true;
   }
-  return CSS.supports(property, value);
+  if (window.CSS && CSS?.supports) {
+    return CSS.supports(property, value);
+  }
+  return true;
 }
 
 function isValidColor(color?: string | null): boolean {

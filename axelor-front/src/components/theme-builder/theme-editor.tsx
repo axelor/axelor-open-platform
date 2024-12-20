@@ -23,6 +23,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { deepGet, deepSet } from "@/utils/objects";
 
+import { Select } from "../select";
 import {
   ThemeElement,
   ThemeElementProperty,
@@ -30,6 +31,7 @@ import {
 } from "./theme-elements";
 import { usePropertiesContext } from "./scope";
 import { isValidCssValue } from "./utils";
+import defaultTheme from "@/hooks/use-app-theme/themes/default.json";
 import styles from "./theme-editor.module.scss";
 
 interface ThemeDesignerProps {
@@ -87,13 +89,13 @@ function ThemeMenuItem({
   return (
     <div
       className={clsx(styles.item, {
-        [styles.invalid]: invalid,
         [styles.active]: active,
       })}
       onClick={() => onSelect(item)}
     >
-      <MaterialIcon className={styles.icon} icon={item.icon ?? "widgets"} />
+      <MaterialIcon icon={item.icon ?? "widgets"} />
       <div className={styles.title}>{item.title}</div>
+      {invalid && <MaterialIcon icon={"error"} color="danger" />}
     </div>
   );
 }
@@ -146,21 +148,35 @@ function PropertyEditor(
   },
 ) {
   const { property, theme, onChange } = props;
-  const { name, path, type, cssProperty = type, cssVariable } = property;
+  const {
+    name,
+    path,
+    type,
+    isValid: isPropertyValid,
+    cssProperty = type,
+    cssVariable,
+  } = property;
 
   const { getCssVar, setInvalids } = usePropertiesContext();
   const value = useMemo(() => deepGet(theme, path) ?? "", [path, theme]);
 
   const placeholder = useMemo(() => {
+    const defaultValue = deepGet(defaultTheme, path);
+    if (defaultValue) {
+      return defaultValue;
+    }
     if (cssVariable) {
       return getCssVar?.(cssVariable);
     }
-    return "";
-  }, [cssVariable, getCssVar]);
+    return property.placeholder ?? "";
+  }, [path, cssVariable, getCssVar, property.placeholder]);
 
   const invalid = useMemo(
-    () => !isValidCssValue(cssProperty, value),
-    [cssProperty, value],
+    () =>
+      isPropertyValid
+        ? !isPropertyValid(value)
+        : !isValidCssValue(cssProperty, value),
+    [isPropertyValid, cssProperty, value],
   );
 
   const handleChange = useCallback(
@@ -183,20 +199,44 @@ function PropertyEditor(
         }
       }),
     );
-  }, [setInvalids, invalid]);
+  }, [path, invalid, setInvalids]);
 
-  return (
-    <div className={styles.property}>
-      <div className={styles.title}>{name}</div>
-      <div className={styles.value}>
-        {type === "color" ? (
+  function render() {
+    switch (type) {
+      case "color":
+        return (
           <ColorInput
             value={value}
             placeholder={placeholder}
             invalid={invalid}
             onChange={handleChange}
           />
-        ) : (
+        );
+      case "select": {
+        const { options = [] } = property;
+        const selected = options.find((x) => x.value === value) ?? null;
+        return (
+          <Select
+            className={styles.select}
+            autoComplete={false}
+            placeholder={placeholder}
+            onChange={(e: any) =>
+              handleChange({
+                target: {
+                  value: e?.value,
+                },
+              } as ChangeEvent<HTMLInputElement>)
+            }
+            value={selected}
+            options={options}
+            optionKey={(x) => x.value}
+            optionLabel={(x) => x.title}
+            optionEqual={(x, y) => x.value === y.value}
+          />
+        );
+      }
+      default:
+        return (
           <Input
             type="text"
             placeholder={placeholder}
@@ -204,8 +244,14 @@ function PropertyEditor(
             value={value}
             onChange={handleChange}
           />
-        )}
-      </div>
+        );
+    }
+  }
+
+  return (
+    <div className={styles.property}>
+      <div className={styles.title}>{name}</div>
+      <div className={styles.value}>{render()}</div>
     </div>
   );
 }
@@ -245,7 +291,7 @@ function ColorInput({
         placeholder={placeholder}
         invalid={invalid}
         value={value}
-        endAdornment={
+        startAdornment={
           <Box
             border
             className={styles.colorInput}

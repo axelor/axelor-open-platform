@@ -44,10 +44,6 @@
       var(--bs-primary-bg-subtle)
     );
   }
-  .item.invalid {
-    color: var(--bs-light);
-    background-color: var(--bs-danger); 
-  }
 }
 
 .panel {
@@ -93,4 +89,8 @@
   height: 1.25rem;
   width: 1.25rem;
   cursor: pointer;
+}
+
+.select {
+  width: 100%;
 }

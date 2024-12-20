@@ -1,13 +1,16 @@
 import { MaterialIconProps } from "@axelor/ui/icons/material-icon";
 
-export type ThemeElementPropertyType = "color" | "text";
+export type ThemeElementPropertyType = "color" | "text" | "select";
 
 export type ThemeElementProperty = {
   name: string;
   path: string;
   type?: ThemeElementPropertyType;
+  options?: { title: string; value: string }[]; // for selection
+  placeholder?: string;
   cssProperty?: string;
   cssVariable?: string;
+  isValid?: (value: any) => boolean;
 };
 
 export type ThemeElementEditor = {
@@ -28,6 +31,22 @@ export const elements: ThemeElement[] = [
     title: "Palette",
     icon: "palette",
     editors: [
+      {
+        name: "Theme",
+        props: [
+          {
+            name: "Mode",
+            path: "palette.mode",
+            type: "select",
+            placeholder: "Light/Dark",
+            options: [
+              { title: "Light", value: "light" },
+              { title: "Dark", value: "dark" },
+            ],
+            isValid: () => true,
+          },
+        ],
+      },
       {
         name: "Theme Colors",
         props: [
@@ -290,7 +309,7 @@ export const elements: ThemeElement[] = [
             name: "Font family",
             path: "typography.fontFamily",
             cssProperty: "font-family",
-            cssVariable: "--bs-body-font-family"
+            cssVariable: "--bs-body-font-family",
           },
           {
             name: "Font size",
