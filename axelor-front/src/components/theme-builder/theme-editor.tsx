@@ -42,6 +42,22 @@ interface ThemeDesignerProps {
   onChange: (theme: ThemeOptions) => void;
 }
 
+const cssPropertyExamples: Record<string, string> = {
+  padding: "ex: 4px 8px, 0.25rem 0.5rem",
+  gap: "ex: 16px, 1rem",
+  height: "ex: 100px, 100%",
+  width: "ex: 100px, 100%",
+  "z-index": "ex: 1, 2, 3",
+  "font-size": "ex: 16px, 1rem",
+  "font-weight": "ex: 400, 500, bold, bolder",
+  "box-shadow": "ex: 0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
+  "row-gap": "ex: 1rem, 16px",
+  "column-gap": "ex: 1rem, 16px",
+  "border-width": "ex: 1px, 0.625rem",
+  "border-style": "ex: solid, dashed, dotted",
+  "border-radius": "ex: 6px, 0.375rem, 15%",
+};
+
 export function ThemeDesigner(props: ThemeDesignerProps) {
   const [selected, setSelected] = useState<ThemeElement>(ELEMENTS[0]);
   const onItemClick = useCallback((node: ThemeElement) => {
@@ -163,7 +179,9 @@ function PropertyEditor(
   const { getCssVar, setInvalids } = usePropertiesContext();
   const value = useMemo(() => deepGet(theme, path) ?? "", [path, theme]);
   const baseTheme = useMemo(() => {
-    return theme?.palette?.mode === "dark" ? merge(cloneDeep(defaultTheme), darkTheme) : defaultTheme;
+    return theme?.palette?.mode === "dark"
+      ? merge(cloneDeep(defaultTheme), darkTheme)
+      : defaultTheme;
   }, [theme?.palette?.mode]);
 
   const placeholder = useMemo(() => {
@@ -174,8 +192,15 @@ function PropertyEditor(
     if (cssVariable) {
       return getCssVar?.(cssVariable);
     }
-    return property.placeholder ?? "";
-  }, [baseTheme, path, cssVariable, property.placeholder, getCssVar]);
+    return property.placeholder ?? cssPropertyExamples[cssProperty ?? ""] ?? "";
+  }, [
+    baseTheme,
+    path,
+    cssVariable,
+    getCssVar,
+    cssProperty,
+    property.placeholder,
+  ]);
 
   const invalid = useMemo(
     () =>
