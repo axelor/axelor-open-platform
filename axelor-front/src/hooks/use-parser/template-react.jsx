@@ -32,9 +32,10 @@ import {
 import { Icon } from "@/components/icon";
 import { TextLink as Link } from "@/components/text-link";
 
-import { parseSafe } from "./parser";
+import { ThemeBuilder } from "@/components/theme-builder";
 import { legacyClassNames } from "@/styles/legacy";
 import { LoadingCache } from "@/utils/cache";
+import { parseSafe } from "./parser";
 
 const COMPONENTS = {
   Alert,
@@ -65,6 +66,7 @@ const COMPONENTS = {
   TableHead,
   TableRow,
   Icon,
+  ThemeBuilder,
   legacyClassNames,
 };
 
