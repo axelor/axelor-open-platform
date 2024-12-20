@@ -213,7 +213,7 @@ function PropertyEditor(
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const newTheme = produce(theme, (draft) =>
-        deepSet(draft, path, event.target.value),
+        deepSet(draft, path, event.target.value || undefined),
       );
       onChange(newTheme);
     },

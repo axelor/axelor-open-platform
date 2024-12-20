@@ -1,6 +1,8 @@
 import Color from "color";
 import deepGet from "lodash/get";
 import deepSet from "lodash/set";
+import isNil from "lodash/isNil";
+import isEmpty from "lodash/isEmpty";
 import { produce } from "immer";
 
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
@@ -66,4 +68,17 @@ export function validateThemeOptions(options: ThemeOptions) {
       });
     }
   });
+}
+
+export function compactTheme(value: any): any {
+  if (Array.isArray(value)) {
+    value = value.map((x) => compactTheme(x)).filter((x) => !isNil(x));
+  }
+  if (value && typeof value === "object") {
+    value = Object.entries(value)
+      .map(([k, v]) => [k, compactTheme(v)])
+      .filter(([k, v]) => !isNil(v))
+      .reduce((prev, [k, v]) => ({ ...prev, [k]: v }), {});
+  }
+  return isEmpty(value) ? undefined : value;
 }

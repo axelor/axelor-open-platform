@@ -11,12 +11,14 @@ import {
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { compactTheme } from "@/components/theme-builder/utils.ts";
 import { DataSource } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { useDialogContext } from "../dialogs";
 import { PropertiesContextProvider } from "./scope";
 import { ThemeDesigner } from "./theme-editor";
+
 import styles from "./theme-builder.module.scss";
 
 export type ThemeBuilderProps = {
@@ -75,7 +77,7 @@ function ThemeBuilderInner(
     const ds = new DataSource(data?.model);
     await ds.save({
       ...data,
-      content: JSON.stringify(theme, null, 2),
+      content: JSON.stringify(compactTheme(theme), null, 2) || null,
     });
     close(true);
     location.reload();
@@ -91,10 +93,7 @@ function ThemeBuilderInner(
     [invalidProps],
   );
 
-  const themeMode = useMemo(
-    () => theme?.palette?.mode,
-    [theme],
-  );
+  const themeMode = useMemo(() => theme?.palette?.mode, [theme]);
 
   return (
     <div className={styles.builder}>
