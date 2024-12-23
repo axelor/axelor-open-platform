@@ -67,12 +67,19 @@ public class GuiceJobRunShell extends JobRunShell {
         .ifPresentOrElse(this::run, super::run);
   }
 
+  private void superRun() {
+    final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
+    try (RequestScoper.CloseableScope ignored = scope.open()) {
+      super.run();
+    }
+  }
+
   private void run(String tenantId) {
     final TenantConfig config = Beans.get(TenantConfigProvider.class).find(tenantId);
     if (Boolean.TRUE.equals(config.getActive())) {
       // JobRunShell may re-use same thread from the pool, so run the task in a new
       // thread to ensure the task is always run with a proper tenant id.
-      TenantAware task = new TenantAware(super::run).tenantId(tenantId).withTransaction(false);
+      TenantAware task = new TenantAware(this::superRun).tenantId(tenantId).withTransaction(false);
       task.start();
       try {
         task.join();
@@ -94,14 +101,11 @@ public class GuiceJobRunShell extends JobRunShell {
 
   @Override
   public void run() {
-    final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
-    try (RequestScoper.CloseableScope ignored = scope.open()) {
-      try {
-        super.initialize(this.sched);
-        this.doRun();
-      } catch (SchedulerException e) {
-        handleError(e);
-      }
+    try {
+      super.initialize(this.sched);
+      this.doRun();
+    } catch (SchedulerException e) {
+      handleError(e);
     }
   }
 }
