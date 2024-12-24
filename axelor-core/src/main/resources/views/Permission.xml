@@ -15,6 +15,7 @@
     <field name="canWrite" width="100" />
     <field name="canCreate" width="100" />
     <field name="canRemove" width="100" />
+    <field name="canImport" width="100" />
     <field name="canExport" width="100" />
   </grid>
 
@@ -28,6 +29,7 @@
       <field name="canWrite" widget="inline-checkbox" />
       <field name="canCreate" widget="inline-checkbox" />
       <field name="canRemove" widget="inline-checkbox" />
+      <field name="canImport" widget="inline-checkbox" />
       <field name="canExport" widget="inline-checkbox" />
     </panel>
     <panel title="Condition" itemSpan="12">

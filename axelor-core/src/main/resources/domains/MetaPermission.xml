@@ -18,6 +18,7 @@
     <string name="field" required="true" />
     <boolean name="canRead" title="Read" />
     <boolean name="canWrite" title="Write" />
+    <boolean name="canImport" title="Import" />
     <boolean name="canExport" title="Export" />
     <string name="readonlyIf" />
     <string name="hideIf" />

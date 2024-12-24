@@ -49,6 +49,8 @@ final class AuthResolver {
         return Boolean.TRUE.equals(permission.getCanCreate());
       case REMOVE:
         return Boolean.TRUE.equals(permission.getCanRemove());
+      case IMPORT:
+        return Boolean.TRUE.equals(permission.getCanImport());
       case EXPORT:
         return Boolean.TRUE.equals(permission.getCanExport());
       default:
