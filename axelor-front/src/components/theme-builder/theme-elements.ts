@@ -401,6 +401,7 @@ export const elements: ThemeElement[] = [
   {
     name: "shell",
     title: "Shell",
+    icon: "code_blocks",
     editors: [
       {
         name: "Shell",
@@ -532,6 +533,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Badge",
     title: "Badge",
+    icon: "badge",
     editors: [
       {
         name: "Badge",
@@ -588,6 +590,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Button",
     title: "Button",
+    icon: "buttons_alt",
     editors: [
       {
         name: "Button",
@@ -619,6 +622,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Input",
     title: "Input",
+    icon: "input",
     editors: [
       {
         name: "Input",
@@ -775,6 +779,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Form",
     title: "Form",
+    icon: "article",
     editors: [
       {
         name: "Form",
@@ -806,6 +811,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Panel",
     title: "Panel",
+    icon: "shelf_position",
     editors: [
       {
         name: "Panel",
@@ -957,6 +963,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Table",
     title: "Table",
+    icon: "list",
     editors: [
       {
         name: "Table",
@@ -1134,6 +1141,7 @@ export const elements: ThemeElement[] = [
   {
     name: "Dropdown",
     title: "Dropdown",
+    icon: "dropdown",
     editors: [
       {
         name: "Dropdown",
@@ -1276,6 +1284,7 @@ export const elements: ThemeElement[] = [
   {
     name: "NavMenu",
     title: "Nav Menu",
+    icon: "menu",
     editors: [
       {
         name: "Menu",
@@ -1417,6 +1426,7 @@ export const elements: ThemeElement[] = [
   {
     name: "NavTabs",
     title: "Nav Tabs",
+    icon: "tabs",
     editors: [
       {
         name: "Text",
