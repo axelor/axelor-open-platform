@@ -52,3 +52,10 @@ specify `canNew` and `canDelete` to `true` or with an expression evaluated again
 It also adds support to editable grids. The linked grid view should have `editable="true"` to allow edit records in
 grids. To disable this behavior, you have to pass `canEdit="false"` to disable editable support without updating the
 linked grid view.
+
+== Label legacy css classes support
+
+Built-in classes `label-warning`, `label-important`, `label-\{variant\}`, ... that automatically applied background
+color have been removed. Now `label-\{variant\}` class only change text color. In order to apply background color, use
+`label-bg-\{variant\}` class like `label-bg-warning`. Such classes are commonly used in custom views or in viewers. Do
+appropriate changes if background color is needed.

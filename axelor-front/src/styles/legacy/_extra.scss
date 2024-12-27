@@ -190,22 +190,6 @@
   width: 100%;
 }
 
-.text-error {
-  color: map.get($label_colors, 'danger');
-}
-
-.text-success {
-  color: map.get($label_colors, 'success');
-}
-
-.text-info {
-  color: map.get($label_colors, 'info');
-}
-
-.text-warning {
-  color: map.get($label_colors, 'warning');
-}
-
 i.fa-colored {
   &.fa-folder {
     color: #ffa726;

@@ -72,30 +72,6 @@ $text_styles: (
   ),
 );
 
-$label_colors: (
-  "red": red,
-  "blue": blue,
-  "green": green,
-  "muted": #777,
-  "primary": #428bca,
-  "success": #3c763d,
-  "info": #31708f,
-  "warning": #8a6d3b,
-  "danger": #a94442,
-);
-
-$label_backgrounds: (
-  "primary": #428bca,
-  "success": #dff0d8,
-  "info": #d9edf7,
-  "warning": #fcf8e3,
-  "danger": #f2dede,
-);
-
-$label_backgrounds_text: (
-  "primary": #fff,
-);
-
 [class*="hilite-"] > .display-text {
   color: inherit;
 }
@@ -142,24 +118,6 @@ $label_backgrounds_text: (
   }
 }
 
-@each $name, $value in $label_colors {
-  .form-item label.label-#{$name},
-  .form-item-container.#{$name},
-  .form-item-container.#{$name} input:first-of-type,
-  .form-item-container.#{$name} input:first-of-type {
-    color: $value !important;
-  }
-}
-
-@each $name, $value in $label_backgrounds {
-  .form-item label.label-bg-#{$name},
-  .form-item-container.bg-#{$name},
-  .form-item-container.bg-#{$name} input:first-of-type,
-  .form-item-container.bg-#{$name} textarea:first-of-type {
-    color: map.get($label_backgrounds_text, $name);
-    background-color: $value !important;
-  }
-}
 
 .font-bold {
   font-weight: 600;

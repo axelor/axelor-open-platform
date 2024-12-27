@@ -35,52 +35,42 @@ a.badge:focus {
   cursor: pointer;
 }
 
-.label-important,
 .badge-important {
   background-color: var(--bs-danger);
 }
 
-.label-important[href],
 .badge-important[href] {
   background-color: var(--bs-danger);
 }
 
-.label-warning,
 .badge-warning {
   background-color: var(--bs-warning);
 }
 
-.label-warning[href],
 .badge-warning[href] {
   background-color: var(--bs-warning);
 }
 
-.label-success,
 .badge-success {
   background-color: var(--bs-success);
 }
 
-.label-success[href],
 .badge-success[href] {
   background-color: var(--bs-success);
 }
 
-.label-info,
 .badge-info {
   background-color: var(--bs-info);
 }
 
-.label-info[href],
 .badge-info[href] {
   background-color: var(--bs-info);
 }
 
-.label-inverse,
 .badge-inverse {
   background-color: var(--bs-secondary);
 }
 
-.label-inverse[href],
 .badge-inverse[href] {
   background-color: var(--bs-secondary);
 }
