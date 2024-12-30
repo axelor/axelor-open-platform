@@ -77,10 +77,9 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
       throw new UncheckedIOException(e);
     }
 
+    // Use AxelorKryo5Codec as default codec instead of Kryo5Codec.
     if (config.getCodec() == null) {
-      // Codec compatible with Java object serialization
-      // Default Kryo5Codec doesn't seem to be able to serialize SimpleSession#id
-      config.setCodec(new org.redisson.codec.SerializationCodec());
+      config.setCodec(new AxelorKryo5Codec());
     }
 
     var redisson = Redisson.create(config);
