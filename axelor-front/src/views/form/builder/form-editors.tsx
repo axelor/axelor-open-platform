@@ -883,8 +883,9 @@ const RecordEditor = memo(function RecordEditor({
       model,
       fields,
       view: editor,
+      schema,
     }),
-    [editor, fields, model],
+    [schema, editor, fields, model],
   );
 
   const editorFormAtom = useMemo(

@@ -38,7 +38,7 @@ import {
   RecordListener,
   WidgetErrors,
 } from "./types";
-import { nextId } from "./utils";
+import { isReferenceField, nextId } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -431,9 +431,17 @@ function useActionAttrs({
       useCallback(
         (get, set, { attrs }) => {
           const formState = get(formAtom);
-          const isJsonScope = formState.meta.view?.json;
-          const updateFormAtom = isJsonScope ? formState.parent! : formAtom;
-          const updateFormState = isJsonScope ? get(updateFormAtom) : formState;
+          const { meta } = formState;
+
+          const schema = (meta as any).schema as Schema;
+          const parentFormAtom = formState.parent!;
+          const isJsonScope = meta.view?.json;
+          const isRefScope =
+            parentFormAtom && schema?.name && isReferenceField(schema);
+
+          const updateFormAtom =
+            isJsonScope || isRefScope ? parentFormAtom : formAtom;
+          const updateFormState = get(updateFormAtom);
 
           let { statesByName } = updateFormState;
 
@@ -447,6 +455,16 @@ function useActionAttrs({
 
             const [target, targetFieldName] = (() => {
               const { target } = attr;
+
+              const toTargetNames = (refName: string) => {
+                return target.startsWith(refName!)
+                  ? [target, target.slice(refName!.length + 1)]
+                  : [`${refName}.${target}`, target];
+              };
+
+              if (isRefScope) {
+                return toTargetNames(schema.name!);
+              }
 
               const isFormField = updateFormState.fields[jsonItem?.name ?? ""];
               const isOwnJsonField =
@@ -462,10 +480,7 @@ function useActionAttrs({
                   target.startsWith(jsonItem.modelField) ||
                   isOwnJsonField)
               ) {
-                const { modelField } = jsonItem;
-                return target.startsWith(modelField!)
-                  ? [target, target.slice(modelField!.length + 1)]
-                  : [`${modelField}.${target}`, target];
+                return toTargetNames(jsonItem.modelField);
               }
               return [target, target];
             })();
