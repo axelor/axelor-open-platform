@@ -280,6 +280,22 @@ export function ExpandableFormView({
     ),
   );
 
+  const doValidate = useAtomCallback(
+    useCallback(
+      (get, set, { silent }: { silent?: boolean } = {}) => {
+        const formState = get(formAtom);
+        const errors = getErrors(formState);
+
+        if (errors || getWidgetErrors()) {
+          errors && silent && onDiscard?.({ id: formState.record.id });
+          errors && !silent && showErrors(errors);
+          return Promise.reject();
+        }
+      },
+      [formAtom, getErrors, getWidgetErrors, onDiscard],
+    ),
+  );
+
   const doSave = useAtomCallback(
     useCallback(
       async (
@@ -297,14 +313,9 @@ export function ExpandableFormView({
         await actionExecutor.wait();
         await handleCommitEditableWidgets();
 
-        const formState = get(formAtom);
-        const errors = getErrors(formState);
+        await doValidate({ silent });
 
-        if (errors || getWidgetErrors()) {
-          errors && silent && onDiscard?.({ id: formState.record.id });
-          errors && !silent && showErrors(errors);
-          return Promise.reject();
-        }
+        const formState = get(formAtom);
 
         const doClose = () => {
           closeRef.current = true;
@@ -348,14 +359,12 @@ export function ExpandableFormView({
       },
       [
         isO2M,
-        getErrors,
-        getWidgetErrors,
+        doValidate,
+        doOnLoad,
         onSaveAction,
         actionExecutor,
-        onDiscard,
         onSave,
         onClose,
-        doOnLoad,
         formAtom,
         meta.fields,
         handleCommitEditableWidgets,
@@ -435,22 +444,7 @@ export function ExpandableFormView({
   );
 
   actionHandler.setValidateHandler(
-    useAtomCallback(
-      useCallback(
-        async (get) => {
-          const { record } = get(formAtom);
-          const { id = 0, version = 0 } = record;
-          if (id === null || version === null || id <= 0) return;
-          if (await ds.verify({ id, version })) return;
-          throw new Error(
-            i18n.get(
-              "The record has been updated or deleted by another action.",
-            ),
-          );
-        },
-        [ds, formAtom],
-      ),
-    ),
+    useCallback(async () => await doValidate(), [doValidate]),
   );
 
   function handleKeyDown(e: KeyboardEvent<HTMLElement>) {
@@ -482,7 +476,7 @@ export function ExpandableFormView({
       }
     }
   }, [formReady, scrollToForm, isCollection, isTreeGrid]);
-  
+
   useEffect(() => {
     if (formSelect) {
       setSelectState((state) => {

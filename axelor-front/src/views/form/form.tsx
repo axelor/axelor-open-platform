@@ -697,6 +697,14 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
+  const doValidate = useCallback(async () => {
+    const errors = getErrors();
+    if (errors) {
+      showErrors(errors);
+      return Promise.reject();
+    }
+  }, [getErrors]);
+
   /**
    * Handle the form save. This includes 3 parts:
    * <ul>
@@ -738,11 +746,8 @@ const FormContainer = memo(function FormContainer({
           handleErrors = false,
         } = options ?? {};
         const formState = get(formAtom);
-        const errors = getErrors();
-        if (errors) {
-          showErrors(errors);
-          return Promise.reject();
-        }
+
+        await doValidate();
 
         if (onSaveAction && callOnSave) {
           await actionExecutor.execute(onSaveAction);
@@ -754,13 +759,10 @@ const FormContainer = memo(function FormContainer({
         const opts = handleErrors ? { onError: handleOnSaveErrors } : undefined;
         const { select } = formState;
 
-        let res = await dataStore.save(
-          savingRecord,
-          {
-            ...opts,
-            select,
-          },
-        );
+        let res = await dataStore.save(savingRecord, {
+          ...opts,
+          select,
+        });
 
         if (callOnRead) {
           const fetched = res.id ? await doRead(res.id, select) : res;
@@ -779,15 +781,14 @@ const FormContainer = memo(function FormContainer({
         return res;
       },
       [
-        meta,
         formAtom,
-        getErrors,
         onSaveAction,
         handleOnSaveErrors,
         dataStore,
         actionExecutor,
         doRead,
         doEdit,
+        doValidate,
         readonly,
         prepareRecordForSave,
       ],
@@ -876,24 +877,7 @@ const FormContainer = memo(function FormContainer({
       ),
     ),
   );
-  actionHandler.setValidateHandler(
-    useAtomCallback(
-      useCallback(
-        async (get) => {
-          const { record } = get(formAtom);
-          const { id = 0, version = 0 } = record;
-          if (id === null || version === null || id <= 0) return;
-          if (await dataStore.verify({ id, version })) return;
-          throw new Error(
-            i18n.get(
-              "The record has been updated or deleted by another action.",
-            ),
-          );
-        },
-        [dataStore, formAtom],
-      ),
-    ),
-  );
+  actionHandler.setValidateHandler(doValidate);
 
   const onDelete = useAtomCallback(
     useCallback(
