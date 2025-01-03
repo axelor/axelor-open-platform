@@ -19,6 +19,7 @@
 package org.apache.shiro.cache.jcache;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.Optional;
 import javax.cache.CacheException;
 import javax.cache.CacheManager;
@@ -32,7 +33,8 @@ public class AxelorJCacheManager extends JCacheManager {
 
   @Inject
   public AxelorJCacheManager(
-      Configuration<String, Object> config, Optional<CacheManager> optionalCacheManager) {
+      @Named("shiro") Configuration<Object, Object> config,
+      @Named("shiro") Optional<CacheManager> optionalCacheManager) {
     this.config = config;
     optionalCacheManager.ifPresent(this::setCacheManager);
   }

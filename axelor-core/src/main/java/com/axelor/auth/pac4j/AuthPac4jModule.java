@@ -41,6 +41,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.ServletContext;
@@ -138,8 +139,8 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
 
     bindAndExpose(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).in(Singleton.class);
-    expose(new TypeLiteral<Configuration<String, Object>>() {});
-    expose(new TypeLiteral<Optional<CacheManager>>() {});
+    expose(new TypeLiteral<Configuration<Object, Object>>() {}).annotatedWith(Names.named("shiro"));
+    expose(new TypeLiteral<Optional<CacheManager>>() {}).annotatedWith(Names.named("shiro"));
   }
 
   protected <T> AnnotatedBindingBuilder<T> bindAndExpose(Class<T> cls) {
@@ -169,44 +170,8 @@ public class AuthPac4jModule extends ShiroWebModule {
     return AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
   }
 
-  /** Cache configuration with session timeout */
   @Provides
-  @Singleton
-  public Configuration<String, Object> cacheConfig(
-      Optional<CachingProvider> optionalCachingProvider,
-      @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
-
-    if (optionalCachingProvider.isEmpty()) {
-      throw new IllegalStateException("Cache provider not configured");
-    }
-
-    final var cachingProvider = optionalCachingProvider.get();
-    final Configuration<String, Object> cacheConfig;
-
-    // Generic fallback cache configuration
-    final var jCacheConfig = new MutableConfiguration<String, Object>();
-    jCacheConfig.setTypes(String.class, Object.class);
-    jCacheConfig.setExpiryPolicyFactory(
-        AccessedExpiryPolicy.factoryOf(new Duration(TimeUnit.MINUTES, sessionTimeoutMinutes)));
-
-    // Specialized cache configuration
-    if (cachingProvider instanceof CaffeineCachingProvider) {
-      // Caffeine specific settings required
-      final var config = new CaffeineConfiguration<String, Object>(jCacheConfig);
-      config.setExpireAfterAccess(OptionalLong.of(sessionTimeoutMinutes * 60_000_000_000L));
-      cacheConfig = config;
-    } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
-      final var configPath = CacheConfig.getShiroCacheProvider().flatMap(CacheProvider::getConfig);
-      final var redisson = RedissonClientProvider.getInstance().get(configPath);
-      cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
-    } else {
-      cacheConfig = jCacheConfig;
-    }
-
-    return cacheConfig;
-  }
-
-  @Provides
+  @Named("shiro")
   @Singleton
   public Optional<CachingProvider> cachingProvider() {
     return CacheConfig.getShiroCacheProvider()
@@ -241,8 +206,10 @@ public class AuthPac4jModule extends ShiroWebModule {
   }
 
   @Provides
+  @Named("shiro")
   @Singleton
-  public Optional<CacheManager> cacheManager(Optional<CachingProvider> optionalCachingProvider) {
+  public Optional<CacheManager> cacheManager(
+      @Named("shiro") Optional<CachingProvider> optionalCachingProvider) {
     return optionalCachingProvider.map(
         cachingProvider -> {
           final var cacheManager = cachingProvider.getCacheManager();
@@ -251,10 +218,48 @@ public class AuthPac4jModule extends ShiroWebModule {
         });
   }
 
+  /** Cache configuration with session timeout */
+  @Provides
+  @Named("shiro")
+  @Singleton
+  public Configuration<Object, Object> cacheConfig(
+      @Named("shiro") Optional<CachingProvider> optionalCachingProvider,
+      @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
+
+    if (optionalCachingProvider.isEmpty()) {
+      throw new IllegalStateException("Cache provider not configured");
+    }
+
+    final var cachingProvider = optionalCachingProvider.get();
+    final Configuration<Object, Object> cacheConfig;
+
+    // Generic fallback cache configuration
+    final var jCacheConfig = new MutableConfiguration<Object, Object>();
+    jCacheConfig.setTypes(Object.class, Object.class);
+    jCacheConfig.setExpiryPolicyFactory(
+        AccessedExpiryPolicy.factoryOf(new Duration(TimeUnit.MINUTES, sessionTimeoutMinutes)));
+
+    // Specialized cache configuration
+    if (cachingProvider instanceof CaffeineCachingProvider) {
+      // Caffeine specific settings required
+      final var config = new CaffeineConfiguration<Object, Object>(jCacheConfig);
+      config.setExpireAfterAccess(OptionalLong.of(sessionTimeoutMinutes * 60_000_000_000L));
+      cacheConfig = config;
+    } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
+      final var configPath = CacheConfig.getShiroCacheProvider().flatMap(CacheProvider::getConfig);
+      final var redisson = RedissonClientProvider.getInstance().get(configPath);
+      cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
+    } else {
+      cacheConfig = jCacheConfig;
+    }
+
+    return cacheConfig;
+  }
+
   @Provides
   @Singleton
   public org.apache.shiro.cache.CacheManager shiroCacheManager(
-      Optional<javax.cache.CacheManager> optionalCacheManager) {
+      @Named("shiro") Optional<javax.cache.CacheManager> optionalCacheManager) {
     return optionalCacheManager
         .map(
             cacheManager ->
