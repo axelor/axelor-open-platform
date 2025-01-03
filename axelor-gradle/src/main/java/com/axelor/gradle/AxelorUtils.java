@@ -20,9 +20,8 @@ package com.axelor.gradle;
 
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,16 +63,13 @@ public class AxelorUtils {
   private AxelorUtils() {}
 
   private static LoadingCache<Project, List<Project>> includedBuildRootsCache =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .build(
-              new CacheLoader<Project, List<Project>>() {
-                @Override
-                public List<Project> load(Project project) throws Exception {
-                  return project.getGradle().getIncludedBuilds().stream()
-                      .map(b -> ((IncludedBuildInternal) b).getTarget())
-                      .map(b -> b.getMutableModel().getRootProject())
-                      .collect(Collectors.toList());
-                }
+              project -> {
+                return project.getGradle().getIncludedBuilds().stream()
+                    .map(b -> ((IncludedBuildInternal) b).getTarget())
+                    .map(b -> b.getMutableModel().getRootProject())
+                    .collect(Collectors.toList());
               });
 
   public static String toRelativePath(Project project, File file) {
@@ -81,7 +77,7 @@ public class AxelorUtils {
   }
 
   private static List<Project> includedBuildRoots(Project project) {
-    return includedBuildRootsCache.getUnchecked(project);
+    return includedBuildRootsCache.get(project);
   }
 
   public static List<Project> findIncludedBuildProjects(Project project) {

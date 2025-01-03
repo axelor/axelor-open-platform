@@ -50,9 +50,9 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Splitter;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -75,7 +75,7 @@ public final class MetaStore {
   private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
   private static final Cache<String, Action> ACTIONS =
-      CacheBuilder.newBuilder().maximumSize(1000).weakValues().build();
+      Caffeine.newBuilder().maximumSize(1000).weakValues().build();
 
   private MetaStore() {}
 

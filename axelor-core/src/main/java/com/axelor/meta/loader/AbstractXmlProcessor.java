@@ -26,9 +26,8 @@ import com.axelor.common.XMLUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.Position;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
@@ -108,20 +107,18 @@ public abstract class AbstractXmlProcessor {
   private static final Pattern NS_PATTERN = Pattern.compile("/(\\w)");
 
   public static final LoadingCache<String, XPathExpression> XPATH_EXPRESSION_CACHE =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .maximumSize(10_000)
           .build(
-              new CacheLoader<String, XPathExpression>() {
-                public XPathExpression load(String key) throws Exception {
-                  XPath xPath;
+              key -> {
+                XPath xPath;
 
-                  synchronized (XPATH_FACTORY) {
-                    xPath = XPATH_FACTORY.newXPath();
-                  }
-
-                  xPath.setNamespaceContext(NS_CONTEXT);
-                  return xPath.compile(NS_PATTERN.matcher(key).replaceAll("/:$1"));
+                synchronized (XPATH_FACTORY) {
+                  xPath = XPATH_FACTORY.newXPath();
                 }
+
+                xPath.setNamespaceContext(NS_CONTEXT);
+                return xPath.compile(NS_PATTERN.matcher(key).replaceAll("/:$1"));
               });
 
   public Object evaluateXPath(
@@ -138,7 +135,7 @@ public abstract class AbstractXmlProcessor {
 
   private Object evaluateXPath(String expression, Object item, QName returnType)
       throws XPathExpressionException {
-    XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.getUnchecked(expression);
+    XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.get(expression);
 
     synchronized (xPathExpression) {
       return xPathExpression.evaluate(item, returnType);

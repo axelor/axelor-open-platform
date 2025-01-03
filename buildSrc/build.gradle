@@ -30,6 +30,7 @@ dependencies {
   implementation libs.eclipselink_moxy
   implementation libs.jasypt
   implementation libs.jakarta_annotation
+  implementation libs.caffeine
 }
 
 test.enabled = false

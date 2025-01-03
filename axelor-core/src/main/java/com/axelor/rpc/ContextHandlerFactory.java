@@ -31,9 +31,8 @@ import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import jakarta.persistence.Entity;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -52,15 +51,7 @@ public final class ContextHandlerFactory {
   private static final String COMPUTE_METHOD_PREFIX = "compute";
 
   private static final LoadingCache<Class<?>, Class<?>> PROXY_CACHE =
-      CacheBuilder.newBuilder()
-          .weakKeys()
-          .maximumSize(500)
-          .build(
-              new CacheLoader<Class<?>, Class<?>>() {
-                public Class<?> load(Class<?> key) throws Exception {
-                  return makeProxy(key);
-                }
-              });
+      Caffeine.newBuilder().weakKeys().maximumSize(500).build(ContextHandlerFactory::makeProxy);
 
   private ContextHandlerFactory() {}
 

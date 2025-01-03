@@ -1,0 +1,3 @@
+---
+title: Migrate from Guava Cache to Caffeine for internal components
+type: change

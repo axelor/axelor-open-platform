@@ -22,11 +22,10 @@ import com.axelor.common.ResourceUtils;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Preconditions;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -47,7 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -62,10 +61,10 @@ import org.objectweb.asm.tree.MethodNode;
 public class Mapper {
 
   private static final LoadingCache<Class<?>, Mapper> MAPPER_CACHE =
-      CacheBuilder.newBuilder().maximumSize(1000).weakKeys().build(CacheLoader.from(Mapper::new));
+      Caffeine.newBuilder().maximumSize(1000).weakKeys().build(Mapper::new);
 
   private static final Cache<Method, Annotation[]> ANNOTATION_CACHE =
-      CacheBuilder.newBuilder().maximumSize(1000).weakKeys().build();
+      Caffeine.newBuilder().maximumSize(1000).weakKeys().build();
 
   private static final Object[] NULL_ARGUMENTS = {};
 
@@ -199,7 +198,7 @@ public class Mapper {
   public static Mapper of(Class<?> klass) {
     try {
       return MAPPER_CACHE.get(klass);
-    } catch (ExecutionException e) {
+    } catch (CompletionException e) {
       throw new RuntimeException(e);
     }
   }

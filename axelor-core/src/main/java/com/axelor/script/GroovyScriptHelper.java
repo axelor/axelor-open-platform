@@ -24,9 +24,8 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
 import com.axelor.rpc.Context;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.MissingPropertyException;
@@ -105,19 +104,15 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
     GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
 
     SCRIPT_CACHE =
-        CacheBuilder.newBuilder()
+        Caffeine.newBuilder()
             .maximumSize(cacheSize)
             .expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
             .build(
-                new CacheLoader<String, Class<?>>() {
-
-                  @Override
-                  public Class<?> load(String code) throws Exception {
-                    try {
-                      return GCL.parseClass(code);
-                    } finally {
-                      GCL.clearCache();
-                    }
+                code -> {
+                  try {
+                    return GCL.parseClass(code);
+                  } finally {
+                    GCL.clearCache();
                   }
                 });
   }

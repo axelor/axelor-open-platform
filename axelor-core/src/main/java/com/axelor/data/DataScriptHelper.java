@@ -20,15 +20,14 @@ package com.axelor.data;
 
 import com.axelor.db.JpaScanner;
 import com.axelor.script.GroovyScriptHelper;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
@@ -73,18 +72,13 @@ public final class DataScriptHelper {
   private int expireTime = DEFAULT_EXPIRE_TIME;
 
   private LoadingCache<String, Script> cache =
-      CacheBuilder.newBuilder()
+      Caffeine.newBuilder()
           .maximumSize(cacheSize)
           .expireAfterAccess(expireTime, TimeUnit.MINUTES)
           .build(
-              new CacheLoader<String, Script>() {
-
-                @Override
-                public Script load(String expr) throws Exception {
-                  final CompilerConfiguration cfg = indy ? configIndy : config;
-                  return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg)
-                      .parse(expr);
-                }
+              expr -> {
+                final CompilerConfiguration cfg = indy ? configIndy : config;
+                return new GroovyShell(JpaScanner.getClassLoader(), new Binding(), cfg).parse(expr);
               });
 
   /**
@@ -140,7 +134,7 @@ public final class DataScriptHelper {
     Script script;
     try {
       script = cache.get(expression);
-    } catch (ExecutionException e) {
+    } catch (CompletionException e) {
       log.warn("Invalid script: {}", expression);
       return null;
     }

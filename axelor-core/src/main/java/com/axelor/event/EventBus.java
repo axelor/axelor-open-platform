@@ -18,9 +18,8 @@
  */
 package com.axelor.event;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
@@ -52,10 +51,7 @@ class EventBus {
       new AtomicReference<>();
 
   private final LoadingCache<Class<?>, Map<Entry<Type, Set<Annotation>>, List<Observer>>>
-      observersCache =
-          CacheBuilder.newBuilder()
-              .weakKeys()
-              .build(CacheLoader.from(k -> new ConcurrentHashMap<>()));
+      observersCache = Caffeine.newBuilder().weakKeys().build(k -> new ConcurrentHashMap<>());
 
   @Inject
   public EventBus(Injector injector) {
@@ -93,7 +89,7 @@ class EventBus {
   public void fire(Object event, Type eventType, Set<Annotation> qualifiers) {
     final Class<?> eventClass = event.getClass();
     final Map<Entry<Type, Set<Annotation>>, List<Observer>> observersByTypeAndQualifiers =
-        observersCache.getUnchecked(eventClass);
+        observersCache.get(eventClass);
     final List<Observer> foundObservers =
         observersByTypeAndQualifiers.computeIfAbsent(
             new SimpleImmutableEntry<>(eventType, qualifiers),
