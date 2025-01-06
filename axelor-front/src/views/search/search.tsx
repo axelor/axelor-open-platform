@@ -42,6 +42,7 @@ import {
 } from "./utils";
 import { processView } from "@/services/client/meta-utils";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
+
 import styles from "./search.module.scss";
 
 export function Search(props: ViewProps<SearchView>) {
@@ -65,6 +66,7 @@ export function Search(props: ViewProps<SearchView>) {
   const { pathname } = useLocation();
   const { action, state: tabAtom } = useViewTab();
   const [searchParams] = useSearchParams();
+  const currentSearchParams = useRef<Record<string, string>>({});
 
   const { params } = action;
   const isViewActive = useAtomValue(
@@ -425,6 +427,12 @@ export function Search(props: ViewProps<SearchView>) {
       queryParams[key] = value;
     }
 
+    if (isEqual(queryParams, currentSearchParams.current)) {
+      return;
+    }
+
+    currentSearchParams.current = queryParams;
+
     const values = Object.keys(formMeta.fields || {}).reduce((values, name) => {
       const field = formMeta.fields?.[name];
       let value: any = queryParams[name];
@@ -444,7 +452,13 @@ export function Search(props: ViewProps<SearchView>) {
     }, {});
 
     setFormValues(values);
-  }, [isViewActive, searchParams, formMeta, setFormValues]);
+  }, [
+    isViewActive,
+    searchParams,
+    formMeta,
+    setFormValues,
+    currentSearchParams,
+  ]);
 
   useAsyncEffect(async () => {
     // skip onNew when query params exist
