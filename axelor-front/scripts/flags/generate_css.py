@@ -11,7 +11,9 @@ CSS_TEMPLATE = """.flag[data-country="{country_code}"] {{
 
 """
 
-CSS_INITIAL = """.flag {
+CSS_INITIAL = """// Auto-generated, don't edit it manually.
+
+.flag {
   height: 24px;
   width: 24px;
   object-fit: none;
