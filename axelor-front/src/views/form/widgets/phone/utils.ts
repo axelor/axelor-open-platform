@@ -1,6 +1,6 @@
 import parsePhoneNumber from "libphonenumber-js/max";
 import { useMemo } from "react";
-import { defaultCountries } from "react-international-phone";
+import { CountryData, defaultCountries } from "react-international-phone";
 
 import flags from "@/assets/flags.svg";
 import { i18n } from "@/services/client/i18n";
@@ -31,7 +31,19 @@ export const FALLBACK_COUNTRIES: Record<string, string> = {
   zh: "cn", // Chinese -> China
 };
 
-export const FLAGS = defaultCountries.map((country) => {
+export const DEFAULT_COUNTRIES = [
+  ...defaultCountries,
+  [
+    "Mayotte",
+    "yt",
+    "262",
+    "",
+    1,
+    ["269", "639"],
+  ] as unknown as CountryData,
+];
+
+export const FLAGS = DEFAULT_COUNTRIES.map((country) => {
   const iso2 = country[1];
   const src = flags;
   return { iso2, src };

@@ -6,7 +6,7 @@ import sys
 DEFAULT_FILE_PATH = "../../node_modules/react-international-phone/dist/types.d.ts"
 
 def extract_country_codes_from_line_with_prefix(file_path, prefix):
-    country_codes = []
+    country_codes = ['yt']
 
     with open(file_path, "r") as file:
         for line in file:

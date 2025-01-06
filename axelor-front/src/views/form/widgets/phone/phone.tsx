@@ -13,7 +13,6 @@ import {
   CountryData,
   CountrySelectorDropdown,
   FlagImage,
-  defaultCountries,
   getActiveFormattingMask,
   usePhoneInput,
 } from "react-international-phone";
@@ -26,7 +25,7 @@ import { i18n } from "@/services/client/i18n";
 import { useViewRoute } from "@/view-containers/views/scope";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
-import { FLAGS, getPhoneInfo, useDefaultCountry } from "./utils";
+import { DEFAULT_COUNTRIES, FLAGS, getPhoneInfo, useDefaultCountry } from "./utils";
 
 import "react-international-phone/style.css";
 
@@ -106,6 +105,23 @@ export function Phone({
     return noPrefix ? _text.replace(/^0/, "") : _text;
   }, [_text, noPrefix]);
 
+  const countries = useMemo(() => {
+
+    // Filter out countries that are not in `onlyCountries`, if specified.
+    let countries = onlyCountries.length
+      ? DEFAULT_COUNTRIES.filter((country) => onlyCountries.includes(country[1]))
+      : DEFAULT_COUNTRIES;
+
+    // Translate country names
+    countries = countries.map((country) => {
+      const [name, ...rest] = country;
+      return [i18n.get(name), ...rest] as CountryData;
+    });
+    countries.sort((a, b) => a[0].localeCompare(b[0]));
+
+    return countries;
+  }, [onlyCountries]);
+
   const {
     inputValue,
     phone,
@@ -115,6 +131,7 @@ export function Phone({
     inputRef,
   } = usePhoneInput({
     defaultCountry,
+    countries: countries,
     value: text,
     onChange: ({ phone, country }) => {
       // If case of only dial code, set empty value instead.
@@ -198,22 +215,6 @@ export function Phone({
     window.addEventListener("scroll", handleScroll, true);
     return () => window.removeEventListener("scroll", handleScroll, true);
   }, [showDropdown]);
-
-  const countries = useMemo(() => {
-    // Filter out countries that are not in `onlyCountries`, if specified.
-    let countries = onlyCountries.length
-      ? defaultCountries.filter((country) => onlyCountries.includes(country[1]))
-      : defaultCountries;
-
-    // Translate country names
-    countries = countries.map((country) => {
-      const [name, ...rest] = country;
-      return [i18n.get(name), ...rest] as CountryData;
-    });
-    countries.sort((a, b) => a[0].localeCompare(b[0]));
-
-    return countries;
-  }, [onlyCountries]);
 
   const countryIso2 = useMemo(() => {
     const { iso2 } = country;
