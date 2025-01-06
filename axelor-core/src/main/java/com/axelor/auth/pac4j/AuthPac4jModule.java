@@ -31,7 +31,6 @@ import com.axelor.auth.pac4j.local.JsonExtractor;
 import com.axelor.cache.CacheConfig;
 import com.axelor.cache.CacheProvider;
 import com.axelor.cache.redisson.RedissonClientProvider;
-import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.github.benmanes.caffeine.jcache.configuration.CaffeineConfiguration;
@@ -175,33 +174,12 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Singleton
   public Optional<CachingProvider> cachingProvider() {
     return CacheConfig.getShiroCacheProvider()
+        .map(CacheProvider::getCachingProvider)
         .map(
             provider -> {
-              final var providerName = provider.getProvider();
-              if ("caffeine".equalsIgnoreCase(providerName)) {
-                return CaffeineCachingProvider.class.getName();
-              } else if ("redisson".equalsIgnoreCase(providerName)) {
-                return org.redisson.jcache.JCachingProvider.class.getName();
-              }
-
-              Class<?> providerClass;
-              try {
-                providerClass = Class.forName(providerName);
-              } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException("Unknown cache provider: " + providerName);
-              }
-              if (!CachingProvider.class.isAssignableFrom(providerClass)) {
-                throw new IllegalArgumentException(
-                    "Unsupported cache provider type: " + providerName);
-              }
-
-              return providerName;
-            })
-        .filter(StringUtils::notBlank)
-        .map(
-            name -> {
-              log.info("JCache provider: {}", name);
-              return Caching.getCachingProvider(name);
+              var className = provider.getName();
+              log.info("JCache provider: {}", className);
+              return Caching.getCachingProvider(className);
             });
   }
 

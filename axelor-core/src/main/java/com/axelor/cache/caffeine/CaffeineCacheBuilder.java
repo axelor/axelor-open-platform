@@ -1,0 +1,93 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2025 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.axelor.cache.caffeine;
+
+import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import java.util.function.Function;
+
+/**
+ * Caffeine cache builder
+ *
+ * <p>This builds an {@link AxelorCache} wrapping either a {@link
+ * com.github.benmanes.caffeine.cache.Cache} or {@link
+ * com.github.benmanes.caffeine.cache.LoadingCache}, because Caffeine uses different interfaces
+ * depending on whether the cache is loading.
+ *
+ * @param <K> the type of keys maintained by this cache
+ * @param <V> the type of mapped values
+ */
+public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
+
+  public CaffeineCacheBuilder(String cacheName) {
+    super(cacheName);
+  }
+
+  @Override
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
+    var caffeine = newCaffeine();
+
+    @SuppressWarnings("unchecked")
+    var cache = (Cache<K1, V1>) caffeine.build();
+
+    return new CaffeineCache<>(cache);
+  }
+
+  @Override
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(Function<? super K1, V1> loader) {
+    var caffeine = newCaffeine();
+
+    @SuppressWarnings("unchecked")
+    var cache = (LoadingCache<K1, V1>) caffeine.build(loader::apply);
+
+    return new CaffeineLoadingCache<>(cache);
+  }
+
+  private Caffeine<K, V> newCaffeine() {
+    var builder = Caffeine.newBuilder();
+
+    if (getMaximumSize() > 0) {
+      builder.maximumSize(getMaximumSize());
+    }
+
+    if (getExpireAfterWrite() != null) {
+      builder.expireAfterWrite(getExpireAfterWrite());
+    }
+
+    if (getExpireAfterAccess() != null) {
+      builder.expireAfterAccess(getExpireAfterAccess());
+    }
+
+    if (isWeakKeys()) {
+      builder.weakKeys();
+    }
+
+    if (isWeakValues()) {
+      builder.weakValues();
+    }
+
+    @SuppressWarnings("unchecked")
+    var caffeine = (Caffeine<K, V>) builder;
+
+    return caffeine;
+  }
+}

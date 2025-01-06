@@ -18,6 +18,7 @@
  */
 package com.axelor.app;
 
+import com.axelor.cache.CacheBuilder;
 import com.axelor.event.EventModule;
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
@@ -119,5 +120,8 @@ public class AppModule extends AbstractModule {
       viewProcessorClasses.forEach(
           viewProcessor -> viewProcessorBinder.addBinding().to(viewProcessor));
     }
+
+    var cacheProvider = CacheBuilder.getCacheProvider();
+    log.info("Cache provider: {}", cacheProvider.getProvider());
   }
 }

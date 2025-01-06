@@ -32,6 +32,12 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 
+/**
+ * Redisson client provider
+ *
+ * <p>This provides a {@link RedissonClient} instance based on a configuration file. For the same
+ * configuration file, the same instance is returned.
+ */
 @Singleton
 public class RedissonClientProvider implements Provider<RedissonClient> {
 
