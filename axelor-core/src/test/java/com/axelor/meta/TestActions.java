@@ -70,7 +70,7 @@ public class TestActions extends MetaTest {
     assertNotNull(views);
     assertNotNull(views.getActions());
 
-    MetaStore.resister(views);
+    MetaStore.register(views);
   }
 
   private ActionHandler createHandler(String action, Map<String, Object> context) {

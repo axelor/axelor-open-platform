@@ -74,7 +74,7 @@ public class TestActionExport extends MetaTest {
   public void test_export() throws Exception {
     ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
 
-    MetaStore.resister(views);
+    MetaStore.register(views);
 
     Action action = MetaStore.getAction("export.sale.order");
     assertNotNull(action);

@@ -80,7 +80,7 @@ public final class MetaStore {
   private MetaStore() {}
 
   /** Used for unit testing. */
-  static void resister(ObjectViews views) {
+  static void register(ObjectViews views) {
     try {
       for (Action item : views.getActions()) {
         ACTIONS.put(item.getName(), item);

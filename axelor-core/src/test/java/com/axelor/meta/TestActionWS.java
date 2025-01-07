@@ -61,7 +61,7 @@ public class TestActionWS extends MetaTest {
     ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
     List<Action> actions = views.getActions();
     assertNotNull(actions);
-    MetaStore.resister(views);
+    MetaStore.register(views);
 
     Action action = MetaStore.getAction("ws.capital.city");
     assertNotNull(action);
