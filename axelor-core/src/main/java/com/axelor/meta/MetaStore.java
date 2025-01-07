@@ -23,6 +23,8 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
@@ -50,8 +52,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.base.Splitter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -74,8 +74,8 @@ public final class MetaStore {
 
   private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
-  private static final Cache<String, Action> ACTIONS =
-      Caffeine.newBuilder().maximumSize(1000).weakValues().build();
+  private static final AxelorCache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder().maximumSize(1000).weakValues().build(XMLViews::findAction);
 
   private MetaStore() {}
 
@@ -90,13 +90,7 @@ public final class MetaStore {
   }
 
   public static Action getAction(String name) {
-    Action action = ACTIONS.getIfPresent(name);
-    if (action == null) {
-      action = XMLViews.findAction(name);
-      if (action != null) {
-        ACTIONS.put(name, action);
-      }
-    }
+    Action action = ACTIONS.get(name);
     if (action == null) {
       return null;
     }
