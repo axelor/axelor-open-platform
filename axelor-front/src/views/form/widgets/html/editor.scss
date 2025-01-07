@@ -38,35 +38,7 @@ $spacing: 0.25rem;
   overflow: auto;
   outline: none;
   word-wrap: break-word;
-  color: var(--text-color);
-}
-
-.custom-html-editor-popup {
-  background: var(--bs-body-bg);
-  box-shadow: 0 $spacing $spacing * 2 rgba(0, 0, 0, 0.2);
-  background-clip: padding-box;
-  width: auto !important;
-  position: absolute;
-  z-index: 9999;
-  color: var(--text-color);
-  left: -50%;
-  border: 1px solid var(--bs-border-color);
-  border-radius: $spacing * 2;
-  border-radius: 0.2rem;
-  user-select: none;
-  padding: 0.5rem;
-
-  [dir="rtl"] & {
-    left: unset;
-    right: -50%;
-  }
-  &.custom-html-editor-popuphover {
-    width: auto;
-  }
-
-  &:empty {
-    display: none;
-  }
+  color: var(--bs-body-color);;
 }
 
 .custom-html-editor-toolbar-icon {
@@ -178,33 +150,6 @@ $spacing: 0.25rem;
   }
 }
 
-.custom-html-editor-popup input {
-  display: block;
-  width: 100%;
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--bs-body-color);
-  background-color: var(--bs-body-bg);
-  background-clip: padding-box;
-  border: var(--bs-border-width) solid var(--bs-border-color);
-  appearance: none;
-
-  border-radius: var(--bs-border-radius);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-  outline: 0;
-
-  &:focus {
-    border: var(--bs-input-border-focus, 1px solid #86b7fe);
-    box-shadow: var(
-      --bs-input-shadow-focus,
-      0 0 0 0.25rem rgba(13, 110, 254, 0.25)
-    );
-  }
-}
-
 .custom-html-editor-toolbar-divider {
   background-color: var(--bs-border-color);
   display: inline-block;
@@ -269,7 +214,7 @@ $spacing: 0.25rem;
   line-height: 3rem;
   border: 2px dashed var(--bs-border-color);
   padding: $spacing * 2;
-  color: var(--text-color);
+  color: var(--bs-body-color);
   text-align: center;
   font-weight: bold;
   margin-bottom: $spacing * 2;
