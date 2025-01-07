@@ -117,6 +117,10 @@ executor.submit(new TenantAware(() -> {
 
 Now the task will have the current tenant context.
 
+IMPORTANT: The `TenantAware` thread will run the task inside a new transaction by default.
+If this is not the expected behaviour, you can disable it with `.withTransaction(false)`
+before starting the thread.
+
 However, if the process is not started from a web request (directly or indirectly),
 you have to pass the desired tenant id manually. Otherwise, it will assume a default tenant.
 
