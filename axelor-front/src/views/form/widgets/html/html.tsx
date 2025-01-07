@@ -42,7 +42,6 @@ export function Html(props: FieldProps<string>) {
         />
       ) : (
         <EditorComponent
-          t={i18n.get}
           translatable={translatable}
           lite={Boolean(lite)}
           height={height}
