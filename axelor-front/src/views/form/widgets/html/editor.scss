@@ -23,6 +23,11 @@ $spacing: 0.25rem;
 
 .custom-html-editor-content[data-placeholder]:empty:before {
   content: attr(data-placeholder);
+  color: var(--ax-theme-input-placeholder-color, var(--bs-secondary-color));
+}
+
+.custom-html-editor-container textarea::placeholder {
+  color: var(--ax-theme-input-placeholder-color, var(--bs-secondary-color));
 }
 
 .custom-html-editor-container textarea,

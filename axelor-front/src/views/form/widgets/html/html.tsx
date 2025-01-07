@@ -12,7 +12,7 @@ import styles from "./html.module.scss";
 
 export function Html(props: FieldProps<string>) {
   const { schema, readonly, valueAtom } = props;
-  const { lite, translatable } = schema;
+  const { lite, translatable, placeholder } = schema;
   const { text, onChange, onBlur, onKeyDown, setValue } = useInput(valueAtom, {
     schema,
   });
@@ -53,6 +53,7 @@ export function Html(props: FieldProps<string>) {
           className={clsx(styles.editorContainer, {
             [styles.invalid]: props.invalid,
           })}
+          placeholder={placeholder}
           {...({} as any)}
         />
       )}
