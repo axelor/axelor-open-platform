@@ -5,7 +5,7 @@ import { atom, useAtom, useAtomValue } from "jotai";
 import { generatePath, useLocation, useSearchParams } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
-import clone from "lodash/clone";
+import cloneDeep from "lodash/cloneDeep";
 
 import {
   ActionView,
@@ -107,7 +107,7 @@ export function Search(props: ViewProps<SearchView>) {
       model,
     });
 
-    const formView = clone(searchForm);
+    const formView = cloneDeep(searchForm);
     if (formView) {
       const formViewMeta = {
         fields: searchFormMeta.fields,
