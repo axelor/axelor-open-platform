@@ -36,6 +36,7 @@
 *** xref:views/dashboard.adoc[Dashboard]
 *** xref:views/calendar.adoc[Calendar]
 *** xref:views/gantt.adoc[Gantt]
+*** xref:views/search.adoc[Search]
 *** xref:views/extensions.adoc[Extension Views]
 
 ** xref:actions/index.adoc[Actions]
