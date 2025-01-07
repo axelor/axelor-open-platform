@@ -27,17 +27,17 @@ import javax.cache.spi.CachingProvider;
  *
  * <p>This is used to store the cache provider name and configuration.
  */
-public class CacheProvider {
+public class CacheProviderInfo {
 
   private final String provider;
   private final Optional<String> config;
 
-  public CacheProvider(String provider, Optional<String> config) {
+  public CacheProviderInfo(String provider, Optional<String> config) {
     this.provider = provider;
     this.config = config;
   }
 
-  public CacheProvider(String provider) {
+  public CacheProviderInfo(String provider) {
     this.provider = provider;
     this.config = Optional.empty();
   }

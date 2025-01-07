@@ -121,7 +121,7 @@ public class AppModule extends AbstractModule {
           viewProcessor -> viewProcessorBinder.addBinding().to(viewProcessor));
     }
 
-    var cacheProvider = CacheBuilder.getCacheProvider();
-    log.info("Cache provider: {}", cacheProvider.getProvider());
+    var cacheProviderInfo = CacheBuilder.getCacheProviderInfo();
+    log.info("Cache provider: {}", cacheProviderInfo.getProvider());
   }
 }

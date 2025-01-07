@@ -43,14 +43,14 @@ public abstract class CacheBuilder<K, V> {
 
   private boolean weakValues;
 
-  private static final CacheProvider cacheProvider;
+  private static final CacheProviderInfo cacheProviderInfo;
 
   private static final Function<String, CacheBuilder<?, ?>> cacheBuilderFactory;
 
   static {
-    cacheProvider =
-        CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProvider("caffeine"));
-    var providerName = cacheProvider.getProvider();
+    cacheProviderInfo =
+        CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
+    var providerName = cacheProviderInfo.getProvider();
 
     switch (providerName) {
       case "caffeine":

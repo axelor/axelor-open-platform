@@ -36,31 +36,31 @@ public class CacheConfig {
 
   private CacheConfig() {}
 
-  public static Optional<CacheProvider> getAppCacheProvider() {
+  public static Optional<CacheProviderInfo> getAppCacheProvider() {
     return getSetting(AvailableAppSettings.APPLICATION_CACHE_PROVIDER)
         .map(
             provider ->
-                new CacheProvider(
+                new CacheProviderInfo(
                     provider, getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG)));
   }
 
-  public static Optional<CacheProvider> getHibernateCacheProvider() {
+  public static Optional<CacheProviderInfo> getHibernateCacheProvider() {
     return getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_PROVIDER)
         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_PROVIDER))
         .map(
             provider ->
-                new CacheProvider(
+                new CacheProviderInfo(
                     provider,
                     getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG)
                         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG))));
   }
 
-  public static Optional<CacheProvider> getShiroCacheProvider() {
+  public static Optional<CacheProviderInfo> getShiroCacheProvider() {
     return getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_PROVIDER)
         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_PROVIDER))
         .map(
             provider ->
-                new CacheProvider(
+                new CacheProviderInfo(
                     provider,
                     getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG)
                         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG))));

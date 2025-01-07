@@ -89,7 +89,7 @@ public class RedissonCacheBuilder<K, V> extends CacheBuilder<K, V> {
   }
 
   private RMapCache<K, V> newMapCache(MapCacheOptions<K, V> options) {
-    var redisson = RedissonClientProvider.getInstance().get(getCacheProvider().getConfig());
+    var redisson = RedissonClientProvider.getInstance().get(getCacheProviderInfo().getConfig());
     var cache = redisson.getMapCache(options);
 
     if (getMaximumSize() > 0) {

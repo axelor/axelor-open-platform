@@ -29,7 +29,7 @@ import com.axelor.auth.pac4j.local.AxelorIndirectBasicAuthClient;
 import com.axelor.auth.pac4j.local.BasicAuthCallbackClientFinder;
 import com.axelor.auth.pac4j.local.JsonExtractor;
 import com.axelor.cache.CacheConfig;
-import com.axelor.cache.CacheProvider;
+import com.axelor.cache.CacheProviderInfo;
 import com.axelor.cache.redisson.RedissonClientProvider;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
@@ -174,7 +174,7 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Singleton
   public Optional<CachingProvider> cachingProvider() {
     return CacheConfig.getShiroCacheProvider()
-        .map(CacheProvider::getCachingProvider)
+        .map(CacheProviderInfo::getCachingProvider)
         .map(
             provider -> {
               var className = provider.getName();
@@ -224,7 +224,8 @@ public class AuthPac4jModule extends ShiroWebModule {
       config.setExpireAfterAccess(OptionalLong.of(sessionTimeoutMinutes * 60_000_000_000L));
       cacheConfig = config;
     } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
-      final var configPath = CacheConfig.getShiroCacheProvider().flatMap(CacheProvider::getConfig);
+      final var configPath =
+          CacheConfig.getShiroCacheProvider().flatMap(CacheProviderInfo::getConfig);
       final var redisson = RedissonClientProvider.getInstance().get(configPath);
       cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
     } else {
