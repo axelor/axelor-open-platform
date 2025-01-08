@@ -47,7 +47,8 @@ can be used, `css` attribute usage to determinate the variant is deprecated. Acc
 == Add/edit/delete support in dashlet and panel-dashlet
 
 This adds support for adding and deleting records on dashboard dashlets and panel-dashlet. It is not enable by default :
-specify `canNew` and `canDelete` to `true`.
+specify `canNew` and `canDelete` to `true` or with an expression evaluated against current context.
 
 It also adds support to editable grids. The linked grid view should have `editable="true"` to allow edit records in
-grids. To disable this behavior, you have to pass `canEdit="false"` to disable editable support.
+grids. To disable this behavior, you have to pass `canEdit="false"` to disable editable support without updating the
+linked grid view.

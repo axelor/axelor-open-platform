@@ -345,8 +345,8 @@ function DashletWrapper(props: WidgetProps) {
   // Be able to edit even if readonly mode
   const canEdit = (isUndefined(schema.canEdit) ? !readonly : schema.canEdit) && hasButton("edit");
   // Be able to create/delete if explicitly defined and not in readonly mode
-  const canNew = !readonly && schema.canNew && hasButton("new");
-  const canDelete = !readonly && schema.canDelete && hasButton("delete");
+  const canNew = !readonly && schema.canNew !== undefined && hasButton("new");
+  const canDelete = !readonly && schema.canDelete !== undefined && hasButton("delete");
 
   return (
     ready && (

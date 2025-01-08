@@ -287,8 +287,8 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
   const getExpressionValue = useCallback(
     (expr?: string) => {
       if (!expr) return;
-      if (["true", "false"].includes(expr.toLowerCase())) {
-        return expr.toLowerCase() === "true";
+      if (["true", "false"].includes(String(expr).toLowerCase())) {
+        return String(expr).toLowerCase() === "true";
       }
       return parseExpression(expr)(evalContext);
     },
@@ -307,8 +307,8 @@ export function Dashboard({ meta }: ViewProps<DashboardView>) {
             schema={item}
             viewId={index}
             canEdit={getExpressionValue(item.canEdit)}
-            canDelete={getExpressionValue(item.canDelete)}
-            canNew={getExpressionValue(item.canNew)}
+            canDelete={item.canDelete !== undefined && getExpressionValue(item.canDelete)}
+            canNew={item.canNew !== undefined && getExpressionValue(item.canNew)}
             onViewLoad={handleItemViewLoad}
             getContext={getContext}
           />
