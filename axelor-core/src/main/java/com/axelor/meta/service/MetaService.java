@@ -200,7 +200,9 @@ public class MetaService {
     Response response = new Response();
 
     AbstractView data = XMLViews.findView(name, type, model);
-    viewProcessors.forEach(viewProcessor -> viewProcessor.process(data));
+    if (data != null) {
+      viewProcessors.forEach(viewProcessor -> viewProcessor.process(data));
+    }
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
