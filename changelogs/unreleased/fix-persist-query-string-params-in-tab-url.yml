@@ -1,8 +1,0 @@
----
-title: Fix persist query string params in tab url
-type: fix
-description: |
-  When app is opened through url let say search-view url like this {demoURL}/#/ds/sale.search/search?customer=Miss then
-  query parameters should be persist with url and also when switching between tabs it should also
-  restored query string url for that associated tab.
-

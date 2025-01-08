@@ -1,8 +1,0 @@
----
-title: Allow TenantAware to not start transaction by default
-type: feature
-description: |
-  Allow TenantAware to not start transaction by default.
-  
-  This is required when the thread task need to manage
-  multiple transactions on it's own.

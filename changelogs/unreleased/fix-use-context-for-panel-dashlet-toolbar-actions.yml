@@ -1,6 +1,0 @@
----
-title: Fix use context for toolbar button for panel-dashlet
-type: fix
-description:
-  It should use context of dashlet action view to evaluate expression like showIf/hideIf/readonlyIf
-  defined on toolbar button instead of tab action view context.

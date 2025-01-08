@@ -1,3 +1,95 @@
+## 7.2.5 (2025-01-08)
+
+#### Feature
+
+* Allow TenantAware to not start transaction by default
+
+  <details>
+  
+  Allow TenantAware to not start transaction by default.
+  
+  This is required when the thread task need to manage
+  multiple transactions on it's own.
+  
+  </details>
+
+#### Fix
+
+* Fix downloading of DMS file with content instead of meta file
+
+  <details>
+  
+  This fixes downloading of DMS file with string content, that are not associated with a meta file.
+  
+  </details>
+
+* Fix default min/max size of json fields
+
+  <details>
+  
+  Doesn't provide default min/max size to 0 for json fields. It is up to the user 
+  to define the values.
+  
+  </details>
+
+* Add support for Mayotte in phone widget
+* Fix persist query string params in tab url
+
+  <details>
+  
+  When app is opened through url let say search-view url like this {demoURL}/#/ds/sale.search/search?customer=Miss then
+  query parameters should be persist with url and also when switching between tabs it should also
+  restored query string url for that associated tab.
+  
+  </details>
+
+* Fix use context for toolbar button for panel-dashlet
+
+  <details>
+  
+  It should use context of dashlet action view to evaluate expression like showIf/hideIf/readonlyIf defined on toolbar button instead of tab action view context.
+  
+  </details>
+
+* Fix X-Forwarded-Host that may contain port
+
+  <details>
+  
+  X-Forwarded-Host may contain port number, so server name should strip out the port from X-Forwarded-Host.
+  It also means that port can either come from X-Forwarded-Host or X-Forwarded-Port.
+  If both X-Forwarded-Host and X-Forwarded-Port are present, port from X-Forwarded-Port will take precedence.
+  
+  </details>
+
+* Fix search view error when using search-form
+* Fix pass _ids in relational field grid
+* Fix hidden/readonly attr on view toolbar button
+
+  <details>
+  
+  When hidden="true" is set on menubar item or toolbar button it should hide the item or
+  when readonly="true" is set on item, it should make item readonly.
+  Currently hidden/readonly is only working when any of showIf/hideIf/readonlyIf is also defined on item.
+  
+  </details>
+
+* Fix logout with form submission cases
+
+  <details>
+  
+  When extending, some logout (ex, SAML central logout) is typically 
+  not a redirection but returns a form that the front-end needs to submit.
+  
+  Fixed by using full page request for logout instead of AJAX.
+  
+  </details>
+
+* Pass context to editable grid onNew action
+* Fix skip passing fields in form record save
+* Fix set action attrs on reference field
+* Fix placeholder support in html widget
+* Fix html widget sanitize issue
+
 ## 7.2.4 (2024-11-29)
 
 #### Fix
