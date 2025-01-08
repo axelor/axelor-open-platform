@@ -803,6 +803,21 @@
                   <xsd:documentation>Specify description of the step under the label for Stepper widget.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="data-domain" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Specify the domain for the corresponding m2o input. Only apply on RefSelect widget.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="data-grid" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Specify the grid view for the corresponding m2o input. Only apply on RefSelect widget.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
+              <xsd:attribute name="data-form" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Specify the form view for the corresponding m2o input. Only apply on RefSelect widget.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:anyAttribute processContents="skip" />
             </xsd:extension>
           </xsd:simpleContent>
