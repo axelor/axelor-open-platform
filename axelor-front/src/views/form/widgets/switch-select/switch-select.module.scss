@@ -2,47 +2,51 @@ $borderThickness: 2px;
 $borderRadius: 0.5rem;
 $animationDuration: 300ms;
 
-.inlineBlock {
-  display: inline-block;
-}
-
 .flex {
   display: flex;
-  overflow: scroll;
+}
+
+.inline {
+  display: inline-block;
 }
 
 .item {
   position: relative;
   cursor: pointer;
-  border-top: $borderThickness solid var(--bs-border-color);
-  border-bottom: $borderThickness solid var(--bs-border-color);
+
+  &.horizontal {
+    border-top: $borderThickness solid var(--bs-border-color);
+    border-bottom: $borderThickness solid var(--bs-border-color);
+  }
 
   &.vertical {
-    border-top: 0;
-    border-bottom: 0;
     border-left: $borderThickness solid var(--bs-border-color);
     border-right: $borderThickness solid var(--bs-border-color);
   }
 
   &.first {
     border-top-left-radius: $borderRadius;
-    border-bottom-left-radius: $borderRadius;
-    border-left: $borderThickness solid var(--bs-border-color);
+
+    &.horizontal {
+      border-bottom-left-radius: $borderRadius;
+      border-left: $borderThickness solid var(--bs-border-color);
+    }
 
     &.vertical {
-      border-bottom-left-radius: 0;
       border-top-right-radius: $borderRadius;
       border-top: $borderThickness solid var(--bs-border-color);
     }
   }
 
   &.last {
-    border-top-right-radius: $borderRadius;
     border-bottom-right-radius: $borderRadius;
-    border-right: $borderThickness solid var(--bs-border-color);
+
+    &.horizontal {
+      border-top-right-radius: $borderRadius;
+      border-right: $borderThickness solid var(--bs-border-color);
+    }
 
     &.vertical {
-      border-top-right-radius: 0;
       border-bottom-left-radius: $borderRadius;
       border-bottom: $borderThickness solid var(--bs-border-color);
     }
@@ -88,7 +92,7 @@ $animationDuration: 300ms;
   }
 }
 
-.activeBorder {
+.highlighter {
   z-index: 1;
   position: absolute;
   border-radius: $borderRadius;
