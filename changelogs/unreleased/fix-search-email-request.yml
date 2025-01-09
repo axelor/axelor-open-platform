@@ -1,0 +1,3 @@
+---
+title: Fix search emails address in recipient field in MailMessage form by adding current selected emails
+type: fix
