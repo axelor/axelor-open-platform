@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
 import { Select, SelectOptionProps } from "@/components/select";
 import { request } from "@/services/client/client";
@@ -23,12 +24,14 @@ export function useMessagePopup() {
       yesTitle,
       noTitle,
       onSave,
+      showRecipients = true,
     }: {
       title: string;
       record: Message;
       yesTitle?: string;
       noTitle?: string;
       onSave: (record: Message) => void;
+      showRecipients?: boolean;
     }) => {
       let formData = { ...record };
       const formAtom = atom<Message>(formData);
@@ -38,6 +41,7 @@ export function useMessagePopup() {
           title,
           content: (
             <Form
+              showRecipients={showRecipients}
               formAtom={formAtom}
               onFormChanged={(data) => {
                 formData = data;
@@ -51,6 +55,16 @@ export function useMessagePopup() {
               yesTitle={yesTitle}
               noTitle={noTitle}
               onClose={async (result) => {
+                if (
+                  result &&
+                  showRecipients &&
+                  ((formData as any).recipients || []).length < 1
+                ) {
+                  alerts.warn({
+                    message: i18n.get("Add recipients to post your message."),
+                  });
+                  return;
+                }
                 if (
                   result ||
                   (await dialogs.confirmDirty(
@@ -80,9 +94,11 @@ export function useMessagePopup() {
 function Form({
   formAtom,
   onFormChanged,
+  showRecipients = true,
 }: {
   formAtom: PrimitiveAtom<Message>;
   onFormChanged: (data: Message) => void;
+  showRecipients?: boolean;
 }) {
   const [formData, setFormValues] = useAtom(formAtom);
   const { subject = "", body = "", recipients = [], files = [] } = formData;
@@ -161,20 +177,23 @@ function Form({
 
   return (
     <Box flex={1} d="flex" flexDirection="column" p={2}>
-      <Box flex={1} mb={2}>
-        <Select
-          value={recipients}
-          multiple={true}
-          onChange={(vals) => onChange("recipients", vals)}
-          options={[] as MessageRecipient[]}
-          optionKey={(x) => x.address}
-          optionLabel={getLabel}
-          optionEqual={(x, y) => x.address === y.address}
-          placeholder={i18n.get("Recipients")}
-          fetchOptions={searchEmails}
-          renderValue={renderValue}
-        />
-      </Box>
+      {showRecipients && (
+        <Box flex={1} mb={2}>
+          <Select
+            value={recipients}
+            invalid={(recipients || []).length === 0}
+            multiple={true}
+            onChange={(vals) => onChange("recipients", vals)}
+            options={[] as MessageRecipient[]}
+            optionKey={(x) => x.address}
+            optionLabel={getLabel}
+            optionEqual={(x, y) => x.address === y.address}
+            placeholder={i18n.get("Recipients")}
+            fetchOptions={searchEmails}
+            renderValue={renderValue}
+          />
+        </Box>
+      )}
       <Box flex={1} mb={2}>
         <Input
           type="text"

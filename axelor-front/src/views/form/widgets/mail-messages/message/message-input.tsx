@@ -117,6 +117,7 @@ export function MessageInput({
       yesTitle: i18n.get("Send"),
       record: { body: value, files } as Message,
       onSave: handleSave,
+      showRecipients: false,
     });
   }
 
