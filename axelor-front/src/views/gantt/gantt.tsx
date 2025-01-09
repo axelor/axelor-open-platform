@@ -26,6 +26,7 @@ import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import { formatRecord, transformRecord } from "./utils";
+import { sortComparator } from "../grid/builder/utils";
 
 import styles from "./gantt.module.scss";
 
@@ -344,31 +345,38 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   );
 
   const ganttRecords = useMemo(() => {
-    const getParent = (task: DataRecord) => task[view.taskParent!];
+    const { taskStart = "", taskSequence, taskParent = "" } = view;
+    const getParent = (task: DataRecord) => task[taskParent];
 
     function collect(
       parent?: DataRecord["id"],
       level: number = 1,
     ): DataRecord[] {
-      return records
-        .filter(
-          (item) =>
-            item[view.taskStart!] &&
-            (parent
-              ? (getParent(item) || {}).id === parent
-              : getParent(item) === parent),
-        )
-        .reduce((list, _item) => {
-          const item: DataRecord = { ..._item, _level: level };
-          const subTasks = collect(item.id, level + 1);
+      let dataset = records.filter(
+        (item) =>
+          item[taskStart] &&
+          (parent
+            ? (getParent(item) || {}).id === parent
+            : getParent(item) === parent),
+      );
 
-          return list.concat([
-            subTasks.length
-              ? { ...item, _children: subTasks.map((t) => t.id) }
-              : item,
-            ...(item._expand === false ? [] : subTasks),
-          ]);
-        }, []) as DataRecord[];
+      if (taskSequence) {
+        dataset = dataset.sort((x1, x2) =>
+          sortComparator(x1[taskSequence], x2[taskSequence]),
+        );
+      }
+
+      return dataset.reduce((list, _item) => {
+        const item: DataRecord = { ..._item, _level: level };
+        const subTasks = collect(item.id, level + 1);
+
+        return list.concat([
+          subTasks.length
+            ? { ...item, _children: subTasks.map((t) => t.id) }
+            : item,
+          ...(item._expand === false ? [] : subTasks),
+        ]);
+      }, []) as DataRecord[];
     }
 
     const list = collect(null);

@@ -90,6 +90,26 @@ export function isValidSequence(field: Property) {
   );
 }
 
+export function sortComparator(value1: any, value2: any) {
+  const locale = l10n.getLocale();
+  const localeCompare = Intl.Collator(locale).compare;
+
+  function toLocaleString(value?: string) {
+    return (value || "").toLocaleString().toLocaleLowerCase();
+  }
+
+  if (value1 == null) {
+    return 1;
+  }
+  if (value2 == null) {
+    return -1;
+  }
+  if (isNaN(value1) || isNaN(value2)) {
+    return localeCompare(toLocaleString(value1), toLocaleString(value2));
+  }
+  return value1 - value2;
+}
+
 function sortDataByColumns(
   list: DataRecord[],
   sortColumns: GridSortColumn[],
@@ -105,25 +125,7 @@ function sortDataByColumns(
     ];
   }
 
-  const locale = l10n.getLocale();
-  const localeCompare = Intl.Collator(locale).compare;
-
-  function toLocaleString(value?: string) {
-    return (value || "").toLocaleString().toLocaleLowerCase();
-  }
-
-  function compare(first: any, second: any) {
-    if (first == null) {
-      return 1;
-    }
-    if (second == null) {
-      return -1;
-    }
-    if (isNaN(first) || isNaN(second)) {
-      return localeCompare(toLocaleString(first), toLocaleString(second));
-    }
-    return first - second;
-  }
+  const compare = sortComparator;
 
   function rcompare(first: any, second: any) {
     return compare(second, first);
