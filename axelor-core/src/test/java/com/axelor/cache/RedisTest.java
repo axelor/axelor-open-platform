@@ -33,36 +33,18 @@ import redis.embedded.RedisServer;
 public class RedisTest extends AbstractBaseCache {
 
   private static RedisServer redisServer;
-
+  private static int redisUseCount = 0;
   private static final int REDIS_PORT = 6379;
 
   private static final Logger log = LoggerFactory.getLogger(RedisTest.class);
 
   public static class RedisTestModule extends CacheTestModule {
 
-    static void startRedis() {
-      redisServer = new RedisServer(REDIS_PORT);
-      redisServer.start();
-    }
-
-    private boolean isServerRunning() {
-      try (final var socket = new Socket("localhost", REDIS_PORT)) {
-        return true;
-      } catch (IOException e) {
-        return false;
-      }
-    }
-
     @Override
     protected void configure() {
       TestingHelpers.resetSettings();
 
-      // start redis
-      if (isServerRunning()) {
-        log.warn("External Redis server is already running on port " + REDIS_PORT);
-      } else {
-        startRedis();
-      }
+      startRedis();
 
       AppSettings.get()
           .getInternalProperties()
@@ -74,8 +56,44 @@ public class RedisTest extends AbstractBaseCache {
 
   @AfterAll
   static void tearDown() {
+    stopRedis();
+  }
+
+  static synchronized void startRedis() {
+    ++redisUseCount;
+
+    if (redisServer != null) {
+      if (!redisServer.isActive()) {
+        redisServer.start();
+      }
+      return;
+    }
+
+    if (isServerRunning()) {
+      log.warn("External Redis server is already running on port " + REDIS_PORT);
+    } else {
+      redisServer = new RedisServer(REDIS_PORT);
+      redisServer.start();
+    }
+  }
+
+  static synchronized void stopRedis() {
+    --redisUseCount;
+
+    if (redisUseCount > 0) {
+      return;
+    }
+
     if (redisServer != null) {
       redisServer.stop();
+    }
+  }
+
+  private static boolean isServerRunning() {
+    try (var socket = new Socket("localhost", REDIS_PORT)) {
+      return true;
+    } catch (IOException e) {
+      return false;
     }
   }
 }
