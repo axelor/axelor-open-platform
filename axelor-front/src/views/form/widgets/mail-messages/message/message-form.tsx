@@ -188,6 +188,7 @@ function Form({
             optionKey={(x) => x.address}
             optionLabel={getLabel}
             optionEqual={(x, y) => x.address === y.address}
+            optionMatch={() => true}
             placeholder={i18n.get("Recipients")}
             fetchOptions={searchEmails}
             renderValue={renderValue}
