@@ -5,10 +5,11 @@ import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { dialogs } from "@/components/dialogs";
-import { Select } from "@/components/select";
+import { Select, SelectOptionProps } from "@/components/select";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
+import { SelectionTag } from "@/views/form/widgets";
 
 import HtmlEditor from "../../html/editor";
 import { Message, MessageFile, MessageRecipient } from "../message/types";
@@ -127,6 +128,33 @@ function Form({
     );
   }
 
+  const handleRemove = useCallback(
+    (recipient: MessageRecipient) => {
+      onChange(
+        "recipients",
+        recipients?.filter((r) => r.address !== recipient.address),
+      );
+    },
+    [onChange, recipients],
+  );
+
+  const getLabel = useCallback(
+    (option: MessageRecipient) => option.personal || option.address,
+    [],
+  );
+
+  const renderValue = useCallback(
+    ({ option }: SelectOptionProps<MessageRecipient>) => {
+      return (
+        <SelectionTag
+          title={getLabel(option)}
+          onRemove={() => handleRemove(option)}
+        />
+      );
+    },
+    [getLabel, handleRemove],
+  );
+
   useEffect(() => {
     onFormChanged?.(formData);
   }, [formData, onFormChanged]);
@@ -140,10 +168,11 @@ function Form({
           onChange={(vals) => onChange("recipients", vals)}
           options={[] as MessageRecipient[]}
           optionKey={(x) => x.address}
-          optionLabel={(x) => x.personal || x.address}
+          optionLabel={getLabel}
           optionEqual={(x, y) => x.address === y.address}
           placeholder={i18n.get("Recipients")}
           fetchOptions={searchEmails}
+          renderValue={renderValue}
         />
       </Box>
       <Box flex={1} mb={2}>

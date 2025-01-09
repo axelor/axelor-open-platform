@@ -1,0 +1,6 @@
+---
+title: Improve mail message form
+type: feature
+description: |
+  On MailMessage form, render recipient as SelectionTag. Allow to remove recipient 
+  from Tag.
