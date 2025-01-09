@@ -1,5 +1,5 @@
 import { PrimitiveAtom, atom, useAtom, useSetAtom } from "jotai";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -104,10 +104,6 @@ function Form({
   const [formData, setFormValues] = useAtom(formAtom);
   const { subject = "", body = "", recipients = [], files = [] } = formData;
 
-  const recipientField = useRef({
-    targetName: "personal",
-  }).current;
-
   function onChange(name: keyof Message, value: any) {
     setFormValues(
       (form) =>
@@ -136,7 +132,7 @@ function Form({
           onChange={(vals) => onChange("recipients", vals)}
           options={[] as MessageRecipient[]}
           optionKey={(x) => x.address}
-          optionLabel={(x) => x.address}
+          optionLabel={(x) => x.personal || x.address}
           optionEqual={(x, y) => x.address === y.address}
           placeholder={i18n.get("Recipients")}
           fetchOptions={searchEmails}
