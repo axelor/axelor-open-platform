@@ -76,24 +76,6 @@ export function useMessagePopup() {
   );
 }
 
-async function searchEmails(term?: string): Promise<MessageRecipient[]> {
-  const resp = await request({
-    url: "ws/search/emails",
-    method: "POST",
-    body: {
-      data: {
-        search: term,
-        selected: [],
-      },
-    },
-  });
-  if (resp.ok) {
-    const { status, data } = await resp.json();
-    return status === 0 ? data : [];
-  }
-  return [];
-}
-
 function Form({
   formAtom,
   onFormChanged,
@@ -103,6 +85,29 @@ function Form({
 }) {
   const [formData, setFormValues] = useAtom(formAtom);
   const { subject = "", body = "", recipients = [], files = [] } = formData;
+
+  const searchEmails = useCallback(
+    async (term?: string): Promise<MessageRecipient[]> => {
+      const resp = await request({
+        url: "ws/search/emails",
+        method: "POST",
+        body: {
+          data: {
+            search: term,
+            selected: (recipients || []).map(function (x) {
+              return x.address;
+            }),
+          },
+        },
+      });
+      if (resp.ok) {
+        const { status, data } = await resp.json();
+        return status === 0 ? data : [];
+      }
+      return [];
+    },
+    [recipients],
+  );
 
   function onChange(name: keyof Message, value: any) {
     setFormValues(
@@ -116,7 +121,10 @@ function Form({
   }
 
   function handleFileRemove(file: MessageFile) {
-    onChange("files", files?.filter((f) => f !== file));
+    onChange(
+      "files",
+      files?.filter((f) => f !== file),
+    );
   }
 
   useEffect(() => {
