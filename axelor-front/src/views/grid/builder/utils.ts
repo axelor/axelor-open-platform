@@ -8,10 +8,10 @@ import { GridColumn, GridSortColumn, GridState } from "@axelor/ui/grid";
 import { Field, GridView, Property } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData } from "@/services/client/meta";
-import { l10n } from "@/services/client/l10n";
 import { toKebabCase } from "@/utils/names.ts";
 import { isValidWidget, normalizeWidget } from "@/views/form/builder/utils";
 import { getFieldValue } from "@/utils/data-record";
+import { compare, reverseCompare } from "@/utils/sort";
 
 export const AUTO_ADD_ROW = Symbol("AUTO_ADD_ROW");
 
@@ -90,26 +90,6 @@ export function isValidSequence(field: Property) {
   );
 }
 
-export function sortComparator(value1: any, value2: any) {
-  const locale = l10n.getLocale();
-  const localeCompare = Intl.Collator(locale).compare;
-
-  function toLocaleString(value?: string) {
-    return (value || "").toLocaleString().toLocaleLowerCase();
-  }
-
-  if (value1 == null) {
-    return 1;
-  }
-  if (value2 == null) {
-    return -1;
-  }
-  if (isNaN(value1) || isNaN(value2)) {
-    return localeCompare(toLocaleString(value1), toLocaleString(value2));
-  }
-  return value1 - value2;
-}
-
 function sortDataByColumns(
   list: DataRecord[],
   sortColumns: GridSortColumn[],
@@ -125,16 +105,10 @@ function sortDataByColumns(
     ];
   }
 
-  const compare = sortComparator;
-
-  function rcompare(first: any, second: any) {
-    return compare(second, first);
-  }
-
   function comparator(first: DataRecord, second: DataRecord) {
     for (let i = 0; i < sortColumns.length; ++i) {
       const { name, order } = sortColumns[i];
-      const cmp = order === "desc" ? rcompare : compare;
+      const cmp = order === "desc" ? reverseCompare : compare;
       const result = cmp(extractor(first, name), extractor(second, name));
       if (result) {
         return result;

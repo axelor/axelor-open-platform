@@ -21,12 +21,12 @@ import { moment } from "@/services/client/l10n";
 import { Field, GanttView, Widget } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import format from "@/utils/format";
+import { compare } from "@/utils/sort";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import { formatRecord, transformRecord } from "./utils";
-import { sortComparator } from "../grid/builder/utils";
 
 import styles from "./gantt.module.scss";
 
@@ -362,7 +362,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
 
       if (taskSequence) {
         dataset = dataset.sort((x1, x2) =>
-          sortComparator(x1[taskSequence], x2[taskSequence]),
+          compare(x1[taskSequence], x2[taskSequence]),
         );
       }
 

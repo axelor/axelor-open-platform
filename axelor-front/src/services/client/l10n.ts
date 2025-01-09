@@ -30,6 +30,7 @@ const getCountry = (locale: string) => toKebabCase(locale).split("-")[1];
 
 let locale = "";
 let dateFormat = "";
+let collatorCompare = Intl.Collator().compare;
 
 /*
   en -> EUR, DD/MM/YYYY (defaults)
@@ -40,6 +41,7 @@ let dateFormat = "";
 */
 async function init() {
   locale = findLocale();
+  collatorCompare = Intl.Collator(locale).compare;
 
   const dayjsLocale = await initDayjs();
   dateFormat = findDateFormat(dayjsLocale);
@@ -115,6 +117,10 @@ export type Moment = Dayjs;
 export namespace l10n {
   export function getLocale() {
     return locale;
+  }
+
+  export function getCompare() {
+    return collatorCompare;
   }
 
   export function findLocale(
