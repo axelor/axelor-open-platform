@@ -15,8 +15,7 @@ import { MessageTrack } from "./types";
 
 import styles from "./message-track.module.scss";
 
-export function formatter(_item: MessageTrack, field?: Property) {
-  const item = { ..._item };
+export function formatter(item: MessageTrack, field?: Property) {
 
   function formatValue(value?: MessageTrack["value"]) {
     if (!value) {
@@ -51,17 +50,17 @@ export function formatter(_item: MessageTrack, field?: Property) {
     if (value === "0E-10") value = "0.000000000000";
     return value;
   }
-  item.displayValue = item.displayValue || formatValue(item.value);
-  item.oldDisplayValue = item.oldDisplayValue || formatValue(item.oldValue);
-  if (item.oldDisplayValue !== undefined) {
-    item.displayValue =
-      item.oldDisplayValue +
+  let displayValue = formatValue(item.value);
+  const oldDisplayValue = formatValue(item.oldValue);
+  if (oldDisplayValue !== undefined) {
+    displayValue =
+      oldDisplayValue +
       " → " +
-      (item.displayValue ||
+      (displayValue ||
         `<span class="${styles["empty-value"]}">${i18n.get("None")}</span>`);
   }
 
-  return { ...item };
+  return displayValue;
 }
 
 function MessageTrackComponent({
@@ -81,15 +80,15 @@ function MessageTrackComponent({
     }
     return fields?.[track?.name];
   }, [track, fields, jsonFields]);
-  const { title, displayValue } = formatter(track, field);
+  const value = formatter(track, field);
   return (
     <li className={styles["track-field"]}>
       <Box d="flex" alignItems="center">
         <Box as="p" mb={0} me={1} fontWeight="bold">
-          {i18n.get(title)} {" : "}
+          {i18n.get(track.title)} {" : "}
         </Box>
-        {displayValue && (
-          <span dangerouslySetInnerHTML={{ __html: sanitize(displayValue) }} />
+        {value && (
+          <span dangerouslySetInnerHTML={{ __html: sanitize(value) }} />
         )}
       </Box>
     </li>

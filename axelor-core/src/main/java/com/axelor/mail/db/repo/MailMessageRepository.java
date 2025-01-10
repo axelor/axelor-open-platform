@@ -27,7 +27,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
@@ -37,13 +36,10 @@ import com.axelor.mail.db.MailFlags;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.MetaFiles;
-import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
-import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.Resource;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -296,39 +292,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
         .fetch();
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  private String updateBody(MailMessage message) throws Exception {
-    final String body = message.getBody();
-    if (!MailConstants.MESSAGE_TYPE_NOTIFICATION.equals(message.getType())
-        || message.getRelatedModel() == null) {
-      return body;
-    }
-    if (message.getBody() == null || message.getBody().trim().charAt(0) != '{') {
-      return body;
-    }
-    final Mapper mapper = Mapper.of(Class.forName(message.getRelatedModel()));
-    final ObjectMapper json = Beans.get(ObjectMapper.class);
-    final Map<String, Object> bodyData = json.readValue(body, Map.class);
-    final List<Map<String, String>> values = new ArrayList<>();
-
-    for (Map<String, String> item : (List<Map>) bodyData.get("tracks")) {
-      values.add(item);
-      final Property property = mapper.getProperty(item.get("name"));
-      if (property == null || StringUtils.isBlank(property.getSelection())) {
-        continue;
-      }
-      final Selection.Option d1 =
-          MetaStore.getSelectionItem(property.getSelection(), item.get("value"));
-      final Selection.Option d2 =
-          MetaStore.getSelectionItem(property.getSelection(), item.get("oldValue"));
-      item.put("displayValue", d1 == null ? null : d1.getLocalizedTitle());
-      item.put("oldDisplayValue", d2 == null ? null : d2.getLocalizedTitle());
-    }
-
-    bodyData.put("tracks", values);
-    return json.writeValueAsString(bodyData);
-  }
-
   public Map<String, Object> details(MailMessage message) {
     final String[] fields = {
       "id", "type", "subject", "body", "summary", "relatedId", "relatedModel", "relatedName"
@@ -382,11 +345,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
               + user.getId()
               + "/image/download?image=true&v="
               + user.getVersion());
-    }
-
-    try {
-      details.put("body", updateBody(message));
-    } catch (Exception e) {
     }
 
     details.put("$from", Resource.toMap(email, "address", "personal"));

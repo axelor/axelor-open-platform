@@ -72,8 +72,6 @@ export type MessageTrack = {
   title: string;
   value: string;
   oldValue?: string;
-  displayValue?: string;
-  oldDisplayValue?: string;
 };
 
 export type MessagePagination = {

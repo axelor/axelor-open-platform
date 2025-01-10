@@ -25,10 +25,12 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.ImapAccount;
@@ -46,9 +48,11 @@ import com.axelor.mail.db.repo.MailAddressRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
+import com.axelor.meta.schema.views.Selection;
 import com.axelor.team.db.Team;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Template;
@@ -72,6 +76,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -303,6 +308,12 @@ public class MailServiceImpl implements MailService, MailConstants {
     final Map<String, Object> data =
         mapper.readValue(jsonBody, new TypeReference<Map<String, Object>>() {});
 
+    try {
+      updateBody(message, data);
+    } catch(Exception e) {
+      //ignore
+    }
+
     data.put("entity", entity);
 
     // TODO: improve template to include messages and tags
@@ -322,6 +333,54 @@ public class MailServiceImpl implements MailService, MailConstants {
                 + "</ul>");
 
     return tmpl.make(data).render();
+  }
+
+  /**
+   * This adds displayValue and oldDisplayValue for selection fields in order to display formatted values in mail
+   */
+  private void updateBody(MailMessage message, Map<String, Object> bodyData) throws Exception {
+    final String body = message.getBody();
+    if (!MailConstants.MESSAGE_TYPE_NOTIFICATION.equals(message.getType())
+        || message.getRelatedModel() == null) {
+      return;
+    }
+    if (message.getBody() == null || message.getBody().trim().charAt(0) != '{') {
+      return;
+    }
+    final Mapper mapper = Mapper.of(Class.forName(message.getRelatedModel()));
+    for (Map<String, String> item : (List<Map>) bodyData.get("tracks")) {
+      final Property property = mapper.getProperty(item.get("name"));
+      if (property == null || StringUtils.isBlank(property.getSelection())) {
+        continue;
+      }
+      item.put("displayValue", formatSelection(property, item.get("value")));
+      item.put("oldDisplayValue", formatSelection(property, item.get("oldValue")));
+    }
+
+  }
+
+  private String formatSelection(Property property, String value) {
+    String val = formatSelectionItem(property, value);
+    if (val != null) {
+      return val;
+    }
+    if (StringUtils.isEmpty(value) || value.indexOf(",") < 1) {
+      return null;
+    }
+    // try multi-select
+    StringJoiner sj = new StringJoiner(", ");
+    for (String item : value.split(",")) {
+      String itemVal = formatSelectionItem(property, item);
+      if (itemVal != null) {
+        sj.add(itemVal);
+      }
+    }
+    return sj.length() > 0 ? sj.toString() : null;
+  }
+
+  private String formatSelectionItem(Property property, String value) {
+    Selection.Option opt = MetaStore.getSelectionItem(property.getSelection(), value);
+    return opt == null ? null : opt.getLocalizedTitle();
   }
 
   /**
