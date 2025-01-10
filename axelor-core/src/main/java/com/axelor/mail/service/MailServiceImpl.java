@@ -310,8 +310,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     try {
       updateBody(message, data);
-    } catch(Exception e) {
-      //ignore
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
 
     data.put("entity", entity);
@@ -336,10 +336,11 @@ public class MailServiceImpl implements MailService, MailConstants {
   }
 
   /**
-   * This adds displayValue and oldDisplayValue for selection fields in order to display formatted values in mail
+   * This adds displayValue and oldDisplayValue to format specific fields values in order to display
+   * formatted values in mail
    */
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void updateBody(MailMessage message, Map<String, Object> bodyData) throws Exception {
-    final String body = message.getBody();
     if (!MailConstants.MESSAGE_TYPE_NOTIFICATION.equals(message.getType())
         || message.getRelatedModel() == null) {
       return;
@@ -350,13 +351,35 @@ public class MailServiceImpl implements MailService, MailConstants {
     final Mapper mapper = Mapper.of(Class.forName(message.getRelatedModel()));
     for (Map<String, String> item : (List<Map>) bodyData.get("tracks")) {
       final Property property = mapper.getProperty(item.get("name"));
-      if (property == null || StringUtils.isBlank(property.getSelection())) {
+      if (property == null) {
         continue;
       }
-      item.put("displayValue", formatSelection(property, item.get("value")));
-      item.put("oldDisplayValue", formatSelection(property, item.get("oldValue")));
+      if (StringUtils.notBlank(property.getSelection())) {
+        item.put("displayValue", formatSelection(property, item.get("value")));
+        item.put("oldDisplayValue", formatSelection(property, item.get("oldValue")));
+        continue;
+      }
+      if (isBoolean(item.get("value"))) {
+        item.put("displayValue", formatBoolean(item.get("value")));
+      }
+      if (isBoolean(item.get("oldValue"))) {
+        item.put("oldDisplayValue", formatBoolean(item.get("oldValue")));
+      }
     }
+  }
 
+  private boolean isBoolean(String value) {
+    return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
+  }
+
+  private String formatBoolean(String value) {
+    if ("true".equalsIgnoreCase(value)) {
+      return I18n.get("True");
+    } else if ("false".equalsIgnoreCase(value)) {
+      return I18n.get("False");
+    } else {
+      return null;
+    }
   }
 
   private String formatSelection(Property property, String value) {
