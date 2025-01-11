@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.db.repo;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
@@ -134,15 +135,27 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 
     private final String jsonModel;
 
+    private static final String DEFAULT_FILTER = "self.jsonModel = :jsonModel";
+
     public MetaJsonRecordQuery(String jsonModel) {
       super(MetaJsonRecord.class);
       this.jsonModel = jsonModel;
+      this.setFilter(DEFAULT_FILTER);
+      this.bind("jsonModel", jsonModel);
     }
 
     @Override
     public Query<MetaJsonRecord> filter(String filter, Object... params) {
+      if (StringUtils.isBlank(filter)) {
+        setFilter(DEFAULT_FILTER);
+        bind("jsonModel", jsonModel);
+        return this;
+      }
+      if (Objects.equals(DEFAULT_FILTER, getFilter())) {
+        setFilter(null);
+      }
       try {
-        return super.filter("(self.jsonModel = :jsonModel) AND (" + filter + ")", params);
+        return super.filter("(" + DEFAULT_FILTER + ") AND (" + filter + ")", params);
       } finally {
         bind("jsonModel", jsonModel);
       }
