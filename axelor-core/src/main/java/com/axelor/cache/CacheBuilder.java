@@ -20,6 +20,7 @@ package com.axelor.cache;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.redisson.RedissonCacheBuilder;
+import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
 import java.time.Duration;
 import java.util.function.Function;
 
@@ -58,6 +59,9 @@ public abstract class CacheBuilder<K, V> {
         break;
       case "redisson":
         cacheBuilderFactory = name -> new RedissonCacheBuilder<>(name);
+        break;
+      case "redisson-native":
+        cacheBuilderFactory = name -> new RedissonCacheNativeBuilder<>(name);
         break;
       default:
         throw new IllegalArgumentException("Unsupported cache provider: " + providerName);

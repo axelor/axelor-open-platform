@@ -22,9 +22,12 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.redisson.RedissonCacheBuilder;
+import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
+import com.axelor.common.Inflector;
 import com.axelor.test.GuiceJunit5Test;
 import com.axelor.test.GuiceModules;
 import java.time.Duration;
@@ -32,10 +35,20 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 @GuiceModules({AbstractBaseCache.CacheTestModule.class})
+@TestMethodOrder(MethodOrderer.MethodName.class)
 class CacheBuilderTest extends GuiceJunit5Test {
+
+  // Enable this to test redisson-native with expireAfterWrite
+  // Currently only supported by Redis 7.4+
+  private static final boolean HAS_REDIS_HPEXPIRE = false;
+
+  private static final Duration TTL = Duration.ofMillis(500);
 
   @BeforeAll
   static void setUp() {
@@ -47,66 +60,92 @@ class CacheBuilderTest extends GuiceJunit5Test {
     RedisTest.stopRedis();
   }
 
-  @Test
-  void testCaffeineCache() {
-    testCacheOperations(CaffeineCacheBuilder::new);
+  enum CacheType {
+    CAFFEINE(CaffeineCacheBuilder::new),
+    REDISSON(RedissonCacheBuilder::new),
+    REDISSON_NATIVE(RedissonCacheNativeBuilder::new);
+
+    private final Function<String, CacheBuilder<String, Object>> factory;
+
+    CacheType(Function<String, CacheBuilder<String, Object>> factory) {
+      this.factory = factory;
+    }
+
+    public Function<String, CacheBuilder<String, Object>> getFactory() {
+      return factory;
+    }
+
+    @Override
+    public String toString() {
+      return Inflector.getInstance().dasherize(name());
+    }
   }
 
-  @Test
-  void testCaffeineCacheLoader() {
-    testCacheLoaderOperations(CaffeineCacheBuilder::new);
+  @ParameterizedTest(name = "{0} - Basic Cache Operations")
+  @EnumSource(CacheType.class)
+  void testBasicCacheOperations(CacheType cacheType) {
+    doBasicCacheOperations(cacheType.getFactory());
   }
 
-  @Test
-  void testCaffeineExpireAfterWrite() {
-    testExpireAfterWrite(CaffeineCacheBuilder::new);
+  @ParameterizedTest(name = "{0} - Cache Loader Operations")
+  @EnumSource(CacheType.class)
+  void testCacheLoaderOperations(CacheType cacheType) {
+    doCacheLoaderOperations(cacheType.getFactory());
   }
 
-  @Test
-  void testCaffeineExpireAfterAccess() {
-    testExpireAfterAccess(CaffeineCacheBuilder::new);
+  // redisson-native with expireAfterWrite requires HPEXPIRE command introduced in Redis 7.4
+  @ParameterizedTest(name = "{0} - Expire After Write Operations")
+  @EnumSource(value = CacheType.class)
+  void testExpireAfterWriteOperations(CacheType cacheType) {
+    assumeTrue(
+        HAS_REDIS_HPEXPIRE || cacheType != CacheType.REDISSON_NATIVE,
+        "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
+    doExpireAfterWrite(cacheType.getFactory());
   }
 
-  @Test
-  void testRedissonCache() {
-    testCacheOperations(RedissonCacheBuilder::new);
+  // redisson-native does not support expireAfterAccess (it behaves like expireAfterWrite)
+  @ParameterizedTest(name = "{0} - Expire After Access Operations")
+  @EnumSource(
+      value = CacheType.class,
+      mode = EnumSource.Mode.EXCLUDE,
+      names = {"REDISSON_NATIVE"})
+  void testExpireAfterAccessOperations(CacheType cacheType) {
+    doExpireAfterAccess(cacheType.getFactory());
   }
 
-  @Test
-  void testRedissonCacheLoader() {
-    testCacheLoaderOperations(RedissonCacheBuilder::new);
+  @ParameterizedTest(name = "{0} - Map Operations")
+  @EnumSource(CacheType.class)
+  void testMapOperations(CacheType cacheType) {
+    doMapOperations(cacheType.getFactory());
   }
 
-  @Test
-  void testRedissonExpireAfterWrite() {
-    testExpireAfterWrite(RedissonCacheBuilder::new);
-  }
-
-  @Test
-  void testRedissonExpireAfterAccess() {
-    testExpireAfterAccess(RedissonCacheBuilder::new);
-  }
-
-  // Test cache without loader
-  private void testCacheOperations(
+  private void doBasicCacheOperations(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-cache").build(),
         cache -> {
           assertNotNull(cache, "Cache should be created");
+          assertEquals(0, cache.estimatedSize(), "Cache should be empty initially");
 
           cache.put("key1", "value1");
           assertEquals("value1", cache.get("key1"), "Should return cached value");
-
           assertNull(cache.get("key2"), "Should return null for non-existent key");
+          assertEquals(1, cache.estimatedSize(), "Cache should contain one entry");
+
+          cache.put("key2", "value2");
+          assertEquals(2, cache.estimatedSize(), "Cache should contain two entries");
 
           cache.invalidate("key1");
           assertNull(cache.get("key1"), "Should return null after invalidation");
+          assertEquals(
+              1, cache.estimatedSize(), "Cache should contain one entry after invalidation");
+
+          cache.invalidateAll();
+          assertEquals(0, cache.estimatedSize(), "Cache should be empty after invalidation of all");
         });
   }
 
-  // Test cache with loader
-  private void testCacheLoaderOperations(
+  private void doCacheLoaderOperations(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
     useCache(
         cacheBuilderFactory.apply("test-cache-loader").build(key -> "loaded-" + key),
@@ -128,50 +167,44 @@ class CacheBuilderTest extends GuiceJunit5Test {
         });
   }
 
-  private void testExpireAfterWrite(
+  private void doExpireAfterWrite(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
-    var expireAfterWrite = Duration.ofMillis(500);
-
     useCache(
-        cacheBuilderFactory.apply("test-write-expiry").expireAfterWrite(expireAfterWrite).build(),
+        cacheBuilderFactory.apply("test-write-expiry").expireAfterWrite(TTL).build(),
         cache -> {
           cache.put("key1", "value1");
           assertEquals("value1", cache.get("key1"), "Should return cached value");
 
           await()
-              .atMost(expireAfterWrite)
-              .pollDelay(expireAfterWrite.dividedBy(2))
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
               .untilAsserted(
                   () ->
                       assertEquals(
                           "value1", cache.get("key1"), "Should not expire before write timeout"));
 
           await()
-              .atMost(expireAfterWrite)
-              .pollDelay(expireAfterWrite.dividedBy(2))
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
               .untilAsserted(
-                  () -> assertNull(cache.get("key1"), "Should expire after write timeout"));
+                  () -> {
+                    var result = cache.get("key1");
+                    assertNull(result, "Should expire after write timeout");
+                  });
         });
   }
 
-  private void testExpireAfterAccess(
+  private void doExpireAfterAccess(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
-    var expireAfterAccess = Duration.ofMillis(500);
-
     useCache(
-        cacheBuilderFactory
-            .apply("test-access-expiry")
-            .expireAfterAccess(expireAfterAccess)
-            .build(),
+        cacheBuilderFactory.apply("test-access-expiry").expireAfterAccess(TTL).build(),
         cache -> {
-          assertEquals(0, cache.estimatedSize(), "Cache should be empty initially");
-
           cache.put("key1", "value1");
           assertEquals("value1", cache.get("key1"), "Should return cached value");
 
           await()
-              .atMost(expireAfterAccess)
-              .pollDelay(expireAfterAccess.dividedBy(2))
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
               .untilAsserted(
                   () ->
                       assertEquals(
@@ -179,13 +212,50 @@ class CacheBuilderTest extends GuiceJunit5Test {
                           cache.get("key1"),
                           "Should not expire before last access timeout"));
 
-          assertEquals(1, cache.estimatedSize(), "Cache should contain one entry");
+          await()
+              .atMost(TTL)
+              .pollDelay(TTL.dividedBy(2))
+              .untilAsserted(
+                  () ->
+                      assertEquals(
+                          "value1",
+                          cache.get("key1"),
+                          "Last access should have refreshed last access timeout"));
 
           await()
-              .atMost(expireAfterAccess.multipliedBy(2))
-              .pollDelay(expireAfterAccess)
+              .atMost(TTL.multipliedBy(2))
+              .pollDelay(TTL)
               .untilAsserted(
                   () -> assertNull(cache.get("key1"), "Should expire after last access timeout"));
+        });
+  }
+
+  private void doMapOperations(Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory.apply("test-map").build(),
+        cache -> {
+          var map = cache.asMap();
+          assertNotNull(map, "Cache should return a map view");
+          assertEquals(0, map.size(), "Map should be empty initially");
+
+          map.put("key1", "value1");
+          assertEquals("value1", map.get("key1"), "Should return cached value");
+          assertNull(map.get("key2"), "Should return null for non-existent key");
+          assertEquals(1, map.size(), "Map should contain one entry");
+
+          assertEquals(
+              "value2",
+              map.computeIfAbsent("key2", key -> "value2"),
+              "Should return computed value");
+          assertEquals(2, map.size(), "Map should contain two entries");
+
+          assertEquals("value1", map.remove("key1"), "Should return removed value");
+
+          assertEquals(
+              cache.get("key1"), map.get("key1"), "Cache and map should be in sync - key1");
+          assertEquals(
+              cache.get("key2"), map.get("key2"), "Cache and map should be in sync - key2");
+          assertEquals(cache.estimatedSize(), map.size(), "Cache and map should be in sync - size");
         });
   }
 

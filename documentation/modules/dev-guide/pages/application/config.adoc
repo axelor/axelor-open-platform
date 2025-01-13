@@ -447,7 +447,7 @@ The cache configuration allows to override those defaults, and is done through t
 ----
 # Global cache configuration applied to Hibernate, Shiro and internal components
 # ~~~~~
-# Global cache provider: default/caffeine/redisson
+# Global cache provider: default/caffeine/redisson/redisson-native
 application.cache.provider = redisson
 # Global cache configuration for specified provider (if required by provider): either on filesystem or resource in classpath
 application.cache.config = redisson.yaml
@@ -463,11 +463,16 @@ application.cache.config = redisson.yaml
 #application.cache.shiro.config = redisson.yaml
 ----
 
-The cache configuration currently supports three providers:
+The cache configuration currently supports these providers:
 
 * `default` - Use default caching implementation that can vary by components
 * `caffeine` - Use Caffeine caching
-* `redisson` - Use Redis/Valkey through Redisson client
+* `redisson` - Use Redis/Valkey through Redisson client using scripted eviction
+* `redisson-native` - Use Redis/Valkey through Redisson client using native eviction
+
+[NOTE]
+Redisson native eviction allows to clean up expired map entries on Redis side instead of using a scheduled task.
+It requires https://github.com/redis/redis/releases/tag/7.4-rc1[Redis 7.4+] and is currently supported for app-level cache and Hibernate cache, but not for Shiro cache.
 
 For global cache configuration, using one of those names will use the appropriate internal customized providers for each component for optimal usage (such as reusing the same Redisson instance).
 
@@ -475,7 +480,7 @@ In the case of component specific configurations (Hibernate, Shiro), you also ha
 
 When using Caffeine, there is no configuration to provide.
 
-When using Redisson, you need to provide a configuration file (e.g. `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details.
+When using Redisson, you can to provide a configuration file (defaults to `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
 
 Example minimal Redisson configuration file:
 

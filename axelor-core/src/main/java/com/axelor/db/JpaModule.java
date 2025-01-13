@@ -23,6 +23,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditInterceptor;
 import com.axelor.cache.CacheConfig;
 import com.axelor.cache.redisson.AxelorRedissonRegionFactory;
+import com.axelor.cache.redisson.AxelorRedissonRegionNativeFactory;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -208,6 +209,10 @@ public class JpaModule extends AbstractModule {
       } else if ("redisson".equalsIgnoreCase(providerName)) {
         if (StringUtils.isBlank(cacheRegionFactory)) {
           cacheRegionFactory = AxelorRedissonRegionFactory.class.getName();
+        }
+      } else if ("redisson-native".equalsIgnoreCase(providerName)) {
+        if (StringUtils.isBlank(cacheRegionFactory)) {
+          cacheRegionFactory = AxelorRedissonRegionNativeFactory.class.getName();
         }
       } else {
         Class<?> providerClass;

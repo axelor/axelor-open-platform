@@ -20,45 +20,54 @@ package com.axelor.cache.redisson;
 
 import java.time.Duration;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-import org.redisson.api.RMapCache;
+import org.apache.commons.lang3.function.TriConsumer;
+import org.redisson.api.RMapCacheNative;
 
 /**
- * Redisson cache with scripted eviction
+ * Redisson cache with native eviction
  *
  * <p>This wraps a {@link org.redisson.api.RMapCache}.
+ *
+ * <p>Setting TTL requires HPEXPIRE command support introduced in Redis 7.4.
  *
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
+public class RedissonCacheNative<K, V> implements ConfigurableRedissonCache<K, V> {
 
-  private final RMapCache<K, V> cache;
+  private final RMapCacheNative<K, V> cache;
+  private Duration ttl;
+  private TriConsumer<K, V, Duration> fastPut;
 
-  private long ttl;
-
-  private TimeUnit ttlUnit;
-
-  private long maxIdleTime;
-
-  private TimeUnit maxIdleTimeUnit;
-
-  public RedissonCache(RMapCache<K, V> cache) {
+  public RedissonCacheNative(RMapCacheNative<K, V> cache) {
     this.cache = cache;
+    setExpireAfterWrite(null);
   }
 
   public void setExpireAfterWrite(Duration expireAfterWrite) {
-    this.ttl = expireAfterWrite.toMillis();
-    this.ttlUnit = TimeUnit.MILLISECONDS;
+    this.ttl = expireAfterWrite;
+
+    if (ttl != null) {
+      fastPut = cache::fastPut;
+    } else {
+      fastPut = (key, value, duration) -> cache.fastPut(key, value);
+    }
   }
 
   public void setExpireAfterAccess(Duration expireAfterAccess) {
-    this.maxIdleTime = expireAfterAccess.toMillis();
-    this.maxIdleTimeUnit = TimeUnit.MILLISECONDS;
+    // RMapCacheNative does not support maxIdleTime
+    // Set ttl instead if not already set
+    if (ttl == null) {
+      setExpireAfterWrite(expireAfterAccess);
+    }
   }
 
   public void setMaximumSize(int maximumSize) {
-    cache.setMaxSize(maximumSize);
+    // RMapCacheNative does not support maximum size
+    // Set ttl if not already set, in order to have a least some kind of eviction
+    if (ttl == null && maximumSize > 0) {
+      setExpireAfterWrite(Duration.ofHours(1));
+    }
   }
 
   @Override
@@ -68,7 +77,7 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
 
   @Override
   public void put(K key, V value) {
-    cache.fastPut(key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit);
+    fastPut.accept(key, value, ttl);
   }
 
   @SuppressWarnings("unchecked")

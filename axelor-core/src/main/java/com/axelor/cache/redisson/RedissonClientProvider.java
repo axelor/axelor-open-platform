@@ -18,8 +18,10 @@
  */
 package com.axelor.cache.redisson;
 
+import com.axelor.cache.redisson.RedissonUtils.Version;
 import com.axelor.common.ClassUtils;
 import com.axelor.inject.Beans;
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import jakarta.inject.Singleton;
 import java.io.File;
@@ -28,9 +30,12 @@ import java.io.UncheckedIOException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Redisson client provider
@@ -44,6 +49,15 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
   private final ConcurrentMap<String, RedissonClient> redissonClients = new ConcurrentHashMap<>();
 
   private static final String DEFAULT_CONFIG = "redisson.yaml";
+
+  private final RedissonUtils redissonUtils;
+
+  private static final Logger log = LoggerFactory.getLogger(RedissonClientProvider.class);
+
+  @Inject
+  public RedissonClientProvider(RedissonUtils redissonUtils) {
+    this.redissonUtils = redissonUtils;
+  }
 
   public static RedissonClientProvider getInstance() {
     return Beans.get(RedissonClientProvider.class);
@@ -90,6 +104,31 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
 
     var redisson = Redisson.create(config);
     Runtime.getRuntime().addShutdownHook(new Thread(redisson::shutdown));
+
+    log.atInfo()
+        .setMessage("Connected to {} on {}")
+        .addArgument(
+            () -> {
+              String name;
+              Version version;
+              var valkeyVersion = redissonUtils.getValkeyVersion(redisson);
+
+              if (valkeyVersion.isPresent()) {
+                name = "Valkey";
+                version = valkeyVersion.get();
+              } else {
+                name = "Redis";
+                version = redissonUtils.getRedisVersion(redisson);
+              }
+
+              return String.format("%s %s", name, version);
+            })
+        .addArgument(
+            () ->
+                redissonUtils.getRedisAddresses(redisson).stream()
+                    .map(a -> String.format("%s:%d", a.getHostString(), a.getPort()))
+                    .collect(Collectors.joining(", ")))
+        .log();
 
     return redisson;
   }

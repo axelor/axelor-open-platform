@@ -19,36 +19,39 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorCache;
-import org.redisson.api.RMapCache;
-import org.redisson.api.options.MapCacheOptions;
+import org.redisson.api.RMapCacheNative;
+import org.redisson.api.options.MapOptions;
 
 /**
- * Redisson cache builder
+ * Redisson cache with native eviction builder
  *
- * <p>This builds an {@link AxelorCache} wrapping a {@link org.redisson.api.RMapCache}.
+ * <p>This builds an {@link AxelorCache} wrapping a {@link org.redisson.api.RMapCacheNative}.
+ *
+ * <p>Weak references are not supported in Redisson collections. When either {@code weakKeys} or
+ * {@code weakValues} are used, TTL is set in order to approximate the behavior.
  *
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class RedissonCacheBuilder<K, V>
-    extends AbstractRedissonCacheBuilder<K, V, RMapCache<K, V>, MapCacheOptions<K, V>> {
+public class RedissonCacheNativeBuilder<K, V>
+    extends AbstractRedissonCacheBuilder<K, V, RMapCacheNative<K, V>, MapOptions<K, V>> {
 
-  public RedissonCacheBuilder(String cacheName) {
+  public RedissonCacheNativeBuilder(String cacheName) {
     super(cacheName);
   }
 
   @Override
-  protected MapCacheOptions<K, V> newOptions() {
-    return MapCacheOptions.<K, V>name(getCacheName());
+  protected MapOptions<K, V> newOptions() {
+    return MapOptions.<K, V>name(getCacheName());
   }
 
   @Override
-  protected RMapCache<K, V> newMapCache(MapCacheOptions<K, V> options) {
-    return getRedissonClient().getMapCache(options);
+  protected RMapCacheNative<K, V> newMapCache(MapOptions<K, V> options) {
+    return getRedissonClient().getMapCacheNative(options);
   }
 
   @Override
-  protected RedissonCache<K, V> newRedissonCache(RMapCache<K, V> cache) {
-    return new RedissonCache<>(cache);
+  protected RedissonCacheNative<K, V> newRedissonCache(RMapCacheNative<K, V> cache) {
+    return new RedissonCacheNative<>(cache);
   }
 }

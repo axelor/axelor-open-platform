@@ -55,7 +55,10 @@ public class CacheProviderInfo {
 
     if ("caffeine".equalsIgnoreCase(providerName)) {
       return CaffeineCachingProvider.class;
-    } else if ("redisson".equalsIgnoreCase(providerName)) {
+    } else if ("redisson".equalsIgnoreCase(providerName)
+        || "redisson-native".equalsIgnoreCase(providerName)) {
+      // "redisson-native" may be configured at global level,
+      // but not supported by Redisson JCache
       return org.redisson.jcache.JCachingProvider.class;
     }
 
