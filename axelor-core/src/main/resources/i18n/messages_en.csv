@@ -140,6 +140,7 @@
 "Default",,,
 "Default home action.",,,
 "Default value",,,
+"Define a name for the theme. <b>light</b> or <b>dark</b> can be used to override built-in themes.",,,
 "Dependent features",,,
 "Dependent modules",,,
 "Depends",,,

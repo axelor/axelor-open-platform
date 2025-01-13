@@ -140,6 +140,7 @@
 "Default","Défaut",,
 "Default home action.","Action par défaut.",,
 "Default value","Valeur par défaut",,
+"Define a name for the theme. <b>light</b> or <b>dark</b> can be used to override built-in themes.","Définissez un nom pour le thème. <b>light</b> ou <b>dark</b> peuvent être utilisés pour remplacer les thèmes intégrés.",,
 "Dependent features","Fonctionnalités dépendantes",,
 "Dependent modules","Modules dépendants",,
 "Depends","Dépend de",,

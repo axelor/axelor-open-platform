@@ -5,7 +5,7 @@
   <module name="meta" package="com.axelor.meta.db" />
 
   <entity name="MetaTheme" table="META_THEME" jsonAttrs="false" repository="none">
-    <string name="name" required="true"/>
+    <string name="name" required="true" help="Define a name for the theme. &lt;b&gt;light&lt;/b&gt; or &lt;b&gt;dark&lt;/b&gt; can be used to override built-in themes."/>
     <boolean name="isSelectable" title="Available for users" help="Allow this theme to be used by users"/>
     <string name="label" title="Label"/>
     <string name="fullname" namecolumn="true"><![CDATA[
