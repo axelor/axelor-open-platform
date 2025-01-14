@@ -59,3 +59,10 @@ Built-in classes `label-warning`, `label-important`, `label-\{variant\}`, ... th
 color have been removed. Now `label-\{variant\}` class only change text color. In order to apply background color, use
 `label-bg-\{variant\}` class like `label-bg-warning`. Such classes are commonly used in custom views or in viewers. Do
 appropriate changes if background color is needed.
+
+As part of these changes, `dms.tag.style.selection` selection values has been updated. You need to run following sql
+query in order to update the database values :
+
+```sql
+UPDATE dms_file_tag SET style = CONCAT ('label-bg-', SPLIT_PART(style, '-', 2))  WHERE style LIKE 'label-%';
+```

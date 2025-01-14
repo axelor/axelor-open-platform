@@ -126,11 +126,11 @@
   <!-- DMSFileTag views -->
   <selection name="dms.tag.style.selection">
     <option value="label">Default</option>
-    <option value="label-success">Success</option>
-    <option value="label-warning">Warning</option>
-    <option value="label-important">Important</option>
-    <option value="label-info">Information</option>
-    <option value="label-inverse">Inverse</option>
+    <option value="label-bg-success">Success</option>
+    <option value="label-bg-warning">Warning</option>
+    <option value="label-bg-important">Important</option>
+    <option value="label-bg-info">Information</option>
+    <option value="label-bg-inverse">Inverse</option>
   </selection>
 
   <grid name="dms-tag-grid" title="Tags" model="com.axelor.dms.db.DMSFileTag" editable="true">
