@@ -150,7 +150,7 @@ public class SaleOrderController {
     data.put("percent", percent);
     data.put("up", total.compareTo(last) > 0);
     data.put("tag", I18n.get("Monthly"));
-    data.put("tagCss", "label-success");
+    data.put("tagCss", "label-bg-success");
 
     // This data will be put into dataset.
     // For report-box, we send a list with a single item accessible as `first`.

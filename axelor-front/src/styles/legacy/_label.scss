@@ -17,11 +17,13 @@ $label_colors: (
 );
 
 $label_backgrounds: (
-  "primary": var(--bs-primary-bg-subtle, #428bca),
-  "success": var(--bs-success-bg-subtle, #dff0d8),
-  "info": var(--bs-info-bg-subtle, #d9edf7),
-  "warning": var(--bs-warning-bg-subtle, #fcf8e3),
-  "danger": var(--bs-danger-bg-subtle, #f2dede),
+  "primary": map.get(colors.$colors, "primary"),
+  "success": map.get(colors.$colors, "success"),
+  "info": map.get(colors.$colors, "info"),
+  "warning": map.get(colors.$colors, "warning"),
+  "important": map.get(colors.$colors, "danger"),
+  "danger": map.get(colors.$colors, "danger"),
+  "inverse": #333333,
 );
 
 $label_backgrounds_text: (
