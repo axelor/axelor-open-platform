@@ -398,9 +398,26 @@ implementation "org.redisson:redisson-hibernate-6:${redisson_version}"
 ----
 [source,properties]
 ----
+# Use RedissonRegionFactory/RedissonRegionNativeFactory or any subclass
 hibernate.cache.region.factory_class = org.redisson.hibernate.RedissonRegionFactory
-# Make sure to add Redisson YAML config in classpath
+
+# Make sure to add `/redisson.yaml` config in classpath
+# Alternatively, you can specify config file path
+hibernate.cache.redisson.config = /path/to/redisson.yaml
+
+# Optional cache settings
+# Max size of cache (not supported by RedissonRegionNativeFactory)
+hibernate.cache.redisson.entity.eviction.max_entries = 10000
+# Time to live per cache entry in milliseconds
+hibernate.cache.redisson.entity.expiration.time_to_live = 600000
+# Max idle time per cache entry in milliseconds (not supported by RedissonRegionNativeFactory)
+hibernate.cache.redisson.entity.expiration.max_idle_time = 300000
 ----
+
+More details on https://redisson.org/docs/cache-api-implementations/#hibernate-cache[Redisson Hibernate Cache documentation].
+
+[NOTE]
+Instead of manually setting `hibernate.cache.region.factory_class`, you can set `application.cache.provider = redisson` or `application.cache.hibernate.provider = redisson` for better integration by reusing the same Redisson client across all the app components. See <<Global and Component-specific Cache Configurations>>.
 
 *Hazelcast :*
 [source,gradle]
