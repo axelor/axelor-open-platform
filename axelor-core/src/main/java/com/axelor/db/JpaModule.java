@@ -32,7 +32,6 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
-import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -61,7 +60,6 @@ public class JpaModule extends AbstractModule {
   private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
   private static final String DEFAULT_CACHE_REGION_FACTORY = "jcache";
-  private static final String DEFAULT_JCACHE_PROVIDER = CaffeineCachingProvider.class.getName();
 
   private String jpaUnit;
   private boolean autoscan;
@@ -204,7 +202,7 @@ public class JpaModule extends AbstractModule {
       if ("caffeine".equalsIgnoreCase(providerName)) {
         if (StringUtils.isBlank(cacheRegionFactory)) {
           cacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
-          jcacheProvider = DEFAULT_JCACHE_PROVIDER;
+          jcacheProvider = CacheConfig.DEFAULT_JCACHE_PROVIDER;
         }
       } else if ("redisson".equalsIgnoreCase(providerName)) {
         if (StringUtils.isBlank(cacheRegionFactory)) {
@@ -240,7 +238,7 @@ public class JpaModule extends AbstractModule {
         || DEFAULT_CACHE_REGION_FACTORY.equals(cacheRegionFactory)) {
       properties.put(CacheSettings.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
       if (StringUtils.isBlank(jcacheProvider)) {
-        jcacheProvider = DEFAULT_JCACHE_PROVIDER;
+        jcacheProvider = CacheConfig.DEFAULT_JCACHE_PROVIDER;
       }
       properties.put(ConfigSettings.PROVIDER, jcacheProvider);
       log.info("JCache provider: {}", jcacheProvider);

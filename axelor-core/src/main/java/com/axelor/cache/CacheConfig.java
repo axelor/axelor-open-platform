@@ -21,6 +21,7 @@ package com.axelor.cache;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
+import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -30,6 +31,8 @@ import java.util.function.Predicate;
  * <p>This is composed of static methods, as it can be used before Guice injector is initialized.
  */
 public class CacheConfig {
+
+  public static final String DEFAULT_JCACHE_PROVIDER = CaffeineCachingProvider.class.getName();
 
   private static Predicate<? super String> filterDefault =
       name -> !"default".equalsIgnoreCase(name);

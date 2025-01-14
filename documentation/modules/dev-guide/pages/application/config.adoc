@@ -445,19 +445,8 @@ extensive configuration : all properties prefix by `hibernate.` will be used.
 
 == Global and Component-specific Cache Configurations
 
-The application supports different cache providers that can be configured globally or for specific components (Hibernate, Shiro).
-
-In the default cache configuration, the application uses the following:
-
-[cols="1,3"]
-|===
-| Component           | Cache Provider
-
-| Hibernate           | https://github.com/ben-manes/caffeine[Caffeine]
-| Shiro               | https://shiro.apache.org/caching.html#memoryconstrainedcachemanager[MemoryConstrainedCacheManager]
-| Internal components | https://github.com/ben-manes/caffeine[Caffeine]
-|===
-
+The application supports different cache providers that can be applied globally or for specific components (Hibernate, Shiro).
+In the default cache configuration, the application globally uses Caffeine cache.
 The cache configuration allows to override those defaults, and is done through the following properties:
 
 [source,properties]
@@ -482,8 +471,8 @@ application.cache.config = redisson.yaml
 
 The cache configuration currently supports these providers:
 
-* `default` - Use default caching implementation that can vary by components
-* `caffeine` - Use Caffeine caching
+* `default` - Use default caching implementation
+* `caffeine` - Use Caffeine caching (same as default)
 * `redisson` - Use Redis/Valkey through Redisson client using scripted eviction
 * `redisson-native` - Use Redis/Valkey through Redisson client using native eviction
 
@@ -495,9 +484,9 @@ For global cache configuration, using one of those names will use the appropriat
 
 In the case of component specific configurations (Hibernate, Shiro), you also have the option to specify the provider as fully-qualified class name in case you have custom requirements. For Hibernate, it can be either a `org.hibernate.cache.spi.RegionFactory` or `javax.cache.spi.CachingProvider` for JCache usage. For Shiro, it should be a `javax.cache.spi.CachingProvider` for JCache usage only.
 
-When using Caffeine, there is no configuration to provide.
+When using Caffeine, there is no cache provider configuration to provide.
 
-When using Redisson, you can to provide a configuration file (defaults to `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
+When using Redisson, you can provide a configuration file (defaults to `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
 
 Example minimal Redisson configuration file:
 
@@ -507,7 +496,7 @@ singleServerConfig:
   address: "redis://localhost:6379"
 ----
 
-See https://redisson.org/docs/configuration/#using-yaml[Redisson configuration documentation] for details.
+See https://redisson.org/docs/configuration/#using-yaml[Redisson configuration documentation] for details about Redisson configuration.
 
 == Global Context Configuration
 

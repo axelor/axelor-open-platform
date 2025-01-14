@@ -31,7 +31,6 @@ import com.axelor.auth.pac4j.local.JsonExtractor;
 import com.axelor.cache.CacheConfig;
 import com.axelor.cache.CacheProviderInfo;
 import com.axelor.cache.redisson.RedissonClientProvider;
-import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.github.benmanes.caffeine.jcache.configuration.CaffeineConfiguration;
 import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
@@ -58,7 +57,6 @@ import javax.cache.expiry.Duration;
 import javax.cache.spi.CachingProvider;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.cache.jcache.AxelorJCacheManager;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.realm.Realm;
@@ -139,7 +137,7 @@ public class AuthPac4jModule extends ShiroWebModule {
 
     bindAndExpose(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).in(Singleton.class);
     expose(new TypeLiteral<Configuration<Object, Object>>() {}).annotatedWith(Names.named("shiro"));
-    expose(new TypeLiteral<Optional<CacheManager>>() {}).annotatedWith(Names.named("shiro"));
+    expose(new TypeLiteral<CacheManager>() {}).annotatedWith(Names.named("shiro"));
   }
 
   protected <T> AnnotatedBindingBuilder<T> bindAndExpose(Class<T> cls) {
@@ -172,28 +170,24 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Provides
   @Named("shiro")
   @Singleton
-  public Optional<CachingProvider> cachingProvider() {
-    return CacheConfig.getShiroCacheProvider()
-        .map(CacheProviderInfo::getCachingProvider)
-        .map(
-            provider -> {
-              var className = provider.getName();
-              log.info("JCache provider: {}", className);
-              return Caching.getCachingProvider(className);
-            });
+  public CachingProvider cachingProvider() {
+    final var providerName =
+        CacheConfig.getShiroCacheProvider()
+            .map(CacheProviderInfo::getCachingProvider)
+            .map(Class::getName)
+            .orElse(CacheConfig.DEFAULT_JCACHE_PROVIDER);
+
+    log.info("JCache provider: {}", providerName);
+    return Caching.getCachingProvider(providerName);
   }
 
   @Provides
   @Named("shiro")
   @Singleton
-  public Optional<CacheManager> cacheManager(
-      @Named("shiro") Optional<CachingProvider> optionalCachingProvider) {
-    return optionalCachingProvider.map(
-        cachingProvider -> {
-          final var cacheManager = cachingProvider.getCacheManager();
-          Runtime.getRuntime().addShutdownHook(new Thread(cacheManager::close));
-          return cacheManager;
-        });
+  public CacheManager cacheManager(@Named("shiro") CachingProvider cachingProvider) {
+    final var cacheManager = cachingProvider.getCacheManager();
+    Runtime.getRuntime().addShutdownHook(new Thread(cacheManager::close));
+    return cacheManager;
   }
 
   /** Cache configuration with session timeout */
@@ -201,14 +195,8 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Named("shiro")
   @Singleton
   public Configuration<Object, Object> cacheConfig(
-      @Named("shiro") Optional<CachingProvider> optionalCachingProvider,
+      @Named("shiro") CachingProvider cachingProvider,
       @Named(AvailableAppSettings.SESSION_TIMEOUT) long sessionTimeoutMinutes) {
-
-    if (optionalCachingProvider.isEmpty()) {
-      throw new IllegalStateException("Cache provider not configured");
-    }
-
-    final var cachingProvider = optionalCachingProvider.get();
     final Configuration<Object, Object> cacheConfig;
 
     // Generic fallback cache configuration
@@ -237,28 +225,17 @@ public class AuthPac4jModule extends ShiroWebModule {
 
   @Provides
   @Singleton
-  public org.apache.shiro.cache.CacheManager shiroCacheManager(
-      @Named("shiro") Optional<javax.cache.CacheManager> optionalCacheManager) {
-    return optionalCacheManager
-        .map(
-            cacheManager ->
-                (org.apache.shiro.cache.CacheManager) Beans.get(AxelorJCacheManager.class))
-        .orElseGet(MemoryConstrainedCacheManager::new);
-  }
-
-  @Provides
-  @Singleton
   public DefaultWebSecurityManager webSecurityManager(
       Collection<Realm> realms,
       Set<AuthenticationListener> authenticationListeners,
       ModularRealmAuthenticator authenticator,
       AxelorSessionManager sessionManager,
       AxelorRememberMeManager rememberMeManager,
-      org.apache.shiro.cache.CacheManager shiroCacheManager) {
+      AxelorJCacheManager cacheManager) {
 
     final DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 
-    securityManager.setCacheManager(shiroCacheManager);
+    securityManager.setCacheManager(cacheManager);
     securityManager.setRealms(realms);
     authenticator.setRealms(securityManager.getRealms());
     authenticator.setAuthenticationListeners(authenticationListeners);

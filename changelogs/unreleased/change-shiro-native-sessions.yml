@@ -6,7 +6,7 @@ description: |
 
   Key changes to be aware of:
 
-  * By default, the session manager now uses a memory-only `MemoryConstrainedCacheManager`. This means that sessions are not persisted between application restarts.
+  * By default, the session manager now uses in-memory Caffeine cache. This means that sessions are not persisted between application restarts.
   * `HttpSessionListener` is no longer used. Instead, you can access active sessions via `AuthSessionService.getActiveSessions()` which uses the `SessionDAO`.
 
   For more details about Shiro's session management, see the https://shiro.apache.org/session-management.html[Shiro Session Management documentation].
