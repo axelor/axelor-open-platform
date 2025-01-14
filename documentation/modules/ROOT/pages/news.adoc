@@ -5,6 +5,22 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 7.3
+
+The main highlights are :
+
+- Add theme customisation support
+- Add editable support in grid dashlet
+- Add QRCode widget
+- Add BarCode widget
+- Add `x-step` support to Integer and Decimal fields
+- Improve mail message form
+- Introduce help widget `variant` attribute
+- Add support to hide view popup header and footer
+
+Please check the {github-repo-url}/blob/7.3/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-7.3.adoc[7.3 migration guide].
+
 == 7.2
 
 The main highlights are :

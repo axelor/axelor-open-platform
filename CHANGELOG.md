@@ -1,3 +1,190 @@
+## 7.3.0 (2025-01-14)
+
+#### Feature
+
+* Add canNew/canEdit/canDelete support for panel-dashlet
+
+  <details>
+  
+  - canEdit param : canEdit="true" is already working for grid view,
+  which signify editing of dashlet grid is allowed in readonly mode as well.
+  canEdit="false" will disabled creation/editing of row in grid. 
+  For other data views it will enable/disable edit option.
+  
+  - canNew/canDelete : it will enable/disable new/delete option for data view.
+  
+  </details>
+
+* Add Barcode widget
+
+  <details>
+  
+  This widget provides the ability to display a `string` value as a barcode in readonly mode.
+  To customize the `Barcode`, use optional attributes `height`, `x-barcode-width`, `x-barcode-line-color`, 
+  `x-barcode-display-value`, `x-barcode-background-color` and `x-barcode-format`.
+  The barcode is only displayed if the value is accepted by the format.
+  
+  `Barcode` is also supported on viewers with the same attributes.
+  
+  </details>
+
+* Add x-step to Integer and Decimal widgets
+
+  <details>
+  
+  Add the ability to customize the increment and decrement amount using `x-step` attribute.
+  Decimal and negative values are accepted. The default value is determined by the scale attribute if it exists, otherwise it is set to 1.
+  
+  </details>
+
+* Add editable support in grid dashlet
+
+  <details>
+  
+  The linked grid view should have `editable="true"` to allow edit records in
+  grids. To disable this behavior, you have to pass `canEdit="false"`.
+  
+  </details>
+
+* Improve mail message form
+
+  <details>
+  
+  On MailMessage form, render recipient as SelectionTag. Allow to remove recipient 
+  from Tag.
+  
+  When adding followers, validate recipients is filled, else it will display warning 
+  notification. Without any recipients, nothing will be done. The process only send 
+  message to the newest recipients.
+  
+  </details>
+
+* Add QrCode widget
+
+  <details>
+  
+  This widget provides the ability to display a `string` value as a QR Code in readonly mode.
+  To customize the QrCode size in px, use `height` attribute with a number value. Default to 140.
+  
+  QrCode is also supported on viewers with attribute `value`.
+  
+  </details>
+
+* Add support to hide view popup header and footer
+
+  <details>
+  
+  Two new view params are added: `popup.show-header` and `popup.show-footer`.
+  
+  This is for advance use cases where we want to show `custom` views
+  inside a popup with it's own header and footer.
+  
+  </details>
+
+* Introduce help widget `variant` attribute
+
+  <details>
+
+  The help variant is extracted from the `css` attributes values. Now, help widget has a new attribute `variant` that
+  can be used, Accepted values are `info`, `success`, `warning` and `error`. Default value is `info`.
+
+  </details>
+
+#### Change
+
+* Upgrade Gradle from 8.7 to 8.11.1
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded : 
+  
+  - Upgrade ASM from 9.7 to 9.7.1
+  - Upgrade byte-buddy from 1.14.17 to 1.15.10
+  - Upgrade commons-cli from 1.7.0 to 1.9.0
+  - Upgrade commons-csv from 1.11.0 to 1.12.0
+  - Upgrade commons-io from 2.16.1 to 2.18.0
+  - Upgrade GraalJS from 22.0.0.2 to 22.3.5
+  - Upgrade guava from 33.2.1-jre to 33.3.1-jre
+  - Upgrade groovy from 3.0.22 to 3.0.23
+  - Upgrade hazelcast from 5.3.7 to 5.3.8
+  - Upgrade jackson from 2.17.1 to 2.18.2
+  - Upgrade hsqldb JDBC from 2.7.3 to 2.7.4
+  - Upgrade postgresql JDBC from 42.7.3 to 42.7.4
+  - Upgrade jsoup from 1.17.2 to 1.18.3
+  - Upgrade junit5 from 5.10.3 to 5.11.3
+  - Upgrade junit-platform-launcher from 1.10.3 to 1.11.3
+  - Upgrade pac4j from 5.7.5 to 5.7.7
+  - Upgrade Quartz from 2.3.2 to 2.4.0
+  - Upgrade Redisson/Hibernate 5.3.x+ from 3.29.0 to 3.38.1
+  - Upgrade slf4j from 2.0.13 to 2.0.16
+  - Upgrade snakeyaml from 2.2 to 2.3
+  - Upgrade swagger-jaxrs2 from 2.2.22 to 2.2.26
+  - Upgrade tomcat from 9.0.90 to 9.0.97
+  - Upgrade undertow from 2.2.33.Final to 2.2.37.Final
+  - Upgrade woodstox-core from 6.6.2 to 6.7.0
+  - Upgrade xstream from 1.4.20 to 1.4.21
+  
+  </details>
+
+#### Deprecate
+
+* help widget `css` attribute deprecated
+
+  <details>
+  
+  The help variant is extracted from the `css` attributes values. Now, help widget has a new attribute `variant` that
+  can be used, `css` attribute usage to determinate the variant is deprecated.
+  
+  </details>
+
+#### Fix
+
+* Fix switch select widget selection issue
+* Fix number increment/decrement when changing sign
+
+  <details>
+  
+  On number fields, when changing sign, 0.5 was decremented to -1.5 instead of -0.5.
+  
+  </details>
+
+* Add toolbar support in grid details view
+* Fix lost focus on editable grid discard
+* Translate boolean fields values in mail message email
+* Fix gantt line alignment
+
+  <details>
+  
+  The gantt line should be aligned to table task row.
+  
+  </details>
+
+* Display personal name in recipient field of MailMessage form
+* Fix task sequence support in gantt view
+* Fix fetch editor nested related fields
+
+  <details>
+  
+  When any nested field of editor field is defined in form then 
+  it should fetched as editor field instead of form field.
+  
+  </details>
+
+* Fix search emails address in recipient field in MailMessage form by adding current selected emails
+* Format multi-select fields values in mail message
+* Fix focused tab with showIf in panel-tabs
+
+  <details>
+  
+  On a form view, when first tab of panel-tabs contains showIf/hideIf expression,
+  so initially it will be hidden and staring focus will be on tab which doesn't contain
+  showIf/hideIf expression.
+  In this case, it should re-focus active tab to starting tab if starting tab is accessible.
+  
+  </details>
+
+
 ## 7.2.5 (2025-01-08)
 
 #### Feature

@@ -1,5 +1,0 @@
----
-title: Fix number increment/decrement when changing sign
-type: fix
-description: |
-  On number fields, when changing sign, 0.5 was decremented to -1.5 instead of -0.5.

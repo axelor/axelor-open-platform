@@ -1,8 +1,0 @@
----
-title: Add QrCode widget
-type: feature
-description: |
-  This widget provides the ability to display a `string` value as a QR Code in readonly mode.
-  To customize the QrCode size in px, use `height` attribute with a number value. Default to 140.
-
-  QrCode is also supported on viewers with attribute `value`.
