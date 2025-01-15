@@ -12,6 +12,7 @@ import { ClientInfo } from "@/services/client/session";
 
 import logo from "@/assets/axelor.svg";
 import styles from "./login.module.scss";
+import { useAppSettings } from "@/hooks/use-app-settings";
 
 const LOGIN_ENDPOINT = "login";
 const FORCE_CLIENT_PARAM = "force_client";
@@ -185,7 +186,8 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 
 function ServerError({ error }: { error: string }) {
   const { data } = useSession();
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
+  const { name } = useAppSettings();
+  const { logo: appLogo = logo } =
     data?.application ?? {};
 
   return (
@@ -198,7 +200,7 @@ function ServerError({ error }: { error: string }) {
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={appLogo} alt={appName} />
+        <Image className={styles.logo} src={appLogo} alt={name} />
         <Alert mt={3} mb={1} p={2} variant="danger">
           {error}
         </Alert>

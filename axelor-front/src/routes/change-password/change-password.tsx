@@ -11,6 +11,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
@@ -31,6 +32,7 @@ export function ChangePassword({
   passwordPatternTitle?: string;
 }) {
   const session = useSession();
+  const { name, copyright } = useAppSettings();
   const appInfo = session.data;
   const defaultClient = appInfo?.authentication?.defaultClient;
 
@@ -55,14 +57,8 @@ export function ChangePassword({
 
   const requireCurrentPassword = Boolean(username);
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
+  const { logo: appLogo = logo} =
     appInfo?.application || {};
-  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005–${new Date().getFullYear()} Axelor. ${i18n.get(
-    "All Rights Reserved",
-  )}.`;
-
-  const copyright = appLegal || defaultLegal;
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -206,7 +202,7 @@ export function ChangePassword({
           <img
             className={styles.logo}
             src={appLogo}
-            alt={appName}
+            alt={name}
             onError={(e) => {
               e.currentTarget.src = logo;
             }}

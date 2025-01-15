@@ -1,10 +1,7 @@
-import { atom, useAtom } from "jotai";
 import { useCallback, useEffect, useState } from "react";
 
 import { SessionInfo, session } from "@/services/client/session";
 import { useAsync } from "../use-async";
-
-const redirectUrlAtom = atom<string | null>(null);
 
 async function init() {
   let info = session.info;

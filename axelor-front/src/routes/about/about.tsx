@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { Box, Button, Link } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
+import { COPYRIGHT, useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { i18n } from "@/services/client/i18n";
 import { session } from "@/services/client/session";
@@ -16,11 +17,11 @@ import AppLogo from "../../assets/axelor.svg?react";
 export function About() {
   const { info } = session;
   const { application: app, user } = info || { application: {}, user: {} };
-
-  const year = new Date().getFullYear();
+  
   const technical = user?.technical;
 
   const { navigate } = useRoute();
+  const { name, description, copyright } = useAppSettings();
 
   const popupHandlerAtom = usePopupHandlerAtom();
   const { close: closePopup } = useAtomValue(popupHandlerAtom);
@@ -42,14 +43,14 @@ export function About() {
       <Box>
         <Box as={AppLogo} style={{ width: 175, height: 100 }} />
         <h5>
-          {app.name} - {app.description}
+          {name} - {description}
         </h5>
       </Box>
       <div>
         <p>
           {i18n.get("Version")}: {app.version}
         </p>
-        <p>{app.copyright}</p>
+        <p>{copyright}</p>
         <Box d="flex" g={1} flexDirection="column">
           {app.home && <Link href={app.home}>{i18n.get("Home page")}</Link>}
           {app.help && <Link href={app.help}>{i18n.get("Documentation")}</Link>}
@@ -72,7 +73,7 @@ export function About() {
           )}
         </p>
 
-        <p>Copyright (c) 2005-{year} Axelor. All Rights Reserved.</p>
+        <p>{COPYRIGHT}</p>
         <Box d="flex" g={1} flexDirection="column">
           <Link href="https://axelor.com">https://axelor.com</Link>
           <Link

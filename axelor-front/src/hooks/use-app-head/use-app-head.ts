@@ -1,29 +1,25 @@
 import { useEffect } from "react";
 
-import { SessionInfo } from "@/services/client/session";
-import { useSession } from "../use-session";
-
-const NAME = "Axelor";
-const DESC = "Axelor Entreprise Application";
+import { useAppSettings } from "@/hooks/use-app-settings";
 
 export function useAppHead() {
-  const { data: info } = useSession();
+  const { name, description, icon, isReady } = useAppSettings();
   useEffect(() => {
-    if (info) {
-      setTitle(info);
-      setIcon(info);
+    if (isReady) {
+      setTitle(name, description);
+      setIcon(icon);
     }
-  }, [info]);
+  }, [name, description, icon, isReady]);
 }
 
-function setTitle(info: SessionInfo) {
-  const { name = NAME, description = DESC } = info.application ?? {};
+function setTitle(name: string, description: string) {
   document.title = `${name} – ${description}`;
 }
 
-function setIcon(info: SessionInfo) {
-  const icon = info.application.icon;
-  const elem = document.querySelector("head > link[rel='shortcut icon']") as HTMLLinkElement;
+function setIcon(icon: string | undefined) {
+  const elem = document.querySelector(
+    "head > link[rel='shortcut icon']",
+  ) as HTMLLinkElement;
 
   if (icon && elem) {
     elem.href = icon;

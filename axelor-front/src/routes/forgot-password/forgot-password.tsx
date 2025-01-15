@@ -9,6 +9,7 @@ import { Navigate, Link as RouterLink, useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel, Select } from "@axelor/ui";
 
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useSession } from "@/hooks/use-session";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
@@ -22,6 +23,7 @@ export function ForgotPassword() {
   const { state: locationState } = location ?? {};
 
   const session = useSession();
+  const { name, copyright } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { resetPasswordEnabled } = application ?? {};
@@ -31,14 +33,8 @@ export function ForgotPassword() {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertError, setError] = useState(locationState?.error ?? "");
 
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
+  const { logo: appLogo = logo } =
     appInfo?.application || {};
-  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005–${new Date().getFullYear()} Axelor. ${i18n.get(
-    "All Rights Reserved",
-  )}.`;
-
-  const copyright = appLegal || defaultLegal;
 
   const [tenantId, setTenantId] = useState(
     locationState?.tenantId ?? authentication?.tenant,
@@ -125,7 +121,7 @@ export function ForgotPassword() {
           <img
             className={styles.logo}
             src={appLogo}
-            alt={appName}
+            alt={name}
             onError={(e) => {
               e.currentTarget.src = logo;
             }}

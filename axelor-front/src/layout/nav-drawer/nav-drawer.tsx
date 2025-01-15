@@ -4,6 +4,7 @@ import { Badge, clsx, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Icon } from "@/components/icon";
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useMenu } from "@/hooks/use-menu";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
@@ -181,9 +182,10 @@ function Header() {
   const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
   const { open: openTab } = useTabs();
+  const { name } = useAppSettings();
 
   const appHome = data?.user?.action;
-  const { logo: appLogo, name: appName = "logo" } = data?.application ?? {};
+  const { logo: appLogo } = data?.application ?? {};
 
   const onLogoClick = useCallback(() => {
     if (appHome) {
@@ -202,20 +204,19 @@ function Header() {
         })}
         onClick={onLogoClick}
       >
-        {appLogo ? <img src={appLogo} alt={appName} /> : <AppLogo />}
+        {appLogo ? <img src={appLogo} alt={name} /> : <AppLogo />}
       </div>
     </div>
   );
 }
 
 function HeaderSmall() {
-  const { data } = useSession();
-  const { icon: appIcon, name: appName = "icon" } = data?.application ?? {};
+  const { name, icon } = useAppSettings();
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
-        {appIcon ? (
-          <img src={appIcon} alt={appName} />
+        {icon ? (
+          <img src={icon} alt={name} />
         ) : (
           <AppIcon viewBox="0 0 241 228" />
         )}

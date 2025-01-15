@@ -11,6 +11,7 @@ import {
 } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
 import {
@@ -26,8 +27,6 @@ import { TextLink as Link } from "../text-link";
 
 import defaultLogo from "@/assets/axelor.svg";
 import styles from "./login-form.module.scss";
-
-const YEAR = new Date().getFullYear();
 
 export type LoginFormProps = {
   onSuccess?: (info: SessionInfo) => void;
@@ -53,6 +52,7 @@ export function LoginForm({
   const { navigate } = useRoute();
 
   const session = useSession();
+  const { name: appName, copyright } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { signIn } = application ?? {};
@@ -135,11 +135,8 @@ export function LoginForm({
       ],
     );
 
-  const {
-    logo: appLogo = defaultLogo,
-    name: appName = "Axelor",
-    resetPasswordEnabled,
-  } = appInfo?.application || {};
+  const { logo: appLogo = defaultLogo, resetPasswordEnabled } =
+    appInfo?.application || {};
   const {
     logo: signInLogo = appLogo,
     title: signInTitle,
@@ -210,13 +207,6 @@ export function LoginForm({
     requestLogin(currentClient);
     return <Reconnecting />;
   }
-
-  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005–${YEAR} Axelor. ${i18n.get(
-    "All Rights Reserved",
-  )}.`;
-
-  const copyright = appLegal || defaultLegal;
 
   let errorText;
   if (showError) {
