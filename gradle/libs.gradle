@@ -232,6 +232,7 @@ libs.buji_pac4j = [
   dependencies.create("io.buji:buji-pac4j:${versions.buji_pac4j}") {
       exclude group: 'org.apache.shiro', module: 'shiro-web'
       exclude group: 'org.pac4j', module: 'pac4j-javaee'
+      exclude group: 'org.projectlombok', module: 'lombok'
   },
   "org.pac4j:jakartaee-pac4j:${versions.jakartaee_pac4j}",
   dependencies.create("org.pac4j:pac4j-jakartaee:${versions.pac4j}") {
