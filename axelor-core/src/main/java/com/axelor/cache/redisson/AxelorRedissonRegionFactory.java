@@ -38,7 +38,7 @@ public class AxelorRedissonRegionFactory extends RedissonRegionFactory {
 
   static RedissonClient getRedissonClientFromConfig() {
     return CacheConfig.getHibernateCacheProvider()
-        .map(provider -> RedissonClientProvider.getInstance().get(provider.getConfigPath()))
+        .map(provider -> RedissonClientProvider.getInstance().get(provider))
         .orElseThrow(() -> new IllegalStateException("Hibernate cache provider not configured"));
   }
 }

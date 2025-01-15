@@ -482,21 +482,53 @@ It requires https://github.com/redis/redis/releases/tag/7.4-rc1[Redis 7.4+] and 
 
 For global cache configuration, using one of those names will use the appropriate internal customized providers for each component for optimal usage (such as reusing the same Redisson instance).
 
-In the case of component specific configurations (Hibernate, Shiro), you also have the option to specify the provider as fully-qualified class name in case you have custom requirements. For Hibernate, it can be either a `org.hibernate.cache.spi.RegionFactory` or `javax.cache.spi.CachingProvider` for JCache usage. For Shiro, it should be a `javax.cache.spi.CachingProvider` for JCache usage only.
+In the case of component-specific configurations (Hibernate, Shiro), you also have the option to specify the provider as fully-qualified class name in case you have custom requirements. For Hibernate, it can be either a `org.hibernate.cache.spi.RegionFactory` or `javax.cache.spi.CachingProvider` for JCache usage. For Shiro, it should be a `javax.cache.spi.CachingProvider` for JCache usage only.
 
 When using Caffeine, there is no cache provider configuration to provide.
 
-When using Redisson, you can provide a configuration file (defaults to `redisson.yaml`) via the `.config.path`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
+When using Redisson, there are two ways to provide Redisson configuration:
 
-Example minimal Redisson configuration file:
+1) Specify the path to a configuration file (defaults to `redisson.yaml`).
+Use `application.cache.config.path` for application-global cache configuration file, `application.cache.hibernate.config.path` for Hibernate-specific cache configuration file, and `application.cache.shiro.config.path` for Shiro-specific cache configuration file.
+Make sure your configuration file exists either in classpath or on file system.
+
+Example Redisson configuration file `redisson.yaml`:
 
 [source,yaml]
 ----
 singleServerConfig:
-  address: "redis://localhost:6379"
+  address: "redis://127.0.0.1:6379"
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
+threads: 16
+nettyThreads: 32
+codec: !<org.redisson.codec.SerializationCodec> {}
 ----
 
-See https://redisson.org/docs/configuration/#using-yaml[Redisson configuration documentation] for details about Redisson configuration.
+2) Specify the configuration values directly within `axelor-config.properties`.
+Use `application.cache.config.` prefix for application-global cache configuration, `application.cache.hibernate.config.` prefix for Hibernate-specific cache configuration, and `application.cache.shiro.config.` prefix for Shiro-specific cache configuration.
+Configuration sub-keys are used to programmatically set the Redisson configuration via Java reflection.
+The syntax for values differs slightly from the YAML Redisson configuration file, such as using comma-separated strings for lists and plain fully-qualified class names for bean instances.
+
+Example embedded Redisson configuration:
+
+[source,properties]
+----
+application.cache.config.single-server-config.address = redis://127.0.0.1:6379
+application.cache.config.single-server-config.idle-connection-timeout = 10000
+application.cache.config.single-server-config.connect-timeout = 10000
+application.cache.config.single-server-config.timeout = 3000
+application.cache.config.single-server-config.retry-attempts = 3
+application.cache.config.single-server-config.retry-interval = 1500
+application.cache.config.threads = 16
+application.cache.config.netty-threads = 32
+application.cache.config.codec = org.redisson.codec.SerializationCodec
+----
+
+See https://redisson.org/docs/configuration/[Redisson configuration documentation] for details about Redisson configuration.
 
 == Global Context Configuration
 

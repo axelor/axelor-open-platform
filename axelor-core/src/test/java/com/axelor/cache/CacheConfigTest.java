@@ -20,6 +20,8 @@ package com.axelor.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
@@ -52,15 +54,15 @@ class CacheConfigTest {
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", appCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", appCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson.yaml", appCacheProvider.get().getConfig().get("path"));
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", hibernateCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson.yaml", hibernateCacheProvider.get().getConfig().get("path"));
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", shiroCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson.yaml", shiroCacheProvider.get().getConfig().get("path"));
   }
 
   @Test
@@ -74,7 +76,7 @@ class CacheConfigTest {
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfig().get("path"));
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertFalse(shiroCacheProvider.isPresent());
@@ -93,7 +95,7 @@ class CacheConfigTest {
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfig().get("path"));
   }
 
   @Test
@@ -106,15 +108,15 @@ class CacheConfigTest {
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", appCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", appCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson.yaml", appCacheProvider.get().getConfig().get("path"));
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfig().get("path"));
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfigPath().get());
+    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfig().get("path"));
   }
 
   @Test
@@ -123,7 +125,7 @@ class CacheConfigTest {
 
     var provider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", provider.get().getProvider());
-    assertFalse(provider.get().getConfigPath().isPresent());
+    assertTrue(provider.get().getConfig().isEmpty());
   }
 
   @Test
@@ -132,5 +134,34 @@ class CacheConfigTest {
 
     var provider = CacheConfig.getAppCacheProvider();
     assertFalse(provider.isPresent());
+  }
+
+  @Test
+  void testAppCacheEmbeddedConfig() {
+    final var singleServerAddressKey = "singleServerConfig.address";
+    final var singleServerAddress = "redis://127.0.0.1:6379";
+
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_PROVIDER, "redisson");
+    setProperty(
+        AvailableAppSettings.APPLICATION_CACHE_CONFIG_PREFIX + singleServerAddressKey,
+        singleServerAddress);
+
+    var appCacheProvider = CacheConfig.getAppCacheProvider();
+    assertEquals("redisson", appCacheProvider.get().getProvider());
+    assertEquals(
+        singleServerAddress, appCacheProvider.get().getConfig().get(singleServerAddressKey));
+    assertNull(appCacheProvider.get().getConfig().get("path"));
+
+    var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
+    assertEquals("redisson", hibernateCacheProvider.get().getProvider());
+    assertEquals(
+        singleServerAddress, hibernateCacheProvider.get().getConfig().get(singleServerAddressKey));
+    assertNull(hibernateCacheProvider.get().getConfig().get("path"));
+
+    var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
+    assertEquals("redisson", shiroCacheProvider.get().getProvider());
+    assertEquals(
+        singleServerAddress, shiroCacheProvider.get().getConfig().get(singleServerAddressKey));
+    assertNull(shiroCacheProvider.get().getConfig().get("path"));
   }
 }

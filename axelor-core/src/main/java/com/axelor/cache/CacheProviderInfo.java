@@ -19,7 +19,8 @@
 package com.axelor.cache;
 
 import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Map;
 import javax.cache.spi.CachingProvider;
 
 /**
@@ -30,24 +31,29 @@ import javax.cache.spi.CachingProvider;
 public class CacheProviderInfo {
 
   private final String provider;
-  private final Optional<String> config;
+  private final Map<String, String> config;
+  private final String configPrefix;
 
-  public CacheProviderInfo(String provider, Optional<String> config) {
+  public CacheProviderInfo(String provider, Map<String, String> config, String configPrefix) {
     this.provider = provider;
     this.config = config;
+    this.configPrefix = configPrefix;
   }
 
   public CacheProviderInfo(String provider) {
-    this.provider = provider;
-    this.config = Optional.empty();
+    this(provider, Collections.emptyMap(), "");
   }
 
   public String getProvider() {
     return provider;
   }
 
-  public Optional<String> getConfigPath() {
+  public Map<String, String> getConfig() {
     return config;
+  }
+
+  public String getConfigPrefix() {
+    return configPrefix;
   }
 
   public Class<? extends CachingProvider> getCachingProvider() {

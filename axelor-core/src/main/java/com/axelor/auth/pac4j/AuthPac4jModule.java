@@ -212,9 +212,10 @@ public class AuthPac4jModule extends ShiroWebModule {
       config.setExpireAfterAccess(OptionalLong.of(sessionTimeoutMinutes * 60_000_000_000L));
       cacheConfig = config;
     } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
-      final var configPath =
-          CacheConfig.getShiroCacheProvider().flatMap(CacheProviderInfo::getConfigPath);
-      final var redisson = RedissonClientProvider.getInstance().get(configPath);
+      final var provider =
+          CacheConfig.getShiroCacheProvider()
+              .orElseThrow(() -> new IllegalStateException("Shiro cache provider not configured"));
+      final var redisson = RedissonClientProvider.getInstance().get(provider);
       cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
     } else {
       cacheConfig = jCacheConfig;

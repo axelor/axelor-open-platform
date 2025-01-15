@@ -18,8 +18,11 @@
  */
 package com.axelor.cache.redisson;
 
+import com.axelor.app.settings.BeanConfigurator;
+import com.axelor.cache.CacheProviderInfo;
 import com.axelor.cache.redisson.RedissonUtils.Version;
 import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -27,7 +30,9 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -65,16 +70,21 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
 
   @Override
   public RedissonClient get() {
-    return get(Optional.empty());
+    return get(Collections.emptyMap(), "");
   }
 
-  public RedissonClient get(Optional<String> configPath) {
-    var path = configPath.orElse(DEFAULT_CONFIG_PATH);
-    return redissonClients.computeIfAbsent(path, this::createRedissonClient);
+  public RedissonClient get(CacheProviderInfo info) {
+    return get(info.getConfig(), info.getConfigPrefix());
   }
 
-  protected RedissonClient createRedissonClient() {
-    return createRedissonClient(DEFAULT_CONFIG_PATH);
+  public RedissonClient get(Map<String, String> config, String prefix) {
+    var path = config.isEmpty() ? DEFAULT_CONFIG_PATH : config.get("path");
+
+    if (StringUtils.notBlank(path)) {
+      return redissonClients.computeIfAbsent(path, this::createRedissonClient);
+    }
+
+    return redissonClients.computeIfAbsent(prefix, k -> createRedissonClient(config, prefix));
   }
 
   protected RedissonClient createRedissonClient(String path) {
@@ -97,6 +107,15 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
       throw new UncheckedIOException(e);
     }
 
+    return createRedissonClient(config, path);
+  }
+
+  protected RedissonClient createRedissonClient(Map<String, String> properties, String prefix) {
+    var config = createConfig(properties);
+    return createRedissonClient(config, prefix + "*");
+  }
+
+  protected RedissonClient createRedissonClient(Config config, String configSource) {
     // Use AxelorKryo5Codec as default codec instead of Kryo5Codec.
     if (config.getCodec() == null) {
       config.setCodec(new AxelorKryo5Codec());
@@ -106,7 +125,9 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     Runtime.getRuntime().addShutdownHook(new Thread(redisson::shutdown));
 
     log.atInfo()
-        .setMessage("Connected to {} on {}")
+        .setMessage("{} connected to {} on {}")
+        .addArgument(
+            () -> "Redisson" + (StringUtils.notBlank(configSource) ? ":" + configSource : ""))
         .addArgument(
             () -> {
               String name;
@@ -131,5 +152,58 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
         .log();
 
     return redisson;
+  }
+
+  protected Config createConfig(Map<String, String> properties) {
+    var config = new Config();
+
+    // Group properties into server and non-server configs
+    var groupedConfigs =
+        properties.entrySet().stream()
+            .collect(
+                Collectors.partitioningBy(
+                    e -> {
+                      var key = e.getKey();
+                      var parts = key.split("\\.", 2);
+                      return parts.length > 1 && parts[0].toLowerCase().endsWith("config");
+                    }));
+
+    // Gather server configs
+    var serverConfigs =
+        groupedConfigs.get(true).stream()
+            .collect(
+                Collectors.groupingBy(
+                    entry -> entry.getKey().split("\\.", 2)[0],
+                    Collectors.toMap(entry -> entry.getKey().split("\\.", 2)[1], Entry::getValue)));
+
+    // Handle server configs
+    serverConfigs.forEach(
+        (type, serverSettings) -> {
+          var serverConfig =
+              switch (type.toLowerCase()) {
+                case String s when s.startsWith("single") -> config.useSingleServer();
+                case String s when s.startsWith("master") -> config.useMasterSlaveServers();
+                case String s when s.startsWith("cluster") -> config.useClusterServers();
+                case String s when s.startsWith("sentinel") -> config.useSentinelServers();
+                case String s when s.startsWith("replicated") -> config.useReplicatedServers();
+                default -> null;
+              };
+
+          if (serverConfig == null) {
+            log.error("Unsupported server config: {}", type);
+            return;
+          }
+
+          // Set properties for the server config
+          serverSettings.forEach(
+              (key, value) -> BeanConfigurator.setField(serverConfig, key, value));
+        });
+
+    // Set properties for the non-server configs
+    groupedConfigs
+        .get(false)
+        .forEach(entry -> BeanConfigurator.setField(config, entry.getKey(), entry.getValue()));
+
+    return config;
   }
 }

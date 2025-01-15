@@ -22,8 +22,11 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Cache configuration
@@ -44,34 +47,59 @@ public class CacheConfig {
         .map(
             provider ->
                 new CacheProviderInfo(
-                    provider, getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH)));
+                    provider,
+                    getSettings(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PREFIX),
+                    AvailableAppSettings.APPLICATION_CACHE_CONFIG_PREFIX));
   }
 
   public static Optional<CacheProviderInfo> getHibernateCacheProvider() {
     return getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_PROVIDER)
         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_PROVIDER))
         .map(
-            provider ->
-                new CacheProviderInfo(
-                    provider,
-                    getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG_PATH)
-                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH))));
+            provider -> {
+              var prefix = AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG_PREFIX;
+              var config = getSettings(prefix);
+
+              if (config.isEmpty()) {
+                prefix = AvailableAppSettings.APPLICATION_CACHE_CONFIG_PREFIX;
+                config = getSettings(prefix);
+              }
+
+              return new CacheProviderInfo(provider, config, prefix);
+            });
   }
 
   public static Optional<CacheProviderInfo> getShiroCacheProvider() {
     return getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_PROVIDER)
         .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_PROVIDER))
         .map(
-            provider ->
-                new CacheProviderInfo(
-                    provider,
-                    getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG_PATH)
-                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH))));
+            provider -> {
+              var prefix = AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG_PREFIX;
+              var config = getSettings(prefix);
+
+              if (config.isEmpty()) {
+                prefix = AvailableAppSettings.APPLICATION_CACHE_CONFIG_PREFIX;
+                config = getSettings(prefix);
+              }
+
+              return new CacheProviderInfo(provider, config, prefix);
+            });
   }
 
   protected static Optional<String> getSetting(String key) {
     return Optional.ofNullable(AppSettings.get().get(key))
         .filter(StringUtils::notBlank)
         .filter(filterDefault);
+  }
+
+  protected static Map<String, String> getSettings(String keyPrefix) {
+    return stripKeyPrefix(AppSettings.get().getPropertiesStartingWith(keyPrefix), keyPrefix);
+  }
+
+  private static <V> Map<String, V> stripKeyPrefix(Map<String, V> map, String prefix) {
+    return map.entrySet().stream()
+        .collect(
+            Collectors.toUnmodifiableMap(
+                entry -> entry.getKey().substring(prefix.length()), Entry::getValue));
   }
 }
