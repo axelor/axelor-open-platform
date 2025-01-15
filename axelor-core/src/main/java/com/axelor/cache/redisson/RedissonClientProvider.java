@@ -48,7 +48,7 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
 
   private final ConcurrentMap<String, RedissonClient> redissonClients = new ConcurrentHashMap<>();
 
-  private static final String DEFAULT_CONFIG = "redisson.yaml";
+  private static final String DEFAULT_CONFIG_PATH = "redisson.yaml";
 
   private final RedissonUtils redissonUtils;
 
@@ -68,13 +68,13 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     return get(Optional.empty());
   }
 
-  public RedissonClient get(Optional<String> config) {
-    var path = config.orElse(DEFAULT_CONFIG);
+  public RedissonClient get(Optional<String> configPath) {
+    var path = configPath.orElse(DEFAULT_CONFIG_PATH);
     return redissonClients.computeIfAbsent(path, this::createRedissonClient);
   }
 
   protected RedissonClient createRedissonClient() {
-    return createRedissonClient(DEFAULT_CONFIG);
+    return createRedissonClient(DEFAULT_CONFIG_PATH);
   }
 
   protected RedissonClient createRedissonClient(String path) {

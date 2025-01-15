@@ -46,7 +46,7 @@ public class CacheProviderInfo {
     return provider;
   }
 
-  public Optional<String> getConfig() {
+  public Optional<String> getConfigPath() {
     return config;
   }
 

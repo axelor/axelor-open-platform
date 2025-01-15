@@ -48,32 +48,33 @@ class CacheConfigTest {
   @Test
   void testAppCacheConfig() {
     setProperty(AvailableAppSettings.APPLICATION_CACHE_PROVIDER, "redisson");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG, "redisson.yaml");
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH, "redisson.yaml");
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", appCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", appCacheProvider.get().getConfig().get());
+    assertEquals("redisson.yaml", appCacheProvider.get().getConfigPath().get());
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", hibernateCacheProvider.get().getConfig().get());
+    assertEquals("redisson.yaml", hibernateCacheProvider.get().getConfigPath().get());
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", shiroCacheProvider.get().getConfig().get());
+    assertEquals("redisson.yaml", shiroCacheProvider.get().getConfigPath().get());
   }
 
   @Test
   void testHibernateCacheConfig() {
     setProperty(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_PROVIDER, "redisson");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG, "redisson-hibernate.yaml");
+    setProperty(
+        AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG_PATH, "redisson-hibernate.yaml");
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertFalse(appCacheProvider.isPresent());
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfig().get());
+    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfigPath().get());
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertFalse(shiroCacheProvider.isPresent());
@@ -82,7 +83,7 @@ class CacheConfigTest {
   @Test
   void testShiroCacheConfig() {
     setProperty(AvailableAppSettings.APPLICATION_CACHE_SHIRO_PROVIDER, "redisson");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG, "redisson-shiro.yaml");
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG_PATH, "redisson-shiro.yaml");
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertFalse(appCacheProvider.isPresent());
@@ -92,27 +93,28 @@ class CacheConfigTest {
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfig().get());
+    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfigPath().get());
   }
 
   @Test
   void testOverridesCacheConfig() {
     setProperty(AvailableAppSettings.APPLICATION_CACHE_PROVIDER, "redisson");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG, "redisson.yaml");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG, "redisson-hibernate.yaml");
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG, "redisson-shiro.yaml");
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH, "redisson.yaml");
+    setProperty(
+        AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG_PATH, "redisson-hibernate.yaml");
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG_PATH, "redisson-shiro.yaml");
 
     var appCacheProvider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", appCacheProvider.get().getProvider());
-    assertEquals("redisson.yaml", appCacheProvider.get().getConfig().get());
+    assertEquals("redisson.yaml", appCacheProvider.get().getConfigPath().get());
 
     var hibernateCacheProvider = CacheConfig.getHibernateCacheProvider();
     assertEquals("redisson", hibernateCacheProvider.get().getProvider());
-    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfig().get());
+    assertEquals("redisson-hibernate.yaml", hibernateCacheProvider.get().getConfigPath().get());
 
     var shiroCacheProvider = CacheConfig.getShiroCacheProvider();
     assertEquals("redisson", shiroCacheProvider.get().getProvider());
-    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfig().get());
+    assertEquals("redisson-shiro.yaml", shiroCacheProvider.get().getConfigPath().get());
   }
 
   @Test
@@ -121,12 +123,12 @@ class CacheConfigTest {
 
     var provider = CacheConfig.getAppCacheProvider();
     assertEquals("redisson", provider.get().getProvider());
-    assertFalse(provider.get().getConfig().isPresent());
+    assertFalse(provider.get().getConfigPath().isPresent());
   }
 
   @Test
   void testMissingProvider() {
-    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG, "config.yaml");
+    setProperty(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH, "config.yaml");
 
     var provider = CacheConfig.getAppCacheProvider();
     assertFalse(provider.isPresent());

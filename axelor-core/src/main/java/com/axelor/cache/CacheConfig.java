@@ -44,7 +44,7 @@ public class CacheConfig {
         .map(
             provider ->
                 new CacheProviderInfo(
-                    provider, getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG)));
+                    provider, getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH)));
   }
 
   public static Optional<CacheProviderInfo> getHibernateCacheProvider() {
@@ -54,8 +54,8 @@ public class CacheConfig {
             provider ->
                 new CacheProviderInfo(
                     provider,
-                    getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG)
-                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG))));
+                    getSetting(AvailableAppSettings.APPLICATION_CACHE_HIBERNATE_CONFIG_PATH)
+                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH))));
   }
 
   public static Optional<CacheProviderInfo> getShiroCacheProvider() {
@@ -65,8 +65,8 @@ public class CacheConfig {
             provider ->
                 new CacheProviderInfo(
                     provider,
-                    getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG)
-                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG))));
+                    getSetting(AvailableAppSettings.APPLICATION_CACHE_SHIRO_CONFIG_PATH)
+                        .or(() -> getSetting(AvailableAppSettings.APPLICATION_CACHE_CONFIG_PATH))));
   }
 
   protected static Optional<String> getSetting(String key) {

@@ -213,7 +213,7 @@ public class AuthPac4jModule extends ShiroWebModule {
       cacheConfig = config;
     } else if (cachingProvider instanceof org.redisson.jcache.JCachingProvider) {
       final var configPath =
-          CacheConfig.getShiroCacheProvider().flatMap(CacheProviderInfo::getConfig);
+          CacheConfig.getShiroCacheProvider().flatMap(CacheProviderInfo::getConfigPath);
       final var redisson = RedissonClientProvider.getInstance().get(configPath);
       cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
     } else {

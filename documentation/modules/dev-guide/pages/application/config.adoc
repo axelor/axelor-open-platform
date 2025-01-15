@@ -456,17 +456,17 @@ The cache configuration allows to override those defaults, and is done through t
 # Global cache provider: default/caffeine/redisson/redisson-native
 application.cache.provider = redisson
 # Global cache configuration for specified provider (if required by provider): either on filesystem or resource in classpath
-application.cache.config = redisson.yaml
+application.cache.config.path = redisson.yaml
 
 # Hibernate-specific cache configuration (takes precedence over global cache configuration)
 # ~~~~~
 #application.cache.hibernate.provider = redisson
-#application.cache.hibernate.config = redisson.yaml
+#application.cache.hibernate.config.path = redisson.yaml
 
 # Shiro-specific cache configuration (takes precedence over global cache configuration)
 # ~~~~~
 #application.cache.shiro.provider = redisson
-#application.cache.shiro.config = redisson.yaml
+#application.cache.shiro.config.path = redisson.yaml
 ----
 
 The cache configuration currently supports these providers:
@@ -486,7 +486,7 @@ In the case of component specific configurations (Hibernate, Shiro), you also ha
 
 When using Caffeine, there is no cache provider configuration to provide.
 
-When using Redisson, you can provide a configuration file (defaults to `redisson.yaml`) via the `.config`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
+When using Redisson, you can provide a configuration file (defaults to `redisson.yaml`) via the `.config.path`-suffixed property that specifies the Redis connection details. Make sure your configuration file exists either in classpath or on file system.
 
 Example minimal Redisson configuration file:
 

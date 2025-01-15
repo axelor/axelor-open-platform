@@ -68,11 +68,11 @@ public interface AvailableAppSettings {
   String APPLICATION_RESET_PASSWORD_MAX_AGE = "application.reset-password.max-age";
 
   String APPLICATION_CACHE_PROVIDER = "application.cache.provider";
-  String APPLICATION_CACHE_CONFIG = "application.cache.config";
+  String APPLICATION_CACHE_CONFIG_PATH = "application.cache.config.path";
   String APPLICATION_CACHE_HIBERNATE_PROVIDER = "application.cache.hibernate.provider";
-  String APPLICATION_CACHE_HIBERNATE_CONFIG = "application.cache.hibernate.config";
+  String APPLICATION_CACHE_HIBERNATE_CONFIG_PATH = "application.cache.hibernate.config.path";
   String APPLICATION_CACHE_SHIRO_PROVIDER = "application.cache.shiro.provider";
-  String APPLICATION_CACHE_SHIRO_CONFIG = "application.cache.shiro.config";
+  String APPLICATION_CACHE_SHIRO_CONFIG_PATH = "application.cache.shiro.config.path";
 
   String VIEW_SINGLE_TAB = "view.single-tab";
   String VIEW_TABS_MAX = "view.max-tabs";
