@@ -621,6 +621,14 @@ const FormContainer = memo(function FormContainer({
     ),
   );
 
+  const doValidate = useCallback(async () => {
+    const errors = getErrors();
+    if (errors) {
+      showErrors(errors);
+      return Promise.reject();
+    }
+  }, [getErrors]);
+
   /**
    * Handle the form save. This includes 3 parts:
    * <ul>
@@ -662,11 +670,8 @@ const FormContainer = memo(function FormContainer({
           handleErrors = false,
         } = options ?? {};
         const formState = get(formAtom);
-        const errors = getErrors();
-        if (errors) {
-          showErrors(errors);
-          return Promise.reject();
-        }
+
+        await doValidate();
 
         const { record } = formState;
         const fieldNames = Object.keys(meta.fields ?? {});
@@ -740,7 +745,6 @@ const FormContainer = memo(function FormContainer({
       },
       [
         formAtom,
-        getErrors,
         meta.fields,
         meta.related,
         onSaveAction,
@@ -749,6 +753,7 @@ const FormContainer = memo(function FormContainer({
         actionExecutor,
         doRead,
         doEdit,
+        doValidate,
         readonly,
       ],
     ),
@@ -836,24 +841,7 @@ const FormContainer = memo(function FormContainer({
       ),
     ),
   );
-  actionHandler.setValidateHandler(
-    useAtomCallback(
-      useCallback(
-        async (get) => {
-          const { record } = get(formAtom);
-          const { id = 0, version = 0 } = record;
-          if (id === null || version === null || id <= 0) return;
-          if (await dataStore.verify({ id, version })) return;
-          throw new Error(
-            i18n.get(
-              "The record has been updated or deleted by another action.",
-            ),
-          );
-        },
-        [dataStore, formAtom],
-      ),
-    ),
-  );
+  actionHandler.setValidateHandler(doValidate);
 
   const onDelete = useAtomCallback(
     useCallback(
