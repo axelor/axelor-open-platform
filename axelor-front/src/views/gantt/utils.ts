@@ -28,6 +28,7 @@ const transformKeys: Record<string, string> = {
 export function formatRecord(view: GanttView, record: DataRecord) {
   const values: DataRecord = {
     data: record,
+    id: record.id,
   };
 
   if (view.taskUser && record[view.taskUser]) {
@@ -44,9 +45,9 @@ export function formatRecord(view: GanttView, record: DataRecord) {
   return {
     ...omit(
       record,
-      Object.keys(transformKeys).map(
-        (k) => view[k as keyof GanttView] as string,
-      ),
+      Object.keys(transformKeys)
+        .map((k) => view[k as keyof GanttView] as string)
+        .filter(Boolean) as string[],
     ),
     ...formattedValues,
   } as DataRecord;
@@ -59,8 +60,8 @@ export function transformRecord(view: GanttView, record: DataRecord) {
     ...omit(record, [...keys, "data", "$color"]),
     ...Object.keys(transformKeys).reduce((vals, k) => {
       const viewKey = view[k as keyof GanttView] as string;
-      if (viewKey) {
-        const valueKey = transformKeys[k];
+      const valueKey = transformKeys[k];
+      if (viewKey && record[valueKey] !== undefined) {
         return { ...vals, [viewKey]: record[valueKey] };
       }
       return vals;
