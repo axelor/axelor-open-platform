@@ -19,9 +19,12 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import org.redisson.api.RMapCache;
+import org.redisson.api.map.event.MapEntryListener;
 
 /**
  * Redisson cache with scripted eviction
@@ -42,6 +45,8 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
   private long maxIdleTime;
 
   private TimeUnit maxIdleTimeUnit;
+
+  private Set<Integer> listenerIds = ConcurrentHashMap.newKeySet();
 
   public RedissonCache(RMapCache<K, V> cache) {
     this.cache = cache;
@@ -84,6 +89,11 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
 
   @Override
   public void close() {
+    if (!listenerIds.isEmpty()) {
+      listenerIds.forEach(cache::removeListener);
+      listenerIds.clear();
+    }
+
     cache.destroy();
   }
 
@@ -95,5 +105,17 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
   @Override
   public ConcurrentMap<K, V> asMap() {
     return cache;
+  }
+
+  public int addListener(MapEntryListener listener) {
+    var listenerId = cache.addListener(listener);
+    listenerIds.add(listenerId);
+
+    return listenerId;
+  }
+
+  public void removeListener(int listenerId) {
+    cache.removeListener(listenerId);
+    listenerIds.remove(listenerId);
   }
 }

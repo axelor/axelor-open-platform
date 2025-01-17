@@ -19,7 +19,13 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.event.RemovalCause;
 import org.redisson.api.RMapCache;
+import org.redisson.api.map.event.EntryEvent;
+import org.redisson.api.map.event.EntryExpiredListener;
+import org.redisson.api.map.event.EntryRemovedListener;
+import org.redisson.api.map.event.EntryUpdatedListener;
 import org.redisson.api.options.MapCacheOptions;
 
 /**
@@ -37,6 +43,10 @@ public class RedissonCacheBuilder<K, V>
     super(cacheName);
   }
 
+  public RedissonCacheBuilder(CacheBuilder<K, V> builder) {
+    super(builder);
+  }
+
   @Override
   protected MapCacheOptions<K, V> newOptions() {
     return MapCacheOptions.<K, V>name(getCacheName());
@@ -50,5 +60,41 @@ public class RedissonCacheBuilder<K, V>
   @Override
   protected RedissonCache<K, V> newRedissonCache(RMapCache<K, V> cache) {
     return new RedissonCache<>(cache);
+  }
+
+  @Override
+  protected void configureCache(ConfigurableRedissonCache<K, V> cache) {
+    super.configureCache(cache);
+    var redissonCache = (RedissonCache<K, V>) cache;
+    var removalListener = getRemovalListener();
+
+    if (removalListener != null) {
+      redissonCache.addListener(
+          (EntryRemovedListener<K, V>)
+              event ->
+                  removalListener.onRemoval(
+                      event.getKey(), event.getValue(), toRemovalCause(event)));
+
+      redissonCache.addListener(
+          (EntryUpdatedListener<K, V>)
+              event ->
+                  removalListener.onRemoval(
+                      event.getKey(), event.getOldValue(), toRemovalCause(event)));
+
+      redissonCache.addListener(
+          (EntryExpiredListener<K, V>)
+              event ->
+                  removalListener.onRemoval(
+                      event.getKey(), event.getValue(), toRemovalCause(event)));
+    }
+  }
+
+  protected RemovalCause toRemovalCause(EntryEvent<K, V> event) {
+    return switch (event.getType()) {
+      case REMOVED -> RemovalCause.REMOVED;
+      case UPDATED -> RemovalCause.REPLACED;
+      case EXPIRED -> RemovalCause.EXPIRED;
+      case CREATED -> throw new UnsupportedOperationException();
+    };
   }
 }

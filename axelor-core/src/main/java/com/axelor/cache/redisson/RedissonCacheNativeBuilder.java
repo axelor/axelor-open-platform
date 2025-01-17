@@ -19,6 +19,8 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.event.RemovalListener;
 import org.redisson.api.RMapCacheNative;
 import org.redisson.api.options.MapOptions;
 
@@ -53,5 +55,15 @@ public class RedissonCacheNativeBuilder<K, V>
   @Override
   protected RedissonCacheNative<K, V> newRedissonCache(RMapCacheNative<K, V> cache) {
     return new RedissonCacheNative<>(cache);
+  }
+
+  /**
+   * Not supported with native eviction. When removal listener is set, fall back to {@link
+   * RedissonCacheBuilder}.
+   */
+  @Override
+  public CacheBuilder<K, V> removalListener(RemovalListener<K, V> removalListener) {
+    super.removalListener(removalListener);
+    return removalListener != null ? new RedissonCacheBuilder<>(this) : this;
   }
 }

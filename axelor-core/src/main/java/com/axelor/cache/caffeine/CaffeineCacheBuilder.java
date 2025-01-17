@@ -20,6 +20,7 @@ package com.axelor.cache.caffeine;
 
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.event.RemovalCause;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -85,9 +86,26 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
       builder.weakValues();
     }
 
+    var removalListener = getRemovalListener();
+
+    if (removalListener != null) {
+      builder.<K, V>removalListener(
+          (key, value, cause) -> removalListener.onRemoval(key, value, toRemovalCause(cause)));
+    }
+
     @SuppressWarnings("unchecked")
     var caffeine = (Caffeine<K, V>) builder;
 
     return caffeine;
+  }
+
+  protected RemovalCause toRemovalCause(com.github.benmanes.caffeine.cache.RemovalCause cause) {
+    return switch (cause) {
+      case EXPLICIT -> RemovalCause.REMOVED;
+      case REPLACED -> RemovalCause.REPLACED;
+      case COLLECTED -> RemovalCause.REMOVED;
+      case EXPIRED -> RemovalCause.EXPIRED;
+      case SIZE -> RemovalCause.REMOVED;
+    };
   }
 }

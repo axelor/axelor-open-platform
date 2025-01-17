@@ -78,4 +78,9 @@ public class CaffeineCache<K, V> implements AxelorCache<K, V> {
   public void close() {
     cache.cleanUp();
   }
+
+  @Override
+  public void cleanUp() {
+    cache.cleanUp();
+  }
 }

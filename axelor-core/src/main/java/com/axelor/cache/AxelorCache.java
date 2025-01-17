@@ -110,4 +110,12 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
   default void close() {
     // Do nothing by default
   }
+
+  /**
+   * Performs any pending maintenance operations needed by the cache. Exactly which activities are
+   * performed -- if any -- is implementation-dependent.
+   */
+  default void cleanUp() {
+    // Do nothing by default
+  }
 }

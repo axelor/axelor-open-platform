@@ -25,12 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
+import com.axelor.cache.event.RemovalCause;
 import com.axelor.cache.redisson.RedissonCacheBuilder;
 import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
 import com.axelor.common.Inflector;
 import com.axelor.test.GuiceJunit5Test;
 import com.axelor.test.GuiceModules;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterAll;
@@ -117,6 +121,12 @@ class CacheBuilderTest extends GuiceJunit5Test {
   @EnumSource(CacheType.class)
   void testMapOperations(CacheType cacheType) {
     doMapOperations(cacheType.getFactory());
+  }
+
+  @ParameterizedTest(name = "{0} - Removal Listener Operations")
+  @EnumSource(value = CacheType.class)
+  void testRemovalListenerOperations(CacheType cacheType) {
+    doRemovalListenerOperations(cacheType.getFactory());
   }
 
   private void doBasicCacheOperations(
@@ -256,6 +266,54 @@ class CacheBuilderTest extends GuiceJunit5Test {
           assertEquals(
               cache.get("key2"), map.get("key2"), "Cache and map should be in sync - key2");
           assertEquals(cache.estimatedSize(), map.size(), "Cache and map should be in sync - size");
+        });
+  }
+
+  private void doRemovalListenerOperations(
+      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+    var removalResults = new ConcurrentHashMap<RemovalCause, Map<String, Object>>();
+
+    useCache(
+        cacheBuilderFactory
+            .apply("test-removal-listener")
+            .expireAfterWrite(TTL)
+            .removalListener(
+                (key, value, cause) ->
+                    removalResults.computeIfAbsent(cause, k -> new HashMap<>()).put(key, value))
+            .build(),
+        cache -> {
+          cache.put("key1", "value1");
+          cache.put("key2", "value2");
+          cache.put("key2", "value22");
+          cache.invalidate("key1");
+
+          await().atMost(TTL).until(() -> removalResults.containsKey(RemovalCause.REMOVED));
+          assertEquals(
+              "value1",
+              removalResults.get(RemovalCause.REMOVED).get("key1"),
+              "Should call listener with REMOVED cause");
+
+          await().atMost(TTL).until(() -> removalResults.containsKey(RemovalCause.REPLACED));
+          assertEquals(
+              "value2",
+              removalResults.get(RemovalCause.REPLACED).get("key2"),
+              "Should call listener with REPLACED cause");
+
+          await()
+              .atMost(Duration.ofSeconds(5).plus(TTL))
+              .pollDelay(TTL)
+              .pollInterval(TTL.dividedBy(2))
+              .until(
+                  () -> {
+                    cache.cleanUp();
+                    return removalResults.get(RemovalCause.EXPIRED) != null;
+                  });
+          assertEquals(
+              "value22",
+              removalResults.get(RemovalCause.EXPIRED).get("key2"),
+              "Should call listener with EXPIRED cause");
+
+          assertEquals(0, cache.estimatedSize(), "Cache should be empty");
         });
   }
 

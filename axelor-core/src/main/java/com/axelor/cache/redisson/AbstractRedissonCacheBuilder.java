@@ -47,6 +47,10 @@ public abstract class AbstractRedissonCacheBuilder<
     super(PREFIX + cacheName);
   }
 
+  protected AbstractRedissonCacheBuilder(CacheBuilder<K, V> builder) {
+    super(builder);
+  }
+
   @Override
   public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build() {
     var cache = newMapCache();
@@ -109,7 +113,7 @@ public abstract class AbstractRedissonCacheBuilder<
     return redissonCache;
   }
 
-  private void configureCache(ConfigurableRedissonCache<K, V> cache) {
+  protected void configureCache(ConfigurableRedissonCache<K, V> cache) {
     var expireAfterWrite = getExpireAfterWrite();
 
     // No weak references in Redisson collections

@@ -19,6 +19,7 @@
 package com.axelor.cache;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
+import com.axelor.cache.event.RemovalListener;
 import com.axelor.cache.redisson.RedissonCacheBuilder;
 import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
 import java.time.Duration;
@@ -43,6 +44,8 @@ public abstract class CacheBuilder<K, V> {
   private boolean weakKeys;
 
   private boolean weakValues;
+
+  private RemovalListener<K, V> removalListener;
 
   private static final CacheProviderInfo cacheProviderInfo;
 
@@ -70,6 +73,16 @@ public abstract class CacheBuilder<K, V> {
 
   protected CacheBuilder(String cacheName) {
     this.cacheName = cacheName;
+  }
+
+  protected CacheBuilder(CacheBuilder<K, V> builder) {
+    this(builder.cacheName);
+    this.maximumSize = builder.maximumSize;
+    this.expireAfterWrite = builder.expireAfterWrite;
+    this.expireAfterAccess = builder.expireAfterAccess;
+    this.weakKeys = builder.weakKeys;
+    this.weakValues = builder.weakValues;
+    this.removalListener = builder.removalListener;
   }
 
   /**
@@ -214,6 +227,22 @@ public abstract class CacheBuilder<K, V> {
    */
   public CacheBuilder<K, V> weakValues() {
     this.weakValues = true;
+    return this;
+  }
+
+  protected RemovalListener<K, V> getRemovalListener() {
+    return removalListener;
+  }
+
+  /**
+   * Specifies a listener instance that caches should notify each time an entry is removed for any
+   * {@link com.axelor.cache.event.RemovalCause reason}.
+   *
+   * @param removalListener the listener instance
+   * @return this {@code CacheBuilder} instance (for chaining)
+   */
+  public CacheBuilder<K, V> removalListener(RemovalListener<K, V> removalListener) {
+    this.removalListener = removalListener;
     return this;
   }
 
