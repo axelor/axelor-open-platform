@@ -8,6 +8,8 @@ import {
   GanttField,
   GanttRecord,
   GanttType,
+  GanttData,
+  GanttFieldRenderer,
 } from "@axelor/ui/gantt";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -43,12 +45,9 @@ function TreeCell({
   onExpand,
 }: {
   value: any;
-  data: GanttRecord & {
-    _level?: number;
-    _expand?: boolean;
-  };
+  data: GanttData;
   field: GanttField;
-  onExpand?: (record: DataRecord, expand?: boolean) => void;
+  onExpand?: (record: GanttData, expand?: boolean) => void;
 }) {
   const { _level: level, _children: children, _expand: expand = true } = data;
   const hasChildren = Boolean(children?.length);
@@ -93,7 +92,7 @@ function ActionsCell({
   onAdd,
   onRemove,
 }: {
-  data: DataRecord;
+  data: GanttData;
   onAdd?: (record: DataRecord) => void;
   onRemove?: (record: DataRecord) => void;
 }) {
@@ -135,45 +134,43 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const { formatter, transformer } = useMemo(
     () => ({
       formatter: (record: DataRecord) => formatRecord(view, record),
-      transformer: (record: DataRecord) => transformRecord(view, record),
+      transformer: (record: GanttRecord) => transformRecord(view, record),
     }),
     [view],
   );
 
   const handleExpand = useCallback(
-    (record: DataRecord, _expand?: boolean) =>
-      setRecords((records) =>
-        records.map((r) => (r.id === record.id ? { ...r, _expand } : r)),
+    (record: GanttData, _expand?: boolean) =>
+      setRecords((prevRecords) =>
+        prevRecords.map((r) => (r.id === record.id ? { ...r, _expand } : r)),
       ),
     [],
   );
 
   const onSearch = useCallback(
     async (options?: SearchOptions) => {
-      const { records } = await dataStore.search({
+      const { records: recs } = await dataStore.search({
         ...options,
         filter: {
           _domain: domain || undefined,
           _domainContext: context,
         },
       });
-      setRecords(records);
+      setRecords(recs);
     },
     [dataStore, domain, context],
   );
 
   const updateRecord = useCallback(
     async (data: DataRecord) => {
-      const record = transformer(data);
-      const updated = await dataStore.save(record);
-      updated &&
-        setRecords((records) =>
-          records.map((r) =>
-            r.id === record.id ? { ...r, ...formatter(updated) } : r,
-          ),
+      const updated = await dataStore.save(data);
+      if (updated) {
+        setRecords((prevRecords) =>
+          prevRecords.map((r) => (r.id === data.id ? { ...r, ...updated } : r)),
         );
+      }
     },
-    [transformer, formatter, dataStore],
+    [dataStore],
   );
 
   const handleRecordConnect = useCallback(
@@ -209,9 +206,13 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   );
 
   const handleRecordUpdate = useCallback(
-    (record: DataRecord, changes: DataRecord) =>
-      updateRecord({ id: record.id, version: record.version, ...changes }),
-    [updateRecord],
+    (record: GanttData, changes: Partial<GanttRecord>) =>
+      updateRecord({
+        id: record.id,
+        version: record.version,
+        ...transformer(changes as GanttRecord),
+      }),
+    [transformer, updateRecord],
   );
 
   const handleRecordRemove = useCallback(
@@ -224,15 +225,17 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         const { id, version } = record;
         if (id) {
           const res = await dataStore.delete({ id, version: version ?? 0 });
-          res && setRecords((records) => records.filter((r) => r.id !== id));
+          if (res) {
+            setRecords((prevRecords) => prevRecords.filter((r) => r.id !== id));
+          }
         }
       }
     },
     [dataStore],
   );
 
-  const handleRecordEdit = useCallback(
-    (record: DataRecord) => {
+  const showRecordEditor = useCallback(
+    (record: GanttData) => {
       const { model, title } = view;
       if (model) {
         const isNew = !record.id;
@@ -260,7 +263,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const handleRecordAddSubTask = useCallback(
     async (record?: DataRecord) => {
       const { taskParent, taskDuration, taskProgress, taskStart } = view;
-      handleRecordEdit({
+      showRecordEditor({
         ...(taskStart && {
           [taskStart]: moment().format("YYYY-MM-DDTHH:mm:ss[Z]"),
         }),
@@ -274,9 +277,9 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
               name: record.name,
             },
           }),
-      });
+      } as GanttData);
     },
-    [view, handleRecordEdit],
+    [view, showRecordEditor],
   );
 
   useEffect(() => {
@@ -306,8 +309,13 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         .map((item, ind) => ({
           ...(ind === 0 && {
             width: 160,
-            renderer: (props: any) => (
-              <TreeCell {...props} onExpand={handleExpand} />
+            renderer: (props: GanttFieldRenderer) => (
+              <TreeCell
+                value={props.value}
+                data={props.data}
+                field={props.field}
+                onExpand={handleExpand}
+              />
             ),
           }),
           ...item,
@@ -326,9 +334,9 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
               </Box>
             ),
             name: "$actions",
-            renderer: (props: any) => (
+            renderer: (props: GanttFieldRenderer) => (
               <ActionsCell
-                {...props}
+                data={props.data}
                 onAdd={handleRecordAddSubTask}
                 onRemove={handleRecordRemove}
               />
@@ -462,7 +470,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
             config={config}
             items={ganttItems}
             records={ganttRecords}
-            onRecordView={handleRecordEdit}
+            onRecordView={showRecordEditor}
             onRecordConnect={handleRecordConnect}
             onRecordDisconnect={handleRecordDisconnect}
             onRecordUpdate={handleRecordUpdate}

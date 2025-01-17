@@ -1,8 +1,7 @@
-import omit from "lodash/omit";
-
+import { GanttData, GanttRecord } from "@axelor/ui/gantt";
 import { GanttView } from "@/services/client/meta.types";
-import { getRandomColor } from "../calendar/colors";
 import { DataRecord } from "@/services/client/data.types";
+import { getRandomColor } from "../calendar/colors";
 
 const defaultValues: Record<string, any> = {
   taskDuration: 1,
@@ -25,10 +24,16 @@ const transformKeys: Record<string, string> = {
   finishToFinish: "finishToFinish",
 };
 
+/**
+ * Format the given record into a gantt record
+ *
+ * @param view the gantt view containing the mapping definitions
+ * @param record the record to format
+ */
 export function formatRecord(view: GanttView, record: DataRecord) {
-  const values: DataRecord = {
-    data: record,
-    id: record.id,
+  const values: GanttRecord = {
+    taskData: record as unknown as GanttData,
+    id: record.id!,
   };
 
   if (view.taskUser && record[view.taskUser]) {
@@ -42,27 +47,26 @@ export function formatRecord(view: GanttView, record: DataRecord) {
       : vals;
   }, values);
 
-  return {
-    ...omit(
-      record,
-      Object.keys(transformKeys)
-        .map((k) => view[k as keyof GanttView] as string)
-        .filter(Boolean) as string[],
-    ),
-    ...formattedValues,
-  } as DataRecord;
+  if (view.items && view.items[0].name) {
+    formattedValues.name = record[view.items[0].name];
+  }
+
+  return { ...formattedValues } as GanttRecord;
 }
 
-export function transformRecord(view: GanttView, record: DataRecord) {
-  const keys = Object.values(transformKeys);
-
+/**
+ * Transform the given gantt data into record values according to the view mapping definitions
+ *
+ * @param view the gantt view containing the mapping definitions
+ * @param data the data to transform
+ */
+export function transformRecord(view: GanttView, data: GanttRecord) {
   return {
-    ...omit(record, [...keys, "data", "$color"]),
     ...Object.keys(transformKeys).reduce((vals, k) => {
       const viewKey = view[k as keyof GanttView] as string;
-      const valueKey = transformKeys[k];
-      if (viewKey && record[valueKey] !== undefined) {
-        return { ...vals, [viewKey]: record[valueKey] };
+      const valueKey = transformKeys[k] as keyof GanttRecord;
+      if (viewKey && data[valueKey] !== undefined) {
+        return { ...vals, [viewKey]: data[valueKey] };
       }
       return vals;
     }, {}),
