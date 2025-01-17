@@ -214,6 +214,7 @@ export function OneToMany(props: FieldProps<DataRecord[]>) {
             "canMove",
             "editable",
             "selector",
+            "summaryView",
             "rowHeight",
             "onNew",
             "orderBy",
