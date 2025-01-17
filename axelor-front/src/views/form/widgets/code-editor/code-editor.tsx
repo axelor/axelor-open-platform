@@ -9,7 +9,7 @@ import styles from "./code-editor.module.scss";
 
 loader.config({ paths: { vs: "js/libs/monaco-editor/vs" } });
 
-export function CodeEditor(props: FieldProps<string>) {
+export function CodeEditorComponent(props: FieldProps<string>) {
   const { schema, invalid, readonly, valueAtom } = props;
   const { codeSyntax, width = "100%" } = schema;
   const height = schema.height ?? schema.widgetAttrs?.height ?? 400;
@@ -31,22 +31,28 @@ export function CodeEditor(props: FieldProps<string>) {
   const w = width && /^(\d+)$/.test(width) ? `${width}px` : width;
 
   return (
+    <Editor
+      className={clsx(styles.container, {
+        [styles.invalid]: invalid,
+        [styles.readonly]: readonly,
+      })}
+      theme={theme}
+      language={codeSyntax}
+      value={value ?? ""}
+      width={w}
+      height={h}
+      onChange={handleChange}
+      options={{
+        readOnly: readonly,
+      }}
+    />
+  );
+}
+
+export function CodeEditor(props: FieldProps<string>) {
+  return (
     <FieldControl {...props}>
-      <Editor
-        className={clsx(styles.container, {
-          [styles.invalid]: invalid,
-          [styles.readonly]: readonly,
-        })}
-        theme={theme}
-        language={codeSyntax}
-        value={value ?? ""}
-        width={w}
-        height={h}
-        onChange={handleChange}
-        options={{
-          readOnly: readonly,
-        }}
-      />
+      <CodeEditorComponent {...props} />
     </FieldControl>
   );
 }

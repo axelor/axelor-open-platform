@@ -73,6 +73,12 @@
     .value {
       gap: 0.375rem;
     }
+    
+    input:disabled,
+    .colorInput.readonly {
+      border-color: transparent !important;
+      background: var(--bs-body-bg);
+    }
 
     input[type="color"] {
       padding: 0.25rem;
@@ -85,10 +91,12 @@
   gap: 0.5rem;
 }
 
-.colorInput {
+.colorInputIcon {
   height: 1.25rem;
   width: 1.25rem;
-  cursor: pointer;
+  .colorInput:not(.readonly) & {
+    cursor: pointer;
+  }
 }
 
 .select {

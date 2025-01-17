@@ -176,7 +176,7 @@ function PropertyEditor(
     cssVariable,
   } = property;
 
-  const { getCssVar, setInvalids } = usePropertiesContext();
+  const { getCssVar, readonly, setInvalids } = usePropertiesContext();
   const value = useMemo(() => deepGet(theme, path) ?? "", [path, theme]);
   const baseTheme = useMemo(() => {
     return theme?.palette?.mode === "dark"
@@ -192,14 +192,18 @@ function PropertyEditor(
     if (cssVariable) {
       return getCssVar?.(cssVariable);
     }
+    if (readonly) {
+      return "";
+    }
     return property.placeholder ?? cssPropertyExamples[cssProperty ?? ""] ?? "";
   }, [
     baseTheme,
     path,
     cssVariable,
-    getCssVar,
-    cssProperty,
+    readonly,
     property.placeholder,
+    cssProperty,
+    getCssVar,
   ]);
 
   const invalid = useMemo(
@@ -238,6 +242,7 @@ function PropertyEditor(
         return (
           <ColorInput
             value={value}
+            readonly={readonly}
             placeholder={placeholder}
             invalid={invalid}
             onChange={handleChange}
@@ -248,6 +253,7 @@ function PropertyEditor(
         const selected = options.find((x) => x.value === value) ?? null;
         return (
           <Select
+            readOnly={readonly}
             className={styles.select}
             autoComplete={false}
             placeholder={placeholder}
@@ -270,6 +276,7 @@ function PropertyEditor(
         return (
           <Input
             type="text"
+            disabled={readonly}
             placeholder={placeholder}
             invalid={invalid}
             value={value}
@@ -291,11 +298,13 @@ const DefaultColor = { h: 0, s: 0, v: 0, a: 1 };
 
 function ColorInput({
   invalid,
+  readonly,
   value,
   placeholder,
   onChange,
 }: {
   invalid?: boolean;
+  readonly?: boolean;
   value?: string;
   placeholder?: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
@@ -318,18 +327,22 @@ function ColorInput({
   return (
     <>
       <AdornedInput
+        disabled={readonly}
         type="text"
         placeholder={placeholder}
         invalid={invalid}
         value={value}
+        className={clsx(styles.colorInput, {
+          [styles.readonly]: readonly,
+        })}
         startAdornment={
           <Box
             border
-            className={styles.colorInput}
+            className={clsx(styles.colorInputIcon)}
             style={{
               backgroundColor: value || placeholder || "transparent",
             }}
-            onClick={(e) => setTarget(e.target as HTMLElement)}
+            onClick={(e) => !readonly && setTarget(e.target as HTMLElement)}
           />
         }
         onChange={onChange}

@@ -1,63 +1,46 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import isEqual from "lodash/isEqual";
 
-import {
-  Alert,
-  Box,
-  Button,
-  DialogHeader,
-  DialogTitle,
-  useControlled,
-} from "@axelor/ui";
+import { Alert, Box, clsx } from "@axelor/ui";
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
-import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { compactTheme } from "@/components/theme-builder/utils.ts";
-import { DataSource } from "@/services/client/data";
-import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { useDialogContext } from "../dialogs";
 import { PropertiesContextProvider } from "./scope";
 import { ThemeDesigner } from "./theme-editor";
 
 import styles from "./theme-builder.module.scss";
 
 export type ThemeBuilderProps = {
-  data?: DataRecord;
+  readonly?: boolean;
+  hidden?: boolean;
+  value?: string | null;
+  onChange?: (value: string | null) => void;
+  onInvalid?: (invalid: boolean) => void;
 };
 
 export function ThemeBuilder(props: ThemeBuilderProps) {
-  const { data } = props;
+  const { value } = props;
 
   const [theme, error] = useMemo(() => {
-    if (data?.content) {
-      try {
-        return [JSON.parse(data.content)];
-      } catch (err) {
-        return [{}, err];
-      }
+    try {
+      return [JSON.parse(value || "{}") || {}];
+    } catch (err) {
+      return [{}, err];
     }
-    return [];
-  }, [data?.content]);
+  }, [value]);
 
-  if (theme) {
-    return <ThemeBuilderInner {...props} theme={theme} error={error} />;
-  }
+  return <ThemeBuilderInner {...props} theme={theme} error={error} />;
 }
 
 function ThemeBuilderInner(
-  props: ThemeBuilderProps & { theme: ThemeOptions; error?: any },
+  props: ThemeBuilderProps & { theme: ThemeOptions; error?: unknown },
 ) {
-  const { error, data } = props;
-  const { close } = useDialogContext();
+  const { readonly = false, hidden, error, onChange, onInvalid } = props;
 
   const [themeDiv, setThemeDiv] = useState<HTMLDivElement | null>(null);
   const [invalidProps, setInvalidProps] = useState<Record<string, boolean>>({});
-  const [theme, setTheme] = useControlled({
-    name: "ThemeBuilder",
-    prop: "theme",
-    state: undefined,
-    defaultState: props.theme,
-  });
+  const [theme, setTheme] = useState<ThemeOptions>(props.theme);
   const styleRef = useRef<CSSStyleDeclaration>();
 
   const getCssVar = useCallback(
@@ -72,20 +55,20 @@ function ThemeBuilderInner(
     [themeDiv],
   );
 
-  const handleClose = useCallback(() => close(false), [close]);
-  const handleSave = useCallback(async () => {
-    const ds = new DataSource(data?.model);
-    await ds.save({
-      ...data,
-      content: JSON.stringify(compactTheme(theme), null, 2) || null,
-    });
-    close(true);
-    location.reload();
-  }, [close, data, theme]);
+  // sync updated theme
+  useEffect(() => {
+    setTheme((currTheme) =>
+      isEqual(currTheme, props.theme) ? currTheme : props.theme,
+    );
+  }, [props.theme]);
 
   const handleChange = useCallback(
-    (newTheme: ThemeOptions) => setTheme(newTheme),
-    [setTheme],
+    (newTheme: ThemeOptions) => {
+      const json = JSON.stringify(compactTheme(newTheme), null, 2) || null;
+      onChange?.(json);
+      setTheme(newTheme);
+    },
+    [setTheme, onChange],
   );
 
   const invalid = useMemo(
@@ -93,38 +76,35 @@ function ThemeBuilderInner(
     [invalidProps],
   );
 
+  useEffect(() => {
+    onInvalid?.(invalid);
+  }, [invalid, onInvalid]);
+
   const themeMode = useMemo(() => theme?.palette?.mode, [theme]);
 
   return (
-    <div className={styles.builder}>
+    <div
+      className={clsx(styles.builder, {
+        [styles.hidden]: hidden,
+      })}
+    >
       <Box d="none" ref={setThemeDiv} data-bs-theme={themeMode} />
-      <DialogHeader className={styles.header}>
-        <DialogTitle className={styles.title}>Theme Builder</DialogTitle>
-        <div className={styles.buttons}>
-          <Button variant="primary" onClick={handleSave} disabled={invalid}>
-            {i18n.get("Save")}
-          </Button>
-          <MaterialIcon
-            icon="close"
-            className={styles.close}
-            onClick={handleClose}
-          />
-        </div>
-      </DialogHeader>
-      {error && (
+      {error ? (
         <Alert m={2} p={2} variant="danger">
           {i18n.get(
             "Failed to parse the given JSON theme : incorrect syntax was encountered.",
           )}
         </Alert>
+      ) : (
+        <PropertiesContextProvider
+          getCssVar={getCssVar}
+          readonly={readonly}
+          invalids={invalidProps}
+          setInvalids={setInvalidProps}
+        >
+          {theme && <ThemeDesigner theme={theme} onChange={handleChange} />}
+        </PropertiesContextProvider>
       )}
-      <PropertiesContextProvider
-        getCssVar={getCssVar}
-        invalids={invalidProps}
-        setInvalids={setInvalidProps}
-      >
-        {theme && <ThemeDesigner theme={theme} onChange={handleChange} />}
-      </PropertiesContextProvider>
     </div>
   );
 }

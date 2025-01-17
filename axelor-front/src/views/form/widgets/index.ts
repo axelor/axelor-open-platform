@@ -65,6 +65,7 @@ export * from "./suggest-box";
 export * from "./switch-select";
 export * from "./tag-select";
 export * from "./text";
+export * from "./theme-builder";
 export * from "./theme-select";
 export * from "./time";
 export * from "./toggle";

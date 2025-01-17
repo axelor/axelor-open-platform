@@ -4,18 +4,8 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+}
 
-  .header {
-    display: flex;
-    .title {
-      flex: 1;
-    }
-    .buttons {
-      display: flex;
-      gap: 1rem;
-      .close {
-        cursor: pointer;
-      }
-    }
-  }
+.hidden {
+  display: none;
 }

@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useMemo } from "react";
 interface PropertiesContextProviderProps {
   invalids: Record<string, boolean>;
   setInvalids: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  readonly?: boolean;
   getCssVar?: (name: string) => string | undefined;
 }
 
@@ -14,6 +15,7 @@ const PropertiesContext = createContext<PropertiesContextProviderProps>({
 export function PropertiesContextProvider({
   children,
   invalids,
+  readonly,
   getCssVar,
   setInvalids,
 }: PropertiesContextProviderProps & {
@@ -22,10 +24,11 @@ export function PropertiesContextProvider({
   const value = useMemo(
     () => ({
       getCssVar,
+      readonly,
       invalids,
       setInvalids,
     }),
-    [getCssVar, invalids, setInvalids],
+    [getCssVar, readonly, invalids, setInvalids],
   );
 
   return (

@@ -6,20 +6,16 @@
     <field name="name" />
     <field name="label" />
     <field name="isSelectable" />
-    <button name="design" icon="style" onClick="action-meta-theme-open-builder" help="Open theme designer"/>
   </grid>
 
   <form title="Theme" name="meta-theme-form" model="com.axelor.meta.db.MetaTheme">
-    <toolbar>
-      <button name="design" icon="style" onClick="save,action-meta-theme-open-builder" help="Open theme designer"/>
-    </toolbar>
     <panel title="Overview">
       <field name="name"/>
       <field name="label"/>
       <field name="isSelectable" hidden="true"/>
     </panel>
-    <panel title="Content">
-      <field name="content" colSpan="12" showTitle="false" widget="CodeEditor" x-code-syntax="json" />
+    <panel>
+      <field name="content" colSpan="12" showTitle="false" widget="ThemeBuilder" />
     </panel>
     <panel sidebar="true">
       <panel showIf="!isSelectable" hidden="true" itemSpan="12">
@@ -49,25 +45,5 @@
     <alert message="A theme with the same name already exist. It may create conflicts. Are you sure you want to continue?"
            if="eval: __repo__(MetaTheme).all().filter('self.name = :name AND self.id != :id').bind('name', name).bind('id', id).count() >= 1"/>
   </action-validate>
-
-  <action-view name="action-meta-theme-open-builder" title="Theme Builder" model="com.axelor.meta.db.MetaTheme">
-    <view type="custom" name="theme-builder-custom" />
-    <view-param name="popup" value="true" />
-    <view-param name="popup.show-header" value="false" />
-    <view-param name="popup.show-footer" value="false" />
-    <context name="id" expr="#{id}" />
-    <context name="_model" expr="#{_model}" />
-  </action-view>
-
-  <custom name="theme-builder-custom" title="Theme Builder">
-    <dataset type="rpc">com.axelor.meta.web.MetaController:loadTheme</dataset>
-    <template>
-    <![CDATA[
-      <>
-        <ThemeBuilder data={data} />
-      </>
-    ]]>
-    </template>
-  </custom>
 
 </object-views>

@@ -1,0 +1,6 @@
+---
+title: Use theme-builder as form widget
+type: change
+description: |
+  Previously, theme-builder used in template with custom component support.
+  Now theme-builder is implemented as form widget and can used in form-view directly.

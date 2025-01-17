@@ -72,7 +72,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import javax.xml.bind.JAXBException;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -341,34 +340,6 @@ public class MetaController {
       }
     }
     response.setInfo(I18n.get("Export complete."));
-  }
-
-  public void loadTheme(ActionRequest request, ActionResponse response) {
-    Long id =
-        Optional.ofNullable(request.getData().get("id"))
-            .map(Object::toString)
-            .map(Long::parseLong)
-            .orElse(null);
-
-    if (id == null) {
-      return;
-    }
-
-    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, MetaTheme.class, id);
-
-    MetaTheme theme = Beans.get(MetaThemeRepository.class).find(id);
-    String content = Optional.ofNullable(theme.getContent()).orElse("{}");
-
-    response.setData(
-        Map.of(
-            "id",
-            id,
-            "version",
-            theme.getVersion(),
-            "model",
-            MetaTheme.class.getName(),
-            "content",
-            content));
   }
 
   public void setThemeSelectable(ActionRequest request, ActionResponse response) {
