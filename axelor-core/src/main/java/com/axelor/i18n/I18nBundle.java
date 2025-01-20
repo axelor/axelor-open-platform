@@ -18,8 +18,11 @@
  */
 package com.axelor.i18n;
 
+import com.axelor.cache.AxelorCache;
+import com.axelor.cache.CacheBuilder;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
 import java.util.Collections;
@@ -29,18 +32,21 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /** The database backed {@link ResourceBundle} that loads translations from the axelor database. */
 public class I18nBundle extends ResourceBundle {
 
   private final Locale locale;
-  private final Map<String, String> messages = new ConcurrentHashMap<>();
+  private final AxelorCache<String, String> messages;
 
   private boolean loaded;
 
   public I18nBundle(Locale locale) {
     this.locale = locale;
+    messages = CacheBuilder.newBuilder(locale.toLanguageTag()).build();
+
+    // With distributed cache, we may have messages previously loaded.
+    loaded = messages.estimatedSize() > 0;
   }
 
   @Override
@@ -71,23 +77,23 @@ public class I18nBundle extends ResourceBundle {
   }
 
   private Map<String, String> load() {
-    return loaded ? messages : doLoad();
+    return loaded ? messages.asMap() : doLoad();
   }
 
   private synchronized Map<String, String> doLoad() {
+    final EntityManager em;
 
     try {
-      JPA.em();
+      em = JPA.em();
     } catch (Throwable e) {
-      return messages;
+      return messages.asMap();
     }
 
     final String lang = locale.toLanguageTag();
     final String baseLang = locale.getLanguage();
     final int limit = 100;
     final TypedQuery<Object[]> query =
-        JPA.em()
-            .createQuery(
+        em.createQuery(
                 """
                 SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END) \
                 FROM MetaTranslation self \
@@ -104,6 +110,9 @@ public class I18nBundle extends ResourceBundle {
     int offset = 0;
     List<Object[]> results;
 
+    // Clear the cache that might be stored externally
+    messages.invalidateAll();
+
     do {
       query.setFirstResult(offset);
       results = query.getResultList();
@@ -114,7 +123,7 @@ public class I18nBundle extends ResourceBundle {
     } while (results.size() >= limit);
 
     this.loaded = true;
-    return messages;
+    return messages.asMap();
   }
 
   public static void invalidate() {
