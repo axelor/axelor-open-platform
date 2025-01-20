@@ -41,7 +41,7 @@ public class Inflections {
   private Inflections() {}
 
   /**
-   * Get the default instance of {@link Inflections} for the English.
+   * Get the default instance of {@link Inflections} for the English language.
    *
    * @return an instance of {@link Inflections}
    */
@@ -56,12 +56,7 @@ public class Inflections {
    * @return an instance of {@link Inflections}
    */
   public static Inflections getInstance(String language) {
-    Inflections instance = INSTANCES.get(language);
-    if (instance == null) {
-      instance = new Inflections();
-      INSTANCES.put(language, instance);
-    }
-    return instance;
+    return INSTANCES.computeIfAbsent(language, key -> new Inflections());
   }
 
   private String capitalize(String word) {

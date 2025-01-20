@@ -45,14 +45,7 @@ public class TenantConnectionProvider
 
   private TenantConfigProvider configProvider;
 
-  private Map<String, DataSource> dataSourceMap;
-
-  private Map<String, DataSource> dataSourceMap() {
-    if (dataSourceMap == null) {
-      dataSourceMap = new ConcurrentHashMap<>();
-    }
-    return dataSourceMap;
-  }
+  private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
   @Override
   protected final DataSource selectAnyDataSource() {
@@ -62,17 +55,14 @@ public class TenantConnectionProvider
   @Override
   protected DataSource selectDataSource(String tenantIdentifier) {
     if (configProvider.find(tenantIdentifier) == null) {
-      dataSourceMap().remove(tenantIdentifier);
+      dataSourceMap.remove(tenantIdentifier);
       LOGGER.debug("no such tenant found: {}", tenantIdentifier);
       throw new TenantNotFoundException("No such tenant found: " + tenantIdentifier);
     }
-    DataSource dataSource = dataSourceMap().get(tenantIdentifier);
+
     LOGGER.trace("using tenant: {}", tenantIdentifier);
-    if (dataSource == null) {
-      dataSource = createDataSource(validate(configProvider.find(tenantIdentifier)));
-      dataSourceMap().put(tenantIdentifier, dataSource);
-    }
-    return dataSource;
+    return dataSourceMap.computeIfAbsent(
+        tenantIdentifier, t -> createDataSource(validate(configProvider.find(tenantIdentifier))));
   }
 
   private DataSource createDataSource(TenantConfig config) {
@@ -111,10 +101,7 @@ public class TenantConnectionProvider
 
   @Override
   public void stop() {
-    if (dataSourceMap != null) {
-      dataSourceMap.clear();
-      dataSourceMap = null;
-    }
+    dataSourceMap.clear();
   }
 
   @Override
