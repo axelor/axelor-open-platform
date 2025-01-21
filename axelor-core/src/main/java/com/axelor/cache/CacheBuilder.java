@@ -51,6 +51,9 @@ public abstract class CacheBuilder<K, V> {
 
   private static final Function<String, CacheBuilder<?, ?>> cacheBuilderFactory;
 
+  private static final StackWalker stackWalker =
+      StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+
   static {
     cacheProviderInfo =
         CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
@@ -86,35 +89,36 @@ public abstract class CacheBuilder<K, V> {
   }
 
   /**
-   * Constructs a new {@code CacheBuilder} instance for the specified class.
+   * Constructs a new {@code CacheBuilder} instance.
    *
-   * <p>The class is used to create a globally unique cache name, depending on the cache provider.
-   * This is suitable if your class contains only one cache. Otherwise, use {@link
-   * #newBuilder(Class, String)}.
+   * <p>The caller class is used as cache name.
    *
-   * @param cls the class to create the cache for
+   * <p>The cache name is used to create a globally unique cache name, depending on the cache
+   * provider.
+   *
    * @param <K> the key type of the cache
    * @param <V> the value type of the cache
    * @return a new {@code CacheBuilder} instance
    */
-  public static <K, V> CacheBuilder<K, V> newBuilder(Class<?> cls) {
-    return newBuilder(cls.getName());
+  public static <K, V> CacheBuilder<K, V> newBuilder() {
+    return fromCacheName(stackWalker.getCallerClass().getName());
   }
 
   /**
-   * Constructs a new {@code CacheBuilder} instance for the specified class and cache name.
+   * Constructs a new {@code CacheBuilder} instance.
    *
-   * <p>The class and the cache name may be used to create a globally unique cache name, depending
-   * on the cache provider.
+   * <p>The caller class is used together with the specified name as cache name.
    *
-   * @param cls the class to create the cache for
-   * @param name the name of the cache
+   * <p>The cache name is used to create a globally unique cache name, depending on the cache
+   * provider.
+   *
+   * @param name the name used as suffix of the cache name
    * @param <K> the key type of the cache
    * @param <V> the value type of the cache
    * @return a new {@code CacheBuilder} instance
    */
-  public static <K, V> CacheBuilder<K, V> newBuilder(Class<?> cls, String name) {
-    return newBuilder(cls.getName() + ":" + name);
+  public static <K, V> CacheBuilder<K, V> newBuilder(String name) {
+    return fromCacheName(stackWalker.getCallerClass().getName() + ":" + name);
   }
 
   /**
@@ -128,7 +132,7 @@ public abstract class CacheBuilder<K, V> {
    * @param <V> the value type of the cache
    * @return a new {@code CacheBuilder} instance
    */
-  public static <K, V> CacheBuilder<K, V> newBuilder(String name) {
+  protected static <K, V> CacheBuilder<K, V> fromCacheName(String name) {
     @SuppressWarnings("unchecked")
     var builder = (CacheBuilder<K, V>) cacheBuilderFactory.apply(name);
 
