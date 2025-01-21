@@ -6,6 +6,7 @@ versions.guice = "7.0.0"
 versions.guava = "33.4.8-jre"
 versions.hibernate = "6.6.15.Final"
 versions.hibernate_validator = "8.0.2.Final"
+versions.caffeine = "3.2.0"
 
 versions.groovy = "4.0.26"
 versions.resteasy = "6.2.12.Final"
@@ -120,9 +121,10 @@ libs.redisson = [
     "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${versions.jackson}"
 ]
 libs.hazelcast = "com.hazelcast:hazelcast:5.5.0"
-libs.caffeine = dependencies.create("com.github.ben-manes.caffeine:jcache:3.1.8") {
-    exclude module: "javax.inject", group: "jakarta.inject-api"
-}
+libs.caffeine = [
+  "com.github.ben-manes.caffeine:caffeine:${versions.caffeine}",
+  "com.github.ben-manes.caffeine:jcache:${versions.caffeine}"
+]
 libs.infinispan = [
     "org.infinispan:infinispan-hibernate-cache-v62:15.0.14.Final",
     "org.infinispan:infinispan-core:15.0.14.Final",
