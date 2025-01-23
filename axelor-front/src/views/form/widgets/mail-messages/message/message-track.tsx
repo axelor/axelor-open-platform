@@ -32,10 +32,21 @@ export function formatter(_item: MessageTrack, field?: Property) {
         toSnakeCase(field.type).toUpperCase(),
       )
     ) {
-      const formattedValue = format(value, {
+      let formattedValue = format(value, {
         props: field as unknown as Field,
         context: { [field.name]: value },
       });
+      
+      // multi-select hack
+      if (value && !formattedValue && field?.selection && value.indexOf(",") > 0) {
+        formattedValue = format(value, {
+          props: {
+            ...(field as unknown as Field),
+            widget: "multi-select"
+          },
+          context: { [field.name]: value },
+        });
+      }
 
       if (formattedValue !== value) {
         return formattedValue;
