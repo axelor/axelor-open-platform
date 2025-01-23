@@ -20,8 +20,10 @@ package com.axelor.cache;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
@@ -150,6 +152,16 @@ class CacheBuilderTest extends GuiceJunit5Test {
           assertEquals(
               1, cache.estimatedSize(), "Cache should contain one entry after invalidation");
 
+          assertEquals(
+              "computed-key1",
+              cache.get("key1", k -> "computed-" + k),
+              "Should call mapping function for non-cached value");
+
+          assertEquals(
+              "value2",
+              cache.get("key2", k -> "another-computed-" + k),
+              "Should not call mapping function for cached value");
+
           cache.invalidateAll();
           assertEquals(0, cache.estimatedSize(), "Cache should be empty after invalidation of all");
         });
@@ -158,22 +170,59 @@ class CacheBuilderTest extends GuiceJunit5Test {
   private void doCacheLoaderOperations(
       Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
     useCache(
-        cacheBuilderFactory.apply("test-cache-loader").build(key -> "loaded-" + key),
+        cacheBuilderFactory
+            .apply("test-cache-loader")
+            .build(key -> key.endsWith("-null") ? null : "loaded-" + key),
         cache -> {
           assertNotNull(cache, "Cache should be created");
 
-          assertEquals("loaded-key1", cache.get("key1"), "Should call loader");
+          assertEquals("loaded-key", cache.get("key"), "Should call loader");
 
-          assertEquals("loaded-key1", cache.get("key1"), "Should not recall loader");
+          assertEquals("loaded-key", cache.get("key"), "Should not recall loader");
 
           assertEquals(
-              "loaded-key2", cache.get("key2"), "Should return loaded value for different key");
+              "loaded-another-key",
+              cache.get("another-key"),
+              "Should return loaded value for another key");
 
-          cache.put("key3", "value3");
-          assertEquals("value3", cache.get("key3"), "Should not call loader for put value");
+          cache.put("existing-key", "existing-value");
+          assertEquals(
+              "existing-value", cache.get("existing-key"), "Should not call loader for put value");
 
-          cache.invalidate("key1");
-          assertEquals("loaded-key1", cache.get("key1"), "Should reload for invalidated key");
+          cache.invalidate("key");
+          assertEquals("loaded-key", cache.get("key"), "Should reload for invalidated key");
+
+          assertEquals(
+              "loaded-key-function",
+              cache.get("key-function", k -> "computed-" + k),
+              "Should not call mapping function if loader returns value");
+
+          assertEquals(
+              "computed-key-function-null",
+              cache.get("key-function-null", k -> "computed-" + k),
+              "Should call mapping function if loader returns null");
+
+          var map = cache.asMap();
+
+          assertTrue(map.containsKey("contains-key-map"), "Should call loader returning value");
+          assertFalse(
+              map.containsKey("contains-key-map-null"), "Should call loader returning null");
+
+          assertEquals("loaded-key-map", map.get("key-map"), "Should call loader for map get");
+
+          assertEquals(
+              "loaded-key-function-map",
+              map.computeIfAbsent("key-function-map", k -> "computed-" + k),
+              "Should not call mapping function if loader returns value");
+
+          assertEquals(
+              "computed-key-function-map-null",
+              map.computeIfAbsent("key-function-map-null", k -> "computed-" + k),
+              "Should call mapping function if loader returns null");
+
+          @SuppressWarnings("unlikely-arg-type")
+          var wrongKeyTypeResult = map.get(8);
+          assertNull(wrongKeyTypeResult, "Should return null for wrong key type");
         });
   }
 
