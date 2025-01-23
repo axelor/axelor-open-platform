@@ -78,9 +78,7 @@ dependencies {
   testImplementation libs.infinispan
   testImplementation libs.ehcache
   // Embedded Redis server for Redis test
-  testImplementation("it.ozimov:embedded-redis:0.7.3") {
-    exclude group: 'org.slf4j', module: 'slf4j-simple'
-  }
+  testImplementation "org.signal:embedded-redis:0.9.1"
   testImplementation 'org.awaitility:awaitility:4.2.2'
 }
 
