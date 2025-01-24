@@ -31,7 +31,7 @@ import { diff, extractDummy } from "@/services/client/data-utils";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
-import { FormView, Perms, Schema } from "@/services/client/meta.types";
+import { Field, FormView, Perms, Schema } from "@/services/client/meta.types";
 import { ErrorReport } from "@/services/client/reject";
 import { session } from "@/services/client/session";
 import { focusAtom } from "@/utils/atoms";
@@ -979,22 +979,55 @@ const FormContainer = memo(function FormContainer({
           // Rely on `createdOn` to check if change tracking is available for the entity
           if (res.createdOn === undefined) {
             alerts.info({
-              message: i18n.get("The audit log related to update and creation isn't available for the record."),
+              message: i18n.get(
+                "The audit log related to update and creation isn't available for the record.",
+              ),
             });
             return;
           }
+
           const name = session.info?.user?.nameField ?? "name";
+          const notAvailableText = i18n.get("Not available");
+
+          function renderAuditData(auditValue: string) {
+            return (
+              <span
+                className={clsx({
+                  [styles.notAvailable]: !auditValue,
+                })}
+              >
+                {auditValue || notAvailableText}
+              </span>
+            );
+          }
+
           dialogs.info({
             content: (
               <dl className={styles.dlist}>
-                <dt>{i18n.get("Created By")}</dt>
-                <dd>{(res.createdBy || {})[name]}</dd>
-                <dt>{i18n.get("Created On")}</dt>
-                <dd>{Formatters.datetime(res.createdOn)}</dd>
-                <dt>{i18n.get("Updated By")}</dt>
-                <dd>{(res.updatedBy || {})[name]}</dd>
-                <dt>{i18n.get("Updated On")}</dt>
-                <dd>{Formatters.datetime(res.updatedOn)}</dd>
+                <dt>{i18n.get("Created By")} :</dt>
+                <dd>{renderAuditData((res.createdBy || {})[name])}</dd>
+                <dt>{i18n.get("Created On")} :</dt>
+                <dd>
+                  {renderAuditData(
+                    Formatters.datetime(res.createdOn, {
+                      props: {
+                        seconds: true,
+                      } as unknown as Field,
+                    }),
+                  )}
+                </dd>
+                <dt>{i18n.get("Updated By")} :</dt>
+                <dd>{renderAuditData((res.updatedBy || {})[name])}</dd>
+                <dt>{i18n.get("Updated On")} :</dt>
+                <dd>
+                  {renderAuditData(
+                    Formatters.datetime(res.updatedOn, {
+                      props: {
+                        seconds: true,
+                      } as unknown as Field,
+                    }),
+                  )}
+                </dd>
               </dl>
             ),
           });
