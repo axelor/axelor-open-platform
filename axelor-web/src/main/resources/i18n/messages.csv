@@ -294,6 +294,7 @@
 "Tasks due",,,
 "Tasks todo",,,
 "Tenant",,,
+"The audit log related to update and creation isn't available for the record.",,,
 "The record has been updated or deleted by another action.",,,
 "There are no records to update.",,,
 "Title",,,

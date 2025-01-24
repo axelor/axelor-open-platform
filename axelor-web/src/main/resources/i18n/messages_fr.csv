@@ -294,6 +294,7 @@
 "Tasks due","Tâche échue",,
 "Tasks todo","Tâche à faire",,
 "Tenant",,,
+"The audit log related to update and creation isn't available for the record.","Le journal d'audit lié à la mise à jour et à la création n'est pas disponible pour l'enregistrement.",,
 "The record has been updated or deleted by another action.","L'enregistrement a été modifié ou supprimé par une autre action.",,
 "There are no records to update.","Il n'y a aucun enregistrement à mettre à jour.",,
 "Title","Titre",,

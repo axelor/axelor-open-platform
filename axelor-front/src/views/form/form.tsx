@@ -976,6 +976,13 @@ const FormContainer = memo(function FormContainer({
           const res = await dataStore.read(id, {
             fields: ["createdBy", "createdOn", "updatedBy", "updatedOn"],
           });
+          // Rely on `createdOn` to check if change tracking is available for the entity
+          if (res.createdOn === undefined) {
+            alerts.info({
+              message: i18n.get("The audit log related to update and creation isn't available for the record."),
+            });
+            return;
+          }
           const name = session.info?.user?.nameField ?? "name";
           dialogs.info({
             content: (
