@@ -20,11 +20,11 @@ package com.axelor.cache.caffeine;
 
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.CacheLoader;
 import com.axelor.cache.event.RemovalCause;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import java.util.function.Function;
 
 /**
  * Caffeine cache builder
@@ -54,11 +54,12 @@ public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(Function<? super K1, V1> loader) {
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
+      CacheLoader<? super K1, V1> loader) {
     var caffeine = newCaffeine();
 
     @SuppressWarnings("unchecked")
-    var cache = (LoadingCache<K1, V1>) caffeine.build(loader::apply);
+    var cache = (LoadingCache<K1, V1>) caffeine.build(loader::load);
 
     return new CaffeineLoadingCache<>(cache, loader);
   }

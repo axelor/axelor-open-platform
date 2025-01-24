@@ -20,8 +20,8 @@ package com.axelor.cache.redisson;
 
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
+import com.axelor.cache.CacheLoader;
 import java.time.Duration;
-import java.util.function.Function;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.map.MapLoader;
@@ -62,7 +62,8 @@ public abstract class AbstractRedissonCacheBuilder<
   }
 
   @Override
-  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(Function<? super K1, V1> loader) {
+  public <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
+      CacheLoader<? super K1, V1> loader) {
     var cache = newMapCache(loader);
 
     @SuppressWarnings("unchecked")
@@ -81,13 +82,17 @@ public abstract class AbstractRedissonCacheBuilder<
     return RedissonClientProvider.getInstance().get(getCacheProviderInfo());
   }
 
+  private M newMapCache() {
+    return newMapCache(newOptions());
+  }
+
   private <K1 extends K, V1 extends V> MapLoader<K, V> newMapLoader(
-      Function<? super K1, V1> loader) {
+      CacheLoader<? super K1, V1> loader) {
     return new MapLoader<>() {
       @SuppressWarnings("unchecked")
       @Override
       public V load(K key) {
-        return loader.apply((K1) key);
+        return loader.load((K1) key);
       }
 
       @Override
@@ -97,11 +102,7 @@ public abstract class AbstractRedissonCacheBuilder<
     };
   }
 
-  private M newMapCache() {
-    return newMapCache(newOptions());
-  }
-
-  private <K1 extends K, V1 extends V> M newMapCache(Function<? super K1, V1> loader) {
+  private <K1 extends K, V1 extends V> M newMapCache(CacheLoader<? super K1, V1> loader) {
     var options = newOptions();
     options.loader(newMapLoader(loader));
     return newMapCache(options);

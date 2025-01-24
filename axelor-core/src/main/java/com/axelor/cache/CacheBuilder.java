@@ -251,7 +251,7 @@ public abstract class CacheBuilder<K, V> {
   }
 
   /**
-   * Builds a {@code AxelorCache} with the specified configuration.
+   * Builds an {@code AxelorCache} which does not automatically load values when keys are requested.
    *
    * @param <K1> the key type of the cache
    * @param <V1> the value type of the cache
@@ -260,14 +260,15 @@ public abstract class CacheBuilder<K, V> {
   public abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> build();
 
   /**
-   * Builds a {@code AxelorCache} with the specified configuration and loading function.
+   * Builds an {@code AxelorCache} which either returns an already-loaded value for a given key or
+   * atomically computes or retrieves it using the supplied {@code CacheLoader}.
    *
-   * @param loader the function to compute values when they are not present in the cache
+   * @param loader the {@code CacheLoader} used to obtain new values
    * @param <K1> the key type of the cache
    * @param <V1> the value type of the cache
    * @return a new {@code AxelorCache} instance having the specified configuration and using the
    *     specified loader
    */
   public abstract <K1 extends K, V1 extends V> AxelorCache<K1, V1> build(
-      Function<? super K1, V1> loader);
+      CacheLoader<? super K1, V1> loader);
 }

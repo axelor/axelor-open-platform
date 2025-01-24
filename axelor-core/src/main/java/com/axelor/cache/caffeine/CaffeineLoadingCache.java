@@ -18,6 +18,7 @@
  */
 package com.axelor.cache.caffeine;
 
+import com.axelor.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ForwardingConcurrentMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,9 +38,9 @@ import java.util.function.Function;
 public class CaffeineLoadingCache<K, V> extends CaffeineCache<K, V> {
 
   protected final ConcurrentMap<K, V> map;
-  protected final Function<? super K, V> loader;
+  protected final CacheLoader<? super K, V> loader;
 
-  public CaffeineLoadingCache(LoadingCache<K, V> cache, Function<? super K, V> loader) {
+  public CaffeineLoadingCache(LoadingCache<K, V> cache, CacheLoader<? super K, V> loader) {
     super(cache);
     this.loader = loader;
 
@@ -85,7 +86,7 @@ public class CaffeineLoadingCache<K, V> extends CaffeineCache<K, V> {
     return cache.get(
         key,
         k -> {
-          var value = loader.apply(k);
+          var value = loader.load(k);
           return value != null ? value : mappingFunction.apply(k);
         });
   }
