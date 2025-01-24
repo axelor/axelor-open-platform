@@ -19,6 +19,8 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.redisson.api.RMapCacheNative;
@@ -76,8 +78,18 @@ public class RedissonCacheNative<K, V> implements ConfigurableRedissonCache<K, V
   }
 
   @Override
+  public Map<K, V> getAll(Set<K> keys) {
+    return cache.getAll(keys);
+  }
+
+  @Override
   public void put(K key, V value) {
     fastPut.accept(key, value, ttl);
+  }
+
+  @Override
+  public void putAll(Map<? extends K, ? extends V> map) {
+    cache.putAll(map);
   }
 
   @SuppressWarnings("unchecked")

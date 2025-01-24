@@ -19,6 +19,7 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -72,8 +73,18 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
   }
 
   @Override
+  public Map<K, V> getAll(Set<K> keys) {
+    return cache.getAll(keys);
+  }
+
+  @Override
   public void put(K key, V value) {
     cache.fastPut(key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit);
+  }
+
+  @Override
+  public void putAll(Map<? extends K, ? extends V> map) {
+    cache.putAll(map);
   }
 
   @SuppressWarnings("unchecked")

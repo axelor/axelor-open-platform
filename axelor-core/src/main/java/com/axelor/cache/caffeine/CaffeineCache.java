@@ -20,6 +20,8 @@ package com.axelor.cache.caffeine;
 
 import com.axelor.cache.AxelorCache;
 import com.github.benmanes.caffeine.cache.Cache;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
@@ -50,8 +52,18 @@ public class CaffeineCache<K, V> implements AxelorCache<K, V> {
   }
 
   @Override
+  public Map<K, V> getAll(Set<K> keys) {
+    return cache.getAllPresent(keys);
+  }
+
+  @Override
   public void put(K key, V value) {
     cache.put(key, value);
+  }
+
+  @Override
+  public void putAll(Map<? extends K, ? extends V> map) {
+    cache.putAll(map);
   }
 
   @Override

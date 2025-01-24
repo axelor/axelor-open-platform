@@ -36,9 +36,11 @@ import com.axelor.test.GuiceModules;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -363,6 +365,89 @@ class CacheBuilderTest extends GuiceJunit5Test {
               "Should call listener with EXPIRED cause");
 
           assertEquals(0, cache.estimatedSize(), "Cache should be empty");
+        });
+  }
+
+  @ParameterizedTest(name = "{0} - GetAll Operations")
+  @EnumSource(CacheType.class)
+  void testGetAllOperations(CacheType cacheType) {
+    doGetAllOperations(cacheType.getFactory());
+  }
+
+  @ParameterizedTest(name = "{0} - PutAll Operations")
+  @EnumSource(CacheType.class)
+  void testPutAllOperations(CacheType cacheType) {
+    doPutAllOperations(cacheType.getFactory());
+  }
+
+  private void doGetAllOperations(
+      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory
+            .apply("test-get-all")
+            .build(key -> key.startsWith("load-") ? "loaded-" + key : null),
+        cache -> {
+          // Existing
+          var initial =
+              Map.of(
+                  "key1", "value1",
+                  "key2", "value2");
+          cache.putAll(initial);
+
+          assertEquals(
+              initial, cache.getAll(initial.keySet()), "Should return all existing values");
+
+          // Mixed existing/missing/loaded
+          var mixedKeys = Set.of("key1", "missing1", "load-missing2");
+          var expectedMixed =
+              Map.of(
+                  "key1", "value1",
+                  "load-missing2", "loaded-load-missing2");
+
+          assertEquals(
+              expectedMixed,
+              cache.getAll(mixedKeys),
+              "Should return mixed existing/missing/loaded values");
+
+          // All missing
+          var allMissing = Set.of("missing3", "missing4");
+          assertEquals(
+              Map.of(), cache.getAll(allMissing), "Should return empty map for all missing keys");
+        });
+  }
+
+  private void doPutAllOperations(
+      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory.apply("test-put-all").build(),
+        cache -> {
+          // Initial putAll
+          Map<String, Object> batch1 =
+              Map.of(
+                  "key1", "value1",
+                  "key2", "value2");
+          cache.putAll(batch1);
+          assertEquals(2, cache.estimatedSize(), "Should add all new entries");
+
+          // Update existing and add new
+          Map<String, Object> batch2 =
+              Map.of(
+                  "key2", "value2-updated",
+                  "key3", "value3");
+          cache.putAll(batch2);
+          assertEquals(3, cache.estimatedSize(), "Should update existing and add new");
+          assertEquals("value2-updated", cache.get("key2"), "Should update existing entry");
+
+          // Test batch
+          Map<String, Object> largeBatch = new HashMap<>();
+          IntStream.range(0, 100).forEach(i -> largeBatch.put("batch-key" + i, "value" + i));
+          cache.putAll(largeBatch);
+          assertEquals(103, cache.estimatedSize(), "Should handle large putAll operations");
+
+          // Verify
+          assertEquals("value1", cache.get("key1"), "Original entry should remain");
+          assertEquals("value2-updated", cache.get("key2"), "Updated entry should persist");
+          assertEquals("value99", cache.get("batch-key99"), "Last batch entry should exist");
         });
   }
 

@@ -21,6 +21,8 @@ package com.axelor.cache.caffeine;
 import com.axelor.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ForwardingConcurrentMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
@@ -78,6 +80,11 @@ public class CaffeineLoadingCache<K, V> extends CaffeineCache<K, V> {
   @Override
   public V get(K key) {
     return ((LoadingCache<K, V>) cache).get(key);
+  }
+
+  @Override
+  public Map<K, V> getAll(Set<K> keys) {
+    return ((LoadingCache<K, V>) cache).getAll(keys);
   }
 
   /** Try cache loader before mapping function for consistency with Redisson. */

@@ -23,8 +23,10 @@ import java.io.Closeable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Cache interface for wrapping different cache implementations
@@ -67,12 +69,35 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
   }
 
   /**
+   * Returns a map of the values associated with the {@code keys} in this cache, using {@link
+   * CacheLoader} if defined and if necessary.
+   *
+   * @param keys the keys whose associated values are to be returned
+   * @return an unmodifiable mapping of keys to values for the specified keys in this cache
+   */
+  default Map<K, V> getAll(Set<K> keys) {
+    return keys.stream().collect(Collectors.toUnmodifiableMap(Function.identity(), this::get));
+  }
+
+  /**
    * Associates the {@code value} with the {@code key}.
    *
    * @param key key with which the specified value is to be associated
    * @param value value to be associated with the specified key
    */
   void put(K key, V value);
+
+  /**
+   * Copies all of the mappings from the specified map to the cache.
+   *
+   * <p>The effect of this call is equivalent to that of calling {@code put(key, value)} on this map
+   * once for each mapping from {@code key} to {@code value} in the specified map.
+   *
+   * @param map the mappings to be stored in this cache
+   */
+  default void putAll(Map<? extends K, ? extends V> map) {
+    map.forEach(this::put);
+  }
 
   /**
    * Discards any cached value for the {@code key}.
