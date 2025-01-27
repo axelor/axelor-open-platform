@@ -1,4 +1,5 @@
 import { i18n } from "@/services/client/i18n";
+import { session } from "@/services/client/session";
 import { $request, $use } from "@/services/http";
 import { useCallback, useEffect, useState } from "react";
 import { alerts } from "../alerts";
@@ -48,7 +49,32 @@ export function useHttpWatch() {
               ]);
             });
           } else if (res.status === 403) {
-            alerts.error({ message: i18n.get("Access error") });
+            alerts.error({
+              title: i18n.get("Access Error"),
+              message: i18n.get(
+                "You are not authorized to access this resource.",
+              ),
+            });
+          } else if (res.status >= 500) {
+            const contentType = res.headers.get("Content-Type");
+
+            // Response has HTML content, so we show it as full page.
+            if (contentType?.includes("text/html")) {
+              const html = await res.text();
+              if (html.trim()) {
+                document.body.innerHTML = html;
+                return;
+              }
+            }
+
+            // Show alert when response has no HTML content.
+            const technical = session.info?.user?.technical;
+            const message = i18n.get(
+              "An error has occurred{}. Please contact your administrator.",
+              technical ? ` (${res.status})` : "",
+            );
+
+            alerts.error({ message });
           }
         }
         return res;
