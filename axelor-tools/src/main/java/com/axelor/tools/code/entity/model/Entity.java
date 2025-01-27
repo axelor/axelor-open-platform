@@ -78,7 +78,7 @@ public class Entity implements BaseType<Entity> {
 
   @XmlTransient private String tablePrefix;
 
-  @XmlTransient boolean modelClass;
+  @XmlTransient boolean isModelClass;
 
   @XmlTransient boolean dynamicUpdate;
 
@@ -95,7 +95,7 @@ public class Entity implements BaseType<Entity> {
   private Boolean jsonAttrs;
 
   @XmlAttribute(name = "logUpdates")
-  private Boolean auditable;
+  private Boolean isAuditable;
 
   @XmlAttribute(name = "equalsIncludeAll")
   private Boolean equalsAll;
@@ -116,8 +116,6 @@ public class Entity implements BaseType<Entity> {
 
   @XmlAttribute(name = "repository")
   private String repositoryType;
-
-  private transient boolean hasExtends;
 
   private static final Logger logger = LoggerFactory.getLogger(Entity.class);
 
@@ -167,13 +165,13 @@ public class Entity implements BaseType<Entity> {
     packageName = ns.getPackageName();
     repoPackage = ns.getRepoPackageName();
     tablePrefix = ns.getTablePrefix();
-    modelClass =
+    isModelClass =
         notBlank(packageName)
             && notBlank(name)
             && packageName.equals("com.axelor.db")
             && name.equals("Model");
 
-    if (modelClass) {
+    if (isModelClass) {
       superClass = null;
       mappedSuperClass = true;
     }
@@ -195,20 +193,14 @@ public class Entity implements BaseType<Entity> {
       repoPackage = packageName + ".repo";
     }
 
-    if (!modelClass) {
-      if (isBlank(superClass)) {
-        superClass =
-            notFalse(auditable) ? "com.axelor.auth.db.AuditableModel" : "com.axelor.db.Model";
-        idField = new Property.LongProperty();
-        idField.setName("id");
-      } else {
-        hasExtends = true;
-      }
+    if (!isModelClass && isBlank(superClass)) {
+      idField = new Property.LongProperty();
+      idField.setName("id");
     }
 
     boolean hasJsonAttrs = getFields().stream().anyMatch(p -> "attrs".equals(p.getName()));
     boolean addJsonAttrs =
-        !modelClass
+        !isModelClass
             && !hasJsonAttrs
             && (notFalse(jsonAttrs))
             && (isTrue(jsonAttrs) || !INTERNAL_PACKAGES.contains(packageName));
@@ -270,6 +262,12 @@ public class Entity implements BaseType<Entity> {
 
     if (other.cacheable != null) {
       cacheable = other.cacheable;
+    }
+
+    if (isTrue(other.isAuditable)) {
+      isAuditable = true;
+    } else if (notFalse(isAuditable) && isFalse(other.isAuditable)) {
+      logger.error("{}: cannot disable change tracking (with logUpdates attributes)", getName());
     }
 
     extraImports =
@@ -372,7 +370,7 @@ public class Entity implements BaseType<Entity> {
   }
 
   public boolean isModelClass() {
-    return modelClass;
+    return isModelClass;
   }
 
   public List<String> getComments() {
@@ -426,12 +424,12 @@ public class Entity implements BaseType<Entity> {
     this.jsonAttrs = jsonAttrs;
   }
 
-  public Boolean getAuditable() {
-    return auditable;
+  public Boolean getIsAuditable() {
+    return isAuditable;
   }
 
-  public void setAuditable(Boolean auditable) {
-    this.auditable = auditable;
+  public void setIsAuditable(Boolean isAuditable) {
+    this.isAuditable = isAuditable;
   }
 
   public Boolean getEqualsAll() {
@@ -477,6 +475,18 @@ public class Entity implements BaseType<Entity> {
 
   public void setSuperClass(String superClass) {
     this.superClass = superClass;
+  }
+
+  public String computeSuperClassName() {
+    if (isModelClass()) { return null; }
+    if (isBlank(superClass)) {
+      return notFalse(isAuditable) ? "com.axelor.auth.db.AuditableModel" : "com.axelor.db.Model";
+    }
+    return superClass;
+  }
+
+  private Boolean hasExtends() {
+    return !isModelClass() && notBlank(superClass);
   }
 
   public String getSuperInterfaces() {
@@ -579,7 +589,7 @@ public class Entity implements BaseType<Entity> {
   }
 
   private JavaAnnotation $cacheable() {
-    if (modelClass || cacheable == null) return null;
+    if (isModelClass() || cacheable == null) return null;
     if (isTrue(cacheable)) {
       return new JavaAnnotation("javax.persistence.Cacheable");
     }
@@ -597,7 +607,7 @@ public class Entity implements BaseType<Entity> {
 
   private JavaAnnotation $strategy() {
     // Inheritance strategy can be specified on root entity only
-    if (isBlank(strategy) || hasExtends) return null;
+    if (isBlank(strategy) || hasExtends()) return null;
     String type = "SINGLE_TABLE";
     if (strategy.equals("JOINED")) type = "JOINED";
     if (strategy.equals("CLASS")) type = "TABLE_PER_CLASS";
@@ -653,7 +663,7 @@ public class Entity implements BaseType<Entity> {
     JavaMethod m1 = new JavaMethod(name, null, Modifier.PUBLIC);
     JavaMethod m2 = new JavaMethod(name, null, Modifier.PUBLIC);
 
-    if (hasExtends) {
+    if (hasExtends()) {
       return List.of(m1);
     }
 
@@ -685,7 +695,7 @@ public class Entity implements BaseType<Entity> {
             .annotation(new JavaAnnotation("Override"))
             .param("obj", "Object");
 
-    if (hasExtends) {
+    if (hasExtends()) {
       method.code("return {0:t}.equals(this, obj);", "com.axelor.db.EntityHelper");
       return method;
     }
@@ -749,7 +759,7 @@ public class Entity implements BaseType<Entity> {
         new JavaMethod("toString", "String", Modifier.PUBLIC)
             .annotation(new JavaAnnotation("Override"));
 
-    if (hasExtends) {
+    if (hasExtends()) {
       method.code("return {0:t}.toString(this);", "com.axelor.db.EntityHelper");
       return method;
     }
@@ -773,7 +783,7 @@ public class Entity implements BaseType<Entity> {
     int modifiers = isModelClass() ? Modifier.PUBLIC | Modifier.ABSTRACT : Modifier.PUBLIC;
     JavaType pojo = JavaType.newClass(name, modifiers);
 
-    if (notBlank(superClass)) pojo.superType(superClass);
+    if (!isModelClass()) pojo.superType(computeSuperClassName());
     if (notEmpty(superInterfaces)) stream(superInterfaces).forEach(pojo::superInterface);
 
     List<JavaAnnotation> annotations = getAnnotations();
@@ -797,7 +807,7 @@ public class Entity implements BaseType<Entity> {
 
     annotations.forEach(pojo::annotation);
 
-    if (modelClass) {
+    if (isModelClass()) {
       JavaField id = new JavaField("id", "Long");
       JavaField cid = new JavaField("cid", "Long", Modifier.PRIVATE | Modifier.TRANSIENT);
       JavaField version = new JavaField("version", "Integer", Modifier.PRIVATE);
@@ -835,7 +845,7 @@ public class Entity implements BaseType<Entity> {
     fields.forEach(pojo::field);
     methods.forEach(pojo::method);
 
-    if (!modelClass) {
+    if (!isModelClass()) {
       toConstructors().forEach(pojo::constructor);
       pojo.method(createEqualsMethod());
       pojo.method(createHashCodeMethod());
