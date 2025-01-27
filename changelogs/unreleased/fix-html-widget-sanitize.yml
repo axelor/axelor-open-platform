@@ -1,0 +1,8 @@
+
+---
+title: Fix broken formatting on HTML widget because of sanitization
+type: fix
+description: |
+  DOMPurify sanitization reverses attributes order,
+  creating discrepancy with view value and causing issue with HTML widget.
+  Now update value if it was actually sanitized only.

@@ -342,7 +342,11 @@ ui.formInput('Html', {
     }
 
     scope.$render_editable = function () {
-      var value = axelor.sanitize(scope.getValue()) || "";
+      var value = scope.getValue() || "";
+      var sanitizedValue = axelor.sanitize(value);
+      if (DOMPurify.removed.length) {
+        value = sanitizedValue;
+      }
       scope.text = scope.format(value);
 
       var current = shellActive ? shell : textElement;
