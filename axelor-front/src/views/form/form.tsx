@@ -65,13 +65,11 @@ import {
   useFormHandlers,
 } from "./builder";
 import { createWidgetAtom } from "./builder/atoms";
+import { FormReadyScope, useAfterActions } from "./builder/scope";
 import {
-  FormEditableScope,
-  FormReadyScope,
-  FormValidityHandler,
-  FormValidityScope,
-  useAfterActions,
-} from "./builder/scope";
+  FormWidgetProviders,
+  FormWidgetsHandler,
+} from "./builder/form-providers";
 import {
   getDefaultValues,
   processOriginal,
@@ -422,28 +420,11 @@ const FormContainer = memo(function FormContainer({
   );
 
   const copyRecordRef = useRef(false);
-  const widgetsRef = useRef(new Set<FormValidityHandler>());
-  const editableWidgetsRef = useRef(new Set<() => void>());
+  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
   const switchTo = useViewSwitch();
 
   const dirtyAtom = useViewDirtyAtom();
   const [isDirty, setDirty] = useAtom(dirtyAtom);
-
-  const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
-    widgetsRef.current.add(fn);
-    return () => widgetsRef.current.delete(fn);
-  }, []);
-
-  const handleAddEditableWidget = useCallback((fn: () => void) => {
-    editableWidgetsRef.current.add(fn);
-    return () => editableWidgetsRef.current.delete(fn);
-  }, []);
-
-  const handleCommitEditableWidgets = useCallback(() => {
-    return Promise.all(
-      Array.from(editableWidgetsRef.current).map((fn) => fn()),
-    );
-  }, []);
 
   const doRead = useCallback(
     async (id: number | string, select?: Record<string, any>) => {
@@ -642,23 +623,17 @@ const FormContainer = memo(function FormContainer({
   );
 
   const getFieldErrors = useGetErrors();
-  const getWidgetErrors = useCallback(() => {
-    return Array.from(widgetsRef.current).some((checkWidgetInvalid) =>
-      checkWidgetInvalid(),
-    );
-  }, []);
-
   const getErrors = useAtomCallback(
     useCallback(
       (get) => {
         const formState = get(formAtom);
         const errors = getFieldErrors(formState);
-        if (errors || getWidgetErrors()) {
+        if (errors || widgetHandler.current?.invalid?.()) {
           return errors || [];
         }
         return;
       },
-      [formAtom, getFieldErrors, getWidgetErrors],
+      [formAtom, getFieldErrors],
     ),
   );
 
@@ -800,10 +775,10 @@ const FormContainer = memo(function FormContainer({
       async (options) => {
         // XXX: Need to find a way to coordinate top save and grid commit.
         actionExecutor.waitFor(300);
-        await handleCommitEditableWidgets();
+        await widgetHandler.current?.commit?.();
         return doSave(options);
       },
-      [actionExecutor, doSave, handleCommitEditableWidgets],
+      [actionExecutor, doSave],
     ),
   );
 
@@ -1168,7 +1143,7 @@ const FormContainer = memo(function FormContainer({
         actionExecutor,
         readyAtom,
         dirtyAtom,
-        commitForm: handleCommitEditableWidgets,
+        commitForm: widgetHandler.current?.commit,
         attachmentItem: canAttach ? attachmentItem : null,
       });
     }
@@ -1184,7 +1159,6 @@ const FormContainer = memo(function FormContainer({
     actionExecutor,
     readyAtom,
     dirtyAtom,
-    handleCommitEditableWidgets,
     attachmentItem,
     canAttach,
   ]);
@@ -1374,33 +1348,20 @@ const FormContainer = memo(function FormContainer({
       )}
       <div className={styles.formViewScroller} ref={containerRef}>
         <ScopeProvider scope={FormReadyScope} value={readyAtom}>
-          <ScopeProvider
-            scope={FormEditableScope}
-            value={{
-              add: handleAddEditableWidget,
-              commit: handleCommitEditableWidgets,
-            }}
-          >
-            <ScopeProvider
-              scope={FormValidityScope}
-              value={{
-                add: handleAddWidgetValidator,
-              }}
-            >
-              <FormComponent
-                className={styles.formView}
-                readonly={readonly}
-                schema={meta.view}
-                fields={meta.fields!}
-                formAtom={formAtom}
-                recordHandler={recordHandler}
-                actionHandler={actionHandler}
-                actionExecutor={actionExecutor}
-                layout={Layout}
-                widgetAtom={widgetAtom}
-              />
-            </ScopeProvider>
-          </ScopeProvider>
+          <FormWidgetProviders ref={widgetHandler}>
+            <FormComponent
+              className={styles.formView}
+              readonly={readonly}
+              schema={meta.view}
+              fields={meta.fields!}
+              formAtom={formAtom}
+              recordHandler={recordHandler}
+              actionHandler={actionHandler}
+              actionExecutor={actionExecutor}
+              layout={Layout}
+              widgetAtom={widgetAtom}
+            />
+          </FormWidgetProviders>
         </ScopeProvider>
       </div>
     </div>

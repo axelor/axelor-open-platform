@@ -9,7 +9,6 @@ import {
   useState,
 } from "react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
-import { ScopeProvider } from "bunshi/react";
 import { SetStateAction, atom, useAtomValue, useSetAtom } from "jotai";
 import merge from "lodash/merge";
 import cloneDeep from "lodash/cloneDeep";
@@ -27,13 +26,11 @@ import { i18n } from "@/services/client/i18n";
 import { toKebabCase } from "@/utils/names";
 import { SaveOptions } from "@/services/client/data";
 
+import { useFormEditableScope, useFormScope } from "@/views/form/builder/scope";
 import {
-  FormEditableScope,
-  FormValidityHandler,
-  FormValidityScope,
-  useFormEditableScope,
-  useFormScope,
-} from "@/views/form/builder/scope";
+  FormWidgetProviders,
+  FormWidgetsHandler,
+} from "@/views/form/builder/form-providers";
 import { Layout, fetchRecord, showErrors, useGetErrors } from "@/views/form";
 import { createFormAtom, createWidgetAtom } from "@/views/form/builder/atoms";
 import { Form, FormState, useFormHandlers } from "@/views/form/builder";
@@ -115,8 +112,9 @@ export function ExpandableFormView({
   const fetchedRef = useRef<DataRecord>();
   const closeRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const widgetsRef = useRef(new Set<FormValidityHandler>());
-  const editableWidgetsRef = useRef(new Set<() => void>());
+
+  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);
 
@@ -124,11 +122,6 @@ export function ExpandableFormView({
 
   const showConfirmDirty = useViewConfirmDirty();
   const getErrors = useGetErrors();
-  const getWidgetErrors = useCallback(() => {
-    return Array.from(widgetsRef.current).some((checkWidgetInvalid) =>
-      checkWidgetInvalid(),
-    );
-  }, []);
 
   const editorRecord = useRef(record).current;
   const editorFormAtom = useMemo(
@@ -184,22 +177,6 @@ export function ExpandableFormView({
     () => createWidgetAtom({ schema, formAtom }),
     [formAtom, schema],
   );
-
-  const handleAddWidgetValidator = useCallback((fn: FormValidityHandler) => {
-    widgetsRef.current.add(fn);
-    return () => widgetsRef.current.delete(fn);
-  }, []);
-
-  const handleAddEditableWidget = useCallback((fn: () => void) => {
-    editableWidgetsRef.current.add(fn);
-    return () => editableWidgetsRef.current.delete(fn);
-  }, []);
-
-  const handleCommitEditableWidgets = useCallback(() => {
-    return Promise.all(
-      Array.from(editableWidgetsRef.current).map((fn) => fn()),
-    );
-  }, []);
 
   const doOnLoad = useAtomCallback(
     useCallback(
@@ -286,13 +263,18 @@ export function ExpandableFormView({
         const formState = get(formAtom);
         const errors = getErrors(formState);
 
-        if (errors || getWidgetErrors()) {
-          errors && silent && onDiscard?.({ id: formState.record.id });
-          errors && !silent && showErrors(errors);
+        if (errors || widgetHandler.current?.invalid?.()) {
+          if (errors) {
+            if (silent) {
+              onDiscard?.({ id: formState.record.id });
+            } else {
+              showErrors(errors);
+            }
+          }
           return Promise.reject();
         }
       },
-      [formAtom, getErrors, getWidgetErrors, onDiscard],
+      [formAtom, getErrors, onDiscard],
     ),
   );
 
@@ -311,7 +293,7 @@ export function ExpandableFormView({
 
         await actionExecutor.waitFor();
         await actionExecutor.wait();
-        await handleCommitEditableWidgets();
+        await widgetHandler.current?.commit?.();
 
         await doValidate({ silent });
 
@@ -367,7 +349,6 @@ export function ExpandableFormView({
         onClose,
         formAtom,
         meta.fields,
-        handleCommitEditableWidgets,
       ],
     ),
   );
@@ -534,90 +515,72 @@ export function ExpandableFormView({
       onKeyDown={handleKeyDown}
     >
       {loading && !formReady ? null : (
-        <ScopeProvider
-          scope={FormEditableScope}
-          value={{
-            id: record.id,
-            add: handleAddEditableWidget,
-            commit: handleCommitEditableWidgets,
-          }}
-        >
-          <ScopeProvider
-            scope={FormValidityScope}
-            value={{
-              add: handleAddWidgetValidator,
-            }}
-          >
-            <Form
-              className={styles.formView}
-              schema={meta.view}
-              fields={meta.fields!}
-              readonly={formReadonly}
-              formAtom={formAtom}
-              actionHandler={actionHandler}
-              actionExecutor={actionExecutor}
-              recordHandler={recordHandler}
-              layout={Layout}
-              widgetAtom={widgetAtom}
-            />
-            {!isTreeGrid && (
-              <Box
-                flex={1}
-                d="flex"
-                justifyContent="flex-end"
-                gap={4}
-                w={100}
-                mt={2}
-              >
-                {canEdit && !readonly ? (
-                  <>
-                    <Button size="sm" variant="danger" onClick={doCancel}>
-                      {i18n.get("Cancel")}
-                    </Button>
-                    {canSave && (
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() =>
-                          doSave?.({
-                            shouldClose: isCollection,
-                          })
-                        }
-                      >
-                        {i18n.get("Update")}
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <>
+        <FormWidgetProviders ref={widgetHandler} record={record}>
+          <Form
+            className={styles.formView}
+            schema={meta.view}
+            fields={meta.fields!}
+            readonly={formReadonly}
+            formAtom={formAtom}
+            actionHandler={actionHandler}
+            actionExecutor={actionExecutor}
+            recordHandler={recordHandler}
+            layout={Layout}
+            widgetAtom={widgetAtom}
+          />
+          {!isTreeGrid && (
+            <Box
+              flex={1}
+              d="flex"
+              justifyContent="flex-end"
+              gap={4}
+              w={100}
+              mt={2}
+            >
+              {canEdit && !readonly ? (
+                <>
+                  <Button size="sm" variant="danger" onClick={doCancel}>
+                    {i18n.get("Cancel")}
+                  </Button>
+                  {canSave && (
                     <Button
                       size="sm"
-                      variant="light"
-                      onClick={() => onClose?.()}
+                      variant="primary"
+                      onClick={() =>
+                        doSave?.({
+                          shouldClose: isCollection,
+                        })
+                      }
                     >
-                      {i18n.get("Close")}
+                      {i18n.get("Update")}
                     </Button>
-                    {!isCollection && canEdit && canSave && (
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() => {
-                          if (edit) {
-                            doSave?.();
-                          } else {
-                            setEdit(true);
-                          }
-                        }}
-                      >
-                        {edit ? i18n.get("Save") : i18n.get("Edit")}
-                      </Button>
-                    )}
-                  </>
-                )}
-              </Box>
-            )}
-          </ScopeProvider>
-        </ScopeProvider>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Button size="sm" variant="light" onClick={() => onClose?.()}>
+                    {i18n.get("Close")}
+                  </Button>
+                  {!isCollection && canEdit && canSave && (
+                    <Button
+                      size="sm"
+                      variant="primary"
+                      onClick={() => {
+                        if (edit) {
+                          doSave?.();
+                        } else {
+                          setEdit(true);
+                        }
+                      }}
+                    >
+                      {edit ? i18n.get("Save") : i18n.get("Edit")}
+                    </Button>
+                  )}
+                </>
+              )}
+            </Box>
+          )}
+        </FormWidgetProviders>
       )}
     </Box>
   );
