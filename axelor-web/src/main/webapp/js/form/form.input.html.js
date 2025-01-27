@@ -489,6 +489,15 @@ ui.formInput('HtmlInline', 'Text', {
     var shellElement = $(shell.getElement());
     wrapper.resizable();
 
+    scope.$render_editable = function () {
+      var value = scope.getValue() || "";
+      var sanitizedValue = axelor.sanitize(value);
+      if (DOMPurify.removed.length) {
+        value = sanitizedValue;
+        model.$setViewValue(value);
+      }
+    };
+
     scope.waitForActions(function() {
       container = element.parents('.ui-dialog-content,.view-container').first();
       wrapper.height(field.height || 175).appendTo(container);

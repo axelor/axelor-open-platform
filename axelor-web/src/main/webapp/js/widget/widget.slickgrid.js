@@ -506,7 +506,7 @@ _.extend(Factory.prototype, {
     }
 
     if (widget === "html") {
-      return value ? '<span>' + value + '</span>' : '';
+      return value ? '<span>' + axelor.sanitize(value) + '</span>' : '';
     }
 
     // try to get dotted field value from related object
