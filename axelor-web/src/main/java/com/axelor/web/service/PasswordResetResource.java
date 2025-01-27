@@ -55,7 +55,7 @@ public class PasswordResetResource {
   @Path("/forgot")
   public Response forgot(Map<String, Object> data) {
     if (!authPasswordResetService.isEnabled()) {
-      return serviceUnavailable();
+      return serviceDisabled();
     }
 
     if (data == null) {
@@ -82,7 +82,7 @@ public class PasswordResetResource {
   @Path("/verify")
   public Response verify(Map<String, Object> data) {
     if (!authPasswordResetService.isEnabled()) {
-      return serviceUnavailable();
+      return serviceDisabled();
     }
 
     if (data == null) {
@@ -118,7 +118,7 @@ public class PasswordResetResource {
   @Path("/reset")
   public Response reset(Map<String, Object> data) {
     if (!authPasswordResetService.isEnabled()) {
-      return serviceUnavailable();
+      return serviceDisabled();
     }
 
     if (data == null) {
@@ -168,8 +168,8 @@ public class PasswordResetResource {
         .build();
   }
 
-  private Response serviceUnavailable() {
-    return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+  private Response serviceDisabled() {
+    return Response.status(Response.Status.FORBIDDEN)
         .entity(errorEntity(I18n.get("Service disabled")))
         .build();
   }
