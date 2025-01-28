@@ -32,13 +32,19 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EventModule extends AbstractModule {
+
+  private static Logger log = LoggerFactory.getLogger(EventModule.class);
 
   @Override
   protected void configure() {
@@ -137,10 +143,39 @@ public class EventModule extends AbstractModule {
       if (ip.getMember() instanceof Field) {
         injectMembers(instance, (Field) ip.getMember());
       } else if (ip.getMember() instanceof Constructor) {
-        Arrays.stream(ip.getMember().getDeclaringClass().getDeclaredFields())
-            .filter(field -> field.getAnnotation(Inject.class) == null)
-            .filter(field -> field.getType() == Event.class)
-            .forEach(field -> injectMembers(instance, field));
+        Class<?> cls = ip.getMember().getDeclaringClass();
+        Set<Type> eventDependencies =
+            ip.getDependencies().stream()
+                .map(dependency -> dependency.getKey().getTypeLiteral())
+                .filter(typeLiteral -> typeLiteral.getRawType() == Event.class)
+                .map(TypeLiteral::getType)
+                .collect(Collectors.toCollection(HashSet::new));
+
+        do {
+          Arrays.stream(cls.getDeclaredFields())
+              .filter(
+                  field ->
+                      field.getAnnotation(Inject.class) == null
+                          && field.getAnnotation(com.google.inject.Inject.class) == null)
+              .filter(field -> field.getType() == Event.class)
+              .filter(field -> eventDependencies.contains(field.getGenericType()))
+              .forEach(
+                  field -> {
+                    injectMembers(instance, field);
+                    eventDependencies.remove(field.getGenericType());
+                  });
+          cls = cls.getSuperclass();
+        } while (!eventDependencies.isEmpty()
+            && cls != null
+            && !cls.isAssignableFrom(Object.class));
+
+        if (!eventDependencies.isEmpty()) {
+          log.error(
+              "{}: unresolved event dependencies {}",
+              ip.getMember().getDeclaringClass().getName(),
+              eventDependencies);
+        }
+
       } else {
         throw new IllegalArgumentException("Unexpected injection point member type");
       }
