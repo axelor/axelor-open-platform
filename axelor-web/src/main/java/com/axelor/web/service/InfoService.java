@@ -95,8 +95,8 @@ public class InfoService extends AbstractService {
         SETTINGS.format(
             I18n.get(SETTINGS.getProperties().get(AvailableAppSettings.APPLICATION_COPYRIGHT))));
     map.put("theme", SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null));
-    map.put("logo", getLogo());
-    map.put("icon", getIcon());
+    map.put("logo", getLogoLink());
+    map.put("icon", getIconLink());
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     final Map<String, Object> signIn = signInInfo();
@@ -224,7 +224,7 @@ public class InfoService extends AbstractService {
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     if (user.getImage() != null) {
-      map.put("image", getLink(user, null));
+      map.put("image", getLink(user));
     }
 
     map.put("action", user.getHomeAction());
@@ -316,15 +316,17 @@ public class InfoService extends AbstractService {
   /**
    * Gets user specific application logo, or falls back to default application logo.
    *
-   * @return user specific logo link
+   * <p>The returned image can be a resource path string, a URL string or a MetaFile
+   *
+   * @return user specific logo
    */
-  public String getLogo() {
+  public Object getLogo() {
     final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
     if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {
-        return getLink(helper.eval("__config__.appLogo"), logo);
+        return Optional.ofNullable(helper.eval("__config__.appLogo")).orElse(logo);
       } catch (Exception e) {
         // Ignore
       }
@@ -333,17 +335,28 @@ public class InfoService extends AbstractService {
   }
 
   /**
+   * Gets user specific application logo link, or falls back to default application logo.
+   *
+   * @return user specific logo link
+   */
+  public String getLogoLink() {
+    return getLink(getLogo());
+  }
+
+  /**
    * Gets user specific application icon, or falls back to default application icon.
+   *
+   * <p>The returned image can be a resource path string, a URL string or a MetaFile
    *
    * @return user specific application icon
    */
-  public String getIcon() {
+  public Object getIcon() {
     final String icon = SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico");
     if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_ICON) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {
-        return getLink(helper.eval("__config__.appIcon"), icon);
+        return Optional.ofNullable(helper.eval("__config__.appIcon")).orElse(icon);
       } catch (Exception e) {
         // Ignore
       }
@@ -351,10 +364,16 @@ public class InfoService extends AbstractService {
     return icon;
   }
 
-  public String getLink(Object value, String defaultValue) {
-    if (value == null) {
-      return defaultValue;
-    }
+  /**
+   * Gets user specific application icon link, or falls back to default application icon.
+   *
+   * @return user specific application icon link
+   */
+  public String getIconLink() {
+    return getLink(getIcon());
+  }
+
+  public String getLink(Object value) {
     if (value instanceof String) {
       return (String) value;
     }
@@ -374,6 +393,6 @@ public class InfoService extends AbstractService {
           + "/image/download?image=true&v="
           + ((User) value).getVersion();
     }
-    return defaultValue;
+    return null;
   }
 }

@@ -21,21 +21,24 @@ package com.axelor.web.service;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.MimeTypesUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.theme.MetaThemeService;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -46,6 +49,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,6 +62,8 @@ public class InfoResource {
   @Context private HttpServletResponse response;
 
   private final InfoService infoService;
+
+  private static Logger log = LoggerFactory.getLogger(InfoResource.class);
 
   @Inject
   public InfoResource(InfoService infoService) {
@@ -110,18 +117,28 @@ public class InfoResource {
     return getImageContent(infoService.getIcon());
   }
 
-  private Response getImageContent(String pathString) {
-    if (StringUtils.notEmpty(pathString)) {
-      final ServletContext context = request.getServletContext();
-      try (final InputStream inputStream = context.getResourceAsStream(pathString)) {
-        if (inputStream != null) {
-          final byte[] imageData = inputStream.readAllBytes();
-          final String mediaType = MimeTypesUtils.getContentType(pathString);
-          return Response.ok(imageData).type(mediaType).build();
+  private Response getImageContent(Object image) {
+    try {
+      if (image instanceof MetaFile) {
+        final MetaFile metaFile = (MetaFile) image;
+        final String filePath = metaFile.getFilePath();
+        final File inputFile = MetaFiles.getPath(filePath).toFile();
+
+        return Response.ok(new FileInputStream(inputFile))
+            .type(MimeTypesUtils.getContentType(inputFile))
+            .build();
+      } else if (ObjectUtils.notEmpty(image)) {
+        final String path = image.toString();
+        final InputStream inputStream = request.getServletContext().getResourceAsStream(path);
+
+        if (inputStream == null) {
+          return Response.seeOther(new URI(path)).build();
         }
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
+
+        return Response.ok(inputStream).type(MimeTypesUtils.getContentType(path)).build();
       }
+    } catch (Exception e) {
+      log.error("Unable to get image content for {}: {}", image, e.getMessage());
     }
 
     return Response.status(Response.Status.NOT_FOUND).build();
