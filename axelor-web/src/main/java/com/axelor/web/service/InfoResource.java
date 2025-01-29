@@ -18,11 +18,13 @@
  */
 package com.axelor.web.service;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
@@ -32,10 +34,9 @@ import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -106,15 +107,15 @@ public class InfoResource {
   @GET
   @Path("logo")
   @Hidden
-  public Response getLogoContent() {
-    return getImageContent(infoService.getLogo());
+  public Response getLogoContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getLogo(mode));
   }
 
   @GET
   @Path("icon")
   @Hidden
-  public Response getIconContent() {
-    return getImageContent(infoService.getIcon());
+  public Response getIconContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getIcon(mode));
   }
 
   private Response getImageContent(Object image) {
@@ -122,20 +123,30 @@ public class InfoResource {
       if (image instanceof MetaFile) {
         final MetaFile metaFile = (MetaFile) image;
         final String filePath = metaFile.getFilePath();
-        final File inputFile = MetaFiles.getPath(filePath).toFile();
+        final java.nio.file.Path inputPath = MetaFiles.getPath(filePath);
 
-        return Response.ok(new FileInputStream(inputFile))
-            .type(MimeTypesUtils.getContentType(inputFile))
-            .build();
+        if (Files.exists(inputPath)) {
+          return Response.ok(Files.newInputStream(inputPath))
+              .type(MimeTypesUtils.getContentType(inputPath))
+              .build();
+        }
       } else if (ObjectUtils.notEmpty(image)) {
         final String path = image.toString();
         final InputStream inputStream = request.getServletContext().getResourceAsStream(path);
 
-        if (inputStream == null) {
-          return Response.seeOther(new URI(path)).build();
+        if (inputStream != null) {
+          return Response.ok(inputStream).type(MimeTypesUtils.getContentType(path)).build();
         }
 
-        return Response.ok(inputStream).type(MimeTypesUtils.getContentType(path)).build();
+        URI uri = new URI(path);
+        if (!uri.isAbsolute()) {
+          uri =
+              UriBuilder.from(AppSettings.get().getBaseURL())
+                  .addPath(path.startsWith("/") ? path : "/" + path)
+                  .toUri();
+        }
+
+        return Response.seeOther(uri).build();
       }
     } catch (Exception e) {
       log.error("Unable to get image content for {}: {}", image, e.getMessage());

@@ -478,7 +478,9 @@ public class Entity implements BaseType<Entity> {
   }
 
   public String computeSuperClassName() {
-    if (isModelClass()) { return null; }
+    if (isModelClass()) {
+      return null;
+    }
     if (isBlank(superClass)) {
       return notFalse(isAuditable) ? "com.axelor.auth.db.AuditableModel" : "com.axelor.db.Model";
     }

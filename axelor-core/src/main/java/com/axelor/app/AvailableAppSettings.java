@@ -33,7 +33,9 @@ public interface AvailableAppSettings {
   String APPLICATION_HELP = "application.help";
   String APPLICATION_COPYRIGHT = "application.copyright";
   String APPLICATION_LOGO = "application.logo";
+  String APPLICATION_LOGO_DARK = "application.logo-dark";
   String APPLICATION_ICON = "application.icon";
+  String APPLICATION_ICON_DARK = "application.icon-dark";
   String APPLICATION_MODE = "application.mode";
   String APPLICATION_BASE_URL = "application.base-url";
   String APPLICATION_CONFIG_PROVIDER = "application.config-provider";
