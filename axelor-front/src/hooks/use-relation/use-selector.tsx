@@ -12,7 +12,7 @@ import { showPopup } from "@/view-containers/view-popup";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 
 import { i18n } from "@/services/client/i18n";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useDataStore } from "../use-data-store";
 import { initTab } from "../use-tabs";
 import { SearchOptions, SearchPage } from "@/services/client/data";
@@ -241,7 +241,7 @@ function Footer({
   onSelect?: (records: DataRecord[]) => void;
 }) {
   const handlerAtom = usePopupHandlerAtom();
-  const handler = useAtomValue(handlerAtom);
+  const [handler, setHandler] = useAtom(handlerAtom);
 
   const onClose = useCallback(
     (result: boolean) => {
@@ -261,7 +261,11 @@ function Footer({
       state?.selectedRows?.map((index) => state.rows[index].record) ?? [];
     onSelect?.(records);
     onClose(true);
-  }, [handler, onSelect, onClose]);
+  }, [handler.data, onSelect, onClose]);
+
+  useEffect(() => {
+    setHandler((popup) => ({ ...popup, close: handleCancel }));
+  }, [setHandler, handleCancel]);
 
   return (
     <Box d="flex" g={2} flex={1}>
