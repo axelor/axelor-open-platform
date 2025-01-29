@@ -16,6 +16,7 @@ import {
 } from "./utils";
 
 import { clsx } from "@axelor/ui";
+import { sanitize } from "@/utils/sanitize";
 import { i18n } from "@/services/client/i18n";
 import "./editor.scss";
 
@@ -159,7 +160,7 @@ function HTMLEditor({
     }
 
     function setHTML(html) {
-      if(getEditor()) getEditor().innerHTML = html || "";
+      if (getEditor()) getEditor().innerHTML = html || "";
     }
 
     function normalize() {
@@ -373,20 +374,25 @@ function HTMLEditor({
     handleBlur({ target: { value: commands.getHTML() } });
   }
 
+  const setHTMLValue = useCallback(
+    (htmlValue) => commands.setHTML(sanitize(htmlValue)),
+    [commands],
+  );
+
   useEffect(() => {
     if (toggle) {
       textareaRef.current && (textareaRef.current.value = htmlRef.current);
     } else {
-      commands.setHTML(htmlRef.current);
+      setHTMLValue(htmlRef.current);
     }
-  }, [toggle, commands]);
+  }, [toggle, setHTMLValue]);
 
   useEffect(() => {
     if (htmlRef.current !== value) {
-      commands.setHTML((htmlRef.current = value));
+      setHTMLValue((htmlRef.current = value));
       updates(true);
     }
-  }, [value, commands, updates]);
+  }, [value, setHTMLValue, updates]);
 
   useEffect(() => {
     initRef.current = true;
