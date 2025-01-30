@@ -503,6 +503,7 @@ with `application.logo`/`application.logo-dark` and `application.icon`/`applicat
 You can customize the login page via the properties `application.sign-in.*`.
 
 - **logo**: Set a custom logo for the login page if you require a different one from `application.logo`.
+- **logo-dark**: Set a custom dark logo for the login page if you require a different one from `application.logo-dark`.
 - **title**: Add a translatable HTML title that appears after the logo.
 - **footer**: Add a translatable HTML footer that appears after the form login panel.
 - **username field**: Configure the username field's title, title visibility, placeholder and icon.
@@ -513,8 +514,9 @@ You can customize the login page via the properties `application.sign-in.*`.
 
 [source,properties]
 ----
-# Absolute or relative URL to have a login logo different from `application.logo`.
+# Absolute or relative URL to have a login logo different from `application.logo`/`application.logo-dark`.
 application.sign-in.logo = url
+application.sign-in.logo-dark = url
 # Translatable sanitized HTML, shown after the logo in the form login panel.
 application.sign-in.title = html
 # Translatable sanitized HTML, shown after the form login panel.

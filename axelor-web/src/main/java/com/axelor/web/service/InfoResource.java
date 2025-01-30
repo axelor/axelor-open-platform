@@ -112,6 +112,13 @@ public class InfoResource {
   }
 
   @GET
+  @Path("sign-in/logo")
+  @Hidden
+  public Response getSignInLogoContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getSignInLogo(mode));
+  }
+
+  @GET
   @Path("icon")
   @Hidden
   public Response getIconContent(@QueryParam("mode") String mode) {

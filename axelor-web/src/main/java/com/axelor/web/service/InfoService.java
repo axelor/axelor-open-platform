@@ -334,6 +334,14 @@ public class InfoService extends AbstractService {
                 : SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png"));
   }
 
+  public Object getSignInLogo(String mode) {
+    final String signInlogo =
+        isDark(mode)
+            ? SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo-dark")
+            : SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo");
+    return Optional.<Object>ofNullable(signInlogo).orElseGet(() -> getLogo(mode));
+  }
+
   /**
    * Gets user specific application icon, or falls back to default application icon.
    *

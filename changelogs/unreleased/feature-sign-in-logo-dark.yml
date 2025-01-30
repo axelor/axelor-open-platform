@@ -1,0 +1,5 @@
+---
+title: Support application settings application.sign-in.logo-dark
+type: feature
+description: |
+  Set a custom dark logo for the login page if require a different one from `application.logo-dark`.
