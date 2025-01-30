@@ -3,13 +3,13 @@ import { useEffect } from "react";
 import { useAppSettings } from "@/hooks/use-app-settings";
 
 export function useAppHead() {
-  const { name, description, icon, isReady } = useAppSettings();
+  const { name, description, isReady, themeMode } = useAppSettings();
   useEffect(() => {
     if (isReady) {
       setTitle(name, description);
-      setIcon(icon);
+      setIcon(`ws/public/app/icon?mode=${themeMode}`);
     }
-  }, [name, description, icon, isReady]);
+  }, [name, description, isReady, themeMode]);
 }
 
 function setTitle(name: string, description: string) {

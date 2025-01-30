@@ -18,8 +18,8 @@ import { useSidebar } from "./hook";
 import AppIcon from "../../assets/axelor-icon.svg?react";
 import AppLogo from "../../assets/axelor.svg?react";
 
-import styles from "./nav-drawer.module.scss";
 import colors from "@/styles/legacy/_colors.module.scss";
+import styles from "./nav-drawer.module.scss";
 
 const TagStyle: Record<string, TBackground> = {
   default: "secondary",
@@ -182,16 +182,17 @@ function Header() {
   const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
   const { open: openTab } = useTabs();
-  const { name } = useAppSettings();
+  const { name, themeMode } = useAppSettings();
 
   const appHome = data?.user?.action;
-  const { logo: appLogo } = data?.application ?? {};
 
   const onLogoClick = useCallback(() => {
     if (appHome) {
       openTab(appHome);
     }
   }, [appHome, openTab]);
+
+  const [imgError, setImgError] = useState(false);
 
   return (
     <div className={styles.header}>
@@ -204,21 +205,36 @@ function Header() {
         })}
         onClick={onLogoClick}
       >
-        {appLogo ? <img src={appLogo} alt={name} /> : <AppLogo />}
+        {imgError ? (
+          <AppLogo />
+        ) : (
+          <img
+            src={`ws/public/app/logo?mode=${themeMode}`}
+            alt={name}
+            onError={() => setImgError(true)}
+          />
+        )}
       </div>
     </div>
   );
 }
 
 function HeaderSmall() {
-  const { name, icon } = useAppSettings();
+  const { name, themeMode } = useAppSettings();
+
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
-        {icon ? (
-          <img src={icon} alt={name} />
-        ) : (
+        {imgError ? (
           <AppIcon viewBox="0 0 241 228" />
+        ) : (
+          <img
+            src={`ws/public/app/icon?mode=${themeMode}`}
+            alt={name}
+            onError={() => setImgError(true)}
+          />
         )}
       </div>
     </div>

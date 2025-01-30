@@ -15,7 +15,7 @@ import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { getGenericErrorMessage } from "../reset-password/utils";
 
-import logo from "@/assets/axelor.svg";
+import defaultLogo from "@/assets/axelor.svg";
 import styles from "./forgot-password.module.scss";
 
 export function ForgotPassword() {
@@ -23,7 +23,7 @@ export function ForgotPassword() {
   const { state: locationState } = location ?? {};
 
   const session = useSession();
-  const { name, copyright } = useAppSettings();
+  const { name, copyright, themeMode } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { resetPasswordEnabled } = application ?? {};
@@ -32,9 +32,6 @@ export function ForgotPassword() {
   const emailAddressRef = useRef<HTMLInputElement>(null);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertError, setError] = useState(locationState?.error ?? "");
-
-  const { logo: appLogo = logo } =
-    appInfo?.application || {};
 
   const [tenantId, setTenantId] = useState(
     locationState?.tenantId ?? authentication?.tenant,
@@ -120,10 +117,10 @@ export function ForgotPassword() {
         >
           <img
             className={styles.logo}
-            src={appLogo}
+            src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
             alt={name}
             onError={(e) => {
-              e.currentTarget.src = logo;
+              e.currentTarget.src = defaultLogo;
             }}
           />
           <Box as="legend" style={{ textWrap: "balance" }}>

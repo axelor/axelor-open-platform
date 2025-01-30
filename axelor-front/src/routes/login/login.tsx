@@ -6,13 +6,13 @@ import { Alert, Box, Button, Image } from "@axelor/ui";
 import { alerts, AlertsProvider } from "@/components/alerts";
 import { LoginForm } from "@/components/login-form";
 import { useAppHead } from "@/hooks/use-app-head";
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { ClientInfo } from "@/services/client/session";
 
-import logo from "@/assets/axelor.svg";
+import defaultLogo from "@/assets/axelor.svg";
 import styles from "./login.module.scss";
-import { useAppSettings } from "@/hooks/use-app-settings";
 
 const LOGIN_ENDPOINT = "login";
 const FORCE_CLIENT_PARAM = "force_client";
@@ -185,10 +185,7 @@ function CentralClient(props: { name: string; title?: string; icon?: string }) {
 }
 
 function ServerError({ error }: { error: string }) {
-  const { data } = useSession();
-  const { name } = useAppSettings();
-  const { logo: appLogo = logo } =
-    data?.application ?? {};
+  const { name, themeMode } = useAppSettings();
 
   return (
     <Box as="main" mt={5} ms="auto" me="auto" className={styles.main}>
@@ -200,7 +197,14 @@ function ServerError({ error }: { error: string }) {
         alignItems="center"
         p={3}
       >
-        <Image className={styles.logo} src={appLogo} alt={name} />
+        <Image
+          className={styles.logo}
+          src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
+          alt={name}
+          onError={(e) => {
+            e.currentTarget.src = defaultLogo;
+          }}
+        />
         <Alert mt={3} mb={1} p={2} variant="danger">
           {error}
         </Alert>

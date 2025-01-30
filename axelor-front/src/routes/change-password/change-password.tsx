@@ -17,7 +17,7 @@ import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "../login";
 
-import logo from "@/assets/axelor.svg";
+import defaultLogo from "@/assets/axelor.svg";
 import styles from "./change-password.module.scss";
 
 export function ChangePassword({
@@ -32,7 +32,7 @@ export function ChangePassword({
   passwordPatternTitle?: string;
 }) {
   const session = useSession();
-  const { name, copyright } = useAppSettings();
+  const { name, copyright, themeMode } = useAppSettings();
   const appInfo = session.data;
   const defaultClient = appInfo?.authentication?.defaultClient;
 
@@ -56,9 +56,6 @@ export function ChangePassword({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const requireCurrentPassword = Boolean(username);
-
-  const { logo: appLogo = logo} =
-    appInfo?.application || {};
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -201,10 +198,10 @@ export function ChangePassword({
         >
           <img
             className={styles.logo}
-            src={appLogo}
+            src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
             alt={name}
             onError={(e) => {
-              e.currentTarget.src = logo;
+              e.currentTarget.src = defaultLogo;
             }}
           />
           <Box as="legend" style={{ textWrap: "balance" }}>

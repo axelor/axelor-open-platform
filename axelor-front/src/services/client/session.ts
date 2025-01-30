@@ -27,8 +27,6 @@ export interface SessionInfo {
     description?: string;
     copyright?: string;
     theme?: string;
-    logo?: string;
-    icon?: string;
     lang?: string;
     version?: string;
     home?: string;
@@ -43,7 +41,6 @@ export interface SessionInfo {
       allowTryItOut?: boolean;
     };
     signIn?: {
-      logo?: string;
       title?: string;
       footer?: string;
       fields?: {

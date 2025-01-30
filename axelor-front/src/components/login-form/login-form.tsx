@@ -52,7 +52,7 @@ export function LoginForm({
   const { navigate } = useRoute();
 
   const session = useSession();
-  const { name: appName, copyright } = useAppSettings();
+  const { name: appName, copyright, themeMode } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { signIn } = application ?? {};
@@ -135,10 +135,8 @@ export function LoginForm({
       ],
     );
 
-  const { logo: appLogo = defaultLogo, resetPasswordEnabled } =
-    appInfo?.application || {};
+  const { resetPasswordEnabled } = appInfo?.application || {};
   const {
-    logo: signInLogo = appLogo,
     title: signInTitle,
     footer: signInFooter,
     fields: signInFields,
@@ -229,7 +227,7 @@ export function LoginForm({
       >
         <img
           className={styles.logo}
-          src={signInLogo}
+          src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
           alt={appName}
           onError={(e) => {
             e.currentTarget.src = defaultLogo;

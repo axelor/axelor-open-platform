@@ -3,21 +3,21 @@ import { useCallback } from "react";
 
 import { Box, Button, Link } from "@axelor/ui";
 
+import { DefaultAppLogo } from "@/components/app-logo";
 import { dialogs } from "@/components/dialogs";
 import { COPYRIGHT, useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { i18n } from "@/services/client/i18n";
 import { session } from "@/services/client/session";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
-
 import { System } from "../system";
 
-import AppLogo from "../../assets/axelor.svg?react";
+import styles from "./about.module.scss";
 
 export function About() {
   const { info } = session;
   const { application: app, user } = info || { application: {}, user: {} };
-  
+
   const technical = user?.technical;
 
   const { navigate } = useRoute();
@@ -41,7 +41,7 @@ export function About() {
   return (
     <Box flex={1} textAlign="center">
       <Box>
-        <Box as={AppLogo} style={{ width: 175, height: 100 }} />
+        <DefaultAppLogo className={styles.logo} />
         <h5>
           {name} - {description}
         </h5>
