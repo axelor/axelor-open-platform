@@ -1,0 +1,4 @@
+title: Upgrade Swagger from 2.2.26 to 2.2.28
+type: fix
+description: |
+    This fix API Swagger documentation error due to jackson version mismatch
