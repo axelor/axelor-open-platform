@@ -9,13 +9,13 @@ import { Navigate, Link as RouterLink, useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel, Select } from "@axelor/ui";
 
+import { AppSignInLogo } from "@/components/app-logo/app-logo";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useSession } from "@/hooks/use-session";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { getGenericErrorMessage } from "../reset-password/utils";
 
-import defaultLogo from "@/assets/axelor.svg";
 import styles from "./forgot-password.module.scss";
 
 export function ForgotPassword() {
@@ -23,7 +23,7 @@ export function ForgotPassword() {
   const { state: locationState } = location ?? {};
 
   const session = useSession();
-  const { name, copyright, themeMode } = useAppSettings();
+  const { copyright } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { resetPasswordEnabled } = application ?? {};
@@ -115,14 +115,7 @@ export function ForgotPassword() {
           alignItems="center"
           p={3}
         >
-          <img
-            className={styles.logo}
-            src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
-            alt={name}
-            onError={(e) => {
-              e.currentTarget.src = defaultLogo;
-            }}
-          />
+          <AppSignInLogo className={styles.logo} />
           <Box as="legend" style={{ textWrap: "balance" }}>
             {i18n.get("Reset your password")}
           </Box>

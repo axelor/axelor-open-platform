@@ -22,10 +22,10 @@ import {
 import { i18n } from "@/services/client/i18n";
 import { SessionInfo, SignInButtonType } from "@/services/client/session";
 import { sanitize } from "@/utils/sanitize";
+import { AppSignInLogo } from "../app-logo/app-logo";
 import { Icon } from "../icon";
 import { TextLink as Link } from "../text-link";
 
-import defaultLogo from "@/assets/axelor.svg";
 import styles from "./login-form.module.scss";
 
 export type LoginFormProps = {
@@ -52,7 +52,7 @@ export function LoginForm({
   const { navigate } = useRoute();
 
   const session = useSession();
-  const { name: appName, copyright, themeMode } = useAppSettings();
+  const { copyright } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { signIn } = application ?? {};
@@ -225,14 +225,7 @@ export function LoginForm({
         p={3}
         mb={3}
       >
-        <img
-          className={styles.logo}
-          src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
-          alt={appName}
-          onError={(e) => {
-            e.currentTarget.src = defaultLogo;
-          }}
-        />
+        <AppSignInLogo className={styles.logo} />
         {isPage && signInTitle && (
           <Box
             d="flex"

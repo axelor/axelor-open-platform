@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Badge, clsx, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { AppIcon, AppLogo } from "@/components/app-logo/app-logo";
 import { Icon } from "@/components/icon";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useMenu } from "@/hooks/use-menu";
@@ -14,9 +15,6 @@ import { i18n } from "@/services/client/i18n";
 import { MenuItem, Tag } from "@/services/client/meta.types";
 import { sanitize, unaccent } from "@/utils/sanitize";
 import { useSidebar } from "./hook";
-
-import defaultIcon from "@/assets/axelor-icon.svg";
-import defaultLogo from "@/assets/axelor.svg";
 
 import colors from "@/styles/legacy/_colors.module.scss";
 import styles from "./nav-drawer.module.scss";
@@ -182,7 +180,6 @@ function Header() {
   const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
   const { open: openTab } = useTabs();
-  const { name, themeMode } = useAppSettings();
 
   const appHome = data?.user?.action;
 
@@ -203,31 +200,17 @@ function Header() {
         })}
         onClick={onLogoClick}
       >
-        <img
-          src={`ws/public/app/logo?mode=${themeMode}`}
-          alt={name}
-          onError={(e) => {
-            e.currentTarget.src = defaultLogo;
-          }}
-        />
+        <AppLogo />
       </div>
     </div>
   );
 }
 
 function HeaderSmall() {
-  const { name, themeMode } = useAppSettings();
-
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
-        <img
-          src={`ws/public/app/icon?mode=${themeMode}`}
-          alt={name}
-          onError={(e) => {
-            e.currentTarget.src = defaultIcon;
-          }}
-        />
+        <AppIcon />
       </div>
     </div>
   );

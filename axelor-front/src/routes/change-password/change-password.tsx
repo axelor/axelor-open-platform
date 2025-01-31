@@ -11,13 +11,13 @@ import { Navigate, useLocation } from "react-router-dom";
 import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
+import { AppSignInLogo } from "@/components/app-logo/app-logo";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "../login";
 
-import defaultLogo from "@/assets/axelor.svg";
 import styles from "./change-password.module.scss";
 
 export function ChangePassword({
@@ -32,7 +32,7 @@ export function ChangePassword({
   passwordPatternTitle?: string;
 }) {
   const session = useSession();
-  const { name, copyright, themeMode } = useAppSettings();
+  const { copyright } = useAppSettings();
   const appInfo = session.data;
   const defaultClient = appInfo?.authentication?.defaultClient;
 
@@ -196,14 +196,7 @@ export function ChangePassword({
           alignItems="center"
           p={3}
         >
-          <img
-            className={styles.logo}
-            src={`ws/public/app/sign-in/logo?mode=${themeMode}`}
-            alt={name}
-            onError={(e) => {
-              e.currentTarget.src = defaultLogo;
-            }}
-          />
+          <AppSignInLogo className={styles.logo} />
           <Box as="legend" style={{ textWrap: "balance" }}>
             {i18n.get("Change your password")}
           </Box>
