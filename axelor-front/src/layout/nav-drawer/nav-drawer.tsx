@@ -15,8 +15,8 @@ import { MenuItem, Tag } from "@/services/client/meta.types";
 import { sanitize, unaccent } from "@/utils/sanitize";
 import { useSidebar } from "./hook";
 
-import AppIcon from "../../assets/axelor-icon.svg?react";
-import AppLogo from "../../assets/axelor.svg?react";
+import defaultIcon from "@/assets/axelor-icon.svg";
+import defaultLogo from "@/assets/axelor.svg";
 
 import colors from "@/styles/legacy/_colors.module.scss";
 import styles from "./nav-drawer.module.scss";
@@ -192,8 +192,6 @@ function Header() {
     }
   }, [appHome, openTab]);
 
-  const [imgError, setImgError] = useState(false);
-
   return (
     <div className={styles.header}>
       <div className={styles.toggle} onClick={(e) => setSidebar(!sidebar)}>
@@ -205,15 +203,13 @@ function Header() {
         })}
         onClick={onLogoClick}
       >
-        {imgError ? (
-          <AppLogo />
-        ) : (
-          <img
-            src={`ws/public/app/logo?mode=${themeMode}`}
-            alt={name}
-            onError={() => setImgError(true)}
-          />
-        )}
+        <img
+          src={`ws/public/app/logo?mode=${themeMode}`}
+          alt={name}
+          onError={(e) => {
+            e.currentTarget.src = defaultLogo;
+          }}
+        />
       </div>
     </div>
   );
@@ -222,20 +218,16 @@ function Header() {
 function HeaderSmall() {
   const { name, themeMode } = useAppSettings();
 
-  const [imgError, setImgError] = useState(false);
-
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
-        {imgError ? (
-          <AppIcon viewBox="0 0 241 228" />
-        ) : (
-          <img
-            src={`ws/public/app/icon?mode=${themeMode}`}
-            alt={name}
-            onError={() => setImgError(true)}
-          />
-        )}
+        <img
+          src={`ws/public/app/icon?mode=${themeMode}`}
+          alt={name}
+          onError={(e) => {
+            e.currentTarget.src = defaultIcon;
+          }}
+        />
       </div>
     </div>
   );
