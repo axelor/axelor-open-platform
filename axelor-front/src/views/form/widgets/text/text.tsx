@@ -1,8 +1,9 @@
 import { useAtomValue } from "jotai";
 import React, { useCallback, useState } from "react";
 
-import { clsx, Input, useTheme } from "@axelor/ui";
+import { clsx, Input } from "@axelor/ui";
 
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { Translatable, useTranslationValue } from "../string/translatable";
@@ -21,12 +22,12 @@ export function Text({
   const { schema, readonly, widgetAtom, valueAtom, invalid } = props;
   const { uid, height, placeholder, translatable } = schema;
   const { onBlur } = inputProps || {};
-  const { mode: themeMode } = useTheme();
+  const { themeMode } = useAppSettings();
 
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
 
-  const [trValue, setTranslateValue] = useTranslationValue(props);
+  const [_, setTranslateValue] = useTranslationValue(props);
 
   const [changed, setChanged] = useState(false);
   const {

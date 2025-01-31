@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 
-import { Badge, Box, TVariant, clsx, useTheme } from "@axelor/ui";
+import { Badge, Box, TVariant, clsx } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { legacyClassNames } from "@/styles/legacy";
+import { useAppSettings } from "@/hooks/use-app-settings";
 
 import styles from "./selection.module.scss";
 
@@ -44,7 +45,7 @@ export function SelectionTag({
     ? undefined
     : legacyClassNames(`hilite-${color}`);
 
-  const { mode: theme } = useTheme();
+  const { themeMode } = useAppSettings();
 
   const textColor = useMemo(() => {
     if (HEXADECIMAL_REGEX.test(color)) {
@@ -69,12 +70,12 @@ export function SelectionTag({
       );
 
       if (a / 255 < 0.5) {
-        return theme === "light" ? "black" : "white";
+        return themeMode === "light" ? "black" : "white";
       } else {
         return 0.2126 * R + 0.7152 * G + 0.0722 * B > 0.179 ? "black" : "white";
       }
     }
-  }, [color, theme]);
+  }, [color, themeMode]);
 
   if (title) {
     return (
