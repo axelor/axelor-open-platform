@@ -12,7 +12,11 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import { MetaScope } from "@/view-containers/views/scope";
+import {
+  MetaScope,
+  useViewDirtyAtom,
+  useViewTab,
+} from "@/view-containers/views/scope";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import {
   Layout,
@@ -33,8 +37,11 @@ export interface DetailsProps {
   record: DataRecord;
   dirty?: boolean;
   overlay?: boolean;
-  onNew?: () => void;
-  onRefresh?: () => void;
+  onNew?: (options?: { showConfirm?: boolean }) => void;
+  onRefresh?: (options?: {
+    showConfirm?: boolean;
+    select?: Record<string, any>;
+  }) => void;
   onCancel?: () => void;
   onSave?: (
     record: DataRecord,
@@ -57,8 +64,10 @@ export function Details({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
 
+  const { id: tabId } = useViewTab();
   const { hasButton } = usePerms(view, perms);
   const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
+  const isSaveOnLoad = useRef(false);
 
   const { toolbar, menubar, onSave: onSaveAction } = view;
   const isNew = (record?.id ?? -1) < 0;
@@ -107,6 +116,7 @@ export function Details({
 
         try {
           await onSave?.(savingRecord, restoreDummyValues);
+          isSaveOnLoad.current = true;
         } catch (err) {
           resetStatesByName.current = null;
         }
@@ -123,6 +133,7 @@ export function Details({
     ),
   );
 
+
   useAsyncEffect(async () => {
     const { onLoad: _onLoad, onNew: _onNew } = view;
     if (record) {
@@ -137,12 +148,23 @@ export function Details({
   const canSave = hasButton("save");
   const canEdit = hasButton("edit");
 
-  const handleRefresh = isNew ? onNew : onRefresh;
+  const doRefresh = useAtomCallback(
+    useCallback(
+      async (get, set, opts?: { showConfirm?: boolean }) => {
+        const { select } = get(formAtom);
+        await onRefresh?.({ ...opts, select });
+      },
+      [formAtom, onRefresh],
+    ),
+  );
 
   useEffect(() => {
-    actionHandler.setRefreshHandler(async () => handleRefresh?.());
     actionHandler.setSaveHandler(handleSave);
   }, [actionHandler, handleSave, handleRefresh]);
+
+  actionHandler.setRefreshHandler(
+    async () => await handleRefresh?.({ showConfirm: false }),
+  );
 
   useShortcuts({
     viewType: relatedViewType,
@@ -172,7 +194,7 @@ export function Details({
                 iconProps: {
                   icon: "add",
                 },
-                onClick: onNew,
+                onClick: () => onNew?.(),
               },
               {
                 key: "save",
@@ -198,7 +220,7 @@ export function Details({
                 iconProps: {
                   icon: "refresh",
                 },
-                onClick: handleRefresh,
+                onClick: () => handleRefresh?.(),
                 disabled: !dirty,
               },
               {

@@ -570,6 +570,7 @@ function GridInner(props: ViewProps<GridView>) {
   const fetchAndSetDetailsRecord = useCallback(
     async (
       record: DataRecord | null,
+      select?: Record<string, any>,
       restoreDummyValues?: (
         saved: DataRecord,
         fetched: DataRecord,
@@ -577,7 +578,7 @@ function GridInner(props: ViewProps<GridView>) {
     ) => {
       if (detailsMeta && record && (record?.id ?? 0) > 0) {
         const saved = record;
-        record = await fetchRecord(detailsMeta, dataStore, record.id!);
+        record = await fetchRecord(detailsMeta, dataStore, record.id!, select);
         if (restoreDummyValues) {
           record = restoreDummyValues(saved, record);
         }
@@ -598,7 +599,7 @@ function GridInner(props: ViewProps<GridView>) {
     ) => {
       const saved = await onSave(record);
       if (saved) {
-        fetchAndSetDetailsRecord(saved, restoreDummyValues);
+        fetchAndSetDetailsRecord(saved, options?.select, restoreDummyValues);
         if ((record.id ?? 0) < 0) {
           saveIdRef.current = saved.id;
         }
@@ -607,23 +608,32 @@ function GridInner(props: ViewProps<GridView>) {
     [onSave, fetchAndSetDetailsRecord],
   );
 
-  const onNewInDetails = useCallback(() => {
-    showConfirmDirty(
-      async () => dirty,
-      async () => {
-        initDetailsRef.current = false;
-        clearSelection();
-        fetchAndSetDetailsRecord({ id: nextId() });
-      },
-    );
-  }, [dirty, clearSelection, fetchAndSetDetailsRecord, showConfirmDirty]);
+  const onNewInDetails = useCallback(
+    ({ showConfirm = true } = {}) => {
+      showConfirmDirty(
+        async () => showConfirm && dirty,
+        async () => {
+          initDetailsRef.current = false;
+          clearSelection();
+          fetchAndSetDetailsRecord({ id: nextId() });
+        },
+      );
+    },
+    [dirty, clearSelection, fetchAndSetDetailsRecord, showConfirmDirty],
+  );
 
-  const onRefreshInDetails = useCallback(() => {
-    showConfirmDirty(
-      async () => dirty,
-      async () => fetchAndSetDetailsRecord(detailsRecord),
-    );
-  }, [fetchAndSetDetailsRecord, dirty, detailsRecord, showConfirmDirty]);
+  const onRefreshInDetails = useCallback(
+    ({
+      showConfirm = true,
+      select,
+    }: { showConfirm?: boolean; select?: Record<string, any> } = {}) => {
+      showConfirmDirty(
+        async () => showConfirm && dirty,
+        async () => fetchAndSetDetailsRecord(detailsRecord, select),
+      );
+    },
+    [fetchAndSetDetailsRecord, dirty, detailsRecord, showConfirmDirty],
+  );
 
   const onCancelInDetails = useCallback(() => {
     showConfirmDirty(
@@ -1240,7 +1250,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
-              onClick: handleNew,
+              onClick: () => handleNew(),
             },
             {
               key: "edit",

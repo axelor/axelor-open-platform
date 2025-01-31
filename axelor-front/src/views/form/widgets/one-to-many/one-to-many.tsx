@@ -963,7 +963,7 @@ function OneToManyInner({
 
   // Reset value ref on form record change, so that we can distinguish
   // between setting initial value and value change.
-  useEffect(resetValue, [formRecordId, resetValue]);
+  useEffect(resetValue, [formRecordId, resetValue, formAtom]);
 
   useAsyncEffect(async () => {
     const last = valueRef.current ?? [];
