@@ -53,6 +53,10 @@ public interface AvailableAppSettings {
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
   String APPLICATION_OPENAPI_ENABLED = "application.openapi.enabled";
+  String APPLICATION_OPENAPI_SCAN_EXCLUDE_PACKAGES = "application.openapi.scan.exclude.packages";
+  String APPLICATION_OPENAPI_SCAN_EXCLUDE_CLASSES = "application.openapi.scan.exclude.classes";
+  String APPLICATION_OPENAPI_SCAN_PACKAGES = "application.openapi.scan.packages";
+  String APPLICATION_OPENAPI_SCAN_CLASSES = "application.openapi.scan.classes";
   String APPLICATION_SWAGGER_UI_ENABLED = "application.swagger-ui.enabled";
   String APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT = "application.swagger-ui.allow-try-it-out";
 

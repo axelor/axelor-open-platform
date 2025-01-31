@@ -231,6 +231,10 @@ db.default.password = secret
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
 | `api.pagination.default-per-page` | define the default number of items per page | 40
 | `application.openapi.enabled` | enable OpenAPI resource endpoint | true
+| `application.openapi.scan.exclude.packages` | list of packages and any subpackages to exclude from OpenApi scans |
+| `application.openapi.scan.exclude.classes` | list of classes to exclude from OpenApi scans |
+| `application.openapi.scan.packages` | list of packages and any subpackages  to include in OpenAPI scans.|
+| `application.openapi.scan.classes` | list of classes  to include in OpenAPI scans|
 | `application.swagger-ui.enabled` | enable both OpenAPI resource endpoint and Swagger UI | true
 | `application.swagger-ui.allow-try-it-out` | allow "Try it out" in Swagger UI | false
 | `session.timeout` | session timeout (in minutes) | 60
