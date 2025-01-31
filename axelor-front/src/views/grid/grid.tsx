@@ -592,12 +592,13 @@ function GridInner(props: ViewProps<GridView>) {
   const onSaveInDetails = useCallback(
     async (
       record: DataRecord,
+      options?: SaveOptions<DataRecord>,
       restoreDummyValues?: (
         saved: DataRecord,
         fetched: DataRecord,
       ) => DataRecord,
     ) => {
-      const saved = await onSave(record);
+      const saved = await onSave(record, options);
       if (saved) {
         fetchAndSetDetailsRecord(saved, options?.select, restoreDummyValues);
         if ((record.id ?? 0) < 0) {

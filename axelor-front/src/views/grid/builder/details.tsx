@@ -5,7 +5,6 @@ import { useAtomCallback } from "jotai/utils";
 import { ReactElement, useCallback, useEffect, useRef } from "react";
 import { ScopeProvider } from "bunshi/react";
 
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { usePerms } from "@/hooks/use-perms";
 import { useShortcuts } from "@/hooks/use-shortcut";
 import { DataRecord } from "@/services/client/data.types";
@@ -28,8 +27,13 @@ import {
 } from "../../form";
 import { Form, FormState, useFormHandlers } from "../../form/builder";
 import { resetFormDummyFieldsState } from "@/views/form/builder/utils";
+import { SaveOptions } from "@/services/client/data";
 
 import styles from "./details.module.scss";
+import {
+  FormWidgetProviders,
+  FormWidgetsHandler,
+} from "@/views/form/builder/form-providers";
 
 export interface DetailsProps {
   meta: ViewData<FormView>;
@@ -45,6 +49,7 @@ export interface DetailsProps {
   onCancel?: () => void;
   onSave?: (
     record: DataRecord,
+    options?: SaveOptions<DataRecord>,
     restoreDummyValues?: (saved: DataRecord, fetched: DataRecord) => DataRecord,
   ) => Promise<void>;
 }
@@ -66,8 +71,11 @@ export function Details({
 
   const { id: tabId } = useViewTab();
   const { hasButton } = usePerms(view, perms);
+
+  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
   const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
   const isSaveOnLoad = useRef(false);
+  const dirtyAtom = useViewDirtyAtom();
 
   const { toolbar, menubar, onSave: onSaveAction } = view;
   const isNew = (record?.id ?? -1) < 0;
@@ -93,19 +101,40 @@ export function Details({
     restoreFormState();
   }, [restoreFormState]);
 
-  const handleSave = useAtomCallback(
+  const doValidate = useAtomCallback(
     useCallback(
       async (get) => {
         const state = get(formAtom);
         const errors = getErrors(state);
-        if (errors) {
-          showErrors(errors);
-          return;
+        if (errors || widgetHandler?.current?.invalid?.()) {
+          if (errors) {
+            showErrors(errors);
+          }
+          return Promise.reject();
         }
+      },
+      [getErrors, formAtom],
+    ),
+  );
 
-        if (onSaveAction) {
+  const doSave = useAtomCallback(
+    useCallback(
+      async (
+        get,
+        set,
+        options: { shouldSave?: boolean; callOnSave?: boolean } = {},
+      ) => {
+        await doValidate();
+
+        const { shouldSave = true, callOnSave = true } = options;
+
+        if (callOnSave && onSaveAction) {
           await actionExecutor.execute(onSaveAction);
         }
+
+        const state = get(formAtom);
+
+        if (!shouldSave) return state.record;
 
         const [savingRecord, restoreDummyValues] = prepareRecordForSave();
 
@@ -115,7 +144,11 @@ export function Details({
         );
 
         try {
-          await onSave?.(savingRecord, restoreDummyValues);
+          await onSave?.(
+            savingRecord,
+            { select: state.select },
+            restoreDummyValues,
+          );
           isSaveOnLoad.current = true;
         } catch (err) {
           resetStatesByName.current = null;
@@ -126,19 +159,29 @@ export function Details({
         formAtom,
         onSaveAction,
         actionExecutor,
-        getErrors,
-        onSave,
         prepareRecordForSave,
+        onSave,
+        doValidate,
       ],
     ),
   );
 
+  const handleSave = useCallback(async () => {
+    await widgetHandler.current?.commit?.();
+    return doSave();
+  }, [doSave]);
 
-  useAsyncEffect(async () => {
+  useEffect(() => {
     const { onLoad: _onLoad, onNew: _onNew } = view;
+    if (isSaveOnLoad.current) {
+      isSaveOnLoad.current = false;
+      return;
+    }
     if (record) {
       const action = (record?.id ?? 0) > 0 ? _onLoad : _onNew;
-      action && (await actionExecutor.execute(action));
+      if (action) {
+        actionExecutor.execute(action);
+      }
     }
   }, [record, view, actionExecutor]);
 
@@ -158,13 +201,29 @@ export function Details({
     ),
   );
 
-  useEffect(() => {
-    actionHandler.setSaveHandler(handleSave);
-  }, [actionHandler, handleSave, handleRefresh]);
+  const handleRefresh = isNew ? onNew : doRefresh;
 
   actionHandler.setRefreshHandler(
     async () => await handleRefresh?.({ showConfirm: false }),
   );
+
+  actionHandler.setSaveHandler(
+    useAtomCallback(
+      useCallback(
+        async (get) => {
+          const { record: rec, dirty: formDirty } = get(formAtom);
+          const isDirty = get(dirtyAtom) || formDirty;
+          const isNewRecord = (rec.id || 0) <= 0;
+          await doSave({
+            callOnSave: false,
+            shouldSave: isDirty || isNewRecord,
+          });
+        },
+        [formAtom, dirtyAtom, doSave],
+      ),
+    ),
+  );
+  actionHandler.setValidateHandler(doValidate);
 
   useShortcuts({
     viewType: relatedViewType,
@@ -267,16 +326,18 @@ export function Details({
             ref={containerRef}
           >
             <ScopeProvider scope={MetaScope} value={meta}>
-              <Form
-                schema={meta.view}
-                fields={meta.fields!}
-                readonly={!canEdit}
-                formAtom={formAtom}
-                actionHandler={actionHandler}
-                actionExecutor={actionExecutor}
-                recordHandler={recordHandler}
-                layout={Layout}
-              />
+              <FormWidgetProviders ref={widgetHandler}>
+                <Form
+                  schema={meta.view}
+                  fields={meta.fields!}
+                  readonly={!canEdit}
+                  formAtom={formAtom}
+                  actionHandler={actionHandler}
+                  actionExecutor={actionExecutor}
+                  recordHandler={recordHandler}
+                  layout={Layout}
+                />
+              </FormWidgetProviders>
             </ScopeProvider>
           </Box>
         </Box>
