@@ -1,4 +1,6 @@
-import { useMemo } from "react";
+import React, { ComponentProps, useMemo } from "react";
+
+import { ThemeContextValue } from "@axelor/ui";
 
 import { APPLICATION_NAME, useAppSettings } from "@/hooks/use-app-settings";
 
@@ -7,18 +9,20 @@ import defaultIcon from "@/assets/axelor-icon.svg";
 import defaultLogo from "@/assets/axelor.svg";
 
 type AppLogoProps = Readonly<{
-  className?: string;
+  className?: ComponentProps<"img">["className"];
   type?: "logo" | "sign-in/logo" | "icon";
 }>;
 
-export function AppLogo({ type = "logo", className }: AppLogoProps) {
+export const AppLogo = React.memo(function ({
+  type = "logo",
+  className,
+}: AppLogoProps) {
   const { name, themeMode } = useAppSettings();
 
-  const imgSrc = useMemo(
-    () =>
-      `ws/public/app/${type}${themeMode !== "light" ? `?mode=${themeMode}` : ""}`,
-    [type, themeMode],
-  );
+  const imgSrc = useMemo(() => {
+    const params = themeMode !== "light" ? `?mode=${themeMode}` : "";
+    return `ws/public/app/${type}${params}`;
+  }, [type, themeMode]);
 
   return (
     <img
@@ -26,33 +30,39 @@ export function AppLogo({ type = "logo", className }: AppLogoProps) {
       src={imgSrc}
       alt={name}
       onError={(e) => {
-        if (type === "icon") {
-          e.currentTarget.src = defaultIcon;
-        } else {
-          e.currentTarget.src =
-            themeMode === "dark" ? defaultLogoDark : defaultLogo;
+        const defaultImgSrc =
+          type === "icon" ? defaultIcon : getDefaultAppLogo(themeMode);
+        // Prevent infinite loop in case default image also fails.
+        if (!e.currentTarget.src.includes(defaultImgSrc)) {
+          e.currentTarget.src = defaultImgSrc;
         }
       }}
     />
   );
-}
+});
 
-export function AppSignInLogo({ className }: AppLogoProps) {
+export const AppSignInLogo = React.memo(function ({ className }: AppLogoProps) {
   return <AppLogo className={className} type="sign-in/logo" />;
-}
+});
 
-export function AppIcon({ className }: AppLogoProps) {
+export const AppIcon = React.memo(function ({ className }: AppLogoProps) {
   return <AppLogo className={className} type="icon" />;
-}
+});
 
-export function DefaultAppLogo({ className }: AppLogoProps) {
+export const DefaultAppLogo = React.memo(function ({
+  className,
+}: AppLogoProps) {
   const { themeMode } = useAppSettings();
 
   return (
     <img
       className={className}
-      src={themeMode === "dark" ? defaultLogoDark : defaultLogo}
+      src={getDefaultAppLogo(themeMode)}
       alt={APPLICATION_NAME}
     />
   );
+});
+
+function getDefaultAppLogo(themeMode: ThemeContextValue["mode"]) {
+  return themeMode === "dark" ? defaultLogoDark : defaultLogo;
 }
