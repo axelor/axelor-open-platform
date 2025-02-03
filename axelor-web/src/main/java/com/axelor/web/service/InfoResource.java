@@ -25,8 +25,9 @@ import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
+import com.axelor.file.store.FileStoreFactory;
+import com.axelor.file.store.Store;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.theme.MetaThemeService;
@@ -47,7 +48,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -127,14 +127,14 @@ public class InfoResource {
 
   private Response getImageContent(Object image) {
     try {
-      if (image instanceof MetaFile) {
-        final MetaFile metaFile = (MetaFile) image;
+      if (image instanceof MetaFile metaFile) {
+        final Store store = FileStoreFactory.getStore();
         final String filePath = metaFile.getFilePath();
-        final java.nio.file.Path inputPath = MetaFiles.getPath(filePath);
 
-        if (Files.exists(inputPath)) {
-          return Response.ok(Files.newInputStream(inputPath))
-              .type(MimeTypesUtils.getContentType(inputPath))
+        if (store.hasFile(filePath)) {
+          final InputStream inputStream = store.getStream(filePath);
+          return Response.ok(inputStream)
+              .type(MimeTypesUtils.getContentType(metaFile.getFileName()))
               .build();
         }
       } else if (ObjectUtils.notEmpty(image)) {
