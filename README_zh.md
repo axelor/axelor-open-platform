@@ -1,6 +1,5 @@
 # Axelor开源平台
 
-./gradlew build -PfinalRelease=true -x test
 
 [uri_axelor]: https://www.axelor.com
 [uri_docs]: https://docs.axelor.com/adk/latest/
