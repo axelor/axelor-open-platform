@@ -1,3 +1,35 @@
+## 7.2.6 (2025-02-05)
+
+#### Fix
+
+* Fix relational field target-name support in grid-view
+* Fix switch select widget selection issue
+* Fix validate action in form view
+* Display personal name in recipient field of MailMessage form
+* Fix task sequence support in gantt view
+* Fix event injection from child constructor
+
+  <details>
+  
+  When constructor injection is used, search for events in the injection point class hierarchy.
+  
+  </details>
+
+* Fix pass action context to calendar view action
+* Fix search emails address in recipient field in MailMessage form by adding current selected emails
+* Format multi-select fields values in mail message
+* Fix focused tab with showIf in panel-tabs
+
+  <details>
+  
+  On a form view, when first tab of panel-tabs contains showIf/hideIf expression,
+  so initially it will be hidden and staring focus will be on tab which doesn't contain
+  showIf/hideIf expression.
+  In this case, it should re-focus active tab to starting tab if starting tab is accessible.
+  
+  </details>
+
+
 ## 7.2.5 (2025-01-08)
 
 #### Feature
