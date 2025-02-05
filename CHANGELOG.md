@@ -1,3 +1,21 @@
+## 6.1.7 (2025-02-05)
+
+#### Fixed
+
+* Fix broken formatting on HTML widget because of sanitization
+
+  <details>
+  
+  DOMPurify sanitization reverses attributes order,
+  creating discrepancy with view value and causing issue with HTML widget.
+  Now update value if it was actually sanitized only.
+  
+  </details>
+
+#### Security
+
+* Sanitize HTML on grid HTML widget
+
 ## 6.1.6 (2024-10-17)
 
 #### Fixed
