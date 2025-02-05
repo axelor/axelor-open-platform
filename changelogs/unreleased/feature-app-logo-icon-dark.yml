@@ -1,7 +1,0 @@
----
-title: Support application settings application.logo-dark and application.icon-dark
-type: feature
-description: |
-  `ws/public/app/logo` and `ws/public/app/logo` accept `mode` query parameter (`light` or `dark`).
-  Application configuration `context.appLogo` and `context.appIcon` accept `String mode` parameter.
-  Removed logo and icon from `ws/public/app/info`.

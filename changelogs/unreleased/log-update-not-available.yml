@@ -1,8 +1,0 @@
----
-title: Display notification if the audit log isn't available for an entity
-type: feature
-description: |
-  Entities with `logUpdates="false"` doesn't have change tracking enabled. So the 
-  `created(On|By)` and `updated(On|By)` fields aren't available. When showing audit log popup,
-  rely on `createdOn` field to check if change tracking is available for the entity. If not, 
-  display a notification instead of showing a popup with empty data.

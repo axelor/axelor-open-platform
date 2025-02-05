@@ -1,3 +1,106 @@
+## 7.3.1 (2025-02-05)
+
+#### Feature
+
+* Add support for OpenAPI scan include/exclude classes/packages
+
+  <details>
+  
+  Introduced new configuration properties to include/exclude classes/packages from OpenAPI scanning with following 
+  rules : class-level settings take precedence over package-level settings, exclusions take precedence over inclusions 
+  and the longest matching rule applies for packages. 
+  By default all classes are scanned (allow all, exclude some), except if some inclusions are defined (exclude all, 
+  include some).
+  
+  Added properties: `application.openapi.scan.exclude.packages`, `application.openapi.scan.exclude.classes`, 
+  `application.openapi.scan.packages`, `application.openapi.scan.classes`
+  
+  </details>
+
+* Support application settings application.sign-in.logo-dark
+
+  <details>
+  
+  Set a custom dark logo for the login page if require a different one from `application.logo-dark`.
+  
+  </details>
+
+* Allow to overwrite entity `logUpdates` attribute
+
+  <details>
+  
+  This allows to overwrite `logUpdates` attributes of entities. It can only enable 
+  change tracking feature for an entity.
+  
+  </details>
+
+* Display notification if the audit log isn't available for an entity
+
+  <details>
+  
+  Entities with `logUpdates="false"` doesn't have change tracking enabled. So the 
+  `created(On|By)` and `updated(On|By)` fields aren't available. When showing audit log popup,
+  rely on `createdOn` field to check if change tracking is available for the entity. If not, 
+  display a notification instead of showing a popup with empty data.
+  
+  </details>
+
+* Support application settings application.logo-dark and application.icon-dark
+
+  <details>
+  
+  `ws/public/app/logo` and `ws/public/app/logo` accept `mode` query parameter (`light` or `dark`).
+  Application configuration `context.appLogo` and `context.appIcon` accept `String mode` parameter.
+  Removed logo and icon from `ws/public/app/info`.
+  
+  </details>
+
+#### Change
+
+* Use theme-builder as form widget
+
+  <details>
+  
+  Previously, theme-builder used in template with custom component support.
+  Now theme-builder is implemented as form widget and can used in form-view directly.
+  
+  </details>
+
+#### Fix
+
+* Fix relational field target-name support in grid-view
+* Fix save action handler in details-view
+* Upgrade Swagger from 2.2.26 to 2.2.28
+
+  <details>
+  
+  This fix API Swagger documentation error due to jackson version mismatch
+  
+  </details>
+
+* Fix close dms popup on file open in tab
+
+  <details>
+  
+  When dms popup view is opened through custom process action-view then
+  on clicking on file to view in tab, it should close popup view (same as 
+  attachment click behavior on form-view)
+  
+  </details>
+
+* Fix validate action in form view
+* Fix gap between line and summary-view in tree-grid
+* Fix event injection from child constructor
+
+  <details>
+  
+  When constructor injection is used, search for events in the injection point class hierarchy.
+  
+  </details>
+
+* Fix pass action context to calendar view action
+* Fix refresh record in details-view
+
 ## 7.3.0 (2025-01-14)
 
 #### Feature

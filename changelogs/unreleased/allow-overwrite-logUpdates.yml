@@ -1,6 +1,0 @@
----
-title: Allow to overwrite entity `logUpdates` attribute
-type: feature
-description: |
-  This allows to overwrite `logUpdates` attributes of entities. It can only enable 
-  change tracking feature for an entity.

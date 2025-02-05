@@ -1,7 +1,0 @@
----
-title: Fix close dms popup on file open in tab
-type: fix
-description: |
-  When dms popup view is opened through custom process action-view then
-  on clicking on file to view in tab, it should close popup view (same as 
-  attachment click behavior on form-view)

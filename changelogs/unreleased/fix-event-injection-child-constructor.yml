@@ -1,5 +1,0 @@
----
-title: Fix event injection from child constructor
-type: fix
-description: |
-  When constructor injection is used, search for events in the injection point class hierarchy.
