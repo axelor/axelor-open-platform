@@ -1,3 +1,12 @@
+## 7.1.12 (2025-02-05)
+
+#### Fix
+
+* Fix validate action in form view
+* Display personal name in recipient field of MailMessage form
+* Fix pass action context to calendar view action
+* Fix html widget sanitize issue
+
 ## 7.1.11 (2024-11-29)
 
 #### Fix
