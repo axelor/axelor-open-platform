@@ -226,7 +226,7 @@ public class Finder {
       code.add(new JavaCode("  .fetchOne()"));
     }
 
-    code.get(code.size() - 1).next(";");
+    code.getLast().next(";");
 
     return method.code(code);
   }

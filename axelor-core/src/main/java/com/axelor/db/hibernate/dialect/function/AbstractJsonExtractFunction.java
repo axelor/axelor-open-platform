@@ -69,7 +69,7 @@ public abstract class AbstractJsonExtractFunction extends StandardSQLFunction {
           "Invalid use of 'json_extract', requires at least 2 arguments.");
     }
 
-    final SqlAstNode field = sqlAstArguments.get(0);
+    final SqlAstNode field = sqlAstArguments.getFirst();
     final List<? extends SqlAstNode> pathArgs = sqlAstArguments.subList(1, sqlAstArguments.size());
 
     if (cast != null) {

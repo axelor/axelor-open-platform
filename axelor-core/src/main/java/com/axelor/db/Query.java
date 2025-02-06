@@ -420,7 +420,7 @@ public class Query<T extends Model> {
    */
   public T fetchOne(int offset) {
     List<T> resultList = fetch(1, offset);
-    return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
+    return resultList == null || resultList.isEmpty() ? null : resultList.getFirst();
   }
 
   /**
@@ -881,7 +881,7 @@ public class Query<T extends Model> {
           map.put(name, value);
         }
         if (collections.size() > 0) {
-          map.putAll(this.fetchCollections(items.get(0)));
+          map.putAll(this.fetchCollections(items.getFirst()));
         }
         result.add(map);
       }

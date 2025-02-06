@@ -129,7 +129,7 @@ public class TestMergeFields {
     final List<Class<?>> entities = loadEntities("MyName");
     final String field = "myName";
 
-    assertNull(getAnnotation(entities.get(0), field, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), field, NameColumn.class));
     assertNotNull(getAnnotation(entities.get(2), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), field, NameColumn.class));
@@ -142,7 +142,7 @@ public class TestMergeFields {
     final List<Class<?>> entities = loadEntities("MyOtherName");
     final String field = "myName";
 
-    assertNull(getAnnotation(entities.get(0), field, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(2), field, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), field, NameColumn.class));
@@ -151,7 +151,7 @@ public class TestMergeFields {
 
     final String otherField = "myOtherName";
 
-    assertNull(getAnnotation(entities.get(0), otherField, NameColumn.class));
+    assertNull(getAnnotation(entities.getFirst(), otherField, NameColumn.class));
     assertNull(getAnnotation(entities.get(1), otherField, NameColumn.class));
     assertNotNull(getAnnotation(entities.get(2), otherField, NameColumn.class));
     assertNull(getAnnotation(entities.get(3), otherField, NameColumn.class));

@@ -81,8 +81,8 @@ public class EnumTest extends JpaTest {
 
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertTrue(result.get(0) instanceof String);
-    assertEquals("OPEN", result.get(0));
+    assertTrue(result.getFirst() instanceof String);
+    assertEquals("OPEN", result.getFirst());
 
     query = em.createNativeQuery("select status_number from contact_enum_check where id = :id");
     query.setParameter("id", entity.getId());
@@ -91,8 +91,8 @@ public class EnumTest extends JpaTest {
 
     assertNotNull(result);
     assertEquals(1, result.size());
-    assertTrue(result.get(0) instanceof Number);
-    assertEquals(3, result.get(0));
+    assertTrue(result.getFirst() instanceof Number);
+    assertEquals(3, result.getFirst());
   }
 
   @Test

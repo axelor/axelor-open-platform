@@ -88,10 +88,10 @@ public class Inflections {
    * @param plural the plural word
    */
   public void irregular(String singular, String plural) {
-    plurals.add(0, new Rule(singular.toLowerCase(), plural.toLowerCase(), true));
-    plurals.add(0, new Rule(capitalize(singular), capitalize(plural), true));
-    singulars.add(0, new Rule(plural.toLowerCase(), singular.toLowerCase(), true));
-    singulars.add(0, new Rule(capitalize(plural), capitalize(singular), true));
+    plurals.addFirst(new Rule(singular.toLowerCase(), plural.toLowerCase(), true));
+    plurals.addFirst(new Rule(capitalize(singular), capitalize(plural), true));
+    singulars.addFirst(new Rule(plural.toLowerCase(), singular.toLowerCase(), true));
+    singulars.addFirst(new Rule(capitalize(plural), capitalize(singular), true));
   }
 
   /**
@@ -101,7 +101,7 @@ public class Inflections {
    * @param replacement the replacement text
    */
   public void singular(String pattern, String replacement) {
-    singulars.add(0, new Rule(pattern, replacement, false));
+    singulars.addFirst(new Rule(pattern, replacement, false));
   }
 
   /**
@@ -111,7 +111,7 @@ public class Inflections {
    * @param replacement the replacement text
    */
   public void plural(String pattern, String replacement) {
-    plurals.add(0, new Rule(pattern, replacement, false));
+    plurals.addFirst(new Rule(pattern, replacement, false));
   }
 
   /**

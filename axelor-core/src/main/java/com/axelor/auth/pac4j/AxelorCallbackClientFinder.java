@@ -78,7 +78,7 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
     // fallback: no client found and we only have one indirect client, use it
     if (result.isEmpty() && indirectClients.size() == 1) {
-      logger.debug("Defaulting to the only client: {}", indirectClients.get(0));
+      logger.debug("Defaulting to the only client: {}", indirectClients.getFirst());
       result.addAll(indirectClients);
     }
 

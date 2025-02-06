@@ -38,7 +38,7 @@ public class TestCSVFileUtils {
     CSVParser parser = parse("grades.csv");
 
     assertEquals(9, parser.getHeaderNames().size());
-    assertEquals("Lastname", parser.getHeaderNames().get(0));
+    assertEquals("Lastname", parser.getHeaderNames().getFirst());
     assertEquals(16, parser.getRecords().size());
   }
 
@@ -48,7 +48,7 @@ public class TestCSVFileUtils {
 
     // Without handle files that start with a Byte Order Mark (BOM), we would have ["Lastname"] as
     // first header name instead of [Lastname]
-    assertEquals("Lastname", bomParser.getHeaderNames().get(0));
+    assertEquals("Lastname", bomParser.getHeaderNames().getFirst());
 
     // Check if records are strictly identical to file without BOM
     CSVParser parser = parse("grades.csv");

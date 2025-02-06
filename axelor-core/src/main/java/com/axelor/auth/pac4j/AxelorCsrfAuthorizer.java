@@ -63,6 +63,6 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
   }
 
   private boolean isDirectClient(List<UserProfile> profiles) {
-    return !profiles.isEmpty() && directClients.contains(profiles.get(0).getClientName());
+    return !profiles.isEmpty() && directClients.contains(profiles.getFirst().getClientName());
   }
 }

@@ -336,7 +336,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
     if (StringUtils.notBlank(hostsValue)) {
       final var hosts = Arrays.asList(hostsValue.split("\\s*,\\s*"));
       if (!hosts.isEmpty()) {
-        final var host = hosts.get(0);
+        final var host = hosts.getFirst();
         if (StringUtils.notBlank(host)) {
           final var httpRequest = getHttpRequest();
           return "%s://%s%s".formatted(httpRequest.getScheme(), host, httpRequest.getContextPath());

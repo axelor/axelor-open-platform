@@ -68,7 +68,7 @@ public class TestComputedViews extends MetaTest {
 
     MetaView originalView = viewRepository.findByNameAndComputed("base-grid", false);
     MetaView metaView = viewRepository.findByNameAndComputed("base-grid", true);
-    GridView view = (GridView) XMLViews.unmarshal(metaView.getXml()).getViews().get(0);
+    GridView view = (GridView) XMLViews.unmarshal(metaView.getXml()).getViews().getFirst();
 
     assertEquals("bar-module", metaView.getModule());
     assertEquals(originalView.getPriority() + 1, metaView.getPriority());

@@ -84,7 +84,7 @@ public class JsonProperty extends Property {
       return null;
     }
 
-    final String fieldName = fieldParts.get(0);
+    final String fieldName = fieldParts.getFirst();
     final String subFieldName = fieldParts.get(1);
     final String propertyName =
         fieldName.startsWith(KEY_JSON_PREFIX)

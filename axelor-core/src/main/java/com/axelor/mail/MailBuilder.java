@@ -321,7 +321,7 @@ public final class MailBuilder {
 
     // simple text or html email
     if (contents.size() == 1 && (hasText || hasHtml)) {
-      contents.get(0).apply(message);
+      contents.getFirst().apply(message);
       return message;
     }
 

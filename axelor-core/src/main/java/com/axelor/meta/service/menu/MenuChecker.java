@@ -134,7 +134,7 @@ public class MenuChecker {
 
     for (Object item : query.getResultList()) {
       final List<?> vals = (List<?>) item;
-      final Long id = (Long) vals.get(0);
+      final Long id = (Long) vals.getFirst();
       if (vals.get(1) != null) {
         Set<String> groups = menuGroups.get(id);
         if (groups == null) {

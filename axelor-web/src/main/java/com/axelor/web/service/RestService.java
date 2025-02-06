@@ -397,7 +397,7 @@ public class RestService extends ResourceService {
   public Response upload(final MultipartFormDataInput input) throws IOException {
 
     final Map<String, List<InputPart>> formData = input.getFormDataMap();
-    final InputPart requestPart = formData.get("request").get(0);
+    final InputPart requestPart = formData.get("request").getFirst();
 
     final Request request =
         Beans.get(ObjectMapper.class).readValue(requestPart.getBodyAsString(), Request.class);
@@ -412,8 +412,8 @@ public class RestService extends ResourceService {
     MetaFiles.checkPath(safeFileName);
     MetaFiles.checkType(fileType);
 
-    final InputPart filePart = formData.get("file").get(0);
-    final InputPart fieldPart = formData.get("field").get(0);
+    final InputPart filePart = formData.get("file").getFirst();
+    final InputPart fieldPart = formData.get("field").getFirst();
     final boolean isAttachment = MetaFile.class.getName().equals(getModel());
     final String field = fieldPart.getBodyAsString();
     final InputStream fileStream = filePart.getBody(InputStream.class, null);

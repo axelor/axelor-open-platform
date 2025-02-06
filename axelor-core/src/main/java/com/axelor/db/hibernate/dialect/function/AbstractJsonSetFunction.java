@@ -58,7 +58,7 @@ public abstract class AbstractJsonSetFunction extends StandardSQLFunction {
       throw new PersistenceException("Invalid use of 'json_set', requires 3 arguments.");
     }
 
-    final SqlAstNode field = sqlAstArguments.get(0);
+    final SqlAstNode field = sqlAstArguments.getFirst();
     final SqlAstNode path = sqlAstArguments.get(1);
     final SqlAstNode value = sqlAstArguments.get(2);
 

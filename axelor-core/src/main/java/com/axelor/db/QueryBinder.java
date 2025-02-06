@@ -217,7 +217,7 @@ public class QueryBinder {
     }
 
     final List<String> names = Splitter.on('.').splitToList(dottedName);
-    return getRelatedValue(bindings.get(names.get(0)), names.subList(1, names.size()));
+    return getRelatedValue(bindings.get(names.getFirst()), names.subList(1, names.size()));
   }
 
   private Object getRelatedValue(Object value, Collection<String> subNames) {

@@ -72,7 +72,7 @@ public class TestModuleResolver {
 
     List<String> all = resolver.names();
 
-    assertEquals("axelor-core", all.get(0));
-    assertEquals("axelor-project", all.get(all.size() - 1));
+    assertEquals("axelor-core", all.getFirst());
+    assertEquals("axelor-project", all.getLast());
   }
 }

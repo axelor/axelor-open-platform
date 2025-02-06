@@ -92,6 +92,6 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     return clients.stream()
         .filter(client -> defaultClient.equals(client.getName()))
         .findFirst()
-        .orElseGet(() -> clients.get(0));
+        .orElseGet(() -> clients.getFirst());
   }
 }

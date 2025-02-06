@@ -117,7 +117,7 @@ public class MetaController {
       return;
     }
 
-    Action current = views.getActions().get(0);
+    Action current = views.getActions().getFirst();
     if (action != null && !action.getName().equals(current.getName())) {
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR)

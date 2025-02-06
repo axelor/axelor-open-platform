@@ -108,7 +108,7 @@ public class TestMenu extends MetaTest {
     // menu-root-1-1 doesn't have tag
     assertFalse(adminTags.stream().anyMatch(it -> it.getName().equals("menu-root-1-1")));
 
-    assertEquals("important", adminTags.get(0).getStyle());
+    assertEquals("important", adminTags.getFirst().getStyle());
 
     List<TagItem> demoTags =
         tagsService.get(

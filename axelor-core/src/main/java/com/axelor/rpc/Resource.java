@@ -1401,7 +1401,7 @@ public class Resource<T extends Model> {
     LOG.debug("JPQL: {}", query);
 
     @SuppressWarnings("all")
-    Map<String, Object> values = (Map) data.get(0);
+    Map<String, Object> values = (Map) data.getFirst();
     final int total = JPA.withTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
@@ -1589,7 +1589,7 @@ public class Resource<T extends Model> {
     Mapper mapper = Mapper.of(model);
     Map<String, Object> data = request.getData();
 
-    String name = request.getFields().get(0);
+    String name = request.getFields().getFirst();
 
     if (name == null) {
       name = "id";

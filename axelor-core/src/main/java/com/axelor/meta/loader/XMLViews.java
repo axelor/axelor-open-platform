@@ -355,7 +355,7 @@ public class XMLViews {
       return null;
     }
     try {
-      return unmarshal(view.getXml()).getViews().get(0);
+      return unmarshal(view.getXml()).getViews().getFirst();
     } catch (JAXBException e) {
       log.error(e.getMessage(), e);
       return null;
@@ -368,7 +368,7 @@ public class XMLViews {
       return null;
     }
     try {
-      return unmarshal(view.getXml()).getViews().get(0);
+      return unmarshal(view.getXml()).getViews().getFirst();
     } catch (JAXBException e) {
       log.error(e.getMessage(), e);
       return null;
@@ -458,7 +458,7 @@ public class XMLViews {
       }
 
       final ObjectViews objectViews = unmarshal(xml);
-      xmlView = objectViews.getViews().get(0);
+      xmlView = objectViews.getViews().getFirst();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       return null;
@@ -497,7 +497,7 @@ public class XMLViews {
     final MetaAction metaAction = Beans.get(MetaActionRepository.class).findByName(name);
     final Action action;
     try {
-      action = XMLViews.unmarshal(metaAction.getXml()).getActions().get(0);
+      action = XMLViews.unmarshal(metaAction.getXml()).getActions().getFirst();
       action.setActionId(metaAction.getId());
       return action;
     } catch (Exception e) {

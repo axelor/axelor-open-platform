@@ -83,7 +83,7 @@ public class TestViews extends MetaTest {
 
     assertNotNull(json);
 
-    Search search = (Search) views.getViews().get(0);
+    Search search = (Search) views.getViews().getFirst();
 
     Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
     assertNotNull(title);
@@ -124,7 +124,7 @@ public class TestViews extends MetaTest {
     assertTrue(form1 instanceof FormView);
     assertTrue(form2 instanceof FormView);
 
-    final PanelInclude include = (PanelInclude) ((FormView) form2).getItems().get(0);
+    final PanelInclude include = (PanelInclude) ((FormView) form2).getItems().getFirst();
     final AbstractView included = include.getView();
 
     assertEquals(form1.getName(), included.getName());
@@ -134,12 +134,12 @@ public class TestViews extends MetaTest {
   public void testChart() throws Exception {
     ObjectViews views = this.unmarshal("com/axelor/meta/Charts.xml", ObjectViews.class);
 
-    ChartView chartView = (ChartView) views.getViews().get(0);
+    ChartView chartView = (ChartView) views.getViews().getFirst();
 
     assertEquals(1, chartView.getActions().size());
-    assertEquals("testChartAction", chartView.getActions().get(0).getName());
+    assertEquals("testChartAction", chartView.getActions().getFirst().getName());
     assertEquals(
-        "com.axelor.meta.web.Hello:chartAction", chartView.getActions().get(0).getAction());
+        "com.axelor.meta.web.Hello:chartAction", chartView.getActions().getFirst().getAction());
 
     StringWriter writer = new StringWriter();
     XMLViews.marshal(views, writer);

@@ -301,7 +301,7 @@ public class ActionGroup extends ActionResumable {
           && iter.hasNext()) {
         Map<String, Object> last = null;
         try {
-          last = (Map) result.get(result.size() - 1);
+          last = (Map) result.getLast();
         } catch (ClassCastException e) {
         }
         if (last == null) continue;

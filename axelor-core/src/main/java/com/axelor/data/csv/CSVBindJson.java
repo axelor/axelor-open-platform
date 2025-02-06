@@ -94,7 +94,7 @@ public class CSVBindJson extends CSVBind {
               Optional.ofNullable(
                       parentJsonModel.isPresent()
                           ? MetaStore.findJsonFields(parentJsonModel.get())
-                          : MetaStore.findJsonFields(parentType, fieldParts.get(0)))
+                          : MetaStore.findJsonFields(parentType, fieldParts.getFirst()))
                   .map(fields -> fields.get(fieldParts.get(1)))
                   .orElse(Collections.emptyMap());
       jsonModel = (String) jsonField.get("jsonTarget");

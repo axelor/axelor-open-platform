@@ -110,7 +110,7 @@ public class MetaJsonReferenceUpdater {
       return;
     }
 
-    final Mapper beanMapper = Mapper.of(EntityHelper.getEntityClass(records.get(0)));
+    final Mapper beanMapper = Mapper.of(EntityHelper.getEntityClass(records.getFirst()));
     final Property field = beanMapper.getNameField();
 
     if (field == null || field.getType() != PropertyType.STRING) {

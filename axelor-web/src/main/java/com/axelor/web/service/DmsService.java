@@ -363,7 +363,7 @@ public class DmsService {
 
     String batchName = "documents-" + LocalDate.now() + ".zip";
     if (records.size() == 1) {
-      batchName = records.get(0).getFileName();
+      batchName = records.getFirst().getFileName();
     }
 
     data.put("batchId", batchId);
@@ -453,7 +453,7 @@ public class DmsService {
     }
 
     // if file
-    final DMSFile record = records.get(0);
+    final DMSFile record = records.getFirst();
     if (records.size() == 1 && !record.getIsDirectory()) {
       File file = getFile(record);
       if (file != null && hasFile(record)) {

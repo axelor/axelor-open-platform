@@ -71,7 +71,7 @@ public class RelationTest extends JpaTest {
     invoices.save(invoice);
 
     assertSame(line1, invoice.getRejectMoveLine());
-    assertSame(line1, move.getMoveLines().get(0));
+    assertSame(line1, move.getMoveLines().getFirst());
 
     assertEquals(new BigDecimal("20"), line1.getCredit());
     assertEquals(BigDecimal.ZERO, line1.getDebit());
@@ -89,7 +89,7 @@ public class RelationTest extends JpaTest {
     assertSame(move, invoice.getMove());
     assertSame(line, invoice.getRejectMoveLine());
 
-    assertSame(line, move.getMoveLines().get(0));
+    assertSame(line, move.getMoveLines().getFirst());
   }
 
   @Transactional

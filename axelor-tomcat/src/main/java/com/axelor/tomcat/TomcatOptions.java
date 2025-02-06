@@ -104,7 +104,7 @@ public class TomcatOptions {
   }
 
   public Path getDocBase() {
-    return roots.isEmpty() ? Path.of("src/main/webapp") : roots.get(0);
+    return roots.isEmpty() ? Path.of("src/main/webapp") : roots.getFirst();
   }
 
   public List<Path> getExtraResources() {

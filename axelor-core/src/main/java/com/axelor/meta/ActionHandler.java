@@ -279,7 +279,7 @@ public class ActionHandler {
 
       // validate no-args or only matched method
       if (methods.size() == 1 || StringUtils.isBlank(methodArgs)) {
-        Method method = methods.get(0);
+        Method method = methods.getFirst();
         if (method.getAnnotation(CallMethod.class) == null) {
           throw new IllegalArgumentException(
               "Action not allowed: %s:%s".formatted(className, methodCall));
@@ -334,7 +334,7 @@ public class ActionHandler {
     Query q = select(query, params);
     q.setMaxResults(1);
     try {
-      return q.getResultList().get(0);
+      return q.getResultList().getFirst();
     } catch (Exception e) {
     }
     return null;

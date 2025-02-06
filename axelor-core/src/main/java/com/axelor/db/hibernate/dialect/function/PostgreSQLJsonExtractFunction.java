@@ -39,7 +39,7 @@ public class PostgreSQLJsonExtractFunction extends AbstractJsonExtractFunction {
       ReturnableType<?> returnType,
       SqlAstTranslator<?> translator) {
 
-    translator.render(pathArgs.get(0), SqlAstNodeRenderingMode.DEFAULT);
+    translator.render(pathArgs.getFirst(), SqlAstNodeRenderingMode.DEFAULT);
 
     for (final SqlAstNode pathArg : pathArgs.subList(1, pathArgs.size())) {
       sqlAppender.appendSql(", ");

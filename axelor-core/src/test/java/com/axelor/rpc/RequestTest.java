@@ -124,12 +124,12 @@ public class RequestTest extends RpcTest {
     Contact p = contacts.edit(data);
 
     assertEquals(Title.class, p.getTitle().getClass());
-    assertEquals(Address.class, p.getAddresses().get(0).getClass());
+    assertEquals(Address.class, p.getAddresses().getFirst().getClass());
     assertEquals(Circle.class, p.getCircle(0).getClass());
     assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
     assertEquals("mr", p.getTitle().getCode());
-    assertEquals("France", p.getAddresses().get(0).getCountry().getName());
+    assertEquals("France", p.getAddresses().getFirst().getCountry().getName());
     assertEquals("family", p.getCircle(0).getCode());
     assertEquals("1977-05-01", p.getDateOfBirth().toString());
 

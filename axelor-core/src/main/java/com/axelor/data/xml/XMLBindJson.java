@@ -76,7 +76,7 @@ public class XMLBindJson extends XMLBind {
               Optional.ofNullable(
                       parentJsonModel.isPresent()
                           ? MetaStore.findJsonFields(parentJsonModel.get())
-                          : MetaStore.findJsonFields(parent.getTypeName(), fieldParts.get(0)))
+                          : MetaStore.findJsonFields(parent.getTypeName(), fieldParts.getFirst()))
                   .map(fields -> fields.get(fieldParts.get(1)))
                   .orElse(Collections.emptyMap());
       jsonModel = (String) jsonField.get("jsonTarget");

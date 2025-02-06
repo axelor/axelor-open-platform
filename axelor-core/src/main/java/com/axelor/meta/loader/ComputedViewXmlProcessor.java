@@ -412,7 +412,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode.getParentNode().removeChild(targetNode);
       return null;
     } else {
-      final Node node = baseDocument.importNode(elements.get(0), true);
+      final Node node = baseDocument.importNode(elements.getFirst(), true);
       targetNode.getParentNode().replaceChild(node, targetNode);
       return doInsert(elements.subList(1, elements.size()), Position.AFTER, node);
     }

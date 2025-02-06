@@ -83,7 +83,7 @@ public class ComputedViewProcessor {
     Document document = processor.compute();
 
     final ObjectViews objectViews = XMLViews.unmarshal(document);
-    final AbstractView finalView = objectViews.getViews().get(0);
+    final AbstractView finalView = objectViews.getViews().getFirst();
     String finalXml = XMLViews.toXml(finalView, true);
 
     computedView.setXml(finalXml);

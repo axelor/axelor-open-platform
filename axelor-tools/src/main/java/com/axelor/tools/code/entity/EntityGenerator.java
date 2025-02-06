@@ -88,7 +88,7 @@ public class EntityGenerator {
     }
 
     final List<EnumType> all = new ArrayList<>(items);
-    final EnumType first = all.get(0);
+    final EnumType first = all.getFirst();
 
     final String ns = first.getPackageName();
     final String name = first.getName();
@@ -113,7 +113,7 @@ public class EntityGenerator {
       }
     }
 
-    final EnumType entity = all.remove(0);
+    final EnumType entity = all.removeFirst();
 
     for (EnumType it : all) {
       entity.merge(it);
@@ -147,7 +147,7 @@ public class EntityGenerator {
     }
 
     final List<Entity> all = new ArrayList<>(items);
-    final Entity first = all.get(0);
+    final Entity first = all.getFirst();
 
     final String ns = first.getPackageName();
     final String name = first.getName();
@@ -172,7 +172,7 @@ public class EntityGenerator {
       }
     }
 
-    final Entity entity = all.remove(0);
+    final Entity entity = all.removeFirst();
     for (Entity it : all) {
       entity.merge(it);
     }
@@ -295,7 +295,7 @@ public class EntityGenerator {
     if (generator.definedEntities.isEmpty()) {
       generator.findAll();
     }
-    lookup.add(0, generator);
+    lookup.addFirst(generator);
   }
 
   public void clean() {
@@ -387,7 +387,7 @@ public class EntityGenerator {
       if (all == null || all.isEmpty()) {
         continue;
       }
-      if (all.size() == 1 && !all.get(0).isModelClass()) { // generate extended Model class in root
+      if (all.size() == 1 && !all.getFirst().isModelClass()) { // generate extended Model class in root
         continue;
       }
       Collections.reverse(all);

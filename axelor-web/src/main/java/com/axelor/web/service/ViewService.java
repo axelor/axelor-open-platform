@@ -533,7 +533,7 @@ public class ViewService extends AbstractService {
     for (String key : params.keySet()) {
       List<String> values = params.get(key);
       if (values.size() == 1) {
-        context.put(key, values.get(0));
+        context.put(key, values.getFirst());
       } else {
         context.put(key, values);
       }

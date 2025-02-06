@@ -237,7 +237,7 @@ public class TestActions extends MetaTest {
 
     assertNotNull(value);
     Map infoMap =
-        (Map) ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).get(0)).get(Info.KEY);
+        (Map) ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).getFirst()).get(Info.KEY);
     assertNotNull(infoMap);
     assertEquals("Hello World!!!", infoMap.get("message"));
     assertEquals("My title", infoMap.get("title"));
@@ -327,7 +327,7 @@ public class TestActions extends MetaTest {
     assertNotNull(value);
     assertTrue(value instanceof List);
     assertFalse(((List<?>) value).isEmpty());
-    assertNotNull(((List<?>) value).get(0));
+    assertNotNull(((List<?>) value).getFirst());
     assertFalse(value.toString().contains("pending"));
 
     handler.getContext().put("firstName", "J");
@@ -338,7 +338,7 @@ public class TestActions extends MetaTest {
     assertNotNull(value);
     assertTrue(value instanceof List);
     assertFalse(((List<?>) value).isEmpty());
-    assertNotNull(((List<?>) value).get(0));
+    assertNotNull(((List<?>) value).getFirst());
     assertTrue(value.toString().contains("pending"));
   }
 

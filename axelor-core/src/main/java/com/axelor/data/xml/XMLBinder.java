@@ -318,7 +318,7 @@ public abstract class XMLBinder {
               }
             });
     if (result.size() == 1) {
-      return result.get(0);
+      return result.getFirst();
     }
     return result.size() == 0 ? null : result;
   }

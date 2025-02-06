@@ -172,7 +172,7 @@ public class MailController extends JpaSupport {
 
     String type = (String) request.getRawContext().get("type");
 
-    final Model related = (Model) request.getRecords().get(0);
+    final Model related = (Model) request.getRecords().getFirst();
     final List<MailMessage> all =
         messages.findBy(type, related, request.getLimit(), request.getOffset());
 
@@ -195,7 +195,7 @@ public class MailController extends JpaSupport {
       return;
     }
 
-    final MailMessage parent = messages.find((Long) request.getRecords().get(0));
+    final MailMessage parent = messages.find((Long) request.getRecords().getFirst());
 
     if (parent == null) {
       return;
