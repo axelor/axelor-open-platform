@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.parsers.SAXParser;
 import org.apache.commons.csv.CSVParser;
@@ -493,7 +492,7 @@ public class I18nExtractor {
     final List<String> langs =
         Stream.concat(Stream.of("en", "fr"), languages.stream())
             .distinct()
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
     for (String lang : langs) {
       Path target = template.resolveSibling("messages_" + lang + ".csv");

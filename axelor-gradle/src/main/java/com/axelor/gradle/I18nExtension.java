@@ -20,7 +20,6 @@ package com.axelor.gradle;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class I18nExtension {
 
@@ -36,6 +35,6 @@ public class I18nExtension {
     this.extraSources =
         extraSrc.stream()
             .map(src -> Path.of(src.toString()))
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
   }
 }

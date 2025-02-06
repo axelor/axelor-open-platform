@@ -24,7 +24,6 @@ import com.axelor.db.annotations.TrackMessage;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** This class is a straightforward implementation of the {@link Track} annotation */
@@ -65,7 +64,7 @@ public class ModelTracking {
 
     return new ModelTracking(
         Stream.concat(Arrays.stream(track.fields()).map(FieldTracking::new), customFields.stream())
-            .collect(Collectors.toUnmodifiableList()),
+            .toList(),
         Arrays.asList(track.messages()),
         Arrays.asList(track.contents()),
         track.subscribe(),

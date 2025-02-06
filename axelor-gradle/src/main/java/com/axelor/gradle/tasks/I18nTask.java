@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
@@ -54,7 +53,7 @@ public class I18nTask extends DefaultTask {
     this.languages =
         Arrays.stream(languages.split("\\s*,\\s*"))
             .map(StringUtils::normalizeLanguageTag)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
   }
 
   @TaskAction

@@ -305,7 +305,7 @@ public abstract class Property {
                   return PropertyAttribute.of(
                       attributeName, descriptors.get(fieldName), checkOverride);
                 })
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
 
     return attributes;
   }

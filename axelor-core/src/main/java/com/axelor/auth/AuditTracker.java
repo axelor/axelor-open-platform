@@ -71,7 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +136,7 @@ final class AuditTracker {
           .bind("model", model.getClass().getName());
     }
 
-    return query.fetch().stream().map(FieldTracking::new).collect(Collectors.toUnmodifiableList());
+    return query.fetch().stream().map(FieldTracking::new).toList();
   }
 
   private ModelTracking getTrack(Model entity) {
