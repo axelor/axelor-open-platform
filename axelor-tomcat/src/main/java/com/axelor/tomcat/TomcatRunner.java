@@ -64,12 +64,12 @@ public class TomcatRunner {
 
   private static List<String> getList(Properties props, String key) {
     String value = props.getProperty(key, "");
-    if (value.trim().length() == 0) {
+    if (value.trim().isEmpty()) {
       return Collections.emptyList();
     }
     return Arrays.stream(value.split(","))
         .map(String::trim)
-        .filter(s -> s.length() > 0)
+        .filter(s -> !s.isEmpty())
         .collect(Collectors.toList());
   }
 

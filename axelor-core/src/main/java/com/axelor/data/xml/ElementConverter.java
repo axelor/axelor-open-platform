@@ -104,7 +104,7 @@ public class ElementConverter implements Converter {
 
     // write the context if any
     String value = reader.getValue();
-    if (value != null && value.trim().length() > 0) {
+    if (value != null && !value.trim().isEmpty()) {
       writer.setValue(value);
     }
 

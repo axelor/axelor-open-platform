@@ -230,7 +230,7 @@ public class Query<T extends Model> {
    * @return the same query instance
    */
   public Query<T> order(String spec) {
-    if (orderBy.length() > 0) {
+    if (!orderBy.isEmpty()) {
       orderBy += ", ";
     } else {
       orderBy = " ORDER BY ";
@@ -640,7 +640,7 @@ public class Query<T extends Model> {
             .append(beanClass.getSimpleName())
             .append(" self")
             .append(joinHelper.toString(!update));
-    if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
+    if (filter != null && !filter.trim().isEmpty()) sb.append(" WHERE ").append(filter);
     if (update) {
       return sb.toString();
     }
@@ -662,7 +662,7 @@ public class Query<T extends Model> {
             .append(beanClass.getSimpleName())
             .append(" self")
             .append(joinHelper.toString(false));
-    if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
+    if (filter != null && !filter.trim().isEmpty()) sb.append(" WHERE ").append(filter);
     return joinHelper.fixSelect(sb.toString());
   }
 
@@ -806,7 +806,7 @@ public class Query<T extends Model> {
               .append(beanClass.getSimpleName())
               .append(" self")
               .append(joinHelper.toString(false));
-      if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
+      if (filter != null && !filter.trim().isEmpty()) sb.append(" WHERE ").append(filter);
       sb.append(orderBy);
       query = joinHelper.fixSelect(sb.toString());
     }
