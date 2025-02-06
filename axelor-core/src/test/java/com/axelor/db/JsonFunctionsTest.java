@@ -69,8 +69,9 @@ class JsonFunctionsTest extends JpaTest {
   void setJsonString() {
     var contact = getContact();
     var qlString =
-        "UPDATE Contact self SET self.attrs = json_set(self.attrs, 'myObject.myString', :myString) "
-            + "WHERE self.id = :id";
+        """
+        UPDATE Contact self SET self.attrs = json_set(self.attrs, 'myObject.myString', :myString) \
+        WHERE self.id = :id""";
     var query =
         JPA.em()
             .createQuery(qlString)
@@ -87,8 +88,9 @@ class JsonFunctionsTest extends JpaTest {
   void getJsonString() {
     var contact = getContact();
     var qlString =
-        "SELECT json_extract_text(self.attrs, 'myObject', 'myString') FROM Contact self "
-            + "WHERE self.id = :id";
+        """
+        SELECT json_extract_text(self.attrs, 'myObject', 'myString') FROM Contact self \
+        WHERE self.id = :id""";
     var query = JPA.em().createQuery(qlString).setParameter("id", contact.getId());
     var result = query.getSingleResult();
 
@@ -101,9 +103,10 @@ class JsonFunctionsTest extends JpaTest {
   void setJsonInteger() {
     var contact = getContact();
     var qlString =
-        "UPDATE Contact self "
-            + "SET self.attrs = json_set(self.attrs, 'myObject.myInteger', :myInteger) "
-            + "WHERE self.id = :id";
+        """
+        UPDATE Contact self \
+        SET self.attrs = json_set(self.attrs, 'myObject.myInteger', :myInteger) \
+        WHERE self.id = :id""";
     var query =
         JPA.em()
             .createQuery(qlString)
@@ -120,8 +123,9 @@ class JsonFunctionsTest extends JpaTest {
   void getJsonInteger() {
     var contact = getContact();
     var qlString =
-        "SELECT json_extract_integer(self.attrs, 'myObject', 'myInteger') FROM Contact self "
-            + "WHERE self.id = :id";
+        """
+        SELECT json_extract_integer(self.attrs, 'myObject', 'myInteger') FROM Contact self \
+        WHERE self.id = :id""";
     var query = JPA.em().createQuery(qlString).setParameter("id", contact.getId());
     var result = query.getSingleResult();
 

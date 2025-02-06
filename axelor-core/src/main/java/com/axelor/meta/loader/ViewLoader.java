@@ -308,9 +308,10 @@ public class ViewLoader extends AbstractParallelLoader {
           views
               .all()
               .filter(
-                  "self.name = ? AND self.module = ? "
-                      + "AND self.xmlId IS NULL "
-                      + "AND COALESCE(self.computed, FALSE) = FALSE",
+                  """
+                  self.name = ? AND self.module = ? \
+                  AND self.xmlId IS NULL \
+                  AND COALESCE(self.computed, FALSE) = FALSE""",
                   name,
                   module.getName())
               .fetchOne();

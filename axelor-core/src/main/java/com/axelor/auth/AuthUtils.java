@@ -89,12 +89,13 @@ public class AuthUtils {
   }
 
   private static final String QS_HAS_ROLE =
-      "SELECT self.id FROM Role self WHERE "
-          + "(self.name IN (:roles)) AND "
-          + "("
-          + "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR "
-          + "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))"
-          + ")";
+      """
+      SELECT self.id FROM Role self WHERE \
+      (self.name IN (:roles)) AND \
+      (\
+        (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR \
+        (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))\
+      )""";
 
   public static boolean hasRole(final User user, final String... roles) {
     Preconditions.checkArgument(user != null, "user not provided.");

@@ -88,12 +88,13 @@ public class I18nBundle extends ResourceBundle {
     final TypedQuery<Object[]> query =
         JPA.em()
             .createQuery(
-                "SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END) "
-                    + "FROM MetaTranslation self "
-                    + "LEFT JOIN MetaTranslation base ON base.key = self.key AND base.language = :baseLang "
-                    + "WHERE self.message IS NOT NULL AND self.language IN (:lang, :baseLang) "
-                    + "GROUP BY self.key "
-                    + "ORDER BY self.key",
+                """
+                SELECT self.key, MAX(CASE WHEN self.language = :lang THEN self.message ELSE base.message END) \
+                FROM MetaTranslation self \
+                LEFT JOIN MetaTranslation base ON base.key = self.key AND base.language = :baseLang \
+                WHERE self.message IS NOT NULL AND self.language IN (:lang, :baseLang) \
+                GROUP BY self.key \
+                ORDER BY self.key""",
                 Object[].class)
             .setParameter("lang", lang)
             .setParameter("baseLang", baseLang)

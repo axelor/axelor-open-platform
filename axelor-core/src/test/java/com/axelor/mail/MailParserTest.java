@@ -29,9 +29,10 @@ import org.junit.jupiter.api.Test;
 public class MailParserTest {
 
   private String html =
-      "<div>This is a test..</div><br><br><p>"
-          + "This is a link: <a href=\"http://example.com/link.html\">Some Link</a></p><br>"
-          + "Regards <br>--<div>John Smith</div>";
+      """
+      <div>This is a test..</div><br><br><p>\
+      This is a link: <a href="http://example.com/link.html">Some Link</a></p><br>\
+      Regards <br>--<div>John Smith</div>""";
 
   @Test
   public void testPlainText() throws Exception {

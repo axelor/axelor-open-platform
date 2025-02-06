@@ -118,11 +118,12 @@ public class MenuService {
     final TypedQuery<Object[]> query =
         JPA.em()
             .createQuery(
-                "SELECT self.menu, MAX(CASE WHEN self.language = :lang THEN self.help ELSE base.help END) "
-                    + "FROM MetaHelp self "
-                    + "LEFT JOIN MetaHelp base ON base.menu = self.menu AND base.language = :baseLang "
-                    + "WHERE self.menu IS NOT NULL AND self.language IN (:lang, :baseLang) "
-                    + "GROUP BY self.menu",
+                """
+                SELECT self.menu, MAX(CASE WHEN self.language = :lang THEN self.help ELSE base.help END) \
+                FROM MetaHelp self \
+                LEFT JOIN MetaHelp base ON base.menu = self.menu AND base.language = :baseLang \
+                WHERE self.menu IS NOT NULL AND self.language IN (:lang, :baseLang) \
+                GROUP BY self.menu""",
                 Object[].class)
             .setParameter("lang", lang)
             .setParameter("baseLang", baseLang)

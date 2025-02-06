@@ -49,54 +49,56 @@ public class STTemplateTest extends TemplateScriptTest {
   }
 
   private static final String TEMPLATE_COMPLEX =
-      ""
-          + "<html>\n"
-          + "<style>\n"
-          + "h1 { font-size: 14px; }\n"
-          + "</style>\n"
-          + "<body>\n"
-          + "   <h1>Welcome!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: $x.fullName$</li>\n"
-          + "       <li>Email: <a href='$x.email$'>$x.email$</a></li>\n"
-          + "       <li>Type: $x.contactType$</li>\n"
-          + "       <li>Status: $x.contactStatus$</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>Nick: $x.nickName$</li>\n"
-          + "       <li>Numerology: $x.numerology$</li>\n"
-          + "       <li>Birthdate: $x.birthDate$</li>\n"
-          + "       <li>Favorite Color: $x.favColor$</li>\n"
-          + "$if(x.guardian.id)$"
-          + "       <li>Guardian: $x.guardian.fullName$</li>\n"
-          + "$endif$"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <style>
+      h1 { font-size: 14px; }
+      </style>
+      <body>
+         <h1>Welcome!</h1>
+         <ul>
+             <li>Name: $x.fullName$</li>
+             <li>Email: <a href='$x.email$'>$x.email$</a></li>
+             <li>Type: $x.contactType$</li>
+             <li>Status: $x.contactStatus$</li>
+         </ul>
+         <ul>
+             <li>Nick: $x.nickName$</li>
+             <li>Numerology: $x.numerology$</li>
+             <li>Birthdate: $x.birthDate$</li>
+             <li>Favorite Color: $x.favColor$</li>
+      $if(x.guardian.id)$\
+             <li>Guardian: $x.guardian.fullName$</li>
+      $endif$\
+         </ul>
+      </body>
+      </html>
+      """;
 
   private static final String OUTPUT_COMPLEX =
-      ""
-          + "<html>\n"
-          + "<style>\n"
-          + "h1 { font-size: 14px; }\n"
-          + "</style>\n"
-          + "<body>\n"
-          + "   <h1>Welcome!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: Mrs. John NAME</li>\n"
-          + "       <li>Email: <a href='jsmith@gmail.com'>jsmith@gmail.com</a></li>\n"
-          + "       <li>Type: Customer</li>\n"
-          + "       <li>Status: One</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>Nick: Some Name</li>\n"
-          + "       <li>Numerology: 2</li>\n"
-          + "       <li>Birthdate: 2020-05-22</li>\n"
-          + "       <li>Favorite Color: Red</li>\n"
-          + "       <li>Guardian: Mr. Mark Ram</li>\n"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <style>
+      h1 { font-size: 14px; }
+      </style>
+      <body>
+         <h1>Welcome!</h1>
+         <ul>
+             <li>Name: Mrs. John NAME</li>
+             <li>Email: <a href='jsmith@gmail.com'>jsmith@gmail.com</a></li>
+             <li>Type: Customer</li>
+             <li>Status: One</li>
+         </ul>
+         <ul>
+             <li>Nick: Some Name</li>
+             <li>Numerology: 2</li>
+             <li>Birthdate: 2020-05-22</li>
+             <li>Favorite Color: Red</li>
+             <li>Guardian: Mr. Mark Ram</li>
+         </ul>
+      </body>
+      </html>
+      """;
 
   @Test
   public void testStringTemplateComplex() {
@@ -191,23 +193,24 @@ public class STTemplateTest extends TemplateScriptTest {
   }
 
   private static final String TEMPLATE_JSON =
-      ""
-          + "<html>\n"
-          + "<body>\n"
-          + "   <h1 style=\"font-size: 14px;\">Hello!</h1>\n"
-          + "   <ul>\n"
-          + "       <li>Name: $x.name$</li>\n"
-          + "       <li>Date: $x.date$</li>\n"
-          + "       <li>Color: $x.color$</li>\n"
-          + "       <li>Contact Name: $x.contact.fullName$</li>\n"
-          + "       <li>Contact Type: $x.contact.contactType$</li>\n"
-          + "   </ul>\n"
-          + "   <ul>\n"
-          + "       <li>World Name: $x.world.name$</li>\n"
-          + "       <li>World Price: $x.world.price$</li>\n"
-          + "   </ul>\n"
-          + "</body>\n"
-          + "</html>\n";
+      """
+      <html>
+      <body>
+         <h1 style="font-size: 14px;">Hello!</h1>
+         <ul>
+             <li>Name: $x.name$</li>
+             <li>Date: $x.date$</li>
+             <li>Color: $x.color$</li>
+             <li>Contact Name: $x.contact.fullName$</li>
+             <li>Contact Type: $x.contact.contactType$</li>
+         </ul>
+         <ul>
+             <li>World Name: $x.world.name$</li>
+             <li>World Price: $x.world.price$</li>
+         </ul>
+      </body>
+      </html>
+      """;
 
   @Test
   @Transactional

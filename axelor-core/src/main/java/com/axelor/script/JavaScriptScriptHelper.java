@@ -51,14 +51,15 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
     ctx.getBindings("js").putMember("__scope", new JavaScriptScope(bindings));
     ctx.eval(
         "js",
-        "Object.setPrototypeOf(globalThis, new Proxy(Object.prototype, {"
-            + "  has(target, key) {"
-            + "    return key in __scope || key in target;"
-            + "  },"
-            + "  get(target, key, receiver) {"
-            + "    return Reflect.get((key in __scope) ? __scope : target, key, receiver);"
-            + "  }"
-            + "}))");
+        """
+        Object.setPrototypeOf(globalThis, new Proxy(Object.prototype, {\
+          has(target, key) {\
+            return key in __scope || key in target;\
+          },\
+          get(target, key, receiver) {\
+            return Reflect.get((key in __scope) ? __scope : target, key, receiver);\
+          }\
+        }))""");
 
     return ctx;
   }

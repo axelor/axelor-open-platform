@@ -96,12 +96,13 @@ public class QueryTest extends ScriptTest {
     String filter =
         "(self.addresses[].country.code = ?1 AND self.title.code = ?2) OR self.firstName = ?3";
     String expected =
-        "SELECT DISTINCT self FROM Contact self "
-            + "LEFT JOIN FETCH self.addresses _addresses "
-            + "LEFT JOIN FETCH _addresses.country _addresses_country "
-            + "LEFT JOIN self.title _title "
-            + "WHERE (_addresses_country.code = ?1 AND _title.code = ?2) OR self.firstName = ?3 "
-            + "ORDER BY _addresses_country.name DESC";
+        """
+        SELECT DISTINCT self FROM Contact self \
+        LEFT JOIN FETCH self.addresses _addresses \
+        LEFT JOIN FETCH _addresses.country _addresses_country \
+        LEFT JOIN self.title _title \
+        WHERE (_addresses_country.code = ?1 AND _title.code = ?2) OR self.firstName = ?3 \
+        ORDER BY _addresses_country.name DESC""";
 
     Query<Contact> q =
         all(Contact.class).filter(filter, "FR", "MR", "John").order("-addresses[].country.name");
@@ -115,9 +116,10 @@ public class QueryTest extends ScriptTest {
   @Test
   public void testDistinct() {
     final String filter =
-        "self.addresses.country.code IS NOT NULL "
-            + "AND self.title.code IS NOT NULL "
-            + "OR self.firstName IS NOT NULL";
+        """
+        self.addresses.country.code IS NOT NULL \
+        AND self.title.code IS NOT NULL \
+        OR self.firstName IS NOT NULL""";
     final List<Contact> resultList = all(Contact.class).filter(filter).fetch();
     final Set<Contact> resultSet = new HashSet<>(resultList);
     assertEquals(resultSet.size(), resultList.size(), "Results should be unique.");

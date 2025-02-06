@@ -80,8 +80,9 @@ public class InfoResource {
   @Operation(
       summary = "Retrieve metadata information for the application",
       description =
-          "Retrieve metadata information for `application` and `authentication`. "
-              + "If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.")
+          """
+          Retrieve metadata information for `application` and `authentication`. \
+          If the user is logged in, also retrieve `user`, `view`, `api`, `data`, and `features` information.""")
   public Map<String, Object> info() {
     return infoService.info(request, response);
   }

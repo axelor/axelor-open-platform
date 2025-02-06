@@ -54,13 +54,14 @@ public class TestJavaMethod {
 
     String code = writer.emit(method).toString();
     assertEquals(
-        ""
-            + "public Message create(\n"
-            + "  String message,\n"
-            + "  @NotNull\n"
-            + "  final File file\n"
-            + ") {\n"
-            + "}\n",
+        """
+        public Message create(
+          String message,
+          @NotNull
+          final File file
+        ) {
+        }
+        """,
         code);
   }
 

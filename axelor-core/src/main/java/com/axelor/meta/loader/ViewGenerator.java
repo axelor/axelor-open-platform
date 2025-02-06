@@ -75,17 +75,19 @@ public class ViewGenerator {
   private List<Long> findForCompute(Collection<String> names) {
     return JPA.em()
         .createQuery(
-            "SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                + "self.name IN :names "
-                + "AND COALESCE(self.extension, FALSE) = FALSE "
-                + "AND COALESCE(self.computed, FALSE) = FALSE "
-                + "AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) "
-                + "IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other "
-                + "LEFT JOIN other.groups otherGroup "
-                + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
-                + "GROUP BY other.name, otherGroup.id) "
-                + "GROUP BY self.id "
-                + "ORDER BY self.id",
+            """
+            SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE \
+            self.name IN :names \
+            AND COALESCE(self.extension, FALSE) = FALSE \
+            AND COALESCE(self.computed, FALSE) = FALSE \
+            AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) \
+            IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other \
+            LEFT JOIN other.groups otherGroup \
+            WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE \
+            GROUP BY other.name, otherGroup.id) \
+            GROUP BY self.id \
+            ORDER BY self.id\
+            """,
             Long.class)
         .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
         .getResultList();

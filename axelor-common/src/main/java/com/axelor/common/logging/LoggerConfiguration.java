@@ -91,9 +91,10 @@ public class LoggerConfiguration {
   private static final Pattern LOGGING_LEVEL_PATTERN = Pattern.compile("logging\\.level\\.(.*?)");
 
   private static final String ANSI_LOG_PATTERN =
-      "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) "
-          + "%clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} "
-          + "%clr(:){faint} %m%n";
+      """
+      %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) \
+      %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} \
+      %clr(:){faint} %m%n""";
 
   private static final String FILE_LOG_PATTERN =
       "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n";

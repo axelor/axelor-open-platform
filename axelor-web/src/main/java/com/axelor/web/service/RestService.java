@@ -262,9 +262,10 @@ public class RestService extends ResourceService {
         Beans.get(JpaSecurity.class).getFilter(JpaSecurity.CAN_READ, DMSFile.class);
     final Filter filter =
         new JPQLFilter(
-            "self.relatedModel = :relatedModel "
-                + "AND self.relatedId = :relatedId "
-                + "AND COALESCE(self.isDirectory, FALSE) = FALSE");
+            """
+            self.relatedModel = :relatedModel \
+            AND self.relatedId = :relatedId \
+            AND COALESCE(self.isDirectory, FALSE) = FALSE""");
     return (securityFilter != null ? Filter.and(securityFilter, filter) : filter)
         .build(DMSFile.class)
         .bind("relatedModel", getModel())
@@ -279,8 +280,9 @@ public class RestService extends ResourceService {
   @Operation(
       summary = "Update a record",
       description =
-          "This service returns the updated record. "
-              + "**Important: Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.**")
+          """
+          This service returns the updated record. \
+          **Important: Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.**""")
   public Response update(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -303,8 +305,9 @@ public class RestService extends ResourceService {
   @Operation(
       summary = "Update records in mass",
       description =
-          "This service returns list of updated records. "
-              + "**Important: Version number is used in order to ensure non-conflicting modifications of the records, and thus must be specified.**")
+          """
+          This service returns list of updated records. \
+          **Important: Version number is used in order to ensure non-conflicting modifications of the records, and thus must be specified.**""")
   public Response updateMass(Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();

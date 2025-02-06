@@ -338,10 +338,11 @@ public abstract class AbstractView {
     final TypedQuery<Object[]> query =
         JPA.em()
             .createQuery(
-                "SELECT self.field, self.type, self.help, self.style "
-                    + "FROM MetaHelp self "
-                    + "WHERE self.model = :model AND (self.view = :view OR self.view IS NULL) AND self.language IN (:lang, :baseLang) "
-                    + "ORDER BY self.view ASC, self.language DESC",
+                """
+                SELECT self.field, self.type, self.help, self.style \
+                FROM MetaHelp self \
+                WHERE self.model = :model AND (self.view = :view OR self.view IS NULL) AND self.language IN (:lang, :baseLang) \
+                ORDER BY self.view ASC, self.language DESC""",
                 Object[].class)
             .setParameter("lang", lang)
             .setParameter("baseLang", baseLang)

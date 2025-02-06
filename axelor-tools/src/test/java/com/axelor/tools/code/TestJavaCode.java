@@ -51,13 +51,13 @@ public class TestJavaCode {
 
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import java.util.ArrayList;\n"
-            + "import java.util.List;\n"
-            + "\n"
-            + "List<String> names = new ArrayList<>()";
+        """
+        package com.example;
+        
+        import java.util.ArrayList;
+        import java.util.List;
+        
+        List<String> names = new ArrayList<>()""";
 
     assertEquals(expected, text);
   }
@@ -67,12 +67,13 @@ public class TestJavaCode {
     JavaCode code = new JavaCode("final var value = {0:m};", "com.some.Example.NAME");
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import com.some.Example;\n"
-            + "\n"
-            + "final var value = Example.NAME;";
+        """
+        package com.example;
+        
+        import com.some.Example;
+        
+        final var value = Example.NAME;\
+        """;
 
     assertEquals(expected, text);
   }
@@ -82,12 +83,13 @@ public class TestJavaCode {
     JavaCode code = new JavaCode("{0:M}({1:s});", "System.out.println", "Hello!");
     String text = render(code);
     String expected =
-        ""
-            + "package com.example;\n"
-            + "\n"
-            + "import static System.out.println;\n"
-            + "\n"
-            + "println(\"Hello!\");";
+        """
+        package com.example;
+        
+        import static System.out.println;
+        
+        println("Hello!");\
+        """;
     assertEquals(expected, text);
   }
 }

@@ -47,64 +47,64 @@ import java.util.Map;
 public class MailController extends JpaSupport {
 
   private static final String SQL_UNREAD =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isRead IS NULL OR g.isRead = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isRead IS NULL OR g.isRead = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_SUBSCRIBERS =
-      ""
-          + "SELECT DISTINCT(u) FROM User u "
-          + "LEFT JOIN u.group g "
-          + "LEFT JOIN u.roles r "
-          + "LEFT JOIN g.roles gr "
-          + "WHERE "
-          + "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-          + "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR "
-          + "	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR "
-          + " (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))";
+      """
+      SELECT DISTINCT(u) FROM User u \
+      LEFT JOIN u.group g \
+      LEFT JOIN u.roles r \
+      LEFT JOIN g.roles gr \
+      WHERE \
+      (u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND \
+      ((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR \
+      	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR \
+       (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))""";
 
   private static final String SQL_INBOX =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_IMPORTANT =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isStarred = true AND g.isArchived = false) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message.id = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isStarred = true AND g.isArchived = false) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   private static final String SQL_ARCHIVE =
-      ""
-          + "SELECT mm FROM MailMessage mm "
-          + "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
-          + "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
-          + "WHERE"
-          + " (mm.parent IS NULL) AND "
-          + " (f.user.id = :uid AND f.archived = false) AND"
-          + " (g.isArchived = true) "
-          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
-          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
+      """
+      SELECT mm FROM MailMessage mm \
+      LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel \
+      LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id \
+      WHERE\
+       (mm.parent IS NULL) AND \
+       (f.user.id = :uid AND f.archived = false) AND\
+       (g.isArchived = true) \
+      ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn \
+      ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC""";
 
   @Inject private MailMessageRepository messages;
 

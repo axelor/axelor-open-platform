@@ -44,16 +44,32 @@ public class TestStringUtils {
   }
 
   static final String text1 =
-      "" + "  this is some text\n" + "  this is some text\n" + "  this is some text\n";
+      """
+        this is some text
+        this is some text
+        this is some text
+      """;
 
   static final String text2 =
-      "" + "  this is some text\n" + "    \tthis is some text\n" + "   this is some text\n";
+      """
+        this is some text
+          	this is some text
+         this is some text
+      """;
 
   static final String text3 =
-      "" + "  this is some text\n" + "  this is some text\n" + " this is some text\n";
+      """
+        this is some text
+        this is some text
+       this is some text
+      """;
 
   static final String text4 =
-      "" + "this is some text\n" + "    |this is some text\n" + "    |this is some text\n";
+      """
+      this is some text
+          |this is some text
+          |this is some text
+      """;
 
   @Test
   public void testStripIndent() {
@@ -63,7 +79,10 @@ public class TestStringUtils {
     assertFalse(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "this is some text\n" + "this is some text");
+        """
+        this is some text
+        this is some text
+        this is some text""");
 
     lines = StringUtils.stripIndent(text2).split("\n");
     assertFalse(Character.isWhitespace(lines[0].charAt(0)));
@@ -71,7 +90,10 @@ public class TestStringUtils {
     assertTrue(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "  \tthis is some text\n" + " this is some text");
+        """
+        this is some text
+          	this is some text
+         this is some text""");
 
     lines = StringUtils.stripIndent(text3).split("\n");
     assertTrue(Character.isWhitespace(lines[0].charAt(0)));
@@ -79,7 +101,10 @@ public class TestStringUtils {
     assertFalse(Character.isWhitespace(lines[2].charAt(0)));
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + " this is some text\n" + " this is some text\n" + "this is some text");
+        """
+         this is some text
+         this is some text
+        this is some text""");
   }
 
   @Test
@@ -87,7 +112,10 @@ public class TestStringUtils {
     String[] lines = StringUtils.stripMargin(text4).split("\n");
     assertEquals(
         Joiner.on("\n").join(lines),
-        "" + "this is some text\n" + "this is some text\n" + "this is some text");
+        """
+        this is some text
+        this is some text
+        this is some text""");
   }
 
   @Test

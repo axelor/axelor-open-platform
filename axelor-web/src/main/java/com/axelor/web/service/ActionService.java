@@ -112,9 +112,10 @@ public class ActionService extends AbstractService {
   @Operation(
       summary = "Execute an action",
       description =
-          "Execute an action along with the provided data context. "
-              + "The action can be single or list of comma-separated actions. "
-              + "An action can be either an xml action or a method call.")
+          """
+          Execute an action along with the provided data context. \
+          The action can be single or list of comma-separated actions. \
+          An action can be either an xml action or a method call.""")
   public Response execute(ActionRequest request) {
     return actionExecutor.execute(request);
   }
@@ -124,9 +125,10 @@ public class ActionService extends AbstractService {
   @Operation(
       summary = "Execute an action",
       description =
-          "Execute an action along with the provided data context. "
-              + "The action can be single or list of comma-separated actions. "
-              + "An action can be either an xml action or a method call.")
+          """
+          Execute an action along with the provided data context. \
+          The action can be single or list of comma-separated actions. \
+          An action can be either an xml action or a method call.""")
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
     return actionExecutor.execute(request);

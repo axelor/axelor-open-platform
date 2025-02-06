@@ -52,13 +52,13 @@ public class TeamRepository extends JpaRepository<Team> {
     final TypedQuery<MailFollower> query =
         JPA.em()
             .createQuery(
-                ""
-                    + "SELECT f FROM MailFollower f "
-                    + "LEFT JOIN f.user u "
-                    + "WHERE f.relatedModel = :model "
-                    + "	AND f.relatedId = :id "
-                    + "	AND u.id NOT IN "
-                    + "		(SELECT x.id FROM Team t LEFT JOIN t.members x WHERE t.id = :id)",
+                """
+                SELECT f FROM MailFollower f \
+                LEFT JOIN f.user u \
+                WHERE f.relatedModel = :model \
+                	AND f.relatedId = :id \
+                	AND u.id NOT IN \
+                		(SELECT x.id FROM Team t LEFT JOIN t.members x WHERE t.id = :id)""",
                 MailFollower.class);
 
     query.setParameter("model", Team.class.getName());

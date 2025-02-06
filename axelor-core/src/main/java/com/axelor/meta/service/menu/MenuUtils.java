@@ -41,9 +41,11 @@ public class MenuUtils {
   public static List<MetaMenu> fetchMetaMenu(List<String> names) {
     final Map<String, Object> params = new HashMap<>();
     String queryString =
-        "SELECT self FROM MetaMenu self "
-            + "LEFT JOIN FETCH self.action "
-            + "LEFT JOIN FETCH self.parent ";
+        """
+        SELECT self FROM MetaMenu self \
+        LEFT JOIN FETCH self.action \
+        LEFT JOIN FETCH self.parent \
+        """;
 
     if (ObjectUtils.notEmpty(names)) {
       queryString += "WHERE self.name IN (:names) ";

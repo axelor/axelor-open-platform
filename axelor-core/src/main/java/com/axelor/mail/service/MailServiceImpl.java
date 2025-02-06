@@ -343,16 +343,16 @@ public class MailServiceImpl implements MailService, MailConstants {
     Templates templates = Beans.get(GroovyTemplates.class);
     Template tmpl =
         templates.fromText(
-            ""
-                + "<ul>"
-                + "<% for (def item : tracks) { %>"
-                + "<% if (item.containsKey('displayValue')) { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> → <span>${item.displayValue}</span></li>"
-                + "<% } else { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldValue}</span> → <span>${item.value}</span></li>"
-                + "<% } %>"
-                + "<% } %>"
-                + "</ul>");
+            """
+            <ul>\
+            <% for (def item : tracks) { %>\
+            <% if (item.containsKey('displayValue')) { %>\
+            <li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> → <span>${item.displayValue}</span></li>\
+            <% } else { %>\
+            <li><strong>${item.title}</strong>: <span>${item.oldValue}</span> → <span>${item.value}</span></li>\
+            <% } %>\
+            <% } %>\
+            </ul>""");
 
     return tmpl.make(data).render();
   }

@@ -37,16 +37,17 @@ public class TestLoader extends AbstractTest {
   @Test
   public void testValidate() {
     String xml =
-        "<form name=\"some-name\" title=\"Some Name\" model=\"com.axelor.test.db.Contact\">"
-            + "<panel>"
-            + "  <field name=\"some\"/>"
-            + "  <panel title=\"Group\" colSpan=\"4\">"
-            + "    <button name=\"button1\" title=\"Click 1\" onClick=\"action.button1\"/>"
-            + "    <button name=\"button2\" title=\"Click 2\" onClick=\"action.button2\"/>"
-            + "  </panel>"
-            + "  <field name=\"other\"/>"
-            + "</panel>"
-            + "</form>";
+        """
+        <form name="some-name" title="Some Name" model="com.axelor.test.db.Contact">\
+        <panel>\
+          <field name="some"/>\
+          <panel title="Group" colSpan="4">\
+            <button name="button1" title="Click 1" onClick="action.button1"/>\
+            <button name="button2" title="Click 2" onClick="action.button2"/>\
+          </panel>\
+          <field name="other"/>\
+        </panel>\
+        </form>""";
     try {
       XMLViews.fromXML(xml);
     } catch (JAXBException e) {

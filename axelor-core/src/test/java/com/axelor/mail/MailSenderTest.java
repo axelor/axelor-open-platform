@@ -47,23 +47,25 @@ public class MailSenderTest extends AbstractMailTest {
   private static final String SEND_TO = "my.name@gmail.com";
 
   private static final String HTML =
-      ""
-          + "<strong>Hello world...</strong>"
-          + "<hr>"
-          + "<p>This is a testing email and not a <strong><span style='color: red;'>spam...</span></strong></p>"
-          + "<p>This is logo1...</p>"
-          + "<img src='cid:logo1.png'></img>" // show logo1.png as inline image
-          + "<br>"
-          + "---"
-          + "<span style='color: blue;'><i>John Smith</i></span>";
+      """
+      <strong>Hello world...</strong>\
+      <hr>\
+      <p>This is a testing email and not a <strong><span style='color: red;'>spam...</span></strong></p>\
+      <p>This is logo1...</p>\
+      <img src='cid:logo1.png'></img>\
+      <br>\
+      ---\
+      <span style='color: blue;'><i>John Smith</i></span>""";
 
   private static final String TEXT =
-      ""
-          + "Hello world...\n"
-          + "--------------\n\n"
-          + "This is a testing email and not a *spam...*\n\n"
-          + "---\n"
-          + "John Smith";
+      """
+      Hello world...
+      --------------
+      
+      This is a testing email and not a *spam...*
+      
+      ---
+      John Smith""";
 
   private void send(MailAccount account, Date sentOn) throws MessagingException, IOException {
 
