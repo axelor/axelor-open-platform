@@ -170,7 +170,7 @@ public class JpaModule extends AbstractModule {
 
     for (String key : keys.keySet()) {
       String name = keys.get(key);
-      String value = settings.get(String.format(key, unit));
+      String value = settings.get(key.formatted(unit));
       if (!StringUtils.isBlank(value)) {
         properties.put(name, value.trim());
       }

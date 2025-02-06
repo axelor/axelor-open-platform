@@ -137,7 +137,7 @@ public class XMLBindJson extends XMLBind {
     return Optional.of(
             Stream.of(search, domain)
                 .filter(StringUtils::notBlank)
-                .map(item -> String.format("(%s)", item))
+                .map(item -> "(%s)".formatted(item))
                 .collect(Collectors.joining(" AND ")))
         .filter(StringUtils::notBlank)
         .orElse(null);
@@ -159,7 +159,7 @@ public class XMLBindJson extends XMLBind {
     if (jsonBindings == null) {
       final XMLBind jsonModelBinding = new XMLBind();
       jsonModelBinding.setField("jsonModel");
-      jsonModelBinding.setExpression(String.format("'%s'", getJsonModel()));
+      jsonModelBinding.setExpression("'%s'".formatted(getJsonModel()));
       jsonBindings = Collections.singletonList(jsonModelBinding);
     }
 

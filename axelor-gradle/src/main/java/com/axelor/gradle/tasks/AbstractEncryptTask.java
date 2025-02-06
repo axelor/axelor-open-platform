@@ -204,7 +204,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
         return YamlUtils.getFlattenedMap(YamlUtils.loadYaml(path));
       }
     } catch (Exception e) {
-      getLogger().error(String.format("Unable to open configuration file %s", path));
+      getLogger().error("Unable to open configuration file %s".formatted(path));
     }
     return new HashMap<>();
   }
@@ -250,16 +250,16 @@ public abstract class AbstractEncryptTask extends DefaultTask {
     log("");
     getLogger()
         .lifecycle(
-            String.format(
-                "WARNING : Do not add property `%s.%s` with the password in your configuration file.\n"
-                    + "Use a reference to an external file : `file:<path_to_file>` as password value.",
-                CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
+        (
+            "WARNING : Do not add property `%s.%s` with the password in your configuration file.\n"
+                + "Use a reference to an external file : `file:<path_to_file>` as password value.").formatted(
+            CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
   }
 
   private void printConfig(String value, String key) {
     if (StringUtils.isBlank(value)) {
       return;
     }
-    log(String.format("%s.%s = %s", CONFIG_ENCRYPTOR_PREFIX, key, value));
+    log("%s.%s = %s".formatted(CONFIG_ENCRYPTOR_PREFIX, key, value));
   }
 }

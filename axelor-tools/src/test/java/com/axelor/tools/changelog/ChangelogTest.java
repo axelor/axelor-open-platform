@@ -75,8 +75,7 @@ public class ChangelogTest {
   }
 
   String getHeader(String version) {
-    return String.format(
-        "%s (%s)", version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
+    return "%s (%s)".formatted(version, LocalDate.of(2020, 1, 10).format(DateTimeFormatter.ISO_LOCAL_DATE));
   }
 
   @Test

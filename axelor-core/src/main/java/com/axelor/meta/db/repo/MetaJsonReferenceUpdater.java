@@ -138,8 +138,7 @@ public class MetaJsonReferenceUpdater {
 
     for (MetaJsonField field : fields) {
       String queryString =
-          String.format(
-              "UPDATE %s self SET self.%s = json_set(self.%s, '%s.%s', :value) WHERE json_extract(self.%s, '%s', 'id') = :id",
+          "UPDATE %s self SET self.%s = json_set(self.%s, '%s.%s', :value) WHERE json_extract(self.%s, '%s', 'id') = :id".formatted(
               field.getModel(),
               field.getModelField(),
               field.getModelField(),

@@ -150,7 +150,7 @@ public class ActionReport extends Action {
             .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")))
             .replace("${name}", getName());
 
-    final String fileName = String.format("%s.%s", outputName, format);
+    final String fileName = "%s.%s".formatted(outputName, format);
     final File output = generator.generate(designName, format, params, AppFilter.getLocale());
 
     result.put("report", getName());

@@ -274,7 +274,7 @@ public class ActionHandler {
       // method not found
       if (methods.size() == 0) {
         throw new IllegalArgumentException(
-            new NoSuchMethodException(String.format("%s.%s()", className, methodName)));
+            new NoSuchMethodException("%s.%s()".formatted(className, methodName)));
       }
 
       // validate no-args or only matched method
@@ -282,7 +282,7 @@ public class ActionHandler {
         Method method = methods.get(0);
         if (method.getAnnotation(CallMethod.class) == null) {
           throw new IllegalArgumentException(
-              String.format("Action not allowed: %s:%s", className, methodCall));
+              "Action not allowed: %s:%s".formatted(className, methodCall));
         }
       } else { // validate exact matched method with arguments
         final Object validator =
@@ -294,7 +294,7 @@ public class ActionHandler {
                         (proxy, method, args) -> {
                           if (method.getAnnotation(CallMethod.class) == null) {
                             throw new IllegalArgumentException(
-                                String.format("Action not allowed: %s:%s", className, methodCall));
+                                "Action not allowed: %s:%s".formatted(className, methodCall));
                           }
                           return null;
                         }))
@@ -360,7 +360,7 @@ public class ActionHandler {
   public Object search(Class<?> entityClass, String filter, Map params) {
     filter =
         makeMethodCall(
-            String.format("__repo__(%s).all().filter", entityClass.getSimpleName()), filter);
+            "__repo__(%s).all().filter".formatted(entityClass.getSimpleName()), filter);
     com.axelor.db.Query q = (com.axelor.db.Query) handleScript(filter);
 
     q = q.bind(bindings);

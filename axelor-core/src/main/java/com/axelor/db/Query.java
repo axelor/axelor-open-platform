@@ -669,7 +669,7 @@ public class Query<T extends Model> {
   protected String updateQuery(Map<String, Object> values, boolean versioned, String filter) {
     final String items =
         values.keySet().stream()
-            .map(key -> String.format("self.%s = :%s", key, key))
+            .map(key -> "self.%s = :%s".formatted(key, key))
             .collect(Collectors.joining(", "));
 
     final StringBuilder sb =
@@ -1067,8 +1067,7 @@ public class Query<T extends Model> {
             property = currentMapper.getProperty(variable);
             if (property == null) {
               throw new IllegalArgumentException(
-                  String.format(
-                      "No such field '%s' in object '%s'",
+                  "No such field '%s' in object '%s'".formatted(
                       variable, currentMapper.getBeanClass().getName()));
             }
             if (property.isReference()) {
@@ -1089,7 +1088,7 @@ public class Query<T extends Model> {
         Property property = mapper.getProperty(name);
         if (property == null) {
           throw new IllegalArgumentException(
-              String.format("No such field '%s' in object '%s'", variable, beanClass.getName()));
+              "No such field '%s' in object '%s'".formatted(variable, beanClass.getName()));
         }
         if (property.isCollection()) {
           return null;
@@ -1117,8 +1116,7 @@ public class Query<T extends Model> {
     }
 
     private String getTranslationJoin(String joinName, String from, String variable, String lang) {
-      return String.format(
-          "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'",
+      return "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'".formatted(
           joinName, joinName, from, variable, joinName, lang);
     }
 
@@ -1129,16 +1127,15 @@ public class Query<T extends Model> {
       final String baseLang = locale.getLanguage();
       final String joinName =
           prefix == null
-              ? String.format("_meta_translation_%s", variable)
-              : String.format("_meta_translation%s_%s", prefix, variable);
+              ? "_meta_translation_%s".formatted(variable)
+              : "_meta_translation%s_%s".formatted(prefix, variable);
       final String baseJoinName = joinName + "_base";
       final String from = prefix == null ? "self" : prefix;
 
       translationJoins.add(getTranslationJoin(joinName, from, variable, lang));
       translationJoins.add(getTranslationJoin(baseJoinName, from, variable, baseLang));
 
-      return String.format(
-          "COALESCE(NULLIF(%s.message, ''), NULLIF(%s.message, ''), %s.%s)",
+      return "COALESCE(NULLIF(%s.message, ''), NULLIF(%s.message, ''), %s.%s)".formatted(
           joinName, baseJoinName, from, variable);
     }
 
@@ -1160,10 +1157,10 @@ public class Query<T extends Model> {
       for (final Entry<String, String> entry : joins.entrySet()) {
         final String fetchString = fetch && fetches.contains(entry.getKey()) ? " FETCH" : "";
         joinItems.add(
-            String.format("LEFT JOIN%s %s %s", fetchString, entry.getKey(), entry.getValue()));
+            "LEFT JOIN%s %s %s".formatted(fetchString, entry.getKey(), entry.getValue()));
       }
       for (final String join : translationJoins) {
-        joinItems.add(String.format("LEFT JOIN %s", join));
+        joinItems.add("LEFT JOIN %s".formatted(join));
       }
       return joinItems.isEmpty() ? "" : " " + joinItems.stream().collect(Collectors.joining(" "));
     }

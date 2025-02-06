@@ -339,7 +339,7 @@ public final class MailParser {
       final String name = node.nodeName();
       switch (name) {
         case "a":
-          builder.append(String.format(" <%s>", node.attr("href")));
+          builder.append(" <%s>".formatted(node.attr("href")));
           break;
         case "p":
         case "div":

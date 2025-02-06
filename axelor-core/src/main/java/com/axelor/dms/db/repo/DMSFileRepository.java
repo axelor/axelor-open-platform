@@ -508,7 +508,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
       // Put inlineUrl only if preview for that file type is supported, to prevent auto-downloading
       if (StringUtils.notBlank(fileType) && previewSupportedPattern.matcher(fileType).find()) {
-        json.put("inlineUrl", String.format("ws/dms/inline/%d", file.getId()));
+        json.put("inlineUrl", "ws/dms/inline/%d".formatted(file.getId()));
       }
     }
 

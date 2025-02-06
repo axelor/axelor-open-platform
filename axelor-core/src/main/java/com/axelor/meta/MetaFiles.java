@@ -605,8 +605,7 @@ public class MetaFiles {
    * @return download link
    */
   public String getDownloadLink(MetaFile metaFile, Model parentModel) {
-    return String.format(
-        "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d",
+    return "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d".formatted(
         MetaFile.class.getName(),
         metaFile.getId(),
         EntityHelper.getEntityClass(parentModel).getName(),

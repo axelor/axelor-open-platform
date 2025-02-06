@@ -314,7 +314,7 @@ public class Property {
 
     if (type == null) {
       throw new IllegalArgumentException(
-          String.format("Invalid property of type '%s': %s", javaType.getName(), name));
+          "Invalid property of type '%s': %s".formatted(javaType.getName(), name));
     }
   }
 

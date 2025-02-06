@@ -71,7 +71,7 @@ public class ReleaseProcessor {
       }
     }
     throw new IllegalArgumentException(
-        String.format("Type %s cannot be found in %s", type, String.join(",", types)));
+        "Type %s cannot be found in %s".formatted(type, String.join(",", types)));
   }
 
   private void validate(Collection<ChangelogEntry> changelogEntries) {

@@ -217,7 +217,7 @@ public class JsonProperty extends Property {
 
   @Override
   public String getName() {
-    return String.format("%s.%s", fieldName, subFieldName);
+    return "%s.%s".formatted(fieldName, subFieldName);
   }
 
   @Override

@@ -154,8 +154,7 @@ public class AuditInterceptor implements Interceptor {
       for (int i = 0; i < propertyNames.length; i++) {
         if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
           throw new PersistenceException(
-              String.format(
-                  "You can't update: %s#%s, values (%s=%s)",
+              "You can't update: %s#%s, values (%s=%s)".formatted(
                   entity.getClass().getName(), id, propertyNames[i], currentState[i]));
         }
         if (UPDATED_ON.equals(propertyNames[i])) {
@@ -217,7 +216,7 @@ public class AuditInterceptor implements Interceptor {
       Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
     if (!canDelete(entity)) {
       throw new PersistenceException(
-          String.format("You can't delete: %s#%s", entity.getClass().getName(), id));
+          "You can't delete: %s#%s".formatted(entity.getClass().getName(), id));
     }
     if (tracker.get() != null && entity instanceof Model) {
       tracker.get().delete((Model) entity);

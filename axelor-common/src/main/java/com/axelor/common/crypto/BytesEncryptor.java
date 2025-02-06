@@ -58,7 +58,7 @@ public class BytesEncryptor implements Encryptor<byte[], byte[]> {
   public BytesEncryptor(OperationMode mode, PaddingScheme paddingScheme, String password) {
     this.mode = mode;
     this.password = password;
-    this.transformation = String.format("%s/%s/%s", AES_ALGORITHM, mode, paddingScheme);
+    this.transformation = "%s/%s/%s".formatted(AES_ALGORITHM, mode, paddingScheme);
     this.encryptionSalt = generateRandomBytes(SALT_SIZE);
     this.encryptionKey = newSecretKey(password, this.encryptionSalt);
     this.payloadSize =

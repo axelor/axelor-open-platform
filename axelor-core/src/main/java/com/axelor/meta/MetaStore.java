@@ -429,9 +429,9 @@ public final class MetaStore {
         attrs.put("target", MetaJsonRecord.class.getName());
         if (record.getTargetJsonModel() != null) {
           final MetaJsonModel targetModel = record.getTargetJsonModel();
-          String domain = String.format("self.jsonModel = '%s'", targetModel.getName());
+          String domain = "self.jsonModel = '%s'".formatted(targetModel.getName());
           if (!StringUtils.isBlank(record.getDomain())) {
-            domain = String.format("(%s) AND (%s)", domain, record.getDomain());
+            domain = "(%s) AND (%s)".formatted(domain, record.getDomain());
           }
           attrs.put("domain", domain);
           attrs.put("gridView", targetModel.getGridView().getName());

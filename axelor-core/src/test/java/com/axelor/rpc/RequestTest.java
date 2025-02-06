@@ -178,14 +178,14 @@ public class RequestTest extends RpcTest {
     Contact john = contacts.edit(johnValues);
     assertNotNull(
         john.getFirstName(),
-        String.format("Entity instance should contain field passed to JPA#edit: %s", john));
+        "Entity instance should contain field passed to JPA#edit: %s".formatted(john)
+        );
     john.getRelatedContacts().stream()
         .forEach(
             relatedContact ->
                 assertNotNull(
                     relatedContact.getFirstName(),
-                    String.format(
-                        "Child entity instance should contain field passed to JPA#edit: %s",
-                        john)));
+                    "Child entity instance should contain field passed to JPA#edit: %s".formatted(john)
+                    ));
   }
 }

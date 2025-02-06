@@ -210,7 +210,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
   protected String getMessage(String key) {
     final var message = I18n.get(key);
     if (Objects.equals(key, message)) {
-      throw new IllegalStateException(String.format("Missing translation for: %s", key));
+      throw new IllegalStateException("Missing translation for: %s".formatted(key));
     }
     return message;
   }
@@ -225,7 +225,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
     final var url =
         new StringBuilder()
             .append(
-                String.format("%s/#/reset-password?token=%s", getBaseUrl(true), createToken(user)));
+            "%s/#/reset-password?token=%s".formatted(getBaseUrl(true), createToken(user)));
     final var httpRequest = getHttpRequest();
     final var headerTenantId = httpRequest.getHeader("X-Tenant-ID");
 
@@ -331,7 +331,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
 
   @Nullable
   protected String getTenantBaseUrl(String tenantId) {
-    final var hostsKey = String.format("db.%s.hosts", tenantId);
+    final var hostsKey = "db.%s.hosts".formatted(tenantId);
     final var hostsValue = settings.get(hostsKey);
     if (StringUtils.notBlank(hostsValue)) {
       final var hosts = Arrays.asList(hostsValue.split("\\s*,\\s*"));
@@ -339,8 +339,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
         final var host = hosts.get(0);
         if (StringUtils.notBlank(host)) {
           final var httpRequest = getHttpRequest();
-          return String.format(
-              "%s://%s%s", httpRequest.getScheme(), host, httpRequest.getContextPath());
+          return "%s://%s%s".formatted(httpRequest.getScheme(), host, httpRequest.getContextPath());
         }
       }
     }

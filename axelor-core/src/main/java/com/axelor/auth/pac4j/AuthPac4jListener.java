@@ -66,7 +66,7 @@ public class AuthPac4jListener implements AuthenticationListener {
         profile
             .map(profileService::getUserIdentifier)
             .orElseGet(() -> String.valueOf(token.getPrincipal()));
-    final String msg = String.format(UNKNOWN_USER, username);
+    final String msg = UNKNOWN_USER.formatted(username);
     final UnknownAccountException exception = new UnknownAccountException(msg);
 
     firePostLoginFailure(token, exception);

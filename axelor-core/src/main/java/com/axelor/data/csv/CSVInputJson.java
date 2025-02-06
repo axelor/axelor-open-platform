@@ -59,8 +59,8 @@ public class CSVInputJson extends CSVInput {
       return search;
     }
 
-    return Stream.of(search, String.format("self.jsonModel = '%s'", getJsonModel()))
-        .map(item -> String.format("(%s)", item))
+    return Stream.of(search, "self.jsonModel = '%s'".formatted(getJsonModel()))
+        .map(item -> "(%s)".formatted(item))
         .collect(Collectors.joining(" AND "));
   }
 
@@ -74,7 +74,7 @@ public class CSVInputJson extends CSVInput {
     if (jsonBindings == null) {
       final CSVBind jsonModelBinding = new CSVBind();
       jsonModelBinding.setField("jsonModel");
-      jsonModelBinding.setExpression(String.format("'%s'", getJsonModel()));
+      jsonModelBinding.setExpression("'%s'".formatted(getJsonModel()));
       jsonBindings = Collections.singletonList(jsonModelBinding);
     }
 

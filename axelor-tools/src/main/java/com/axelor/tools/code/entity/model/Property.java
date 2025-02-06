@@ -354,8 +354,8 @@ public abstract class Property {
     if (type == PropertyType.ENUM) return target;
     if (type == PropertyType.ONE_TO_ONE) return target;
     if (type == PropertyType.MANY_TO_ONE) return target;
-    if (type == PropertyType.ONE_TO_MANY) return String.format("java.util.List<%s>", target);
-    if (type == PropertyType.MANY_TO_MANY) return String.format("java.util.Set<%s>", target);
+    if (type == PropertyType.ONE_TO_MANY) return "java.util.List<%s>".formatted(target);
+    if (type == PropertyType.MANY_TO_MANY) return "java.util.Set<%s>".formatted(target);
     return null;
   }
 
@@ -966,8 +966,7 @@ public abstract class Property {
     if (isTrue(json) && type == PropertyType.STRING) {
       if (isTrue(encrypted)) {
         throw new IllegalArgumentException(
-            String.format(
-                "Encryption is not supported on json field: %s.%s", entity.getName(), name));
+            "Encryption is not supported on json field: %s.%s".formatted(entity.getName(), name));
       }
       return List.of(
           new JavaAnnotation("jakarta.persistence.Basic")

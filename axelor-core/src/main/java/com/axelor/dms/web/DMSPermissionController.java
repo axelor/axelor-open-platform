@@ -58,6 +58,6 @@ public class DMSPermissionController {
             .map(Model::getId)
             .map(Number::toString)
             .collect(Collectors.joining(","));
-    return String.format("self.id NOT IN (%s)", idListString.isEmpty() ? "0" : idListString);
+    return "self.id NOT IN (%s)".formatted(idListString.isEmpty() ? "0" : idListString);
   }
 }

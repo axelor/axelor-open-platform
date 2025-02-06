@@ -72,7 +72,7 @@ public class EncryptFileTask extends AbstractEncryptTask {
   public void printOutput() {
     log("");
     log("-------OUTPUT-------");
-    String text = String.format("Found and encrypt %s setting(s)", encodedSettings.size());
+    String text = "Found and encrypt %s setting(s)".formatted(encodedSettings.size());
     if (ObjectUtils.notEmpty(encodedSettings)) {
       text += " : " + String.join(", ", encodedSettings);
     }

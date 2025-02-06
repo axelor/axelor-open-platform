@@ -63,7 +63,7 @@ public class JavaFile {
    */
   public Path getPath(Path base) {
     String[] dirs = javaContext.getPackageName().split("\\.");
-    String name = String.format("%s.java", javaType.getName());
+    String name = "%s.java".formatted(javaType.getName());
     return Stream.of(dirs).map(Paths::get).reduce(base, Path::resolve).resolve(name);
   }
 

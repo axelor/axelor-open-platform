@@ -134,7 +134,7 @@ public abstract class AbstractXmlProcessor {
   private String prepareXPathExpression(String subExpression, String name, String type) {
     final String rootExpr = "/:object-views/:%s[@name='%s']";
     final String expr = subExpression.startsWith("/") ? subExpression.substring(1) : subExpression;
-    return String.format(expr.isEmpty() ? rootExpr : rootExpr + "/" + expr, type, name, expr);
+    return (expr.isEmpty() ? rootExpr : rootExpr + "/" + expr).formatted(type, name, expr);
   }
 
   private Object evaluateXPath(String expression, Object item, QName returnType)

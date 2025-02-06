@@ -103,7 +103,7 @@ public class ActionValidate extends ActionResumable {
       result.put(key, value);
 
       if (i + 1 < validators.size() && validator instanceof Alert) {
-        result.put("pending", String.format("%s[%d]", getName(), i + 1));
+        result.put("pending", "%s[%d]".formatted(getName(), i + 1));
       }
 
       if (info != null) {

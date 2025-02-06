@@ -83,7 +83,7 @@ public final class WebServer {
   }
 
   public WebTarget target() {
-    return client().target(String.format("http://localhost:%s%s", PORT, CONTEXT_PATH));
+    return client().target("http://localhost:%s%s".formatted(PORT, CONTEXT_PATH));
   }
 
   private Undertow createServer() {

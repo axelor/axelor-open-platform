@@ -205,7 +205,7 @@ public class Context extends SimpleBindings {
     final T bean = (T) getTarget();
     if (!type.isInstance(bean)) {
       throw new IllegalArgumentException(
-          String.format("Invalid type %s, should be %s", type.getName(), beanClass.getName()));
+          "Invalid type %s, should be %s".formatted(type.getName(), beanClass.getName()));
     }
     return bean;
   }

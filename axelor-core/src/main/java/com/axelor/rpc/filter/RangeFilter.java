@@ -41,7 +41,7 @@ class RangeFilter extends SimpleFilter {
   public String getQuery() {
 
     if (getOperator() == Operator.BETWEEN || getOperator() == Operator.NOT_BETWEEN) {
-      return String.format("(%s %s ? AND ?)", getOperand(), getOperator());
+      return "(%s %s ? AND ?)".formatted(getOperand(), getOperator());
     }
 
     StringBuilder sb = new StringBuilder(getOperand());

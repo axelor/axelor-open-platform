@@ -71,7 +71,7 @@ class SimpleFilter extends Filter {
 
   @Override
   public String getQuery() {
-    return String.format("(%s %s ?)", getOperand(), operator);
+    return "(%s %s ?)".formatted(getOperand(), operator);
   }
 
   @Override

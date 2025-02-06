@@ -55,7 +55,7 @@ public class CSVBindJson extends CSVBind {
     try {
       if (StringUtils.notBlank(jsonModel)) {
         setType(MetaJsonRecord.class.getName());
-        domain = String.format("self.jsonModel = '%s'", jsonModel);
+        domain = "self.jsonModel = '%s'".formatted(jsonModel);
         return;
       }
 
@@ -154,7 +154,7 @@ public class CSVBindJson extends CSVBind {
     return Optional.of(
             Stream.of(search, domain)
                 .filter(StringUtils::notBlank)
-                .map(item -> String.format("(%s)", item))
+                .map(item -> "(%s)".formatted(item))
                 .collect(Collectors.joining(" AND ")))
         .filter(StringUtils::notBlank)
         .orElse(null);
@@ -176,7 +176,7 @@ public class CSVBindJson extends CSVBind {
     if (jsonBindings == null) {
       final CSVBind jsonModelBinding = new CSVBind();
       jsonModelBinding.setField("jsonModel");
-      jsonModelBinding.setExpression(String.format("'%s'", getJsonModel()));
+      jsonModelBinding.setExpression("'%s'".formatted(getJsonModel()));
       jsonBindings = Collections.singletonList(jsonModelBinding);
     }
 

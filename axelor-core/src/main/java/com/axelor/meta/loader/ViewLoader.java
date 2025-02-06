@@ -140,8 +140,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!unresolved.isEmpty()) {
       LOG.error("Found {} unresolved item(s): {}", unresolved.size(), unresolved);
       throw new PersistenceException(
-          String.format(
-              "Found %d unresolved item(s). Please check the logs for details.",
+          "Found %d unresolved item(s). Please check the logs for details.".formatted(
               unresolved.size()));
     }
 
@@ -376,7 +375,7 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   private static String getName(String name, String xmlId) {
-    return xmlId == null ? name : String.format("%s(id=%s)", name, xmlId);
+    return xmlId == null ? name : "%s(id=%s)".formatted(name, xmlId);
   }
 
   @Transactional

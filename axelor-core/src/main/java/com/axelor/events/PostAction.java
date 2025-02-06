@@ -40,7 +40,7 @@ public class PostAction extends ActionEvent {
         && !(result instanceof ActionResponse)) {
       String msg = "Expected action result of type '%s' but was '%s'";
       throw new IllegalArgumentException(
-          String.format(msg, ActionResponse.class.getName(), result.getClass().getName()));
+          msg.formatted(ActionResponse.class.getName(), result.getClass().getName()));
     }
 
     this.result = result;

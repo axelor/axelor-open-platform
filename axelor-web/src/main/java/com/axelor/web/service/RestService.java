@@ -142,7 +142,7 @@ public class RestService extends ResourceService {
             .orElse(";");
     if (separator.length() != 1) {
       throw new IllegalArgumentException(
-          String.format("Illegal data export separator: %s", separator));
+          "Illegal data export separator: %s".formatted(separator));
     }
     CSV_SEPARATOR = separator.charAt(0);
   }

@@ -246,8 +246,7 @@ public class MetaController {
     MetaField metaField = request.getContext().asType(MetaField.class);
 
     String domain =
-        String.format(
-            "self.packageName = '%s' AND self.name = '%s'",
+        "self.packageName = '%s' AND self.name = '%s'".formatted(
             metaField.getPackageName(), metaField.getTypeName());
     response.setView(
         ActionView.define(metaField.getTypeName())
@@ -267,7 +266,7 @@ public class MetaController {
       final String durationTime =
           LocalTime.MIN.plusSeconds(duration.getSeconds()).format(DateTimeFormatter.ISO_LOCAL_TIME);
       response.setNotify(
-          String.format(I18n.get("All views have been restored (%s)."), durationTime)
+          I18n.get("All views have been restored (%s).").formatted(durationTime)
               + "<br>"
               + I18n.get("Please refresh your browser to see updated views."));
       log.info("Restore meta time: {}", durationTime);

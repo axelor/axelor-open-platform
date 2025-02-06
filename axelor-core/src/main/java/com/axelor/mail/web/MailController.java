@@ -279,7 +279,7 @@ public class MailController extends JpaSupport {
     if (unread == null) {
       unread = 0L;
     }
-    return String.format("%s/%s", unread, total);
+    return "%s/%s".formatted(unread, total);
   }
 
   private List<MailMessage> findChildren(MailMessage message) {

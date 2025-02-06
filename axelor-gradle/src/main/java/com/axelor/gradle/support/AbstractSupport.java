@@ -30,7 +30,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler;
 public abstract class AbstractSupport implements Plugin<Project> {
 
   protected void applyConfigurationLibs(Project project, String libs, String as) {
-    final String path = String.format("com/axelor/gradle/%s-libs.txt", libs);
+    final String path = "com/axelor/gradle/%s-libs.txt".formatted(libs);
     try (Reader reader = new InputStreamReader(ResourceUtils.getResourceStream(path))) {
       final DependencyHandler handler = project.getDependencies();
       CharStreams.readLines(reader).forEach(lib -> handler.add(as, lib));

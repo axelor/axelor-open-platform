@@ -83,7 +83,7 @@ public class OpenAPIScannerTest {
   private void addScanProp(String key, String value) {
     AppSettings.get()
         .getInternalProperties()
-        .put(String.format("application.openapi.scan.%s", key), value);
+        .put("application.openapi.scan.%s".formatted(key), value);
   }
 
   @BeforeEach

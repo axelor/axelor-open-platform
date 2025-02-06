@@ -37,7 +37,7 @@ class NullFilter extends SimpleFilter {
 
   @Override
   public String getQuery() {
-    return String.format("(%s %s)", getOperand(), getOperator());
+    return "(%s %s)".formatted(getOperand(), getOperator());
   }
 
   @Override

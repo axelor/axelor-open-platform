@@ -116,11 +116,11 @@ public class DBHelper {
         throw new RuntimeException("Invalid persistence.xml, missing persistence unit name.");
       }
 
-      final String configDataSource = String.format("db.%s.datasource", pu);
-      final String configDriver = String.format("db.%s.driver", pu);
-      final String configUrl = String.format("db.%s.url", pu);
-      final String configUser = String.format("db.%s.user", pu);
-      final String configPassword = String.format("db.%s.password", pu);
+      final String configDataSource = "db.%s.datasource".formatted(pu);
+      final String configDriver = "db.%s.driver".formatted(pu);
+      final String configUrl = "db.%s.url".formatted(pu);
+      final String configUser = "db.%s.user".formatted(pu);
+      final String configPassword = "db.%s.password".formatted(pu);
 
       jndiName = settings.get(configDataSource);
       jdbcDriver = settings.get(configDriver);

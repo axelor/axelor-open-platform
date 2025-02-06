@@ -127,13 +127,13 @@ public class SettingsBuilder {
   }
 
   private URL getDefaultPropertiesFile() {
-    String fileName = String.format("%s.properties", SettingsUtils.CONFIG_FILE_NAME);
+    String fileName = "%s.properties".formatted(SettingsUtils.CONFIG_FILE_NAME);
     return ClassUtils.getResource(fileName);
   }
 
   private URL getDefaultYamlFile() {
     for (String ext : getYamlFileExtensions()) {
-      String fileName = String.format("%s.%s", SettingsUtils.CONFIG_FILE_NAME, ext);
+      String fileName = "%s.%s".formatted(SettingsUtils.CONFIG_FILE_NAME, ext);
       URL resource = ClassUtils.getResource(fileName);
       if (resource != null) {
         return resource;

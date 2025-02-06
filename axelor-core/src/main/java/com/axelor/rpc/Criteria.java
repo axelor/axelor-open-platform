@@ -204,8 +204,8 @@ public class Criteria {
                 .orElseThrow(
                     () ->
                         new IllegalArgumentException(
-                            String.format("%s doesn't have a name column.", property.getTarget())));
-        fieldName = String.format("%s.%s", fieldName, nameField.getName());
+                            "%s doesn't have a name column.".formatted(property.getTarget())));
+        fieldName = "%s.%s".formatted(fieldName, nameField.getName());
       }
     }
 

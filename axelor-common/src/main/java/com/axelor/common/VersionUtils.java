@@ -64,7 +64,7 @@ public final class VersionUtils {
       this.minor = Integer.parseInt(matcher.group(2));
       this.patch = Integer.parseInt(matcher.group(3));
       this.rc = matcher.group(4) != null ? Integer.parseInt(matcher.group(4)) : 0;
-      this.feature = String.format("%s.%s", major, minor);
+      this.feature = "%s.%s".formatted(major, minor);
       this.snapshot = matcher.group(5) != null;
     }
 

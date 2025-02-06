@@ -723,14 +723,14 @@ public class Entity implements BaseType<Entity> {
         data.stream()
             .map(p -> p.getName())
             .map(n -> getterName(n))
-            .map(n -> String.format("Objects.equals(%s(), other.%s())", n, n))
+            .map(n -> "Objects.equals(%s(), other.%s())".formatted(n, n))
             .collect(Collectors.joining("\n  && "));
 
     var nullconditions =
         data.stream()
             .map(p -> p.getName())
             .map(n -> getterName(n))
-            .map(n -> String.format("%s() != null", n))
+            .map(n -> "%s() != null".formatted(n))
             .collect(Collectors.joining("\n    || "));
 
     method.code("return " + conditions);

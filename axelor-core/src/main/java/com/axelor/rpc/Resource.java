@@ -426,8 +426,7 @@ public class Resource<T extends Model> {
     }
 
     return new JPQLFilter(
-        String.format(
-            "self.id IN (SELECT __item.id FROM %s __parent JOIN __parent.%s __item WHERE __parent.id = ?)",
+        "self.id IN (SELECT __item.id FROM %s __parent JOIN __parent.%s __item WHERE __parent.id = ?)".formatted(
             parentModel.getSimpleName(), property.getName()),
         parentId);
   }
@@ -569,7 +568,7 @@ public class Resource<T extends Model> {
         .findAny()
         .ifPresent(
             name -> {
-              throw new IllegalArgumentException(String.format("Invalid name: %s", name));
+              throw new IllegalArgumentException("Invalid name: %s".formatted(name));
             });
 
     builder
@@ -1610,7 +1609,7 @@ public class Resource<T extends Model> {
       if (p != null && p.isJson()) {
         selectName = func.toString();
       } else {
-        selectName = String.format("self.%s", name);
+        selectName = "self.%s".formatted(name);
       }
     }
 
@@ -1631,8 +1630,7 @@ public class Resource<T extends Model> {
 
     if (selectName != null) {
       String qs =
-          String.format(
-              "SELECT %s FROM %s self WHERE self.id = :id", selectName, model.getSimpleName());
+          "SELECT %s FROM %s self WHERE self.id = :id".formatted(selectName, model.getSimpleName());
 
       jakarta.persistence.Query query = JPA.em().createQuery(qs);
       QueryBinder.of(query).setCacheable().setReadOnly().bind(data);

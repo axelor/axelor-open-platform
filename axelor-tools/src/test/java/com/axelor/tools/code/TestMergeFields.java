@@ -233,7 +233,7 @@ public class TestMergeFields {
   List<Class<?>> loadEntities(String name) throws Exception {
     final List<Class<?>> classes = new ArrayList<>();
     for (int i = 0; i < 6; ++i) {
-      classes.add(loadEntity(String.format("%s%d", name, i)));
+      classes.add(loadEntity("%s%d".formatted(name, i)));
     }
     return classes;
   }

@@ -59,8 +59,7 @@ public class EqualityTest extends JpaTest {
       assertNotEquals(
           entity1,
           entity2,
-          String.format(
-              "Two new empty instances of %s should not be equal.", modelClass.getSimpleName()));
+          "Two new empty instances of %s should not be equal.".formatted(modelClass.getSimpleName()));
     }
   }
 
@@ -74,23 +73,21 @@ public class EqualityTest extends JpaTest {
       entities.add(entity2);
       assertTrue(
           entities.contains(entity1),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       assertTrue(
           entities.contains(entity2),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       entities.remove(entity1);
       assertFalse(
           entities.contains(entity1),
-          String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
+          "Set should not contain removed instance of %s.".formatted(modelClass.getSimpleName()));
       assertTrue(
           entities.contains(entity2),
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
+          "Set should contain added instance of %s.".formatted(modelClass.getSimpleName()));
       entities.remove(entity2);
       assertFalse(
           entities.contains(entity2),
-          String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
+          "Set should not contain removed instance of %s.".formatted(modelClass.getSimpleName()));
     }
   }
 
@@ -105,30 +102,25 @@ public class EqualityTest extends JpaTest {
       assertSame(
           entity1,
           entities.get(entity1),
-          String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instance of %s from map.".formatted(modelClass.getSimpleName()));
       assertSame(
           entity2,
           entities.get(entity2),
-          String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instance of %s from map.".formatted(modelClass.getSimpleName()));
       entities.remove(entity1);
       assertSame(
           null,
           entities.get(entity1),
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
+          "Should not find removed instance of %s from map.".formatted(modelClass.getSimpleName()));
       assertSame(
           entity2,
           entities.get(entity2),
-          String.format(
-              "Should retrieve same instandce of %s from map.", modelClass.getSimpleName()));
+          "Should retrieve same instandce of %s from map.".formatted(modelClass.getSimpleName()));
       entities.remove(entity2);
       assertSame(
           null,
           entities.get(entity2),
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
+          "Should not find removed instance of %s from map.".formatted(modelClass.getSimpleName()));
     }
   }
 

@@ -145,7 +145,7 @@ public class CSVBinder {
             beanFields.add(field);
             continue;
           }
-          final String fieldName = String.format("%s.%s", parts[0], parts[1]);
+          final String fieldName = "%s.%s".formatted(parts[0], parts[1]);
           final String subFieldName =
               Arrays.stream(Arrays.copyOfRange(parts, 2, parts.length))
                   .collect(Collectors.joining("."));

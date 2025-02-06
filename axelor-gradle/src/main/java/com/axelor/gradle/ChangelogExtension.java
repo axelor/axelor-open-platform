@@ -50,8 +50,7 @@ public class ChangelogExtension {
     this.header.convention(
         project.provider(
             () ->
-                String.format(
-                    "%s (%s)",
+                "%s (%s)".formatted(
                     project.getVersion().toString(),
                     new SimpleDateFormat("yyyy-MM-dd").format(new Date()))));
 

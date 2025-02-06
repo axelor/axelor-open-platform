@@ -109,8 +109,7 @@ public class EntityGenerator {
     for (EnumType it : all) {
       if (!ns.equals(it.getPackageName())) {
         throw new IllegalArgumentException(
-            String.format(
-                "Invalid namespace: %s.%s != %s.%s", ns, name, it.getPackageName(), name));
+            "Invalid namespace: %s.%s != %s.%s".formatted(ns, name, it.getPackageName(), name));
       }
     }
 
@@ -169,8 +168,7 @@ public class EntityGenerator {
     for (Entity it : all) {
       if (!ns.equals(it.getPackageName())) {
         throw new IllegalArgumentException(
-            String.format(
-                "Invalid namespace: %s.%s != %s.%s", ns, name, it.getPackageName(), name));
+            "Invalid namespace: %s.%s != %s.%s".formatted(ns, name, it.getPackageName(), name));
       }
     }
 

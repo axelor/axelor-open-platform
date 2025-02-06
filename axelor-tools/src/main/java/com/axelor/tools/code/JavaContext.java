@@ -113,14 +113,14 @@ public class JavaContext implements JavaElement {
   private List<String> getStaticStatements() {
     return statics.values().stream()
         .filter(s -> shouldImportStatic(s))
-        .map(s -> String.format("import static %s;", s))
+        .map(s -> "import static %s;".formatted(s))
         .collect(toList());
   }
 
   private List<String> getImportStatements() {
     return imports.values().stream()
         .filter(s -> shouldImport(s))
-        .map(s -> String.format("import %s;", s))
+        .map(s -> "import %s;".formatted(s))
         .collect(toList());
   }
 

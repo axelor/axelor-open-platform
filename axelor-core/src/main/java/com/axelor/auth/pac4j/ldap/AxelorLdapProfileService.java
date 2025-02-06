@@ -245,7 +245,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
       final String format =
           StringUtils.notBlank(userDnFormat)
               ? userDnFormat
-              : String.format("%s=%%s,%s", idAttribute, usersDn);
+              : "%s=%%s,%s".formatted(idAttribute, usersDn);
       dnResolver = new FormatDnResolver(format);
     }
 
@@ -305,7 +305,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
 
   @Nullable
   public LdapEntry searchGroup(String groupName) {
-    final String filter = String.format(FILTER_FORMAT, AxelorLdapGroupDefinition.NAME, groupName);
+    final String filter = FILTER_FORMAT.formatted(AxelorLdapGroupDefinition.NAME, groupName);
     final SearchRequest request =
         new SearchRequest(
             groupsDn, filter, AxelorLdapGroupDefinition.ATTRIBUTES.stream().toArray(String[]::new));
@@ -357,7 +357,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
     search.setEntryHandlers(new ObjectSidHandler(), new ObjectGuidHandler());
     final SearchRequest request =
         new SearchRequest(
-            getUsersDn(), String.format(FILTER_FORMAT, getIdAttribute(), profile.getId()));
+            getUsersDn(), FILTER_FORMAT.formatted(getIdAttribute(), profile.getId()));
     final SearchResponse response;
 
     try {
@@ -400,14 +400,14 @@ public class AxelorLdapProfileService extends LdapProfileService {
       // Search posixGroup
       final Integer groupId = (Integer) profile.getAttribute(AxelorLdapGroupDefinition.ID);
       if (groupId == null
-          || setGroup(profile, String.format("(%s=%d)", AxelorLdapGroupDefinition.ID, groupId))
+          || setGroup(profile, "(%s=%d)".formatted(AxelorLdapGroupDefinition.ID, groupId))
               == null) {
         final String entryId = getEntryId(convertProfileAndPasswordToAttributes(profile, null));
 
         // Search groupOfUniqueNames, groupOfNames, and group
         for (final String memberAttribute :
             List.of(AxelorLdapGroupDefinition.UNIQUE_MEMBER, AxelorLdapGroupDefinition.MEMBER)) {
-          if (setGroup(profile, String.format(FILTER_FORMAT, memberAttribute, entryId)) != null) {
+          if (setGroup(profile, FILTER_FORMAT.formatted(memberAttribute, entryId)) != null) {
             break;
           }
         }

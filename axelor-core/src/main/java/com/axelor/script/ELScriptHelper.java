@@ -211,9 +211,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
     public static String formatText(String format, Object... args) {
       if (args == null) {
-        return String.format(format, args);
+        return format.formatted(args);
       }
-      return String.format(format, args);
+      return format.formatted(args);
     }
   }
 

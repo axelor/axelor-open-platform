@@ -72,6 +72,6 @@ public class FieldTracking {
   }
 
   public String getName() {
-    return isCustomField ? String.format("%s.%s", jsonFieldName, fieldName) : fieldName;
+    return isCustomField ? "%s.%s".formatted(jsonFieldName, fieldName) : fieldName;
   }
 }

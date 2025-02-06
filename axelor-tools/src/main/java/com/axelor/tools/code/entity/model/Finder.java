@@ -195,7 +195,7 @@ public class Finder {
                   ? entity.getPackageName() + "." + propType
                   : prop.getTarget();
         }
-        query.add(String.format("self.%s = :%s", propName, propName));
+        query.add("self.%s = :%s".formatted(propName, propName));
       }
       propName = JavaCodeUtils.firstLower(propName);
 

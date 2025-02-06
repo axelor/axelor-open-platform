@@ -45,8 +45,8 @@ class LikeFilter extends SimpleFilter {
   @Override
   public String getQuery() {
     if (DBHelper.isUnaccentEnabled()) {
-      return String.format("(unaccent(UPPER(%s)) %s unaccent(?))", getOperand(), getOperator());
+      return "(unaccent(UPPER(%s)) %s unaccent(?))".formatted(getOperand(), getOperator());
     }
-    return String.format("(UPPER(%s) %s ?)", getOperand(), getOperator());
+    return "(UPPER(%s) %s ?)".formatted(getOperand(), getOperator());
   }
 }
