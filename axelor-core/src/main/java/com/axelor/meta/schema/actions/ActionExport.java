@@ -45,7 +45,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -82,7 +81,7 @@ public class ActionExport extends Action {
 
   public static File getExportPath() {
     final Path exportPath =
-        Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
+        Path.of(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
     final String tenantId = TenantResolver.currentTenantIdentifier();
     if (StringUtils.isBlank(tenantId)) {
       return exportPath.toFile();

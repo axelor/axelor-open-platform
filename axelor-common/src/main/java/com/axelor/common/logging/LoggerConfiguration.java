@@ -42,7 +42,7 @@ import com.axelor.common.StringUtils;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -221,7 +221,7 @@ public class LoggerConfiguration {
     // create file appender
     if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_FILE))
         && !StringUtils.isBlank(logPath)) {
-      rootLogger.addAppender(createFileAppender(Paths.get(logPath, "axelor.log").toString()));
+      rootLogger.addAppender(createFileAppender(Path.of(logPath, "axelor.log").toString()));
     }
   }
 

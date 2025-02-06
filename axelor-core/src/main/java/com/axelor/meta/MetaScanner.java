@@ -33,7 +33,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -128,7 +127,7 @@ public final class MetaScanner {
 
     final Path file;
     try {
-      file = Paths.get(new URI(fileName));
+      file = Path.of(new URI(fileName));
     } catch (URISyntaxException e) {
       // this should never happen
       throw new RuntimeException(e);
@@ -166,7 +165,7 @@ public final class MetaScanner {
 
     for (URL url : findClassPathURLs(loader)) {
       try {
-        Path next = Paths.get(url.toURI());
+        Path next = Path.of(url.toURI());
         if (Files.isDirectory(next) && outputs.contains(next)) {
           paths.add(url);
         }

@@ -51,7 +51,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -228,7 +227,7 @@ public class MetaFiles {
     if (targetName.contains("{name}")) {
       targetName = targetName.replace("{name}", fileName);
     } else {
-      targetName = Paths.get(targetName, fileName).toString();
+      targetName = Path.of(targetName, fileName).toString();
     }
 
     return targetName;

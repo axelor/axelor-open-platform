@@ -30,7 +30,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
@@ -155,7 +154,7 @@ public class S3Cache {
         cacheEntryMap.put(fileName, entry);
       }
 
-      File tempFile = Paths.get(getCacheDir().toString(), fileName).toFile();
+      File tempFile = Path.of(getCacheDir().toString(), fileName).toFile();
       FileUtils.write(tempFile, inputStream);
       return tempFile;
     } catch (IOException e) {
@@ -194,12 +193,12 @@ public class S3Cache {
   }
 
   private Path getCacheDir() {
-    return Paths.get(TempFiles.getRootTempPath().toString(), CACHE_DIR_NAME);
+    return Path.of(TempFiles.getRootTempPath().toString(), CACHE_DIR_NAME);
   }
 
   private void deleteFileAndEntry(CacheEntry entry) throws IOException {
     cacheEntryMap.remove(entry.key);
-    Files.deleteIfExists(Paths.get(getCacheDir().toString(), entry.key));
+    Files.deleteIfExists(Path.of(getCacheDir().toString(), entry.key));
     removeEntry(entry);
   }
 

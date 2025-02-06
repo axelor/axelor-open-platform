@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -279,14 +278,14 @@ public class MetaController {
 
   private void exportI18n(String module, URL file) throws IOException {
 
-    String name = Paths.get(file.getFile()).getFileName().toString();
+    String name = Path.of(file.getFile()).getFileName().toString();
     if (!name.startsWith("messages_")) {
       return;
     }
 
     Path path = ActionExport.getExportPath().toPath().resolve("i18n");
     String lang = StringUtils.normalizeLanguageTag(name.substring(9, name.length() - 4));
-    Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
+    Path target = path.resolve(Path.of(module, "src/main/resources/i18n", name));
 
     final List<String[]> items = new ArrayList<>();
     final CSVFile csv = CSVFile.DEFAULT.withFirstRecordAsHeader();

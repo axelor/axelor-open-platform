@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,8 +111,8 @@ public class TomcatRunner {
 
     final List<Path> webapps = new ArrayList<>();
 
-    cli.getArgList().stream().map(Paths::get).forEach(webapps::add);
-    getList(props, "webapps").stream().map(Paths::get).forEach(webapps::add);
+    cli.getArgList().stream().map(Path::of).forEach(webapps::add);
+    getList(props, "webapps").stream().map(Path::of).forEach(webapps::add);
 
     if (webapps.isEmpty()) {
       usage(options);
@@ -135,9 +134,9 @@ public class TomcatRunner {
 
     Path baseDir = null;
     if (cli.hasOption(OPTION_BASE)) {
-      baseDir = Paths.get(cli.getOptionValue(OPTION_BASE));
+      baseDir = Path.of(cli.getOptionValue(OPTION_BASE));
     } else if (props.containsKey("baseDir")) {
-      baseDir = Paths.get(props.getProperty("baseDir"));
+      baseDir = Path.of(props.getProperty("baseDir"));
     }
     if (baseDir != null) {
       if (Files.exists(baseDir) && Files.isRegularFile(baseDir)) {
@@ -151,21 +150,21 @@ public class TomcatRunner {
       Arrays.stream(cli.getOptionValues(OPTION_CLASSES))
           .flatMap(value -> Arrays.stream(value.split(",")))
           .map(String::trim)
-          .map(Paths::get)
+          .map((Path::of))
           .forEach(settings::addClasses);
     }
 
-    getList(props, "extraClasses").stream().map(Paths::get).forEach(settings::addClasses);
+    getList(props, "extraClasses").stream().map((Path::of)).forEach(settings::addClasses);
 
     if (cli.hasOption(OPTION_LIBS)) {
       Arrays.stream(cli.getOptionValues(OPTION_LIBS))
           .flatMap(value -> Arrays.stream(value.split(",")))
           .map(String::trim)
-          .map(Paths::get)
+          .map((Path::of))
           .forEach(settings::addLib);
     }
 
-    getList(props, "extraLibs").stream().map(Paths::get).forEach(settings::addLib);
+    getList(props, "extraLibs").stream().map((Path::of)).forEach(settings::addLib);
 
     final TomcatServer server = new TomcatServer(settings);
     server.start();

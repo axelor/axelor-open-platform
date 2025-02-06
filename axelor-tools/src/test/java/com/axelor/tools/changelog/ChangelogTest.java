@@ -28,7 +28,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -49,7 +48,7 @@ public class ChangelogTest {
         processor.process(getEntries(), version, header, ChangelogEntryConstants.TYPES, null);
 
     File outputFile =
-        Paths.get(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
+        Path.of(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
     String output =
         com.google.common.io.Files.asCharSource(outputFile, StandardCharsets.UTF_8).read();
 
@@ -60,7 +59,7 @@ public class ChangelogTest {
     URL changelogsUrl = ResourceUtils.getResource("changelogs/entries/");
     ChangelogEntryParser parser = new ChangelogEntryParser();
 
-    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI())).sorted()) {
+    try (Stream<Path> stream = Files.list(Path.of(changelogsUrl.toURI())).sorted()) {
       return stream
           .map(Path::toFile)
           .map(

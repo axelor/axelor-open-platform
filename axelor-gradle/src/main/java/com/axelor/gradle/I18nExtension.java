@@ -19,7 +19,6 @@
 package com.axelor.gradle;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,7 @@ public class I18nExtension {
   public void setExtraSources(List<CharSequence> extraSrc) {
     this.extraSources =
         extraSrc.stream()
-            .map(src -> Paths.get(src.toString()))
+            .map(src -> Path.of(src.toString()))
             .collect(Collectors.toUnmodifiableList());
   }
 }

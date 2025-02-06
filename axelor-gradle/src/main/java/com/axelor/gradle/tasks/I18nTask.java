@@ -23,7 +23,6 @@ import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.I18nExtension;
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,8 +60,8 @@ public class I18nTask extends DefaultTask {
   @TaskAction
   public void extract() {
     final I18nExtractor extractor = new I18nExtractor();
-    final Path base = Paths.get(getProject().getProjectDir().getPath());
-    final Path src = base.resolve(Paths.get("src", "main"));
+    final Path base = Path.of(getProject().getProjectDir().getPath());
+    final Path src = base.resolve(Path.of("src", "main"));
     final Path dest = src.resolve("resources");
     final boolean update = true;
 

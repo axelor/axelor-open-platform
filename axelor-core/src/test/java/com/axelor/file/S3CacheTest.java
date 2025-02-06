@@ -40,7 +40,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
@@ -96,7 +95,7 @@ public class S3CacheTest extends JpaTest {
   }
 
   protected Path getCacheFile(String name) {
-    return Paths.get(TempFiles.getRootTempPath().toString(), "s3_cache").resolve(name);
+    return Path.of(TempFiles.getRootTempPath().toString(), "s3_cache").resolve(name);
   }
 
   @Test

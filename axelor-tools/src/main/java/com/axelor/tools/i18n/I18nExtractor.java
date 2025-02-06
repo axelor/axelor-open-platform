@@ -35,7 +35,6 @@ import java.io.Reader;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -377,7 +376,7 @@ public class I18nExtractor {
   }
 
   public void extract(final Path base, boolean update, boolean withContext) {
-    Path src = base.resolve(Paths.get("src", "main"));
+    Path src = base.resolve(Path.of("src", "main"));
     Path dest = src.resolve("resources");
     extract(src, dest, update, withContext);
   }
@@ -462,7 +461,7 @@ public class I18nExtractor {
       throws IOException {
 
     // first save the template
-    Path template = destPath.resolve(Paths.get("i18n", "messages.csv"));
+    Path template = destPath.resolve(Path.of("i18n", "messages.csv"));
 
     log.info("generating: " + template);
 

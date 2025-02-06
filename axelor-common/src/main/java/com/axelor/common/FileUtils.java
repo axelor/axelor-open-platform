@@ -34,7 +34,6 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -315,7 +314,7 @@ public final class FileUtils {
       return null;
     }
 
-    return getFileName(Paths.get(filePath));
+    return getFileName(Path.of(filePath));
   }
 
   /**

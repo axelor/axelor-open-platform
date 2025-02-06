@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 public class TestMimeTypesUtils {
@@ -40,7 +39,7 @@ public class TestMimeTypesUtils {
     assertEquals(defaultContentType, MimeTypesUtils.getContentType(new File("dontexist")));
 
     assertEquals(defaultContentType, MimeTypesUtils.getContentType((Path) null));
-    assertEquals(defaultContentType, MimeTypesUtils.getContentType(Paths.get("dontexist")));
+    assertEquals(defaultContentType, MimeTypesUtils.getContentType(Path.of("dontexist")));
   }
 
   @Test

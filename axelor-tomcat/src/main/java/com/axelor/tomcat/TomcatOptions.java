@@ -19,7 +19,6 @@
 package com.axelor.tomcat;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +84,7 @@ public class TomcatOptions {
   }
 
   public Path getBaseDir() {
-    return baseDir == null ? Paths.get("build/tomcat") : baseDir;
+    return baseDir == null ? Path.of("build/tomcat") : baseDir;
   }
 
   public void setBaseDir(Path baseDir) {
@@ -105,7 +104,7 @@ public class TomcatOptions {
   }
 
   public Path getDocBase() {
-    return roots.isEmpty() ? Paths.get("src/main/webapp") : roots.get(0);
+    return roots.isEmpty() ? Path.of("src/main/webapp") : roots.get(0);
   }
 
   public List<Path> getExtraResources() {

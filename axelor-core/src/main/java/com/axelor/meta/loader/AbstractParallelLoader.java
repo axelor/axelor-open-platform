@@ -28,7 +28,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +72,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
 
     // Filtered by paths
     return lists.parallelStream()
-        .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Paths.get(toUri(url))))
+        .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Path.of(toUri(url))))
         .collect(Collectors.toList());
   }
 
@@ -107,7 +106,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
   }
 
   private long getLastModifiedTimeMillis(FileSystem fs, URL url) {
-    final Path path = fs.getPath(Paths.get(toUri(url)).toString());
+    final Path path = fs.getPath(Path.of(toUri(url)).toString());
     try {
       return Files.getLastModifiedTime(path).toMillis();
     } catch (IOException e) {

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -96,7 +95,7 @@ public class EncryptFileTask extends AbstractEncryptTask {
     if (StringUtils.isBlank(this.file)) {
       return super.getConfigurationFile();
     }
-    return Paths.get(this.file);
+    return Path.of(this.file);
   }
 
   class FileProcessor {

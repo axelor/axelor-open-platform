@@ -35,7 +35,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 public class FileSystemStore implements Store {
@@ -43,7 +42,7 @@ public class FileSystemStore implements Store {
   private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/.axelor";
 
   private static final Path UPLOAD_PATH =
-      Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
+      Path.of(AppSettings.get().get(AvailableAppSettings.DATA_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
 
   private static final CopyOption[] COPY_OPTIONS = {
     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES
@@ -74,7 +73,7 @@ public class FileSystemStore implements Store {
 
   private Path resolveFilePath(String fileName) {
     // Make sure the file is located in the upload directory
-    if (!FileUtils.isChildPath(getRootPath(), Paths.get(fileName))) {
+    if (!FileUtils.isChildPath(getRootPath(), Path.of(fileName))) {
       throw new IllegalArgumentException(
           "Invalid file name: " + fileName + ". Not located in the upload directory.");
     }

@@ -27,7 +27,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.eclipse.birt.report.model.api.IResourceLocator;
@@ -53,7 +52,7 @@ public class ReportResourceLocator implements IResourceLocator {
   public ReportResourceLocator() {
     final String dir =
         AppSettings.get().getPath(AvailableAppSettings.REPORTS_DESIGN_DIR, DEFAULT_REPORT_DIR);
-    this.searchPath = Paths.get(dir);
+    this.searchPath = Path.of(dir);
   }
 
   @SuppressWarnings("rawtypes")

@@ -40,7 +40,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -208,12 +207,12 @@ public final class ViewWatcher {
         propsPath = fs.getPath("META-INF", "axelor-module.properties");
       } else {
         for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
-          final String subPathStr = Paths.get('/' + location).toString();
+          final String subPathStr = Path.of('/' + location).toString();
           final int index = pathStr.indexOf(subPathStr);
           if (index >= 0) {
             final Path current =
-                Paths.get(pathStr.substring(0, index))
-                    .resolve(Paths.get(location, "META-INF", "axelor-module.properties"));
+                Path.of(pathStr.substring(0, index))
+                    .resolve(Path.of(location, "META-INF", "axelor-module.properties"));
             if (Files.exists(current)) {
               propsPath = current;
               break;
@@ -329,14 +328,14 @@ public final class ViewWatcher {
               switch (rootResource.getProtocol()) {
                 case "file":
                   final Path path =
-                      Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
+                      Path.of(toURI(rootResource)).resolve(Path.of("..", "lib")).normalize();
                   if (path.toFile().isDirectory()) {
                     paths.add(path);
                   }
                   break;
                 case "jar":
                   final Path pathJar =
-                      Paths.get(toURI(rootResource.getPath())).getParent().getParent();
+                      Path.of(toURI(rootResource.getPath())).getParent().getParent();
                   if (Files.isDirectory(pathJar)) {
                     paths.add(pathJar);
                   }
@@ -348,7 +347,7 @@ public final class ViewWatcher {
 
     Reflections.findResources().byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$").find().stream()
         .filter(url -> url.getPath().startsWith("/"))
-        .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
+        .map(url -> Path.of(toURI(url)).resolve("..").normalize())
         .distinct()
         .forEach(paths::add);
 

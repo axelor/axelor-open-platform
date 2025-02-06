@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
@@ -131,24 +130,24 @@ public class TestFileUtils {
     assertEquals("filename.ext", FileUtils.getFileName("/qsc/filename.ext"));
 
     assertNull(FileUtils.getFileName((Path) null));
-    assertEquals("", FileUtils.getFileName(Paths.get("")));
-    assertEquals("hello.txt", FileUtils.getFileName(Paths.get("hello.txt")));
-    assertEquals("hello", FileUtils.getFileName(Paths.get("hello")));
-    assertEquals("hel.lo.txt", FileUtils.getFileName(Paths.get("hel.lo.txt")));
-    assertEquals("filename.ext", FileUtils.getFileName(Paths.get("../filename.ext")));
-    assertEquals("filename.ext", FileUtils.getFileName(Paths.get("/qsc/filename.ext")));
+    assertEquals("", FileUtils.getFileName(Path.of("")));
+    assertEquals("hello.txt", FileUtils.getFileName(Path.of("hello.txt")));
+    assertEquals("hello", FileUtils.getFileName(Path.of("hello")));
+    assertEquals("hel.lo.txt", FileUtils.getFileName(Path.of("hel.lo.txt")));
+    assertEquals("filename.ext", FileUtils.getFileName(Path.of("../filename.ext")));
+    assertEquals("filename.ext", FileUtils.getFileName(Path.of("/qsc/filename.ext")));
   }
 
   @Test
   public void testIsChildPath() {
-    Path parent = Paths.get("/tmp/test");
+    Path parent = Path.of("/tmp/test");
 
     assertTrue(FileUtils.isChildPath(parent, parent.resolve("some")));
-    assertTrue(FileUtils.isChildPath(parent, Paths.get("some")));
+    assertTrue(FileUtils.isChildPath(parent, Path.of("some")));
 
     assertFalse(FileUtils.isChildPath(parent, parent));
-    assertFalse(FileUtils.isChildPath(parent, Paths.get("/test")));
-    assertFalse(FileUtils.isChildPath(parent, Paths.get("../../some")));
+    assertFalse(FileUtils.isChildPath(parent, Path.of("/test")));
+    assertFalse(FileUtils.isChildPath(parent, Path.of("../../some")));
   }
 
   @Test

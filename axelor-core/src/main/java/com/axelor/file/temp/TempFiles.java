@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
@@ -36,7 +35,7 @@ public class TempFiles {
   private static final String TEMP_DIR_NAME = "tmp_files";
 
   private static final Path TMP_PATH =
-      Paths.get(
+      Path.of(
           AppSettings.get()
               .get(AvailableAppSettings.DATA_UPLOAD_TEMP_DIR, DEFAULT_UPLOAD_TEMP_PATH));
 

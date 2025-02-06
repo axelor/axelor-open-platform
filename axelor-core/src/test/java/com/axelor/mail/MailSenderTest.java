@@ -29,7 +29,7 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Base64;
@@ -73,7 +73,7 @@ public class MailSenderTest extends AbstractMailTest {
     final String image = ResourceUtils.getResource("com/axelor/mail/test-image.png").getFile();
     final String imageData =
         "data:image/png;base64,"
-            + Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image)));
+            + Base64.getEncoder().encodeToString(Files.readAllBytes(Path.of(image)));
     final String html = HTML + "<br><img src='" + imageData + "' title='test-image.png'>";
 
     sender

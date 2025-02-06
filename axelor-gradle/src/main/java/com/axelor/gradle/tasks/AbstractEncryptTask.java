@@ -24,7 +24,6 @@ import com.axelor.common.YamlUtils;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.encryption.StringEncryption;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -212,7 +211,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
 
   @Internal
   protected Path getConfigurationFile() {
-    Path rootPath = Paths.get(getProject().getRootDir().toURI());
+    Path rootPath = Path.of(getProject().getRootDir().toURI());
     for (String fileName : CONFIGS_FILES) {
       Path filePath = rootPath.resolve(CONFIGS_FILES_PATH).resolve(fileName);
       if (filePath.toFile().exists()) {
