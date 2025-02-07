@@ -19,9 +19,9 @@
 package com.axelor.common;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Preconditions;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.Objects;
 
 /**
  * The {@link Inflector} provides various methods to transform words to plural, singular, titles,
@@ -121,7 +121,7 @@ public final class Inflector {
    * @return converted string
    */
   public String underscore(String camelCase) {
-    Preconditions.checkNotNull(camelCase);
+    Objects.requireNonNull(camelCase);
     return camelCase
         .trim()
         .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
@@ -143,7 +143,7 @@ public final class Inflector {
    * @return converted string
    */
   public String humanize(String word) {
-    Preconditions.checkNotNull(word);
+    Objects.requireNonNull(word);
     String result =
         underscore(word).replaceAll("_id$", "").replaceAll("\\A_+", "").replaceAll("[_\\s]+", " ");
     return capitalize(result);
@@ -216,7 +216,7 @@ public final class Inflector {
    * @return converted string
    */
   public String capitalize(String word) {
-    Preconditions.checkNotNull(word);
+    Objects.requireNonNull(word);
     return Character.toUpperCase(word.charAt(0)) + word.substring(1);
   }
 
@@ -259,7 +259,7 @@ public final class Inflector {
    * @return shortened text
    */
   public String ellipsize(String text, int length) {
-    Preconditions.checkNotNull(text);
+    Objects.requireNonNull(text);
     if (text.length() <= length) return text;
     if (length < 4) return "...";
     return text.substring(0, length - 3) + "...";
@@ -276,7 +276,7 @@ public final class Inflector {
    * @return normalized text
    */
   public String simplify(String text) {
-    Preconditions.checkNotNull(text);
+    Objects.requireNonNull(text);
     return Normalizer.normalize(text, Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}", "");
   }
 

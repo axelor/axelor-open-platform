@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -87,7 +88,7 @@ public class Mapper {
   private Class<?> beanClass;
 
   private Mapper(Class<?> beanClass) {
-    Preconditions.checkNotNull(beanClass);
+    Objects.requireNonNull(beanClass);
     this.beanClass = beanClass;
     try {
       BeanInfo info = Introspector.getBeanInfo(beanClass, Object.class);
@@ -245,7 +246,7 @@ public class Mapper {
    * @return the property associated with the method
    */
   public Property getProperty(Method method) {
-    Preconditions.checkNotNull(method);
+    Objects.requireNonNull(method);
     return getProperty(methods.get(method.getName()));
   }
 
@@ -285,7 +286,7 @@ public class Mapper {
    * @return set of fields accessed by computed property
    */
   public Set<String> getComputeDependencies(Property property) {
-    Preconditions.checkNotNull(property);
+    Objects.requireNonNull(property);
     if (computeDependencies == null) {
       computeDependencies = findComputeDependencies();
     }
@@ -368,8 +369,8 @@ public class Mapper {
    * @return property value
    */
   public Object get(Object bean, String name) {
-    Preconditions.checkNotNull(bean);
-    Preconditions.checkNotNull(name);
+    Objects.requireNonNull(bean);
+    Objects.requireNonNull(name);
     Preconditions.checkArgument(beanClass.isInstance(bean));
     Preconditions.checkArgument(!name.trim().equals(""));
     try {
@@ -388,8 +389,8 @@ public class Mapper {
    * @return old value of the property
    */
   public Object set(Object bean, String name, Object value) {
-    Preconditions.checkNotNull(bean);
-    Preconditions.checkNotNull(name);
+    Objects.requireNonNull(bean);
+    Objects.requireNonNull(name);
     Preconditions.checkArgument(beanClass.isInstance(bean));
     Preconditions.checkArgument(!name.trim().equals(""));
 

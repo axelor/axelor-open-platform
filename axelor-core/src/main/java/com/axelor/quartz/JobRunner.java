@@ -30,13 +30,13 @@ import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
 import com.axelor.meta.db.repo.MetaScheduleRepository;
-import com.google.common.base.Preconditions;
 import com.google.common.primitives.Longs;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -176,7 +176,7 @@ public class JobRunner {
       throw new IllegalStateException(I18n.get("The scheduler service has been stopped."));
     }
 
-    Preconditions.checkNotNull(meta);
+    Objects.requireNonNull(meta);
 
     JobKey jobKey = new JobKey(meta.getName());
     if (scheduler.checkExists(jobKey)) {

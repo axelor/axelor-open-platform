@@ -46,6 +46,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.stream.XMLInputFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class XMLImporter implements Importer {
   public XMLImporter(
       @Named("axelor.data.config") String configFile, @Named("axelor.data.dir") String dataDir) {
 
-    Preconditions.checkNotNull(configFile);
+    Objects.requireNonNull(configFile);
 
     File file = new File(configFile);
 

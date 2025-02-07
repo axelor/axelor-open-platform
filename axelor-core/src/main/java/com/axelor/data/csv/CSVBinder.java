@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -417,7 +418,7 @@ public class CSVBinder {
   public Object bind(String[] values, Map<String, Object> localContext) {
 
     Preconditions.checkNotNull(values);
-    Preconditions.checkNotNull(localContext);
+    Objects.requireNonNull(localContext);
     Preconditions.checkArgument(values.length == fields.length);
 
     Map<String, Object> map = Maps.newHashMap(localContext);

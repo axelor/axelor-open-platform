@@ -19,7 +19,6 @@
 package com.axelor.tools.code.entity.model;
 
 import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
 import java.beans.PropertyDescriptor;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -48,7 +47,7 @@ public class PropertyAttribute {
       PropertyDescriptor descriptor,
       BiConsumer<Object, Object> checkOverride,
       Predicate<Object> isAbsent) {
-    Preconditions.checkNotNull(descriptor);
+    Objects.requireNonNull(descriptor);
     this.name = StringUtils.notBlank(name) ? name : descriptor.getName();
     this.descriptor = descriptor;
     this.checkOverride = checkOverride != null ? checkOverride : (a, b) -> {};

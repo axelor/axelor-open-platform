@@ -22,7 +22,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -623,7 +622,7 @@ public final class JPA {
    * @param task the task to run.
    */
   public static void runInTransaction(Runnable task) {
-    Preconditions.checkNotNull(task);
+    java.util.Objects.requireNonNull(task);
     EntityTransaction txn = em().getTransaction();
     boolean txnStarted = false;
     try {

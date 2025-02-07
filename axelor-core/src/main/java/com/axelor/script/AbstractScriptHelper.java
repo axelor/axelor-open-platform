@@ -20,7 +20,7 @@ package com.axelor.script;
 
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,8 +61,8 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 
   @Override
   public Object call(Object obj, String methodCall) {
-    Preconditions.checkNotNull(obj);
-    Preconditions.checkNotNull(methodCall);
+    Objects.requireNonNull(obj);
+    Objects.requireNonNull(methodCall);
 
     Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
     Matcher m = p.matcher(methodCall);

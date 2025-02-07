@@ -52,6 +52,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -321,8 +322,8 @@ public class MetaFiles {
    */
   @Transactional
   public MetaFile upload(File file, MetaFile metaFile) throws IOException {
-    Preconditions.checkNotNull(metaFile);
-    Preconditions.checkNotNull(file);
+    Objects.requireNonNull(metaFile);
+    Objects.requireNonNull(file);
 
     final Store store = FileStoreFactory.getStore();
     final String originalFilePath = metaFile.getFilePath();
@@ -441,10 +442,10 @@ public class MetaFiles {
    */
   @Transactional
   public DMSFile attach(MetaFile metaFile, String fileName, Model entity) {
-    Preconditions.checkNotNull(metaFile);
-    Preconditions.checkNotNull(metaFile.getId());
-    Preconditions.checkNotNull(entity);
-    Preconditions.checkNotNull(entity.getId());
+    Objects.requireNonNull(metaFile);
+    Objects.requireNonNull(metaFile.getId());
+    Objects.requireNonNull(entity);
+    Objects.requireNonNull(entity.getId());
 
     final String name = isBlank(fileName) ? metaFile.getFileName() : fileName;
     final DMSFile dmsFile = new DMSFile();
@@ -486,9 +487,9 @@ public class MetaFiles {
    * @return a new instance of {@link MetaAttachment}
    */
   public MetaAttachment attach(MetaFile file, Model entity) {
-    Preconditions.checkNotNull(file);
-    Preconditions.checkNotNull(entity);
-    Preconditions.checkNotNull(entity.getId());
+    Objects.requireNonNull(file);
+    Objects.requireNonNull(entity);
+    Objects.requireNonNull(entity.getId());
 
     MetaAttachment attachment = new MetaAttachment();
     attachment.setMetaFile(file);
@@ -506,8 +507,8 @@ public class MetaFiles {
    */
   @Transactional
   public void delete(MetaAttachment attachment) throws IOException {
-    Preconditions.checkNotNull(attachment);
-    Preconditions.checkNotNull(attachment.getMetaFile());
+    Objects.requireNonNull(attachment);
+    Objects.requireNonNull(attachment.getMetaFile());
 
     MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
     DMSFileRepository dms = Beans.get(DMSFileRepository.class);
@@ -540,7 +541,7 @@ public class MetaFiles {
    */
   @Transactional
   public void delete(MetaFile metaFile) throws IOException {
-    Preconditions.checkNotNull(metaFile);
+    Objects.requireNonNull(metaFile);
 
     filesRepo.remove(metaFile);
 

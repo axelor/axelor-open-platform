@@ -20,8 +20,8 @@ package com.axelor.auth;
 
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
-import com.google.common.base.Preconditions;
 import jakarta.inject.Inject;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 /** This class can be used to run batch jobs that requires to keep track of audit logs. */
@@ -68,8 +68,8 @@ public class AuditableRunner {
    * @throws Exception if unable to compute a result
    */
   public <T> T run(Callable<T> job) throws Exception {
-    Preconditions.checkNotNull(job);
-    Preconditions.checkNotNull(users);
+    Objects.requireNonNull(job);
+    Objects.requireNonNull(users);
 
     User user = AuthUtils.getUser();
     if (user == null) {

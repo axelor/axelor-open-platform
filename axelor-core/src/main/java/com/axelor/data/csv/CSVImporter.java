@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
@@ -96,12 +97,12 @@ public class CSVImporter implements Importer {
 
     File _file = new File(config);
 
-    Preconditions.checkNotNull(_file);
+    Objects.requireNonNull(_file);
     Preconditions.checkArgument(_file.isFile());
 
     if (dataDir != null) {
       File _data = new File(dataDir);
-      Preconditions.checkNotNull(_data);
+      Objects.requireNonNull(_data);
       Preconditions.checkArgument(_data.isDirectory());
       this.dataDir = _data;
     }
@@ -124,7 +125,7 @@ public class CSVImporter implements Importer {
 
     if (dataDir != null) {
       File _data = new File(dataDir);
-      Preconditions.checkNotNull(_data);
+      Objects.requireNonNull(_data);
       Preconditions.checkArgument(_data.isDirectory());
       this.dataDir = _data;
     }
