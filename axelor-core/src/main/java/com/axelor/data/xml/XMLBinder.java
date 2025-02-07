@@ -181,7 +181,7 @@ public abstract class XMLBinder {
         if (!(value instanceof List)) {
           value = Lists.newArrayList(value);
         }
-        List<Object> items = Lists.newArrayList();
+        List<Object> items = new ArrayList<>();
         for (Object item : (List<?>) value) {
           items.add(relational(property, bind, item, ctx));
         }
@@ -353,7 +353,7 @@ public abstract class XMLBinder {
   }
 
   private List<Node> find(Node node, XMLBind bind, String prefix) {
-    List<Node> nodes = Lists.newArrayList();
+    List<Node> nodes = new ArrayList<>();
     String name = bind.getNode();
     String path = name;
 

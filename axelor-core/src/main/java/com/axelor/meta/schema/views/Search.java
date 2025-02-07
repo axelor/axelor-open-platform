@@ -37,7 +37,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -45,6 +44,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -310,7 +310,7 @@ public class Search extends AbstractView {
 
       Class<? extends Model> klass = getModelClass();
 
-      List<Filter> all = Lists.newArrayList();
+      List<Filter> all = new ArrayList<>();
       Filter filter = where.build(scriptHelper);
       if (filter == null) {
         return null;
@@ -503,7 +503,7 @@ public class Search extends AbstractView {
         return null;
       }
 
-      List<Filter> filters = Lists.newArrayList();
+      List<Filter> filters = new ArrayList<>();
       if (ObjectUtils.notEmpty(inputs)) {
         for (SearchSelectInput input : inputs) {
 

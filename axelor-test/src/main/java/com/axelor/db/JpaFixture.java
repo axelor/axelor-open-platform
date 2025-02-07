@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -202,7 +203,7 @@ public class JpaFixture {
     Yaml data = new Yaml(ctor);
     data.load(stream);
 
-    for (Object item : Lists.reverse(Lists.newArrayList(objects.values()))) {
+    for (Object item : Lists.reverse(new ArrayList<>(objects.values()))) {
       JPA.manage((Model) item);
     }
   }

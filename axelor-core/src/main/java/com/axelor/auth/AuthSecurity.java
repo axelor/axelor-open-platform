@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
     public Condition(User user, String condition, String params) {
 
-      final List<Object> args = Lists.newArrayList();
+      final List<Object> args = new ArrayList<>();
 
       if (StringUtils.notBlank(params)) {
         for (String param : params.split(",")) {
@@ -132,7 +133,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
       return null;
     }
 
-    final List<Filter> filters = Lists.newArrayList();
+    final List<Filter> filters = new ArrayList<>();
     final Set<Permission> permissions = authResolver.resolve(user, model.getName(), type);
     if (permissions.isEmpty()) {
       return null;

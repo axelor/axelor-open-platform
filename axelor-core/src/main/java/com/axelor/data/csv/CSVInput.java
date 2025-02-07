@@ -23,11 +23,11 @@ import com.axelor.data.adapter.DataAdapter;
 import com.axelor.inject.Beans;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,12 +65,12 @@ public class CSVInput {
   private String searchCall;
 
   @XStreamImplicit(itemFieldName = "bind")
-  private List<CSVBind> bindings = Lists.newArrayList();
+  private List<CSVBind> bindings = new ArrayList<>();
 
   private boolean bindingsLinked;
 
   @XStreamImplicit(itemFieldName = "adapter")
-  private List<DataAdapter> adapters = Lists.newArrayList();
+  private List<DataAdapter> adapters = new ArrayList<>();
 
   public String getFileName() {
     return fileName;
@@ -174,7 +174,7 @@ public class CSVInput {
 
   public List<DataAdapter> getAdapters() {
     if (adapters == null) {
-      adapters = Lists.newArrayList();
+      adapters = new ArrayList<>();
     }
     return adapters;
   }

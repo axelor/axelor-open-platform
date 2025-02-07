@@ -30,7 +30,6 @@ import com.axelor.db.Model;
 import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -42,6 +41,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -61,9 +61,9 @@ public class CSVImporter implements Importer {
 
   private CSVConfig config;
 
-  private List<Listener> listeners = Lists.newArrayList();
+  private List<Listener> listeners = new ArrayList<>();
 
-  private List<String[]> valuesStack = Lists.newArrayList();
+  private List<String[]> valuesStack = new ArrayList<>();
 
   private Map<String, Object> context;
 
@@ -137,7 +137,7 @@ public class CSVImporter implements Importer {
   }
 
   private List<File> getFiles(String... names) {
-    List<File> all = Lists.newArrayList();
+    List<File> all = new ArrayList<>();
     for (String name : names) all.add(new File(dataDir, name));
     return all;
   }

@@ -27,7 +27,6 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -35,6 +34,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +67,7 @@ public class ActionImport extends Action {
 
     final StringReader reader = new StringReader((String) data);
     final HashMultimap<String, Reader> mapping = HashMultimap.create();
-    final List<Model> records = Lists.newArrayList();
+    final List<Model> records = new ArrayList<>();
 
     mapping.put(fileName, reader);
 
@@ -138,7 +138,7 @@ public class ActionImport extends Action {
         continue;
       }
 
-      List<Model> records = Lists.newArrayList();
+      List<Model> records = new ArrayList<>();
       Object data = action.evaluate(handler);
 
       if (data instanceof Collection) {

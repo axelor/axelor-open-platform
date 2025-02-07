@@ -58,7 +58,6 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.axelor.script.ScriptBindings;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
@@ -115,7 +114,7 @@ public class ViewService extends AbstractService {
   public Response models() {
 
     final Response response = new Response();
-    final List<String> all = Lists.newArrayList();
+    final List<String> all = new ArrayList<>();
 
     for (Class<?> cls : JPA.models()) {
       if (security.isPermitted(AccessType.READ, (Class) cls)) {
@@ -150,7 +149,7 @@ public class ViewService extends AbstractService {
     }
 
     final Map<String, Object> jsonFields = Maps.newHashMap();
-    final List<String> names = Lists.newArrayList();
+    final List<String> names = new ArrayList<>();
 
     meta.put("model", model);
     meta.put("jsonFields", jsonFields);

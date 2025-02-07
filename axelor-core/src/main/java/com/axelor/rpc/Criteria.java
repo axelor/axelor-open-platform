@@ -26,7 +26,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.rpc.filter.Operator;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,7 +117,7 @@ public class Criteria {
   public static Criteria parse(
       Map<String, Object> rawCriteria, Class<?> beanClass, boolean translate) {
     final Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
-    final List<Filter> all = Lists.newArrayList();
+    final List<Filter> all = new ArrayList<>();
     final Map<String, Object> context = Maps.newHashMap();
     final List<?> domains = (List<?>) rawCriteria.get("_domains");
 
@@ -162,7 +161,7 @@ public class Criteria {
 
   @SuppressWarnings("all")
   private static List<Filter> parseDomains(final List<?> domains, final Map<String, ?> context) {
-    final List<Filter> filters = Lists.newArrayList();
+    final List<Filter> filters = new ArrayList<>();
     for (final Object item : domains) {
       if (item instanceof Map && ((Map) item).containsKey("domain")) {
         final Map map = (Map) item;

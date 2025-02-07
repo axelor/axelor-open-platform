@@ -21,11 +21,11 @@ package com.axelor.data.csv;
 import com.axelor.common.VersionUtils;
 import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @XStreamAlias("csv-inputs")
@@ -36,10 +36,10 @@ public class CSVConfig {
   public static final String VERSION = VersionUtils.getVersion().feature;
 
   @XStreamImplicit(itemFieldName = "input")
-  private List<CSVInput> inputs = Lists.newArrayList();
+  private List<CSVInput> inputs = new ArrayList<>();
 
   @XStreamImplicit(itemFieldName = "adapter")
-  private List<DataAdapter> adapters = Lists.newArrayList();
+  private List<DataAdapter> adapters = new ArrayList<>();
 
   /**
    * Get all {@link #inputs} nodes
@@ -66,7 +66,7 @@ public class CSVConfig {
    */
   public List<DataAdapter> getAdapters() {
     if (adapters == null) {
-      adapters = Lists.newArrayList();
+      adapters = new ArrayList<>();
     }
     return adapters;
   }

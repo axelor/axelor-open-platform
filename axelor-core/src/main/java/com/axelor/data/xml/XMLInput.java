@@ -20,10 +20,10 @@ package com.axelor.data.xml;
 
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.util.ArrayList;
 import java.util.List;
 
 @XStreamAlias("input")
@@ -36,10 +36,10 @@ public class XMLInput {
   @XStreamAsAttribute private String root;
 
   @XStreamImplicit(itemFieldName = "adapter")
-  private List<DataAdapter> adapters = Lists.newArrayList();
+  private List<DataAdapter> adapters = new ArrayList<>();
 
   @XStreamImplicit(itemFieldName = "bind")
-  private List<XMLBind> bindings = Lists.newArrayList();
+  private List<XMLBind> bindings = new ArrayList<>();
 
   public String getFileName() {
     return fileName;
@@ -59,7 +59,7 @@ public class XMLInput {
 
   public List<DataAdapter> getAdapters() {
     if (adapters == null) {
-      adapters = Lists.newArrayList();
+      adapters = new ArrayList<>();
     }
     return adapters;
   }

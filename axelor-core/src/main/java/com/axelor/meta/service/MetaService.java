@@ -67,7 +67,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
@@ -328,7 +327,7 @@ public class MetaService {
     Search search = (Search) XMLViews.findView(name, "search");
     ScriptHelper helper = search.scriptHandler(context);
 
-    List<Object> data = Lists.newArrayList();
+    List<Object> data = new ArrayList<>();
 
     for (Search.SearchSelect select : search.getSelects()) {
 
@@ -414,7 +413,7 @@ public class MetaService {
   @Transactional
   public Response removeAttachment(Request request) {
     Response response = new Response();
-    List<Object> result = Lists.newArrayList();
+    List<Object> result = new ArrayList<>();
     List<Object> records = request.getRecords();
 
     if (records == null || records.isEmpty()) {
@@ -540,7 +539,7 @@ public class MetaService {
     data.put("xType", chart.getCategory().getType());
     data.put("xTitle", chart.getCategory().getLocalizedTitle());
 
-    List<Object> series = Lists.newArrayList();
+    List<Object> series = new ArrayList<>();
     Map<String, Object> config = Maps.newHashMap();
     List<Map<String, Object>> actions = new ArrayList<>();
 

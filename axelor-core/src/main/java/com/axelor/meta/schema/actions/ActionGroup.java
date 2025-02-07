@@ -62,7 +62,7 @@ public class ActionGroup extends ActionResumable {
 
   public void addAction(String name) {
     if (this.actions == null) {
-      this.actions = Lists.newArrayList();
+      this.actions = new ArrayList<>();
     }
     ActionItem item = new ActionItem();
     item.setName(name);
@@ -182,7 +182,7 @@ public class ActionGroup extends ActionResumable {
     // validate the action group
     this.validate();
 
-    List<Object> result = Lists.newArrayList();
+    List<Object> result = new ArrayList<>();
     Iterator<ActionItem> iter = actions.iterator();
 
     if (StringUtils.notBlank(getName()) && !getName().matches("(.*)MenuTag\\((.*)\\)$")) {

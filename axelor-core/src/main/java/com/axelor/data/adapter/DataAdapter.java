@@ -18,10 +18,10 @@
  */
 package com.axelor.data.adapter;
 
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -58,7 +58,7 @@ public class DataAdapter {
   public DataAdapter(String name, Class<?> type, String... options) {
     this.name = name;
     this.klass = type.getName();
-    this.options = Lists.newArrayList();
+    this.options = new ArrayList<>();
     if (options.length % 2 == 0) {
       for (int i = 0; i < options.length; i += 2) {
         String key = options[i];

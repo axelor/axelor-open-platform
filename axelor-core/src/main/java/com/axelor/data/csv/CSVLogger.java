@@ -24,13 +24,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +58,7 @@ public class CSVLogger {
 
   private File configFile;
 
-  private List<String> filesName = Lists.newArrayList();
+  private List<String> filesName = new ArrayList<>();
 
   private boolean inputExported;
 
@@ -219,7 +219,7 @@ public class CSVLogger {
    * @throws IOException if unable to read config file
    */
   private void computeBindings() throws IOException {
-    List<String> lines = Lists.newArrayList();
+    List<String> lines = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
     XStream xStream = XStreamUtils.createXStream();
     xStream.processAnnotations(CSVConfig.class);

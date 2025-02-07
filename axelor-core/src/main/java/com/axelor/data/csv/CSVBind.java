@@ -25,10 +25,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -203,7 +203,7 @@ public class CSVBind {
     }
 
     for (String col : cols) {
-      if (cb.bindings == null) cb.bindings = Lists.newArrayList();
+      if (cb.bindings == null) cb.bindings = new ArrayList<>();
       cb.bindings.add(CSVBind.getBinding(field + "." + col, col, null));
     }
 

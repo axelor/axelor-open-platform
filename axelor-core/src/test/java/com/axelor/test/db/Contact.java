@@ -26,7 +26,6 @@ import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
 import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.db.hibernate.type.ValueEnumType;
-import com.google.common.collect.Lists;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Basic;
@@ -42,6 +41,7 @@ import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -247,7 +247,7 @@ public class Contact extends JpaModel {
 
   public Circle getCircle(int index) {
     if (circles == null) return null;
-    return Lists.newArrayList(circles).get(index);
+    return new ArrayList<>(circles).get(index);
   }
 
   public Set<Circle> getCircles() {

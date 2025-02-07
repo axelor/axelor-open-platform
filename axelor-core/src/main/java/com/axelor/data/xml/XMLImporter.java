@@ -28,7 +28,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.WstxDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
@@ -43,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +87,7 @@ public class XMLImporter implements Importer {
 
   private Map<String, Object> context;
 
-  private List<Listener> listeners = Lists.newArrayList();
+  private List<Listener> listeners = new ArrayList<>();
 
   private boolean canClear = true;
 
@@ -119,7 +119,7 @@ public class XMLImporter implements Importer {
   }
 
   private List<File> getFiles(String... names) {
-    List<File> all = Lists.newArrayList();
+    List<File> all = new ArrayList<>();
     for (String name : names) all.add(dataDir != null ? new File(dataDir, name) : new File(name));
     return all;
   }

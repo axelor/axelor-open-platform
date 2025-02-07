@@ -755,12 +755,12 @@ public class Query<T extends Model> {
   public class Selector {
 
     private List<String> names = Lists.newArrayList("id", "version");
-    private List<String> collections = Lists.newArrayList();
+    private List<String> collections = new ArrayList<>();
     private String query;
     private Mapper mapper = Mapper.of(beanClass);
 
     private Selector(String... names) {
-      List<String> selects = Lists.newArrayList();
+      List<String> selects = new ArrayList<>();
       selects.add("self.id");
       selects.add("self.version");
       for (String name : names) {
@@ -863,7 +863,7 @@ public class Query<T extends Model> {
     public List<Map> fetch(int limit, int offset) {
 
       List<List> data = values(limit, offset);
-      List<Map> result = Lists.newArrayList();
+      List<Map> result = new ArrayList<>();
 
       for (List items : data) {
         Map<String, Object> map = Maps.newHashMap();
@@ -911,7 +911,7 @@ public class Query<T extends Model> {
       for (String name : collections) {
         Collection<Model> items = (Collection<Model>) mapper.get(self, name);
         if (items != null) {
-          List<Object> all = Lists.newArrayList();
+          List<Object> all = new ArrayList<>();
           for (Model obj : items) {
             all.add(Resource.toMapCompact(obj));
           }

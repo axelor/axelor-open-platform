@@ -591,7 +591,7 @@ public final class JPA {
       Object value = p.get(bean);
 
       if (value instanceof List && deep) {
-        List items = Lists.newArrayList();
+        List items = new ArrayList<>();
         for (Object item : (List) value) {
           Object val = copy((Model) item, true);
           // break bi-directional association

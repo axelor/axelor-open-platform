@@ -212,7 +212,7 @@ public class Resource<T extends Model> {
     final Repository<?> repository = JpaRepository.of(model);
 
     final Map<String, Object> meta = Maps.newHashMap();
-    final List<Object> fields = Lists.newArrayList();
+    final List<Object> fields = new ArrayList<>();
 
     if (repository == null) {
       for (Property p : JPA.fields(model)) {
@@ -237,7 +237,7 @@ public class Resource<T extends Model> {
 
     Response response = new Response();
 
-    List<String> data = Lists.newArrayList();
+    List<String> data = new ArrayList<>();
     for (Class<?> type : JPA.models()) {
       data.add(type.getName());
     }
@@ -292,8 +292,8 @@ public class Resource<T extends Model> {
 
   private List<String> getSortBy(Request request) {
 
-    final List<String> sortBy = Lists.newArrayList();
-    final List<String> sortOn = Lists.newArrayList();
+    final List<String> sortBy = new ArrayList<>();
+    final List<String> sortOn = new ArrayList<>();
     final Mapper mapper = Mapper.of(model);
 
     boolean unique = false;
@@ -492,7 +492,7 @@ public class Resource<T extends Model> {
       if (txn.isActive()) {
         txn.rollback();
       }
-      data = Lists.newArrayList();
+      data = new ArrayList<>();
       LOG.error("Error: {}", e, e);
     }
 
@@ -550,7 +550,7 @@ public class Resource<T extends Model> {
     }
 
     final StringBuilder builder = new StringBuilder();
-    final List ids = Lists.newArrayList();
+    final List ids = new ArrayList<>();
 
     for (Object item : result) {
       ids.add(((Map) item).get("id"));
@@ -998,7 +998,7 @@ public class Resource<T extends Model> {
 
     Request request = newRequest(null, id);
     final Response response = new Response();
-    final List<Object> data = Lists.newArrayList();
+    final List<Object> data = new ArrayList<>();
 
     firePreRequestEvent(RequestEvent.READ, request);
 
@@ -1267,7 +1267,7 @@ public class Resource<T extends Model> {
 
     firePreRequestEvent(RequestEvent.SAVE, request);
 
-    final List<Object> data = Lists.newArrayList();
+    final List<Object> data = new ArrayList<>();
     final String[] names;
     if (request.getFields() != null) {
       names = request.getFields().toArray(new String[0]);
@@ -1466,7 +1466,7 @@ public class Resource<T extends Model> {
 
     JPA.runInTransaction(
         () -> {
-          final List<Model> entities = Lists.newArrayList();
+          final List<Model> entities = new ArrayList<>();
 
           for (Object record : records) {
             Map map = (Map) record;
@@ -1832,7 +1832,7 @@ public class Resource<T extends Model> {
       }
 
       if (value instanceof Collection) { // o2m | m2m
-        List<Object> items = Lists.newArrayList();
+        List<Object> items = new ArrayList<>();
         for (Model input : (Collection<Model>) value) {
           Map<String, Object> item;
           if (input.getId() != null) {

@@ -30,12 +30,12 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +164,7 @@ public class ActionView extends Action {
     Map<String, Object> result = Maps.newHashMap();
     Map<String, Object> context = Maps.newHashMap();
     Map<String, Object> viewParams = Maps.newHashMap();
-    List<Object> items = Lists.newArrayList();
+    List<Object> items = new ArrayList<>();
 
     String viewType = null;
 
@@ -300,9 +300,9 @@ public class ActionView extends Action {
 
     private ActionViewBuilder(String title) {
       view.title = title;
-      view.views = Lists.newArrayList();
-      view.params = Lists.newArrayList();
-      view.contexts = Lists.newArrayList();
+      view.views = new ArrayList<>();
+      view.params = new ArrayList<>();
+      view.contexts = new ArrayList<>();
     }
 
     public ActionViewBuilder name(String name) {
@@ -373,7 +373,7 @@ public class ActionView extends Action {
     public Map<String, Object> map() {
       Map<String, Object> result = Maps.newHashMap();
       Map<String, Object> params = Maps.newHashMap();
-      List<Object> items = Lists.newArrayList();
+      List<Object> items = new ArrayList<>();
       String type = null;
 
       for (View v : view.views) {

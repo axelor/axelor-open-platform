@@ -30,11 +30,11 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import jakarta.validation.ValidationException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -116,7 +116,7 @@ public class CSVBinder {
       String searchCall) {
     this.beanClass = beanClass;
     this.fields = fields;
-    this.bindings = Lists.newArrayList();
+    this.bindings = new ArrayList<>();
     this.query = query;
     this.update = update;
     this.postProcess = postProcess;
@@ -173,7 +173,7 @@ public class CSVBinder {
   }
 
   private List<String> getBoundCols(List<CSVBind> bindings, List<String> bounds) {
-    if (bounds == null) bounds = Lists.newArrayList();
+    if (bounds == null) bounds = new ArrayList<>();
     if (bindings != null) {
       for (CSVBind cb : bindings) {
         if (cb.getColumn() != null) bounds.add(cb.getColumn());
@@ -439,7 +439,7 @@ public class CSVBinder {
   }
 
   private List<CSVBind> flatten(List<CSVBind> bindings) {
-    List<CSVBind> all = Lists.newArrayList();
+    List<CSVBind> all = new ArrayList<>();
     for (CSVBind cb : bindings) {
       all.add(cb);
       if (cb.getBindings() != null) {

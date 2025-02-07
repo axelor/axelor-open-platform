@@ -28,11 +28,11 @@ import com.axelor.test.db.Move;
 import com.axelor.test.db.MoveLine;
 import com.axelor.test.db.repo.InvoiceRepository;
 import com.axelor.test.db.repo.MoveRepository;
-import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,7 @@ public class RelationTest extends JpaTest {
     Invoice invoice = invoices.all().fetchOne();
 
     Move move = new Move();
-    move.setMoveLines(Lists.<MoveLine>newArrayList());
+    move.setMoveLines(new ArrayList<>());
     move.setInvoice(invoice);
 
     MoveLine line1 = new MoveLine();

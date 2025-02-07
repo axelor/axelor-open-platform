@@ -24,10 +24,10 @@ import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class TestActionExport extends MetaTest {
     context.put("orderDate", LocalDate.now());
     context.put("customer", ImmutableMap.of("name", "John Smith"));
 
-    List<Object> items = Lists.newArrayList();
+    List<Object> items = new ArrayList<>();
     context.put("items", items);
 
     items.add(
