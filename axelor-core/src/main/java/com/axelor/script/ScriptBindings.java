@@ -30,12 +30,12 @@ import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +137,7 @@ public class ScriptBindings extends SimpleBindings {
 
   @Override
   public Set<String> keySet() {
-    Set<String> keys = Sets.newHashSet(super.keySet());
+    Set<String> keys = new HashSet<>(super.keySet());
     keys.addAll(variables.keySet());
     keys.addAll(META_VARS);
     return keys;

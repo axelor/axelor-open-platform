@@ -26,7 +26,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -309,7 +308,7 @@ public final class JPA {
    * @return a JPA managed object of the given model class
    */
   public static <T extends Model> T edit(Class<T> klass, Map<String, Object> values) {
-    Set<Model> visited = Sets.newHashSet();
+    Set<Model> visited = new HashSet<>();
     Multimap<String, Long> edited = HashMultimap.create();
     try {
       return _edit(klass, values, visited, edited);
@@ -458,7 +457,7 @@ public final class JPA {
    * @return JPA managed model instance
    */
   public static <T extends Model> T manage(T bean) {
-    Set<Model> visited = Sets.newHashSet();
+    Set<Model> visited = new HashSet<>();
     try {
       T managed = _manage(bean, visited);
       if (EntityHelper.isUninitialized(managed)) {
@@ -551,7 +550,7 @@ public final class JPA {
    * @return a copy of the given bean
    */
   public static <T extends Model> T copy(T bean, boolean deep) {
-    Set<String> visited = Sets.newHashSet();
+    Set<String> visited = new HashSet<>();
     try {
       return _copy(bean, deep, visited);
     } finally {

@@ -22,11 +22,11 @@ import com.axelor.data.DataScriptHelper;
 import com.axelor.data.ImportException;
 import com.axelor.inject.Beans;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -215,8 +215,8 @@ public class XMLBind {
 
   public boolean isMultiple(XMLBind bind) {
     if (multiples == null) {
-      multiples = Sets.newHashSet();
-      Set<String> found = Sets.newHashSet();
+      multiples = new HashSet<>();
+      Set<String> found = new HashSet<>();
       for (XMLBind b : bindings) {
         if (found.contains(b.getNode())) {
           multiples.add(b.getNode());

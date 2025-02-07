@@ -28,11 +28,11 @@ import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -117,7 +117,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
   @Override
   public Set<AccessType> getAccessTypes(Class<? extends Model> model, Long id) {
-    final Set<AccessType> types = Sets.newHashSet();
+    final Set<AccessType> types = new HashSet<>();
     for (AccessType type : AccessType.values()) {
       if (id == null ? isPermitted(type, model) : isPermitted(type, model, id)) {
         types.add(type);

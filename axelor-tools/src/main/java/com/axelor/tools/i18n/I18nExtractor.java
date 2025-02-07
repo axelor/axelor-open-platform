@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import java.io.File;
 import java.io.FileReader;
@@ -41,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,40 +76,16 @@ public class I18nExtractor {
   private static final Set<String> JS_FILE_EXTENSIONS = Set.of(".js", ".jsx", ".ts", ".tsx");
 
   private static final Set<String> VIEW_TYPES =
-      Sets.newHashSet(
-          "form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom");
+      new HashSet<>(Arrays.asList("form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom"));
 
   private static final Set<String> FIELD_NODES =
-      Sets.newHashSet(
-          "string",
-          "boolean",
-          "integer",
-          "long",
-          "decimal",
-          "date",
-          "time",
-          "datetime",
-          "binary",
-          "enum",
-          "one-to-one",
-          "many-to-one",
-          "one-to-many",
-          "many-to-many");
+      new HashSet<>(Arrays.asList("string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary", "enum", "one-to-one", "many-to-one", "one-to-many", "many-to-many"));
 
   private static final Set<String> TEXT_ATTRS =
-      Sets.newHashSet(
-          "tag",
-          "prompt",
-          "placeholder",
-          "x-true-text",
-          "x-false-text",
-          "data-description",
-          "confirm-btn-title",
-          "cancel-btn-title",
-          "x-tree-field-title");
+      new HashSet<>(Arrays.asList("tag", "prompt", "placeholder", "x-true-text", "x-false-text", "data-description", "confirm-btn-title", "cancel-btn-title", "x-tree-field-title"));
 
   private static final Set<String> TEXT_NODES =
-      Sets.newHashSet("option", "message", "static", "help");
+      new HashSet<>(Arrays.asList("option", "message", "static", "help"));
 
   private static class I18nItem {
 

@@ -33,7 +33,6 @@ import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.script.ScriptBindings;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.xml.XmlEscapers;
 import java.io.File;
@@ -47,6 +46,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -296,7 +296,7 @@ public class StringTemplates implements Templates {
     }
 
     private Set<String> findAttributes() {
-      Set<String> names = Sets.newHashSet();
+      Set<String> names = new HashSet<>();
       int ip = 0;
       while (ip < template.impl.codeSize) {
         int opcode = template.impl.instrs[ip];

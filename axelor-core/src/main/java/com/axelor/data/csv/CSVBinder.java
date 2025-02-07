@@ -30,7 +30,6 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import jakarta.validation.ValidationException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -129,7 +128,7 @@ public class CSVBinder {
 
   private void autoBind(String[] fields) {
 
-    Set<String> beanFields = Sets.newHashSet();
+    Set<String> beanFields = new HashSet<>();
     Map<String, Set<String>> refFields = new HashMap<>();
     List<String> boundCols = getBoundCols(this.bindings, null);
 
