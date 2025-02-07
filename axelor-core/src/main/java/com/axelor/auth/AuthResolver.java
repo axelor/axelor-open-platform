@@ -23,7 +23,7 @@ import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /** This class is responsible to resolve permissions. */
@@ -72,7 +72,7 @@ final class AuthResolver {
    */
   private Set<Permission> filterPermissions(
       final Set<Permission> permissions, final String object, final AccessType type) {
-    final Set<Permission> all = Sets.newLinkedHashSet();
+    final Set<Permission> all = new LinkedHashSet<>();
     if (permissions == null || permissions.isEmpty()) {
       return all;
     }
