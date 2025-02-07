@@ -20,7 +20,6 @@ package com.axelor.db;
 
 import com.axelor.common.ResourceUtils;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
@@ -30,6 +29,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,7 +142,7 @@ public class JpaFixture {
   public void load(String fixture) {
 
     final InputStream stream = read(fixture);
-    final Map<Node, Object> objects = Maps.newLinkedHashMap();
+    final Map<Node, Object> objects = new LinkedHashMap<>();
 
     if (stream == null) {
       throw new IllegalArgumentException("No such fixture found: " + fixture);
