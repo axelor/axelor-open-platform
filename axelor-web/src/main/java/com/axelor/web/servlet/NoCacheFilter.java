@@ -21,7 +21,6 @@ package com.axelor.web.servlet;
 import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.common.StringUtils;
-import com.google.common.collect.ImmutableList;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -58,7 +57,7 @@ public class NoCacheFilter implements Filter {
     "*.jpg"
   };
 
-  private static final List<String> EXCLUDED_EXTS = ImmutableList.of(".jsp");
+  private static final List<String> EXCLUDED_EXTS = List.of(".jsp");
 
   private static final String CACHE_BUSTER_PARAM = "" + Calendar.getInstance().getTimeInMillis();
 

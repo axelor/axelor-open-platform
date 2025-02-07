@@ -49,7 +49,7 @@ import org.junit.jupiter.api.Test;
 public class EqualityTest extends JpaTest {
 
   private final List<Class<? extends Model>> modelClasses =
-      ImmutableList.of(Address.class, Contact.class);
+      List.of(Address.class, Contact.class);
 
   @Test
   public void testNewInstanceNotEquals() throws Exception {

@@ -35,7 +35,6 @@ import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -119,7 +118,7 @@ public class ActionGroup extends ActionResumable {
         view.setType(parts[0]);
         view.setName(parts[1]);
 
-        actionView.setViews(ImmutableList.of(view));
+        actionView.setViews(List.of(view));
         actionView.setName(actionName);
 
         if (parts.length == 3) {

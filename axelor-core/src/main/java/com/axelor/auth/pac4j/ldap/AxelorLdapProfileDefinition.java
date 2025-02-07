@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j.ldap;
 
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,7 +36,7 @@ public class AxelorLdapProfileDefinition extends CommonProfileDefinition {
   public static final String PASSWORD = "userPassword";
 
   public static final List<String> ATTRIBUTES =
-      ImmutableList.of(
+      List.of(
           USERNAME,
           EMAIL,
           DISPLAY_NAME,

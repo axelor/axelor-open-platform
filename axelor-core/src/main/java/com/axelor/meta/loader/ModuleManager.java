@@ -32,7 +32,6 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.lang.reflect.Field;
@@ -86,7 +85,7 @@ public class ModuleManager {
     this.viewLoader = viewLoader;
     this.dataLoader = dataLoader;
     this.demoLoader = demoLoader;
-    metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
+    metaLoaders = List.of(modelLoader, viewLoader, i18nLoader);
   }
 
   public void initialize(final boolean update, final boolean withDemo) {

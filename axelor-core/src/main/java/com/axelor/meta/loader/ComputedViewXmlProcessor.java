@@ -22,7 +22,6 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.Position;
-import com.google.common.collect.ImmutableList;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
@@ -297,7 +296,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode = toolBarNode;
       position = Position.INSIDE_LAST;
     } else {
-      elements = ImmutableList.of(element);
+      elements = List.of(element);
       targetNode =
           (Node)
               evaluateXPath(
@@ -326,7 +325,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
       targetNode = menuBarNode;
       position = Position.INSIDE_LAST;
     } else {
-      elements = ImmutableList.of(element);
+      elements = List.of(element);
       final Node toolBarNode =
           (Node)
               evaluateXPath(
@@ -352,7 +351,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private void doInsertPanelMail(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node targetNode;
     final Position position;
     final Node panelMailNode =
@@ -419,7 +418,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private Node doReplaceToolBar(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node toolBarNode =
         (Node)
             evaluateXPath(
@@ -442,7 +441,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private Node doReplaceMenuBar(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node menuBarNode =
         (Node)
             evaluateXPath(
@@ -482,7 +481,7 @@ public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
   }
 
   private Node doReplacePanelMail(Element element) throws XPathExpressionException {
-    final List<Element> elements = ImmutableList.of(element);
+    final List<Element> elements = List.of(element);
     final Node panelMailNode =
         (Node)
             evaluateXPath(

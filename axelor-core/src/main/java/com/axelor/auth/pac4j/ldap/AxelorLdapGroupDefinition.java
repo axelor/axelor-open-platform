@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j.ldap;
 
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 public class AxelorLdapGroupDefinition {
@@ -29,7 +28,7 @@ public class AxelorLdapGroupDefinition {
   public static final String MEMBER = "member";
 
   public static final List<String> ATTRIBUTES =
-      ImmutableList.of(NAME, ID, OBJECT_CLASS, UNIQUE_MEMBER, MEMBER);
+      List.of(NAME, ID, OBJECT_CLASS, UNIQUE_MEMBER, MEMBER);
 
   private AxelorLdapGroupDefinition() {}
 }

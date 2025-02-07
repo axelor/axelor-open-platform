@@ -563,7 +563,7 @@ public class Resource<T extends Model> {
       parentName = (String) childOn.get("parent");
     }
 
-    ImmutableList.of(modelName, parentName).stream()
+    List.of(modelName, parentName).stream()
         .filter(name -> !NAME_PATTERN.matcher(name).matches())
         .findAny()
         .ifPresent(
@@ -1443,7 +1443,7 @@ public class Resource<T extends Model> {
               return bean;
             });
 
-    response.setData(ImmutableList.of(toMapCompact(removedBean)));
+    response.setData(List.of(toMapCompact(removedBean)));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.REMOVE, req, response);
@@ -1538,7 +1538,7 @@ public class Resource<T extends Model> {
     // break bi-directional links
     fixLinks(bean);
 
-    response.setData(ImmutableList.of(bean));
+    response.setData(List.of(bean));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.COPY, request, response);
@@ -1639,7 +1639,7 @@ public class Resource<T extends Model> {
       data.put(name, value);
     }
 
-    response.setData(ImmutableList.of(data));
+    response.setData(List.of(data));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.FETCH_NAME, req, response);

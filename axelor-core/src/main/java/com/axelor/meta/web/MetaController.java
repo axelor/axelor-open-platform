@@ -54,7 +54,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.script.ScriptHelper;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -105,7 +104,7 @@ public class MetaController {
     Action action = XMLViews.findAction(meta.getName());
     Map<String, Map<String, String>> data = Maps.newHashMap();
 
-    response.setData(ImmutableList.of(data));
+    response.setData(List.of(data));
 
     ObjectViews views;
     try {
@@ -139,7 +138,7 @@ public class MetaController {
       data.putAll(validateBuilder.build());
     }
 
-    response.setData(ImmutableList.of(data));
+    response.setData(List.of(data));
   }
 
   private List<MetaAttrs> findAttrs(String model, String view) {

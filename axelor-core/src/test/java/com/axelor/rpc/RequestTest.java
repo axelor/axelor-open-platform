@@ -28,7 +28,6 @@ import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -174,7 +173,7 @@ public class RequestTest extends RpcTest {
             "lastName",
             "Doe",
             "relatedContacts",
-            ImmutableList.of(janeValues, babyValues));
+            List.of(janeValues, babyValues));
     Contact john = contacts.edit(johnValues);
     assertNotNull(
         john.getFirstName(),

@@ -41,7 +41,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
@@ -230,10 +229,10 @@ public class XMLViews {
     StringWriter writer = new StringWriter();
 
     if (obj instanceof Action) {
-      views.setActions(ImmutableList.of((Action) obj));
+      views.setActions(List.of((Action) obj));
     }
     if (obj instanceof AbstractView) {
-      views.setViews(ImmutableList.of((AbstractView) obj));
+      views.setViews(List.of((AbstractView) obj));
     }
     if (obj instanceof List) {
       views.setViews((List) obj);

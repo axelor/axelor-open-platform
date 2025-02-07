@@ -37,7 +37,6 @@ import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import java.math.BigDecimal;
@@ -357,8 +356,8 @@ public class TestActions extends MetaTest {
     context.put("myDateTime", LocalDateTime.now());
     context.put("myEnum", EnumStatusNumber.ONE);
     context.put("myReference", new Title());
-    context.put("myCollection", ImmutableList.of(new Address()));
-    context.put("myCollection2", ImmutableList.of(new Address()));
+    context.put("myCollection", List.of(new Address()));
+    context.put("myCollection2", List.of(new Address()));
 
     Map<String, Object> expected =
         Map.ofEntries(
