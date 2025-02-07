@@ -40,7 +40,6 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.db.repo.MetaFileRepository;
-import com.google.common.base.Preconditions;
 import com.google.inject.persist.Transactional;
 import jakarta.activation.MimeType;
 import jakarta.activation.MimeTypeParseException;
@@ -102,7 +101,7 @@ public class MetaFiles {
    * @return actual file path
    */
   public static Path getPath(MetaFile file) {
-    Preconditions.checkNotNull(file, "file instance can't be null");
+    Objects.requireNonNull(file, "file instance can't be null");
     Store store = FileStoreFactory.getStore();
     return store.getPath(file.getFilePath());
   }
@@ -114,7 +113,7 @@ public class MetaFiles {
    * @return actual file path
    */
   public static Path getPath(String filePath) {
-    Preconditions.checkNotNull(filePath, "file path can't be null");
+    Objects.requireNonNull(filePath, "file path can't be null");
     Store store = FileStoreFactory.getStore();
     return store.getPath(filePath);
   }
@@ -129,7 +128,7 @@ public class MetaFiles {
    * @throws IllegalArgumentException if the file path to check is not valid
    */
   public static void checkPath(String filePath) {
-    Preconditions.checkNotNull(filePath, "file path can't be null");
+    Objects.requireNonNull(filePath, "file path can't be null");
 
     boolean blocked =
         !BLACKLIST_PATTERNS.isEmpty() && isMatchingFileNamePattern(BLACKLIST_PATTERNS, filePath);
@@ -198,7 +197,7 @@ public class MetaFiles {
    * @throws IllegalArgumentException
    */
   public static void checkType(File file) {
-    Preconditions.checkNotNull(file, "file can't be null");
+    Objects.requireNonNull(file, "file can't be null");
     checkType(MimeTypesUtils.getContentType(file));
   }
 
@@ -388,9 +387,9 @@ public class MetaFiles {
    */
   @Transactional
   public MetaFile upload(InputStream stream, MetaFile metaFile) throws IOException {
-    Preconditions.checkNotNull(stream, "stream can't be null");
-    Preconditions.checkNotNull(metaFile, "meta file can't be null");
-    Preconditions.checkNotNull(metaFile.getFileName(), "meta file should have filename");
+    Objects.requireNonNull(stream, "stream can't be null");
+    Objects.requireNonNull(metaFile, "meta file can't be null");
+    Objects.requireNonNull(metaFile.getFileName(), "meta file should have filename");
 
     final Path tmp = TempFiles.createTempFile();
     final File tmpFile = upload(stream, 0, -1, tmp.toFile().getName());

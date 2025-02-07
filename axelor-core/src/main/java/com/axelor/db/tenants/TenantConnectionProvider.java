@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
@@ -99,7 +100,7 @@ public class TenantConnectionProvider
   }
 
   private TenantConfig validate(TenantConfig config) {
-    Preconditions.checkNotNull(config, "invalid tenant config.");
+    Objects.requireNonNull(config, "invalid tenant config.");
     if (config.getJndiDataSource() != null) {
       return config;
     }

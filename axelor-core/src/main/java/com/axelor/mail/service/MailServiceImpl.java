@@ -60,7 +60,6 @@ import com.axelor.text.Templates;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
@@ -87,6 +86,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -445,7 +445,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 
   @Override
   public void send(final MailMessage message) throws MailException {
-    Preconditions.checkNotNull(message, "mail message can't be null");
+    Objects.requireNonNull(message, "mail message can't be null");
     final Model related = findEntity(message);
     final MailSender sender = getMailSender(message, related);
     if (sender == null) {

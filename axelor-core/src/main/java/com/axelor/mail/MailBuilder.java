@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -124,7 +125,7 @@ public final class MailBuilder {
   private MailBuilder addAll(Collection<String> to, String... recipients) {
     Preconditions.checkNotNull(recipients, "recipients can't be null");
     for (String email : recipients) {
-      Preconditions.checkNotNull(email, "email can't be null");
+      Objects.requireNonNull(email, "email can't be null");
     }
     Collections.addAll(to, recipients);
     return this;
@@ -158,7 +159,7 @@ public final class MailBuilder {
   }
 
   public MailBuilder header(String name, String value) {
-    Preconditions.checkNotNull(name, "header name can't be null");
+    Objects.requireNonNull(name, "header name can't be null");
     headers.put(name, value);
     return this;
   }
@@ -195,7 +196,7 @@ public final class MailBuilder {
   }
 
   private MailBuilder text(String text, boolean html) {
-    Preconditions.checkNotNull(text, "text can't be null");
+    Objects.requireNonNull(text, "text can't be null");
     Content content = new Content();
     content.text = text;
     content.html = html;
@@ -223,7 +224,7 @@ public final class MailBuilder {
    * @return this
    */
   public MailBuilder attach(String name, String link, String cid) {
-    Preconditions.checkNotNull(link, "link can't be null");
+    Objects.requireNonNull(link, "link can't be null");
     Content content = new Content();
     content.name = name;
     content.file = link;
@@ -247,7 +248,7 @@ public final class MailBuilder {
    * @return this
    */
   public MailBuilder inline(String name, String link) {
-    Preconditions.checkNotNull(link, "link can't be null");
+    Objects.requireNonNull(link, "link can't be null");
     Content content = new Content();
     content.name = name;
     content.file = link;

@@ -23,7 +23,6 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import com.google.common.base.Preconditions;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +38,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumSet;
+import java.util.Objects;
 
 /** This class provides some helper methods to deal with files. */
 public final class FileUtils {
@@ -51,7 +51,7 @@ public final class FileUtils {
    * @return the file
    */
   public static File getFile(String first, String... more) {
-    Preconditions.checkNotNull(first, "first element must not be null");
+    Objects.requireNonNull(first, "first element must not be null");
     File file = new File(first);
     if (more != null) {
       for (String name : more) {
@@ -70,8 +70,8 @@ public final class FileUtils {
    * @return the file
    */
   public static File getFile(File directory, String next, String... more) {
-    Preconditions.checkNotNull(directory, "directory must not be null");
-    Preconditions.checkNotNull(next, "next element must not be null");
+    Objects.requireNonNull(directory, "directory must not be null");
+    Objects.requireNonNull(next, "next element must not be null");
     File file = new File(directory, next);
     if (more != null) {
       for (String name : more) {

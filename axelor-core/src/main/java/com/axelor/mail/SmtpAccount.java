@@ -19,12 +19,12 @@
 package com.axelor.mail;
 
 import com.axelor.common.StringUtils;
-import com.google.common.base.Preconditions;
 import jakarta.mail.Authenticator;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
+import java.util.Objects;
 import java.util.Properties;
 
 /** The default implementation of {@link MailAccount} for SMPT accounts. */
@@ -51,7 +51,7 @@ public class SmtpAccount implements MailAccount {
    * @param port the smtp server port
    */
   public SmtpAccount(String host, String port) {
-    Preconditions.checkNotNull(host, "host can't be null");
+    Objects.requireNonNull(host, "host can't be null");
     this.host = host;
     this.port = port;
   }

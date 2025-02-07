@@ -46,7 +46,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -61,6 +60,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -375,7 +375,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
   @Transactional
   public DMSFile setOffline(DMSFile file, boolean offline) {
-    Preconditions.checkNotNull(file, "file can't be null");
+    Objects.requireNonNull(file, "file can't be null");
 
     // directory can't be marked as offline
     if (Boolean.TRUE.equals(file.getIsDirectory())) {
