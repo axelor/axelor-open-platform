@@ -116,7 +116,8 @@ public class ScriptBindings extends SimpleBindings {
         if (bean == null || bean.getId() == null) return null;
         return JPA.em().getReference(EntityHelper.getEntityClass(bean), bean.getId());
       case "__ref__":
-        Map values = (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).getFirst();
+        Map values =
+            (Map) ((List) ((Map) variables.get("_searchContext")).get("_results")).getFirst();
         Class<?> klass = Class.forName((String) values.get("model"));
         return JPA.em()
             .getReference(klass, Long.parseLong(((List) values.get("ids")).getFirst().toString()));

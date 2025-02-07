@@ -605,10 +605,11 @@ public class MetaFiles {
    * @return download link
    */
   public String getDownloadLink(MetaFile metaFile, Model parentModel) {
-    return "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d".formatted(
-        MetaFile.class.getName(),
-        metaFile.getId(),
-        EntityHelper.getEntityClass(parentModel).getName(),
-        parentModel.getId());
+    return "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d"
+        .formatted(
+            MetaFile.class.getName(),
+            metaFile.getId(),
+            EntityHelper.getEntityClass(parentModel).getName(),
+            parentModel.getId());
   }
 }

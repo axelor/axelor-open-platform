@@ -387,7 +387,8 @@ public class EntityGenerator {
       if (all == null || all.isEmpty()) {
         continue;
       }
-      if (all.size() == 1 && !all.getFirst().isModelClass()) { // generate extended Model class in root
+      if (all.size() == 1
+          && !all.getFirst().isModelClass()) { // generate extended Model class in root
         continue;
       }
       Collections.reverse(all);

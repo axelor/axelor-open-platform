@@ -31,7 +31,6 @@ import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
-import com.google.common.base.Charsets;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.Files;
 import jakarta.xml.bind.annotation.XmlAttribute;
@@ -44,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -128,7 +128,7 @@ public class ActionExport extends Action {
       contents = handler.template(engine, reader);
 
       Files.createParentDirs(output);
-      Files.asCharSink(output, Charsets.UTF_8).write(contents);
+      Files.asCharSink(output, StandardCharsets.UTF_8).write(contents);
 
       log.info("file saved: {}", output);
 

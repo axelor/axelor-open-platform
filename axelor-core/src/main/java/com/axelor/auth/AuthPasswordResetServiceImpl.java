@@ -224,8 +224,7 @@ public class AuthPasswordResetServiceImpl implements AuthPasswordResetService {
   protected String createResetUrl(User user) {
     final var url =
         new StringBuilder()
-            .append(
-            "%s/#/reset-password?token=%s".formatted(getBaseUrl(true), createToken(user)));
+            .append("%s/#/reset-password?token=%s".formatted(getBaseUrl(true), createToken(user)));
     final var httpRequest = getHttpRequest();
     final var headerTenantId = httpRequest.getHeader("X-Tenant-ID");
 

@@ -141,8 +141,7 @@ public class RestService extends ResourceService {
             .filter(StringUtils::notEmpty)
             .orElse(";");
     if (separator.length() != 1) {
-      throw new IllegalArgumentException(
-          "Illegal data export separator: %s".formatted(separator));
+      throw new IllegalArgumentException("Illegal data export separator: %s".formatted(separator));
     }
     CSV_SEPARATOR = separator.charAt(0);
   }

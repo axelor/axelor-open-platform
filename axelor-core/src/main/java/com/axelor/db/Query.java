@@ -1067,8 +1067,8 @@ public class Query<T extends Model> {
             property = currentMapper.getProperty(variable);
             if (property == null) {
               throw new IllegalArgumentException(
-                  "No such field '%s' in object '%s'".formatted(
-                      variable, currentMapper.getBeanClass().getName()));
+                  "No such field '%s' in object '%s'"
+                      .formatted(variable, currentMapper.getBeanClass().getName()));
             }
             if (property.isReference()) {
               joinOn = prefix + "." + variable;
@@ -1116,8 +1116,8 @@ public class Query<T extends Model> {
     }
 
     private String getTranslationJoin(String joinName, String from, String variable, String lang) {
-      return "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'".formatted(
-          joinName, joinName, from, variable, joinName, lang);
+      return "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'"
+          .formatted(joinName, joinName, from, variable, joinName, lang);
     }
 
     private String translate(Property property, String prefix) {
@@ -1135,8 +1135,8 @@ public class Query<T extends Model> {
       translationJoins.add(getTranslationJoin(joinName, from, variable, lang));
       translationJoins.add(getTranslationJoin(baseJoinName, from, variable, baseLang));
 
-      return "COALESCE(NULLIF(%s.message, ''), NULLIF(%s.message, ''), %s.%s)".formatted(
-          joinName, baseJoinName, from, variable);
+      return "COALESCE(NULLIF(%s.message, ''), NULLIF(%s.message, ''), %s.%s)"
+          .formatted(joinName, baseJoinName, from, variable);
     }
 
     public String joinName(String name) {
@@ -1156,8 +1156,7 @@ public class Query<T extends Model> {
       final List<String> joinItems = new ArrayList<>();
       for (final Entry<String, String> entry : joins.entrySet()) {
         final String fetchString = fetch && fetches.contains(entry.getKey()) ? " FETCH" : "";
-        joinItems.add(
-            "LEFT JOIN%s %s %s".formatted(fetchString, entry.getKey(), entry.getValue()));
+        joinItems.add("LEFT JOIN%s %s %s".formatted(fetchString, entry.getKey(), entry.getValue()));
       }
       for (final String join : translationJoins) {
         joinItems.add("LEFT JOIN %s".formatted(join));

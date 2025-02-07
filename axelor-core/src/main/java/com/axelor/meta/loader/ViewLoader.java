@@ -58,7 +58,6 @@ import com.axelor.meta.schema.views.Selection;
 import com.axelor.meta.service.MetaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -73,6 +72,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -140,8 +140,8 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!unresolved.isEmpty()) {
       LOG.error("Found {} unresolved item(s): {}", unresolved.size(), unresolved);
       throw new PersistenceException(
-          "Found %d unresolved item(s). Please check the logs for details.".formatted(
-              unresolved.size()));
+          "Found %d unresolved item(s). Please check the logs for details."
+              .formatted(unresolved.size()));
     }
 
     migrateViews();
@@ -797,7 +797,7 @@ public class ViewLoader extends AbstractParallelLoader {
       try {
         LOG.debug("Creating default views: {}", out);
         Files.createParentDirs(out);
-        Files.asCharSink(out, Charsets.UTF_8).write(xml);
+        Files.asCharSink(out, StandardCharsets.UTF_8).write(xml);
       } catch (IOException e) {
         LOG.error("Unable to create: {}", out);
       }

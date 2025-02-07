@@ -32,9 +32,6 @@ public class I18nExtension {
   }
 
   public void setExtraSources(List<CharSequence> extraSrc) {
-    this.extraSources =
-        extraSrc.stream()
-            .map(src -> Path.of(src.toString()))
-            .toList();
+    this.extraSources = extraSrc.stream().map(src -> Path.of(src.toString())).toList();
   }
 }

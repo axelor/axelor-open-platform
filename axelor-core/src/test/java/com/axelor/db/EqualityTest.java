@@ -48,8 +48,7 @@ import org.junit.jupiter.api.Test;
  */
 public class EqualityTest extends JpaTest {
 
-  private final List<Class<? extends Model>> modelClasses =
-      List.of(Address.class, Contact.class);
+  private final List<Class<? extends Model>> modelClasses = List.of(Address.class, Contact.class);
 
   @Test
   public void testNewInstanceNotEquals() throws Exception {
@@ -59,7 +58,8 @@ public class EqualityTest extends JpaTest {
       assertNotEquals(
           entity1,
           entity2,
-          "Two new empty instances of %s should not be equal.".formatted(modelClass.getSimpleName()));
+          "Two new empty instances of %s should not be equal."
+              .formatted(modelClass.getSimpleName()));
     }
   }
 

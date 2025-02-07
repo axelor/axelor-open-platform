@@ -490,9 +490,7 @@ public class I18nExtractor {
 
     // Generate initial templates for specified languages.
     final List<String> langs =
-        Stream.concat(Stream.of("en", "fr"), languages.stream())
-            .distinct()
-            .toList();
+        Stream.concat(Stream.of("en", "fr"), languages.stream()).distinct().toList();
 
     for (String lang : langs) {
       Path target = template.resolveSibling("messages_" + lang + ".csv");

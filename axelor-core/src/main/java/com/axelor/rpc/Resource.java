@@ -426,8 +426,8 @@ public class Resource<T extends Model> {
     }
 
     return new JPQLFilter(
-        "self.id IN (SELECT __item.id FROM %s __parent JOIN __parent.%s __item WHERE __parent.id = ?)".formatted(
-            parentModel.getSimpleName(), property.getName()),
+        "self.id IN (SELECT __item.id FROM %s __parent JOIN __parent.%s __item WHERE __parent.id = ?)"
+            .formatted(parentModel.getSimpleName(), property.getName()),
         parentId);
   }
 

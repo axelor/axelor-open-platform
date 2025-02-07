@@ -61,9 +61,9 @@ public class MailSenderTest extends AbstractMailTest {
       """
       Hello world...
       --------------
-      
+
       This is a testing email and not a *spam...*
-      
+
       ---
       John Smith""";
 

@@ -53,10 +53,10 @@ public class TestJavaCode {
     String expected =
         """
         package com.example;
-        
+
         import java.util.ArrayList;
         import java.util.List;
-        
+
         List<String> names = new ArrayList<>()""";
 
     assertEquals(expected, text);
@@ -69,9 +69,9 @@ public class TestJavaCode {
     String expected =
         """
         package com.example;
-        
+
         import com.some.Example;
-        
+
         final var value = Example.NAME;\
         """;
 
@@ -85,9 +85,9 @@ public class TestJavaCode {
     String expected =
         """
         package com.example;
-        
+
         import static System.out.println;
-        
+
         println("Hello!");\
         """;
     assertEquals(expected, text);

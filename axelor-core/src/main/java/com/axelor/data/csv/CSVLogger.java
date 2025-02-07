@@ -20,7 +20,6 @@ package com.axelor.data.csv;
 
 import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
-import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -31,6 +30,7 @@ import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -130,11 +130,11 @@ public class CSVLogger {
     try {
       if (!this.currentFile.exists()) {
         Files.createParentDirs(this.currentFile);
-        Files.asCharSink(this.currentFile, Charsets.UTF_8, FileWriteMode.APPEND)
+        Files.asCharSink(this.currentFile, StandardCharsets.UTF_8, FileWriteMode.APPEND)
             .write(Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(this.header)));
         this.filesName.add(this.currentFile.getName());
       }
-      Files.asCharSink(this.currentFile, Charsets.UTF_8, FileWriteMode.APPEND)
+      Files.asCharSink(this.currentFile, StandardCharsets.UTF_8, FileWriteMode.APPEND)
           .write("\n" + Joiner.on(this.csvInput.getSeparator()).join(this.transformLine(values)));
     } catch (IOException e) {
     }
@@ -232,7 +232,7 @@ public class CSVLogger {
         sb.append(xStream.toXML(adapter));
       }
     } else {
-      lines = Files.readLines(this.configFile, Charsets.UTF_8);
+      lines = Files.readLines(this.configFile, StandardCharsets.UTF_8);
 
       for (int i = 0; i < lines.size() - 1; i++) {
         if (i == 0 || i == 1 || i == (lines.size() - 1)) {
@@ -251,7 +251,7 @@ public class CSVLogger {
     sb.append(xStream.toXML(this.csvInput));
     this.csvInput.setFileName(originalFileName);
 
-    Files.asCharSink(this.configFile, Charsets.UTF_8).write(this.prepareXML(sb.toString()));
+    Files.asCharSink(this.configFile, StandardCharsets.UTF_8).write(this.prepareXML(sb.toString()));
   }
 
   /**

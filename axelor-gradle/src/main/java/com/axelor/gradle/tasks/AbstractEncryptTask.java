@@ -250,11 +250,10 @@ public abstract class AbstractEncryptTask extends DefaultTask {
     log("");
     getLogger()
         .lifecycle(
-        (
-            """
+            ("""
             WARNING : Do not add property `%s.%s` with the password in your configuration file.
-            Use a reference to an external file : `file:<path_to_file>` as password value.""").formatted(
-            CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
+            Use a reference to an external file : `file:<path_to_file>` as password value.""")
+                .formatted(CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
   }
 
   private void printConfig(String value, String key) {

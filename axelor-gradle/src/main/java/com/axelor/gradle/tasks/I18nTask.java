@@ -51,9 +51,7 @@ public class I18nTask extends DefaultTask {
       description = "comma-separated list of additional languages files to create")
   public void setLanguages(String languages) {
     this.languages =
-        Arrays.stream(languages.split("\\s*,\\s*"))
-            .map(StringUtils::normalizeLanguageTag)
-            .toList();
+        Arrays.stream(languages.split("\\s*,\\s*")).map(StringUtils::normalizeLanguageTag).toList();
   }
 
   @TaskAction

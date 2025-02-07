@@ -20,11 +20,11 @@ package com.axelor.gradle.tasks;
 
 import com.axelor.common.VersionUtils;
 import com.axelor.gradle.AxelorPlugin;
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileTree;
@@ -75,7 +75,7 @@ public class UpdateVersion extends DefaultTask {
     }
 
     getLogger().info("Processing {}", file);
-    Files.asCharSink(file, Charsets.UTF_8).write(txt);
+    Files.asCharSink(file, StandardCharsets.UTF_8).write(txt);
   }
 
   private String process_xml(String text) {

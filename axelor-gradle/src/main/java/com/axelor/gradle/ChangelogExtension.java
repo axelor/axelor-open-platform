@@ -50,9 +50,10 @@ public class ChangelogExtension {
     this.header.convention(
         project.provider(
             () ->
-                "%s (%s)".formatted(
-                    project.getVersion().toString(),
-                    new SimpleDateFormat("yyyy-MM-dd").format(new Date()))));
+                "%s (%s)"
+                    .formatted(
+                        project.getVersion().toString(),
+                        new SimpleDateFormat("yyyy-MM-dd").format(new Date()))));
 
     this.output = project.getObjects().fileProperty();
     this.output.convention(

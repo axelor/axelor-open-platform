@@ -245,8 +245,8 @@ public class MetaController {
     MetaField metaField = request.getContext().asType(MetaField.class);
 
     String domain =
-        "self.packageName = '%s' AND self.name = '%s'".formatted(
-            metaField.getPackageName(), metaField.getTypeName());
+        "self.packageName = '%s' AND self.name = '%s'"
+            .formatted(metaField.getPackageName(), metaField.getTypeName());
     response.setView(
         ActionView.define(metaField.getTypeName())
             .model(MetaModel.class.getName())

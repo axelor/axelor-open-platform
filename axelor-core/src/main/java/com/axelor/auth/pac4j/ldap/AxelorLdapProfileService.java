@@ -356,8 +356,7 @@ public class AxelorLdapProfileService extends LdapProfileService {
     final SearchOperation search = new SearchOperation(getConnectionFactory());
     search.setEntryHandlers(new ObjectSidHandler(), new ObjectGuidHandler());
     final SearchRequest request =
-        new SearchRequest(
-            getUsersDn(), FILTER_FORMAT.formatted(getIdAttribute(), profile.getId()));
+        new SearchRequest(getUsersDn(), FILTER_FORMAT.formatted(getIdAttribute(), profile.getId()));
     final SearchResponse response;
 
     try {

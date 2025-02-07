@@ -78,8 +78,8 @@ public class ActionGroup extends ActionResumable {
       Action action = findAction(item.getName());
       if (action instanceof ActionReport && index < actions.size()) {
         String message =
-            I18n.get("Invalid use of action-record: %s, must be the last action.").formatted(
-                action.getName());
+            I18n.get("Invalid use of action-record: %s, must be the last action.")
+                .formatted(action.getName());
         throw new IllegalStateException(message);
       }
     }

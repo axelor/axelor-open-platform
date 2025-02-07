@@ -154,8 +154,8 @@ public class AuditInterceptor implements Interceptor {
       for (int i = 0; i < propertyNames.length; i++) {
         if (!canUpdate(entity, propertyNames[i], previousState[i], currentState[i])) {
           throw new PersistenceException(
-              "You can't update: %s#%s, values (%s=%s)".formatted(
-                  entity.getClass().getName(), id, propertyNames[i], currentState[i]));
+              "You can't update: %s#%s, values (%s=%s)"
+                  .formatted(entity.getClass().getName(), id, propertyNames[i], currentState[i]));
         }
         if (UPDATED_ON.equals(propertyNames[i])) {
           currentState[i] = LocalDateTime.now();
