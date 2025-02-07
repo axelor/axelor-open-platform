@@ -54,7 +54,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.script.ScriptHelper;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import jakarta.xml.bind.JAXBException;
@@ -67,6 +66,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -102,7 +102,7 @@ public class MetaController {
     MetaAction meta = request.getContext().asType(MetaAction.class);
 
     Action action = XMLViews.findAction(meta.getName());
-    Map<String, Map<String, String>> data = Maps.newHashMap();
+    Map<String, Map<String, String>> data = new HashMap<>();
 
     response.setData(List.of(data));
 
@@ -128,7 +128,7 @@ public class MetaController {
 
   public void validateView(ActionRequest request, ActionResponse response) {
     MetaView meta = request.getContext().asType(MetaView.class);
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
 
     try {
       validateXML(meta.getXml());

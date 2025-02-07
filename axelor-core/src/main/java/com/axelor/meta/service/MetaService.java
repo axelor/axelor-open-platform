@@ -67,7 +67,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
@@ -445,7 +444,7 @@ public class MetaService {
   public Response addAttachment(long id, Request request) {
     Response response = new Response();
     Map<String, Object> data = request.getData();
-    Map<String, Object> map = Maps.newHashMap();
+    Map<String, Object> map = new HashMap<>();
 
     Model fileBean = (Model) JPA.find(MetaFile.class, Long.valueOf(data.get("id").toString()));
 
@@ -486,7 +485,7 @@ public class MetaService {
     if (hasDataSet) {
 
       final String string = chart.getDataSet().getText();
-      final Map<String, Object> context = Maps.newHashMap();
+      final Map<String, Object> context = new HashMap<>();
       if (request.getData() != null) {
         context.putAll(request.getData());
       }
@@ -540,11 +539,11 @@ public class MetaService {
     data.put("xTitle", chart.getCategory().getLocalizedTitle());
 
     List<Object> series = new ArrayList<>();
-    Map<String, Object> config = Maps.newHashMap();
+    Map<String, Object> config = new HashMap<>();
     List<Map<String, Object>> actions = new ArrayList<>();
 
     for (ChartSeries cs : chart.getSeries()) {
-      Map<String, Object> map = Maps.newHashMap();
+      Map<String, Object> map = new HashMap<>();
       map.put("key", cs.getKey());
       map.put("type", cs.getType());
       map.put("groupBy", cs.getGroupBy());

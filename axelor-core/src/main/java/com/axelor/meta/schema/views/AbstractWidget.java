@@ -29,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.base.CaseFormat;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAnyAttribute;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -117,7 +116,7 @@ public abstract class AbstractWidget {
     if (otherAttributes == null || otherAttributes.isEmpty()) {
       return null;
     }
-    final Map<String, Object> attrs = Maps.newHashMap();
+    final Map<String, Object> attrs = new HashMap<>();
     for (final Map.Entry<QName, String> entry : otherAttributes.entrySet()) {
       String name = entry.getKey().getLocalPart();
       final String value = entry.getValue();

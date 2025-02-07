@@ -36,7 +36,6 @@ import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
@@ -207,7 +206,7 @@ public class ActionGroup extends ActionResumable {
           continue;
         }
         String pending = this.getPending(i);
-        Map<String, Object> res = Maps.newHashMap();
+        Map<String, Object> res = new HashMap<>();
         res.put(name, true);
         res.put("pending", pending);
         result.add(res);
@@ -243,7 +242,7 @@ public class ActionGroup extends ActionResumable {
 
         // if error then concat the response result with result of previous actions and quit
         if (!ObjectUtils.isEmpty(res.getErrors())) {
-          Map<String, Object> resValues = Maps.newHashMap();
+          Map<String, Object> resValues = new HashMap<>();
           resValues.put("data", res.getItem(0));
           resValues.put("errors", res.getErrors());
 

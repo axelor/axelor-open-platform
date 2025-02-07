@@ -71,7 +71,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
@@ -211,7 +210,7 @@ public class Resource<T extends Model> {
     final Response response = new Response();
     final Repository<?> repository = JpaRepository.of(model);
 
-    final Map<String, Object> meta = Maps.newHashMap();
+    final Map<String, Object> meta = new HashMap<>();
     final List<Object> fields = new ArrayList<>();
 
     if (repository == null) {
@@ -585,7 +584,7 @@ public class Resource<T extends Model> {
 
     QueryBinder.of(q).setReadOnly();
 
-    Map counts = Maps.newHashMap();
+    Map counts = new HashMap<>();
     for (Object item : q.getResultList()) {
       counts.put(((Map) item).get("id"), ((Map) item).get("count"));
     }
@@ -1420,7 +1419,7 @@ public class Resource<T extends Model> {
     security.get().check(JpaSecurity.CAN_REMOVE, model, id);
     final Response response = new Response();
     final Repository repository = JpaRepository.of(model);
-    final Map<String, Object> data = Maps.newHashMap();
+    final Map<String, Object> data = new HashMap<>();
 
     data.put("id", id);
     data.put("version", request.getData().get("version"));
@@ -1744,7 +1743,7 @@ public class Resource<T extends Model> {
     bean = EntityHelper.getEntity(bean);
 
     if (fields == null) {
-      fields = Maps.newHashMap();
+      fields = new HashMap<>();
     }
 
     Map<String, Object> result = new HashMap<String, Object>();
@@ -1868,7 +1867,7 @@ public class Resource<T extends Model> {
 
   @SuppressWarnings("all")
   private static Map<String, Object> unflatten(Map<String, Object> map, String... names) {
-    if (map == null) map = Maps.newHashMap();
+    if (map == null) map = new HashMap<>();
     if (names == null) return map;
     for (String name : names) {
       if (map.containsKey(name)) continue;
@@ -1876,11 +1875,11 @@ public class Resource<T extends Model> {
         String[] parts = name.split("\\.", 2);
         Map<String, Object> child = (Map) map.get(parts[0]);
         if (child == null) {
-          child = Maps.newHashMap();
+          child = new HashMap<>();
         }
         map.put(parts[0], unflatten(child, parts[1]));
       } else {
-        map.put(name, Maps.newHashMap());
+        map.put(name, new HashMap<>());
       }
     }
     return map;

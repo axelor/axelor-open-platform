@@ -37,7 +37,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -45,6 +44,7 @@ import jakarta.xml.bind.annotation.XmlEnum;
 import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -146,7 +146,7 @@ public class Search extends AbstractView {
   }
 
   public ScriptHelper scriptHandler(Map<String, Object> variables) {
-    Map<String, Object> map = Maps.newHashMap(variables);
+    Map<String, Object> map = new HashMap<>(variables);
     for (BaseSearchField field : searchFields) {
       map.put(field.getName(), field.validate(variables.get(field.getName())));
     }

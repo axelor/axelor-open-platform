@@ -30,7 +30,6 @@ import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import java.time.LocalDate;
@@ -179,7 +178,7 @@ public class ScriptBindings extends SimpleBindings {
 
   @Override
   public void putAll(Map<? extends String, ? extends Object> toMerge) {
-    final Map<String, Object> values = Maps.newHashMap();
+    final Map<String, Object> values = new HashMap<>();
     for (String name : toMerge.keySet()) {
       Object value = toMerge.get(name);
       if (META_VARS.contains(name)) {

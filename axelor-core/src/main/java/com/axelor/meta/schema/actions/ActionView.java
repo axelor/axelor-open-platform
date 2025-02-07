@@ -30,13 +30,13 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -161,9 +161,9 @@ public class ActionView extends Action {
 
   @Override
   public Object evaluate(ActionHandler handler) {
-    Map<String, Object> result = Maps.newHashMap();
-    Map<String, Object> context = Maps.newHashMap();
-    Map<String, Object> viewParams = Maps.newHashMap();
+    Map<String, Object> result = new HashMap<>();
+    Map<String, Object> context = new HashMap<>();
+    Map<String, Object> viewParams = new HashMap<>();
     List<Object> items = new ArrayList<>();
 
     String viewType = null;
@@ -174,7 +174,7 @@ public class ActionView extends Action {
         continue;
       }
 
-      Map<String, Object> map = Maps.newHashMap();
+      Map<String, Object> map = new HashMap<>();
       map.put("name", handler.evaluate(elem.getName()));
       map.put("type", elem.getType());
 
@@ -296,7 +296,7 @@ public class ActionView extends Action {
   public static final class ActionViewBuilder {
 
     private ActionView view = new ActionView();
-    private Map<String, Object> context = Maps.newHashMap();
+    private Map<String, Object> context = new HashMap<>();
 
     private ActionViewBuilder(String title) {
       view.title = title;
@@ -371,8 +371,8 @@ public class ActionView extends Action {
      * @return a {@link Map}
      */
     public Map<String, Object> map() {
-      Map<String, Object> result = Maps.newHashMap();
-      Map<String, Object> params = Maps.newHashMap();
+      Map<String, Object> result = new HashMap<>();
+      Map<String, Object> params = new HashMap<>();
       List<Object> items = new ArrayList<>();
       String type = null;
 
@@ -380,7 +380,7 @@ public class ActionView extends Action {
         if (type == null) {
           type = v.type;
         }
-        Map<String, Object> item = Maps.newHashMap();
+        Map<String, Object> item = new HashMap<>();
         item.put("type", v.getType());
         item.put("name", v.getName());
         items.add(item);

@@ -28,11 +28,11 @@ import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.actions.validate.validator.Notify;
 import com.axelor.meta.schema.actions.validate.validator.Validator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElements;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +71,7 @@ public class ActionValidate extends ActionResumable {
 
     Map<String, String> info = null;
     final List<Map<String, String>> notify = new ArrayList<>();
-    final Map<String, Object> result = Maps.newHashMap();
+    final Map<String, Object> result = new HashMap<>();
 
     for (int i = getIndex(); i < validators.size(); i++) {
 

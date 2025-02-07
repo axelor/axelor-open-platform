@@ -30,7 +30,6 @@ import com.axelor.db.Model;
 import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -400,7 +399,7 @@ public class CSVImporter implements Importer {
       Boolean onRollback)
       throws Exception {
     Object bean = null;
-    Map<String, Object> ctx = Maps.newHashMap(context);
+    Map<String, Object> ctx = new HashMap<>(context);
 
     bean = binder.bind(values, ctx);
 

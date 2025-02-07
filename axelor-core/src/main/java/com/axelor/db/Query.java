@@ -32,7 +32,6 @@ import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.TypedQuery;
@@ -709,7 +708,7 @@ public class Query<T extends Model> {
    */
   public Query<T> bind(Map<String, Object> params) {
     if (this.namedParams == null) {
-      this.namedParams = Maps.newHashMap();
+      this.namedParams = new HashMap<>();
     }
     if (params != null) {
       this.namedParams.putAll(params);
@@ -725,7 +724,7 @@ public class Query<T extends Model> {
    * @return the same instance
    */
   public Query<T> bind(String name, Object value) {
-    Map<String, Object> params = Maps.newHashMap();
+    Map<String, Object> params = new HashMap<>();
     params.put(name, value);
     return this.bind(params);
   }
@@ -866,7 +865,7 @@ public class Query<T extends Model> {
       List<Map> result = new ArrayList<>();
 
       for (List items : data) {
-        Map<String, Object> map = Maps.newHashMap();
+        Map<String, Object> map = new HashMap<>();
         for (int i = 0; i < names.size(); i++) {
           Object value = items.get(i);
           String name = names.get(i);
@@ -893,7 +892,7 @@ public class Query<T extends Model> {
       if (items.get(at) == null && items.get(at + 1) == null) {
         return null;
       }
-      Map<String, Object> value = Maps.newHashMap();
+      Map<String, Object> value = new HashMap<>();
       String name = names.get(at);
       String nameField = names.get(at + 3).replace(name + ".", "");
 
@@ -906,7 +905,7 @@ public class Query<T extends Model> {
 
     @SuppressWarnings("all")
     private Map<String, List> fetchCollections(Object id) {
-      Map<String, List> result = Maps.newHashMap();
+      Map<String, List> result = new HashMap<>();
       Object self = JPA.em().find(beanClass, id);
       for (String name : collections) {
         Collection<Model> items = (Collection<Model>) mapper.get(self, name);

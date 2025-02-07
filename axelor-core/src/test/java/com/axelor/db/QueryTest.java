@@ -33,7 +33,6 @@ import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,6 +41,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -238,7 +238,7 @@ public class QueryTest extends ScriptTest {
               try (ResultSet rs = stm.executeQuery("SELECT * FROM contact_title")) {
                 ResultSetMetaData meta = rs.getMetaData();
                 while (rs.next()) {
-                  Map<String, Object> item = Maps.newHashMap();
+                  Map<String, Object> item = new HashMap<>();
                   for (int i = 0; i < meta.getColumnCount(); i++) {
                     item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
                   }

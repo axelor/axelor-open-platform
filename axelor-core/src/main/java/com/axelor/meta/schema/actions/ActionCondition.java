@@ -24,7 +24,6 @@ import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
@@ -48,7 +47,7 @@ public class ActionCondition extends Action {
 
   @Override
   public Object evaluate(ActionHandler handler) {
-    Map<String, String> errors = Maps.newHashMap();
+    Map<String, String> errors = new HashMap<>();
     for (Check check : conditions) {
       String names = check.getField();
       String error = check.getLocalizedError();

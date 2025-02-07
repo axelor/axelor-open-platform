@@ -27,7 +27,6 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
@@ -116,7 +115,7 @@ public class ActionImport extends Action {
 
   @Override
   public Object evaluate(ActionHandler handler) {
-    Map<String, Object> result = Maps.newHashMap();
+    Map<String, Object> result = new HashMap<>();
 
     Object configName = handler.evaluate(config);
     if (configName == null) {

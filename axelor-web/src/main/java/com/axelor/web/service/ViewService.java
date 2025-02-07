@@ -58,7 +58,6 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.axelor.script.ScriptBindings;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -140,7 +139,7 @@ public class ViewService extends AbstractService {
   public Response fields(
       @PathParam("model") String model, @QueryParam("jsonModel") String jsonModel) {
     final Response response = new Response();
-    final Map<String, Object> meta = Maps.newHashMap();
+    final Map<String, Object> meta = new HashMap<>();
     final Class<?> modelClass = findClass(model);
 
     if (!security.isPermitted(AccessType.READ, (Class) modelClass)) {
@@ -148,7 +147,7 @@ public class ViewService extends AbstractService {
       return response;
     }
 
-    final Map<String, Object> jsonFields = Maps.newHashMap();
+    final Map<String, Object> jsonFields = new HashMap<>();
     final List<String> names = new ArrayList<>();
 
     meta.put("model", model);
@@ -181,7 +180,7 @@ public class ViewService extends AbstractService {
   @Hidden
   public Response views(@PathParam("model") String model) {
     final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
-    final Map<String, String> views = Maps.newHashMap();
+    final Map<String, String> views = new HashMap<>();
     for (String mode : params.keySet()) {
       views.put(mode, params.getFirst(mode));
     }
@@ -278,7 +277,7 @@ public class ViewService extends AbstractService {
     final Response response = service.findView(model, name, type);
     final AbstractView view = (AbstractView) response.getData();
 
-    final Map<String, Object> data = Maps.newHashMap();
+    final Map<String, Object> data = new HashMap<>();
     data.put("view", view);
 
     if (view instanceof Search && ((Search) view).getSearchForm() != null) {
@@ -303,7 +302,7 @@ public class ViewService extends AbstractService {
         names.add("attrs");
       }
 
-      final Map<String, Object> jsonFieldsMap = Maps.newHashMap();
+      final Map<String, Object> jsonFieldsMap = new HashMap<>();
       for (Property jsonField : jsonFields) {
         Map<String, Object> jsonFieldMap =
             MetaJsonRecord.class.getName().equals(model) && ObjectUtils.notEmpty(jsonModel)
@@ -526,7 +525,7 @@ public class ViewService extends AbstractService {
   @Hidden
   public Response chart(@PathParam("name") String name) {
     final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
-    final Map<String, Object> context = Maps.newHashMap();
+    final Map<String, Object> context = new HashMap<>();
     final Request request = new Request();
 
     for (String key : params.keySet()) {

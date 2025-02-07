@@ -33,11 +33,11 @@ import com.axelor.meta.schema.views.PanelInclude;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +88,7 @@ public class TestViews extends MetaTest {
     Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
     assertNotNull(title);
 
-    Map<String, Object> binding = Maps.newHashMap();
+    Map<String, Object> binding = new HashMap<>();
     binding.put("customer", "Some");
     binding.put("date", "2011-11-11");
     binding.put("xxx", 111);
@@ -96,7 +96,7 @@ public class TestViews extends MetaTest {
     binding.put("country", "IN");
     binding.put("value", "100.10");
 
-    Map<String, Object> partner = Maps.newHashMap();
+    Map<String, Object> partner = new HashMap<>();
     partner.put("firstName", "Name");
 
     binding.put("partner", partner);

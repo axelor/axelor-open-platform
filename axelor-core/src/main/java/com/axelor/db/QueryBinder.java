@@ -23,12 +23,12 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.Parameter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -149,7 +149,7 @@ public class QueryBinder {
     if (namedParams instanceof ScriptBindings) {
       bindings = (ScriptBindings) namedParams;
     } else {
-      Map<String, Object> variables = Maps.newHashMap();
+      Map<String, Object> variables = new HashMap<>();
       if (namedParams != null) {
         variables.putAll(namedParams);
       }

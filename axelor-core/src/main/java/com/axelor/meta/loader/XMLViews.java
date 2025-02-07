@@ -42,7 +42,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -56,6 +55,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -259,7 +259,7 @@ public class XMLViews {
   }
 
   public static Map<String, Object> findViews(String model, Map<String, String> views) {
-    final Map<String, Object> result = Maps.newHashMap();
+    final Map<String, Object> result = new HashMap<>();
     if (views == null || views.isEmpty()) {
       views = ImmutableMap.of("grid", "", "form", "");
     }

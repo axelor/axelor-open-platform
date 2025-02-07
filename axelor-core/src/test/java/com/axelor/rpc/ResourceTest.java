@@ -33,10 +33,10 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
@@ -114,7 +114,7 @@ public class ResourceTest extends RpcTest {
   public void testUpdate() throws Exception {
 
     Contact c = contacts.all().fetchOne();
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
 
     data.put("id", c.getId());
     data.put("version", c.getVersion());

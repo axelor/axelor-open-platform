@@ -61,7 +61,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
@@ -76,6 +75,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -444,7 +444,7 @@ public class ViewLoader extends AbstractParallelLoader {
         continue;
       }
 
-      Map<String, Object> data = Maps.newHashMap();
+      Map<String, Object> data = new HashMap<>();
       for (QName param : opt.getDataAttributes().keySet()) {
         String paramName = param.getLocalPart();
         if (paramName.startsWith("data-")) {

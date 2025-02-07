@@ -37,7 +37,6 @@ import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -76,7 +75,7 @@ public class TestActions extends MetaTest {
 
     ActionRequest request = new ActionRequest();
 
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
     request.setData(data);
     request.setModel(Contact.class.getName());
     request.setAction(action);
@@ -191,7 +190,7 @@ public class TestActions extends MetaTest {
   public void testValidate() {
 
     Action action = MetaStore.getAction("action-contact-validate");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -207,7 +206,7 @@ public class TestActions extends MetaTest {
   public void testCondition() {
 
     Action action = MetaStore.getAction("check.dates");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("orderDate", LocalDate.parse("2012-12-10"));
     context.put("createDate", LocalDate.parse("2012-12-11"));
@@ -225,7 +224,7 @@ public class TestActions extends MetaTest {
   public void testMethod() {
 
     Action action = MetaStore.getAction("action-contact-greetings");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -246,7 +245,7 @@ public class TestActions extends MetaTest {
   public void testRpc() {
 
     Action action = MetaStore.getAction("action-contact-greetings-rpc");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -278,7 +277,7 @@ public class TestActions extends MetaTest {
     FormView view = (FormView) views.getViews().get(1);
     assertNotNull(view);
 
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("firstName", "John");
     context.put("lastName", "Smith");
@@ -299,7 +298,7 @@ public class TestActions extends MetaTest {
   public void testView() {
 
     Action action = MetaStore.getAction("action-view-contact");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -314,7 +313,7 @@ public class TestActions extends MetaTest {
   @Test
   public void testGroup() {
     Action action = MetaStore.getAction("action.group.test");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("id", 1);
     context.put("firstName", "John");
@@ -425,7 +424,7 @@ public class TestActions extends MetaTest {
   @Test
   void testContextProxy() throws JsonProcessingException {
     Action action = MetaStore.getAction("action-contact-context-proxy");
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
 
     context.put("firstName", "myFirstName");
     context.put("lastName", "myLastName");
@@ -437,7 +436,7 @@ public class TestActions extends MetaTest {
 
     context.put("attrs", getObjectMapper().writeValueAsString(customFieldsCtx));
 
-    Map<String, Object> titleCtx = Maps.newHashMap();
+    Map<String, Object> titleCtx = new HashMap<>();
     titleCtx.put("code", "myTitle");
     titleCtx.put("name", "myTitle");
     titleCtx.put("_model", Title.class.getName());

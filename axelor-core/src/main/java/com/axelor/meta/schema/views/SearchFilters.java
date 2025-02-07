@@ -24,10 +24,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +111,7 @@ public class SearchFilters extends AbstractView implements ContainerView {
       if (contexts == null || contexts.isEmpty()) {
         return null;
       }
-      Map<String, Object> context = Maps.newHashMap();
+      Map<String, Object> context = new HashMap<>();
       for (SearchContext ctx : contexts) {
         context.put(ctx.getName(), ctx.getValue());
       }

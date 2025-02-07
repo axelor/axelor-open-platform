@@ -20,7 +20,6 @@ package com.axelor.meta.schema.actions;
 
 import com.axelor.meta.ActionHandler;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
@@ -61,7 +60,7 @@ public class ActionAttrs extends Action {
   @SuppressWarnings("all")
   protected Object evaluate(ActionHandler handler) {
 
-    Map<String, Object> map = Maps.newHashMap();
+    Map<String, Object> map = new HashMap<>();
     for (Attribute attribute : attributes) {
       if (!attribute.test(handler) || Strings.isNullOrEmpty(attribute.getFieldName())) continue;
       for (String field : attribute.fieldName.split(",")) {
@@ -71,7 +70,7 @@ public class ActionAttrs extends Action {
         field = field.trim();
         Map<String, Object> attrs = (Map) map.get(field);
         if (attrs == null) {
-          attrs = Maps.newHashMap();
+          attrs = new HashMap<>();
           map.put(field, attrs);
         }
 

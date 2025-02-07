@@ -25,7 +25,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Provider;
@@ -41,6 +40,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -388,7 +388,7 @@ public final class JPA {
           for (Object val : (Collection) value) {
             if (val instanceof Map) {
               if (p.getMappedBy() != null) {
-                if (val instanceof ImmutableMap) val = Maps.newHashMap((Map) val);
+                if (val instanceof ImmutableMap) val = new HashMap<>((Map) val);
                 ((Map) val).remove(p.getMappedBy());
               }
               Model item = _edit(target, (Map) val, visited, edited);

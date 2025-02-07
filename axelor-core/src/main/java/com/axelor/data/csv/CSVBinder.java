@@ -30,13 +30,13 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import jakarta.validation.ValidationException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class CSVBinder {
 
   private String searchCall;
 
-  private Map<String, DataAdapter> adapters = Maps.newHashMap();
+  private Map<String, DataAdapter> adapters = new HashMap<>();
 
   public void registerAdapter(DataAdapter adapter) {
     adapters.put(adapter.getName(), adapter);
@@ -130,7 +130,7 @@ public class CSVBinder {
   private void autoBind(String[] fields) {
 
     Set<String> beanFields = Sets.newHashSet();
-    Map<String, Set<String>> refFields = Maps.newHashMap();
+    Map<String, Set<String>> refFields = new HashMap<>();
     List<String> boundCols = getBoundCols(this.bindings, null);
 
     for (String field : fields) {
@@ -421,7 +421,7 @@ public class CSVBinder {
     Objects.requireNonNull(localContext);
     Preconditions.checkArgument(values.length == fields.length);
 
-    Map<String, Object> map = Maps.newHashMap(localContext);
+    Map<String, Object> map = new HashMap<>(localContext);
     for (int i = 0; i < fields.length; i++) {
       map.put(fields[i], values[i]);
     }

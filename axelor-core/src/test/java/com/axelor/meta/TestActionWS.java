@@ -24,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
-import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
@@ -40,7 +40,7 @@ public class TestActionWS extends MetaTest {
 
     ActionRequest request = new ActionRequest();
 
-    Map<String, Object> data = Maps.newHashMap();
+    Map<String, Object> data = new HashMap<>();
     request.setData(data);
     request.setModel("com.axelor.test.db.Contact");
 
@@ -51,7 +51,7 @@ public class TestActionWS extends MetaTest {
   }
 
   private Map<String, Object> prepareContext() {
-    Map<String, Object> context = Maps.newHashMap();
+    Map<String, Object> context = new HashMap<>();
     context.put("ISOCode", "FR");
     return context;
   }
