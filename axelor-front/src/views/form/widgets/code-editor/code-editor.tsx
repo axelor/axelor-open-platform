@@ -1,9 +1,10 @@
 import Editor, { loader } from "@monaco-editor/react";
-import { clsx, useTheme } from "@axelor/ui";
+import { clsx } from "@axelor/ui";
 import { useAtom } from "jotai";
 import { useCallback } from "react";
 
 import { FieldControl, FieldProps } from "../../builder";
+import { useAppSettings } from "@/hooks/use-app-settings";
 
 import styles from "./code-editor.module.scss";
 
@@ -14,7 +15,7 @@ export function CodeEditorComponent(props: FieldProps<string>) {
   const { codeSyntax, width = "100%" } = schema;
   const height = schema.height ?? schema.widgetAttrs?.height ?? 400;
 
-  const themeMode = useTheme().mode;
+  const { themeMode } = useAppSettings();
 
   const theme = themeMode === "dark" ? "vs-dark" : "light";
 

@@ -9,12 +9,13 @@ import { Navigate, Link as RouterLink, useLocation } from "react-router-dom";
 
 import { Alert, Box, Button, Input, InputLabel, Select } from "@axelor/ui";
 
+import { AppSignInLogo } from "@/components/app-logo/app-logo";
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useSession } from "@/hooks/use-session";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { getGenericErrorMessage } from "../reset-password/utils";
 
-import logo from "@/assets/axelor.svg";
 import styles from "./forgot-password.module.scss";
 
 export function ForgotPassword() {
@@ -22,6 +23,7 @@ export function ForgotPassword() {
   const { state: locationState } = location ?? {};
 
   const session = useSession();
+  const { copyright } = useAppSettings();
   const appInfo = session.data;
   const { authentication, application } = appInfo ?? {};
   const { resetPasswordEnabled } = application ?? {};
@@ -30,15 +32,6 @@ export function ForgotPassword() {
   const emailAddressRef = useRef<HTMLInputElement>(null);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertError, setError] = useState(locationState?.error ?? "");
-
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
-    appInfo?.application || {};
-  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005–${new Date().getFullYear()} Axelor. ${i18n.get(
-    "All Rights Reserved",
-  )}.`;
-
-  const copyright = appLegal || defaultLegal;
 
   const [tenantId, setTenantId] = useState(
     locationState?.tenantId ?? authentication?.tenant,
@@ -122,14 +115,7 @@ export function ForgotPassword() {
           alignItems="center"
           p={3}
         >
-          <img
-            className={styles.logo}
-            src={appLogo}
-            alt={appName}
-            onError={(e) => {
-              e.currentTarget.src = logo;
-            }}
-          />
+          <AppSignInLogo className={styles.logo} />
           <Box as="legend" style={{ textWrap: "balance" }}>
             {i18n.get("Reset your password")}
           </Box>

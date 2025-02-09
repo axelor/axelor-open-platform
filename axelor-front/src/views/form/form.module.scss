@@ -57,6 +57,9 @@
   display: grid;
   grid-template-columns: auto 1fr;
   margin: 0;
+  dt {
+    text-align: right;
+  }
   dd {
     padding: 0 1rem;
   }
@@ -66,6 +69,10 @@
     &:last-child {
       margin-bottom: 0;
     }
+  }
+  .notAvailable {
+    opacity: 0.6;
+    font-style: italic;
   }
 }
 

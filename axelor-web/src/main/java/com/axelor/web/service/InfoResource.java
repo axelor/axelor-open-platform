@@ -18,24 +18,28 @@
  */
 package com.axelor.web.service;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.MimeTypesUtils;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.theme.MetaThemeService;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
+import java.net.URI;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -46,6 +50,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,6 +63,8 @@ public class InfoResource {
   @Context private HttpServletResponse response;
 
   private final InfoService infoService;
+
+  private static Logger log = LoggerFactory.getLogger(InfoResource.class);
 
   @Inject
   public InfoResource(InfoService infoService) {
@@ -99,29 +107,56 @@ public class InfoResource {
   @GET
   @Path("logo")
   @Hidden
-  public Response getLogoContent() {
-    return getImageContent(infoService.getLogo());
+  public Response getLogoContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getLogo(mode));
+  }
+
+  @GET
+  @Path("sign-in/logo")
+  @Hidden
+  public Response getSignInLogoContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getSignInLogo(mode));
   }
 
   @GET
   @Path("icon")
   @Hidden
-  public Response getIconContent() {
-    return getImageContent(infoService.getIcon());
+  public Response getIconContent(@QueryParam("mode") String mode) {
+    return getImageContent(infoService.getIcon(mode));
   }
 
-  private Response getImageContent(String pathString) {
-    if (StringUtils.notEmpty(pathString)) {
-      final ServletContext context = request.getServletContext();
-      try (final InputStream inputStream = context.getResourceAsStream(pathString)) {
-        if (inputStream != null) {
-          final byte[] imageData = inputStream.readAllBytes();
-          final String mediaType = MimeTypesUtils.getContentType(pathString);
-          return Response.ok(imageData).type(mediaType).build();
+  private Response getImageContent(Object image) {
+    try {
+      if (image instanceof MetaFile) {
+        final MetaFile metaFile = (MetaFile) image;
+        final String filePath = metaFile.getFilePath();
+        final java.nio.file.Path inputPath = MetaFiles.getPath(filePath);
+
+        if (Files.exists(inputPath)) {
+          return Response.ok(Files.newInputStream(inputPath))
+              .type(MimeTypesUtils.getContentType(inputPath))
+              .build();
         }
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
+      } else if (ObjectUtils.notEmpty(image)) {
+        final String path = image.toString();
+        final InputStream inputStream = request.getServletContext().getResourceAsStream(path);
+
+        if (inputStream != null) {
+          return Response.ok(inputStream).type(MimeTypesUtils.getContentType(path)).build();
+        }
+
+        URI uri = new URI(path);
+        if (!uri.isAbsolute()) {
+          uri =
+              UriBuilder.from(AppSettings.get().getBaseURL())
+                  .addPath(path.startsWith("/") ? path : "/" + path)
+                  .toUri();
+        }
+
+        return Response.seeOther(uri).build();
       }
+    } catch (Exception e) {
+      log.error("Unable to get image content for {}: {}", image, e.getMessage());
     }
 
     return Response.status(Response.Status.NOT_FOUND).build();

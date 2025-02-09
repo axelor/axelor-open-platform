@@ -11,12 +11,13 @@ import { Navigate, useLocation } from "react-router-dom";
 import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
+import { AppSignInLogo } from "@/components/app-logo/app-logo";
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
 import { i18n } from "@/services/client/i18n";
 import { CLIENT_NAME_PARAM, FORM_CLIENT_NAME } from "../login";
 
-import logo from "@/assets/axelor.svg";
 import styles from "./change-password.module.scss";
 
 export function ChangePassword({
@@ -31,6 +32,7 @@ export function ChangePassword({
   passwordPatternTitle?: string;
 }) {
   const session = useSession();
+  const { copyright } = useAppSettings();
   const appInfo = session.data;
   const defaultClient = appInfo?.authentication?.defaultClient;
 
@@ -54,15 +56,6 @@ export function ChangePassword({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const requireCurrentPassword = Boolean(username);
-
-  const { logo: appLogo = logo, name: appName = "Axelor" } =
-    appInfo?.application || {};
-  const appLegal = appInfo?.application.copyright?.replace("&copy;", "©");
-  const defaultLegal = `© 2005–${new Date().getFullYear()} Axelor. ${i18n.get(
-    "All Rights Reserved",
-  )}.`;
-
-  const copyright = appLegal || defaultLegal;
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
@@ -203,14 +196,7 @@ export function ChangePassword({
           alignItems="center"
           p={3}
         >
-          <img
-            className={styles.logo}
-            src={appLogo}
-            alt={appName}
-            onError={(e) => {
-              e.currentTarget.src = logo;
-            }}
-          />
+          <AppSignInLogo className={styles.logo} />
           <Box as="legend" style={{ textWrap: "balance" }}>
             {i18n.get("Change your password")}
           </Box>

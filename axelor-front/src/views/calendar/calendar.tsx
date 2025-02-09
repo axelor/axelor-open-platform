@@ -375,6 +375,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         viewName,
         record,
         readonly: !canEdit,
+        context: getViewContext(true),
         onSelect: () => onRefresh(),
         footer: ({ close }) => {
           return (
@@ -407,6 +408,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
       onRefresh,
       canDelete,
       onDelete,
+      getViewContext,
     ],
   );
 

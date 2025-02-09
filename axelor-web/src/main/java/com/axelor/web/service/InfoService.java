@@ -42,12 +42,14 @@ import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -95,8 +97,6 @@ public class InfoService extends AbstractService {
         SETTINGS.format(
             I18n.get(SETTINGS.getProperties().get(AvailableAppSettings.APPLICATION_COPYRIGHT))));
     map.put("theme", SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null));
-    map.put("logo", getLogo());
-    map.put("icon", getIcon());
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     final Map<String, Object> signIn = signInInfo();
@@ -224,7 +224,7 @@ public class InfoService extends AbstractService {
     map.put("lang", AppFilter.getLocale().toLanguageTag());
 
     if (user.getImage() != null) {
-      map.put("image", getLink(user, null));
+      map.put("image", getLink(user));
     }
 
     map.put("action", user.getHomeAction());
@@ -316,45 +316,109 @@ public class InfoService extends AbstractService {
   /**
    * Gets user specific application logo, or falls back to default application logo.
    *
-   * @return user specific logo link
+   * <p>The returned image can be a resource path string, a URL string or a MetaFile
+   *
+   * @param mode light or dark
+   * @return user specific logo
    */
-  public String getLogo() {
-    final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        return getLink(helper.eval("__config__.appLogo"), logo);
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-    return logo;
+  public Object getLogo(String mode) {
+    return getImage(
+        SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO),
+        mode,
+        "appLogo",
+        () ->
+            isDark(mode)
+                ? SETTINGS.get(
+                    AvailableAppSettings.APPLICATION_LOGO_DARK,
+                    SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor-dark.png"))
+                : SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png"));
+  }
+
+  public Object getSignInLogo(String mode) {
+    final String signInlogo =
+        isDark(mode)
+            ? SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo-dark")
+            : SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo");
+    return Optional.<Object>ofNullable(signInlogo).orElseGet(() -> getLogo(mode));
   }
 
   /**
    * Gets user specific application icon, or falls back to default application icon.
    *
+   * <p>The returned image can be a resource path string, a URL string or a MetaFile
+   *
+   * @param mode light or dark
    * @return user specific application icon
    */
-  public String getIcon() {
-    final String icon = SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico");
-    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_ICON) != null) {
-      final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
-      final ScriptHelper helper = new CompositeScriptHelper(bindings);
-      try {
-        return getLink(helper.eval("__config__.appIcon"), icon);
-      } catch (Exception e) {
-        // Ignore
-      }
-    }
-    return icon;
+  public Object getIcon(String mode) {
+    return getImage(
+        SETTINGS.get(AvailableAppSettings.CONTEXT_APP_ICON),
+        mode,
+        "appIcon",
+        () ->
+            isDark(mode)
+                ? SETTINGS.get(
+                    AvailableAppSettings.APPLICATION_ICON_DARK,
+                    SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico"))
+                : SETTINGS.get(AvailableAppSettings.APPLICATION_ICON, "ico/favicon.ico"));
   }
 
-  public String getLink(Object value, String defaultValue) {
-    if (value == null) {
-      return defaultValue;
+  private Object getImage(
+      String contextImage, String mode, String config, Supplier<String> defaultValue) {
+    Object result;
+
+    try {
+      result = getImage(contextImage, mode);
+      if (ObjectUtils.notEmpty(result)) {
+        return result;
+      }
+      return defaultValue.get();
+    } catch (Exception e) {
+      // Ignore
     }
+
+    try {
+      result = getConfigImage(config);
+      if (ObjectUtils.notEmpty(result)) {
+        return result;
+      }
+    } catch (Exception e) {
+      // Ignore
+    }
+
+    return defaultValue.get();
+  }
+
+  private Object getImage(String imageCall, String mode) throws Exception {
+    final String[] parts = imageCall.split("\\:", 2);
+
+    if (parts.length != 2) {
+      return null;
+    }
+
+    final String className = parts[0];
+    final String methodName = parts[1];
+
+    final Class<?> klass = Class.forName(className);
+    final Method method = klass.getMethod(methodName, String.class);
+    final Object bean = Beans.get(klass);
+
+    return method.invoke(bean, mode);
+  }
+
+  // Legacy way to retrieve context image without passing mode
+  @Deprecated(forRemoval = true)
+  private Object getConfigImage(String name) {
+    final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
+    final ScriptHelper scriptHelper = new CompositeScriptHelper(bindings);
+    return scriptHelper.eval("__config__." + name);
+  }
+
+  private boolean isDark(String mode) {
+    return "dark".equalsIgnoreCase(mode);
+  }
+
+  public String getLink(Object value) {
     if (value instanceof String) {
       return (String) value;
     }
@@ -374,6 +438,6 @@ public class InfoService extends AbstractService {
           + "/image/download?image=true&v="
           + ((User) value).getVersion();
     }
-    return defaultValue;
+    return null;
   }
 }

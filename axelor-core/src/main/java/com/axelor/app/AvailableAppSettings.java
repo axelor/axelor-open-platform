@@ -33,7 +33,9 @@ public interface AvailableAppSettings {
   String APPLICATION_HELP = "application.help";
   String APPLICATION_COPYRIGHT = "application.copyright";
   String APPLICATION_LOGO = "application.logo";
+  String APPLICATION_LOGO_DARK = "application.logo-dark";
   String APPLICATION_ICON = "application.icon";
+  String APPLICATION_ICON_DARK = "application.icon-dark";
   String APPLICATION_MODE = "application.mode";
   String APPLICATION_BASE_URL = "application.base-url";
   String APPLICATION_CONFIG_PROVIDER = "application.config-provider";
@@ -53,6 +55,10 @@ public interface AvailableAppSettings {
   String APPLICATION_DOMAIN_BLOCKLIST_PATTERN = "application.domain-blocklist-pattern";
 
   String APPLICATION_OPENAPI_ENABLED = "application.openapi.enabled";
+  String APPLICATION_OPENAPI_SCAN_EXCLUDE_PACKAGES = "application.openapi.scan.exclude.packages";
+  String APPLICATION_OPENAPI_SCAN_EXCLUDE_CLASSES = "application.openapi.scan.exclude.classes";
+  String APPLICATION_OPENAPI_SCAN_PACKAGES = "application.openapi.scan.packages";
+  String APPLICATION_OPENAPI_SCAN_CLASSES = "application.openapi.scan.classes";
   String APPLICATION_SWAGGER_UI_ENABLED = "application.swagger-ui.enabled";
   String APPLICATION_SWAGGER_UI_ALLOW_TRY_IT_OUT = "application.swagger-ui.allow-try-it-out";
 

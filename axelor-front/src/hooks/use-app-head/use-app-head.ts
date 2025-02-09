@@ -1,31 +1,41 @@
 import { useEffect } from "react";
 
-import { SessionInfo } from "@/services/client/session";
-import { useSession } from "../use-session";
-
-const NAME = "Axelor";
-const DESC = "Axelor Entreprise Application";
+import { useAppSettings } from "@/hooks/use-app-settings";
 
 export function useAppHead() {
-  const { data: info } = useSession();
+  const { name, description, isReady } = useAppSettings();
+
+  // Document title
   useEffect(() => {
-    if (info) {
-      setTitle(info);
-      setIcon(info);
+    if (isReady) {
+      setTitle(name, description);
     }
-  }, [info]);
+  }, [name, description, isReady]);
+
+  // For favicon, use browser color scheme, not app theme mode.
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    handleIcon(mediaQuery);
+    mediaQuery.addEventListener("change", handleIcon);
+
+    return () => mediaQuery.removeEventListener("change", handleIcon);
+  }, []);
 }
 
-function setTitle(info: SessionInfo) {
-  const { name = NAME, description = DESC } = info.application ?? {};
+function setTitle(name: string, description: string) {
   document.title = `${name} – ${description}`;
 }
 
-function setIcon(info: SessionInfo) {
-  const icon = info.application.icon;
-  const elem = document.querySelector("head > link[rel='shortcut icon']") as HTMLLinkElement;
+function setIcon(icon: string | undefined) {
+  const elem = document.querySelector(
+    "head > link[rel='shortcut icon']",
+  ) as HTMLLinkElement;
 
-  if (icon && elem) {
+  if (icon && elem && elem.href !== icon) {
     elem.href = icon;
   }
 }
+
+const handleIcon = (e: MediaQueryListEvent | MediaQueryList) => {
+  setIcon(`ws/public/app/icon${e.matches ? "?mode=dark" : ""}`);
+};

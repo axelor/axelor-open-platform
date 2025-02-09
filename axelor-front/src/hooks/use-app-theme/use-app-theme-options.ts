@@ -1,15 +1,15 @@
-import merge from "lodash/merge";
-import cloneDeep from "lodash/cloneDeep";
 import { ThemeOptions } from "@axelor/ui/core/styles/theme/types";
+import cloneDeep from "lodash/cloneDeep";
+import merge from "lodash/merge";
 
 import { validateThemeOptions } from "@/components/theme-builder/utils";
 import { request } from "@/services/client/client";
 import { LoadingCache } from "@/utils/cache";
 
 import { useAsync } from "../use-async";
-import { useAppTheme } from "./use-app-theme";
-import defaultTheme from "./themes/default.json";
 import darkTheme from "./themes/dark.json";
+import defaultTheme from "./themes/default.json";
+import { useAppTheme } from "./use-app-theme";
 
 const cache = new LoadingCache<Promise<ThemeOptions>>();
 
@@ -25,7 +25,9 @@ export function useAppThemeOption() {
       let themeContent: ThemeOptions = {};
       let baseTheme = defaultTheme;
       try {
-        themeContent = await get(`ws/public/app/theme?name=${encodeURIComponent(theme)}`);
+        themeContent = await get(
+          `ws/public/app/theme?name=${encodeURIComponent(theme)}`,
+        );
       } catch {
         // ignore
       }

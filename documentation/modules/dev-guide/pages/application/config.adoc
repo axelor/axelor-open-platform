@@ -203,7 +203,9 @@ db.default.password = secret
 | `application.author` | application author |
 | `application.copyright` | application copyright |
 | `application.logo` | header logo. Should be 40px in height with transparent background | img/axelor.png
+| `application.logo-dark` | (optional) dark header logo. Should be 40px in height with transparent background | `application.logo` or img/axelor-dark.png
 | `application.icon` | website icon. Must be a multiple of 48px square for favicon compatibility | ico/favicon.ico
+| `application.icon-dark` | (optional) dark website icon. Must be a multiple of 48px square for favicon compatibility | `application.icon` or ico/favicon.ico
 | `application.home` | home website. Link to be used as home page link in user dropdown menu |
 | `application.help` | online help. Link to be used in About page |
 | `application.mode` | application deployment mode. Can be `prod` or `dev` | dev
@@ -231,6 +233,10 @@ db.default.password = secret
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
 | `api.pagination.default-per-page` | define the default number of items per page | 40
 | `application.openapi.enabled` | enable OpenAPI resource endpoint | true
+| `application.openapi.scan.exclude.packages` | list of packages and any subpackages to exclude from OpenApi scans |
+| `application.openapi.scan.exclude.classes` | list of classes to exclude from OpenApi scans |
+| `application.openapi.scan.packages` | list of packages and any subpackages  to include in OpenAPI scans.|
+| `application.openapi.scan.classes` | list of classes  to include in OpenAPI scans|
 | `application.swagger-ui.enabled` | enable both OpenAPI resource endpoint and Swagger UI | true
 | `application.swagger-ui.allow-try-it-out` | allow "Try it out" in Swagger UI | false
 | `session.timeout` | session timeout (in minutes) | 60
@@ -467,7 +473,8 @@ context.appLogo = com.axelor.custom.AppService:getLogo
 context.appIcon = com.axelor.custom.AppService:getIcon
 ----
 
-The `appLogo`/`appIcon` methods should return either:
+The `appLogo`/`appIcon` methods can optionally accept a `String mode` parameter : either `light` or `dark` or if null,
+assuming default `light` is used. Methods should return either:
 
 * a string, link to logo/icon file (eg. `img/my-logo.png`, `ico/my-icon.ico`)
 * an instance of `MetaFile` pointing to the logo/icon file
@@ -478,18 +485,17 @@ Here is an example in case it returns a `MetaFile`:
 ----
 public class AppService {
 
-  public MetaFile getLogo() {
-    final User user = AuthUtils.getUser();
-    if(user == null || user.getActiveCompany() == null) {
-        return null;
-    }
-    return user.getActiveCompany().getLogo();
+  public MetaFile getLogo(String mode) {
+    return Optional.ofNullable(AuthUtils.getUser())
+            .map(User::getActiveCompany)
+            .map(company -> "dark".equals(mode) ? company.getDarkLogo() : company.getLogo())
+            .orElse(null); // Returning null will show default application logo.
   }
 }
 ----
 
 If return value is null, it will show default logo/icon specified
-with `application.logo` and `application.icon` in configuration file.
+with `application.logo`/`application.logo-dark` and `application.icon`/`application.icon-dark` in configuration file.
 
 [#custom-login-page]
 == Custom Login Page
@@ -497,6 +503,7 @@ with `application.logo` and `application.icon` in configuration file.
 You can customize the login page via the properties `application.sign-in.*`.
 
 - **logo**: Set a custom logo for the login page if you require a different one from `application.logo`.
+- **logo-dark**: Set a custom dark logo for the login page if you require a different one from `application.logo-dark`.
 - **title**: Add a translatable HTML title that appears after the logo.
 - **footer**: Add a translatable HTML footer that appears after the form login panel.
 - **username field**: Configure the username field's title, title visibility, placeholder and icon.
@@ -507,8 +514,9 @@ You can customize the login page via the properties `application.sign-in.*`.
 
 [source,properties]
 ----
-# Absolute or relative URL to have a login logo different from `application.logo`.
+# Absolute or relative URL to have a login logo different from `application.logo`/`application.logo-dark`.
 application.sign-in.logo = url
+application.sign-in.logo-dark = url
 # Translatable sanitized HTML, shown after the logo in the form login panel.
 application.sign-in.title = html
 # Translatable sanitized HTML, shown after the form login panel.

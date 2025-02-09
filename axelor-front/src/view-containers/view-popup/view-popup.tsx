@@ -1,4 +1,4 @@
-import { atom, useAtomValue } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -138,24 +138,23 @@ const PopupDialogInner = memo(function PopupDialog({
         </>
       }
       showHeader={showHeader}
-        showFooter={showFooter}
-        header={({ close }) => (
-          <Header
-            header={header}
-            maximized={maximized}
-            expanded={expanded}
-            params={tab.action?.params}
-            close={close}
-            setMaximized={setMaximized}
-            setExpanded={setExpanded}
-          />
-        )}
-        footer={footer}
-        buttons={buttons}
-        onClose={onClose}
-        maximize={maximized}
-      />
-    
+      showFooter={showFooter}
+      header={({ close }) => (
+        <Header
+          header={header}
+          maximized={maximized}
+          expanded={expanded}
+          params={tab.action?.params}
+          close={close}
+          setMaximized={setMaximized}
+          setExpanded={setExpanded}
+        />
+      )}
+      footer={footer}
+      buttons={buttons}
+      onClose={onClose}
+      maximize={maximized}
+    />
   );
 });
 
@@ -248,18 +247,19 @@ function Footer({
   params?: DataRecord;
 }) {
   const handlerAtom = usePopupHandlerAtom();
-  const handler = useAtomValue(handlerAtom);
+  const [handler, setHandler] = useAtom(handlerAtom);
   const handleClose = useClose(handler, close, params);
 
   const popupCanConfirm = params?.["show-confirm"] !== false;
   const popupCanSave = params?.["popup-save"] !== false;
 
+  const getHandlerState = handler.getState;
   const handleCancel = useCallback(() => {
     dialogs.confirmDirty(
-      async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
+      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
       async () => handleClose(),
     );
-  }, [handleClose, handler, popupCanConfirm]);
+  }, [handleClose, getHandlerState, popupCanConfirm]);
 
   const handleConfirm = useCallback(async () => {
     const { getState, getErrors, commitForm, onSave } = handler;
@@ -294,6 +294,10 @@ function Footer({
       // TODO: show error
     }
   }, [handleClose, handler]);
+  
+  useEffect(() => {
+    setHandler((popup) => ({ ...popup, close: handleCancel }));
+  }, [handleCancel, setHandler]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {
@@ -329,15 +333,15 @@ function useClose(
     [handler.readyAtom],
   );
   const ready = useAtomValue(readyAtom);
-
   const originalRef = useRef<DataRecord>();
+  const getHandlerState = handler.getState;
 
   useEffect(() => {
-    const record = handler.getState?.().record;
+    const record = getHandlerState?.().record;
     if (originalRef.current == null && ready && record) {
       originalRef.current = { ...record };
     }
-  }, [handler, ready]);
+  }, [getHandlerState, ready]);
 
   const parentId = useRef<string | null>(null);
 
@@ -350,7 +354,7 @@ function useClose(
   const shouldReload = useCallback(
     (record?: DataRecord) => {
       if (record) return true;
-      const current = handler.getState?.().record;
+      const current = getHandlerState?.().record;
       const original = originalRef.current;
       return (
         !current ||
@@ -359,7 +363,7 @@ function useClose(
         current?.version !== original?.version
       );
     },
-    [handler],
+    [getHandlerState],
   );
 
   const triggerReload = useCallback(() => {

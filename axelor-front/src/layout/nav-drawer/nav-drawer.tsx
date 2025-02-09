@@ -3,7 +3,9 @@ import { useCallback, useMemo, useState } from "react";
 import { Badge, clsx, NavMenu, NavMenuItem, TBackground } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
+import { AppIcon, AppLogo } from "@/components/app-logo/app-logo";
 import { Icon } from "@/components/icon";
+import { useAppSettings } from "@/hooks/use-app-settings";
 import { useMenu } from "@/hooks/use-menu";
 import { useSession } from "@/hooks/use-session";
 import { useShortcut } from "@/hooks/use-shortcut";
@@ -14,11 +16,8 @@ import { MenuItem, Tag } from "@/services/client/meta.types";
 import { sanitize, unaccent } from "@/utils/sanitize";
 import { useSidebar } from "./hook";
 
-import AppIcon from "../../assets/axelor-icon.svg?react";
-import AppLogo from "../../assets/axelor.svg?react";
-
-import styles from "./nav-drawer.module.scss";
 import colors from "@/styles/legacy/_colors.module.scss";
+import styles from "./nav-drawer.module.scss";
 
 const TagStyle: Record<string, TBackground> = {
   default: "secondary",
@@ -183,7 +182,6 @@ function Header() {
   const { open: openTab } = useTabs();
 
   const appHome = data?.user?.action;
-  const { logo: appLogo, name: appName = "logo" } = data?.application ?? {};
 
   const onLogoClick = useCallback(() => {
     if (appHome) {
@@ -202,23 +200,17 @@ function Header() {
         })}
         onClick={onLogoClick}
       >
-        {appLogo ? <img src={appLogo} alt={appName} /> : <AppLogo />}
+        <AppLogo />
       </div>
     </div>
   );
 }
 
 function HeaderSmall() {
-  const { data } = useSession();
-  const { icon: appIcon, name: appName = "icon" } = data?.application ?? {};
   return (
     <div className={styles.header}>
       <div className={styles.appIcon}>
-        {appIcon ? (
-          <img src={appIcon} alt={appName} />
-        ) : (
-          <AppIcon viewBox="0 0 241 228" />
-        )}
+        <AppIcon />
       </div>
     </div>
   );

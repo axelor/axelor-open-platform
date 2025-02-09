@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
@@ -173,14 +173,15 @@ function Footer({
 
   const hasToMany = Boolean(onSave); // o2m, m2m grid
   const handlerAtom = usePopupHandlerAtom();
-  const handler = useAtomValue(handlerAtom);
+  const [handler, setHandler] = useAtom(handlerAtom);
 
+  const getHandlerState = handler.getState;
   const handleClose = useCallback(() => {
     dialogs.confirmDirty(
-      async () => popupCanConfirm && (handler.getState?.().dirty ?? false),
+      async () => popupCanConfirm && (getHandlerState?.().dirty ?? false),
       async () => onClose(false),
     );
-  }, [handler, popupCanConfirm, onClose]);
+  }, [getHandlerState, popupCanConfirm, onClose]);
 
   const handleConfirm = useAfterActions(
     useAtomCallback(
@@ -233,6 +234,10 @@ function Footer({
       ),
     ),
   );
+
+  useEffect(() => {
+    setHandler((popup) => ({ ...popup, close: handleClose }));
+  }, [setHandler, handleClose]);
 
   useEffect(() => {
     return handler.actionHandler?.subscribe(async (data) => {

@@ -99,7 +99,9 @@ export function Dms(props: ViewProps<GridView>) {
   const { open: openTab } = useTabs();
   const { navigate } = useRoute();
   const showEditor = useEditor();
-  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const popupHandler = usePopupHandlerAtom();
+  const setPopupHandlers = useSetAtom(popupHandler);
+
   const viewAction = useViewAction();
 
   const popupRecord = action.params?.["_popup-record"];
@@ -152,32 +154,26 @@ export function Dms(props: ViewProps<GridView>) {
 
   const supportsSpreadsheet = session?.features?.dmsSpreadsheet;
 
-  const openDMSFile = useCallback(
-    (record: TreeRecord) => {
-      const customViewTypes = [
-        ...(supportsSpreadsheet ? [CONTENT_TYPE.SPREADSHEET] : []),
-        CONTENT_TYPE.HTML,
-      ];
-      if (customViewTypes.includes(record.contentType)) {
-        // open HTML/spreadsheet view
-        openTab(prepareCustomView(view, record));
-      } else {
-        navigate(`/ds/dms.file/edit/${record.id}`);
-      }
-      if (popup) {
-        // find top most parent
-        let parent = contentRef?.current?.parentElement;
-        while (parent && parent?.parentElement !== document.body) {
-          parent = parent?.parentElement;
+  const openDMSFile = useAtomCallback(
+    useCallback(
+      (get, set, record: TreeRecord) => {
+        const customViewTypes = [
+          ...(supportsSpreadsheet ? [CONTENT_TYPE.SPREADSHEET] : []),
+          CONTENT_TYPE.HTML,
+        ];
+        if (customViewTypes.includes(record.contentType)) {
+          // open HTML/spreadsheet view
+          openTab(prepareCustomView(view, record));
+        } else {
+          navigate(`/ds/dms.file/edit/${record.id}`);
         }
-        // close the popup
-        const closeBtn = parent?.querySelector?.(
-          "[data-popup-close]",
-        ) as HTMLButtonElement;
-        closeBtn?.click?.();
-      }
-    },
-    [supportsSpreadsheet, popup, openTab, view, navigate],
+        if (popup) {
+          const popupState = get(popupHandler);
+          popupState.close?.();
+        }
+      },
+      [supportsSpreadsheet, popup, openTab, view, navigate, popupHandler],
+    ),
   );
 
   const setRootIfNeeded = useCallback(
@@ -218,7 +214,9 @@ export function Dms(props: ViewProps<GridView>) {
           return Promise.resolve(undefined);
         }
 
-        const { query = {}, searchText = "" } = searchAtom ? get(searchAtom) : {};
+        const { query = {}, searchText = "" } = searchAtom
+          ? get(searchAtom)
+          : {};
 
         let domain: string;
         if (searchText?.trim()) {
@@ -664,11 +662,12 @@ export function Dms(props: ViewProps<GridView>) {
 
   useEffect(() => {
     if (popup) {
-      setPopupHandlers({
+      setPopupHandlers((popup) => ({
+        ...popup,
         data: {
           selected: getSelectedDocuments(),
         },
-      });
+      }));
     }
   }, [popup, getSelectedDocuments, setPopupHandlers]);
 
@@ -936,7 +935,7 @@ function Breadcrumbs({
           return item.id === root.id ? (
             <MaterialIcon icon="home" fill />
           ) : (
-            item.$displayName ?? item.fileName
+            (item.$displayName ?? item.fileName)
           );
         }
         return (
