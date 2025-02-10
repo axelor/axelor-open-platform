@@ -1,6 +1,9 @@
 import { useAtomValue } from "jotai";
 import { useCallback } from "react";
 
+import { Field } from "@/services/client/meta.types";
+import format from "@/utils/format";
+
 import { FieldControl, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 import { MaskedInput } from "../date/mask-input";
@@ -16,8 +19,17 @@ export function Time(props: FieldProps<string | number>) {
   const { attrs } = useAtomValue(widgetAtom);
   const { focus, required } = attrs;
 
-  const { value, text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
+  const formatValue = useCallback(
+    (value?: string | number | null) =>
+      format(value, {
+        props: schema as Field,
+      }),
+    [schema],
+  );
+
+  const { text, onChange, onBlur, onKeyDown } = useInput(valueAtom, {
     validate: isValid,
+    format: formatValue,
     schema,
   });
 
@@ -38,7 +50,7 @@ export function Time(props: FieldProps<string | number>) {
 
   return (
     <FieldControl {...props}>
-      {readonly && <ViewerInput name={schema.name} value={value || ""} />}
+      {readonly && <ViewerInput name={schema.name} value={text} />}
       {readonly || (
         <MaskedInput
           key={focus ? "focused" : "normal"}
