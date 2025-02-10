@@ -1,0 +1,6 @@
+---
+title: Fix time widget format
+type: fix
+description: |
+  Display formatted value of time widget in readonly. This will 
+  take into account if the field should display the seconds.
