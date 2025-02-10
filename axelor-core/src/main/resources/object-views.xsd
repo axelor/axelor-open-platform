@@ -981,7 +981,7 @@
     <xsd:attribute name="x-step" type="xsd:decimal">
       <xsd:annotation>
         <xsd:documentation>
-          The value of each step. Default to `1` for integer fields type, depending on the scale for decimal fields type.
+          The value of each step. Default to `1`.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

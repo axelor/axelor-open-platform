@@ -116,8 +116,7 @@ The following attributes are supported:
 * `x-scale`: scale of the decimal value (total number of digits in decimal part). It accepts an integer
 for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
-* `x-step`: amount to increment or decrement on each step. Accept negative and decimal values. Default
-value is determined by the scale attribute if it exists, otherwise it is set to `1`.
+* `x-step`: amount to increment or decrement on each step. Accept negative and decimal/integer values. Default to `1`.
 
 == Slider
 

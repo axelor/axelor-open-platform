@@ -1,0 +1,7 @@
+---
+title: Revert back default step to 1 for decimal fields
+type: fix
+description: |
+  On decimal fields, the default step was determined by the current scale of the field. If a field with scale set to 2, 
+  default step would be 0.01. As it haven't been adopted, it reverts back previous behavior, with a default step to 1 
+  for decimal fields. So it is no more allowed to have a step depending on the dynamic scale of the field.
