@@ -69,7 +69,7 @@ public class ContentDisposition {
 
   @Override
   public int hashCode() {
-    return com.google.common.base.Objects.hashCode(type, name, filename);
+    return Objects.hash(type, name, filename);
   }
 
   /** Return the header value for this content disposition as defined in RFC 6266. */

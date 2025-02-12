@@ -19,10 +19,10 @@
 package com.axelor.meta.loader;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 final class Module {
 
@@ -120,7 +120,7 @@ final class Module {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(Module.class.getName(), name);
+    return Objects.hash(Module.class.getName(), name);
   }
 
   @Override
