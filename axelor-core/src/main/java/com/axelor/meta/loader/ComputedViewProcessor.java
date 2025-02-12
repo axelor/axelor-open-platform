@@ -28,7 +28,6 @@ import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
-import com.google.common.base.MoreObjects;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -149,7 +149,7 @@ public class ComputedViewProcessor {
       } else {
         final MetaView copy = metaViewRepo.copy(baseView, false);
         final String xmlId =
-            MoreObjects.firstNonNull(baseView.getXmlId(), baseView.getName()) + "__computed__";
+            Objects.requireNonNullElse(baseView.getXmlId(), baseView.getName()) + "__computed__";
         copy.setXmlId(xmlId);
         copy.setComputed(true);
         computedView = metaViewRepo.save(copy);
