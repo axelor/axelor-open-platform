@@ -133,6 +133,9 @@ The custom fields are saved as `com.axelor.meta.db.MetaJsonField` records. Follo
 | `readonlyIf`
 | conditional js expression to make field readonly
 
+| `includeIf`
+| server expression to check whether to use this field
+
 | `hidden`
 | whether to hide the field by default`
 
