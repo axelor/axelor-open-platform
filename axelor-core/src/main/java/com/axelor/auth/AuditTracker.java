@@ -54,7 +54,6 @@ import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.math.BigDecimal;
@@ -69,6 +68,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import org.hibernate.Transaction;
@@ -257,7 +257,7 @@ final class AuditTracker {
           matched =
               oldValues.isEmpty()
                   ? values.containsKey(field)
-                  : !Objects.equal(values.get(field), oldValues.get(field));
+                  : !Objects.equals(values.get(field), oldValues.get(field));
           if (matched) {
             break;
           }
@@ -359,7 +359,7 @@ final class AuditTracker {
       final Object value = getValue(values, jsonValues, field, property);
       final Object oldValue = getValue(oldValues, oldJsonValues, field, property);
 
-      if (Objects.equal(value, oldValue)) {
+      if (Objects.equals(value, oldValue)) {
         continue;
       }
 

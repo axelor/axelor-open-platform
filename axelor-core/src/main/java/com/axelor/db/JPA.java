@@ -21,7 +21,6 @@ package com.axelor.db;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -43,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -133,7 +133,7 @@ public final class JPA {
   }
 
   private static boolean isAutoFlushEnabled() {
-    return !Objects.equal(
+    return !Objects.equals(
         "false", em().getEntityManagerFactory().getProperties().get("JPA.auto_flush"));
   }
 
@@ -234,7 +234,7 @@ public final class JPA {
     }
     final Class<T> klass = EntityHelper.getEntityClass(bean);
     final Model entity = JPA.em().find(klass, bean.getId());
-    if (entity == null || !Objects.equal(version, entity.getVersion())) {
+    if (entity == null || !Objects.equals(version, entity.getVersion())) {
       Exception cause = new StaleObjectStateException(klass.getName(), bean.getId());
       throw new OptimisticLockException(cause.getMessage(), cause, bean);
     }
@@ -261,7 +261,7 @@ public final class JPA {
     Model entity = id == null ? null : JPA.find(model, id);
 
     if (id != null && version != null) {
-      if (entity == null || !Objects.equal(version, entity.getVersion())) {
+      if (entity == null || !Objects.equals(version, entity.getVersion())) {
         Exception cause = new StaleObjectStateException(model.getName(), id);
         throw new OptimisticLockException(cause);
       }

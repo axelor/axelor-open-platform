@@ -31,8 +31,8 @@ import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.PanelMailDisplay;
-import com.google.common.base.Objects;
 import jakarta.persistence.EntityManager;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -70,7 +70,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     }
 
     // if name field is changed, update or records with new name field value
-    if (!Objects.equal(lastName, jsonModel.getNameField())) {
+    if (!Objects.equals(lastName, jsonModel.getNameField())) {
       MetaJsonRecordRepository records = Beans.get(MetaJsonRecordRepository.class);
       try (final Stream<MetaJsonRecord> stream = records.all(jsonModel.getName()).fetchStream()) {
         stream.forEach(records::save);

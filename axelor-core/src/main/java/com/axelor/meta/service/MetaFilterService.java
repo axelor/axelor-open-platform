@@ -24,10 +24,10 @@ import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.db.repo.MetaFilterRepository;
-import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Objects;
 import org.apache.shiro.authz.AuthorizationException;
 
 public class MetaFilterService {
@@ -53,7 +53,7 @@ public class MetaFilterService {
     filter.setFilters(ctx.getFilters());
     filter.setFilterCustom(ctx.getFilterCustom());
 
-    if (Objects.equal(filter.getUser(), user)) {
+    if (Objects.equals(filter.getUser(), user)) {
       filter.setShared(ctx.getShared());
     }
 
@@ -69,7 +69,7 @@ public class MetaFilterService {
         filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
 
     if (filter != null) {
-      if (!Objects.equal(filter.getUser(), user)) {
+      if (!Objects.equals(filter.getUser(), user)) {
         throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
       }
 

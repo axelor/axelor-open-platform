@@ -21,7 +21,7 @@ package com.axelor.common.http;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.axelor.common.StringUtils;
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 /** This class provides some methods to deal with Content-Disposition as defined in RFC 6266 */
 public class ContentDisposition {
@@ -62,14 +62,14 @@ public class ContentDisposition {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ContentDisposition that = (ContentDisposition) o;
-    return Objects.equal(type, that.type)
-        && Objects.equal(name, that.name)
-        && Objects.equal(filename, that.filename);
+    return Objects.equals(type, that.type)
+        && Objects.equals(name, that.name)
+        && Objects.equals(filename, that.filename);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(type, name, filename);
+    return com.google.common.base.Objects.hashCode(type, name, filename);
   }
 
   /** Return the header value for this content disposition as defined in RFC 6266. */

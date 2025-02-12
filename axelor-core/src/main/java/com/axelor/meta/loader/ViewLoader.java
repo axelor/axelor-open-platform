@@ -58,7 +58,6 @@ import com.axelor.meta.schema.views.Selection;
 import com.axelor.meta.service.MetaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -79,6 +78,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -332,7 +332,7 @@ public class ViewLoader extends AbstractParallelLoader {
             .computeIfAbsent(view.getName(), k -> Collections.synchronizedList(new ArrayList<>()))
             .add(view.getXmlId());
       }
-    } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    } else if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }
@@ -411,7 +411,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing view
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -539,7 +539,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -627,7 +627,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -721,7 +721,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     // set priority higher to existing menu
-    if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+    if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
       entity.setPriority(other.getPriority() + 1);
     }
 

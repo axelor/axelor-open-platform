@@ -50,7 +50,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -64,6 +63,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -486,7 +486,7 @@ public final class MetaStore {
 
       if (item instanceof ValueEnum<?>) {
         Object value = ((ValueEnum<?>) item).getValue();
-        if (!Objects.equal(name, value)) {
+        if (!Objects.equals(name, value)) {
           data.put("value", value);
         }
       }

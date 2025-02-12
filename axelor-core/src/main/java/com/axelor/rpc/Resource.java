@@ -65,7 +65,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -106,6 +105,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -970,7 +970,7 @@ public class Resource<T extends Model> {
     final String key = "value:" + text;
     return Optional.ofNullable(bundle.getString(key))
         .filter(StringUtils::notBlank)
-        .filter(translation -> !Objects.equal(key, translation))
+        .filter(translation -> !Objects.equals(key, translation))
         .orElse(text);
   }
 
@@ -1191,7 +1191,7 @@ public class Resource<T extends Model> {
                 .map(
                     item ->
                         newItems.stream()
-                            .filter(x -> Objects.equal(x.get("id"), item.get("id")))
+                            .filter(x -> Objects.equals(x.get("id"), item.get("id")))
                             .findFirst()
                             .map(found -> mergeGraph(item, found))
                             .orElse(item))
@@ -1479,7 +1479,7 @@ public class Resource<T extends Model> {
             security.get().check(JpaSecurity.CAN_REMOVE, model, id);
             Model bean = JPA.find(model, id);
 
-            if (bean == null || (version != null && !Objects.equal(version, bean.getVersion()))) {
+            if (bean == null || (version != null && !Objects.equals(version, bean.getVersion()))) {
               throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
             }
             entities.add(bean);
@@ -1856,7 +1856,7 @@ public class Resource<T extends Model> {
       if (prop.isEnum() && value instanceof ValueEnum<?>) {
         String enumName = ((Enum<?>) value).name();
         Object enumValue = ((ValueEnum<?>) value).getValue();
-        if (!Objects.equal(enumName, enumValue)) {
+        if (!Objects.equals(enumName, enumValue)) {
           result.put(name + "$value", ((ValueEnum<?>) value).getValue());
         }
       }

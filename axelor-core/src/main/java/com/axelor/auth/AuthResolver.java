@@ -22,8 +22,8 @@ import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSecurity.AccessType;
-import com.google.common.base.Objects;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /** This class is responsible to resolve permissions. */
@@ -79,7 +79,7 @@ final class AuthResolver {
 
     // add object permissions
     for (final Permission permission : permissions) {
-      if (Objects.equal(object, permission.getObject()) && hasAccess(permission, type)) {
+      if (Objects.equals(object, permission.getObject()) && hasAccess(permission, type)) {
         all.add(permission);
       }
     }
@@ -87,7 +87,7 @@ final class AuthResolver {
     // add wild card permissions
     final String pkg = object.substring(0, object.lastIndexOf('.')) + ".*";
     for (final Permission permission : permissions) {
-      if (Objects.equal(pkg, permission.getObject()) && hasAccess(permission, type)) {
+      if (Objects.equals(pkg, permission.getObject()) && hasAccess(permission, type)) {
         all.add(permission);
       }
     }

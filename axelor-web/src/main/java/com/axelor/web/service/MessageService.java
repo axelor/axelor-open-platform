@@ -38,7 +38,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
@@ -59,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.shiro.authz.UnauthorizedException;
 
 @RequestScoped
@@ -271,7 +271,7 @@ public class MessageService extends AbstractService {
 
     if (!MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
             && !MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)
-        || !Objects.equal(message.getCreatedBy(), AuthUtils.getUser())) {
+        || !Objects.equals(message.getCreatedBy(), AuthUtils.getUser())) {
       final AuthSecurityException cause =
           new AuthSecurityException(JpaSecurity.AccessType.REMOVE, MailMessage.class, id);
       throw new UnauthorizedException(cause.getMessage(), cause);

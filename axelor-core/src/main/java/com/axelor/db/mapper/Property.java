@@ -29,7 +29,6 @@ import com.axelor.db.converters.AbstractEncryptedConverter;
 import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.i18n.I18n;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -61,6 +60,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.hibernate.Length;
@@ -723,7 +723,7 @@ public class Property {
     if (current instanceof BigDecimal && oldValue instanceof BigDecimal) {
       return ((BigDecimal) current).compareTo((BigDecimal) oldValue) != 0;
     }
-    return !Objects.equal(current, oldValue);
+    return !Objects.equals(current, oldValue);
   }
 
   /**

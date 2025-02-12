@@ -34,7 +34,6 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
@@ -44,6 +43,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @XmlType
 public class ActionGroup extends ActionResumable {
@@ -271,7 +271,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       // stop for reload
-      if (value instanceof Map && Objects.equal(Boolean.TRUE, ((Map) value).get("reload"))) {
+      if (value instanceof Map && Objects.equals(Boolean.TRUE, ((Map) value).get("reload"))) {
         String pending = this.getPending(i);
         log.debug("wait for 'reload', pending actions: {}", pending);
         ((Map<String, Object>) value).put("pending", pending);
@@ -288,7 +288,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       if (action instanceof ActionCondition) {
-        if (Objects.equal(value, Boolean.FALSE)
+        if (Objects.equals(value, Boolean.FALSE)
             || (value instanceof Map && hasErrors((Map) value))) {
           break;
         }
@@ -303,7 +303,7 @@ public class ActionGroup extends ActionResumable {
         } catch (ClassCastException e) {
         }
         if (last == null) continue;
-        if (Objects.equal(Boolean.TRUE, last.get("reload"))
+        if (Objects.equals(Boolean.TRUE, last.get("reload"))
             || last.containsKey(Info.KEY)
             || last.containsKey(Alert.KEY)
             || last.containsKey(Error.KEY)
