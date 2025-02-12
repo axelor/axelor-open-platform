@@ -68,7 +68,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -656,7 +655,7 @@ public class Resource<T extends Model> {
   }
 
   private static final Set<String> EXCLUDED_EXPORT_TYPES =
-      ImmutableSet.of("panel", "button", "label", "spacer", "separator");
+      Set.of("panel", "button", "label", "spacer", "separator");
 
   @SuppressWarnings("all")
   private int export(Request request, Writer writer, Locale locale, char separator)

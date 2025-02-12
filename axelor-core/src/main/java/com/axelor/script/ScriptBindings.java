@@ -29,7 +29,6 @@ import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +45,7 @@ public class ScriptBindings extends SimpleBindings {
   private static final String MODEL_KEY = "_model";
 
   private static final Set<String> META_VARS =
-      ImmutableSet.of(
+      Set.of(
           "__id__",
           "__ids__",
           "__this__",

@@ -46,7 +46,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
@@ -95,7 +94,7 @@ public class ActionHandler {
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
   private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
-      ImmutableSet.of(MetaAction.class, MetaFilter.class);
+      Set.of(MetaAction.class, MetaFilter.class);
 
   ActionHandler(
       ActionRequest request,
