@@ -48,7 +48,7 @@ export function useNavTabsSize() {
 export function NavTabs({ container }: { container: HTMLDivElement | null }) {
   const { active, items: tabs, popups, open, close } = useTabs();
   const { data: sessionInfo } = useSession();
-  const value = active?.id;
+  const activeTabId = active?.id;
 
   const [menuTarget, setMenuTarget] = useState<HTMLElement | null>(null);
   const [menuOffset, setMenuOffset] = useState<[number, number]>([0, 0]);
@@ -64,6 +64,22 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
     [setTabContainerSize, containerSize],
   );
 
+  /**
+   * The tab id of the `menuTarget` HTML element
+   */
+  const activeMenuTabId = useMemo(() => {
+    return (
+      menuTarget?.querySelector("[data-tab]")?.getAttribute("data-tab") ??
+      undefined
+    );
+  }, [menuTarget]);
+
+  /**
+   * Determines if a given tab name matches the user home action.
+   *
+   * @param {string | undefined} tabName - The name of the tab to check.
+   * @returns {boolean} - Returns `true` if `tabName` matches the user home action. Otherwise, returns `false`.
+   */
   const isHomeAction = useCallback(
     (tabName: string | undefined) => {
       const userAction = sessionInfo?.user?.action;
@@ -131,19 +147,15 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
       setMenuTarget(null);
       setMenuShow(false);
 
-      if (menuTarget) {
+      if (activeMenuTabId) {
         const action = e.currentTarget.getAttribute("data-action");
-        const target = menuTarget.querySelector("[data-tab]");
-        if (target) {
-          const tab = target.getAttribute("data-tab");
-          if (tab && action === "refresh") doRefresh(tab);
-          if (tab && action === "close") doClose(tab);
-          if (tab && action === "close-all") doCloseAll();
-          if (tab && action === "close-others") doCloseAll(tab);
-        }
+        if (action === "refresh") doRefresh(activeMenuTabId);
+        else if (action === "close") doClose(activeMenuTabId);
+        else if (action === "close-all") doCloseAll();
+        else if (action === "close-others") doCloseAll(activeMenuTabId);
       }
     },
-    [doClose, doCloseAll, doRefresh, menuTarget],
+    [activeMenuTabId, doClose, doCloseAll, doRefresh],
   );
 
   const handleContextHide = useCallback(() => {
@@ -192,7 +204,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           <Tabs
             className={styles.tabList}
             items={items}
-            active={value}
+            active={activeTabId}
             onItemClick={handleItemClick}
           />
         </Portal>
@@ -202,9 +214,9 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         <div
           key={tab.id}
           data-tab-content={tab.id}
-          data-tab-active={tab.id === value}
+          data-tab-active={tab.id === activeTabId}
           className={clsx(styles.tabContent, {
-            [styles.active]: tab.id === value,
+            [styles.active]: tab.id === activeTabId,
           })}
         >
           <Views tab={tab} />
@@ -225,7 +237,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
           {i18n.get("Refresh")}
         </AxMenuItem>
         <AxMenuDivider />
-        {!isHomeAction(value) && (
+        {!isHomeAction(activeMenuTabId) && (
           <AxMenuItem data-action="close" onClick={handleContextClick}>
             {i18n.get("Close")}
           </AxMenuItem>
@@ -233,7 +245,7 @@ export function NavTabs({ container }: { container: HTMLDivElement | null }) {
         <AxMenuItem data-action="close-others" onClick={handleContextClick}>
           {i18n.get("Close Others")}
         </AxMenuItem>
-        {!isHomeAction(value) && (
+        {!isHomeAction(activeMenuTabId) && (
           <AxMenuItem data-action="close-all" onClick={handleContextClick}>
             {i18n.get("Close All")}
           </AxMenuItem>
