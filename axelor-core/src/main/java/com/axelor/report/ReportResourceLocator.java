@@ -25,6 +25,7 @@ import com.axelor.common.ResourceUtils;
 import com.axelor.db.internal.DBHelper;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Map;
@@ -95,8 +96,8 @@ public class ReportResourceLocator implements IResourceLocator {
     // if already an url
     if (URL_PATTERN.matcher(fileName).matches()) {
       try {
-        return new URL(fileName);
-      } catch (MalformedURLException e) {
+        return URI.create(fileName).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
       }
     }
 

@@ -21,6 +21,7 @@ package com.axelor.common;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 
@@ -185,8 +186,8 @@ public final class ClassUtils {
       }
     }
     try {
-      return new URL(location);
-    } catch (MalformedURLException e) {
+      return URI.create(location).toURL();
+    } catch (MalformedURLException | IllegalArgumentException e) {
       try {
         return new File(location).toURI().toURL();
       } catch (MalformedURLException ex) {

@@ -41,6 +41,7 @@ import jakarta.mail.internet.PreencodedMimeBodyPart;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -362,9 +363,9 @@ public final class MailBuilder {
       if (content.file != null) {
         final MimeBodyPart part = new MimeBodyPart();
         try {
-          final URL link = new URL(content.file);
+          final URL link = URI.create(content.file).toURL();
           part.setDataHandler(new DataHandler(new URLDataSource(link)));
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | IllegalArgumentException e) {
           // default implementation fails to detect mime type
           final FileDataSource fds = new FileDataSource(new File(content.file));
           fds.setFileTypeMap(fileTypeMap);
