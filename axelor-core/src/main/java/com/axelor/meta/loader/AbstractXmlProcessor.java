@@ -29,7 +29,6 @@ import com.axelor.meta.schema.views.Position;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,7 +60,7 @@ public abstract class AbstractXmlProcessor {
   static final String MENU_BAR = "menubar";
   static final String PANEL_MAIL = "panel-mail";
   static final Map<Position, Position> ROOT_NODE_POSITION_MAP =
-      ImmutableMap.of(Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
+      Map.of(Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
 
   static AppConfig appConfigProvider;
 

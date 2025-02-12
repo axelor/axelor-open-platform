@@ -29,7 +29,6 @@ import com.axelor.rpc.ContextEntity;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.MethodOrderer;
@@ -69,7 +68,7 @@ public class TestContext extends ScriptTest {
     proxy.setFirstName("Some");
     assertEquals("Mrs. Some NAME", proxy.getFullName());
 
-    context.putAll(ImmutableMap.of("firstName", "Some1"));
+    context.putAll(Map.of("firstName", "Some1"));
     assertEquals("Mrs. Some1 NAME", proxy.getFullName());
 
     assertEquals("Mr. John Smith", managed.getFullName());

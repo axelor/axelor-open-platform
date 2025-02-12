@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +42,7 @@ public class TestObjectUtils {
     assertTrue(ObjectUtils.isEmpty(new String[] {}));
     assertFalse(ObjectUtils.isEmpty(new String[] {"some", "value"}));
     assertTrue(ObjectUtils.isEmpty(new HashMap<>()));
-    assertFalse(ObjectUtils.isEmpty(ImmutableMap.of("some", "value")));
+    assertFalse(ObjectUtils.isEmpty(Map.of("some", "value")));
     assertTrue(ObjectUtils.isEmpty(Arrays.asList()));
     assertFalse(ObjectUtils.isEmpty(Arrays.asList("some", "value")));
   }

@@ -60,7 +60,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
@@ -324,7 +323,7 @@ public class RestService extends ResourceService {
   public Response delete(@PathParam("id") long id, @QueryParam("version") int version) {
     Request request = new Request();
     request.setModel(getModel());
-    request.setData(ImmutableMap.of("id", (Object) id, "version", version));
+    request.setData(Map.of("id", (Object) id, "version", version));
     return getResource().remove(id, request);
   }
 

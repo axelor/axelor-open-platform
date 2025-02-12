@@ -147,7 +147,7 @@ public class RequestTest extends RpcTest {
     data.put("firstName", "Some");
     data.put("lastName", "thing");
 
-    String json = toJson(ImmutableMap.of("data", data));
+    String json = toJson(Map.of("data", data));
     Request req = fromJson(json, Request.class);
 
     assertTrue(req.getData() instanceof Map);

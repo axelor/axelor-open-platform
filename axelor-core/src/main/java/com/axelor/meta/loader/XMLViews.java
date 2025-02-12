@@ -41,7 +41,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -261,7 +260,7 @@ public class XMLViews {
   public static Map<String, Object> findViews(String model, Map<String, String> views) {
     final Map<String, Object> result = new HashMap<>();
     if (views == null || views.isEmpty()) {
-      views = ImmutableMap.of("grid", "", "form", "");
+      views = Map.of("grid", "", "form", "");
     }
     for (Entry<String, String> entry : views.entrySet()) {
       final String type = entry.getKey();

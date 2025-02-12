@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.collect.ImmutableMap;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
 import java.util.List;
@@ -60,7 +59,7 @@ public class ResourceTest extends AbstractTest {
   public void testSearch() {
 
     Request request = new Request();
-    request.setData(ImmutableMap.of("firstName", (Object) "John", "lastName", "Teen"));
+    request.setData(Map.of("firstName", (Object) "John", "lastName", "Teen"));
 
     Response response = crud("search").post(Entity.json(request), Response.class);
 

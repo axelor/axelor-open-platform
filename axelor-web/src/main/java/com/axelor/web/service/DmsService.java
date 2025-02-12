@@ -41,7 +41,6 @@ import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptHelper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -101,7 +100,7 @@ public class DmsService {
   @Inject private DMSFileRepository repository;
 
   private static final Map<String, String> EXTS =
-      ImmutableMap.of("html", ".html", "spreadsheet", ".csv");
+      Map.of("html", ".html", "spreadsheet", ".csv");
 
   @GET
   @Path("files")

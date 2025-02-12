@@ -29,7 +29,6 @@ import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableMap;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -275,7 +274,7 @@ public class ActionView extends Action {
 
   @Override
   protected Object wrapper(Object value) {
-    return ImmutableMap.of("view", value);
+    return Map.of("view", value);
   }
 
   /**
@@ -388,8 +387,8 @@ public class ActionView extends Action {
 
       if (type == null) {
         type = "grid";
-        items.add(ImmutableMap.of("type", "grid"));
-        items.add(ImmutableMap.of("type", "form"));
+        items.add(Map.of("type", "grid"));
+        items.add(Map.of("type", "form"));
       }
 
       for (Param param : view.params) {

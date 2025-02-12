@@ -32,7 +32,6 @@ import com.axelor.script.ScriptTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -206,7 +205,7 @@ public class QueryTest extends ScriptTest {
     }
 
     // Update several fields
-    q.update(ImmutableMap.of("self.lang", lang, "self.food", food));
+    q.update(Map.of("self.lang", lang, "self.food", food));
 
     getEntityManager().clear();
 

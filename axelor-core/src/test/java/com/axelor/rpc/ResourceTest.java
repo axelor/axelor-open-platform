@@ -32,7 +32,6 @@ import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
@@ -121,7 +120,7 @@ public class ResourceTest extends RpcTest {
     data.put("firstName", "jack");
     data.put("lastName", "sparrow");
 
-    String json = toJson(ImmutableMap.of("data", data));
+    String json = toJson(Map.of("data", data));
 
     Request req = fromJson(json, Request.class);
     Response res = resource.save(req);

@@ -30,7 +30,6 @@ import com.axelor.db.tenants.TenantAware;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
@@ -38,6 +37,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
@@ -407,6 +407,6 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
   }
 
   private int getValueLevel(DMSPermission entity) {
-    return ImmutableMap.of("READ", 1, "WRITE", 2, "FULL", 3).getOrDefault(entity.getValue(), 0);
+    return Map.of("READ", 1, "WRITE", 2, "FULL", 3).getOrDefault(entity.getValue(), 0);
   }
 }

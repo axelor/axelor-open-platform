@@ -38,7 +38,6 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -81,7 +80,7 @@ public class MessageService extends AbstractService {
       description = "This service returns the message for the given message id.")
   public Response getMessage(@PathParam("id") long id) {
     final ActionResponse res = new ActionResponse();
-    final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
+    final MailMessage message = JPA.edit(MailMessage.class, Map.of("id", id));
 
     if (message == null) {
       return res;
@@ -266,7 +265,7 @@ public class MessageService extends AbstractService {
    */
   @Transactional
   public void removeMessage(long id) {
-    final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
+    final MailMessage message = JPA.edit(MailMessage.class, Map.of("id", id));
     final String eventType = message.getType();
 
     if (!MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
