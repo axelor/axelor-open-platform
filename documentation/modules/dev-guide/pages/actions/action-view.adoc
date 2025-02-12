@@ -55,6 +55,7 @@ The `<view-param>` parameter name accepts the following options:
 * `kanban-column-width` - desired kanban column width
 * `auto-reload` - enable view auto-reloading with value specified in seconds
 * `hideActions` - `true` to hide the actions in the search view
+* `target` - in case of html view, it opens the link in a new tab. `_blank` opens the url in new browser tab.
 
 [[popup-reload]]
 [NOTE]
