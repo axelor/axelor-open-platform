@@ -121,29 +121,29 @@ public class PanelEditor extends AbstractPanel {
 
     final Set<String> all = new HashSet<>();
 
-    if (widget instanceof SimpleWidget) {
-      String depends = ((SimpleWidget) widget).getDepends();
+    if (widget instanceof SimpleWidget simpleWidget) {
+      String depends = simpleWidget.getDepends();
       if (StringUtils.notBlank(depends)) {
         Collections.addAll(all, depends.trim().split("\\s*,\\s*"));
       }
     }
 
-    if (widget instanceof Field) {
-      all.add(((Field) widget).getName());
+    if (widget instanceof Field field) {
+      all.add(field.getName());
       // include related field for ref-select widget
-      String relatedAttr = ((Field) widget).getRelated();
+      String relatedAttr = field.getRelated();
       if (StringUtils.notBlank(relatedAttr)) {
         all.add(relatedAttr);
       }
       return all;
     }
 
-    if (widget instanceof PanelEditor) {
-      for (AbstractWidget item : ((PanelEditor) widget).getItems()) {
+    if (widget instanceof PanelEditor panelEditor) {
+      for (AbstractWidget item : panelEditor.getItems()) {
         all.addAll(findFields(item));
       }
-    } else if (widget instanceof Panel) {
-      for (AbstractWidget item : ((Panel) widget).getItems()) {
+    } else if (widget instanceof Panel panel) {
+      for (AbstractWidget item : panel.getItems()) {
         all.addAll(findFields(item));
       }
     }
@@ -180,10 +180,10 @@ public class PanelEditor extends AbstractPanel {
 
     while (!widgets.isEmpty()) {
       final AbstractWidget widget = widgets.remove();
-      if (widget instanceof PanelField) {
-        ((PanelField) widget).setFromEditor(true);
-      } else if (widget instanceof Panel) {
-        widgets.addAll(((Panel) widget).getItems());
+      if (widget instanceof PanelField panelField) {
+        panelField.setFromEditor(true);
+      } else if (widget instanceof Panel panel) {
+        widgets.addAll(panel.getItems());
       }
     }
   }

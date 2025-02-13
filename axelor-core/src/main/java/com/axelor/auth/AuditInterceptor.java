@@ -107,10 +107,10 @@ public class AuditInterceptor implements Interceptor {
   }
 
   private boolean canDelete(Object entity) {
-    if (entity instanceof User && ADMIN_USER.equals(((User) entity).getCode())) {
+    if (entity instanceof User user && ADMIN_USER.equals(user.getCode())) {
       return false;
     }
-    if (entity instanceof Group && ADMIN_GROUP.equals(((Group) entity).getCode())) {
+    if (entity instanceof Group group && ADMIN_GROUP.equals(group.getCode())) {
       return false;
     }
     return true;
@@ -168,11 +168,11 @@ public class AuditInterceptor implements Interceptor {
       }
     }
 
-    if (entity instanceof Model && tracker.get() != null) {
+    if (entity instanceof Model model && tracker.get() != null) {
       // change tracking
-      tracker.get().track((Model) entity, propertyNames, currentState, previousState);
+      tracker.get().track(model, propertyNames, currentState, previousState);
       // for before completion event
-      tracker.get().updated((Model) entity);
+      tracker.get().updated(model);
     }
 
     return changed;
@@ -201,11 +201,11 @@ public class AuditInterceptor implements Interceptor {
       }
     }
 
-    if (entity instanceof Model && tracker.get() != null) {
+    if (entity instanceof Model model && tracker.get() != null) {
       // change tracking
-      tracker.get().track((Model) entity, propertyNames, state, null);
+      tracker.get().track(model, propertyNames, state, null);
       // for before completion event
-      tracker.get().updated((Model) entity);
+      tracker.get().updated(model);
     }
 
     return changed;
@@ -218,8 +218,8 @@ public class AuditInterceptor implements Interceptor {
       throw new PersistenceException(
           "You can't delete: %s#%s".formatted(entity.getClass().getName(), id));
     }
-    if (tracker.get() != null && entity instanceof Model) {
-      tracker.get().delete((Model) entity);
+    if (tracker.get() != null && entity instanceof Model model) {
+      tracker.get().delete(model);
     }
   }
 }

@@ -162,8 +162,7 @@ public class Criteria {
   private static List<Filter> parseDomains(final List<?> domains, final Map<String, ?> context) {
     final List<Filter> filters = new ArrayList<>();
     for (final Object item : domains) {
-      if (item instanceof Map && ((Map) item).containsKey("domain")) {
-        final Map map = (Map) item;
+      if (item instanceof Map map && map.containsKey("domain")) {
         filters.add(JPQLFilter.forDomain((String) map.get("domain")));
         try {
           context.putAll((Map) map.get("context"));
@@ -214,8 +213,8 @@ public class Criteria {
       return Filter.notBetween(fieldName, rawCriteria.get("value"), rawCriteria.get("value2"));
     }
 
-    if (value instanceof String) {
-      value = ((String) value).trim();
+    if (value instanceof String stringValue) {
+      value = stringValue.trim();
     }
 
     switch (operator) {

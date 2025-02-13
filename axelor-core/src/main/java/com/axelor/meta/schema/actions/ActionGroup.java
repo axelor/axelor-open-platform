@@ -155,8 +155,8 @@ public class ActionGroup extends ActionResumable {
       log.debug("continue action-validate: {}", actionName);
       log.debug("continue at: {}", index);
       Action action = MetaStore.getAction(actionName);
-      if (action instanceof ActionResumable) {
-        return ((ActionResumable) action).resumeAt(index);
+      if (action instanceof ActionResumable actionResumable) {
+        return actionResumable.resumeAt(index);
       }
       return action;
     }
@@ -231,8 +231,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       Object value = action.wrap(handler);
-      if (value instanceof Response) {
-        Response res = (Response) value;
+      if (value instanceof Response res) {
         // if this is the only action then return the response
         if (res.getStatus() != Response.STATUS_SUCCESS || actions.size() == 1) {
           return res;
@@ -260,26 +259,26 @@ public class ActionGroup extends ActionResumable {
       }
 
       // update the context if required
-      if (value instanceof Map) {
-        updateContext(handler, (Map) value);
+      if (value instanceof Map map) {
+        updateContext(handler, map);
       }
 
-      if (action instanceof ActionGroup && value instanceof Collection) {
-        result.addAll((Collection<?>) value);
+      if (action instanceof ActionGroup && value instanceof Collection<?> collection) {
+        result.addAll(collection);
       } else {
         result.add(value);
       }
 
       // stop for reload
-      if (value instanceof Map && Objects.equals(Boolean.TRUE, ((Map) value).get("reload"))) {
+      if (value instanceof Map map && Objects.equals(Boolean.TRUE, map.get("reload"))) {
         String pending = this.getPending(i);
         log.debug("wait for 'reload', pending actions: {}", pending);
         ((Map<String, Object>) value).put("pending", pending);
         break;
       }
 
-      if (action instanceof ActionValidate && value instanceof Map) {
-        String validate = (String) ((Map) value).get("pending");
+      if (action instanceof ActionValidate && value instanceof Map map) {
+        String validate = (String) map.get("pending");
         String pending = this.getPending(i, validate);
         log.debug("wait for validation: {}, {}", name, value);
         log.debug("pending actions: {}", pending);
@@ -289,7 +288,7 @@ public class ActionGroup extends ActionResumable {
 
       if (action instanceof ActionCondition) {
         if (Objects.equals(value, Boolean.FALSE)
-            || (value instanceof Map && hasErrors((Map) value))) {
+            || (value instanceof Map map && hasErrors(map))) {
           break;
         }
       }
@@ -328,9 +327,9 @@ public class ActionGroup extends ActionResumable {
     if (ObjectUtils.isEmpty(value)) return Boolean.FALSE;
 
     Object errors = value.get("errors");
-    if (errors instanceof Map) {
-      for (Object key : ((Map) errors).keySet()) {
-        String error = (String) ((Map) errors).get(key);
+    if (errors instanceof Map map) {
+      for (Object key : map.keySet()) {
+        String error = (String) map.get(key);
         if (!StringUtils.isEmpty(error)) {
           return Boolean.TRUE;
         }
@@ -347,8 +346,8 @@ public class ActionGroup extends ActionResumable {
     Object values = value.get("values");
     final Map<String, Object> map;
 
-    if (values instanceof ContextEntity) {
-      map = ((ContextEntity) values).getContextMap();
+    if (values instanceof ContextEntity contextEntity) {
+      map = contextEntity.getContextMap();
     } else if (values instanceof Model) {
       map = Mapper.toMap(value);
     } else if (values instanceof Map) {
@@ -367,10 +366,10 @@ public class ActionGroup extends ActionResumable {
 
     values = value.get("attrs");
 
-    if (values instanceof Map) {
-      for (Object key : ((Map) values).keySet()) {
+    if (values instanceof Map valuesMap) {
+      for (Object key : valuesMap.keySet()) {
         String name = key.toString();
-        Map attrs = (Map) ((Map) values).get(key);
+        Map attrs = (Map) valuesMap.get(key);
         if (name.indexOf('$') == 0) name = name.substring(1);
         if (attrs.containsKey("value")) {
           map.put(name, attrs.get("value"));

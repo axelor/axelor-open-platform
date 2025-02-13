@@ -43,7 +43,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
   public Object adapt(
       Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
 
-    if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
+    if (value == null || (value instanceof String stringValue && "".equals(stringValue.trim()))) {
       return null;
     }
 
@@ -73,14 +73,14 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     if (value == null) {
       return null;
     }
-    if (value instanceof ZonedDateTime) {
-      return (ZonedDateTime) value;
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return zonedDateTime;
     }
-    if (value instanceof Date) {
-      return ((Date) value).toInstant().atZone(ZoneId.systemDefault());
+    if (value instanceof Date date) {
+      return date.toInstant().atZone(ZoneId.systemDefault());
     }
-    if (value instanceof Calendar) {
-      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault());
+    if (value instanceof Calendar calendar) {
+      return calendar.toInstant().atZone(ZoneId.systemDefault());
     }
     try {
       return ZonedDateTime.from(((Temporal) value));
@@ -111,17 +111,17 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     if (value == null) {
       return null;
     }
-    if (value instanceof LocalDate) {
-      return (LocalDate) value;
+    if (value instanceof LocalDate localDate) {
+      return localDate;
     }
-    if (value instanceof ZonedDateTime) {
-      return ((ZonedDateTime) value).toLocalDate();
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return zonedDateTime.toLocalDate();
     }
-    if (value instanceof Date) {
-      return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    if (value instanceof Date date) {
+      return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
-    if (value instanceof Calendar) {
-      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    if (value instanceof Calendar calendar) {
+      return calendar.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
     try {
       return LocalDate.parse(value.toString());

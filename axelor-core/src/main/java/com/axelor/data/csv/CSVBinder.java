@@ -322,7 +322,7 @@ public class CSVBinder {
       if (newBean == false && Boolean.TRUE.equals(cb.getConditionEmpty())) {
         Object o = p.get(bean);
         if (o != null && p.isCollection()) {
-          if (o instanceof Collection<?> && !((Collection<?>) o).isEmpty()) {
+          if (o instanceof Collection<?> collection && !collection.isEmpty()) {
             LOG.trace("field is not empty");
             continue;
           }
@@ -369,8 +369,8 @@ public class CSVBinder {
 
       if (p.isCollection()) {
         if (value == null) {
-        } else if (value instanceof Collection<?>) {
-          p.addAll(bean, (Collection<?>) value);
+        } else if (value instanceof Collection<?> collection) {
+          p.addAll(bean, collection);
         } else {
           p.add(bean, value);
         }

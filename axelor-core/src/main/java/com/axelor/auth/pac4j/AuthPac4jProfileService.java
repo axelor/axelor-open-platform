@@ -130,7 +130,7 @@ public class AuthPac4jProfileService {
     return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
         .map(
             group ->
-                group instanceof Collection ? ((Collection<?>) group).iterator().next() : group)
+                group instanceof Collection<?> c ? c.iterator().next() : group)
         .map(String::valueOf)
         .map(this::getGroup)
         .orElse(null);

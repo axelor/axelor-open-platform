@@ -274,13 +274,13 @@ public final class JPA {
       if (!(value instanceof Map || value instanceof Collection)) {
         continue;
       }
-      if (property.isCollection() && value instanceof Collection) {
+      if (property.isCollection() && value instanceof Collection collection) {
         int size = 0;
         try {
           size = ((Collection) property.get(entity)).size();
         } catch (Exception e) {
         }
-        if (size > ((Collection) value).size()) {
+        if (size > collection.size()) {
           Exception cause = new StaleObjectStateException(model.getName(), id);
           throw new OptimisticLockException(cause);
         }
@@ -290,8 +290,8 @@ public final class JPA {
         value = Lists.newArrayList(value);
       }
       for (Object item : (Collection<?>) value) {
-        if (item instanceof Map) {
-          verify((Class) property.getTarget(), (Map) item);
+        if (item instanceof Map map) {
+          verify((Class) property.getTarget(), map);
         }
       }
     }
@@ -399,11 +399,11 @@ public final class JPA {
         }
 
         Object old = mapper.get(bean, name);
-        if (old instanceof Collection) {
-          boolean changed = ((Collection) old).size() != items.size();
+        if (old instanceof Collection collection) {
+          boolean changed = collection.size() != items.size();
           if (!changed) {
             for (Object item : items) {
-              if (!((Collection) old).contains(item)) {
+              if (!collection.contains(item)) {
                 changed = true;
                 break;
               }
@@ -411,7 +411,7 @@ public final class JPA {
           }
           if (changed) {
             if (p.isOrphan()) {
-              for (Object item : (Collection) old) {
+              for (Object item : collection) {
                 if (!items.contains(item)) {
                   p.setAssociation(item, null);
                 }
@@ -427,8 +427,8 @@ public final class JPA {
           p.addAll(bean, items);
         }
         value = items;
-      } else if (p.isReference() && value instanceof Map) {
-        value = _edit(target, (Map) value, visited, edited);
+      } else if (p.isReference() && value instanceof Map map) {
+        value = _edit(target, map, visited, edited);
       }
       Object oldValue = mapper.set(bean, name, value);
       if (p.valueChanged(bean, oldValue)) {
@@ -484,7 +484,7 @@ public final class JPA {
       Object value = property.get(bean);
       if (value == null) continue;
 
-      if (value instanceof PersistentCollection && !((PersistentCollection) value).wasInitialized())
+      if (value instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized())
         continue;
 
       // bind M2O
@@ -589,9 +589,9 @@ public final class JPA {
 
       Object value = p.get(bean);
 
-      if (value instanceof List && deep) {
+      if (value instanceof List list && deep) {
         List items = new ArrayList<>();
-        for (Object item : (List) value) {
+        for (Object item : list) {
           Object val = copy((Model) item, true);
           // break bi-directional association
           p.setAssociation(val, null);
@@ -600,12 +600,12 @@ public final class JPA {
         value = items;
       } else if (value instanceof List) {
         value = null;
-      } else if (value instanceof Set) {
-        value = new HashSet((Set) value);
+      } else if (value instanceof Set set) {
+        value = new HashSet(set);
       }
 
-      if (value instanceof String && p.isUnique()) {
-        value = ((String) value) + " Copy (" + random + ")";
+      if (value instanceof String str && p.isUnique()) {
+        value = str + " Copy (" + random + ")";
       }
 
       p.set(obj, value);

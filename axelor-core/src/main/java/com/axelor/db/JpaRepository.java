@@ -143,8 +143,8 @@ public class JpaRepository<T extends Model> implements Repository<T> {
 
       if (value instanceof Collection) {
         items = (Collection<? extends Model>) value;
-      } else if (value instanceof Model) {
-        items = Collections.singletonList((Model) value);
+      } else if (value instanceof Model model) {
+        items = Collections.singletonList(model);
       } else {
         continue;
       }

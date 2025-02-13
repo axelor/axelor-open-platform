@@ -70,8 +70,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       if (value != null) {
         final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
         final Map<String, Object> map =
-            value instanceof ContextEntity
-                ? ((ContextEntity) value).getContextMap()
+            value instanceof ContextEntity contextEntity
+                ? contextEntity.getContextMap()
                 : Resource.toMap(value);
         serializer.serialize(map, jgen, provider);
       }

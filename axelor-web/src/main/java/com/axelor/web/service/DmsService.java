@@ -190,8 +190,8 @@ public class DmsService {
     for (Object item : request.getRecords()) {
       @SuppressWarnings("rawtypes")
       Object fileRecord = filesRepo.find(Longs.tryParse(((Map) item).get("id").toString()));
-      if (fileRecord instanceof MetaFile) {
-        items.add((MetaFile) fileRecord);
+      if (fileRecord instanceof MetaFile metaFile) {
+        items.add(metaFile);
       } else {
         throw new IllegalArgumentException("Invalid list of attachment records.");
       }
@@ -437,7 +437,7 @@ public class DmsService {
         ids.stream()
             .map(
                 id ->
-                    id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString()))
+                    id instanceof Number n ? n.longValue() : Long.valueOf(id.toString()))
             .toArray(Long[]::new);
 
     if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {

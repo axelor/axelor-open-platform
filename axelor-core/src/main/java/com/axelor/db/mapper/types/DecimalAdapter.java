@@ -35,22 +35,22 @@ public class DecimalAdapter implements TypeAdapter<BigDecimal> {
     Integer scale = null;
     Boolean nullable = null;
     for (Annotation a : annotations) {
-      if (a instanceof Digits) {
-        scale = ((Digits) a).fraction();
+      if (a instanceof Digits digits) {
+        scale = digits.fraction();
       }
-      if (a instanceof Column) {
-        nullable = ((Column) a).nullable();
+      if (a instanceof Column column) {
+        nullable = column.nullable();
       }
     }
 
     boolean empty =
-        value == null || (value instanceof String && "".equals(((String) value).trim()));
+        value == null || (value instanceof String s && "".equals(s.trim()));
     if (empty) {
       return Boolean.TRUE.equals(nullable) ? null : BigDecimal.ZERO;
     }
 
-    if (value instanceof BigDecimal) {
-      return adjust((BigDecimal) value, scale);
+    if (value instanceof BigDecimal decimal) {
+      return adjust(decimal, scale);
     }
     return adjust(new BigDecimal(value.toString()), scale);
   }

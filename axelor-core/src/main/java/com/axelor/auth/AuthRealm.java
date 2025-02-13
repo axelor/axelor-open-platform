@@ -49,8 +49,8 @@ public class AuthRealm extends AuthorizingRealm {
       Object saved = getStoredPassword(info);
       AuthService service = AuthService.getInstance();
 
-      if (plain instanceof char[]) {
-        plain = new String((char[]) plain);
+      if (plain instanceof char[] chars) {
+        plain = new String(chars);
       }
 
       if (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info)) {

@@ -362,8 +362,7 @@ public class MetaService {
       LOG.debug("Found : {}", items.size());
 
       for (Object item : items) {
-        if (item instanceof Map) {
-          Map<String, Object> map = (Map) item;
+        if (item instanceof Map map) {
           for (SearchSelectField field : select.getFields()) {
             if (map.containsKey(field.getName())) {
               map.put(field.getAs(), map.get(field.getName()));
@@ -371,10 +370,10 @@ public class MetaService {
             }
           }
 
-          ((Map) item).put("_model", select.getModel());
-          ((Map) item).put("_modelTitle", select.getLocalizedTitle());
-          ((Map) item).put("_form", select.getFormView());
-          ((Map) item).put("_grid", select.getGridView());
+          map.put("_model", select.getModel());
+          map.put("_modelTitle", select.getLocalizedTitle());
+          map.put("_form", select.getFormView());
+          map.put("_grid", select.getGridView());
         }
       }
 

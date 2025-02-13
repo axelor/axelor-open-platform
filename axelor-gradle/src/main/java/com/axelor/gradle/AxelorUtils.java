@@ -199,8 +199,7 @@ public class AxelorUtils {
 
   public static Project findProject(Project project, ResolvedArtifact artifact) {
     final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
-    if (cid instanceof ProjectComponentIdentifier) {
-      ProjectComponentIdentifier id = (ProjectComponentIdentifier) cid;
+    if (cid instanceof ProjectComponentIdentifier id) {
       String path = id.getProjectPath();
       Project sub = project.findProject(path);
       if (":".equals(path)) {

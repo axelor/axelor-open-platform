@@ -263,8 +263,8 @@ public class EntityGenerator {
     }
     try {
       for (BaseType<?> type : EntityParser.parse(input)) {
-        if (type instanceof Entity) entities.put(type.getName(), (Entity) type);
-        if (type instanceof EnumType) enums.put(type.getName(), (EnumType) type);
+        if (type instanceof Entity entity) entities.put(type.getName(), entity);
+        if (type instanceof EnumType enumType) enums.put(type.getName(), enumType);
       }
     } catch (JAXBException e) {
       throw new RuntimeException(e);

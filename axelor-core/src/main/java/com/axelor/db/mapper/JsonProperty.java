@@ -184,13 +184,12 @@ public class JsonProperty extends Property {
   }
 
   private Object persist(Object value) {
-    if (value instanceof Model) {
-      final Model bean = (Model) value;
+    if (value instanceof Model bean) {
       if (Optional.ofNullable(bean.getId()).orElse(0L) <= 0L) {
         JPA.em().persist(bean);
       }
-    } else if (value instanceof Collection) {
-      ((Collection<?>) value).forEach(this::persist);
+    } else if (value instanceof Collection<?> collection) {
+      collection.forEach(this::persist);
     }
     return value;
   }

@@ -140,8 +140,8 @@ public class ActionImport extends Action {
       List<Model> records = new ArrayList<>();
       Object data = action.evaluate(handler);
 
-      if (data instanceof Collection) {
-        for (Object item : (Collection<?>) data) {
+      if (data instanceof Collection<?> collection) {
+        for (Object item : collection) {
           if (item instanceof String) {
             log.info("action-import (xml stream)");
             List<Model> imported = doImport(importer, stream.getFile(), item);

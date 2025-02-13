@@ -126,10 +126,10 @@ final class AuditTracker {
   public List<FieldTracking> getTrackedCustomFields(Model model) {
     Query<MetaJsonField> query = Query.of(MetaJsonField.class).cacheable().autoFlush(false);
 
-    if (model instanceof MetaJsonRecord) {
+    if (model instanceof MetaJsonRecord metaJsonRecord) {
       query
           .filter("self.jsonModel.name = :name AND self.tracked IS TRUE")
-          .bind("name", ((MetaJsonRecord) model).getJsonModel());
+          .bind("name", metaJsonRecord.getJsonModel());
     } else {
       query
           .filter("self.model = :model AND self.tracked IS TRUE")
@@ -186,14 +186,14 @@ final class AuditTracker {
     if (value instanceof Boolean) {
       return Boolean.TRUE.equals(value) ? "True" : "False";
     }
-    if (value instanceof BigDecimal) {
-      return ((BigDecimal) value).toPlainString();
+    if (value instanceof BigDecimal decimal) {
+      return decimal.toPlainString();
     }
-    if (value instanceof ZonedDateTime) {
-      return ((ZonedDateTime) value).withZoneSameInstant(ZoneOffset.UTC).toString();
+    if (value instanceof ZonedDateTime zonedDateTime) {
+      return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toString();
     }
-    if (value instanceof LocalDateTime) {
-      return ((LocalDateTime) value)
+    if (value instanceof LocalDateTime localDateTime) {
+      return localDateTime
           .atZone(ZoneId.systemDefault())
           .withZoneSameInstant(ZoneOffset.UTC)
           .toString();

@@ -64,8 +64,8 @@ public class AxelorAuthenticator implements Authenticator {
     final String username = credentials.getUsername();
     final String password = credentials.getPassword();
     final String newPassword =
-        credentials instanceof AxelorFormCredentials
-            ? ((AxelorFormCredentials) credentials).getNewPassword()
+        credentials instanceof AxelorFormCredentials axelorFormCredentials
+            ? axelorFormCredentials.getNewPassword()
             : null;
 
     if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {

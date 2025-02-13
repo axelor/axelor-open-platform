@@ -127,9 +127,9 @@ public final class EntityHelper {
   @SuppressWarnings("unchecked")
   public static <T> Class<T> getEntityClass(T entity) {
     Preconditions.checkNotNull(entity);
-    if (entity instanceof HibernateProxy) {
+    if (entity instanceof HibernateProxy proxy) {
       return (Class<T>)
-          ((HibernateProxy) entity).getHibernateLazyInitializer().getPersistentClass();
+          proxy.getHibernateLazyInitializer().getPersistentClass();
     }
     Class<?> klass = entity.getClass();
     while (ContextEntity.class.isAssignableFrom(klass)) {
@@ -155,11 +155,11 @@ public final class EntityHelper {
     if (entity == null) {
       return null;
     }
-    if (entity instanceof HibernateProxy) {
-      return (T) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation();
+    if (entity instanceof HibernateProxy proxy) {
+      return (T) proxy.getHibernateLazyInitializer().getImplementation();
     }
-    if (entity instanceof ContextEntity) {
-      return (T) ((ContextEntity) entity).getContextEntity();
+    if (entity instanceof ContextEntity contextEntity) {
+      return (T) contextEntity.getContextEntity();
     }
     return entity;
   }
@@ -172,7 +172,7 @@ public final class EntityHelper {
    * @return true if uninitialized false otherwise
    */
   public static <T> boolean isUninitialized(T entity) {
-    return entity instanceof HibernateProxy
-        && ((HibernateProxy) entity).getHibernateLazyInitializer().isUninitialized();
+    return entity instanceof HibernateProxy proxy
+        && proxy.getHibernateLazyInitializer().isUninitialized();
   }
 }

@@ -122,8 +122,8 @@ public class AuthService {
    * @return the same instance passed
    */
   public Object encrypt(Object user, @SuppressWarnings("rawtypes") Map context) {
-    if (user instanceof User) {
-      return encrypt((User) user);
+    if (user instanceof User userInstance) {
+      return encrypt(userInstance);
     }
     return user;
   }

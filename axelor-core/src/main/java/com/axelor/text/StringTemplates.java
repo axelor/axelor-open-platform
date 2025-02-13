@@ -205,8 +205,8 @@ public class StringTemplates implements Templates {
       final Object jsonModel = context.get("jsonModel");
 
       // custom model?
-      if (jsonModel instanceof String && MetaJsonRecord.class.isAssignableFrom(klass)) {
-        final MetaJsonField field = findCustomField((String) jsonModel, key);
+      if (jsonModel instanceof String string && MetaJsonRecord.class.isAssignableFrom(klass)) {
+        final MetaJsonField field = findCustomField(string, key);
         return format(field, value);
       }
 
@@ -240,12 +240,12 @@ public class StringTemplates implements Templates {
     public synchronized Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
-      if (o instanceof Context) return handle((Context) o, propertyName);
-      if (o instanceof JsonContext) return handle((JsonContext) o, propertyName);
-      if (o instanceof MetaJsonRecord) return handle((MetaJsonRecord) o, propertyName);
-      if (o instanceof Model) return handle((Model) o, propertyName);
-      if (o instanceof Map) {
-        return mapModelAdaptor.getProperty(interp, self, (Map<?, ?>) o, property, propertyName);
+      if (o instanceof Context context) return handle(context, propertyName);
+      if (o instanceof JsonContext jsonContext) return handle(jsonContext, propertyName);
+      if (o instanceof MetaJsonRecord metaJsonRecord) return handle(metaJsonRecord, propertyName);
+      if (o instanceof Model model) return handle(model, propertyName);
+      if (o instanceof Map<?, ?> map) {
+        return mapModelAdaptor.getProperty(interp, self, map, property, propertyName);
       }
       return super.getProperty(interp, self, o, property, propertyName);
     }
@@ -324,8 +324,8 @@ public class StringTemplates implements Templates {
           for (String name : names) {
             try {
               Object value = vars.get(name);
-              if (context instanceof Context) {
-                Object jsonContext = buildJsonContext((Context) context, name);
+              if (context instanceof Context ctx) {
+                Object jsonContext = buildJsonContext(ctx, name);
                 if (jsonContext != null) {
                   value = jsonContext;
                 }

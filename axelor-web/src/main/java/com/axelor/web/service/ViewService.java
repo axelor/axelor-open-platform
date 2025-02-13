@@ -189,18 +189,17 @@ public class ViewService extends AbstractService {
 
   private Set<String> findNames(final Set<String> names, final AbstractWidget widget) {
     List<? extends AbstractWidget> all = null;
-    if (widget instanceof SimpleContainer) {
-      all = ((SimpleContainer) widget).getItems();
-    } else if (widget instanceof Panel) {
-      all = ((Panel) widget).getItems();
-    } else if (widget instanceof PanelTabs) {
-      all = ((PanelTabs) widget).getItems();
-    } else if (widget instanceof PanelInclude) {
-      names.addAll(findNames(((PanelInclude) widget).getView()));
-    } else if (widget instanceof Field) {
-      names.add(((Field) widget).getName());
-      if (widget instanceof PanelField) {
-        PanelField field = (PanelField) widget;
+    if (widget instanceof SimpleContainer container) {
+      all = container.getItems();
+    } else if (widget instanceof Panel panel) {
+      all = panel.getItems();
+    } else if (widget instanceof PanelTabs tabs) {
+      all = tabs.getItems();
+    } else if (widget instanceof PanelInclude include) {
+      names.addAll(findNames(include.getView()));
+    } else if (widget instanceof Field fieldWidget) {
+      names.add(fieldWidget.getName());
+      if (widget instanceof PanelField field) {
         if (field.getEditor() != null && field.getTarget() == null) {
           all = field.getEditor().getItems();
         }
@@ -212,23 +211,23 @@ public class ViewService extends AbstractService {
         }
       }
       // include related field for ref-select widget
-      String relatedAttr = ((Field) widget).getRelated();
+      String relatedAttr = fieldWidget.getRelated();
       if (StringUtils.notBlank(relatedAttr)) {
         names.add(relatedAttr);
       }
-    } else if (widget instanceof PanelRelated) {
-      names.add(((PanelRelated) widget).getName());
+    } else if (widget instanceof PanelRelated panelRelated) {
+      names.add(panelRelated.getName());
     }
 
-    if (widget instanceof SimpleWidget) {
-      String depends = ((SimpleWidget) widget).getDepends();
+    if (widget instanceof SimpleWidget simpleWidget) {
+      String depends = simpleWidget.getDepends();
       if (StringUtils.notBlank(depends)) {
         Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
       }
     }
 
-    if (widget instanceof MenuItem) {
-      String depends = ((MenuItem) widget).getDepends();
+    if (widget instanceof MenuItem menuItem) {
+      String depends = menuItem.getDepends();
       if (StringUtils.notBlank(depends)) {
         Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
       }
@@ -247,8 +246,7 @@ public class ViewService extends AbstractService {
     final Set<String> names = new HashSet<>();
     final List<AbstractWidget> items = new ArrayList<>();
 
-    if (view instanceof ContainerView) {
-      final ContainerView containerView = (ContainerView) view;
+    if (view instanceof ContainerView containerView) {
       items.addAll(Optional.ofNullable(containerView.getItems()).orElse(Collections.emptyList()));
       items.addAll(containerView.getExtraItems());
       names.addAll(containerView.getExtraNames());
@@ -280,8 +278,8 @@ public class ViewService extends AbstractService {
     final Map<String, Object> data = new HashMap<>();
     data.put("view", view);
 
-    if (view instanceof Search && ((Search) view).getSearchForm() != null) {
-      String searchForm = ((Search) view).getSearchForm();
+    if (view instanceof Search search && search.getSearchForm() != null) {
+      String searchForm = search.getSearchForm();
       Response searchResponse = service.findView(null, searchForm, "form");
       data.put("searchForm", searchResponse.getData());
     }
@@ -601,15 +599,15 @@ public class ViewService extends AbstractService {
 
     Object res = act.execute(handler);
 
-    if (res instanceof ActionResponse) {
-      res = ((ActionResponse) res).getItem(0);
-      if (res instanceof Map && ((Map) res).containsKey("view")) {
-        res = ((Map) res).get("view");
+    if (res instanceof ActionResponse response) {
+      res = response.getItem(0);
+      if (res instanceof Map map && map.containsKey("view")) {
+        res = map.get("view");
       }
     }
 
-    if (res instanceof Map) {
-      Map<String, Object> ctx = (Map) ((Map) res).get("context");
+    if (res instanceof Map map) {
+      Map<String, Object> ctx = (Map) map.get("context");
       if (ctx != null) {
         domainContext.putAll(ctx);
       }

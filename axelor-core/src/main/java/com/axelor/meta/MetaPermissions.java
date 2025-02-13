@@ -137,7 +137,7 @@ public class MetaPermissions {
       property = mapper.getProperty(field);
 
       // For editor fields, allow name field only if no read permissions.
-      if (widget instanceof PanelField && ((PanelField) widget).isFromEditor()) {
+      if (widget instanceof PanelField panelField && panelField.isFromEditor()) {
         return Objects.equals(property, mapper.getNameField())
             || Beans.get(JpaSecurity.class)
                 .isPermitted(JpaSecurity.CAN_READ, klass.asSubclass(Model.class));

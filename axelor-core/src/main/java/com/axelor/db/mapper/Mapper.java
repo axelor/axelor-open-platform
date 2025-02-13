@@ -234,8 +234,8 @@ public class Mapper {
     return Optional.ofNullable(getProperty(name))
         .orElseGet(
             () ->
-                bean instanceof MetaJsonRecord
-                    ? JsonProperty.of(((MetaJsonRecord) bean).getJsonModel(), name)
+                bean instanceof MetaJsonRecord metaJsonRecord
+                    ? JsonProperty.of(metaJsonRecord.getJsonModel(), name)
                     : JsonProperty.of(bean.getClass(), name));
   }
 

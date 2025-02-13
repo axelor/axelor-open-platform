@@ -52,9 +52,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
-      if (base instanceof ELClass && FIELD_CLASS.equals(property)) {
+      if (base instanceof ELClass elClass && FIELD_CLASS.equals(property)) {
         context.setPropertyResolved(true);
-        return ((ELClass) base).getKlass();
+        return elClass.getKlass();
       }
 
       if (base != null) {
@@ -111,11 +111,11 @@ public class ELScriptHelper extends AbstractScriptHelper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-      if (base instanceof Map<?, ?>
+      if (base instanceof Map<?, ?> map
           && !(base instanceof ContextEntity)
-          && ((Map<?, ?>) base).containsKey(property)) {
+          && map.containsKey(property)) {
         context.setPropertyResolved(true);
-        return ((Map<?, ?>) base).get(property);
+        return map.get(property);
       }
       if (base instanceof Class<?> && ((Class<?>) base).isEnum()) {
         context.setPropertyResolved(true);
@@ -131,8 +131,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
         Object method,
         Class<?>[] paramTypes,
         Object[] params) {
-      if (base instanceof Class) {
-        final Class<?> klass = (Class<?>) base;
+      if (base instanceof Class<?> klass) {
         try {
           final Method staticMethod = klass.getMethod(method.toString(), paramTypes);
           context.setPropertyResolved(true);
@@ -152,29 +151,29 @@ public class ELScriptHelper extends AbstractScriptHelper {
   public static final class Helpers {
 
     private static Class<?> typeClass(Object type) {
-      if (type instanceof Class<?>) return (Class<?>) type;
+      if (type instanceof Class<?> klass) return klass;
       if (type instanceof String)
         try {
           return Class.forName(type.toString());
         } catch (ClassNotFoundException e) {
           throw new IllegalArgumentException(e);
         }
-      if (type instanceof ELClass) return ((ELClass) type).getKlass();
+      if (type instanceof ELClass elClass) return elClass.getKlass();
       throw new IllegalArgumentException("Invalid type: " + type);
     }
 
     public static Object as(Object base, Object type) {
       final Class<?> klass = typeClass(type);
-      if (base instanceof Context) {
-        return ((Context) base).asType(klass);
+      if (base instanceof Context context) {
+        return context.asType(klass);
       }
       return klass.cast(base);
     }
 
     public static Object is(Object base, Object type) {
       final Class<?> klass = typeClass(type);
-      if (base instanceof Context) {
-        return klass.isAssignableFrom(((Context) base).getContextClass());
+      if (base instanceof Context context) {
+        return klass.isAssignableFrom(context.getContextClass());
       }
       return klass.isInstance(base);
     }
@@ -195,11 +194,11 @@ public class ELScriptHelper extends AbstractScriptHelper {
       if (value == null) {
         return null;
       }
-      if (value instanceof Integer) {
-        return (Integer) value;
+      if (value instanceof Integer integer) {
+        return integer;
       }
-      if (value instanceof Long) {
-        return Ints.checkedCast((Long) value);
+      if (value instanceof Long longValue) {
+        return Ints.checkedCast(longValue);
       }
       return Integer.valueOf(value.toString());
     }

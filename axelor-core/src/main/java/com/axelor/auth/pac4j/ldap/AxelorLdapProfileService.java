@@ -269,15 +269,15 @@ public class AxelorLdapProfileService extends LdapProfileService {
   protected boolean shouldInitialize(boolean forceReinit) {
     final ConnectionFactory factory = getConnectionFactory();
     return super.shouldInitialize(forceReinit)
-        || factory instanceof PooledConnectionFactory
-            && !((PooledConnectionFactory) factory).isInitialized();
+        || factory instanceof PooledConnectionFactory pooledConnectionFactory
+            && !pooledConnectionFactory.isInitialized();
   }
 
   @Override
   protected void internalInit(boolean forceReinit) {
     final ConnectionFactory factory = getConnectionFactory();
-    if (factory instanceof PooledConnectionFactory) {
-      ((PooledConnectionFactory) factory).initialize();
+    if (factory instanceof PooledConnectionFactory pooledConnectionFactory) {
+      pooledConnectionFactory.initialize();
     }
     super.internalInit(forceReinit);
   }
@@ -467,9 +467,9 @@ public class AxelorLdapProfileService extends LdapProfileService {
       final LdapAttribute ldapAttribute = it.next();
       final String name = ldapAttribute.getName();
       final Object value = attributes.get(name);
-      if (value instanceof byte[]) {
+      if (value instanceof byte[] bytes) {
         it.remove();
-        binaryLdapAttributes.add(new LdapAttribute(name, (byte[]) value));
+        binaryLdapAttributes.add(new LdapAttribute(name, bytes));
       }
     }
 

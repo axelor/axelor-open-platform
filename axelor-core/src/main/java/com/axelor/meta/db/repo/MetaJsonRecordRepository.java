@@ -94,8 +94,8 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
    * @return saved instance {@link MetaJsonRecord}
    */
   public MetaJsonRecord save(Context context) {
-    if (context instanceof MetaJsonContext && ((MetaJsonContext) context).record != null) {
-      return save(((MetaJsonContext) context).record);
+    if (context instanceof MetaJsonContext metaJsonContext && metaJsonContext.record != null) {
+      return save(metaJsonContext.record);
     }
     return save(context.asType(MetaJsonRecord.class));
   }

@@ -221,8 +221,8 @@ public class GroovyTemplates implements Templates {
       if (bean == null) return null;
       Iterator<String> iter = Splitter.on(".").split(expr).iterator();
       Object obj = null;
-      if (bean instanceof Map) {
-        obj = ((Map) bean).get(iter.next());
+      if (bean instanceof Map map) {
+        obj = map.get(iter.next());
       } else {
         obj = Mapper.of(EntityHelper.getEntityClass(bean)).get(bean, iter.next());
       }

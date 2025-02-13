@@ -50,7 +50,7 @@ public final class EntityTypes {
 
     @Override
     public boolean equals(Object obj) {
-      return obj instanceof EntityType && ((EntityType) obj).value().isAssignableFrom(value);
+      return obj instanceof EntityType entityType && entityType.value().isAssignableFrom(value);
     }
 
     @Override

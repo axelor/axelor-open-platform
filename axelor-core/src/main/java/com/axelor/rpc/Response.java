@@ -134,16 +134,15 @@ public class Response {
   }
 
   public void setException(Throwable throwable) {
-    if (throwable instanceof ResponseException) {
-      ResponseException error = (ResponseException) throwable;
+    if (throwable instanceof ResponseException error) {
       this.setData(error.toReport());
       this.setStatus(STATUS_FAILURE);
       return;
     }
 
     Throwable cause = Throwables.getRootCause(throwable);
-    if (cause instanceof BatchUpdateException) {
-      cause = ((BatchUpdateException) cause).getNextException();
+    if (cause instanceof BatchUpdateException exception) {
+      cause = exception.getNextException();
     }
 
     String message = throwable.getMessage();

@@ -56,20 +56,20 @@ public final class ObjectUtils {
     if (value == null) {
       return true;
     }
-    if (value instanceof Optional) {
-      return !((Optional<?>) value).isPresent();
+    if (value instanceof Optional<?> optional) {
+      return !optional.isPresent();
     }
     if (value.getClass().isArray()) {
       return Array.getLength(value) == 0;
     }
-    if (value instanceof CharSequence) {
-      return ((CharSequence) value).length() == 0;
+    if (value instanceof CharSequence sequence) {
+      return sequence.length() == 0;
     }
-    if (value instanceof Collection) {
-      return ((Collection<?>) value).isEmpty();
+    if (value instanceof Collection<?> collection) {
+      return collection.isEmpty();
     }
-    if (value instanceof Map) {
-      return ((Map<?, ?>) value).isEmpty();
+    if (value instanceof Map<?, ?> map) {
+      return map.isEmpty();
     }
     return false;
   }

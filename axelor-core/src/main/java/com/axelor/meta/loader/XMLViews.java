@@ -227,14 +227,14 @@ public class XMLViews {
     ObjectViews views = new ObjectViews();
     StringWriter writer = new StringWriter();
 
-    if (obj instanceof Action) {
-      views.setActions(List.of((Action) obj));
+    if (obj instanceof Action action) {
+      views.setActions(List.of(action));
     }
-    if (obj instanceof AbstractView) {
-      views.setViews(List.of((AbstractView) obj));
+    if (obj instanceof AbstractView view) {
+      views.setViews(List.of(view));
     }
-    if (obj instanceof List) {
-      views.setViews((List) obj);
+    if (obj instanceof List list) {
+      views.setViews(list);
     }
     try {
       marshal(views, writer);

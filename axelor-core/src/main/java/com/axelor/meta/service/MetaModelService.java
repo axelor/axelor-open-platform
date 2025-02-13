@@ -237,9 +237,8 @@ public class MetaModelService {
     Type type = field.getGenericType();
     String typeName = null;
 
-    if (type instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType) type;
-      for (Type t : pt.getActualTypeArguments()) {
+    if (type instanceof ParameterizedType parameterizedType) {
+      for (Type t : parameterizedType.getActualTypeArguments()) {
         typeName = t.toString();
       }
     }

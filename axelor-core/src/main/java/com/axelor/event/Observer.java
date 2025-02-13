@@ -48,8 +48,8 @@ class Observer implements Comparable<Observer> {
     final Parameter param = method.getParameters()[0];
 
     for (Annotation annotation : param.getAnnotations()) {
-      if (annotation instanceof Priority) {
-        this.priority = ((Priority) annotation).value();
+      if (annotation instanceof Priority priorityInst) {
+        this.priority = priorityInst.value();
       }
       if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
         qualifiers.add(annotation);
@@ -75,8 +75,8 @@ class Observer implements Comparable<Observer> {
   }
 
   private boolean isUnbounded(Type type) {
-    if (type instanceof ParameterizedType) {
-      for (Type t : ((ParameterizedType) type).getActualTypeArguments()) {
+    if (type instanceof ParameterizedType parameterizedType) {
+      for (Type t : parameterizedType.getActualTypeArguments()) {
         if (t instanceof WildcardType && t.getTypeName().equals("?")) {
           return true;
         }
@@ -108,8 +108,8 @@ class Observer implements Comparable<Observer> {
       // Exception raised by a synchronous or transactional observer for a synchronous event stops
       // the notification chain and the exception is propagated immediately.
       Throwable throwable = e.getCause();
-      if (throwable instanceof RuntimeException) {
-        throw (RuntimeException) throwable;
+      if (throwable instanceof RuntimeException runtimeException) {
+        throw runtimeException;
       }
       throw new ObserverException(throwable);
     } catch (IllegalAccessException e) {

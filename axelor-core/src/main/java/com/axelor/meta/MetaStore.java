@@ -484,8 +484,8 @@ public final class MetaStore {
       Map<String, Object> data = new HashMap<>();
       option.setData(data);
 
-      if (item instanceof ValueEnum<?>) {
-        Object value = ((ValueEnum<?>) item).getValue();
+      if (item instanceof ValueEnum<?> enumValue) {
+        Object value = enumValue.getValue();
         if (!Objects.equals(name, value)) {
           data.put("value", value);
         }

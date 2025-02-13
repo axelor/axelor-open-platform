@@ -119,14 +119,13 @@ public class JsonContext extends SimpleBindings {
   }
 
   private void ensureManaged(Object value) {
-    if (value instanceof Model) {
-      final Model bean = (Model) value;
+    if (value instanceof Model bean) {
       if (bean.getId() == null || bean.getId() <= 0) {
         throw new IllegalArgumentException();
       }
     }
-    if (value instanceof Collection) {
-      ((Collection<?>) value).forEach(this::ensureManaged);
+    if (value instanceof Collection<?> collection) {
+      collection.forEach(this::ensureManaged);
     }
   }
 
@@ -201,12 +200,12 @@ public class JsonContext extends SimpleBindings {
       return super.get(key);
     }
 
-    if (value instanceof Map) {
-      return ContextHandlerFactory.newHandler(targetClass, (Map) value).getProxy();
+    if (value instanceof Map map) {
+      return ContextHandlerFactory.newHandler(targetClass, map).getProxy();
     }
 
-    if (value instanceof Collection) {
-      return ((Collection<?>) value)
+    if (value instanceof Collection<?> collection) {
+      return collection
           .stream()
               .map(item -> (Map<String, Object>) item)
               .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())

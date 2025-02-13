@@ -512,8 +512,8 @@ public class RestService extends ResourceService {
       return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
-    if (bean instanceof MetaFile) {
-      return download((MetaFile) bean, fileName, checkOnly);
+    if (bean instanceof MetaFile metaFile) {
+      return download(metaFile, fileName, checkOnly);
     }
 
     if (StringUtils.isBlank(fileName)) {
@@ -521,8 +521,8 @@ public class RestService extends ResourceService {
     }
     Object data = mapper.get(bean, field);
 
-    if (data instanceof MetaFile) {
-      return download((MetaFile) data, fileName, checkOnly);
+    if (data instanceof MetaFile metaFile) {
+      return download(metaFile, fileName, checkOnly);
     }
 
     if (isImage) {
@@ -530,8 +530,8 @@ public class RestService extends ResourceService {
         return jakarta.ws.rs.core.Response.ok().build();
       }
       String base64 = BLANK_IMAGE;
-      if (data instanceof byte[]) {
-        base64 = new String((byte[]) data);
+      if (data instanceof byte[] bytes) {
+        base64 = new String(bytes);
       }
       try {
         base64 = base64.substring(base64.indexOf(";base64,") + 8);

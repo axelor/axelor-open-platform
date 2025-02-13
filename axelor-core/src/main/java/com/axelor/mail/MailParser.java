@@ -307,8 +307,8 @@ public final class MailParser {
 
     @Override
     public FilterResult head(Node node, int depth) {
-      if (node instanceof TextNode) {
-        builder.append(((TextNode) node).text());
+      if (node instanceof TextNode textNode) {
+        builder.append(textNode.text());
         return FilterResult.CONTINUE;
       }
       final String name = node.nodeName();

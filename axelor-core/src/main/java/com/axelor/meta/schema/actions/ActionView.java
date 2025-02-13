@@ -188,22 +188,22 @@ public class ActionView extends Action {
       for (Context ctx : contexts) {
         if (ctx.test(handler)) {
           Object value = handler.evaluate(ctx.getExpression());
-          if (Boolean.TRUE.equals(ctx.getCanCopy()) && value instanceof Model) {
-            value = JPA.copy((Model) value, true);
+          if (Boolean.TRUE.equals(ctx.getCanCopy()) && value instanceof Model model) {
+            value = JPA.copy(model, true);
           }
-          if (value instanceof ContextEntity) {
-            value = ((ContextEntity) value).getContextMap();
+          if (value instanceof ContextEntity entity) {
+            value = entity.getContextMap();
           }
           if (value instanceof Model && JPA.em().contains(value)) {
             value = Resource.toMapCompact(value);
           }
-          if (value instanceof Collection) {
+          if (value instanceof Collection<?> collection) {
             value =
                 Collections2.transform(
-                    (Collection<?>) value,
+                    collection,
                     item -> {
-                      if (item instanceof ContextEntity) {
-                        return ((ContextEntity) item).getContextMap();
+                      if (item instanceof ContextEntity entity) {
+                        return entity.getContextMap();
                       }
                       return item instanceof Model && JPA.em().contains(item)
                           ? Resource.toMapCompact(item)
@@ -338,10 +338,10 @@ public class ActionView extends Action {
 
     public ActionViewBuilder context(String key, Object value) {
       this.context.put(key, value);
-      if (value instanceof String) {
+      if (value instanceof String string) {
         Context context = new Context();
         context.setName(key);
-        context.setExpression((String) value);
+        context.setExpression(string);
         view.contexts.add(context);
       }
       return this;

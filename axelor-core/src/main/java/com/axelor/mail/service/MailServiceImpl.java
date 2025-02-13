@@ -258,8 +258,8 @@ public class MailServiceImpl implements MailService, MailConstants {
           getSubject(message.getParent() == null ? message.getRoot() : message.getParent(), entity);
     }
     // in case of message groups
-    if (subject == null && entity instanceof Team) {
-      subject = ((Team) entity).getName();
+    if (subject == null && entity instanceof Team team) {
+      subject = team.getName();
     }
     if (message.getParent() != null && subject != null) {
       subject = "Re: " + subject;
@@ -660,8 +660,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     int count = 0;
     for (Message message : messages) {
-      if (message instanceof MimeMessage) {
-        final MailMessage entity = messageReceived((MimeMessage) message);
+      if (message instanceof MimeMessage mimeMessage) {
+        final MailMessage entity = messageReceived(mimeMessage);
         if (entity != null) {
           repo.save(entity);
           count += 1;

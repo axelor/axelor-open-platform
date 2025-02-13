@@ -260,8 +260,8 @@ public class JobRunner {
 
     for (Object item : records) {
       Long id =
-          item instanceof MetaSchedule
-              ? ((MetaSchedule) item).getId()
+          item instanceof MetaSchedule metaSchedule
+              ? metaSchedule.getId()
               : Longs.tryParse(((Map<?, ?>) item).get("id").toString());
       MetaSchedule record = Beans.get(MetaScheduleRepository.class).find(id);
       if (Boolean.TRUE.equals(record.getActive())) {

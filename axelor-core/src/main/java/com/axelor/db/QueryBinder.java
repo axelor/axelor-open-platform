@@ -146,8 +146,8 @@ public class QueryBinder {
 
     final ScriptBindings bindings;
 
-    if (namedParams instanceof ScriptBindings) {
-      bindings = (ScriptBindings) namedParams;
+    if (namedParams instanceof ScriptBindings scriptBindings) {
+      bindings = scriptBindings;
     } else {
       Map<String, Object> variables = new HashMap<>();
       if (namedParams != null) {
@@ -178,12 +178,11 @@ public class QueryBinder {
       int pos = i + 1;
       Parameter<?> param;
       Object value = params[i];
-      if (value instanceof ContextEntity) {
-        value = ((ContextEntity) value).getContextId();
-      } else if (value instanceof Model) {
-        value = ((Model) value).getId();
-      } else if (value instanceof String) {
-        final String expr = (String) value;
+      if (value instanceof ContextEntity entity) {
+        value = entity.getContextId();
+      } else if (value instanceof Model model) {
+        value = model.getId();
+      } else if (value instanceof String expr) {
         if (expr.startsWith("__") && expr.endsWith("__") && bindings.containsKey(expr)) {
           // special variable
           value = bindings.get(expr);
@@ -195,8 +194,8 @@ public class QueryBinder {
         continue;
       }
 
-      if (value instanceof Collection) {
-        query.setParameter(pos, adaptCollection((Collection<?>) value, param));
+      if (value instanceof Collection<?> collection) {
+        query.setParameter(pos, adaptCollection(collection, param));
       } else {
         try {
           query.setParameter(pos, value);
@@ -260,16 +259,16 @@ public class QueryBinder {
       return this;
     }
 
-    if (value instanceof ContextEntity) {
-      value = ((ContextEntity) value).getContextId();
-    } else if (value instanceof Model) {
-      value = ((Model) value).getId();
-    } else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+    if (value instanceof ContextEntity entity) {
+      value = entity.getContextId();
+    } else if (value instanceof Model model) {
+      value = model.getId();
+    } else if (value == null || value instanceof String string && "".equals(string.trim())) {
       value = adapt(value, parameter);
     }
 
-    if (value instanceof Collection) {
-      query.setParameter(name, adaptCollection((Collection<?>) value, parameter));
+    if (value instanceof Collection<?> collection) {
+      query.setParameter(name, adaptCollection(collection, parameter));
     } else {
       try {
         query.setParameter(name, value);
@@ -316,10 +315,9 @@ public class QueryBinder {
   private Object adapt(Object value, Class<?> type) {
     value = Adapter.adapt(value, type, type, null);
 
-    if (value instanceof Number && Model.class.isAssignableFrom(type)) {
-      value = JPA.em().find(type, ((Number) value).longValue());
-    } else if (value instanceof Model && type.isInstance(value)) {
-      Model bean = (Model) value;
+    if (value instanceof Number number && Model.class.isAssignableFrom(type)) {
+      value = JPA.em().find(type, number.longValue());
+    } else if (value instanceof Model bean && type.isInstance(value)) {
       if (bean.getId() != null) {
         value = JPA.find(bean.getClass(), bean.getId());
       }

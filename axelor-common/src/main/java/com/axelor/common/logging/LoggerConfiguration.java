@@ -318,8 +318,8 @@ public class LoggerConfiguration {
   }
 
   private void start(LifeCycle lifeCycle) {
-    if (lifeCycle instanceof ContextAware) {
-      ((ContextAware) lifeCycle).setContext(this.context);
+    if (lifeCycle instanceof ContextAware aware) {
+      aware.setContext(this.context);
     }
     lifeCycle.start();
   }

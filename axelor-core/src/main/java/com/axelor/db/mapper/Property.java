@@ -171,11 +171,11 @@ public class Property {
         type = PropertyType.DECIMAL;
       }
 
-      if (annotation instanceof OneToOne) {
+      if (annotation instanceof OneToOne oneToOne) {
         type = PropertyType.ONE_TO_ONE;
         target = (Class<? extends Model>) javaType;
-        mappedBy = ((OneToOne) annotation).mappedBy();
-        orphan = !((OneToOne) annotation).orphanRemoval();
+        mappedBy = oneToOne.mappedBy();
+        orphan = !oneToOne.orphanRemoval();
       }
 
       if (annotation instanceof ManyToOne) {
@@ -183,19 +183,19 @@ public class Property {
         target = (Class<? extends Model>) javaType;
       }
 
-      if (annotation instanceof OneToMany) {
+      if (annotation instanceof OneToMany oneToMany) {
         type = PropertyType.ONE_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = ((OneToMany) annotation).mappedBy();
-        orphan = !((OneToMany) annotation).orphanRemoval();
+        mappedBy = oneToMany.mappedBy();
+        orphan = !oneToMany.orphanRemoval();
       }
 
-      if (annotation instanceof ManyToMany) {
+      if (annotation instanceof ManyToMany manyToMany) {
         type = PropertyType.MANY_TO_MANY;
         target =
             (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-        mappedBy = ((ManyToMany) annotation).mappedBy();
+        mappedBy = manyToMany.mappedBy();
       }
 
       if (annotation instanceof Id) {
@@ -209,8 +209,7 @@ public class Property {
         hidden = true;
       }
 
-      if (annotation instanceof Column) {
-        final Column column = (Column) annotation;
+      if (annotation instanceof Column column) {
         unique = column.unique();
         nullable = column.nullable();
 
@@ -223,30 +222,24 @@ public class Property {
       if (annotation instanceof NotNull) {
         required = true;
       }
-      if (annotation instanceof Size) {
-        Size s = (Size) annotation;
+      if (annotation instanceof Size s) {
         maxSize = s.max();
         minSize = s.min();
       }
-      if (annotation instanceof Digits) {
-        Digits d = (Digits) annotation;
+      if (annotation instanceof Digits d) {
         scale = d.fraction();
         precision = d.integer() + scale;
       }
-      if (annotation instanceof Min) {
-        Min m = (Min) annotation;
+      if (annotation instanceof Min m) {
         minSize = m.value();
       }
-      if (annotation instanceof Max) {
-        Max m = (Max) annotation;
+      if (annotation instanceof Max m) {
         maxSize = m.value();
       }
-      if (annotation instanceof DecimalMin) {
-        DecimalMin m = (DecimalMin) annotation;
+      if (annotation instanceof DecimalMin m) {
         minSize = m.value();
       }
-      if (annotation instanceof DecimalMax) {
-        DecimalMax m = (DecimalMax) annotation;
+      if (annotation instanceof DecimalMax m) {
         maxSize = m.value();
       }
 
@@ -267,29 +260,28 @@ public class Property {
         equalsInclude = true;
       }
 
-      if (annotation instanceof Sequence) {
+      if (annotation instanceof Sequence sequenceAnnotation) {
         sequence = true;
-        sequenceName = ((Sequence) annotation).value();
+        sequenceName = sequenceAnnotation.value();
       }
 
-      if (annotation instanceof org.hibernate.annotations.Type) {
+      if (annotation instanceof org.hibernate.annotations.Type typeAnnotation) {
         Class<? extends UserType<?>> userType =
-            ((org.hibernate.annotations.Type) annotation).value();
+            typeAnnotation.value();
         json = JsonType.class.isAssignableFrom(userType);
         encrypted = EncryptedTextType.class.isAssignableFrom(userType);
       }
 
       // encrypted
-      if (annotation instanceof Convert) {
-        Class<?> converter = ((Convert) annotation).converter();
+      if (annotation instanceof Convert convert) {
+        Class<?> converter = convert.converter();
         if (AbstractEncryptedConverter.class.isAssignableFrom(converter)) {
           encrypted = true;
         }
       }
 
       // Widget attributes
-      if (annotation instanceof Widget) {
-        Widget w = (Widget) annotation;
+      if (annotation instanceof Widget w) {
         title = w.title();
         help = w.help();
         readonly = w.readonly();
@@ -566,8 +558,8 @@ public class Property {
 
     if (this.isCollection()) {
       this.clear(bean);
-      if (value instanceof Collection<?>) {
-        this.addAll(bean, (Collection<?>) value);
+      if (value instanceof Collection<?> collection) {
+        this.addAll(bean, collection);
       } else {
         this.add(bean, value);
       }
@@ -720,8 +712,8 @@ public class Property {
    */
   public boolean valueChanged(Object bean, Object oldValue) {
     Object current = get(bean);
-    if (current instanceof BigDecimal && oldValue instanceof BigDecimal) {
-      return ((BigDecimal) current).compareTo((BigDecimal) oldValue) != 0;
+    if (current instanceof BigDecimal currentDecimal && oldValue instanceof BigDecimal oldDecimal) {
+      return currentDecimal.compareTo(oldDecimal) != 0;
     }
     return !Objects.equals(current, oldValue);
   }
@@ -750,10 +742,10 @@ public class Property {
 
       if ((value == null)
           || Modifier.isTransient(field.getModifiers())
-          || (value instanceof String && ((String) value).equals(""))
-          || (value instanceof Boolean && !((Boolean) value))
-          || (value instanceof Integer && ((Integer) value) == 0)
-          || (value instanceof Object[] && ((Object[]) value).length == 0)) {
+          || (value instanceof String strValue && strValue.equals(""))
+          || (value instanceof Boolean boolValue && !boolValue)
+          || (value instanceof Integer intValue && intValue == 0)
+          || (value instanceof Object[] objValue && objValue.length == 0)) {
         continue;
       }
 

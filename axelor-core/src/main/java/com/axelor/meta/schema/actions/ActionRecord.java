@@ -207,8 +207,8 @@ public class ActionRecord extends Action {
         }
 
         if (Boolean.TRUE.equals(((RecordField) recordField).getCanCopy())
-            && value instanceof Model) {
-          value = JPA.copy((Model) value, true);
+            && value instanceof Model model) {
+          value = JPA.copy(model, true);
         }
 
         try {

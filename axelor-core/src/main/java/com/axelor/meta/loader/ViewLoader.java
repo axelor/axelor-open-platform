@@ -265,8 +265,7 @@ public class ViewLoader extends AbstractParallelLoader {
       return;
     }
 
-    if (view instanceof ExtendableView) {
-      final ExtendableView extendableView = (ExtendableView) view;
+    if (view instanceof ExtendableView extendableView) {
       final boolean isExtension = Boolean.TRUE.equals(view.getExtension());
 
       if (isExtension || computedViews.contains(name)) {
@@ -559,8 +558,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String type = klass.getSimpleName().replaceAll("([a-z\\d])([A-Z]+)", "$1-$2").toLowerCase();
     entity.setType(type);
 
-    if (action instanceof ActionView) {
-      ActionView view = (ActionView) action;
+    if (action instanceof ActionView view) {
       Boolean home = view.getHome();
       if (home == null) {
         for (ActionView.View item : view.getViews()) {

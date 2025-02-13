@@ -93,13 +93,13 @@ public class EclipseSupport extends AbstractSupport {
               cp.getEntries()
                   .removeIf(
                       it ->
-                          it instanceof SourceFolder
-                              && ((SourceFolder) it).getPath().contains(project.getName()));
+                          it instanceof SourceFolder sourceFolder
+                              && sourceFolder.getPath().contains(project.getName()));
               cp.getEntries()
                   .removeIf(
                       it ->
-                          it instanceof Library
-                              && ((Library) it).getPath().contains(project.getName() + "/build"));
+                          it instanceof Library l
+                              && l.getPath().contains(project.getName() + "/build"));
             });
 
     // finally configure wtp resources

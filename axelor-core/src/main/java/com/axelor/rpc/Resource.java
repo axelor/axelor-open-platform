@@ -690,8 +690,8 @@ public class Resource<T extends Model> {
                   .filter(
                       entry -> {
                         final Object value = entry.getValue();
-                        if (value instanceof Map) {
-                          return !EXCLUDED_EXPORT_TYPES.contains(((Map<?, ?>) value).get("type"));
+                        if (value instanceof Map<?, ?> mapInstance) {
+                          return !EXCLUDED_EXPORT_TYPES.contains(mapInstance.get("type"));
                         }
                         return true;
                       })
@@ -929,22 +929,22 @@ public class Resource<T extends Model> {
               .collect(Collectors.joining(", "));
     }
 
-    if (objValue instanceof String) {
+    if (objValue instanceof String string) {
       if (translatableNames.contains(names.get(index))) {
-        objValue = getValueTranslation(bundle, (String) objValue);
+        objValue = getValueTranslation(bundle, string);
       }
-    } else if (objValue instanceof Number) {
-      objValue = formatter.format((Number) objValue, false);
-    } else if (objValue instanceof LocalDate) {
-      objValue = formatter.format((LocalDate) objValue);
-    } else if (objValue instanceof LocalTime) {
-      objValue = formatter.format((LocalTime) objValue);
-    } else if (objValue instanceof LocalDateTime) {
-      objValue = formatter.format((LocalDateTime) objValue);
-    } else if (objValue instanceof ZonedDateTime) {
-      objValue = formatter.format((ZonedDateTime) objValue);
-    } else if (objValue instanceof Enum) {
-      objValue = getTranslation(bundle, getTitle((Enum<?>) objValue));
+    } else if (objValue instanceof Number number) {
+      objValue = formatter.format(number, false);
+    } else if (objValue instanceof LocalDate localDate) {
+      objValue = formatter.format(localDate);
+    } else if (objValue instanceof LocalTime localTime) {
+      objValue = formatter.format(localTime);
+    } else if (objValue instanceof LocalDateTime localDateTime) {
+      objValue = formatter.format(localDateTime);
+    } else if (objValue instanceof ZonedDateTime zonedDateTime) {
+      objValue = formatter.format(zonedDateTime);
+    } else if (objValue instanceof Enum<?> enumVal) {
+      objValue = getTranslation(bundle, getTitle(enumVal));
     }
     return objValue == null ? "" : objValue.toString();
   }
@@ -1130,20 +1130,19 @@ public class Resource<T extends Model> {
               final String[] names = e.getValue().toArray(new String[] {});
               Object old = values.get(name);
               Object value = mapper.get(entity, name);
-              if (value instanceof Collection<?>) {
+              if (value instanceof Collection<?> collection) {
                 value =
-                    ((Collection<?>) value)
+                    collection
                         .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
-              } else if (value instanceof Model) {
-                final Model modelValue = (Model) value;
+              } else if (value instanceof Model modelValue) {
                 final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
                 if (jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {
                   value = toMap(value, filterPermitted(value, names));
                 } else {
                   value = toMap(value, "id");
                 }
-                if (old instanceof Map) {
-                  value = mergeMaps((Map) value, (Map) old);
+                if (old instanceof Map map) {
+                  value = mergeMaps((Map) value, map);
                 }
               }
               values.put(name, value);
@@ -1159,8 +1158,8 @@ public class Resource<T extends Model> {
     for (String key : source.keySet()) {
       Object old = source.get(key);
       Object val = target.get(key);
-      if (val instanceof Map && old instanceof Map) {
-        mergeMaps((Map) val, (Map) old);
+      if (val instanceof Map map && old instanceof Map oldMap) {
+        mergeMaps(map, oldMap);
       } else if (val == null) {
         target.put(key, old);
       }
@@ -1178,8 +1177,8 @@ public class Resource<T extends Model> {
       Object value = entry.getValue();
       Object old = target.get(name);
 
-      if (value instanceof Map && old instanceof Map) {
-        value = mergeGraph((Map) old, (Map) value);
+      if (value instanceof Map map && old instanceof Map oldMap) {
+        value = mergeGraph(oldMap, map);
       }
 
       if (value instanceof Collection && old instanceof Collection) {
@@ -1306,8 +1305,8 @@ public class Resource<T extends Model> {
             Model bean = JPA.edit(model, (Map) record);
 
             // if user, update password
-            if (bean instanceof User) {
-              changeUserPassword((User) bean, (Map) record);
+            if (bean instanceof User user) {
+              changeUserPassword(user, (Map) record);
             }
 
             bean = JPA.manage(bean);
@@ -1816,8 +1815,7 @@ public class Resource<T extends Model> {
 
       // decimal values should be rounded accordingly otherwise the
       // json mapper may use wrong scale.
-      if (value instanceof BigDecimal) {
-        BigDecimal decimal = (BigDecimal) value;
+      if (value instanceof BigDecimal decimal) {
         int scale = prop.getScale();
         if (decimal.scale() == 0 && scale > 0 && scale != decimal.scale()) {
           value = decimal.setScale(scale, RoundingMode.HALF_UP);
@@ -1852,11 +1850,11 @@ public class Resource<T extends Model> {
       }
 
       // include custom enum value
-      if (prop.isEnum() && value instanceof ValueEnum<?>) {
+      if (prop.isEnum() && value instanceof ValueEnum<?> valueEnum) {
         String enumName = ((Enum<?>) value).name();
-        Object enumValue = ((ValueEnum<?>) value).getValue();
+        Object enumValue = valueEnum.getValue();
         if (!Objects.equals(enumName, enumValue)) {
-          result.put(name + "$value", ((ValueEnum<?>) value).getValue());
+          result.put(name + "$value", valueEnum.getValue());
         }
       }
     }

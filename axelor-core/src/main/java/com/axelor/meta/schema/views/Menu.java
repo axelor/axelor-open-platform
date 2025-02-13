@@ -84,11 +84,11 @@ public class Menu extends SimpleWidget {
   public List<AbstractWidget> getItems() {
     if (items != null) {
       for (Object item : items) {
-        if (item instanceof Item) {
-          ((Item) item).setModel(getModel());
+        if (item instanceof Item mItem) {
+          mItem.setModel(getModel());
         }
-        if (item instanceof Menu) {
-          ((Menu) item).setModel(getModel());
+        if (item instanceof Menu menu) {
+          menu.setModel(getModel());
         }
       }
     }

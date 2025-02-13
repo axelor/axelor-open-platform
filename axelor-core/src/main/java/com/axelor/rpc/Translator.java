@@ -74,8 +74,8 @@ final class Translator {
 
   static Map<String, Object> translate(Map<String, Object> values, String name) {
     Object value = values.get(name);
-    if (value instanceof String) {
-      Object val = getTranslation((String) value);
+    if (value instanceof String string) {
+      Object val = getTranslation(string);
       if (!Objects.equals(val, value)) {
         values.put(toKey(name), val);
       }

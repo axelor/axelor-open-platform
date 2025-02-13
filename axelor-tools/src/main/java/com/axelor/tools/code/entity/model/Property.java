@@ -865,7 +865,7 @@ public abstract class Property {
             $orderBy(),
             $sequence(),
             $converter())
-        .flatMap(x -> x instanceof Collection ? ((Collection<?>) x).stream() : Stream.of(x))
+        .flatMap(x -> x instanceof Collection<?> c ? c.stream() : Stream.of(x))
         .filter(Objects::nonNull)
         .map(JavaAnnotation.class::cast)
         .forEach(field::annotation);

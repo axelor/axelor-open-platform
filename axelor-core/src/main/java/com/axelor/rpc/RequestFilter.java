@@ -38,8 +38,8 @@ public class RequestFilter implements MethodInterceptor, WriterInterceptor {
   private Request getRequest(MethodInvocation invocation) {
     final Object[] args = invocation.getArguments();
     for (Object arg : args) {
-      if (arg instanceof Request) {
-        return (Request) arg;
+      if (arg instanceof Request request) {
+        return request;
       }
     }
     return null;

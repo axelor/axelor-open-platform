@@ -262,8 +262,8 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
     }
     for (AbstractWidget item : items) {
       item.setModel(super.getModel());
-      if (item instanceof PanelInclude) {
-        ((PanelInclude) item).setOwner(this);
+      if (item instanceof PanelInclude panelInclude) {
+        panelInclude.setOwner(this);
       }
     }
     return items;

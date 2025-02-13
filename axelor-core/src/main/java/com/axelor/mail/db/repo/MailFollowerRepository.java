@@ -61,9 +61,9 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     final Long relatedId;
     final String relatedModel;
 
-    if (entity instanceof MailMessage) {
-      relatedId = ((MailMessage) entity).getRelatedId();
-      relatedModel = ((MailMessage) entity).getRelatedModel();
+    if (entity instanceof MailMessage message) {
+      relatedId = message.getRelatedId();
+      relatedModel = message.getRelatedModel();
     } else {
       relatedId = entity.getId();
       relatedModel = EntityHelper.getEntityClass(entity).getName();
@@ -87,9 +87,9 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     final Long relatedId;
     final String relatedModel;
 
-    if (entity instanceof MailMessage) {
-      relatedId = ((MailMessage) entity).getRelatedId();
-      relatedModel = ((MailMessage) entity).getRelatedModel();
+    if (entity instanceof MailMessage message) {
+      relatedId = message.getRelatedId();
+      relatedModel = message.getRelatedModel();
     } else {
       relatedId = entity.getId();
       relatedModel = EntityHelper.getEntityClass(entity).getName();
@@ -116,9 +116,9 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     final Long relatedId;
     final String relatedModel;
 
-    if (entity instanceof MailMessage) {
-      relatedId = ((MailMessage) entity).getRelatedId();
-      relatedModel = ((MailMessage) entity).getRelatedModel();
+    if (entity instanceof MailMessage message) {
+      relatedId = message.getRelatedId();
+      relatedModel = message.getRelatedModel();
     } else {
       relatedId = entity.getId();
       relatedModel = EntityHelper.getEntityClass(entity).getName();
@@ -259,9 +259,9 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     follower.setUser(user);
 
     // create menu
-    if (entity instanceof Team) {
-      ((Team) entity).addMember(user);
-      createOrDeleteMenu((Team) entity, user, false);
+    if (entity instanceof Team team) {
+      team.addMember(user);
+      createOrDeleteMenu(team, user, false);
     }
 
     save(follower);
@@ -315,9 +315,9 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     }
 
     // remove menu
-    if (entity instanceof Team) {
-      ((Team) entity).removeMember(user);
-      createOrDeleteMenu((Team) entity, user, true);
+    if (entity instanceof Team team) {
+      team.removeMember(user);
+      createOrDeleteMenu(team, user, true);
     }
   }
 

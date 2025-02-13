@@ -122,8 +122,8 @@ public abstract class AbstractJsonExtractFunction extends StandardSQLFunction {
         pathArgs.stream()
             .map(
                 arg ->
-                    arg instanceof Literal
-                        ? ((Literal) arg).getLiteralValue().toString()
+                    arg instanceof Literal l
+                        ? l.getLiteralValue().toString()
                         : arg.toString())
             .map(AbstractJsonExtractFunction::validateArg)
             .collect(collectPath);

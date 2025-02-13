@@ -487,8 +487,8 @@ public class Search extends AbstractView {
       }
 
       for (int i = 1; i < names.length; i++) {
-        if (value instanceof Map) {
-          value = ((Map) value).get(names[i]);
+        if (value instanceof Map map) {
+          value = map.get(names[i]);
         } else if (value instanceof Model) {
           Mapper mapper = Mapper.of(value.getClass());
           value = mapper.get(value, names[i]);
@@ -514,8 +514,8 @@ public class Search extends AbstractView {
 
           if (value != null) {
 
-            if (value instanceof String) {
-              value = ((String) value).trim();
+            if (value instanceof String string) {
+              value = string.trim();
             }
 
             Filter filter;

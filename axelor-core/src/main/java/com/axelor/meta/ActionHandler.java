@@ -433,9 +433,9 @@ public class ActionHandler {
 
   private Object toCompact(final Object item) {
     if (item == null) return null;
-    if (item instanceof Collection) {
+    if (item instanceof Collection<?> collection) {
       return Collections2.transform(
-          (Collection<?>) item,
+          collection,
           new Function<Object, Object>() {
             @Override
             public Object apply(Object input) {
@@ -443,8 +443,7 @@ public class ActionHandler {
             }
           });
     }
-    if (item instanceof Model) {
-      Model bean = (Model) item;
+    if (item instanceof Model bean) {
       if (bean.getId() != null && JPA.em().contains(bean)) {
         return Resource.toMapCompact(bean);
       }
@@ -459,9 +458,9 @@ public class ActionHandler {
   @SuppressWarnings("all")
   private Object process(Object data) {
     if (data == null || data instanceof ContextEntity) return data;
-    if (data instanceof Collection) {
+    if (data instanceof Collection collection) {
       final List items = new ArrayList<>();
-      for (Object item : (Collection) data) {
+      for (Object item : collection) {
         items.add(process(item));
       }
       return items;
@@ -513,8 +512,8 @@ public class ActionHandler {
 
     Object data = action.wrap(this);
 
-    if (data instanceof ActionResponse) {
-      return (ActionResponse) data;
+    if (data instanceof ActionResponse actionResponse) {
+      return actionResponse;
     }
 
     response.setData(process(data));

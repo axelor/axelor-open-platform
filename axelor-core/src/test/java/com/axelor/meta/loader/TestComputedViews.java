@@ -97,7 +97,7 @@ public class TestComputedViews extends MetaTest {
 
   Field findFieldInView(GridView view, String field) {
     return view.getItems().stream()
-        .filter(it -> it instanceof Field && ((Field) it).getName().equals(field))
+        .filter(it -> it instanceof Field f && f.getName().equals(field))
         .map(Field.class::cast)
         .findFirst()
         .orElse(null);
@@ -105,7 +105,7 @@ public class TestComputedViews extends MetaTest {
 
   Button findButtonInView(GridView view, String button) {
     return view.getItems().stream()
-        .filter(it -> it instanceof Button && ((Button) it).getName().equals(button))
+        .filter(it -> it instanceof Button b && b.getName().equals(button))
         .map(Button.class::cast)
         .findFirst()
         .orElse(null);

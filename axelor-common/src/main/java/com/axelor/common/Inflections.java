@@ -188,7 +188,7 @@ public class Inflections {
     public boolean equals(Object obj) {
       if (obj == this) return true;
       if (obj == null) return false;
-      if (obj instanceof Rule && pattern.equals(((Rule) obj).pattern)) {
+      if (obj instanceof Rule rule && pattern.equals(rule.pattern)) {
         return true;
       }
       return false;

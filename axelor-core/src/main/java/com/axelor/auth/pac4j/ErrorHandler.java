@@ -55,8 +55,7 @@ public class ErrorHandler {
       throw runtimeException(e);
     }
 
-    if (e instanceof HttpAction) {
-      final var action = (HttpAction) e;
+    if (e instanceof HttpAction action) {
       logger.debug("extra HTTP action required in security: {}", action.getCode());
       return httpActionAdapter.adapt(action, context);
     }
@@ -76,8 +75,8 @@ public class ErrorHandler {
   }
 
   protected RuntimeException runtimeException(final Exception exception) {
-    if (exception instanceof RuntimeException) {
-      throw (RuntimeException) exception;
+    if (exception instanceof RuntimeException runtimeException) {
+      throw runtimeException;
     } else {
       throw new RuntimeException(exception);
     }

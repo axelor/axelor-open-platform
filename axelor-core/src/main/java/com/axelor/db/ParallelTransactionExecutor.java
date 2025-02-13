@@ -166,10 +166,10 @@ public class ParallelTransactionExecutor {
 
               if (cause instanceof ErrorInAnotherWorker) {
                 return;
-              } else if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-              } else if (cause instanceof Error) {
-                throw (Error) cause;
+              } else if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+              } else if (cause instanceof Error error) {
+                throw error;
               } else {
                 // Should never happen
                 throw new IllegalStateException(cause);

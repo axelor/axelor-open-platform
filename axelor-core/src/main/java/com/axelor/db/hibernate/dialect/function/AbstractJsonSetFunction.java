@@ -67,8 +67,8 @@ public abstract class AbstractJsonSetFunction extends StandardSQLFunction {
     translator.render(field, SqlAstNodeRenderingMode.DEFAULT);
     sqlAppender.appendSql(", ");
 
-    if (path instanceof Literal) {
-      final String pathName = ((Literal) path).getLiteralValue().toString();
+    if (path instanceof Literal literal) {
+      final String pathName = literal.getLiteralValue().toString();
       validatePath(pathName);
       sqlAppender.appendSql(transformPath(pathName));
     } else {

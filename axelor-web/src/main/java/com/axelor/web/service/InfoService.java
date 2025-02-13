@@ -423,24 +423,24 @@ public class InfoService extends AbstractService {
   }
 
   public String getLink(Object value) {
-    if (value instanceof String) {
-      return (String) value;
+    if (value instanceof String stringValue) {
+      return stringValue;
     }
-    if (value instanceof MetaFile) {
+    if (value instanceof MetaFile metaFile) {
       return "ws/rest/"
           + MetaFile.class.getName()
           + "/"
-          + ((MetaFile) value).getId()
+          + metaFile.getId()
           + "/content/download?v="
-          + ((MetaFile) value).getVersion();
+          + metaFile.getVersion();
     }
-    if (value instanceof User) {
+    if (value instanceof User user) {
       return "ws/rest/"
           + User.class.getName()
           + "/"
-          + ((User) value).getId()
+          + user.getId()
           + "/image/download?image=true&v="
-          + ((User) value).getVersion();
+          + user.getVersion();
     }
     return null;
   }

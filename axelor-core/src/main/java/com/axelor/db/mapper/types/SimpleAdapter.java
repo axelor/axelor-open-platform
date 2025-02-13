@@ -31,7 +31,7 @@ public class SimpleAdapter implements TypeAdapter<Object> {
   @Override
   public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
 
-    if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
+    if (value == null || (value instanceof String string && "".equals(string.trim()))) {
       return adaptNull(value, type, genericType, annotations);
     }
 
@@ -55,8 +55,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
       return value.toString();
     }
 
-    if (type == byte[].class && value instanceof String) {
-      return ((String) value).getBytes();
+    if (type == byte[].class && value instanceof String string) {
+      return string.getBytes();
     }
 
     if (type == Character.TYPE || type == Character.class)
@@ -67,8 +67,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
     if (type == Short.TYPE || type == Short.class) return Short.valueOf(value.toString());
 
     if (type == Integer.TYPE || type == Integer.class) {
-      if (value instanceof Number) {
-        return ((Number) value).intValue();
+      if (value instanceof Number number) {
+        return number.intValue();
       }
       return Integer.valueOf(value.toString());
     }
@@ -114,8 +114,8 @@ public class SimpleAdapter implements TypeAdapter<Object> {
     }
 
     for (Annotation annotation : annotations) {
-      if (annotation instanceof Column) {
-        return ((Column) annotation).nullable();
+      if (annotation instanceof Column column) {
+        return column.nullable();
       }
     }
 

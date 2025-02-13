@@ -55,9 +55,9 @@ public interface ValueEnum<T> {
         }
       }
     }
-    if (value instanceof String) {
+    if (value instanceof String string) {
       try {
-        return Enum.valueOf(enumType, (String) value);
+        return Enum.valueOf(enumType, string);
       } catch (Exception e) {
       }
     }

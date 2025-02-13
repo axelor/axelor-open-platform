@@ -49,8 +49,8 @@ public class AuthPac4jListener implements AuthenticationListener {
 
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
-    if (info instanceof UserAuthenticationInfo) {
-      final User user = ((UserAuthenticationInfo) info).getUser();
+    if (info instanceof UserAuthenticationInfo authenticationInfo) {
+      final User user = authenticationInfo.getUser();
 
       if (user != null) {
         sessionManager.changeSessionId();

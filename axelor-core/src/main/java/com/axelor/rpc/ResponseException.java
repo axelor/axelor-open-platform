@@ -77,21 +77,18 @@ public class ResponseException extends RuntimeException {
       report.put("causeString", cause.toString());
     }
 
-    if (cause instanceof OptimisticLockException) {
-      OptimisticLockException ex = (OptimisticLockException) cause;
+    if (cause instanceof OptimisticLockException ex) {
       Object entity = ex.getEntity();
-      if (entity instanceof Model) {
-        report.put("entityId", ((Model) entity).getId());
+      if (entity instanceof Model model) {
+        report.put("entityId", model.getId());
         report.put("entityName", EntityHelper.getEntityClass(entity).getName());
-      } else if (ex.getCause() instanceof StaleObjectStateException) {
-        StaleObjectStateException sx = (StaleObjectStateException) ex.getCause();
+      } else if (ex.getCause() instanceof StaleObjectStateException sx) {
         report.put("entityId", sx.getIdentifier());
         report.put("entityName", sx.getEntityName());
       }
     }
 
-    if (cause instanceof ConstraintViolationException) {
-      ConstraintViolationException ex = (ConstraintViolationException) cause;
+    if (cause instanceof ConstraintViolationException ex) {
       Map<String, Object> errors = new HashMap<>();
       ex.getConstraintViolations()
           .forEach(error -> errors.put(error.getPropertyPath().toString(), error.getMessage()));

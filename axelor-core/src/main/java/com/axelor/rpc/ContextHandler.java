@@ -178,9 +178,9 @@ public class ContextHandler<T> {
     if (property == null) {
       return value;
     }
-    if (property.isCollection() && value instanceof Collection) {
+    if (property.isCollection() && value instanceof Collection<?> collection) {
       value =
-          ((Collection<?>) value)
+          collection
               .stream().map(item -> createOrFind(property, item)).collect(Collectors.toList());
     } else if (property.isReference()) {
       value = createOrFind(property, value);
@@ -330,11 +330,10 @@ public class ContextHandler<T> {
 
     final Function<Object, Object> transform =
         (item) -> {
-          if (item instanceof ContextEntity) {
-            return ((ContextEntity) item).getContextMap();
+          if (item instanceof ContextEntity entity) {
+            return entity.getContextMap();
           }
-          if (item instanceof Model) {
-            Model m = (Model) item;
+          if (item instanceof Model m) {
             return m.getId() == null ? Resource.toMap(m) : Resource.toMapCompact(m);
           }
           return item;
@@ -347,8 +346,8 @@ public class ContextHandler<T> {
         .forEach(
             name -> {
               Object value = beanMapper.get(bean, name);
-              if (value instanceof Collection) {
-                value = Collections2.transform((Collection<?>) value, transform::apply);
+              if (value instanceof Collection<?> collection) {
+                value = Collections2.transform(collection, transform::apply);
               } else {
                 value = transform.apply(value);
               }
@@ -384,8 +383,8 @@ public class ContextHandler<T> {
         .forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
 
     // make sure to have version value
-    if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
-      ((Model) bean).setVersion(((Model) managed).getVersion());
+    if (bean instanceof Model model && !values.containsKey(FIELD_VERSION)) {
+      model.setVersion(((Model) managed).getVersion());
     }
 
     return bean;

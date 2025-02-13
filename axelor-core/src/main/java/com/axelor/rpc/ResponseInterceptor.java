@@ -95,27 +95,27 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     final Throwable cause = throwable.getCause();
     final Throwable root = Throwables.getRootCause(throwable);
     for (Throwable ex : Arrays.asList(throwable, cause, root)) {
-      if (ex instanceof AuthorizationException) {
-        return onAuthorizationException((AuthorizationException) ex, response);
+      if (ex instanceof AuthorizationException exception) {
+        return onAuthorizationException(exception, response);
       }
-      if (ex instanceof AuthSecurityException) {
-        return onAuthSecurityException((AuthSecurityException) ex, response);
+      if (ex instanceof AuthSecurityException exception) {
+        return onAuthSecurityException(exception, response);
       }
-      if (ex instanceof OptimisticLockException) {
-        return onOptimisticLockException((OptimisticLockException) ex, response);
+      if (ex instanceof OptimisticLockException exception) {
+        return onOptimisticLockException(exception, response);
       }
-      if (ex instanceof ConstraintViolationException) {
-        return onConstraintViolationException((ConstraintViolationException) ex, response);
+      if (ex instanceof ConstraintViolationException exception) {
+        return onConstraintViolationException(exception, response);
       }
-      if (ex instanceof SQLIntegrityConstraintViolationException) {
+      if (ex instanceof SQLIntegrityConstraintViolationException exception) {
         return onSQLIntegrityConstraintViolationException(
-            (SQLIntegrityConstraintViolationException) ex, response);
+            exception, response);
       }
-      if (ex instanceof SQLException) {
-        return onSQLException((SQLException) ex, response);
+      if (ex instanceof SQLException exception) {
+        return onSQLException(exception, response);
       }
-      if (ex instanceof EncryptorException) {
-        return onEncryptorException((EncryptorException) ex, response);
+      if (ex instanceof EncryptorException exception) {
+        return onEncryptorException(exception, response);
       }
     }
     response.setException(throwable);

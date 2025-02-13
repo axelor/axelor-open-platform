@@ -28,8 +28,8 @@ public abstract class LoginEvent {
 
   public LoginEvent(AuthenticationToken token) {
     Object credentials = token.getCredentials();
-    if (credentials instanceof char[]) {
-      credentials = new String((char[]) credentials);
+    if (credentials instanceof char[] chars) {
+      credentials = new String(chars);
     }
     this.principal = token.getPrincipal();
     this.credentials = credentials;

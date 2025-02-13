@@ -178,8 +178,8 @@ public final class MetaScanner {
   }
 
   private static List<URL> findClassPathURLs(ClassLoader loader) {
-    return loader instanceof URLClassLoader
-        ? Arrays.asList(((URLClassLoader) loader).getURLs())
+    return loader instanceof URLClassLoader urlcl
+        ? Arrays.asList(urlcl.getURLs())
         : Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
             .map(
                 item -> {

@@ -127,9 +127,9 @@ public class MetaJsonReferenceUpdater {
     String filter = "self.type = 'many-to-one' and self.targetModel = :model";
     String model = entityClass.getName();
 
-    if (bean instanceof MetaJsonRecord) {
+    if (bean instanceof MetaJsonRecord metaJsonRecord) {
       filter = "self.type = 'json-many-to-one' and self.targetJsonModel.name = :model";
-      model = ((MetaJsonRecord) bean).getJsonModel();
+      model = metaJsonRecord.getJsonModel();
     }
 
     final MetaJsonFieldRepository fieldRepository = Beans.get(MetaJsonFieldRepository.class);
