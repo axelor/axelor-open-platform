@@ -621,7 +621,7 @@ public final class JPA {
    * @param task the task to run.
    */
   public static void runInTransaction(Runnable task) {
-    java.util.Objects.requireNonNull(task);
+    Objects.requireNonNull(task);
     EntityTransaction txn = em().getTransaction();
     boolean txnStarted = false;
     try {

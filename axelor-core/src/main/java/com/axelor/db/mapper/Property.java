@@ -587,7 +587,7 @@ public class Property {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private Object add(Object bean, Object item, boolean associate) {
-    java.util.Objects.requireNonNull(bean);
+    Objects.requireNonNull(bean);
     Preconditions.checkArgument(entity.isInstance(bean));
     Preconditions.checkState(isCollection());
 
@@ -674,7 +674,7 @@ public class Property {
    * @return the same bean instance
    */
   public Object clear(Object bean) {
-    java.util.Objects.requireNonNull(bean);
+    Objects.requireNonNull(bean);
     Preconditions.checkArgument(entity.isInstance(bean));
     Preconditions.checkState(this.isCollection());
 
