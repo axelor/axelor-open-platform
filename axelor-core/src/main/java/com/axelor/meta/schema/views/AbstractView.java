@@ -286,7 +286,7 @@ public abstract class AbstractView {
   }
 
   @XmlTransient
-  @JsonProperty("helpOverride")
+  @JsonProperty(value = "helpOverride", access = JsonProperty.Access.READ_ONLY)
   @Nullable
   public Collection<Map<String, Object>> getHelpOverride() {
     if (AuthUtils.getUser() != null && Boolean.TRUE.equals(AuthUtils.getUser().getNoHelp())) {
