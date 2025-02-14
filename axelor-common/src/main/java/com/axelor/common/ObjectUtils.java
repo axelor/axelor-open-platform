@@ -57,7 +57,7 @@ public final class ObjectUtils {
       return true;
     }
     if (value instanceof Optional<?> optional) {
-      return !optional.isPresent();
+      return optional.isEmpty();
     }
     if (value.getClass().isArray()) {
       return Array.getLength(value) == 0;

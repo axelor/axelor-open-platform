@@ -157,7 +157,7 @@ public class MetaPermissions {
       property = mapper.getProperty(fieldPart);
       final Optional<Class<?>> target = Optional.ofNullable(property).map(Property::getTarget);
 
-      if (!target.isPresent()) {
+      if (target.isEmpty()) {
         break;
       }
 

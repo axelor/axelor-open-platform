@@ -223,7 +223,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     for (DMSFile parentFile = entity.getFile().getParent();
         parentFile != null;
         parentFile = parentFile.getParent()) {
-      if (!filterPermission(parentFile.getPermissions(), entity).findFirst().isPresent()) {
+      if (filterPermission(parentFile.getPermissions(), entity).findFirst().isEmpty()) {
         final DMSPermission dmsPermission = new DMSPermission();
         dmsPermission.setUser(entity.getUser());
         dmsPermission.setGroup(entity.getGroup());
