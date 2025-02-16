@@ -291,7 +291,7 @@ export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   tooltip?: Tooltip;
   views?: (FormView | GridView)[];
   selectionList?: Selection[];
-  jsonFields?: JsonField[];
+  jsonFields?: Record<string, JsonField>;
   viewer?: Viewer;
   editor?: Editor;
 }
@@ -422,6 +422,8 @@ export interface JsonField extends Omit<Field, "type"> {
   sequence: number;
   columnSequence: number;
   visibleInGrid?: boolean;
+
+  nameField?: boolean;
 
   jsonTarget?: string;
   jsonField?: string;

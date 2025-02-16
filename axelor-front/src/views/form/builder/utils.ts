@@ -1,7 +1,7 @@
-import uniqueId from "lodash/uniqueId";
 import isUndefined from "lodash/isUndefined";
 import pick from "lodash/pick";
 import uniq from "lodash/uniq";
+import uniqueId from "lodash/uniqueId";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -15,8 +15,8 @@ import {
   View,
   Widget,
 } from "@/services/client/meta.types";
-import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 import { getJSON } from "@/utils/data-record";
+import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 
 import {
   getBaseDummy,
@@ -27,8 +27,8 @@ import { moment } from "@/services/client/l10n.ts";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
-import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 import { findViewItems } from "@/utils/schema";
+import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
 
 import * as WIDGETS from "../widgets";
 
@@ -251,19 +251,21 @@ export function processContextValues(
         values[fieldName] = value
           ? compactJson(value, {
               findItem: (jsonPath: string) => {
-                function findTargetNames(schema: Schema): Schema[] {
+                function findTargetNames(schema: Schema): string[] {
                   const items =
                     schema.type !== "panel-related" ? (schema.items ?? []) : [];
                   const nested = items.flatMap((item) => findTargetNames(item));
                   return [
                     ...items
                       .filter((item) => item.json && item.name === fieldName)
-                      .map(
-                        (item) =>
-                          item.jsonFields?.find(
-                            (jsonItem: JsonField) => jsonItem.name === jsonPath,
-                          )?.targetName,
-                      ),
+                      .map((item) => {
+                        const itemFields: Record<string, JsonField> =
+                          item.jsonFields ?? {};
+                        return Object.values(itemFields).find(
+                          (jsonItem: JsonField) => jsonItem.name === jsonPath,
+                        )?.targetName as string;
+                      })
+                      .filter(Boolean),
                     ...nested,
                   ];
                 }
@@ -433,13 +435,6 @@ export function processView(
     );
   }
 
-  if (Array.isArray(res.jsonFields)) {
-    res.jsonFields = res.jsonFields.reduce(
-      (prev, field) => ({ ...prev, [field.name!]: field }),
-      {},
-    );
-  }
-
   return res;
 }
 
@@ -502,16 +497,17 @@ function getDefaultJsonFieldValues(widgets?: Widget[]) {
       const { jsonFields, name } = widget as Field;
 
       if (jsonFields) {
-        const fields = Object.fromEntries(
-          jsonFields.map(({ name, type, sequence, ...rest }) => [
-            name,
-            {
+        const fields = Object.keys(jsonFields).reduce((_fields, key) => {
+          const { name, type, sequence, ...rest } = jsonFields[key];
+          return {
+            ..._fields,
+            [name]: {
               name,
               type: toSnakeCase(type).toUpperCase(),
               ...rest,
             } as Property,
-          ]),
-        );
+          };
+        }, {});
         const defaultValues = getDefaultFieldValues(fields);
         setJSONValues(name, defaultValues);
       }
