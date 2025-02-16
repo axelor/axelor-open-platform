@@ -1,11 +1,11 @@
 import { Box, clsx } from "@axelor/ui";
-import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
+import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import filter from "lodash/filter";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import isNumber from "lodash/isNumber";
-import filter from "lodash/filter";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -18,8 +18,8 @@ import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import {
   Editor,
-  Field,
   FormView,
+  JsonField,
   Panel,
   Property,
   Schema,
@@ -1149,7 +1149,7 @@ function JsonEditor({
   );
   const model = useAtomValue(modelAtom);
   const jsonModel = schema.jsonModel;
-  const jsonFields = processJsonFields(schema);
+  const jsonFields: Record<string, JsonField> = schema.jsonFields ?? {};
   const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
   const jsonValueRef = useRef<DataRecord>();
 
@@ -1239,17 +1239,6 @@ function JsonEditor({
       layout={jsonLayout}
     />
   );
-}
-
-function processJsonFields(schema: Schema) {
-  const fields: Record<string, Schema> = schema.jsonFields ?? {};
-  return Object.entries(fields).reduce((acc, [k, v]) => {
-    const { nameField: nameColumn, ...field } = v;
-    return {
-      ...acc,
-      [k]: nameColumn ? { ...field, nameColumn } : field,
-    };
-  }, {}) as Record<string, Field>;
 }
 
 function processJsonView(schema: Schema, jsonFields: any) {

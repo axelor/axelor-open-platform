@@ -423,6 +423,8 @@ export interface JsonField extends Omit<Field, "type"> {
   columnSequence: number;
   visibleInGrid?: boolean;
 
+  nameField?: boolean;
+
   jsonTarget?: string;
   jsonField?: string;
   jsonPath?: string;
