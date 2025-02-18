@@ -177,14 +177,15 @@ public class RequestTest extends RpcTest {
             ImmutableList.of(janeValues, babyValues));
     Contact john = contacts.edit(johnValues);
     assertNotNull(
-        String.format("Entity instance should contain field passed to JPA#edit.", john),
-        john.getFirstName());
+        john.getFirstName(),
+        String.format("Entity instance should contain field passed to JPA#edit: %s", john));
     john.getRelatedContacts().stream()
         .forEach(
             relatedContact ->
                 assertNotNull(
+                    relatedContact.getFirstName(),
                     String.format(
-                        "Child entity instance should contain field passed to JPA#edit.", john),
-                    relatedContact.getFirstName()));
+                        "Child entity instance should contain field passed to JPA#edit: %s",
+                        john)));
   }
 }
