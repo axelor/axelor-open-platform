@@ -68,7 +68,7 @@ function useFieldClassNames(schema: Schema) {
   useEffect(() => {
     if (!hilites?.length) return;
 
-    recordHandler.subscribe((record) => {
+    return recordHandler.subscribe((record) => {
       const { color, background, css } = getHilite(record)?.[0] ?? {};
       setLabelClassName(color ? legacyClassNames(`hilite-${color}-text`) : "");
       setContentClassName(
