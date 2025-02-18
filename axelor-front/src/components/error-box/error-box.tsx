@@ -49,7 +49,7 @@ export function ErrorBox({
       <Box textAlign="center">
         <Box as="p" fontSize={5}>
           <Box as="span" color="danger">
-            {i18n.get("Opps!")}
+            {i18n.get("Oops!")}
           </Box>{" "}
           {message}
         </Box>
