@@ -331,7 +331,9 @@ public class ViewLoader extends AbstractParallelLoader {
             .computeIfAbsent(view.getName(), k -> Collections.synchronizedList(new ArrayList<>()))
             .add(view.getXmlId());
       }
-    } else if (entity.getId() == null && other != null && !Objects.equals(xmlId, other.getXmlId())) {
+    } else if (entity.getId() == null
+        && other != null
+        && !Objects.equals(xmlId, other.getXmlId())) {
       // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }

@@ -43,7 +43,8 @@ public class ImportException extends Exception {
   }
 
   public static ImportException from(Throwable ex) {
-    if (ex instanceof ConstraintViolationException constraintViolationException) return from(constraintViolationException);
+    if (ex instanceof ConstraintViolationException constraintViolationException)
+      return from(constraintViolationException);
     if (ex instanceof PSQLException psqlException) return from(psqlException);
     return new ImportException(ex);
   }

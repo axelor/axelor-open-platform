@@ -54,7 +54,8 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
     Object result = eval(expr);
     if (result == null) return false;
     if (result instanceof Boolean booleanResult) return booleanResult;
-    if (result instanceof Number numberResult) return Double.compare(numberResult.doubleValue(), 0) != 0;
+    if (result instanceof Number numberResult)
+      return Double.compare(numberResult.doubleValue(), 0) != 0;
 
     return ObjectUtils.notEmpty(result);
   }

@@ -128,8 +128,7 @@ public final class EntityHelper {
   public static <T> Class<T> getEntityClass(T entity) {
     Preconditions.checkNotNull(entity);
     if (entity instanceof HibernateProxy proxy) {
-      return (Class<T>)
-          proxy.getHibernateLazyInitializer().getPersistentClass();
+      return (Class<T>) proxy.getHibernateLazyInitializer().getPersistentClass();
     }
     Class<?> klass = entity.getClass();
     while (ContextEntity.class.isAssignableFrom(klass)) {

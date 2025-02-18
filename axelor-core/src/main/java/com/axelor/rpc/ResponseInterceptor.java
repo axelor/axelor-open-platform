@@ -108,8 +108,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
         return onConstraintViolationException(exception, response);
       }
       if (ex instanceof SQLIntegrityConstraintViolationException exception) {
-        return onSQLIntegrityConstraintViolationException(
-            exception, response);
+        return onSQLIntegrityConstraintViolationException(exception, response);
       }
       if (ex instanceof SQLException exception) {
         return onSQLException(exception, response);

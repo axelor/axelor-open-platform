@@ -143,7 +143,8 @@ public abstract class Action {
 
     Object result = handler.evaluate(toExpression(expression, false));
     if (result instanceof Boolean booleanResult) return booleanResult;
-    if (result instanceof Number numberResult) return Double.compare(numberResult.doubleValue(), 0) != 0;
+    if (result instanceof Number numberResult)
+      return Double.compare(numberResult.doubleValue(), 0) != 0;
 
     return ObjectUtils.notEmpty(result);
   }

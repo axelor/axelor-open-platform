@@ -287,8 +287,7 @@ public class ActionGroup extends ActionResumable {
       }
 
       if (action instanceof ActionCondition) {
-        if (Objects.equals(value, Boolean.FALSE)
-            || (value instanceof Map map && hasErrors(map))) {
+        if (Objects.equals(value, Boolean.FALSE) || (value instanceof Map map && hasErrors(map))) {
           break;
         }
       }

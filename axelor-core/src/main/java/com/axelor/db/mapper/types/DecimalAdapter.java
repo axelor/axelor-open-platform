@@ -43,8 +43,7 @@ public class DecimalAdapter implements TypeAdapter<BigDecimal> {
       }
     }
 
-    boolean empty =
-        value == null || (value instanceof String s && "".equals(s.trim()));
+    boolean empty = value == null || (value instanceof String s && "".equals(s.trim()));
     if (empty) {
       return Boolean.TRUE.equals(nullable) ? null : BigDecimal.ZERO;
     }

@@ -205,11 +205,10 @@ public class JsonContext extends SimpleBindings {
     }
 
     if (value instanceof Collection<?> collection) {
-      return collection
-          .stream()
-              .map(item -> (Map<String, Object>) item)
-              .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
-              .collect(Collectors.toList());
+      return collection.stream()
+          .map(item -> (Map<String, Object>) item)
+          .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
+          .collect(Collectors.toList());
     }
 
     return super.get(key);

@@ -76,13 +76,40 @@ public class I18nExtractor {
   private static final Set<String> JS_FILE_EXTENSIONS = Set.of(".js", ".jsx", ".ts", ".tsx");
 
   private static final Set<String> VIEW_TYPES =
-      new HashSet<>(Arrays.asList("form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom"));
+      new HashSet<>(
+          Arrays.asList(
+              "form", "grid", "tree", "calendar", "kanban", "cards", "gantt", "chart", "custom"));
 
   private static final Set<String> FIELD_NODES =
-      new HashSet<>(Arrays.asList("string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary", "enum", "one-to-one", "many-to-one", "one-to-many", "many-to-many"));
+      new HashSet<>(
+          Arrays.asList(
+              "string",
+              "boolean",
+              "integer",
+              "long",
+              "decimal",
+              "date",
+              "time",
+              "datetime",
+              "binary",
+              "enum",
+              "one-to-one",
+              "many-to-one",
+              "one-to-many",
+              "many-to-many"));
 
   private static final Set<String> TEXT_ATTRS =
-      new HashSet<>(Arrays.asList("tag", "prompt", "placeholder", "x-true-text", "x-false-text", "data-description", "confirm-btn-title", "cancel-btn-title", "x-tree-field-title"));
+      new HashSet<>(
+          Arrays.asList(
+              "tag",
+              "prompt",
+              "placeholder",
+              "x-true-text",
+              "x-false-text",
+              "data-description",
+              "confirm-btn-title",
+              "cancel-btn-title",
+              "x-tree-field-title"));
 
   private static final Set<String> TEXT_NODES =
       new HashSet<>(Arrays.asList("option", "message", "static", "help"));

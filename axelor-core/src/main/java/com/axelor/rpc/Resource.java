@@ -1132,8 +1132,9 @@ public class Resource<T extends Model> {
               Object value = mapper.get(entity, name);
               if (value instanceof Collection<?> collection) {
                 value =
-                    collection
-                        .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
+                    collection.stream()
+                        .map(input -> toMap(input, names))
+                        .collect(Collectors.toList());
               } else if (value instanceof Model modelValue) {
                 final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
                 if (jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {

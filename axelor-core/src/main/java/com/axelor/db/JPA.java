@@ -484,8 +484,8 @@ public final class JPA {
       Object value = property.get(bean);
       if (value == null) continue;
 
-      if (value instanceof PersistentCollection persistentCollection && !persistentCollection.wasInitialized())
-        continue;
+      if (value instanceof PersistentCollection persistentCollection
+          && !persistentCollection.wasInitialized()) continue;
 
       // bind M2O
       if (property.isReference()) {

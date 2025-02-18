@@ -99,8 +99,7 @@ public class DmsService {
 
   @Inject private DMSFileRepository repository;
 
-  private static final Map<String, String> EXTS =
-      Map.of("html", ".html", "spreadsheet", ".csv");
+  private static final Map<String, String> EXTS = Map.of("html", ".html", "spreadsheet", ".csv");
 
   @GET
   @Path("files")
@@ -435,9 +434,7 @@ public class DmsService {
 
     final Long[] idArray =
         ids.stream()
-            .map(
-                id ->
-                    id instanceof Number n ? n.longValue() : Long.valueOf(id.toString()))
+            .map(id -> id instanceof Number n ? n.longValue() : Long.valueOf(id.toString()))
             .toArray(Long[]::new);
 
     if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {

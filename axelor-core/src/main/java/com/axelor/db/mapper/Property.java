@@ -266,8 +266,7 @@ public class Property {
       }
 
       if (annotation instanceof org.hibernate.annotations.Type typeAnnotation) {
-        Class<? extends UserType<?>> userType =
-            typeAnnotation.value();
+        Class<? extends UserType<?>> userType = typeAnnotation.value();
         json = JsonType.class.isAssignableFrom(userType);
         encrypted = EncryptedTextType.class.isAssignableFrom(userType);
       }

@@ -180,8 +180,9 @@ public class ContextHandler<T> {
     }
     if (property.isCollection() && value instanceof Collection<?> collection) {
       value =
-          collection
-              .stream().map(item -> createOrFind(property, item)).collect(Collectors.toList());
+          collection.stream()
+              .map(item -> createOrFind(property, item))
+              .collect(Collectors.toList());
     } else if (property.isReference()) {
       value = createOrFind(property, value);
     }
