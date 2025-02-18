@@ -1,0 +1,6 @@
+---
+title: Improve rendering phase
+type: feature
+description: |
+  A change in an internal hook, by using `queueMicrotask` instead of `setTimeout` improve queue task execution. This 
+  avoids unnecessary re-rendering if the callback updates state (mostly if used when fetching data).
