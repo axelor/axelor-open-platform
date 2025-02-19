@@ -36,7 +36,12 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { findActionView, findView } from "@/services/client/meta-cache";
-import { FormView, GridView, Widget } from "@/services/client/meta.types";
+import {
+  FormView,
+  GridView,
+  Schema,
+  Widget,
+} from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
@@ -1205,9 +1210,19 @@ function GridInner(props: ViewProps<GridView>) {
               serverType: field.type,
               [AUTO_ADD_ROW]: false,
             },
-            ...(expandableSummaryMeta?.view?.items ?? []).filter(
-              (item) => item.name !== "$wkfStatus", // skip wkf status
-            ),
+            ...(expandableSummaryMeta?.view?.items ?? [])
+              .filter(
+                (item) => item.name !== "$wkfStatus", // skip wkf status
+              )
+              .map((item) => {
+                if ((item as Schema).serverType?.endsWith("_TO_MANY")) {
+                  return {
+                    ...item,
+                    [AUTO_ADD_ROW]: false,
+                  };
+                }
+                return item;
+              }),
           ],
           width: "*",
         } as any,

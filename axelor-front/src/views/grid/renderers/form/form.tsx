@@ -335,10 +335,11 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         context: viewContext,
         states: initFormFieldsStates,
       });
+
+    const isNew = !record?.id || record?.id < 0;
     const onSaveAction =
       (view as Schema).serverType !== "ONE_TO_MANY" && view.onSave;
-    const onNewAction =
-      (!record?.id || record?.id < 0) && !record?._dirty && view.onNew;
+    const onNewAction = isNew && !record?._dirty && view.onNew;
 
     const formDirty = useAtomValue(
       useMemo(() => selectAtom(formAtom, (x) => x.dirty), [formAtom]),
@@ -519,8 +520,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
               findColumnIndexByNode(e.target as HTMLElement),
             ).then(async () => {
               if (shouldAddSubLine) {
-                !expand && (await handleExpand());
-                onAddSubLine(record);
+                if (!isNew || autoAddNewRow) {
+                  !expand && (await handleExpand());
+                  onAddSubLine(record);
+                }
               } else if (!autoAddNewRow && isLastRow && savable) {
                 set(newItemAtom, { refId: record.id });
               }
@@ -528,6 +531,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           }
         },
         [
+          isNew,
           expand,
           record,
           autoAddNewRow,

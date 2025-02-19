@@ -96,6 +96,7 @@ export function ExpandableFormView({
     [meta.view.model],
   );
   const schema = meta.view!;
+
   const isCollection = (gridView as Schema)?.serverType?.endsWith("_TO_MANY");
   const isTreeGrid =
     toKebabCase((gridView as Schema)?.widget ?? "") === "tree-grid";
@@ -285,15 +286,31 @@ export function ExpandableFormView({
         set,
         opts: {
           silent?: boolean;
+          autoSave?: boolean;
           shouldClose?: boolean;
+          shouldReload?: boolean;
           callOnSave?: boolean;
         } = {},
       ) => {
-        const { silent, shouldClose = false, callOnSave = true } = opts;
+        const {
+          silent,
+          autoSave = false,
+          shouldClose = false,
+          shouldReload = true,
+          callOnSave = true,
+        } = opts;
 
-        await actionExecutor.waitFor();
+        // XXX: Need to find a way to coordinate top save and grid commit.
+        // case for top level tree-grid auto save
+        if (!isCollection && autoSave) {
+          await actionExecutor.waitFor(300);
+        }
+
         await actionExecutor.wait();
-        await widgetHandler.current?.commit?.();
+
+        if (!autoSave) {
+          await widgetHandler.current?.commit?.();
+        }
 
         await doValidate({ silent });
 
@@ -306,12 +323,16 @@ export function ExpandableFormView({
 
         if (formState.dirty) {
           if (isO2M) {
-            shouldClose && doClose();
+            if (shouldClose) doClose();
+
+            set(formAtom, (draft) => ({ ...draft, dirty: false }));
+
             return onSave?.({
               ...formState.record,
               _dirty: true,
             });
           }
+
           const fieldNames = Object.keys(meta.fields ?? {});
           const dummy = extractDummy(formState.record, fieldNames);
           const dummyVals = Object.entries(dummy).reduce((acc, [k, v]) => {
@@ -327,19 +348,26 @@ export function ExpandableFormView({
           const { record: rec, original = {} } = get(formAtom); // record may have changed by actions
           const vals = diff(rec, original);
 
-          const updated = await onSave?.({
-            ...processSaveValues({ ...dummyVals, ...vals }, formState.meta),
-            _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
-          });
+          const updated = await onSave?.(
+            {
+              ...processSaveValues({ ...dummyVals, ...vals }, formState.meta),
+              _original: processOriginal(original, meta.fields ?? {}), // pass original values to check for concurrent updates
+            },
+            isTopGridTree ? { select: get(selectStateAtom) } : {},
+          );
 
-          if (updated && !shouldClose) {
+          if (updated && shouldReload && !shouldClose) {
             doOnLoad(updated);
           }
         }
 
-        shouldClose && doClose();
+        if (shouldClose) {
+          doClose();
+        }
       },
       [
+        isCollection,
+        isTopGridTree,
         isO2M,
         doValidate,
         doOnLoad,
@@ -348,6 +376,7 @@ export function ExpandableFormView({
         onSave,
         onClose,
         formAtom,
+        selectStateAtom,
         meta.fields,
       ],
     ),
@@ -371,39 +400,22 @@ export function ExpandableFormView({
   );
 
   const doRefresh = useCallback(() => {
-    record && doOnLoad(record);
+    if (record) doOnLoad(record);
   }, [record, doOnLoad]);
 
   const doActionReload = useCallback(async () => {
-    record && doOnLoad(record, { fromAction: true });
+    if (record) doOnLoad(record, { fromAction: true });
   }, [record, doOnLoad]);
 
-  const doAutoSave = useAtomCallback(
-    useCallback(
-      async (get, set, record: DataRecord) => {
-        const formState = get(formAtom)!;
-        if (!formState.dirty || getErrors(formState)) return;
-        set(formAtom, { ...formState, dirty: false });
-        await onSave?.(
-          { ...record, ...formState.record, _dirty: true },
-          isTopGridTree ? { select: get(selectStateAtom) } : {},
-        )?.then((result) => {
-          const savedRecord = result as unknown as DataRecord;
-          if (savedRecord && isTopGridTree) {
-            doOnLoad(savedRecord);
-          }
-        });
-      },
-      [formAtom, selectStateAtom, getErrors, onSave, isTopGridTree, doOnLoad],
-    ),
-  );
-
-  // auto save form
   useEffect(() => {
-    if (formDirty && isTreeGrid) {
-      doAutoSave(record);
+    // auto save whenever form is dirty
+    if (formDirty && record && isTreeGrid) {
+      doSave({
+        autoSave: true,
+        shouldReload: isTopGridTree,
+      });
     }
-  }, [formDirty, isTreeGrid, record, doAutoSave]);
+  }, [formDirty, isTreeGrid, record, doSave, isTopGridTree]);
 
   actionHandler.setRefreshHandler(doActionReload);
 
