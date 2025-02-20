@@ -870,6 +870,7 @@ function OneToManyInner({
                   version: item.version,
                   $version: item.$version ?? item.version,
                   cid: item.cid,
+                  _dirty: true,
                 })
               : item;
           });
@@ -1230,7 +1231,7 @@ function OneToManyInner({
     return onSaveRef.current(record, {
       select: false,
       change: true,
-      dirty: false,
+      dirty: true,
     });
   }, []);
 
