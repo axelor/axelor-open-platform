@@ -1,6 +1,7 @@
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import uniqBy from "lodash/uniqBy";
+import uniq from "lodash/uniq";
 import isPlainObject from "lodash/isPlainObject";
 
 import { getDefaultPageSize } from "@/utils/app-settings.ts";
@@ -25,10 +26,11 @@ function ifDiff<T>(current: T, value: T): T {
 function updateRecord(
   initialRecord: DataRecord,
   record: DataRecord,
+  selectFields: string[] = [],
 ): DataRecord {
   const rec: DataRecord = {};
 
-  Object.keys(initialRecord).forEach((fieldName) => {
+  uniq(Object.keys(initialRecord).concat(selectFields)).forEach((fieldName) => {
     const fieldValue = record[fieldName];
     if (fieldName.includes(".")) {
       const nestValue = getObjValue(record, fieldName.split("."));
@@ -178,7 +180,7 @@ export class DataStore extends DataSource {
     const opts = this.#prepareOption(options);
     const { page, ...result } = await super.search(opts);
 
-    const records = uniqBy(result.records, 'id');
+    const records = uniqBy(result.records, "id");
 
     this.#accept(opts, page, records);
 
@@ -224,7 +226,11 @@ export class DataStore extends DataSource {
     if (data.id) {
       const recInd = records.findIndex((r) => r.id === res.id);
       if (recInd > -1) {
-        records[recInd] = updateRecord(records[recInd], { ...data, ...res });
+        records[recInd] = updateRecord(
+          records[recInd],
+          { ...data, ...res },
+          Object.keys(options?.select ?? {}),
+        );
       }
     } else if (res.id && res.id !== data.id) {
       const totalCount = page.totalCount ?? this.records.length;
