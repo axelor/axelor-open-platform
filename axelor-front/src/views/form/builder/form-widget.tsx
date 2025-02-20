@@ -441,9 +441,11 @@ function useExpressions({
       canArchive,
       canAttach,
       canSelect,
-      bind,
-    } = processSchema(schema);
+      valueExpr,
+    } = schema;
 
+    const bind = schema.jsonField && valueExpr ? valueExpr : schema.bind;
+    
     const isExpr = (attr: unknown) => typeof attr === "string";
 
     const hasExpression =
@@ -502,57 +504,6 @@ function useExpressions({
     handleValidation,
     createContext,
   ]);
-}
-
-function processSchema(_schema: Schema) {
-  const schema = { ..._schema };
-  const {
-    jsonField,
-    contextField,
-    contextFieldValue,
-    hidden,
-    required,
-    showIf,
-    hideIf,
-    requiredIf,
-  } = schema;
-
-  if (jsonField && schema.valueExpr) {
-    schema.bind = schema.valueExpr;
-  }
-
-  if (
-    !jsonField ||
-    !contextField ||
-    !contextFieldValue ||
-    (hidden && !showIf && !hideIf)
-  ) {
-    return schema;
-  }
-
-  let contextFieldShowIf = `($record.${contextField}.id === ${contextFieldValue})`;
-  let contextFieldRequiredIf = requiredIf;
-
-  if (required || requiredIf) {
-    contextFieldRequiredIf = requiredIf
-      ? `${contextFieldShowIf} && (${requiredIf})`
-      : contextFieldShowIf;
-  }
-
-  if (showIf) {
-    contextFieldShowIf += ` && (${showIf})`;
-  }
-
-  if (hideIf) {
-    contextFieldShowIf += ` && !(${hideIf})`;
-  }
-
-  return {
-    ...schema,
-    showIf: contextFieldShowIf,
-    hideIf: undefined,
-    requiredIf: contextFieldRequiredIf,
-  };
 }
 
 function Unknown(props: WidgetProps) {
