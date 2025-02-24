@@ -61,6 +61,8 @@ import {
   prepareCustomView,
   toStrongText,
 } from "./builder/utils";
+import { DataStore } from "@/services/client/data-store";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 import styles from "./dms.module.scss";
 
@@ -139,8 +141,8 @@ export function Dms(props: ViewProps<GridView>) {
   );
 
   const getSelectedDocument = useCallback(() => {
-    const selected = selectedRows?.[0];
-    return rows[selected ?? -1]?.record;
+    const _selected = selectedRows?.[0];
+    return rows[_selected ?? -1]?.record;
   }, [rows, selectedRows]);
 
   const getSelectedDocuments = useCallback(() => {
@@ -206,6 +208,39 @@ export function Dms(props: ViewProps<GridView>) {
 
   const shouldSearch = useRef(true);
 
+  const onTreeSearch = useCallback(() => {
+    const treeDS = new DataStore(dataStore.model);
+    const wheres = [
+      ...(action.domain ? [action.domain] : []),
+      "self.isDirectory = true",
+      ...(popupRecord?.id
+        ? [
+            `self.id != ${popupRecord.id}`,
+            `self.parent.id = ${popupRecord.id}`,
+            ...(popupRecord.relatedModel && [`self.relatedModel = '${popupRecord.relatedModel}'`]),
+            ...(popupRecord.relatedId && [`self.relatedId = '${popupRecord.relatedId}'`]),
+          ]
+        : ["self.parent is NULL"]),
+    ];
+    treeDS
+      .search({
+        fields: ["fileName", "parent.id"],
+        filter: {
+          _domain: wheres.join(" AND "),
+          _domainContext: {
+            _populate: false,
+          },
+        },
+        offset: 0,
+        limit: -1,
+        translate: true,
+      })
+      .then((result) => {
+        const { records } = result;
+        setTreeRecords([ROOT, ...records]);
+      });
+  }, [ROOT, action.domain, dataStore, popupRecord]);
+
   const onSearch = useAtomCallback(
     useCallback(
       (get, set, options: Partial<SearchOptions> = {}) => {
@@ -250,6 +285,7 @@ export function Dms(props: ViewProps<GridView>) {
             },
             // reset offset is not provided (ie, not using PageText)
             offset: 0,
+            translate: true,
             ...options,
             ...(options.fields && {
               fields: uniq([
@@ -265,12 +301,18 @@ export function Dms(props: ViewProps<GridView>) {
           .then((result) => {
             const { records } = result;
             const dirs = records.filter((r) => r.isDirectory);
-            const dirIds = dirs.map((r) => r.id);
 
-            setTreeRecords((records) => [
-              ...records.filter((r) => !dirIds.includes(r.id)),
-              ...dirs,
-            ]);
+            setTreeRecords((_records) => {
+              const recIds = _records.map((r) => r.id);
+              const newRecords = dirs.filter((r) => !recIds.includes(r.id));
+              return [
+                ..._records.map((rec) => {
+                  const dir = dirs.find((d) => d.id === rec.id);
+                  return dir ? { ...rec, ...dir } : rec;
+                }),
+                ...newRecords,
+              ];
+            });
 
             return result;
           });
@@ -316,8 +358,13 @@ export function Dms(props: ViewProps<GridView>) {
             }),
         });
         if (record) {
+          if (record.isDirectory) {
+            setTreeRecords((list) => [...list, record]);
+          }
           const rootChanged = setRootIfNeeded(record);
-          !rootChanged && onSearch({});
+          if (!rootChanged) {
+            onSearch();
+          }
         }
         return record;
       }
@@ -347,7 +394,7 @@ export function Dms(props: ViewProps<GridView>) {
         contentType: CONTENT_TYPE.HTML,
       },
     );
-    record && openDMSFile(record);
+    if (record) openDMSFile(record);
   }, [onNew, openDMSFile]);
 
   const onSpreadsheetNew = useCallback(async () => {
@@ -359,7 +406,7 @@ export function Dms(props: ViewProps<GridView>) {
         contentType: CONTENT_TYPE.SPREADSHEET,
       },
     );
-    record && openDMSFile(record);
+    if (record) openDMSFile(record);
   }, [onNew, openDMSFile]);
 
   const onDocumentRename = useCallback(async () => {
@@ -381,10 +428,11 @@ export function Dms(props: ViewProps<GridView>) {
         version: record.version,
         fileName: input,
       });
-      if (updated && !doc) {
+      if (updated) {
+        const { fileName, version } = updated;
         setTreeRecords((records) =>
           records.map((r) =>
-            r.id === updated.id ? { ...r, fileName: updated.fileName } : r,
+            r.id === updated.id ? { ...r, fileName, version } : r,
           ),
         );
       }
@@ -398,7 +446,7 @@ export function Dms(props: ViewProps<GridView>) {
 
   const onDocumentDownload = useCallback(async () => {
     const record = getSelected();
-    record && downloadAsBatch(record);
+    if (record) downloadAsBatch(record);
   }, [getSelected]);
 
   const onDocumentPermissions = useCallback(() => {
@@ -458,14 +506,15 @@ export function Dms(props: ViewProps<GridView>) {
         const dirIds = records.filter((r) => r.isDirectory).map((r) => r.id);
 
         // remove directories from tree
-        dirIds.length > 0 &&
-          setTreeRecords((records) =>
-            records.filter((r) => !dirIds.includes(r.id)),
+        if (dirIds.length > 0) {
+          setTreeRecords((_records) =>
+            _records.filter((r) => !dirIds.includes(r.id)),
           );
+        }
 
         // set to root when selected node is deleted
-        setSelected((selected) =>
-          dirIds.includes(selected) ? root.id : selected,
+        setSelected((_selected) =>
+          dirIds.includes(_selected) ? root.id : _selected,
         );
       }
     }
@@ -512,11 +561,11 @@ export function Dms(props: ViewProps<GridView>) {
       );
       if (records) {
         (records as DataRecord[]).forEach((record) => {
-          record.isDirectory &&
-            setTreeRecords((records) => {
-              const exist = records.some((r) => r.id === record.id);
+          if (record.isDirectory) {
+            setTreeRecords((list) => {
+              const exist = list.some((r) => r.id === record.id);
               if (exist) {
-                return records.map((r) =>
+                return list.map((r) =>
                   r.id === record.id
                     ? {
                         ...r,
@@ -525,10 +574,11 @@ export function Dms(props: ViewProps<GridView>) {
                     : r,
                 );
               }
-              return [...records, { ...record, "parent.id": node.id }];
+              return [...list, { ...record, "parent.id": node.id }];
             });
+          }
         });
-        onSearch({});
+        onSearch();
       }
     },
     [dataStore, onSearch],
@@ -593,7 +643,7 @@ export function Dms(props: ViewProps<GridView>) {
       if (col?.name === "typeIcon" && record.isDirectory) {
         handleDocumentOpen(e, row);
       } else if (col?.name === "downloadIcon") {
-        row?.record && downloadAsBatch(row.record);
+        if (row?.record) downloadAsBatch(row.record);
       } else if (col?.name === "detailsIcon") {
         setDetailsPopup(true);
         setDetailsId(record.id);
@@ -631,6 +681,11 @@ export function Dms(props: ViewProps<GridView>) {
     [records, detailsId],
   );
 
+  const onTabRefresh = useCallback(() => {
+    onTreeSearch();
+    onSearch();
+  }, [onSearch, onTreeSearch]);
+
   useEffect(() => {
     const parent = getSelectedNode();
     uploader.setSaveHandler(async (data: DataRecord) => {
@@ -645,7 +700,7 @@ export function Dms(props: ViewProps<GridView>) {
             },
           }),
       });
-      record && setRootIfNeeded(record);
+      if (record) setRootIfNeeded(record);
       return record;
     });
   }, [
@@ -658,13 +713,13 @@ export function Dms(props: ViewProps<GridView>) {
   ]);
 
   useEffect(() => {
-    !showDetails && setDetailsId(null);
+    if (!showDetails) setDetailsId(null);
   }, [showDetails]);
 
   useEffect(() => {
     if (popup) {
-      setPopupHandlers((popup) => ({
-        ...popup,
+      setPopupHandlers((_popup) => ({
+        ..._popup,
         data: {
           selected: getSelectedDocuments(),
         },
@@ -672,8 +727,10 @@ export function Dms(props: ViewProps<GridView>) {
     }
   }, [popup, getSelectedDocuments, setPopupHandlers]);
 
+  useAsyncEffect(async () => onTreeSearch(), [onTreeSearch]);
+
   // register tab:refresh
-  useViewTabRefresh("grid", onSearch);
+  useViewTabRefresh("grid", onTabRefresh);
 
   const size = useResponsive();
 
@@ -921,9 +978,9 @@ function Breadcrumbs({
     if (_data.length <= MAX_BREADCRUMBS) {
       return _data;
     }
-    const [root, ...rest] = _data;
+    const [_root, ...rest] = _data;
     return [
-      root,
+      _root,
       { ...rest.slice(-MAX_BREADCRUMBS)[0], $displayName: "..." },
       ...rest.slice(1 - MAX_BREADCRUMBS),
     ];
