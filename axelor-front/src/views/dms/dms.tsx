@@ -333,15 +333,25 @@ export function Dms(props: ViewProps<GridView>) {
     async (title: string, inputValue?: string, data?: TreeRecord) => {
       const node = getSelectedNode();
 
-      const exists = dataStore.records.filter(
-        (rec) =>
-          rec.fileName === inputValue &&
-          (!data?.isDirectory || rec.isDirectory === true),
-      );
+      const regex = new RegExp(`^${inputValue}.?(\\(([0-9]+)\\))?$`);
+      let count = 0;
 
-      if (exists.length > 0) {
-        inputValue = `${inputValue} (${exists.length + 1})`;
+      const children = data?.isDirectory
+        ? treeRecords.filter((r) => r["parent.id"] === selected)
+        : dataStore.records;
+
+      children.forEach((rec) => {
+        const match = regex.exec(rec.fileName);
+
+        if (match) {
+          count = Math.max(count, (+match[2] ? +match[2] : 1) + 1);
+        }
+      });
+
+      if (count > 0) {
+        inputValue = `${inputValue} (${count})`;
       }
+
       const input = await promptInput(title, inputValue);
 
       if (input) {
@@ -359,7 +369,10 @@ export function Dms(props: ViewProps<GridView>) {
         });
         if (record) {
           if (record.isDirectory) {
-            setTreeRecords((list) => [...list, record]);
+            setTreeRecords((list) => [
+              ...list,
+              { ...record, "parent.id": record.parent && record.parent.id },
+            ]);
           }
           const rootChanged = setRootIfNeeded(record);
           if (!rootChanged) {
@@ -370,6 +383,8 @@ export function Dms(props: ViewProps<GridView>) {
       }
     },
     [
+      treeRecords,
+      selected,
       relatedId,
       relatedModel,
       dataStore,
