@@ -28,6 +28,7 @@
       <field name="createdBy" title="Owner" />
       <field name="createdOn" title="Created" />
       <field name="updatedOn" title="Modified" />
+      <field name="parent" canView="false"/>
     </panel>
     <panel name="tagsPanel" title="Tags" itemSpan="12" sidebar="true">
       <field name="tags" form-view="dms-tag-form" widget="TagSelect" x-create="code,name"

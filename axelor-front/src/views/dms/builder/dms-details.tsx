@@ -8,9 +8,9 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { useAsync } from "@/hooks/use-async";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
-import { ViewData } from "@/services/client/meta";
+import { MetaData, ViewData } from "@/services/client/meta";
 import { findView } from "@/services/client/meta-cache";
-import { FormView } from "@/services/client/meta.types";
+import { Field, FormView } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Formatters } from "@/utils/format";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
@@ -32,6 +32,7 @@ export const DmsDetails = memo(function DmsDetails({
   open,
   model,
   data,
+  fields,
   onSave,
   onView,
   onClose,
@@ -39,13 +40,21 @@ export const DmsDetails = memo(function DmsDetails({
   open?: boolean;
   model?: string;
   data?: TreeRecord | null;
+  fields?: MetaData["fields"];
   onSave?: (data: TreeRecord) => void;
   onView?: (data: TreeRecord) => void;
   onClose?: () => void;
 }) {
   const [edit, setEdit] = useState(false);
-  const { fileName, createdBy, createdOn, updatedOn, isDirectory, tags } =
-    data || {};
+  const {
+    fileName,
+    parent,
+    createdBy,
+    createdOn,
+    updatedOn,
+    isDirectory,
+    tags,
+  } = data || {};
 
   const handleEdit = useCallback(() => {
     setEdit(true);
@@ -73,7 +82,6 @@ export const DmsDetails = memo(function DmsDetails({
       </Box>
     );
   }
-
   return (
     <Box
       className={clsx(styles.drawer, {
@@ -105,6 +113,14 @@ export const DmsDetails = memo(function DmsDetails({
             {renderField(i18n.get("Owner"), createdBy?.name)}
             {renderField(i18n.get("Created"), Formatters.datetime(createdOn))}
             {renderField(i18n.get("Modified"), Formatters.datetime(updatedOn))}
+            {renderField(
+              i18n.get("Parent"),
+              parent === null
+                ? i18n.get("DMS.Home")
+                : Formatters["many-to-one"](parent, {
+                    props: fields?.parent as unknown as Field,
+                  }),
+            )}
           </Box>
           <Box d="flex" mt={2} px={1}>
             {edit ? (

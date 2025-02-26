@@ -1,6 +1,6 @@
-import { useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
-import { useAtomCallback } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniq from "lodash/uniq";
 import {
   SyntheticEvent,
@@ -30,7 +30,6 @@ import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { sanitize } from "@/utils/sanitize.ts";
-import { isNumber } from "@/utils/types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import {
   usePopupHandlerAtom,
@@ -149,6 +148,10 @@ export function Dms(props: ViewProps<GridView>) {
     const selectedTreeNode = treeRecords.find((r) => r.id === selected);
     return selectedTreeNode ? (selectedTreeNode as DataRecord) : null;
   }, [treeRecords, selected]);
+
+  const allFields = useAtomValue(
+    useMemo(() => selectAtom(searchAtom!, (s) => s.fields), [searchAtom]),
+  );
 
   /**
    * Get the first selected dms record in dms grid list
@@ -330,6 +333,7 @@ export function Dms(props: ViewProps<GridView>) {
               fields: uniq([
                 ...options.fields,
                 "isDirectory",
+                "parent",
                 "parent.id",
                 "relatedModel",
                 "relatedId",
@@ -961,6 +965,7 @@ export function Dms(props: ViewProps<GridView>) {
               />
               <DmsDetails
                 open={showDetails}
+                fields={allFields}
                 data={detailRecord}
                 onView={openDMSFile}
                 onSave={onDocumentSave}
