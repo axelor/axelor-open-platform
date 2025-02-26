@@ -606,7 +606,9 @@ export function Dms(props: ViewProps<GridView>) {
           set(searchAtom, (prev) => {
             return {
               ...prev,
-              query: undefined,
+              query: {
+                criteria: [],
+              },
               searchText: undefined,
             };
           });
