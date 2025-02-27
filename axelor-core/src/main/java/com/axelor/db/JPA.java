@@ -383,11 +383,11 @@ public final class JPA {
         Collection items = new ArrayList();
         if (Set.class.isAssignableFrom(p.getJavaType())) items = new HashSet();
 
-        if (value instanceof Collection) {
-          for (Object val : (Collection) value) {
-            if (val instanceof Map) {
+        if (value instanceof Collection collection) {
+          for (Object val : collection) {
+            if (val instanceof Map map) {
               if (p.getMappedBy() != null) {
-                if (val instanceof ImmutableMap) val = new HashMap<>((Map) val);
+                if (val instanceof ImmutableMap) val = new HashMap<>(map);
                 ((Map) val).remove(p.getMappedBy());
               }
               Model item = _edit(target, (Map) val, visited, edited);
