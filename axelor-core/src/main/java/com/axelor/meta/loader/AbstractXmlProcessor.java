@@ -170,7 +170,7 @@ public abstract class AbstractXmlProcessor {
   }
 
   public List<Node> nodeListToList(NodeList nodeList) {
-    return new AbstractList<Node>() {
+    return new AbstractList<>() {
       @Override
       public int size() {
         return nodeList.getLength();

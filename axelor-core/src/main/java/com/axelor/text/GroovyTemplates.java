@@ -159,7 +159,7 @@ public class GroovyTemplates implements Templates {
       final Mapper mapper =
           context == null ? null : Mapper.of(EntityHelper.getEntityClass(context));
       final Map<String, Object> ctx =
-          new HashMap<String, Object>() {
+          new HashMap<>() {
 
             @Override
             public boolean containsKey(Object key) {

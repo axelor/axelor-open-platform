@@ -98,7 +98,7 @@ public class MetaModelService {
       metaModel.setTableName(klass.getAnnotation(Table.class).name());
     }
 
-    metaModel.setMetaFields(new ArrayList<MetaField>());
+    metaModel.setMetaFields(new ArrayList<>());
     metaModel.getMetaFields().addAll(this.createFields(metaModel, klass));
 
     return metaModel;
@@ -212,7 +212,7 @@ public class MetaModelService {
    */
   private List<MetaField> createFields(MetaModel metaModel, Class<?> klass) {
 
-    List<MetaField> modelFields = new ArrayList<MetaField>();
+    List<MetaField> modelFields = new ArrayList<>();
     Mapper mapper = Mapper.of(klass);
 
     for (Property property : mapper.getProperties()) {

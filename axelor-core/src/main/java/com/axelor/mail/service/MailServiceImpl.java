@@ -502,7 +502,7 @@ public class MailServiceImpl implements MailService, MailConstants {
   protected void send(final MailSender sender, final MimeMessage email) throws Exception {
     final AuditableRunner runner = Beans.get(AuditableRunner.class);
     final Callable<Boolean> job =
-        new Callable<Boolean>() {
+        new Callable<>() {
           @Override
           public Boolean call() throws Exception {
             sender.send(email);

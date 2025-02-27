@@ -1056,7 +1056,7 @@ public class Resource<T extends Model> {
 
   @SuppressWarnings("unchecked")
   private Map<String, Object> toGraph(Model entity, Map<String, Object> select) {
-    final Map<String, Object> result = new HashMap<String, Object>();
+    final Map<String, Object> result = new HashMap<>();
     final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
     final Property nameProperty =
         mapper.getNameField() == null ? mapper.getProperty("code") : mapper.getNameField();
@@ -1745,7 +1745,7 @@ public class Resource<T extends Model> {
       fields = new HashMap<>();
     }
 
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     Mapper mapper = Mapper.of(bean.getClass());
 
     boolean isSaved = ((Model) bean).getId() != null;

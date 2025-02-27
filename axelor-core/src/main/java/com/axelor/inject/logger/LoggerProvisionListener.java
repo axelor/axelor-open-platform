@@ -25,7 +25,7 @@ import java.util.ArrayDeque;
 final class LoggerProvisionListener implements ProvisionListener {
 
   static final ThreadLocal<ArrayDeque<Binding<?>>> bindingStack =
-      new ThreadLocal<ArrayDeque<Binding<?>>>() {
+      new ThreadLocal<>() {
         protected ArrayDeque<Binding<?>> initialValue() {
           return new ArrayDeque<>();
         }

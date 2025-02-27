@@ -889,7 +889,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   // Fields names are not in ordered but some JVM implementation can.
   private List<String> fieldNames(Class<?> klass) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     for (java.lang.reflect.Field field : klass.getDeclaredFields()) {
       if (!field.getName().matches("id|version|selected|created(By|On)|updated(By|On)")) {
         result.add(field.getName());

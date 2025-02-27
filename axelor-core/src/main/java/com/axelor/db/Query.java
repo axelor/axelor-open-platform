@@ -103,7 +103,7 @@ public class Query<T extends Model> {
   }
 
   public static <T extends Model> Query<T> of(Class<T> klass) {
-    return new Query<T>(klass);
+    return new Query<>(klass);
   }
 
   protected EntityManager em() {

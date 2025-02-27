@@ -206,7 +206,7 @@ public class JpaScanner extends AbstractScannerImpl {
         executor.shutdown();
       }
     }
-    return new HashSet<Class<?>>(modelCache.values());
+    return new HashSet<>(modelCache.values());
   }
 
   private static void register(Class<?> model) {

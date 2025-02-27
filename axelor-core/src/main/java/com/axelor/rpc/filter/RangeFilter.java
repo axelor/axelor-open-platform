@@ -61,6 +61,6 @@ class RangeFilter extends SimpleFilter {
 
   @Override
   public List<Object> getParams() {
-    return new ArrayList<Object>(values);
+    return new ArrayList<>(values);
   }
 }

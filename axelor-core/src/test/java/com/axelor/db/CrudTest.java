@@ -191,7 +191,7 @@ public class CrudTest extends JpaTest {
     assertNotNull(c1);
 
     if (c1.getCircles() == null) {
-      c1.setCircles(new HashSet<Circle>());
+      c1.setCircles(new HashSet<>());
     }
 
     c1.getCircles().add(g1);

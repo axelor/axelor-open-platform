@@ -76,7 +76,7 @@ class SimpleFilter extends Filter {
 
   @Override
   public List<Object> getParams() {
-    List<Object> params = new ArrayList<Object>();
+    List<Object> params = new ArrayList<>();
     params.add(value);
     return params;
   }

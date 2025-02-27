@@ -69,7 +69,7 @@ class LogicalFilter extends Filter {
 
   @Override
   public List<Object> getParams() {
-    List<Object> params = new ArrayList<Object>();
+    List<Object> params = new ArrayList<>();
     for (Filter filter : filters) {
       params.addAll(filter.getParams());
     }

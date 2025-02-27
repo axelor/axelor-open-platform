@@ -36,7 +36,7 @@ import org.hibernate.type.Type;
 
 public class AuditInterceptor implements Interceptor {
 
-  private final ThreadLocal<User> currentUser = new ThreadLocal<User>();
+  private final ThreadLocal<User> currentUser = new ThreadLocal<>();
   private final ThreadLocal<AuditTracker> tracker = new ThreadLocal<>();
 
   private static final String UPDATED_BY = "updatedBy";

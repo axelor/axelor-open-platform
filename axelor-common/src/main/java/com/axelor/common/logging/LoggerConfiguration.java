@@ -245,7 +245,7 @@ public class LoggerConfiguration {
   }
 
   private Appender<ILoggingEvent> createConsoleAppender() {
-    final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
+    final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<>();
     final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     final String logPattern = config.getProperty(LOGGING_PATTERN_CONSOLE, ANSI_LOG_PATTERN);
 

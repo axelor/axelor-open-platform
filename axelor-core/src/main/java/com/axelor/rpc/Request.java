@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class Request {
 
-  static final ThreadLocal<Request> CURRENT = new ThreadLocal<Request>();
+  static final ThreadLocal<Request> CURRENT = new ThreadLocal<>();
 
   private int limit;
 

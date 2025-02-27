@@ -128,7 +128,7 @@ public final class WebServer {
     public InstanceHandle<GuiceResteasyBootstrapServletContextListener> createInstance()
         throws InstantiationException {
 
-      return new InstanceHandle<GuiceResteasyBootstrapServletContextListener>() {
+      return new InstanceHandle<>() {
 
         @Override
         public GuiceResteasyBootstrapServletContextListener getInstance() {
@@ -155,7 +155,7 @@ public final class WebServer {
     @Override
     public InstanceHandle<GuiceServletContextListener> createInstance()
         throws InstantiationException {
-      return new InstanceHandle<GuiceServletContextListener>() {
+      return new InstanceHandle<>() {
 
         @Override
         public GuiceServletContextListener getInstance() {

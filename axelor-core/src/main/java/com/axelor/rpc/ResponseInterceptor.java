@@ -47,7 +47,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
   private final Logger log = LoggerFactory.getLogger(ResponseInterceptor.class);
 
-  private final ThreadLocal<Boolean> running = new ThreadLocal<Boolean>();
+  private final ThreadLocal<Boolean> running = new ThreadLocal<>();
 
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {

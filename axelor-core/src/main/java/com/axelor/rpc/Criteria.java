@@ -100,7 +100,7 @@ public class Criteria {
       if (!key.matches("^[a-zA-Z].*$") || "context".equals(key)) {
         continue;
       }
-      final Map<String, Object> criterion = new HashMap<String, Object>();
+      final Map<String, Object> criterion = new HashMap<>();
       criterion.put("fieldName", key);
       criterion.put("operator", "like");
       criterion.put("value", request.getData().get(key));
@@ -179,7 +179,7 @@ public class Criteria {
     Operator operator = Operator.get((String) rawCriteria.get("operator"));
 
     if (operator == Operator.AND || operator == Operator.OR || operator == Operator.NOT) {
-      List<Filter> filters = new ArrayList<Filter>();
+      List<Filter> filters = new ArrayList<>();
       for (Object raw : (List<?>) rawCriteria.get("criteria")) {
         filters.add(parseCriterion((Map<String, Object>) raw, beanClass));
       }

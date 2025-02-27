@@ -366,7 +366,7 @@ public class RestService extends ResourceService {
   @Hidden
   public Response details(@PathParam("id") long id, @QueryParam("name") String name) {
     Request request = new Request();
-    Map<String, Object> data = new HashMap<String, Object>();
+    Map<String, Object> data = new HashMap<>();
 
     data.put("id", id);
     request.setModel(getModel());

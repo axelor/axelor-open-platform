@@ -100,20 +100,20 @@ public class MapperTest extends JpaTest {
   }
 
   private Map<String, Object> getDemoData() {
-    Map<String, Object> values = new HashMap<String, Object>();
+    Map<String, Object> values = new HashMap<>();
     values.put("id", 1L);
     values.put("firstName", "Some");
     values.put("lastName", "Name");
     values.put("fullName", "My Name"); // test readonly
     values.put("dateOfBirth", "1975-02-27");
 
-    Map<String, Object> title = new HashMap<String, Object>();
+    Map<String, Object> title = new HashMap<>();
     title.put("code", "mr");
     title.put("name", "Mr.");
     values.put("title", title);
 
-    Set<Map<String, Object>> groups = new HashSet<Map<String, Object>>();
-    Map<String, Object> family = new HashMap<String, Object>();
+    Set<Map<String, Object>> groups = new HashSet<>();
+    Map<String, Object> family = new HashMap<>();
     family.put("code", "family");
     family.put("title", "Family");
     groups.add(family);
@@ -125,7 +125,7 @@ public class MapperTest extends JpaTest {
   @Test
   @Order(4)
   public void testTypes() {
-    Map<String, Object> values = new HashMap<String, Object>();
+    Map<String, Object> values = new HashMap<>();
     values.put("boolValue", "true");
     values.put("intValue", 121);
     values.put("longValue", 199L);

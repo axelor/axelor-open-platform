@@ -70,7 +70,7 @@ public class GuiceRunner extends BlockJUnit4ClassRunner {
       throw new InitializationError("No Guice modules specified.");
     }
 
-    List<Module> modules = new ArrayList<Module>();
+    List<Module> modules = new ArrayList<>();
 
     for (Class<? extends Module> c : guiceModules.value()) {
       try {
