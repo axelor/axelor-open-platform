@@ -73,9 +73,7 @@ public class PublishSupport extends AbstractSupport {
           .create(
               "pluginMaven",
               MavenPublication.class,
-              publication -> {
-                publication.artifact(sourcesJar);
-              });
+              publication -> publication.artifact(sourcesJar));
     } else {
       publishing
           .getPublications()

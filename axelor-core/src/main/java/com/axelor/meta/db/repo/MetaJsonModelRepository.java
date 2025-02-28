@@ -44,15 +44,14 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
         .filter(f -> Boolean.TRUE.equals(f.getNameField()))
         .findFirst()
         .orElseGet(
-            () -> {
-              return jsonModel.getFields().stream()
-                  .filter(
-                      f ->
-                          "name".equalsIgnoreCase(f.getName())
-                              || "fullName".equalsIgnoreCase(f.getName()))
-                  .findFirst()
-                  .orElse(null);
-            });
+            () ->
+                jsonModel.getFields().stream()
+                    .filter(
+                        f ->
+                            "name".equalsIgnoreCase(f.getName())
+                                || "fullName".equalsIgnoreCase(f.getName()))
+                    .findFirst()
+                    .orElse(null));
   }
 
   private void onSave(MetaJsonModel jsonModel) {

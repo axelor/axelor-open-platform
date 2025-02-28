@@ -207,12 +207,11 @@ public class AxelorPlugin implements Plugin<Project> {
         .getSourceSets()
         .getByName(
             SourceSet.MAIN_SOURCE_SET_NAME,
-            sourceSet -> {
-              sourceSet.setCompileClasspath(
-                  project
-                      .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
-                      .plus(sourceSet.getCompileClasspath()));
-            });
+            sourceSet ->
+                sourceSet.setCompileClasspath(
+                    project
+                        .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
+                        .plus(sourceSet.getCompileClasspath())));
   }
 
   private void configureEncryptionSupport(Project project) {

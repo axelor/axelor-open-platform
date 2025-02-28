@@ -96,22 +96,20 @@ public abstract class AbstractBaseCache extends JpaTest {
   @BeforeAll
   public static void doInit() {
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                JPA.all(Person.class).remove();
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  JPA.all(Person.class).remove();
+                }));
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe");
-                aPerson.setCode("my-unique-code");
-                JPA.save(aPerson);
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe");
+                  aPerson.setCode("my-unique-code");
+                  JPA.save(aPerson);
+                }));
   }
 
   @AfterAll
@@ -177,16 +175,15 @@ public abstract class AbstractBaseCache extends JpaTest {
     final AtomicLong aPersonId = new AtomicLong();
 
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe");
-                aPerson.setCode("unique-code");
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe");
+                  aPerson.setCode("unique-code");
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+                }));
 
     // Should NOT hit query cache because this is first run
     doInSession(
@@ -219,17 +216,16 @@ public abstract class AbstractBaseCache extends JpaTest {
     final AtomicLong aPersonId = new AtomicLong();
 
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe 2");
-                aPerson.setCode("unique-code2");
-                aPerson.setContact(JPA.all(Contact.class).fetchOne());
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe 2");
+                  aPerson.setCode("unique-code2");
+                  aPerson.setContact(JPA.all(Contact.class).fetchOne());
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+                }));
 
     doInSession(
         () -> {
@@ -267,16 +263,15 @@ public abstract class AbstractBaseCache extends JpaTest {
     // try to insert an existing person (duplicated code)
     try {
       doInSession(
-          () -> {
-            JPA.runInTransaction(
-                () -> {
-                  Person aPerson = new Person();
-                  aPerson.setName("John Doe 2");
-                  aPerson.setCode("my-unique-code");
-                  JPA.save(aPerson);
-                  aPersonId.set(aPerson.getId());
-                });
-          });
+          () ->
+              JPA.runInTransaction(
+                  () -> {
+                    Person aPerson = new Person();
+                    aPerson.setName("John Doe 2");
+                    aPerson.setCode("my-unique-code");
+                    JPA.save(aPerson);
+                    aPersonId.set(aPerson.getId());
+                  }));
       fail("Should trigger ConstraintViolationException : not unique `code`");
     } catch (PersistenceException e) {
       // ignore
@@ -303,28 +298,26 @@ public abstract class AbstractBaseCache extends JpaTest {
 
     // Add a new person
     doInSession(
-        () -> {
-          JPA.runInTransaction(
-              () -> {
-                Person aPerson = new Person();
-                aPerson.setName("John Doe 2");
-                aPerson.setCode("my-unique-code2");
-                JPA.save(aPerson);
-                aPersonId.set(aPerson.getId());
-              });
-        });
+        () ->
+            JPA.runInTransaction(
+                () -> {
+                  Person aPerson = new Person();
+                  aPerson.setName("John Doe 2");
+                  aPerson.setCode("my-unique-code2");
+                  JPA.save(aPerson);
+                  aPersonId.set(aPerson.getId());
+                }));
 
     // try update previous person with a non-unique code from repository
     try {
       doInSession(
-          () -> {
-            JPA.runInTransaction(
-                () -> {
-                  Person aPerson = JPA.find(Person.class, aPersonId.get());
-                  aPerson.setName("hello");
-                  Beans.get(PersonRepository.class).save(aPerson);
-                });
-          });
+          () ->
+              JPA.runInTransaction(
+                  () -> {
+                    Person aPerson = JPA.find(Person.class, aPersonId.get());
+                    aPerson.setName("hello");
+                    Beans.get(PersonRepository.class).save(aPerson);
+                  }));
       fail("Should trigger ValidationException : see in PersonRepository");
     } catch (ValidationException e) {
       // ignore
@@ -379,19 +372,18 @@ public abstract class AbstractBaseCache extends JpaTest {
         });
 
     doInSession(
-        () -> {
-          // Fetch and check data
-          JPA.runInTransaction(
-              () -> {
-                Product product = JPA.find(Product.class, ids.product);
-                assertNotNull(product.getConfig());
-                assertEquals(ids.config, product.getConfig().getId());
+        () ->
+            // Fetch and check data
+            JPA.runInTransaction(
+                () -> {
+                  Product product = JPA.find(Product.class, ids.product);
+                  assertNotNull(product.getConfig());
+                  assertEquals(ids.config, product.getConfig().getId());
 
-                ProductConfig config = JPA.find(ProductConfig.class, ids.config);
-                assertNotNull(config.getProduct());
-                assertEquals(ids.product, config.getProduct().getId());
-              });
-        });
+                  ProductConfig config = JPA.find(ProductConfig.class, ids.config);
+                  assertNotNull(config.getProduct());
+                  assertEquals(ids.product, config.getProduct().getId());
+                }));
   }
 
   static void doInSession(Runnable task) {

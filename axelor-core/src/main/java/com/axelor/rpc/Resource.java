@@ -675,11 +675,10 @@ public class Resource<T extends Model> {
         name ->
             jsonFieldsMap.computeIfAbsent(
                 name,
-                (n) -> {
-                  return MetaJsonRecord.class.isAssignableFrom(model)
-                      ? MetaStore.findJsonFields((String) request.getContext().get("jsonModel"))
-                      : MetaStore.findJsonFields(model.getName(), n);
-                });
+                (n) ->
+                    MetaJsonRecord.class.isAssignableFrom(model)
+                        ? MetaStore.findJsonFields((String) request.getContext().get("jsonModel"))
+                        : MetaStore.findJsonFields(model.getName(), n));
 
     final Function<String, List<String>> findJsonPaths =
         name -> {

@@ -65,10 +65,7 @@ public class AppSettingsTest {
 
     // unmodifiableMap
     assertThrows(
-        UnsupportedOperationException.class,
-        () -> {
-          settings.getProperties().put("some", "thing");
-        });
+        UnsupportedOperationException.class, () -> settings.getProperties().put("some", "thing"));
 
     // real map
     assertDoesNotThrow(

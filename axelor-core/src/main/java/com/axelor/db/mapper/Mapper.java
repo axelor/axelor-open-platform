@@ -320,15 +320,14 @@ public class Mapper {
             .collect(
                 Collectors.toMap(
                     m -> methods.get(m.name),
-                    m -> {
-                      return Arrays.stream(m.instructions.toArray())
-                          .filter(n -> n.getOpcode() == Opcodes.GETFIELD)
-                          .filter(n -> n instanceof FieldInsnNode)
-                          .map(n -> (FieldInsnNode) n)
-                          .filter(n -> !n.name.equals(methods.get(m.name)))
-                          .map(n -> n.name)
-                          .collect(Collectors.toSet());
-                    }));
+                    m ->
+                        Arrays.stream(m.instructions.toArray())
+                            .filter(n -> n.getOpcode() == Opcodes.GETFIELD)
+                            .filter(n -> n instanceof FieldInsnNode)
+                            .map(n -> (FieldInsnNode) n)
+                            .filter(n -> !n.name.equals(methods.get(m.name)))
+                            .map(n -> n.name)
+                            .collect(Collectors.toSet())));
   }
 
   /**

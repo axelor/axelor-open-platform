@@ -36,12 +36,11 @@ public class JavaSupport extends AbstractSupport {
     project
         .getConfigurations()
         .all(
-            config -> {
-              config.resolutionStrategy(
-                  strategy -> {
-                    strategy.preferProjectModules();
-                  });
-            });
+            config ->
+                config.resolutionStrategy(
+                    strategy -> {
+                      strategy.preferProjectModules();
+                    }));
 
     project
         .getTasks()

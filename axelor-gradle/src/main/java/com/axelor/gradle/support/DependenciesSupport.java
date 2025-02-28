@@ -41,17 +41,19 @@ public class DependenciesSupport extends AbstractSupport {
     project
         .getConfigurations()
         .forEach(
-            files -> {
-              files
-                  .getResolutionStrategy()
-                  .eachDependency(
-                      dependencyResolveDetails -> {
-                        if (dependencyResolveDetails.getRequested().getGroup().equals("com.axelor")
-                            && AxelorUtils.isCore(
-                                dependencyResolveDetails.getRequested().getName())) {
-                          dependencyResolveDetails.useVersion(version);
-                        }
-                      });
-            });
+            files ->
+                files
+                    .getResolutionStrategy()
+                    .eachDependency(
+                        dependencyResolveDetails -> {
+                          if (dependencyResolveDetails
+                                  .getRequested()
+                                  .getGroup()
+                                  .equals("com.axelor")
+                              && AxelorUtils.isCore(
+                                  dependencyResolveDetails.getRequested().getName())) {
+                            dependencyResolveDetails.useVersion(version);
+                          }
+                        }));
   }
 }

@@ -35,10 +35,7 @@ public final class AppLogger {
     final Properties loggingConfig = new Properties();
     settings
         .getPropertiesKeysStartingWith("logging.")
-        .forEach(
-            n -> {
-              loggingConfig.setProperty(n, settings.get(n));
-            });
+        .forEach(n -> loggingConfig.setProperty(n, settings.get(n)));
     if (loggingConfig.containsKey(AvailableAppSettings.LOGGING_PATH)) {
       loggingConfig.setProperty(
           AvailableAppSettings.LOGGING_PATH,
