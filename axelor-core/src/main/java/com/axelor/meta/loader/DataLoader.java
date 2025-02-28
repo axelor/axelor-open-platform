@@ -22,7 +22,6 @@ import com.axelor.common.FileUtils;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.xml.XMLImporter;
 import com.axelor.meta.MetaScanner;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
 import jakarta.inject.Singleton;
@@ -138,7 +137,7 @@ class DataLoader extends AbstractLoader {
     Files.createParentDirs(dst);
     OutputStream out = new FileOutputStream(dst);
     try {
-      ByteStreams.copy(in, out);
+      in.transferTo(out);
     } finally {
       out.close();
     }
