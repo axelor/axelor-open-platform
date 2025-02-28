@@ -32,8 +32,18 @@
   <xsd:element name="object-views">
     <xsd:complexType>
       <xsd:choice minOccurs="1" maxOccurs="unbounded">
-        <xsd:element name="form" type="tns:FormView" />
-        <xsd:element name="grid" type="tns:GridView" />
+        <xsd:element name="form" type="tns:FormView" >
+          <xsd:unique name="formIds">
+            <xsd:selector xpath=".//*"/>
+            <xsd:field xpath="@id"/>
+          </xsd:unique>
+        </xsd:element>
+        <xsd:element name="grid" type="tns:GridView">
+          <xsd:unique name="gridIds">
+            <xsd:selector xpath=".//*"/>
+            <xsd:field xpath="@id"/>
+          </xsd:unique>
+        </xsd:element>
         <xsd:element name="tree" type="tns:TreeView" />
         <xsd:element name="calendar" type="tns:CalendarView" />
         <xsd:element name="gantt" type="tns:GanttView" />
@@ -61,19 +71,15 @@
         <xsd:element name="action-report" type="tns:ActionReport" />
       </xsd:choice>
     </xsd:complexType>
+    <xsd:unique name="viewIds">
+      <xsd:selector xpath="./*"/>
+      <xsd:field xpath="@id"/>
+    </xsd:unique>
   </xsd:element>
 
   <xsd:complexType name="MenuItem">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
-        <xsd:attribute name="id" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              If overriding some existing one, provide an unique id to identify
-              this one.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
@@ -428,6 +434,13 @@
   </xsd:complexType>
 
   <xsd:complexType name="AbstractWidget" abstract="true">
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Unique id to identify the current widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>

@@ -66,6 +66,9 @@ import javax.xml.namespace.QName;
 })
 public abstract class AbstractWidget {
 
+  @XmlAttribute(name = "id")
+  private String xmlId;
+
   @JsonIgnore
   @XmlAttribute(name = "if")
   private String conditionToCheck;
@@ -77,6 +80,14 @@ public abstract class AbstractWidget {
   @JsonIgnore @XmlAnyAttribute private Map<QName, String> otherAttributes;
 
   @XmlTransient @JsonIgnore private String model;
+
+  public String getXmlId() {
+    return xmlId;
+  }
+
+  public void setXmlId(String xmlId) {
+    this.xmlId = xmlId;
+  }
 
   public String getConditionToCheck() {
     return conditionToCheck;
