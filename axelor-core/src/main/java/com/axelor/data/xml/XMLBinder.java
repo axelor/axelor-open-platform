@@ -26,14 +26,13 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -296,27 +295,25 @@ public abstract class XMLBinder {
 
   private Object value(List<Node> nodes, final XMLBind bind) {
     List<Object> result =
-        Lists.transform(
-            nodes,
-            new Function<Node, Object>() {
-              @Override
-              public Object apply(@Nullable Node input) {
-                if (bind.getBindings() != null) {
-                  return toMap(input, bind);
-                }
-                if (input.getNodeType() == Node.ELEMENT_NODE) {
-                  Node child = input.getFirstChild();
-                  if (child == null) {
-                    return null;
+        nodes.stream()
+            .map(
+                input -> {
+                  if (bind.getBindings() != null) {
+                    return toMap(input, bind);
                   }
-                  if (child.getNodeType() == Node.TEXT_NODE) {
-                    return child.getNodeValue();
+                  if (input.getNodeType() == Node.ELEMENT_NODE) {
+                    Node child = input.getFirstChild();
+                    if (child == null) {
+                      return null;
+                    }
+                    if (child.getNodeType() == Node.TEXT_NODE) {
+                      return child.getNodeValue();
+                    }
+                    return toMap(input, bind);
                   }
-                  return toMap(input, bind);
-                }
-                return input.getNodeValue();
-              }
-            });
+                  return input.getNodeValue();
+                })
+            .collect(Collectors.toList());
     if (result.size() == 1) {
       return result.getFirst();
     }

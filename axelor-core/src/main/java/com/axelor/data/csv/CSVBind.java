@@ -20,11 +20,8 @@ package com.axelor.data.csv;
 
 import com.axelor.data.DataScriptHelper;
 import com.axelor.inject.Beans;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -34,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 @XStreamAlias("bind")
@@ -209,17 +207,9 @@ public class CSVBind {
 
     cb.update = true;
     cb.search =
-        Joiner.on(" AND ")
-            .join(
-                Collections2.transform(
-                    cols,
-                    new Function<String, String>() {
-
-                      @Override
-                      public String apply(String input) {
-                        return "self.%s = :%s_%s_".formatted(input, field.replace('.', '_'), input);
-                      }
-                    }));
+        cols.stream()
+            .map(input -> "self.%s = :%s_%s_".formatted(input, field.replace('.', '_'), input))
+            .collect(Collectors.joining(" AND "));
 
     return cb;
   }

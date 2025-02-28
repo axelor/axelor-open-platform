@@ -42,10 +42,8 @@ import com.axelor.rpc.Resource;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.axelor.text.Templates;
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
@@ -434,14 +432,7 @@ public class ActionHandler {
   private Object toCompact(final Object item) {
     if (item == null) return null;
     if (item instanceof Collection<?> collection) {
-      return Collections2.transform(
-          collection,
-          new Function<Object, Object>() {
-            @Override
-            public Object apply(Object input) {
-              return toCompact(input);
-            }
-          });
+      return collection.stream().map(this::toCompact).collect(Collectors.toList());
     }
     if (item instanceof Model bean) {
       if (bean.getId() != null && JPA.em().contains(bean)) {

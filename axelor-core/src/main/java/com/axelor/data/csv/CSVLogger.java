@@ -20,10 +20,8 @@ package com.axelor.data.csv;
 
 import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 import com.thoughtworks.xstream.XStream;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,15 +146,7 @@ public class CSVLogger {
    * @return list of the quoted row values
    */
   private Collection<String> transformLine(String[] values) {
-    return Collections2.transform(
-        Arrays.asList(values),
-        new Function<String, String>() {
-
-          @Override
-          public String apply(String value) {
-            return "\"" + value + "\"";
-          }
-        });
+    return Arrays.stream(values).map(value -> "\"" + value + "\"").collect(Collectors.toList());
   }
 
   /**
