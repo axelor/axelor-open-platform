@@ -46,12 +46,9 @@ public class AuditableRunner {
   public void run(final Runnable job) {
     try {
       run(
-          new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-              job.run();
-              return true;
-            }
+          () -> {
+            job.run();
+            return true;
           });
     } catch (Exception e) {
       // propagate the exception

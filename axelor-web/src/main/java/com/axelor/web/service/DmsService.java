@@ -58,7 +58,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
@@ -319,13 +318,10 @@ public class DmsService {
     }
 
     final StreamingOutput so =
-        new StreamingOutput() {
-          @Override
-          public void write(OutputStream output) throws IOException, WebApplicationException {
-            try (InputStream input =
-                FileStoreFactory.getStore().getStream(file.getMetaFile().getFilePath())) {
-              writeTo(output, input);
-            }
+        output -> {
+          try (InputStream input =
+              FileStoreFactory.getStore().getStream(file.getMetaFile().getFilePath())) {
+            writeTo(output, input);
           }
         };
 
@@ -460,13 +456,10 @@ public class DmsService {
     }
 
     final StreamingOutput so =
-        new StreamingOutput() {
-          @Override
-          public void write(OutputStream output) throws IOException, WebApplicationException {
-            try (final ZipOutputStream zos = new ZipOutputStream(output)) {
-              for (DMSFile file : records) {
-                writeToZip(zos, file);
-              }
+        output -> {
+          try (final ZipOutputStream zos = new ZipOutputStream(output)) {
+            for (DMSFile file : records) {
+              writeToZip(zos, file);
             }
           }
         };

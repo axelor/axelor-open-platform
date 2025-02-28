@@ -489,12 +489,9 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     // send email using a separate process to void thread blocking
     executor.submit(
-        new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            send(sender, email);
-            return true;
-          }
+        () -> {
+          send(sender, email);
+          return true;
         });
   }
 
@@ -502,13 +499,10 @@ public class MailServiceImpl implements MailService, MailConstants {
   protected void send(final MailSender sender, final MimeMessage email) throws Exception {
     final AuditableRunner runner = Beans.get(AuditableRunner.class);
     final Callable<Boolean> job =
-        new Callable<>() {
-          @Override
-          public Boolean call() throws Exception {
-            sender.send(email);
-            messageSent(email);
-            return true;
-          }
+        () -> {
+          sender.send(email);
+          messageSent(email);
+          return true;
         };
     runner.run(job);
   }

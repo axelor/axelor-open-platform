@@ -78,7 +78,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -468,13 +467,7 @@ public class RestService extends ResourceService {
     }
 
     return jakarta.ws.rs.core.Response.ok(
-            new StreamingOutput() {
-
-              @Override
-              public void write(OutputStream output) throws IOException, WebApplicationException {
-                uploadSave(store.getStream(metaFile.getFilePath()), output);
-              }
-            })
+            (StreamingOutput) output -> uploadSave(store.getStream(metaFile.getFilePath()), output))
         .header(
             "Content-Disposition",
             ContentDisposition.attachment().filename(fileName).build().toString())
@@ -792,15 +785,11 @@ public class RestService extends ResourceService {
       throw new IllegalArgumentException(name);
     }
 
-    return new StreamingOutput() {
-
-      @Override
-      public void write(OutputStream output) throws IOException, WebApplicationException {
-        try (final InputStream is = new FileInputStream(temp.toFile())) {
-          uploadSave(is, output);
-        } finally {
-          Files.deleteIfExists(temp);
-        }
+    return output -> {
+      try (final InputStream is = new FileInputStream(temp.toFile())) {
+        uploadSave(is, output);
+      } finally {
+        Files.deleteIfExists(temp);
       }
     };
   }

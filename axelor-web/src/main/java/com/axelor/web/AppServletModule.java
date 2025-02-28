@@ -43,13 +43,11 @@ import com.axelor.web.socket.inject.WebSocketSecurity;
 import com.axelor.web.socket.inject.WebSocketSecurityInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
-import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.ext.Provider;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
@@ -143,16 +141,13 @@ public class AppServletModule extends ServletModule {
     // intercept request accepting methods
     bindInterceptor(
         Matchers.annotatedWith(Path.class),
-        new Matcher<Method>() {
-          @Override
-          public boolean matches(Method t) {
-            for (Class<?> c : t.getParameterTypes()) {
-              if (Request.class.isAssignableFrom(c)) {
-                return true;
-              }
+        t -> {
+          for (Class<?> c : t.getParameterTypes()) {
+            if (Request.class.isAssignableFrom(c)) {
+              return true;
             }
-            return false;
           }
+          return false;
         },
         new RequestFilter());
 

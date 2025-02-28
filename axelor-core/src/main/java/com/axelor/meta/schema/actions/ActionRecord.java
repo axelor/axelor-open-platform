@@ -238,13 +238,10 @@ public class ActionRecord extends Action {
 
     if (canSave(handler, (Model) target)) {
       JPA.runInTransaction(
-          new Runnable() {
-            @Override
-            public void run() {
-              Model bean = JPA.save(((Model) result[0]));
-              map.putAll(Resource.toMapCompact(bean));
-              result[0] = bean;
-            }
+          () -> {
+            Model bean = JPA.save(((Model) result[0]));
+            map.putAll(Resource.toMapCompact(bean));
+            result[0] = bean;
           });
     }
 

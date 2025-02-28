@@ -30,8 +30,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -120,18 +118,14 @@ public class ReportGenerator {
       task.getAppContext().put(IConnectionFactory.CLOSE_PASS_IN_CONNECTION, Boolean.FALSE);
 
       JPA.jdbcWork(
-          new JPA.JDBCWork() {
-
-            @Override
-            public void execute(Connection connection) throws SQLException {
-              task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
-              try {
-                task.run();
-              } catch (EngineException e) {
-                throw new RuntimeException(e);
-              } finally {
-                task.close();
-              }
+          connection -> {
+            task.getAppContext().put(IConnectionFactory.PASS_IN_CONNECTION, connection);
+            try {
+              task.run();
+            } catch (EngineException e) {
+              throw new RuntimeException(e);
+            } finally {
+              task.close();
             }
           });
     }
