@@ -20,6 +20,7 @@ package com.axelor.gradle.support;
 
 import java.util.ArrayList;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.ResolutionStrategy;
 import org.gradle.api.plugins.GroovyPlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -35,12 +36,7 @@ public class JavaSupport extends AbstractSupport {
 
     project
         .getConfigurations()
-        .all(
-            config ->
-                config.resolutionStrategy(
-                    strategy -> {
-                      strategy.preferProjectModules();
-                    }));
+        .all(config -> config.resolutionStrategy(ResolutionStrategy::preferProjectModules));
 
     project
         .getTasks()

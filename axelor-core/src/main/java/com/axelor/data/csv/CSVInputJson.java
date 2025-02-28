@@ -60,7 +60,7 @@ public class CSVInputJson extends CSVInput {
     }
 
     return Stream.of(search, "self.jsonModel = '%s'".formatted(getJsonModel()))
-        .map(item -> "(%s)".formatted(item))
+        .map("(%s)"::formatted)
         .collect(Collectors.joining(" AND "));
   }
 

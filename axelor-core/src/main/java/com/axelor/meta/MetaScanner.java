@@ -259,7 +259,7 @@ public final class MetaScanner {
    */
   public static List<Properties> findModuleProperties() {
     return findModuleFiles().stream()
-        .map(file -> findProperties(file))
+        .map(MetaScanner::findProperties)
         .filter(p -> StringUtils.notBlank(p.getProperty("name")))
         .collect(Collectors.toList());
   }

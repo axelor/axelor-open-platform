@@ -79,7 +79,7 @@ public class GenerateCode extends DefaultTask {
   @InputFiles
   public List<File> getLookupFiles() {
     return AxelorUtils.findAxelorProjects(getProject()).stream()
-        .map(sub -> getJavaOutputDir(sub))
+        .map(GenerateCode::getJavaOutputDir)
         .collect(Collectors.toList());
   }
 

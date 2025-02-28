@@ -721,16 +721,16 @@ public class Entity implements BaseType<Entity> {
 
     var conditions =
         data.stream()
-            .map(p -> p.getName())
-            .map(n -> getterName(n))
+            .map(Property::getName)
+            .map(Utils::getterName)
             .map(n -> "Objects.equals(%s(), other.%s())".formatted(n, n))
             .collect(Collectors.joining("\n  && "));
 
     var nullconditions =
         data.stream()
-            .map(p -> p.getName())
-            .map(n -> getterName(n))
-            .map(n -> "%s() != null".formatted(n))
+            .map(Property::getName)
+            .map(Utils::getterName)
+            .map("%s() != null"::formatted)
             .collect(Collectors.joining("\n    || "));
 
     method.code("return " + conditions);
@@ -855,7 +855,7 @@ public class Entity implements BaseType<Entity> {
     }
 
     getComments().stream()
-        .filter(s -> notBlank(s))
+        .filter(Utils::notBlank)
         .findFirst()
         .ifPresent(
             comment -> {

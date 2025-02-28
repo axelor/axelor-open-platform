@@ -147,8 +147,8 @@ public abstract class AbstractXmlProcessor {
 
   public List<Element> findElements(NodeList nodeList) {
     return nodeListToStream(nodeList)
-        .filter(node -> node instanceof Element)
-        .map(node -> (Element) node)
+        .filter(Element.class::isInstance)
+        .map(Element.class::cast)
         .collect(Collectors.toList());
   }
 
@@ -160,7 +160,7 @@ public abstract class AbstractXmlProcessor {
 
   public Node findViewNode(Document document) {
     return nodeListToStream(document.getFirstChild().getChildNodes())
-        .filter(node -> node instanceof Element)
+        .filter(Element.class::isInstance)
         .findFirst()
         .orElseThrow(NoSuchElementException::new);
   }

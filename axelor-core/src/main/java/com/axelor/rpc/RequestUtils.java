@@ -60,7 +60,7 @@ public class RequestUtils {
   private static void processRecords(
       Collection<Object> records, Consumer<Map<String, Object>> consumer) {
     records.stream()
-        .filter(record -> record instanceof Map)
+        .filter(Map.class::isInstance)
         .forEach(
             record -> {
               @SuppressWarnings("unchecked")

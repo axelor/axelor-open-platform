@@ -458,7 +458,7 @@ public class ViewService extends AbstractService {
 
         final List<SimpleWidget> existing =
             view.getItems().stream()
-                .filter(widget -> widget instanceof SimpleWidget)
+                .filter(SimpleWidget.class::isInstance)
                 .map(SimpleWidget.class::cast)
                 .filter(widget -> Objects.equals(widget.getName(), name))
                 .collect(Collectors.toList());
@@ -481,7 +481,7 @@ public class ViewService extends AbstractService {
             stream = Stream.concat(stream, filterView.getItems().stream());
           }
           stream
-              .filter(widget -> widget instanceof SimpleWidget)
+              .filter(SimpleWidget.class::isInstance)
               .map(SimpleWidget.class::cast)
               .filter(widget -> Objects.equals(widget.getName(), name))
               .filter(widget -> StringUtils.notBlank(widget.getTitle()))
@@ -501,7 +501,7 @@ public class ViewService extends AbstractService {
     // Add missing fields as hidden
     if (originalView != null) {
       originalView.getItems().stream()
-          .filter(widget -> widget instanceof SimpleWidget)
+          .filter(SimpleWidget.class::isInstance)
           .map(SimpleWidget.class::cast)
           .filter(widget -> StringUtils.notBlank(widget.getName()))
           .filter(widget -> !names.contains(widget.getName()))

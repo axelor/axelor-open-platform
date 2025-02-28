@@ -103,14 +103,14 @@ public class TomcatSupport extends AbstractSupport {
     // try to use linked axelor-web's webapp dir
     project.getGradle().getIncludedBuilds().stream()
         .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
-        .filter(it -> it.exists())
+        .filter(File::exists)
         .findFirst()
         .ifPresent(webapps::add);
 
     // try to use linked axelor-front's dist
     project.getGradle().getIncludedBuilds().stream()
         .map(it -> new File(it.getProjectDir(), "axelor-front/dist"))
-        .filter(it -> it.exists())
+        .filter(File::exists)
         .findFirst()
         .ifPresent(webapps::add);
 

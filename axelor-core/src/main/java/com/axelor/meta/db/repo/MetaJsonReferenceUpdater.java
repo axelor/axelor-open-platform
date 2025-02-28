@@ -94,7 +94,7 @@ public class MetaJsonReferenceUpdater {
   private boolean nameChanged(Property field, Map<?, ?> map) {
     if (field.isVirtual()) {
       Mapper mapper = Mapper.of(field.getEntity());
-      return mapper.getComputeDependencies(field).stream().anyMatch(name -> map.containsKey(name));
+      return mapper.getComputeDependencies(field).stream().anyMatch(map::containsKey);
     }
     return map.containsKey(field.getName());
   }

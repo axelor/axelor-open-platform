@@ -313,7 +313,7 @@ public class Mapper {
 
     return ((List<?>) node.methods)
         .stream()
-            .map(m -> (MethodNode) m)
+            .map(MethodNode.class::cast)
             .filter(m -> Modifier.isProtected(m.access))
             .filter(m -> m.name.startsWith(PREFIX_COMPUTE))
             .filter(m -> methods.containsKey(m.name))
@@ -323,8 +323,8 @@ public class Mapper {
                     m ->
                         Arrays.stream(m.instructions.toArray())
                             .filter(n -> n.getOpcode() == Opcodes.GETFIELD)
-                            .filter(n -> n instanceof FieldInsnNode)
-                            .map(n -> (FieldInsnNode) n)
+                            .filter(FieldInsnNode.class::isInstance)
+                            .map(FieldInsnNode.class::cast)
                             .filter(n -> !n.name.equals(methods.get(m.name)))
                             .map(n -> n.name)
                             .collect(Collectors.toSet())));

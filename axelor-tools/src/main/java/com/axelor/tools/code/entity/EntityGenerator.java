@@ -23,6 +23,7 @@ import com.axelor.tools.code.JavaType;
 import com.axelor.tools.code.entity.model.BaseType;
 import com.axelor.tools.code.entity.model.Entity;
 import com.axelor.tools.code.entity.model.EnumType;
+import com.axelor.tools.code.entity.model.TrackField;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import jakarta.xml.bind.JAXBException;
@@ -181,7 +182,7 @@ public class EntityGenerator {
         .ifPresent(
             track ->
                 track.getFields().stream()
-                    .map(field -> field.getName())
+                    .map(TrackField::getName)
                     .filter(fieldName -> !fieldExists(entity.getName(), fieldName))
                     .forEach(
                         fieldName ->

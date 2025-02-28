@@ -76,16 +76,16 @@ public class EclipseSupport extends AbstractSupport {
             (Classpath cp) -> {
               // separate output for main & test sources
               cp.getEntries().stream()
-                  .filter(it -> it instanceof SourceFolder)
-                  .map(it -> (SourceFolder) it)
+                  .filter(SourceFolder.class::isInstance)
+                  .map(SourceFolder.class::cast)
                   .filter(
                       it ->
                           it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
                   .forEach(it -> it.setOutput("bin/main"));
 
               cp.getEntries().stream()
-                  .filter(it -> it instanceof SourceFolder)
-                  .map(it -> (SourceFolder) it)
+                  .filter(SourceFolder.class::isInstance)
+                  .map(SourceFolder.class::cast)
                   .filter(it -> it.getPath().startsWith("src/test/"))
                   .forEach(it -> it.setOutput("bin/test"));
 
@@ -132,7 +132,7 @@ public class EclipseSupport extends AbstractSupport {
     final File dir =
         project.getGradle().getIncludedBuilds().stream()
             .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
-            .filter(it -> it.exists())
+            .filter(File::exists)
             .findFirst()
             .orElse(null);
 

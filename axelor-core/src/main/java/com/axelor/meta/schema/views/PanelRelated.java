@@ -411,7 +411,7 @@ public class PanelRelated extends AbstractPanel {
     if (ObjectUtils.notEmpty(getItems())) {
       fieldNames.addAll(
           getItems().stream()
-              .filter(x -> x instanceof SimpleWidget)
+              .filter(SimpleWidget.class::isInstance)
               .map(x -> ((SimpleWidget) x).getName())
               .filter(n -> !StringUtils.isBlank(n))
               .collect(Collectors.toList()));

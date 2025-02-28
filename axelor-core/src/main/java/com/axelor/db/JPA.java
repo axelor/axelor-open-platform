@@ -669,7 +669,7 @@ public final class JPA {
   public static void jdbcWork(final JDBCWork work) {
     Session session = (Session) em().getDelegate();
     try {
-      session.doWork(connection -> work.execute(connection));
+      session.doWork(work::execute);
     } catch (HibernateException e) {
       throw new PersistenceException(e);
     }

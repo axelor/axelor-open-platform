@@ -310,7 +310,7 @@ public class QueryTest extends ScriptTest {
     // Hibernate 6 cannot coerce multi value and does not throw IllegalArgumentException.
     query.setParameter("credits", credits);
 
-    assertThrows(NumberFormatException.class, () -> query.getResultList());
+    assertThrows(NumberFormatException.class, query::getResultList);
   }
 
   @Test
@@ -326,6 +326,6 @@ public class QueryTest extends ScriptTest {
 
     // Hibernate 5 doesn't fail because of null in collection.
     // Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
-    assertThrows(AssertionError.class, () -> query.getResultList());
+    assertThrows(AssertionError.class, query::getResultList);
   }
 }

@@ -137,7 +137,7 @@ public class XMLBindJson extends XMLBind {
     return Optional.of(
             Stream.of(search, domain)
                 .filter(StringUtils::notBlank)
-                .map(item -> "(%s)".formatted(item))
+                .map("(%s)"::formatted)
                 .collect(Collectors.joining(" AND ")))
         .filter(StringUtils::notBlank)
         .orElse(null);
