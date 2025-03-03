@@ -20,6 +20,7 @@ package com.axelor.common;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -83,5 +84,55 @@ public final class ObjectUtils {
    */
   public static boolean notEmpty(Object value) {
     return !isEmpty(value);
+  }
+
+  /**
+   * Check whether the given map is mutable.
+   *
+   * @param map the map to check
+   * @return true if mutable false otherwise
+   */
+  public static boolean isMutable(Map<?, ?> map) {
+    if (isKnownImmutable(map)) {
+      return false;
+    }
+
+    try {
+      map.remove(new Object());
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
+    }
+  }
+
+  /**
+   * Check whether the given collection is mutable.
+   *
+   * @param collection the collection to check
+   * @return true if mutable false otherwise
+   */
+  public static boolean isMutable(Collection<?> collection) {
+    if (isKnownImmutable(collection)) {
+      return false;
+    }
+
+    try {
+      collection.remove(new Object());
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
+    }
+  }
+
+  private static final List<String> KNOWN_IMMUTABLE_CLASS_PARTS =
+      List.of("Immutable", "Unmodifiable", "$Empty", "$Singleton");
+
+  private static boolean isKnownImmutable(Object object) {
+    if (object == null) {
+      return true;
+    }
+
+    var className = object.getClass().getName();
+    return KNOWN_IMMUTABLE_CLASS_PARTS.stream().anyMatch(className::contains);
   }
 }

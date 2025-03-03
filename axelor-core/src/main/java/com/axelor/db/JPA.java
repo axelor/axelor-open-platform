@@ -18,11 +18,11 @@
  */
 package com.axelor.db;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Provider;
@@ -387,10 +387,12 @@ public final class JPA {
           for (Object val : collection) {
             if (val instanceof Map map) {
               if (p.getMappedBy() != null) {
-                if (val instanceof ImmutableMap) val = new HashMap<>(map);
-                ((Map) val).remove(p.getMappedBy());
+                if (!ObjectUtils.isMutable(map)) {
+                  map = new HashMap<>(map);
+                }
+                map.remove(p.getMappedBy());
               }
-              Model item = _edit(target, (Map) val, visited, edited);
+              Model item = _edit(target, map, visited, edited);
               items.add(p.setAssociation(item, bean));
             } else if (val instanceof Number) {
               items.add(JPA.find(target, Long.parseLong(val.toString())));
