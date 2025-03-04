@@ -121,6 +121,20 @@ configure(subprojects - project(':axelor-front')) {
               distribution = 'repo'
             }
           }
+
+          developers {
+            developer {
+              id = "axelor-team"
+              name = "Axelor Team"
+              email = 'it@axelor.com'
+            }
+          }
+
+          scm {
+            url = "https://github.com/axelor/axelor-open-platform"
+            connection = "scm:git:https://github.com/axelor/axelor-open-platform.git"
+            developerConnection = "scm:git:ssh://git@github.com/axelor/axelor-open-platform.git"
+          }
         }
       }
     }
