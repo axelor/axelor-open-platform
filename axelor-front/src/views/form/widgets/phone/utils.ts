@@ -1,6 +1,6 @@
 import parsePhoneNumber from "libphonenumber-js/max";
 import { useMemo } from "react";
-import { CountryData, defaultCountries } from "react-international-phone";
+import { defaultCountries } from "react-international-phone";
 
 import flags from "@/assets/flags.svg";
 import { i18n } from "@/services/client/i18n";
@@ -33,14 +33,6 @@ export const FALLBACK_COUNTRIES: Record<string, string> = {
 
 export const DEFAULT_COUNTRIES = [
   ...defaultCountries,
-  [
-    "Mayotte",
-    "yt",
-    "262",
-    "",
-    1,
-    ["269", "639"],
-  ] as unknown as CountryData,
 ];
 
 export const FLAGS = DEFAULT_COUNTRIES.map((country) => {
