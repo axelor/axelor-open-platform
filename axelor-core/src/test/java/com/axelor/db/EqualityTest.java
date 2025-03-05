@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.axelor.JpaTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
-import com.google.common.collect.ImmutableList;
 import jakarta.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,7 +92,7 @@ public class EqualityTest extends JpaTest {
 
   @Test
   public void testModelMap() throws Exception {
-    for (Class<? extends Model> modelClass : ImmutableList.of(Address.class, Contact.class)) {
+    for (Class<? extends Model> modelClass : List.of(Address.class, Contact.class)) {
       Map<Model, Model> entities = new HashMap<>();
       Model entity1 = modelClass.getDeclaredConstructor().newInstance();
       Model entity2 = modelClass.getDeclaredConstructor().newInstance();

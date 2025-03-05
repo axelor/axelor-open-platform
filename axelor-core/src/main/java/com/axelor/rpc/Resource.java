@@ -65,7 +65,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -242,7 +241,7 @@ public class Resource<T extends Model> {
 
     Collections.sort(data);
 
-    response.setData(ImmutableList.copyOf(data));
+    response.setData(List.copyOf(data));
     response.setStatus(Response.STATUS_SUCCESS);
 
     return response;

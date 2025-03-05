@@ -19,9 +19,9 @@
 package com.axelor.rpc;
 
 import com.axelor.common.ObjectUtils;
-import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -49,7 +49,7 @@ public class RequestUtils {
       final Collection<Object> dataAsCollection = (Collection<Object>) data;
       allRecords = dataAsCollection;
     } else if (data != null) {
-      allRecords = ImmutableList.of(data);
+      allRecords = List.of(data);
     } else {
       allRecords = Collections.emptyList();
     }

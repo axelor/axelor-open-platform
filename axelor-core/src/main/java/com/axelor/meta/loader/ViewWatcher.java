@@ -27,7 +27,6 @@ import com.axelor.common.reflections.Reflections;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
@@ -46,6 +45,7 @@ import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -206,7 +206,7 @@ public final class ViewWatcher {
         fs = FileSystems.newFileSystem(path, (ClassLoader) null);
         propsPath = fs.getPath("META-INF", "axelor-module.properties");
       } else {
-        for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
+        for (final String location : List.of("WEB-INF/classes", "main")) {
           final String subPathStr = Path.of('/' + location).toString();
           final int index = pathStr.indexOf(subPathStr);
           if (index >= 0) {
