@@ -10,6 +10,10 @@ def projectsIncludeInJavadocs = subprojects.findAll {
   return !projectsToSkipJavadocs.contains( it.name )
 }
 
+/////
+// Unifying javadoc
+/////
+
 task generateDocs(type: Javadoc) {
 
   description "Generate API docs."
@@ -49,4 +53,23 @@ task generateDocs(type: Javadoc) {
   doFirst {
     title = "Axelor Open Platform $version API"
   }
+}
+
+/////
+// Individual javadoc
+/////
+
+configure(subprojects - project(':axelor-front')) { p ->
+
+  javadoc {
+
+    exclude '**/internal/**'
+    exclude '**/org/jboss/logging/**'
+
+    options {
+      encoding = "UTF-8"
+      memberLevel = JavadocMemberLevel.PROTECTED
+    }
+  }
+
 }

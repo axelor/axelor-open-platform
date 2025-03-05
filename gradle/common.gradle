@@ -3,6 +3,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 java {
+  withJavadocJar()
   toolchain {
     languageVersion = JavaLanguageVersion.of(21)
   }
