@@ -1,8 +1,8 @@
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
-import { selectAtom } from "jotai/utils";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { selectAtom, useAtomCallback } from "jotai/utils";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Box, NavTabItem, NavTabs, clsx } from "@axelor/ui";
 
@@ -21,6 +21,7 @@ import { fallbackWidgetAtom } from "../../builder/atoms";
 import {
   FormTabScope,
   useAfterActions,
+  useFormRefresh,
   useFormScope,
 } from "../../builder/scope";
 
@@ -33,12 +34,25 @@ export function PanelTabs(props: WidgetProps) {
     Record<string, string | undefined>
   >({});
 
-  const hidden = useAtomValue(widgetAtom).attrs?.hidden;
+  const shouldRefocus = useRef<boolean | null>(true);
+  const lastActiveTab = useRef<string | null>(null);
 
-  const handleChange = useCallback(
-    (item: NavTabItem) => setActiveTab(item.id),
-    [],
+  const hidden = useAtomValue(widgetAtom).attrs?.hidden;
+  const parentId = useAtomValue(
+    useMemo(() => selectAtom(formAtom, (form) => form.record.id), [formAtom]),
   );
+
+  const isFormDirty = useAtomCallback(
+    useCallback((get) => get(formAtom).dirty, [formAtom]),
+  );
+
+  const handleChange = useCallback((item: NavTabItem) => {
+    // once tab is selected manually by user click
+    // then auto re-focus will be disabled
+    shouldRefocus.current = null;
+    lastActiveTab.current = item.id;
+    setActiveTab(item.id);
+  }, []);
 
   const tabs = useMemo(
     () =>
@@ -88,13 +102,37 @@ export function PanelTabs(props: WidgetProps) {
   );
 
   useEffect(() => {
-    if (visibleTabs.some((item) => item.uid === activeTab)) return;
+    // check for last selected tab (by user) is not hidden
+    // then it should select that tab
+    const lastSelectedId = lastActiveTab.current;
+    const isLastSelectedPresent = lastSelectedId && !hiddenTabs[lastSelectedId];
+
+    if (isLastSelectedPresent) {
+      return setActiveTab(lastSelectedId);
+    }
+
+    if (visibleTabs.some((item) => item.uid === activeTab)) {
+      if (shouldRefocus.current) {
+        const activeIndex = visibleTabs.findIndex((t) => t.uid === activeTab);
+        const firstTab = visibleTabs.find((t, i) => i < activeIndex);
+        const formDirty = isFormDirty();
+        if (firstTab || formDirty) {
+          shouldRefocus.current = false;
+          // after any changes to form it should not shift the focus
+          if (!formDirty && firstTab) {
+            setActiveTab(firstTab.uid);
+          }
+        }
+      }
+      return;
+    }
+    
     const timer = setTimeout(() => {
       if (activeTab) {
-        let index = tabs.findIndex((item) => item.uid === activeTab);
+        const index = tabs.findIndex((item) => item.uid === activeTab);
         let prevIndex = index - 1;
         while (prevIndex >= 0) {
-          let prev = tabs[prevIndex];
+          const prev = tabs[prevIndex];
           if (!hiddenTabs[prev.uid]) {
             setActiveTab(prev.uid);
             return;
@@ -102,13 +140,13 @@ export function PanelTabs(props: WidgetProps) {
           prevIndex--;
         }
       }
-      let first = visibleTabs[0];
+      const first = visibleTabs[0];
       if (first) {
         setActiveTab(first.uid ?? null);
       }
     }, 50);
     return () => clearTimeout(timer);
-  }, [activeTab, hiddenTabs, tabs, visibleTabs]);
+  }, [activeTab, hiddenTabs, tabs, visibleTabs, isFormDirty]);
 
   const { actionExecutor } = useFormScope();
   const handleOnSelect = useAfterActions(
@@ -122,6 +160,15 @@ export function PanelTabs(props: WidgetProps) {
       [actionExecutor],
     ),
   );
+
+  const resetTabRefocus = useCallback(() => {
+    if (shouldRefocus.current === false) {
+      shouldRefocus.current = true;
+    }
+  }, []);
+
+  useFormRefresh(resetTabRefocus);
+  useEffect(resetTabRefocus, [resetTabRefocus, parentId]);
 
   useEffect(() => {
     handleOnSelect(visibleTabs, activeTab);
