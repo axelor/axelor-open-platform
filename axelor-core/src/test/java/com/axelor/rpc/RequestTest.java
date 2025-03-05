@@ -28,7 +28,6 @@ import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
@@ -164,10 +163,10 @@ public class RequestTest extends RpcTest {
 
   @Test
   public void testEdit() {
-    Map<String, Object> janeValues = ImmutableMap.of("firstName", "Jane", "lastName", "Doe");
-    Map<String, Object> babyValues = ImmutableMap.of("firstName", "Baby", "lastName", "Doe");
+    Map<String, Object> janeValues = Map.of("firstName", "Jane", "lastName", "Doe");
+    Map<String, Object> babyValues = Map.of("firstName", "Baby", "lastName", "Doe");
     Map<String, Object> johnValues =
-        ImmutableMap.of(
+        Map.of(
             "firstName",
             "John",
             "lastName",
