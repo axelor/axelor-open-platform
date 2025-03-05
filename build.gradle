@@ -1,4 +1,6 @@
 import com.axelor.common.VersionUtils
+import com.axelor.gradle.task.CentralPortalUploadTask
+
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -59,6 +61,7 @@ configure(subprojects - project(':axelor-front')) {
   apply plugin: com.axelor.gradle.support.LicenseSupport
   apply plugin: com.axelor.gradle.support.PublishSupport
   apply plugin: 'com.adarshr.test-logger'
+  apply plugin: 'signing'
 
   group = "com.axelor"
   version = rootProject.version
@@ -101,6 +104,9 @@ configure(subprojects - project(':axelor-front')) {
 
   }
 
+  def centralPortalBundleName = "centralPortalBundle.zip"
+  def centralPortalUrlPath = project.layout.buildDirectory.dir('central')
+
   project.afterEvaluate {
     publishing {
       publications.all {
@@ -137,7 +143,51 @@ configure(subprojects - project(':axelor-front')) {
           }
         }
       }
+      repositories {
+        maven {
+          name = "CentralPortal"
+          url = centralPortalUrlPath
+        }
+      }
     }
+
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+
+    if (project.hasProperty("finalRelease") && signingKey != null && signingPassword != null) {
+      signing {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications
+      }
+    }
+
+  }
+
+  task centralPortalBundle(type: Zip) {
+    description "Create central portal bundle"
+    group = "publishing"
+
+    dependsOn(project.name == "axelor-gradle"
+            ? "publishPluginMavenPublicationToCentralPortalRepository"
+            : "publishMavenJavaPublicationToCentralPortalRepository")
+
+    from(centralPortalUrlPath)
+    exclude("**/maven-metadata*.*")
+    archiveFileName.set(centralPortalBundleName)
+    destinationDirectory.set(project.layout.buildDirectory)
+  }
+
+  task uploadToCentralPortal(type: CentralPortalUploadTask) {
+    description "Publish artifact to central portal"
+    group = "publishing"
+
+    dependsOn(centralPortalBundle)
+
+    username = project.findProperty("centralPortalUserName")
+    password = project.findProperty("centralPortalToken")
+    autoPublish = false
+    archiveFile = project.layout.buildDirectory.file(centralPortalBundleName)
+    publicationName = project.name + "-" + project.version
   }
 
 }
