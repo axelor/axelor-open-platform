@@ -1,6 +1,13 @@
+buildscript {
+  repositories repos
+  dependencies {
+    classpath("com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin:1.3.1")
+  }
+}
+
 description = 'Gradle plugin for integrating Axelor'
 
-apply plugin: 'java-gradle-plugin'
+apply plugin: 'com.gradle.plugin-publish'
 
 configurations {
   tomcat
@@ -27,12 +34,15 @@ dependencies {
 }
 
 gradlePlugin {
+  website = "https://github.com/axelor/axelor-open-platform"
+  vcsUrl = "https://github.com/axelor/axelor-open-platform.git"
   plugins {
     axelorPlugin {
       id = "com.axelor.app"
       implementationClass = "com.axelor.gradle.AxelorPlugin"
       displayName = "Axelor Gradle plugin"
       description = "Gradle plugin for integrating Axelor"
+      tags.addAll('axelor', 'java', 'platform')
     }
   }
 }

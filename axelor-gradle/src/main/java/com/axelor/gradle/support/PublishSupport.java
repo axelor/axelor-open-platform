@@ -68,6 +68,12 @@ public class PublishSupport extends AbstractSupport {
                 });
 
     if (project.getPlugins().hasPlugin(JavaGradlePluginPlugin.class)) {
+      if (project.getPlugins().hasPlugin("com.gradle.plugin-publish")) {
+        // Since version 1.0.0, Plugin Publish Plugin automatically applies Maven Publish Plugin
+        // https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#plugin-publishing-plugin
+        return;
+      }
+
       publishing
           .getPublications()
           .create(
