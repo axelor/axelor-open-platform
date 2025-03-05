@@ -24,7 +24,6 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -348,7 +347,7 @@ public class ContextHandler<T> {
             name -> {
               Object value = beanMapper.get(bean, name);
               if (value instanceof Collection<?> collection) {
-                value = Collections2.transform(collection, transform::apply);
+                value = collection.stream().map(transform).collect(Collectors.toList());
               } else {
                 value = transform.apply(value);
               }

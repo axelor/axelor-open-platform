@@ -28,7 +28,6 @@ import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Collections2;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlTransient;
@@ -199,16 +198,17 @@ public class ActionView extends Action {
           }
           if (value instanceof Collection<?> collection) {
             value =
-                Collections2.transform(
-                    collection,
-                    item -> {
-                      if (item instanceof ContextEntity entity) {
-                        return entity.getContextMap();
-                      }
-                      return item instanceof Model && JPA.em().contains(item)
-                          ? Resource.toMapCompact(item)
-                          : item;
-                    });
+                collection.stream()
+                    .map(
+                        item -> {
+                          if (item instanceof ContextEntity entity) {
+                            return entity.getContextMap();
+                          }
+                          return item instanceof Model && JPA.em().contains(item)
+                              ? Resource.toMapCompact(item)
+                              : item;
+                        })
+                    .toList();
           }
           context.put(ctx.getName(), value);
 
