@@ -1,0 +1,5 @@
+---
+title: Upgrade react-international-phone from 4.3.0 to 4.5.0
+type: fix
+description: |
+  Update/add/fix some countries phone numbers formats.
