@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.rpc.ActionRequest;
-import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -60,9 +59,9 @@ public class TestActionExport extends MetaTest {
     List<Object> items = new ArrayList<>();
     context.put("items", items);
 
-    items.add(Map.of("product", ImmutableMap.of("name", "PC1"), "price", 250, "quantity", 1));
-    items.add(Map.of("product", ImmutableMap.of("name", "PC2"), "price", 550, "quantity", 1));
-    items.add(Map.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "PC1"), "price", 250, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "PC2"), "price", 550, "quantity", 1));
+    items.add(Map.of("product", Map.of("name", "Laptop"), "price", 690, "quantity", 1));
 
     return context;
   }

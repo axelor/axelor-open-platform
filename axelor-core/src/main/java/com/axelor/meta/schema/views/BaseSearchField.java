@@ -23,7 +23,6 @@ import com.axelor.db.mapper.Adapter;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.google.common.collect.ImmutableMap;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlType;
 import java.math.BigDecimal;
@@ -56,14 +55,13 @@ public class BaseSearchField extends Field {
   }
 
   private static final Map<String, Class<?>> TYPES =
-      new ImmutableMap.Builder<String, Class<?>>()
-          .put("string", String.class)
-          .put("integer", Integer.class)
-          .put("decimal", BigDecimal.class)
-          .put("date", LocalDate.class)
-          .put("datetime", LocalDateTime.class)
-          .put("boolean", Boolean.class)
-          .build();
+      Map.of(
+          "string", String.class,
+          "integer", Integer.class,
+          "decimal", BigDecimal.class,
+          "date", LocalDate.class,
+          "datetime", LocalDateTime.class,
+          "boolean", Boolean.class);
 
   @SuppressWarnings("rawtypes")
   public Object validate(Object input) {

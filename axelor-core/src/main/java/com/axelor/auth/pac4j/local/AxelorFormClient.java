@@ -29,8 +29,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.pac4j.core.context.CallContext;
@@ -104,15 +103,12 @@ public class AxelorFormClient extends FormClient {
     try {
       context.setResponseContentType(HttpConstants.APPLICATION_JSON + "; charset=utf-8");
 
-      final Builder<String, String> stateBuilder =
-          new ImmutableMap.Builder<String, String>()
-              .put("passwordPattern", authService.getPasswordPattern())
-              .put("passwordPatternTitle", authService.getPasswordPatternTitle());
+      final Map<String, String> state = new HashMap<>();
+      state.put("passwordPattern", authService.getPasswordPattern());
+      state.put("passwordPatternTitle", authService.getPasswordPatternTitle());
       if (StringUtils.notBlank(errorMessage)) {
-        stateBuilder.put(ERROR_PARAMETER, I18n.get(errorMessage));
+        state.put(ERROR_PARAMETER, I18n.get(errorMessage));
       }
-      final Map<String, String> state = stateBuilder.build();
-
       final String content =
           (new ObjectMapper())
               .writeValueAsString(

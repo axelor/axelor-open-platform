@@ -65,7 +65,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -188,7 +187,9 @@ public class Resource<T extends Model> {
     request.setModel(model.getName());
 
     List<Object> items =
-        Stream.of(records).map(item -> ImmutableMap.of("id", item)).collect(Collectors.toList());
+        Stream.of(records)
+            .map(item -> Collections.singletonMap("id", item))
+            .collect(Collectors.toList());
 
     request.setRecords(items);
 

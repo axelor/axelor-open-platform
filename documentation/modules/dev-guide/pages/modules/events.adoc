@@ -153,7 +153,7 @@ Observing fetch events, it is possible to add workflow status as tags in the for
     final Map<String, Object> values = (Map<String, Object>) event.getResponse().getItem(0);
     if (values != null) {
       final List<Map<String, Object>> status = new ArrayList<>();
-      status.add(ImmutableMap.of("name", "s1", "title", "Status 1", "color", "red"));
+      status.add(Map.of("name", "s1", "title", "Status 1", "color", "red"));
       values.put("$wkfStatus", status);
     }
   }
