@@ -27,7 +27,7 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.jvm.tasks.Jar;
+import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin;
 
 public class PublishSupport extends AbstractSupport {
