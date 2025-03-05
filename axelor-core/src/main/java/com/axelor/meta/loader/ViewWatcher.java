@@ -27,7 +27,6 @@ import com.axelor.common.reflections.Reflections;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +103,7 @@ public final class ViewWatcher {
                             }
                           })
                       .collect(Collectors.toSet()))
-          .orElseGet(() -> ImmutableSet.of(ENTRY_CREATE));
+          .orElseGet(() -> Set.of(ENTRY_CREATE));
 
   private ViewWatcher() {}
 

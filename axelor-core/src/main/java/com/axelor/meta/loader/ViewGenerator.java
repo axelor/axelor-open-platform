@@ -25,7 +25,6 @@ import com.axelor.db.tenants.TenantAware;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.xml.bind.JAXBException;
@@ -39,6 +38,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,7 +89,7 @@ public class ViewGenerator {
             ORDER BY self.id\
             """,
             Long.class)
-        .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
+        .setParameter("names", ObjectUtils.isEmpty(names) ? Set.of("") : names)
         .getResultList();
   }
 
