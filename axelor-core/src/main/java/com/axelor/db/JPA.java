@@ -23,7 +23,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
@@ -287,7 +286,7 @@ public final class JPA {
       }
 
       if (value instanceof Map) {
-        value = Lists.newArrayList(value);
+        value = List.of(value);
       }
       for (Object item : (Collection<?>) value) {
         if (item instanceof Map map) {

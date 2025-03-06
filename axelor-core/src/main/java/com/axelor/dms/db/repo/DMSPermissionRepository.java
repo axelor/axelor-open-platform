@@ -320,7 +320,8 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
   private void recursiveRemoveHavingSamePermission(DMSPermission entity) {
     final JpaRepository<DMSFile> dmsFileRepo = JpaRepository.of(DMSFile.class);
-    final List<Long> entityIds = Lists.newArrayList(entity.getId());
+    final List<Long> entityIds = new ArrayList<>();
+    entityIds.add(entity.getId());
 
     // Find orphan parent permissions.
     for (DMSFile parentFile = entity.getFile().getParent();

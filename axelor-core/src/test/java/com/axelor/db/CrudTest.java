@@ -33,11 +33,11 @@ import com.axelor.test.db.Contact;
 import com.axelor.test.db.Country;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
-import com.google.common.collect.Lists;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
 import jakarta.persistence.OptimisticLockException;
 import java.util.HashSet;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,7 +79,7 @@ public class CrudTest extends JpaTest {
     addr2.setCountry(country);
     addr2.setContact(contact);
 
-    contact.setAddresses(Lists.newArrayList(addr1, addr2));
+    contact.setAddresses(List.of(addr1, addr2));
     contacts.save(contact);
   }
 
@@ -108,11 +108,11 @@ public class CrudTest extends JpaTest {
     addr1.setCountry(country);
     addr1.setContact(contact);
 
-    contact.setAddresses(Lists.newArrayList(addr1));
+    contact.setAddresses(List.of(addr1));
 
     contacts.save(contact);
 
-    for (Model e : Lists.newArrayList(contact, title, addr1, country)) {
+    for (Model e : List.of(contact, title, addr1, country)) {
       assertNotNull(e.getId());
       assertNotNull(e.getVersion());
     }

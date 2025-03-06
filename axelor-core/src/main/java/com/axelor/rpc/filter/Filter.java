@@ -22,6 +22,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.google.common.collect.Lists;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -137,11 +138,11 @@ public abstract class Filter {
   }
 
   public static Filter between(String fieldName, Object start, Object end) {
-    return new RangeFilter(Operator.BETWEEN, fieldName, Lists.newArrayList(start, end));
+    return new RangeFilter(Operator.BETWEEN, fieldName, Arrays.asList(start, end));
   }
 
   public static Filter notBetween(String fieldName, Object start, Object end) {
-    return new RangeFilter(Operator.NOT_BETWEEN, fieldName, Lists.newArrayList(start, end));
+    return new RangeFilter(Operator.NOT_BETWEEN, fieldName, Arrays.asList(start, end));
   }
 
   public static Filter and(List<Filter> filters) {

@@ -47,7 +47,6 @@ import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
 import jakarta.annotation.Nullable;
@@ -220,13 +219,13 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
    * @return home parent
    */
   protected DMSFile findOrCreateHome(Model related) {
-    final List<Filter> dmsRootFilters =
-        Lists.newArrayList(
-            new JPQLFilter(
-                """
-                COALESCE(self.isDirectory, FALSE) = TRUE \
-                AND self.relatedModel = :model \
-                AND COALESCE(self.relatedId, 0) = 0"""));
+    final List<Filter> dmsRootFilters = new ArrayList<>();
+    dmsRootFilters.add(
+        new JPQLFilter(
+            """
+            COALESCE(self.isDirectory, FALSE) = TRUE \
+            AND self.relatedModel = :model \
+            AND COALESCE(self.relatedId, 0) = 0"""));
     final DMSFile dmsRootParent = getRootParent(related);
 
     if (dmsRootParent != null) {

@@ -26,7 +26,6 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -178,7 +177,7 @@ public abstract class XMLBinder {
         value = relational(property, bind, value, ctx);
       } else if (property.isCollection() && value != null) {
         if (!(value instanceof List)) {
-          value = Lists.newArrayList(value);
+          value = List.of(value);
         }
         List<Object> items = new ArrayList<>();
         for (Object item : (List<?>) value) {

@@ -20,7 +20,6 @@ package com.axelor.meta.loader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +52,7 @@ public class TestModuleResolver {
     add("axelor-project", "axelor-sale");
 
     List<String> expected =
-        Lists.newArrayList(
+        List.of(
             "axelor-core",
             "axelor-auth",
             "axelor-data",

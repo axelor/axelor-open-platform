@@ -27,10 +27,10 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
-import com.google.common.collect.Lists;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -154,7 +154,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
     Filter right = null;
 
     if (ids != null && ids.length > 0 && ids[0] != null) {
-      right = Filter.in("id", Lists.newArrayList(ids));
+      right = Filter.in("id", Arrays.asList(ids));
     }
 
     if (right == null) return left;

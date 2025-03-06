@@ -18,12 +18,13 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.google.common.collect.Lists;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.core.HttpHeaders;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -138,8 +139,8 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   }
 
   protected void addSameSiteCookieHeader(BiConsumer<String, String> adder, String header) {
-    final List<String> parts = Lists.newArrayList(header, "SameSite=None");
-
+    final List<String> parts = new ArrayList<>();
+    Collections.addAll(parts, header, "SameSite=None");
     if (header.indexOf(COOKIE_ATTR_SEPARATOR + "Secure") < 0) {
       parts.add("Secure");
     }

@@ -34,11 +34,11 @@ import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -85,7 +85,9 @@ public class ActionGroup extends ActionResumable {
   }
 
   private String getPending(int index, String... prepend) {
-    final List<String> pending = Lists.newArrayList(prepend);
+    final List<String> pending = new ArrayList<>();
+    Collections.addAll(pending, prepend);
+
     if ((index + 1) < actions.size()) {
       String name = getName();
       if (StringUtils.isBlank(name)) { // dummy group

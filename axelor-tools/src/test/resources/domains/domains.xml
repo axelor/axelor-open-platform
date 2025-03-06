@@ -26,7 +26,7 @@
     <extra-imports>
     import org.slf4j.*;
     import java.util.List;
-    import static com.google.common.collect.Lists.newArrayList;
+    import java.util.ArrayList;
     </extra-imports>
 
     <extra-code>
@@ -34,7 +34,7 @@
     private static final Logger log = LoggerFactory.getLogger(Title.class);
 
   public static List<String> getFooNames() {
-      final List<String> names = newArrayList();
+      final List<String> names = new ArrayList<>();
       names.add("foo");
       names.add("bar");
       return names;
