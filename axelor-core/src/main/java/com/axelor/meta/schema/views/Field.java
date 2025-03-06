@@ -26,6 +26,7 @@ import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collection;
@@ -748,7 +749,7 @@ public class Field extends SimpleWidget {
   }
 
   @XmlTransient
-  @JsonProperty
+  @JsonProperty(access = Access.READ_ONLY)
   public Collection<?> getJsonFields() {
     final Map<String, Object> fields =
         StringUtils.isBlank(jsonModel)

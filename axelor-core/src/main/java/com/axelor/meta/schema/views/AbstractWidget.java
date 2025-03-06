@@ -47,7 +47,20 @@ import javax.xml.namespace.QName;
   @Type(Label.class),
   @Type(Static.class),
   @Type(Help.class),
-  @Type(Dashlet.class)
+  @Type(Dashlet.class),
+  @Type(Panel.class),
+  @Type(PanelField.class),
+  @Type(PanelStack.class),
+  @Type(PanelTabs.class),
+  @Type(PanelRelated.class),
+  @Type(PanelMail.class),
+  @Type(PanelInclude.class),
+  @Type(PanelMail.MailMessages.class),
+  @Type(PanelMail.MailFollowers.class),
+  @Type(ButtonGroup.class),
+  @Type(Menu.class),
+  @Type(Menu.Item.class),
+  @Type(Menu.Divider.class)
 })
 public abstract class AbstractWidget {
 

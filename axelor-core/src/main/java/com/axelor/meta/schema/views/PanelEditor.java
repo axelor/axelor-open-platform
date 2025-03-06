@@ -21,8 +21,9 @@ package com.axelor.meta.schema.views;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -150,7 +151,7 @@ public class PanelEditor extends AbstractPanel {
     return all;
   }
 
-  @JsonGetter("fields")
+  @JsonProperty(value = "fields", access = Access.READ_ONLY)
   public List<Object> getTargetFields() {
     if (targetFields != null || items == null || forField == null || forField.getTarget() == null) {
       return targetFields;

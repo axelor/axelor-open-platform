@@ -22,7 +22,8 @@ import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.MetaStore;
-import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -390,7 +391,7 @@ public class PanelRelated extends AbstractPanel {
     return null;
   }
 
-  @JsonGetter("fields")
+  @JsonProperty(value = "fields", access = Access.READ_ONLY)
   public List<Object> getTargetFields() {
     Class<?> target;
     try {
