@@ -497,7 +497,9 @@ function GridInner(props: ViewProps<GridView>) {
     onEdit({});
   }, [onEdit]);
 
-  const onNewInGrid = useCallback(() => {
+  const onNewInGrid = useCallback((e?: any) => {
+    // to prevent active edited row outside click
+    e?.preventDefault?.();
     gridRef.current?.onAdd?.();
   }, []);
 
@@ -1005,13 +1007,15 @@ function GridInner(props: ViewProps<GridView>) {
 
   const canNew = hasButton("new");
   const handleNew = useMemo(() => {
-    if (hasDetailsView) {
-      return onNewInDetails;
-    }
-    if (editable) {
-      return onNewInGrid;
-    }
-    return onNew;
+    return (e?: any) => {
+      if (hasDetailsView) {
+        return onNewInDetails();
+      }
+      if (editable) {
+        return onNewInGrid(e);
+      }
+      return onNew();
+    };
   }, [hasDetailsView, editable, onNewInDetails, onNewInGrid, onNew]);
 
   const editEnabled = hasRowSelected && (!hasDetailsView || !dirty);
@@ -1265,7 +1269,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
-              onClick: () => handleNew(),
+              onClick: handleNew,
             },
             {
               key: "edit",

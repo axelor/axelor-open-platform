@@ -1299,6 +1299,7 @@ function OneToManyInner({
 
   const onAddInGrid = useCallback(
     (e: any) => {
+      // to prevent active edited row outside click
       e?.preventDefault?.();
       handleAddInGrid();
     },
