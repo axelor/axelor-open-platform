@@ -1,3 +1,36 @@
+## 7.1.13 (2025-03-07)
+
+#### Fix
+
+* Upgrade react-international-phone from 4.3.0 to 4.5.0
+
+  <details>
+  
+  Update/add/fix some countries phone numbers formats.
+  
+  </details>
+
+* Fix time widget format
+
+  <details>
+  
+  Display formatted value of time widget in readonly. This will 
+  take into account if the field should display the seconds.
+  
+  </details>
+
+* Fix focused tab with showIf in panel-tabs
+
+  <details>
+  
+  On a form view, when first tab of panel-tabs contains showIf/hideIf expression,
+  so initially it will be hidden and staring focus will be on tab which doesn't contain
+  showIf/hideIf expression.
+  In this case, it should re-focus active tab to starting tab if starting tab is accessible.
+  
+  </details>
+
+
 ## 7.1.12 (2025-02-05)
 
 #### Fix
