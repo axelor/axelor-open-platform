@@ -223,7 +223,7 @@ function GridInner(props: ViewProps<GridView>) {
     ),
   });
 
-  const { orderBy, rows, selectedRows, selectedCell } = state;
+  const { orderBy = null, rows, selectedRows, selectedCell } = state;
   const dashletParams = action.params?.["dashlet.params"];
   const detailsView = action.params?.["details-view"];
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
