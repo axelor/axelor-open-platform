@@ -95,8 +95,13 @@ public class AppContextListener extends GuiceServletContextListener {
     final ServletContext context = servletContextEvent.getServletContext();
     final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
     cookieConfig.setHttpOnly(true);
-    cookieConfig.setSecure(
-        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
+    final boolean sessionCookieSecure =
+        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false);
+
+    if (sessionCookieSecure) {
+      cookieConfig.setSecure(sessionCookieSecure);
+      cookieConfig.setAttribute("SameSite", "None");
+    }
   }
 
   private void beforeStart(ServletContextEvent servletContextEvent) {
