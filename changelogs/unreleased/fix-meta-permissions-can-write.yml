@@ -1,0 +1,5 @@
+---
+title: Fix MetaPermissions.canWrite permission check
+type: fix
+description: |
+  MetaPermissions.canWrite should check CAN_WRITE instead of CAN_EXPORT
