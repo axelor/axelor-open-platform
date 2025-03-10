@@ -20,6 +20,16 @@
         <extend target="//button[@name='btnTest']">
             <attribute name="title" value="Awesome"/>
         </extend>
+        <extend target="/hilite[@if=&quot;$contains(email, 'gmeil.com')&quot;]">
+            <insert position="after">
+                <hilite if="$contains(email, 'gmial.com')" color="red" />
+            </insert>
+        </extend>
+        <extend target="/field[@name='proEmail']">
+            <insert position="inside">
+                <hilite if="!phone" color="orange" />
+            </insert>
+        </extend>
     </grid>
 
 </object-views>

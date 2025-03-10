@@ -31,8 +31,10 @@ import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.GridView;
+import com.axelor.meta.schema.views.Hilite;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeAll;
@@ -87,6 +89,10 @@ public class TestComputedViews extends MetaTest {
 
     // Attribute on extend views aren't managed
     assertNull(view.getCss());
+
+    // Hilite extend
+    assertNotNull(findHiliteInView(view, "$contains(email, 'gmial.com')"));
+    assertNotNull(findHiliteInView(view, "!phone"));
   }
 
   Field findFieldInView(GridView view, String field) {
@@ -103,5 +109,26 @@ public class TestComputedViews extends MetaTest {
         .map(Button.class::cast)
         .findFirst()
         .orElse(null);
+  }
+
+  Hilite findHiliteInView(GridView view, String condition) {
+    var found =
+        view.getHilites().stream()
+            .filter(it -> it.getCondition().equals(condition))
+            .findFirst()
+            .orElse(null);
+    if (found == null) {
+      found =
+          view.getItems().stream()
+              .filter(Field.class::isInstance)
+              .map(Field.class::cast)
+              .map(Field::getHilites)
+              .filter(Objects::nonNull)
+              .flatMap(List::stream)
+              .filter(it -> it.getCondition().equals(condition))
+              .findFirst()
+              .orElse(null);
+    }
+    return found;
   }
 }

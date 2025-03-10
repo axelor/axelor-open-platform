@@ -3589,6 +3589,7 @@
   <xsd:group name="ExtendFormItems">
     <xsd:choice>
       <xsd:group ref="tns:PanelItems" />
+      <xsd:element name="hilite" type="tns:Hilite" />
       <xsd:element name="toolbar" type="tns:Toolbar" />
       <xsd:element name="menubar" type="tns:Menubar" />
       <xsd:element name="menu" type="tns:MenubarMenu" />
