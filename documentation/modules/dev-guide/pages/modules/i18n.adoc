@@ -26,7 +26,7 @@ The `messages.csv` is the template from which we have to create language specifi
 `messages_<language>.csv` files. The template should not be updated manually as
 it's automatically generated using the string extraction utility.
 
-The language part in the filename should follow the https://datatracker.ietf.org/doc/html/rfc5646[IETF BCP 47 language tag] standard (eg. `en`, `en-US`, `fr`, `fr-CA`). The language tags are case insensitive, but it is recommended to use the canonical form (eg. `en-US` instead of `en-us`). Once loaded into the database, the language tags are normalized to the canonical form.
+The language part in the filename should follow the https://datatracker.ietf.org/doc/html/rfc5646[IETF BCP 47 language tag] standard (e.g. `en`, `en-US`, `fr`, `fr-CA`). The language tags are case-insensitive, but it is recommended to use the canonical form (e.g. `en-US` instead of `en-us`). Once loaded into the database, the language tags are normalized to the canonical form.
 
 The following Gradle task can be used to extract and update message files:
 
@@ -47,10 +47,10 @@ The CSV files have four columns:
 
 The `context` column is populated only if `--with-context` option is used.
 
-The translation messages are imported in database during the db initialization.
+The translation messages are imported in the database during the db initialization.
 The corresponding database table only stores `key` and `message`.
 
-The key is original text extracted from the Java, Groovy or XML files. In case
+The key is the original text extracted from the Java, Groovy or XML files. In case
 of fields where title is not given, the field name is automatically converted to
 human-readable form.
 
@@ -64,7 +64,7 @@ human-readable form.
 -----
 
 In this case, as there is no title given, a human-readable text `Full name` is
-generated and used as key. Also, the `help="true"` is used to automatically
+generated and used as the key. Also, the `help="true"` is used to automatically
 generate key for help attribute. The format of auto generate help key is
 `help:<entity>.<field>` so in this case a key `help:Contact.fullName` is
 generated.
@@ -135,13 +135,13 @@ JPA context is initialized (like static variables).
 
 There is a translation fallback mechanism that ensures that if an exact match for a translation is not found, the translation for the primary language is used instead. This is particularly useful for avoiding duplicate translation effort for languages with regional variations, as well as for maintaining a consistent user experience even when some translations are missing.
 
-For example, if a user selects `fr-CA` (Canadian French) as their language and a specific translation is not available in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not found, original translation key is used, which is typically the message for the default language, `en` (English).
+For example, if a user selects `fr-CA` (Canadian French) as their language and a specific translation is not available in `messages_fr-CA.csv`, the translation will fall back to `messages_fr.csv` (French). If the translation is still not found, the original translation key is used, which is typically the message for the default language, `en` (English).
 
 This fallback mechanism is used in translated messages, as well as in translated search results.
 
 == Value Translation
 
-The value translation feature allows to translate record values.
+The value translation feature allows translating record values.
 
 [source,xml]
 ----
