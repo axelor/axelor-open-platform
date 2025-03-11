@@ -1,0 +1,6 @@
+---
+title: Hide attachment icon for custom form editor popup and not saved record
+type: fix
+description: |
+  On not saved records in form editor popup, it shouldn't show the attachment icon.
+  Same for some custom form editor popups like user preferences.

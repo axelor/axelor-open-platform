@@ -4,7 +4,7 @@ import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import { useCallback, useEffect, useRef } from "react";
 
-import { Box, Button, CommandBar, CommandItemProps } from "@axelor/ui";
+import { Box, Button, CommandBar } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { openTab_internal as openTab } from "@/hooks/use-tabs";
@@ -30,6 +30,7 @@ export type EditorOptions = {
   view?: FormView;
   viewName?: string;
   context?: DataContext;
+  canAttach?: boolean;
   canSave?: boolean;
   params?: ActionView["params"];
   header?: PopupProps["header"];
@@ -101,6 +102,7 @@ export function useEditor() {
       context,
       readonly,
       maximize,
+      canAttach = true,
       canSave = true,
       params,
       header,
@@ -141,6 +143,7 @@ export function useEditor() {
       footer: ({ close }) => (
         <Footer
           footer={footer}
+          canAttach={canAttach && (record?.id ?? 0) > 0}
           hasOk={canSave}
           params={tabParams}
           onClose={close}
@@ -154,6 +157,7 @@ export function useEditor() {
 }
 
 function Footer({
+  canAttach = true,
   hasOk = true,
   footer: FooterComp,
   params,
@@ -161,6 +165,7 @@ function Footer({
   onSave,
   onSelect,
 }: {
+  canAttach?: boolean;
   hasOk?: boolean;
   footer?: EditorOptions["footer"];
   onClose: (result: boolean) => void;
@@ -251,11 +256,11 @@ function Footer({
 
   const { attachmentItem } = handler;
 
-  const commandItems = [attachmentItem].filter(Boolean) as CommandItemProps[];
-
   return (
     <>
-      {commandItems && <CommandBar items={commandItems} iconOnly />}
+      {canAttach && attachmentItem && (
+        <CommandBar items={[attachmentItem]} iconOnly />
+      )}
       <Box d="flex" flex={1} justifyContent="flex-end" g={2}>
         {FooterComp && <FooterComp close={onClose} />}
         <Box d="flex" g={2}>
