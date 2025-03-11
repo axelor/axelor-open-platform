@@ -335,11 +335,11 @@ public class InfoService extends AbstractService {
   }
 
   public Object getSignInLogo(String mode) {
-    final String signInlogo =
+    final String signInLogo =
         isDark(mode)
             ? SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo-dark")
             : SETTINGS.get(AvailableAppSettings.APPLICATION_SIGN_IN_PREFIX + "logo");
-    return Optional.<Object>ofNullable(signInlogo).orElseGet(() -> getLogo(mode));
+    return Optional.<Object>ofNullable(signInLogo).orElseGet(() -> getLogo(mode));
   }
 
   /**
