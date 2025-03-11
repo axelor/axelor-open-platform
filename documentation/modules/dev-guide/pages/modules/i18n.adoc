@@ -87,6 +87,28 @@ Because of the context column being a multiline value, it's difficult to edit
 the CSV files in plain text editors. So always prefer editing with some
 spreadsheet editors (Excel or LibreOffice).
 
+== Custom translations
+
+Some words/sentences that need to be translated may not be scanned and extracted from the source code due to how they
+are used/coded.
+
+Examples:
+
+* A translation already provided in another module (through dependencies) which you need to override
+* A translation key present in a file not scanned by `./gradlew i18n` task (e.g. _.rptdesign_ files used to design BIRT reports)
+
+For that, you can create manually a file `src/main/resources/i18n/custom_<language>.csv`. It should follow the same
+format as `messages_<language>.csv`.
+
+.Example: custom_fr.csv
+[source,csv]
+-----
+"key","message","comment","context"
+"email","Courriel","Custom translation",
+-----
+
+The translations defined over there will take precedence over `messages_<language>.csv` as they are loaded after.
+
 == Supported Languages
 
 Default supported languages are `en` and `fr`. To add more languages, you need to enrich the `select.language` selection.
