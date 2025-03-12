@@ -63,71 +63,6 @@ export type FormEditorProps = FieldEditorProps & {
   fields: Record<string, Property>;
 };
 
-/**
- * For the given json field, check if the context field value match with the record data.
- *
- * @param field the json field
- * @param record the record to match against
- */
-function isContextFieldMatch(field: JsonField, record: DataRecord): boolean {
-  if (field.contextField) {
-    return (
-      String(field.contextFieldValue) === String(record[field.contextField]?.id)
-    );
-  }
-  return true;
-}
-
-function createJsonEditor(
-  schema: Schema,
-  jsonFields: Record<string, JsonField>,
-) {
-  const editor: Schema = {
-    layout: schema.type === "panel-json" ? "table" : undefined,
-    flexbox: true,
-    jsonFields,
-    items: [],
-  };
-
-  let panel: Schema | undefined = undefined;
-  let panelTab: Schema | undefined = undefined;
-
-  for (const field of Object.values(jsonFields)) {
-    if (field.type === "panel") {
-      panel = { ...field, items: [] };
-      if ((field.widgetAttrs || {}).sidebar && parent) {
-        panel.sidebar = true;
-      }
-      if ((field.widgetAttrs || {}).tab) {
-        panelTab = panelTab || {
-          type: "panel-tabs",
-          colSpan: 12,
-          items: [],
-        };
-        panelTab.items?.push(panel);
-      } else {
-        editor.items?.push(panel);
-      }
-      continue;
-    }
-    if (panel) {
-      panel.items?.push(field);
-    } else {
-      editor.items?.push(field);
-    }
-  }
-
-  if (panelTab) {
-    editor.items?.push(panelTab);
-  }
-
-  if (!schema.viewer) {
-    editor.viewer = true;
-  }
-
-  return editor as FormView;
-}
-
 function processEditor(schema: Schema) {
   const editor: Editor = schema.editor;
   const widgetAttrs = editor.widgetAttrs ?? {};
@@ -1197,72 +1132,7 @@ const RecordEditor = memo(function RecordEditor({
   );
 });
 
-function JsonEditor(props: FormEditorProps) {
-  const { schema, formAtom } = props;
-
-  const fieldsAtom = useMemo(
-    () => selectAtom(formAtom, (o) => o.fields),
-    [formAtom],
-  );
-
-  const modelFields = useAtomValue(fieldsAtom);
-  const jsonFields: Record<string, JsonField> = useMemo(
-    () => schema.jsonFields ?? {},
-    [schema.jsonFields],
-  );
-
-  const editorFieldsRef = useRef<Record<string, JsonField>>({});
-  const editorFieldsAtom = useMemo(() => {
-    return atom((get) => {
-      if (
-        Object.values(jsonFields)
-          .filter((x) => x.contextField)
-          .map((x) => x.contextField!)
-          .filter((x) => modelFields[x])
-          .filter((x, i, a) => a.indexOf(x) === i).length === 0
-      ) {
-        return jsonFields;
-      }
-      const record = get(formAtom).record;
-      let lastPanelExcluded = false;
-      const nextFields = Object.entries(jsonFields)
-        .filter(([_, field]) => {
-          if (field.type === "panel") {
-            const res = isContextFieldMatch(field, record);
-            lastPanelExcluded = !res;
-            return res;
-          } else if (lastPanelExcluded) {
-            return false;
-          }
-
-          return isContextFieldMatch(field, record);
-        })
-        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-      // if fields changed, update the ref
-      const currentValues = Object.values(editorFieldsRef.current);
-      const nextValues = Object.values(nextFields);
-      if (
-        currentValues.length !== nextValues.length ||
-        currentValues.some((x, i) => x !== nextValues[i])
-      ) {
-        editorFieldsRef.current = nextFields;
-      }
-
-      return editorFieldsRef.current;
-    });
-  }, [formAtom, jsonFields, modelFields]);
-
-  const editorFields = useAtomValue(editorFieldsAtom);
-  const editor = useMemo(
-    () => createJsonEditor(schema, editorFields),
-    [editorFields, schema],
-  );
-
-  return <JsonEditorInner {...props} editor={editor} />;
-}
-
-function JsonEditorInner({
+function JsonEditor({
   schema,
   editor,
   fields,

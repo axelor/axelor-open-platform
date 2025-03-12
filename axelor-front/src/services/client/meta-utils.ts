@@ -581,6 +581,9 @@ export function processView(
         flexbox: true,
         items: [],
       };
+      let panel: Schema | null = null;
+      let panelTab: Schema | null = null;
+
       let jsonFields: JsonField[] = item.jsonFields ?? [];
 
       jsonFields = item.jsonFields.filter(
@@ -623,11 +626,26 @@ export function processView(
         if (field.type === "panel" || field.type === "separator") {
           field.visibleInGrid = false;
         }
+        if (field.type === "panel") {
+          panel = { ...field, items: [] };
+          if ((field.widgetAttrs || {}).sidebar && parent) {
+            panel.sidebar = true;
+            parent.width = "large";
+          }
+          if ((field.widgetAttrs || {}).tab) {
+            panelTab = panelTab || {
+              type: "panel-tabs",
+              colSpan: 12,
+              items: [],
+            };
+            panelTab.items?.push(panel);
+          } else {
+            editor.items?.push(panel);
+          }
+          return;
+        }
         if (field.type !== "separator") {
           field.title = field.title || field.autoTitle;
-        }
-        if (field.type === "panel" && field.widgetAttrs?.sidebar && parent) {
-          parent.width = "large";
         }
         const colSpan = (field.widgetAttrs || {}).colSpan || field.colSpan;
         if (field.type === "one-to-many") {
@@ -640,12 +658,21 @@ export function processView(
         ) {
           field.colSpan = colSpan || 12;
         }
+        if (panel) {
+          panel.items?.push(field);
+        } else {
+          editor.items?.push(field);
+        }
       });
 
       item.jsonFields = jsonFields.reduce(
         (acc, x) => ({ ...acc, [x.name]: x }),
         {},
       );
+
+      if (panelTab) {
+        editor.items?.push(panelTab);
+      }
 
       if (isFormField) {
         item.widget = "json-field";
