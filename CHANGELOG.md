@@ -1,3 +1,17 @@
+## 7.3.3 (2025-03-12)
+
+#### Fix
+
+* Revert json field processing improvements
+
+  <details>
+  
+  Previous version introduce json field processing improvements. Due to the nature of the change, this introduced 
+  issue in json fields behavior. This has been reverted and will be re-added on further version.
+  
+  </details>
+
+
 ## 7.3.2 (2025-03-12)
 
 #### Feature
