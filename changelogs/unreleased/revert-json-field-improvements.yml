@@ -1,0 +1,5 @@
+title: Revert json field processing improvements
+type: fix
+description: |
+  Previous version introduce json field processing improvements. Due to the nature of the change, this introduced 
+  issue in json fields behavior. This has been reverted and will be re-added on further version.

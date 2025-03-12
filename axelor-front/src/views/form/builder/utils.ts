@@ -1,7 +1,7 @@
+import uniqueId from "lodash/uniqueId";
 import isUndefined from "lodash/isUndefined";
 import pick from "lodash/pick";
 import uniq from "lodash/uniq";
-import uniqueId from "lodash/uniqueId";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -15,8 +15,8 @@ import {
   View,
   Widget,
 } from "@/services/client/meta.types";
-import { getJSON } from "@/utils/data-record";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
+import { getJSON } from "@/utils/data-record";
 
 import {
   getBaseDummy,
@@ -27,8 +27,8 @@ import { moment } from "@/services/client/l10n.ts";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
 import convert from "@/utils/convert";
-import { findViewItems } from "@/utils/schema";
 import { Attrs, DEFAULT_ATTRS, FormState } from "./types";
+import { findViewItems } from "@/utils/schema";
 
 import * as WIDGETS from "../widgets";
 
@@ -251,21 +251,19 @@ export function processContextValues(
         values[fieldName] = value
           ? compactJson(value, {
               findItem: (jsonPath: string) => {
-                function findTargetNames(schema: Schema): string[] {
+                function findTargetNames(schema: Schema): Schema[] {
                   const items =
                     schema.type !== "panel-related" ? (schema.items ?? []) : [];
                   const nested = items.flatMap((item) => findTargetNames(item));
                   return [
                     ...items
                       .filter((item) => item.json && item.name === fieldName)
-                      .map((item) => {
-                        const itemFields: Record<string, JsonField> =
-                          item.jsonFields ?? {};
-                        return Object.values(itemFields).find(
-                          (jsonItem: JsonField) => jsonItem.name === jsonPath,
-                        )?.targetName as string;
-                      })
-                      .filter(Boolean),
+                      .map(
+                        (item) =>
+                          item.jsonFields?.find(
+                            (jsonItem: JsonField) => jsonItem.name === jsonPath,
+                          )?.targetName,
+                      ),
                     ...nested,
                   ];
                 }
@@ -432,6 +430,13 @@ export function processView(
   if (res.items) {
     res.items = res.items.map((item) =>
       processView(item, res.fields ?? fields, res),
+    );
+  }
+
+  if (Array.isArray(res.jsonFields)) {
+    res.jsonFields = res.jsonFields.reduce(
+      (prev, field) => ({ ...prev, [field.name!]: field }),
+      {},
     );
   }
 
