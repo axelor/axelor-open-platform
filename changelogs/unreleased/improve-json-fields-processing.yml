@@ -1,5 +1,0 @@
----
-title: Improve json field processing
-type: feature
-description: |
-  Contextual fields are filtered out in advance so that json fields aren't processing every time at rendering.

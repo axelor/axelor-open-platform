@@ -1,7 +1,0 @@
----
-title: Fix add record in editable panel-dashlet grid
-type: fix
-description: |
-  When we add new record in grid then if we try to add more subsequent record by clicking
-  again on `+` button by expecting to commit current edited row and add new row. But it
-  was adding/commiting duplicate records.

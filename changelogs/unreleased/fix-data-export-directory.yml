@@ -1,6 +1,0 @@
----
-title: Fix data export directory not multi-tenancy compatible
-type: fix
-description: |
-  The data export directory is not multi-tenancy compatible. It should follow the multi-tenancy data upload 
-  directory structure by including the tenantId as child path.
