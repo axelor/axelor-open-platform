@@ -82,7 +82,7 @@ public class ActionExport extends Action {
 
   public static File getExportPath() {
     final Path exportPath =
-            Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
+        Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
     final String tenantId = TenantResolver.currentTenantIdentifier();
     if (StringUtils.isBlank(tenantId)) {
       return exportPath.toFile();
