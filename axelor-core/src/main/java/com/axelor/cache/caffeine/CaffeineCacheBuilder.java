@@ -39,6 +39,10 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  */
 public class CaffeineCacheBuilder<K, V> extends CacheBuilder<K, V> {
 
+  public CaffeineCacheBuilder() {
+    this(null);
+  }
+
   public CaffeineCacheBuilder(String cacheName) {
     super(cacheName);
   }

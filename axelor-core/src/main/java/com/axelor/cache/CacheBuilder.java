@@ -122,6 +122,19 @@ public abstract class CacheBuilder<K, V> {
   }
 
   /**
+   * Constructs a new {@code CacheBuilder} instance for an in-memory cache.
+   *
+   * <p>This currently uses Caffeine as the in-memory cache provider.
+   *
+   * @param <K> the key type of the cache
+   * @param <V> the value type of the cache
+   * @return a new {@code CacheBuilder} instance
+   */
+  public static <K, V> CacheBuilder<K, V> newInMemoryBuilder() {
+    return new CaffeineCacheBuilder<>();
+  }
+
+  /**
    * Constructs a new {@code CacheBuilder} instance for the specified cache name.
    *
    * <p>The cache name is used to create a globally unique cache name, depending on the cache
