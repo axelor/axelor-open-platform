@@ -451,6 +451,97 @@ class CacheBuilderTest extends GuiceJunit5Test {
         });
   }
 
+  @ParameterizedTest(name = "{0} - Serialization")
+  @EnumSource(CacheType.class)
+  void testSerialization(CacheType cacheType) {
+    doSerializationOperations(cacheType.getFactory());
+  }
+
+  private void doSerializationOperations(
+      Function<String, CacheBuilder<String, Object>> cacheBuilderFactory) {
+    useCache(
+        cacheBuilderFactory.apply("test-serialization").build(),
+        cache -> {
+          // Serialize data
+          var container1 = new MyContainer("myContainer");
+          container1.getDataMap().put("key1", new MyData("myName1"));
+          cache.put("test", container1);
+
+          // Deserialize data
+          var container2 = (MyContainer) cache.get("test");
+          assertEquals(
+              container1.getData().getName(),
+              container2.getData().getName(),
+              "Deserialized data should match");
+          assertEquals(
+              container1.getDataMap().get("key1").getName(),
+              container2.getDataMap().get("key1").getName(),
+              "Deserialized data should match");
+
+          // Update data
+          container2.getData().setName("myUpdatedContainer");
+          container2.getDataMap().put("key1", new MyData("myUpdatedName1"));
+          container2.getDataMap().put("key2", new MyData("myName2"));
+
+          // Storing data again is required to update the cache entry
+          // (except for Caffeine which does not serialize)
+          cache.put("test", container2);
+
+          // Deserialize updated data
+          var container3 = (MyContainer) cache.get("test");
+          assertEquals(
+              container2.getData().getName(),
+              container3.getData().getName(),
+              "Deserialized updated data should match");
+          assertEquals(
+              container2.getDataMap().size(),
+              container3.getDataMap().size(),
+              "Deserialized updated data should match");
+          assertEquals(
+              container2.getDataMap().get("key1").getName(),
+              container3.getDataMap().get("key1").getName(),
+              "Deserialized updated data should match");
+          assertEquals(
+              container2.getDataMap().get("key2").getName(),
+              container3.getDataMap().get("key2").getName(),
+              "Deserialized updated data should match");
+        });
+  }
+
+  private static class MyContainer {
+    private final MyData data;
+    private final Map<String, MyData> dataMap;
+
+    public MyContainer(String name) {
+      this.data = new MyData(name);
+      this.dataMap = new HashMap<>();
+    }
+
+    public MyData getData() {
+      return data;
+    }
+
+    public Map<String, MyData> getDataMap() {
+      return dataMap;
+    }
+  }
+
+  private static class MyData {
+    private String name;
+
+    public MyData(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
+
   private void useCache(
       AxelorCache<String, Object> cache, Consumer<AxelorCache<String, Object>> consumer) {
     cache.invalidateAll();
