@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import org.redisson.api.RMapCache;
 import org.redisson.api.map.event.MapEntryListener;
 
@@ -128,5 +129,10 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
   public void removeListener(int listenerId) {
     cache.removeListener(listenerId);
     listenerIds.remove(listenerId);
+  }
+
+  @Override
+  public Lock getLock(K key) {
+    return cache.getLock(key);
   }
 }

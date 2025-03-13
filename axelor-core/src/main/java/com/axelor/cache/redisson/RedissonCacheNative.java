@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.redisson.api.RMapCacheNative;
 
@@ -116,5 +117,10 @@ public class RedissonCacheNative<K, V> implements ConfigurableRedissonCache<K, V
   @Override
   public ConcurrentMap<K, V> asMap() {
     return cache;
+  }
+
+  @Override
+  public Lock getLock(K key) {
+    return cache.getLock(key);
   }
 }

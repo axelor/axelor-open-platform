@@ -20,9 +20,13 @@ package com.axelor.cache.caffeine;
 
 import com.axelor.cache.AxelorCache;
 import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 /**
@@ -36,6 +40,9 @@ import java.util.function.Function;
 public class CaffeineCache<K, V> implements AxelorCache<K, V> {
 
   protected final Cache<K, V> cache;
+
+  protected final LoadingCache<K, Lock> locks =
+      Caffeine.newBuilder().weakValues().build(k -> new ReentrantLock());
 
   public CaffeineCache(Cache<K, V> cache) {
     this.cache = cache;
@@ -94,5 +101,10 @@ public class CaffeineCache<K, V> implements AxelorCache<K, V> {
   @Override
   public void cleanUp() {
     cache.cleanUp();
+  }
+
+  @Override
+  public Lock getLock(K key) {
+    return locks.get(key);
   }
 }

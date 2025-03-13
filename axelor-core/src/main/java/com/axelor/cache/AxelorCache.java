@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -149,4 +150,6 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
   default void cleanUp() {
     // Do nothing by default
   }
+
+  Lock getLock(K key);
 }
