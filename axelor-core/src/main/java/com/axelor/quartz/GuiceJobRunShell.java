@@ -29,6 +29,7 @@ import com.google.inject.servlet.ServletScopes;
 import java.util.Collections;
 import java.util.Optional;
 import org.quartz.Job;
+import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger.CompletedExecutionInstruction;
@@ -36,6 +37,7 @@ import org.quartz.core.JobRunShell;
 import org.quartz.core.QuartzScheduler;
 import org.quartz.core.QuartzSchedulerResources;
 import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.utils.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,9 +63,9 @@ public class GuiceJobRunShell extends JobRunShell {
 
   private void doRun() {
     Optional.ofNullable(firedTriggerBundle.getJobDetail())
-        .map(x -> x.getKey())
-        .map(x -> x.getGroup()) // group is tenant id
-        .filter(StringUtils::notBlank)
+        .map(JobDetail::getKey)
+        .map(Key::getGroup) // group is tenant id
+        .filter(group -> StringUtils.notBlank(group) && !"DEFAULT".equals(group))
         .ifPresentOrElse(this::run, super::run);
   }
 
@@ -76,7 +78,7 @@ public class GuiceJobRunShell extends JobRunShell {
 
   private void run(String tenantId) {
     final TenantConfig config = Beans.get(TenantConfigProvider.class).find(tenantId);
-    if (Boolean.TRUE.equals(config.getActive())) {
+    if (config != null && Boolean.TRUE.equals(config.getActive())) {
       // JobRunShell may re-use same thread from the pool, so run the task in a new
       // thread to ensure the task is always run with a proper tenant id.
       TenantAware task = new TenantAware(this::superRun).tenantId(tenantId).withTransaction(false);
