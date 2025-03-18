@@ -47,13 +47,19 @@ public abstract class Channel {
     return true;
   }
 
+  /** Gets the user from the subject associated with the session. */
   protected User getUser(Session session) {
+    String code = getUserCode(session);
+    return code == null ? null : AuthUtils.getUser(code);
+  }
+
+  /** Gets the user code from the subject associated with the session. */
+  protected String getUserCode(Session session) {
     if (session.getUserPrincipal() == null) {
       return null;
     }
 
     final Subject subject = (Subject) session.getUserProperties().get(Subject.class.getName());
-    final String code = subject.getPrincipal().toString();
-    return AuthUtils.getUser(code);
+    return subject.getPrincipal().toString();
   }
 }
