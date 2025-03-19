@@ -19,6 +19,7 @@
 package com.axelor.gradle;
 
 import com.axelor.common.StringUtils;
+import com.axelor.common.VersionUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -39,14 +40,26 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.DependencySubstitution;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
+import org.gradle.api.artifacts.component.ModuleComponentSelector;
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
+import org.gradle.api.internal.tasks.JvmConstants;
 import org.gradle.internal.composite.IncludedBuildInternal;
 
 public class AxelorUtils {
+
+  private static final Set<String> CORE_MODULES = Set.of("axelor-core", "axelor-web");
+
+  private static final Set<String> TEST_MODULES = Set.of("axelor-test");
+
+  private static final Set<String> ENTERPRISE_MODULES = Set.of("axelor-enterprise");
+
+  private static final String EE_SUFFIX = "enterprise";
+  private static final String USE_EE_PLATFORM_PROPERTY = "axelor.platform.ee";
 
   private AxelorUtils() {}
 
@@ -211,13 +224,110 @@ public class AxelorUtils {
     return null;
   }
 
+  private static Project findProject(Project project, String name) {
+    final Project root = project.getRootProject();
+    final Project match = root.findProject(":" + name);
+    if (match != null) {
+      return match;
+    }
+    return findIncludedBuildProjects(project).stream()
+        .filter(x -> x.getName().equals(name))
+        .findFirst()
+        .orElse(null);
+  }
+
+  static void addDependencies(Project project) {
+    // add implementation dependencies
+    addImplementations(project);
+    // add testImplementation dependencies
+    addTestImplementations(project);
+    // add substitutions
+    addSubstitutions(project);
+  }
+
+  private static void addSubstitutions(Project project) {
+    if (shouldUsePlatformEE(project)) {
+      project
+          .getConfigurations()
+          .all(
+              config ->
+                  config
+                      .getResolutionStrategy()
+                      .getDependencySubstitution()
+                      .all(AxelorUtils::addEESubstitutions));
+    }
+  }
+
+  private static void addEESubstitutions(DependencySubstitution substitution) {
+    if (substitution.getRequested() instanceof ModuleComponentSelector) {
+      ModuleComponentSelector selector = (ModuleComponentSelector) substitution.getRequested();
+      String group = selector.getGroup();
+      String name = selector.getModule();
+      String version = selector.getVersion();
+      if ("com.axelor".equals(group) && (CORE_MODULES.contains(name))) {
+        String target = toDependency(name, version, true);
+        substitution.useTarget(target);
+      }
+    }
+  }
+
+  private static void addImplementations(Project project) {
+    final boolean useEE = shouldUsePlatformEE(project);
+    final String version = VersionUtils.getVersion().version;
+    final String config = JvmConstants.IMPLEMENTATION_CONFIGURATION_NAME;
+
+    // add core modules
+    CORE_MODULES.forEach(module -> addDependency(project, config, module, version, useEE));
+
+    // add enterprise modules
+    if (useEE) {
+      ENTERPRISE_MODULES.forEach(module -> addDependency(project, config, module, version, false));
+    }
+  }
+
+  private static void addTestImplementations(Project project) {
+    final String version = VersionUtils.getVersion().version;
+    final String config = JvmConstants.TEST_IMPLEMENTATION_CONFIGURATION_NAME;
+    TEST_MODULES.forEach(module -> addDependency(project, config, module, version, false));
+  }
+
+  private static void addDependency(
+      Project project, String configuration, String module, String version, boolean useEE) {
+    // find a project
+    Object dependency = findProject(project, module);
+    if (dependency == null) {
+      // otherwise use jar
+      dependency = toDependency(module, version, useEE);
+    }
+    // add dependency
+    project.getDependencies().add(configuration, dependency);
+  }
+
+  private static String toDependency(String module, String version, boolean useEE) {
+    String name = findVariantName(module, useEE);
+    return String.format("com.axelor:%s:%s", name, version);
+  }
+
+  public static String findVariantName(String module, boolean useEE) {
+    // Only core modules have EE
+    if (useEE && CORE_MODULES.contains(module)) {
+      return String.format("%s-%s", module, EE_SUFFIX);
+    }
+    return module;
+  }
+
+  private static boolean shouldUsePlatformEE(Project project) {
+    return Boolean.parseBoolean((String) project.findProperty(USE_EE_PLATFORM_PROPERTY));
+  }
+
   public static boolean isCore(Project project) {
-    String name = project.getName();
-    return "axelor-core".equals(name) || "axelor-web".equals(name) || "axelor-test".equals(name);
+    return isCore(project.getName());
   }
 
   public static boolean isCore(String name) {
-    return "axelor-core".equals(name) || "axelor-web".equals(name) || "axelor-test".equals(name);
+    return CORE_MODULES.contains(name)
+        || TEST_MODULES.contains(name)
+        || ENTERPRISE_MODULES.contains(name);
   }
 
   public static boolean isAxelorApplication(Project project) {
