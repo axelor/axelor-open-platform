@@ -18,7 +18,7 @@ function Image({ valueAtom, schema }: FieldProps<string>) {
 
   useEffect(() => {
     if (value?.includes("{{")) {
-      recordHandler.subscribe((record) => {
+      return recordHandler.subscribe((record) => {
         const src = parseAngularExp(value)(record);
         setSrc(src);
       });

@@ -196,7 +196,7 @@ public class MetaPermissions {
   }
 
   public boolean canWrite(User user, String object, String field) {
-    return can(user, object, field, CAN_EXPORT);
+    return can(user, object, field, CAN_WRITE);
   }
 
   public boolean canExport(User user, String object, String field) {

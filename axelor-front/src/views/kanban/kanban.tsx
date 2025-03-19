@@ -50,6 +50,7 @@ import { CardTemplate } from "../cards/card-template";
 import { useCardClassName } from "../cards/use-card-classname";
 import { KanbanBoard } from "./kanban-board";
 import { KanbanColumn, KanbanRecord } from "./types";
+import { createContextParams } from "../form/builder/utils";
 import {
   getColumnIndex,
   getColumnRecords,
@@ -101,14 +102,13 @@ export function Kanban(props: ViewProps<KanbanView>) {
     [action.model, getViewContext],
   );
 
-  const getActionContext = useCallback(() => {
-    return {
+  const getActionContext = useCallback(
+    () => ({
       ...getContext(),
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
-    };
-  }, [action.name, action.viewType, action.views, getContext]);
+      ...createContextParams(view, action),
+    }),
+    [view, action, getContext],
+  );
 
   const getColumnByValue = useCallback(
     (value: any) => {
@@ -799,6 +799,7 @@ function KanbanCard({
       >
         <CardTemplate
           component={Template}
+          view={view}
           fields={fields}
           record={record! as DataRecord}
           onRefresh={onRefresh}

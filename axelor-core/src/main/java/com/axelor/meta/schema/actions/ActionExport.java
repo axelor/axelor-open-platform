@@ -22,6 +22,8 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
+import com.axelor.common.StringUtils;
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
@@ -39,6 +41,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -77,9 +81,13 @@ public class ActionExport extends Action {
   }
 
   public static File getExportPath() {
-    final String path =
-        AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
-    return new File(path);
+    final Path exportPath =
+        Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
+    final String tenantId = TenantResolver.currentTenantIdentifier();
+    if (StringUtils.isBlank(tenantId)) {
+      return exportPath.toFile();
+    }
+    return exportPath.resolve(tenantId).toFile();
   }
 
   protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {

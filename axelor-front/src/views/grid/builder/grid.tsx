@@ -226,102 +226,103 @@ export const Grid = forwardRef<
     const { id } = value ?? {};
     const activeContextField = id ? { name, id: String(id) } : null;
 
-    const columns: GridColumn[] = viewItems.map((item) => {
-      const field = fields?.[item.name!];
-      const title = item.title ?? item.autoTitle;
-      const attrs = item.widgetAttrs;
-      const serverType = (item as Field).serverType || field?.type;
-      const columnProps: Partial<GridColumn> = {};
-      const extraAttrs = columnAttrs?.[item.name!];
+    const columns: GridColumn[] = viewItems
+      .filter((item) => {
+        const { contextField: ctxField, contextFieldValue: ctxFieldValue } =
+          item as Record<string, any>;
 
-      let widget;
-      if (item.type === "field") {
-        widget = getWidget(item, field);
-        columnProps.help = item.help;
-      }
+        if (ctxField) {
+          return (
+            ctxField === activeContextField?.name &&
+            String(ctxFieldValue) === String(activeContextField?.id)
+          );
+        }
+        return true;
+      })
+      .map((item) => {
+        const field = fields?.[item.name!];
+        const title = item.title ?? item.autoTitle;
+        const attrs = item.widgetAttrs;
+        const serverType = (item as Field).serverType || field?.type;
+        const columnProps: Partial<GridColumn> = {};
+        const extraAttrs = columnAttrs?.[item.name!];
 
-      if (view.sortable === false) {
-        columnProps.sortable = (item as Field).sortable === true;
-      }
+        let widget;
+        if (item.type === "field") {
+          widget = getWidget(item, field);
+          columnProps.help = item.help;
+        }
 
-      if (item.width) {
-        columnProps.width = parseInt(item.width as string);
-        columnProps.computed = true;
-      }
+        if (view.sortable === false) {
+          columnProps.sortable = (item as Field).sortable === true;
+        }
 
-      if (item.type === "button" || item.widget === "icon") {
-        columnProps.sortable = false;
-        columnProps.searchable = false;
-        columnProps.editable = false;
-        columnProps.computed = true;
-        columnProps.width = columnProps.width || 40;
-        columnProps.action = true;
-      }
+        if (item.width) {
+          columnProps.width = parseInt(item.width as string);
+          columnProps.computed = true;
+        }
 
-      const isCollection = ["one-to-many", "many-to-many"].includes(
-        toKebabCase(field?.type ?? ""),
-      );
-      const jsonField = (item as unknown as JsonField).jsonField;
-      const searchable =
-        jsonField ||
-        (field && // check dummy
-          !field.transient &&
-          !field.json &&
-          !field.encrypted);
+        if (item.type === "button" || item.widget === "icon") {
+          columnProps.sortable = false;
+          columnProps.searchable = false;
+          columnProps.editable = false;
+          columnProps.computed = true;
+          columnProps.width = columnProps.width || 40;
+          columnProps.action = true;
+        }
 
-      if (!searchable || (isCollection && !field?.targetName)) {
-        columnProps.searchable = false;
-      }
+        const isCollection = ["one-to-many", "many-to-many"].includes(
+          toKebabCase(field?.type ?? ""),
+        );
+        const jsonField = (item as unknown as JsonField).jsonField;
+        const searchable =
+          jsonField ||
+          (field && // check dummy
+            !field.transient &&
+            !field.json &&
+            !field.encrypted);
 
-      if ((!searchable || isCollection) && !hasClientSideSort) {
-        columnProps.sortable = false;
-      }
+        if (!searchable || (isCollection && !field?.targetName)) {
+          columnProps.searchable = false;
+        }
 
-      if (
-        ["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "") &&
-        !((item as Field).selection || item.widget == "rating")
-      ) {
-        columnProps.$css = clsx(styles.number);
-        columnProps.$headerCss = clsx(styles.numberHeaderColumn);
-      }
+        if ((!searchable || isCollection) && !hasClientSideSort) {
+          columnProps.sortable = false;
+        }
 
-      if (
-        serverType === "TEXT" ||
-        ["html"].includes(item.widget?.toLowerCase() ?? "")
-      ) {
-        columnProps.$css = clsx(styles["multi-line-text"]);
-      }
+        if (
+          ["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "") &&
+          !((item as Field).selection || item.widget == "rating")
+        ) {
+          columnProps.$css = clsx(styles.number);
+          columnProps.$headerCss = clsx(styles.numberHeaderColumn);
+        }
 
-      const hidden = extraAttrs?.hidden ?? item.hidden;
-      if (hidden !== undefined) {
-        columnProps.visible = !hidden;
-      }
+        if (
+          serverType === "TEXT" ||
+          ["html"].includes(item.widget?.toLowerCase() ?? "")
+        ) {
+          columnProps.$css = clsx(styles["multi-line-text"]);
+        }
 
-      const { contextField, contextFieldValue } = item as Record<string, any>;
+        const hidden = extraAttrs?.hidden ?? item.hidden;
+        if (hidden !== undefined) {
+          columnProps.visible = !hidden;
+        }
 
-      if (
-        contextField &&
-        (!activeContextField ||
-          contextField !== activeContextField.name ||
-          String(contextFieldValue) !== activeContextField.id)
-      ) {
-        columnProps.visible = false;
-        columnProps.hidden = true;
-      }
-
-      return {
-        ...field,
-        ...item,
-        ...attrs,
-        ...(item.type === "field" && { serverType }),
-        title,
-        formatter: columnFormatter || formatter,
-        valueGetter: columnValueGetter,
-        ...columnProps,
-        ...extraAttrs,
-        ...(widget && { widget }),
-      } as any;
-    });
+        return {
+          ...field,
+          ...item,
+          ...attrs,
+          ...(item.type === "field" && { serverType }),
+          title,
+          formatter: columnFormatter || formatter,
+          valueGetter: columnValueGetter,
+          ...columnProps,
+          ...extraAttrs,
+          ...(widget && { widget }),
+        } as any;
+      });
 
     if (showNewIcon) {
       columns.push({

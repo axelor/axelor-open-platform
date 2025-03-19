@@ -36,12 +36,8 @@ export function Decimal(props: FieldProps<string | number>) {
 
   const step = useMemo(
     () =>
-      stepAttrs
-        ? Number(isDecimal ? stepAttrs : Math.trunc(stepAttrs))
-        : scale > 0
-          ? Math.pow(10, -Math.floor(scale))
-          : 1,
-    [isDecimal, scale, stepAttrs],
+      stepAttrs ? Number(isDecimal ? stepAttrs : Math.trunc(stepAttrs)) : 1,
+    [isDecimal, stepAttrs],
   );
 
   const inputRef = useRef<HTMLInputElement>(null);

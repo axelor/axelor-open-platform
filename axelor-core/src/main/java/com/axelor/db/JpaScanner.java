@@ -253,4 +253,13 @@ public class JpaScanner extends AbstractScannerImpl {
     }
     return enumCache.get(enumNames.getOrDefault(name, name));
   }
+
+  public static Set<Class<?>> findEnums() {
+    synchronized (lock) {
+      if (modelCache.isEmpty()) {
+        findClasses();
+      }
+    }
+    return new HashSet<>(enumCache.values());
+  }
 }

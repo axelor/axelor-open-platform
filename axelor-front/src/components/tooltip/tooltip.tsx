@@ -1,6 +1,8 @@
 import { SyntheticEvent, cloneElement } from "react";
 
-import { Box, ClickAwayListener, Popper, usePopperTrigger } from "@axelor/ui";
+import { Box, ClickAwayListener, usePopperTrigger } from "@axelor/ui";
+
+import { Popper } from "../popper";
 
 import styles from "./tooltip.module.scss";
 

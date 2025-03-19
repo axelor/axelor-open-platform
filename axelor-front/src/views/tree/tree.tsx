@@ -36,6 +36,7 @@ import {
   NodeText as NodeTextComponent,
   NodeTextProps,
 } from "./renderers/node-text";
+import { createContextParams } from "../form/builder/utils";
 import { getNodeOfTreeRecord } from "./utils";
 
 import styles from "./tree.module.scss";
@@ -51,11 +52,10 @@ export function Tree({ meta }: ViewProps<TreeView>) {
   const getContext = useCallback(
     (actions?: boolean) => {
       const ctx = getViewContext(actions);
+      const params = createContextParams(view, action);
       return {
         ...ctx,
-        _viewName: view.name,
-        _viewType: view.type,
-        _views: action.views,
+        ...params,
         _model: ctx?._model || view.nodes?.[0]?.model,
       } as DataContext;
     },

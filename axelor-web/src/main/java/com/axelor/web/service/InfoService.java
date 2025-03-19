@@ -390,6 +390,10 @@ public class InfoService extends AbstractService {
   }
 
   private Object getImage(String imageCall, String mode) throws Exception {
+    if (StringUtils.isBlank(imageCall)) {
+      return null;
+    }
+
     final String[] parts = imageCall.split("\\:", 2);
 
     if (parts.length != 2) {

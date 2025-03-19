@@ -343,6 +343,7 @@ function FarItems() {
       model: "com.axelor.auth.db.User",
       title: i18n.get("Preferences"),
       viewName: "user-preferences-form",
+      canAttach: false,
       record: {
         id: session.info?.user?.id,
       },

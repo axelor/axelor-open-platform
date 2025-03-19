@@ -410,6 +410,7 @@ export function Dms(props: ViewProps<GridView>) {
         model: view.model!,
         viewName: "dms-file-permission-form",
         record: doc,
+        canAttach: false,
         readonly: false,
         onSelect: () => {},
       });

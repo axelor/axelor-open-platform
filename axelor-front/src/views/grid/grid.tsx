@@ -36,7 +36,12 @@ import { DataContext, DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { findActionView, findView } from "@/services/client/meta-cache";
-import { FormView, GridView, Widget } from "@/services/client/meta.types";
+import {
+  FormView,
+  GridView,
+  Schema,
+  Widget,
+} from "@/services/client/meta.types";
 import { commonClassNames } from "@/styles/common";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
@@ -61,7 +66,7 @@ import { Dms } from "../dms";
 import { fetchRecord } from "../form";
 import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
-import { nextId } from "../form/builder/utils";
+import { createContextParams, nextId } from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
@@ -218,7 +223,7 @@ function GridInner(props: ViewProps<GridView>) {
     ),
   });
 
-  const { orderBy, rows, selectedRows, selectedCell } = state;
+  const { orderBy = null, rows, selectedRows, selectedCell } = state;
   const dashletParams = action.params?.["dashlet.params"];
   const detailsView = action.params?.["details-view"];
   const detailsViewOverlay = action.params?.["details-view-mode"] !== "inline";
@@ -277,6 +282,7 @@ function GridInner(props: ViewProps<GridView>) {
           filter._domainContext = {
             ...filter?._domainContext,
             ...formContext,
+            ...createContextParams(view, action),
           };
           filter._domainAction = _domainAction;
         }
@@ -294,7 +300,8 @@ function GridInner(props: ViewProps<GridView>) {
         orderBy,
         searchAtom,
         fields,
-        view.items,
+        view,
+        action,
         dashlet,
         getViewContext,
         getSearchTranslate,
@@ -490,7 +497,9 @@ function GridInner(props: ViewProps<GridView>) {
     onEdit({});
   }, [onEdit]);
 
-  const onNewInGrid = useCallback(() => {
+  const onNewInGrid = useCallback((e?: any) => {
+    // to prevent active edited row outside click
+    e?.preventDefault?.();
     gridRef.current?.onAdd?.();
   }, []);
 
@@ -722,12 +731,9 @@ function GridInner(props: ViewProps<GridView>) {
       ...(selectedIdsRef.current?.length > 0 && {
         _ids: selectedIdsRef.current,
       }),
-      _model: action.model,
-      _viewName: action.name,
-      _viewType: action.viewType,
-      _views: action.views,
+      ...createContextParams(view, action),
     }),
-    [action, getViewContext],
+    [action, view, getViewContext],
   );
 
   const formAtom = useMemo(
@@ -1001,13 +1007,15 @@ function GridInner(props: ViewProps<GridView>) {
 
   const canNew = hasButton("new");
   const handleNew = useMemo(() => {
-    if (hasDetailsView) {
-      return onNewInDetails;
-    }
-    if (editable) {
-      return onNewInGrid;
-    }
-    return onNew;
+    return (e?: any) => {
+      if (hasDetailsView) {
+        return onNewInDetails();
+      }
+      if (editable) {
+        return onNewInGrid(e);
+      }
+      return onNew();
+    };
   }, [hasDetailsView, editable, onNewInDetails, onNewInGrid, onNew]);
 
   const editEnabled = hasRowSelected && (!hasDetailsView || !dirty);
@@ -1206,9 +1214,19 @@ function GridInner(props: ViewProps<GridView>) {
               serverType: field.type,
               [AUTO_ADD_ROW]: false,
             },
-            ...(expandableSummaryMeta?.view?.items ?? []).filter(
-              (item) => item.name !== "$wkfStatus", // skip wkf status
-            ),
+            ...(expandableSummaryMeta?.view?.items ?? [])
+              .filter(
+                (item) => item.name !== "$wkfStatus", // skip wkf status
+              )
+              .map((item) => {
+                if ((item as Schema).serverType?.endsWith("_TO_MANY")) {
+                  return {
+                    ...item,
+                    [AUTO_ADD_ROW]: false,
+                  };
+                }
+                return item;
+              }),
           ],
           width: "*",
         } as any,
@@ -1251,7 +1269,7 @@ function GridInner(props: ViewProps<GridView>) {
               iconProps: {
                 icon: "add",
               },
-              onClick: () => handleNew(),
+              onClick: handleNew,
             },
             {
               key: "edit",

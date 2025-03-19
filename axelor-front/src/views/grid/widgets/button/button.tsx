@@ -2,7 +2,11 @@ import { Box, clsx } from "@axelor/ui";
 
 import { dialogs } from "@/components/dialogs";
 import { Icon } from "@/components/icon";
-import { Button as ButtonField, Field } from "@/services/client/meta.types";
+import {
+  Button as ButtonField,
+  Field,
+  JsonField,
+} from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { useCanDirty, useFormEditableScope } from "@/views/form/builder/scope";
 import { processContextValues } from "@/views/form/builder/utils";
@@ -14,7 +18,7 @@ import styles from "./button.module.scss";
 export function Button(props: GridCellProps) {
   const { record, data: field, actionExecutor, onUpdate } = props;
   const { prompt, onClick } = field as ButtonField;
-  const { title, name, icon, css, help: _help } = field as Field;
+  const { title, name, icon, css, help: _help, jsonPath } = field as JsonField;
   const help = _help || title;
 
   const canDirty = useCanDirty();
@@ -44,7 +48,7 @@ export function Button(props: GridCellProps) {
         context: {
           ...processContextValues(record),
           selected: true,
-          _signal: name,
+          _signal: jsonPath ?? name,
           _ids: undefined,
           ...(record.$$id && {
             id: record.$$id,

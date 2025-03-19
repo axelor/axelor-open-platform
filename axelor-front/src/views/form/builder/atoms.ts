@@ -4,7 +4,7 @@ import { PrimitiveAtom, SetStateAction, atom } from "jotai";
 import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
-import { FormView, Schema } from "@/services/client/meta.types";
+import { ActionView, FormView, Schema } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 import { deepEqual, deepGet, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
@@ -244,16 +244,15 @@ export const fallbackWidgetAtom = createWidgetAtom({
  */
 export const contextAtom = atom(
   null,
-  (get, set, formAtom: FormAtom, options: DataContext = {}): DataContext => {
+  (
+    get,
+    set,
+    formAtom: FormAtom,
+    options: DataContext = {},
+    actionView?: ActionView,
+  ): DataContext => {
     const prepare = (formAtom: FormAtom, options?: DataContext) => {
-      const {
-        meta,
-        model,
-        record,
-        context: _context,
-        parent,
-        statesByName,
-      } = get(formAtom);
+      const { meta, model, record, context: _context, parent } = get(formAtom);
 
       let context: DataContext = {
         ..._context,
@@ -262,7 +261,25 @@ export const contextAtom = atom(
         _model: model,
       };
 
-      context = processContextValues(context, meta);
+      const { view } = meta;
+      const json = view.json ?? false;
+
+      const [ctxView, ctxAction] = (() => {
+        if (parent) {
+          if (json) {
+            // json is part of the main view
+            return [get(parent)?.meta?.view, actionView];
+          }
+          // editor, parent context will be available
+          return [view];
+        }
+        return [view, actionView];
+      })();
+
+      context = {
+        ...processContextValues(context, meta),
+        ...createContextParams(ctxView, ctxAction),
+      };
 
       if (parent) {
         context._parent = prepare(parent);

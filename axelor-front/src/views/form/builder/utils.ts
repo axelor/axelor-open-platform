@@ -5,18 +5,24 @@ import uniq from "lodash/uniq";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
+  ActionView,
   Field,
   FormView,
   JsonField,
   Panel,
   Property,
   Schema,
+  View,
   Widget,
 } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase, toSnakeCase } from "@/utils/names";
 import { getJSON } from "@/utils/data-record";
 
-import { getBaseDummy, isCleanDummy, isDummy } from "@/services/client/data-utils";
+import {
+  getBaseDummy,
+  isCleanDummy,
+  isDummy,
+} from "@/services/client/data-utils";
 import { moment } from "@/services/client/l10n.ts";
 import { MetaData, ViewData } from "@/services/client/meta";
 import { LoadingCache } from "@/utils/cache";
@@ -62,10 +68,13 @@ const FIELD_WIDGETS: Record<string, string[]> = {
 function getDefaultServerType(schema: Schema): string {
   const widget = toKebabCase(normalizeWidget(schema.widget) ?? "");
 
-  if (schema.serverType && SERVER_TYPES.includes(toKebabCase(schema.serverType))) {
+  if (
+    schema.serverType &&
+    SERVER_TYPES.includes(toKebabCase(schema.serverType))
+  ) {
     return schema.serverType;
   }
-  
+
   let serverType = schema.serverType ?? "string";
 
   if (SERVER_TYPES.includes(widget)) {
@@ -563,11 +572,33 @@ export function processOriginal(
   return original;
 }
 
-export function createContextParams(schema: Schema) {
-  const source = schema.name ? { _source: schema.name } : undefined;
-  if (!schema.target) return source;
-  const form = schema.formView && { type: "form", name: schema.formView };
-  const grid = schema.gridView && { type: "grid", name: schema.gridView };
+export function createContextParams(
+  schema: Schema | View,
+  action?: ActionView,
+) {
+  const { name, type } = schema;
+  if (action) {
+    const { model, views: _views, viewType, context } = action;
+    const found = _views?.some((x) => x.type === type);
+    const _viewType = found ? type : viewType;
+
+    const _view = _views?.find((x) => x.type === _viewType);
+    const _viewName = _view ? (_view.name ?? name) : name;
+
+    return {
+      ...context,
+      _model: model,
+      _viewName,
+      _viewType,
+      _views,
+    };
+  }
+
+  const { target, formView, gridView } = schema as Schema;
+  const source = name ? { _source: name } : undefined;
+  if (!target) return source;
+  const form = formView && { type: "form", name: formView };
+  const grid = gridView && { type: "grid", name: gridView };
   const _views = [grid, form].filter(Boolean);
   const _viewName = _views[0]?.name;
   const _viewType = _views[0]?.type ?? "grid";

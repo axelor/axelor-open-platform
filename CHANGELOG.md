@@ -1,3 +1,116 @@
+## 7.3.3 (2025-03-12)
+
+#### Fix
+
+* Revert json field processing improvements
+
+  <details>
+  
+  Previous version introduce json field processing improvements. Due to the nature of the change, this introduced 
+  issue in json fields behavior. This has been reverted and will be re-added on further version.
+  
+  </details>
+
+
+## 7.3.2 (2025-03-12)
+
+#### Feature
+
+* Add support to find value enums
+
+  <details>
+  
+  A new `JpaScanner#findEnums` method added to find all value enums in the classpath.
+  
+  </details>
+
+* Improve rendering phase
+
+  <details>
+  
+  A change in an internal hook, by using `queueMicrotask` instead of `setTimeout` improve queue task execution. This 
+  avoids unnecessary re-rendering if the callback updates state (mostly if used when fetching data).
+  
+  </details>
+
+* Improve initial logo loading
+
+  <details>
+  
+  Caught NPE when first loading logo seems to cause initial delay.
+  
+  </details>
+
+* Improve json field processing
+
+  <details>
+  
+  Contextual fields are filtered out in advance so that json fields aren't processing every time at rendering.
+  
+  </details>
+
+#### Fix
+
+* Prevent closing user home action tab
+* Fix time widget format
+
+  <details>
+  
+  Display formatted value of time widget in readonly. This will 
+  take into account if the field should display the seconds.
+  
+  </details>
+
+* Fix data export directory not multi-tenancy compatible
+
+  <details>
+  
+  The data export directory is not multi-tenancy compatible. It should follow the multi-tenancy data upload 
+  directory structure by including the tenantId as child path.
+  
+  </details>
+
+* Fix auto save data in expandable tree-grid
+* Fix add record in editable panel-dashlet grid
+
+  <details>
+  
+  When we add new record in grid then if we try to add more subsequent record by clicking
+  again on `+` button by expecting to commit current edited row and add new row. But it
+  was adding/commiting duplicate records.
+  
+  </details>
+
+* Fix MetaPermissions.canWrite permission check
+
+  <details>
+  
+  MetaPermissions.canWrite should check CAN_WRITE instead of CAN_EXPORT
+  
+  </details>
+
+* Revert back default step to 1 for decimal fields
+
+  <details>
+  
+  On decimal fields, the default step was determined by the current scale of the field. If a field with scale set to 2, 
+  default step would be 0.01. As it haven't been adopted, it reverts back previous behavior, with a default step to 1 
+  for decimal fields. So it is no more allowed to have a step depending on the dynamic scale of the field.
+  
+  </details>
+
+* Fix pass context params in action context
+* Fix action on o2m/tree-grid setting dirty
+* Hide attachment icon for custom form editor popup and not saved record
+
+  <details>
+  
+  On not saved records in form editor popup, it shouldn't show the attachment icon.
+  Same for some custom form editor popups like user preferences.
+  
+  </details>
+
+
 ## 7.3.1 (2025-02-05)
 
 #### Feature

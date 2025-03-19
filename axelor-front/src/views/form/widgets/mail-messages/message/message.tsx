@@ -84,6 +84,7 @@ export function MessageUser({
           record: { id },
           readonly: true,
           canSave: false,
+          canAttach: false,
         });
       } else if (isDevelopment() && !view) {
         console.log(`${name} view doesn't exist`);

@@ -65,7 +65,10 @@ function computeLayout(schema: Schema) {
         gridColumnStart: colStart,
         gridColumnEnd: colEnd,
         ...(hasField && { alignSelf: "end" }),
-        ...(schema.$json && { gridColumn: `span ${colSpan}` }),
+        ...(schema.$json && {
+          gridColumnStart: `span ${colSpan}`,
+          gridColumnEnd: "auto",
+        }),
       },
       content: item,
     };
@@ -91,7 +94,7 @@ function layoutClassName(item: Schema) {
     .filter((name) => {
       if (/^span\d+/.test(name)) return false;
       if (/^btn-?/.test(name)) return false;
-      if (item.type === 'help' && /^alert?/.test(name)) return false;
+      if (item.type === "help" && /^alert?/.test(name)) return false;
       return true;
     });
   return legacyClassNames(names);

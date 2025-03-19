@@ -2,12 +2,12 @@ import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 
 type AsyncEffectCallbackResult = ReturnType<EffectCallback>;
 type AsyncEffectCallback = (
-  signal: AbortSignal
+  signal: AbortSignal,
 ) => Promise<AsyncEffectCallbackResult>;
 
 export function useAsyncEffect(
   effect: AsyncEffectCallback,
-  deps?: DependencyList
+  deps?: DependencyList,
 ) {
   const abortRef = useRef<AbortController>();
 
@@ -20,19 +20,19 @@ export function useAsyncEffect(
 
   useEffect(() => {
     let canceled = false;
-    let signal = abortRef.current!.signal;
     let result: AsyncEffectCallbackResult;
-    let load = async () => {
+
+    const load = async () => {
+      const signal = abortRef.current!.signal;
       if (canceled || signal.aborted) {
         return;
       }
       result = await effect(signal);
     };
 
-    const timer = setTimeout(load);
+    queueMicrotask(load);
 
     return () => {
-      clearTimeout(timer);
       canceled = true;
       if (result) {
         result();
