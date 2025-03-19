@@ -80,6 +80,8 @@ public class JobRunner {
   private static Logger log = LoggerFactory.getLogger(JobRunner.class);
   private static final String META_SCHEDULE_QUERY =
       "SELECT DISTINCT self FROM MetaSchedule self LEFT JOIN FETCH self.params";
+  private static final String DEFAULT_GROUP = "DEFAULT";
+
 
   private Scheduler scheduler;
 
@@ -308,6 +310,9 @@ public class JobRunner {
   /** Restart tasks */
   public void restart() {
     String group = TenantResolver.currentTenantIdentifier();
+    if (group == null) {
+      group = DEFAULT_GROUP;
+    }
     try {
       this.remove(group);
     } catch (SchedulerException e) {
@@ -321,6 +326,9 @@ public class JobRunner {
   /** Stop tasks */
   public void stop() {
     String group = TenantResolver.currentTenantIdentifier();
+    if (group == null) {
+      group = DEFAULT_GROUP;
+    }
     try {
       scheduler.pauseJobs(GroupMatcher.groupEquals(group));
     } catch (SchedulerException e) {
