@@ -185,9 +185,7 @@ public class AuthPac4jModule extends ShiroWebModule {
   @Named("shiro")
   @Singleton
   public CacheManager cacheManager(@Named("shiro") CachingProvider cachingProvider) {
-    final var cacheManager = cachingProvider.getCacheManager();
-    Runtime.getRuntime().addShutdownHook(new Thread(cacheManager::close));
-    return cacheManager;
+    return cachingProvider.getCacheManager();
   }
 
   /** Cache configuration with session timeout */

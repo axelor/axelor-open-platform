@@ -18,6 +18,8 @@
  */
 package org.apache.shiro.cache.jcache;
 
+import com.axelor.event.Observes;
+import com.axelor.events.ShutdownEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import javax.cache.CacheException;
@@ -63,5 +65,9 @@ public class AxelorJCacheManager extends JCacheManager {
     @SuppressWarnings("unchecked")
     var typedConfig = (Configuration<K, V>) config;
     return typedConfig;
+  }
+
+  protected void onAppShutdownEvent(@Observes ShutdownEvent event) {
+    getCacheManager().close();
   }
 }

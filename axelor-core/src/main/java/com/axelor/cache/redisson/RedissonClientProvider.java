@@ -23,9 +23,12 @@ import com.axelor.cache.CacheProviderInfo;
 import com.axelor.cache.redisson.RedissonUtils.Version;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.event.Observes;
+import com.axelor.events.ShutdownEvent;
 import com.axelor.inject.Beans;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import jakarta.annotation.Priority;
 import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +125,6 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     }
 
     var redisson = Redisson.create(config);
-    Runtime.getRuntime().addShutdownHook(new Thread(redisson::shutdown));
 
     log.atInfo()
         .setMessage("{} connected to {} on {}")
@@ -205,5 +207,15 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
         .forEach(entry -> BeanConfigurator.setField(config, entry.getKey(), entry.getValue()));
 
     return config;
+  }
+
+  protected void onAppShutdownEvent(@Observes @Priority(Integer.MAX_VALUE) ShutdownEvent event) {
+    for (var redisson : redissonClients.values()) {
+      try {
+        redisson.shutdown();
+      } catch (Exception e) {
+        log.error("Error shutting down {}: {}", redisson, e);
+      }
+    }
   }
 }
