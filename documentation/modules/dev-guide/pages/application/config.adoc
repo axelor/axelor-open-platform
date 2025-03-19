@@ -235,6 +235,12 @@ Choose the right option by environment :
 | `view.adv-search.export-full` | whether to disable export full option in advance search | true
 | `view.form.check-version` | whether to check version value for concurrent updates when switching tabs | false
 | `view.collaboration.enabled` | whether to enable view collaboration (🏷️ EE only) | true
+| `view.collaboration.amqp.url`            | AMQP 1.0 broker URL for view collaboration (🏷️ EE only)      |
+| `view.collaboration.amqp.address`        | AMQP 1.0 address for view collaboration (🏷️ EE only)         |
+| `view.collaboration.amqp.source-address` | AMQP 1.0 source address for view collaboration (🏷️ EE only)  |
+| `view.collaboration.amqp.target-address` | AMQP 1.0 target address for view collaboration (🏷️ EE only)  |
+| `view.collaboration.amqp.username`       | AMQP 1.0 broker username for view collaboration (🏷️ EE only) |
+| `view.collaboration.amqp.password`       | AMQP 1.0 broker password for view collaboration (🏷️ EE only) |
 | `user.password.pattern` | pattern to validate user password | .{4,}
 | `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
