@@ -1596,7 +1596,7 @@ function OneToManyInner({
   );
 
   const hasActions = showBars && (toolbar?.length || menubar?.length);
-  const rowSize = 40;
+  const rowSize = 35;
   const headerSize = isSubTreeGrid ? rowSize : 75;
   const maxHeight = headerSize + (+height > 0 ? +height : 10) * rowSize;
   const changed = useMemo(() => value?.some((x) => x._dirty), [value]);
