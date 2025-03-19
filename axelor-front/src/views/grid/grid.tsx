@@ -282,7 +282,6 @@ function GridInner(props: ViewProps<GridView>) {
           filter._domainContext = {
             ...filter?._domainContext,
             ...formContext,
-            ...createContextParams(view, action),
           };
           filter._domainAction = _domainAction;
         }
@@ -301,7 +300,6 @@ function GridInner(props: ViewProps<GridView>) {
         searchAtom,
         fields,
         view,
-        action,
         dashlet,
         getViewContext,
         getSearchTranslate,
