@@ -287,7 +287,7 @@ public class QueryBinder {
     value = Adapter.adapt(value, type, type, null);
 
     if (value instanceof Number && Model.class.isAssignableFrom(type)) {
-      value = JPA.em().find(type, value);
+      value = JPA.em().find(type, ((Number) value).longValue());
     } else if (value instanceof Model && type.isInstance(value)) {
       Model bean = (Model) value;
       if (bean.getId() != null) {
