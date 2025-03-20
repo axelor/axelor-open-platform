@@ -1,4 +1,5 @@
-import { produce } from "immer";
+import { useMemo } from "react";
+import { produce, WritableDraft } from "immer";
 import { PrimitiveAtom, SetStateAction, atom } from "jotai";
 
 import { isCleanDummy, mergeCleanDummy } from "@/services/client/data-utils";
@@ -9,7 +10,7 @@ import { focusAtom } from "@/utils/atoms";
 import { deepEqual, deepGet, deepSet } from "@/utils/objects";
 import { ActionExecutor } from "@/view-containers/action";
 
-import { FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
+import { Attrs, FormAtom, FormState, WidgetAtom, WidgetState } from "./types";
 import {
   createContextParams,
   defaultAttrs as getDefaultAttrs,
@@ -290,3 +291,36 @@ export const contextAtom = atom(
     return prepare(formAtom, options);
   },
 );
+
+const DEFAULT_ATTRS = {};
+
+export function useWidgetAttrsAtomByName({
+  schema,
+  formAtom,
+}: {
+  schema: Schema;
+  formAtom: FormAtom;
+}) {
+  const { name = "" } = schema;
+  return useMemo(
+    () =>
+      atom(
+        (get) => get(formAtom).statesByName?.[name]?.attrs ?? DEFAULT_ATTRS,
+        (get, set, updater: (draft: WritableDraft<Attrs>) => void) => {
+          set(
+            formAtom,
+            produce((draft) => {
+              if (!draft.statesByName[name]) {
+                draft.statesByName[name] = { attrs: {} };
+              } else if (!draft.statesByName[name].attrs) {
+                draft.statesByName[name].attrs = {};
+              }
+              const attrs = draft.statesByName[name].attrs!;
+              updater(attrs);
+            }),
+          );
+        },
+      ),
+    [name, formAtom],
+  );
+}
