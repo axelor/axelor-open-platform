@@ -2,6 +2,9 @@
 :toc:
 :toc-title:
 
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md
+:gradle-8: https://docs.gradle.org/current/userguide/upgrading_version_8.html
+
 :url-jdk-upgrade: https://docs.oracle.com/en/java/javase/21/migrate/index.html
 :url-jdk-features: https://www.oracle.com/java/technologies/javase/21-relnote-issues.html
 
@@ -21,7 +24,24 @@
 
 In this document, we will see the major steps to migrate from 7.x to 8.0.
 
-NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md[change log] for detailed list of fixes, changes and improvements introduced in 8.0
+NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/CHANGELOG.md[changelog] for a detailed list of fixes, changes and improvements introduced in 8.0.
+
+== Dependencies upgrade
+
+Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.
+
+Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
+improvements: `./gradlew wrapper --gradle-version 8.13`.
+
+[NOTE]
+====
+Note that running the wrapper task once will update `gradle-wrapper.properties` only, but leave the wrapper itself in
+`gradle-wrapper.jar` untouched. This is usually fine as new versions of Gradle can be run even with ancient wrapper
+files. If you nevertheless want all the wrapper files to be completely up-to-date, you’ll need to run the `wrapper`
+task a second time.
+====
+
+Check Gradle migration to update your builds: {gradle-8}[Upgrading your build from Gradle 8.x to the latest]
 
 == Java 11 to Java 21
 
