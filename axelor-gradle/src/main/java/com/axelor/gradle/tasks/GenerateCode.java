@@ -109,11 +109,15 @@ public class GenerateCode extends DefaultTask {
 
     List<String> descriptionLines = new ArrayList<>();
     List<String> depends = new ArrayList<>();
+    List<String> dependsMaven = new ArrayList<>();
 
     artifacts.forEach(
         artifact -> {
           try {
-            depends.add(AxelorUtils.getModuleName(project, artifact));
+            String module = AxelorUtils.getModuleName(project, artifact);
+            String group = AxelorUtils.getGroupName(project, artifact);
+            depends.add(module);
+            dependsMaven.add(String.format("%s:%s", group, module));
           } catch (Exception e) {
             getLogger().error("Error generating axelor-module.properties", e);
           }
@@ -152,6 +156,9 @@ public class GenerateCode extends DefaultTask {
 
     if (!depends.isEmpty()) {
       text.append("\n").append("depends = ").append(Joiner.on(", ").join(depends)).append("\n");
+    }
+    if (!dependsMaven.isEmpty()) {
+      text.append("depends.maven = ").append(Joiner.on(", ").join(dependsMaven)).append("\n");
     }
 
     Files.asCharSink(outputPath, StandardCharsets.UTF_8).write(text);

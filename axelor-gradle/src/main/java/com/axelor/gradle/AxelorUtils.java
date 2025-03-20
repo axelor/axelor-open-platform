@@ -18,6 +18,7 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.common.StringUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -41,6 +42,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
 import org.gradle.internal.composite.IncludedBuildInternal;
 
@@ -134,17 +136,8 @@ public class AxelorUtils {
 
   private static final Object LOCK = new Object();
 
-  public static String getModuleName(Project project, ResolvedArtifact artifact)
+  private static String getModuleProperty(Project project, ResolvedArtifact artifact, String name)
       throws IOException {
-
-    // Try by project
-    Project sub = findProject(project, artifact);
-    if (sub != null) {
-      return sub.getName();
-    }
-
-    // Try in jar
-
     synchronized (LOCK) {
       try (final URLClassLoader loader =
               new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
@@ -152,13 +145,43 @@ public class AxelorUtils {
         if (in != null) {
           Properties props = new java.util.Properties();
           props.load(in);
-          return (String) props.get("name");
+          return props.getProperty(name);
         } else {
           throw new IOException(
               "Unable to locate axelor-module.properties in " + artifact.getName());
         }
       }
     }
+  }
+
+  public static String getModuleName(Project project, ResolvedArtifact artifact)
+      throws IOException {
+    // Try by project
+    Project sub = findProject(project, artifact);
+    if (sub != null) {
+      return sub.getName();
+    }
+    // Try in jar
+    return getModuleProperty(project, artifact, "name");
+  }
+
+  public static String getGroupName(Project project, ResolvedArtifact artifact) throws IOException {
+    // Try by project
+    Project sub = findProject(project, artifact);
+    if (sub != null) {
+      return (String) sub.getGroup();
+    }
+    // Try in jar
+    String group = getModuleProperty(project, artifact, "group");
+    if (StringUtils.notBlank(group)) {
+      return group;
+    }
+    // Try from maven artifact
+    ComponentIdentifier identifier = artifact.getId().getComponentIdentifier();
+    if (identifier instanceof ModuleComponentIdentifier) {
+      return ((ModuleComponentIdentifier) identifier).getGroup();
+    }
+    throw new IOException("Unable to find module group id for " + artifact.getName());
   }
 
   public static Project findProject(Project project, ResolvedArtifact artifact) {

@@ -38,6 +38,7 @@ final class ModuleResolver {
 
   private Map<String, Module> modules = Collections.synchronizedMap(new LinkedHashMap<>());
 
+  private Map<String, String> mavenGroups = new ConcurrentHashMap<>();
   private Map<String, List<Module>> resolutions = new ConcurrentHashMap<>();
   private List<Module> resolved = new ArrayList<>();
 
@@ -46,11 +47,19 @@ final class ModuleResolver {
     for (Properties props : moduleList) {
       String name = props.getProperty("name");
       String[] depends = props.getProperty("depends", "").trim().split("\\s*,\\s*");
+      String[] dependsMaven = props.getProperty("depends.maven", "").trim().split("\\s*,\\s*");
       String title = props.getProperty("title");
       String description = props.getProperty("description");
       String mavenGroup = props.getProperty("mavenGroup");
       String version = props.getProperty("version");
       boolean application = "true".equals(props.getProperty("application"));
+
+      for (var id : dependsMaven) {
+        String[] mavenIds = id.split(":");
+        if (mavenIds.length > 1) {
+          mavenGroups.put(mavenIds[1], mavenIds[0]);
+        }
+      }
 
       Module module = add(name, depends);
 
@@ -64,6 +73,9 @@ final class ModuleResolver {
     for (String name : modules.keySet()) {
       for (Module module : resolve(name)) {
         if (!resolved.contains(module)) resolved.add(module);
+        if (StringUtils.isBlank(module.getMavenGroup())) {
+          module.setMavenGroup(mavenGroups.get(name));
+        }
       }
     }
   }
