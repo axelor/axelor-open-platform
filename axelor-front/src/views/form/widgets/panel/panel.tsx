@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -18,6 +18,7 @@ import {
   WidgetProps,
 } from "../../builder";
 import { useFormScope } from "../../builder/scope";
+import { useWidgetAttrsAtomByName } from "../../builder/atoms";
 
 import styles from "./panel.module.scss";
 
@@ -31,11 +32,14 @@ export function Panel(props: WidgetProps) {
     canCollapse = Boolean(collapseIf),
   } = schema;
   const { attrs } = useAtomValue(widgetAtom);
-  const { title, collapse } = attrs;
+  const { title, collapse = false } = attrs;
   const [collapsed, setCollapsed] = useState(collapse);
 
+  const widgetAttrsAtom = useWidgetAttrsAtomByName({ schema, formAtom });
+  const setWidgetAttrsByName = useSetAtom(widgetAttrsAtom);
+
   const resetStates = useCallback(() => {
-    canCollapse && setCollapsed(collapse);
+    if (canCollapse) setCollapsed(collapse);
   }, [canCollapse, collapse]);
 
   useEffect(() => {
@@ -45,6 +49,16 @@ export function Panel(props: WidgetProps) {
       document.removeEventListener("form:reset-states", resetStates);
     };
   }, [resetStates]);
+
+  const toggleCollapse = useCallback(() => {
+    // reset collapse in statesByName
+    setWidgetAttrsByName((_attrs) => {
+      if (_attrs.collapse === collapsed) {
+        _attrs.collapse = !collapsed;
+      }
+    });
+    setCollapsed((prev) => !prev);
+  }, [collapsed, setWidgetAttrsByName]);
 
   const hasHeader = showTitle !== false && showFrame !== false && !!title;
 
@@ -116,7 +130,7 @@ export function Panel(props: WidgetProps) {
       toolbar={toolbar}
       collapsible={hasHeader && canCollapse}
       collapsed={collapseIf && collapsed == null ? true : collapsed}
-      setCollapsed={setCollapsed}
+      setCollapsed={toggleCollapse}
       className={clsx(styles.panel, {
         [styles.noFrame]: showFrame === false,
         [styles.hasHeader]: hasHeader,
