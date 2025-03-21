@@ -7,7 +7,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box, NavTabItem, NavTabs, clsx } from "@axelor/ui";
 
 import { Schema } from "@/services/client/meta.types";
-import { focusAtom } from "@/utils/atoms";
 
 import {
   FieldLabelTitle,
@@ -17,7 +16,10 @@ import {
   WidgetAtom,
   WidgetProps,
 } from "../../builder";
-import { fallbackWidgetAtom } from "../../builder/atoms";
+import {
+  fallbackWidgetAtom,
+  useWidgetAttrsAtomByName,
+} from "../../builder/atoms";
 import {
   FormTabScope,
   useAfterActions,
@@ -46,13 +48,18 @@ export function PanelTabs(props: WidgetProps) {
     useCallback((get) => get(formAtom).dirty, [formAtom]),
   );
 
-  const handleChange = useCallback((item: NavTabItem) => {
+  const setTabActive = useCallback((tabId: string) => {
     // once tab is selected manually by user click
     // then auto re-focus will be disabled
     shouldRefocus.current = null;
-    lastActiveTab.current = item.id;
-    setActiveTab(item.id);
+    lastActiveTab.current = tabId;
+    setActiveTab(tabId);
   }, []);
+
+  const handleChange = useCallback(
+    (item: NavTabItem) => setTabActive(item.id),
+    [setTabActive],
+  );
 
   const tabs = useMemo(
     () =>
@@ -130,7 +137,7 @@ export function PanelTabs(props: WidgetProps) {
       }
       return;
     }
-    
+
     const timer = setTimeout(() => {
       if (activeTab) {
         const index = tabs.findIndex((item) => item.uid === activeTab);
@@ -213,7 +220,7 @@ export function PanelTabs(props: WidgetProps) {
         formAtom={formAtom}
         parentAtom={widgetAtom}
         setHidden={setHidden}
-        setActive={setActiveTab}
+        setActive={setTabActive}
         setTitle={setTabTitle}
       />
       {visibleTabs.map((item) => {
@@ -326,27 +333,17 @@ const DummyTab = memo(function DummyTab(
     setTitle: (id: string, title?: string) => void;
   },
 ) {
-  const { schema, widgetAtom, setHidden, setActive, setTitle } = props;
+  const { schema, formAtom, widgetAtom, setHidden, setActive, setTitle } =
+    props;
   const hidden = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.hidden), [widgetAtom]),
   );
   const title = useAtomValue(
     useMemo(() => selectAtom(widgetAtom, (a) => a.attrs.title), [widgetAtom]),
   );
-  const [active, setActiveAttr] = useAtom(
-    useMemo(
-      () =>
-        focusAtom(
-          widgetAtom,
-          ({ attrs }) => attrs?.active ?? false,
-          ({ attrs, ...rest }, active) => ({
-            ...rest,
-            attrs: { ...attrs, active },
-          }),
-        ),
-      [widgetAtom],
-    ),
-  );
+
+  const widgetAttrsAtom = useWidgetAttrsAtomByName({ schema, formAtom });
+  const [{ active }, setWidgetAttrsByName] = useAtom(widgetAttrsAtom);
 
   useEffect(() => {
     setHidden(schema.uid, !!hidden);
@@ -358,10 +355,17 @@ const DummyTab = memo(function DummyTab(
 
   useEffect(() => {
     if (active) {
-      !hidden && setActive(schema.uid);
-      setActiveAttr(false);
+      if (!hidden) {
+        setActive(schema.uid);
+      }
+      // reset active in statesByName
+      setWidgetAttrsByName((_attrs) => {
+        if (_attrs.active) {
+          _attrs.active = false;
+        }
+      });
     }
-  }, [active, schema.uid, hidden, setActive, setActiveAttr]);
+  }, [active, schema.uid, hidden, setActive, setWidgetAttrsByName]);
 
   return null;
 });
