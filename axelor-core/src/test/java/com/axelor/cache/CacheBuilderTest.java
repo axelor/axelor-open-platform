@@ -26,11 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.event.RemovalCause;
-import com.axelor.cache.redisson.RedissonCacheBuilder;
-import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
-import com.axelor.common.Inflector;
 import com.axelor.test.GuiceJunit5Test;
 import com.axelor.test.GuiceModules;
 import java.time.Duration;
@@ -68,37 +64,16 @@ class CacheBuilderTest extends GuiceJunit5Test {
     RedisTest.stopRedis();
   }
 
-  enum CacheType {
-    CAFFEINE(CaffeineCacheBuilder::new),
-    REDISSON(RedissonCacheBuilder::new),
-    REDISSON_NATIVE(RedissonCacheNativeBuilder::new);
-
-    private final Function<String, CacheBuilder<String, Object>> factory;
-
-    CacheType(Function<String, CacheBuilder<String, Object>> factory) {
-      this.factory = factory;
-    }
-
-    public Function<String, CacheBuilder<String, Object>> getFactory() {
-      return factory;
-    }
-
-    @Override
-    public String toString() {
-      return Inflector.getInstance().dasherize(name());
-    }
-  }
-
   @ParameterizedTest(name = "{0} - Basic Cache Operations")
   @EnumSource(CacheType.class)
   void testBasicCacheOperations(CacheType cacheType) {
-    doBasicCacheOperations(cacheType.getFactory());
+    doBasicCacheOperations(cacheType::getCacheBuilder);
   }
 
   @ParameterizedTest(name = "{0} - Cache Loader Operations")
   @EnumSource(CacheType.class)
   void testCacheLoaderOperations(CacheType cacheType) {
-    doCacheLoaderOperations(cacheType.getFactory());
+    doCacheLoaderOperations(cacheType::getCacheBuilder);
   }
 
   // redisson-native with expireAfterWrite requires HPEXPIRE command introduced in Redis 7.4
@@ -108,7 +83,7 @@ class CacheBuilderTest extends GuiceJunit5Test {
     assumeTrue(
         HAS_REDIS_HPEXPIRE || cacheType != CacheType.REDISSON_NATIVE,
         "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
-    doExpireAfterWrite(cacheType.getFactory());
+    doExpireAfterWrite(cacheType::getCacheBuilder);
   }
 
   // redisson-native does not support expireAfterAccess (it behaves like expireAfterWrite)
@@ -118,19 +93,19 @@ class CacheBuilderTest extends GuiceJunit5Test {
       mode = EnumSource.Mode.EXCLUDE,
       names = {"REDISSON_NATIVE"})
   void testExpireAfterAccessOperations(CacheType cacheType) {
-    doExpireAfterAccess(cacheType.getFactory());
+    doExpireAfterAccess(cacheType::getCacheBuilder);
   }
 
   @ParameterizedTest(name = "{0} - Map Operations")
   @EnumSource(CacheType.class)
   void testMapOperations(CacheType cacheType) {
-    doMapOperations(cacheType.getFactory());
+    doMapOperations(cacheType::getCacheBuilder);
   }
 
   @ParameterizedTest(name = "{0} - Removal Listener Operations")
   @EnumSource(value = CacheType.class)
   void testRemovalListenerOperations(CacheType cacheType) {
-    doRemovalListenerOperations(cacheType.getFactory());
+    doRemovalListenerOperations(cacheType::getCacheBuilder);
   }
 
   private void doBasicCacheOperations(
@@ -371,13 +346,13 @@ class CacheBuilderTest extends GuiceJunit5Test {
   @ParameterizedTest(name = "{0} - GetAll Operations")
   @EnumSource(CacheType.class)
   void testGetAllOperations(CacheType cacheType) {
-    doGetAllOperations(cacheType.getFactory());
+    doGetAllOperations(cacheType::getCacheBuilder);
   }
 
   @ParameterizedTest(name = "{0} - PutAll Operations")
   @EnumSource(CacheType.class)
   void testPutAllOperations(CacheType cacheType) {
-    doPutAllOperations(cacheType.getFactory());
+    doPutAllOperations(cacheType::getCacheBuilder);
   }
 
   private void doGetAllOperations(
@@ -454,7 +429,7 @@ class CacheBuilderTest extends GuiceJunit5Test {
   @ParameterizedTest(name = "{0} - Serialization")
   @EnumSource(CacheType.class)
   void testSerialization(CacheType cacheType) {
-    doSerializationOperations(cacheType.getFactory());
+    doSerializationOperations(cacheType::getCacheBuilder);
   }
 
   private void doSerializationOperations(

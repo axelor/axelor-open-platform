@@ -22,8 +22,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditInterceptor;
 import com.axelor.cache.CacheConfig;
-import com.axelor.cache.redisson.AxelorRedissonRegionFactory;
-import com.axelor.cache.redisson.AxelorRedissonRegionNativeFactory;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -42,6 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.cache.spi.CachingProvider;
 import org.hibernate.cache.jcache.ConfigSettings;
+import org.hibernate.cache.jcache.internal.JCacheRegionFactory;
 import org.hibernate.cache.spi.RegionFactory;
 import org.hibernate.cfg.CacheSettings;
 import org.hibernate.cfg.Environment;
@@ -193,26 +192,26 @@ public class JpaModule extends AbstractModule {
     String cacheRegionPrefix = settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_PREFIX);
     String jcacheProvider = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER);
 
-    final var optionalCacheProvider = CacheConfig.getHibernateCacheProvider();
+    final var optCacheProvider = CacheConfig.getHibernateCacheProvider();
 
-    if (optionalCacheProvider.isPresent()) {
-      final var provider = optionalCacheProvider.get();
-      final var providerName = provider.getProvider();
+    if (optCacheProvider.isPresent()) {
+      final var cacheProvider = optCacheProvider.get();
+      final var optCacheType = cacheProvider.getCacheType();
 
-      if ("caffeine".equalsIgnoreCase(providerName)) {
-        if (StringUtils.isBlank(cacheRegionFactory)) {
-          cacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
-          jcacheProvider = CacheConfig.DEFAULT_JCACHE_PROVIDER;
-        }
-      } else if ("redisson".equalsIgnoreCase(providerName)) {
-        if (StringUtils.isBlank(cacheRegionFactory)) {
-          cacheRegionFactory = AxelorRedissonRegionFactory.class.getName();
-        }
-      } else if ("redisson-native".equalsIgnoreCase(providerName)) {
-        if (StringUtils.isBlank(cacheRegionFactory)) {
-          cacheRegionFactory = AxelorRedissonRegionNativeFactory.class.getName();
+      String providerCacheRegionFactory = null;
+      String providerJcacheProvider = null;
+
+      if (optCacheType.isPresent()) {
+        // Built-in cache provider options
+        var cacheType = optCacheType.get();
+        providerCacheRegionFactory = cacheType.getCacheRegionFactory();
+
+        if (isJCacheRegionFactory(providerCacheRegionFactory)) {
+          providerJcacheProvider = cacheType.getCachingProviderClass().getName();
         }
       } else {
+        // Get custom cache provider from provider name
+        final var providerName = cacheProvider.getProvider();
         Class<?> providerClass;
         try {
           providerClass = Class.forName(providerName);
@@ -220,13 +219,23 @@ public class JpaModule extends AbstractModule {
           throw new IllegalArgumentException("Unknown cache provider: " + providerName);
         }
         if (CachingProvider.class.isAssignableFrom(providerClass)) {
-          cacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
-          jcacheProvider = providerName;
+          providerCacheRegionFactory = DEFAULT_CACHE_REGION_FACTORY;
+          providerJcacheProvider = providerName;
         } else if (RegionFactory.class.isAssignableFrom(providerClass)) {
-          cacheRegionFactory = providerName;
+          providerCacheRegionFactory = providerName;
         } else {
           throw new IllegalArgumentException("Unsupported cache provider type: " + providerName);
         }
+      }
+
+      // Don't override any explicit cache region factory.
+      if (StringUtils.isBlank(cacheRegionFactory)) {
+        cacheRegionFactory = providerCacheRegionFactory;
+      }
+
+      // Don't override any explicit jcache provider.
+      if (StringUtils.isBlank(jcacheProvider)) {
+        jcacheProvider = providerJcacheProvider;
       }
 
       if (StringUtils.isBlank(cacheRegionPrefix)) {
@@ -234,8 +243,7 @@ public class JpaModule extends AbstractModule {
       }
     }
 
-    if (StringUtils.isBlank(cacheRegionFactory)
-        || DEFAULT_CACHE_REGION_FACTORY.equals(cacheRegionFactory)) {
+    if (StringUtils.isBlank(cacheRegionFactory) || isJCacheRegionFactory(cacheRegionFactory)) {
       properties.put(CacheSettings.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
       if (StringUtils.isBlank(jcacheProvider)) {
         jcacheProvider = CacheConfig.DEFAULT_JCACHE_PROVIDER;
@@ -251,6 +259,11 @@ public class JpaModule extends AbstractModule {
       properties.put(CacheSettings.CACHE_REGION_PREFIX, cacheRegionPrefix);
       log.trace("Cache region prefix: {}", cacheRegionPrefix);
     }
+  }
+
+  private static boolean isJCacheRegionFactory(String cacheRegionFactory) {
+    return DEFAULT_CACHE_REGION_FACTORY.equals(cacheRegionFactory)
+        || JCacheRegionFactory.class.getName().equals(cacheRegionFactory);
   }
 
   private void configureMultiTenancy(final AppSettings settings, final Properties properties) {

@@ -18,9 +18,9 @@
  */
 package com.axelor.cache;
 
-import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import javax.cache.spi.CachingProvider;
 
 /**
@@ -57,17 +57,13 @@ public class CacheProviderInfo {
   }
 
   public Class<? extends CachingProvider> getCachingProvider() {
-    var providerName = getProvider();
+    var cacheType = getCacheType();
 
-    if ("caffeine".equalsIgnoreCase(providerName)) {
-      return CaffeineCachingProvider.class;
-    } else if ("redisson".equalsIgnoreCase(providerName)
-        || "redisson-native".equalsIgnoreCase(providerName)) {
-      // "redisson-native" may be configured at global level,
-      // but not supported by Redisson JCache
-      return org.redisson.jcache.JCachingProvider.class;
+    if (cacheType.isPresent()) {
+      return cacheType.get().getCachingProviderClass();
     }
 
+    var providerName = getProvider();
     Class<? extends CachingProvider> providerClass;
     try {
       providerClass = Class.forName(providerName).asSubclass(CachingProvider.class);
@@ -82,5 +78,13 @@ public class CacheProviderInfo {
     }
 
     return providerClass;
+  }
+
+  public Optional<CacheType> getCacheType() {
+    try {
+      return Optional.of(CacheType.from(provider));
+    } catch (IllegalArgumentException e) {
+      return Optional.empty();
+    }
   }
 }

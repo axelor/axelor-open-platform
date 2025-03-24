@@ -20,10 +20,7 @@ package com.axelor.cache;
 
 import com.axelor.cache.caffeine.CaffeineCacheBuilder;
 import com.axelor.cache.event.RemovalListener;
-import com.axelor.cache.redisson.RedissonCacheBuilder;
-import com.axelor.cache.redisson.RedissonCacheNativeBuilder;
 import java.time.Duration;
-import java.util.function.Function;
 
 /**
  * A builder of {@link AxelorCache} instances
@@ -47,32 +44,19 @@ public abstract class CacheBuilder<K, V> {
 
   private RemovalListener<K, V> removalListener;
 
-  private static final CacheProviderInfo cacheProviderInfo;
+  private static final CacheProviderInfo cacheProviderInfo =
+      CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
 
-  private static final Function<String, CacheBuilder<?, ?>> cacheBuilderFactory;
+  private static final CacheType cacheProvider =
+      cacheProviderInfo
+          .getCacheType()
+          .orElseThrow(
+              () ->
+                  new IllegalArgumentException(
+                      "Unsupported cache provider: " + cacheProviderInfo.getProvider()));
 
   private static final StackWalker stackWalker =
       StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-
-  static {
-    cacheProviderInfo =
-        CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
-    var providerName = cacheProviderInfo.getProvider();
-
-    switch (providerName) {
-      case "caffeine":
-        cacheBuilderFactory = name -> new CaffeineCacheBuilder<>(name);
-        break;
-      case "redisson":
-        cacheBuilderFactory = name -> new RedissonCacheBuilder<>(name);
-        break;
-      case "redisson-native":
-        cacheBuilderFactory = name -> new RedissonCacheNativeBuilder<>(name);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported cache provider: " + providerName);
-    }
-  }
 
   protected CacheBuilder(String cacheName) {
     this.cacheName = cacheName;
@@ -145,11 +129,9 @@ public abstract class CacheBuilder<K, V> {
    * @param <V> the value type of the cache
    * @return a new {@code CacheBuilder} instance
    */
+  @SuppressWarnings("unchecked")
   protected static <K, V> CacheBuilder<K, V> fromCacheName(String name) {
-    @SuppressWarnings("unchecked")
-    var builder = (CacheBuilder<K, V>) cacheBuilderFactory.apply(name);
-
-    return builder;
+    return cacheProvider.getCacheBuilder(name);
   }
 
   /**
