@@ -136,8 +136,7 @@ public class TenantFilter implements Filter {
         .filter(tenants::containsKey);
   }
 
-  private String currentTenant(HttpServletRequest req, HttpServletResponse res)
-      throws BadTenantException {
+  private String currentTenant(HttpServletRequest req, HttpServletResponse res) {
     final TenantInfo tenantInfo = TenantResolver.getTenantInfo(false);
     final String hostTenant = tenantInfo.getHostTenant();
 
