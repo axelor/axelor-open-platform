@@ -18,6 +18,8 @@
  */
 package com.axelor.quartz;
 
+import static org.quartz.utils.Key.DEFAULT_GROUP;
+
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
@@ -80,8 +82,6 @@ public class JobRunner {
   private static Logger log = LoggerFactory.getLogger(JobRunner.class);
   private static final String META_SCHEDULE_QUERY =
       "SELECT DISTINCT self FROM MetaSchedule self LEFT JOIN FETCH self.params";
-  private static final String DEFAULT_GROUP = "DEFAULT";
-
 
   private Scheduler scheduler;
 

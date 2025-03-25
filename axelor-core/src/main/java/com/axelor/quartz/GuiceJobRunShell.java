@@ -18,6 +18,8 @@
  */
 package com.axelor.quartz;
 
+import static org.quartz.utils.Key.DEFAULT_GROUP;
+
 import com.axelor.common.StringUtils;
 import com.axelor.db.tenants.TenantAware;
 import com.axelor.db.tenants.TenantConfig;
@@ -65,7 +67,7 @@ public class GuiceJobRunShell extends JobRunShell {
     Optional.ofNullable(firedTriggerBundle.getJobDetail())
         .map(JobDetail::getKey)
         .map(Key::getGroup) // group is tenant id
-        .filter(group -> StringUtils.notBlank(group) && !"DEFAULT".equals(group))
+        .filter(group -> StringUtils.notBlank(group) && !DEFAULT_GROUP.equals(group))
         .ifPresentOrElse(this::run, super::run);
   }
 
