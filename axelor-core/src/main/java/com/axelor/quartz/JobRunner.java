@@ -265,6 +265,7 @@ public class JobRunner {
    * @param group the tenant group
    */
   public void remove(String group) throws SchedulerException {
+    log.info("Deleting jobs from group {}", group);
     scheduler.deleteJobs(new ArrayList<>(scheduler.getJobKeys(GroupMatcher.groupEquals(group))));
   }
 
