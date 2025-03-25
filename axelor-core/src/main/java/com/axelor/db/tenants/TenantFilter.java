@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.shiro.session.Session;
@@ -56,9 +57,13 @@ public class TenantFilter implements Filter {
 
   private final AxelorSessionManager sessionManager;
 
+  private final TenantConfigProvider tenantConfigProvider;
+
   @Inject
-  public TenantFilter(AxelorSessionManager sessionManager) {
+  public TenantFilter(
+      AxelorSessionManager sessionManager, TenantConfigProvider tenantConfigProvider) {
     this.sessionManager = sessionManager;
+    this.tenantConfigProvider = tenantConfigProvider;
   }
 
   @Override
@@ -102,13 +107,16 @@ public class TenantFilter implements Filter {
           session.stop();
         }
 
+        removeCookie(req, res, TENANT_COOKIE_NAME);
+
         if (AuthPac4jInfo.isXHR(req)) {
           // Ajax request
           res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           res.setContentType(HttpConstants.APPLICATION_JSON);
           response.setCharacterEncoding(StandardCharsets.UTF_8.name());
           final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-          res.getWriter().write(mapper.writeValueAsString(Map.of("status", 1)));
+          res.getWriter()
+              .write(mapper.writeValueAsString(Map.of("status", 1, "error", e.getMessage())));
         } else {
           // Full page load
           res.sendRedirect(".");
@@ -120,55 +128,61 @@ public class TenantFilter implements Filter {
     }
   }
 
-  // When tenant comes from header/cookie, need to check it.
-  // For login, consider header only.
-  private Optional<String> getRequestTenant(
-      HttpServletRequest req, boolean isLogin, Map<String, String> tenants) {
-    return Optional.ofNullable(req.getHeader(TENANT_HEADER_NAME))
+  /**
+   * Gets tenant from header/cookie. For login, consider header only.
+   *
+   * @param request
+   * @param isLogin
+   * @return tenant
+   */
+  private Optional<String> getRequestTenant(HttpServletRequest request, boolean isLogin) {
+    return Optional.ofNullable(request.getHeader(TENANT_HEADER_NAME))
         .filter(StringUtils::notBlank)
         .or(
             () ->
                 isLogin
                     ? Optional.empty()
-                    : Optional.ofNullable(getCookie(req, TENANT_COOKIE_NAME))
+                    : Optional.ofNullable(getCookie(request, TENANT_COOKIE_NAME))
                         .map(Cookie::getValue)
-                        .filter(StringUtils::notBlank))
-        .filter(tenants::containsKey);
+                        .filter(StringUtils::notBlank));
   }
 
   private String currentTenant(HttpServletRequest req, HttpServletResponse res) {
-    final TenantInfo tenantInfo = TenantResolver.getTenantInfo(false);
-    final String hostTenant = tenantInfo.getHostTenant();
-
     final Session session = sessionManager.getSession(req, res);
     final Optional<String> sessionTenant =
         Optional.ofNullable(session).map(s -> (String) s.getAttribute(TENANT_ATTRIBUTE_NAME));
-
-    if (hostTenant != null) {
-      if (session != null && sessionTenant.isEmpty()) {
-        session.setAttribute(TENANT_ATTRIBUTE_NAME, hostTenant);
-      }
-      return hostTenant;
-    }
-
     final boolean isLogin = PATH_CALLBACK.equals(req.getServletPath());
-    final Map<String, String> tenants = tenantInfo.getTenants();
+
+    // Get tenant from session first, then request, then any host-resolved tenant.
     final String tenant =
         sessionTenant
             .filter(t -> !isLogin)
-            .or(() -> getRequestTenant(req, isLogin, tenants))
-            .orElse(null);
+            .or(() -> getRequestTenant(req, isLogin))
+            .orElseGet(() -> TenantResolver.getTenantInfo(false).getHostTenant());
 
+    // Missing tenant
     if (tenant == null && (isLogin || req.getHeader(HttpConstants.AUTHORIZATION_HEADER) != null)) {
       throw new BadTenantException();
     }
 
-    if (session != null && tenant != null) {
-      if (!tenants.containsKey(tenant)) {
-        throw new BadTenantException();
-      } else if ((sessionTenant.isEmpty() || isLogin)) {
-        session.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
+    if (tenant != null) {
+      final TenantConfig config = tenantConfigProvider.find(tenant);
+
+      // Check active tenant
+      if (config == null || Boolean.FALSE.equals(config.getActive())) {
+        throw new TenantNotFoundException(tenant);
       }
+
+      // Check tenant host
+      final String hosts = config.getTenantHosts();
+      if (StringUtils.notBlank(hosts)
+          && !List.of(hosts.split("\\s*,\\s*")).contains(TenantResolver.CURRENT_HOST.get())) {
+        throw new BadTenantException();
+      }
+    }
+
+    if (session != null && sessionTenant.isEmpty()) {
+      session.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
     }
 
     if (isLogin) {
@@ -209,5 +223,14 @@ public class TenantFilter implements Filter {
     }
 
     response.addCookie(cookie);
+  }
+
+  private void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    Cookie cookie = getCookie(request, name);
+    if (cookie != null) {
+      cookie.setMaxAge(0);
+      cookie.setValue("");
+      response.addCookie(cookie);
+    }
   }
 }

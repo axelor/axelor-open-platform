@@ -78,7 +78,7 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
       }
     }
 
-    // User-selectabled tenants
+    // User-selectable tenants
     return TenantInfo.multiple(configsToNames(configs));
   }
 
