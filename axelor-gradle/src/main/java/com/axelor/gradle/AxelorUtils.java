@@ -246,6 +246,12 @@ public class AxelorUtils {
   }
 
   private static void addSubstitutions(Project project) {
+    final String core = CORE_MODULES.iterator().next();
+    final Object coreProject = findProject(project, core);
+    if (coreProject != null) {
+      return;
+    }
+
     if (shouldUsePlatformEE(project)) {
       project
           .getConfigurations()
