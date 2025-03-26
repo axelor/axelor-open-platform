@@ -19,13 +19,21 @@ export const parseTemplate = (tmpl) => {
     if (!text.includes("${")) {
       return () => text;
     }
-    const resFn = parseSafe("`" + text + "`");
+
+    let resFn;
+    try {
+      resFn = parseSafe("`" + text + "`");
+    } catch (err) {
+      console.error(`Unable to parse template : ${text}`);
+      return () => null;
+    }
+
     return (...args) => {
       try {
         const result = resFn(...args);
         return result && result.replace(/undefined/gi, "").replace(/null/g, "");
       } catch {
-        console.error(`Invalid template line : ${text}`);
+        console.error(`Invalid template : ${text}`);
         return null;
       }
     };
@@ -40,12 +48,19 @@ export const parseTemplate = (tmpl) => {
  */
 export const parseExpression = (expr) => {
   return cache.get(makeKey("expr", expr), () => {
-    const fn = parseSafe(expr);
+    let fn;
+    try {
+      fn = parseSafe(expr);
+    } catch (err) {
+      console.error(`Unable to parse expression : "${expr}"`);
+      return () => false;
+    }
+
     return (...args) => {
       try {
         return fn(...args);
       } catch {
-        console.error(`Invalid expression : ${expr}`);
+        console.error(`Invalid expression : "${expr}"`);
         return false;
       }
     };

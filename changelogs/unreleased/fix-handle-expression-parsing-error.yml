@@ -1,0 +1,6 @@
+---
+title: Handle templates/expressions parsing errors
+type: fix
+description: |
+  This managed templates and expressions parsing errors (mostly due to incorrect syntax) : instead of crashing the 
+  view, errors are now caught and appropriate value returned depending on context.
