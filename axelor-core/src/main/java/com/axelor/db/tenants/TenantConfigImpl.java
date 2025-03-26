@@ -137,38 +137,36 @@ public class TenantConfigImpl implements TenantConfig {
   }
 
   public static TenantConfig findById(Map<String, String> props, String tenantId) {
-    if (CONFIGS.containsKey(tenantId)) {
-      return CONFIGS.get(tenantId);
-    }
+    return CONFIGS.computeIfAbsent(
+        tenantId,
+        id -> {
+          final String prefix = "db." + tenantId;
+          final TenantConfigImpl cfg = new TenantConfigImpl();
 
-    final String prefix = "db." + tenantId;
-    final TenantConfigImpl cfg = new TenantConfigImpl();
+          final String active = get(props, prefix, "active");
+          final String visible = get(props, prefix, "visible");
 
-    final String active = get(props, prefix, "active");
-    final String visible = get(props, prefix, "visible");
+          cfg.active = active == null || "true".equalsIgnoreCase(active);
+          cfg.visible = visible == null || "true".equalsIgnoreCase(visible);
 
-    cfg.active = active == null || "true".equalsIgnoreCase(active);
-    cfg.visible = visible == null || "true".equalsIgnoreCase(visible);
+          cfg.tenantId = tenantId;
+          cfg.tenantName = get(props, prefix, "name");
+          cfg.tenantHosts = get(props, prefix, "hosts");
+          cfg.tenantRoles = get(props, prefix, "roles");
 
-    cfg.tenantId = tenantId;
-    cfg.tenantName = get(props, prefix, "name");
-    cfg.tenantHosts = get(props, prefix, "hosts");
-    cfg.tenantRoles = get(props, prefix, "roles");
+          cfg.jndiDataSource = get(props, prefix, "datasource");
 
-    cfg.jndiDataSource = get(props, prefix, "datasource");
+          cfg.jdbcDriver = get(props, prefix, "driver");
+          cfg.jdbcUrl = get(props, prefix, "url");
+          cfg.jdbcUser = get(props, prefix, "user");
+          cfg.jdbcPassword = get(props, prefix, "password");
 
-    cfg.jdbcDriver = get(props, prefix, "driver");
-    cfg.jdbcUrl = get(props, prefix, "url");
-    cfg.jdbcUser = get(props, prefix, "user");
-    cfg.jdbcPassword = get(props, prefix, "password");
+          if (cfg.jndiDataSource == null && (cfg.jdbcDriver == null || cfg.jdbcUrl == null)) {
+            return null;
+          }
 
-    if (cfg.jndiDataSource == null && (cfg.jdbcDriver == null || cfg.jdbcUrl == null)) {
-      return null;
-    }
-
-    CONFIGS.put(tenantId, cfg);
-
-    return cfg;
+          return cfg;
+        });
   }
 
   private static String getHosts(Map<String, String> props, String tenantId) {
