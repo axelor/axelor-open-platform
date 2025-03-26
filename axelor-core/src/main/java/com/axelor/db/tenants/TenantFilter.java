@@ -33,7 +33,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.ws.rs.core.HttpHeaders;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -199,29 +198,9 @@ public class TenantFilter implements Filter {
 
     if (request.isSecure()) {
       cookie.setSecure(true);
+      cookie.setAttribute("SameSite", "None");
     }
 
     response.addCookie(cookie);
-
-    if (cookie.getSecure()) {
-      addSameSite(response, name);
-    }
-  }
-
-  // With Jakarta Servlet API, we'll be able to use Cookie#setAttribute to set SameSite=None
-  // Add SameSite=None attribute manually for now
-  private void addSameSite(HttpServletResponse response, String name) {
-    boolean first = true;
-    for (String cookieString : response.getHeaders(HttpHeaders.SET_COOKIE)) {
-      if (StringUtils.notEmpty(cookieString) && cookieString.startsWith(name)) {
-        cookieString += "; SameSite=None";
-      }
-      if (first) {
-        response.setHeader(HttpHeaders.SET_COOKIE, cookieString);
-        first = false;
-      } else {
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieString);
-      }
-    }
   }
 }
