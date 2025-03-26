@@ -1,4 +1,4 @@
-import { clsx, Box, CommandBar } from "@axelor/ui";
+import { clsx, Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { useAtomCallback } from "jotai/utils";
@@ -13,6 +13,15 @@ import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
 import { MetaScope, useViewDirtyAtom } from "@/view-containers/views/scope";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
+import { resetFormDummyFieldsState } from "@/views/form/builder/utils";
+import { SaveOptions } from "@/services/client/data";
+import { useSingleClickHandler } from "@/hooks/use-button";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
+import {
+  FormWidgetProviders,
+  FormWidgetsHandler,
+} from "@/views/form/builder/form-providers";
+
 import {
   Layout,
   showErrors,
@@ -22,15 +31,8 @@ import {
   usePrepareSaveRecord,
 } from "../../form";
 import { Form, FormState, useFormHandlers } from "../../form/builder";
-import { resetFormDummyFieldsState } from "@/views/form/builder/utils";
-import { SaveOptions } from "@/services/client/data";
 
 import styles from "./details.module.scss";
-import {
-  FormWidgetProviders,
-  FormWidgetsHandler,
-} from "@/views/form/builder/form-providers";
-import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 export interface DetailsProps {
   meta: ViewData<FormView>;
@@ -172,9 +174,12 @@ export function Details({
   );
 
   const handleSave = useCallback(async () => {
+    await actionExecutor.waitFor();
     await widgetHandler.current?.commit?.();
     return doSave();
-  }, [doSave]);
+  }, [actionExecutor, doSave]);
+
+  const handleSaveClick = useSingleClickHandler(handleSave);
 
   useAsyncEffect(async () => {
     const { onLoad: _onLoad, onNew: _onNew } = view;
@@ -268,7 +273,7 @@ export function Details({
                 iconProps: {
                   icon: "save",
                 },
-                onClick: handleSave,
+                onClick: handleSaveClick as CommandItemProps['onClick'],
               },
               {
                 key: "back",

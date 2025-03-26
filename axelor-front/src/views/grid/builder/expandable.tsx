@@ -37,6 +37,7 @@ import { Form, FormState, useFormHandlers } from "@/views/form/builder";
 import { processOriginal, processSaveValues } from "@/views/form/builder/utils";
 import { useViewConfirmDirty, useViewTab } from "@/view-containers/views/scope";
 import { useGridExpandableContext, useGridContext } from "./scope";
+import { useSingleClickHandler } from "@/hooks/use-button";
 import formStyles from "@/views/form/form.module.scss";
 import styles from "./expandable.module.scss";
 
@@ -407,6 +408,20 @@ export function ExpandableFormView({
     if (record) doOnLoad(record, { fromAction: true });
   }, [record, doOnLoad]);
 
+  const handleUpdateClick = useSingleClickHandler(
+    useCallback(() => {
+      doSave({
+        shouldClose: isCollection,
+      });
+    }, [doSave, isCollection]),
+  );
+
+  const handleSaveClick = useSingleClickHandler(
+    useCallback(() => {
+      doSave();
+    }, [doSave]),
+  );
+
   useEffect(() => {
     // auto save whenever form is dirty
     if (formDirty && record && isTreeGrid) {
@@ -558,11 +573,7 @@ export function ExpandableFormView({
                     <Button
                       size="sm"
                       variant="primary"
-                      onClick={() =>
-                        doSave?.({
-                          shouldClose: isCollection,
-                        })
-                      }
+                      onClick={handleUpdateClick}
                     >
                       {i18n.get("Update")}
                     </Button>
@@ -577,9 +588,9 @@ export function ExpandableFormView({
                     <Button
                       size="sm"
                       variant="primary"
-                      onClick={() => {
+                      onClick={(e) => {
                         if (edit) {
-                          doSave?.();
+                          handleSaveClick(e);
                         } else {
                           setEdit(true);
                         }

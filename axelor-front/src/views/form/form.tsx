@@ -51,6 +51,7 @@ import {
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
+import { useSingleClickHandler } from "@/hooks/use-button";
 
 import { useDMSPopup } from "../dms/builder/hooks";
 import { ViewProps } from "../types";
@@ -1094,7 +1095,7 @@ const FormContainer = memo(function FormContainer({
   const canOpenProcess =
     session.info?.features?.studio && record.id && processInstanceId;
 
-  const handleSave = useCallback(
+  const _handleSave = useCallback(
     async (e?: SyntheticEvent) => {
       const onSaveClick = e?.type === "click";
       if (!onSaveClick) {
@@ -1110,10 +1111,12 @@ const FormContainer = memo(function FormContainer({
         elem?.click?.();
       }
       await actionExecutor.waitFor();
-      actionExecutor.wait().then(handleOnSave);
+      return actionExecutor.wait().then(handleOnSave);
     },
     [actionExecutor, handleOnSave],
   );
+
+  const handleSave = useSingleClickHandler(_handleSave);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -1251,7 +1254,7 @@ const FormContainer = memo(function FormContainer({
               iconProps: {
                 icon: "save",
               },
-              onClick: handleSave,
+              onClick: handleSave as CommandItemProps["onClick"],
               hidden: !canSave,
             },
             {
