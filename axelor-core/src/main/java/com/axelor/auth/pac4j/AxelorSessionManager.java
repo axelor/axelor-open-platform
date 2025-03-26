@@ -19,11 +19,15 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AvailableAppSettings;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionException;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
@@ -87,5 +91,26 @@ public class AxelorSessionManager extends DefaultWebSessionManager {
     }
 
     return cookie;
+  }
+
+  /**
+   * Gets session from request and response if it exists.
+   *
+   * <p>Normally, you can use {@link org.apache.shiro.subject.Subject#getSession}.
+   *
+   * <p>This is for cases where security manager is not available.
+   *
+   * @param request
+   * @param response
+   * @return session or null
+   */
+  @Nullable
+  public Session getSession(HttpServletRequest request, HttpServletResponse response) {
+    var sessionId = getSessionId(request, response);
+    try {
+      return getSession(new DefaultSessionKey(sessionId));
+    } catch (SessionException e) {
+      return null;
+    }
   }
 }

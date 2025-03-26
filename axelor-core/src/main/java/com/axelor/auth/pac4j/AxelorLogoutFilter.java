@@ -28,10 +28,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Optional;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.jee.filter.LogoutFilter;
 
@@ -64,9 +64,9 @@ public class AxelorLogoutFilter extends LogoutFilter {
       Optional.ofNullable(AuthUtils.getSubject()).ifPresent(Subject::logout);
 
       // Destroy web session.
-      final HttpSession session = ((HttpServletRequest) servletRequest).getSession(false);
+      final Session session = SecurityUtils.getSubject().getSession(false);
       if (session != null) {
-        session.invalidate();
+        session.stop();
       }
     }
   }

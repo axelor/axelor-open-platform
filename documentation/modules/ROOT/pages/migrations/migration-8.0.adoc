@@ -328,6 +328,7 @@ We have switched from servlet-container sessions to Shiro native sessions. This 
 
 Key changes to be aware of:
 
+* Migration from `HttpSession` to Shiro's native `org.apache.shiro.session.Session`: if you are using `HttpServletRequest.getSession()`, you need to update your code to use `SecurityUtils.getSubject().getSession()` instead.
 * By default, the session manager now uses in-memory Caffeine cache. This means that sessions are not persisted between application restarts.
 * `HttpSessionListener` is no longer used. Instead, you can access active sessions via `AuthSessionService.getActiveSessions()` which uses the `SessionDAO`.
 

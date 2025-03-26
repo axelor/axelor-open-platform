@@ -20,7 +20,6 @@ package com.axelor.web.socket.inject;
 
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.inject.Beans;
-import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
@@ -64,9 +63,7 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
   @Override
   public void modifyHandshake(
       ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
-    HttpSession httpSession = (HttpSession) request.getHttpSession();
     final Map<String, Object> properties = sec.getUserProperties();
-    properties.put(HttpSession.class.getName(), httpSession);
     properties.put(Subject.class.getName(), SecurityUtils.getSubject());
     properties.put(SecurityManager.class.getName(), SecurityUtils.getSecurityManager());
 

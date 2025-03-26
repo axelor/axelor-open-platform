@@ -47,8 +47,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
@@ -58,7 +56,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
@@ -85,6 +82,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.eclipse.persistence.annotations.Transformation;
 
 @RequestScoped
@@ -93,8 +92,6 @@ import org.eclipse.persistence.annotations.Transformation;
 @Path("/dms")
 @Tag(name = "DMS")
 public class DmsService {
-
-  @Context private HttpServletRequest httpRequest;
 
   @Inject private DMSFileRepository repository;
 
@@ -363,7 +360,7 @@ public class DmsService {
     data.put("batchId", batchId);
     data.put("batchName", batchName);
 
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     if (session != null) {
       session.setAttribute(batchId, ids);
     }
@@ -372,12 +369,12 @@ public class DmsService {
   }
 
   private boolean hasBatchIds(String batchIds) {
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     return session != null && ObjectUtils.notEmpty((List<?>) session.getAttribute(batchIds));
   }
 
   private List<?> findBatchIds(String batchOrId) {
-    final HttpSession session = httpRequest.getSession(false);
+    final Session session = SecurityUtils.getSubject().getSession(false);
     List<?> ids = session != null ? (List<?>) session.getAttribute(batchOrId) : null;
     if (ids == null) {
       Long id = Longs.tryParse(batchOrId);

@@ -19,9 +19,11 @@
 package com.axelor.db.tenants;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.AxelorSessionManager;
 import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -32,11 +34,11 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.shiro.session.Session;
 import org.pac4j.core.context.HttpConstants;
 
 @Singleton
@@ -51,6 +53,13 @@ public class TenantFilter implements Filter {
   private static final String PATH_CALLBACK = "/callback";
 
   private boolean enabled;
+
+  private final AxelorSessionManager sessionManager;
+
+  @Inject
+  public TenantFilter(AxelorSessionManager sessionManager) {
+    this.sessionManager = sessionManager;
+  }
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -87,10 +96,10 @@ public class TenantFilter implements Filter {
       if (AuthPac4jInfo.isWebSocket(req)) {
         res.sendError(HttpServletResponse.SC_FORBIDDEN);
       } else {
-        final HttpSession httpSession = req.getSession(false);
+        final Session session = sessionManager.getSession(req, res);
 
-        if (httpSession != null) {
-          httpSession.invalidate();
+        if (session != null) {
+          session.stop();
         }
 
         if (AuthPac4jInfo.isXHR(req)) {
@@ -132,14 +141,13 @@ public class TenantFilter implements Filter {
     final TenantInfo tenantInfo = TenantResolver.getTenantInfo(false);
     final String hostTenant = tenantInfo.getHostTenant();
 
-    final HttpSession httpSession = req.getSession(false);
+    final Session session = sessionManager.getSession(req, res);
     final Optional<String> sessionTenant =
-        Optional.ofNullable(httpSession)
-            .map(session -> (String) session.getAttribute(TENANT_ATTRIBUTE_NAME));
+        Optional.ofNullable(session).map(s -> (String) s.getAttribute(TENANT_ATTRIBUTE_NAME));
 
     if (hostTenant != null) {
-      if (httpSession != null && sessionTenant.isEmpty()) {
-        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, hostTenant);
+      if (session != null && sessionTenant.isEmpty()) {
+        session.setAttribute(TENANT_ATTRIBUTE_NAME, hostTenant);
       }
       return hostTenant;
     }
@@ -156,11 +164,11 @@ public class TenantFilter implements Filter {
       throw new BadTenantException();
     }
 
-    if (httpSession != null && tenant != null) {
+    if (session != null && tenant != null) {
       if (!tenants.containsKey(tenant)) {
         throw new BadTenantException();
       } else if ((sessionTenant.isEmpty() || isLogin)) {
-        httpSession.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
+        session.setAttribute(TENANT_ATTRIBUTE_NAME, tenant);
       }
     }
 

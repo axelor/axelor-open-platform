@@ -136,6 +136,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
 
     bindAndExpose(SessionDAO.class).to(EnterpriseCacheSessionDAO.class).in(Singleton.class);
+    bindAndExpose(AxelorSessionManager.class);
     expose(new TypeLiteral<Configuration<Object, Object>>() {}).annotatedWith(Names.named("shiro"));
     expose(new TypeLiteral<CacheManager>() {}).annotatedWith(Names.named("shiro"));
   }
