@@ -234,25 +234,27 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const handleRecordEdit = useCallback(
     (record: DataRecord) => {
       const { model, title } = view;
-      const isNew = !record.id;
-      model &&
+      if (model) {
+        const isNew = !record.id;
         showEditor({
           title: title ?? "",
           model,
           record,
+          viewName: action.views?.find((v) => v.type === "form")?.name,
           readonly: false,
-          onSelect: (record: DataRecord) => {
-            setRecords((records) => {
+          onSelect: (_record: DataRecord) => {
+            setRecords((_records) => {
               return isNew
-                ? [...records, record]
-                : records.map((r) =>
-                    r.id === record.id ? { ...r, ...record } : r,
+                ? [..._records, _record]
+                : _records.map((r) =>
+                    r.id === _record.id ? { ...r, ..._record } : r,
                   );
             });
           },
         });
+      }
     },
-    [view, showEditor],
+    [view, showEditor, action.views],
   );
 
   const handleRecordAddSubTask = useCallback(
