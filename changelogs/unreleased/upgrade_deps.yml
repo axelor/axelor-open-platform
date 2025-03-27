@@ -10,3 +10,4 @@ description: |
   - Upgrade Postgresql JDBC from 42.7.4 to 42.7.5
   - Upgrade Groovy from 3.0.23 to 3.0.24
   - Upgrade Jackson from 2.18.2 to 2.18.3
+  - Upgrade Junit5 from 5.11.3 to 5.11.4
