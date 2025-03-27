@@ -20,8 +20,8 @@ package com.axelor.meta.theme;
 
 import com.axelor.auth.db.User;
 import com.axelor.meta.db.MetaTheme;
+import jakarta.annotation.Nullable;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public interface MetaThemeService {
 
