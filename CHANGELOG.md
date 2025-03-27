@@ -1,3 +1,32 @@
+## 7.3.4 (2025-03-27)
+
+#### Feature
+
+* Improve json field processing
+
+  <details>
+  
+  Contextual fields are filtered out in advance so that json fields aren't processing every time at rendering.
+  
+  </details>
+
+#### Fix
+
+* Fix pass _model in panel-dashlet search context
+* Fix tree search on dms view
+* Fix query binder issue with integer id param
+* Fix shades of colors in the color picker of HTML widget
+* Handle templates/expressions parsing errors
+
+  <details>
+  
+  This managed templates and expressions parsing errors (mostly due to incorrect syntax) : instead of crashing the 
+  view, errors are now caught and appropriate value returned depending on context.
+  
+  </details>
+
+* Fix compute default file/folder name in dms
+
 ## 7.3.3 (2025-03-12)
 
 #### Fix
