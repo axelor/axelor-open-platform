@@ -8,3 +8,4 @@ description: |
   - Upgrade SLF4J from 2.0.16 to 2.0.17
   - Upgrade Apache Tomcat from 9.0.97 to 9.0.102
   - Upgrade Postgresql JDBC from 42.7.4 to 42.7.5
+  - Upgrade Groovy from 3.0.23 to 3.0.24
