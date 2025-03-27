@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.JpaTest;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptTest;
