@@ -28,7 +28,7 @@ import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
-import { formatRecord, transformRecord } from "./utils";
+import { formatRecord, getFieldNames, transformRecord } from "./utils";
 
 import styles from "./gantt.module.scss";
 
@@ -131,6 +131,8 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const { items } = view;
   const { domain, context } = action;
 
+  const fieldNames = useMemo(() => getFieldNames(view), [view]);
+
   const { formatter, transformer } = useMemo(
     () => ({
       formatter: (record: DataRecord) => formatRecord(view, record),
@@ -151,6 +153,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
     async (options?: SearchOptions) => {
       const { records: recs } = await dataStore.search({
         ...options,
+        fields: fieldNames,
         filter: {
           _domain: domain || undefined,
           _domainContext: context,
@@ -158,7 +161,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
       });
       setRecords(recs);
     },
-    [dataStore, domain, context],
+    [dataStore, fieldNames, domain, context],
   );
 
   const updateRecord = useCallback(

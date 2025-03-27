@@ -1,0 +1,6 @@
+---
+title: Fix support dotted fields to gantt view
+type: fix
+description: |
+  It should be possible to render nested fields like <field name="user.code" /> in gantt view.
+  Also that dotted field should be allow to use as taskSequence.

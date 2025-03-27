@@ -1,4 +1,6 @@
 import { GanttData, GanttRecord } from "@axelor/ui/gantt";
+import uniq from "lodash/uniq";
+
 import { GanttView } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
 import { getRandomColor } from "../calendar/colors";
@@ -12,6 +14,7 @@ const defaultValues: Record<string, any> = {
 };
 
 const transformKeys: Record<string, string> = {
+  taskUser: "taskUser",
   taskParent: "parent",
   taskStart: "startDate",
   taskEnd: "endDate",
@@ -23,6 +26,15 @@ const transformKeys: Record<string, string> = {
   finishToStart: "finishToStart",
   finishToFinish: "finishToFinish",
 };
+
+export function getFieldNames(view: GanttView) {
+  return uniq(
+    Object.keys(transformKeys)
+      .map((k) => view[k as keyof GanttView])
+      .concat((view.items ?? []).map((item) => item.name))
+      .filter(Boolean),
+  ) as string[];
+}
 
 /**
  * Format the given record into a gantt record
