@@ -19,7 +19,7 @@ versions.ldaptive = "2.3.2"
 versions.junit4 = "4.13.2"
 versions.junit5 = "5.11.3"
 
-versions.slf4j = "2.0.16"
+versions.slf4j = "2.0.17"
 
 versions.tomcat = "9.0.97"
 versions.tomcat_embed = "${versions.tomcat}"
