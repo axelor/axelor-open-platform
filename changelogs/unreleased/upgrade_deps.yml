@@ -1,0 +1,7 @@
+---
+title: Upgrade backend dependencies
+type: feature
+description: |
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Logback from 1.3.14 to 1.3.15
