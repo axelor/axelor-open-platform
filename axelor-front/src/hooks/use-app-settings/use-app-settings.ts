@@ -7,7 +7,7 @@ import { useSession } from "../use-session";
 
 export const APPLICATION_NAME = "Axelor";
 const DESCRIPTION = "Axelor Enterprise Application";
-export const COPYRIGHT = `© 2005–${new Date().getFullYear()} Axelor. ${i18n.get(
+export const COPYRIGHT = `© ${new Date().getFullYear()} Axelor. ${i18n.get(
   "All Rights Reserved",
 )}.`;
 
