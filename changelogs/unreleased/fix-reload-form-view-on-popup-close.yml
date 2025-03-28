@@ -1,0 +1,6 @@
+---
+title: Fix reload form view on popup close
+type: fix
+description: |
+  When popup is opened from another popup with popup=reload then it should reload the tab view 
+  instead of reload closed popup view.

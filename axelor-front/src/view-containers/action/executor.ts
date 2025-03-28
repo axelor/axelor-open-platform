@@ -456,7 +456,7 @@ export class DefaultActionExecutor implements ActionExecutor {
       ...view,
     };
 
-    if (this.#handler.refresh && tab.params?.popup) {
+    if (this.#handler.refresh && tab.params?.popup && getActivePopups().length === 0) {
       tab.params = {
         ...tab.params,
         __onPopupReload: () => this.#handler.refresh(),
