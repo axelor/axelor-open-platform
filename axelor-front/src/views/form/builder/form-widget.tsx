@@ -148,6 +148,7 @@ export function FormWidget(props: FormWidgetProps) {
     return (
       <FieldEditor
         {...editorProps}
+        readonly={readonly}
         widgetAtom={widgetAtom}
         valueAtom={valueAtom}
       />
