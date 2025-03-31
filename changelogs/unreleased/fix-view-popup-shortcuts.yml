@@ -1,0 +1,5 @@
+---
+title: Fix view shortcuts scoping
+type: fix
+description: |
+  The last popup view should be used as the target view tab.
