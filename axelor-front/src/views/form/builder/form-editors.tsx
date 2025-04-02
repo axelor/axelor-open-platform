@@ -563,7 +563,14 @@ function useItemsFamily({
         if (items.length === 1 && isInitial(items[0]) && isClean(items[0])) {
           return;
         }
-        const next = multiple ? items : (items[0] ?? null);
+        const cleanInitial = (val: DataRecord | null) =>
+          isInitial(val) ? { ...val, [IS_INITIAL]: false } : val;
+
+        // once updated, it should clean up IS_INITIAL
+        const next = multiple
+          ? items?.map(cleanInitial)
+          : (cleanInitial(items[0]) ?? null);
+
         set(valueAtom, next, fireOnChange, markDirty);
         setInitialItem(undefined);
       },

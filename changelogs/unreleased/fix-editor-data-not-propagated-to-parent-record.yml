@@ -1,0 +1,7 @@
+---
+title: Fix editor data not propagated to parent record.
+type: fix
+description: |
+  As soon as clearing values on an editor item that is shown by default on records,
+  the changes aren't propagated to the parent record. So the parent don't see the user changes
+  and used wrong previous data that the one displaying in the editor.
