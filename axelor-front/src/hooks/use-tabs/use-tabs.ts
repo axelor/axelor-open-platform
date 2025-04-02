@@ -345,11 +345,12 @@ export async function initTab(
       : await findActionView(actionName);
 
   if (actionView) {
-    const { name: id, title, context } = actionView;
+    const { name: id, title, context, views = [] } = actionView;
 
     const defaultType = getDefaultViewType(actionView);
     const type = getViewType(options?.type ?? defaultType);
-    const route = context?._showRecord
+    
+    const route = context?._showRecord && views.some(v => v.type === 'form')
       ? {
           ...initRoute,
           mode: "edit",
