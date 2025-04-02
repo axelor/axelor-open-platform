@@ -37,6 +37,7 @@ import {
 } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 import { createWidgetAtom } from "../../builder/atoms";
+import { processContextValues } from "../../builder/utils";
 import classes from "./dashlet.module.scss";
 
 interface DashletProps {
@@ -131,7 +132,7 @@ export function DashletComponent({
           ...(dashboard
             ? ctx
             : {
-                ...viewContext,
+                ...processContextValues(viewContext ?? {}),
                 ...actionView.context,
                 _id: _id || viewContext?._id,
                 _showRecord,

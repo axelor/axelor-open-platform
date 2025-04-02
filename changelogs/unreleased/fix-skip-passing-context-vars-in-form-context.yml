@@ -1,0 +1,5 @@
+---
+title: Fix skip special context variables in form context
+type: fix
+description: |
+  Special variables like _showSingle, _showRecord should not be forwared to form contexts.

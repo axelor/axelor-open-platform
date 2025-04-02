@@ -66,7 +66,11 @@ import { Dms } from "../dms";
 import { fetchRecord } from "../form";
 import { createFormAtom } from "../form/builder/atoms";
 import { useActionExecutor, useAfterActions } from "../form/builder/scope";
-import { createContextParams, nextId } from "../form/builder/utils";
+import {
+  createContextParams,
+  nextId,
+  processContextValues,
+} from "../form/builder/utils";
 import { HelpComponent } from "../form/widgets";
 import { ViewProps } from "../types";
 import { Grid as GridComponent, GridHandler } from "./builder";
@@ -164,6 +168,11 @@ function GridInner(props: ViewProps<GridView>) {
   const switchTo = useViewSwitch();
   const { isMobile } = useDevice();
   const { data: sessionData } = useSession();
+
+  const viewContext = useMemo(
+    () => processContextValues(action.context ?? {}),
+    [action.context],
+  );
 
   const gridSearchAtom = useMemo(
     () =>
@@ -355,7 +364,7 @@ function GridInner(props: ViewProps<GridView>) {
         setMassUpdatePopperEl(null);
 
         let _domain = action.domain;
-        let _context = { _model: model, ...action.context } as any;
+        let _context = { _model: model, ...viewContext } as any;
         if (!hasAll) {
           if (_domain) {
             _domain = _domain + " AND self.id IN (:__ids__)";
@@ -394,7 +403,7 @@ function GridInner(props: ViewProps<GridView>) {
       view,
       rows,
       action.domain,
-      action.context,
+      viewContext,
       getSearchOptions,
       onSearch,
     ],
@@ -462,7 +471,11 @@ function GridInner(props: ViewProps<GridView>) {
           const actionView = await findActionView(_domainAction, formContext, {
             silent: true,
           });
-          viewContext = { ...actionView.context };
+          const { context = {} } = actionView;
+          viewContext = {
+            ...processContextValues(context),
+            __check_version: context["__check_version"],
+          };
         }
 
         const forceEdit = action.params?.["forceEdit"];
@@ -1361,7 +1374,7 @@ function GridInner(props: ViewProps<GridView>) {
               ref={gridRef}
               records={records}
               view={view}
-              viewContext={action.context}
+              viewContext={viewContext}
               fields={fields}
               perms={perms}
               state={state}

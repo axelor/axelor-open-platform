@@ -2,6 +2,7 @@ import isUndefined from "lodash/isUndefined";
 import pick from "lodash/pick";
 import uniq from "lodash/uniq";
 import uniqueId from "lodash/uniqueId";
+import omit from "lodash/omit";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import {
@@ -194,6 +195,7 @@ export function processContextValues(
     "_dirty",
     "_fetched",
     "_showRecord",
+    "__check_version",
     "_showSingle",
   ];
 
@@ -581,8 +583,11 @@ export function createContextParams(
     const _view = _views?.find((x) => x.type === _viewType);
     const _viewName = _view ? (_view.name ?? name) : name;
 
+      // ignore special context names
+    const IGNORE = ["_showRecord", "_showSingle", "__check_version"];
+
     return {
-      ...context,
+      ...omit(context ?? {}, IGNORE),
       _model: model,
       _viewName,
       _viewType,
