@@ -30,6 +30,7 @@ import { i18n } from "@/services/client/i18n";
 import { GridView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { sanitize } from "@/utils/sanitize.ts";
+import { isNumber } from "@/utils/types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -135,24 +136,53 @@ export function Dms(props: ViewProps<GridView>) {
   const uploader = useMemo(() => new Uploader(), []);
   const { relatedId, relatedModel } = popupRecord || {};
 
-  const getSelectedNode = useCallback(
-    () => treeRecords.find((r) => r.id === selected),
-    [treeRecords, selected],
-  );
+  /**
+   * Return the first selected node in the DMSTree
+   * @returns {DataRecord|null} - record if found, otherwise `null`.
+   */
+  const getSelectedNode = useCallback(() => {
+    const selectedTreeNode = treeRecords.find((r) => r.id === selected);
+    return selectedTreeNode ? (selectedTreeNode as DataRecord) : null;
+  }, [treeRecords, selected]);
 
+  /**
+   * Get the first selected dms record in dms grid list
+   * @returns {DataRecord|null} - record if found, otherwise `null`.
+   */
   const getSelectedDocument = useCallback(() => {
-    const _selected = selectedRows?.[0];
-    return rows[_selected ?? -1]?.record;
+    const selectedDocument = rows[selectedRows?.[0] ?? -1]?.record;
+    return selectedDocument ? (selectedDocument as DataRecord) : null;
   }, [rows, selectedRows]);
 
+  /**
+   * Get the selected dms records in dms grid list
+   * @returns {DataRecord[]|null} - records if found, otherwise `null`.
+   */
   const getSelectedDocuments = useCallback(() => {
-    const records = selectedRows?.map?.((ind) => rows[ind]?.record);
-    return records?.length ? records : null;
+    const records = selectedRows
+      ?.map?.((ind) => rows[ind]?.record)
+      ?.filter(Boolean);
+    return records?.length ? (records as DataRecord[]) : null;
   }, [rows, selectedRows]);
 
-  const getSelected = useCallback(() => {
+  /**
+   * Get the first selected dms record either in the dms grid list or the selected node in the DMSTree
+   * @returns {DataRecord|null} - record if found, otherwise `null`.
+   */
+  const getFirstSelected = useCallback(() => {
     return getSelectedDocument() || getSelectedNode();
   }, [getSelectedDocument, getSelectedNode]);
+
+  /**
+   * Get the selected dms record either in the dms grid list or the selected node in the DMSTree
+   * @returns {DataRecord[]|null} - records if found, otherwise `null`.
+   */
+  const getSelected = useCallback(() => {
+    const docs = getSelectedDocuments();
+    const node = getSelectedNode();
+    if (!docs && !node) return null;
+    return docs! || [node!];
+  }, [getSelectedDocuments, getSelectedNode]);
 
   const supportsSpreadsheet = session?.features?.dmsSpreadsheet;
 
@@ -217,8 +247,12 @@ export function Dms(props: ViewProps<GridView>) {
         ? [
             `self.id != ${popupRecord.id}`,
             `self.parent.id = ${popupRecord.id}`,
-            ...(popupRecord.relatedModel && [`self.relatedModel = '${popupRecord.relatedModel}'`]),
-            ...(popupRecord.relatedId && [`self.relatedId = '${popupRecord.relatedId}'`]),
+            ...(popupRecord.relatedModel && [
+              `self.relatedModel = '${popupRecord.relatedModel}'`,
+            ]),
+            ...(popupRecord.relatedId && [
+              `self.relatedId = '${popupRecord.relatedId}'`,
+            ]),
           ]
         : ["self.parent is NULL"]),
     ];
@@ -425,9 +459,7 @@ export function Dms(props: ViewProps<GridView>) {
   }, [onNew, openDMSFile]);
 
   const onDocumentRename = useCallback(async () => {
-    const doc = getSelectedDocument();
-    const node = getSelectedNode();
-    const record = doc || node;
+    const record = getFirstSelected();
 
     if (!record) return;
 
@@ -452,7 +484,7 @@ export function Dms(props: ViewProps<GridView>) {
         );
       }
     }
-  }, [getSelectedNode, getSelectedDocument, dataStore]);
+  }, [getFirstSelected, dataStore]);
 
   const onDocumentSave = useCallback(
     (record: TreeRecord) => dataStore.save(record),
@@ -460,8 +492,10 @@ export function Dms(props: ViewProps<GridView>) {
   );
 
   const onDocumentDownload = useCallback(async () => {
-    const record = getSelected();
-    if (record) downloadAsBatch(record);
+    const records = getSelected();
+    if (!records) return;
+
+    downloadAsBatch(records.map((_rec) => _rec.id!));
   }, [getSelected]);
 
   const onDocumentPermissions = useCallback(() => {
@@ -488,13 +522,8 @@ export function Dms(props: ViewProps<GridView>) {
   }, [navigate, getSelectedDocument]);
 
   const onDocumentDelete = useCallback(async () => {
-    const docs = getSelectedDocuments();
-    const node = getSelectedNode();
-
-    if (!docs && !node) return;
-
-    const records = docs || [node];
-    const [record] = records;
+    const records = getSelected();
+    if (!records) return;
 
     const confirmed = await dialogs.confirm({
       content:
@@ -508,7 +537,7 @@ export function Dms(props: ViewProps<GridView>) {
             dangerouslySetInnerHTML={{
               __html: i18n.get(
                 "Are you sure you want to delete {0}?",
-                toStrongText(sanitize(record.fileName)),
+                toStrongText(sanitize(records[0].fileName)),
               ),
             }}
           />
@@ -516,7 +545,9 @@ export function Dms(props: ViewProps<GridView>) {
     });
 
     if (confirmed) {
-      const result = await dataStore.delete(records);
+      const result = await dataStore.delete(
+        records.map((_rec) => ({ id: _rec.id!, version: _rec.version! })),
+      );
       if (result) {
         const dirIds = records.filter((r) => r.isDirectory).map((r) => r.id);
 
@@ -533,7 +564,7 @@ export function Dms(props: ViewProps<GridView>) {
         );
       }
     }
-  }, [getSelectedDocuments, getSelectedNode, root, dataStore]);
+  }, [getSelected, dataStore, root.id]);
 
   const handleUpload = useCallback(
     async (files: FileList | null) => {
@@ -660,7 +691,7 @@ export function Dms(props: ViewProps<GridView>) {
       if (col?.name === "typeIcon" && record.isDirectory) {
         handleDocumentOpen(e, row);
       } else if (col?.name === "downloadIcon") {
-        if (row?.record) downloadAsBatch(row.record);
+        if (row?.record) downloadAsBatch([row.record.id]);
       } else if (col?.name === "detailsIcon") {
         setDetailsPopup(true);
         setDetailsId(record.id);
