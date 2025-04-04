@@ -278,28 +278,58 @@ libs.commons_csv = [
 ]
 
 // BIRT Runtime
+
+def birt_module = { name ->
+  dependencies.create("org.eclipse.birt:${name}:4.20.0") {
+    exclude module: "jetty-servlet-api"
+    exclude module: "xml-apis"
+  }
+}
+
 libs.birt_runtime = [
-  dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
-    exclude module: "derby"
-    exclude module: "org.eclipse.datatools.connectivity.apache.derby"
-    exclude module: "org.eclipse.datatools.connectivity.apache.derby.dbdefinition"
-    exclude module: "org.apache.batik.pdf" // causing issue with commons-io
-    exclude module: "commons-cli"
-    exclude module: "xml-apis"
-    exclude module: "javax.xml.stream"
-    exclude module: "org.w3c.dom.smil"
-    exclude module: "org.apache.xerces"
-    exclude module: "xmlbeans"
-    exclude module: "flute"
-    exclude module: "org.apache.commons.codec"
-    exclude module: "com.ibm.icu"
-  },
-  // overrides
-  dependencies.create("xerces:xercesImpl:2.12.2") {
-    exclude module: "xml-apis"
-  },
-  "milyn:flute:1.3",
-  "org.apache.xmlbeans:xmlbeans:3.1.0"
+  birt_module("org.eclipse.birt.chart.device.extension"),
+  birt_module("org.eclipse.birt.chart.device.pdf"),
+  birt_module("org.eclipse.birt.chart.device.svg"),
+  birt_module("org.eclipse.birt.chart.engine.extension"),
+  birt_module("org.eclipse.birt.chart.engine"),
+  birt_module("org.eclipse.birt.chart.reportitem"),
+  birt_module("org.eclipse.birt.core.script.function"),
+  birt_module("org.eclipse.birt.data.oda.pojo"),
+  birt_module("org.eclipse.birt.report.data.oda.excel"),
+  birt_module("org.eclipse.birt.report.data.oda.hive"),
+  birt_module("org.eclipse.birt.report.data.oda.jdbc.dbprofile"),
+  birt_module("org.eclipse.birt.report.data.oda.jdbc"),
+  birt_module("org.eclipse.birt.report.data.oda.xml"),
+  birt_module("org.eclipse.birt.report.engine.dataextraction.csv"),
+  birt_module("org.eclipse.birt.report.engine.dataextraction"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.docx"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.excel"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.html"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.odp"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.ods"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.odt"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.pdf"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.postscript"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.ppt"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.pptx"),
+  birt_module("org.eclipse.birt.report.engine.emitter.config.wpml"),
+  birt_module("org.eclipse.birt.report.engine.emitter.docx"),
+  birt_module("org.eclipse.birt.report.engine.emitter.html"),
+  birt_module("org.eclipse.birt.report.engine.emitter.odp"),
+  birt_module("org.eclipse.birt.report.engine.emitter.ods"),
+  birt_module("org.eclipse.birt.report.engine.emitter.odt"),
+  birt_module("org.eclipse.birt.report.engine.emitter.pdf"),
+  birt_module("org.eclipse.birt.report.engine.emitter.postscript"),
+  birt_module("org.eclipse.birt.report.engine.emitter.ppt"),
+  birt_module("org.eclipse.birt.report.engine.emitter.pptx"),
+  birt_module("org.eclipse.birt.report.engine.emitter.prototype.excel"),
+  birt_module("org.eclipse.birt.report.engine.emitter.wpml"),
+  birt_module("org.eclipse.birt.report.engine.fonts"),
+  birt_module("org.eclipse.birt.report.engine.script.javascript"),
+  birt_module("org.eclipse.birt.report.engine"),
+  birt_module("org.eclipse.birt.report.item.crosstab.core"),
+  birt_module("org.eclipse.birt.report.model.adapter.oda"),
+  birt_module("uk.co.spudsoft.birt.emitters.excel"),
 ]
 
 // Quartz Scheduler

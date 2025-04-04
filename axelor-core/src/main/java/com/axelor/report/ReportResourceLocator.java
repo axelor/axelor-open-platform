@@ -32,21 +32,16 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.eclipse.birt.report.model.api.ModuleHandle;
-import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * This is a {@link ResourceLocator} that first searches external reports directory for the
- * resources and fallbacks to module resources if not found.
+ * This is a {@link IResourceLocator} that first searches external reports directory for the
+ * resources and falls back to module resources if not found.
  */
 public class ReportResourceLocator implements IResourceLocator {
 
   public static final String DEFAULT_REPORT_DIR = "{user.home}/axelor/reports";
 
   private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
-
-  private static final Logger log = LoggerFactory.getLogger(ReportResourceLocator.class);
 
   private Path searchPath;
 

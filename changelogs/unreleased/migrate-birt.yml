@@ -1,0 +1,14 @@
+---
+title: Upgrade BIRT from 4.4.2 to 4.20.0
+type: change
+description: |
+  Many of your reports will likely have rendering changes or may even be broken due to numerous emitter improvements/changes in BIRT.
+
+  `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but enabled by default.
+
+  BIRT has transitive dependency to Apache POI, upgraded from 3.9 to 5.4.0, that includes **breaking** changes:
+  https://poi.apache.org/changes.html
+
+  Also, the XML parser in BIRT has become more strict. Most notably, in your `fontsConfig.xml`,
+  you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
+  Otherwise, your font configuration file will fail validation and will be ignored.

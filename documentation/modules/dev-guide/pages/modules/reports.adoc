@@ -110,13 +110,10 @@ public class PrintService {
 
     @Inject private ReportGenerator generator;
 
-    public void print(String design, Map<String, Object> params) throws IOException {
+    public void print(String design, String format, Map<String, Object> params) throws IOException, BirtException {
 
-        OutputStream output = new FileOutputStream(...);
-        try {
-            generator.generate(output, design, params, Locale.getDefault());
-        } finally {
-            output.close();
+        try (OutputStream output = new FileOutputStream(...)) {
+            generator.generate(output, design, format, params, Locale.getDefault());
         }
     }
 }
