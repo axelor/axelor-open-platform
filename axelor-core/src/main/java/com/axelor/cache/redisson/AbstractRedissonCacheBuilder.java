@@ -79,7 +79,7 @@ public abstract class AbstractRedissonCacheBuilder<
   protected abstract ConfigurableRedissonCache<K, V> newRedissonCache(M cache);
 
   protected RedissonClient getRedissonClient() {
-    return RedissonClientProvider.getInstance().get(getCacheProviderInfo());
+    return RedissonClientProvider.getInstance().get();
   }
 
   private M newMapCache() {

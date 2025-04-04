@@ -19,8 +19,8 @@
 package com.axelor.cache.redisson;
 
 import com.axelor.app.settings.BeanConfigurator;
+import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheProviderInfo;
-import com.axelor.cache.redisson.RedissonUtils.Version;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.event.Observes;
@@ -33,7 +33,6 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,11 +70,22 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     return Beans.get(RedissonClientProvider.class);
   }
 
+  /**
+   * Gets default Redisson client.
+   *
+   * @return redisson client
+   */
   @Override
   public RedissonClient get() {
-    return get(Collections.emptyMap(), "");
+    return get(CacheBuilder.getCacheProviderInfo());
   }
 
+  /**
+   * Gets Redisson client given the `CacheProviderInfo`
+   *
+   * @param info
+   * @return redisson client
+   */
   public RedissonClient get(CacheProviderInfo info) {
     return get(info.getConfig(), info.getConfigPrefix());
   }
@@ -131,21 +141,11 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
         .addArgument(
             () -> "Redisson" + (StringUtils.notBlank(configSource) ? ":" + configSource : ""))
         .addArgument(
-            () -> {
-              String name;
-              Version version;
-              var valkeyVersion = redissonUtils.getValkeyVersion(redisson);
-
-              if (valkeyVersion.isPresent()) {
-                name = "Valkey";
-                version = valkeyVersion.get();
-              } else {
-                name = "Redis";
-                version = redissonUtils.getRedisVersion(redisson);
-              }
-
-              return String.format("%s %s", name, version);
-            })
+            () ->
+                redissonUtils
+                    .getValkeyVersion(redisson)
+                    .map(version -> "Valkey " + version)
+                    .orElseGet(() -> "Redis " + redissonUtils.getRedisVersion(redisson)))
         .addArgument(
             () ->
                 redissonUtils.getRedisAddresses(redisson).stream()

@@ -27,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.event.RemovalCause;
+import com.axelor.cache.redisson.RedissonClientProvider;
+import com.axelor.cache.redisson.RedissonUtils;
+import com.axelor.cache.redisson.Version;
 import com.axelor.test.GuiceJunit5Test;
 import com.axelor.test.GuiceModules;
 import java.time.Duration;
@@ -43,25 +46,41 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @GuiceModules({AbstractBaseCache.CacheTestModule.class})
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class CacheBuilderTest extends GuiceJunit5Test {
 
-  // Enable this to test redisson-native with expireAfterWrite
-  // Currently only supported by Redis 7.4+
-  private static final boolean HAS_REDIS_HPEXPIRE = false;
-
   private static final Duration TTL = Duration.ofMillis(500);
+
+  private static boolean hasRedisHPExpire;
+
+  private static final Logger log = LoggerFactory.getLogger(CacheBuilderTest.class);
 
   @BeforeAll
   static void setUp() {
     RedisTest.startRedis();
+    init();
   }
 
   @AfterAll
   static void tearDown() {
     RedisTest.stopRedis();
+  }
+
+  private static void init() {
+    // HPEXPIRE command is supported in Redis 7.4+
+    var redisson = RedissonClientProvider.getInstance().get();
+    var redisVersion = RedissonUtils.getInstance().getRedisVersion(redisson);
+    var minRedisVersion = Version.of(7, 4);
+    hasRedisHPExpire = redisVersion.compareTo(minRedisVersion) >= 0;
+
+    if (!hasRedisHPExpire) {
+      log.warn(
+          "{} tests that require HPEXPIRE support will be skipped.", CacheType.REDISSON_NATIVE);
+    }
   }
 
   @ParameterizedTest(name = "{0} - Basic Cache Operations")
@@ -81,7 +100,7 @@ class CacheBuilderTest extends GuiceJunit5Test {
   @EnumSource(value = CacheType.class)
   void testExpireAfterWriteOperations(CacheType cacheType) {
     assumeTrue(
-        HAS_REDIS_HPEXPIRE || cacheType != CacheType.REDISSON_NATIVE,
+        hasRedisHPExpire || cacheType != CacheType.REDISSON_NATIVE,
         "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
     doExpireAfterWrite(cacheType::getCacheBuilder);
   }

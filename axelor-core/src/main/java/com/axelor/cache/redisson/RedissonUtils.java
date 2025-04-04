@@ -92,8 +92,7 @@ public class RedissonUtils {
    * @return the version of the Redis server
    */
   public Version getRedisVersion(RedissonClient redisson) {
-    return getVersion(redisson, "redis_version")
-        .orElseThrow(() -> new IllegalStateException("Redis version not found"));
+    return getVersion(redisson, "redis_version").orElse(Version.UNKNOWN);
   }
 
   /**
@@ -102,7 +101,7 @@ public class RedissonUtils {
    * <p>If the Redisson client is configured to a cluster, this returns the minimum version of all
    * the Valkey servers.
    *
-   * <p>This returns an optional version that is empty if server is not Valkey
+   * <p>This relies on valkey_version server info that is present on Valkey only.
    *
    * @param redisson
    * @return the optional version of the Valkey server
@@ -169,28 +168,5 @@ public class RedissonUtils {
         .reduce(
             (version, otherVersion) ->
                 version.compareTo(otherVersion) <= 0 ? version : otherVersion);
-  }
-
-  public static record Version(int major, int minor, int patch) {
-
-    public static Version parse(String version) {
-      var parts = version.split("\\.");
-      return new Version(
-          Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-    }
-
-    public int compareTo(Version other) {
-      if (major != other.major) {
-        return major - other.major;
-      }
-      if (minor != other.minor) {
-        return minor - other.minor;
-      }
-      return patch - other.patch;
-    }
-
-    public String toString() {
-      return major + "." + minor + "." + patch;
-    }
   }
 }
