@@ -25,7 +25,7 @@ import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import format from "@/utils/format";
 import { compare } from "@/utils/sort";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
+import { useViewContext, useViewTab, useViewTabRefresh } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import { formatRecord, getFieldNames, transformRecord } from "./utils";
@@ -126,6 +126,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
   const [records, setRecords] = useState<DataRecord[]>([]);
   const { action, dashlet } = useViewTab();
   const showEditor = useManyEditor(action, dashlet);
+  const getViewContext = useViewContext();
 
   const { fields, view } = meta;
   const { items } = view;
@@ -248,6 +249,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
           record,
           viewName: action.views?.find((v) => v.type === "form")?.name,
           readonly: false,
+          context: getViewContext(true),
           onSelect: (_record: DataRecord) => {
             setRecords((_records) => {
               return isNew
@@ -260,7 +262,7 @@ export function Gantt({ dataStore, meta }: ViewProps<GanttView>) {
         });
       }
     },
-    [view, showEditor, action.views],
+    [view, showEditor, getViewContext, action.views],
   );
 
   const handleRecordAddSubTask = useCallback(

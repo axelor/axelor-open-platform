@@ -1,0 +1,6 @@
+---
+title: Fix pass action context to data view popup editor
+type: fix
+description: |
+  When popup editor is used directly on data views like grid, kanban, cards,
+  calendar, gantt, dms etc then it should pass action context to popup editor.

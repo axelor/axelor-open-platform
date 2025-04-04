@@ -367,23 +367,27 @@ export function Kanban(props: ViewProps<KanbanView>) {
     ) => {
       const viewName = action.views?.find((v) => v.type === "form")?.name;
       const { title, model } = view;
-      model &&
+      if (model) {
         showEditor({
           title: title ?? "",
           model,
           viewName,
+          context: getContext(),
           record: record as DataRecord,
           readonly,
           onSearch: () => onRefresh(),
         });
+      }
     },
-    [showEditor, view, action, onRefresh],
+    [showEditor, view, action, getContext, onRefresh],
   );
 
   const onNew = useCallback(() => {
-    hasAddPopup
-      ? onEditInPopup({ record: {} as KanbanRecord })
-      : onEdit({ record: {} as KanbanRecord });
+    if (hasAddPopup) {
+      onEditInPopup({ record: {} as KanbanRecord });
+    } else {
+      onEdit({ record: {} as KanbanRecord });
+    }
   }, [hasAddPopup, onEdit, onEditInPopup]);
 
   const onCreate = useCallback(

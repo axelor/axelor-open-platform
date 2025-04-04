@@ -192,26 +192,36 @@ export function Cards(props: ViewProps<CardsView>) {
     (record: DataRecord, readonly = false) => {
       const viewName = action.views?.find((v) => v.type === "form")?.name;
       const { title, model } = view;
-      model &&
+      if (model) {
         showEditor({
           title: title ?? "",
           model,
           viewName,
+          context: getViewContext(true),
           record,
           readonly,
           onSearch: () => onSearch({}),
         });
+      }
     },
-    [showEditor, view, action, onSearch],
+    [showEditor, view, action, getViewContext, onSearch],
   );
 
   const onNew = useCallback(() => {
-    hasAddPopup ? onEditInPopup({}) : onEdit({});
+    if (hasAddPopup) {
+      onEditInPopup({});
+    } else {
+      onEdit({});
+    }
   }, [hasAddPopup, onEdit, onEditInPopup]);
 
   const onView = useCallback(
     (record: DataRecord) => {
-      hasEditPopup ? onEditInPopup(record, true) : onEdit(record, true);
+      if (hasEditPopup) {
+        onEditInPopup(record, true);
+      } else {
+        onEdit(record, true);
+      }
     },
     [hasEditPopup, onEdit, onEditInPopup],
   );
@@ -236,9 +246,10 @@ export function Cards(props: ViewProps<CardsView>) {
         actionExecutor,
         view,
         onRefresh,
-        ...(canNew && canEdit && {
-          onAdd: () => onEditInPopup({}),
-        }),
+        ...(canNew &&
+          canEdit && {
+            onAdd: () => onEditInPopup({}),
+          }),
       });
     }
   }, [

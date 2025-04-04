@@ -465,14 +465,15 @@ function GridInner(props: ViewProps<GridView>) {
   const onEdit = useCallback(
     async (record: DataRecord, readonly = false) => {
       if (dashlet || hasEditInMobile) {
-        let viewContext = {};
+        let editorContext = getViewContext(true);
         if (dashlet) {
           const { _domainAction, ...formContext } = getViewContext() ?? {};
           const actionView = await findActionView(_domainAction, formContext, {
             silent: true,
           });
           const { context = {} } = actionView;
-          viewContext = {
+          editorContext = {
+            ...editorContext,
             ...processContextValues(context),
             __check_version: context["__check_version"],
           };
@@ -480,9 +481,9 @@ function GridInner(props: ViewProps<GridView>) {
 
         const forceEdit = action.params?.["forceEdit"];
         if (hasPopup || hasEditInMobile || viewProps?.readonly === true) {
-          return onEditInPopup(record, viewContext, readonly);
+          return onEditInPopup(record, editorContext, readonly);
         }
-        return onEditInTab(record, viewContext, forceEdit ? false : readonly);
+        return onEditInTab(record, editorContext, forceEdit ? false : readonly);
       }
       const recordId = record.id || 0;
       const id = recordId > 0 ? String(recordId) : "";

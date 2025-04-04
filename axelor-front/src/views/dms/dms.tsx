@@ -36,6 +36,7 @@ import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewAction,
+  useViewContext,
   useViewTab,
   useViewTabRefresh,
 } from "@/view-containers/views/scope";
@@ -105,6 +106,7 @@ export function Dms(props: ViewProps<GridView>) {
   const popupHandler = usePopupHandlerAtom();
   const setPopupHandlers = useSetAtom(popupHandler);
 
+  const getViewContext = useViewContext();
   const viewAction = useViewAction();
 
   const popupRecord = action.params?.["_popup-record"];
@@ -507,12 +509,13 @@ export function Dms(props: ViewProps<GridView>) {
         model: view.model!,
         viewName: "dms-file-permission-form",
         record: doc,
+        context: getViewContext(true),
         canAttach: false,
         readonly: false,
         onSelect: () => {},
       });
     }
-  }, [view, showEditor, getSelectedDocument]);
+  }, [view, showEditor, getViewContext, getSelectedDocument]);
 
   const onDocumentAttachedTo = useCallback(() => {
     const doc = getSelectedDocument();
