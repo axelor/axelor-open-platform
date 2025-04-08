@@ -1,0 +1,6 @@
+---
+title: Fix parsing logo/icon path content
+type: fix
+description: |
+  Context app logo/icon methods can return an absolute url (ie a string). This fix 
+  parsing the url if it contains query params (merge with the default app base url).

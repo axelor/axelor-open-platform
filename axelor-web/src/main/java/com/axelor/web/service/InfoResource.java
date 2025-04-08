@@ -148,9 +148,7 @@ public class InfoResource {
         URI uri = new URI(path);
         if (!uri.isAbsolute()) {
           uri =
-              UriBuilder.from(AppSettings.get().getBaseURL())
-                  .addPath(path.startsWith("/") ? path : "/" + path)
-                  .toUri();
+              UriBuilder.from(AppSettings.get().getBaseURL()).merge(UriBuilder.from(path)).toUri();
         }
 
         return Response.seeOther(uri).build();
