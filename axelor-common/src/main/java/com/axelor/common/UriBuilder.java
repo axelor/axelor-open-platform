@@ -141,6 +141,21 @@ public class UriBuilder {
   }
 
   /**
+   * Create a deep copy of the given {@code UriBuilder} instance
+   *
+   * @param other the {@code UriBuilder} instance to copy from
+   */
+  public UriBuilder(UriBuilder other) {
+    this.scheme = other.scheme;
+    this.userInfo = other.userInfo;
+    this.host = other.host;
+    this.port = other.port;
+    this.pathBuilder = other.pathBuilder.cloneBuilder();
+    this.queryParams.putAll(other.queryParams);
+    this.fragment = other.fragment;
+  }
+
+  /**
    * Create builder from the given uri
    *
    * @param uri the uri
@@ -170,6 +185,46 @@ public class UriBuilder {
     builder.setFragment(fragment);
 
     return builder;
+  }
+
+  /**
+   * Merges the attributes of the given {@code UriBuilder} instance into the current {@code
+   * UriBuilder} instance. This method updates the current {@code UriBuilder} instance with the
+   * non-null and non-default values from the given UriBuilder instance.
+   *
+   * @param other the {@code UriBuilder} instance to copy from
+   * @return this {@code UriBuilder}
+   */
+  public UriBuilder merge(UriBuilder other) {
+    if (other.scheme != null) {
+      this.setScheme(other.scheme);
+    }
+    if (other.userInfo != null) {
+      this.setUserInfo(other.userInfo);
+    }
+    if (other.host != null) {
+      this.setHost(other.host);
+    }
+    if (other.getPort() != -1) {
+      this.setPort(other.port);
+    }
+    this.addPath(other.pathBuilder.getPath());
+    if (!other.queryParams.isEmpty()) {
+      this.addQueryParams(other.queryParams);
+    }
+    if (other.fragment != null) {
+      this.setFragment(other.fragment);
+    }
+    return this;
+  }
+
+  /**
+   * Clone the current {@code UriBuilder} instance
+   *
+   * @return a new {@code UriBuilder} instance that is a copy of this builder
+   */
+  public UriBuilder cloneBuilder() {
+    return new UriBuilder(this);
   }
 
   /**
@@ -357,7 +412,9 @@ public class UriBuilder {
     private final List<String> paths = new ArrayList<>();
 
     public void append(String path) {
-      this.paths.add(path);
+      if (StringUtils.notBlank(path)) {
+        this.paths.add(path);
+      }
     }
 
     public String getPath() {
@@ -386,6 +443,12 @@ public class UriBuilder {
         path = path.substring(0, path.length() - 1);
       }
       return path;
+    }
+
+    public PathBuilder cloneBuilder() {
+      PathBuilder builder = new PathBuilder();
+      builder.paths.addAll(this.paths);
+      return builder;
     }
   }
 }
