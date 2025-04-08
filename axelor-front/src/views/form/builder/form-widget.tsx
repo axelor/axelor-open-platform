@@ -146,7 +146,8 @@ export function FormWidget(props: FormWidgetProps) {
   if (canShowEditor || showEditorAsViewer) {
     const editorProps = props as FieldProps<any>;
     return (
-      <FieldEditor
+      <FormField
+        component={FieldEditor}
         {...editorProps}
         readonly={readonly}
         widgetAtom={widgetAtom}
@@ -446,7 +447,7 @@ function useExpressions({
     } = schema;
 
     const bind = schema.jsonField && valueExpr ? valueExpr : schema.bind;
-    
+
     const isExpr = (attr: unknown) => typeof attr === "string";
 
     const hasExpression =
