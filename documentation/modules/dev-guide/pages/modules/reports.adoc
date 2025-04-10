@@ -59,7 +59,7 @@ The `<action-report>` is used to define the action reports.
 | *`name`* | name of the action
 | *`design`* | the design file name (.rptdesign file)
 | *`output`* | name of the output file (can use `$\{name}`, `$\{date}`, `$\{time}` to provide dynamic name)
-| `format` | output format (pdf, doc, xsl, ps, html)
+| `format` | output format: `pdf` (default), `docx`, `xlsx`, `doc`, `xsl`, `odt`, `ods`, `html`
 | `attachment` | boolean, whether to attach the generated report to current object
 |===
 

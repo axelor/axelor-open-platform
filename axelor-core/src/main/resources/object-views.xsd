@@ -4368,6 +4368,10 @@
               <xsd:enumeration value="html" />
               <xsd:enumeration value="doc" />
               <xsd:enumeration value="xls" />
+              <xsd:enumeration value="docx" />
+              <xsd:enumeration value="xlsx" />
+              <xsd:enumeration value="odt" />
+              <xsd:enumeration value="ods" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
