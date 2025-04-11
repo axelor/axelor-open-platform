@@ -103,10 +103,13 @@ export function DateComponent({
     if (focus) {
       setTimeout(() => {
         const calendar = pickerRef.current;
-        const selectedDay = calendar?.calendar?.componentNode.querySelector(
-          '.react-datepicker__day[tabindex="0"]',
-        );
-        selectedDay && selectedDay.focus({ preventScroll: true });
+        const selectedDay =
+          calendar?.calendar?.containerRef?.current?.querySelector(
+            '.react-datepicker__day[tabindex="0"]',
+          );
+        if (selectedDay) {
+          selectedDay.focus({ preventScroll: true });
+        }
       }, 100);
     }
   }, []);
