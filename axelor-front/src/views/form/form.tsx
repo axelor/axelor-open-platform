@@ -188,7 +188,7 @@ export const usePrepareSaveRecord = (
             const restoreDummyValues = Object.keys(dummy).reduce(
               (values, key) => {
                 const viewItem = findViewItem(meta, key);
-                return viewItem?.resetState === true
+                return !viewItem || viewItem?.resetState === true
                   ? values
                   : { ...values, [key]: dummy[key] };
               },

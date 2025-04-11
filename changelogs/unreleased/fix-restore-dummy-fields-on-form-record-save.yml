@@ -1,0 +1,5 @@
+---
+title: Fix restore dummy fields on form record save
+type: fix
+description: |
+  When any dummy field is not defined in view then it's value shouldn't be restore in form record state.
