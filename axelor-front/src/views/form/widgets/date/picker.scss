@@ -75,7 +75,7 @@
 }
 
 .react-datepicker__input-time-container {
-  margin: 10px 0 10px -10px;
+  margin: 5px auto 10px auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -120,7 +120,7 @@
 }
 
 .react-datepicker__navigation:hover *::before {
-  border-color: var(--bs-secondary-bg);
+  border-color: var(--bs-secondary-color);
 }
 
 .react-datepicker__current-month,

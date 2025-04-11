@@ -1,0 +1,47 @@
+.timeInputSelect {
+  width: 24px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  &:hover .arrow, &.open .arrow {
+    border-color: var(--bs-secondary-color);
+  }
+}
+
+.arrow {
+  border-color: var(--bs-border-color);
+  border-width: 3px 3px 0 0;
+  border-style: solid;
+  content: "";
+  top: 1px;
+  right: -1px;
+  height: 8px;
+  width: 8px;
+  position: absolute;
+  transform: rotate(135deg);
+}
+
+.popperContent {
+  width: 50px;
+  height: 150px;
+  overflow-y: scroll;
+}
+
+.tick {
+  position: absolute;
+  left: 0.25rem;
+}
+
+.option {
+  position: relative;
+  text-align: center;
+  line-height: 1.25rem;
+  width: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--bs-secondary-bg);
+  }
+}
