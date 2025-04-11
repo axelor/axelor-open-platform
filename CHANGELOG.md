@@ -1,3 +1,84 @@
+## 7.3.5 (2025-04-11)
+
+#### Feature
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Logback from 1.3.14 to 1.3.15
+  - Upgrade SLF4J from 2.0.16 to 2.0.17
+  - Upgrade Apache Tomcat from 9.0.97 to 9.0.102
+  - Upgrade Postgresql JDBC from 42.7.4 to 42.7.5
+  - Upgrade Groovy from 3.0.23 to 3.0.24
+  - Upgrade Jackson from 2.18.2 to 2.18.3
+  - Upgrade Junit5 from 5.11.3 to 5.11.4
+  
+  </details>
+
+#### Fix
+
+* Fix skip special context variables in form context
+
+  <details>
+  
+  Special variables like _showSingle, _showRecord should not be forwared to form contexts.
+  
+  </details>
+
+* Fix set focus on field multiple times using action-attrs
+* Fix reload form view on popup close
+
+  <details>
+  
+  When popup is opened from another popup with popup=reload then it should reload the tab view 
+  instead of reload closed popup view.
+  
+  </details>
+
+* Fix pass action context to data view popup editor
+
+  <details>
+  
+  When popup editor is used directly on data views like grid, kanban, cards,
+  calendar, gantt, dms etc then it should pass action context to popup editor.
+  
+  </details>
+
+* Fix editor data not propagated to parent record.
+
+  <details>
+  
+  As soon as clearing values on an editor item that is shown by default on records,
+  the changes aren't propagated to the parent record. So the parent don't see the user changes
+  and used wrong previous data that the one displaying in the editor.
+  
+  </details>
+
+* Fix parsing logo/icon path content
+
+  <details>
+  
+  Context app logo/icon methods can return an absolute url (ie a string). This fix 
+  parsing the url if it contains query params (merge with the default app base url).
+  
+  </details>
+
+* Fix format record in gantt view
+* Fix readonlyIf for relation field editor
+* Fix use action-view form view for gantt form
+* Fix support dotted fields to gantt view
+
+  <details>
+  
+  It should be possible to render nested fields like <field name="user.code" /> in gantt view.
+  Also that dotted field should be allow to use as taskSequence.
+  
+  </details>
+
+
 ## 7.3.4 (2025-03-27)
 
 #### Feature
