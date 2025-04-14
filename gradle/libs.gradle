@@ -84,7 +84,7 @@ libs.jakarta_mail = [
     "jakarta.mail:jakarta.mail-api:2.1.3",
     "jakarta.activation:jakarta.activation-api:2.1.3"
 ]
-libs.greenmail = "com.icegreen:greenmail-junit5:2.1.1"
+libs.greenmail = "com.icegreen:greenmail-junit5:2.1.3"
 libs.jakarta_el = "jakarta.el:jakarta.el-api:5.0.1"
 libs.websocket_api = [
     "jakarta.websocket:jakarta.websocket-api:2.1.1",
