@@ -5,7 +5,7 @@ def versions = ext.libsVersions = [:]
 versions.guice = "7.0.0"
 versions.guava = "33.3.1-jre"
 versions.hibernate = "6.6.13.Final"
-versions.hibernate_validator = "8.0.1.Final"
+versions.hibernate_validator = "8.0.2.Final"
 
 versions.groovy = "4.0.26"
 versions.resteasy = "6.2.12.Final"
