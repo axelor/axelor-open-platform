@@ -124,9 +124,9 @@ libs.caffeine = dependencies.create("com.github.ben-manes.caffeine:jcache:3.1.8"
     exclude module: "javax.inject", group: "jakarta.inject-api"
 }
 libs.infinispan = [
-    "org.infinispan:infinispan-hibernate-cache-v62:15.0.11.Final",
-    "org.infinispan:infinispan-core:15.0.11.Final",
-    "org.infinispan:infinispan-jcache:15.0.11.Final"
+    "org.infinispan:infinispan-hibernate-cache-v62:15.0.14.Final",
+    "org.infinispan:infinispan-core:15.0.14.Final",
+    "org.infinispan:infinispan-jcache:15.0.14.Final"
 ]
 
 // apache tika
