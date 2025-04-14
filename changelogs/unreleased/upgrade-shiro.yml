@@ -1,5 +1,5 @@
 ---
-title: Upgrade Shiro from 1.13.0 to 2.0.2
+title: Upgrade Shiro from 1.13.0 to 2.0.3
 type: change
 description: |
   Use Shiro 2 default hash algorithm: argon2id
