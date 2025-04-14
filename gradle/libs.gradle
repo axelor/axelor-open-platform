@@ -7,7 +7,7 @@ versions.guava = "33.3.1-jre"
 versions.hibernate = "6.6.2.Final"
 versions.hibernate_validator = "8.0.1.Final"
 
-versions.groovy = "4.0.24"
+versions.groovy = "4.0.26"
 versions.resteasy = "6.2.11.Final"
 versions.jackson = "2.18.3"
 versions.shiro = "2.0.2:jakarta"
