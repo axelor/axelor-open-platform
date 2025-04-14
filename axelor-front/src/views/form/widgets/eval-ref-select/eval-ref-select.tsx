@@ -71,9 +71,7 @@ export function EvalRefSelect(props: FieldProps<any>) {
     return atom(
       (get) => {
         const value = get(titleAtom);
-        return {
-          [targetName]: value,
-        };
+        return value ? { [targetName]: value } : null;
       },
       (get, set, value, fireOnChange) => {
         const record = value || {};
