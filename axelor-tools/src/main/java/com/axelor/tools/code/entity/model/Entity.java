@@ -487,6 +487,10 @@ public class Entity implements BaseType<Entity> {
     return superClass;
   }
 
+  public String getSimpleSuperClass() {
+    return superClass != null ? superClass.substring(superClass.lastIndexOf('.') + 1) : null;
+  }
+
   private Boolean hasExtends() {
     return !isModelClass() && notBlank(superClass);
   }

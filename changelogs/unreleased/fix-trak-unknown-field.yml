@@ -1,0 +1,8 @@
+---
+title: Fix generateCode task spurious warning "track unknown field"
+type: fix
+description: |
+  When defining an entity in xml, extending an entity not available in project source (defined in dependencies),
+  that super entity was not available in lookup, and caused spurious warning "track unknown field".
+
+  Now make sure to compute lookup for any super classes if not present.

@@ -30,6 +30,7 @@ import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -178,6 +179,10 @@ public class EntityGenerator {
     }
     mergedEntities.put(entity.getName(), entity);
 
+    if (doLookup) {
+      lookupSuperClasses(entity);
+    }
+
     Optional.ofNullable(entity.getTrack())
         .ifPresent(
             track ->
@@ -204,6 +209,37 @@ public class EntityGenerator {
     return rendered;
   }
 
+  private void lookupSuperClasses(Entity entity) {
+    String className = entity.getSimpleSuperClass();
+
+    while (className != null) {
+      Entity mergedEntity =
+          mergedEntities.computeIfAbsent(
+              className,
+              key ->
+                  lookup.stream()
+                      .flatMap(
+                          gen -> {
+                            if (gen.definedEntities.contains(key) && gen.entities.isEmpty()) {
+                              try {
+                                gen.processAll(false);
+                              } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                              }
+                            }
+                            return gen.entities.get(key).stream();
+                          })
+                      .reduce(
+                          (entity1, entity2) -> {
+                            entity1.merge(entity2);
+                            return entity1;
+                          })
+                      .orElse(null));
+
+      className = mergedEntity != null ? mergedEntity.getSimpleSuperClass() : null;
+    }
+  }
+
   private boolean fieldExists(String entityName, String fieldName) {
     Entity itEntity;
     String itEntityName = entityName;
@@ -219,7 +255,7 @@ public class EntityGenerator {
       if (itEntity.findField(fieldName) != null) {
         return true;
       }
-    } while ((itEntityName = itEntity.getSuperClass()) != null);
+    } while ((itEntityName = itEntity.getSimpleSuperClass()) != null);
 
     return false;
   }
