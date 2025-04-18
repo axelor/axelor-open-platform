@@ -1,0 +1,6 @@
+---
+title: Implement batch saving of tracking messages/followers
+type: feature
+description: |
+  Optimized the saving of audit tracking messages and followers by implementing batch processing.
+  This improves performance, especially during operations that generate many tracking entries.

@@ -29,6 +29,7 @@ import com.axelor.db.Query;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
 import com.axelor.db.annotations.TrackMessage;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -85,6 +86,7 @@ final class AuditTracker {
 
   private static final ThreadLocal<Set<Model>> UPDATED = ThreadLocal.withInitial(HashSet::new);
   private static final ThreadLocal<Set<Model>> DELETED = ThreadLocal.withInitial(HashSet::new);
+  private static final ThreadLocal<User> CURRENT_USER = new ThreadLocal<>();
 
   private static class EntityState {
 
@@ -481,26 +483,41 @@ final class AuditTracker {
     }
   }
 
-  private void processTracks(Transaction tx, User user) {
+  private void processTracks(Transaction tx) {
     final Map<String, EntityState> store = STORE.get();
     if (store.isEmpty()) {
       return;
     }
+
     // prevent concurrent update
     STORE.remove();
+
+    int count = 0;
     for (EntityState state : store.values()) {
+      User user = CURRENT_USER.get();
       process(state, user);
+
+      if (++count % DBHelper.getJdbcBatchSize() == 0) {
+        JPA.flush();
+        JPA.clear();
+
+        if (user != null) {
+          CURRENT_USER.set(AuthUtils.getUser(user.getCode()));
+        }
+      }
     }
   }
 
-  private void processDelete(Transaction tx, User user) {
+  private void processDelete(Transaction tx) {
     final Set<Model> deleted = DELETED.get();
     if (deleted.isEmpty()) {
       return;
     }
     final MetaFiles files = Beans.get(MetaFiles.class);
+
     // prevent concurrent delete
     DELETED.remove();
+
     for (Model entity : deleted) {
       files.deleteAttachments(entity);
     }
@@ -523,6 +540,7 @@ final class AuditTracker {
     STORE.remove();
     DELETED.remove();
     UPDATED.remove();
+    CURRENT_USER.remove();
   }
 
   /**
@@ -535,8 +553,10 @@ final class AuditTracker {
   public void onComplete(Transaction tx, User user) {
     try {
       this.fireBeforeCompleteEvent();
-      this.processTracks(tx, user);
-      this.processDelete(tx, user);
+
+      CURRENT_USER.set(user);
+      this.processTracks(tx);
+      this.processDelete(tx);
     } finally {
       clear();
       JPA.em().flush();
