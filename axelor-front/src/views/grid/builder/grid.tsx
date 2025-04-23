@@ -290,6 +290,11 @@ export const Grid = forwardRef<
           columnProps.sortable = false;
         }
 
+        // aggregate only supported on number fields
+        if (!["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "")) {
+          columnProps.aggregate = undefined;
+        }
+
         if (
           ["DECIMAL", "INTEGER", "LONG"].includes(serverType ?? "") &&
           !((item as Field).selection || item.widget == "rating")
