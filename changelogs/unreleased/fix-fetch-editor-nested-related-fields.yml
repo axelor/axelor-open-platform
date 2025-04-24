@@ -1,6 +1,0 @@
----
-title: Fix fetch editor nested related fields
-type: fix
-description: |
-  When any nested field of editor field is defined in form then 
-  it should fetched as editor field instead of form field.
