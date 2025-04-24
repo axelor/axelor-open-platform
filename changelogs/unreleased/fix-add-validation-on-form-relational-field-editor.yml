@@ -1,6 +1,0 @@
----
-title: Fix add validation on form relational field editor
-type: fix
-description: |
-  When requiredIf or validIf is used on relational field (with editor) then
-  it should validate those conditions.

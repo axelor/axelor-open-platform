@@ -1,3 +1,37 @@
+## 7.3.6 (2025-04-24)
+
+#### Fix
+
+* Fix time selection input in datepicker
+
+  <details>
+  
+  Native select used for time selection hangs on some browsers in popup.
+  This is now renders in same way as year/month selection.
+  
+  </details>
+
+* Downgrade postgres driver - performance issue with v42.7.5
+* Fix add validation on form relational field editor
+
+  <details>
+  
+  When requiredIf or validIf is used on relational field (with editor) then
+  it should validate those conditions.
+  
+  </details>
+
+* Fix swagger ui styles for dark base themes
+* Fix reset value in eval-ref-select/ref-text widget
+* Fix restore dummy fields on form record save
+
+  <details>
+  
+  When any dummy field is not defined in view then it's value shouldn't be restore in form record state.
+  
+  </details>
+
+
 ## 7.3.5 (2025-04-11)
 
 #### Feature

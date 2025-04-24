@@ -1,6 +1,0 @@
----
-title: Fix time selection input in datepicker
-type: fix
-description: |
-  Native select used for time selection hangs on some browsers in popup.
-  This is now renders in same way as year/month selection.
