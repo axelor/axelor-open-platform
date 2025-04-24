@@ -69,9 +69,6 @@ public class TomcatRun extends AbstractRunTask {
     if (debug) {
       jvmArgs.add("-Daxelor.view.watch=true");
     }
-    // Disable the global canonical file name cache to protect against CVE-2024-56337
-    // removed in Java 21 onwards
-    jvmArgs.add("-Dsun.io.useCanonCaches=false");
     return jvmArgs;
   }
 
