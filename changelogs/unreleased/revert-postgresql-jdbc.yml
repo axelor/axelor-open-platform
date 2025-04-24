@@ -1,0 +1,3 @@
+---
+title: Downgrade postgres driver - performance issue with v42.7.5
+type: fix
