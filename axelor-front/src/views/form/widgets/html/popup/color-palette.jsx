@@ -45,7 +45,7 @@ function ColorPalettePopup({ commands, onClick }) {
   const rows = [];
 
   for (let row = 1; row < 15; ++row) {
-    const row = [];
+    const rowData = [];
     for (let col = 0; col < 25; ++col) {
       let color;
       if (col === 24) {
@@ -58,9 +58,9 @@ function ColorPalettePopup({ commands, onClick }) {
         const value = row > 8 ? (16 - row) / 8 : 1;
         color = HSVtoRGB(hue, saturation, value);
       }
-      row.push(color);
+      rowData.push(color);
     }
-    rows.push(row);
+    rows.push(rowData);
   }
 
   return (
