@@ -1,3 +1,28 @@
+## 7.1.14 (2025-04-24)
+
+#### Fix
+
+* Fix fetch editor nested related fields
+
+  <details>
+  
+  When any nested field of editor field is defined in form then 
+  it should fetched as editor field instead of form field.
+  
+  </details>
+
+* Fix shades of colors in the color picker of HTML widget
+* Fix skip passing fields in form record save
+* Prevent page from being translated
+
+  <details>
+  
+  the `translate="no"` attribute and `notranslate` class are added to the html 
+  tag to prevent page from being translated by vendor translation services.
+  
+  </details>
+
+
 ## 7.1.13 (2025-03-07)
 
 #### Fix
