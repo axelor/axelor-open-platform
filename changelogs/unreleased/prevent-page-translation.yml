@@ -1,0 +1,6 @@
+---
+title: Prevent page from being translated
+type: fix
+description: |
+  the `translate="no"` attribute and `notranslate` class are added to the html 
+  tag to prevent page from being translated by vendor translation services.
