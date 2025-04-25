@@ -61,8 +61,7 @@ public class ExtendItemInsert {
     @XmlElement(name = "panel-mail", type = PanelMail.class),
     @XmlElement(name = "menu", type = Menu.class),
     @XmlElement(name = "item", type = Item.class),
-    @XmlElement(name = "divider", type = Divider.class),
-    @XmlElement(name = "tooltip", type = ToolTip.class)
+    @XmlElement(name = "divider", type = Divider.class)
   })
   private List<AbstractWidget> items;
 

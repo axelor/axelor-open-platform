@@ -58,10 +58,11 @@ public class ExtendItemReplace {
     @XmlElement(name = "panel-mail", type = PanelMail.class),
     @XmlElement(name = "menu", type = Menu.class),
     @XmlElement(name = "item", type = Item.class),
-    @XmlElement(name = "divider", type = Divider.class),
-    @XmlElement(name = "tooltip", type = ToolTip.class)
+    @XmlElement(name = "divider", type = Divider.class)
   })
   private List<AbstractWidget> items;
+
+  @XmlElement private ToolTip tooltip;
 
   @XmlElement private PanelViewer viewer;
 
@@ -97,6 +98,14 @@ public class ExtendItemReplace {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public ToolTip getTooltip() {
+    return tooltip;
+  }
+
+  public void setTooltip(ToolTip tooltip) {
+    this.tooltip = tooltip;
   }
 
   public PanelViewer getViewer() {
