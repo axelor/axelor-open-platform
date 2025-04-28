@@ -5,7 +5,7 @@
 :url-quartz: https://quartz-scheduler.org/
 :url-cron: https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
 
-The {page-component-title} integrates feature rich {url-quartz}[quartz scheduler] library
+The {page-component-title} integrates a feature rich {url-quartz}[quartz scheduler] library
 for job scheduling.
 
 Jobs are executed by a separate process running under an admin session. The
@@ -14,8 +14,8 @@ using the admin access.
 
 == Configuration
 
-The scheduler is disabled by default. It can be enabled with following
-configuration.
+The scheduler is disabled by default. It can be enabled with the following
+configuration:
 
 [source,properties]
 ----
@@ -28,8 +28,56 @@ quartz.enable = false
 
 # total number of threads in quartz thread pool
 # the number of jobs that can run simultaneously
-quartz.thread-count = 5
+quartz.thread-count = 3
 ----
+
+=== JobStore
+
+When the scheduler is enabled, `RAMJobStore` is used by default, which stores job and trigger information within memory. For persistence, you can configure Quartz to use a JDBC JobStore, which stores that information in the database. This is required for multi-instance deployments, but can also be useful for single-instance deployments to ensure missed jobs during downtime are executed at the next application startup.
+
+The {page-component-title} automatically configures the JDBC JobStore to use the application's main database and creates the necessary Quartz tables (`qrtz_*`) if they don't exist on application startup.
+
+To enable persistence using the `JobStoreTX`, set the following property:
+
+[source,properties]
+----
+# Use JobStoreTX for persistence instead of default RAMJobStore
+quartz.job-store.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+----
+
+NOTE: Any extra `quartz.job-store.*` properties are passed and used to configure the job store via reflection in case you need advanced configuration.
+If you do that, make sure the appropriate setters exist on the job store.
+
+==== JDBC JobStore Clustering
+
+Quartz `JobStoreTX` job store with clustering features are automatically enabled when setting `application.cache.provider` to a distributed cache provider such as `redisson` or `redisson-native`. This is required for proper scheduling in multi-instance deployments.
+
+Quartz clustering is further tunable with the following optional property:
+
+[source,properties]
+----
+# Frequency (in milliseconds) at which an instance "checks-in" with the other instances of the cluster
+quartz.job-store.cluster-checkin-interval = 7500
+----
+
+==== JDBC JobStore Data Source
+
+When using a JDBC JobStore (`JobStoreTX` whether clustered or not), an underlying `HikariDataSource` connection pool is configured to use the application's main database settings and can be tuned with these optional properties:
+
+[source,properties]
+----
+# Maximum number of connections that the DataSource can create in its pool of connections
+quartz.data-source.maximum-pool-size = 10
+
+# Optional SQL query string that the DataSource can use to detect and replace failed/corrupt connections
+quartz.data-source.connection-test-query =
+
+# Discards connections after they have been idle this many milliseconds (disabled by default)
+quartz.data-source.idle-timeout = 0
+----
+
+NOTE: All `quartz.data-source.*` properties are passed and used to configure the data source via reflection in case you need advanced configuration.
+If you do that, make sure the appropriate setters exist on the data source.
 
 == Jobs
 

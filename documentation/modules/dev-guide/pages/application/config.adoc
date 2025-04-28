@@ -287,6 +287,11 @@ Choose the right option by environment :
 | `cors.expose-headers` | comma-separated list of headers to include in a response |
 | `quartz.enable` | whether to enable quartz scheduler | false
 | `quartz.thread-count` | total number of threads in quartz thread pool | 3
+| `quartz.job-store.class` | JobStore class (e.g., `org.quartz.impl.jdbcjobstore.JobStoreTX` for JDBC persistence) | `org.quartz.simpl.RAMJobStore`
+| `quartz.job-store.cluster-checkin-interval` | cluster check-in interval in milliseconds | `7500`
+| `quartz.data-source.maximum-pool-size` | maximum number of connections for JDBC JobStore's data source | `10`
+| `quartz.data-source.connection-test-query` | SQL validation query for JDBC JobStore's data source |
+| `quartz.data-source.idle-timeout` | idle connection discard time in milliseconds for JDBC JobStore's data source | `0` (disabled)
 | `mail.smtp.host` | smtp server host |
 | `mail.smtp.port` | smtp server port |
 | `mail.smtp.user` | smtp login username |

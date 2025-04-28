@@ -43,6 +43,7 @@ import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
+import org.quartz.ObjectAlreadyExistsException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -154,6 +155,12 @@ public class JobRunner {
 
     try {
       scheduler.scheduleJob(detail, trigger);
+    } catch (ObjectAlreadyExistsException e) {
+      // This is expected if job is already persisted
+      // or in a clustered environment if another node already scheduled it.
+      // Catching ObjectAlreadyExistsException is preferred over
+      // checkExists() followed by scheduleJob() which would not be atomic.
+      log.info("Job already exists: {}", name);
     } catch (SchedulerException e) {
       log.error("Unable to configure scheduled job: {}", name, e);
     }

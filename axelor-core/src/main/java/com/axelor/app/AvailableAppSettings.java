@@ -157,6 +157,9 @@ public interface AvailableAppSettings {
 
   String QUARTZ_ENABLE = "quartz.enable";
   String QUARTZ_THREAD_COUNT = "quartz.thread-count";
+  String QUARTZ_JOB_STORE_PREFIX = "quartz.job-store.";
+  String QUARTZ_JOB_STORE_CLASS = QUARTZ_JOB_STORE_PREFIX + "class";
+  String QUARTZ_DATA_SOURCE_PREFIX = "quartz.data-source.";
 
   String USER_PASSWORD_PATTERN = "user.password.pattern";
   String USER_PASSWORD_PATTERN_TITLE = /*$$(*/ "user.password.pattern-title" /*)*/;
