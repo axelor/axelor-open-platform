@@ -3,6 +3,7 @@ import { ScopeProvider } from "bunshi/react";
 import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
 import filter from "lodash/filter";
+import cloneDeep from "lodash/cloneDeep";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import isNumber from "lodash/isNumber";
@@ -78,54 +79,39 @@ function isContextFieldMatch(field: JsonField, record: DataRecord): boolean {
   return true;
 }
 
-function createJsonEditor(
-  schema: Schema,
-  jsonFields: Record<string, JsonField>,
+/**
+ * Filter the given editor based on available editorFields. The editorFields are the
+ * filtered contextual fields based on the record.
+ *
+ * @param editor the editor
+ * @param editorFields the available editorFields
+ */
+function filterJsonEditorItems(
+  editor: FormView,
+  editorFields: Record<string, JsonField>,
 ) {
-  const editor: Schema = {
-    layout: schema.type === "panel-json" ? "table" : undefined,
-    flexbox: true,
-    jsonFields,
-    items: [],
-  };
+  const newEditor: FormView = cloneDeep(editor);
 
-  let panel: Schema | undefined = undefined;
-  let panelTab: Schema | undefined = undefined;
-
-  for (const field of Object.values(jsonFields)) {
-    if (field.type === "panel") {
-      panel = { ...field, items: [] };
-      if ((field.widgetAttrs || {}).sidebar && parent) {
-        panel.sidebar = true;
-      }
-      if ((field.widgetAttrs || {}).tab) {
-        panelTab = panelTab || {
-          type: "panel-tabs",
-          colSpan: 12,
-          items: [],
-        };
-        panelTab.items?.push(panel);
-      } else {
-        editor.items?.push(panel);
-      }
-      continue;
+  function walkInItems(items: any) {
+    const newItems: any[] = [];
+    if (!items || items.length === 0) {
+      return items;
     }
-    if (panel) {
-      panel.items?.push(field);
-    } else {
-      editor.items?.push(field);
-    }
+    items.forEach((item: any) => {
+      if (item.name && !Object.keys(editorFields).includes(item.name)) {
+        return;
+      }
+      if (item.items) {
+        item.items = walkInItems(item.items);
+      }
+      newItems.push(item);
+    });
+    return newItems;
   }
 
-  if (panelTab) {
-    editor.items?.push(panelTab);
-  }
+  newEditor.items = walkInItems(newEditor.items);
 
-  if (!schema.viewer) {
-    editor.viewer = true;
-  }
-
-  return editor as FormView;
+  return newEditor;
 }
 
 function processEditor(schema: Schema) {
@@ -1205,7 +1191,7 @@ const RecordEditor = memo(function RecordEditor({
 });
 
 function JsonEditor(props: FormEditorProps) {
-  const { schema, formAtom } = props;
+  const { schema, formAtom, editor } = props;
 
   const fieldsAtom = useMemo(
     () => selectAtom(formAtom, (o) => o.fields),
@@ -1261,12 +1247,12 @@ function JsonEditor(props: FormEditorProps) {
   }, [formAtom, jsonFields, modelFields]);
 
   const editorFields = useAtomValue(editorFieldsAtom);
-  const editor = useMemo(
-    () => createJsonEditor(schema, editorFields),
-    [editorFields, schema],
+  const jsonEditor = useMemo(
+    () => filterJsonEditorItems(editor, editorFields),
+    [editor, editorFields],
   );
 
-  return <JsonEditorInner {...props} editor={editor} />;
+  return <JsonEditorInner {...props} editor={jsonEditor} />;
 }
 
 function JsonEditorInner({

@@ -116,16 +116,21 @@ export const FormLayoutComponent = ({
               type: "field",
               name: item.jsonField,
               title: item.title || item.name,
-              editor: {},
+              editor: {
+                items: [
+                  {
+                    ...item,
+                    inGridEditor: true,
+                    colSpan: 12,
+                    name: item.jsonPath ?? item.name,
+                  },
+                ],
+                widgetAttrs: {
+                  showTitles: "false",
+                }
+              },
               jsonFields: {
-                [item.jsonPath!]: {
-                  ...item,
-                  title: item.title || item.name,
-                  inGridEditor: true,
-                  showTitle: false,
-                  colSpan: 12,
-                  name: item.jsonPath ?? item.name,
-                },
+                [item.jsonPath!]: {...item}
               },
               json: true,
               cols: 12,

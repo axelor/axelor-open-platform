@@ -581,15 +581,16 @@ export function processView(
         flexbox: true,
         items: [],
       };
-      let jsonFields: JsonField[] = item.jsonFields ?? [];
+      let panel: Schema | null = null;
+      let panelTab: Schema | null = null;
 
-      jsonFields = item.jsonFields.filter(
+      item.jsonFields = item.jsonFields.filter(
         (x: JsonField) => !(x as JsonField).forceHidden,
       );
-      jsonFields.sort((x: Schema, y: Schema) => {
+      item.jsonFields.sort((x: Schema, y: Schema) => {
         return x.sequence - y.sequence;
       });
-      jsonFields.forEach((field: Schema) => {
+      item.jsonFields.forEach((field: Schema) => {
         if (field.nameField) {
           field.nameColumn = field.nameField;
         }
@@ -623,11 +624,26 @@ export function processView(
         if (field.type === "panel" || field.type === "separator") {
           field.visibleInGrid = false;
         }
+        if (field.type === "panel") {
+          panel = { ...field, items: [] };
+          if ((field.widgetAttrs || {}).sidebar && parent) {
+            panel.sidebar = true;
+            parent.width = "large";
+          }
+          if ((field.widgetAttrs || {}).tab) {
+            panelTab = panelTab || {
+              type: "panel-tabs",
+              colSpan: 12,
+              items: [],
+            };
+            panelTab.items?.push(panel);
+          } else {
+            editor.items?.push(panel);
+          }
+          return;
+        }
         if (field.type !== "separator") {
           field.title = field.title || field.autoTitle;
-        }
-        if (field.type === "panel" && field.widgetAttrs?.sidebar && parent) {
-          parent.width = "large";
         }
         const colSpan = (field.widgetAttrs || {}).colSpan || field.colSpan;
         if (field.type === "one-to-many") {
@@ -640,12 +656,21 @@ export function processView(
         ) {
           field.colSpan = colSpan || 12;
         }
+        if (panel) {
+          panel.items?.push(field);
+        } else {
+          editor.items?.push(field);
+        }
       });
 
-      item.jsonFields = jsonFields.reduce(
+      item.jsonFields = (item.jsonFields as JsonField[]).reduce(
         (acc, x) => ({ ...acc, [x.name]: x }),
         {},
       );
+
+      if (panelTab) {
+        editor.items?.push(panelTab);
+      }
 
       if (isFormField) {
         item.widget = "json-field";
