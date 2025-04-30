@@ -127,10 +127,13 @@ export const FormLayoutComponent = ({
                 ],
                 widgetAttrs: {
                   showTitles: "false",
-                }
+                },
               },
               jsonFields: {
-                [item.jsonPath!]: {...item}
+                [item.jsonPath!]: {
+                  ...item,
+                  type: item.serverType ?? item.type,
+                },
               },
               json: true,
               cols: 12,
