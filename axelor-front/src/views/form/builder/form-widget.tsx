@@ -144,15 +144,16 @@ export function FormWidget(props: FormWidgetProps) {
   }
 
   if (canShowEditor || showEditorAsViewer) {
-    const editorProps = props as FieldProps<any>;
-    return (
-      <FormField
-        component={FieldEditor}
-        {...editorProps}
-        readonly={readonly}
-        widgetAtom={widgetAtom}
-        valueAtom={valueAtom}
-      />
+    const editorProps = {
+      ...props,
+      readonly,
+      widgetAtom,
+      valueAtom,
+    } as FieldProps<any>;
+    return schema.json ? (
+      <FieldEditor {...editorProps} />
+    ) : (
+      <FormField component={FieldEditor} {...editorProps} />
     );
   }
 
