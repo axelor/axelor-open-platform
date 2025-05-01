@@ -1122,11 +1122,11 @@ const FormContainer = memo(function FormContainer({
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
-    onNew: canNew ? onNew : undefined,
-    onEdit: canEdit ? onEdit : undefined,
+    onNew: showToolbar && canNew ? onNew : undefined,
+    onEdit: showToolbar && canEdit ? onEdit : undefined,
     onSave: canSave ? handleSave : undefined,
-    onCopy: canCopy ? onCopy : undefined,
-    onDelete: canDelete ? onDelete : undefined,
+    onCopy: showToolbar && canCopy ? onCopy : undefined,
+    onDelete: showToolbar && canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: handleFocus,
   });
