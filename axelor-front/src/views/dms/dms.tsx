@@ -32,7 +32,10 @@ import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { sanitize } from "@/utils/sanitize.ts";
 import { isNumber } from "@/utils/types";
 import { AdvanceSearch } from "@/view-containers/advance-search";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import {
+  usePopupHandlerAtom,
+  useSetPopupHandlers,
+} from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewAction,
@@ -104,7 +107,7 @@ export function Dms(props: ViewProps<GridView>) {
   const { navigate } = useRoute();
   const showEditor = useEditor();
   const popupHandler = usePopupHandlerAtom();
-  const setPopupHandlers = useSetAtom(popupHandler);
+  const setPopupHandlers = useSetPopupHandlers();
 
   const getViewContext = useViewContext();
   const viewAction = useViewAction();
@@ -769,12 +772,11 @@ export function Dms(props: ViewProps<GridView>) {
 
   useEffect(() => {
     if (popup) {
-      setPopupHandlers((_popup) => ({
-        ..._popup,
+      setPopupHandlers({
         data: {
           selected: getSelectedDocuments(),
         },
-      }));
+      });
     }
   }, [popup, getSelectedDocuments, setPopupHandlers]);
 

@@ -49,7 +49,7 @@ import { toKebabCase } from "@/utils/names";
 import { findViewItem } from "@/utils/schema";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewConfirmDirty,
@@ -803,8 +803,7 @@ function GridInner(props: ViewProps<GridView>) {
     onSave: handleRowSave,
   });
 
-  const popupHandlerAtom = usePopupHandlerAtom();
-  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+  const setPopupHandlers = useSetPopupHandlers();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {

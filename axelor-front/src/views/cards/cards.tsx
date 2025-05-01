@@ -21,7 +21,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewContext,
@@ -226,7 +226,7 @@ export function Cards(props: ViewProps<CardsView>) {
     [hasEditPopup, onEdit, onEditInPopup],
   );
 
-  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const setPopupHandlers = useSetPopupHandlers();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {

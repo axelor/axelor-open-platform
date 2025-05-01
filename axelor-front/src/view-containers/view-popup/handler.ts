@@ -2,10 +2,11 @@ import { SearchOptions, SearchResult } from "@/services/client/data";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { FormState, WidgetErrors } from "@/views/form/builder";
-import { WritableAtom, atom } from "jotai";
+import { WritableAtom, atom, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { ActionExecutor, ActionHandler } from "../action";
 import { CommandItemProps } from "@axelor/ui";
+import { useCallback } from "react";
 
 export type PopupHandler = {
   data?: any;
@@ -41,4 +42,21 @@ const popupMolecule = molecule((getMol, getScope) => {
 
 export function usePopupHandlerAtom() {
   return useMolecule(popupMolecule);
+}
+
+export function useSetPopupHandlers() {
+  const popupHandlerAtom = usePopupHandlerAtom();
+  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+
+  return useCallback(
+    (handlers: PopupHandler) => {
+      setPopupHandlers((draft) => ({
+        // only restore popup actions, which is set by popup itself
+        // so it can't be overriden by view set popupHandlers
+        close: draft.close,
+        ...handlers,
+      }));
+    },
+    [setPopupHandlers],
+  );
 }

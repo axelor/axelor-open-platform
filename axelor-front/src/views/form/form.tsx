@@ -38,7 +38,7 @@ import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { usePopupHandlerAtom, useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
@@ -1018,7 +1018,7 @@ const FormContainer = memo(function FormContainer({
     readonly,
   );
   const popupHandlerAtom = usePopupHandlerAtom();
-  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+  const setPopupHandlers = useSetPopupHandlers();
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
