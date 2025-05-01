@@ -1,6 +1,6 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
-import { selectAtom } from "jotai/utils";
+import { selectAtom, useAtomCallback } from "jotai/utils";
 import { memo, useCallback, useEffect, useMemo } from "react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
@@ -29,6 +29,8 @@ import { processContextValues } from "@/views/form/builder/utils";
 import { AdvancedSearchState } from "../advance-search/types";
 import { prepareAdvanceSearchQuery } from "../advance-search/utils";
 import { MetaScope, ViewScope } from "./scope";
+import { useTabShortcut } from "@/hooks/use-shortcut";
+import { usePopupHandlerAtom } from "../view-popup/handler";
 
 async function loadComp(viewType: string) {
   const type = toKebabCase(viewType);
@@ -128,6 +130,7 @@ function ViewContainer({
           {meta ? (
             <ScopeProvider scope={MetaScope} value={meta}>
               <Comp meta={meta} dataStore={dataStore} searchAtom={searchAtom} />
+              {tab.popup && <PopupViewShortcuts />}
             </ScopeProvider>
           ) : (
             (() => {
@@ -141,6 +144,28 @@ function ViewContainer({
       </Fade>
     );
   }
+
+  return null;
+}
+
+function PopupViewShortcuts() {
+  const popupHandlerAtom = usePopupHandlerAtom();
+
+  const onClose = useAtomCallback(
+    useCallback(
+      (get) => {
+        const handlers = get(popupHandlerAtom);
+        return handlers?.close?.();
+      },
+      [popupHandlerAtom],
+    ),
+  );
+
+  useTabShortcut({
+    key: "q",
+    ctrlKey: true,
+    action: useCallback(() => onClose?.(), [onClose]),
+  });
 
   return null;
 }
