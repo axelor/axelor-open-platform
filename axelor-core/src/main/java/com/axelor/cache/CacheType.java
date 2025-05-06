@@ -29,27 +29,33 @@ import java.util.function.Function;
 import javax.cache.spi.CachingProvider;
 
 public enum CacheType {
-  CAFFEINE(name -> new CaffeineCacheBuilder<>(name), CaffeineCachingProvider.class, "jcache"),
+  CAFFEINE(
+      name -> new CaffeineCacheBuilder<>(name), CaffeineCachingProvider.class, "jcache", false),
   REDISSON(
       name -> new RedissonCacheBuilder<>(name),
       org.redisson.jcache.JCachingProvider.class,
-      AxelorRedissonRegionFactory.class.getName()),
+      AxelorRedissonRegionFactory.class.getName(),
+      true),
   REDISSON_NATIVE(
       name -> new RedissonCacheNativeBuilder<>(name),
       org.redisson.jcache.JCachingProvider.class,
-      AxelorRedissonRegionNativeFactory.class.getName());
+      AxelorRedissonRegionNativeFactory.class.getName(),
+      true);
 
   private final Function<String, CacheBuilder<?, ?>> cacheBuilderFactory;
   private final Class<? extends CachingProvider> cachingProviderClass;
   private final String cacheRegionFactory;
+  private final boolean distributed;
 
   CacheType(
       Function<String, CacheBuilder<?, ?>> cacheBuilderFactory,
       Class<? extends CachingProvider> cachingProviderClass,
-      String cacheRegionFactory) {
+      String cacheRegionFactory,
+      boolean distributed) {
     this.cacheBuilderFactory = cacheBuilderFactory;
     this.cachingProviderClass = cachingProviderClass;
     this.cacheRegionFactory = cacheRegionFactory;
+    this.distributed = distributed;
   }
 
   public String getName() {
@@ -68,6 +74,10 @@ public enum CacheType {
 
   public String getCacheRegionFactory() {
     return cacheRegionFactory;
+  }
+
+  public boolean isDistributed() {
+    return distributed;
   }
 
   /**
