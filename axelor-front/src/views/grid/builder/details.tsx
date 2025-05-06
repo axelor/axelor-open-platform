@@ -11,11 +11,7 @@ import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import { FormView } from "@/services/client/meta.types";
-import {
-  MetaScope,
-  useViewDirtyAtom,
-  useViewTab,
-} from "@/view-containers/views/scope";
+import { MetaScope, useViewDirtyAtom } from "@/view-containers/views/scope";
 import { ToolbarActions } from "@/view-containers/view-toolbar";
 import {
   Layout,
@@ -34,6 +30,7 @@ import {
   FormWidgetProviders,
   FormWidgetsHandler,
 } from "@/views/form/builder/form-providers";
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 
 export interface DetailsProps {
   meta: ViewData<FormView>;
@@ -69,7 +66,6 @@ export function Details({
   const { formAtom, actionHandler, actionExecutor, recordHandler } =
     useFormHandlers(meta, record);
 
-  const { id: tabId } = useViewTab();
   const { hasButton } = usePerms(view, perms);
 
   const widgetHandler = useRef<FormWidgetsHandler | null>(null);
@@ -83,6 +79,15 @@ export function Details({
 
   const getErrors = useGetErrors();
   const prepareRecordForSave = usePrepareSaveRecord(meta, formAtom);
+
+  const setFormReady = useAtomCallback(
+    useCallback(
+      (get, set) => {
+        set(formAtom, (state) => ({ ...state, ready: true }));
+      },
+      [formAtom],
+    ),
+  );
 
   const restoreFormState = useAtomCallback(
     useCallback(
@@ -171,7 +176,7 @@ export function Details({
     return doSave();
   }, [doSave]);
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     const { onLoad: _onLoad, onNew: _onNew } = view;
     if (isSaveOnLoad.current) {
       isSaveOnLoad.current = false;
@@ -180,8 +185,9 @@ export function Details({
     if (record) {
       const action = (record?.id ?? 0) > 0 ? _onLoad : _onNew;
       if (action) {
-        actionExecutor.execute(action);
+        await actionExecutor.execute(action);
       }
+      setFormReady();
     }
   }, [record, view, actionExecutor]);
 
