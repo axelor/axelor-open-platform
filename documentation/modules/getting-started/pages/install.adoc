@@ -12,7 +12,7 @@ operating systems for working with {page-component-title} sources.
 
 == Prerequisite
 
-* {url-jdk}[OpenJDK 11]
+* {url-jdk}[OpenJDK 21]
 * {url-postgresql}[PostgreSQL 12.0] or later
 * Your favourite IDE
   ** xref:eclipse.adoc[Eclipse 2021-06] or later
@@ -20,7 +20,7 @@ operating systems for working with {page-component-title} sources.
 
 == OpenJDK
 
-On Linux/MacOS install OpenJDK 11 and make sure JDK command line tools are in your path.
+On Linux/MacOS, install OpenJDK 21 and make sure JDK command line tools are in your path.
 If you use distribution provided OpenJDK, they are already available in `PATH` otherwise do this:
 
 [source,sh]

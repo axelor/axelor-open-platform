@@ -81,7 +81,7 @@ dependencies {
 ----
 <1> Use axelor application plugin
 <2> The application project config
-<3> Use Java 11
+<3> Use Java 21
 <4> Use JUnit5 for unit testing
 
 The `com.axelor.app` gradle plugin defines an extension point `axelor` where
