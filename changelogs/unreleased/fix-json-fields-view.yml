@@ -1,0 +1,6 @@
+---
+title: Fix missing elements in json view
+type: fix
+description: |
+  Due to latest change on json fields processing improvements, some json fields 
+  (either a field or panel, separator, ...) were missing in the view.
