@@ -1,3 +1,19 @@
+## 7.3.7 (2025-05-07)
+
+#### Fix
+
+* Fix render dashlets in details form view
+* Fix missing elements in json view
+
+  <details>
+  
+  Due to latest change on json fields processing improvements, some json fields 
+  (either a field or panel, separator, ...) were missing in the view.
+  
+  </details>
+
+* Fix validate json fields in form view
+
 ## 7.3.6 (2025-04-24)
 
 #### Fix
