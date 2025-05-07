@@ -30,7 +30,10 @@ import com.axelor.file.store.s3.S3Store;
 import com.axelor.test.GuiceModules;
 import io.minio.messages.Bucket;
 import java.io.IOException;
-import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,15 +51,19 @@ public class S3StoreTest extends AbstractBaseFile {
 
   @BeforeAll
   public static void checkMinioAvailability() {
-    boolean isMinioRunning = isServerRunning(ENDPOINT);
-    assumeTrue(isMinioRunning, "Object storage server is not running on " + ENDPOINT);
+    assumeTrue(isServerRunning(), "Object storage server is not running on " + ENDPOINT);
   }
 
-  private static boolean isServerRunning(String endpoint) {
-    EndpointInfo info = EndpointInfo.parse(endpoint);
-    try (Socket socket = new Socket(info.getHost(), info.getPort())) {
-      return true;
-    } catch (IOException e) {
+  private static boolean isServerRunning() {
+    try (HttpClient client = HttpClient.newHttpClient()) {
+      HttpRequest request =
+          HttpRequest.newBuilder()
+              .uri(URI.create("http://%s/minio/health/live".formatted(ENDPOINT)))
+              .GET()
+              .build();
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      return response.statusCode() == 200;
+    } catch (IOException | InterruptedException e) {
       return false;
     }
   }

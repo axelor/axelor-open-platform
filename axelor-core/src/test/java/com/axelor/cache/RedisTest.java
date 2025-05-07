@@ -21,7 +21,11 @@ package com.axelor.cache;
 import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.test.GuiceModules;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 import org.hibernate.cfg.Environment;
 import org.junit.jupiter.api.AfterAll;
@@ -34,7 +38,10 @@ public class RedisTest extends AbstractBaseCache {
 
   private static RedisServer redisServer;
   private static int redisUseCount = 0;
+
+  private static final String REDIS_HOST = "localhost";
   private static final int REDIS_PORT = 6379;
+  private static final int TIMEOUT_MS = 2000;
 
   private static final Logger log = LoggerFactory.getLogger(RedisTest.class);
 
@@ -90,8 +97,19 @@ public class RedisTest extends AbstractBaseCache {
   }
 
   private static boolean isServerRunning() {
-    try (var socket = new Socket("localhost", REDIS_PORT)) {
-      return true;
+    try (var socket = new Socket(REDIS_HOST, REDIS_PORT)) {
+      socket.setSoTimeout(TIMEOUT_MS);
+
+      try (var out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+          var in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+        out.print("PING\r\n");
+        out.flush();
+
+        var response = in.readLine();
+
+        return "+PONG".equals(response);
+      }
     } catch (IOException e) {
       return false;
     }
