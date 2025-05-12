@@ -26,22 +26,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The ModuleInfos class acts as a wrapper and provides a simplified interface for managing and
+ * The ModuleInfo class acts as a wrapper and provides a simplified interface for managing and
  * retrieving information about a specific module.
  */
-public class ModuleInfos {
+public class ModuleInfo {
 
   private final String name;
   private final Module module;
 
   /**
-   * Constructs a new ModuleInfos instance for the specified module name. Throws an
+   * Constructs a new ModuleInfo instance for the specified module name. Throws an
    * IllegalArgumentException if no module with the provided name is found.
    *
    * @param name the name of the module to retrieve information for
    * @throws IllegalArgumentException if the module with the specified name cannot be found
    */
-  public ModuleInfos(String name) {
+  public ModuleInfo(String name) {
     this.name = name;
     this.module = ModuleManager.getModule(name);
     if (this.module == null) {
@@ -105,14 +105,14 @@ public class ModuleInfos {
 
   /**
    * Retrieves a list of modules that the current module depends on, represented as {@link
-   * ModuleInfos} objects.
+   * ModuleInfo} objects.
    *
-   * @return a list of {@link ModuleInfos}
+   * @return a list of {@link ModuleInfo}
    */
-  public List<ModuleInfos> getDepends() {
-    List<ModuleInfos> depends = new ArrayList<>();
+  public List<ModuleInfo> getDepends() {
+    List<ModuleInfo> depends = new ArrayList<>();
     for (Module depend : module.getDepends()) {
-      depends.add(new ModuleInfos(depend.getName()));
+      depends.add(new ModuleInfo(depend.getName()));
     }
     return depends;
   }
@@ -128,15 +128,15 @@ public class ModuleInfos {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(ModuleInfos.class.getName(), name);
+    return Objects.hashCode(ModuleInfo.class.getName(), name);
   }
 
   @Override
   public boolean equals(Object obj) {
     if (obj == this) return true;
     if (obj == null) return false;
-    if (!(obj instanceof ModuleInfos)) return false;
-    return name.equals(((ModuleInfos) obj).getName());
+    if (!(obj instanceof ModuleInfo)) return false;
+    return name.equals(((ModuleInfo) obj).getName());
   }
 
   @Override
