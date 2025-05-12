@@ -56,7 +56,7 @@ public class AxelorUtils {
 
   private static final Set<String> TEST_MODULES = Set.of("axelor-test");
 
-  private static final Set<String> ENTERPRISE_MODULES = Set.of("axelor-enterprise");
+  private static final Set<String> ENTERPRISE_MODULES = Set.of("axelor-enterprise-edition");
 
   private static final String EE_SUFFIX = "enterprise";
   private static final String USE_EE_PLATFORM_PROPERTY = "axelor.platform.ee";
