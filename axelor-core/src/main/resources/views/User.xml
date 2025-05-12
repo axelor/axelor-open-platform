@@ -48,6 +48,7 @@
         </panel>
         <help>user.password.pattern-title</help>
       </panel>
+      <panel-dashlet action="action.view.show.active.tokens" colSpan="12" canNew="true"/>
     </panel>
     <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
@@ -72,6 +73,10 @@
           <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
           <help>user.password.pattern-title</help>
       </panel>
+      <panel>
+        <field name="$manageAPIKeys" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
+        <panel-dashlet name="activeUserTokenPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageAPIKeys"/>
+      </panel>
     </panel>
   </form>
 
@@ -87,5 +92,14 @@
     <check error="Password doesn't match configured pattern." field="newPassword"
       if="!com.axelor.auth.AuthService.getInstance().passwordMatchesPattern(newPassword)" />
   </action-condition>
+
+  <action-view name="action.view.show.active.tokens" title="API keys" model="com.axelor.auth.db.UserToken">
+    <view type="grid" name="user-token-grid" />
+    <view type="form" name="user-token-form" />
+    <view-param name="popup" value="true"/>
+    <view-param name="popup-save" value="false"/>
+    <domain>self.owner = :userId</domain>
+    <context name="userId" expr="eval: id" />
+  </action-view>
 
 </object-views>

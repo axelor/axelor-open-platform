@@ -2,8 +2,14 @@
 :toc:
 :toc-title:
 
-For the moment, web services uses session based authentication. So the client
-application must keep track of session id and cookies between requests.
+Web services support two authentication methods:
+
+1. Session-based authentication
+2. API key authentication
+
+== Session-based authentication
+
+Session-based authentication requires the client application to keep track of session ID and cookies between requests.
 
 The session can be established with login services:
 
@@ -52,3 +58,74 @@ Some libraries that can keep track of sessions:
 * http://docs.python-requests.org/en/latest/[Request for Python]
 * https://github.com/request/request[Request for NodeJS]
 * http://hc.apache.org/[Apache HTTP Client (Java)]
+
+== API key authentication
+
+API key authentication allows clients to authenticate API requests without maintaining a session. This is particularly useful for server-to-server communication and automated scripts.
+
+=== Managing API keys
+
+API keys are managed by the `com.axelor.auth.db.UserToken` object. Each user can have multiple API keys with different names and expiration dates.
+
+==== Creating API keys
+
+API keys can be created from the User Preference form. To create a new API key:
+
+1. Checkout "Manage API key?"
+2. Click "Add" to create a new API key
+3. Provide a name
+4. Set an expiration date (default is one month from creation)
+5. Click "Create API key"
+
+IMPORTANT: When a new API key is created, it will be displayed only once. Make sure to copy and store it securely as you won't be able to view it again later.
+
+==== Managing existing API keys
+
+The API Keys tab displays a list of all tokens for the user with the following information:
+
+* Name: A descriptive name for the token
+* Expiration date: When the token will expire
+* Last used: The last time the token was used for authentication
+
+The system provides visual indicators for token expiration:
+* *Red highlight*: For expired tokens
+* *Yellow highlight*: For tokens expiring within 7 days
+
+==== Token operations
+
+For each token, you can perform the following operations:
+
+* *Revoke*: Permanently disables the token. Any services using this token will immediately lose access.
+* *Rotate*: Replaces the token with a new one while maintaining the same name and expiration date. This is useful when you suspect a token might have been compromised.
+
+IMPORTANT: API keys should be treated as sensitive information. Do not share your API keys and store them securely.
+
+=== Using API keys for authentication
+
+To authenticate using an API key, include the API key in the `API-KEY` HTTP header with each request:
+
+.Request with API Key Authentication
+----
+GET /ws/path
+----
+
+.Header
+----
+API-KEY: <your-api-key>
+----
+
+The API key authentication does not create a session, so each request must include the API-KEY header.
+
+=== API key validation
+
+All API requests are authenticated through the following security checks:
+
+1. Key validation
+* Verifies the structure and presence of the API key
+* Authenticates the key against stored credentials
+
+2. Validity checks
+* Checks if the API key hasn't expired
+* Confirms the associated user account is active
+
+If any of these checks fail, the request is rejected with HTTP status `401 Unauthorized`.

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.0.xsd">
+
+  <grid name="user-token-grid" title="User tokens" model="com.axelor.auth.db.UserToken" x-selector="none" canEdit="false" orderBy="-createdOn ">
+    <hilite if="$moment(expiresAt) &lt; $moment()" color="danger" strong="true" />
+    <hilite if="$moment(expiresAt) &gt;= $moment() &amp;&amp; $moment(expiresAt).diff($moment(),'days') &lt;= 7" color="warning" strong="true" />
+    <field name="name" />
+    <field name="expiresAt" />
+    <field name="lastUsedAt" />
+    <button name="revoke" title="Revoke" onClick="action-method-revoke-token" icon="delete" prompt="Revoking this API key will permanently disable it. Any services currently using this key will immediately lose access and won’t be able to authenticate. Are you sure you want to proceed?" />
+    <button name="rotate" title="Rotate" onClick="action-method-rotate-token" icon="autorenew" prompt="Rotating this API key will replace it with a new one. Services using the old key will lose access until updated. Do you want to proceed?" showIf="$moment(expiresAt) &gt; $moment()" />
+  </grid>
+
+  <form name="user-token-form" title="User token" model="com.axelor.auth.db.UserToken" onNew="default-user-token-record">
+    <panel name="generalInfoPanel">
+      <field name="name" readonlyIf="id" />
+      <field name="expiresAt" readonlyIf="id" validIf="$moment(expiresAt) &gt; $moment()" />
+      <button name="createTokenBtn" onClick="validate,action-method-create-token" title="Create API key" showIf="!id" />
+    </panel>
+  </form>
+
+  <form name="user-token-api-key-form" title="User token" model="com.axelor.auth.db.UserToken" onNew="action-method-show-api-key">
+    <panel name="apiKeyPanel" itemSpan="12">
+      <!-- TODO: remove readonly="false" when password widget supports show/copy buttons in readonly  -->
+      <field name="apiKey" readonly="false" />
+      <help>
+        <![CDATA[
+          This is your new API key. <br> Please make sure to copy and store it securely now — you won't be able to view it again later.
+        ]]>
+      </help>
+    </panel>
+  </form>
+
+  <action-method name="action-method-create-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="createToken" />
+  </action-method>
+
+  <action-method name="action-method-revoke-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="revokeToken" />
+  </action-method>
+
+  <action-method name="action-method-show-api-key">
+    <call class="com.axelor.auth.web.UserTokenController" method="showApiKey" />
+  </action-method>
+
+  <action-method name="action-method-rotate-token">
+    <call class="com.axelor.auth.web.UserTokenController" method="rotateToken" />
+  </action-method>
+
+  <action-record name="default-user-token-record" model="com.axelor.auth.db.UserToken">
+    <field name="expiresAt" expr="eval: __datetime__.plusMonths(1)" />
+  </action-record>
+
+</object-views>
