@@ -217,7 +217,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
     switch (errorNumber) {
       case 1217:
-        // fall through
+      // fall through
       case 1451: // foreign key violation
         title = I18n.get(REFERENCE_ERROR_TTILE);
         message = I18n.get(REFERENCE_ERROR_MESSAGE);

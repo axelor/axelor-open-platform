@@ -1,7 +1,7 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.25.0"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:7.0.3"
   }
 }
 
@@ -28,13 +28,13 @@ spotless {
       include 'gradle/*.gradle'
       include 'documentation/*.yml'
     }
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }
   format 'markdown', {
     target '**/*.md'
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     endWithNewline()
   }
 }
@@ -71,7 +71,7 @@ configure(subprojects - project(':axelor-front')) { p ->
           exclude 'src/main/resources/conf/*'
         }
       }
-      indentWithSpaces(2)
+      leadingTabsToSpaces(2)
       trimTrailingWhitespace()
       endWithNewline()
     }
