@@ -18,7 +18,6 @@
       <field name="field" />
       <field name="canRead" />
       <field name="canWrite" />
-      <field name="canImport" />
       <field name="canExport" />
     </panel-related>
   </form>
@@ -28,7 +27,6 @@
       <field name="field" colSpan="12" />
       <field name="canRead" colSpan="4" widget="inline-checkbox"/>
       <field name="canWrite" colSpan="4" widget="inline-checkbox"/>
-      <field name="canImport" colSpan="4" widget="inline-checkbox"/>
       <field name="canExport" colSpan="4" widget="inline-checkbox"/>
     </panel>
     <panel title="Conditions" itemSpan="12">
