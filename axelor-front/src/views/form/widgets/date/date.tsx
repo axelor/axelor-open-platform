@@ -98,9 +98,9 @@ export function DateComponent({
     return calendar?.input?.inputElement as HTMLElement;
   }, []);
 
-  const handleOpen = useCallback((focus?: boolean) => {
+  const handleOpen = useCallback((isFocus?: boolean) => {
     setOpen(true);
-    if (focus) {
+    if (isFocus) {
       setTimeout(() => {
         const calendar = pickerRef.current;
         const selectedDay =
@@ -200,7 +200,7 @@ export function DateComponent({
           ? true
           : false;
 
-      callOnChange &&
+      if (callOnChange) {
         onChange(
           newValue && moment(newValue).isValid()
             ? (() => {
@@ -221,6 +221,7 @@ export function DateComponent({
             : null,
           callOnChange,
         );
+      }
       setChanged(!callOnChange);
     },
     [onChange, format, valueFormat, value, isDateTime],

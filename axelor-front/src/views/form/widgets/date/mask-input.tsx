@@ -6,7 +6,9 @@ function moveCaretToStart(el: HTMLInputElement) {
   const { value } = el;
   if (typeof el.selectionStart == "number") {
     const ind = value.indexOf("_");
-    ind > -1 && (el.selectionStart = el.selectionEnd = ind);
+    if (ind > -1) {
+      el.selectionStart = el.selectionEnd = ind;
+    }
   } else if (typeof (el as any).createTextRange != "undefined") {
     el.focus();
     const range = (el as any).createTextRange();
@@ -14,6 +16,8 @@ function moveCaretToStart(el: HTMLInputElement) {
     range.select();
   }
 }
+
+const PLACEHOLDER = "_";
 
 export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
   (props, ref) => {
@@ -29,10 +33,10 @@ export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
           el.selectionEnd === (el.value || "").length
         ) {
           el.value = "";
-          onChange && onChange(e as any);
+          onChange?.(e as any);
         }
       }
-      onKeyDown && onKeyDown(e);
+      onKeyDown?.(e);
     }
 
     function handleFocus(event: FocusEvent<HTMLInputElement>) {
@@ -41,18 +45,19 @@ export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
       setTimeout(function () {
         moveCaretToStart(inputEl);
       }, 10);
-      onFocus && onFocus(event);
+      onFocus?.(event);
     }
 
     function handleBlur(event: any) {
       setShowMask(false);
-      onBlur && onBlur(event);
+      onBlur?.(event);
     }
 
     return (
       <ReactTextMask
         showMask={showMask}
-        placeholderChar={"_"}
+        placeholderChar={PLACEHOLDER}
+        keepCharPositions
         guide
         ref={ref}
         {...props}
@@ -62,5 +67,5 @@ export const MaskedInput = forwardRef<any, MaskedInputProps & InputProps>(
         render={(ref, props) => <Input ref={ref} {...(props as any)} />}
       />
     );
-  }
+  },
 );

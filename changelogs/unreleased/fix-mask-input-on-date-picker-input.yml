@@ -1,0 +1,9 @@
+---
+title: Fix mask input on date picker input
+type: fix
+description: |
+  On widgets using a mask (date/time,...), previously adding characters causes existing characters to advance. And 
+  deleting characters causes existing characters to move back. Now adding or deleting characters will not affect the 
+  positions of existing characters.
+  
+  On date/datetime, it also validates date parts (days/months/years) for valid inputs.
