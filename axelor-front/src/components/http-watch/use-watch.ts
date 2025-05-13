@@ -62,7 +62,12 @@ export function useHttpWatch() {
             if (contentType?.includes("text/html")) {
               const html = await res.text();
               if (html.trim()) {
-                document.body.innerHTML = html;
+                document.open();
+                try {
+                  html.split("\n").forEach((line) => document.writeln(line));
+                } finally {
+                  document.close();
+                }
                 return;
               }
             }
