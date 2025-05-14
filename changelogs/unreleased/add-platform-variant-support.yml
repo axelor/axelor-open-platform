@@ -3,7 +3,7 @@ title: Change enterprise edition usage
 type: change
 description: |
   Usage of the enterprise edition of the platform is evolving: it is no longer a matter of a single 
-  `com.axelor:axelor-enterprise-edition` module to depended on, but of different variant of the core modules.
+  `com.axelor:axelor-enterprise-edition` module to rely on, but of different variant of the core modules.
   
   As of now, to use enterprise edition, remove the dependency `com.axelor:axelor-enterprise-edition` 
   and add the property `axelor.platform.ee = true` in your `gradle.properties`. This will automatically 

@@ -1,0 +1,32 @@
+= 7.4 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.4/CHANGELOG.md
+:gradle-8-0-8-7: https://docs.gradle.org/current/userguide/upgrading_version_8.html
+
+In this document, we will see the major steps to migrate from 7.3 to 7.4.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements introduced in 7.4
+
+== Axelor Enterprise edition usage
+
+Usage of the enterprise edition of the platform is evolving: it is no longer a matter of a single
+`com.axelor:axelor-enterprise-edition` module to rely on.
+
+To use enterprise edition, remove the dependency `com.axelor:axelor-enterprise-edition`
+and add the property `axelor.platform.ee = true` in your `gradle.properties`. This will automatically
+update your dependencies to use requires and right EE modules.
+
+It also brings new features such as studio and advance import/export.
+
+== Database changes
+
+Run following SQL script to adjust `auth_permission` and `meta_permission_rule` tables changes :
+
+```sql
+ALTER TABLE auth_permission ADD COLUMN can_import boolean;
+ALTER TABLE meta_permission_rule ADD COLUMN can_import boolean;
+```
+
+This is used only by enterprise edition for the moment to fine-grained data import permissions support.
