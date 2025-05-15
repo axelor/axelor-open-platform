@@ -1,0 +1,6 @@
+---
+title: Fix disable selection in readonly mode
+type: fix
+description: |
+  When selection widget is rendered in readonly, it should open selection through any 
+  interactive events like key press, key up/down or element click.
