@@ -1,5 +1,0 @@
----
-title: Fix view field hilite extension support
-type: fix
-description: |
-    Adding new hilite rules to fields were not working.

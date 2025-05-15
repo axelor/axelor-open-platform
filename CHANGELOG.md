@@ -1,3 +1,155 @@
+## 7.4.0 (2025-05-15)
+
+#### Feature
+
+* Add maven group id to module meta data
+
+  <details>
+  
+  The maven group id of the module is now stored in axelor-module.properties.
+  
+  </details>
+
+* Fix view schema deserialisation issues
+
+  <details>
+  
+  The view schema types are designed with JSON serialisation in mind. However,
+  with the new studio designer, we also need proper JSON deserialisation support.
+  
+  - added missing annotations
+  - added missing getter/setters
+  - added missing subtype annotations
+  - added `x-json-model` on to AbstractView to identify view by custom model
+  - added `id` attribute to form/grid view items
+  - fix widgetAttrs deserialization issue
+  - use `PanelField` instead of base `Field`
+  - fix duplicate `type` key in serialized view json
+  - fix view width serialization issue
+  
+  </details>
+
+* Add maintenance service
+
+  <details>
+  
+  You can define maintenance mode behavior by implementing `MaintenanceService`:
+  
+  ```java
+  import com.axelor.web.service.MaintenanceService;
+  
+  public class ContactModule extends AxelorModule {
+  
+    @Override
+    protected void configure() {
+      // (...module configuration)
+  
+      // Bind the maintenance service interface to your implementation.
+      bind(MaintenanceService.class).to(MyMaintenanceService.class);
+    }
+  }
+  ```
+  
+  ```java
+  public class MyMaintenanceService implements MaintenanceService {
+  
+    // Implement your maintenance mode logic.
+    // By default, maintenance mode is never enabled.
+    @Override
+    public boolean isMaintenanceMode(User user, HttpServletRequest httpRequest) {
+      if (/*custom logic*/) {
+        return true;
+      }
+  
+      return false;
+    }
+  }
+  ```
+  
+  Default maintenance page is `error-503.html` located in `src/main/webapp` directory.
+  Note that you are free to override it if needed, by putting your own `error-503.html`
+  in the `src/main/webapp` directory of your module.
+  
+  </details>
+
+* Implement batch saving of tracking messages/followers
+
+  <details>
+  
+  Optimized the saving of audit tracking messages and followers by implementing batch processing.
+  This improves performance, especially during operations that generate many tracking entries.
+  
+  </details>
+
+* Add data import permissions
+
+  <details>
+  
+  For the upcoming advance import/export feature (enterprise only),
+  we need more fine grained data import permissions support.
+  
+  This change adds an additional `canImport` permission option for objects and fields.
+  
+  Run following SQL script to adjust `auth_permission` and `meta_permission_rule` tables changes :
+  ```sql
+  ALTER TABLE auth_permission ADD COLUMN can_import boolean;
+  ALTER TABLE meta_permission_rule ADD COLUMN can_import boolean;
+  ```
+  
+  </details>
+
+#### Change
+
+* Change enterprise edition usage
+
+  <details>
+  
+  Usage of the enterprise edition of the platform is evolving: it is no longer a matter of a single 
+  `com.axelor:axelor-enterprise-edition` module to rely on, but of different variant of the core modules.
+  
+  As of now, to use enterprise edition, remove the dependency `com.axelor:axelor-enterprise-edition` 
+  and add the property `axelor.platform.ee = true` in your `gradle.properties`. This will automatically 
+  update your dependencies to use requires and right EE modules.
+  
+  </details>
+
+#### Fix
+
+* Fix view shortcuts scoping
+
+  <details>
+  
+  The last popup view should be used as the target view tab.
+  
+  </details>
+
+* Fix custom record filtering
+
+  <details>
+  
+  The `Query` instance obtained with `MetaJsonRecordRepository#all(String)`
+  should filter custom records even if no additional filter provided.
+  
+  </details>
+
+* Fix disable selection in readonly mode
+
+  <details>
+  
+  When selection widget is rendered in readonly, it should open selection through any 
+  interactive events like key press, key up/down or element click.
+  
+  </details>
+
+* Fix view field hilite extension support
+
+  <details>
+  
+  Adding new hilite rules to fields were not working.
+  
+  </details>
+
+
 ## 7.3.7 (2025-05-07)
 
 #### Fix

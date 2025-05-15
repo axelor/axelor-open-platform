@@ -11,6 +11,11 @@ This version is a transition to our new enterprise edition. It is focused on bri
 and advance import/export. Few changes has been made in order to support this transition, but it should be compatible
 with previous 7.3 as it is mostly internal changes.
 
+It also comes with :
+
+- improvement of audit tracking messages and followers processing to optimize performance on large operations
+- feature to put application in maintenance mode
+
 Please check the {github-repo-url}/blob/7.4/CHANGELOG.md[change log] for detailed list of changes and
 the xref:ROOT:migrations/migration-7.4.adoc[7.4 migration guide].
 

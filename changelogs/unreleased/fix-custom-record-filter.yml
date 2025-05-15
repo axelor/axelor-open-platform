@@ -1,6 +1,0 @@
----
-title: Fix custom record filtering
-type: fix
-description: |
-  The `Query` instance obtained with `MetaJsonRecordRepository#all(String)`
-  should filter custom records even if no additional filter provided.
