@@ -20,7 +20,7 @@ package com.axelor.web.service;
 
 import com.axelor.auth.db.User;
 import com.google.inject.ImplementedBy;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Service for managing maintenance mode */
 @ImplementedBy(MaintenanceServiceNever.class)

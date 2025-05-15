@@ -19,7 +19,7 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.db.User;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /** Default maintenance service that never turns on maintenance mode */
 public class MaintenanceServiceNever implements MaintenanceService {
