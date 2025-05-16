@@ -67,10 +67,6 @@ public abstract class AbstractMailAccount implements MailAccount {
     props.setProperty("mail." + protocol + ".connectiontimeout", "" + connectionTimeout);
     props.setProperty("mail." + protocol + ".timeout", "" + timeout);
 
-    if (properties != null) {
-      props.putAll(properties);
-    }
-
     props.setProperty("mail.store.protocol", protocol);
     props.setProperty("mail." + protocol + ".host", host);
     props.setProperty("mail." + protocol + ".port", port);
@@ -93,6 +89,10 @@ public abstract class AbstractMailAccount implements MailAccount {
             return new PasswordAuthentication(user, password);
           }
         };
+
+    if (properties != null) {
+      props.putAll(properties);
+    }
 
     return Session.getInstance(props, authenticator);
   }
