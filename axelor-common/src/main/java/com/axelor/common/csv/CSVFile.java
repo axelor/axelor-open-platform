@@ -57,23 +57,23 @@ public final class CSVFile {
   }
 
   public CSVFile withDelimiter(char delimiter) {
-    return new CSVFile(format.builder().setDelimiter(delimiter).build());
+    return new CSVFile(format.builder().setDelimiter(delimiter).get());
   }
 
   public CSVFile withEscape(char escape) {
-    return new CSVFile(format.builder().setEscape(escape).build());
+    return new CSVFile(format.builder().setEscape(escape).get());
   }
 
   public CSVFile withQuoteAll() {
-    return new CSVFile(format.builder().setQuoteMode(QuoteMode.ALL).build());
+    return new CSVFile(format.builder().setQuoteMode(QuoteMode.ALL).get());
   }
 
   public CSVFile withFirstRecordAsHeader() {
-    return new CSVFile(format.builder().setHeader().setSkipHeaderRecord(true).build());
+    return new CSVFile(format.builder().setHeader().setSkipHeaderRecord(true).get());
   }
 
   public CSVFile withHeader(String... header) {
-    return new CSVFile(format.builder().setHeader(header).build());
+    return new CSVFile(format.builder().setHeader(header).get());
   }
 
   public CSVParser parse(InputStream in) throws IOException {
