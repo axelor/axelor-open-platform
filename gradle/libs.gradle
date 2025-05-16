@@ -9,7 +9,7 @@ versions.hibernate_validator = "8.0.2.Final"
 
 versions.groovy = "4.0.26"
 versions.resteasy = "6.2.12.Final"
-versions.jackson = "2.18.3"
+versions.jackson = "2.19.0"
 versions.shiro = "2.0.3"
 versions.buji_pac4j = "9.1.0"
 versions.jakartaee_pac4j = "8.0.1"
