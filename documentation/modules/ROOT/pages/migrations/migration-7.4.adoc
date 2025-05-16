@@ -16,7 +16,7 @@ Usage of the enterprise edition of the platform is evolving: it is no longer a m
 
 To use enterprise edition, remove the dependency `com.axelor:axelor-enterprise-edition`
 and add the property `axelor.platform.ee = true` in your `gradle.properties`. This will automatically
-update your dependencies to use requires and right EE modules.
+update your dependencies to use the required and right EE modules.
 
 It also brings new features such as studio and advance import/export.
 
