@@ -24,9 +24,9 @@ import ch.qos.logback.core.pattern.CompositeConverter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.Ansi.Attribute;
-import org.fusesource.jansi.Ansi.Color;
+import org.jline.jansi.Ansi;
+import org.jline.jansi.Ansi.Attribute;
+import org.jline.jansi.Ansi.Color;
 
 /** Custom color converter for logback using jansi. */
 public class ColorConverter extends CompositeConverter<ILoggingEvent> {

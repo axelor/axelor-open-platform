@@ -1,0 +1,6 @@
+---
+title: Switch from org.fusesource.jansi to org.jline:jansi 3.30.1
+type: change
+description: |
+  org.fusesource.jansi is no longer maintained.
+  It has been merged into org.jline:jansi.
