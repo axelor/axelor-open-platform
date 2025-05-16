@@ -132,7 +132,7 @@ libs.infinispan = [
 ]
 
 // apache tika
-libs.apache_tika_core = "org.apache.tika:tika-core:2.9.3"
+libs.apache_tika_core = "org.apache.tika:tika-core:3.1.0"
 
 // flyway
 libs.flywaydb = [
