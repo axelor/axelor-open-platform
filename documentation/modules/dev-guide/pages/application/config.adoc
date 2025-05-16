@@ -281,6 +281,7 @@ db.default.password = secret
 | `mail.smtp.timeout` | smtp socket read timeout | 60000
 | `mail.smtp.connection-timeout` | smtp socket connection timeout | 60000
 | `mail.smtp.from` | default from attribute |
+| `mail.smtp.properties.<java-mail-property>` | additional java mail properties |
 | `mail.imap.host` | imap server host |
 | `mail.imap.port` | imap server port |
 | `mail.imap.user` | imap login username |
@@ -288,6 +289,7 @@ db.default.password = secret
 | `mail.imap.channel` | imap encryption channel (starttls or ssl) |
 | `mail.imap.timeout` | imap socket read timeout | 60000
 | `mail.imap.connection-timeout` | imap socket connection timeout | 60000
+| `mail.imap.properties.<java-mail-property>` | additional java mail properties |
 |===
 
 All specified path can use special variables:

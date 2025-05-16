@@ -75,6 +75,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
@@ -153,6 +154,16 @@ public class MailServiceImpl implements MailService, MailConstants {
     final int connectionTimeout =
         settings.getInt(AvailableAppSettings.MAIL_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
+    final Properties otherProperties = new Properties();
+    settings
+        .getPropertiesKeysStartingWith(AvailableAppSettings.MAIL_SMTP_PROPERTIES_PREFIX)
+        .forEach(
+            s -> {
+              otherProperties.put(
+                  s.substring(AvailableAppSettings.MAIL_SMTP_PROPERTIES_PREFIX.length()),
+                  settings.get(s));
+            });
+
     if (isBlank(host)) {
       return null;
     }
@@ -160,6 +171,7 @@ public class MailServiceImpl implements MailService, MailConstants {
     final SmtpAccount smtpAccount = new SmtpAccount(host, port, user, pass, channel, from);
     smtpAccount.setTimeout(timeout);
     smtpAccount.setConnectionTimeout(connectionTimeout);
+    smtpAccount.setProperties(otherProperties);
     sender = new MailSender(smtpAccount);
 
     return sender;
@@ -198,6 +210,16 @@ public class MailServiceImpl implements MailService, MailConstants {
     final int connectionTimeout =
         settings.getInt(AvailableAppSettings.MAIL_IMAP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
+    final Properties otherProperties = new Properties();
+    settings
+        .getPropertiesKeysStartingWith(AvailableAppSettings.MAIL_IMAP_PROPERTIES_PREFIX)
+        .forEach(
+            s -> {
+              otherProperties.put(
+                  s.substring(AvailableAppSettings.MAIL_IMAP_PROPERTIES_PREFIX.length()),
+                  settings.get(s));
+            });
+
     if (isBlank(host)) {
       return null;
     }
@@ -205,6 +227,7 @@ public class MailServiceImpl implements MailService, MailConstants {
     final ImapAccount account = new ImapAccount(host, port, user, pass, channel);
     account.setTimeout(timeout);
     account.setConnectionTimeout(connectionTimeout);
+    account.setProperties(otherProperties);
     reader = new MailReader(account);
 
     return reader;

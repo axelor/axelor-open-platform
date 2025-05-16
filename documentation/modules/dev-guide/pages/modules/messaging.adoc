@@ -156,6 +156,8 @@ quartz.enable = true
 #mail.smtp.channel = starttls
 #mail.smtp.user = user@gmail.com
 #mail.smtp.password = secret
+#mail.smtp.from =
+#mail.smtp.properties.<java-mail-property> =
 
 # timeout settings
 #mail.smtp.timeout = 60000
@@ -170,11 +172,16 @@ quartz.enable = true
 #mail.imap.channel = ssl
 #mail.imap.user = user@gmail.com
 #mail.imap.password = secret
+#mail.imap.properties.<java-mail-property> =
 
 # timeout settings
 #mail.imap.timeout = 60000
 #mail.imap.connection-timeout = 60000
 ----
+
+`mail.smtp.properties.*` and `mail.imap.properties.*` can be used to add additional java mail properties. For example,
+if mail server use a test certificate or a self-signed certificate instead of a certificate signed by a commercial
+Certificate Authority, add `mail.smtp.properties.mail.smtp.ssl.trust = <host-name-of-mail-server>`.
 
 The `quartz` scheduler should be enabled to fetch incoming messages from the
 configured `IMAP` server.
