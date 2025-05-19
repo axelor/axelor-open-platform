@@ -79,7 +79,7 @@ dependencies {
   testImplementation libs.ehcache
   // Embedded Redis server for Redis test
   testImplementation "org.signal:embedded-redis:0.9.1"
-  testImplementation 'org.awaitility:awaitility:4.2.2'
+  testImplementation 'org.awaitility:awaitility:4.3.0'
 }
 
 test {
