@@ -501,8 +501,6 @@ public class Resource<T extends Model> {
 
     final Repository repo = JpaRepository.of(model);
     final List<Object> jsonData = new ArrayList<>();
-    final boolean populate =
-        request.getContext() != null && request.getContext().get("_populate") != Boolean.FALSE;
 
     final JpaSecurity jpaSecurity = security.get();
     for (Object item : data) {
@@ -515,9 +513,7 @@ public class Resource<T extends Model> {
         if (User.class.isAssignableFrom(model)) {
           map.remove("password");
         }
-        if (populate) {
-          item = repo.populate(map, request.getContext());
-        }
+        item = repo.populate(map, request.getContext());
         Translator.applyTranslatables(map, model);
       }
       jsonData.add(item);

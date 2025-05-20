@@ -442,6 +442,10 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
   @Override
   public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
+    if (context != null && context.get("_populate") == Boolean.FALSE) {
+      return json;
+    }
+
     final DMSFile file = findFrom(json);
     if (file == null) {
       return json;
