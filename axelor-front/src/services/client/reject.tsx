@@ -1,6 +1,7 @@
 import { dialogs } from "@/components/dialogs";
 
 import { alerts } from "@/components/alerts";
+import { ErrorBoxFooter } from "@/components/error-box";
 import { Box, Button } from "@axelor/ui";
 import { i18n } from "./i18n";
 import { session } from "./session";
@@ -82,6 +83,7 @@ const showDialog = ({
                 size: "xl",
                 yesNo: false,
                 padding: "0",
+                footer: () => <ErrorBoxFooter error={new Error(stacktrace)} />,
               })
             }
           >
