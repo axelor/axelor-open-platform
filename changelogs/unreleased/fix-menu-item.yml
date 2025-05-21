@@ -1,0 +1,3 @@
+---
+title: Fix menuitem schema causing wrong reload on overridden menuitem
+type: fix
