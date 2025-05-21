@@ -79,7 +79,7 @@ export function String({
           name={schema.name}
           {...(inputProps?.type === "password" && { type: "password" })}
           value={trValue ?? text}
-          endAdornment={translatableAdornment}
+          endAdornment={endAdornment}
         />
       ) : (
         <AdornedInput
