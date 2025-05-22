@@ -320,8 +320,8 @@ export function useCustomizePopup({
                       ),
                     });
                     if (confirmed) {
-                      fn(false);
                       await resetView(view);
+                      fn(false);
                       reload();
                     }
                   },
@@ -344,8 +344,8 @@ export function useCustomizePopup({
             onClick: async (fn) => {
               const view = getView?.(gridState);
               if (view) {
-                fn(true);
                 await saveView(view);
+                fn(true);
                 reload();
               }
             },
