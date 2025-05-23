@@ -445,7 +445,7 @@ public class ViewService extends AbstractService {
     final Set<String> names = new HashSet<>();
 
     for (AbstractWidget item : view.getItems()) {
-      if (item instanceof Field || item instanceof Button) continue;
+      if (item instanceof PanelField || item instanceof Button) continue;
       items.add(item);
     }
 
@@ -454,7 +454,7 @@ public class ViewService extends AbstractService {
       final Map<Object, Object> map = (Map<Object, Object>) item;
       final String type = (String) map.get("type");
       if ("field".equals(type) || "button".equals(type)) {
-        final Class<?> itemType = "field".equals(type) ? Field.class : Button.class;
+        final Class<?> itemType = "field".equals(type) ? PanelField.class : Button.class;
         final String name = (String) map.get("name");
         if (StringUtils.notBlank(name)) {
           names.add(name);

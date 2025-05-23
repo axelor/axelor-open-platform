@@ -841,7 +841,7 @@ public class ViewLoader extends AbstractParallelLoader {
         related.add(panel);
       } else {
         Field formItem = new PanelField();
-        Field gridItem = new Field();
+        Field gridItem = new PanelField();
         formItem.setName(p.getName());
         gridItem.setName(p.getName());
         formItems.add(formItem);

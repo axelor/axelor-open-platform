@@ -117,7 +117,7 @@ public class GridView extends AbstractView implements ContainerView, ExtendableV
   private List<Hilite> hilites;
 
   @XmlElements({
-    @XmlElement(name = "field", type = Field.class),
+    @XmlElement(name = "field", type = PanelField.class),
     @XmlElement(name = "button", type = Button.class)
   })
   private List<AbstractWidget> items;
