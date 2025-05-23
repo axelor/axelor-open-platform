@@ -304,7 +304,7 @@ export function HelpPopover({
 
 function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
-  const { name, serverType, type, target, help, widget, selection, action } =
+  const { name, serverType, type, target, help, widget, selection, action, enumType } =
     schema;
   const { model: formModel, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
@@ -390,6 +390,22 @@ function HelpContent(props: WidgetProps) {
               <dt>{i18n.get("Action")}</dt>
               <dd>
                 <code>{action}</code>
+              </dd>
+            </>
+          )}
+          {selection && (
+            <>
+              <dt>{i18n.get("Selection")}</dt>
+              <dd>
+                <code>{selection}</code>
+              </dd>
+            </>
+          )}
+          {enumType && (
+            <>
+              <dt>{i18n.get("Enum type")}</dt>
+              <dd>
+                <code>{enumType}</code>
               </dd>
             </>
           )}
