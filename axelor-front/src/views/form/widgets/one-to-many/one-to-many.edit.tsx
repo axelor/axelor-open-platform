@@ -349,7 +349,12 @@ export function OneToManyEdit({
         ]}
       />
 
-      <Popper open={popup} target={inputRef.current} placement="bottom-start">
+      <Popper
+        className={styles.popper}
+        open={popup}
+        target={inputRef.current}
+        placement="bottom-start"
+      >
         <Box d="flex">
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box d="flex">
