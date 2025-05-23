@@ -23,7 +23,11 @@ import { GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
-import { FieldProps, usePermission, usePrepareContext } from "../../builder";
+import {
+  FieldProps,
+  usePermission,
+  usePrepareWidgetContext,
+} from "../../builder";
 import { nextId } from "../../builder/utils";
 import styles from "./one-to-many.edit.module.scss";
 
@@ -98,7 +102,7 @@ export function OneToManyEdit({
   const parentModel = useAtomValue(
     useMemo(() => selectAtom(formAtom, (form) => form.model), [formAtom]),
   );
-  const getContext = usePrepareContext(formAtom);
+  const getContext = usePrepareWidgetContext(schema, formAtom, widgetAtom);
   const dataStore = useMemo(() => new DataStore(model), [model]);
 
   const { focus, domain } = attrs;
@@ -200,6 +204,9 @@ export function OneToManyEdit({
         record,
         readonly,
         viewName: formView,
+        context: {
+          _parent: getContext(),
+        },
         ...(form && {
           view: { ...form },
         }),
@@ -212,6 +219,7 @@ export function OneToManyEdit({
       model,
       views,
       formView,
+      getContext,
       setValue,
       showEditor,
       isManyToMany,
