@@ -23,6 +23,7 @@ import { GridView, View } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
 import { Grid as GridComponent } from "@/views/grid/builder";
 import { useGridState } from "@/views/grid/builder/utils";
+import { useGridColumnNames } from "@/views/grid/builder/scope";
 import {
   FieldProps,
   usePermission,
@@ -128,6 +129,11 @@ export function OneToManyEdit({
     });
   }, [views, gridView, model]);
 
+  const columnNames = useGridColumnNames({
+    view: meta?.view ?? schema,
+    fields: meta?.fields ?? schema.fields,
+  });
+
   const onSearch = useCallback(
     async (options?: SearchOptions) => {
       const ids = (value || []).map((x) => x.id).filter((id) => (id ?? 0) > 0);
@@ -139,8 +145,10 @@ export function OneToManyEdit({
           limit: -1,
           offset: 0,
           sortBy: sortBy?.split?.(","),
+          fields: columnNames,
           filter: {
             ...options?.filter,
+            _archived: true,
             _domain: "self.id in (:_field_ids)",
             _domainContext: {
               _model: model,
@@ -160,7 +168,7 @@ export function OneToManyEdit({
         );
       }
     },
-    [dataStore, model, name, parentId, parentModel, sortBy, value],
+    [dataStore, model, name, parentId, parentModel, sortBy, value, columnNames],
   );
 
   const focusInput = useCallback(() => {
