@@ -51,11 +51,18 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
       return Optional.empty();
     }
 
-    final Optional<Credentials> credentials = super.getCredentials(ctx);
+    return super.getCredentials(ctx);
+  }
 
-    if (credentials.isEmpty()) {
+  @Override
+  protected Optional<Credentials> internalValidateCredentials(
+      CallContext ctx, Credentials credentials) {
+    var validatedCredentials = super.internalValidateCredentials(ctx, credentials);
+
+    if (validatedCredentials.isEmpty()) {
       Optional<Credentials> credentialsOpt = Optional.empty();
       CredentialsException error;
+
       try {
         credentialsOpt = getCredentialsExtractor().extract(ctx);
         error = new BadCredentialsException(AxelorAuthenticator.INCORRECT_CREDENTIALS);
@@ -70,10 +77,11 @@ public class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
               .map(UsernamePasswordCredentials::getUsername)
               .orElse(null);
       credentialsHandler.handleInvalidCredentials(this, username, error);
+    } else {
+      var context = ctx.webContext();
+      context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
     }
 
-    context.setRequestAttribute(DefaultSubjectContext.SESSION_CREATION_ENABLED, Boolean.FALSE);
-
-    return credentials;
+    return validatedCredentials;
   }
 }
