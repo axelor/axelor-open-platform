@@ -259,7 +259,7 @@ export function Dms(props: ViewProps<GridView>) {
               `self.relatedModel = '${popupRecord.relatedModel}'`,
             ]),
             ...(popupRecord.relatedId && [
-              `self.relatedId = '${popupRecord.relatedId}'`,
+              `self.relatedId = ${popupRecord.relatedId}`,
             ]),
           ]
         : ["self.parent is NULL"]),
