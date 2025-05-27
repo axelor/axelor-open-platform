@@ -18,6 +18,7 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -327,5 +328,31 @@ public class QueryTest extends ScriptTest {
     // Hibernate 5 doesn't fail because of null in collection.
     // Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
     assertThrows(AssertionError.class, query::getResultList);
+  }
+
+  @Test
+  void testQueryParamType() {
+    var em = JPA.em();
+
+    assertDoesNotThrow(
+        () ->
+            em.createQuery("SELECT self FROM Contact self WHERE self.id = :id", Contact.class)
+                .setParameter("id", 1L),
+        "Named parameter with Long type should succeed");
+
+    assertDoesNotThrow(
+        () ->
+            em.createQuery("SELECT self FROM Contact self WHERE self.id = :id", Contact.class)
+                .setParameter("id", "1"),
+        "Named parameter with String type should be coerced and succeed since Hibernate 6");
+
+    assertDoesNotThrow(
+        () -> em.createQuery("SELECT self FROM Contact self WHERE self.id = 1", Contact.class),
+        "Numeric literal should succeed");
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> em.createQuery("SELECT self FROM Contact self WHERE self.id = '1'", Contact.class),
+        "Comparing numeric to string literal should fail since Hibernate 6");
   }
 }

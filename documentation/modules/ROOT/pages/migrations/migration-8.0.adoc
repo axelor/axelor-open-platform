@@ -206,6 +206,25 @@ try (Stream<MyEntity> stream = query.stream()) {
 // Stream automatically closed after try block
 ----
 
+==== Stricter type checking for literals in field comparisons
+
+.Before
+[source,jpql]
+----
+-- Literal type could be coerced for the comparison
+SELECT e FROM MyEntity e WHERE e.id = '123'
+----
+
+.After
+[source,jpql]
+----
+-- Use the correct type for the literal
+SELECT e FROM MyEntity e WHERE e.id = 123
+
+-- Or use a parameter
+SELECT e FROM MyEntity e WHERE e.id = :entityId
+----
+
 === Other Notable Changes
 
 ==== Hibernate 6 supports automatic coercion of single-value parameters
