@@ -1,0 +1,5 @@
+---
+title: Fix grid rendering issue on sorting
+type: fix
+description: |
+  Avoid grid unmount/mount during search requests causing some grid state resetting (scroll positions, ...)

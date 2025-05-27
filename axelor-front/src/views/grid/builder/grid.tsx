@@ -181,6 +181,7 @@ export const Grid = forwardRef<
     onSave,
     onDiscard,
     className,
+    noRecordsText,
     ...gridProps
   } = props;
 
@@ -192,6 +193,7 @@ export const Grid = forwardRef<
   const allowCheckboxSelection =
     (view.selector ?? user?.view?.grid?.selection ?? "checkbox") === "checkbox";
   const hasClientSideSort = (gridProps?.sortType || "state") === "state";
+  const [initData, setInitData] = useState(false);
 
   const { commit: commitTreeForm } = useCollectionTreeEditable();
 
@@ -400,8 +402,9 @@ export const Grid = forwardRef<
     }
   }, [expandable, model, fields, expandableView]);
 
-  const init = useAsync(async () => {
-    onSearch?.({ ...searchOptions, fields: names });
+  useAsyncEffect(async () => {
+    await onSearch?.({ ...searchOptions, fields: names });
+    setInitData(true);
   }, [onSearch, searchOptions, names]);
 
   const handleCellClick = useCallback(
@@ -651,8 +654,6 @@ export const Grid = forwardRef<
     [editable, readonly, _gridContext],
   );
 
-  if (init.state === "loading") return null;
-
   return (
     <AxGridProvider>
       <GridContext.Provider value={gridContext}>
@@ -695,6 +696,7 @@ export const Grid = forwardRef<
           records={records!}
           rowHeight={Math.max(view.rowHeight ?? 35, 35)}
           {...gridProps}
+          {...(initData && { noRecordsText })}
           columns={columns}
           className={clsx(className, styles.grid)}
         />
