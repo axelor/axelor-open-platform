@@ -23,8 +23,7 @@
 
   <form name="user-token-api-key-form" title="User token" model="com.axelor.auth.db.UserToken" onNew="action-method-show-api-key">
     <panel name="apiKeyPanel" itemSpan="12">
-      <!-- TODO: remove readonly="false" when password widget supports show/copy buttons in readonly  -->
-      <field name="apiKey" readonly="false" />
+      <field name="apiKey" />
       <help>
         <![CDATA[
           This is your new API key. <br> Please make sure to copy and store it securely now — you won't be able to view it again later.
