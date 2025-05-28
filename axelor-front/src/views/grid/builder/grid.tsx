@@ -102,7 +102,6 @@ const getLabels: () => Record<GridLabel, string> = () =>
     "Sort Descending": i18n.get("Sort Descending"),
     "Group by": i18n.get("Group by"),
     "Customize...": i18n.get("Customize..."),
-    "No records found.": i18n.get("No records found."),
   });
 
 export type GridHandler = {
