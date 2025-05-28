@@ -129,7 +129,12 @@ export const FormLayoutComponent = ({
                   showTitles: "false",
                 },
               },
-              jsonFields: [item],
+              jsonFields: {
+                [item.jsonPath!]: {
+                  ...item,
+                  type: item.serverType ?? item.type,
+                },
+              },
               json: true,
               cols: 12,
               inGridEditorColName: item.name,

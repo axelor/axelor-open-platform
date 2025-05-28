@@ -352,7 +352,7 @@ export class DataSource {
 
       if (!silent) {
         dialogs.box({
-          title: i18n.get("Access error"),
+          title: i18n.get("Access Error"),
           content: Object.values(errors ?? {}).join("<br>"),
           yesNo: false,
         });

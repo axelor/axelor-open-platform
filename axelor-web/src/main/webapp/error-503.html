@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+  <head>
+    <title x-translate>Maintenance</title>
+    <link rel="shortcut icon" href="ws/public/app/icon" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+    />
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 3rem;
+        background-color: #f4f6f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: rgb(90, 90, 124);
+      }
+      body.dark {
+        background-color: #31334d;
+        color: white;
+      }
+      #maintenanceMessage {
+        margin-top: 1rem;
+      }
+      #maintenanceMessage > p {
+        margin: 0.5rem;
+      }
+      #maintenanceMessage > p.secondaryText {
+        font-size: 0.8rem;
+        margin-top: 0.67rem;
+        font-style: italic;
+      }
+      .main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        max-width: 600px;
+        padding: 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      body.dark .container {
+        background-color: #292a41;
+      }
+      #dateContainer {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+      .link-button {
+        display: inline;
+        padding: 0;
+        border: 0;
+        font: inherit;
+        text-decoration: underline;
+        cursor: pointer;
+        background: transparent;
+        color: rgb(0, 0, 238);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <img id="logo" src="ws/public/app/logo" alt="Axelor" />
+      <div id="maintenanceMessage" class="container">
+        <h1 x-translate>Site under maintenance</h1>
+        <p x-translate>Please check back later. Thank you for your patience.</p>
+        <p class="secondaryText">
+          <span x-translate>This page is automatically reloaded every 30 seconds.</span>
+          <br />
+          <span x-translate>Please contact your administrator if the problem persists.</span>
+        </p>
+        <button id="reloadButton" class="link-button" x-translate>Reload</button>
+      </div>
+      <p id="dateContainer">
+        <span x-translate>Refreshed at</span>
+        <span id="refreshDate"></span>
+      </p>
+    </div>
+
+    <script>
+      const reloadPage = () => location.reload();
+
+      const setup = () => {
+        document
+          .getElementById("dateContainer")
+          .querySelector("#refreshDate").innerHTML =
+          new Date().toLocaleTimeString(navigator.language);
+
+        document
+          .getElementById("reloadButton")
+          .addEventListener("click", reloadPage);
+
+        window.setTimeout(reloadPage, 30000);
+      };
+
+      const applyMessages = async () => {
+        const response = await fetch("js/messages.js");
+
+        if (!response.ok) {
+          console.error(
+            `Messages response failed: ${
+              response.statusText || response.status
+            }`
+          );
+          return;
+        }
+
+        const messages = await response.json();
+
+        document.querySelectorAll("[x-translate]")?.forEach((element) => {
+          const text = element.textContent;
+          const message = messages?.[text];
+          if (message) {
+            element.textContent = message;
+          }
+        });
+      };
+
+      const applyColorScheme = () => {
+        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        const logo = document.getElementById("logo");
+        const icon = document.querySelector("link[rel='shortcut icon']");
+
+        const onColorSchemeUpdate = (e) => {
+          const dark = e.matches;
+          const mode = dark ? "dark" : "light";
+
+          document.body.classList.toggle("dark", dark);
+          logo.src = `ws/public/app/logo?mode=${mode}`;
+          icon.href = `ws/public/app/icon?mode=${mode}`;
+        };
+
+        onColorSchemeUpdate(mediaQuery);
+        mediaQuery.addEventListener("change", onColorSchemeUpdate);
+      };
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setup();
+        applyMessages();
+        applyColorScheme();
+      });
+    </script>
+  </body>
+</html>

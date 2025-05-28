@@ -21,7 +21,7 @@ import { TreeField, TreeNode, TreeView } from "@/services/client/meta.types";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { toKebabCase, toTitleCase } from "@/utils/names";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewTabRefresh,
@@ -313,7 +313,7 @@ export function Tree({ meta }: ViewProps<TreeView>) {
     }
   }, [rootNode, dataStore, toTreeData, resetCount]);
 
-  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const setPopupHandlers = useSetPopupHandlers();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {

@@ -22,9 +22,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -65,7 +66,7 @@ public class PanelViewer {
     this.template = template;
   }
 
-  @JsonGetter("fields")
+  @JsonProperty(value = "fields", access = Access.READ_ONLY)
   public Collection<?> getTargetFields() {
     if (forField == null || forField.getTarget() == null) {
       return null;

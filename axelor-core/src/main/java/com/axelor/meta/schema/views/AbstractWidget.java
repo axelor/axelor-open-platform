@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -47,9 +49,25 @@ import javax.xml.namespace.QName;
   @Type(Label.class),
   @Type(Static.class),
   @Type(Help.class),
-  @Type(Dashlet.class)
+  @Type(Dashlet.class),
+  @Type(Panel.class),
+  @Type(PanelField.class),
+  @Type(PanelStack.class),
+  @Type(PanelTabs.class),
+  @Type(PanelRelated.class),
+  @Type(PanelMail.class),
+  @Type(PanelInclude.class),
+  @Type(PanelMail.MailMessages.class),
+  @Type(PanelMail.MailFollowers.class),
+  @Type(ButtonGroup.class),
+  @Type(Menu.class),
+  @Type(Menu.Item.class),
+  @Type(Menu.Divider.class)
 })
 public abstract class AbstractWidget {
+
+  @XmlAttribute(name = "id")
+  private String xmlId;
 
   @JsonIgnore
   @XmlAttribute(name = "if")
@@ -62,6 +80,14 @@ public abstract class AbstractWidget {
   @JsonIgnore @XmlAnyAttribute private Map<QName, String> otherAttributes;
 
   @XmlTransient @JsonIgnore private String model;
+
+  public String getXmlId() {
+    return xmlId;
+  }
+
+  public void setXmlId(String xmlId) {
+    this.xmlId = xmlId;
+  }
 
   public String getConditionToCheck() {
     return conditionToCheck;
@@ -120,7 +146,22 @@ public abstract class AbstractWidget {
 
   @XmlTransient
   public void setWidgetAttrs(Map<String, Object> attrs) {
-    // does nothing
+    if (ObjectUtils.isArray(attrs)) {
+      otherAttributes = null;
+      return;
+    }
+
+    otherAttributes = new HashMap<>();
+
+    for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      if (ObjectUtils.notEmpty(value)) {
+        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, key);
+        String qn = String.format("x-%s", name);
+        otherAttributes.put(QName.valueOf(qn), value.toString());
+      }
+    }
   }
 
   public String getModel() {

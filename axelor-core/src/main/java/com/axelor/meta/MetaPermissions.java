@@ -40,6 +40,7 @@ public class MetaPermissions {
 
   private static final String CAN_READ = "read";
   private static final String CAN_WRITE = "write";
+  private static final String CAN_IMPORT = "import";
   private static final String CAN_EXPORT = "export";
 
   private MetaPermission find(Set<MetaPermission> permissions, String object, String field) {
@@ -184,6 +185,9 @@ public class MetaPermissions {
       case CAN_WRITE:
         if (Boolean.TRUE.equals(rule.getCanWrite())) return true;
         break;
+      case CAN_IMPORT:
+        if (Boolean.TRUE.equals(rule.getCanImport())) return true;
+        break;
       case CAN_EXPORT:
         if (Boolean.TRUE.equals(rule.getCanExport())) return true;
         break;
@@ -197,6 +201,10 @@ public class MetaPermissions {
 
   public boolean canWrite(User user, String object, String field) {
     return can(user, object, field, CAN_WRITE);
+  }
+
+  public boolean canImport(User user, String object, String field) {
+    return can(user, object, field, CAN_IMPORT);
   }
 
   public boolean canExport(User user, String object, String field) {

@@ -29,6 +29,7 @@ public interface JpaSecurity {
     WRITE(/*$$(*/ "You are not authorized to update this resource." /*)*/),
     CREATE(/*$$(*/ "You are not authorized to create this resource." /*)*/),
     REMOVE(/*$$(*/ "You are not authorized to remove this resource." /*)*/),
+    IMPORT(/*$$(*/ "You are not authorized to import the data." /*)*/),
     EXPORT(/*$$(*/ "You are not authorized to export the data." /*)*/);
 
     private String message;
@@ -46,6 +47,7 @@ public interface JpaSecurity {
   public static final AccessType CAN_WRITE = AccessType.WRITE;
   public static final AccessType CAN_CREATE = AccessType.CREATE;
   public static final AccessType CAN_REMOVE = AccessType.REMOVE;
+  public static final AccessType CAN_IMPORT = AccessType.IMPORT;
   public static final AccessType CAN_EXPORT = AccessType.EXPORT;
 
   Set<AccessType> getAccessTypes(Class<? extends Model> model);

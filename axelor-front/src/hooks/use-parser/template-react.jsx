@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 import {
   Alert,
@@ -83,11 +84,20 @@ const cache = new LoadingCache();
 
 export function processReactTemplate(template) {
   return cache.get(template, () => {
-    const render = parseSafe(template);
-    const ReactComponent = ({ context }) => {
-      const ctx = useMemo(() => createContext(context), [context]);
-      return render(ctx);
-    };
-    return ReactComponent;
+    try {
+      const render = parseSafe(template);
+      const ReactComponent = ({ context }) => {
+        const ctx = useMemo(() => createContext(context), [context]);
+        return render(ctx);
+      };
+      return ({ context }) => (
+        <ErrorBoundary fallback={<Box />}>
+          <ReactComponent context={context} />
+        </ErrorBoundary>
+      );
+    } catch (err) {
+      console.error("React template error : ", err);
+      return () => null;
+    }
   });
 }

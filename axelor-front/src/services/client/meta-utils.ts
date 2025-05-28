@@ -520,13 +520,18 @@ export function processView(
       }
     }
 
-    ["canNew", "canView", "canEdit", "canRemove", "canSelect", "canDelete"].forEach(
-      (name) => {
-        if (item[name] === "false" || item[name] === "true") {
-          item[name] = item[name] === "true";
-        }
-      },
-    );
+    [
+      "canNew",
+      "canView",
+      "canEdit",
+      "canRemove",
+      "canSelect",
+      "canDelete",
+    ].forEach((name) => {
+      if (item[name] === "false" || item[name] === "true") {
+        item[name] = item[name] === "true";
+      }
+    });
 
     if (item.items) {
       processView(meta, item, view);
@@ -578,6 +583,7 @@ export function processView(
       };
       let panel: Schema | null = null;
       let panelTab: Schema | null = null;
+
       item.jsonFields = item.jsonFields.filter(
         (x: JsonField) => !(x as JsonField).forceHidden,
       );
@@ -585,6 +591,10 @@ export function processView(
         return x.sequence - y.sequence;
       });
       item.jsonFields.forEach((field: Schema) => {
+        if (field.nameField) {
+          field.nameColumn = field.nameField;
+        }
+
         if (field.widgetAttrs) {
           if (typeof field.widgetAttrs === "string") {
             field.widgetAttrs = JSON.parse(field.widgetAttrs);
@@ -652,6 +662,11 @@ export function processView(
           editor.items?.push(field);
         }
       });
+
+      item.jsonFields = (item.jsonFields as JsonField[]).reduce(
+        (acc, x) => ({ ...acc, [x.name]: x }),
+        {},
+      );
 
       if (panelTab) {
         editor.items?.push(panelTab);

@@ -20,11 +20,15 @@ package com.axelor.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.JpaTest;
+import com.axelor.rpc.Context;
+import com.axelor.rpc.ContextEntity;
+import com.axelor.script.ScriptTest;
+import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.google.common.collect.ImmutableMap;
@@ -43,12 +47,25 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-public class QueryTest extends JpaTest {
+public class QueryTest extends ScriptTest {
 
   @Test
   public void testCount() {
     assertTrue(all(Circle.class).count() > 0);
     assertTrue(all(Contact.class).count() > 0);
+  }
+
+  @Test
+  public void testQueryPathComparison() {
+    // comparing an entity path against a literal
+    assertTrue(all(Address.class).filter("self.country = ?1", 1).count() > 0);
+
+    // comparing an entity path against a proxy instance
+    final Context context = new Context(contextMap(), Contact.class);
+    final Contact proxy = context.asType(Contact.class);
+
+    assertInstanceOf(ContextEntity.class, proxy);
+    assertTrue(all(Address.class).filter("self.contact = ?1", proxy).count() > 0);
   }
 
   @Test

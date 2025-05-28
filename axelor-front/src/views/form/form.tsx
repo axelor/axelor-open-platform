@@ -38,7 +38,7 @@ import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { usePopupHandlerAtom, useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
@@ -188,7 +188,7 @@ export const usePrepareSaveRecord = (
             const restoreDummyValues = Object.keys(dummy).reduce(
               (values, key) => {
                 const viewItem = findViewItem(meta, key);
-                return viewItem?.resetState === true
+                return !viewItem || viewItem?.resetState === true
                   ? values
                   : { ...values, [key]: dummy[key] };
               },
@@ -1018,7 +1018,7 @@ const FormContainer = memo(function FormContainer({
     readonly,
   );
   const popupHandlerAtom = usePopupHandlerAtom();
-  const setPopupHandlers = useSetAtom(popupHandlerAtom);
+  const setPopupHandlers = useSetPopupHandlers();
 
   const showToolbar = popupOptions?.showToolbar !== false;
 
@@ -1122,11 +1122,11 @@ const FormContainer = memo(function FormContainer({
   // register shortcuts
   useShortcuts({
     viewType: schema.type,
-    onNew: canNew ? onNew : undefined,
-    onEdit: canEdit ? onEdit : undefined,
+    onNew: showToolbar && canNew ? onNew : undefined,
+    onEdit: showToolbar && canEdit ? onEdit : undefined,
     onSave: canSave ? handleSave : undefined,
-    onCopy: canCopy ? onCopy : undefined,
-    onDelete: canDelete ? onDelete : undefined,
+    onCopy: showToolbar && canCopy ? onCopy : undefined,
+    onDelete: showToolbar && canDelete ? onDelete : undefined,
     onRefresh: onRefresh,
     onFocus: handleFocus,
   });

@@ -150,7 +150,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
   const actionExecutor = useMemo(() => {
     return new DefaultActionExecutor(
       new FormActionHandler(() => ({
-        ...getContext(),
+        ...getContext(true),
         ...getRecordContext(),
         _chart: chartName,
         _model: "com.axelor.script.ScriptBindings",
@@ -163,7 +163,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
       async (get, set) => {
         if (view?.onInit) {
           const res = await actionExecutor.execute(view.onInit, {
-            context: getContext(),
+            context: getContext(true),
           });
           // collect values from action result
           const values = res?.reduce?.(

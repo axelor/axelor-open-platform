@@ -35,6 +35,7 @@ import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.openapi.OpenApiModule;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
+import com.axelor.web.servlet.MaintenanceFilter;
 import com.axelor.web.servlet.NoCacheFilter;
 import com.axelor.web.servlet.ProxyFilter;
 import com.axelor.web.socket.inject.WebSocketModule;
@@ -126,6 +127,9 @@ public class AppServletModule extends ServletModule {
 
     // no-cache filter
     filter("/js/*", NoCacheFilter.STATIC_URL_PATTERNS).through(NoCacheFilter.class);
+
+    // Maintenance mode (503 Service Unavailable)
+    filter("/", "/index.html", "/ws/*").through(MaintenanceFilter.class);
 
     // i18n bundle
     serve("/js/messages.js").with(I18nServlet.class);

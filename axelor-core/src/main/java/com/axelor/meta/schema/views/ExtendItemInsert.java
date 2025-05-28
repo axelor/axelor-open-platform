@@ -40,6 +40,9 @@ public class ExtendItemInsert {
   @XmlElement(name = "menu")
   private List<Menu> menubar;
 
+  @XmlElement(name = "hilite")
+  private List<Hilite> hilites;
+
   @XmlElements({
     @XmlElement(name = "field", type = PanelField.class),
     @XmlElement(name = "spacer", type = Spacer.class),
@@ -57,11 +60,8 @@ public class ExtendItemInsert {
     @XmlElement(name = "panel-tabs", type = PanelTabs.class),
     @XmlElement(name = "panel-mail", type = PanelMail.class),
     @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "hilite", type = Hilite.class),
     @XmlElement(name = "item", type = Item.class),
-    @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "divider", type = Divider.class),
-    @XmlElement(name = "tooltip", type = ToolTip.class)
+    @XmlElement(name = "divider", type = Divider.class)
   })
   private List<AbstractWidget> items;
 
@@ -93,6 +93,14 @@ public class ExtendItemInsert {
 
   public void setMenubar(List<Menu> menubar) {
     this.menubar = menubar;
+  }
+
+  public List<Hilite> getHilites() {
+    return hilites;
+  }
+
+  public void setHilites(List<Hilite> hilites) {
+    this.hilites = hilites;
   }
 
   public List<AbstractWidget> getItems() {

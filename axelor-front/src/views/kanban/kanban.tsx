@@ -34,7 +34,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { DEFAULT_KANBAN_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewContext,
@@ -367,23 +367,27 @@ export function Kanban(props: ViewProps<KanbanView>) {
     ) => {
       const viewName = action.views?.find((v) => v.type === "form")?.name;
       const { title, model } = view;
-      model &&
+      if (model) {
         showEditor({
           title: title ?? "",
           model,
           viewName,
+          context: getContext(),
           record: record as DataRecord,
           readonly,
           onSearch: () => onRefresh(),
         });
+      }
     },
-    [showEditor, view, action, onRefresh],
+    [showEditor, view, action, getContext, onRefresh],
   );
 
   const onNew = useCallback(() => {
-    hasAddPopup
-      ? onEditInPopup({ record: {} as KanbanRecord })
-      : onEdit({ record: {} as KanbanRecord });
+    if (hasAddPopup) {
+      onEditInPopup({ record: {} as KanbanRecord });
+    } else {
+      onEdit({ record: {} as KanbanRecord });
+    }
   }, [hasAddPopup, onEdit, onEditInPopup]);
 
   const onCreate = useCallback(
@@ -585,7 +589,7 @@ export function Kanban(props: ViewProps<KanbanView>) {
     ],
   );
 
-  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const setPopupHandlers = useSetPopupHandlers();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {

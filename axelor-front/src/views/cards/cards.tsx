@@ -21,7 +21,7 @@ import { legacyClassNames } from "@/styles/legacy";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { AdvanceSearch } from "@/view-containers/advance-search";
 import { useDashletHandlerAtom } from "@/view-containers/view-dashlet/handler";
-import { usePopupHandlerAtom } from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useViewContext,
@@ -192,31 +192,41 @@ export function Cards(props: ViewProps<CardsView>) {
     (record: DataRecord, readonly = false) => {
       const viewName = action.views?.find((v) => v.type === "form")?.name;
       const { title, model } = view;
-      model &&
+      if (model) {
         showEditor({
           title: title ?? "",
           model,
           viewName,
+          context: getViewContext(true),
           record,
           readonly,
           onSearch: () => onSearch({}),
         });
+      }
     },
-    [showEditor, view, action, onSearch],
+    [showEditor, view, action, getViewContext, onSearch],
   );
 
   const onNew = useCallback(() => {
-    hasAddPopup ? onEditInPopup({}) : onEdit({});
+    if (hasAddPopup) {
+      onEditInPopup({});
+    } else {
+      onEdit({});
+    }
   }, [hasAddPopup, onEdit, onEditInPopup]);
 
   const onView = useCallback(
     (record: DataRecord) => {
-      hasEditPopup ? onEditInPopup(record, true) : onEdit(record, true);
+      if (hasEditPopup) {
+        onEditInPopup(record, true);
+      } else {
+        onEdit(record, true);
+      }
     },
     [hasEditPopup, onEdit, onEditInPopup],
   );
 
-  const setPopupHandlers = useSetAtom(usePopupHandlerAtom());
+  const setPopupHandlers = useSetPopupHandlers();
   const setDashletHandlers = useSetAtom(useDashletHandlerAtom());
 
   useEffect(() => {
@@ -236,9 +246,10 @@ export function Cards(props: ViewProps<CardsView>) {
         actionExecutor,
         view,
         onRefresh,
-        ...(canNew && canEdit && {
-          onAdd: () => onEditInPopup({}),
-        }),
+        ...(canNew &&
+          canEdit && {
+            onAdd: () => onEditInPopup({}),
+          }),
       });
     }
   }, [

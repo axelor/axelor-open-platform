@@ -19,9 +19,7 @@ export function RefText(props: FieldProps<any>) {
     return atom(
       (get) => {
         const value = get(valueAtom);
-        return {
-          [targetName]: value ?? "",
-        };
+        return value ? { [targetName]: value } : null;
       },
       (get, set, value: DataRecord, fireOnChange?: boolean) => {
         set(valueAtom, value?.[targetName] || null, fireOnChange);

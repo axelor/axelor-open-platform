@@ -195,10 +195,7 @@ export function useTemplateContext(
   const action = useViewAction();
 
   const getContext = useCallback(
-    () => ({
-      ...action.context,
-      ...createContextParams(view, action),
-    }),
+    () => createContextParams(view, action),
     [view, action],
   );
 

@@ -1,11 +1,12 @@
 import { Box, clsx } from "@axelor/ui";
-import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "bunshi/react";
+import { SetStateAction, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atomFamily, selectAtom, useAtomCallback } from "jotai/utils";
+import filter from "lodash/filter";
+import cloneDeep from "lodash/cloneDeep";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import isNumber from "lodash/isNumber";
-import filter from "lodash/filter";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
@@ -18,8 +19,8 @@ import { i18n } from "@/services/client/i18n";
 import { ViewData } from "@/services/client/meta";
 import {
   Editor,
-  Field,
   FormView,
+  JsonField,
   Panel,
   Property,
   Schema,
@@ -62,6 +63,56 @@ export type FormEditorProps = FieldEditorProps & {
   editor: FormView;
   fields: Record<string, Property>;
 };
+
+/**
+ * For the given json field, check if the context field value match with the record data.
+ *
+ * @param field the json field
+ * @param record the record to match against
+ */
+function isContextFieldMatch(field: JsonField, record: DataRecord): boolean {
+  if (field.contextField) {
+    return (
+      String(field.contextFieldValue) === String(record[field.contextField]?.id)
+    );
+  }
+  return true;
+}
+
+/**
+ * Filter the given editor based on available editorFields. The editorFields are the
+ * filtered contextual fields based on the record.
+ *
+ * @param editor the editor
+ * @param editorFields the available editorFields
+ */
+function filterJsonEditorItems(
+  editor: FormView,
+  editorFields: Record<string, JsonField>,
+) {
+  const newEditor: FormView = cloneDeep(editor);
+
+  function walkInItems(items: any) {
+    const newItems: any[] = [];
+    if (!items || items.length === 0) {
+      return items;
+    }
+    items.forEach((item: any) => {
+      if (item.name && !Object.keys(editorFields).includes(item.name)) {
+        return;
+      }
+      if (item.items) {
+        item.items = walkInItems(item.items);
+      }
+      newItems.push(item);
+    });
+    return newItems;
+  }
+
+  newEditor.items = walkInItems(newEditor.items);
+
+  return newEditor;
+}
 
 function processEditor(schema: Schema) {
   const editor: Editor = schema.editor;
@@ -498,7 +549,14 @@ function useItemsFamily({
         if (items.length === 1 && isInitial(items[0]) && isClean(items[0])) {
           return;
         }
-        const next = multiple ? items : (items[0] ?? null);
+        const cleanInitial = (val: DataRecord | null) =>
+          isInitial(val) ? { ...val, [IS_INITIAL]: false } : val;
+
+        // once updated, it should clean up IS_INITIAL
+        const next = multiple
+          ? items?.map(cleanInitial)
+          : (cleanInitial(items[0]) ?? null);
+
         set(valueAtom, next, fireOnChange, markDirty);
         setInitialItem(undefined);
       },
@@ -1132,7 +1190,72 @@ const RecordEditor = memo(function RecordEditor({
   );
 });
 
-function JsonEditor({
+function JsonEditor(props: FormEditorProps) {
+  const { schema, formAtom, editor } = props;
+
+  const fieldsAtom = useMemo(
+    () => selectAtom(formAtom, (o) => o.fields),
+    [formAtom],
+  );
+
+  const modelFields = useAtomValue(fieldsAtom);
+  const jsonFields: Record<string, JsonField> = useMemo(
+    () => schema.jsonFields ?? {},
+    [schema.jsonFields],
+  );
+
+  const editorFieldsRef = useRef<Record<string, JsonField>>({});
+  const editorFieldsAtom = useMemo(() => {
+    return atom((get) => {
+      if (
+        Object.values(jsonFields)
+          .filter((x) => x.contextField)
+          .map((x) => x.contextField!)
+          .filter((x) => modelFields[x])
+          .filter((x, i, a) => a.indexOf(x) === i).length === 0
+      ) {
+        return jsonFields;
+      }
+      const record = get(formAtom).record;
+      let lastPanelExcluded = false;
+      const nextFields = Object.entries(jsonFields)
+        .filter(([_, field]) => {
+          if (field.type === "panel") {
+            const res = isContextFieldMatch(field, record);
+            lastPanelExcluded = !res;
+            return res;
+          } else if (lastPanelExcluded) {
+            return false;
+          }
+
+          return isContextFieldMatch(field, record);
+        })
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+
+      // if fields changed, update the ref
+      const currentValues = Object.values(editorFieldsRef.current);
+      const nextValues = Object.values(nextFields);
+      if (
+        currentValues.length !== nextValues.length ||
+        currentValues.some((x, i) => x !== nextValues[i])
+      ) {
+        editorFieldsRef.current = nextFields;
+      }
+
+      return editorFieldsRef.current;
+    });
+  }, [formAtom, jsonFields, modelFields]);
+
+  const editorFields = useAtomValue(editorFieldsAtom);
+  const jsonEditor = useMemo(
+    () => filterJsonEditorItems(editor, editorFields),
+    [editor, editorFields],
+  );
+
+  return <JsonEditorInner {...props} editor={jsonEditor} />;
+}
+
+function JsonEditorInner({
   schema,
   editor,
   fields,
@@ -1149,7 +1272,7 @@ function JsonEditor({
   );
   const model = useAtomValue(modelAtom);
   const jsonModel = schema.jsonModel;
-  const jsonFields = processJsonFields(schema);
+  const jsonFields: Record<string, JsonField> = schema.jsonFields ?? {};
   const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
   const jsonValueRef = useRef<DataRecord>();
 
@@ -1239,17 +1362,6 @@ function JsonEditor({
       layout={jsonLayout}
     />
   );
-}
-
-function processJsonFields(schema: Schema) {
-  const fields: Record<string, Schema> = schema.jsonFields ?? {};
-  return Object.entries(fields).reduce((acc, [k, v]) => {
-    const { nameField: nameColumn, ...field } = v;
-    return {
-      ...acc,
-      [k]: nameColumn ? { ...field, nameColumn } : field,
-    };
-  }, {}) as Record<string, Field>;
 }
 
 function processJsonView(schema: Schema, jsonFields: any) {

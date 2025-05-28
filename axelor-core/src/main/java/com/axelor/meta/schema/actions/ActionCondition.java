@@ -42,6 +42,10 @@ public class ActionCondition extends Action {
     return conditions;
   }
 
+  public void setConditions(List<Check> conditions) {
+    this.conditions = conditions;
+  }
+
   @Override
   public Object evaluate(ActionHandler handler) {
     Map<String, String> errors = Maps.newHashMap();
@@ -101,8 +105,16 @@ public class ActionCondition extends Action {
       return field;
     }
 
+    public void setField(String field) {
+      this.field = field;
+    }
+
     public String getError() {
       return error;
+    }
+
+    public void setError(String error) {
+      this.error = error;
     }
 
     public String getLocalizedError() {

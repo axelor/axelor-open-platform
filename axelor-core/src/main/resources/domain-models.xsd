@@ -21,7 +21,7 @@
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/domain-models"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://axelor.com/xml/ns/domain-models"
-  elementFormDefault="qualified" attributeFormDefault="unqualified" version="7.3">
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="7.4">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -606,23 +606,16 @@
     <xsd:attribute name="unique" type="xsd:string"/>
     <xsd:attribute name="columns" use="required">
       <xsd:annotation>
-        <xsd:documentation>
-          Comma separated list of column names.
+        <xsd:documentation><![CDATA[
+          Comma separated list of field names.
 
-          &lt;br&gt;
-          &lt;br&gt;
+          The column names can be followed by either ASC or DESC. If ASC or DESC is not specified, ASC is assumed.
 
-          The column names can be followed by either ASC or DESC.
-          If ASC or DESC is not specified, ASC is assumed.
-
-          &lt;br&gt;
-          &lt;br&gt;
-
-          Some examples:&lt;br&gt;&lt;br&gt;
-          ... columns="code,name"&lt;br&gt;
-          ... columns="code ASC,name DESC"&lt;br&gt;
-          ... columns="code,name DESC"&lt;br&gt;
-        </xsd:documentation>
+          Some examples:
+          columns="code,name"
+          columns="code ASC,name DESC"
+          columns="code,name DESC"
+        ]]></xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
@@ -637,7 +630,7 @@
     <xsd:attribute name="columns" use="required">
       <xsd:annotation>
         <xsd:documentation>
-          Comma separated list of column names.
+          Comma separated list of field names.
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>

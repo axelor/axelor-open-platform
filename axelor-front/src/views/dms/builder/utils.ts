@@ -76,15 +76,14 @@ export function prepareCustomView({ model }: GridView, record: DataRecord) {
 }
 
 export async function downloadAsBatch(
-  record: DataRecord,
-  model = "com.axelor.dms.db.DMSFile",
+  ids: number[],
 ) {
   const resp = await request({
     url: `ws/dms/download/batch`,
     method: "POST",
     body: {
-      model,
-      records: [record.id],
+      model: "com.axelor.dms.db.DMSFile",
+      records: ids,
     },
   });
   if (resp.ok) {

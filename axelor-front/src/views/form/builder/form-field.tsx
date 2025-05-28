@@ -1,7 +1,8 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
 import {
   forwardRef,
+  useCallback,
   useDeferredValue,
   useEffect,
   useMemo,
@@ -31,15 +32,15 @@ import {
   Tooltip as TooltipType,
 } from "@/services/client/meta.types";
 import { session } from "@/services/client/session";
-import { focusAtom } from "@/utils/atoms";
 import format from "@/utils/format";
+import { legacyClassNames } from "@/styles/legacy";
+import { sanitize } from "@/utils/sanitize";
 
 import { useFormScope } from "./scope";
 import { FieldProps, FormAtom, ValueAtom, WidgetProps } from "./types";
+import { useWidgetAttrsAtomByName } from "./atoms";
 
 import styles from "./form-field.module.css";
-import { legacyClassNames } from "@/styles/legacy";
-import { sanitize } from "@/utils/sanitize";
 
 export type WidgetControlProps = WidgetProps & {
   className?: string;
@@ -99,14 +100,21 @@ export function FieldControl({
   const canShowTitle =
     showTitle ?? schema.showTitle ?? schema.widgetAttrs?.showTitle ?? true;
 
-  const [focus, setFocus] = useAtom(
+  const widgetAttrsAtom = useWidgetAttrsAtomByName({ schema, formAtom });
+  const setWidgetAttrsByName = useSetAtom(widgetAttrsAtom);
+
+  const resetFocusAttr = useCallback(() => {
+    // reset focus in statesByName
+    setWidgetAttrsByName((_attrs) => {
+      if (_attrs.focus) {
+        _attrs.focus = false;
+      }
+    });
+  }, [setWidgetAttrsByName]);
+
+  const focus = useAtomValue(
     useMemo(
-      () =>
-        focusAtom(
-          widgetAtom,
-          (state) => state.attrs.focus,
-          (state, focus) => ({ ...state, attrs: { ...state.attrs, focus } }),
-        ),
+      () => selectAtom(widgetAtom, (state) => state.attrs.focus),
       [widgetAtom],
     ),
   );
@@ -117,7 +125,7 @@ export function FieldControl({
       const input = containerRef.current?.querySelector?.(
         "input,textarea",
       ) as HTMLInputElement;
-      input && input?.select?.();
+      input?.select?.();
     }
   }, [focusInput]);
 
@@ -126,9 +134,7 @@ export function FieldControl({
       <Box className={clsx(styles.content, contentClassName)}>{children}</Box>
     );
     return focus ? (
-      <ClickAwayListener onClickAway={() => setFocus(undefined)}>
-        {content}
-      </ClickAwayListener>
+      <ClickAwayListener onClickAway={resetFocusAttr}>{content}</ClickAwayListener>
     ) : (
       content
     );

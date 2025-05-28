@@ -2,6 +2,8 @@ import { atom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import isEqual from "lodash/isEqual";
+import omit from "lodash/omit";
+import pick from "lodash/pick";
 import {
   SetStateAction,
   useCallback,
@@ -124,7 +126,22 @@ export function useViewContext({
 
   return useCallback(
     (actionContext?: boolean) => {
-      const _parent = dashlet || recordId ? getFormContext() : undefined;
+      const formCtx = dashlet || recordId ? getFormContext() : undefined;
+      const _parent = (() => {
+        if (dashlet) {
+          return {
+            ...(actionContext ? omit(formCtx, ["_domainAction"]) : formCtx),
+            ...pick(action.context ?? {}, [
+              "_model",
+              "_viewName",
+              "_viewType",
+              "_views",
+            ]),
+          };
+        }
+        return formCtx;
+      })();
+
       return processContextValues(
         actionContext
           ? {

@@ -81,7 +81,10 @@ function walkSchema(
   }) => Schema | undefined,
 ): Schema | undefined {
   const name = schema.name;
-  const items = schema.items ?? schema.editor?.items ?? [];
+  const items =
+    schema.json && schema.jsonFields
+      ? Object.values(schema.jsonFields)
+      : (schema.items ?? schema.editor?.items ?? []);
   const path = name ? [...schemaPath, ...name.split(".")] : schemaPath;
 
   if (name) {

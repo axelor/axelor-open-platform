@@ -21,7 +21,7 @@
 -->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="7.3">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="7.4">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -32,8 +32,18 @@
   <xsd:element name="object-views">
     <xsd:complexType>
       <xsd:choice minOccurs="1" maxOccurs="unbounded">
-        <xsd:element name="form" type="tns:FormView" />
-        <xsd:element name="grid" type="tns:GridView" />
+        <xsd:element name="form" type="tns:FormView" >
+          <xsd:unique name="formIds">
+            <xsd:selector xpath=".//*"/>
+            <xsd:field xpath="@id"/>
+          </xsd:unique>
+        </xsd:element>
+        <xsd:element name="grid" type="tns:GridView">
+          <xsd:unique name="gridIds">
+            <xsd:selector xpath=".//*"/>
+            <xsd:field xpath="@id"/>
+          </xsd:unique>
+        </xsd:element>
         <xsd:element name="tree" type="tns:TreeView" />
         <xsd:element name="calendar" type="tns:CalendarView" />
         <xsd:element name="gantt" type="tns:GanttView" />
@@ -61,19 +71,15 @@
         <xsd:element name="action-report" type="tns:ActionReport" />
       </xsd:choice>
     </xsd:complexType>
+    <xsd:unique name="viewIds">
+      <xsd:selector xpath="./*"/>
+      <xsd:field xpath="@id"/>
+    </xsd:unique>
   </xsd:element>
 
   <xsd:complexType name="MenuItem">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
-        <xsd:attribute name="id" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              If overriding some existing one, provide an unique id to identify
-              this one.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
@@ -428,6 +434,13 @@
   </xsd:complexType>
 
   <xsd:complexType name="AbstractWidget" abstract="true">
+    <xsd:attribute name="id" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Unique id to identify the current widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
@@ -1407,6 +1420,13 @@
     <xsd:attribute name="editable" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether the grid is editable.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-json-model" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify the custom model name of this view.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:attributeGroup>
@@ -3589,6 +3609,7 @@
   <xsd:group name="ExtendFormItems">
     <xsd:choice>
       <xsd:group ref="tns:PanelItems" />
+      <xsd:element name="hilite" type="tns:Hilite" />
       <xsd:element name="toolbar" type="tns:Toolbar" />
       <xsd:element name="menubar" type="tns:Menubar" />
       <xsd:element name="menu" type="tns:MenubarMenu" />

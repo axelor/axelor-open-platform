@@ -9,6 +9,7 @@ import { GridRowProps } from "@axelor/ui/grid";
 import { DMS_NODE_TYPE, TreeRecord } from "./types";
 import { DataRecord } from "@/services/client/data.types";
 import { useDMSGridHandlerAtom } from "./handler";
+import { compare } from "@/utils/sort";
 import styles from "./dms-tree.module.scss";
 
 interface TreeProps {
@@ -128,7 +129,8 @@ export const DmsTree = memo(function DmsTree({
     function toTreeNode(record: TreeRecord, level = 0) {
       const _children: TreeRecord[] = data
         .filter((rec) => rec["parent.id"] === record.id)
-        .map((record) => toTreeNode(record, level + 1));
+        .map((rec) => toTreeNode(rec, level + 1))
+        .sort((r1, r2) => compare(r1.fileName, r2.fileName));
 
       const $record = {
         ...record,

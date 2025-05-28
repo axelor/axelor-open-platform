@@ -18,7 +18,6 @@
  */
 package com.axelor.gradle;
 
-import com.axelor.common.VersionUtils;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
@@ -51,8 +50,6 @@ public class AxelorPlugin implements Plugin<Project> {
 
   public static final String AXELOR_APP_GROUP = "axelor application";
   public static final String AXELOR_BUILD_GROUP = "axelor build";
-
-  private final String version = VersionUtils.getVersion().version;
 
   public static File getClassOutputDir(Project project, String sourceType) {
     return project
@@ -100,9 +97,7 @@ public class AxelorPlugin implements Plugin<Project> {
     }
 
     // include core dependencies
-    project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
-    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
-    project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
+    AxelorUtils.addDependencies(project);
   }
 
   private void configureWarSupport(Project project) {

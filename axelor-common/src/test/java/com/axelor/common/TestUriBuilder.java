@@ -53,6 +53,12 @@ public class TestUriBuilder {
   }
 
   @Test
+  void fromRelative() throws URISyntaxException {
+    assertEquals(new URI("/vi/foo?bar#baz"), UriBuilder.from("vi/foo?bar#baz").toUri());
+    assertEquals(new URI("/vi/foo?bar#baz"), UriBuilder.from("/vi/foo?bar#baz").toUri());
+  }
+
+  @Test
   void withPort() throws URISyntaxException {
     assertEquals(
         new URI("https://example.com/foo?bar#baz"),
@@ -102,5 +108,25 @@ public class TestUriBuilder {
             .addQueryParams(Map.of("q2", "test2"))
             .toUri();
     assertEquals(expected, uri4);
+  }
+
+  @Test
+  void merge() throws URISyntaxException {
+    UriBuilder base = UriBuilder.from("https://example.com/v1");
+
+    assertEquals(
+        new URI("https://example.com/v1/foo?bar#baz"),
+        base.cloneBuilder().merge(UriBuilder.from("foo?bar#baz")).toUri());
+    assertEquals(
+        new URI("https://example.com/v1/foo?bar#baz"),
+        base.cloneBuilder().merge(UriBuilder.from("/foo?bar#baz")).toUri());
+
+    // Weird
+    assertEquals(
+        new URI("https://example.com/foo/v1?bar#baz"),
+        UriBuilder.from("/foo?bar#baz").merge(base.cloneBuilder()).toUri());
+    assertEquals(
+        new URI("https://test.com:8080/v1/sub?foo#foz"),
+        base.cloneBuilder().merge(UriBuilder.from("https://test.com:8080/sub?foo#foz")).toUri());
   }
 }

@@ -1,3 +1,315 @@
+## 7.4.0 (2025-05-15)
+
+#### Feature
+
+* Add maven group id to module meta data
+
+  <details>
+  
+  The maven group id of the module is now stored in axelor-module.properties.
+  
+  </details>
+
+* Fix view schema deserialisation issues
+
+  <details>
+  
+  The view schema types are designed with JSON serialisation in mind. However,
+  with the new studio designer, we also need proper JSON deserialisation support.
+  
+  - added missing annotations
+  - added missing getter/setters
+  - added missing subtype annotations
+  - added `x-json-model` on to AbstractView to identify view by custom model
+  - added `id` attribute to form/grid view items
+  - fix widgetAttrs deserialization issue
+  - use `PanelField` instead of base `Field`
+  - fix duplicate `type` key in serialized view json
+  - fix view width serialization issue
+  
+  </details>
+
+* Add maintenance service
+
+  <details>
+  
+  You can define maintenance mode behavior by implementing `MaintenanceService`:
+  
+  ```java
+  import com.axelor.web.service.MaintenanceService;
+  
+  public class ContactModule extends AxelorModule {
+  
+    @Override
+    protected void configure() {
+      // (...module configuration)
+  
+      // Bind the maintenance service interface to your implementation.
+      bind(MaintenanceService.class).to(MyMaintenanceService.class);
+    }
+  }
+  ```
+  
+  ```java
+  public class MyMaintenanceService implements MaintenanceService {
+  
+    // Implement your maintenance mode logic.
+    // By default, maintenance mode is never enabled.
+    @Override
+    public boolean isMaintenanceMode(User user, HttpServletRequest httpRequest) {
+      if (/*custom logic*/) {
+        return true;
+      }
+  
+      return false;
+    }
+  }
+  ```
+  
+  Default maintenance page is `error-503.html` located in `src/main/webapp` directory.
+  Note that you are free to override it if needed, by putting your own `error-503.html`
+  in the `src/main/webapp` directory of your module.
+  
+  </details>
+
+* Implement batch saving of tracking messages/followers
+
+  <details>
+  
+  Optimized the saving of audit tracking messages and followers by implementing batch processing.
+  This improves performance, especially during operations that generate many tracking entries.
+  
+  </details>
+
+* Add data import permissions
+
+  <details>
+  
+  For the upcoming advance import/export feature (enterprise only),
+  we need more fine grained data import permissions support.
+  
+  This change adds an additional `canImport` permission option for objects and fields.
+  
+  Run following SQL script to adjust `auth_permission` and `meta_permission_rule` tables changes :
+  ```sql
+  ALTER TABLE auth_permission ADD COLUMN can_import boolean;
+  ALTER TABLE meta_permission_rule ADD COLUMN can_import boolean;
+  ```
+  
+  </details>
+
+#### Change
+
+* Change enterprise edition usage
+
+  <details>
+  
+  Usage of the enterprise edition of the platform is evolving: it is no longer a matter of a single 
+  `com.axelor:axelor-enterprise-edition` module to rely on, but of different variant of the core modules.
+  
+  As of now, to use enterprise edition, remove the dependency `com.axelor:axelor-enterprise-edition` 
+  and add the property `axelor.platform.ee = true` in your `gradle.properties`. This will automatically 
+  update your dependencies to use requires and right EE modules.
+  
+  </details>
+
+#### Fix
+
+* Fix view shortcuts scoping
+
+  <details>
+  
+  The last popup view should be used as the target view tab.
+  
+  </details>
+
+* Fix custom record filtering
+
+  <details>
+  
+  The `Query` instance obtained with `MetaJsonRecordRepository#all(String)`
+  should filter custom records even if no additional filter provided.
+  
+  </details>
+
+* Fix disable selection in readonly mode
+
+  <details>
+  
+  When selection widget is rendered in readonly, it should open selection through any 
+  interactive events like key press, key up/down or element click.
+  
+  </details>
+
+* Fix view field hilite extension support
+
+  <details>
+  
+  Adding new hilite rules to fields were not working.
+  
+  </details>
+
+
+## 7.3.7 (2025-05-07)
+
+#### Fix
+
+* Fix render dashlets in details form view
+* Fix missing elements in json view
+
+  <details>
+  
+  Due to latest change on json fields processing improvements, some json fields 
+  (either a field or panel, separator, ...) were missing in the view.
+  
+  </details>
+
+* Fix validate json fields in form view
+
+## 7.3.6 (2025-04-24)
+
+#### Fix
+
+* Fix time selection input in datepicker
+
+  <details>
+  
+  Native select used for time selection hangs on some browsers in popup.
+  This is now renders in same way as year/month selection.
+  
+  </details>
+
+* Downgrade postgres driver - performance issue with v42.7.5
+* Fix add validation on form relational field editor
+
+  <details>
+  
+  When requiredIf or validIf is used on relational field (with editor) then
+  it should validate those conditions.
+  
+  </details>
+
+* Fix swagger ui styles for dark base themes
+* Fix reset value in eval-ref-select/ref-text widget
+* Fix restore dummy fields on form record save
+
+  <details>
+  
+  When any dummy field is not defined in view then it's value shouldn't be restore in form record state.
+  
+  </details>
+
+
+## 7.3.5 (2025-04-11)
+
+#### Feature
+
+* Upgrade backend dependencies
+
+  <details>
+  
+  Here is the list of backend dependencies upgraded :
+  
+  - Upgrade Logback from 1.3.14 to 1.3.15
+  - Upgrade SLF4J from 2.0.16 to 2.0.17
+  - Upgrade Apache Tomcat from 9.0.97 to 9.0.102
+  - Upgrade Postgresql JDBC from 42.7.4 to 42.7.5
+  - Upgrade Groovy from 3.0.23 to 3.0.24
+  - Upgrade Jackson from 2.18.2 to 2.18.3
+  - Upgrade Junit5 from 5.11.3 to 5.11.4
+  
+  </details>
+
+#### Fix
+
+* Fix skip special context variables in form context
+
+  <details>
+  
+  Special variables like _showSingle, _showRecord should not be forwared to form contexts.
+  
+  </details>
+
+* Fix set focus on field multiple times using action-attrs
+* Fix reload form view on popup close
+
+  <details>
+  
+  When popup is opened from another popup with popup=reload then it should reload the tab view 
+  instead of reload closed popup view.
+  
+  </details>
+
+* Fix pass action context to data view popup editor
+
+  <details>
+  
+  When popup editor is used directly on data views like grid, kanban, cards,
+  calendar, gantt, dms etc then it should pass action context to popup editor.
+  
+  </details>
+
+* Fix editor data not propagated to parent record.
+
+  <details>
+  
+  As soon as clearing values on an editor item that is shown by default on records,
+  the changes aren't propagated to the parent record. So the parent don't see the user changes
+  and used wrong previous data that the one displaying in the editor.
+  
+  </details>
+
+* Fix parsing logo/icon path content
+
+  <details>
+  
+  Context app logo/icon methods can return an absolute url (ie a string). This fix 
+  parsing the url if it contains query params (merge with the default app base url).
+  
+  </details>
+
+* Fix format record in gantt view
+* Fix readonlyIf for relation field editor
+* Fix use action-view form view for gantt form
+* Fix support dotted fields to gantt view
+
+  <details>
+  
+  It should be possible to render nested fields like <field name="user.code" /> in gantt view.
+  Also that dotted field should be allow to use as taskSequence.
+  
+  </details>
+
+
+## 7.3.4 (2025-03-27)
+
+#### Feature
+
+* Improve json field processing
+
+  <details>
+  
+  Contextual fields are filtered out in advance so that json fields aren't processing every time at rendering.
+  
+  </details>
+
+#### Fix
+
+* Fix pass _model in panel-dashlet search context
+* Fix tree search on dms view
+* Fix query binder issue with integer id param
+* Fix shades of colors in the color picker of HTML widget
+* Handle templates/expressions parsing errors
+
+  <details>
+  
+  This managed templates and expressions parsing errors (mostly due to incorrect syntax) : instead of crashing the 
+  view, errors are now caught and appropriate value returned depending on context.
+  
+  </details>
+
+* Fix compute default file/folder name in dms
+
 ## 7.3.3 (2025-03-12)
 
 #### Fix

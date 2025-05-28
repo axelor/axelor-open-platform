@@ -38,7 +38,7 @@ import {
   RecordListener,
   WidgetErrors,
 } from "./types";
-import { isReferenceField, nextId } from "./utils";
+import { isReferenceField, nextId, processContextValues } from "./utils";
 
 type ContextCreator = () => DataContext;
 
@@ -896,7 +896,7 @@ export function FormRecordUpdates({
     recordHandler.setRecordUpdater(() =>
       createEvalContext(
         {
-          ...action.context,
+          ...processContextValues(action.context ?? {}),
           ...treeFormRecord,
           ...record,
         },

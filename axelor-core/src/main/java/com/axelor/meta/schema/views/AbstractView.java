@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
@@ -36,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Strings;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -53,7 +54,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.hibernate.jpa.QueryHints;
 
 @XmlType
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
+@JsonTypeInfo(use = Id.NAME, include = As.EXISTING_PROPERTY, property = "type")
 @JsonInclude(Include.NON_NULL)
 @JsonSubTypes({
   @Type(GridView.class),
@@ -98,11 +99,20 @@ public abstract class AbstractView {
 
   @XmlAttribute private Boolean extension;
 
+  @XmlAttribute(name = "x-json-model")
+  private String jsonModel;
+
   @JsonIgnore
   @XmlAttribute(name = "width")
   private String widthSpec;
 
   @XmlTransient @JsonIgnore private transient AbstractView owner;
+
+  @XmlTransient private String width;
+
+  @XmlTransient private String minWidth;
+
+  @XmlTransient private String maxWidth;
 
   public String getXmlId() {
     return xmlId;
@@ -176,6 +186,7 @@ public abstract class AbstractView {
   }
 
   public String getWidthSpec() {
+    computeWidthSpec();
     return widthSpec;
   }
 
@@ -196,6 +207,14 @@ public abstract class AbstractView {
 
   public void setModel(String model) {
     this.model = model;
+  }
+
+  public String getJsonModel() {
+    return jsonModel;
+  }
+
+  public void setJsonModel(String jsonModel) {
+    this.jsonModel = jsonModel;
   }
 
   public Boolean getEditable() {
@@ -231,30 +250,61 @@ public abstract class AbstractView {
   }
 
   private String widthPart(int which) {
-    if (Strings.isNullOrEmpty(widthSpec)) {
+    if (StringUtils.isBlank(widthSpec)) {
       return null;
     }
     String[] parts = widthSpec.split(":");
-    if (which >= parts.length) {
-      return null;
+    return which >= parts.length ? null : parts[which];
+  }
+
+  private void computeWidthSpec() {
+    String min = StringUtils.notBlank(minWidth) ? minWidth : null;
+    String max = StringUtils.notBlank(maxWidth) ? maxWidth : null;
+    String w = StringUtils.notBlank(width) ? width : minWidth;
+
+    if (w == null && min == null && max == null) {
+      return;
     }
-    String part = parts[which];
-    if (part.matches("\\d+")) {
-      part += "px";
+
+    List<String> parts = new ArrayList<>();
+
+    parts.add(w);
+
+    if (min != null || max != null) parts.add(min);
+    if (max != null) parts.add(max);
+
+    widthSpec = parts.stream().map(x -> x == null ? "" : x).collect(Collectors.joining(":"));
+  }
+
+  private String ensureWidth(String width, int index) {
+    if (StringUtils.notBlank(width)) {
+      return width;
     }
-    return part;
+    return widthPart(index);
   }
 
   public String getWidth() {
-    return widthPart(0);
+    return ensureWidth(width, 0);
+  }
+
+  public void setWidth(String width) {
+    this.width = width;
   }
 
   public String getMinWidth() {
-    return widthPart(1);
+    return ensureWidth(minWidth, 1);
+  }
+
+  public void setMinWidth(String minWidth) {
+    this.minWidth = minWidth;
   }
 
   public String getMaxWidth() {
-    return widthPart(2);
+    return ensureWidth(maxWidth, 2);
+  }
+
+  public void setMaxWidth(String maxWidth) {
+    this.maxWidth = maxWidth;
   }
 
   public AbstractView getOwner() {
@@ -275,7 +325,7 @@ public abstract class AbstractView {
   }
 
   @XmlTransient
-  @JsonProperty("helpOverride")
+  @JsonProperty(value = "helpOverride", access = JsonProperty.Access.READ_ONLY)
   @Nullable
   public Collection<Map<String, Object>> getHelpOverride() {
     if (AuthUtils.getUser() != null && Boolean.TRUE.equals(AuthUtils.getUser().getNoHelp())) {

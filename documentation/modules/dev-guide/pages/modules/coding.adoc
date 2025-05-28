@@ -299,3 +299,40 @@ for the `HelloService` interface and wherever you inject the `HelloService`, you
 will get an instance of the `HelloServiceSaleImpl` class.
 
 See {url-guice}[Guice Documentation] for more details.
+
+== Maintenance Service
+
+You can define maintenance mode behavior by implementing `MaintenanceService`:
+
+[source,java]
+-----
+import com.axelor.web.service.MaintenanceService;
+
+public class ContactModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    // (...module configuration)
+
+    // Bind the maintenance service interface to your implementation.
+    bind(MaintenanceService.class).to(MyMaintenanceService.class);
+  }
+}
+-----
+
+[source,java]
+-----
+public class MyMaintenanceService implements MaintenanceService {
+
+  // Implement your maintenance mode logic.
+  // By default, maintenance mode is never enabled.
+  @Override
+  public boolean isMaintenanceMode(User user, HttpServletRequest httpRequest) {
+    return /*custom condition*/;
+  }
+}
+-----
+
+Default maintenance page is `error-503.html`.
+Note that you are free to override it if needed, by putting your own `error-503.html`
+in the `src/main/webapp` directory of your module.

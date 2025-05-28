@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from "react";
 
 import { dialogsActive } from "@/components/dialogs";
-import { getActivePopup } from "@/view-containers/view-popup";
 import { device } from "@/utils/device";
 import { useSelectViewState, useViewTab } from "@/view-containers/views/scope";
+import { getActivePopupTabId } from "@/layout/nav-tabs/utils";
+
 import { useTabs } from "../use-tabs";
 
 const { isMac } = device;
@@ -71,6 +72,7 @@ export function useShortcut(options: Options) {
     shiftKeyProp,
     key,
   );
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (
@@ -84,12 +86,22 @@ export function useShortcut(options: Options) {
       ) {
         e.stopPropagation();
         e.preventDefault();
-        const popupTabId = getActivePopup()?.tabId;
-        if (popupTabId && popupTabId !== tab.id) return;
-        !dialogsActive() && action(e);
+        const popupTabId = getActivePopupTabId();
+        // if any editor popup is opened or dialog is opened
+        if ((popupTabId && popupTabId !== tab.id) || dialogsActive()) return;
+        action(e);
       }
     },
-    [key, ctrlKey, altKey, shiftKey, metaKey, tab.id, canHandle, action],
+    [
+      key,
+      ctrlKey,
+      altKey,
+      shiftKey,
+      metaKey,
+      tab.id,
+      canHandle,
+      action,
+    ],
   );
 
   useEffect(() => {
@@ -104,9 +116,11 @@ export function useTabShortcut({
   canHandle = alwaysTrue,
   ...options
 }: Options) {
-  const { active } = useTabs();
+  const { active, popups } = useTabs();
   const tab = useViewTab();
-  const isActiveTab = active === tab;
+
+  const activeTab = popups?.[popups.length - 1] ?? active;
+  const isActiveTab = activeTab === tab;
 
   const canHandleInTab = useCallback(
     (e: KeyboardEvent) => isActiveTab && canHandle(e),

@@ -12,7 +12,7 @@ Each file should have proper declaration:
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
-  https://axelor.com/xml/ns/domain-models/domain-models_7.3.xsd">
+  https://axelor.com/xml/ns/domain-models/domain-models_7.4.xsd">
 
   <!-- entity definitions here -->
 
@@ -554,8 +554,8 @@ WARNING: You should be aware that the formula field usage takes a native SQL cla
 
 The `<index>` tag can be used to define a composite index.
 
-It is defined by specifying a comma-separated list of column names
-in the `columns` attribute. A name can be defined with the `name` attribute.
+- `columns` : comma-separated list of field names (database column name from field `column` attribute can also be used)
+- `name` : and optional name for the unique constraint.
 
 [source,xml]
 ----
@@ -577,12 +577,15 @@ By default, all reference fields, namecolumn, name and code are automatically in
 
 The `<unique-constraint>` tag can be used to define a composite unique constraint.
 
-It is defined by specifying a comma-separated list of column names
-in the `columns` attribute. A name can be defined with the `name` attribute.
+It is defined by specifying :
+
+- `columns` : comma-separated list of field names (database column name from field `column` attribute can also be used)
+- `name` : and optional name for the unique constraint.
 
 [source,xml]
 ----
-<unique-constraint columns="first_name,last_name" />
+<unique-constraint columns="firstName,lastName" />
+<unique-constraint columns="firstName,lastName" name="uni_contact_first_name_last_name"/>
 ----
 
 == Field Encryption

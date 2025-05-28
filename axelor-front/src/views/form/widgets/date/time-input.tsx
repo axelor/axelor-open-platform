@@ -1,6 +1,15 @@
-import { forwardRef, useEffect, useMemo, useState } from "react";
-import { Box } from "@axelor/ui";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Box, ClickAwayListener, Popper, clsx } from "@axelor/ui";
 import padStart from "lodash/padStart";
+
+import styles from "./time-unit.module.scss";
 
 interface TimeInputProps {
   dateValue?: Date | null;
@@ -9,16 +18,109 @@ interface TimeInputProps {
   onUpdate?: (value: Date) => void;
 }
 
+const toText = (val: number) => padStart(`${val}`, 2, "0");
+
+type TimeSelectOption = { value: string; title: string };
+
+function TimeSelect({
+  size,
+  value = "0",
+  onChange,
+}: {
+  size: number;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [popperContent, setPopperContent] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const boxRef = useRef<HTMLDivElement | null>(null);
+
+  const options = useMemo(
+    () =>
+      new Array(size).fill(0).map(
+        (_, ind) =>
+          ({
+            value: `${ind}`,
+            title: toText(ind),
+          }) as TimeSelectOption,
+      ),
+    [size],
+  );
+
+  const openPicker = useCallback(() => setOpen(true), []);
+  const closePicker = useCallback(() => setOpen(false), []);
+
+  const selected = useMemo(
+    () => options.find((x) => x.value === String(+value)) ?? null,
+    [options, value],
+  );
+
+  function handleChange(opt: TimeSelectOption) {
+    onChange(opt.value);
+    closePicker();
+  }
+
+  useEffect(() => {
+    if (open && popperContent) {
+      const item = popperContent.querySelector("[aria-selected='true']");
+      item?.scrollIntoView({
+        block: "center",
+      });
+    }
+  }, [open, popperContent]);
+
+  return (
+    <>
+      <Box
+        ref={boxRef}
+        d="flex"
+        position="relative"
+        className={clsx(styles.timeInputSelect, { [styles.open]: open })}
+        onClick={openPicker}
+      >
+        {selected?.title}
+        <Box className={styles.arrow} />
+      </Box>
+      <Popper
+        placement={"bottom"}
+        target={boxRef.current!}
+        open={open}
+        disablePortal
+      >
+        <ClickAwayListener onClickAway={closePicker}>
+          <Box ref={setPopperContent} className={styles.popperContent}>
+            {options.map((opt) => {
+              const isSelected = selected === opt;
+              return (
+                <Box
+                  className={styles.option}
+                  key={opt.value}
+                  onClick={() => handleChange(opt)}
+                  {...(isSelected && { ["aria-selected"]: true })}
+                >
+                  {isSelected && <span className={styles.tick}>✓</span>}
+                  {opt.title}
+                </Box>
+              );
+            })}
+          </Box>
+        </ClickAwayListener>
+      </Popper>
+    </>
+  );
+}
+
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
   ({ format, value, dateValue: propDate, onUpdate }, ref) => {
-    const [{ hour, minute, second }, setTimes] = useState({
+    const [times, setTimes] = useState({
       hour: "",
       minute: "",
       second: "",
     });
     const hasSeconds = format?.includes("ss");
 
-    const toText = (val: number) => padStart(`${val}`, 2, "0");
     const setValue = (hour: string, minute: string, second: string) => {
       const date = propDate || new Date();
 
@@ -30,41 +132,19 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       onUpdate?.(date);
     };
 
-    function handleHourChange(value: string) {
-      setValue(value, minute, second);
+    function handleHourChange(val: string) {
+      const { minute, second } = times;
+      setValue(val, minute, second);
     }
 
-    function handleMinuteChange(value: string) {
-      setValue(hour, value, second);
+    function handleMinuteChange(val: string) {
+      const { hour, second } = times;
+      setValue(hour, val, second);
     }
 
-    function handleSecondChange(value: string) {
-      setValue(hour, minute, value);
-    }
-
-    function renderSelect(
-      size: number,
-      value: string,
-      onChange: (value: string) => void,
-    ) {
-      return (
-        <Box
-          mx={1}
-          as="select"
-          value={`${parseInt(value)}`}
-          onChange={(e: any) => onChange(e.target.value!)}
-          className={"form-control-sm"}
-        >
-          {new Array(size).fill(0).map((_, ind) => {
-            const text = toText(ind);
-            return (
-              <option key={ind} value={ind}>
-                {text}
-              </option>
-            );
-          })}
-        </Box>
-      );
+    function handleSecondChange(val: string) {
+      const { hour, minute } = times;
+      setValue(hour, minute, val);
     }
 
     const timeAsStr = useMemo(
@@ -88,11 +168,21 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
     }, [timeAsStr]);
 
     return (
-      <div ref={ref}>
-        {renderSelect(24, hour, handleHourChange)}
-        {renderSelect(60, minute, handleMinuteChange)}
-        {hasSeconds && renderSelect(60, second, handleSecondChange)}
-      </div>
+      <Box d="flex" gap={10} ref={ref}>
+        <TimeSelect value={times.hour} size={24} onChange={handleHourChange} />
+        <TimeSelect
+          value={times.minute}
+          size={60}
+          onChange={handleMinuteChange}
+        />
+        {hasSeconds && (
+          <TimeSelect
+            value={times.second}
+            size={60}
+            onChange={handleSecondChange}
+          />
+        )}
+      </Box>
     );
   },
 );

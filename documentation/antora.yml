@@ -1,6 +1,6 @@
 name: adk
 title: Axelor Open Platform
-version: "7.3"
+version: "7.4"
 start_page: ROOT:index.adoc
 nav:
   - modules/ROOT/nav.adoc

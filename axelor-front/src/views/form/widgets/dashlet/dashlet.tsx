@@ -2,6 +2,7 @@ import { useAtomValue } from "jotai";
 import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import uniqueId from "lodash/uniqueId";
+import pick from "lodash/pick";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { produce } from "immer";
 
@@ -36,6 +37,7 @@ import {
 } from "../../builder/scope";
 import { DashletActions } from "./dashlet-actions";
 import { createWidgetAtom } from "../../builder/atoms";
+import { processContextValues } from "../../builder/utils";
 import classes from "./dashlet.module.scss";
 
 interface DashletProps {
@@ -130,11 +132,12 @@ export function DashletComponent({
           ...(dashboard
             ? ctx
             : {
-                ...viewContext,
+                ...processContextValues(viewContext ?? {}),
                 ...actionView.context,
                 _id: _id || viewContext?._id,
                 _showRecord,
               }),
+          ...pick(ctx, ["_viewName", "_viewType", "_views"]),
           _model: ctx.model ?? ctx._model,
           _domainAction: action,
         },
@@ -343,10 +346,13 @@ function DashletWrapper(props: WidgetProps) {
   }, [tab.action.model, getFormContext]);
 
   // Be able to edit even if readonly mode
-  const canEdit = (isUndefined(schema.canEdit) ? !readonly : schema.canEdit) && hasButton("edit");
+  const canEdit =
+    (isUndefined(schema.canEdit) ? !readonly : schema.canEdit) &&
+    hasButton("edit");
   // Be able to create/delete if explicitly defined and not in readonly mode
   const canNew = !readonly && schema.canNew !== undefined && hasButton("new");
-  const canDelete = !readonly && schema.canDelete !== undefined && hasButton("delete");
+  const canDelete =
+    !readonly && schema.canDelete !== undefined && hasButton("delete");
 
   return (
     ready && (

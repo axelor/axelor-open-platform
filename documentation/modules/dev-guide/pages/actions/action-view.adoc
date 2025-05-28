@@ -69,6 +69,7 @@ Special context variable names
 
 * `_showRecord` - show the record by given id in form view
 * `_showSingle` - `true` to show the only record in form view
+* `__check_version`- `true` to check record version in form view when tab is active
 
 Examples:
 

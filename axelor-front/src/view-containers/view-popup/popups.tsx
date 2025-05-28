@@ -46,11 +46,6 @@ export function PopupsProvider() {
   );
 }
 
-export function getActivePopup() {
-  const popups = popupStore.get(popupAtom);
-  return popups?.slice(-1)?.[0];
-}
-
 function Popups() {
   const popups = useAtomValue(popupAtom);
   return (

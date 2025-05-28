@@ -2,3 +2,24 @@
   height: calc(100vh - 3rem);
   overflow: auto;
 }
+
+:global {
+  .swagger-ui {
+    & *:not(.opblock-summary-method, .title pre, .highlight-code *),
+    & .loading-container .loading:after {
+      color: var(--bs-body-color) !important;
+    }
+    & .scheme-container,
+    & .opblock-section-header,
+    & input,
+    & select {
+      background: var(--bs-body-bg) !important;
+    }
+    & svg path {
+      fill: var(--bs-body-color);
+    }
+  }
+  .swagger-theme-dark .swagger-ui .model-toggle:after {
+    background: url("data:image/svg+xml;charset=utf-8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\"><path fill=\"white\" d=\"M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z\"/></svg>") 50% no-repeat !important;
+  }
+}
