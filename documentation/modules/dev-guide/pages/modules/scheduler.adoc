@@ -66,8 +66,8 @@ When using a JDBC JobStore (`JobStoreTX` whether clustered or not), an underlyin
 
 [source,properties]
 ----
-# Maximum number of connections that the DataSource can create in its pool of connections
-quartz.data-source.maximum-pool-size = 10
+# Maximum number of connections that the DataSource can create in its pool of connections (defaults to `quartz.thread-count`)
+quartz.data-source.maximum-pool-size = 3
 
 # Optional SQL query string that the DataSource can use to detect and replace failed/corrupt connections
 quartz.data-source.connection-test-query =

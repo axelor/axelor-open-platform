@@ -195,6 +195,11 @@ class SchedulerProvider implements Provider<Scheduler> {
                     Map.Entry::getValue));
 
     cfg.putAll(dataSourceProps);
+
+    // Default data source's maximum pool size to thread pool's thread count.
+    cfg.computeIfAbsent(
+        key(PROP_DATASOURCE_PREFIX, dataSourceName, "maximumPoolSize"),
+        k -> cfg.get(key(PROP_THREAD_POOL_PREFIX, "threadCount")));
   }
 
   /**
