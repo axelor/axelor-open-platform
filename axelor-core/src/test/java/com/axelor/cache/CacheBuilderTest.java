@@ -351,7 +351,7 @@ class CacheBuilderTest extends GuiceJunit5Test {
               .until(
                   () -> {
                     cache.cleanUp();
-                    return removalResults.get(RemovalCause.EXPIRED) != null;
+                    return removalResults.containsKey(RemovalCause.EXPIRED);
                   });
           assertEquals(
               "value22",

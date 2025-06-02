@@ -73,7 +73,7 @@ public class RedissonCacheBuilder<K, V>
           (EntryRemovedListener<K, V>)
               event ->
                   removalListener.onRemoval(
-                      event.getKey(), event.getValue(), toRemovalCause(event)));
+                      event.getKey(), event.getOldValue(), toRemovalCause(event)));
 
       redissonCache.addListener(
           (EntryUpdatedListener<K, V>)

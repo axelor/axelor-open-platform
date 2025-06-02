@@ -27,7 +27,7 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
-versions.redisson = "3.46.0"
+versions.redisson = "3.48.0"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
