@@ -106,6 +106,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   @Inject private ViewGenerator viewGenerator;
 
+  private final Set<String> computedViews = ConcurrentHashMap.newKeySet();
   private final Set<String> viewsToGenerate = ConcurrentHashMap.newKeySet();
   private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
   private final Map<String, List<Consumer<Group>>> groupsToCreate = new ConcurrentHashMap<>();
@@ -147,7 +148,16 @@ public class ViewLoader extends AbstractParallelLoader {
     migrateViews();
   }
 
+  protected void initialize() {
+    computedViews.addAll(
+        JPA.em()
+            .createQuery(
+                "SELECT self.name FROM MetaView self WHERE self.computed = TRUE", String.class)
+            .getResultList());
+  }
+
   protected void terminate(boolean update) {
+    computedViews.clear();
     linkMissingGroups();
     generateFinalViews(update);
 
@@ -253,16 +263,22 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (view instanceof ExtendableView) {
       final ExtendableView extendableView = (ExtendableView) view;
+      final boolean isExtension = Boolean.TRUE.equals(view.getExtension());
 
-      if (Boolean.TRUE.equals(view.getExtension())) {
-        viewsToGenerate.add(view.getName());
-      } else if (ObjectUtils.notEmpty(extendableView.getExtends())) {
-        LOG.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
+      if (isExtension || computedViews.contains(name)) {
+        viewsToGenerate.add(name);
+      }
+
+      if (!isExtension && ObjectUtils.notEmpty(extendableView.getExtends())) {
+        LOG.atError()
+            .setMessage("View with extensions must have extension=\"true\": {}")
+            .addArgument(() -> getName(name, xmlId))
+            .log();
         return;
       }
     }
 
-    LOG.debug("Loading view: {}", getName(name, xmlId));
+    LOG.atDebug().setMessage("Loading view: {}").addArgument(() -> getName(name, xmlId));
     final String xml = XMLViews.toXml(view, true);
 
     if (type.matches("tree|chart|portal|dashboard|search|custom")) {

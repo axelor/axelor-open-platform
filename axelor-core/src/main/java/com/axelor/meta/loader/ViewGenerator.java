@@ -76,7 +76,7 @@ public class ViewGenerator {
     return JPA.em()
         .createQuery(
             "SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                + "((self.name IN :names OR :namesEmpty = TRUE) "
+                + "(self.name IN :names "
                 + "AND (:update = TRUE OR NOT EXISTS ("
                 + "SELECT computedView FROM MetaView computedView "
                 + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
@@ -94,7 +94,6 @@ public class ViewGenerator {
             Long.class)
         .setParameter("update", update)
         .setParameter("names", namesEmpty ? ImmutableSet.of("") : names)
-        .setParameter("namesEmpty", namesEmpty)
         .getResultList();
   }
 
