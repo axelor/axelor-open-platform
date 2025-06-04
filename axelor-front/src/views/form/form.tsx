@@ -216,6 +216,35 @@ export const usePrepareSaveRecord = (
   );
 };
 
+export const restoreSelectedStateWithSavedRecord = (
+  formState: FormState,
+  savedRecord: DataRecord,
+) => {
+  if (formState.statesByName) {
+    const statesByName = formState.statesByName;
+    for (const [key, value] of Object.entries(statesByName)) {
+      const list = savedRecord[key];
+      if (
+        Array.isArray(list) &&
+        list.some((x) => x.cid && x.cid !== x.id) &&
+        value?.selected?.length
+      ) {
+        statesByName[key] = {
+          ...value,
+          selected: value.selected
+            .map((id) => {
+              const found = list.find((x) => x.cid === id);
+              return found ? found.id : id;
+            })
+            .filter(Boolean),
+        };
+      }
+    }
+    return { ...formState, statesByName };
+  }
+  return formState;
+};
+
 export const useHandleFocus = (containerRef: RefObject<HTMLDivElement>) => {
   const handleFocus = useCallback(() => {
     const elem = containerRef.current;
@@ -815,6 +844,10 @@ const FormContainer = memo(function FormContainer({
           ...opts,
           select,
         });
+
+        set(formAtom, (state) =>
+          restoreSelectedStateWithSavedRecord(state, res),
+        );
 
         if (callOnRead) {
           const fetched = res.id ? await doRead(res.id, select) : res;
@@ -1689,6 +1722,7 @@ function fillRecordWithCid(savedRecord: DataRecord, fetchedRecord: DataRecord) {
           {} as DataRecord,
         ),
         ...(prev.cid && {
+          selected: prev.selected,
           cid: prev.cid,
         }),
       };

@@ -303,6 +303,7 @@ function OneToManyInner({
   const panelRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridHandler>(null);
   const saveIdRef = useRef<number | null>();
+  const lastSelectedIdsByServer = useRef<number[]>([]);
 
   const eventsAtom = useMemo(() => atom<GridExpandableEvents>({}), []);
 
@@ -377,8 +378,10 @@ function OneToManyInner({
       () =>
         atom(null, (get, set, selectedIds: number[]) => {
           const state = get(widgetState);
-          if (isEqual(state?.selected, selectedIds.sort())) return;
-          set(widgetState, { ...state, selected: selectedIds.sort() });
+          selectedIds.sort();
+          if (isEqual(state?.selected, selectedIds)) return;
+          set(widgetState, { ...state, selected: selectedIds });
+          lastSelectedIdsByServer.current = selectedIds;
         }),
       [widgetState],
     ),
@@ -709,8 +712,8 @@ function OneToManyInner({
   );
 
   const lastSelectedIds = useRef<number[]>([]);
-  const lastSelectedIdsByServer = useRef<number[]>([]);
   const serverSelectedIds = useRef<number[] | null>(null);
+  const syncServerSelectionPending = useRef(false);
 
   const syncSelection = useAtomCallback(
     useCallback(
@@ -734,7 +737,6 @@ function OneToManyInner({
           ...x,
           selected: ids.includes(x.id!),
         }));
-
         set(valueAtom, (valueRef.current = next), false, false);
       },
       [getItems, valueAtom],
@@ -743,6 +745,7 @@ function OneToManyInner({
 
   const syncServerSelection = useCallback(() => {
     setState((draft) => {
+      draft.selectedCell = null;
       draft.selectedRows = draft.rows
         .map((row, ind) =>
           row.type === "row" &&
@@ -753,14 +756,17 @@ function OneToManyInner({
         .filter((ind) => ind !== null);
     });
     serverSelectedIds.current = null;
+    syncServerSelectionPending.current = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.rows, setState]);
 
   useEffect(() => {
     if (isEqual(selectedIds, lastSelectedIds.current)) return;
     setSelection(selectedIds);
-    syncSelection(selectedIds);
-    serverSelectedIds.current = selectedIds;
+    if (!syncServerSelectionPending.current) {
+      syncSelection(selectedIds);
+      serverSelectedIds.current = selectedIds;
+    }
     lastSelectedIds.current = selectedIds;
   }, [selectedIds, setSelection, syncSelection]);
 
@@ -769,6 +775,7 @@ function OneToManyInner({
 
     lastSelectedIdsByServer.current = selectedIdsByServer;
     serverSelectedIds.current = selectedIdsByServer?.slice().sort() as number[];
+    syncServerSelectionPending.current = true;
   }, [selectedIdsByServer]);
 
   useEffect(() => {

@@ -23,6 +23,7 @@ import {
 
 import {
   Layout,
+  restoreSelectedStateWithSavedRecord,
   showErrors,
   useFormAttachment,
   useFormPerms,
@@ -98,7 +99,12 @@ export function Details({
         const statesByName = resetStatesByName.current;
         if (statesByName) {
           resetStatesByName.current = null;
-          set(formAtom, (prev) => ({ ...prev, statesByName }));
+          set(formAtom, (prev) =>
+            restoreSelectedStateWithSavedRecord(
+              { ...prev, statesByName },
+              prev.record,
+            ),
+          );
         }
       },
       [formAtom],
@@ -274,7 +280,7 @@ export function Details({
                 iconProps: {
                   icon: "save",
                 },
-                onClick: handleSaveClick as CommandItemProps['onClick'],
+                onClick: handleSaveClick as CommandItemProps["onClick"],
               },
               {
                 key: "back",
