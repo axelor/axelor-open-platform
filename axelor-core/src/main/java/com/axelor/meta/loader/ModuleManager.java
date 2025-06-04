@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,9 +98,23 @@ public class ModuleManager {
               .peek(m -> log.info("Loading package {}...", m.getName()))
               .filter(Module::isPending)
               .collect(Collectors.toList());
+      if (ObjectUtils.notEmpty(moduleList)) {
+        evictAllCacheRegions();
+      }
       loadModules(moduleList, update, withDemo);
     } finally {
       doCleanUp();
+    }
+  }
+
+  // When using distributed cache, it may contain incompatible data.
+  // Need to clear it before loading new modules.
+  private void evictAllCacheRegions() {
+    try {
+      var sessionFactory = JPA.em().unwrap(Session.class).getSessionFactory();
+      sessionFactory.getCache().evictAllRegions();
+    } catch (Exception e) {
+      log.error("Failed to evict regions", e);
     }
   }
 
