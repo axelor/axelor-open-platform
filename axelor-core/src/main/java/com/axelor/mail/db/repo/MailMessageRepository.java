@@ -51,7 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +146,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
   }
 
   private static String mailHost;
-  private static AtomicInteger mailId = new AtomicInteger();
 
   protected String generateMessageId(MailMessage entity) {
     if (mailHost == null) {
@@ -158,8 +157,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     }
     final StringBuilder builder = new StringBuilder();
     builder.append("<");
-    builder.append(builder.hashCode()).append(".");
-    builder.append(mailId.getAndIncrement()).append(".");
+    builder.append(UUID.randomUUID()).append(".");
     builder.append(System.currentTimeMillis());
     builder.append(mailHost);
     builder.append(">");
