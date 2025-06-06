@@ -153,12 +153,12 @@ export function Phone({
   const routeIdRef = useRef(routeId);
 
   useEffect(() => {
-    if (routeId === routeIdRef.current) return;
+    if (routeId === routeIdRef.current || text) return;
     routeIdRef.current = routeId;
     if (country.iso2 !== defaultCountry) {
       setCountry(defaultCountry);
     }
-  }, [routeId, country.iso2, defaultCountry, setCountry]);
+  }, [routeId, text, country.iso2, defaultCountry, setCountry]);
 
   const placeholder = useMemo(() => {
     if (_placeholder) return _placeholder;
