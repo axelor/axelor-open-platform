@@ -25,6 +25,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.cache.DistributedFactory;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
@@ -41,7 +42,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -70,8 +70,6 @@ public class ModuleManager {
   private static long lastRestored;
   private final Set<Path> pathsToRestore = new HashSet<>();
 
-  private static final AtomicBoolean BUSY = new AtomicBoolean(false);
-
   @Inject
   public ModuleManager(
       AuthService authService,
@@ -90,6 +88,8 @@ public class ModuleManager {
   }
 
   public void initialize(final boolean update, final boolean withDemo) {
+    var lock = DistributedFactory.getLockIfDistributed("initialize");
+    lock.lock();
     try {
       createDefault();
       resolve(update);
@@ -104,6 +104,7 @@ public class ModuleManager {
       loadModules(moduleList, update, withDemo);
     } finally {
       doCleanUp();
+      lock.unlock();
     }
   }
 
@@ -155,8 +156,9 @@ public class ModuleManager {
   }
 
   public void restoreMeta() {
+    var busy = DistributedFactory.getAtomicLong("busy");
     try {
-      if (!BUSY.compareAndSet(false, true)) {
+      if (!busy.compareAndSet(0, 1)) {
         throw new IllegalStateException(
             I18n.get(
                 "A views restoring is already in progress. Please wait until it ends and try again."));
@@ -164,7 +166,7 @@ public class ModuleManager {
       loadData = false;
       update(false);
     } finally {
-      BUSY.set(false);
+      busy.set(0);
       loadData = true;
     }
   }
