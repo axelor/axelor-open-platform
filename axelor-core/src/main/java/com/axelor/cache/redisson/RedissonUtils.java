@@ -18,8 +18,6 @@
  */
 package com.axelor.cache.redisson;
 
-import com.axelor.inject.Beans;
-import jakarta.inject.Singleton;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +29,11 @@ import org.redisson.api.redisnode.RedisNode.InfoSection;
 import org.redisson.api.redisnode.RedisNodes;
 
 /** Redisson utilities */
-@Singleton
 public class RedissonUtils {
 
-  public static RedissonUtils getInstance() {
-    return Beans.get(RedissonUtils.class);
-  }
+  private RedissonUtils() {}
 
-  public List<InetSocketAddress> getRedisAddresses(RedissonClient redisson) {
+  public static List<InetSocketAddress> getRedisAddresses(RedissonClient redisson) {
     var config = redisson.getConfig();
 
     if (config.isClusterConfig()) {
@@ -56,26 +51,27 @@ public class RedissonUtils {
     return getRedisAddressesMasterSlave(redisson);
   }
 
-  private List<InetSocketAddress> getRedisAddressesCluster(RedissonClient redisson) {
+  private static List<InetSocketAddress> getRedisAddressesCluster(RedissonClient redisson) {
     var cluster = redisson.getRedisNodes(RedisNodes.CLUSTER);
     return cluster.getMasters().stream().map(RedisNode::getAddr).toList();
   }
 
-  private List<InetSocketAddress> getRedisAddressesMasterSlave(RedissonClient redisson) {
+  private static List<InetSocketAddress> getRedisAddressesMasterSlave(RedissonClient redisson) {
     return getRedisAddressesMasterSlave(redisson, RedisNodes.MASTER_SLAVE);
   }
 
-  private List<InetSocketAddress> getRedisAddressesSentinelMasterSlave(RedissonClient redisson) {
+  private static List<InetSocketAddress> getRedisAddressesSentinelMasterSlave(
+      RedissonClient redisson) {
     return getRedisAddressesMasterSlave(redisson, RedisNodes.SENTINEL_MASTER_SLAVE);
   }
 
-  private List<InetSocketAddress> getRedisAddressesMasterSlave(
+  private static List<InetSocketAddress> getRedisAddressesMasterSlave(
       RedissonClient redisson, RedisNodes<? extends RedisMasterSlave> masterSlaveNodes) {
     var masterSlave = redisson.getRedisNodes(masterSlaveNodes);
     return List.of(masterSlave.getMaster().getAddr());
   }
 
-  private List<InetSocketAddress> getRedisAddressesSingle(RedissonClient redisson) {
+  private static List<InetSocketAddress> getRedisAddressesSingle(RedissonClient redisson) {
     var single = redisson.getRedisNodes(RedisNodes.SINGLE);
     return List.of(single.getInstance().getAddr());
   }
@@ -91,7 +87,7 @@ public class RedissonUtils {
    * @param redisson
    * @return the version of the Redis server
    */
-  public Version getRedisVersion(RedissonClient redisson) {
+  public static Version getRedisVersion(RedissonClient redisson) {
     return getVersion(redisson, "redis_version").orElse(Version.UNKNOWN);
   }
 
@@ -106,11 +102,11 @@ public class RedissonUtils {
    * @param redisson
    * @return the optional version of the Valkey server
    */
-  public Optional<Version> getValkeyVersion(RedissonClient redisson) {
+  public static Optional<Version> getValkeyVersion(RedissonClient redisson) {
     return getVersion(redisson, "valkey_version");
   }
 
-  private Optional<Version> getVersion(RedissonClient redisson, String versionKey) {
+  private static Optional<Version> getVersion(RedissonClient redisson, String versionKey) {
     var config = redisson.getConfig();
 
     if (config.isClusterConfig()) {
@@ -128,21 +124,22 @@ public class RedissonUtils {
     return getVersionMasterSlave(redisson, versionKey);
   }
 
-  private Optional<Version> getVersionCluster(RedissonClient redisson, String versionKey) {
+  private static Optional<Version> getVersionCluster(RedissonClient redisson, String versionKey) {
     var cluster = redisson.getRedisNodes(RedisNodes.CLUSTER);
     return findMinVersion(cluster.getMasters().stream(), versionKey);
   }
 
-  private Optional<Version> getVersionMasterSlave(RedissonClient redisson, String versionKey) {
+  private static Optional<Version> getVersionMasterSlave(
+      RedissonClient redisson, String versionKey) {
     return getVersionMasterSlave(redisson, RedisNodes.MASTER_SLAVE, versionKey);
   }
 
-  private Optional<Version> getVersionSentinelMasterSlave(
+  private static Optional<Version> getVersionSentinelMasterSlave(
       RedissonClient redisson, String versionKey) {
     return getVersionMasterSlave(redisson, RedisNodes.SENTINEL_MASTER_SLAVE, versionKey);
   }
 
-  private Optional<Version> getVersionMasterSlave(
+  private static Optional<Version> getVersionMasterSlave(
       RedissonClient redisson,
       RedisNodes<? extends RedisMasterSlave> masterSlaveNodes,
       String versionKey) {
@@ -150,17 +147,18 @@ public class RedissonUtils {
     return getVersion(masterSlave.getMaster(), versionKey);
   }
 
-  private Optional<Version> getVersionSingle(RedissonClient redisson, String versionKey) {
+  private static Optional<Version> getVersionSingle(RedissonClient redisson, String versionKey) {
     var single = redisson.getRedisNodes(RedisNodes.SINGLE);
     return getVersion(single.getInstance(), versionKey);
   }
 
-  private Optional<Version> getVersion(RedisNode node, String versionKey) {
+  private static Optional<Version> getVersion(RedisNode node, String versionKey) {
     var version = node.info(InfoSection.SERVER).get(versionKey);
     return Optional.ofNullable(version).map(Version::parse);
   }
 
-  private Optional<Version> findMinVersion(Stream<? extends RedisNode> nodes, String versionKey) {
+  private static Optional<Version> findMinVersion(
+      Stream<? extends RedisNode> nodes, String versionKey) {
     return nodes
         .map(node -> getVersion(node, versionKey))
         .filter(Optional::isPresent)

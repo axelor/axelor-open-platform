@@ -151,5 +151,11 @@ public interface AxelorCache<K, V> extends Iterable<Map.Entry<K, V>>, Closeable 
     // Do nothing by default
   }
 
+  /**
+   * Returns key-specific lock for this cache.
+   *
+   * @param key
+   * @return reentrant lock
+   */
   Lock getLock(K key);
 }

@@ -49,7 +49,7 @@ public class RedissonCacheNativeBuilder<K, V>
 
   @Override
   protected RMapCacheNative<K, V> newMapCache(MapOptions<K, V> options) {
-    return getRedissonClient().getMapCacheNative(options);
+    return RedissonProvider.get().getMapCacheNative(options);
   }
 
   @Override

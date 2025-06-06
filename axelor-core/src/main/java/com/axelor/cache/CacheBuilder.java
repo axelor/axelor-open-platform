@@ -47,7 +47,7 @@ public abstract class CacheBuilder<K, V> {
   private static final CacheProviderInfo cacheProviderInfo =
       CacheConfig.getAppCacheProvider().orElseGet(() -> new CacheProviderInfo("caffeine"));
 
-  private static final CacheType cacheProvider =
+  private static final CacheType cacheType =
       cacheProviderInfo
           .getCacheType()
           .orElseThrow(
@@ -57,6 +57,10 @@ public abstract class CacheBuilder<K, V> {
 
   private static final StackWalker stackWalker =
       StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+
+  public static CacheType getCacheType() {
+    return cacheType;
+  }
 
   protected CacheBuilder(String cacheName) {
     this.cacheName = cacheName;
@@ -70,22 +74,6 @@ public abstract class CacheBuilder<K, V> {
     this.weakKeys = builder.weakKeys;
     this.weakValues = builder.weakValues;
     this.removalListener = builder.removalListener;
-  }
-
-  /**
-   * Constructs a new {@code CacheBuilder} instance.
-   *
-   * <p>The caller class is used as cache name.
-   *
-   * <p>The cache name is used to create a globally unique cache name, depending on the cache
-   * provider.
-   *
-   * @param <K> the key type of the cache
-   * @param <V> the value type of the cache
-   * @return a new {@code CacheBuilder} instance
-   */
-  public static <K, V> CacheBuilder<K, V> newBuilder() {
-    return fromCacheName(stackWalker.getCallerClass().getName());
   }
 
   /**
@@ -131,7 +119,7 @@ public abstract class CacheBuilder<K, V> {
    */
   @SuppressWarnings("unchecked")
   protected static <K, V> CacheBuilder<K, V> fromCacheName(String name) {
-    return cacheProvider.getCacheBuilder(name);
+    return cacheType.getCacheBuilder(name);
   }
 
   /**

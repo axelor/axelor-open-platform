@@ -27,11 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.axelor.cache.event.RemovalCause;
-import com.axelor.cache.redisson.RedissonClientProvider;
+import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.cache.redisson.RedissonUtils;
 import com.axelor.cache.redisson.Version;
-import com.axelor.test.GuiceJunit5Test;
-import com.axelor.test.GuiceModules;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,16 +40,12 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@GuiceModules({AbstractBaseCache.CacheTestModule.class})
-@TestMethodOrder(MethodOrderer.MethodName.class)
-class CacheBuilderTest extends GuiceJunit5Test {
+class CacheBuilderTest {
 
   private static final Duration TTL = Duration.ofMillis(500);
 
@@ -72,8 +66,8 @@ class CacheBuilderTest extends GuiceJunit5Test {
 
   private static void init() {
     // HPEXPIRE command is supported in Redis 7.4+
-    var redisson = RedissonClientProvider.getInstance().get();
-    var redisVersion = RedissonUtils.getInstance().getRedisVersion(redisson);
+    var redisson = RedissonProvider.get();
+    var redisVersion = RedissonUtils.getRedisVersion(redisson);
     var minRedisVersion = Version.of(7, 4);
     hasRedisHPExpire = redisVersion.compareTo(minRedisVersion) >= 0;
 

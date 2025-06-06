@@ -20,6 +20,7 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
@@ -77,6 +78,7 @@ public class AppStartup extends HttpServlet {
       jobRunner.shutdown();
       ReportExecutor.shutdown();
       FileStoreFactory.shutdown();
+      RedissonProvider.shutdown();
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

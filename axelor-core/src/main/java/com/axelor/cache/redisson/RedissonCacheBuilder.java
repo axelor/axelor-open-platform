@@ -54,7 +54,7 @@ public class RedissonCacheBuilder<K, V>
 
   @Override
   protected RMapCache<K, V> newMapCache(MapCacheOptions<K, V> options) {
-    return getRedissonClient().getMapCache(options);
+    return RedissonProvider.get().getMapCache(options);
   }
 
   @Override

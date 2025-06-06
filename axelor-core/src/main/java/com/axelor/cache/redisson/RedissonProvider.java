@@ -23,13 +23,6 @@ import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheProviderInfo;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
-import com.axelor.event.Observes;
-import com.axelor.events.ShutdownEvent;
-import com.axelor.inject.Beans;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import jakarta.annotation.Priority;
-import jakarta.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -50,34 +43,28 @@ import org.slf4j.LoggerFactory;
  * <p>This provides a {@link RedissonClient} instance based on a configuration file. For the same
  * configuration file, the same instance is returned.
  */
-@Singleton
-public class RedissonClientProvider implements Provider<RedissonClient> {
+public class RedissonProvider {
 
-  private final ConcurrentMap<String, RedissonClient> redissonClients = new ConcurrentHashMap<>();
+  private static final ConcurrentMap<String, RedissonClient> redissonClients =
+      new ConcurrentHashMap<>();
 
   private static final String DEFAULT_CONFIG_PATH = "redisson.yaml";
 
-  private final RedissonUtils redissonUtils;
+  private static final Logger log = LoggerFactory.getLogger(RedissonProvider.class);
 
-  private static final Logger log = LoggerFactory.getLogger(RedissonClientProvider.class);
-
-  @Inject
-  public RedissonClientProvider(RedissonUtils redissonUtils) {
-    this.redissonUtils = redissonUtils;
+  private static class DefaultRedissonHolder {
+    private static final RedissonClient INSTANCE = get(CacheBuilder.getCacheProviderInfo());
   }
 
-  public static RedissonClientProvider getInstance() {
-    return Beans.get(RedissonClientProvider.class);
-  }
+  private RedissonProvider() {}
 
   /**
    * Gets default Redisson client.
    *
    * @return redisson client
    */
-  @Override
-  public RedissonClient get() {
-    return get(CacheBuilder.getCacheProviderInfo());
+  public static RedissonClient get() {
+    return DefaultRedissonHolder.INSTANCE;
   }
 
   /**
@@ -86,21 +73,21 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
    * @param info
    * @return redisson client
    */
-  public RedissonClient get(CacheProviderInfo info) {
+  public static RedissonClient get(CacheProviderInfo info) {
     return get(info.getConfig(), info.getConfigPrefix());
   }
 
-  public RedissonClient get(Map<String, String> config, String prefix) {
+  public static RedissonClient get(Map<String, String> config, String prefix) {
     var path = config.isEmpty() ? DEFAULT_CONFIG_PATH : config.get("path");
 
     if (StringUtils.notBlank(path)) {
-      return redissonClients.computeIfAbsent(path, this::createRedissonClient);
+      return redissonClients.computeIfAbsent(path, k -> createRedissonClient(path));
     }
 
     return redissonClients.computeIfAbsent(prefix, k -> createRedissonClient(config, prefix));
   }
 
-  protected RedissonClient createRedissonClient(String path) {
+  protected static RedissonClient createRedissonClient(String path) {
     Config config;
 
     try {
@@ -123,12 +110,13 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     return createRedissonClient(config, path);
   }
 
-  protected RedissonClient createRedissonClient(Map<String, String> properties, String prefix) {
+  protected static RedissonClient createRedissonClient(
+      Map<String, String> properties, String prefix) {
     var config = createConfig(properties);
     return createRedissonClient(config, prefix + "*");
   }
 
-  protected RedissonClient createRedissonClient(Config config, String configSource) {
+  protected static RedissonClient createRedissonClient(Config config, String configSource) {
     // Use AxelorKryo5Codec as default codec instead of Kryo5Codec.
     if (config.getCodec() == null) {
       config.setCodec(new AxelorKryo5Codec());
@@ -142,13 +130,12 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
             () -> "Redisson" + (StringUtils.notBlank(configSource) ? ":" + configSource : ""))
         .addArgument(
             () ->
-                redissonUtils
-                    .getValkeyVersion(redisson)
+                RedissonUtils.getValkeyVersion(redisson)
                     .map(version -> "Valkey " + version)
-                    .orElseGet(() -> "Redis " + redissonUtils.getRedisVersion(redisson)))
+                    .orElseGet(() -> "Redis " + RedissonUtils.getRedisVersion(redisson)))
         .addArgument(
             () ->
-                redissonUtils.getRedisAddresses(redisson).stream()
+                RedissonUtils.getRedisAddresses(redisson).stream()
                     .map(a -> String.format("%s:%d", a.getHostString(), a.getPort()))
                     .collect(Collectors.joining(", ")))
         .log();
@@ -156,7 +143,7 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     return redisson;
   }
 
-  protected Config createConfig(Map<String, String> properties) {
+  protected static Config createConfig(Map<String, String> properties) {
     var config = new Config();
 
     // Group properties into server and non-server configs
@@ -209,7 +196,13 @@ public class RedissonClientProvider implements Provider<RedissonClient> {
     return config;
   }
 
-  protected void onAppShutdownEvent(@Observes @Priority(Integer.MAX_VALUE) ShutdownEvent event) {
+  /** Shuts down all Redisson clients. */
+  public static void shutdown() {
+    if (redissonClients.isEmpty()) {
+      return;
+    }
+
+    log.info("Shutting down Redisson...");
     for (var redisson : redissonClients.values()) {
       try {
         redisson.shutdown();

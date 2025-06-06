@@ -27,7 +27,6 @@ import com.axelor.inject.Beans;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.google.inject.AbstractModule;
-import jakarta.inject.Inject;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,8 +38,8 @@ import org.redisson.config.ReadMode;
 import org.redisson.config.TransportMode;
 
 @ExtendWith(GuiceExtension.class)
-@GuiceModules({RedissonClientProviderTest.TestModule.class})
-class RedissonClientProviderTest {
+@GuiceModules({RedissonProviderTest.TestModule.class})
+class RedissonProviderTest {
 
   public static class TestModule extends AbstractModule {
     @Override
@@ -48,8 +47,6 @@ class RedissonClientProviderTest {
       bind(Beans.class).asEagerSingleton();
     }
   }
-
-  @Inject private RedissonClientProvider provider;
 
   @Test
   void testSingleServerConfig() throws MalformedURLException, URISyntaxException {
@@ -67,7 +64,7 @@ class RedissonClientProviderTest {
             Map.entry("codec", JsonJacksonCodec.class.getName()),
             Map.entry("transport-mode", "EPOLL"));
 
-    var config = provider.createConfig(properties);
+    var config = RedissonProvider.createConfig(properties);
     var singleServer = config.useSingleServer();
 
     assertEquals("redis://localhost:6379", singleServer.getAddress());
@@ -92,7 +89,7 @@ class RedissonClientProviderTest {
             Map.entry("master-slave-servers-config.database", "0"),
             Map.entry("master-slave-servers-config.read-mode", "MASTER_SLAVE"));
 
-    var config = provider.createConfig(properties);
+    var config = RedissonProvider.createConfig(properties);
 
     var masterSlaveServers = config.useMasterSlaveServers();
     assertEquals("redis://localhost:6379", masterSlaveServers.getMasterAddress());
@@ -112,7 +109,7 @@ class RedissonClientProviderTest {
                 "redis://localhost:7001, redis://localhost:7002"),
             Map.entry("cluster-servers-config.scan-interval", "2000"));
 
-    var config = provider.createConfig(properties);
+    var config = RedissonProvider.createConfig(properties);
 
     var clusterServers = config.useClusterServers();
     var nodeAddresses = clusterServers.getNodeAddresses();
@@ -131,7 +128,7 @@ class RedissonClientProviderTest {
                 "redis://localhost:26379,redis://localhost:26380"),
             Map.entry("sentinel-servers-config.database", "0"));
 
-    var config = provider.createConfig(properties);
+    var config = RedissonProvider.createConfig(properties);
 
     var sentinelServers = config.useSentinelServers();
     assertEquals("my-master", sentinelServers.getMasterName());
@@ -151,7 +148,7 @@ class RedissonClientProviderTest {
             Map.entry("replicated-servers-config.scan-interval", "2000"),
             Map.entry("replicated-servers-config.database", "1"));
 
-    var config = provider.createConfig(properties);
+    var config = RedissonProvider.createConfig(properties);
 
     var replicatedServers = config.useReplicatedServers();
     var nodeAddresses = replicatedServers.getNodeAddresses();
@@ -165,24 +162,26 @@ class RedissonClientProviderTest {
   void testInvalidConfig() {
     var nonExistingProps = Map.of("non-existing-property", "some-value");
     assertThrows(
-        Exception.class, () -> provider.createConfig(nonExistingProps), "Non-existing property");
+        Exception.class,
+        () -> RedissonProvider.createConfig(nonExistingProps),
+        "Non-existing property");
 
     var invalidValueProps = Map.of("transport-mode", "NOT_EXISTING");
     assertThrows(
         Exception.class,
-        () -> provider.createConfig(invalidValueProps),
+        () -> RedissonProvider.createConfig(invalidValueProps),
         "Invalid transport mode value");
 
     var invalidValueTypeProps = Map.of("single-server-config.database", "MyString");
     assertThrows(
         Exception.class,
-        () -> provider.createConfig(invalidValueTypeProps),
+        () -> RedissonProvider.createConfig(invalidValueTypeProps),
         "Invalid database value type");
 
     var incompatibleClassProps = Map.of("codec", Object.class.getName());
     assertThrows(
         Exception.class,
-        () -> provider.createConfig(incompatibleClassProps),
+        () -> RedissonProvider.createConfig(incompatibleClassProps),
         "Incompatible codec class");
   }
 }

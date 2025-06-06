@@ -18,27 +18,23 @@
  */
 package com.axelor.cache.redisson;
 
-import com.axelor.cache.CacheConfig;
-import java.util.Map;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.redisson.api.RedissonClient;
-import org.redisson.hibernate.RedissonRegionFactory;
+import com.axelor.cache.DistributedAtomicLong;
+import com.axelor.cache.DistributedService;
+import java.util.concurrent.locks.Lock;
 
-/**
- * Hibernate Cache region factory based on Redisson with ability to reuse Redisson client from
- * configuration
- */
-public class AxelorRedissonRegionFactory extends RedissonRegionFactory {
+public class RedissonDistributedService implements DistributedService {
+
+  protected static final String LOCK_PREFIX = "axelor-lock:";
+  protected static final String ATOMIC_PREFIX = "axelor-atomic:";
 
   @Override
-  protected RedissonClient createRedissonClient(
-      StandardServiceRegistry registry, @SuppressWarnings("rawtypes") Map properties) {
-    return getRedissonClientFromConfig();
+  public Lock getLock(String name) {
+    return RedissonProvider.get().getLock(LOCK_PREFIX + name);
   }
 
-  static RedissonClient getRedissonClientFromConfig() {
-    return CacheConfig.getHibernateCacheProvider()
-        .map(RedissonProvider::get)
-        .orElseThrow(() -> new IllegalStateException("Hibernate cache provider not configured"));
+  @Override
+  public DistributedAtomicLong getAtomicLong(String name) {
+    return new RedissonAtomicLongAdapter(
+        RedissonProvider.get().getAtomicLong(ATOMIC_PREFIX + name));
   }
 }

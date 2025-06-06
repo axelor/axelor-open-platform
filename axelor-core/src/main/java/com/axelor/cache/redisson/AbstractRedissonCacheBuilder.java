@@ -23,7 +23,6 @@ import com.axelor.cache.CacheBuilder;
 import com.axelor.cache.CacheLoader;
 import java.time.Duration;
 import org.redisson.api.RMap;
-import org.redisson.api.RedissonClient;
 import org.redisson.api.map.MapLoader;
 import org.redisson.api.options.ExMapOptions;
 
@@ -41,7 +40,8 @@ import org.redisson.api.options.ExMapOptions;
 public abstract class AbstractRedissonCacheBuilder<
         K, V, M extends RMap<K, V>, O extends ExMapOptions<?, K, V>>
     extends CacheBuilder<K, V> {
-  protected static final String PREFIX = "axelor:";
+
+  protected static final String PREFIX = "axelor-cache:";
 
   protected AbstractRedissonCacheBuilder(String cacheName) {
     super(PREFIX + cacheName);
@@ -77,10 +77,6 @@ public abstract class AbstractRedissonCacheBuilder<
   protected abstract M newMapCache(O options);
 
   protected abstract ConfigurableRedissonCache<K, V> newRedissonCache(M cache);
-
-  protected RedissonClient getRedissonClient() {
-    return RedissonClientProvider.getInstance().get();
-  }
 
   private M newMapCache() {
     return newMapCache(newOptions());

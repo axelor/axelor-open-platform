@@ -30,7 +30,7 @@ import com.axelor.auth.pac4j.local.BasicAuthCallbackClientFinder;
 import com.axelor.auth.pac4j.local.JsonExtractor;
 import com.axelor.cache.CacheConfig;
 import com.axelor.cache.CacheProviderInfo;
-import com.axelor.cache.redisson.RedissonClientProvider;
+import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.meta.MetaScanner;
 import com.github.benmanes.caffeine.jcache.configuration.CaffeineConfiguration;
 import com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider;
@@ -214,7 +214,7 @@ public class AuthPac4jModule extends ShiroWebModule {
       final var provider =
           CacheConfig.getShiroCacheProvider()
               .orElseThrow(() -> new IllegalStateException("Shiro cache provider not configured"));
-      final var redisson = RedissonClientProvider.getInstance().get(provider);
+      final var redisson = RedissonProvider.get(provider);
       cacheConfig = RedissonConfiguration.fromInstance(redisson, jCacheConfig);
     } else {
       cacheConfig = jCacheConfig;
