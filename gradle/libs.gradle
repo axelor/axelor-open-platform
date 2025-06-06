@@ -7,6 +7,7 @@ versions.guava = "33.4.8-jre"
 versions.hibernate = "6.6.17.Final"
 versions.hibernate_validator = "8.0.2.Final"
 versions.caffeine = "3.2.0"
+versions.redisson = "3.49.0"
 
 versions.groovy = "4.0.27"
 versions.resteasy = "6.2.12.Final"
@@ -26,8 +27,6 @@ versions.tomcat = "10.1.41"
 versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
-
-versions.redisson = "3.48.0"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
