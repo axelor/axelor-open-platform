@@ -298,12 +298,31 @@ function OneToManyInner({
     perms,
   } = schema;
 
-  const reorderRef = useRef(false);
-  const recordsSyncRef = useRef(false);
+  const refs = useRef<{
+    reorder: boolean;
+    recordsSync: boolean;
+    forceRefresh: boolean;
+    savedId?: number | null;
+    lastItems: DataRecord[];
+    value?: DataRecord[] | null;
+    lastValue?: DataRecord[] | null | undefined;
+    lastSelectedIds: number[];
+    lastSelectedIdsByServer: number[];
+    serverSelectedIds: number[] | null;
+    syncServerSelectionPending: boolean;
+  }>({
+    reorder: false,
+    recordsSync: false,
+    forceRefresh: false,
+    lastItems: [],
+    lastSelectedIds: [],
+    lastSelectedIdsByServer: [],
+    serverSelectedIds: null,
+    syncServerSelectionPending: false,
+  });
+
   const panelRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<GridHandler>(null);
-  const saveIdRef = useRef<number | null>();
-  const lastSelectedIdsByServer = useRef<number[]>([]);
 
   const eventsAtom = useMemo(() => atom<GridExpandableEvents>({}), []);
 
@@ -381,20 +400,18 @@ function OneToManyInner({
           selectedIds.sort();
           if (isEqual(state?.selected, selectedIds)) return;
           set(widgetState, { ...state, selected: selectedIds });
-          lastSelectedIdsByServer.current = selectedIds;
+          refs.current.lastSelectedIdsByServer = selectedIds;
         }),
       [widgetState],
     ),
   );
 
-  const lastValueRef = useRef<DataRecord[] | null>();
-  const lastItemsRef = useRef<DataRecord[]>([]);
   const getItems = useCallback((value: DataRecord[] | null | undefined) => {
-    if (lastValueRef.current === value) return lastItemsRef.current;
+    if (refs.current.lastValue === value) return refs.current.lastItems;
     const items = value ?? [];
     const isNum = (x: unknown) => typeof x === "number";
-    lastValueRef.current = value;
-    lastItemsRef.current = items.map((x) =>
+    refs.current.lastValue = value;
+    refs.current.lastItems = items.map((x) =>
       isNum(x)
         ? ({ id: x } as unknown as DataRecord)
         : x.id === undefined || x.id === null
@@ -408,7 +425,7 @@ function OneToManyInner({
             }
           : x,
     );
-    return lastItemsRef.current;
+    return refs.current.lastItems;
   }, []);
 
   const valueAtom = useMemo(
@@ -490,7 +507,7 @@ function OneToManyInner({
 
             const result = await set(
               valueAtom,
-              (valueRef.current = values),
+              (refs.current.value = values),
               callOnChange,
               markDirty,
             );
@@ -528,7 +545,7 @@ function OneToManyInner({
                 }
                 draft.map(process);
               });
-              set(valueAtom, (valueRef.current = updatedValues), false, false);
+              set(valueAtom, (refs.current.value = updatedValues), false, false);
             }
           },
         ),
@@ -711,10 +728,6 @@ function OneToManyInner({
     [state.rows, state.selectedRows],
   );
 
-  const lastSelectedIds = useRef<number[]>([]);
-  const serverSelectedIds = useRef<number[] | null>(null);
-  const syncServerSelectionPending = useRef(false);
-
   const syncSelection = useAtomCallback(
     useCallback(
       (get, set, ids: number[]) => {
@@ -737,7 +750,7 @@ function OneToManyInner({
           ...x,
           selected: ids.includes(x.id!),
         }));
-        set(valueAtom, (valueRef.current = next), false, false);
+        set(valueAtom, (refs.current.value = next), false, false);
       },
       [getItems, valueAtom],
     ),
@@ -749,37 +762,40 @@ function OneToManyInner({
       draft.selectedRows = draft.rows
         .map((row, ind) =>
           row.type === "row" &&
-          serverSelectedIds.current?.includes(row.record?.id)
+          refs.current.serverSelectedIds?.includes(row.record?.id)
             ? ind
             : null,
         )
         .filter((ind) => ind !== null);
     });
-    serverSelectedIds.current = null;
-    syncServerSelectionPending.current = false;
+    refs.current.serverSelectedIds = null;
+    refs.current.syncServerSelectionPending = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.rows, setState]);
 
   useEffect(() => {
-    if (isEqual(selectedIds, lastSelectedIds.current)) return;
+    if (isEqual(selectedIds, refs.current.lastSelectedIds)) return;
     setSelection(selectedIds);
-    if (!syncServerSelectionPending.current) {
+    if (!refs.current.syncServerSelectionPending) {
       syncSelection(selectedIds);
-      serverSelectedIds.current = selectedIds;
+      refs.current.serverSelectedIds = selectedIds;
     }
-    lastSelectedIds.current = selectedIds;
+    refs.current.lastSelectedIds = selectedIds;
   }, [selectedIds, setSelection, syncSelection]);
 
   useEffect(() => {
-    if (isEqual(selectedIdsByServer, lastSelectedIdsByServer.current)) return;
+    if (isEqual(selectedIdsByServer, refs.current.lastSelectedIdsByServer))
+      return;
 
-    lastSelectedIdsByServer.current = selectedIdsByServer;
-    serverSelectedIds.current = selectedIdsByServer?.slice().sort() as number[];
-    syncServerSelectionPending.current = true;
+    refs.current.lastSelectedIdsByServer = selectedIdsByServer;
+    refs.current.serverSelectedIds = selectedIdsByServer
+      ?.slice()
+      .sort() as number[];
+    refs.current.syncServerSelectionPending = true;
   }, [selectedIdsByServer]);
 
   useEffect(() => {
-    if (serverSelectedIds.current) {
+    if (refs.current.serverSelectedIds) {
       syncServerSelection();
     }
   }, [syncServerSelection]);
@@ -862,7 +878,7 @@ function OneToManyInner({
             currNewEditRecord = editRecord;
           }
         }
-        recordsSyncRef.current = true;
+        refs.current.recordsSync = true;
 
         setRecords((prevRecords) => {
           const newRecords = newItems.map((item, index) => {
@@ -954,8 +970,6 @@ function OneToManyInner({
     );
   }, [dataStore, state.columns, state.orderBy]);
 
-  const valueRef = useRef<DataRecord[] | null>();
-  const forceRefreshRef = useRef(false);
   const [shouldReorder, setShouldReorder] = useState(false);
 
   const formRecordId = useAtomValue(
@@ -963,8 +977,8 @@ function OneToManyInner({
   );
 
   const resetValue = useCallback(() => {
-    valueRef.current = null;
-    forceRefreshRef.current = true;
+    refs.current.value = null;
+    refs.current.forceRefresh = true;
   }, []);
 
   const setRefresh = useFormActiveHandler();
@@ -974,24 +988,24 @@ function OneToManyInner({
   useEffect(resetValue, [formRecordId, resetValue, formAtom]);
 
   useAsyncEffect(async () => {
-    const last = valueRef.current ?? [];
+    const last = refs.current.value ?? [];
     const next = value ?? [];
 
     // avoid searching for internal value changes
     if (last === next) return;
 
     if (
-      forceRefreshRef.current ||
+      refs.current.forceRefresh ||
       last.length !== next.length ||
       last.some((x) => {
         const y = next.find((d) => d.id === x.id);
         return y === undefined || !equals(x, y) || x.selected !== y.selected;
       })
     ) {
-      const resetOrder = forceRefreshRef.current;
-      forceRefreshRef.current = false;
-      const prevValue = valueRef.current;
-      valueRef.current = value;
+      const resetOrder = refs.current.forceRefresh;
+      refs.current.forceRefresh = false;
+      const prevValue = refs.current.value;
+      refs.current.value = value;
       setRefresh(async () => {
         await onSearch(dataStore.options, resetOrder);
         if (prevValue && orderField) {
@@ -1035,7 +1049,7 @@ function OneToManyInner({
             nextItems.map((x) => x[orderField]),
           )
         ) {
-          set(valueAtom, (valueRef.current = nextItems));
+          set(valueAtom, (refs.current.value = nextItems));
           setRecords((prevRecords) =>
             nextItems.map((item) =>
               nestedToDotted({
@@ -1113,8 +1127,8 @@ function OneToManyInner({
     () => ({
       _viewType: "grid",
       _views: [{ type: "grid", name: gridView }],
-      ...(lastSelectedIds.current?.length > 0 && {
-        _ids: lastSelectedIds.current,
+      ...(refs.current.lastSelectedIds?.length > 0 && {
+        _ids: refs.current.lastSelectedIds,
       }),
       _parent: getContext(),
     }),
@@ -1409,7 +1423,7 @@ function OneToManyInner({
   }, [updateViewDirty]);
 
   const onRowReorder = useCallback(() => {
-    reorderRef.current = true;
+    refs.current.reorder = true;
   }, []);
 
   const hasRowSelected = !!selectedRows?.length;
@@ -1448,20 +1462,21 @@ function OneToManyInner({
   }, [model, detailFormName]);
 
   useEffect(() => {
-    const savedId = saveIdRef.current;
+    const savedId = refs.current.savedId;
     if (savedId) {
       const savedInd = rows?.findIndex((r) => r.record?.id === savedId);
-      savedInd > 0 &&
+      if (savedInd > 0) {
         setState((draft) => {
           draft.selectedCell = [savedInd, 0];
           draft.selectedRows = [savedInd];
         });
-      saveIdRef.current = null;
+      }
+      refs.current.savedId = null;
     }
   }, [selectedRows, rows, setState]);
 
   useEffect(() => {
-    if (reorderRef.current) {
+    if (refs.current.reorder) {
       // For dummy fields, so that internal value change is detected
       if (!orderField) {
         resetValue();
@@ -1488,7 +1503,7 @@ function OneToManyInner({
         true,
       );
     }
-    reorderRef.current = false;
+    refs.current.reorder = false;
   }, [orderField, resetValue, rows, setValue]);
 
   const fetchAndSetDetailRecord = useCallback(
@@ -1504,7 +1519,9 @@ function OneToManyInner({
 
   const onRowClick = useCallback(
     (e: SyntheticEvent, row: GridRow) => {
-      selected?.id === row?.record?.id && fetchAndSetDetailRecord(row.record);
+      if (selected?.id === row?.record?.id) {
+        fetchAndSetDetailRecord(row.record);
+      }
     },
     [selected, fetchAndSetDetailRecord],
   );
@@ -1550,7 +1567,7 @@ function OneToManyInner({
           ...(orderField && maxOrder != null && { [orderField]: maxOrder + 1 }),
         },
       ]);
-      saveIdRef.current = newId;
+      refs.current.savedId = newId;
     }
   }, [
     dataStore,
@@ -1780,8 +1797,8 @@ function OneToManyInner({
   );
 
   useEffect(() => {
-    if (recordsSyncRef.current) {
-      recordsSyncRef.current = false;
+    if (refs.current.recordsSync) {
+      refs.current.recordsSync = false;
       if (expandable && isRootTreeGrid) {
         syncRecordsToTree(records);
       }
