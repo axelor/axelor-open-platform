@@ -1,7 +1,0 @@
----
-title: Fix calling repository populate on read web service
-type: fix
-description: |
-  read record by id using GET method (`ws/rest/<model>/<id>`), should
-  call the entity repository like any other web services that returns
-  data.

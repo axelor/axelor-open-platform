@@ -1,3 +1,87 @@
+## 7.4.1 (2025-06-10)
+
+#### Feature
+
+* Allow to provide additional java mail properties
+
+  <details>
+  
+  Allow to provide additional java mail properties for smtp and imap from
+  properties file. Any java mail properties can be added using
+  `mail.<protocol>.properties.` prefix. 
+  
+  For example : `mail.smtp.properties.mail.smtp.ssl.trust = <host-name-of-mail-server>`
+  
+  </details>
+
+* Add selection or enum type in field help popover
+* Add parent field in dms view details
+
+#### Fix
+
+* Fix prevent executing multiple time the same action if already in progress
+
+  <details>
+  
+  It will prevent executing multiple time the same action if already in progress. 
+  Mostly related to save click in form view or popup dialog buttons.
+  
+  </details>
+
+* Fix saving customized grid view
+* Fixed the order of actions on the buttons in the grid customize popup
+
+  <details>
+  
+  In the grid customization popup, the reset and save buttons should
+  first trigger the process. Then, if the action completes, close the
+  popup. So that in case of error, the popup doesn't close prematurely.
+  
+  </details>
+
+* Fix calling repository populate on read web service
+
+  <details>
+  
+  read record by id using GET method (`ws/rest/<model>/<id>`), should
+  call the entity repository like any other web services that returns
+  data.
+  
+  </details>
+
+* Fix grid rendering issue on sorting
+
+  <details>
+  
+  Avoid grid unmount/mount during search requests causing some grid state resetting (scroll positions, ...)
+  
+  </details>
+
+* Fix pass context to o2m inline editable widget
+* Fix set default country in phone widget
+* Fix menuitem schema causing wrong reload on overridden menuitem
+* Fix mask input on date picker input
+
+  <details>
+  
+  On widgets using a mask (date/time,...), previously adding characters causes existing characters to advance. And 
+  deleting characters causes existing characters to move back. Now adding or deleting characters will not affect the 
+  positions of existing characters.
+  
+  On date/datetime, it also validates date parts (days/months/years) for valid inputs.
+  
+  </details>
+
+* Fix can* attributes evaluation on form view
+
+  <details>
+  
+  can* attributes (`canNew`, `canEdit`, ...) on form view allow javascript 
+  expressions and should be evaluated against the associated context.
+  
+  </details>
+
+
 ## 7.4.0 (2025-05-15)
 
 #### Feature

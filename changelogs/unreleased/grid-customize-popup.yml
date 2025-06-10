@@ -1,7 +1,0 @@
----
-title: Fixed the order of actions on the buttons in the grid customize popup
-type: fix
-description: |
-  In the grid customization popup, the reset and save buttons should
-  first trigger the process. Then, if the action completes, close the
-  popup. So that in case of error, the popup doesn't close prematurely.

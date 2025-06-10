@@ -1,9 +1,0 @@
----
-title: Allow to provide additional java mail properties
-type: feature
-description: |
-  Allow to provide additional java mail properties for smtp and imap from
-  properties file. Any java mail properties can be added using
-  `mail.<protocol>.properties.` prefix. 
-  
-  For example : `mail.smtp.properties.mail.smtp.ssl.trust = <host-name-of-mail-server>`

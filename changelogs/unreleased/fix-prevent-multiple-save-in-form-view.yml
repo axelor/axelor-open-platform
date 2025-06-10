@@ -1,6 +1,0 @@
----
-title: Fix prevent executing multiple time the same action if already in progress
-type: fix
-description: |
-  It will prevent executing multiple time the same action if already in progress. 
-  Mostly related to save click in form view or popup dialog buttons.
