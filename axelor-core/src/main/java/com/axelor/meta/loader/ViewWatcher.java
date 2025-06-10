@@ -346,10 +346,7 @@ public final class ViewWatcher {
               }
             });
 
-    Reflections.findResources()
-        .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
-        .find()
-        .parallelStream()
+    Reflections.findResources().byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$").find().stream()
         .filter(url -> url.getPath().startsWith("/"))
         .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
         .distinct()
