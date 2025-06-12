@@ -82,10 +82,8 @@ public class ViewGenerator {
                 + "IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other "
                 + "LEFT JOIN other.groups otherGroup "
                 + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
-                + "GROUP BY other.name, otherGroup) "
-                + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
-                + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE) "
-                + "GROUP BY self "
+                + "GROUP BY other.name, otherGroup.id) "
+                + "GROUP BY self.id "
                 + "ORDER BY self.id",
             Long.class)
         .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
@@ -174,20 +172,8 @@ public class ViewGenerator {
   }
 
   public long process(Collection<String> names) {
-    final long count = process(findForCompute(names));
+    List<Long> viewsIds = findForCompute(names);
 
-    if (count == 0L && ObjectUtils.notEmpty(names)) {
-      metaViewRepo
-          .all()
-          .filter("self.name IN :names AND self.computed = TRUE")
-          .bind("names", names)
-          .remove();
-    }
-
-    return count;
-  }
-
-  private long process(List<Long> viewsIds) {
     if (ObjectUtils.isEmpty(viewsIds)) {
       return 0L;
     }
@@ -249,6 +235,7 @@ public class ViewGenerator {
     // each of the same size (the final list may be smaller)
     for (List<Long> items : splitList(viewsIds, CHUNK_SIZE)) {
       count += generateComputedView(JPA.findByIds(MetaView.class, items));
+      JPA.flush();
       JPA.clear();
     }
 
