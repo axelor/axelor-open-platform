@@ -75,7 +75,7 @@ export function useHttpWatch() {
             // Show alert when response has no HTML content.
             const technical = session.info?.user?.technical;
             const message = i18n.get(
-              "An error has occurred{}. Please contact your administrator.",
+              "An error has occurred{0}. Please contact your administrator.",
               technical ? ` (${res.status})` : "",
             );
 

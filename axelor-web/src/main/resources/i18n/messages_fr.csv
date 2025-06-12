@@ -24,7 +24,7 @@
 "All Day","Toute la journée",,
 "All Rights Reserved","Tous droits réservés",,
 "Alt.Key","Alt",,
-"An error has occurred{}. Please contact your administrator.","Une erreur s'est produite{}. Veuillez contacter votre administrateur.",,
+"An error has occurred{0}. Please contact your administrator.","Une erreur s'est produite{0}. Veuillez contacter votre administrateur.",,
 "Apply","Appliquer",,
 "Apply as default for all users","Appliquer par défaut pour tous les utilisateurs",,
 "Archive","Archiver",,
