@@ -210,8 +210,13 @@ public class ViewLoader extends AbstractParallelLoader {
     }
   }
 
-  private void generateFinalViews(boolean update) {
+  private void generateFinalViews() {
+    if (viewsToGenerate.isEmpty()) {
+      return;
+    }
+
     LOG.info("Generating computed views...");
+
     try {
       viewGenerator.process(viewsToGenerate);
     } finally {
