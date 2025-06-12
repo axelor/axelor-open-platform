@@ -71,15 +71,11 @@ public class ViewGenerator {
     }
   }
 
-  private List<Long> findForCompute(Collection<String> names, boolean update) {
-    final boolean namesEmpty = ObjectUtils.isEmpty(names);
+  private List<Long> findForCompute(Collection<String> names) {
     return JPA.em()
         .createQuery(
             "SELECT self.id FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                + "(self.name IN :names "
-                + "AND (:update = TRUE OR NOT EXISTS ("
-                + "SELECT computedView FROM MetaView computedView "
-                + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
+                + "self.name IN :names "
                 + "AND COALESCE(self.extension, FALSE) = FALSE "
                 + "AND COALESCE(self.computed, FALSE) = FALSE "
                 + "AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) "
@@ -92,8 +88,7 @@ public class ViewGenerator {
                 + "GROUP BY self "
                 + "ORDER BY self.id",
             Long.class)
-        .setParameter("update", update)
-        .setParameter("names", namesEmpty ? ImmutableSet.of("") : names)
+        .setParameter("names", ObjectUtils.isEmpty(names) ? ImmutableSet.of("") : names)
         .getResultList();
   }
 
@@ -178,8 +173,8 @@ public class ViewGenerator {
     return view;
   }
 
-  public long process(Collection<String> names, boolean update) {
-    final long count = process(findForCompute(names, update));
+  public long process(Collection<String> names) {
+    final long count = process(findForCompute(names));
 
     if (count == 0L && ObjectUtils.notEmpty(names)) {
       metaViewRepo

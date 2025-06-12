@@ -65,7 +65,7 @@ public class ViewObserver {
     if (ObjectUtils.isEmpty(names)) {
       return;
     }
-    viewGenerator.process(names, true);
+    viewGenerator.process(names);
   }
 
   void onPostSave(
@@ -75,7 +75,7 @@ public class ViewObserver {
         values -> {
           final MetaView view = JPA.edit(MetaView.class, values);
           if (!Boolean.TRUE.equals(view.getComputed())) {
-            viewGenerator.process(Collections.singletonList(view.getName()), true);
+            viewGenerator.process(Collections.singletonList(view.getName()));
           }
         });
   }
@@ -94,7 +94,7 @@ public class ViewObserver {
   void onPostRemove(
       @Observes @Named(RequestEvent.REMOVE) @EntityType(MetaView.class) PostRequest event) {
     try {
-      viewGenerator.process(toRegenerate, true);
+      viewGenerator.process(toRegenerate);
     } finally {
       toRegenerate.clear();
     }

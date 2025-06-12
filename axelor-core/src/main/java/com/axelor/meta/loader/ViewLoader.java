@@ -156,10 +156,10 @@ public class ViewLoader extends AbstractParallelLoader {
             .getResultList());
   }
 
-  protected void terminate(boolean update) {
+  protected void terminate() {
     computedViews.clear();
     linkMissingGroups();
-    generateFinalViews(update);
+    generateFinalViews();
 
     final Set<String> duplicates = getDuplicates();
     if (!duplicates.isEmpty()) {
@@ -213,7 +213,7 @@ public class ViewLoader extends AbstractParallelLoader {
   private void generateFinalViews(boolean update) {
     LOG.info("Generating computed views...");
     try {
-      viewGenerator.process(viewsToGenerate, update);
+      viewGenerator.process(viewsToGenerate);
     } finally {
       viewsToGenerate.clear();
     }

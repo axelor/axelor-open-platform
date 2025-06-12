@@ -165,7 +165,7 @@ public class ModuleManager {
                 moduleList.forEach(m -> viewLoader.doLast(m, update));
               });
     } finally {
-      viewLoader.terminate(update);
+      viewLoader.terminate();
     }
   }
 
