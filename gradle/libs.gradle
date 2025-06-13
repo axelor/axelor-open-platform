@@ -128,9 +128,9 @@ libs.caffeine = [
   "com.github.ben-manes.caffeine:jcache:${versions.caffeine}"
 ]
 libs.infinispan = [
-    "org.infinispan:infinispan-hibernate-cache-v62:15.2.2.Final",
-    "org.infinispan:infinispan-core:15.2.2.Final",
-    "org.infinispan:infinispan-jcache:15.2.2.Final"
+    "org.infinispan:infinispan-hibernate-cache-v62:15.2.4.Final",
+    "org.infinispan:infinispan-core:15.2.4.Final",
+    "org.infinispan:infinispan-jcache:15.2.4.Final"
 ]
 
 // apache tika
