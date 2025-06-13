@@ -46,6 +46,10 @@ data.object-storage.cache.time-to-live =
 data.object-storage.cache.clean-frequency =
 ----
 
+[NOTE]
+`access-key` and `secret-key` are used for setting credentials.
+They may be optional depending on your S3 configuration.
+
 [cols="2,7,2"]
 |===
 | Setting | Description | Default value

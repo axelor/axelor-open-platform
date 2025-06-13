@@ -39,10 +39,12 @@ public class S3Client {
   }
 
   public S3Client build() {
-    MinioClient.Builder builder =
-        MinioClient.builder()
-            .endpoint(getEndpoint())
-            .credentials(configuration.getAccessKey(), configuration.getSecretKey());
+    MinioClient.Builder builder = MinioClient.builder().endpoint(getEndpoint());
+
+    if (StringUtils.notEmpty(configuration.getAccessKey())
+        && StringUtils.notEmpty(configuration.getSecretKey())) {
+      builder.credentials(configuration.getAccessKey(), configuration.getSecretKey());
+    }
 
     if (StringUtils.notEmpty(configuration.getRegion())) {
       builder.region(configuration.getRegion());
