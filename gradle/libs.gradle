@@ -10,6 +10,7 @@ versions.caffeine = "3.2.1"
 versions.redisson = "3.49.0"
 
 versions.groovy = "4.0.27"
+versions.graal_js = "24.2.1"
 versions.resteasy = "6.2.12.Final"
 versions.jackson = "2.19.1"
 versions.shiro = "2.0.4"
@@ -79,7 +80,11 @@ libs.asm = [
 libs.byte_buddy = "net.bytebuddy:byte-buddy:1.17.5"
 
 // Graal JS
-libs.graal_js = "org.graalvm.js:js:22.3.5"
+libs.graal_js = [
+  "org.graalvm.js:js:${versions.graal_js}",
+  "org.graalvm.sdk:graal-sdk:${versions.graal_js}",
+  "com.ibm.icu:icu4j:77.1"
+]
 
 // javax libs
 libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2"

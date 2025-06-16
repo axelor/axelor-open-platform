@@ -1,0 +1,6 @@
+---
+title: Upgrade GraalJS from 22.3.5 to 24.2.1
+type: change
+description: |
+  Enabled ECMAScript 2024 features
+  https://github.com/oracle/graaljs/blob/graal-24.2.1/CHANGELOG.md
