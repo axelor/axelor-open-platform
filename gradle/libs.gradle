@@ -28,6 +28,8 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
+versions.flyway = "11.9.1"
+
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
@@ -138,9 +140,13 @@ libs.apache_tika_core = "org.apache.tika:tika-core:3.2.0"
 
 // flyway
 libs.flywaydb = [
-    dependencies.create("org.flywaydb:flyway-core:9.22.3") {
+    dependencies.create("org.flywaydb:flyway-core:${versions.flyway}") {
         exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-toml'
     },
+    "org.flywaydb:flyway-database-hsqldb:${versions.flyway}",
+    "org.flywaydb:flyway-database-oracle:${versions.flyway}",
+    "org.flywaydb:flyway-database-postgresql:${versions.flyway}",
+    "org.flywaydb:flyway-mysql:${versions.flyway}",
     // overrides jackson version used
     "com.fasterxml.jackson.dataformat:jackson-dataformat-toml:${versions.jackson}"
 ]

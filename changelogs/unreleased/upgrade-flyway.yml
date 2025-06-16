@@ -1,0 +1,6 @@
+---
+title: Upgrade Flyway from 9.22.3 to 11.9.1
+type: change
+description: |
+  Modularized database support
+  https://documentation.red-gate.com/flyway/release-notes-and-older-versions/release-notes-for-flyway-engine
