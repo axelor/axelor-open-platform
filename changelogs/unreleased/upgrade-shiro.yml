@@ -12,3 +12,5 @@ description: |
   ```
 
   When users set their new passwords, the new hash algorithm will be used.
+
+  https://shiro.apache.org/blog/2024/02/apache-shiro-200-released.html

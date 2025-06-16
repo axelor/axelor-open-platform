@@ -1,3 +1,5 @@
 ---
 title: Upgrade Junit5 from 5.11.4 to 5.13.1
 type: change
+description: |
+  https://junit.org/junit5/docs/snapshot/release-notes/index.html#release-notes-5.13.1

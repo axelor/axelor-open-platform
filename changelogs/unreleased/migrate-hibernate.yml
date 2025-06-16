@@ -1,3 +1,13 @@
 ---
-title: Upgrade Hibernate from 5.6.x to 6.6.18.Final (Jakarta Persistence 3.1)
+title: Upgrade Hibernate from 5.6.x to 6.6.18.Final
 type: change
+description: |
+  Moved to Jakarta EE namespace
+  Implements Jakarta Persistence 3.1 (Jakarta EE 10)
+  https://docs.jboss.org/hibernate/orm/6.0/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.1/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.2/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.3/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.4/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.5/migration-guide/migration-guide.html
+  https://docs.jboss.org/hibernate/orm/6.6/migration-guide/migration-guide.html

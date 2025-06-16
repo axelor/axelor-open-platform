@@ -1,3 +1,6 @@
 ---
 title: Upgrade Infinispan from 13.0.22 to 15.2.4.Final
 type: change
+description: |
+  Supports Jakarta EE
+  https://infinispan.org/release-notes
