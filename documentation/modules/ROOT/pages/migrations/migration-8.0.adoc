@@ -341,6 +341,39 @@ We now support an S3-compatible object storage service for storing uploaded file
 The default implementation uses disk storage using the existing `data.upload.dir` property.
 Object storage can be activated by configuring the `data.object-storage.*` properties.
 
+Make sure you use `com.axelor.meta.MetaFiles` service and the new `com.axelor.file.store.FileStoreFactory`
+instead of assuming disk storage and directly working with the file system.
+
+Example:
+
+[source,java]
+----
+Store store = FileStoreFactory.getStore();
+
+// File path can be either on file system or in object storage.
+String filePath = metaFile.getFilePath();
+
+if (store.hasFile(filePath)) {
+  try (InputStream inputStream = store.getStream(filePath)) {
+    // ...
+  }
+}
+----
+
+Temporary file management was moved from `com.axelor.meta.MetaFiles` to `com.axelor.file.temp.TempFiles`
+and will use the new `data.upload.temp-dir` property:
+
+[source,java]
+----
+// Was: Path tempFile = MetaFiles.createTempFile(prefix, suffix);
+Path tempFile = TempFiles.createTempFile(prefix, suffix)
+
+// Was: Path tempFile = Files.createTempDirectory(prefix);
+Path tempFile = TempFiles.createTempDir(prefix);
+----
+
+For detailed information on configuring and using file storage, refer to xref:dev-guide:application/file-storage.adoc[File Storage Documentation].
+
 == Groovy 3 to Groovy 4
 
 Groovy 4 brings improvements in performance, Java compatibility, and language features. Beware of a few breaking changes mentioned in the https://groovy-lang.org/releasenotes/groovy-4.0.html[Groovy 4 release notes].

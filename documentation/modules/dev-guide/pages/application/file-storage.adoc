@@ -72,7 +72,7 @@ To deal with temporary files, the following property can be configured as a dedi
 
 [source,properties]
 ----
-# Storage path for temp files
+# Storage path for temp files (defaults to `{java.io.tmpdir}/.axelor`)
 data.upload.temp-dir = {user.home}/.axelor-temp
 ----
 
@@ -87,5 +87,4 @@ Path tempFile = TempFiles.createTempFile();
 Path tempFile = TempFiles.createTempDir();
 ----
 
-Files will be created under the `tmp_files` directory.
-
+Files will be created under subdirectory `tmp_files` of `data.upload.temp-dir`.
