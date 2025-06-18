@@ -66,14 +66,15 @@ public class BaseSearchField extends Field {
   @SuppressWarnings("rawtypes")
   public Object validate(Object input) {
     try {
-      Class<?> klass = TYPES.get(getServerType());
-      if ("reference".equals(getServerType())) {
+      String serverType = getServerType();
+      Class<?> klass = serverType != null ? TYPES.get(serverType) : null;
+      if ("reference".equals(serverType)) {
         klass = Class.forName(getTarget());
         if (input != null) {
           return JPA.em().find(klass, Long.valueOf(((Map) input).get("id").toString()));
         }
       }
-      if ("enum".equals(getServerType())) {
+      if ("enum".equals(serverType)) {
         return input;
       }
       if (klass != null && BigDecimal.class.isAssignableFrom(klass) && input == null) {

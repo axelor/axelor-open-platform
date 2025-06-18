@@ -540,7 +540,9 @@ public class DmsService {
   }
 
   private String getFileName(DMSFile record) {
-    return record.getFileName() + EXTS.getOrDefault(record.getContentType(), "");
+    String contentType = record.getContentType();
+    String ext = contentType != null ? EXTS.get(contentType) : null;
+    return record.getFileName() + (ext != null ? ext : "");
   }
 
   private Map<String, DMSFile> findFiles(DMSFile file, String base) {
