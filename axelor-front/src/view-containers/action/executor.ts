@@ -245,7 +245,7 @@ export class DefaultActionExecutor implements ActionExecutor {
     }
 
     if (data.signal === "refresh-tab") {
-      const tabId = getActiveTabId();
+      const tabId = getActiveTabId(-1);
       const event = new CustomEvent("tab:refresh", { detail: { id: tabId } });
       document.dispatchEvent(event);
     }

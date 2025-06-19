@@ -9,10 +9,11 @@ function getLastViewId(elems: (Element | null)[]) {
   return parent?.getAttribute("data-view-id");
 }
 
+// if level is negative then it will always return active tab id
 export function getActiveTabId(level = 0) {
   const elems = [
     document.querySelector(`[data-tab-content][data-tab-active='true']`),
-    ...getActivePopups(),
+    ...(level >= 0 ? getActivePopups() : []),
   ];
 
   for (let i = 0; i < level; ++i) {

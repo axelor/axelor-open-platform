@@ -1,0 +1,6 @@
+---
+title: Fix refresh-tab signal on active tab view only
+type: fix
+description: |
+  `refresh-tab` signal should be applied on active tab view, not on active view.
+  Means that popups are excluded and only active tab view is reloaded (whatever view type is).
