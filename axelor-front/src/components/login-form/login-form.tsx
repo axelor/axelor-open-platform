@@ -6,6 +6,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   InputLabel,
   Select,
 } from "@axelor/ui";
@@ -44,6 +45,7 @@ export function LoginForm({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const isPage = !onSuccess;
@@ -89,6 +91,7 @@ export function LoginForm({
     useCallback(
       async (event) => {
         event.preventDefault();
+        setIsSubmitting(true);
 
         // Need to specify client if default client is not form client.
         const params =
@@ -120,6 +123,8 @@ export function LoginForm({
           }
         } catch (e) {
           setShowError(true);
+        } finally {
+          setIsSubmitting(false);
         }
       },
       [
@@ -162,6 +167,7 @@ export function LoginForm({
       submit: {
         title: i18n.get("Sign in"),
         order: 0,
+        submitting: isSubmitting,
         onSubmit: handleSubmit,
         ...submit,
       },
@@ -182,7 +188,7 @@ export function LoginForm({
           })
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       : [buttons.submit];
-  }, [signInButtons, handleSubmit, isPage]);
+  }, [signInButtons, isSubmitting, handleSubmit, isPage]);
 
   const handleForgotPassword = useCallback<
     React.MouseEventHandler<HTMLAnchorElement>
@@ -379,9 +385,11 @@ function LoginFormButton({
   variant,
   onSubmit,
   usernameRef,
+  submitting,
 }: SignInButtonType & {
   onSubmit?: (e: React.SyntheticEvent) => Promise<void>;
   usernameRef?: React.RefObject<HTMLInputElement>;
+  submitting?: boolean;
 }) {
   const handleClick = useCallback(
     (e: React.SyntheticEvent) => {
@@ -426,12 +434,14 @@ function LoginFormButton({
       type={onSubmit ? "submit" : "button"}
       onClick={handleClick}
       variant={variant ?? "primary"}
+      disabled={submitting}
       d="flex"
       justifyContent="center"
       mt={2}
       w={100}
       gap={4}
     >
+      {submitting && <CircularProgress size={16} indeterminate />}
       {icon && <Icon icon={icon} className={styles.icon} />}
       {title}
     </Button>

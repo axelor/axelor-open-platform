@@ -8,7 +8,14 @@ import {
 } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
+import {
+  AdornedInput,
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  InputLabel,
+} from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { AppSignInLogo } from "@/components/app-logo/app-logo";
@@ -54,13 +61,18 @@ export function ChangePassword({
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const requireCurrentPassword = Boolean(username);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
+      setIsSubmitting(true);
+
       if (onSubmit) {
-        return onSubmit(event);
+        await onSubmit(event);
+        setIsSubmitting(false);
+        return;
       }
 
       event.preventDefault();
@@ -80,6 +92,7 @@ export function ChangePassword({
         );
 
         const { user, route } = info;
+        setIsSubmitting(false);
 
         if (route) {
           const { path, state } = route;
@@ -109,7 +122,10 @@ export function ChangePassword({
           setErrorMessage(i18n.get("Wrong current username or password"));
           return;
         }
+      } finally {
+        setIsSubmitting(false);
       }
+
 
       setErrorMessage(
         i18n.get("Sorry, something went wrong. Please try again later."),
@@ -316,14 +332,19 @@ export function ChangePassword({
             <Button
               type="submit"
               variant="primary"
+              d="flex"
+              justifyContent="center"
+              gap={4}
               mt={3}
               w={100}
               disabled={
                 (requireCurrentPassword && !currentPassword) ||
                 !newPassword ||
-                !confirmPassword
+                !confirmPassword ||
+                isSubmitting
               }
             >
+              {isSubmitting && <CircularProgress size={16} indeterminate />}
               {i18n.get("Change password")}
             </Button>
           </Box>

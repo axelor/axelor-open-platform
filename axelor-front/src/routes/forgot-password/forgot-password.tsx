@@ -7,7 +7,15 @@ import {
 } from "react";
 import { Navigate, Link as RouterLink, useLocation } from "react-router-dom";
 
-import { Alert, Box, Button, Input, InputLabel, Select } from "@axelor/ui";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Input,
+  InputLabel,
+  Select,
+} from "@axelor/ui";
 
 import { AppSignInLogo } from "@/components/app-logo/app-logo";
 import { useAppSettings } from "@/hooks/use-app-settings";
@@ -32,6 +40,7 @@ export function ForgotPassword() {
   const emailAddressRef = useRef<HTMLInputElement>(null);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertError, setError] = useState(locationState?.error ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [tenantId, setTenantId] = useState(
     locationState?.tenantId ?? authentication?.tenant,
@@ -64,6 +73,7 @@ export function ForgotPassword() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     async (event) => {
       event.preventDefault();
+      setIsSubmitting(true);
 
       const headers =
         hasTenantSelect && tenantId ? { "X-Tenant-ID": tenantId } : undefined;
@@ -76,6 +86,8 @@ export function ForgotPassword() {
         },
         headers,
       });
+
+      setIsSubmitting(false);
 
       if (!response.ok) {
         try {
@@ -172,10 +184,16 @@ export function ForgotPassword() {
                   <Button
                     type="submit"
                     variant="primary"
+                    d="flex"
+                    justifyContent="center"
+                    gap={4}
                     mt={2}
                     w={100}
-                    disabled={!emailAddress}
+                    disabled={!emailAddress || isSubmitting}
                   >
+                    {isSubmitting && (
+                      <CircularProgress size={16} indeterminate />
+                    )}
                     {i18n.get("Reset password")}
                   </Button>
                 </>
