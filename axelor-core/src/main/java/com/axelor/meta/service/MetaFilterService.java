@@ -68,11 +68,13 @@ public class MetaFilterService {
     MetaFilter filter =
         filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
 
-    if (!Objects.equal(filter.getUser(), user)) {
-      throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
-    }
+    if (filter != null) {
+      if (!Objects.equal(filter.getUser(), user)) {
+        throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
+      }
 
-    filters.remove(filter);
+      filters.remove(filter);
+    }
 
     return ctx;
   }
