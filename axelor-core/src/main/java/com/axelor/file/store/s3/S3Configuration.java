@@ -41,6 +41,10 @@ public class S3Configuration {
 
   public String storageClass;
 
+  public String awsConfigFilename;
+  public String awsConfigProfile;
+  public String iamAwsCustomEndpoint;
+
   public S3Configuration(
       String endpoint,
       boolean pathStyle,
@@ -51,7 +55,10 @@ public class S3Configuration {
       String region,
       S3EncryptionType encryption,
       String kmsKeyId,
-      String storageClass) {
+      String storageClass,
+      String awsConfigFilename,
+      String awsConfigProfile,
+      String iamAwsCustomEndpoint) {
     this.endpoint = endpoint;
     this.pathStyle = pathStyle;
     this.secure = secure;
@@ -62,6 +69,10 @@ public class S3Configuration {
     this.encryption = encryption;
     this.kmsKeyId = kmsKeyId;
     this.storageClass = storageClass;
+
+    this.awsConfigFilename = awsConfigFilename;
+    this.awsConfigProfile = awsConfigProfile;
+    this.iamAwsCustomEndpoint = iamAwsCustomEndpoint;
   }
 
   public String getEndpoint() {
@@ -142,6 +153,30 @@ public class S3Configuration {
 
   public void setStorageClass(String storageClass) {
     this.storageClass = storageClass;
+  }
+
+  public String getAwsConfigFilename() {
+    return awsConfigFilename;
+  }
+
+  public void setAwsConfigFilename(String awsConfigFilename) {
+    this.awsConfigFilename = awsConfigFilename;
+  }
+
+  public String getAwsConfigProfile() {
+    return awsConfigProfile;
+  }
+
+  public void setAwsConfigProfile(String awsConfigProfile) {
+    this.awsConfigProfile = awsConfigProfile;
+  }
+
+  public String getIamAwsCustomEndpoint() {
+    return iamAwsCustomEndpoint;
+  }
+
+  public void setIamAwsCustomEndpoint(String iamAwsCustomEndpoint) {
+    this.iamAwsCustomEndpoint = iamAwsCustomEndpoint;
   }
 
   @Override

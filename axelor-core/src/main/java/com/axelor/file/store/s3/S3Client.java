@@ -20,7 +20,13 @@ package com.axelor.file.store.s3;
 
 import com.axelor.common.StringUtils;
 import io.minio.MinioClient;
+import io.minio.credentials.AwsConfigProvider;
+import io.minio.credentials.AwsEnvironmentProvider;
+import io.minio.credentials.ChainedProvider;
+import io.minio.credentials.IamAwsProvider;
+import io.minio.credentials.Provider;
 import io.minio.http.HttpUtils;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -41,20 +47,30 @@ public class S3Client {
   public S3Client build() {
     MinioClient.Builder builder = MinioClient.builder().endpoint(getEndpoint());
 
+    this.okHttpClient =
+        HttpUtils.newDefaultHttpClient(
+            DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
+
     if (StringUtils.notEmpty(configuration.getAccessKey())
         && StringUtils.notEmpty(configuration.getSecretKey())) {
       builder.credentials(configuration.getAccessKey(), configuration.getSecretKey());
+    } else {
+      Provider iamAwsProvider =
+          new IamAwsProvider(configuration.getIamAwsCustomEndpoint(), okHttpClient);
+      Provider awsConfigProvider =
+          new AwsConfigProvider(
+              configuration.getAwsConfigFilename(), configuration.getAwsConfigProfile());
+      Provider awsEnvironmentProvider = new AwsEnvironmentProvider();
+      builder.credentialsProvider(
+          new ChainedProvider(iamAwsProvider, awsConfigProvider, awsEnvironmentProvider));
     }
 
     if (StringUtils.notEmpty(configuration.getRegion())) {
       builder.region(configuration.getRegion());
     }
 
-    this.okHttpClient =
-        HttpUtils.newDefaultHttpClient(
-            DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_CONNECTION_TIMEOUT);
-
     builder.httpClient(okHttpClient);
+
     this.minioClient = builder.build();
 
     return this;
@@ -69,8 +85,15 @@ public class S3Client {
     return HttpUrl.get(scheme + "://" + host);
   }
 
-  public OkHttpClient getOkHttpClient() {
-    return okHttpClient;
+  public void shutdown() throws IOException {
+    if (okHttpClient != null) {
+      var cache = okHttpClient.cache();
+      if (cache != null) {
+        cache.close();
+      }
+      okHttpClient.dispatcher().executorService().shutdown();
+      okHttpClient.connectionPool().evictAll();
+    }
   }
 
   public MinioClient getMinioClient() {

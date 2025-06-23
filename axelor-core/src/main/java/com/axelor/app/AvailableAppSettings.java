@@ -140,6 +140,11 @@ public interface AvailableAppSettings {
   String DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID = "data.object-storage.encryption-kms-key-id";
   String DATA_OBJECT_STORAGE_STORAGE_CLASS = "data.object-storage.storage-class";
 
+  String DATA_OBJECT_STORAGE_AWS_CONFIG_FILENAME = "data.object-storage.aws-config.filename";
+  String DATA_OBJECT_STORAGE_AWS_CONFIG_PROFILE = "data.object-storage.aws-config.profile";
+  String DATA_OBJECT_STORAGE_IAM_AWS_CUSTOM_ENDPOINT =
+      "data.object-storage.iam-aws.custom-endpoint";
+
   String DATA_OBJECT_STORAGE_CACHE_ENABLED = "data.object-storage.cache.enabled";
   String DATA_OBJECT_STORAGE_CACHE_MAX_ENTRIES = "data.object-storage.cache.max-entries";
   String DATA_OBJECT_STORAGE_CACHE_TIME_TO_LIVE = "data.object-storage.cache.time-to-live";

@@ -23,7 +23,6 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import io.minio.MinioClient;
 import jakarta.inject.Singleton;
-import okhttp3.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,10 @@ public class DefaultS3ClientManager implements S3ClientManager {
         settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_REGION),
         getEncryption(settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION)),
         settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_ENCRYPTION_KMS_KEY_ID),
-        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_STORAGE_CLASS));
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_STORAGE_CLASS),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_AWS_CONFIG_FILENAME, null),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_AWS_CONFIG_PROFILE, null),
+        settings.get(AvailableAppSettings.DATA_OBJECT_STORAGE_IAM_AWS_CUSTOM_ENDPOINT, null));
   }
 
   private S3EncryptionType getEncryption(String encryptionName) {
@@ -83,12 +85,7 @@ public class DefaultS3ClientManager implements S3ClientManager {
   @Override
   public void shutdown() {
     try {
-      Cache cache = s3Client.getOkHttpClient().cache();
-      if (cache != null) {
-        cache.close();
-      }
-      s3Client.getOkHttpClient().dispatcher().executorService().shutdown();
-      s3Client.getOkHttpClient().connectionPool().evictAll();
+      s3Client.shutdown();
     } catch (Exception e) {
       LOG.error("Unable to shutdown S3 connections", e);
     }
