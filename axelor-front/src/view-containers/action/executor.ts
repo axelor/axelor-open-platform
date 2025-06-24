@@ -13,6 +13,7 @@ import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as actionRequest } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
+import { device } from "@/utils/device";
 import { download } from "@/utils/download";
 
 import { TaskQueue } from "./queue";
@@ -417,7 +418,9 @@ export class DefaultActionExecutor implements ActionExecutor {
 
       if (data.reportLink) {
         const url = `ws/files/report?link=${data.reportLink}&name=${data.reportFile}`;
-        if (data.reportFormat) {
+        if (device.isMobile && data.reportFormat !== "html") {
+          download(url);
+        } else if (data.reportFormat && ['pdf', 'html'].indexOf(data.reportFormat) > -1) {
           await this.#openView({
             title: data.reportFile!,
             resource: url,
