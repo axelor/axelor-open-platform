@@ -27,6 +27,7 @@ import io.minio.credentials.IamAwsProvider;
 import io.minio.credentials.Provider;
 import io.minio.http.HttpUtils;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -39,6 +40,8 @@ public class S3Client {
 
   private OkHttpClient okHttpClient;
   private MinioClient minioClient;
+
+  private static final String SCHEME_SEPARATOR = "://";
 
   public S3Client(S3Configuration configuration) {
     this.configuration = configuration;
@@ -55,8 +58,7 @@ public class S3Client {
         && StringUtils.notEmpty(configuration.getSecretKey())) {
       builder.credentials(configuration.getAccessKey(), configuration.getSecretKey());
     } else {
-      Provider iamAwsProvider =
-          new IamAwsProvider(configuration.getIamAwsCustomEndpoint(), okHttpClient);
+      Provider iamAwsProvider = new IamAwsProvider(getIamAwsCustomEndpoint(), okHttpClient);
       Provider awsConfigProvider =
           new AwsConfigProvider(
               configuration.getAwsConfigFilename(), configuration.getAwsConfigProfile());
@@ -73,16 +75,30 @@ public class S3Client {
 
     this.minioClient = builder.build();
 
+    if (configuration.isPathStyle()) {
+      this.minioClient.disableVirtualStyleEndpoint();
+    }
+
     return this;
   }
 
   private HttpUrl getEndpoint() {
-    String host = configuration.getEndpoint();
-    if (!configuration.isPathStyle()) {
-      host = configuration.getBucket() + "." + host;
+    String endpoint = addScheme(configuration.getEndpoint());
+    Objects.requireNonNull(endpoint, "Endpoint is required");
+    return HttpUrl.get(endpoint);
+  }
+
+  private String getIamAwsCustomEndpoint() {
+    return addScheme(configuration.getIamAwsCustomEndpoint());
+  }
+
+  private String addScheme(String endpoint) {
+    if (endpoint == null || endpoint.contains(SCHEME_SEPARATOR)) {
+      return endpoint;
     }
+
     String scheme = configuration.isSecure() ? "https" : "http";
-    return HttpUrl.get(scheme + "://" + host);
+    return scheme + SCHEME_SEPARATOR + endpoint;
   }
 
   public void shutdown() throws IOException {
