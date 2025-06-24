@@ -92,7 +92,7 @@ Form view can have the following attributes:
 | `canArchive` | whether to allow archiving/unarchiving record (JavaScript expression)
 | `canSave` | whether to allow saving record (JavaScript expression)
 | `canAttach` | whether to allow attaching files to record (JavaScript expression)
-| `width` | The preferred width style of the view: `mini`, `mid` or `large`.
+| `width` | The preferred width style of the view: `mini`, `mid`, `large` or `*` (occupy all the available width).
 |===
 
 The form uses responsive layout that adjusts according to the available screen
