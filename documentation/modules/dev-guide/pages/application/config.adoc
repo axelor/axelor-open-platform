@@ -197,7 +197,7 @@ Choose the right option by environment :
 
 - Production: `none` or `validate` for stability.
 - Development: `update` is the go-to for flexibility.
-- Testing: `create` or `create-dro`p gives you fresh data every test.
+- Testing: `create` or `create-drop` gives you fresh data every test.
 
 == Other Settings
 
