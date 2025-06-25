@@ -288,6 +288,14 @@ See all the Hibernate 6.x migration guides for detailed information about the mi
 * {url-hibernate-migration-6-5}[Hibernate 6.5 Migration Guide]
 * {url-hibernate-migration-6-6}[Hibernate 6.6 Migration Guide]
 
+== Hibernate Event Listeners
+
+As part of the upgrade to Hibernate 6.6, we have migrated audit support from **Hibernate Interceptor** to **Hibernate Event Listeners**. This change addresses issues with accessing the current transaction's session, which was problematic in scenarios where the session was created outside of the dependency injection context. Using Event Listeners allows access to the current session from the event source, ensuring more reliable operation across different contexts.
+
+Additionally, a new feature has been introduced that allows developers to register their own custom Hibernate event listeners.
+If you were using a custom Hibernate interceptor, we encourage you to migrate to event listeners as well, in order to address these issues.
+For details, refer to xref:dev-guide:modules/hibernate-listeners.adoc[Hibernate Event Listeners Documentation].
+
 == Guice 5.1 to Guice 7.0
 
 Guice 7.0 supports the Jakarta EE namespace and is part of the Jakarta EE migration. Compared to previous versions, it has completely dropped support for the `javax.*` namespace.

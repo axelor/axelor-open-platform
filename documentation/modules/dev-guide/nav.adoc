@@ -10,6 +10,7 @@
 ** xref:modules/index.adoc[Modules]
 *** xref:modules/coding.adoc[Services]
 *** xref:modules/events.adoc[Events]
+*** xref:modules/hibernate-listeners.adoc[Hibernate Listener Configurator]
 *** xref:modules/security.adoc[Security]
 *** xref:modules/reports.adoc[Reports]
 *** xref:modules/scheduler.adoc[Scheduler]

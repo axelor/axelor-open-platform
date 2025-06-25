@@ -1,0 +1,83 @@
+= Hibernate Event Listeners
+
+The `HibernateListenerConfigurator` interface allows developers to configure custom Hibernate event listeners within the {page-component-title}. This feature enables the registration of listeners for various Hibernate events, such as pre-insert, pre-update, post-insert, etc., providing a way to execute custom logic during these events.
+
+== Usage
+
+To use `HibernateListenerConfigurator`, you need to bind it in your module configuration and implement the interface to register your custom listeners.
+
+=== Example Configuration
+
+In your module class, bind the `HibernateListenerConfigurator` to your custom implementation:
+
+[source,java]
+----
+public class MyModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    // Other configurations...
+
+    bind(HibernateListenerConfigurator.class).to(MyHibernateListenerConfigurator.class);
+  }
+}
+----
+
+=== Implementing the Configurator
+
+Create a class that implements `HibernateListenerConfigurator` to register your listeners:
+
+[source,java]
+----
+public class MyHibernateListenerConfigurator implements HibernateListenerConfigurator {
+
+  private final MyPreInsertEventListener myPreInsertEventListener;
+
+  @Inject
+  public MyHibernateListenerConfigurator(MyPreInsertEventListener myPreInsertEventListener) {
+    this.myPreInsertEventListener = myPreInsertEventListener;
+  }
+
+  @Override
+  public void registerListeners(EventListenerRegistry registry) {
+    registry.appendListeners(EventType.PRE_INSERT, myPreInsertEventListener);
+  }
+}
+----
+
+=== Creating a Custom Listener
+
+Implement a specific Hibernate event listener, such as `PreInsertEventListener`, to define the custom logic:
+
+[source,java]
+----
+public class MyPreInsertEventListener implements PreInsertEventListener {
+
+  private static final Logger log = LoggerFactory.getLogger(MyPreInsertEventListener.class);
+
+  @Override
+  public boolean onPreInsert(PreInsertEvent event) {
+    if (event.getEntity() instanceof Product) {
+      log.info("Before inserting Product: {}", event.getEntity());
+    }
+
+    return false;
+  }
+}
+----
+
+In this example, the listener logs a message before a `Product` entity is inserted into the database. The `return false` indicates that the event processing should continue as normal. Returning `true` would veto the insert operation.
+
+== Supported Event Types
+
+The `org.hibernate.event.spi.EventType` enum in Hibernate defines various event types you can listen to, such as:
+
+- `PRE_INSERT`
+- `PRE_UPDATE`
+- `PRE_DELETE`
+- `POST_INSERT`
+- `POST_UPDATE`
+- `POST_DELETE`
+- and others...
+
+You can register listeners for any of these event types using the `EventListenerRegistry` provided in the `registerListeners` method.
