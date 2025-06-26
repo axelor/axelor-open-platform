@@ -996,7 +996,7 @@ image::widgets/suggest-box.png[]
 
 == TagSelect
 
-The `TagSelect` widget can be used with a `many-to-many` field to select multiple values displayed as tags.
+The `TagSelect` widget can be used either with `many-to-one` field to select single value or with a `many-to-many` field to select multiple values displayed as tags.
 
 [source,xml]
 ----

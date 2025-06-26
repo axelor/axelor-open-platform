@@ -30,12 +30,24 @@ import {
 import { removeVersion } from "../../builder/utils";
 import { SelectionTag } from "../selection";
 import { RelationalValue } from "../many-to-one";
+import { TagSelect as M2OTagSelect } from "../many-to-one/tag-select";
 
 import styles from "./tag-select.module.scss";
 
 const EMPTY: DataRecord[] = [];
 
-export function TagSelect(props: FieldProps<DataRecord[]>) {
+export function TagSelect(props: FieldProps<any>) {
+  const { schema } = props;
+  const isManyToOne = toKebabCase(schema.serverType || schema.widget).endsWith(
+    "-to-one",
+  );
+  if (isManyToOne) {
+    return <M2OTagSelect {...props} />;
+  }
+  return <TagSelectInner {...props} />;
+}
+
+function TagSelectInner(props: FieldProps<DataRecord[]>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
     name,
@@ -390,13 +402,16 @@ type TagProps = {
   onClick?: (record: DataRecord) => void;
 };
 
-function Tag(props: TagProps) {
+export function Tag(props: TagProps) {
   const { record, schema, onClick, onRemove } = props;
   const { colorField, imageField } = schema;
-  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    onClick?.(record);
-  }, [onClick, record]);
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      onClick?.(record);
+    },
+    [onClick, record],
+  );
 
   const handleRemove = useCallback(() => {
     onRemove?.(record);

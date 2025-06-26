@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { useCallback, useMemo, useState } from "react";
-import { Box } from "@axelor/ui";
+import { Box, SelectProps } from "@axelor/ui";
 
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
@@ -37,7 +37,10 @@ import { makeImageURL } from "../image/utils";
 import styles from "./many-to-one.module.css";
 
 export function ManyToOne(
-  props: FieldProps<DataRecord> & { isSuggestBox?: boolean },
+  props: FieldProps<DataRecord> & {
+    isSuggestBox?: boolean;
+    selectProps?: Partial<SelectProps<DataRecord, false>>;
+  },
 ) {
   const {
     schema,
@@ -47,6 +50,7 @@ export function ManyToOne(
     readonly: _readonly,
     invalid,
     isSuggestBox,
+    selectProps,
   } = props;
   const {
     target,
@@ -61,6 +65,7 @@ export function ManyToOne(
     searchLimit,
     perms,
     imageField,
+    colorField,
   } = schema;
   const [value, setValue] = useAtom(valueAtom);
   const [hasSearchMore, setSearchMore] = useState(false);
@@ -74,12 +79,18 @@ export function ManyToOne(
   const showEditorInTab = useEditorInTab(schema);
   const showCreator = useCreateOnTheFly(schema);
 
+  const fetchFields = useMemo<string[]>(
+    () => (colorField ? [colorField] : []),
+    [colorField],
+  );
+
   const search = useCompletion({
     sortBy,
     limit,
     target,
     targetName,
     targetSearch,
+    fetchFields,
   });
 
   const handleChange = useCallback(
@@ -331,7 +342,11 @@ export function ManyToOne(
       {readonly &&
         (value && hasButton("view") ? (
           <ViewerLink onClick={handleView}>
-            <RelationalValue schema={schema} value={value} />
+            {selectProps?.renderOption ? (
+              selectProps.renderOption({ option: value })
+            ) : (
+              <RelationalValue schema={schema} value={value} />
+            )}
           </ViewerLink>
         ) : (
           <ViewerInput name={schema.name} value={getOptionLabel(value)} />
@@ -365,6 +380,7 @@ export function ManyToOne(
           clearIcon={false}
           toggleIcon={isSuggestBox ? undefined : false}
           {...(imageField && selectPropsWithImage)}
+          {...selectProps}
         />
       )}
     </FieldControl>

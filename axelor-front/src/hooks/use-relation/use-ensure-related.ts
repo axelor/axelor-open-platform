@@ -61,7 +61,7 @@ export function useFieldRelated({
   dottedOnly?: boolean;
 }) {
   const { findItems } = useViewMeta();
-  const { name = "", targetName } = field;
+  const { name = "", targetName, colorField } = field;
 
   const related = useMemo(() => {
     const prefix = `${name}.`;
@@ -80,10 +80,10 @@ export function useFieldRelated({
 
     const names = dottedOnly
       ? [...dotted].filter(Boolean)
-      : [...dotted, targetName, ...relatedFields].flat().filter(Boolean);
+      : [...dotted, targetName, colorField, ...relatedFields].flat().filter(Boolean);
 
     return [...new Set(names)] as string[];
-  }, [dottedOnly, findItems, name, targetName]);
+  }, [dottedOnly, findItems, name, targetName, colorField]);
 
   return related;
 }

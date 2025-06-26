@@ -231,6 +231,11 @@ export async function findViewFields(
     }
   }
 
+  function addRelated(field: string, relatedField: string) {
+    const collect = result.related[field] || (result.related[field] = []);
+    pushIn(relatedField, collect);
+  }
+
   function acceptEditor(item: Schema) {
     let collect = items;
     const editor = item.editor;
@@ -316,11 +321,16 @@ export async function findViewFields(
       await findViewFields(viewFields, item, result);
     } else if (item.name && item.type === "field") {
       pushIn(item.name, items);
+      const { colorField } = item;
       const targetName = getNonDefaultTargetName(item, viewFields);
       if (targetName) {
-        const collect =
-          result.related[item.name] || (result.related[item.name] = []);
-        pushIn(targetName, collect);
+        addRelated(item.name, targetName);
+      }
+      if (colorField) {
+        const viewField = viewFields[item.name];
+        if (viewField?.type?.endsWith("TO_ONE")) {
+          addRelated(item.name, colorField);
+        }
       }
     }
   }
