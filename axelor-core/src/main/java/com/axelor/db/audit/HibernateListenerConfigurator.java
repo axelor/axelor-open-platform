@@ -18,13 +18,11 @@
  */
 package com.axelor.db.audit;
 
-import com.google.inject.ImplementedBy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 
 /*
  * Service for configuring additional Hibernate event listeners.
  */
-@ImplementedBy(HibernateListenerConfiguratorNoOp.class)
 public interface HibernateListenerConfigurator {
 
   /*

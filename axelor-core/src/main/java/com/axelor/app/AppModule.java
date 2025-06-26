@@ -19,6 +19,7 @@
 package com.axelor.app;
 
 import com.axelor.cache.CacheBuilder;
+import com.axelor.db.audit.HibernateListenerConfigurator;
 import com.axelor.event.EventModule;
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
@@ -71,6 +72,9 @@ public class AppModule extends AbstractModule {
 
     // Init QuickMenuCreator
     Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
+
+    // Hibernate listener configurator binder
+    Multibinder.newSetBinder(binder(), HibernateListenerConfigurator.class);
 
     // View processor binder
     final Multibinder<ViewProcessor> viewProcessorBinder =

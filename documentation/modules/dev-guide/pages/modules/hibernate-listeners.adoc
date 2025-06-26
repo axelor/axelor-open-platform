@@ -1,53 +1,19 @@
 = Hibernate Event Listeners
 
-The `HibernateListenerConfigurator` interface allows developers to configure custom Hibernate event listeners within the {page-component-title}. This feature enables the registration of listeners for various Hibernate events, such as pre-insert, pre-update, post-insert, etc., providing a way to execute custom logic during these events.
+The {page-component-title} provides a mechanism for registering custom listeners for various Hibernate events, such as pre-insert, pre-update, post-insert, etc.
 
 == Usage
 
-To use `HibernateListenerConfigurator`, you need to bind it in your module configuration and implement the interface to register your custom listeners.
+To add a custom Hibernate event listener, you need to follow these steps:
 
-=== Example Configuration
+1.  Create a listener class.
+2.  Create a configurator class that implements `HibernateListenerConfigurator`.
+3.  Bind the configurator in your `AxelorModule`.
 
-In your module class, bind the `HibernateListenerConfigurator` to your custom implementation:
+=== Create a Listener
 
-[source,java]
-----
-public class MyModule extends AxelorModule {
-
-  @Override
-  protected void configure() {
-    // Other configurations...
-
-    bind(HibernateListenerConfigurator.class).to(MyHibernateListenerConfigurator.class);
-  }
-}
-----
-
-=== Implementing the Configurator
-
-Create a class that implements `HibernateListenerConfigurator` to register your listeners:
-
-[source,java]
-----
-public class MyHibernateListenerConfigurator implements HibernateListenerConfigurator {
-
-  private final MyPreInsertEventListener myPreInsertEventListener;
-
-  @Inject
-  public MyHibernateListenerConfigurator(MyPreInsertEventListener myPreInsertEventListener) {
-    this.myPreInsertEventListener = myPreInsertEventListener;
-  }
-
-  @Override
-  public void registerListeners(EventListenerRegistry registry) {
-    registry.appendListeners(EventType.PRE_INSERT, myPreInsertEventListener);
-  }
-}
-----
-
-=== Creating a Custom Listener
-
-Implement a specific Hibernate event listener, such as `PreInsertEventListener`, to define the custom logic:
+Implement one of Hibernate's event listener interfaces.
+For example, to execute logic before an entity is inserted, you would implement `org.hibernate.event.spi.PreInsertEventListener`.
 
 [source,java]
 ----
@@ -58,19 +24,62 @@ public class MyPreInsertEventListener implements PreInsertEventListener {
   @Override
   public boolean onPreInsert(PreInsertEvent event) {
     if (event.getEntity() instanceof Product) {
-      log.info("Before inserting Product: {}", event.getEntity());
+      log.info("A new Product is about to be inserted: {}", event.getEntity());
     }
 
+    // Return false to allow the insertion to proceed.
     return false;
   }
 }
 ----
 
-In this example, the listener logs a message before a `Product` entity is inserted into the database. The `return false` indicates that the event processing should continue as normal. Returning `true` would veto the insert operation.
+=== Implement a Configurator
+
+Create a class that implements `com.axelor.db.audit.HibernateListenerConfigurator`. This class is responsible for registering your listeners with Hibernate's `EventListenerRegistry`. You can inject your listener instances directly into the configurator.
+
+[source,java]
+----
+public class MyHibernateListenerConfigurator implements HibernateListenerConfigurator {
+
+  private final MyPreInsertEventListener myPreInsertEventListener;
+  // Possibly declare more listeners...
+
+  @Inject
+  public MyHibernateListenerConfigurator(MyPreInsertEventListener myPreInsertEventListener) {
+    this.myPreInsertEventListener = myPreInsertEventListener;
+  }
+
+  @Override
+  public void registerListeners(EventListenerRegistry registry) {
+    registry.appendListeners(EventType.PRE_INSERT, myPreInsertEventListener);
+    // Possibly register more listeners...
+  }
+}
+----
+
+=== Bind a Configurator
+
+Finally, bind your configurator in your module's `configure()` method using helper method `addHibernateListenerConfigurator()`
+that uses Guice's `Multibinder` to be able to bind multiple configurators.
+
+[source,java]
+----
+public class MyModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    // Other configurations...
+
+    // Bind the configurator.
+    // You can add multiple configurators from different modules.
+    addHibernateListenerConfigurator(MyHibernateListenerConfigurator.class);
+  }
+}
+----
 
 == Supported Event Types
 
-The `org.hibernate.event.spi.EventType` enum in Hibernate defines various event types you can listen to, such as:
+You can register listeners for any event type defined in the `org.hibernate.event.spi.EventType` enum. Common event types include:
 
 - `PRE_INSERT`
 - `PRE_UPDATE`
@@ -78,6 +87,11 @@ The `org.hibernate.event.spi.EventType` enum in Hibernate defines various event 
 - `POST_INSERT`
 - `POST_UPDATE`
 - `POST_DELETE`
-- and others...
+- `POST_LOAD`
+- And others...
 
 You can register listeners for any of these event types using the `EventListenerRegistry` provided in the `registerListeners` method.
+
+== Performance Considerations
+
+Hibernate event listeners should be used sparingly because of performance concerns. Each listener adds overhead to database operations, and excessive or poorly optimized listeners can significantly impact application performance. Consider the necessity of each listener and optimize their logic to minimize processing time.

@@ -27,12 +27,8 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AuditIntegrator implements Integrator {
-
-  private static Logger log = LoggerFactory.getLogger(AuditIntegrator.class);
 
   @Override
   public void integrate(
@@ -47,14 +43,7 @@ public class AuditIntegrator implements Integrator {
     registry.appendListeners(EventType.PRE_UPDATE, auditListener);
     registry.appendListeners(EventType.PRE_DELETE, auditListener);
 
-    HibernateListenerConfigurator configurator = Beans.get(HibernateListenerConfigurator.class);
-
-    if (configurator instanceof HibernateListenerConfiguratorNoOp) {
-      log.trace("Custom Hibernate event listener configurator not found");
-    } else {
-      log.debug("Hibernate event listener configurator: {}", configurator.getClass().getName());
-      configurator.registerListeners(registry);
-    }
+    Beans.get(HibernateListenerService.class).registerListeners(registry);
   }
 
   @Override

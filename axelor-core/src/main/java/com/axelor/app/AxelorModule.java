@@ -18,6 +18,7 @@
  */
 package com.axelor.app;
 
+import com.axelor.db.audit.HibernateListenerConfigurator;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -37,5 +38,14 @@ public abstract class AxelorModule extends AbstractModule {
 
   protected void addQuickMenu(Class<? extends QuickMenuCreator> quickMenuClass) {
     quickMenuBinder().addBinding().to(quickMenuClass);
+  }
+
+  protected Multibinder<HibernateListenerConfigurator> hibernateListenerConfiguratorBinder() {
+    return Multibinder.newSetBinder(binder(), HibernateListenerConfigurator.class);
+  }
+
+  protected void addHibernateListenerConfigurator(
+      Class<? extends HibernateListenerConfigurator> listenerClass) {
+    hibernateListenerConfiguratorBinder().addBinding().to(listenerClass);
   }
 }
