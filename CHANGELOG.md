@@ -1,3 +1,41 @@
+## 7.4.2 (2025-06-26)
+
+#### Feature
+
+* Add processing indicators on login and reset/forgot password buttons
+* Provide better error message when filter name is already in use
+
+#### Fix
+
+* Fix sync selection of collection in action context
+* Avoid full recomputation of extended views after view hotswap
+
+  <details>
+  
+  Modifying a view XML file that doesn't contain view extensions
+  incorrectly triggered a recomputation of all extended views.
+  
+  </details>
+
+* Fix interpolation in error notification
+* Fix missed resources to watch in view watcher
+
+  <details>
+  
+  Finding paths was not thread-safe and could occasionally cause missing paths to watch.
+  
+  </details>
+
+* Fix refresh-tab signal on active tab view only
+
+  <details>
+  
+  `refresh-tab` signal should be applied on active tab view, not on active view.
+  Means that popups are excluded and only active tab view is reloaded (whatever view type is).
+  
+  </details>
+
+
 ## 7.4.1 (2025-06-10)
 
 #### Feature

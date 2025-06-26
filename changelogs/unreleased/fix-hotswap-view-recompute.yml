@@ -1,6 +1,0 @@
----
-title: Avoid full recomputation of extended views after view hotswap
-type: fix
-description: |
-  Modifying a view XML file that doesn't contain view extensions
-  incorrectly triggered a recomputation of all extended views.

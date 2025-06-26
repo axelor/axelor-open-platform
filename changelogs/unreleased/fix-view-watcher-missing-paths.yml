@@ -1,5 +1,0 @@
----
-title: Fix missed resources to watch in view watcher
-type: fix
-description: |
-  Finding paths was not thread-safe and could occasionally cause missing paths to watch.
