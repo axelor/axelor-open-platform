@@ -73,14 +73,19 @@ export function useGridColumnNames({
             if ((item as JsonField).jsonField) {
               return [...names, (item as JsonField).jsonField as string];
             } else if (field) {
+              const schema = item as Schema;
+              const hasToOne = field.type?.endsWith("TO_ONE");
               return [
                 ...names,
                 field.name,
-                ...(field.type?.endsWith("TO_ONE") &&
-                (item as Schema).target &&
-                (item as Schema).targetName &&
-                (item as Schema).targetName !== field.targetName
-                  ? [`${field.name}.${(item as Schema).targetName}`]
+                ...(hasToOne &&
+                schema.target &&
+                schema.targetName &&
+                schema.targetName !== field.targetName
+                  ? [`${field.name}.${schema.targetName}`]
+                  : []),
+                ...(hasToOne && schema.colorField
+                  ? [`${field.name}.${schema.colorField}`]
                   : []),
               ];
             }
