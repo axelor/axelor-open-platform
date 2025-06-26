@@ -22,8 +22,8 @@ axelor-demo
 │   └── main
 │       ├── java
 │       └── resources
+│           ├── axelor-config.properties <1>
 │           └── META-INF
-│               ├── axelor-config.properties <1>
 │               └── persistence.xml <2>
 ├── gradle <3>
 │   └── wrapper
