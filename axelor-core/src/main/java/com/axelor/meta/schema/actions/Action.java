@@ -29,12 +29,13 @@ import com.google.common.base.MoreObjects;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
+import java.io.Serializable;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @XmlType(name = "AbstractAction")
-public abstract class Action {
+public abstract class Action implements Serializable {
 
   protected final transient Logger log = LoggerFactory.getLogger(getClass());
 
@@ -150,7 +151,7 @@ public abstract class Action {
   }
 
   @XmlType
-  public abstract static class Element {
+  public abstract static class Element implements Serializable {
 
     @XmlAttribute(name = "if")
     private String condition;
