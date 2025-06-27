@@ -353,7 +353,9 @@ Store store = FileStoreFactory.getStore();
 // File path can be either on file system or in object storage.
 String filePath = metaFile.getFilePath();
 
+// Use store method to check if the file exists.
 if (store.hasFile(filePath)) {
+  // Use store method to get the file stream.
   try (InputStream inputStream = store.getStream(filePath)) {
     // ...
   }

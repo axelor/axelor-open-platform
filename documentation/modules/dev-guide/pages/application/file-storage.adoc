@@ -46,28 +46,6 @@ data.object-storage.cache.time-to-live =
 data.object-storage.cache.clean-frequency =
 ----
 
-==== Credentials provider chain
-
-When `access-key` and `secret-key` are not specified, an AWS credentials provider chain will be used instead.
-The following credentials will be tried in this order:
-
-1. IAM roles for Amazon EC2 (`data.object-storage.iam-aws.custom-endpoint`)
-2. Amazon AWS credentials file (`data.object-storage.aws-config.filename` and `data.object-storage.aws-config.profile`)
-3. Amazon AWS environment variables
-
-Here are the AWS specific configuration properties:
-
-[source,properties]
-----
-// Optional Amazon AWS credentials file
-data.object-storage.aws-config.filename =
-// Optional Amazon AWS credentials profile
-data.object-storage.aws-config.profile =
-
-// Optional custom endpoint to fetch IAM role credentials
-data.object-storage.iam-aws.custom-endpoint =
------
-
 [cols="2,7,2"]
 |===
 | Setting | Description | Default value
@@ -87,6 +65,39 @@ data.object-storage.iam-aws.custom-endpoint =
 | cache.time-to-live | Time-to-live of a cache entry, in seconds, -1 means unlimited | 600
 | cache.clean-frequency | Number of hits from which the cache is cleaned, -1 means disabled  | 1000
 |===
+
+==== Credentials provider chain
+
+When `access-key` and `secret-key` are not specified, an AWS credentials provider chain will be used instead.
+The following credentials will be tried in this order:
+
+1. IAM roles for Amazon EC2 (`data.object-storage.iam-aws.custom-endpoint`)
+2. Amazon AWS credentials file (`data.object-storage.aws-config.filename` and `data.object-storage.aws-config.profile`)
+3. Amazon AWS environment variables
+
+Here are the AWS-specific configuration properties:
+
+[source,properties]
+----
+// Optional custom endpoint to fetch IAM role credentials
+data.object-storage.iam-aws.custom-endpoint =
+
+// Optional Amazon AWS credentials file
+data.object-storage.aws-config.filename =
+// Optional Amazon AWS credentials profile
+data.object-storage.aws-config.profile =
+----
+
+[cols="3,9"]
+|===
+| Setting | Description
+
+| iam-aws.custom-endpoint | Custom endpoint to fetch IAM role credentials
+| aws-config.filename | AWS credentials file
+| aws-config.profile | AWS credentials profile
+|===
+
+All the AWS-specific properties are usually left empty, unless you have special requirements.
 
 == Temp files
 
