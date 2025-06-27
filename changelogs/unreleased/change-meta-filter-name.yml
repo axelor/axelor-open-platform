@@ -1,0 +1,16 @@
+---
+title: Save/update/delete filters now by id instead of name
+type: change
+description: |
+  Removed field `name` on MetaFilter.
+  Removed unique constraint on name, filterView,
+  and replaced it with index `meta_filter_filter_view_idx` on filterView.
+
+  This allows different users to create filters with the same title.
+
+  Database migration script:
+
+  ```sql
+  ALTER TABLE meta_filter DROP COLUMN name;
+  CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+  ```

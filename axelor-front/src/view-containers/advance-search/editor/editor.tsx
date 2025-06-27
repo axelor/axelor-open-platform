@@ -51,9 +51,6 @@ function FormControl({
   );
 }
 
-const getFilterName = (title?: string) =>
-  title?.replace(" ", "_").toLowerCase();
-
 export interface EditorProps {
   stateAtom: AdvancedSearchAtom;
   fields: Field[];
@@ -272,8 +269,6 @@ export function Editor({
       if (id && !savedAs) {
         savedFilter.id = id;
         savedFilter.version = version;
-      } else {
-        savedFilter.name = getFilterName(title);
       }
       onSave?.(savedFilter as SavedFilter);
     },

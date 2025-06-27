@@ -18,14 +18,11 @@
  */
 package com.axelor.meta.web;
 
-import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.service.MetaFilterService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.axelor.rpc.ResponseException;
 import jakarta.inject.Inject;
-import jakarta.persistence.PersistenceException;
 
 public class MetaFilterController {
 
@@ -34,16 +31,8 @@ public class MetaFilterController {
   public void saveFilter(ActionRequest request, ActionResponse response) {
     MetaFilter ctx = request.getContext().asType(MetaFilter.class);
     if (ctx != null) {
-      try {
-        ctx = service.saveFilter(ctx);
-        response.setData(ctx);
-      } catch (PersistenceException e) {
-        response.setException(
-            new ResponseException(
-                I18n.get("Please provide a different name for the filter."),
-                I18n.get("Filter name already used"),
-                null));
-      }
+      ctx = service.saveFilter(ctx);
+      response.setData(ctx);
     }
   }
 

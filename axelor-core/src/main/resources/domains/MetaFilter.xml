@@ -11,7 +11,6 @@
     This object stores the custom filters.
     ]]>
 
-    <string name="name" required="true" />
     <string name="title" required="true" namecolumn="true" />
     <string name="filters" />
     <string name="filterCustom" large="true" />
@@ -20,7 +19,7 @@
     <boolean name="shared"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" />
 
-    <index columns="name,filterView" unique="true"/>
+    <index columns="filterView" />
   </entity>
 
 </domain-models>

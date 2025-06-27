@@ -435,3 +435,15 @@ After:
 == Groovy 3 to Groovy 4
 
 Groovy 4 brings improvements in performance, Java compatibility, and language features. Beware of a few breaking changes mentioned in the https://groovy-lang.org/releasenotes/groovy-4.0.html[Groovy 4 release notes].
+
+== Dropped `name` field on MetaFilter
+
+The `name` field on `MetaFilter` has been removed, and different users can now create filters with the same title.
+
+For the migration, you need to alter the table `meta_filter` with the following SQL statement:
+
+[source,sql]
+----
+ALTER TABLE meta_filter DROP COLUMN name;
+CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
+----

@@ -37,14 +37,19 @@ public class MetaFilterService {
   @Transactional
   public MetaFilter saveFilter(MetaFilter ctx) {
     User user = AuthUtils.getUser();
-    String query =
-        "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-    MetaFilter filter =
-        filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+    Long id = ctx.getId();
+    MetaFilter filter;
 
-    if (filter == null) {
+    if (id != null) {
+      filter = filters.find(id);
+      if (filter == null) {
+        throw new IllegalArgumentException(I18n.get("Filter not found"));
+      }
+      if (!Objects.equals(filter.getUser(), user) && !Boolean.TRUE.equals(filter.getShared())) {
+        throw new AuthorizationException(I18n.get("You are not allowed to update this filter."));
+      }
+    } else {
       filter = new MetaFilter();
-      filter.setName(ctx.getName());
       filter.setUser(user);
       filter.setFilterView(ctx.getFilterView());
     }
@@ -63,18 +68,21 @@ public class MetaFilterService {
   @Transactional
   public MetaFilter removeFilter(MetaFilter ctx) {
     User user = AuthUtils.getUser();
-    String query =
-        "self.name = ?1 AND self.filterView = ?2 AND (self.user.code = ?3 OR self.shared = true)";
-    MetaFilter filter =
-        filters.all().filter(query, ctx.getName(), ctx.getFilterView(), user.getCode()).fetchOne();
+    Long id = ctx.getId();
 
-    if (filter != null) {
-      if (!Objects.equals(filter.getUser(), user)) {
-        throw new AuthorizationException(I18n.get("You are not allowed to remove this filter"));
-      }
+    Objects.requireNonNull(id);
 
-      filters.remove(filter);
+    MetaFilter filter = filters.find(id);
+
+    if (filter == null) {
+      throw new IllegalArgumentException(I18n.get("Filter not found"));
     }
+
+    if (!Objects.equals(filter.getUser(), user)) {
+      throw new AuthorizationException(I18n.get("You are not allowed to remove this filter."));
+    }
+
+    filters.remove(filter);
 
     return ctx;
   }
