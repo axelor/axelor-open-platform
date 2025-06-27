@@ -283,7 +283,7 @@ public class ViewLoader extends AbstractParallelLoader {
       }
     }
 
-    LOG.atDebug().setMessage("Loading view: {}").addArgument(() -> getName(name, xmlId));
+    LOG.atDebug().setMessage("Loading view: {}").addArgument(() -> getName(name, xmlId)).log();
     final String xml = XMLViews.toXml(view, true);
 
     if (type.matches("tree|chart|portal|dashboard|search|custom")) {
