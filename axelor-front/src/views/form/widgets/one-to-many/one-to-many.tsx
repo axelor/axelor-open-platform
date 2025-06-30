@@ -8,6 +8,7 @@ import pick from "lodash/pick";
 import uniq from "lodash/uniq";
 import uniqueId from "lodash/uniqueId";
 import {
+  CSSProperties,
   ForwardedRef,
   Fragment,
   HTMLAttributes,
@@ -545,7 +546,12 @@ function OneToManyInner({
                 }
                 draft.map(process);
               });
-              set(valueAtom, (refs.current.value = updatedValues), false, false);
+              set(
+                valueAtom,
+                (refs.current.value = updatedValues),
+                false,
+                false,
+              );
             }
           },
         ),
@@ -1879,6 +1885,18 @@ function OneToManyInner({
     });
   }, [isTreeGrid, summaryView, model]);
 
+  const gridStyle: CSSProperties = useMemo(
+    () => ({
+      minHeight:
+        headerSize +
+        (isSubTreeGrid ? (readonly ? -headerSize : 0) : 2 * rowSize), // min 2 rows
+      ...(!expandable && {
+        maxHeight, // auto height to the max rows to display
+      }),
+    }),
+    [isSubTreeGrid, expandable, readonly, headerSize, rowSize, maxHeight],
+  );
+
   const expandableView = useMemo(() => {
     if (isTreeGrid) {
       const summaryFields = expandableSummaryMeta?.fields ?? {};
@@ -2058,18 +2076,11 @@ function OneToManyInner({
             },
           ],
         }}
-        style={{
-          minHeight:
-            headerSize +
-            (isSubTreeGrid ? (readonly ? -headerSize : 0) : 2 * rowSize), // min 2 rows
-          ...(!expandable && {
-            maxHeight, // auto height to the max rows to display
-          }),
-        }}
       >
         <GridExpandableContext.Provider value={expandableContext}>
           <ScopeProvider scope={MetaScope} value={viewMeta}>
             <GridComponent
+              style={gridStyle}
               className={clsx(styles["grid"], {
                 [styles["tree-grid"]]: isTreeGrid,
                 [styles["sub-tree-grid"]]: isSubTreeGrid,
