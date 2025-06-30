@@ -10,7 +10,7 @@ import {
   useRefs,
 } from "@axelor/ui";
 
-import { SelectionTag } from "@/views/form/widgets";
+import { Tag } from "@/components/tag";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import styles from "./overflow-menu.module.scss";
 
@@ -58,7 +58,7 @@ export function OverflowMenu<T>({
   return (
     <Box onMouseLeave={hideMenu}>
       <Box ref={iconRef} onMouseEnter={showMenu}>
-        <SelectionTag
+        <Tag
           title={`+${overflowCount ?? ""}`}
           color={themeMode === "dark" ? "gray" : "white"}
           className={clsx(styles.count, styles[themeMode])}

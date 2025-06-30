@@ -6,7 +6,27 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { legacyClassNames } from "@/styles/legacy";
 import { useAppSettings } from "@/hooks/use-app-settings";
 
-import styles from "./selection.module.scss";
+import styles from "./tag.module.scss";
+
+type TagProps = {
+  /**
+   * Title content
+   */
+  title?: React.ReactNode;
+  /**
+   * Color to apply in background: can be either a variant (`primary`, `secondary`, ...),
+   * a bult-in color name (`red`, `brown`, ...) or a hexadecimal value.
+   */
+  color?: string;
+  /**
+   * CSS class name
+   */
+  className?: string;
+  /**
+   * A callback function that is invoked when an item is removed. This adds the ability to remove the tag.
+   */
+  onRemove?: () => void;
+};
 
 const VARIANTS: TVariant[] = [
   "primary",
@@ -26,17 +46,12 @@ const COLOR_MAPS: Record<string, TVariant> = {
 
 const HEXADECIMAL_REGEX = /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6,8})$/;
 
-export function SelectionTag({
-  title,
-  color: _color,
-  className,
-  onRemove,
-}: {
-  title?: React.ReactNode;
-  color?: string;
-  className?: string;
-  onRemove?: () => void;
-}) {
+/**
+ * A component that renders a tag with optional styling, text, and a remove action.
+ */
+export function Tag(props: TagProps) {
+  const { title, className, onRemove, color: _color } = props;
+
   const color = _color ?? "primary";
   const variant = COLOR_MAPS[color!] ?? (color as TVariant);
   const isVariant = variant && VARIANTS.includes(variant);

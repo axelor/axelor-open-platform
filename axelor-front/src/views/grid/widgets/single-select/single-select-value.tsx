@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
+import { Tag } from "@/components/tag";
 import { Schema, Selection } from "@/services/client/meta.types";
-import { SelectionTag } from "@/views/form/widgets";
 
 export type SingleSelectChipProps = {
   schema: Schema;
@@ -17,7 +17,7 @@ export function SingleSelectValue(props: SingleSelectChipProps) {
   );
 
   if (selection) {
-    return <SelectionTag title={selection.title} color={selection.color} />;
+    return <Tag title={selection.title} color={selection.color} />;
   }
 
   return value;

@@ -4,13 +4,13 @@ import { useSearchParams } from "react-router-dom";
 
 import { Box, Button, SelectOptionProps } from "@axelor/ui";
 
+import { Tag } from "@/components/tag";
 import { Select, SelectProps } from "@/components/select";
 import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { MenuItem, SearchView } from "@/services/client/meta.types";
 import { focusAtom } from "@/utils/atoms";
 
-import { SelectionTag } from "../form/widgets";
 import { fetchMenus } from "./utils";
 
 import styles from "./search-objects.module.scss";
@@ -150,7 +150,7 @@ export function SearchObjects({
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => {
       return (
-        <SelectionTag
+        <Tag
           title={<span>{option?.title}</span>}
           color="primary"
           onRemove={() => {

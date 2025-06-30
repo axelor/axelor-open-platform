@@ -5,12 +5,12 @@ import { Box, Button, Input } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
+import { Tag } from "@/components/tag";
 import { dialogs } from "@/components/dialogs";
 import { Select, SelectOptionProps } from "@/components/select";
 import { request } from "@/services/client/client";
 import { i18n } from "@/services/client/i18n";
 import { useDMSPopup } from "@/views/dms/builder/hooks";
-import { SelectionTag } from "@/views/form/widgets";
 
 import HtmlEditor from "../../html/editor";
 import { Message, MessageFile, MessageRecipient } from "../message/types";
@@ -162,7 +162,7 @@ function Form({
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<MessageRecipient>) => {
       return (
-        <SelectionTag
+        <Tag
           title={getLabel(option)}
           onRemove={() => handleRemove(option)}
         />

@@ -2,11 +2,12 @@ import { useAtom } from "jotai";
 import { useCallback } from "react";
 import { clsx, Box } from "@axelor/ui";
 
+import { Tag } from "@/components/tag";
 import { SelectOptionProps } from "@/components/select";
 import { Selection as SelectionType } from "@/services/client/meta.types";
 
 import { FieldProps } from "../../builder";
-import { Selection, SelectionTag } from "../selection";
+import { Selection } from "../selection";
 import { getMultiValues, joinMultiValues } from "../selection/utils";
 import styles from "./multi-select.module.scss";
 
@@ -30,7 +31,7 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<SelectionType>) => {
       return (
-        <SelectionTag
+        <Tag
           title={option.title}
           color={option.color}
           onRemove={readonly ? undefined : () => removeItem(option)}
@@ -54,7 +55,7 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
   const renderOption = useCallback(
     ({ option }: SelectOptionProps<SelectionType>) => {
       if (!selectionShowCheckbox) {
-        return <SelectionTag title={option.title} color={option.color} />;
+        return <Tag title={option.title} color={option.color} />;
       }
       const checked = getMultiValues(value).includes(option.value!);
       return (
@@ -74,7 +75,7 @@ export function MultiSelect(props: FieldProps<string | number | null>) {
             me={2}
           >
             <Box as="span" className={styles.box} me={2} />
-            <SelectionTag title={option.title} color={option.color} />
+            <Tag title={option.title} color={option.color} />
           </Box>
         </Box>
       );

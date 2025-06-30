@@ -17,6 +17,7 @@ import {
 } from "@axelor/ui/icons/material-icon";
 
 import { alerts } from "@/components/alerts";
+import { Tag } from "@/components/tag";
 import { dialogs } from "@/components/dialogs";
 import { useSession } from "@/hooks/use-session";
 import { useTabShortcut } from "@/hooks/use-shortcut";
@@ -35,7 +36,6 @@ import { focusAtom } from "@/utils/atoms";
 import { download } from "@/utils/download";
 import { unaccent } from "@/utils/sanitize.ts";
 import { focusAndSelectInput } from "@/views/form";
-import { SelectionTag } from "@/views/form/widgets";
 
 import { ViewPopper } from "../view-popup/view-popper";
 import { useViewAction, useViewTab } from "../views/scope";
@@ -609,7 +609,7 @@ function SearchInput({
     return (
       <Box rounded border d="flex" p={1} pe={2}>
         <Box d="flex" flex={1}>
-          <SelectionTag
+          <Tag
             title={label}
             color="primary"
             onRemove={() => onClear?.()}

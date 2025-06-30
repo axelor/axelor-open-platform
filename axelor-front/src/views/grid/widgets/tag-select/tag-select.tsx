@@ -2,8 +2,8 @@ import { useCallback, useMemo } from "react";
 import { Box, Overflow, OverflowItem } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
 
+import { RelationalTag } from "@/components/tag";
 import { OverflowMenu } from "@/components/overflow-menu/overflow-menu";
-import { Tag } from "@/views/form/widgets";
 import { DataRecord } from "@/services/client/data.types";
 import { Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
@@ -29,7 +29,7 @@ function MultipleTagSelect(props: GridColumnProps) {
   const { rawValue, data: schema } = props;
 
   const renderItem = useCallback(
-    (item: DataRecord) => <Tag schema={schema as Schema} record={item} />,
+    (item: DataRecord) => <RelationalTag schema={schema as Schema} value={item} />,
     [schema],
   );
 

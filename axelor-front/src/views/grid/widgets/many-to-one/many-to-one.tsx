@@ -3,7 +3,8 @@ import set from "lodash/set";
 
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid";
-import { RelationalValue, Tag } from "@/views/form/widgets";
+import { RelationalTag } from "@/components/tag";
+import { RelationalValue } from "@/views/form/widgets";
 import { Field, Schema } from "@/services/client/meta.types";
 
 export function ManyToOne(props: GridColumnProps) {
@@ -34,7 +35,7 @@ export function ManyToOne(props: GridColumnProps) {
       {!isTagSelect && (
         <RelationalValue schema={schema as Schema} value={value} />
       )}
-      {isTagSelect && value && <Tag schema={schema as Schema} record={value} />}
+      {isTagSelect && value && <RelationalTag schema={schema as Schema} value={value} />}
     </Box>
   );
 }

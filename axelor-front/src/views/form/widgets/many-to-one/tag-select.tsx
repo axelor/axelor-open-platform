@@ -1,12 +1,13 @@
 import { useCallback, useRef } from "react";
 import { useAtom } from "jotai";
 
+import { SelectProps } from "@axelor/ui";
+import { SelectOptionProps } from "@/components/select";
+import { RelationalTag } from "@/components/tag";
 import { DataRecord } from "@/services/client/data.types";
+
 import { ManyToOne } from "./many-to-one";
 import { FieldProps } from "../../builder";
-import { SelectOptionProps } from "@/components/select";
-import { Tag } from "../tag-select";
-import { SelectProps } from "@axelor/ui";
 
 export function TagSelect(props: FieldProps<DataRecord>) {
   const { schema, valueAtom } = props;
@@ -25,14 +26,14 @@ export function TagSelect(props: FieldProps<DataRecord>) {
 
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => (
-      <Tag record={option} schema={schema} onRemove={handleRemove} />
+      <RelationalTag value={option} schema={schema} onRemove={handleRemove} />
     ),
     [schema, handleRemove],
   );
 
   const renderOption = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => (
-      <Tag record={option} schema={schema} />
+      <RelationalTag value={option} schema={schema} />
     ),
     [schema],
   );

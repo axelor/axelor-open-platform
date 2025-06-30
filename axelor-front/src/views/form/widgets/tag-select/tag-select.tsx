@@ -3,10 +3,10 @@ import { selectAtom } from "jotai/utils";
 import getObjValue from "lodash/get";
 import isEqual from "lodash/isEqual";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Box, clsx, SelectRefHandler } from "@axelor/ui";
+import { SelectRefHandler } from "@axelor/ui";
 
+import { RelationalTag } from "@/components/tag";
 import { Select, SelectOptionProps, SelectValue } from "@/components/select";
-import { Schema } from "@/services/client/meta.types";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import {
   useBeforeSelect,
@@ -28,11 +28,7 @@ import {
   usePrepareWidgetContext,
 } from "../../builder";
 import { removeVersion } from "../../builder/utils";
-import { SelectionTag } from "../selection";
-import { RelationalValue } from "../many-to-one";
 import { TagSelect as M2OTagSelect } from "../many-to-one/tag-select";
-
-import styles from "./tag-select.module.scss";
 
 const EMPTY: DataRecord[] = [];
 
@@ -336,7 +332,7 @@ function TagSelectInner(props: FieldProps<DataRecord[]>) {
 
   const renderOption = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => {
-      return <Tag record={option} schema={schema} />;
+      return <RelationalTag value={option} schema={schema} />;
     },
     [schema],
   );
@@ -344,8 +340,8 @@ function TagSelectInner(props: FieldProps<DataRecord[]>) {
   const renderValue = useCallback(
     ({ option }: SelectOptionProps<DataRecord>) => {
       return (
-        <Tag
-          record={option}
+        <RelationalTag
+          value={option}
           schema={schema}
           onClick={canView ? handleEdit : undefined}
           onRemove={canRemove ? handleRemove : undefined}
@@ -360,7 +356,6 @@ function TagSelectInner(props: FieldProps<DataRecord[]>) {
   return (
     <FieldControl {...props}>
       <Select
-        className={styles.select}
         autoFocus={focus}
         multiple={true}
         readOnly={readonly}
@@ -392,57 +387,5 @@ function TagSelectInner(props: FieldProps<DataRecord[]>) {
         renderOption={renderOption}
       />
     </FieldControl>
-  );
-}
-
-type TagProps = {
-  record: DataRecord;
-  schema: Schema;
-  onRemove?: (record: DataRecord) => void;
-  onClick?: (record: DataRecord) => void;
-};
-
-export function Tag(props: TagProps) {
-  const { record, schema, onClick, onRemove } = props;
-  const { colorField, imageField } = schema;
-  const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      onClick?.(record);
-    },
-    [onClick, record],
-  );
-
-  const handleRemove = useCallback(() => {
-    onRemove?.(record);
-  }, [onRemove, record]);
-
-  const canOpen = Boolean(onClick);
-  const canRemove = Boolean(onRemove);
-
-  return (
-    <SelectionTag
-      {...(imageField && {
-        className: clsx(styles.imageTag, {
-          [styles.colorField]: record[colorField],
-        }),
-      })}
-      title={
-        canOpen ? (
-          <Box
-            d="flex"
-            alignItems="center"
-            className={styles.tagLink}
-            onClick={handleClick}
-          >
-            <RelationalValue schema={schema} value={record} />
-          </Box>
-        ) : (
-          <RelationalValue schema={schema} value={record} />
-        )
-      }
-      color={(colorField ? record[colorField] : "") || "primary"}
-      onRemove={canRemove ? handleRemove : undefined}
-    />
   );
 }
