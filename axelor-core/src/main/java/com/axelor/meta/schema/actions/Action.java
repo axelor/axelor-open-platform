@@ -29,6 +29,7 @@ import com.google.common.base.MoreObjects;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlTransient;
 import jakarta.xml.bind.annotation.XmlType;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @XmlType(name = "AbstractAction")
 public abstract class Action implements Serializable {
 
-  protected final transient Logger log = LoggerFactory.getLogger(getClass());
+  protected transient Logger log = LoggerFactory.getLogger(getClass());
 
   @XmlAttribute(name = "id")
   private String xmlId;
@@ -125,6 +126,20 @@ public abstract class Action implements Serializable {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(getClass()).add("name", getName()).toString();
+  }
+
+  /**
+   * Custom deserialization method to reinitialize transient fields.
+   *
+   * <p>Required by the {@link org.redisson.codec.SerializationCodec} codec.
+   *
+   * @param in the ObjectInputStream used for deserialization
+   * @throws IOException
+   * @throws ClassNotFoundException
+   */
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    log = LoggerFactory.getLogger(getClass());
   }
 
   protected static String toExpression(String expression, boolean quote) {
