@@ -6,10 +6,10 @@ import { SelectOptionProps } from "@/components/select";
 import { RelationalTag } from "@/components/tag";
 import { DataRecord } from "@/services/client/data.types";
 
-import { ManyToOne } from "./many-to-one";
+import { ManyToOne } from "../many-to-one";
 import { FieldProps } from "../../builder";
 
-export function TagSelect(props: FieldProps<DataRecord>) {
+export function Tag(props: FieldProps<DataRecord>) {
   const { schema, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
   const selectRef = useRef<HTMLDivElement>();

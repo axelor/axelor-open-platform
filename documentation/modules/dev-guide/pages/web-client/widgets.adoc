@@ -994,16 +994,37 @@ The `SuggestBox` widget can be used with a `many-to-one` or `one-to-one` field t
 
 image::widgets/suggest-box.png[]
 
-== TagSelect
+== Tag
 
-The `TagSelect` widget can be used either with `many-to-one` field to select single value or with a `many-to-many` field to select multiple values displayed as tags.
+The `Tags` widget can be used with `many-to-one`/`one-to-one` fields to select a single record displayed as a tag
 
 [source,xml]
 ----
-<field name="circles" widget="TagSelect"/>
+<field name="category" widget="Tag"/>
 ----
 
-image::widgets/tag-select.png[]
+image::widgets/tag.png[]
+
+The following attributes are supported:
+
+* `x-color-field`: specify the tag color field that should either use selection `color.name.selection` or a hexadecimal
+value.
+* `x-image-field`: specify the image field to use.
+
+The widget is also supported in grids views.
+
+== Tags
+
+The `Tags` widget can be used with `many-to-many` fields to select multiple values displayed as tags.
+
+__ `TagSelect` was the former name of the widget. It is now deprecated and `Tags` should be used instead. __
+
+[source,xml]
+----
+<field name="circles" widget="Tags"/>
+----
+
+image::widgets/tags.png[]
 
 The following attributes are supported:
 
@@ -1011,7 +1032,12 @@ The following attributes are supported:
 _7.2.1_, it also accepts a hexadecimal value.
 * `x-image-field`: specify the image field to use.
 
-Available tag color values for `MultiSelect`, `SingleSelect`, and `TagSelect`:
+The widget is also supported in grids views. The only limit is that the `x-color-field` attribute isn't supported.
+
+CAUTION: Excessive use of `Tags` in grids views can cause performance issue during rendering due to dynamic calculation
+of items depending on the available column width.
+
+Available tag color values for `MultiSelect`, `SingleSelect`, `Tags` and `Tag`:
 
 [source,xml]
 ----
@@ -1280,7 +1306,7 @@ depending on the widget/type.
 
 It accepts an integer for a fix scale, or a field name for a dynamic evaluation. | `2`
 | `x-accept` | specify the file types the file input should accept |
-| `x-image-field` | specify the image field to use with `m2o` and `tag-select` widget |
+| `x-image-field` | specify the image field to use with `m2o` and `tags`/`tag` widget |
 | `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized |
 |===
 

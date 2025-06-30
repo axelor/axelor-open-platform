@@ -31,7 +31,7 @@
       <field name="parent" canView="false"/>
     </panel>
     <panel name="tagsPanel" title="Tags" itemSpan="12" sidebar="true">
-      <field name="tags" form-view="dms-tag-form" widget="TagSelect" x-create="code,name"
+      <field name="tags" form-view="dms-tag-form" widget="Tags" x-create="code,name"
         showTitle="false" />
     </panel>
     <panel-dashlet action="dms.file.children" showIf="isDirectory" height="400"/>
@@ -120,7 +120,7 @@
 
   <form name="dms-file-tags-form" title="Tags" model="com.axelor.dms.db.DMSFile">
     <panel itemSpan="12" showFrame="false">
-      <field name="tags" showTitle="false" widget="TagSelect" x-create="code,name" />
+      <field name="tags" showTitle="false" widget="Tags" x-create="code,name" />
     </panel>
   </form>
 

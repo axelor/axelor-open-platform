@@ -28,22 +28,10 @@ import {
   usePrepareWidgetContext,
 } from "../../builder";
 import { removeVersion } from "../../builder/utils";
-import { TagSelect as M2OTagSelect } from "../many-to-one/tag-select";
 
 const EMPTY: DataRecord[] = [];
 
-export function TagSelect(props: FieldProps<any>) {
-  const { schema } = props;
-  const isManyToOne = toKebabCase(schema.serverType || schema.widget).endsWith(
-    "-to-one",
-  );
-  if (isManyToOne) {
-    return <M2OTagSelect {...props} />;
-  }
-  return <TagSelectInner {...props} />;
-}
-
-function TagSelectInner(props: FieldProps<DataRecord[]>) {
+export function Tags(props: FieldProps<any>) {
   const { schema, formAtom, valueAtom, widgetAtom, readonly, invalid } = props;
   const {
     name,

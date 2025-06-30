@@ -9,7 +9,7 @@ import { Field, Schema } from "@/services/client/meta.types";
 
 export function ManyToOne(props: GridColumnProps) {
   const { rawValue, record, data: schema } = props;
-  const isTagSelect = (schema as Field).widget === "tag-select";
+  const isTag = (schema as Field).widget === "tag";
 
   const value = useMemo(() => {
     if (!rawValue) {
@@ -32,10 +32,10 @@ export function ManyToOne(props: GridColumnProps) {
 
   return (
     <Box d="inline-flex">
-      {!isTagSelect && (
-        <RelationalValue schema={schema as Schema} value={value} />
+      {!isTag && <RelationalValue schema={schema as Schema} value={value} />}
+      {isTag && value && (
+        <RelationalTag schema={schema as Schema} value={value} />
       )}
-      {isTagSelect && value && <RelationalTag schema={schema as Schema} value={value} />}
     </Box>
   );
 }

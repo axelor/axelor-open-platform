@@ -62,8 +62,8 @@ const FIELD_WIDGETS: Record<string, string[]> = {
   integer: ["Duration", "Progress", "Rating"],
   datetime: ["RelativeTime"],
   text: ["CodeEditor", "Html"],
-  "many-to-one": ["BinaryLink", "Image", "SuggestBox", "Drawing"],
-  "many-to-many": ["TagSelect"],
+  "many-to-one": ["BinaryLink", "Image", "SuggestBox", "Drawing", "Tag"],
+  "many-to-many": ["Tags", "TagSelect"],
 };
 
 function getDefaultServerType(schema: Schema): string {

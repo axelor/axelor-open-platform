@@ -436,7 +436,7 @@
             {
               "type": "field",
               "name": "circles",
-              "widget": "TagSelect",
+              "widget": "Tags",
               "target": "com.axelor.contact.db.Circle",
               "targetName": "name",
               "autoTitle": "Circles"

@@ -16,5 +16,7 @@ export * from "./phone";
 export * from "./progress";
 export * from "./rating";
 export * from "./single-select";
+export * from "./tag";
 export * from "./tag-select";
+export * from "./tags";
 export * from "./url";

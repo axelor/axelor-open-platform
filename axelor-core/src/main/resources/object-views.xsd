@@ -1375,14 +1375,14 @@
     <xsd:attribute name="x-color-field" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          Specify the color field to use with tag-select widget.
+          Specify the color field to use with `tags`/`tag` widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-image-field" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          specify the image field to use with `m2o` and `tag-select` widget.
+          specify the image field to use with `m2o` and `tags`/`tag` widget.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

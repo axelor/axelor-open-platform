@@ -67,7 +67,7 @@ export function prepareSearchFields(fields?: SearchField[]) {
       field.canEdit = "false";
       if (field.multiple) {
         field.type = "ONE_TO_MANY";
-        field.widget = "tag-select";
+        field.widget = "tags";
       }
     }
     if ((field.selection || field.selectionList) && !field.widget) {

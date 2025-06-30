@@ -121,7 +121,7 @@ function ChartInner(props: ViewProps<ChartView> & { view: ChartView }) {
                   type: "field",
                   ...(item.multiple && (item.target || item.selection)
                     ? {
-                        widget: item.target ? "tag-select" : "multi-select",
+                        widget: item.target ? "tags" : "multi-select",
                       }
                     : {}),
                 })),

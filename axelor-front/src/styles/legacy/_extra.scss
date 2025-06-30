@@ -77,7 +77,8 @@
   display: none;
 }
 
-.tag-select .label {
+.tag-select .label,
+.tags .label {
   @each $name, $value in colors.$colors {
     &.#{$name} {
       background: $value;

@@ -455,3 +455,9 @@ For the migration, you need to alter the table `meta_filter` with the following 
 ALTER TABLE meta_filter DROP COLUMN name;
 CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
 ----
+
+== `TagSelect` widget deprecated in favor of `Tags`
+
+`TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it's just a renaming of the widget name
+for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage will be
+removed in a next version.
