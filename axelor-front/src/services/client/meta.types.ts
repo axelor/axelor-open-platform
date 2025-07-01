@@ -720,7 +720,6 @@ export interface Dashboard extends View {
 export interface SearchView extends View {
   type: "search";
   limit?: number;
-  searchForm?: string;
   searchFields?: SearchField[];
   hilites?: Hilite[];
   resultFields?: SearchResultField[];

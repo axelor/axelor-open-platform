@@ -7,6 +7,7 @@ import { Criteria, DataContext, DataRecord } from "./data.types";
 import {
   ActionView,
   ChartView,
+  FormView,
   HelpOverride,
   JsonField,
   MenuItem,
@@ -183,6 +184,7 @@ export interface MetaData {
 
 export interface ViewData<T> extends Partial<MetaData> {
   view: T;
+  searchForm?: FormView; // for search-view
   helps?: Record<string, Record<string, HelpOverride>>;
   related?: Record<string, string[]>; // additional fields after view processing
 }
