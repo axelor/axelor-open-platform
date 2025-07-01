@@ -30,7 +30,7 @@
 *** xref:views/tree.adoc[Tree View]
 *** xref:views/cards.adoc[Cards View]
 *** xref:views/kanban.adoc[Kanban View]
-*** xref:views/details.adoc[Master-Details]
+*** xref:views/details.adoc[Details View]
 *** xref:views/custom.adoc[Custom View]
 *** xref:views/charts.adoc[Charts]
 *** xref:views/dashboard.adoc[Dashboard]
