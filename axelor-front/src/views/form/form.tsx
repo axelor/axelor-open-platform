@@ -221,7 +221,7 @@ export const restoreSelectedStateWithSavedRecord = (
   savedRecord: DataRecord,
 ) => {
   if (formState.statesByName) {
-    const statesByName = formState.statesByName;
+    let statesByName = formState.statesByName;
     for (const [key, value] of Object.entries(statesByName)) {
       const list = savedRecord[key];
       if (
@@ -229,14 +229,17 @@ export const restoreSelectedStateWithSavedRecord = (
         list.some((x) => x.cid && x.cid !== x.id) &&
         value?.selected?.length
       ) {
-        statesByName[key] = {
-          ...value,
-          selected: value.selected
-            .map((id) => {
-              const found = list.find((x) => x.cid === id);
-              return found ? found.id : id;
-            })
-            .filter(Boolean),
+        statesByName = {
+          ...statesByName,
+          [key]: {
+            ...value,
+            selected: value.selected
+              .map((id) => {
+                const found = list.find((x) => x.cid === id);
+                return found ? found.id : id;
+              })
+              .filter(Boolean),
+          },
         };
       }
     }
