@@ -1,0 +1,27 @@
+= View Attributes
+:toc:
+:toc-title:
+
+View attributes are usually set directly in the XML of the view. Some of them can also be updated thanks to xref:dev-guide:actions/action-attrs.adoc[Attrs Actions].
+
+But we can also configure view attributes directly from the UI for and even more advanced configuration.
+
+== Overview
+
+The configuration of these enhanced view attributes is done from the application UI, in the menu _Administration -> View Management -> View Attributes_.
+
+image::view-attribute.png[]
+
+They are evaluated on form view events `onNew` and `onLoad`, even if these attributes are not defined explicitly in the form view.
+These attributes take the precedence over the ones defined on the XML view and in the _action-attrs_ (only during `onNew` and `onLoad` events for this latter).
+
+== Available Fields
+
+* *Model* _(Required)_ - The FQN of the name on which the view attribute should be applied.
+* *View* _(Optional)_ - The name of the form view on which the view attribute should be applied. If empty, the attribute will be applied on all the form views representing the given model.
+* *Field* _(Required)_ - The field on which the attribute should be applied. Custom fields are supported (example: _attrs.myCustomField_).
+* *Order* _(Optional)_ - If several records set the same view attribute, define which one has the priority.
+* *Name* _(Required)_ - The name of the attribute we want to set. Can be any value handled by usual xref:dev-guide:actions/action-attrs.adoc[Attrs Actions].
+* *Name* _(Required)_ - The value of the attribute we want to set.
+* *Condition* _(Optional)_ - A JS expression to set the attribute value if and only if the expression evaluates to true.
+* *Roles* _(Optional)_ - A set of user roles on which this view attribute will be applied. If empty, the view attribute will be applied to all the users.
