@@ -29,6 +29,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantConnectionProvider;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.db.tenants.TenantResolver;
+import com.axelor.inject.Beans;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -104,6 +105,9 @@ public class JpaModule extends AbstractModule {
   @Override
   protected void configure() {
     log.debug("Configuring database...");
+
+    // Initialize Beans helper
+    bind(Beans.class).asEagerSingleton();
 
     final AppSettings settings = AppSettings.get();
     final Properties properties = new Properties();
