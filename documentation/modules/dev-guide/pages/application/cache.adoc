@@ -1,0 +1,80 @@
+= Caching
+:toc:
+:toc-title:
+
+The {page-component-title} provides a generic caching interface that wraps various cache implementations, providing a unified API for caching operations. The API aims to stay close to Google's Guava Cache and Caffeine, while adding support for potentially distributed caching.
+
+== AxelorCache Interface
+
+The `AxelorCache` interface offers a range of methods for managing cached data:
+
+[cols="1,2"]
+|===
+| Method | Description
+
+| `get(key)` +
+`get(key, mappingFunction)` +
+`getAll(keys)`
+| Retrieves or computes the values associated with the keys.
+
+| `put(key, value)` +
+`putAll(map)`
+| Associates values with the keys.
+
+| `invalidate(key)` +
+`invalidateAll()`
+| Discards cached entries.
+
+| `estimatedSize()`
+| Provides an approximate count of cache entries, accounting for concurrent and pending updates.
+
+| `asMap()`
+| Returns a thread-safe `ConcurrentMap` view of the cache, where modifications directly affect the cache.
+
+| `getLock(key)`
+| Offers a key-specific reentrant lock for managing concurrent access to cache entries.
+|===
+
+== CacheBuilder
+
+The `CacheBuilder` class is used to configure and construct `AxelorCache` instances.
+
+=== Builder Creation
+
+- `newBuilder(name)`: Creates a cache builder supporting either in-memory or distributed caching, depending on application configuration. The name, combined with the caller class, forms a globally unique cache identifier that is used in case of distributed caching.
+- `newInMemoryBuilder()`: Creates a builder for an in-memory cache. This is useful when you need in-memory caching while using `AxelorCache` API.
+
+=== Builder Options
+
+- `maximumSize(size)`: Sets the maximum number of entries the cache can hold.
+- `expireAfterWrite(duration)`: Configures entries to expire after a specified duration following their last write operation.
+- `expireAfterAccess(duration)`: Configures entries to expire after a specified duration following their last access.
+- `weakKeys()` and `weakValues()`: Specifies the use of weak references for keys or values, allowing garbage collection if no strong references exist.
+- `removalListener(listener)`: Attaches a listener to be notified when entries are removed from the cache.
+
+NOTE: Support of these various options depends on the underlying cache implementation and may be approximated or ignored if not supported at all.
+
+=== Building the Cache
+
+- `build()`: Constructs an `AxelorCache` instance without automatic value loading.
+- `build(loader)`: Constructs an `AxelorCache` instance that uses the provided cache loader to compute values for keys that are absent from the cache.
+
+== Usage Example
+
+[source,java]
+----
+private static final AxelorCache<String, Action> ACTIONS =
+    CacheBuilder.newBuilder("actions").maximumSize(1000).weakValues().build(XMLViews::findAction);
+----
+
+Here, the cache is configured with a maximum size of 1000 entries and uses weak references for values. The `XMLViews::findAction` loader dynamically loads actions not present in the cache.
+
+== DistributedFactory
+
+`DistributedFactory` is a utility class that facilitates concurrency control in distributed cache environments. It provides static methods to access distributed-aware synchronization primitives, ensuring thread safety across multiple application instances when using distributed caching systems.
+
+- `getLock(name)`: Returns a distributed-aware reentrant lock for the specified name, prefixed with the caller class name for uniqueness. This lock can be used to synchronize access to shared resources or cache entries in a distributed setup.
+- `getLockIfDistributed(name)`: Returns a lock only if the cache is configured for distribution; otherwise, it provides a no-op lock, avoiding unnecessary synchronization overhead in single-instance setups.
+- `getAtomicLong(name)`: Returns a distributed-aware atomic long for the specified name, useful for maintaining counters or sequence numbers across distributed instances.
+
+These utilities are essential for applications leveraging distributed caches, as they ensure consistent and safe access to cached data in multi-node deployments.

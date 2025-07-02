@@ -6,6 +6,7 @@
 *** xref:application/multi-tenancy.adoc[Multi-Tenancy]
 *** xref:application/logging.adoc[Logging]
 *** xref:application/develop.adoc[Develop]
+*** xref:application/cache.adoc[Cache]
 
 ** xref:modules/index.adoc[Modules]
 *** xref:modules/coding.adoc[Services]
