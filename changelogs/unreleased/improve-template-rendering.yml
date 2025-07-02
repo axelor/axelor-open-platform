@@ -1,0 +1,13 @@
+---
+title: Improve template rendering
+type: feature
+description : |
+  Previously, the React template component was being remounted entirely whenever the record context changed.
+  This caused visible UI flicker and unnecessary teardown/re-initialization of the component,
+  even when only the record data was updated.
+  
+  This fix ensures that the template component now mounts only once, and instead of remounting,
+  it will re-render efficiently in response to changes in the record context. This preserves component in dom by react 
+  and eliminates the flicker, resulting in a smoother user experience during form changes.
+  
+  This impacts all fields viewers, label/static/help widgets, fields tooltip, kanban/cards/calendar/custom views.

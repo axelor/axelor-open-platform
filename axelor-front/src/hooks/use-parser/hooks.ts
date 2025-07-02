@@ -4,8 +4,10 @@ import cloneDeep from "lodash/cloneDeep";
 import get from "lodash/get";
 import set from "lodash/set";
 import {
+  createContext,
   createElement,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useState,
@@ -14,10 +16,7 @@ import {
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { findViewItem } from "@/utils/schema";
 import { BaseHilite, Schema, View } from "@/services/client/meta.types";
-import {
-  useViewAction,
-  useViewMeta,
-} from "@/view-containers/views/scope";
+import { useViewAction, useViewMeta } from "@/view-containers/views/scope";
 import { FormAtom } from "@/views/form/builder";
 import { FormActionHandler, useFormScope } from "@/views/form/builder/scope";
 
@@ -37,6 +36,8 @@ import {
   parseExpression,
 } from "./utils";
 import { createContextParams } from "@/views/form/builder/utils";
+
+const TemplateScope = createContext<DataContext>({});
 
 function useFindAttrs() {
   return useAtomCallback(
@@ -99,6 +100,114 @@ export function useExpression(expression: string) {
     },
     [expression],
   );
+}
+
+function TemplateElement({ template }: { template: string }) {
+  const Comp = isReactTemplate(template)
+    ? processReactTemplate(template)
+    : processLegacyTemplate(template);
+  const context = useContext(TemplateScope);
+  return createElement(Comp, { context });
+}
+
+export function TemplateRenderer({
+  template,
+  field,
+  parent: parentFormAtom,
+  context: propsContext,
+  options: propsOptions,
+}: {
+  template: string;
+  context: DataContext;
+  field?: Schema;
+  parent?: FormAtom;
+  options?: EvalContextOptions;
+}) {
+  const { findItem, findField } = useViewMeta();
+  const { actionExecutor, formAtom } = useFormScope();
+  const _createParentContext = useCreateParentContext(
+    parentFormAtom ?? formAtom,
+    Boolean(parentFormAtom),
+  );
+  const findAttrs = useFindAttrs();
+  const $getField = useCallback(
+    (name: string) => {
+      if (field && field.name === name) {
+        const serverField = findField(name);
+        const serverType = field?.serverType || serverField?.type;
+        const more = serverType ? { serverType } : {};
+        const schema = {
+          ...serverField,
+          ...field,
+          ...field?.widgetAttrs,
+          ...more,
+        };
+        return findAttrs(formAtom, schema);
+      }
+      return findAttrs(formAtom, findItem(name) ?? { name });
+    },
+    [field, findAttrs, findField, findItem, formAtom],
+  );
+
+  const context = useMemo(() => {
+    // Deep clone of all fields excluding dotted fields
+    const _context = Object.keys(propsContext)
+      .filter((key) => !key.includes("."))
+      .reduce((cur, key) => {
+        return Object.assign(cur, { [key]: cloneDeep(propsContext[key]) });
+      }, {} as any);
+
+    // Merge dot fields (ie some.foo.bar) into object (ie product[foo])
+    Object.keys(propsContext)
+      .filter((key) => key.includes("."))
+      .reduce((cur, key) => {
+        const value = cloneDeep(propsContext[key]);
+        const prev = get(cur, key);
+        return set(
+          cur,
+          key,
+          value && typeof value === "object"
+            ? Array.isArray(value)
+              ? [...value]
+              : { ...prev, ...value }
+            : value,
+        );
+      }, _context);
+
+    const {
+      helpers,
+      execute = actionExecutor.execute.bind(actionExecutor),
+      ...options
+    } = propsOptions ?? {};
+
+    const opts = {
+      ...options,
+      execute,
+      helpers: {
+        $getField,
+        ...helpers,
+      },
+    };
+
+    const ctx = { ..._context, _createParentContext };
+    return isReactTemplate(template)
+      ? createScriptContext(ctx, opts)
+      : createEvalContext(ctx, opts);
+  }, [
+    propsContext,
+    propsOptions,
+    $getField,
+    template,
+    _createParentContext,
+    actionExecutor,
+  ]);
+
+  return createElement(TemplateScope.Provider, {
+    value: context,
+    children: createElement(TemplateElement, {
+      template,
+    }),
+  });
 }
 
 export function useTemplate(

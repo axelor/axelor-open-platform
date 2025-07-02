@@ -3,7 +3,7 @@ import { ScopeProvider } from "bunshi/react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { useCallback, useMemo } from "react";
 
-import { useTemplate } from "@/hooks/use-parser";
+import { TemplateRenderer } from "@/hooks/use-parser";
 import { isReactTemplate } from "@/hooks/use-parser/utils";
 import { DataRecord } from "@/services/client/data.types";
 import { ViewData } from "@/services/client/meta";
@@ -177,8 +177,6 @@ function TemplateViewer({
   fields,
   schema,
 }: FormViewerProps & { model: string; record: DataRecord }) {
-  const Template = useTemplate(template, { field: schema });
-
   const isReact = useMemo(() => isReactTemplate(template), [template]);
   const isReference = useMemo(() => isReferenceField(schema), [schema]);
 
@@ -200,10 +198,16 @@ function TemplateViewer({
     () => ({ ...getLegacyContext(), _model, ...record }),
     [_model, getLegacyContext, record],
   );
+  const options = useMemo(() => ({ fields }), [fields]);
 
   return (
     <div className={styles.content}>
-      <Template context={ctx} options={{ fields }} />
+      <TemplateRenderer
+        template={template}
+        field={schema}
+        context={ctx}
+        options={options}
+      />
     </div>
   );
 }
