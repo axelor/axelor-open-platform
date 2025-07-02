@@ -1399,7 +1399,7 @@ public class Resource<T extends Model> {
 
     @SuppressWarnings("all")
     Map<String, Object> values = (Map) data.getFirst();
-    final int total = JPA.withTransaction(() -> query.update(values, AuthUtils.getUser()));
+    final int total = JPA.callInTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
     LOG.debug("Records updated: {}", response.getTotal());
@@ -1427,7 +1427,7 @@ public class Resource<T extends Model> {
     firePreRequestEvent(RequestEvent.REMOVE, req);
 
     final Model removedBean =
-        JPA.withTransaction(
+        JPA.callInTransaction(
             () -> {
               Model bean = JPA.edit(model, data);
               if (bean.getId() != null) {
