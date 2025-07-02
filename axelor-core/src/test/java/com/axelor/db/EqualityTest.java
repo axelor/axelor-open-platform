@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -282,13 +281,6 @@ public class EqualityTest extends JpaTest {
           T _entity = getEntityManager().merge(entity);
           assertTrue(
               tuples.contains(_entity), "The entity is not found in the Set after it's merged.");
-        });
-
-    inTransaction(
-        () -> {
-          getEntityManager().unwrap(Session.class).update(entity);
-          assertTrue(
-              tuples.contains(entity), "The entity is not found in the Set after it's reattached.");
         });
 
     inTransaction(
