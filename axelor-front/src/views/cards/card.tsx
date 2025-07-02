@@ -1,10 +1,9 @@
 import { Box, CommandBar, CommandItemProps, clsx } from "@axelor/ui";
-import { FunctionComponent, memo } from "react";
+import { memo } from "react";
 
-import { EvalContextOptions } from "@/hooks/use-parser/context";
 import { SearchResult } from "@/services/client/data";
 import { CardsView, Property } from "@/services/client/meta.types";
-import { DataContext, DataRecord } from "@/services/client/data.types";
+import { DataRecord } from "@/services/client/data.types";
 import { i18n } from "@/services/client/i18n";
 import { CardTemplate } from "./card-template";
 import { useCardClassName } from "./use-card-classname";
@@ -18,7 +17,7 @@ export const Card = memo(function Card({
   onView,
   onDelete,
   onRefresh,
-  Template,
+  template,
   width,
   minWidth,
 }: {
@@ -29,10 +28,7 @@ export const Card = memo(function Card({
   onView?: (record: DataRecord) => void;
   onDelete?: (record: DataRecord) => void;
   onRefresh?: () => Promise<SearchResult>;
-  Template: FunctionComponent<{
-    context: DataContext;
-    options?: EvalContextOptions;
-  }>;
+  template: string;
   width?: string;
   minWidth?: string;
 }) {
@@ -86,7 +82,7 @@ export const Card = memo(function Card({
           onClick={handleClick}
         >
           <CardTemplate
-            component={Template}
+            template={template}
             record={record}
             view={view}
             fields={fields}

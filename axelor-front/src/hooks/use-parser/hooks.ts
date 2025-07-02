@@ -1,11 +1,12 @@
 import { atom, useAtomValue } from "jotai";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import cloneDeep from "lodash/cloneDeep";
-import get from "lodash/get";
-import set from "lodash/set";
+import getValue from "lodash/get";
+import setValue from "lodash/set";
 import {
   createContext,
   createElement,
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -65,10 +66,12 @@ function useCreateParentContext(formAtom: FormAtom, parent?: boolean) {
   const $getField = useAtomCallback(
     useCallback(
       (get, set, name: string) => {
-        const parent = parentAtom as FormAtom;
-        if (parent) {
-          const schema = findViewItem(get(parent).meta, name) ?? { name };
-          return findAttrs(parent, schema);
+        const parentFormAtom = parentAtom as FormAtom;
+        if (parentFormAtom) {
+          const schema = findViewItem(get(parentFormAtom).meta, name) ?? {
+            name,
+          };
+          return findAttrs(parentFormAtom, schema);
         }
       },
       [findAttrs, parentAtom],
@@ -102,13 +105,21 @@ export function useExpression(expression: string) {
   );
 }
 
-function TemplateElement({ template }: { template: string }) {
-  const Comp = isReactTemplate(template)
-    ? processReactTemplate(template)
-    : processLegacyTemplate(template);
+const TemplateElement = memo(function TemplateElement({
+  template,
+}: {
+  template: string;
+}) {
+  const Comp = useMemo(
+    () =>
+      isReactTemplate(template)
+        ? processReactTemplate(template)
+        : processLegacyTemplate(template),
+    [template],
+  );
   const context = useContext(TemplateScope);
   return createElement(Comp, { context });
-}
+});
 
 export function TemplateRenderer({
   template,
@@ -162,8 +173,8 @@ export function TemplateRenderer({
       .filter((key) => key.includes("."))
       .reduce((cur, key) => {
         const value = cloneDeep(propsContext[key]);
-        const prev = get(cur, key);
-        return set(
+        const prev = getValue(cur, key);
+        return setValue(
           cur,
           key,
           value && typeof value === "object"
@@ -210,90 +221,6 @@ export function TemplateRenderer({
   });
 }
 
-export function useTemplate(
-  template: string,
-  { field, parent: parentFormAtom }: { field?: Schema; parent?: FormAtom } = {},
-) {
-  const { findItem, findField } = useViewMeta();
-  const { actionExecutor, formAtom } = useFormScope();
-  const _createParentContext = useCreateParentContext(
-    parentFormAtom ?? formAtom,
-    Boolean(parentFormAtom),
-  );
-  const findAttrs = useFindAttrs();
-  const $getField = useCallback(
-    (name: string) => {
-      if (field && field.name === name) {
-        const serverField = findField(name);
-        const serverType = field?.serverType || serverField?.type;
-        const more = serverType ? { serverType } : {};
-        const schema = {
-          ...serverField,
-          ...field,
-          ...field?.widgetAttrs,
-          ...more,
-        };
-        return findAttrs(formAtom, schema);
-      }
-      return findAttrs(formAtom, findItem(name) ?? { name });
-    },
-    [field, findAttrs, findField, findItem, formAtom],
-  );
-
-  return useMemo(() => {
-    const Comp = isReactTemplate(template)
-      ? processReactTemplate(template)
-      : processLegacyTemplate(template);
-    return (props: { context: DataContext; options?: EvalContextOptions }) => {
-      // Deep clone of all fields excluding dotted fields
-      const _context = Object.keys(props.context)
-        .filter((key) => !key.includes("."))
-        .reduce((cur, key) => {
-          return Object.assign(cur, { [key]: cloneDeep(props.context[key]) });
-        }, {} as any);
-
-      // Merge dot fields (ie some.foo.bar) into object (ie product[foo])
-      Object.keys(props.context)
-        .filter((key) => key.includes("."))
-        .reduce((cur, key) => {
-          const value = cloneDeep(props.context[key]);
-          const prev = get(cur, key);
-          return set(
-            cur,
-            key,
-            value && typeof value === "object"
-              ? Array.isArray(value)
-                ? [...value]
-                : { ...prev, ...value }
-              : value,
-          );
-        }, _context);
-
-      const {
-        helpers,
-        execute = actionExecutor.execute.bind(actionExecutor),
-        ...options
-      } = props.options ?? {};
-
-      const opts = {
-        ...options,
-        execute,
-        helpers: {
-          $getField,
-          ...helpers,
-        },
-      };
-
-      const ctx = { ..._context, _createParentContext };
-      const context = isReactTemplate(template)
-        ? createScriptContext(ctx, opts)
-        : createEvalContext(ctx, opts);
-
-      return createElement(Comp, { context });
-    };
-  }, [$getField, _createParentContext, actionExecutor, template]);
-}
-
 export function useTemplateContext(
   record: DataRecord,
   options: { view: View; onRefresh?: () => Promise<void> },
@@ -310,26 +237,32 @@ export function useTemplateContext(
 
   const { context, actionExecutor } = useMemo(() => {
     const $record = { ...record, ...values };
-    const context = { ...getContext?.(), ...$record };
-    const actionHandler = new FormActionHandler(() => context);
+    const $context = { ...getContext?.(), ...$record };
+    const actionHandler = new FormActionHandler(() => $context);
 
-    onRefresh && actionHandler.setRefreshHandler(onRefresh);
+    if (onRefresh) {
+      actionHandler.setRefreshHandler(onRefresh);
+    }
 
-    const actionExecutor = new DefaultActionExecutor(actionHandler);
-    return { context, actionExecutor };
+    return {
+      context: $context,
+      actionExecutor: new DefaultActionExecutor(actionHandler),
+    };
   }, [getContext, onRefresh, record, values]);
 
   const execute = useCallback(
-    async (action: string, options?: ActionOptions) => {
-      const res = await actionExecutor.execute(action, options);
-      const values = res?.reduce?.(
-        (obj, { values }) => ({
+    async (_action: string, _options?: ActionOptions) => {
+      const res = await actionExecutor.execute(_action, _options);
+      const _values = res?.reduce?.(
+        (obj, resultItem) => ({
           ...obj,
-          ...values,
+          ...resultItem.values,
         }),
         {},
       );
-      values && setValues(values);
+      if (_values) {
+        setValues(_values);
+      }
     },
     [actionExecutor],
   );

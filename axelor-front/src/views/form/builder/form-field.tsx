@@ -21,7 +21,7 @@ import {
 import { Tooltip } from "@/components/tooltip";
 import { Icon } from "@/components/icon";
 import { useAsync } from "@/hooks/use-async";
-import { useHilites, useTemplate } from "@/hooks/use-parser";
+import { TemplateRenderer, useHilites } from "@/hooks/use-parser";
 import { useSession } from "@/hooks/use-session";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
@@ -134,7 +134,9 @@ export function FieldControl({
       <Box className={clsx(styles.content, contentClassName)}>{children}</Box>
     );
     return focus ? (
-      <ClickAwayListener onClickAway={resetFocusAttr}>{content}</ClickAwayListener>
+      <ClickAwayListener onClickAway={resetFocusAttr}>
+        {content}
+      </ClickAwayListener>
     ) : (
       content
     );
@@ -237,7 +239,6 @@ export function FieldDetails({
   parent?: FormAtom;
 }) {
   const { depends, template } = data;
-  const Template = useTemplate(template!, { parent });
   const { data: context } = useAsync(async () => {
     let values = { ...record };
     if (fetch && model && record?.id) {
@@ -253,7 +254,11 @@ export function FieldDetails({
   return (
     context && (
       <Box>
-        <Template context={context} />
+        <TemplateRenderer
+          context={context}
+          template={template!}
+          parent={parent}
+        />
       </Box>
     )
   );
@@ -304,8 +309,17 @@ export function HelpPopover({
 
 function HelpContent(props: WidgetProps) {
   const { schema, formAtom, widgetAtom } = props;
-  const { name, serverType, type, target, help, widget, selection, action, enumType } =
-    schema;
+  const {
+    name,
+    serverType,
+    type,
+    target,
+    help,
+    widget,
+    selection,
+    action,
+    enumType,
+  } = schema;
   const { model: formModel, original } = useAtomValue(formAtom);
   const { attrs } = useAtomValue(widgetAtom);
   const { domain } = attrs;

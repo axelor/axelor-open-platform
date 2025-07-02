@@ -11,7 +11,7 @@ import {
   SchedulerView,
 } from "@/components/scheduler";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useHilites, useTemplate } from "@/hooks/use-parser";
+import { useHilites } from "@/hooks/use-parser";
 import { useViewPerms } from "@/hooks/use-perms";
 import { useManyEditor } from "@/hooks/use-relation";
 import { useShortcuts } from "@/hooks/use-shortcut";
@@ -585,8 +585,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
     }, [] as SchedulerEvent<DataRecord>[]);
   }, [events, filters, handleHilites]);
 
-  const Template = useTemplate(template);
-
   // register shortcuts
   useShortcuts({ viewType: "calendar", onRefresh: onRefresh });
 
@@ -639,7 +637,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
           onEdit={showRecord}
           onDelete={canDelete ? onDelete : undefined}
           onClose={hidePopover}
-          Template={template ? Template : undefined}
+          template={template}
           fields={meta.fields}
           onRefresh={onRefresh}
         />
