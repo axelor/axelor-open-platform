@@ -63,7 +63,7 @@ public class RedissonCacheBuilder<K, V>
   }
 
   @Override
-  protected void configureCache(ConfigurableRedissonCache<K, V> cache) {
+  protected void configureCache(AbstractRedissonCache<K, V, RMapCache<K, V>> cache) {
     super.configureCache(cache);
     var redissonCache = (RedissonCache<K, V>) cache;
     var removalListener = getRemovalListener();

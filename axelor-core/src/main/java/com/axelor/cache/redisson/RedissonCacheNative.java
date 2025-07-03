@@ -19,10 +19,6 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.Lock;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.redisson.api.RMapCacheNative;
 
@@ -36,91 +32,45 @@ import org.redisson.api.RMapCacheNative;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class RedissonCacheNative<K, V> implements ConfigurableRedissonCache<K, V> {
+public class RedissonCacheNative<K, V> extends AbstractRedissonCache<K, V, RMapCacheNative<K, V>> {
 
-  private final RMapCacheNative<K, V> cache;
   private Duration ttl;
-  private TriConsumer<K, V, Duration> fastPut;
+  private TriConsumer<K, V, Duration> putter;
 
   public RedissonCacheNative(RMapCacheNative<K, V> cache) {
-    this.cache = cache;
+    super(cache);
     setExpireAfterWrite(null);
   }
 
+  @Override
   public void setExpireAfterWrite(Duration expireAfterWrite) {
-    this.ttl = expireAfterWrite;
-
-    if (ttl != null) {
-      fastPut = cache::fastPut;
-    } else {
-      fastPut = (key, value, duration) -> cache.fastPut(key, value);
-    }
+    ttl = expireAfterWrite;
+    putter =
+        ttl != null && Duration.ZERO.compareTo(ttl) != 0
+            ? cache::fastPut
+            : (key, value, duration) -> cache.fastPut(key, value);
   }
 
+  @Override
   public void setExpireAfterAccess(Duration expireAfterAccess) {
-    // RMapCacheNative does not support maxIdleTime
-    // Set ttl instead if not already set
+    // RMapCacheNative does not support maxIdleTime.
+    // Set ttl instead if not already set.
     if (ttl == null) {
       setExpireAfterWrite(expireAfterAccess);
     }
   }
 
+  @Override
   public void setMaximumSize(int maximumSize) {
-    // RMapCacheNative does not support maximum size
-    // Set ttl if not already set, in order to have a least some kind of eviction
+    // RMapCacheNative does not support maximum size.
+    // Set ttl if not already set, in order to have a least some kind of eviction.
     if (ttl == null && maximumSize > 0) {
       setExpireAfterWrite(Duration.ofHours(1));
     }
   }
 
   @Override
-  public V get(K key) {
-    return cache.get(key);
-  }
-
-  @Override
-  public Map<K, V> getAll(Set<K> keys) {
-    return cache.getAll(keys);
-  }
-
-  @Override
   public void put(K key, V value) {
-    fastPut.accept(key, value, ttl);
-  }
-
-  @Override
-  public void putAll(Map<? extends K, ? extends V> map) {
-    cache.putAll(map);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void invalidate(K key) {
-    cache.fastRemove(key);
-  }
-
-  @Override
-  public void invalidateAll() {
-    cache.clear();
-  }
-
-  @Override
-  public void close() {
-    cache.destroy();
-  }
-
-  @Override
-  public long estimatedSize() {
-    return cache.size();
-  }
-
-  @Override
-  public ConcurrentMap<K, V> asMap() {
-    return cache;
-  }
-
-  @Override
-  public Lock getLock(K key) {
-    return cache.getLock(key);
+    putter.accept(key, value, ttl);
   }
 }

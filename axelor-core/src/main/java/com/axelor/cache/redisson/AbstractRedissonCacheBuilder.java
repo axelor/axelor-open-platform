@@ -76,7 +76,7 @@ public abstract class AbstractRedissonCacheBuilder<
 
   protected abstract M newMapCache(O options);
 
-  protected abstract ConfigurableRedissonCache<K, V> newRedissonCache(M cache);
+  protected abstract AbstractRedissonCache<K, V, M> newRedissonCache(M cache);
 
   private M newMapCache() {
     return newMapCache(newOptions());
@@ -104,13 +104,13 @@ public abstract class AbstractRedissonCacheBuilder<
     return newMapCache(options);
   }
 
-  private ConfigurableRedissonCache<K, V> newConfiguredCache(M cache) {
+  private AbstractRedissonCache<K, V, M> newConfiguredCache(M cache) {
     var redissonCache = newRedissonCache(cache);
     configureCache(redissonCache);
     return redissonCache;
   }
 
-  protected void configureCache(ConfigurableRedissonCache<K, V> cache) {
+  protected void configureCache(AbstractRedissonCache<K, V, M> cache) {
     var expireAfterWrite = getExpireAfterWrite();
 
     // No weak references in Redisson collections

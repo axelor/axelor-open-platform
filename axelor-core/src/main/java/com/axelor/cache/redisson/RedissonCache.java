@@ -19,12 +19,9 @@
 package com.axelor.cache.redisson;
 
 import java.time.Duration;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import org.redisson.api.RMapCache;
 import org.redisson.api.map.event.MapEntryListener;
 
@@ -36,67 +33,52 @@ import org.redisson.api.map.event.MapEntryListener;
  * @param <K> the type of keys maintained by this cache
  * @param <V> the type of mapped values
  */
-public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
-
-  private final RMapCache<K, V> cache;
+public class RedissonCache<K, V> extends AbstractRedissonCache<K, V, RMapCache<K, V>> {
 
   private long ttl;
-
   private TimeUnit ttlUnit;
 
   private long maxIdleTime;
-
   private TimeUnit maxIdleTimeUnit;
 
-  private Set<Integer> listenerIds = ConcurrentHashMap.newKeySet();
+  private CachePutter<K, V> putter;
+
+  private final Set<Integer> listenerIds = ConcurrentHashMap.newKeySet();
 
   public RedissonCache(RMapCache<K, V> cache) {
-    this.cache = cache;
+    super(cache);
+    updatePutter();
   }
 
+  protected void updatePutter() {
+    putter =
+        ttl != 0 || maxIdleTime != 0
+            ? cache::fastPut
+            : (key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit) -> cache.fastPut(key, value);
+  }
+
+  @Override
   public void setExpireAfterWrite(Duration expireAfterWrite) {
-    this.ttl = expireAfterWrite.toMillis();
-    this.ttlUnit = TimeUnit.MILLISECONDS;
+    ttl = expireAfterWrite.toMillis();
+    ttlUnit = TimeUnit.MILLISECONDS;
+    updatePutter();
   }
 
+  @Override
   public void setExpireAfterAccess(Duration expireAfterAccess) {
-    this.maxIdleTime = expireAfterAccess.toMillis();
-    this.maxIdleTimeUnit = TimeUnit.MILLISECONDS;
+    maxIdleTime = expireAfterAccess.toMillis();
+    maxIdleTimeUnit = TimeUnit.MILLISECONDS;
+    updatePutter();
   }
 
+  @Override
   public void setMaximumSize(int maximumSize) {
     cache.setMaxSize(maximumSize);
   }
 
   @Override
-  public V get(K key) {
-    return cache.get(key);
-  }
-
-  @Override
-  public Map<K, V> getAll(Set<K> keys) {
-    return cache.getAll(keys);
-  }
-
-  @Override
   public void put(K key, V value) {
-    cache.fastPut(key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit);
-  }
-
-  @Override
-  public void putAll(Map<? extends K, ? extends V> map) {
-    cache.putAll(map);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void invalidate(K key) {
-    cache.fastRemove(key);
-  }
-
-  @Override
-  public void invalidateAll() {
-    cache.clear();
+    putter.accept(key, value, ttl, ttlUnit, maxIdleTime, maxIdleTimeUnit);
   }
 
   @Override
@@ -106,17 +88,7 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
       listenerIds.clear();
     }
 
-    cache.destroy();
-  }
-
-  @Override
-  public long estimatedSize() {
-    return cache.size();
-  }
-
-  @Override
-  public ConcurrentMap<K, V> asMap() {
-    return cache;
+    super.close();
   }
 
   public int addListener(MapEntryListener listener) {
@@ -131,8 +103,10 @@ public class RedissonCache<K, V> implements ConfigurableRedissonCache<K, V> {
     listenerIds.remove(listenerId);
   }
 
-  @Override
-  public Lock getLock(K key) {
-    return cache.getLock(key);
+  @FunctionalInterface
+  static interface CachePutter<K, V> {
+
+    public void accept(
+        K key, V value, long ttl, TimeUnit ttlUnit, long maxIdleTime, TimeUnit maxIdleTimeUnit);
   }
 }
