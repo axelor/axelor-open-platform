@@ -290,8 +290,8 @@ export const contextAtom = atom(
       })();
 
       context = {
-        ...processContextValues(context, meta),
         ...createContextParams(ctxView, ctxAction),
+        ...processContextValues(context, meta),
       };
 
       if (parent) {

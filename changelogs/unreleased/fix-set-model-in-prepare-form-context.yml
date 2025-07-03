@@ -1,0 +1,15 @@
+---
+title: Fixes how the form context is prepared
+type: fix
+description : |
+  The way from context was prepared was creating issues. The form context is a concatenation of the action view 
+  context values and the view/record values. But it was created in the wrong order : instead of appending view/record 
+  context values first and then the action view context values, it is now the reverse. The view/record context values 
+  should be priority over action view context values.
+  
+  Means that if passing some data in action view context that can have the same names as the view/record context 
+  values, the latter will have priority.
+  
+  This fixes an issue with chart/search views search-field requests : the model was coming from the action view instead 
+  of the form itself. In case of chart and search views (without `search-form`), the model is by default 
+  `com.axelor.script.ScriptBindings`.
