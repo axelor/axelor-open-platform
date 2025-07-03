@@ -95,8 +95,7 @@ export function Search(props: ViewProps<SearchView>) {
   const { formMeta, formView } = useMemo(() => {
     const { searchForm } = meta;
 
-    const model =
-      searchForm?.model ?? meta.view.selects?.find((s) => s.model)?.model;
+    const model = searchForm?.model ?? "com.axelor.script.ScriptBindings";
     const searchFormMeta = prepareSearchFormMeta({
       ...meta,
       model,
