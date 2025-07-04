@@ -7,6 +7,7 @@ import { SessionInfo, session } from "@/services/client/session";
 
 import { Loader } from "../loader/loader";
 import { LoginForm } from "../login-form";
+import { MFAForm } from "../mfa-form";
 import { useHttpBlock } from "./use-block";
 import { useHttpWatch } from "./use-watch";
 
@@ -59,7 +60,7 @@ function HttpIndicator({ count }: { count: number }) {
   );
 }
 
-function HttpBlock({ count, disabled }: { count: number, disabled?: boolean }) {
+function HttpBlock({ count, disabled }: { count: number; disabled?: boolean }) {
   const [wait, setWait] = useState(false);
   const [block, setBlock] = useState(false);
   const [blocked] = useHttpBlock();
@@ -115,23 +116,55 @@ function HttpBlock({ count, disabled }: { count: number, disabled?: boolean }) {
 }
 
 function HttpAuth({ resume }: { resume?: () => void }) {
+  const [mfaState, setMFAState] = useState<Record<string, unknown> | null>(
+    null,
+  );
   const prev = session.info?.user?.login;
+
   const handleSuccess = useCallback(
     (info: SessionInfo) => {
       const curr = info.user?.login;
       if (prev !== curr) {
         window.location.reload();
       } else {
+        setMFAState(null);
         resume?.();
       }
     },
     [prev, resume],
   );
+
+  const handleRequireMFA = useCallback((state: Record<string, unknown>) => {
+    setMFAState(state);
+  }, []);
+
+  const handleBackToLogin = useCallback(() => {
+    setMFAState(null);
+  }, []);
+
+  const showLoginDialog = Boolean(resume);
+  const showMFADialog = Boolean(mfaState);
+
   return (
     <Portal>
-      <Dialog open={Boolean(resume)} backdrop>
+      <Dialog open={showLoginDialog && !showMFADialog} backdrop>
         <DialogContent>
-          <LoginForm onSuccess={handleSuccess} />
+          <LoginForm
+            onSuccess={handleSuccess}
+            onRequireMFA={handleRequireMFA}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showMFADialog && Boolean(resume)} backdrop>
+        <DialogContent>
+          {mfaState && (
+            <MFAForm
+              state={mfaState}
+              onSuccess={handleSuccess}
+              onBackToLogin={handleBackToLogin}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Portal>

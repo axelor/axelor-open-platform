@@ -171,11 +171,17 @@ export class Session {
   }
 
   async login(
-    args: {
-      username: string;
-      password: string;
-      newPassword?: string;
-    },
+    args:
+      | {
+          username: string;
+          password: string;
+          newPassword?: string;
+        }
+      | {
+          username: string;
+          mfaCode: string;
+          mfaMethod: string;
+        },
     options?: {
       params?: URLSearchParams;
       tenant?: string;

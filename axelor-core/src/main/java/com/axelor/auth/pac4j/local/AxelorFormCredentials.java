@@ -12,16 +12,31 @@ public class AxelorFormCredentials extends UsernamePasswordCredentials {
 
   private String newPassword;
 
-  public AxelorFormCredentials(String username, String password, String newPassword) {
+  private String mfaCode;
+
+  private String mfaMethod;
+
+  public AxelorFormCredentials(
+      String username, String password, String newPassword, String mfaCode, String mfaMethod) {
     super(username, password);
     this.newPassword = newPassword;
+    this.mfaCode = mfaCode;
+    this.mfaMethod = mfaMethod;
   }
 
   public AxelorFormCredentials(String username, String password) {
-    this(username, password, null);
+    this(username, password, null, null, null);
   }
 
   public String getNewPassword() {
     return newPassword;
+  }
+
+  public String getMfaCode() {
+    return mfaCode;
+  }
+
+  public String getMfaMethod() {
+    return mfaMethod;
   }
 }

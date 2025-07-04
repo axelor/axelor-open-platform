@@ -16,7 +16,7 @@
     <field name="group"/>
   </grid>
 
-  <form name="user-form" title="User" model="com.axelor.auth.db.User">
+  <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="action-method-user-save">
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
       <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
@@ -50,14 +50,18 @@
       </panel>
       <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true"/>
     </panel>
-    <panel-tabs>
+      <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
+      </panel>
+      <panel-tabs>
       <panel-related field="roles" form-view="role-form" grid-view="role-grid"/>
       <panel-related field="permissions" grid-view="simple-permission-grid" form-view="permission-form"/>
       <panel-related field="metaPermissions"/>
     </panel-tabs>
   </form>
 
-  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User">
+  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User" onSave="action-method-user-save">
     <panel title="User preferences" itemSpan="12">
       <field name="image" showTitle="false" />
       <field name="email" widget="Email"/>
@@ -76,6 +80,10 @@
       <panel>
         <field name="$manageUserTokens" title="Manage API keys?" type="boolean" widget="inline-checkbox" />
         <panel-dashlet name="activeUserTokensPanel" action="action.view.show.active.tokens" colSpan="12" canNew="true" showIf="$manageUserTokens"/>
+      </panel>
+      <panel title="Multi-Factor Authentication" if="__repo__(MFA).isPermitted()">
+        <label title="Multi-Factor Authentication adds an extra layer of security." colSpan="7"/>
+        <button name="manageMfaBtn" onClick="action-method-show-mfa-form" title="Manage multi-factor authentication" colSpan="5"/>
       </panel>
     </panel>
   </form>
@@ -101,5 +109,13 @@
     <domain>self.owner = :userId</domain>
     <context name="userId" expr="eval: id" />
   </action-view>
+
+  <action-method name="action-method-user-save">
+    <call class="com.axelor.auth.web.UserController" method="onSave"/>
+  </action-method>
+
+  <action-method name="action-method-show-mfa-form">
+     <call class="com.axelor.auth.web.MFAController" method="showRelatedMfa"/>
+   </action-method>
 
 </object-views>

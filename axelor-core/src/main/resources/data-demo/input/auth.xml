@@ -30,6 +30,12 @@
     <domain-params>__user__.id</domain-params>
   </permission>
 
+  <permission name="perm.auth.my.mfa" object="com.axelor.auth.db.MFA">
+    <can create="true" read="true" write="true" remove="true"/>
+    <domain>self.owner.id = ?</domain>
+    <domain-params>__user__.id</domain-params>
+  </permission>
+
   <role name="role.super" title="Super">
     <permission name="perm.auth.all"/>
   </role>
@@ -43,6 +49,7 @@
   <role name="role.user" title="User">
     <permission name="perm.auth.my.user"/>
     <permission name="perm.auth.my.usertoken"/>
+    <permission name="perm.auth.my.mfa"/>
   </role>
 
 </auth>

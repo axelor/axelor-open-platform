@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views https://axelor.com/xml/ns/object-views/object-views_8.0.xsd">
+
+  <form name="mfa-form" title="Multi-Factor Authentication" model="com.axelor.auth.db.MFA">
+    <panel name="mainPanel">
+      <field name="enabled" showTitle="false" readonly="true">
+        <viewer>
+          <![CDATA[
+            <>
+              <Box d="flex" alignItems="center" gap="4">
+                <strong>{_t("Status:")}</strong>
+                <Box d="flex" alignItems="center" textTransform="uppercase">
+                  {enabled && <Badge bg="success">{_t('Enabled')}</Badge>}
+                  {!enabled && <Badge bg="warning">{_t('Disabled')}</Badge>}
+                </Box>
+              </Box>
+            </>
+          ]]>
+          </viewer>
+      </field>
+      <panel name="actionPanel" itemSpan="12">
+        <button name="enableMfaBtn" title="Enable multi-factor authentication" icon="check_circle" css="btn-success" onClick="com.axelor.auth.web.MFAController:enableMFA" showIf="!enabled"
+          prompt="Are you sure you want to enable multi-factor authentication? You’ll be asked for an additional verification code at sign-in to help keep your account secure." />
+        <button name="disableMfaBtn" title="Disable multi-factor authentication" icon="block" css="btn-danger" onClick="com.axelor.auth.web.MFAController:disableMFA" showIf="enabled"
+          prompt="Are you sure you want to disable multi-factor authentication? Without it, your account will only be protected by your password, which may reduce security. This will clear all your multi-factor authentication settings." />
+      </panel>
+    </panel>
+    <panel name="methodsPanel" title="Multi-factor authentication methods" colSpan="12" showIf="enabled">
+      <field name="defaultMethod" hidden="true" colSpan="12" />
+      <field name="isTotpValidated" showTitle="false">
+        <viewer><![CDATA[
+            <>
+              <Box d="flex" alignItems="center" justifyContent="center" p={2} mb={2} gap="4">
+                <strong>
+                  <Box d="flex" alignItems="center" gap="4">
+                    <Icon icon="mobile"/>
+                    {_t("Authenticator app")}
+                    <Box d="flex" alignItems="center" textTransform="uppercase">
+                      {isTotpValidated && <Badge bg="success">{_t('Enabled')}</Badge>}
+                      {!isTotpValidated && <Badge bg="warning">{_t('Disabled')}</Badge>}
+                    </Box>
+                  </Box>
+                </strong>
+                {isTotpValidated &&
+                  <Rating
+                    max="1"
+                    value={defaultMethod === "TOTP" ? 1 : 0}
+                    readonly={defaultMethod === "TOTP"}
+                    text={defaultMethod === "TOTP" ? _t("Default method") : _t("Set as default method")}
+                    handleClick={() => $execute("com.axelor.auth.web.MFAController:changeDefaultMethodTOTP")}
+                  />
+                }
+              </Box>
+              <Box d="flex" alignItems="center" justifyContent="center" gap="4">
+                {
+                  isTotpValidated ? (
+                    <>
+                      <Button variant="primary" onClick={$action("action-mfa-reconfigure-totp")}>
+                        {_t('Reconfigure')}
+                      </Button>
+                      <Button variant="danger" onClick={$action("action-mfa-remove-totp")}>
+                        {_t('Remove')}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button variant="primary" onClick={$action("com.axelor.auth.web.MFAController:configureTOTP")}>
+                      {_t('Configure')}
+                    </Button>
+                  )
+                }
+              </Box>
+            </>
+          ]]>
+          </viewer>
+      </field>
+      <field name="isEmailValidated" showTitle="false">
+        <viewer><![CDATA[
+            <>
+              <Box d="flex" alignItems="center" justifyContent="center" p={2} mb={2} gap="4">
+                <strong>
+                  <Box d="flex" alignItems="center" gap="4">
+                    <Icon icon="mail"/>
+                    {_t("Email")}
+                    <Box d="flex" alignItems="center" textTransform="uppercase">
+                      {isEmailValidated && <Badge bg="success">{_t('Enabled')}</Badge>}
+                      {!isEmailValidated && <Badge bg="warning">{_t('Disabled')}</Badge>}
+                    </Box>
+                  </Box>
+                </strong>
+                {isEmailValidated &&
+                  <Rating
+                    max="1"
+                    value={defaultMethod === "EMAIL" ? 1 : 0}
+                    readonly={defaultMethod === "EMAIL"}
+                    text={defaultMethod === "EMAIL" ? _t("Default method") : _t("Set as default method")}
+                    handleClick={() => $execute("com.axelor.auth.web.MFAController:changeDefaultMethodEmail")}
+                  />
+                }
+              </Box>
+              <Box d="flex" alignItems="center" justifyContent="center" gap="4">
+                {
+                  !isEmailValidated &&
+                  <Button variant="primary" onClick={$action("com.axelor.auth.web.MFAController:configureEmail")}>
+                    {_t('Configure')}
+                  </Button>
+                }
+                {
+                  isEmailValidated &&
+                  <Button variant="danger" onClick={$action("action-mfa-remove-email")}>
+                    {_t('Remove')}
+                  </Button>
+                }
+              </Box>
+            </>
+          ]]>
+          </viewer>
+      </field>
+    </panel>
+    <panel title="Recovery Codes" name="recoveryCodesPanel" colSpan="12" showIf="enabled">
+      <help colSpan="12">
+                    <![CDATA[
+                    Recovery codes allow you to access your account if you lose access to your authentication device. Each code can only be used once.<br><p><strong>Important:</strong> Store these codes in a secure location. If you lose access to your authentication device and don't have recovery codes, you may be locked out of your account.</p>
+                    ]]>
+
+                </help>
+      <button name="generateRecoveryBtn" title="Generate new recovery codes" onClick="com.axelor.auth.web.MFAController:generateRecoveryCodes" icon="autorenew" colSpan="12"
+        prompt="Generating new recovery codes will invalidate your existing ones. Do you want to continue?" />
+    </panel>
+  </form>
+
+  <form title="Recovery codes" name="mfa-recovery-codes-form" model="com.axelor.auth.db.MFA" onLoad="com.axelor.auth.web.MFAController:loadRecoveryCodes">
+    <panel>
+      <help colSpan="12">
+          <![CDATA[
+            Below are your recovery codes. Each code can be used only once.<br>Please store these codes in a safe and secure place. They will allow you to access your account if you lose access to your primary authentication method.
+            ]]>
+      </help>
+      <spacer colSpan="4" />
+      <field name="_recoveryCodes" x-dirty="false" widget="html" readonly="true" showTitle="false" colSpan="4" />
+    </panel>
+  </form>
+
+  <form title="Authenticator app" name="mfa-totp-config-form" model="com.axelor.auth.db.MFA" onLoad="com.axelor.auth.web.MFAController:loadTOTPConfig">
+    <panel name="totpConfig">
+      <panel name="secretKeyPanel">
+        <help colSpan="12">
+          <![CDATA[
+          Your secret code and QR code have been successfully generated.<br> To complete the setup, scan this QR code with your authentication app to start receiving your security codes.<br>Can't scan the QR code? Use the security key below to manually set up your authenticator app.
+          ]]>
+        </help>
+        <field name="_secretKey" x-dirty="false" title="Secret key" readonly="true" widget="password" colSpan="12" help="Enter this secret key manually in your authenticator app if you can't scan the QR code." />
+      </panel>
+      <panel name="qrCodePanel">
+        <spacer colSpan="2" />
+        <field name="_qrCode" x-dirty="false" type="binary" title="QR code" readonly="true" showIf="id" colSpan="4" widget="Image">
+          <viewer><![CDATA[
+            <>
+              <Image src={_qrCode} style={{width: "200px"}} />
+            </>
+            ]]>
+          </viewer>
+        </field>
+      </panel>
+    </panel>
+
+    <panel title="Verification" showIf="id &amp;&amp; !isTotpValidated " colSpan="12">
+      <field name="_code" x-dirty="false" required="true" showTitle="false" placeholder="Enter your 6-digit verification code" help="Enter the code from your authenticator app." />
+      <button name="validateBtn" readonlyIf="!_code" title="Verify" onClick="com.axelor.auth.web.MFAController:validateTotpMethod" icon="check" />
+    </panel>
+  </form>
+
+  <form title="Email verification code" name="mfa-email-config-form" model="com.axelor.auth.db.MFA">
+    <panel name="emailConfig">
+      <help colSpan="12">
+          <![CDATA[
+          We've sent a verification code to your email address. Please enter the code below to complete the setup.
+          ]]>
+        </help>
+    </panel>
+
+    <panel title="Verification" showIf="id &amp;&amp; !isEmailValidated " colSpan="12">
+      <field name="_code" x-dirty="false" required="true" showTitle="false" placeholder="Enter your 6-digit verification code" help="Enter the code received by email." />
+      <panel itemSpan="12">
+        <button name="resentBtn" onClick="com.axelor.auth.web.MFAController:sendEmailConfirmation" title="Send new code" icon="autorenew" css="btn-warning" />
+        <button name="validateBtn" readonlyIf="!_code" title="Verify" onClick="com.axelor.auth.web.MFAController:validateEmailMethod" icon="check" />
+      </panel>
+    </panel>
+  </form>
+
+  <action-group name="action-mfa-reconfigure-totp">
+    <action name="action-mfa-reconfigure-method-prompt" />
+    <action name="com.axelor.auth.web.MFAController:configureTOTP" />
+  </action-group>
+
+  <action-group name="action-mfa-remove-totp">
+    <action name="action-mfa-remove-method-prompt" />
+    <action name="com.axelor.auth.web.MFAController:removeTOTP" />
+  </action-group>
+
+  <action-group name="action-mfa-remove-email">
+    <action name="action-mfa-remove-method-prompt" />
+    <action name="com.axelor.auth.web.MFAController:removeEmail" />
+  </action-group>
+
+  <action-validate name="action-mfa-reconfigure-method-prompt">
+    <alert message="You are about to reconfigure this authentication method. The new configuration will be applied once the setup is completed. If you do not finish the verification process, your current configuration will remain active."
+      confirm-btn-title="Reconfigure" />
+  </action-validate>
+
+  <action-validate name="action-mfa-remove-method-prompt">
+    <alert message="Are you sure you want to remove this authentication method? You will no longer be able to use it for verification. Make sure you have another active multi-factor authentication method configured to avoid losing access to your account."
+      confirm-btn-title="Remove" />
+  </action-validate>
+
+</object-views>

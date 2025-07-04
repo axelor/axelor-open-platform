@@ -402,6 +402,44 @@ create index auth_user_token_owner_idx on auth_user_token (owner);
 
 To make it available for users, permissions need to be configured for the `com.axelor.auth.db.UserToken` object.
 
+== Multi-factor authentication
+
+A new `com.axelor.auth.db.MFA` entity is used to store multi-factor authentication configuration for a user.
+
+Run the following SQL script to create the table:
+
+[source,sql]
+----
+CREATE TABLE auth_mfa (
+	id bigint NOT NULL,
+	archived bool NULL,
+	"version" integer NULL,
+	created_on timestamp(6) NULL,
+	updated_on timestamp(6) NULL,
+	default_method integer NULL,
+	email varchar(255) NULL,
+	email_code varchar(255) NULL,
+	email_code_expires_at timestamp(6) NULL,
+	enabled bool NULL,
+	is_email_validated bool NULL,
+	is_totp_validated bool NULL,
+	recovery_codes text NULL,
+	totp_secret varchar(255) NULL,
+	created_by bigint NULL,
+	updated_by bigint NULL,
+	"owner" bigint NOT NULL,
+	CONSTRAINT auth_mfa_pkey PRIMARY KEY (id),
+	CONSTRAINT uk_qlaks9iymof66mwqotodtpyg2 UNIQUE (owner),
+	CONSTRAINT fk_2yt0vnr9h8h8sxg1co544m64q FOREIGN KEY (created_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_o5nfu3rveqcse0hmkd54r5m4p FOREIGN KEY (updated_by) REFERENCES auth_user(id),
+	CONSTRAINT fk_qlaks9iymof66mwqotodtpyg2 FOREIGN KEY ("owner") REFERENCES auth_user(id)
+);
+CREATE INDEX auth_mfa_owner_idx ON auth_mfa USING btree (owner);
+----
+
+To make multi-factor authentication available for users, permissions must be set on `com.axelor.auth.db.MFA` object
+with domain `self.owner = ?` and domain parameter `__user__`, with at least create, read, and write accesses.
+
 == S3-Compatible Object Storage
 
 We now support an S3-compatible object storage service for storing uploaded files.

@@ -8,17 +8,11 @@ import {
 } from "react";
 import { Navigate, useLocation } from "react-router";
 
-import {
-  AdornedInput,
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  InputLabel,
-} from "@axelor/ui";
+import { AdornedInput, Alert, Box, Button, InputLabel } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
 import { AppSignInLogo } from "@/components/app-logo/app-logo";
+import { LoadingButton } from "@/components/loading-button";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -125,7 +119,6 @@ export function ChangePassword({
       } finally {
         setIsSubmitting(false);
       }
-
 
       setErrorMessage(
         i18n.get("Sorry, something went wrong. Please try again later."),
@@ -329,7 +322,7 @@ export function ChangePassword({
               </Alert>
             )}
 
-            <Button
+            <LoadingButton
               type="submit"
               variant="primary"
               d="flex"
@@ -337,16 +330,15 @@ export function ChangePassword({
               gap={4}
               mt={3}
               w={100}
+              loading={isSubmitting}
               disabled={
                 (requireCurrentPassword && !currentPassword) ||
                 !newPassword ||
-                !confirmPassword ||
-                isSubmitting
+                !confirmPassword
               }
             >
-              {isSubmitting && <CircularProgress size={16} indeterminate />}
               {i18n.get("Change password")}
-            </Button>
+            </LoadingButton>
           </Box>
         </Box>
         <Box as="p" textAlign="center">

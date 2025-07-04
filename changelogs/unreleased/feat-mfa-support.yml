@@ -1,0 +1,11 @@
+---
+title: Add Multi-Factor Authentication (MFA) support
+type: feature
+description: |
+  Introduced Multi-Factor Authentication (MFA) as an optional security feature to enhance user account protection.
+  Supported MFA methods: 
+    - TOTP (Time-based One-Time Password) via authenticator apps.
+    - Email verification codes (with 5-minute validity)
+    - Recovery codes as backup authentication method
+  Users can configure, test, and enable MFA from their preferences, select a default MFA method, and
+  are prompted for a second-factor code during login once MFA is activated.

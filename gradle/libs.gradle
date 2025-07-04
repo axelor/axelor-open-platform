@@ -395,3 +395,7 @@ libs.minio = [
   // CVE-2025-48924
   "org.apache.commons:commons-compress:1.28.0"
 ]
+
+libs.totp = dependencies.create('dev.samstevens.totp:totp:1.7.1') {
+  exclude group: 'com.beust', module: 'jcommander'
+}

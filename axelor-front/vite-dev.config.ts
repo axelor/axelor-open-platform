@@ -25,18 +25,20 @@ const proxyAll: ProxyOptions = {
   changeOrigin: true,
   xfwd: true,
   bypass(req, res, options) {
+    // Compare pathname without any query params
+    const pathname = req.url.split('?')[0];
     if (
-      req.url === base ||
-      req.url === base + "index.html" ||
-      req.url.startsWith(base + "src/") ||
-      req.url.startsWith(base + "@fs/") ||
-      req.url === base + "@react-refresh" ||
-      req.url.startsWith(base + "@id/") ||
-      req.url.startsWith(base + "@vite/") ||
-      req.url.startsWith(base + "node_modules/") ||
-      /\/theme\/([^.]+)\.json/.test(req.url)
+      pathname === base ||
+      pathname === base + "index.html" ||
+      pathname.startsWith(base + "src/") ||
+      pathname.startsWith(base + "@fs/") ||
+      pathname === base + "@react-refresh" ||
+      pathname.startsWith(base + "@id/") ||
+      pathname.startsWith(base + "@vite/") ||
+      pathname.startsWith(base + "node_modules/") ||
+      /\/theme\/([^.]+)\.json/.test(pathname)
     ) {
-      return req.url;
+      return pathname;
     }
   },
 };

@@ -6,12 +6,12 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   InputLabel,
   Select,
 } from "@axelor/ui";
 import { BootstrapIcon } from "@axelor/ui/icons/bootstrap-icon";
 
+import { LoadingButton } from "../loading-button";
 import { useAppSettings } from "@/hooks/use-app-settings";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
@@ -21,6 +21,7 @@ import {
   requestLogin,
 } from "@/routes/login";
 import { i18n } from "@/services/client/i18n";
+import { mfaSession } from "@/services/client/mfa";
 import { SessionInfo, SignInButtonType } from "@/services/client/session";
 import { sanitize } from "@/utils/sanitize";
 import { AppSignInLogo } from "../app-logo/app-logo";
@@ -30,17 +31,19 @@ import { TextLink as Link } from "../text-link";
 import styles from "./login-form.module.scss";
 
 export type LoginFormProps = {
-  onSuccess?: (info: SessionInfo) => void;
   shadow?: boolean;
   error?: string;
   children?: React.ReactNode;
+  onSuccess?: (info: SessionInfo) => void;
+  onRequireMFA?: (state: Record<string, unknown>) => void;
 };
 
 export function LoginForm({
-  onSuccess,
   error,
   shadow,
   children,
+  onSuccess,
+  onRequireMFA,
 }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -102,6 +105,9 @@ export function LoginForm({
             : undefined;
 
         try {
+          // reset mfa session before login
+          mfaSession.reset(username);
+
           const info = await session.login(
             { username, password },
             { params, tenant: hasTenantSelect ? tenantId : undefined },
@@ -110,12 +116,26 @@ export function LoginForm({
 
           if (route) {
             const { path, state } = route;
-            navigate(path, {
-              state: {
-                ...locationState,
-                route: { ...state, username },
-              },
-            });
+
+            const routeState = {
+              ...state,
+              username,
+              ...(hasTenantSelect && { tenant: tenantId }),
+            };
+
+            if (onRequireMFA && path === "/mfa") {
+              onRequireMFA({ ...routeState, params });
+            } else {
+              navigate(
+                { pathname: path, search: params?.toString() },
+                {
+                  state: {
+                    ...locationState,
+                    route: routeState,
+                  },
+                },
+              );
+            }
           } else if (user) {
             onSuccess?.(info);
           } else {
@@ -137,6 +157,7 @@ export function LoginForm({
         navigate,
         locationState,
         onSuccess,
+        onRequireMFA,
       ],
     );
 
@@ -430,20 +451,19 @@ function LoginFormButton({
   }
 
   return (
-    <Button
+    <LoadingButton
       type={onSubmit ? "submit" : "button"}
       onClick={handleClick}
       variant={variant ?? "primary"}
-      disabled={submitting}
+      loading={submitting}
       d="flex"
       justifyContent="center"
       mt={2}
       w={100}
       gap={4}
     >
-      {submitting && <CircularProgress size={16} indeterminate />}
       {icon && <Icon icon={icon} className={styles.icon} />}
       {title}
-    </Button>
+    </LoadingButton>
   );
 }

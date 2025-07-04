@@ -37,10 +37,15 @@ public class JsonExtractor extends FormExtractor {
     final String username = (String) data.get("username");
     final String password = (String) data.get("password");
     final String newPassword = (String) data.get("newPassword");
-    if (username == null || password == null) {
+    final String mfaCode = (String) data.get("mfaCode");
+    final String mfaMethod = (String) data.get("mfaMethod");
+
+    if ((username == null || password == null) && (mfaCode == null || mfaMethod == null)) {
       return Optional.empty();
     }
-
-    return Optional.of(new AxelorFormCredentials(username, password, newPassword));
+    if (username != null && password != null) {
+      return Optional.of(new AxelorFormCredentials(username, password, newPassword, null, null));
+    }
+    return Optional.of(new AxelorFormCredentials(null, null, null, mfaCode, mfaMethod));
   }
 }

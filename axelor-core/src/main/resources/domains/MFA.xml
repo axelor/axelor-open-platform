@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="auth" package="com.axelor.auth.db" />
+
+  <entity name="MFA" cacheable="true" repository="abstract">
+    <one-to-one name="owner" ref="com.axelor.auth.db.User" title="User" required="true" readonly="true"/>
+    <boolean name="enabled" title="Enable multi-factor authentication" />
+    <string name="recoveryCodes" large="true" password="true" readonly="true" />
+
+    <enum name="defaultMethod" ref="MFAMethod" />
+
+    <boolean name="isTotpValidated" readonly="true" title="Validated" />
+    <string name="totpSecret" encrypted="true" readonly="true" title="Secret key" password="true"/>
+
+    <boolean name="isEmailValidated" readonly="true" title="Validated" />
+    <string name="email" />
+    <string name="emailCode" password="true" readonly="true" />
+    <datetime name="emailCodeExpiresAt" readonly="true" />
+
+    <finder-method name="findByOwner" using="owner" cacheable="true" />
+  </entity>
+
+  <enum name="MFAMethod" numeric="true">
+    <item name="TOTP" value="0" title="Authenticator app"/>
+    <item name="EMAIL" value="1" title="Email"/>
+  </enum>
+
+</domain-models>

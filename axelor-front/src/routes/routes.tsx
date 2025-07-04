@@ -13,6 +13,7 @@ import { ChangePassword } from "./change-password";
 import { ErrorPage } from "./error";
 import { ForgotPassword } from "./forgot-password";
 import { Login } from "./login";
+import { MFA } from "./mfa";
 import { ResetPassword } from "./reset-password";
 import { Root } from "./root";
 import { View } from "./view";
@@ -31,6 +32,10 @@ const router = createHashRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/mfa",
+    element: <MFA />,
   },
   {
     path: "/change-password",
