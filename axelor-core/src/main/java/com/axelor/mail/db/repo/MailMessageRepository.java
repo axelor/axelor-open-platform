@@ -40,6 +40,7 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
+import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -317,7 +318,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     if (MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
         || MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)) {
       eventText = I18n.get("added comment");
-      details.put("$canDelete", message.getCreatedBy() == AuthUtils.getUser());
+      details.put("$canDelete", Objects.equal(message.getCreatedBy(), AuthUtils.getUser()));
     }
 
     final MailAddress email = message.getFrom();
