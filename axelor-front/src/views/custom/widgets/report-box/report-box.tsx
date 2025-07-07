@@ -64,10 +64,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
       ref={ref as LegacyRef<HTMLDivElement>}
       className={legacyClassNames("report-data", "hidden")}
     >
-      {icon && icon.includes("fa-") && (
-        <i className={legacyClassNames("report-icon", "fa", icon)} />
-      )}
-      {icon && !icon.includes("fa-") && (
+      {icon && (
         <Icon icon={icon} className={legacyClassNames("report-icon")} />
       )}
       <div>

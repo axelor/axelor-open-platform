@@ -231,8 +231,8 @@
                     "type": "field",
                     "name": "primary",
                     "widget": "toggle",
-                    "icon": "fa-star-o",
-                    "iconActive": "fa-star",
+                    "icon": "star",
+                    "iconActive": "star-fill",
                     "exclusive": true,
                     "autoTitle": "Primary"
                   }

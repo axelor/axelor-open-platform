@@ -33,7 +33,6 @@
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.4",
     "echarts": "^5.5.1",
-    "font-awesome": "^4.7.0",
     "immer": "^10.1.1",
     "jotai": "^2.10.3",
     "jotai-immer": "^0.4.1",
@@ -89,8 +88,7 @@
   "packageManager": "pnpm@9.14.4+sha512.c8180b3fbe4e4bca02c94234717896b5529740a6cbadf19fa78254270403ea2f27d4e1d46a08a0f56c89b63dc8ebfd3ee53326da720273794e6200fcf0d184ab",
   "pnpm": {
     "patchedDependencies": {
-      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
-      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch"
+      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch"
     },
     "peerDependencyRules": {
       "ignoreMissing": [

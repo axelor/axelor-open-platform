@@ -1,0 +1,5 @@
+---
+title: Remove support of Font Awesome icons
+type: remove
+description: |
+  Use either Material Symbols and Bootstrap Icons.

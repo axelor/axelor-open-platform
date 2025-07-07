@@ -8,9 +8,6 @@ patchedDependencies:
   bootstrap-sass@2.3.2:
     hash: 7jwz2hglnrq3hxry2suq775qi4
     path: patches/bootstrap-sass@2.3.2.patch
-  font-awesome@4.7.0:
-    hash: b36n7p33c4ewtt5v6is5moc24u
-    path: patches/font-awesome@4.7.0.patch
 
 importers:
 
@@ -67,9 +64,6 @@ importers:
       echarts:
         specifier: ^5.5.1
         version: 5.5.1
-      font-awesome:
-        specifier: ^4.7.0
-        version: 4.7.0(patch_hash=b36n7p33c4ewtt5v6is5moc24u)
       immer:
         specifier: ^10.1.1
         version: 10.1.1
@@ -2265,10 +2259,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-
-  font-awesome@4.7.0:
-    resolution: {integrity: sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==}
-    engines: {node: '>=0.10.3'}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -6104,8 +6094,6 @@ snapshots:
       tabbable: 6.2.0
 
   follow-redirects@1.15.9: {}
-
-  font-awesome@4.7.0(patch_hash=b36n7p33c4ewtt5v6is5moc24u): {}
 
   foreground-child@3.3.1:
     dependencies:

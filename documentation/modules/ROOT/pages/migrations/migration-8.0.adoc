@@ -472,3 +472,4 @@ See xref:migrations/migration-7.3.adoc#help-widget-variant-support[7.3 migration
 * Remove deprecated `ws/files/report/{link:.\*}` and `ws/files/data-export/{fileName:.*}` web services in favor of their
 equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
 * Remove `MetaPermissions#isCollectionReadable` method.
+* Remove support of Font Awesome icons. Use either Material Symbols and Bootstrap Icons.
