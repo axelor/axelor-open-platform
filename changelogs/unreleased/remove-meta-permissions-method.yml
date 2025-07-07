@@ -1,0 +1,3 @@
+---
+title: Remove `MetaPermissions#isCollectionReadable` method
+type: remove

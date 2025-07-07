@@ -104,23 +104,6 @@ public class MetaPermissions {
     return null;
   }
 
-  @Deprecated
-  public boolean isCollectionReadable(User user, String object, String field) {
-    if (StringUtils.isBlank(object)) return true;
-    final Class<?> klass;
-    try {
-      klass = Class.forName(object);
-    } catch (ClassNotFoundException e) {
-      throw new IllegalArgumentException(e);
-    }
-    final Mapper mapper = Mapper.of(klass);
-    final Property property = mapper.getProperty(field);
-    return property == null
-        || !property.isCollection()
-        || Beans.get(JpaSecurity.class)
-            .isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
-  }
-
   public boolean isRelatedReadable(String object, String field, SimpleWidget widget) {
     if (StringUtils.isBlank(object)) return true;
     final Class<?> klass;
