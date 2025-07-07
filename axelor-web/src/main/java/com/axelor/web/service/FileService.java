@@ -83,14 +83,6 @@ public class FileService extends AbstractService {
   }
 
   @GET
-  @Path("data-export/{name:.*}")
-  @Hidden
-  @Deprecated(forRemoval = true)
-  public jakarta.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
-    return downloadExportFile(name);
-  }
-
-  @GET
   @Path("report")
   @Hidden
   public jakarta.ws.rs.core.Response downloadReportFile(
@@ -130,15 +122,6 @@ public class FileService extends AbstractService {
             ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
-  }
-
-  @GET
-  @Path("report/{link:.*}")
-  @Hidden
-  @Deprecated(forRemoval = true)
-  public jakarta.ws.rs.core.Response reportFile(
-      @PathParam("link") final String link, @QueryParam("name") final String name) {
-    return downloadReportFile(link, name);
   }
 
   @DELETE

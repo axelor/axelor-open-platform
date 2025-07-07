@@ -469,3 +469,5 @@ Some features that were marked as deprecated in previous versions are now droppe
 
 * Help widget `css` support is removed, use `variant` instead.
 See xref:migrations/migration-7.3.adoc#help-widget-variant-support[7.3 migration guide]
+* Remove deprecated `ws/files/report/{link:.\*}` and `ws/files/data-export/{fileName:.*}` web services in favor of their
+equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
