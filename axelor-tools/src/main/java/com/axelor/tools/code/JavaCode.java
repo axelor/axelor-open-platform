@@ -46,13 +46,13 @@ public class JavaCode implements JavaElement {
    * <p>For example:
    *
    * <pre>
-   * new JavaCode("private {0:t}<String> name = {0:t}.of({1:s}, {2:s});", "java.util.List", "Hello", "World");
+   * new JavaCode("private {0:t}&lt;String&gt; name = {0:t}.of({1:s}, {2:s});", "java.util.List", "Hello", "World");
    * </pre>
    *
    * This will output:
    *
    * <pre>
-   * private List<String> name = List.of("Hello", "World");
+   * private List&lt;String&gt; name = List.of("Hello", "World");
    * </pre>
    *
    * Following placeholder suffixes are supported:

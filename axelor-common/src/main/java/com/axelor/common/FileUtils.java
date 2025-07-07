@@ -211,7 +211,7 @@ public final class FileUtils {
    *   <li>Replaces spaces and consecutive underscore with a single dash
    *   <li>Trims dot, dash and underscore from beginning and end of filename (with and without the
    *       extension part)
-   *       <ul>
+   * </ul>
    *
    * @param originalFileName The filename to be sanitized
    * @return string The sanitized filename
