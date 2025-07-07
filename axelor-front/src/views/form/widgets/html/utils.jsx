@@ -387,7 +387,7 @@ export function getActions() {
     {
       lite: false,
       title: _t("Style"),
-      image: "\uf1dd",
+      icon: "format_paragraph",
       popup: DropdownPopup,
       ...getDropdown(
         {
@@ -404,13 +404,13 @@ export function getActions() {
         (commands, format) => {
           commands.format(format);
           commands.closePopup();
-        }
+        },
       ),
     },
     {
       lite: false,
       title: _t("Font"),
-      image: "\uf031",
+      icon: "format_color_text",
       ...getDropdown(
         [
           '"Times New Roman", Times, serif',
@@ -427,7 +427,7 @@ export function getActions() {
                 </span>
               ),
             }),
-          {}
+          {},
         ),
         (commands, font) => {
           try {
@@ -437,13 +437,13 @@ export function getActions() {
           } finally {
             document.execCommand("styleWithCSS", false, true);
           }
-        }
+        },
       ),
     },
     {
       lite: false,
       title: _t("Font size"),
-      image: "\uf035",
+      icon: "format_size",
       ...getDropdown(
         {
           1: <span style={{ fontSize: "x-small" }}>{_t("Smaller")}</span>,
@@ -460,44 +460,44 @@ export function getActions() {
           } finally {
             document.execCommand("styleWithCSS", false, true);
           }
-        }
+        },
       ),
     },
     divider(false),
     {
       title: _t("Bold (Ctrl+B)"),
-      image: "\uf032",
+      icon: "format_bold",
       command: "bold",
       hotkey: "b",
     },
     {
       title: _t("Italic (Ctrl+I)"),
-      image: "\uf033",
+      icon: "format_italic",
       command: "italic",
       hotkey: "i",
     },
     {
       title: _t("Underline (Ctrl+U)"),
-      image: "\uf0cd",
+      icon: "format_underlined",
       command: "underline",
       hotkey: "u",
     },
     {
       title: _t("Strikethrough (Ctrl+S)"),
-      image: "\uf0cc",
+      icon: "format_strikethrough",
       command: "strikeThrough",
       hotkey: "s",
     },
     {
       title: _t("Remove format"),
-      image: "\uf12d",
+      icon: "format_clear",
       command: "removeFormat",
     },
     divider(),
     {
       lite: false,
       title: _t("Font color"),
-      image: "\uf1fc",
+      icon: "colorize",
       popup: ColorPalettePopup,
       popupProps: {
         onClick: (commands, color) => {
@@ -510,7 +510,7 @@ export function getActions() {
     {
       lite: false,
       title: _t("Background color"),
-      image: "\uf043",
+      icon: "format_color_fill",
       popup: ColorPalettePopup,
       popupProps: {
         onClick: (commands, color) => {
@@ -524,71 +524,71 @@ export function getActions() {
     {
       lite: false,
       title: _t("Insert link"),
-      image: "\uf08e",
+      icon: "add_link",
       popup: CreateLinkPopup,
     },
     {
       lite: false,
       title: _t("Insert image"),
-      image: "\uf030",
+      icon: "add_photo_alternate",
       popup: CreateImagePopup,
     },
     divider(false),
     {
       title: _t("Align left"),
-      image: "\uf036",
+      icon: "format_align_left",
       command: "justifyLeft",
     },
     {
       title: _t("Center"),
-      image: "\uf037",
+      icon: "format_align_center",
       command: "justifyCenter",
     },
     {
       title: _t("Align right"),
-      image: "\uf038",
+      icon: "format_align_right",
       command: "justifyRight",
     },
     {
       title: _t("Justify"),
-      image: "\uf039",
+      icon: "format_align_justify",
       command: "justifyFull",
     },
     divider(),
     {
       title: _t("Ordered list"),
-      image: "\uf0cb",
+      icon: "format_list_numbered",
       command: "insertOrderedList",
     },
     {
       title: _t("Unordered list"),
-      image: "\uf0ca",
+      icon: "format_list_bulleted",
       command: "insertUnorderedList",
     },
     divider(false),
     {
       lite: false,
       title: _t("Indent"),
-      image: "\uf03c",
+      icon: "format_indent_increase",
       command: "indent",
     },
     {
       lite: false,
       title: _t("Outdent"),
-      image: "\uf03b",
+      icon: "format_indent_decrease",
       command: "outdent",
     },
     divider(false),
     {
       lite: false,
       title: _t("Normalize"),
-      image: "\uf0d0",
+      icon: "wand_stars",
       command: "normalize",
     },
     {
       lite: false,
       title: _t("Code"),
-      image: "\uf121",
+      icon: "code",
       command: "toggleCode",
     },
   ];

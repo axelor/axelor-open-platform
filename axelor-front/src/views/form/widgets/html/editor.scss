@@ -11,8 +11,6 @@ $spacing: 0.25rem;
   min-height: 100px;
   width: 100%;
   border-radius: 0;
-  display: flex;
-  flex-direction: column;
   resize: vertical;
   overflow: auto;
   & textarea {
@@ -42,13 +40,11 @@ $spacing: 0.25rem;
 }
 
 .custom-html-editor-toolbar-icon {
-  font-family: FontAwesome;
   padding: $spacing $spacing * 1.5;
   font-size: 0.85rem;
-  font-family: FontAwesome;
   text-decoration: none;
   color: inherit;
-  display: inline-block;
+  display: flex;
   cursor: pointer;
   opacity: 0.7;
 
@@ -68,6 +64,8 @@ $spacing: 0.25rem;
 .custom-html-editor-toolbar {
   overflow: hidden;
   border-bottom: 1px solid var(--bs-border-color);
+  display: flex;
+  flex-wrap: wrap;
 
   a,
   a:hover,

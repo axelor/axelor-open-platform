@@ -16,14 +16,16 @@ import {
 } from "./utils";
 
 import { clsx } from "@axelor/ui";
+import { Icon } from "@/components/icon";
 import { sanitize } from "@/utils/sanitize";
 import { i18n } from "@/services/client/i18n";
+
 import "./editor.scss";
 
 function Link(props) {
   return (
     <a unselectable="on" alt="Action" {...props}>
-      {props.children}
+      <Icon icon={props.icon} fill/>
     </a>
   );
 }
@@ -52,9 +54,8 @@ function Toolbar({ toggle, emitChange, actions, onAction }) {
               }
             }}
             title={action.title}
-          >
-            {action.image}
-          </Link>
+            icon={action.icon}
+          ></Link>
         );
       })}
     </div>
@@ -248,7 +249,7 @@ function HTMLEditor({
             ? [
                 {
                   title: i18n.get("Translate"),
-                  image: "\uf024",
+                  icon: "flag",
                   command: "translate",
                 },
               ]
