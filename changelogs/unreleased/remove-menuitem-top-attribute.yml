@@ -1,0 +1,5 @@
+---
+title: Remove `top` attribute in `menuitem`
+type: remove
+description: |
+  Top menu support has been removed since 7.0. To ensure compatibility, the attribute was still present in xsd.

@@ -473,3 +473,5 @@ See xref:migrations/migration-7.3.adoc#help-widget-variant-support[7.3 migration
 equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/files/data-export?fileName=<fileName>`.
 * Remove `MetaPermissions#isCollectionReadable` method.
 * Remove support of Font Awesome icons. Use either Material Symbols and Bootstrap Icons.
+* Remove `top` attribute in `menuitem`. Top menu support has been removed since 7.0. To ensure compatibility, the
+attribute was still present in xsd.
