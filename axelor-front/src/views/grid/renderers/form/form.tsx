@@ -48,6 +48,7 @@ import {
 import { ExpandIcon } from "../../builder/expandable";
 import { AUTO_ADD_ROW } from "../../builder/utils";
 import { fallbackFormAtom } from "@/views/form/builder/atoms";
+import { executeWithoutQueue } from "@/view-containers/action";
 
 import styles from "./form.module.scss";
 
@@ -357,12 +358,6 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
       !isManyToMany && formDirty !== undefined && setDirty(formDirty);
     }, [isManyToMany, formDirty, setDirty]);
 
-    useEffect(() => {
-      actionHandler.setRefreshHandler(
-        parentActionHandler.refresh.bind(parentActionHandler),
-      );
-    }, [actionHandler, parentActionHandler]);
-
     const getParent = useCallback(() => {
       if (parentRef.current) return parentRef.current;
       const container = containerRef.current;
@@ -402,7 +397,13 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
 
     const handleSave = useAtomCallback(
       useCallback(
-        async (get, set, saveFromEdit?: boolean, columnIndex?: number) => {
+        async (
+          get,
+          set,
+          saveFromEdit?: boolean,
+          columnIndex?: number,
+          saveFromAction?: boolean,
+        ) => {
           const input = document.activeElement as HTMLInputElement;
           const elem = containerRef.current;
           if (input && elem?.contains(input)) {
@@ -411,7 +412,10 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
           }
 
           await actionExecutor.waitFor();
-          await actionExecutor.wait();
+
+          if (!saveFromAction) {
+            await actionExecutor.wait();
+          }
 
           if (onSaveAction) {
             await actionExecutor.execute(onSaveAction);
@@ -494,6 +498,16 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
         [formAtom, handleSave, handleCancel],
       ),
     );
+
+    useEffect(() => {
+      actionHandler.setRefreshHandler(
+        parentActionHandler.refresh.bind(parentActionHandler),
+      );
+      actionHandler.setSaveHandler(async () => {
+        await executeWithoutQueue(() => handleSave(true, undefined, true));
+        return parentActionHandler.save.bind(parentActionHandler)();
+      });
+    }, [actionHandler, parentActionHandler, handleSave]);
 
     useTabShortcut({
       key: "g",

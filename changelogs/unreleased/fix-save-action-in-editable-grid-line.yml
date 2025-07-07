@@ -1,0 +1,17 @@
+---
+title: Fix handle save action in editable grid line
+type: fix
+description: |
+  When a "save" action occurs from a button inside an grid line, the save is now handle by the main record
+  whatever if the grid is in edit or non-edit mode. It also ensure data integrity and correct state updates.
+  The following sequence occurs :
+
+  1. In case of non-edit grid mode, trigger the onChange of the current field, if any input is currently 
+  focused and value changed.
+  2. Trigger the onClick action of the button to update the line data.
+  3. As soon as a "save" action is detected, commit the line to trigger the onChange of the relational field.
+  4. Finally, the save action of the main record is triggered with the updated grid data.
+  5. Continue any pending action after the save.
+  
+  It is not recommended to update the record after the save. action-view/report/validate can still occurs.
+  

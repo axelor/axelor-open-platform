@@ -84,6 +84,7 @@ export type ActionOptions = {
   };
   context?: DataContext;
   enqueue?: boolean;
+  handle?: (result: ActionResult) => Promise<void>;
 };
 
 export interface ActionExecutor {
