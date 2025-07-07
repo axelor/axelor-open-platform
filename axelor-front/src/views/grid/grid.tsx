@@ -1363,7 +1363,7 @@ function GridInner(props: ViewProps<GridView>) {
       )}
       {canShowHelp && (
         <div className={styles.help}>
-          <HelpComponent text={inlineHelp.text} css={inlineHelp.css} />
+          <HelpComponent text={inlineHelp.text}/>
         </div>
       )}
       <div className={styles.views}>

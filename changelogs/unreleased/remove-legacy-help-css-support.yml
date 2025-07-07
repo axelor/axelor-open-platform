@@ -1,0 +1,5 @@
+---
+title: Remove help css deprecated support
+type: remove
+description: |
+  Help widget `css` support is removed, use `variant` instead.

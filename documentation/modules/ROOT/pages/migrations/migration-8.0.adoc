@@ -461,3 +461,11 @@ CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_vie
 `TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it's just a renaming of the widget name
 for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage will be
 removed in a next version.
+
+
+== Dropped deprecated features
+
+Some features that were marked as deprecated in previous versions are now dropped :
+
+* Help widget `css` support is removed, use `variant` instead.
+See xref:migrations/migration-7.3.adoc#help-widget-variant-support[7.3 migration guide]
