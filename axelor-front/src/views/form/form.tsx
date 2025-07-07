@@ -275,7 +275,10 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
 export const useFormPerms = (
   schema: Schema,
   perms?: Perms,
-  { recordHandler }: { recordHandler?: RecordHandler } = {},
+  {
+    recordHandler,
+    readonly,
+  }: { recordHandler?: RecordHandler; readonly?: boolean } = {},
 ) => {
   const { hasPermission, hasButton: hasButtonPerm } = usePerms(schema, perms);
   const exprList = useMemo(
@@ -292,7 +295,7 @@ export const useFormPerms = (
   );
 
   const [widgetAttrs, setWidgetAttrs] = useState<Attrs>({
-    readonly: !!schema.readonlyIf,
+    readonly: readonly ?? !!schema.readonlyIf,
     ...exprList.reduce((attrs, name) => {
       const attr = schema[name];
       return !isUndefined(attr)
@@ -512,6 +515,9 @@ const FormContainer = memo(function FormContainer({
     attrs: { readonly: readonlyExclusive },
   } = useFormPerms(schema, perms ?? meta.perms, {
     recordHandler,
+    ...(schema.readonlyIf && {
+      readonly: viewProps?.readonly,
+    }),
   });
 
   const canNew = hasButton("new");
