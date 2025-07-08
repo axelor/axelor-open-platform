@@ -19,6 +19,7 @@
 package com.axelor.web.service;
 
 import com.axelor.common.FileUtils;
+import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
 import com.axelor.file.temp.TempFiles;
@@ -96,19 +97,11 @@ public class FileService extends AbstractService {
       throw new IllegalArgumentException(new FileNotFoundException(name));
     }
 
-    MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-    if (name.endsWith(".pdf")) type = new MediaType("application", "pdf");
-    if (name.endsWith(".html")) type = new MediaType("text", "html");
-    if (name.endsWith(".png")) type = new MediaType("image", "png");
-    if (name.endsWith(".jpg")) type = new MediaType("image", "jpg");
-    if (name.endsWith(".svg")) type = new MediaType("image", "svg+xml");
-    if (name.endsWith(".gif")) type = new MediaType("image", "gif");
-    if (name.endsWith(".webp")) type = new MediaType("image", "webp");
-
+    final MediaType type = MediaType.valueOf(MimeTypesUtils.getContentType(file));
     final String fileName = name == null ? file.toFile().getName() : name;
     final ResponseBuilder builder = jakarta.ws.rs.core.Response.ok(file.toFile(), type);
 
-    if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+    if (MetaFiles.isBrowserPreviewCompatible(type)) {
       return builder
           .header(
               "Content-Disposition",

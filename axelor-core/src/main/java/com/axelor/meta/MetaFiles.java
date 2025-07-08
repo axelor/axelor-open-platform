@@ -45,11 +45,13 @@ import jakarta.activation.MimeType;
 import jakarta.activation.MimeTypeParseException;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
+import jakarta.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -611,5 +613,15 @@ public class MetaFiles {
             metaFile.getId(),
             EntityHelper.getEntityClass(parentModel).getName(),
             parentModel.getId());
+  }
+
+  private static final MediaType[] BROWSER_PREVIEW_COMPATIBLE_MEDIA_TYPE = {
+    new MediaType("application", "pdf"), new MediaType("image", "*"), new MediaType("text", "html")
+  };
+
+  public static boolean isBrowserPreviewCompatible(MediaType mediaType) {
+    return mediaType != null
+        && Arrays.stream(BROWSER_PREVIEW_COMPATIBLE_MEDIA_TYPE)
+            .anyMatch(s -> s.isCompatible(mediaType));
   }
 }

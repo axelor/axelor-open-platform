@@ -20,6 +20,7 @@ package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
@@ -625,22 +626,10 @@ public class DmsService {
   }
 
   private jakarta.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
-    MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-
-    if (inline) {
-      if (fileName.endsWith(".pdf")) type = new MediaType("application", "pdf");
-      if (fileName.endsWith(".html")) type = new MediaType("text", "html");
-      if (fileName.endsWith(".png")) type = new MediaType("image", "png");
-      if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
-      if (fileName.endsWith(".jpeg")) type = new MediaType("image", "jpg");
-      if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
-      if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
-      if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");
-    }
-
+    final MediaType type = MediaType.valueOf(MimeTypesUtils.getContentType(fileName));
     final ResponseBuilder builder = jakarta.ws.rs.core.Response.ok(content, type);
 
-    if (inline && type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+    if (inline && MetaFiles.isBrowserPreviewCompatible(type)) {
       return builder
           .header(
               "Content-Disposition",

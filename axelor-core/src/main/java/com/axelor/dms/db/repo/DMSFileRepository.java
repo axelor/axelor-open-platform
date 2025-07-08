@@ -52,6 +52,7 @@ import com.google.inject.persist.Transactional;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,7 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import org.apache.shiro.authz.UnauthorizedException;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {
@@ -73,8 +73,6 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   @Inject private DMSPermissionRepository dmsPermissions;
 
   @Inject private MetaAttachmentRepository attachments;
-
-  private static final Pattern previewSupportedPattern = Pattern.compile("\\b(?:pdf|image)\\b");
 
   public DMSFileRepository() {
     super(DMSFile.class);
@@ -506,7 +504,8 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       json.put("metaFile.sizeText", metaFile.getSizeText());
 
       // Put inlineUrl only if preview for that file type is supported, to prevent auto-downloading
-      if (StringUtils.notBlank(fileType) && previewSupportedPattern.matcher(fileType).find()) {
+      if (StringUtils.notBlank(fileType)
+          && MetaFiles.isBrowserPreviewCompatible(MediaType.valueOf(fileType))) {
         json.put("inlineUrl", "ws/dms/inline/%d".formatted(file.getId()));
       }
     }

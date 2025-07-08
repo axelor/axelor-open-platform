@@ -1,0 +1,6 @@
+---
+title: Return MediaType when downloading a file
+type: feature
+description: |
+  When downloading a file, return the right `Content-Type`.
+  Only pdf/images and html files can be previewed in browser.
