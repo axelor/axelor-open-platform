@@ -38,17 +38,15 @@ import { focusAtom } from "@/utils/atoms";
 import { Formatters } from "@/utils/format";
 import { findViewItem } from "@/utils/schema";
 import { isAdvancedSearchView } from "@/view-containers/advance-search/utils";
-import {
-  usePopupHandlerAtom,
-  useSetPopupHandlers,
-} from "@/view-containers/view-popup/handler";
+import { useSetPopupHandlers } from "@/view-containers/view-popup/handler";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import {
   useSelectViewState,
+  useSetViewProps,
   useViewAction,
   useViewConfirmDirty,
   useViewDirtyAtom,
-  useViewProps,
+  useViewProp,
   useViewRoute,
   useViewSwitch,
   useViewTab,
@@ -356,15 +354,15 @@ export function Form(props: ViewProps<FormView>) {
   const { meta, dataStore } = props;
 
   const { id } = useViewRoute();
-  const [viewProps = {}] = useViewProps();
   const { action } = useViewTab();
   const recordRef = useRef<DataRecord | null>(null);
+  const readonlyViewProp = useViewProp<boolean>("readonly");
 
   const { params } = action;
   const recordId = String(id || "");
   const readonly =
     !params?.forceEdit &&
-    (params?.forceReadonly || (viewProps.readonly ?? Boolean(recordId)));
+    (params?.forceReadonly || (readonlyViewProp ?? Boolean(recordId)));
 
   const popupRecord = params?.["_popup-record"];
 
@@ -455,7 +453,10 @@ const FormContainer = memo(function FormContainer({
     action,
     state: tabAtom,
   } = useViewTab();
-  const [viewProps, setViewProps] = useViewProps();
+  const setViewProps = useSetViewProps();
+  const readonlyViewProp = useViewProp<boolean>("readonly");
+  const dataStoreViewProp = useViewProp<DataStore>("dataStore");
+
   const { formAtom, actionHandler, recordHandler, actionExecutor } =
     useFormHandlers(meta, defaultRecord, {
       context: action?.context,
@@ -516,7 +517,7 @@ const FormContainer = memo(function FormContainer({
   } = useFormPerms(schema, perms ?? meta.perms, {
     recordHandler,
     ...(schema.readonlyIf && {
-      readonly: viewProps?.readonly,
+      readonly: readonlyViewProp,
     }),
   });
 
@@ -526,8 +527,8 @@ const FormContainer = memo(function FormContainer({
   const hasSave = hasButton("save") || canSaveNew;
 
   const readonly = useMemo(() => {
-    const readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
-    return !readonly && !hasEdit ? true : readonly;
+    const $readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
+    return !$readonly && !hasEdit ? true : $readonly;
   }, [readonlyExclusive, attrs.readonly, props.readonly, hasEdit]);
 
   const prevType = useSelectViewState(
@@ -1132,11 +1133,10 @@ const FormContainer = memo(function FormContainer({
   );
 
   const pagination = usePagination(
-    viewProps?.dataStore ?? dataStore,
+    dataStoreViewProp ?? dataStore,
     record,
     readonly,
   );
-  const popupHandlerAtom = usePopupHandlerAtom();
   const setPopupHandlers = useSetPopupHandlers();
 
   const showToolbar = popupOptions?.showToolbar !== false;
@@ -1197,7 +1197,7 @@ const FormContainer = memo(function FormContainer({
   }, [formDirty, setDirty]);
 
   useEffect(() => {
-    setViewProps((props) => ({ ...props, readonly }));
+    setViewProps({ editing: !readonly });
   }, [readonly, setViewProps]);
 
   const tab = useViewTab();

@@ -53,6 +53,7 @@ export type TabProps = {
   canDelete?: boolean;
   readonly?: boolean;
   recordId?: boolean;
+  editing?: boolean;
   showSingle?: boolean;
   dataStore?: DataStore;
   gridState?: GridState;
