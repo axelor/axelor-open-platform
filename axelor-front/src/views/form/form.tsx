@@ -82,7 +82,7 @@ import {
   resetFormDummyFieldsState,
 } from "./builder/utils";
 import { Collaboration } from "./widgets/collaboration";
-import { isUndefined, isBoolean } from "@/utils/types";
+import { isUndefined, isBoolean, isNil } from "@/utils/types";
 
 import styles from "./form.module.scss";
 
@@ -273,10 +273,7 @@ export const focusAndSelectInput = (input?: null | HTMLInputElement) => {
 export const useFormPerms = (
   schema: Schema,
   perms?: Perms,
-  {
-    recordHandler,
-    readonly,
-  }: { recordHandler?: RecordHandler; readonly?: boolean } = {},
+  { recordHandler }: { recordHandler?: RecordHandler } = {},
 ) => {
   const { hasPermission, hasButton: hasButtonPerm } = usePerms(schema, perms);
   const exprList = useMemo(
@@ -293,7 +290,7 @@ export const useFormPerms = (
   );
 
   const [widgetAttrs, setWidgetAttrs] = useState<Attrs>({
-    readonly: readonly ?? !!schema.readonlyIf,
+    readonly: !!schema.readonlyIf,
     ...exprList.reduce((attrs, name) => {
       const attr = schema[name];
       return !isUndefined(attr)
@@ -356,13 +353,9 @@ export function Form(props: ViewProps<FormView>) {
   const { id } = useViewRoute();
   const { action } = useViewTab();
   const recordRef = useRef<DataRecord | null>(null);
-  const readonlyViewProp = useViewProp<boolean>("readonly");
 
   const { params } = action;
   const recordId = String(id || "");
-  const readonly =
-    !params?.forceEdit &&
-    (params?.forceReadonly || (readonlyViewProp ?? Boolean(recordId)));
 
   const popupRecord = params?.["_popup-record"];
 
@@ -414,7 +407,6 @@ export function Form(props: ViewProps<FormView>) {
       isLoading={isLoading}
       record={record}
       recordRef={recordRef}
-      readonly={readonly}
       perms={perms}
     />
   );
@@ -428,11 +420,9 @@ const FormContainer = memo(function FormContainer({
   searchAtom,
   isLoading,
   perms,
-  ...props
 }: ViewProps<FormView> & {
   record: DataRecord;
   recordRef: MutableRefObject<DataRecord | null>;
-  readonly?: boolean;
   isLoading?: boolean;
   perms?: Perms;
 }) {
@@ -516,9 +506,6 @@ const FormContainer = memo(function FormContainer({
     attrs: { readonly: readonlyExclusive },
   } = useFormPerms(schema, perms ?? meta.perms, {
     recordHandler,
-    ...(schema.readonlyIf && {
-      readonly: readonlyViewProp,
-    }),
   });
 
   const canNew = hasButton("new");
@@ -527,9 +514,28 @@ const FormContainer = memo(function FormContainer({
   const hasSave = hasButton("save") || canSaveNew;
 
   const readonly = useMemo(() => {
-    const $readonly = readonlyExclusive || (attrs.readonly ?? props.readonly);
-    return !$readonly && !hasEdit ? true : $readonly;
-  }, [readonlyExclusive, attrs.readonly, props.readonly, hasEdit]);
+    // from perms or dynamic js attributes (readonlyIf, canEdit, ...)
+    if (readonlyExclusive || !hasEdit) {
+      return true;
+    }
+    // from attrs, ie edit/back toolbar buttons
+    if (!isNil(attrs.readonly)) {
+      return attrs.readonly;
+    }
+    // forceEdit action params
+    if (action.params?.forceEdit) {
+      return false;
+    }
+    // else based on tab readonly state, else on record id
+    return readonlyViewProp ?? Boolean(record.id);
+  }, [
+    readonlyExclusive,
+    attrs.readonly,
+    hasEdit,
+    action.params,
+    readonlyViewProp,
+    record.id,
+  ]);
 
   const prevType = useSelectViewState(
     useCallback((state) => state.prevType, []),
@@ -1197,7 +1203,7 @@ const FormContainer = memo(function FormContainer({
   }, [formDirty, setDirty]);
 
   useEffect(() => {
-    setViewProps({ editing: !readonly });
+    setViewProps({ displayMode: readonly ? "read" : "edit" });
   }, [readonly, setViewProps]);
 
   const tab = useViewTab();
