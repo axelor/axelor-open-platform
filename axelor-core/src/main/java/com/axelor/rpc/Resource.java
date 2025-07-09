@@ -23,6 +23,7 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
@@ -1382,6 +1383,7 @@ public class Resource<T extends Model> {
     checkRelationalPermissions(recordMap, Mapper.of(target));
   }
 
+  @SuppressWarnings("unchecked")
   public Response updateMass(Request request) {
 
     security.get().check(JpaSecurity.CAN_WRITE, model);
@@ -1395,6 +1397,7 @@ public class Resource<T extends Model> {
     firePreRequestEvent(RequestEvent.MASS_UPDATE, request);
 
     Response response = new Response();
+    MetaPermissions perms = Beans.get(MetaPermissions.class);
 
     Query<?> query = getQuery(request);
     List<?> data = request.getRecords();
@@ -1403,6 +1406,12 @@ public class Resource<T extends Model> {
 
     @SuppressWarnings("all")
     Map<String, Object> values = (Map) data.get(0);
+    for (Map.Entry<String, Object> entry : values.entrySet()) {
+      if (!perms.canWrite(AuthUtils.getUser(), model.getName(), entry.getKey())) {
+        final AuthSecurityException cause = new AuthSecurityException(AccessType.WRITE, model);
+        throw new UnauthorizedException(cause.getMessage(), cause);
+      }
+    }
     final int total = JPA.withTransaction(() -> query.update(values, AuthUtils.getUser()));
     response.setTotal(total);
 
