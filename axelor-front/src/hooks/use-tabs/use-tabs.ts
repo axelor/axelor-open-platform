@@ -57,7 +57,6 @@ export type TabProps = {
    * depends on action params / perms / ...
    */
   readonly?: boolean;
-  recordId?: boolean;
   /**
    * For form views, whatever if the view is in read or edit mode.
    */
