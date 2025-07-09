@@ -42,6 +42,7 @@ import {
   Schema,
   Widget,
 } from "@/services/client/meta.types";
+import { rejectAsAlert } from "@/services/client/reject";
 import { commonClassNames } from "@/styles/common";
 import { DEFAULT_PAGE_SIZE } from "@/utils/app-settings.ts";
 import { focusAtom } from "@/utils/atoms";
@@ -373,8 +374,10 @@ function GridInner(props: ViewProps<GridView>) {
         });
 
         if (resp.ok) {
-          const { status } = await resp.json();
-          if (status !== 0) return Promise.reject(500);
+          const { status, data } = await resp.json();
+          if (status !== 0) {
+            return rejectAsAlert(data);
+          }
         }
 
         onSearch();
