@@ -1,0 +1,6 @@
+---
+title: Add mass updatable fields even if not declared in grid view
+type: feature
+description: |
+  Currently, only fields declared in the grid view marked with the massUpdate attribute are updatable.
+  Now, fields in the entity, even if not declared in the grid view, will also be listed in the mass update popover.

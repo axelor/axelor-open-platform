@@ -1,15 +1,7 @@
-
 import { useMemo, useState, useId } from "react";
 import forEach from "lodash/forEach";
 
-import {
-  Box,
-  Button,
-  Divider,
-  Input,
-  InputLabel,
-  Link,
-} from "@axelor/ui";
+import { Box, Button, Divider, Input, InputLabel, Link } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { Select } from "@/components/select";
@@ -34,10 +26,9 @@ export function useMassUpdateFields(
 ) {
   return useMemo(() => {
     const _fields: Property[] = [];
-    const accept = (field: Property | undefined, item: Field) => {
+    const accept = (field: Property, item: Field | undefined) => {
       if (
-        !field ||
-        !(item.massUpdate ?? field.massUpdate) ||
+        !(item?.massUpdate ?? field.massUpdate) ||
         /^(id|version|selected|archived|((updated|created)(On|By)))$/.test(
           field.name,
         ) ||
@@ -49,15 +40,13 @@ export function useMassUpdateFields(
       }
       _fields.push({
         ...field,
-        ...item,
+        ...(item || {}),
         type: field.type,
-        placeholder: item.placeholder ?? item?.title ?? field.title,
+        placeholder: item?.placeholder ?? item?.title ?? field.title,
       });
     };
-    forEach(items, (item) => {
-      if (item.type === "field") {
-        accept(fields?.[item.name!], item as Field);
-      }
+    forEach(fields, (field) => {
+      accept(field, items?.find((item) => item.name === field.name) as Field);
     });
 
     return _fields;
