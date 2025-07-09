@@ -27,11 +27,6 @@
     "color": "rgba(234, 234, 255, 0.12)"
   },
   "components": {
-    "Shell": {
-      "sidebar": {
-        "bg": "#292A41"
-      }
-    },
     "Panel": {
       "header": {
         "bg": "#3A3E5B"
@@ -54,6 +49,7 @@
       }
     },
     "NavMenu": {
+      "bg": "#292A41",
       "item_hover": {
         "bg": "rgba(234, 234, 255, 0.05)"
       }

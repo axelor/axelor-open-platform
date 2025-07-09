@@ -22,11 +22,6 @@
     }
   },
   "components": {
-    "Shell": {
-      "sidebar": {
-        "bg": "#F8F8FF"
-      }
-    },
     "Panel": {
       "header": {
         "bg": "#FBFBFF",
@@ -54,10 +49,17 @@
       }
     },
     "NavMenu": {
+      "bg": "#F8F8FF",
+      "border": {
+        "radius": "1rem"
+      },
       "item": {
         "border": {
           "radius": "1rem"
         }
+      },
+      "header": {
+        "padding": "0.5rem"
       },
       "item_hover": {
         "bg": "var(--bs-primary-bg-subtle)"
@@ -74,6 +76,9 @@
       },
       "icon_active": {
         "color": "white"
+      },
+      "buttons": {
+        "bg": "transparent"
       }
     },
     "NavTabs": {
