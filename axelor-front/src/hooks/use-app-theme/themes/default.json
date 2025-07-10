@@ -22,6 +22,22 @@
     }
   },
   "components": {
+    "Shell": {
+      "view": {
+        "toolbar": {
+          "gap": "0.25rem",
+          "padding": "0.25rem",
+          "border": {
+            "color": "var(--bs-border-color)",
+            "style": "solid",
+            "width": "1px"
+          }
+        },
+        "content": {
+          "padding": "0"
+        }
+      }
+    },
     "Panel": {
       "header": {
         "bg": "#FBFBFF",

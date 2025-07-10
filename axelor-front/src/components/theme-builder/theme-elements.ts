@@ -437,6 +437,11 @@ export const elements: ThemeElement[] = [
             type: "color",
           },
           {
+            name: "Gap",
+            path: "components.Shell.view.toolbar.gap",
+            cssProperty: "gap",
+          },
+          {
             name: "Padding",
             path: "components.Shell.view.toolbar.padding",
             cssProperty: "padding",
