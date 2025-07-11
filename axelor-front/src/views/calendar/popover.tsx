@@ -7,7 +7,7 @@ import { SchedulerEvent } from "@/components/scheduler";
 import { DataRecord } from "@/services/client/data.types";
 import { moment } from "@/services/client/l10n";
 
-import { TemplateRenderer, useTemplateContext } from "@/hooks/use-parser";
+import { TemplateRenderer, usePrepareTemplateContext } from "@/hooks/use-parser";
 import { CalendarView } from "@/services/client/meta.types";
 import { MetaData } from "@/services/client/meta";
 
@@ -73,7 +73,7 @@ export function Popover({
   const {
     context,
     options: { execute },
-  } = useTemplateContext(record, { view, onRefresh });
+  } = usePrepareTemplateContext(record, { view, onRefresh });
 
   // Close popover after clicking on link or button on template.
   const handleTemplateClick = useCallback(

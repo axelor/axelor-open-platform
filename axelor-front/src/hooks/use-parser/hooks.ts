@@ -105,6 +105,10 @@ export function useExpression(expression: string) {
   );
 }
 
+export function useTemplateContext() {
+  return useContext(TemplateScope);
+}
+
 const TemplateElement = memo(function TemplateElement({
   template,
 }: {
@@ -117,7 +121,7 @@ const TemplateElement = memo(function TemplateElement({
         : processLegacyTemplate(template),
     [template],
   );
-  const context = useContext(TemplateScope);
+  const context = useTemplateContext();
   return createElement(Comp, { context });
 });
 
@@ -221,7 +225,7 @@ export function TemplateRenderer({
   });
 }
 
-export function useTemplateContext(
+export function usePrepareTemplateContext(
   record: DataRecord,
   options: { view: View; onRefresh?: () => Promise<void> },
 ) {

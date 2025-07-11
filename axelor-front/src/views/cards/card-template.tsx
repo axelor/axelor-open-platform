@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { TemplateRenderer, useTemplateContext } from "@/hooks/use-parser";
+import { TemplateRenderer, usePrepareTemplateContext } from "@/hooks/use-parser";
 import { DataRecord } from "@/services/client/data.types";
 import { MetaData } from "@/services/client/meta";
 import { CardsView, KanbanView } from "@/services/client/meta.types";
@@ -21,7 +21,7 @@ export function CardTemplate({
   const {
     context,
     options: { execute },
-  } = useTemplateContext(record, { view, onRefresh });
+  } = usePrepareTemplateContext(record, { view, onRefresh });
 
   const options = useMemo(() => ({ execute, fields }), [execute, fields]);
 
