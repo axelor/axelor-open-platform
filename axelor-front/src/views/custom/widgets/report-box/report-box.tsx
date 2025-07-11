@@ -1,20 +1,12 @@
-import React, { LegacyRef } from "react";
+import React, { LegacyRef, useMemo } from "react";
 import { Icon } from "@/components/icon";
 import { legacyClassNames } from "@/styles/legacy";
 import { i18n } from "@/services/client/i18n";
+import { useTemplateContext } from "@/hooks/use-parser";
+import { parseExpression } from "@/hooks/use-parser/utils";
 
 export const ReportBox = React.forwardRef(function ReportBox(
-  {
-    icon,
-    label,
-    tag: _tag,
-    up: _up,
-    "tag-css": _tagCss,
-    percent: _percent,
-    value: _value,
-    eval: $eval,
-    context,
-  }: {
+  props: {
     icon: string;
     label: string;
     tag?: string;
@@ -22,20 +14,27 @@ export const ReportBox = React.forwardRef(function ReportBox(
     percent?: number | string;
     up?: string;
     value: number | string;
-    eval: (arg: any) => any;
-    context: Record<string, any>;
   },
-  boxRef,
+  _,
 ) {
+  const tagCssProp = props["tag-css"];
+  const { icon, label } = props;
+  const context = useTemplateContext();
   const ref = React.useRef<HTMLDivElement>();
-  const value = $eval(_value);
-  const percent = $eval(_percent);
-  const tag = $eval(_tag);
-  const tagCss = $eval(_tagCss);
-  const up = $eval(_up);
 
-  function format(value: any) {
-    return isNaN(value) ? value : context.__number(value);
+  const { value, percent, tag, tagCss, up } = useMemo(
+    () => ({
+      value: parseExpression(String(props.value))(context),
+      percent: parseExpression(String(props.percent))(context),
+      tag: parseExpression(String(props.tag))(context),
+      tagCss: parseExpression(String(tagCssProp))(context),
+      up: parseExpression(String(props.up))(context),
+    }),
+    [context, props.value, props.percent, props.tag, props.up, tagCssProp],
+  );
+
+  function format(text: string | number) {
+    return isNaN(text as number) ? text : context.__number(text);
   }
 
   function percentStyle() {
@@ -83,7 +82,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
           )}
         >
           <span>{context.__percent(percent)}</span>
-          {up != null && <Icon icon={"trending_" + (up ? "up" : "down")}/>}
+          {up != null && <Icon icon={"trending_" + (up ? "up" : "down")} />}
         </div>
       </div>
       {tag && (

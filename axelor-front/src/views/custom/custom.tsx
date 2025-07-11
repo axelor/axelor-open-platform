@@ -19,6 +19,8 @@ import { ReportBox } from "./widgets/report-box";
 import { ReportTable } from "./widgets/report-table";
 import styles from "./custom.module.scss";
 
+export const CUSTOM_COMPONENTS = { ReportBox, ReportTable };
+
 export function Custom({ meta }: ViewProps<CustomView>) {
   const { dashlet } = useViewTab();
   const { view } = meta;
@@ -53,10 +55,10 @@ export function Custom({ meta }: ViewProps<CustomView>) {
     () => ({
       components: {
         "report-box": (props: any) => <ReportBox {...props} />,
-        "report-table": (props: any) => <ReportTable {...props} view={view} />,
+        "report-table": (props: any) => <ReportTable {...props} />,
       },
     }),
-    [view],
+    [],
   );
 
   // register tab:refresh

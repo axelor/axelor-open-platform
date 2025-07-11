@@ -31,14 +31,7 @@ function reactComponent(element, _props = {}, _component, context, ref) {
   const CustomComponent = context?.$component(compName);
 
   if (CustomComponent) {
-    return (
-      <CustomComponent
-        ref={ref}
-        {...props}
-        context={context}
-        eval={(arg) => parseExpression(arg)(context)}
-      />
-    );
+    return <CustomComponent ref={ref} {...props} />;
   }
   return React.createElement(compName, props);
 }
