@@ -98,6 +98,7 @@ import {
 } from "../../builder/utils";
 import { fetchRecord } from "../../form";
 import { DetailsForm } from "./one-to-many.details";
+import { usePanelClass } from "../panel";
 
 import styles from "./one-to-many.module.scss";
 
@@ -1897,6 +1898,7 @@ function OneToManyInner({
     [isSubTreeGrid, expandable, readonly, headerSize, rowSize, maxHeight],
   );
 
+  const panelClass = usePanelClass(schema);
   const expandableView = useMemo(() => {
     if (isTreeGrid) {
       const summaryFields = expandableSummaryMeta?.fields ?? {};
@@ -1959,10 +1961,10 @@ function OneToManyInner({
       )}
       <Panel
         ref={panelRef}
-        className={clsx(styles.container, {
+        className={clsx(styles.container, panelClass, {
           [styles.toolbar]: hasActions,
           [styles.tree]: isTreeGrid,
-          [styles.hasHeader]: !isRootTreeGrid && canShowHeader,
+          [styles.hasHeader]: isSubTreeGrid && canShowHeader,
           [styles.hasNewHeader]: isTreeGrid && !state.rows?.length,
           [styles.noHeader]: noHeader,
           [styles.noTitle]: !canShowTitle,

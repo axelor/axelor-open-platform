@@ -11,8 +11,14 @@
   border: 0;
 }
 
+.panelBox:not(.topLevel),
+.topLevel .topLevel {
+  --ax-panel-shadow: none !important;
+}
+
 .panel:not(.hasFrame) {
   border: 0;
+  --ax-panel-shadow: none !important;
   &.hasHeader {
     > div:first-child > div,
     > div:nth-child(2) > div > div {

@@ -824,7 +824,7 @@ function KanbanCard({
             minWidth: 200,
           }}
         >
-          <Panel header={popoverData.title}>
+          <Panel header={popoverData.title} style={{ boxShadow: "none" }}>
             <Box>
               {popoverData.body && (
                 <div

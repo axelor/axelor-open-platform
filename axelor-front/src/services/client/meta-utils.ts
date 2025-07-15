@@ -31,6 +31,22 @@ function processJsonForm(view: Schema) {
   return view;
 }
 
+const TOP_LEVEL_ITEM = Symbol("TOP_LEVEL_ITEM");
+
+type ItemSchema = Schema & {
+  [key in typeof TOP_LEVEL_ITEM]?: boolean;
+};
+
+export function isTopLevelItem(schema: ItemSchema) {
+  return schema[TOP_LEVEL_ITEM];
+}
+
+export function toTopLevelItem(schema: ItemSchema) {
+  schema.showFrame = schema.showFrame ?? true;
+  schema[TOP_LEVEL_ITEM] = true;
+  return schema;
+}
+
 export function processFields(fields: Property[] | Record<string, Property>) {
   let result: Record<string, Property> = {};
   if (isArray(fields)) {
@@ -483,9 +499,10 @@ export function processView(
 
   forEach(view.items, (item, itemIndex) => {
     if (["panel", "panel-related"].includes(item.type ?? "") && !parent) {
-      item.showFrame = item.showFrame ?? true;
+      toTopLevelItem(item);
     } else if (item.type === "panel-tabs") {
       item.items?.forEach((sub) => {
+        toTopLevelItem(sub);
         sub.showFrame = true;
       });
     }

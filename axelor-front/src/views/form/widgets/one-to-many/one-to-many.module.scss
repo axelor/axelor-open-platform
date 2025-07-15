@@ -3,6 +3,7 @@ $treeNodePadding: 1.175rem;
 .container {
   --ax-panel-body-padding: 0;
   --ax-panel-header-border: 0;
+  border: var(--ax-panel-border) !important;
   &.toolbar {
     --ax-panel-header-title-padding: 0 0.5rem;
   }
