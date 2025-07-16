@@ -3,22 +3,18 @@ import { Grid, GridProvider, GridState } from "@axelor/ui/grid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { WritableAtom } from "jotai";
 import { useAtomCallback } from "jotai/utils";
-import forEach from "lodash/forEach";
 
 import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
 import { Field, GridView } from "@/services/client/meta.types";
-import { useGridState } from "./utils";
 import { DataRecord } from "@/services/client/data.types";
 import { resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
-import { useSelector } from "@/hooks/use-relation";
-import { nextId } from "@/views/form/builder/utils";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
-import { toTitleCase } from "@/utils/names";
-import { unaccent } from "@/utils/sanitize.ts";
 
+import { CustomizeSelectorDialog } from "./customize-selector";
+import { useGridState } from "./utils";
 import styles from "./customize.module.scss";
 
 const reload = () => window.location.reload();
@@ -48,7 +44,6 @@ function CustomizeDialog({
       }))
       .filter((item) => item.hidden !== true) as DataRecord[],
   );
-  const showSelector = useSelector();
 
   const { selectedRows } = state;
 
@@ -83,10 +78,11 @@ function CustomizeDialog({
             const mainGridItem = gridState?.columns?.find(
               (c) => c.name === record.name && c.computed && c.width,
             );
-            mainGridItem &&
-              ((schemaItem as Field).width = `${parseInt(
+            if (mainGridItem) {
+              (schemaItem as Field).width = `${parseInt(
                 String(mainGridItem.width)!,
-              )}`);
+              )}`;
+            }
           }
           return schemaItem;
         });
@@ -101,100 +97,37 @@ function CustomizeDialog({
     [view, shared, state.rows, saveWidths, records],
   );
 
-  const handleSelect = useCallback(() => {
-    const extraFields = view?.items
-      ?.filter(
-        (item) =>
-          (item.name && item.name.includes(".")) || item.type !== "field",
-      )
-      .map((item) => ({
-        id: nextId(),
-        name: item.name,
-        type: "field",
-        label: item.title || item.autoTitle,
-      }));
-    showSelector({
-      model: "com.axelor.meta.db.MetaField",
+  const handleSelect = useCallback(async () => {
+    let selected: DataRecord[] = [];
+
+    await dialogs.modal({
+      open: true,
       title: i18n.get("Columns"),
-      multiple: true,
-      view: {
-        name: "custom-meta-field-grid",
-        fields: {
-          label: {
-            name: "label",
-            type: "STRING",
-            required: true,
-          },
-          name: {
-            name: "name",
-            type: "STRING",
-            required: true,
-          },
-        },
-        type: "grid",
-        items: [
-          {
-            type: "field",
-            name: "label",
-            title: "Title",
-            sortable: false,
-            searchable: false,
-          },
-          {
-            type: "field",
-            name: "name",
-            title: "Name",
-          },
-        ],
-      } as unknown as GridView,
-      viewParams: {
-        "_can-customize-popup": false,
-      },
-      domain:
-        "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames",
-      context: {
-        _excludedFieldNames: ["id", "version"],
-        _model: "com.axelor.meta.db.MetaField",
-        _modelName: view.model,
-      },
-      onGridSearch: (records, page, search) => {
-        let recs: DataRecord[] = [];
-        forEach(records, (rec) => {
-          recs.push({
-            ...rec,
-            label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
-          });
-        });
-        if (page.offset === 0) {
-          // add the extra fields at the end of the first page only
-          let extra = extraFields;
-          if (search && search.name) {
-            extra = extraFields?.filter(
-              (f) =>
-                f.name &&
-                unaccent(f.name.toLowerCase()).includes(
-                  unaccent(search.name.toLowerCase()),
-                ),
-            );
-          }
-          extra?.forEach((i) => recs.push(i));
+      content: (
+        <CustomizeSelectorDialog
+          view={view}
+          onSelectionChange={(selection: DataRecord[]) => {
+            selected = selection;
+          }}
+        />
+      ),
+      size: "lg",
+      onClose: (isOk) => {
+        if (isOk) {
+          setRecords((_records) => [
+            ..._records,
+            ...(selected || [])
+              .filter((s) => !_records.find((r) => r.name === s.name))
+              .map((record) => ({
+                ...record,
+                type: "field",
+                title: record.label,
+              })),
+          ]);
         }
-        return recs;
-      },
-      onSelect: (selected) => {
-        setRecords((records) => [
-          ...records,
-          ...(selected || [])
-            .filter((s) => !records.find((r) => r.name === s.name))
-            .map((record) => ({
-              ...record,
-              type: "field",
-              title: record.label,
-            })),
-        ]);
       },
     });
-  }, [showSelector, view]);
+  }, [view]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
