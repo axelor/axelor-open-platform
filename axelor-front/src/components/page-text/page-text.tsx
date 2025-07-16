@@ -16,13 +16,7 @@ import { getDefaultMaxPerPage } from "@/utils/app-settings.ts";
 
 import styles from "./page-text.module.scss";
 
-export function PageText({
-  dataStore,
-  count = 0,
-}: {
-  count?: number;
-  dataStore: DataStore;
-}) {
+export function PageText({ dataStore }: { dataStore: DataStore }) {
   const page = useDataStore(dataStore, (state) => state.page);
   const maxLimit = getDefaultMaxPerPage();
   const { offset = 0, totalCount = 0 } = page;
@@ -77,10 +71,9 @@ export function PageText({
 
   const onShow = useCallback(() => setShowEditor(true), []);
 
-  const to =
-    (limit > 0 ? Math.min(offset + limit, totalCount) : totalCount) + count;
+  const to = limit > 0 ? Math.min(offset + limit, totalCount) : totalCount;
   const start = to === 0 ? 0 : offset + 1;
-  const text = i18n.get("{0} to {1} of {2}", start, to, totalCount + count);
+  const text = i18n.get("{0} to {1} of {2}", start, to, totalCount);
 
   if (showEditor) {
     return (

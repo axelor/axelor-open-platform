@@ -202,34 +202,17 @@ function GridInner(props: ViewProps<GridView>) {
   const hasRowSelectedFromState = useRef((viewSelectedRows?.length ?? 0) > 0);
   const [records, setRecords] = useState(dataStore.records);
 
-  const processSearchResult = useAtomCallback(
-    useCallback(
-      (get, set, { records, page }: SearchResult) => {
-        const { onGridSearch } = popupOptions ?? {};
-        if (onGridSearch) {
-          const { search } = (searchAtom && get(searchAtom)) ?? {};
-          return onGridSearch(records, page, search);
-        }
-        return records;
-      },
-      [popupOptions, searchAtom],
-    ),
-  );
-
   useEffect(
     () =>
       dataStore.subscribe((ds) => {
-        setRecords(processSearchResult(ds));
+        setRecords(ds.records);
       }),
-    [dataStore, processSearchResult],
+    [dataStore],
   );
 
   const onColumnCustomize = useCustomizePopup({
     view,
     stateAtom: gridStateAtom,
-    allowCustomization: Boolean(
-      action.params?.["_can-customize-popup"] ?? true,
-    ),
   });
 
   const { orderBy = null, rows, selectedRows, selectedCell } = state;
@@ -810,7 +793,6 @@ function GridInner(props: ViewProps<GridView>) {
     if (popup) {
       setPopupHandlers({
         data: state,
-        dataRecords: records,
         dataStore: dataStore,
         onSearch,
       });
@@ -1363,7 +1345,7 @@ function GridInner(props: ViewProps<GridView>) {
       )}
       {canShowHelp && (
         <div className={styles.help}>
-          <HelpComponent text={inlineHelp.text}/>
+          <HelpComponent text={inlineHelp.text} />
         </div>
       )}
       <div className={styles.views}>

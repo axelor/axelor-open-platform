@@ -52,8 +52,8 @@ export type TabProps = {
   canEdit?: boolean;
   canDelete?: boolean;
   /**
-   * Indicates if requesting to open the view in readonly or in edit mode. This 
-   * doesn't mean that the views will be displayed in the desired mode; it also 
+   * Indicates if requesting to open the view in readonly or in edit mode. This
+   * doesn't mean that the views will be displayed in the desired mode; it also
    * depends on action params / perms / ...
    */
   readonly?: boolean;
@@ -192,15 +192,6 @@ export type Tab = {
      *
      */
     multiSelect?: boolean;
-
-    /**
-     * The method called after grid search request
-     */
-    onGridSearch?: (
-      records: DataRecord[],
-      page: SearchPage,
-      search?: Record<string, string>,
-    ) => DataRecord[];
   };
 
   /**
@@ -333,19 +324,9 @@ export async function initTab(
     route?: Omit<TabRoute, "action">;
     props?: Record<string, any>;
     tab?: boolean;
-    onGridSearch?: (
-      records: DataRecord[],
-      page: SearchPage,
-      search?: Record<string, string>,
-    ) => DataRecord[];
   },
 ) {
-  const {
-    route: initRoute,
-    props,
-    tab: initAsTab,
-    onGridSearch,
-  } = options ?? {};
+  const { route: initRoute, props, tab: initAsTab } = options ?? {};
   const actionName = viewName(view);
   const actionView =
     typeof view === "object" && view.views?.length
@@ -357,14 +338,15 @@ export async function initTab(
 
     const defaultType = getDefaultViewType(actionView);
     const type = getViewType(options?.type ?? defaultType);
-    
-    const route = context?._showRecord && views.some(v => v.type === 'form')
-      ? {
-          ...initRoute,
-          mode: "edit",
-          id: context?._showRecord,
-        }
-      : initRoute;
+
+    const route =
+      context?._showRecord && views.some((v) => v.type === "form")
+        ? {
+            ...initRoute,
+            mode: "edit",
+            id: context?._showRecord,
+          }
+        : initRoute;
     const initState = updateTabState(id, { type, title }, { route, props });
 
     const tabAtom = atom<TabState>(initState);
@@ -393,7 +375,6 @@ export async function initTab(
       showToolbar: actionView.params?.["show-toolbar"] !== false,
       showEditIcon: actionView.params?.["_popup-edit-icon"] !== false,
       multiSelect: actionView.params?.["_popup-multi-select"] !== false,
-      onGridSearch,
     };
 
     const tab: Tab = {

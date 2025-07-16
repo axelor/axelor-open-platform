@@ -10,7 +10,6 @@ import { useCallback } from "react";
 
 export type PopupHandler = {
   data?: any;
-  dataRecords?: DataRecord[];
   dataStore?: DataStore;
   actionHandler?: ActionHandler;
   actionExecutor?: ActionExecutor;
