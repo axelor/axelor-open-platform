@@ -18,8 +18,6 @@ import {
 import { unaccent } from "@/utils/sanitize";
 import { ActionOptions } from "@/view-containers/action";
 
-let warnedRecordPrefix = false;
-
 export type ScriptContextOptions = {
   valid?: (name?: string) => boolean;
   execute?: (name: string, options?: ActionOptions) => Promise<any>;
@@ -256,15 +254,6 @@ export function createScriptContext(
 
   return new Proxy<Context>(context as Context, {
     get(target, p, receiver) {
-      if (p === "record") {
-        if (session?.info?.application?.mode != "prod" && !warnedRecordPrefix) {
-          console.warn(
-            `Trying to access field with "record." prefix. This is deprecated and support will be removed in next major version.`,
-          );
-          warnedRecordPrefix = true;
-        }
-        return receiver;
-      }
       if (p === "_parent" && receiver._createParentContext) {
         return (
           parentContext ?? (parentContext = receiver._createParentContext())

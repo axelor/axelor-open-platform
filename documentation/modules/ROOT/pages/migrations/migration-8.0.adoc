@@ -475,3 +475,6 @@ equivalencies using query parameters : `ws/files/report?link=<link>` and `ws/fil
 * Remove support of Font Awesome icons. Use either Material Symbols and Bootstrap Icons.
 * Remove `top` attribute in `menuitem`. Top menu support has been removed since 7.0. To ensure compatibility, the
 attribute was still present in xsd.
+* Remove `record.` prefix support in expressions/templates/EvalRefSelect. Added for backward compatibility, accessing
+fields now no longer need `record.` prefix. Update your js expressions, templates and EvalRefSelect `x-eval-*`
+attributes according.

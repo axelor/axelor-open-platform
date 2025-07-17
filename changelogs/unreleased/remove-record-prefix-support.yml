@@ -1,0 +1,6 @@
+---
+title: Remove `record.` prefix support in expressions/templates/EvalRefSelect
+type: remove
+description: |
+  Added for backward compatibility, accessing fields now no longer need `record.` prefix. Update your js expressions, 
+  templates and EvalRefSelect `x-eval-*` attributes according.
