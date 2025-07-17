@@ -1,5 +1,7 @@
-- !MetaSequence:
-  name: seq.emp.id
-  prefix: EMP_
-  suffix: _ID
-  padding: 5
+- type: MetaSequence
+  key: seq.emp.id
+  properties:
+    name: seq.emp.id
+    prefix: EMP_
+    suffix: _ID
+    padding: 5

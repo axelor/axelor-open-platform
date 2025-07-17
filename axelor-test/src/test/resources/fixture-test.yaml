@@ -1,0 +1,46 @@
+- type: Country
+  key: country:france
+  properties:
+    name: France
+    code: FR
+    
+- type: Country
+  key: country:usa
+  properties:
+    name: United States
+    code: US
+
+- type: Address
+  key: address:home
+  properties:
+    person: person:john_doe
+    number: 123
+    street: Main St
+    city: Paris
+    postalCode: 75001
+    isValid: true
+    country: country:france
+    type: HOME
+
+- type: Address
+  key: address:work
+  properties:
+    number: 456
+    street: Elm St
+    city: New York
+    postalCode: 10001
+    country: country:usa
+    type: WORK
+
+- type: Person
+  key: person:john_doe
+  properties:
+    firstName: John
+    lastName: Doe
+    email: john.doe@example.com
+    birtDate: 1979-11-01
+    internalCode: 1234567890
+    totalSale: 159.99
+    addresses:
+      - address:home
+      - address:work

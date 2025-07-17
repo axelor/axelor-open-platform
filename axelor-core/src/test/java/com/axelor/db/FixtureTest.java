@@ -24,8 +24,10 @@ import com.axelor.JpaTestModule;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.FieldTypes;
+import com.axelor.test.fixture.Fixture;
 import com.google.inject.persist.Transactional;
 import jakarta.inject.Inject;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -38,17 +40,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(GuiceExtension.class)
 @GuiceModules({JpaTestModule.class})
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class JpaFixtureTest extends JpaSupport {
+public class FixtureTest extends JpaSupport {
 
-  @Inject private JpaFixture fixture;
+  @Inject private Fixture fixture;
 
   private FieldTypes fieldTypes;
 
   @BeforeEach
   @Transactional
-  public void setUp() {
+  public void setUp() throws IOException {
     if (all(FieldTypes.class).count() == 0) {
-      fixture.load("demo-field-types.yml");
+      fixture.load("demo-field-types.yml", JPA::model, bean -> JPA.manage((Model) bean));
     }
   }
 

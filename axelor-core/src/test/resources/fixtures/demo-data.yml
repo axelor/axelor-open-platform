@@ -1,101 +1,144 @@
-- !Country: &IN
-  code: IN
-  name: India
+- type: Country
+  key: IN
+  properties:
+    code: IN
+    name: India
   
-- !Country: &FR
-  code: FR
-  name: France
+- type: Country
+  key: FR
+  properties:
+    code: FR
+    name: France
   
-- !Country: &UK
-  code: UK
-  name: United Kingdom
+- type: Country
+  key: UK
+  properties:
+    code: UK
+    name: United Kingdom
   
-- !Country: &US
-  code: US
-  name: United States
+- type: Country
+  key: US
+  properties:
+    code: US
+    name: United States
   
-- !Country: &DE
-  code: DE
-  name: Germany
+- type: Country
+  key: DE
+  properties:
+    code: DE
+    name: Germany
 
-- !Circle: &family
-  code: family
-  name: Family
+- type: Country
+  key: ES
+  properties:
+    code: ES
+    name: Spain
 
-- !Circle: &friends
-  code: friends
-  name: Friends
-  
-- !Circle: &business
-  code: business
-  name: Business
-  
-- !Title: &mr
-  code: mr
-  name: Mr.
-  
-- !Title: &mrs
-  code: mrs
-  name: Mrs.
-  
-- !Title: &miss
-  code: miss
-  name: Miss
-  
-- !Address: &james_addr_home
-  street: 12, some street
-  area: near my home
-  city: Paris
-  zip: 21312312
-  country: *FR
-  
-- !Address: &james_addr_office
-  street: 21, some street
-  area: near my office
-  city: Paris
-  zip: 21312343
-  country: *FR
+- type: Circle
+  key: family
+  properties:
+    code: family
+    name: Family
 
-- !Contact:
-  title:
-    !Title:
-      code: dr
-      name: Dr.
-  firstName: James
-  lastName: Taylor
-  email: jtaylor@gmail.com
-  dateOfBirth: 1977-05-01
-  addresses:
-    - *james_addr_home
-    - *james_addr_office
-  circles:
-    - *family
+- type: Circle
+  key: friends
+  properties:
+    code: friends
+    name: Friends
   
-- !Contact:
-  title: *mr
-  firstName: John
-  lastName: Smith
-  email: jsmith@gmail.com
-  dateOfBirth: 1979-11-01
-  credit: "2.5"
-  circles:
-    - *friends
-    - *business
-  addresses:
-    - !Address:
-      street: 11, some street
-      area: near my office
-      city: Madrid
-      zip: 21312343
-      country:
-        !Country:
-          code: ES
-          name: Spain
-- !Contact:
-  title: *mr
-  firstName: Mark
-  lastName: Ram
-  email: ram@markram.com
-  dateOfBirth: 1975-03-23
-  circles:
-    - *business
+- type: Circle
+  key: business
+  properties:
+    code: business
+    name: Business
+  
+- type: Title
+  key: mr
+  properties:
+    code: mr
+    name: Mr.
+  
+- type: Title
+  key: mrs
+  properties:
+    code: mrs
+    name: Mrs.
+  
+- type: Title
+  key: miss
+  properties:
+    code: miss
+    name: Miss
+
+- type: Title
+  key: dr
+  properties:
+    code: dr
+    name: Dr.
+
+- type: Address
+  key: james_addr_home
+  properties:
+    street: 12, some street
+    area: near my home
+    city: Paris
+    zip: 21312312
+    country: FR
+  
+- type: Address
+  key: james_addr_office
+  properties:
+    street: 21, some street
+    area: near my office
+    city: Paris
+    zip: 21312343
+    country: FR
+
+- type: Address
+  key: john_addr_home
+  properties:
+    street: 11, some street
+    area: near my home
+    city: Madrid
+    zip: 21312312
+    country: ES
+
+- type: Contact
+  key: james_taylor
+  properties:
+    title: dr
+    firstName: James
+    lastName: Taylor
+    email: jtaylor@gmail.com
+    dateOfBirth: 1977-05-01
+    addresses:
+      - james_addr_home
+      - james_addr_office
+    circles:
+      - family
+
+- type: Contact
+  key: john_smith
+  properties:
+    title: mr
+    firstName: John
+    lastName: Smith
+    email: jsmith@gmail.com
+    dateOfBirth: 1979-11-01
+    credit: "2.5"
+    circles:
+      - friends
+      - business
+    addresses:
+      - john_addr_home
+
+- type: Contact
+  key: mark_ram
+  properties:
+    title: mr
+    firstName: Mark
+    lastName: Ram
+    email: ram@markram.com
+    dateOfBirth: 1975-03-23
+    circles:
+      - business

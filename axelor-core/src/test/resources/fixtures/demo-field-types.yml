@@ -1,5 +1,7 @@
-- !FieldTypes:
-  string: Hello, Axelor!
-  localDate: 2021-04-29
-  localDateTime: 2021-04-29T07:57:00Z
-  localTime: 07:57
+- type: FieldTypes
+  key: demo_field_types
+  properties:
+    string: Hello, Axelor!
+    localDate: 2021-04-29
+    localDateTime: 2021-04-29T07:57:00Z
+    localTime: 07:57
