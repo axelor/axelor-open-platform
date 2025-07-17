@@ -1,6 +1,0 @@
----
-title: Fix and improve NavMenu theming
-type: fix
-description: |
-  This fix few styles issues on NavMenu. As part of the changes, it also comes 
-  with improvements on NavMenu theming capabilities.

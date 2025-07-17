@@ -1,3 +1,77 @@
+## 7.4.3 (2025-07-17)
+
+#### Feature
+
+* Improve template rendering
+
+  <details>
+  
+  Previously, the React template component was being remounted entirely whenever the record context changed.
+  This caused visible UI flicker and unnecessary teardown/re-initialization of the component,
+  even when only the record data was updated.
+  
+  This fix ensures that the template component now mounts only once, and instead of remounting,
+  it will re-render efficiently in response to changes in the record context. This preserves component in dom by react 
+  and eliminates the flicker, resulting in a smoother user experience during form changes.
+  
+  This impacts all fields viewers, label/static/help widgets, fields tooltip, kanban/cards/calendar/custom views.
+  
+  </details>
+
+* Add React template support for ReportBox and ReportTable templates
+
+#### Fix
+
+* Fix o2m header gets hidden on scroll
+* Fixes how the form context is prepared
+
+  <details>
+  
+  The way from context was prepared was creating issues. The form context is a concatenation of the action view 
+  context values and the view/record values. But it was created in the wrong order : instead of appending view/record 
+  context values first and then the action view context values, it is now the reverse. The view/record context values 
+  should be priority over action view context values.
+  
+  Means that if passing some data in action view context that can have the same names as the view/record context 
+  values, the latter will have priority.
+  
+  This fixes an issue with chart/search views search-field requests : the model was coming from the action view instead 
+  of the form itself. In case of chart and search views (without `search-form`), the model is by default 
+  `com.axelor.script.ScriptBindings`.
+  
+  </details>
+
+* Fix box-shadow styles for nested panels
+* Fix evaluate readonlyIf attribute in form view
+* Fix handle save action in editable grid line
+
+  <details>
+  
+  When a "save" action occurs from a button inside an grid line, the save is now handle by the main record
+  whatever if the grid is in edit or non-edit mode. It also ensure data integrity and correct state updates.
+  The following sequence occurs :
+  
+  1. In case of non-edit grid mode, trigger the onChange of the current field, if any input is currently 
+  focused and value changed.
+  2. Trigger the onClick action of the button to update the line data.
+  3. As soon as a "save" action is detected, commit the line to trigger the onChange of the relational field.
+  4. Finally, the save action of the main record is triggered with the updated grid data.
+  5. Continue any pending action after the save.
+  
+  It is not recommended to update the record after the save. action-view/report/validate can still occurs.
+  
+  </details>
+
+* Fix and improve NavMenu theming
+
+  <details>
+  
+  This fix few styles issues on NavMenu. As part of the changes, it also comes 
+  with improvements on NavMenu theming capabilities.
+  
+  </details>
+
+
 ## 7.4.2 (2025-06-26)
 
 #### Feature
