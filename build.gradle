@@ -154,11 +154,10 @@ configure(subprojects - project(':axelor-front')) {
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")
 
-    if (project.hasProperty("finalRelease") && signingKey != null && signingPassword != null) {
-      signing {
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign publishing.publications
-      }
+    signing {
+      required = { rootProject.finalRelease }
+      useInMemoryPgpKeys(signingKey, signingPassword)
+      sign publishing.publications
     }
 
   }
