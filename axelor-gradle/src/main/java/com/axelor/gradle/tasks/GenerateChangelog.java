@@ -107,7 +107,7 @@ public class GenerateChangelog extends DefaultTask {
 
   @Input private boolean allowNoEntry;
 
-  public boolean isAllowNoEntry() {
+  public boolean getAllowNoEntry() {
     return allowNoEntry;
   }
 
@@ -140,7 +140,7 @@ public class GenerateChangelog extends DefaultTask {
 
     List<ChangelogEntry> entries = getChangelogEntries();
 
-    if (ObjectUtils.isEmpty(entries) && !isAllowNoEntry()) {
+    if (ObjectUtils.isEmpty(entries) && !getAllowNoEntry()) {
       getLogger().lifecycle("No unreleased changelog entries to process");
       return;
     }

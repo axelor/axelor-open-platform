@@ -49,7 +49,7 @@ public class CentralPortalUploadTask extends DefaultTask {
 
   @Input @Optional public Boolean autoPublish = false;
 
-  public Boolean isAutoPublish() {
+  public Boolean getAutoPublish() {
     return autoPublish;
   }
 
@@ -106,7 +106,7 @@ public class CentralPortalUploadTask extends DefaultTask {
     if (getPublicationName() != null && !getPublicationName().isEmpty()) {
       map.put("name", getPublicationName());
     }
-    map.put("publicationType", isAutoPublish() ? "AUTOMATIC" : "USER_MANAGED");
+    map.put("publicationType", getAutoPublish() ? "AUTOMATIC" : "USER_MANAGED");
     return String.format(
         "%s?%s",
         SONATYPE_URL,
