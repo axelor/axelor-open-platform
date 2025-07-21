@@ -31,7 +31,7 @@ jar {
   into('webapp') {
     from "src/main/webapp"
     from "${rootDir}/axelor-front/dist"
-    duplicatesStrategy 'exclude'
+    duplicatesStrategy = 'exclude'
   }
 }
 

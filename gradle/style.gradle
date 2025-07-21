@@ -12,7 +12,7 @@ buildscript {
 apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
 spotless {
-  enforceCheck false
+  enforceCheck = false
 
   java {
     target fileTree(projectDir) {
@@ -48,7 +48,7 @@ configure(subprojects - project(':axelor-front')) { p ->
   apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
   spotless {
-    enforceCheck false
+    enforceCheck = false
 
     java {
       target fileTree(p.projectDir) {
@@ -86,8 +86,8 @@ configure(subprojects - project(':axelor-front')) { p ->
 configure([rootProject] + (subprojects - project(':axelor-front'))) {
 
   tasks.register('formatCode') {
-    description "Add license and format code."
-    group "Axelor"
+    description = "Add license and format code."
+    group = "Axelor"
     if (tasks.findByName('licenseFormat')) {
       dependsOn 'licenseFormat'
     }

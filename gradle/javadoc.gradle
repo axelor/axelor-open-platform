@@ -16,8 +16,8 @@ def projectsIncludeInJavadocs = subprojects.findAll {
 
 task generateDocs(type: Javadoc) {
 
-  description "Generate API docs."
-  group "Axelor"
+  description = "Generate API docs."
+  group = "Axelor"
 
   dependsOn {
     projectsIncludeInJavadocs.collect {

@@ -67,8 +67,8 @@ configure(subprojects - project(':axelor-front')) {
   version = rootProject.version
 
   testlogger {
-    theme 'mocha'
-    slowThreshold 3000
+    theme = 'mocha'
+    slowThreshold = 3000
   }
 
   afterEvaluate {
@@ -163,7 +163,7 @@ configure(subprojects - project(':axelor-front')) {
   }
 
   task centralPortalBundle(type: Zip) {
-    description "Create central portal bundle"
+    description = "Create central portal bundle"
     group = "publishing"
 
     dependsOn(project.name == "axelor-gradle"
@@ -177,7 +177,7 @@ configure(subprojects - project(':axelor-front')) {
   }
 
   task uploadToCentralPortal(type: CentralPortalUploadTask) {
-    description "Publish artifact to central portal"
+    description = "Publish artifact to central portal"
     group = "publishing"
 
     dependsOn(centralPortalBundle)
@@ -192,8 +192,8 @@ configure(subprojects - project(':axelor-front')) {
 }
 
 task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
-  description "Update version text in source files."
-  group "Axelor"
+  description = "Update version text in source files."
+  group = "Axelor"
   processFiles = fileTree(projectDir) {
     include '**/src/**/resources/**/*.xml'
     include '**/src/**/resources/domain-models.xsd'
