@@ -70,6 +70,8 @@ configure(subprojects - project(':axelor-front')) { p ->
       encoding = "UTF-8"
       memberLevel = JavadocMemberLevel.PROTECTED
     }
+
+    options.addStringOption('Xdoclint:none', '-quiet')
   }
 
 }
