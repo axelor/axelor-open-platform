@@ -49,10 +49,13 @@ public class GenerateCode extends DefaultTask {
       "Generate code for domain models from xml definitions.";
   public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
-  private static final String DIR_INPUT = "src/main/resources/domains";
+  private static final String DIR_INPUT_MAIN = "src/main/resources/domains";
+  private static final String DIR_INPUT_TEST = "src/test/resources/domains";
 
-  private static final String DIR_OUTPUT_JAVA = "src-gen/java";
-  private static final String DIR_OUTPUT_RESOURCES = "src-gen/resources";
+  private static final String DIR_OUTPUT_MAIN_JAVA = "src-gen/main/java";
+  private static final String DIR_OUTPUT_TEST_JAVA = "src-gen/test/java";
+
+  private static final String DIR_OUTPUT_MAIN_RESOURCES = "src-gen/main/resources";
 
   private Function<String, String> formatter;
 
@@ -60,37 +63,51 @@ public class GenerateCode extends DefaultTask {
     this.formatter = formatter;
   }
 
-  public static File getInputDir(Project project) {
-    return new File(project.getProjectDir(), DIR_INPUT);
+  public static File getInputMainDir(Project project) {
+    return new File(project.getProjectDir(), DIR_INPUT_MAIN);
+  }
+
+  public static File getInputTestDir(Project project) {
+    return new File(project.getProjectDir(), DIR_INPUT_TEST);
   }
 
   private static File getOutputBase(Project project) {
     return project.getLayout().getBuildDirectory().get().getAsFile();
   }
 
-  public static File getJavaOutputDir(Project project) {
-    return new File(getOutputBase(project), DIR_OUTPUT_JAVA);
+  public static File getMainJavaOutputDir(Project project) {
+    return new File(getOutputBase(project), DIR_OUTPUT_MAIN_JAVA);
   }
 
-  public static File getResourceOutputDir(Project project) {
-    return new File(getOutputBase(project), DIR_OUTPUT_RESOURCES);
+  public static File getTestJavaOutputDir(Project project) {
+    return new File(getOutputBase(project), DIR_OUTPUT_TEST_JAVA);
+  }
+
+  public static File getMainResourceOutputDir(Project project) {
+    return new File(getOutputBase(project), DIR_OUTPUT_MAIN_RESOURCES);
   }
 
   @InputFiles
   public List<File> getLookupFiles() {
     return AxelorUtils.findAxelorProjects(getProject()).stream()
-        .map(GenerateCode::getJavaOutputDir)
+        .flatMap(
+            project ->
+                Arrays.asList(getMainJavaOutputDir(project), getTestJavaOutputDir(project))
+                    .stream())
         .collect(Collectors.toList());
   }
 
   @InputFiles
-  public File getInputDirectory() {
-    return getInputDir(getProject());
+  public List<File> getInputDirectories() {
+    return Arrays.asList(getInputMainDir(getProject()), getInputTestDir(getProject()));
   }
 
   @OutputDirectories
   public List<File> getOutputDirectories() {
-    return Arrays.asList(getJavaOutputDir(getProject()), getResourceOutputDir(getProject()));
+    return Arrays.asList(
+        getMainJavaOutputDir(getProject()),
+        getTestJavaOutputDir(getProject()),
+        getMainResourceOutputDir(getProject()));
   }
 
   private void generateInfo(AxelorExtension extension, List<ResolvedArtifact> artifacts)
@@ -98,7 +115,7 @@ public class GenerateCode extends DefaultTask {
     final Project project = getProject();
     final File outputPath =
         FileUtils.getFile(
-            getResourceOutputDir(getProject()), "META-INF", "axelor-module.properties");
+            getMainResourceOutputDir(getProject()), "META-INF", "axelor-module.properties");
     try {
       outputPath.getParentFile().mkdirs();
     } catch (Exception e) {
@@ -164,9 +181,17 @@ public class GenerateCode extends DefaultTask {
     Files.asCharSink(outputPath, StandardCharsets.UTF_8).write(text);
   }
 
-  private EntityGenerator buildGenerator(Project project) {
-    final File domainPath = getInputDir(project);
-    final File targetPath = getJavaOutputDir(project);
+  private EntityGenerator buildMainGenerator(Project project) {
+    final File domainPath = getInputMainDir(project);
+    final File targetPath = getMainJavaOutputDir(project);
+    return formatter != null
+        ? new EntityGenerator(domainPath, targetPath, formatter)
+        : new EntityGenerator(domainPath, targetPath);
+  }
+
+  private EntityGenerator buildTestGenerator(Project project) {
+    final File domainPath = getInputTestDir(project);
+    final File targetPath = getTestJavaOutputDir(project);
     return formatter != null
         ? new EntityGenerator(domainPath, targetPath, formatter)
         : new EntityGenerator(domainPath, targetPath);
@@ -185,10 +210,55 @@ public class GenerateCode extends DefaultTask {
     // generate module info
     generateInfo(extension, axelorArtifacts);
 
-    // start code generation
-    final EntityGenerator generator = buildGenerator(project);
+    // Generate code for main sources
+    generateCodeForSourceSet(project, axelorArtifacts, true);
 
-    // add lookup generators
+    // Generate code for test sources
+    generateCodeForSourceSet(project, axelorArtifacts, false);
+  }
+
+  private void generateCodeForSourceSet(
+      Project project, List<ResolvedArtifact> axelorArtifacts, boolean isMain) throws IOException {
+    final File inputDir = isMain ? getInputMainDir(project) : getInputTestDir(project);
+
+    // Only generate if the input directory exists and contains domain files
+    if (!inputDir.exists() || !inputDir.isDirectory()) {
+      getLogger()
+          .info(
+              "Skipping {} code generation - input directory does not exist: {}",
+              isMain ? "main" : "test",
+              inputDir.getAbsolutePath());
+      return;
+    }
+
+    // Check if there are any domain files
+    File[] domainFiles = inputDir.listFiles((dir, name) -> name.endsWith(".xml"));
+    if (domainFiles == null || domainFiles.length == 0) {
+      getLogger()
+          .info(
+              "Skipping {} code generation - no domain files found in: {}",
+              isMain ? "main" : "test",
+              inputDir.getAbsolutePath());
+      return;
+    }
+
+    getLogger()
+        .info(
+            "Starting {} code generation from: {}",
+            isMain ? "main" : "test",
+            inputDir.getAbsolutePath());
+
+    // Start code generation
+    final EntityGenerator generator =
+        isMain ? buildMainGenerator(project) : buildTestGenerator(project);
+
+    // For test generation, also add main domains as lookup source
+    if (!isMain && getInputMainDir(project).exists()) {
+      getLogger().debug("Adding main domains as lookup source for test generation");
+      generator.addLookupSource(buildMainGenerator(project));
+    }
+
+    // Add lookup generators from dependencies
     for (ResolvedArtifact artifact : axelorArtifacts) {
       final Project sub = AxelorUtils.findProject(project, artifact);
       if (sub == null) {
@@ -199,10 +269,15 @@ public class GenerateCode extends DefaultTask {
                     .matching(new PatternSet().include("**/domains/**"))
                     .getFiles()));
       } else {
-        generator.addLookupSource(buildGenerator(sub));
+        // Add both main and test generators for lookup from sub-projects
+        generator.addLookupSource(buildMainGenerator(sub));
+        if (getInputTestDir(sub).exists()) {
+          generator.addLookupSource(buildTestGenerator(sub));
+        }
       }
     }
 
     generator.start();
+    getLogger().info("Completed {} code generation", isMain ? "main" : "test");
   }
 }

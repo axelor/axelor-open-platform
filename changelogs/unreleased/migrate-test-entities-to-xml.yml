@@ -1,0 +1,6 @@
+---
+title: Add code generation support for test entities
+type: feature
+description: |
+  Test entities can now be generated from XML files. This enables using the 
+  same domain modeling approach for test entities as production code.

@@ -80,13 +80,17 @@ public class EclipseSupport extends AbstractSupport {
                   .map(SourceFolder.class::cast)
                   .filter(
                       it ->
-                          it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
+                          it.getPath().startsWith("src/main/")
+                              || it.getPath().contains("src-gen/main/"))
                   .forEach(it -> it.setOutput("bin/main"));
 
               cp.getEntries().stream()
                   .filter(SourceFolder.class::isInstance)
                   .map(SourceFolder.class::cast)
-                  .filter(it -> it.getPath().startsWith("src/test/"))
+                  .filter(
+                      it ->
+                          it.getPath().startsWith("src/test/")
+                              || it.getPath().contains("src-gen/test/"))
                   .forEach(it -> it.setOutput("bin/test"));
 
               // remove self-dependency

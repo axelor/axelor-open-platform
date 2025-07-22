@@ -184,21 +184,32 @@ public class AxelorPlugin implements Plugin<Project> {
                   });
         });
 
-    // add src-gen dirs
+    // add main src-gen dir
     project
         .getExtensions()
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getJava()
-        .srcDir(GenerateCode.getJavaOutputDir(project));
+        .srcDir(GenerateCode.getMainJavaOutputDir(project));
+
+    // add test src-gen dir
+    project
+        .getExtensions()
+        .getByType(JavaPluginExtension.class)
+        .getSourceSets()
+        .getByName(SourceSet.TEST_SOURCE_SET_NAME)
+        .getJava()
+        .srcDir(GenerateCode.getTestJavaOutputDir(project));
+
+    // add main src-gen resources dir
     project
         .getExtensions()
         .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getResources()
-        .srcDir(GenerateCode.getResourceOutputDir(project));
+        .srcDir(GenerateCode.getMainResourceOutputDir(project));
 
     // XXX: prepend class output directory to compile classpath (see #26420)
     // XXX: https://github.com/gradle/gradle/issues/12575
