@@ -8,9 +8,10 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { focusAtom } from "@/utils/atoms";
+import { validateFileSize } from "@/utils/files";
 
 import { FieldControl, FieldProps } from "../../builder";
-import { META_FILE_MODEL, makeImageURL, validateFileSize } from "./utils";
+import { META_FILE_MODEL, makeImageURL } from "./utils";
 
 import styles from "./image.module.scss";
 

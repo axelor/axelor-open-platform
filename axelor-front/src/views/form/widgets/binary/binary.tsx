@@ -6,6 +6,7 @@ import { Box, Button, ButtonGroup } from "@axelor/ui";
 
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
+import { validateFileSize } from "@/utils/files";
 import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
@@ -13,7 +14,6 @@ import { FieldControl, FieldProps, FormAtom } from "../../builder";
 import {
   META_FILE_MODEL,
   makeImageURL,
-  validateFileSize,
 } from "../image/utils";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { formDirtyUpdater } from "../../builder/atoms";

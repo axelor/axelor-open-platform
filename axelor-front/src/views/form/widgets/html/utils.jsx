@@ -1,4 +1,5 @@
 import { i18n } from "@/services/client/i18n";
+import { validateFileSize } from "@/utils/files";
 import {
   ColorPalette as ColorPalettePopup,
   CreateLink as CreateLinkPopup,
@@ -65,7 +66,7 @@ export function selectionInside(containerNode, force) {
 // read file as data-url
 export function filecontents(file, callback) {
   // base64 a 2GB video is insane: 16MB should work for an average image
-  if (file.size > 0x1000000) return;
+  if (!validateFileSize(file)) return;
 
   // read file as data-url
   const normalize_dataurl = function (orientation) {

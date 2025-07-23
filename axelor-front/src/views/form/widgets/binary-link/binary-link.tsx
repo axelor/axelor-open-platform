@@ -8,12 +8,12 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 import { DataStore } from "@/services/client/data-store";
 import { DataRecord } from "@/services/client/data.types";
 import { download } from "@/utils/download";
+import { validateFileSize } from "@/utils/files";
 
 import { FieldControl, FieldProps } from "../../builder";
 import {
   META_FILE_MODEL,
   makeImageURL,
-  validateFileSize,
 } from "../image/utils";
 
 import styles from "./binary-link.module.scss";

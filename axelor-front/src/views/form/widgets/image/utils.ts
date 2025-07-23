@@ -1,9 +1,6 @@
 import isNumber from "lodash/isNumber";
 
-import { alerts } from "@/components/alerts";
 import { DataRecord } from "@/services/client/data.types";
-import { i18n } from "@/services/client/i18n";
-import { session } from "@/services/client/session";
 
 const BLANK =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -46,21 +43,4 @@ export function makeImageURL(
   }
 
   return url;
-}
-
-export function validateFileSize(file: File): boolean {
-  if (!file) return false;
-  const maxSize = session.info?.data?.upload?.maxSize ?? 0;
-  const uploadMaxSize = 1048576 * maxSize;
-
-  if (maxSize > 0 && file.size > uploadMaxSize) {
-    alerts.info({
-      message: i18n.get(
-        "You are not allowed to upload a file bigger than {0} MB.",
-        maxSize,
-      ),
-    });
-    return false;
-  }
-  return true;
 }
