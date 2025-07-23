@@ -26,6 +26,7 @@ import com.axelor.auth.db.User;
 import com.axelor.cache.AxelorCache;
 import com.axelor.cache.CacheBuilder;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -101,6 +102,42 @@ public final class MetaStore {
     return null;
   }
 
+  public static Map<String, Object> getPermissions(Property property) {
+    final Map<String, Object> map = new HashMap<>();
+    MetaPermissions perms = Beans.get(MetaPermissions.class);
+    final User user = AuthUtils.getUser();
+    if (user == null || AuthUtils.isAdmin(user)) {
+      return null;
+    }
+
+    // Field permissions
+    map.put("read", perms.canRead(user, property.getEntity().getName(), property.getName()));
+    map.put("write", perms.canWrite(user, property.getEntity().getName(), property.getName()));
+    map.put("export", perms.canExport(user, property.getEntity().getName(), property.getName()));
+
+    // Model permissions
+    final Map<String, Object> modelPerms =
+        property.getTarget() != null ? getPermissions(property.getTarget()) : new HashMap<>();
+
+    if (ObjectUtils.isEmpty(modelPerms)) {
+      return map;
+    }
+
+    // Merge Model & Field permissions
+    for (String key : modelPerms.keySet()) {
+      boolean modelPerm =
+          ObjectUtils.isEmpty(modelPerms.get(key))
+              || Boolean.parseBoolean(modelPerms.get(key).toString());
+      if (map.containsKey(key)) {
+        map.replace(key, Boolean.parseBoolean(map.get(key).toString()) && modelPerm);
+      } else {
+        map.put(key, modelPerm);
+      }
+    }
+
+    return map;
+  }
+
   public static Map<String, Object> getPermissions(Class<?> model) {
     final User user = AuthUtils.getUser();
     if (user == null || AuthUtils.isAdmin(user) || !Model.class.isAssignableFrom(model)) {
@@ -163,9 +200,7 @@ public final class MetaStore {
       if (property.isEnum()) {
         map.put("selectionList", getSelectionList(property.getEnumType()));
       }
-      if (property.getTarget() != null) {
-        map.put("perms", getPermissions(property.getTarget()));
-      }
+      map.put("perms", getPermissions(property));
       // find the default value
       if (!property.isTransient() && !property.isVirtual()) {
         Object obj = null;
