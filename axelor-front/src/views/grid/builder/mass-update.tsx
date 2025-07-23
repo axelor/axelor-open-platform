@@ -34,7 +34,8 @@ export function useMassUpdateFields(
         ) ||
         (field as any).large ||
         field.unique ||
-        ["BINARY", "ONE_TO_MANY", "MANY_TO_MANY"].includes(field.type)
+        ["BINARY", "ONE_TO_MANY", "MANY_TO_MANY"].includes(field.type) ||
+        !(field.perms?.read !== false && field.perms?.write !== false)
       ) {
         return;
       }
