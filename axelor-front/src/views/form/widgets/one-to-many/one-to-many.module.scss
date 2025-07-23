@@ -32,8 +32,8 @@ $treeNodePadding: 1.175rem;
 }
 
 .noHeader {
-  border-color: transparent;
-  border-width: 0;
+  border-color: transparent !important;
+  border-width: 0 !important;
 }
 
 .container.tree {
