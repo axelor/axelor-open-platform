@@ -145,7 +145,6 @@ public final class MetaStore {
     final Map<String, Property> fieldsMap = new LinkedHashMap<>();
     final List<Object> fields = new ArrayList<>();
 
-    boolean massUpdate = false;
     Object bean = null;
     try {
       bean = modelClass.getDeclaredConstructor().newInstance();
@@ -166,9 +165,6 @@ public final class MetaStore {
       }
       if (property.getTarget() != null) {
         map.put("perms", getPermissions(property.getTarget()));
-      }
-      if (property.isMassUpdate() && !name.contains(".")) {
-        massUpdate = true;
       }
       // find the default value
       if (!property.isTransient() && !property.isVirtual()) {
@@ -196,12 +192,6 @@ public final class MetaStore {
     }
 
     Map<String, Object> perms = getPermissions(modelClass);
-    if (massUpdate) {
-      if (perms == null) {
-        perms = new HashMap<>();
-      }
-      perms.put("massUpdate", massUpdate);
-    }
 
     // find dotted json fields
     final Map<String, Map<String, Object>> jsonFields = new HashMap<>();
