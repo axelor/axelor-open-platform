@@ -42,7 +42,7 @@
     "monaco-editor": "^0.52.2",
     "parse5": "^8.0.0",
     "react": "^18.3.1",
-    "react-datepicker": "^7.5.0",
+    "react-datepicker": "^8.4.0",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.1.2",
     "react-grid-layout": "1.4.3",
