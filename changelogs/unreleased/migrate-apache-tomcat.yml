@@ -1,5 +1,5 @@
 ---
-title: Upgrade Apache Tomcat from 9.0.x to 10.1.42
+title: Upgrade Apache Tomcat from 9.0.x to 10.1.43
 type: change
 description: |
   Moved to Jakarta EE namespace
