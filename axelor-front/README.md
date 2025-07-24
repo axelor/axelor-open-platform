@@ -19,7 +19,7 @@ $ nvm install 20
 
 # pnpm
 $ corepack enable
-$ corepack prepare pnpm@latest-9 --activate
+$ corepack prepare pnpm@latest-10 --activate
 ```
 
 See more installation methods:

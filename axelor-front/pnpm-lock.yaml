@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   bootstrap-sass@2.3.2:
-    hash: 7jwz2hglnrq3hxry2suq775qi4
+    hash: 8244e2704d64c19ee4e2f3796f1f96b3903d19d5a8ce1214bffcbf4c80ca308a
     path: patches/bootstrap-sass@2.3.2.patch
 
 importers:
@@ -45,7 +45,7 @@ importers:
         version: 2.3.3(@babel/runtime@7.24.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       bootstrap-sass:
         specifier: 2.3.2
-        version: 2.3.2(patch_hash=7jwz2hglnrq3hxry2suq775qi4)
+        version: 2.3.2(patch_hash=8244e2704d64c19ee4e2f3796f1f96b3903d19d5a8ce1214bffcbf4c80ca308a)
       bunshi:
         specifier: ^2.1.5
         version: 2.1.5(react@18.3.1)
@@ -5624,7 +5624,7 @@ snapshots:
 
   bootstrap-icons@1.11.3: {}
 
-  bootstrap-sass@2.3.2(patch_hash=7jwz2hglnrq3hxry2suq775qi4): {}
+  bootstrap-sass@2.3.2(patch_hash=8244e2704d64c19ee4e2f3796f1f96b3903d19d5a8ce1214bffcbf4c80ca308a): {}
 
   bootstrap@5.3.3(@popperjs/core@2.11.8):
     dependencies:

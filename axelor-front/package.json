@@ -85,7 +85,7 @@
     "vite-plugin-svgr": "^4.3.0",
     "vitest": "^2.1.9"
   },
-  "packageManager": "pnpm@9.14.4+sha512.c8180b3fbe4e4bca02c94234717896b5529740a6cbadf19fa78254270403ea2f27d4e1d46a08a0f56c89b63dc8ebfd3ee53326da720273794e6200fcf0d184ab",
+  "packageManager": "pnpm@10.13.1+sha256.0f9ed48d808996ae007835fb5c4641cf9a300def2eddc9e957d9bbe4768c5f28",
   "pnpm": {
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch"
