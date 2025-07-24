@@ -53,7 +53,7 @@ Following variables are available in script execution context:
 | `$request` | the `ActionRequest`
 | `$response` | the `ActionReponse`
 | `$em` | the `EntityManager` if script is `transactional`
-| `$json` | instance of `MetaJsonRecordRepository` to work with xref:models/custom-models.adoc#[custom models]
+| `$json` | instance of `MetaJsonRecordRepository` to work with xref:models/custom-models.adoc[custom models]
 |===
 
 The `action-script` can be used for custom models too. Here is an example:
