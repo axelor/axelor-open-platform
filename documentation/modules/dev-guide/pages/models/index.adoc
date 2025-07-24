@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-:url-hibernate,: http://hibernate.org/orm/
+:url-hibernate: http://hibernate.org/orm/
 
 In this chapter we will see one of the main component of the modules, the domain objects.
 
