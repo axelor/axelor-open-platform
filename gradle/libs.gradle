@@ -157,7 +157,7 @@ libs.flywaydb = [
 ]
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.6"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7"
 
 // groovy
 libs.groovy = [
