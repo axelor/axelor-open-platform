@@ -2,7 +2,7 @@ import react from "@vitejs/plugin-react";
 import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
 import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
 import { ProxyOptions, loadEnv, mergeConfig } from "vite";
-import { UserConfig, defineConfig } from "vitest/config";
+import { ViteUserConfig, defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
 let env = loadEnv("dev", process.cwd(), "");
@@ -11,7 +11,7 @@ let base = env.VITE_PROXY_CONTEXT ?? "/";
 base = base.endsWith("/") ? base : `${base}/`;
 const unslashedBase = base === "/" ? base : base.slice(0, -1);
 
-const { plugins, ...conf } = viteConfig as UserConfig;
+const { plugins, ...conf } = viteConfig as ViteUserConfig;
 
 // replace react plugin
 plugins[0] = react({

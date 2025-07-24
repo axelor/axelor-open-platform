@@ -81,7 +81,7 @@
     "typescript-eslint": "^8.38.0",
     "vite": "^7.0.6",
     "vite-plugin-svgr": "^4.3.0",
-    "vitest": "^2.1.9"
+    "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.13.1+sha256.0f9ed48d808996ae007835fb5c4641cf9a300def2eddc9e957d9bbe4768c5f28",
   "pnpm": {
