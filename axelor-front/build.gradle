@@ -16,7 +16,7 @@ node {
     download = true
 }
 
-task buildFront(type: PnpmTask) {
+tasks.register("buildFront", PnpmTask) {
     group = 'axelor'
     description = 'Build Front-end'
 
@@ -31,7 +31,7 @@ task buildFront(type: PnpmTask) {
     environment.put('NODE_OPTIONS', '--max-old-space-size=4096')
 }
 
-task installFrontDeps(type: PnpmTask) {
+tasks.register("installFrontDeps", PnpmTask) {
     group = 'axelor'
     description = 'Install Front-end dependencies'
 

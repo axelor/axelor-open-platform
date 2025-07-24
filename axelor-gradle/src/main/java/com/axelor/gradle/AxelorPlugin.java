@@ -129,7 +129,7 @@ public class AxelorPlugin implements Plugin<Project> {
   private void configureCodeGeneration(Project project) {
     project
         .getTasks()
-        .create(
+        .register(
             I18nTask.TASK_NAME,
             I18nTask.class,
             task -> {
@@ -139,7 +139,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project
         .getTasks()
-        .create(
+        .register(
             UpdateVersion.TASK_NAME,
             UpdateVersion.class,
             task -> {
@@ -159,13 +159,14 @@ public class AxelorPlugin implements Plugin<Project> {
     Task generateCodeTask =
         project
             .getTasks()
-            .create(
+            .register(
                 GenerateCode.TASK_NAME,
                 GenerateCode.class,
                 task -> {
                   task.setDescription(GenerateCode.TASK_DESCRIPTION);
                   task.setGroup(GenerateCode.TASK_GROUP);
-                });
+                })
+            .get();
 
     // add dependencies to optimize up-to-date checks
     dependsOn(compileTask, generateCodeTask);
@@ -217,7 +218,7 @@ public class AxelorPlugin implements Plugin<Project> {
   private void configureEncryptionSupport(Project project) {
     project
         .getTasks()
-        .create(
+        .register(
             EncryptTextTask.TASK_NAME,
             EncryptTextTask.class,
             task -> {
@@ -227,7 +228,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
     project
         .getTasks()
-        .create(
+        .register(
             EncryptFileTask.TASK_NAME,
             EncryptFileTask.class,
             task -> {

@@ -54,7 +54,7 @@ public class TomcatSupport extends AbstractSupport {
 
     project
         .getTasks()
-        .create(
+        .register(
             TOMCAT_RUNNER_CONFIG_TASK,
             task -> {
               task.dependsOn(
@@ -72,7 +72,7 @@ public class TomcatSupport extends AbstractSupport {
 
     project
         .getTasks()
-        .create(
+        .register(
             TOMCAT_RUN_TASK,
             TomcatRun.class,
             task -> {
@@ -83,7 +83,7 @@ public class TomcatSupport extends AbstractSupport {
 
     project
         .getTasks()
-        .create(
+        .register(
             GENERATE_LAUNCHER_TASK,
             task -> {
               task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);

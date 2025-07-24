@@ -41,7 +41,7 @@ public class WarSupport extends AbstractSupport {
     // copy webapp to root build dir
     project
         .getTasks()
-        .create(
+        .register(
             COPY_WEBAPP_TASK_NAME,
             CopyWebapp.class,
             task -> {

@@ -14,14 +14,14 @@ def projectsIncludeInJavadocs = subprojects.findAll {
 // Unifying javadoc
 /////
 
-task generateDocs(type: Javadoc) {
+tasks.register("generateDocs", Javadoc) {
 
   description = "Generate API docs."
   group = "Axelor"
 
   dependsOn {
     projectsIncludeInJavadocs.collect {
-      it.tasks.getByName("jar")
+      it.tasks.named("jar")
     }
   }
 

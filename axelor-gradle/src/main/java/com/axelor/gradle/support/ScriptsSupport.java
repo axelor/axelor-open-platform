@@ -32,7 +32,7 @@ public class ScriptsSupport extends AbstractSupport {
 
     project
         .getTasks()
-        .create(
+        .register(
             DatabaseTask.TASK_NAME,
             DatabaseTask.class,
             task -> {

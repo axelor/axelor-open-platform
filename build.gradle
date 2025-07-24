@@ -162,7 +162,7 @@ configure(subprojects - project(':axelor-front')) {
 
   }
 
-  task centralPortalBundle(type: Zip) {
+  tasks.register("centralPortalBundle", Zip) {
     description = "Create central portal bundle"
     group = "publishing"
 
@@ -176,7 +176,7 @@ configure(subprojects - project(':axelor-front')) {
     destinationDirectory.set(project.layout.buildDirectory)
   }
 
-  task uploadToCentralPortal(type: CentralPortalUploadTask) {
+  tasks.register("uploadToCentralPortal", CentralPortalUploadTask) {
     description = "Publish artifact to central portal"
     group = "publishing"
 
@@ -191,7 +191,7 @@ configure(subprojects - project(':axelor-front')) {
 
 }
 
-task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
+tasks.register("updateVersion", com.axelor.gradle.tasks.UpdateVersion) {
   description = "Update version text in source files."
   group = "Axelor"
   processFiles = fileTree(projectDir) {

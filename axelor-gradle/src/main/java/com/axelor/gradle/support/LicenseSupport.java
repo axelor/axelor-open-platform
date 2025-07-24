@@ -130,8 +130,10 @@ public class LicenseSupport extends AbstractSupport {
       project.getPlugins().apply(LicenseBasePlugin.class);
       project.getPlugins().apply(LicenseReportingPlugin.class);
 
-      baseCheckTask = project.task(LicenseBasePlugin.getLICENSE_TASK_BASE_NAME());
-      baseFormatTask = project.task(LicenseBasePlugin.getFORMAT_TASK_BASE_NAME());
+      baseCheckTask =
+          project.getTasks().register(LicenseBasePlugin.getLICENSE_TASK_BASE_NAME()).get();
+      baseFormatTask =
+          project.getTasks().register(LicenseBasePlugin.getFORMAT_TASK_BASE_NAME()).get();
 
       baseCheckTask.setGroup("License");
       baseFormatTask.setGroup(baseCheckTask.getGroup());

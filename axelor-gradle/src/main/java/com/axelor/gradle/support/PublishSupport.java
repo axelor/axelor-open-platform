@@ -27,6 +27,7 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin;
 
@@ -54,10 +55,10 @@ public class PublishSupport extends AbstractSupport {
 
     final SourceSet main = extension.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
     final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
-    final Jar sourcesJar =
+    final TaskProvider<Jar> sourcesJar =
         project
             .getTasks()
-            .create(
+            .register(
                 "sourcesJar",
                 Jar.class,
                 task -> {
