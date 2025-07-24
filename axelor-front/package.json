@@ -51,7 +51,7 @@
     "react-text-mask": "^5.5.0",
     "react-transition-group": "^4.4.5",
     "signature_pad": "^5.0.10",
-    "swagger-ui-react": "^5.20.2"
+    "swagger-ui-react": "^5.27.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
