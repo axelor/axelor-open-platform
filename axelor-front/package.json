@@ -34,7 +34,7 @@
     "dompurify": "^3.2.6",
     "echarts": "^5.6.0",
     "immer": "^10.1.1",
-    "jotai": "^2.10.3",
+    "jotai": "^2.12.5",
     "jotai-immer": "^0.4.1",
     "jsdom": "^25.0.1",
     "libphonenumber-js": "^1.11.16",
