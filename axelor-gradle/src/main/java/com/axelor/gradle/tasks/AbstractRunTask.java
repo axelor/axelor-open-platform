@@ -42,10 +42,12 @@ import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.JavaExecSpec;
 
 public abstract class AbstractRunTask extends DefaultTask {
 
+  private ExecOperations execOperations;
   private String config;
 
   @Input
@@ -126,10 +128,14 @@ public abstract class AbstractRunTask extends DefaultTask {
 
   protected void configure(JavaExecSpec task) {}
 
+  public AbstractRunTask(ExecOperations execOperations) {
+    this.execOperations = execOperations;
+  }
+
   @TaskAction
   public void exec() throws Exception {
     final Project project = getProject();
-    project.javaexec(
+    execOperations.javaexec(
         task -> {
           task.classpath(createManifestJar());
           task.args(getArgs());

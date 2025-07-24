@@ -24,11 +24,13 @@ import com.axelor.gradle.support.TomcatSupport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.options.Option;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.JavaExecSpec;
 
 public class TomcatRun extends AbstractRunTask {
@@ -38,6 +40,11 @@ public class TomcatRun extends AbstractRunTask {
   private int port = 8080;
 
   private boolean debug;
+
+  @Inject
+  public TomcatRun(ExecOperations execOperations) {
+    super(execOperations);
+  }
 
   @Option(option = "port", description = "Specify the tomcat server port (default 8080).")
   public void setPort(String port) {

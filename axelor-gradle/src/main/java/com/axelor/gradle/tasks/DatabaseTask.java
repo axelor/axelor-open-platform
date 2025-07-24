@@ -23,8 +23,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.support.ScriptsSupport;
 import java.io.File;
+import javax.inject.Inject;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.options.Option;
+import org.gradle.process.ExecOperations;
 import org.gradle.process.JavaExecSpec;
 
 public class DatabaseTask extends AbstractRunTask {
@@ -46,6 +48,11 @@ public class DatabaseTask extends AbstractRunTask {
   private boolean encrypt;
 
   private String modules;
+
+  @Inject
+  public DatabaseTask(ExecOperations execOperations) {
+    super(execOperations);
+  }
 
   @Option(option = "init", description = "initialize the database")
   public void setInit(boolean init) {
