@@ -1,6 +1,0 @@
----
-title: Upgrade guava from 33.3.1-jre to 33.4.8-jre
-type: change
-description: |
-  Removed dependency on JSR-305 (javax.annotation)
-  https://github.com/google/guava/releases/tag/v33.4.3

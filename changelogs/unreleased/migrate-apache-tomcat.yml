@@ -1,8 +1,0 @@
----
-title: Upgrade Apache Tomcat from 9.0.x to 10.1.43
-type: change
-description: |
-  Moved to Jakarta EE namespace
-  Implements Jakarta Servlet 6.0 (Jakarta EE 10)
-  https://tomcat.apache.org/tomcat-10.0-doc/RELEASE-NOTES.txt
-  https://tomcat.apache.org/tomcat-10.1-doc/RELEASE-NOTES.txt

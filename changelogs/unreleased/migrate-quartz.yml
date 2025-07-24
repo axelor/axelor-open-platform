@@ -1,6 +1,0 @@
----
-title: Upgrade to Quartz 2.5
-type: change
-description: |
-  Moved to Jakarta EE namespace
-  https://github.com/quartz-scheduler/quartz/releases/tag/v2.5.0

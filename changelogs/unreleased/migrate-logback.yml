@@ -1,6 +1,0 @@
----
-title: Upgrade to Logback 1.5
-type: change
-description: |
-  Moved to Jakarta EE namespace
-  https://logback.qos.ch/news.html

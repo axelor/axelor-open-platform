@@ -1,6 +1,0 @@
----
-title: Upgrade to Guice 7 (Jakarta EE 9)
-type: change
-description: |
-  Moved to Jakarta EE namespace
-  https://github.com/google/guice/wiki/Guice700

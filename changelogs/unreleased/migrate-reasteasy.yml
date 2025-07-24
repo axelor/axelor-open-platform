@@ -1,6 +1,0 @@
----
-title: Upgrade to Resteasy 6
-type: change
-description: |
-  Implements Jakarta REST 3.1 (Jakarta EE 10)
-  https://resteasy.dev/docs/
