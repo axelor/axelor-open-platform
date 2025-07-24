@@ -10,7 +10,7 @@ versions.caffeine = "3.2.2"
 versions.redisson = "3.50.0"
 
 versions.groovy = "4.0.28"
-versions.graal_js = "24.2.1"
+versions.graal_js = "24.2.2"
 versions.resteasy = "6.2.12.Final"
 versions.jackson = "2.19.2"
 versions.shiro = "2.0.5"

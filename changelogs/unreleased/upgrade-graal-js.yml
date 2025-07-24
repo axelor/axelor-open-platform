@@ -1,5 +1,5 @@
 ---
-title: Upgrade GraalJS from 22.3.5 to 24.2.1
+title: Upgrade GraalJS from 22.3.5 to 24.2.2
 type: change
 description: |
   Enabled ECMAScript 2024 features
