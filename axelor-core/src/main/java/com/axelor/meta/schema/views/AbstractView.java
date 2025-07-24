@@ -51,7 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.EXISTING_PROPERTY, property = "type")
@@ -348,7 +348,7 @@ public abstract class AbstractView {
             .setParameter("baseLang", baseLang)
             .setParameter("model", getModel())
             .setParameter("view", getName())
-            .setHint(QueryHints.HINT_CACHEABLE, true);
+            .setHint(AvailableHints.HINT_CACHEABLE, true);
 
     final List<Object[]> found = query.getResultList();
 

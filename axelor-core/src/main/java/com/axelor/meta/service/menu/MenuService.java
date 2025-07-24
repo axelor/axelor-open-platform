@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.hibernate.jpa.QueryHints;
+import org.hibernate.jpa.AvailableHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +127,7 @@ public class MenuService {
                 Object[].class)
             .setParameter("lang", lang)
             .setParameter("baseLang", baseLang)
-            .setHint(QueryHints.HINT_CACHEABLE, true);
+            .setHint(AvailableHints.HINT_CACHEABLE, true);
 
     return query.getResultList().stream()
         .collect(Collectors.toMap(a -> (String) a[0], a -> (String) a[1]));
