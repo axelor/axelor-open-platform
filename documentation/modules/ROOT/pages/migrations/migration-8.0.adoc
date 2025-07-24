@@ -462,6 +462,11 @@ CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_vie
 for readability and relevance. Old name can still be used, but we encourage adopting the new name as its usage will be
 removed in a next version.
 
+== Remove Junit4 support
+
+JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support
+for JUnit Jupiter (JUnit 5) was introduced in v6.0. It is time to drop support for JUnit 4. Migrate your Junit tests
+to Junit5.
 
 == Dropped deprecated features
 

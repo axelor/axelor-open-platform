@@ -4,7 +4,6 @@ apply plugin: "java-library"
 
 dependencies {
 
-  api libs.junit
   api libs.junit_jupiter
   api libs.junit_launcher
   api project(":axelor-core")

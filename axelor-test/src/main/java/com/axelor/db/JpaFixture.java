@@ -108,7 +108,7 @@ import org.yaml.snakeyaml.nodes.Tag;
  * <p>In order to use the fixture data, the {@link JpaFixture} must be injected.
  *
  * <pre>
- * &#64;RunWith(GuiceRunner.class)
+ * &#64;ExtendWith(GuiceExtension.class)
  * &#64;GuiceModules({MyModule.class})
  * class FixtureTest {
  *

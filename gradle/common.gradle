@@ -18,12 +18,6 @@ dependencies {
   }
 }
 
-configurations {
-  // Remove Junit4, only keep Junit5
-  testImplementation.exclude group: 'junit', module: 'junit'
-  testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-}
-
 configurations.all {
   exclude group: 'org.slf4j', module: 'slf4j-log4j12'
   exclude group: 'org.glassfish.jaxb', module: 'jaxb-runtime'
