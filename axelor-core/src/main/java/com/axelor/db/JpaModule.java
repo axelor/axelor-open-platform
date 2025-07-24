@@ -159,7 +159,7 @@ public class JpaModule extends AbstractModule {
 
   private void configureConnection(final AppSettings settings, final Properties properties) {
     if (DBHelper.isDataSourceUsed()) {
-      properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
+      properties.put(Environment.JAKARTA_JTA_DATASOURCE, DBHelper.getDataSourceName());
       return;
     }
 
