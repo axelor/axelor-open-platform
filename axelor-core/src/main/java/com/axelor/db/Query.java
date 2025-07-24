@@ -1021,7 +1021,8 @@ public class Query<T extends Model> {
                 "could not resolve property: "
                     + item
                     + " of: "
-                    + currentMapper.getBeanClass().getName());
+                    + currentMapper.getBeanClass().getName(),
+                (String) null);
           }
 
           if (property.isJson()) {
