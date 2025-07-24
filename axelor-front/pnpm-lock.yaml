@@ -62,8 +62,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4
       echarts:
-        specifier: ^5.5.1
-        version: 5.5.1
+        specifier: ^5.6.0
+        version: 5.6.0
       immer:
         specifier: ^10.1.1
         version: 10.1.1
@@ -134,9 +134,6 @@ importers:
       '@types/color':
         specifier: ^4.2.0
         version: 4.2.0
-      '@types/echarts':
-        specifier: ^4.9.22
-        version: 4.9.22
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
@@ -1441,9 +1438,6 @@ packages:
   '@types/color@4.2.0':
     resolution: {integrity: sha512-6+xrIRImMtGAL2X3qYkd02Mgs+gFGs+WsK0b7VVMaO4mYRISwyTjcqNrO0mNSmYEoq++rSLDB2F5HDNmqfOe+A==}
 
-  '@types/echarts@4.9.22':
-    resolution: {integrity: sha512-7Fo6XdWpoi8jxkwP7BARUOM7riq8bMhmsCtSG8gzUcJmFhLo387tihoBYS/y5j7jl3PENT5RxeWZdN9RiwO7HQ==}
-
   '@types/estree@1.0.7':
     resolution: {integrity: sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ==}
 
@@ -1521,9 +1515,6 @@ packages:
 
   '@types/yargs@17.0.33':
     resolution: {integrity: sha512-WpxBCKWPLr4xSsHgz511rFJAM+wS28w2zEO1QDNY5zM/S8ok70NNfztH0xwhqKyaK0OHCbN98LDAZuy1ctxDkA==}
-
-  '@types/zrender@4.0.6':
-    resolution: {integrity: sha512-1jZ9bJn2BsfmYFPBHtl5o3uV+ILejAtGrDcYSpT4qaVKEI/0YY+arw3XHU04Ebd8Nca3SQ7uNcLaqiL+tTFVMg==}
 
   '@typescript-eslint/eslint-plugin@8.29.0':
     resolution: {integrity: sha512-PAIpk/U7NIS6H7TEtN45SPGLQaHNgB7wSjsQV/8+KYokAb2T/gloOA/Bee2yd4/yKVhPKe5LlaUGhAZk5zmSaQ==}
@@ -2092,8 +2083,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  echarts@5.5.1:
-    resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
+  echarts@5.6.0:
+    resolution: {integrity: sha512-oTbVTsXfKuEhxftHqL5xprgLoc0k7uScAwtryCgWF6hPYFLRwOUHiFmHGCBKP5NPFNkDVopOieyUqYGH8Fa3kA==}
 
   electron-to-chromium@1.5.129:
     resolution: {integrity: sha512-JlXUemX4s0+9f8mLqib/bHH8gOHf5elKS6KeWG3sk3xozb/JTq/RLXIv8OKUWiK4Ah00Wm88EFj5PYkFr4RUPA==}
@@ -3603,8 +3594,8 @@ packages:
   zenscroll@4.0.2:
     resolution: {integrity: sha512-jEA1znR7b4C/NnaycInCU6h/d15ZzCd1jmsruqOKnZP6WXQSMH3W2GL+OXbkruslU4h+Tzuos0HdswzRUk/Vgg==}
 
-  zrender@5.6.0:
-    resolution: {integrity: sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==}
+  zrender@5.6.1:
+    resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
 snapshots:
 
@@ -5189,10 +5180,6 @@ snapshots:
     dependencies:
       '@types/color-convert': 2.0.4
 
-  '@types/echarts@4.9.22':
-    dependencies:
-      '@types/zrender': 4.0.6
-
   '@types/estree@1.0.7': {}
 
   '@types/hast@2.3.10':
@@ -5283,8 +5270,6 @@ snapshots:
   '@types/yargs@17.0.33':
     dependencies:
       '@types/yargs-parser': 21.0.3
-
-  '@types/zrender@4.0.6': {}
 
   '@typescript-eslint/eslint-plugin@8.29.0(@typescript-eslint/parser@8.29.0(eslint@9.15.0)(typescript@5.6.3))(eslint@9.15.0)(typescript@5.6.3)':
     dependencies:
@@ -5894,10 +5879,10 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  echarts@5.5.1:
+  echarts@5.6.0:
     dependencies:
       tslib: 2.3.0
-      zrender: 5.6.0
+      zrender: 5.6.1
 
   electron-to-chromium@1.5.129: {}
 
@@ -7433,6 +7418,6 @@ snapshots:
 
   zenscroll@4.0.2: {}
 
-  zrender@5.6.0:
+  zrender@5.6.1:
     dependencies:
       tslib: 2.3.0

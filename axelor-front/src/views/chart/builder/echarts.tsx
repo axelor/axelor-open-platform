@@ -20,8 +20,8 @@ export function ECharts({
   onClick,
 }: Pick<ChartProps, "data" | "legend" | "onClick"> & {
   type: ChartType;
-  height: number | string;
-  width: number | string;
+  height: number;
+  width: number;
   options: Partial<echarts.EChartsOption>;
   isMerge: boolean;
   lazyUpdate: boolean;
@@ -95,7 +95,7 @@ export function ECharts({
             legend: undefined,
           }),
           color: getColor(type, data.config?.colors, data.config?.shades),
-        } as echarts.EChartOption,
+        } as echarts.EChartsOption,
         !isMerge,
         lazyUpdate,
       );
