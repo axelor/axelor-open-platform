@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="Currency" table="TEST_CURRENCY" sequential="true">
+
+    <string name="code" required="true" unique="true"/>
+    <string name="name" required="true" unique="true"/>
+
+  </entity>
+
+</domain-models>

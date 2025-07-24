@@ -267,7 +267,7 @@ public class QueryTest extends ScriptTest {
     credits.add("");
     credits.add("2.5");
     var results = all(Contact.class).filter(filter).bind("credits", credits).fetch();
-    assertEquals(1, results.size());
+    assertEquals(3, results.size());
   }
 
   @Test

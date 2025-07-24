@@ -86,7 +86,7 @@ public class TestContext extends ScriptTest {
 
     assertNotNull(proxy.getCircles());
     assertTrue(proxy.getCircles().size() > 0);
-    assertFalse(proxy.getCircle(0) instanceof ContextEntity);
+    assertFalse(proxy.getCircles().iterator().next() instanceof ContextEntity);
 
     assertTrue(proxy instanceof ContextEntity);
     assertNotNull(((ContextEntity) proxy).getContextEntity());

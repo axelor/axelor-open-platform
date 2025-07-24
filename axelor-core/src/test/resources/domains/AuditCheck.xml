@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="AuditCheck" table="AUDIT_CHECK" sequential="true">
+    <string name="name"/>
+    <string name="email"/>
+    <string name="empSeq" sequence="seq.emp.id"/>
+
+    <track>
+      <field name="name"/>
+      <field name="email" on="ALWAYS"/>
+      <field name="empSeq" on="CREATE"/>
+      <message if="email?.contains('example.com')" on="ALWAYS">Invalid email?</message>
+    </track>
+
+  </entity>
+
+</domain-models>

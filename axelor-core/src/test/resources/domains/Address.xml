@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="Address" table="CONTACT_ADDRESS">
+
+    <string name="street" required="true" initParam="true"/>
+    <string name="area" initParam="true"/>
+    <string name="city" required="true" initParam="true"/>
+    <string name="zip" required="true"/>
+
+    <many-to-one name="country" ref="Country"/>
+    <many-to-one name="contact" ref="Contact" required="true"/>
+
+  </entity>
+
+</domain-models>

@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="TypeCheck" table="CONTACT_TYPE_CHECK">
+
+    <boolean name="boolValue" default="false"/>
+    <long name="longValue"/>
+    <integer name="intValue" default="0"/>
+    <decimal name="doubleValue"/>
+
+    <boolean name="boolValue2"/>
+    <long name="longValue2"/>
+    <integer name="intValue2"/>
+    <decimal name="doubleValue2"/>
+
+    <decimal name="decimalValue1" precision="20" scale="10"/>
+    <decimal name="decimalValue2"/>
+
+    <datetime name="dateTime1" tz="true"/>
+    <datetime name="dateTime2" tz="true"/>
+
+    <date name="localDate1"/>
+    <date name="localDate2"/>
+
+  </entity>
+
+</domain-models>

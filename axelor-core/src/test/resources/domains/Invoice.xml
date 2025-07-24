@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="Invoice" table="TEST_INVOICE">
+
+    <many-to-one name="move" ref="Move"/>
+    <many-to-one name="oldMove" ref="Move"/>
+    <many-to-one name="rejectMoveLine" ref="MoveLine"/>
+
+    <date name="date" column="invoice_date"/>
+    <date name="dueDate"/>
+
+  </entity>
+
+</domain-models>

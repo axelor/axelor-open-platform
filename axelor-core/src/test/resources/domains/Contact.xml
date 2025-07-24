@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <entity name="Contact" table="CONTACT_CONTACT" repository="none">
+
+    <many-to-one name="title" ref="Title"/>
+
+    <string name="firstName" required="true" initParam="true"/>
+    <string name="lastName" required="true" initParam="true"/>
+
+    <string name="fullName" namecolumn="true" search="firstName,lastName">
+      <![CDATA[
+      fullName = firstName + " " + lastName;
+      if (this.title != null) {
+          return this.title.getName() + " " + fullName;
+      }
+      return fullName;
+      ]]>
+    </string>
+
+    <string name="email"/>
+    <string name="proEmail"/>
+    <string name="phone"/>
+    <string name="lang"/>
+
+    <string name="food" selection="food.selection"/>
+
+    <decimal name="credit"/>
+
+    <date name="dateOfBirth"/>
+
+    <one-to-many name="addresses" ref="Address" mappedBy="contact" orphanRemoval="true"/>
+
+    <many-to-many name="circles" ref="Circle"/>
+
+    <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
+
+    <string name="contactType" selection="contact.type"/>
+
+    <enum name="contactStatus" ref="EnumStatusNumber"/>
+
+    <string name="notes" multiline="true" transient="true"/>
+
+    <string name="uniqueName" unique="true" equalsInclude="true"/>
+    <string name="UUID" unique="true" equalsInclude="true"/>
+
+    <many-to-many name="relatedContacts" ref="Contact"/>
+
+    <string name="attrs" title="Attributes" json="true"/>
+    <string name="anotherAttrs" title="Another Attributes" json="true"/>
+
+  </entity>
+
+</domain-models>

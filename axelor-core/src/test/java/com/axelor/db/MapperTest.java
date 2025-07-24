@@ -19,15 +19,16 @@
 package com.axelor.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.TypeCheck;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,7 +97,7 @@ public class MapperTest extends JpaTest {
 
     assertNotNull(contact.getCircles());
     assertEquals(1, contact.getCircles().size());
-    assertEquals("Business", contact.getCircle(0).getName());
+    assertEquals("Business", contact.getCircles().iterator().next().getName());
   }
 
   private Map<String, Object> getDemoData() {
@@ -145,17 +146,17 @@ public class MapperTest extends JpaTest {
     TypeCheck bean = JPA.edit(TypeCheck.class, values);
 
     assertSame(Boolean.TRUE, bean.getBoolValue());
-    assertTrue(121 == bean.getIntValue());
-    assertTrue(199L == bean.getLongValue());
-    assertTrue(23.12 == bean.getDoubleValue());
+    assertEquals(121, bean.getIntValue());
+    assertEquals(199L, bean.getLongValue());
+    assertEquals(new BigDecimal("23.12"), bean.getDoubleValue());
 
-    assertTrue(false == bean.isBoolValue2());
-    assertTrue(0 == bean.getIntValue2());
-    assertTrue(0L == bean.getLongValue2());
-    assertTrue(0.0 == bean.getDoubleValue2());
+    assertFalse(bean.getBoolValue2());
+    assertEquals(0, bean.getIntValue2());
+    assertEquals(0L, bean.getLongValue2());
+    assertEquals(BigDecimal.ZERO, bean.getDoubleValue2());
 
-    assertEquals("123.0123456789", bean.getDecimalValue1().toString());
-    assertTrue(bean.getDateTime1().getYear() == 2011);
-    assertTrue(bean.getLocalDate1().getYear() == 1111);
+    assertEquals(new BigDecimal("123.0123456789"), bean.getDecimalValue1());
+    assertEquals(2011, bean.getDateTime1().getYear());
+    assertEquals(1111, bean.getLocalDate1().getYear());
   }
 }

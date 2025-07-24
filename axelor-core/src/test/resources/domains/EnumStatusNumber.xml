@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_8.0.xsd">
+
+  <module name="test" package="com.axelor.test.db"/>
+
+  <enum name="EnumStatusNumber" numeric="true">
+    <item name="ONE" value="1"/>
+    <item name="TWO" value="2"/>
+    <item name="THREE" value="3"/>
+  </enum>
+
+</domain-models>
