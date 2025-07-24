@@ -121,7 +121,7 @@ public class AuditListener
       final Property property = mapper.getProperty(names[i]);
       if (property != null && property.isSequence()) {
         state[i] = JpaSequence.nextValue(session, property.getSequenceName());
-        persister.setPropertyValue(entity, i, state[i]);
+        persister.setValue(entity, i, state[i]);
       }
     }
   }
@@ -137,7 +137,7 @@ public class AuditListener
     for (int i = 0; i < names.length; i++) {
       if (names[i].equals(name)) {
         state[i] = value;
-        persister.setPropertyValue(entity, i, value);
+        persister.setValue(entity, i, value);
         break;
       }
     }
