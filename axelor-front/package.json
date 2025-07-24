@@ -47,7 +47,7 @@
     "react-error-boundary": "^6.0.0",
     "react-grid-layout": "1.4.3",
     "react-international-phone": "^4.6.0",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^7.7.1",
     "react-text-mask": "^5.5.0",
     "react-transition-group": "^4.4.5",
     "signature_pad": "^5.0.4",
