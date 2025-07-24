@@ -84,7 +84,7 @@ describe("parser", () => {
 
     for (let expr of cases) {
       let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrowError();
+      expect(() => fn(context)).toThrow();
     }
   });
 
@@ -98,7 +98,7 @@ describe("parser", () => {
 
     for (let expr of cases) {
       let fn = parser.parse(expr);
-      expect(() => fn(context)).toThrowError();
+      expect(() => fn(context)).toThrow();
     }
   });
 
@@ -108,7 +108,7 @@ describe("parser", () => {
       `new Function('x', 'console.log(x)')(1)`,
     ];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
+      expect(() => parser.parse(expr)).toThrow();
     }
   });
 
@@ -118,7 +118,7 @@ describe("parser", () => {
       `new Function('x', 'console.log(x)')(1)`,
     ];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
+      expect(() => parser.parse(expr)).toThrow();
     }
   });
 
@@ -135,13 +135,13 @@ describe("parser", () => {
        r[\`create\${x}\`]('div')`,
     ];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)(context)).toThrowError();
+      expect(() => parser.parse(expr)(context)).toThrow();
     }
   });
 
   it("should support optional chaining (elvis operator)", () => {
     expect(parser.parse("props.style.width")(context)).toEqual(100);
-    expect(() => parser.parse("props.data.id")(context)).toThrowError();
+    expect(() => parser.parse("props.data.id")(context)).toThrow();
     expect(parser.parse("props?.data?.id")(context)).toBeUndefined();
   });
 
@@ -150,17 +150,17 @@ describe("parser", () => {
     const ctx = { x: `javascript: alert(1)`, y: "some?value=1" };
     expect(() =>
       parser.parse(`<a href="javaScript: alert(1)">Test</a>`)(ctx)
-    ).toThrowError();
+    ).toThrow();
     expect(() =>
       parser.parse(`<a href="\\t\\x00javascript: alert(1)">Test</a>`)(ctx)
-    ).toThrowError();
+    ).toThrow();
     expect(() =>
       parser.parse(`<a href="some?value=1">Test</a>`)(ctx)
-    ).not.toThrowError();
-    expect(() => parser.parse(`<a href={x}>Test</a>`)(ctx)).toThrowError();
+    ).not.toThrow();
+    expect(() => parser.parse(`<a href={x}>Test</a>`)(ctx)).toThrow();
     expect(() =>
       parser.parse(`<a href={y}>Test</a> | <a href=""></a>`)(ctx)
-    ).not.toThrowError();
+    ).not.toThrow();
   });
 
   it("should handle expressions with class declaration", () => {
@@ -294,7 +294,7 @@ describe("parser", () => {
   it('should not allow re-declaring "React"', () => {
     const cases = [`function test(React) {}`, `const React = {}`];
     for (let expr of cases) {
-      expect(() => parser.parse(expr)).toThrowError();
+      expect(() => parser.parse(expr)).toThrow();
     }
   });
 });
@@ -315,7 +315,7 @@ describe("safe parser", () => {
     };
     const cases = [`some?.another.value`, `some.nested?.name.toUpperCase()`];
     for (let expr of cases) {
-      expect(() => parser.parseSafe(expr)(ctx)).toThrowError();
+      expect(() => parser.parseSafe(expr)(ctx)).toThrow();
     }
   });
   it("should not transform left hand side of assignment expressions", () => {

@@ -16,8 +16,8 @@ describe("http tests", async () => {
         Accept: "application/json",
       },
     });
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -35,8 +35,8 @@ describe("http tests", async () => {
         some: "value",
       }),
     });
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -57,8 +57,8 @@ describe("http tests", async () => {
         some: "value",
       }),
     });
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -79,8 +79,8 @@ describe("http tests", async () => {
         some: "value",
       }),
     });
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "PATCH",
       headers: {
         Accept: "application/json",
@@ -97,8 +97,8 @@ describe("http tests", async () => {
         Accept: "application/json",
       },
     });
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "DELETE",
       headers: {
         Accept: "application/json",
@@ -107,15 +107,15 @@ describe("http tests", async () => {
   });
   it("should make HEAD request", async () => {
     await http.head("some/resource/1");
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "HEAD",
     });
   });
   it("should make OPTIONS request", async () => {
     await http.options("some/resource/1");
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "OPTIONS",
     });
   });
@@ -141,8 +141,8 @@ describe("http tests", async () => {
 
     await http.get("some/resource/1");
 
-    expect(fetch).toBeCalledTimes(1);
-    expect(fetch).toBeCalledWith("some/resource/1", {
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith("some/resource/1", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -155,6 +155,6 @@ describe("http tests", async () => {
       // do nothing and doesn't call next
     });
     await http.get("some/resource/1");
-    expect(fetch).not.toBeCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 });
