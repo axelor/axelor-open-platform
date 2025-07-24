@@ -29,7 +29,7 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
-versions.flyway = "11.9.1"
+versions.flyway = "11.10.3"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
