@@ -4,8 +4,8 @@ The next generation web frontend of Axelor.
 
 ## Pre-requisites
 
-- node >= v20
-- pnpm >= 9
+- node >= v20.19.4
+- pnpm >= 10
 
 ```bash
 # Nodejs
@@ -14,7 +14,7 @@ $ sudo apt-get install -y nodejs
 
 # Alternatively, `nvm` can be used as a Node Version Manager
 $ curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-$ source ~/.profile
+$ source ~/.nvm/nvm.sh
 $ nvm install 20
 
 # pnpm
