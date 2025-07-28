@@ -6,7 +6,7 @@ import startsWith from "lodash/startsWith";
 import uniqueId from "lodash/uniqueId";
 
 import { toKebabCase } from "@/utils/names";
-import { findViewItem } from "@/utils/schema";
+import { findJsonFieldItem, findViewItem } from "@/utils/schema";
 import { i18n } from "./i18n";
 import { ViewData, viewFields as fetchViewFields } from "./meta";
 import { ActionView, Field, JsonField, Property, Schema } from "./meta.types";
@@ -518,7 +518,6 @@ export function processView(
     const fields = view.fields ?? meta.fields ?? {};
 
     if (item.name) {
-      const field = fields[item.name];
       forEach(fields[item.name], (value, key) => {
         if (!Object.hasOwn(item, key)) {
           item[key] = value;
@@ -530,7 +529,7 @@ export function processView(
       // in case when custom field is used in form
       // but it doesn't exist in custom fields of that model
       // another case : it was deleted/removed
-      if (isCustomField && !field) {
+      if (isCustomField && !findJsonFieldItem(meta, item.name)) {
         item.serverType = "STRING";
         item.readonly = true;
         item.readonlyIf = "true";
