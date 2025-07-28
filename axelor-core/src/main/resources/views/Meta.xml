@@ -170,7 +170,7 @@
   </grid>
 
   <form name="meta-view-custom-form" title="Personalized View" model="com.axelor.meta.db.MetaViewCustom"
-        onSave="com.axelor.meta.web.MetaController:clearCache" width="large">
+        onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large">
     <panel title="Overview">
       <field name="name"/>
       <field name="title"/>

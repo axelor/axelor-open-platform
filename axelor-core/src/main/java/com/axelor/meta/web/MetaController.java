@@ -40,6 +40,7 @@ import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTheme;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaAttrsRepository;
 import com.axelor.meta.db.repo.MetaThemeRepository;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
@@ -131,11 +132,14 @@ public class MetaController {
   }
 
   public void validateView(ActionRequest request, ActionResponse response) {
-    MetaView meta = request.getContext().asType(MetaView.class);
+    String xml =
+        MetaViewCustom.class.isAssignableFrom(request.getBeanClass())
+            ? request.getContext().asType(MetaViewCustom.class).getXml()
+            : request.getContext().asType(MetaView.class).getXml();
     Map<String, Object> data = new HashMap<>();
 
     try {
-      validateXML(meta.getXml());
+      validateXML(xml);
     } catch (Exception e) {
       ActionValidateBuilder validateBuilder =
           new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
