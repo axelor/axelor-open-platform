@@ -72,7 +72,7 @@ function CustomizeDialog({
             (v) => v.name === record.name,
           ) || {
             name: record.name,
-            type: "field",
+            type: record.type,
           };
           if (saveWidths && schemaItem.type === "field") {
             const mainGridItem = gridState?.columns?.find(
@@ -120,7 +120,6 @@ function CustomizeDialog({
               .filter((s) => !_records.find((r) => r.name === s.name))
               .map((record) => ({
                 ...record,
-                type: "field",
                 title: record.label,
               })),
           ]);

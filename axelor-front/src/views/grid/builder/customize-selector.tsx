@@ -80,13 +80,14 @@ export function CustomizeSelectorDialog({
       .map((item) => ({
         id: nextId(),
         name: item.name,
-        type: "field",
+        type: item.type === "button" ? "button" : "field",
         label: item.title || item.autoTitle,
       })) as DataRecord[];
 
     return [
       ...result.records.map((rec) => ({
         ...rec,
+        type: "field",
         label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
       })),
       ...extraFields,
