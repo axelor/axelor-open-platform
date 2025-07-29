@@ -21,5 +21,6 @@ package com.axelor.test;
 import org.junit.runner.RunWith;
 
 /** Abstract class to run Junit4 tests */
+@Deprecated
 @RunWith(GuiceRunner.class)
 public abstract class GuiceTest {}

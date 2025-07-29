@@ -54,6 +54,7 @@ import org.junit.runners.model.InitializationError;
  *
  * </pre>
  */
+@Deprecated
 public class GuiceRunner extends BlockJUnit4ClassRunner {
 
   private final Injector injector;
