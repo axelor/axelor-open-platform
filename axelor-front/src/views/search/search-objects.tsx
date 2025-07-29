@@ -1,6 +1,6 @@
 import { PrimitiveAtom, useAtom } from "jotai";
 import { useCallback, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 
 import { Box, Button, SelectOptionProps } from "@axelor/ui";
 

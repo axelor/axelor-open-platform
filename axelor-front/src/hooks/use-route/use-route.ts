@@ -4,7 +4,7 @@ import {
   generatePath,
   useLocation,
   useNavigate,
-} from "react-router-dom";
+} from "react-router";
 
 export function useRoute() {
   const navigate = useNavigate();

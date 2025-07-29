@@ -3,7 +3,7 @@ import {
   Navigate,
   RouterProvider,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
 
 import { useSession } from "@/hooks/use-session";
 import { Swagger } from "@/routes/swagger";

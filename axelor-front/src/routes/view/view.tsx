@@ -1,6 +1,6 @@
 import { atom, useAtomValue } from "jotai";
 import { useEffect, useCallback, useMemo, useRef } from "react";
-import { generatePath, useParams, useSearchParams } from "react-router-dom";
+import { generatePath, useParams, useSearchParams } from "react-router";
 import { useAtomCallback } from "jotai/utils";
 import { produce } from "immer";
 

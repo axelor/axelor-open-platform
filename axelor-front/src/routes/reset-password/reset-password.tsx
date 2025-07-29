@@ -1,5 +1,5 @@
 import { FormEventHandler, useCallback, useMemo, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router";
 
 import { useAsync } from "@/hooks/use-async";
 import { request } from "@/services/client/client";

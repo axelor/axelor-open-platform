@@ -2,7 +2,7 @@ import { Box } from "@axelor/ui";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { selectAtom, useAtomCallback } from "jotai/utils";
 import { atom, useAtom, useAtomValue } from "jotai";
-import { generatePath, useLocation, useSearchParams } from "react-router-dom";
+import { generatePath, useLocation, useSearchParams } from "react-router";
 import isEqual from "lodash/isEqual";
 import uniqueId from "lodash/uniqueId";
 import cloneDeep from "lodash/cloneDeep";

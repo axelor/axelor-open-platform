@@ -15,7 +15,7 @@ import {
   MaterialIconProps,
 } from "@axelor/ui/icons/material-icon";
 import { useCallback, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 import { dialogs } from "@/components/dialogs";
 import { useAsyncEffect } from "@/hooks/use-async-effect";

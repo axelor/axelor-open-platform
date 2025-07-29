@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Navigate, Link as RouterLink, useLocation } from "react-router-dom";
+import { Navigate, Link as RouterLink, useLocation } from "react-router";
 
 import {
   Alert,
