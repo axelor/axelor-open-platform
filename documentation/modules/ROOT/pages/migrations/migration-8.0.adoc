@@ -31,7 +31,7 @@ NOTE: Please check the https://github.com/axelor/axelor-open-platform/blob/8.0/C
 Dependencies have been upgraded to major versions. Check the {product-version-changelog}[changelog] for a detailed list.
 
 Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
-improvements: `./gradlew wrapper --gradle-version=8.14.2 && ./gradlew wrapper`.
+improvements: `./gradlew wrapper --gradle-version=8.14.3 && ./gradlew wrapper`.
 
 Check Gradle migration to update your builds: {gradle-8}[Upgrading your build from Gradle 8.x to the latest]
 
