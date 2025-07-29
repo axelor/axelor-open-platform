@@ -97,6 +97,16 @@
         "@babel/*",
         "@eslint/*"
       ]
-    }
+    },
+    "ignoredBuiltDependencies": [
+      "@tree-sitter-grammars/tree-sitter-yaml",
+      "core-js",
+      "core-js-pure",
+      "tree-sitter",
+      "tree-sitter-json"
+    ],
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
