@@ -11,10 +11,7 @@ import { MaterialIcon } from "@axelor/ui/icons/material-icon";
 
 import { i18n } from "@/services/client/i18n";
 import { FieldControl, FieldProps, FormAtom } from "../../builder";
-import {
-  META_FILE_MODEL,
-  makeImageURL,
-} from "../image/utils";
+import { META_FILE_MODEL, makeImageURL } from "../image/utils";
 import { useViewDirtyAtom } from "@/view-containers/views/scope";
 import { formDirtyUpdater } from "../../builder/atoms";
 
@@ -43,14 +40,17 @@ export function Binary(
 
   const setValue = useSetAtom(valueAtom);
   const dirtyAtom = useViewDirtyAtom();
-  const parentId = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (o) => o.record.id), [formAtom]),
-  );
-  const parentVersion = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (o) => o.record.version), [formAtom]),
-  );
-  const parentModel = useAtomValue(
-    useMemo(() => selectAtom(formAtom, (o) => o.model), [formAtom]),
+  const record = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(formAtom, (o) => ({
+          id: o.record.id,
+          version: o.record.version,
+          fileName: o.record.fileName,
+          _model: o.model,
+        })),
+      [formAtom],
+    ),
   );
 
   const setUpload = useFormFieldSetter(formAtom, "$upload");
@@ -58,13 +58,7 @@ export function Binary(
   const setFileName = useFormFieldSetter(formAtom, "fileName");
   const setFileType = useFormFieldSetter(formAtom, "fileType");
 
-  const record = {
-    id: parentId,
-    version: parentVersion,
-    _model: parentModel,
-  } as DataRecord;
-
-  const isMetaModel = parentModel === META_FILE_MODEL;
+  const isMetaModel = record._model === META_FILE_MODEL;
 
   function canDownload() {
     if ((record?.id ?? -1) < 0) return false;
