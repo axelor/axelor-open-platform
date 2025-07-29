@@ -8,10 +8,11 @@ import { DialogButton, dialogs } from "@/components/dialogs";
 import { i18n } from "@/services/client/i18n";
 import { Field, GridView } from "@/services/client/meta.types";
 import { DataRecord } from "@/services/client/data.types";
-import { resetView } from "@/services/client/meta";
+import { MetaData, resetView } from "@/services/client/meta";
 import { saveView } from "@/services/client/meta-cache";
 import { session } from "@/services/client/session";
 import { isUserAllowedCustomizeViews } from "@/utils/app-settings.ts";
+import { useViewMeta } from "@/view-containers/views/scope";
 
 import { CustomizeSelectorDialog } from "./customize-selector";
 import { useGridState } from "./utils";
@@ -24,11 +25,13 @@ type ViewHandler = (state?: GridState) => GridView | undefined;
 function CustomizeDialog({
   title = i18n.get("Columns"),
   view,
+  jsonFields,
   canShare,
   onUpdate,
 }: {
   title?: string;
   view: GridView;
+  jsonFields?: MetaData["jsonFields"];
   canShare?: boolean;
   onUpdate?: (fn: ViewHandler) => void;
 }) {
@@ -106,6 +109,7 @@ function CustomizeDialog({
       content: (
         <CustomizeSelectorDialog
           view={view}
+          jsonFields={jsonFields}
           onSelectionChange={(selection: DataRecord[]) => {
             selected = selection;
           }}
@@ -126,7 +130,7 @@ function CustomizeDialog({
         }
       },
     });
-  }, [view]);
+  }, [jsonFields, view]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
@@ -225,6 +229,10 @@ export function useCustomizePopup({
   const canCustomize =
     allowCustomization && view?.name && isUserAllowedCustomizeViews();
 
+  const {
+    meta: { jsonFields },
+  } = useViewMeta();
+
   const showCustomizeDialog = useAtomCallback(
     useCallback(
       async (get, set, { title }: { title?: string }) => {
@@ -290,6 +298,7 @@ export function useCustomizePopup({
           content: (
             <CustomizeDialog
               view={view}
+              jsonFields={jsonFields}
               title={title}
               canShare={canShare}
               onUpdate={(fn) => {
@@ -302,7 +311,7 @@ export function useCustomizePopup({
           onClose: () => {},
         });
       },
-      [view, stateAtom],
+      [view, stateAtom, jsonFields],
     ),
   );
 

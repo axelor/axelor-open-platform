@@ -11,6 +11,7 @@ import { DataStore } from "@/services/client/data-store";
 import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
 import { i18n } from "@/services/client/i18n";
+import { MetaData } from "@/services/client/meta";
 import { nextId } from "@/views/form/builder/utils";
 import { toTitleCase } from "@/utils/names";
 import { unaccent } from "@/utils/sanitize";
@@ -22,9 +23,11 @@ const dataStore = new DataStore("com.axelor.meta.db.MetaField");
 
 export function CustomizeSelectorDialog({
   view,
+  jsonFields,
   onSelectionChange,
 }: {
   view: GridView;
+  jsonFields?: MetaData["jsonFields"];
   onSelectionChange: (records: DataRecord[]) => void;
 }) {
   const [state, setState] = useGridState({
@@ -72,11 +75,21 @@ export function CustomizeSelectorDialog({
       fields: ["label", "name"],
     });
 
+    // Custom fields
+    const customFields = Object.values(jsonFields ?? []).flatMap((fields) =>
+      Object.values(fields)
+        .filter((item) => !item.forceHidden)
+        .map((item) => ({
+          id: nextId(),
+          name: `${item.jsonField}.${item.name}`,
+          type: item.type === "button" ? "button" : "field",
+          label: item.title || item.autoTitle,
+        })),
+    ) as DataRecord[];
+
+    // Extra fields from view
     const extraFields = view.items
-      ?.filter(
-        (item) =>
-          (item.name && item.name.includes(".")) || item.type !== "field",
-      )
+      ?.filter((item) => item.name?.includes(".") || item.type !== "field")
       .map((item) => ({
         id: nextId(),
         name: item.name,
@@ -90,9 +103,13 @@ export function CustomizeSelectorDialog({
         type: "field",
         label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
       })),
-      ...extraFields,
+      ...Array.from(
+        new Map(
+          [...customFields, ...extraFields].map((rec) => [rec.name, rec]),
+        ).values(),
+      ),
     ];
-  }, [view]);
+  }, [view, jsonFields]);
 
   const gridColumns = useMemo(
     () => [
