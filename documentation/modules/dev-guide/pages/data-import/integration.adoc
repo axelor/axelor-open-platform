@@ -29,18 +29,18 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.db.Model;
 import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
+import com.axelor.test.GuiceExtension;
 import com.google.inject.Injector;
 
-@RunWith(GuiceRunner.class)
+@ExtendWith(GuiceExtension.class)
 @GuiceModules(DataModule.class)
 public class CSVTest {
 
