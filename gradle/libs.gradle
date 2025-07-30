@@ -81,9 +81,8 @@ libs.byte_buddy = "net.bytebuddy:byte-buddy:1.17.6"
 
 // Graal JS
 libs.graal_js = [
-  "org.graalvm.js:js:${versions.graal_js}",
-  "org.graalvm.sdk:graal-sdk:${versions.graal_js}",
-  "com.ibm.icu:icu4j:77.1"
+  "org.graalvm.polyglot:polyglot:${versions.graal_js}",
+  "org.graalvm.polyglot:js:${versions.graal_js}",
 ]
 
 // javax libs
