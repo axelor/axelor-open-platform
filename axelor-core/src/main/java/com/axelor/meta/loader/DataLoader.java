@@ -21,6 +21,7 @@ package com.axelor.meta.loader;
 import com.axelor.common.FileUtils;
 import com.axelor.data.csv.CSVImporter;
 import com.axelor.data.xml.XMLImporter;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.MetaScanner;
 import com.google.common.io.Files;
 import com.google.common.io.LineReader;
@@ -54,12 +55,14 @@ class DataLoader extends AbstractLoader {
   @Override
   protected void doLoad(Module module, boolean update) {
 
-    File tmp = extract(module);
-    if (tmp == null) {
-      return;
-    }
+    File tmp = null;
 
     try {
+      tmp = extract(module);
+      if (tmp == null) {
+        return;
+      }
+
       File config = FileUtils.getFile(tmp, getDirName(), INPUT_CONFIG_NAME);
       if (isConfig(config, patCsv)) {
         importCsv(config);
@@ -107,7 +110,7 @@ class DataLoader extends AbstractLoader {
     return DATA_DIR_NAME;
   }
 
-  private File extract(Module module) {
+  private File extract(Module module) throws IOException {
 
     final String dirName = this.getDirName();
     final List<URL> files = MetaScanner.findAll(module.getName(), dirName, "(.+?)");
@@ -116,7 +119,7 @@ class DataLoader extends AbstractLoader {
       return null;
     }
 
-    final File tmp = Files.createTempDir();
+    final File tmp = TempFiles.createTempDir().toFile();
 
     for (URL file : files) {
       String name = file.toString();
@@ -135,15 +138,15 @@ class DataLoader extends AbstractLoader {
   private void copy(InputStream in, File toDir, String name) throws IOException {
     File dst = FileUtils.getFile(toDir, name);
     Files.createParentDirs(dst);
-    OutputStream out = new FileOutputStream(dst);
-    try {
+    try (OutputStream out = new FileOutputStream(dst)) {
       in.transferTo(out);
-    } finally {
-      out.close();
     }
   }
 
   private void clean(File file) {
+    if (file == null) {
+      return;
+    }
     if (file.isDirectory()) {
       for (File child : file.listFiles()) {
         clean(child);
