@@ -109,7 +109,7 @@ libs.hibernate = [
   "org.hibernate.orm:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate.validator:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate.orm:hibernate-jcache:${versions.hibernate}",
-  "com.zaxxer:HikariCP:6.3.2"
+  "com.zaxxer:HikariCP:7.0.0"
 ]
 
 // Caching libs
