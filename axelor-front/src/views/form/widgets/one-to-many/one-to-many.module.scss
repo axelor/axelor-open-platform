@@ -15,9 +15,11 @@ $treeNodePadding: 1.175rem;
     --ax-expandable-form-view-padding: 0 #{$treeNodePadding} 0 0;
   }
 
-  &:not(.hasContent) {
+  &.subTree:not(.hasContent) {
+    // Remove panel border on sub tree grid without rows
     border: none !important;
     & > div > div {
+      // Doesn't apply default panel header bg color on sub tree grid without rows
       background-color: unset;
     }
   }
