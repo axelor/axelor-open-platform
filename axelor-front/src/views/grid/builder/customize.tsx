@@ -48,6 +48,11 @@ function CustomizeDialog({
       .filter((item) => item.hidden !== true) as DataRecord[],
   );
 
+  const currentFieldsInView: string[] = useMemo(
+    () => records.map((r) => r.name) as string[],
+    [records],
+  );
+
   const { selectedRows } = state;
 
   const columns = useMemo(
@@ -110,6 +115,7 @@ function CustomizeDialog({
         <CustomizeSelectorDialog
           view={view}
           jsonFields={jsonFields}
+          excludeFields={currentFieldsInView}
           onSelectionChange={(selection: DataRecord[]) => {
             selected = selection;
           }}
@@ -130,16 +136,17 @@ function CustomizeDialog({
         }
       },
     });
-  }, [jsonFields, view]);
+  }, [currentFieldsInView, jsonFields, view]);
 
   const handleRemove = useCallback(async () => {
     const confirmed = await dialogs.confirm({
       content: i18n.get("Do you really want to delete the selected record(s)?"),
     });
-    confirmed &&
-      setRecords((records) =>
-        records.filter((r, ind) => !selectedRows?.includes(ind)),
+    if (confirmed) {
+      setRecords((_records) =>
+        _records.filter((r, ind) => !selectedRows?.includes(ind))
       );
+    }
   }, [selectedRows]);
 
   useEffect(() => {
@@ -282,9 +289,9 @@ export function useCustomizePopup({
             title: i18n.get("OK"),
             variant: "primary",
             onClick: async (fn) => {
-              const view = getView?.(gridState);
-              if (view) {
-                await saveView(view);
+              const _view = getView?.(gridState);
+              if (_view) {
+                await saveView(_view);
                 fn(true);
                 reload();
               }

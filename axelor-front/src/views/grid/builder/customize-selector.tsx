@@ -25,10 +25,12 @@ export function CustomizeSelectorDialog({
   view,
   jsonFields,
   onSelectionChange,
+  excludeFields,
 }: {
   view: GridView;
   jsonFields?: MetaData["jsonFields"];
   onSelectionChange: (records: DataRecord[]) => void;
+  excludeFields?: string[];
 }) {
   const [state, setState] = useGridState({
     orderBy: [{ name: "label", order: "asc" }],
@@ -61,7 +63,7 @@ export function CustomizeSelectorDialog({
   const { data: records, state: dataState } = useAsync<
     DataRecord[]
   >(async () => {
-    const result = await dataStore.search({
+    let { records: _records } = await dataStore.search({
       filter: {
         _domain:
           "self.metaModel.fullName = :_metaModelName AND self.name NOT IN :_excludedFieldNames",
@@ -74,6 +76,12 @@ export function CustomizeSelectorDialog({
       limit: -1,
       fields: ["label", "name"],
     });
+
+    _records = _records.map((rec) => ({
+      ...rec,
+      type: "field",
+      label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
+    }));
 
     // Custom fields
     const customFields = Object.values(jsonFields ?? []).flatMap((fields) =>
@@ -97,19 +105,19 @@ export function CustomizeSelectorDialog({
         label: item.title || item.autoTitle,
       })) as DataRecord[];
 
-    return [
-      ...result.records.map((rec) => ({
-        ...rec,
-        type: "field",
-        label: i18n.get(rec.label || toTitleCase(rec.name ?? "")),
-      })),
-      ...Array.from(
-        new Map(
-          [...customFields, ...extraFields].map((rec) => [rec.name, rec]),
-        ).values(),
-      ),
-    ];
-  }, [view, jsonFields]);
+    return (
+      [..._records, ...customFields, ...extraFields]
+        // exclude fields already in the grid
+        .filter((value) => (excludeFields || []).indexOf(value.name) < 0)
+        // remove duplicate
+        .reduce((acc, cur) => {
+          if (!acc.find((item: DataRecord) => item.name === cur.name)) {
+            acc.push(cur);
+          }
+          return acc;
+        }, [] as DataRecord[])
+    );
+  }, [view, jsonFields, excludeFields]);
 
   const gridColumns = useMemo(
     () => [
