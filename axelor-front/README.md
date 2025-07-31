@@ -4,22 +4,20 @@ The next generation web frontend of Axelor.
 
 ## Pre-requisites
 
-- node >= v20.19.4
+- node >= v22.17
 - pnpm >= 10
 
 ```bash
-# Nodejs
-$ curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-$ sudo apt-get install -y nodejs
+#Nodejs
 
-# Alternatively, `nvm` can be used as a Node Version Manager
-$ curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-$ source ~/.nvm/nvm.sh
-$ nvm install 20
+# Install Node Version Manager
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+$ source "$HOME/.nvm/nvm.sh"
+# Install and use node version found in .nvmrc of the project
+$ nvm install && nvm use
 
 # pnpm
-$ corepack enable
-$ corepack prepare pnpm@latest-10 --activate
+$ corepack enable pnpm
 ```
 
 See more installation methods:
