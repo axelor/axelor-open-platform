@@ -10,15 +10,9 @@ $treeNodePadding: 1.175rem;
 }
 
 .tree {
-  border-radius: 0;
   --ax-expandable-form-view-padding: 0 0 0 #{$treeNodePadding};
   [dir="rtl"] & {
     --ax-expandable-form-view-padding: 0 #{$treeNodePadding} 0 0;
-  }
-
-  &.hasContent:not(.subTree) {
-    margin-top: 0.125rem;
-    margin-bottom: 0.125rem;
   }
 
   &:not(.hasContent) {
