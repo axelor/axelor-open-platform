@@ -28,7 +28,7 @@ versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
-versions.flyway = "11.10.3"
+versions.flyway = "11.10.5"
 
 // unit testing
 libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
