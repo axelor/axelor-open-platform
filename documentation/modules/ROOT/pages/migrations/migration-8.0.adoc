@@ -356,6 +356,22 @@ Example:
 
 [source,java]
 ----
+// ❌ Old code directly working with the file system.
+
+String filePath = metaFile.getFilePath();
+Path inputPath = MetaFiles.getPath(filePath);
+
+if (Files.exists(inputPath)) {
+  try (InputStream inputStream = Files.newInputStream(inputPath)) {
+    // ...
+  }
+}
+----
+
+[source,java]
+----
+// ✅ New code using `com.axelor.file.store.FileStoreFactory`.
+
 Store store = FileStoreFactory.getStore();
 
 // File path can be either on file system or in object storage.
