@@ -21,7 +21,7 @@ description: |
   
   * Upgrade Apache Tomcat from 9.0.x to 10.1.43
   * Upgrade Junit5 from 5.11.4 to 5.13.4
-  * Upgrade Ldaptive from 2.3.2 to 2.4.1
+  * Upgrade Ldaptive from 2.3.2 to 2.4.2
   * Upgrade jsoup from 1.18.3 to 1.21.1
   * Upgrade pac4j from 5.7.x to 6.2.0, buji-pac4j from 8.1.x to 9.1.0, and jakartaee-pac4j from 7.1.x to 8.0.1
   * Upgrade mysql-connector-j from 8.4.0 to 9.4.0
