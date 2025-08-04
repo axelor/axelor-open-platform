@@ -456,8 +456,11 @@ public class ViewService extends AbstractService {
       if ("field".equals(type) || "button".equals(type)) {
         final Class<?> itemType = "field".equals(type) ? PanelField.class : Button.class;
         final String name = (String) map.get("name");
-        if (StringUtils.notBlank(name)) {
+
+        if (StringUtils.notBlank(name) && !names.contains(name)) {
           names.add(name);
+        } else {
+          continue;
         }
 
         final List<SimpleWidget> existing =

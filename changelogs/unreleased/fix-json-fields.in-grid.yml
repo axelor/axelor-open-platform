@@ -1,0 +1,5 @@
+---
+title: Fix json fields in customized grid
+type: fix
+description: |
+  Fix json fields handling in customized grid leading to duplication issues.
