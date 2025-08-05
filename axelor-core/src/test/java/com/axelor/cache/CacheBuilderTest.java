@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import com.axelor.cache.event.RemovalCause;
 import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.cache.redisson.RedissonUtils;
-import com.axelor.cache.redisson.Version;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +48,7 @@ class CacheBuilderTest {
 
   private static final Duration TTL = Duration.ofMillis(500);
 
-  private static boolean hasRedisHPExpire;
+  private static boolean hasHPExpire;
 
   private static final Logger log = LoggerFactory.getLogger(CacheBuilderTest.class);
 
@@ -65,13 +64,12 @@ class CacheBuilderTest {
   }
 
   private static void init() {
-    // HPEXPIRE command is supported in Redis 7.4+
+    // Check for HPEXPIRE command (Redis 7.4+ and Valkey 9.0+)
     var redisson = RedissonProvider.get();
-    var redisVersion = RedissonUtils.getRedisVersion(redisson);
-    var minRedisVersion = Version.of(7, 4);
-    hasRedisHPExpire = redisVersion.compareTo(minRedisVersion) >= 0;
 
-    if (!hasRedisHPExpire) {
+    hasHPExpire = RedissonUtils.hasHashFieldExpiration(redisson);
+
+    if (!hasHPExpire) {
       log.warn(
           "{} tests that require HPEXPIRE support will be skipped.", CacheType.REDISSON_NATIVE);
     }
@@ -94,7 +92,7 @@ class CacheBuilderTest {
   @EnumSource(value = CacheType.class)
   void testExpireAfterWriteOperations(CacheType cacheType) {
     assumeTrue(
-        hasRedisHPExpire || cacheType != CacheType.REDISSON_NATIVE,
+        hasHPExpire || cacheType != CacheType.REDISSON_NATIVE,
         "redisson-native expireAfterWrite requires Redis HPEXPIRE support");
     doExpireAfterWrite(cacheType::getCacheBuilder);
   }

@@ -18,15 +18,20 @@
  */
 package com.axelor.cache.redisson;
 
+import com.axelor.common.StringUtils;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
+import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.redisnode.RedisMasterSlave;
 import org.redisson.api.redisnode.RedisNode;
 import org.redisson.api.redisnode.RedisNode.InfoSection;
 import org.redisson.api.redisnode.RedisNodes;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.client.protocol.RedisCommand;
 
 /** Redisson utilities */
 public class RedissonUtils {
@@ -104,6 +109,37 @@ public class RedissonUtils {
    */
   public static Optional<Version> getValkeyVersion(RedissonClient redisson) {
     return getVersion(redisson, "valkey_version");
+  }
+
+  public static boolean hasCommand(RedissonClient redisson, String command) {
+    if (StringUtils.isBlank(command) || !command.matches("\\w+")) {
+      return false;
+    }
+
+    var executor = ((Redisson) redisson).getCommandExecutor();
+    var commandInfo = new RedisCommand<>("COMMAND", "INFO");
+
+    try {
+      var result =
+          executor
+              .readRandomAsync(StringCodec.INSTANCE, commandInfo, command)
+              .toCompletableFuture()
+              .get();
+      if (result instanceof List<?> list) {
+        return !list.isEmpty() && list.get(0) != null;
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new RuntimeException(e);
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e.getCause());
+    }
+
+    return false;
+  }
+
+  public static boolean hasHashFieldExpiration(RedissonClient redisson) {
+    return hasCommand(redisson, "HPEXPIRE");
   }
 
   private static Optional<Version> getVersion(RedissonClient redisson, String versionKey) {
