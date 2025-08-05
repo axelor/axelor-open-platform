@@ -18,6 +18,8 @@
  */
 package com.axelor.auth.pac4j;
 
+import static org.pac4j.core.context.WebContextHelper.*;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.pac4j.core.authorization.authorizer.CsrfAuthorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.profile.UserProfile;
+import org.pac4j.core.util.Pac4jConstants;
 
 @Singleton
 public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
@@ -59,7 +62,19 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
       return true;
     }
 
-    return super.isAuthorized(context, sessionStore, profiles);
+    var checkRequest = isPost(context) || isPut(context) || isPatch(context) || isDelete(context);
+    if (checkRequest) {
+      var parameterToken = context.getRequestParameter(getParameterName()).orElse(null);
+      var headerToken = context.getRequestHeader(getHeaderName()).orElse(null);
+      var sessionToken = sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
+      var hasSessionData = sessionToken.isPresent();
+      var token = (String) sessionToken.orElse(Pac4jConstants.EMPTY_STRING);
+      var isGoodToken = hashEquals(token, parameterToken) || hashEquals(token, headerToken);
+      if (!hasSessionData || !isGoodToken) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean isDirectClient(List<UserProfile> profiles) {
