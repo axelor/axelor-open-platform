@@ -448,9 +448,18 @@ public class ViewService extends AbstractService {
     for (Object item : (List<?>) json.get("items")) {
       @SuppressWarnings("unchecked")
       final Map<Object, Object> map = (Map<Object, Object>) item;
-      final String type = (String) map.get("type");
-      if ("field".equals(type) || "button".equals(type)) {
-        final Class<?> itemType = "field".equals(type) ? PanelField.class : Button.class;
+      final String jsonField = (String) map.get("jsonField");
+
+      String type = (String) map.get("type");
+      final boolean isButton = "button".equals(type);
+
+      if (StringUtils.notBlank(jsonField) && !isButton && !"field".equals(type)) {
+        type = "field";
+        map.put("type", type);
+      }
+
+      if (isButton || "field".equals(type)) {
+        final Class<?> itemType = isButton ? Button.class : PanelField.class;
         final String name = (String) map.get("name");
 
         if (StringUtils.notBlank(name) && !names.contains(name)) {
@@ -513,6 +522,29 @@ public class ViewService extends AbstractService {
                 widget.setHidden(true);
                 items.add(widget);
               });
+    }
+
+    // Hide attrs
+    var model = (String) json.get("model");
+    if (StringUtils.notBlank(model)) {
+      var modelClass = findClass(model);
+      var mapper = Mapper.of(modelClass);
+      var property = mapper.getProperty("attrs");
+      if (property != null && property.isJson()) {
+        items.stream()
+            .filter(SimpleWidget.class::isInstance)
+            .map(SimpleWidget.class::cast)
+            .filter(widget -> Objects.equals(widget.getName(), property.getName()))
+            .findAny()
+            .ifPresentOrElse(
+                widget -> widget.setHidden(true),
+                () -> {
+                  var widget = new PanelField();
+                  widget.setName(property.getName());
+                  widget.setHidden(true);
+                  items.add(widget);
+                });
+      }
     }
 
     view.setCustomViewShared((Boolean) json.get("customViewShared"));

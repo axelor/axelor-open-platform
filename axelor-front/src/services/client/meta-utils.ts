@@ -724,7 +724,7 @@ export function processView(
     // include json fields in grid
     let items: Schema[] = [];
     forEach(view.items, (item) => {
-      if (item.jsonFields) {
+      if (item.jsonFields && !item.hidden) {
         forEach(item.jsonFields, (field) => {
           const type = field.type || "text";
           if (
