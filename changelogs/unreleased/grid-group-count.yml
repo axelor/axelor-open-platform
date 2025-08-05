@@ -1,0 +1,5 @@
+---
+title: Fix item count in grid group aggregation
+type: fix
+description: |
+  On a grid with multiple groups, the item count displayed on each level was incorrect.
