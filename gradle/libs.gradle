@@ -24,7 +24,6 @@ versions.junit5 = "5.13.4"
 versions.slf4j = "2.0.17"
 
 versions.tomcat = "10.1.43"
-versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.8"
 
@@ -82,7 +81,7 @@ libs.graal_js = [
   "org.graalvm.polyglot:js:${versions.graal_js}",
 ]
 
-// javax libs
+// jakarta libs
 libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2"
 libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:6.0.0"
 libs.jakarta_mail = [
@@ -90,7 +89,6 @@ libs.jakarta_mail = [
     "jakarta.activation:jakarta.activation-api:2.1.3"
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.1.4"
-libs.jakarta_el = "jakarta.el:jakarta.el-api:5.0.1"
 libs.websocket_api = [
     "jakarta.websocket:jakarta.websocket-api:2.1.1",
     "jakarta.websocket:jakarta.websocket-client-api:2.1.1"
@@ -348,14 +346,15 @@ libs.ST4 = "org.antlr:ST4:4.3.4"
 // gradle plugins
 libs.plugin_license = "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
 
+// jakarta EL API and impl
+libs.tomcat_jakarta_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcat}"
 // embeded tomcat
 libs.tomcat_embed = [
-  "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
-  "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
-  "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcat_embed}",
-  libs.jakarta_el
+  "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat}",
+  "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat}",
+  "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcat}",
+  libs.tomcat_jakarta_el
 ]
-libs.tomcat_embed_el = "org.apache.tomcat.embed:tomcat-embed-el:${versions.tomcat_embed}"
 
 libs.jasypt = "org.jasypt:jasypt:1.9.3"
 
