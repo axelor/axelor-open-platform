@@ -160,6 +160,8 @@ public class Entity implements BaseType<Entity> {
 
   @XmlTransient Entity baseEntity;
 
+  @XmlTransient boolean isInSingleTableHierarchy;
+
   void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
     final Namespace ns = ((DomainModels) parent).getNamespace();
     packageName = ns.getPackageName();
@@ -574,12 +576,20 @@ public class Entity implements BaseType<Entity> {
     return extraImports;
   }
 
+  public boolean isInSingleTableHierarchy() {
+    return isInSingleTableHierarchy;
+  }
+
+  public void setInSingleTableHierarchy(boolean isInSingleTableHierarchy) {
+    this.isInSingleTableHierarchy = isInSingleTableHierarchy;
+  }
+
   private JavaAnnotation $entity() {
     return isTrue(mappedSuperClass) ? null : new JavaAnnotation("jakarta.persistence.Entity");
   }
 
   private JavaAnnotation $table() {
-    if (isBlank(table) || isTrue(mappedSuperClass)) return null;
+    if (isBlank(table) || isTrue(mappedSuperClass) || isInSingleTableHierarchy) return null;
 
     JavaAnnotation annotation =
         new JavaAnnotation("jakarta.persistence.Table").param("name", "{0:s}", table);

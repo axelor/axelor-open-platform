@@ -183,6 +183,18 @@ public class EntityGenerator {
       lookupSuperClasses(entity);
     }
 
+    // Check for single table inheritance
+    if (entity.getSuperClass() != null) {
+      Entity parent = mergedEntities.get(entity.getSimpleSuperClass());
+      while (parent != null && parent.getSuperClass() != null) {
+        parent = mergedEntities.get(parent.getSimpleSuperClass());
+      }
+      if (parent != null
+          && (parent.getStrategy() == null || "SINGLE".equals(parent.getStrategy()))) {
+        entity.setInSingleTableHierarchy(true);
+      }
+    }
+
     Optional.ofNullable(entity.getTrack())
         .ifPresent(
             track ->
