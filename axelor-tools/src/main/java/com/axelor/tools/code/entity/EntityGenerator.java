@@ -183,17 +183,7 @@ public class EntityGenerator {
       lookupSuperClasses(entity);
     }
 
-    // Check for single table inheritance
-    if (entity.getSuperClass() != null) {
-      Entity parent = mergedEntities.get(entity.getSimpleSuperClass());
-      while (parent != null && parent.getSuperClass() != null) {
-        parent = mergedEntities.get(parent.getSimpleSuperClass());
-      }
-      if (parent != null
-          && (parent.getStrategy() == null || "SINGLE".equals(parent.getStrategy()))) {
-        entity.setInSingleTableHierarchy(true);
-      }
-    }
+    checkSingleTableInheritance(entity);
 
     Optional.ofNullable(entity.getTrack())
         .ifPresent(
@@ -222,9 +212,15 @@ public class EntityGenerator {
   }
 
   private void lookupSuperClasses(Entity entity) {
+    Set<String> visitedClasses = new HashSet<>();
     String className = entity.getSimpleSuperClass();
 
     while (className != null) {
+      if (!visitedClasses.add(className)) {
+        log.error("{}: circular inheritance with '{}'", entity.getName(), className);
+        break;
+      }
+
       Entity mergedEntity =
           mergedEntities.computeIfAbsent(
               className,
@@ -252,9 +248,30 @@ public class EntityGenerator {
     }
   }
 
+  private void checkSingleTableInheritance(Entity entity) {
+    if (entity.getSuperClass() == null) {
+      return;
+    }
+
+    Set<String> visitedClasses = new HashSet<>();
+    Entity parent = entity;
+
+    do {
+      parent = mergedEntities.get(parent.getSimpleSuperClass());
+    } while (parent != null
+        && parent.getSuperClass() != null
+        && visitedClasses.add(parent.getName()));
+
+    if (parent != null && (parent.getStrategy() == null || "SINGLE".equals(parent.getStrategy()))) {
+      entity.setInSingleTableHierarchy(true);
+    }
+  }
+
   private boolean fieldExists(String entityName, String fieldName) {
+    Set<String> visitedClasses = new HashSet<>();
     Entity itEntity;
     String itEntityName = entityName;
+
     do {
       itEntity = mergedEntities.get(itEntityName);
       if (itEntity == null) {
@@ -267,7 +284,8 @@ public class EntityGenerator {
       if (itEntity.findField(fieldName) != null) {
         return true;
       }
-    } while ((itEntityName = itEntity.getSimpleSuperClass()) != null);
+    } while ((itEntityName = itEntity.getSimpleSuperClass()) != null
+        && visitedClasses.add(itEntityName));
 
     return false;
   }
