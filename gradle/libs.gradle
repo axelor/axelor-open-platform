@@ -85,8 +85,8 @@ libs.graal_js = [
 libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2"
 libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:6.0.0"
 libs.jakarta_mail = [
-    "jakarta.mail:jakarta.mail-api:2.1.3",
-    "jakarta.activation:jakarta.activation-api:2.1.3"
+    "org.eclipse.angus:jakarta.mail:2.0.3",
+    "org.eclipse.angus:angus-activation:2.0.2"
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.1.4"
 libs.websocket_api = [
@@ -151,7 +151,9 @@ libs.flywaydb = [
 ]
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7"
+libs.eclipselink_moxy = dependencies.create("org.eclipse.persistence:org.eclipse.persistence.moxy:4.0.7") {
+    exclude group: 'org.eclipse.angus'
+}
 
 // groovy
 libs.groovy = [
@@ -170,6 +172,7 @@ def resteasy_module = { name ->
         exclude module: "jackson-module-jakarta-xmlbind-annotations"
         exclude module: "jackson-jakarta-rs-json-provider"
         exclude module: "mail", group: "javax.mail"
+        exclude module: "angus-activation"
         exclude module: "jandex", group: "org.jboss"
     }
 }
@@ -180,9 +183,11 @@ libs.resteasy = [
     resteasy_module("resteasy-client"),
     dependencies.create("org.jboss.resteasy:resteasy-jaxb-provider:${versions.resteasy}") {
       exclude module: "jandex", group: "org.jboss"
+      exclude module: "angus-activation"
     },
     dependencies.create("org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}") {
       exclude module: "jandex", group: "org.jboss"
+      exclude module: "angus-activation"
     },
 ]
 
@@ -193,6 +198,7 @@ libs.resteasy_guice = dependencies.create("dev.resteasy.guice:resteasy-guice:1.0
     exclude module: "jackson-module-jakarta-xmlbind-annotations"
     exclude module: "jackson-jakarta-rs-json-provider"
     exclude module: "mail", group: "javax.mail"
+    exclude module: "angus-activation"
     exclude module: "jandex", group: "org.jboss"
 }
 libs.resteasy_client = resteasy_module("resteasy-client")
