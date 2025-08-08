@@ -1,3 +1,39 @@
+## 7.4.4 (2025-08-08)
+
+#### Deprecate
+
+* Deprecated Junit4 support
+
+  <details>
+  
+  JUnit 4 is no longer actively maintained, and the last maintenance release was JUnit 4.13.2 in February 2021. Support 
+  for JUnit Jupiter (JUnit 5) was introduced in v6.0. Junit4 support will be dropped in the next major version. Migrate 
+  your Junit tests using Junit5.
+  
+  </details>
+
+#### Fix
+
+* Fix show download option in binary widget
+* Fix tree-grid border styles
+* Phone formats updates
+
+  <details>
+  
+  Update French Guiana, French Polynesia, Guadeloupe, Martinique, Mayotte and La Réunion phone formats.
+  Add missing Saint Pierre & Miquelon and Wallis & Futuna support.
+  
+  </details>
+
+* Fix json fields in customized grid
+
+  <details>
+  
+  Fix json fields handling in customized grid leading to duplication issues.
+  
+  </details>
+
+
 ## 7.4.3 (2025-07-17)
 
 #### Feature
