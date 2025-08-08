@@ -225,18 +225,21 @@ public class EntityGenerator {
           mergedEntities.computeIfAbsent(
               className,
               key ->
-                  lookup.stream()
-                      .flatMap(
-                          gen -> {
-                            if (gen.definedEntities.contains(key) && gen.entities.isEmpty()) {
-                              try {
-                                gen.processAll(false);
-                              } catch (IOException e) {
-                                throw new UncheckedIOException(e);
-                              }
-                            }
-                            return gen.entities.get(key).stream();
-                          })
+                  Stream.concat(
+                          entities.get(key).stream(),
+                          lookup.stream()
+                              .flatMap(
+                                  gen -> {
+                                    if (gen.definedEntities.contains(key)
+                                        && gen.entities.isEmpty()) {
+                                      try {
+                                        gen.processAll(false);
+                                      } catch (IOException e) {
+                                        throw new UncheckedIOException(e);
+                                      }
+                                    }
+                                    return gen.entities.get(key).stream();
+                                  }))
                       .reduce(
                           (entity1, entity2) -> {
                             entity1.merge(entity2);
