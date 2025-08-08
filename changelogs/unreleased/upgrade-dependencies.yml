@@ -19,7 +19,7 @@ description: |
   you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
   Otherwise, your font configuration file will fail validation and will be ignored.
   
-  * Upgrade Apache Tomcat from 9.0.x to 10.1.43
+  * Upgrade Apache Tomcat from 9.0.x to 10.1.44
   * Upgrade Junit5 from 5.11.4 to 5.13.4
   * Upgrade Ldaptive from 2.3.2 to 2.4.2
   * Upgrade jsoup from 1.18.3 to 1.21.1
