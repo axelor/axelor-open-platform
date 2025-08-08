@@ -3,11 +3,11 @@ title: Upgrade backend dependencies
 type: change
 description: |
   Here is the list of backend dependencies upgraded :
-  
+
   * Upgrade to Guice 7 (Jakarta EE 9)
   * Upgrade Hibernate from 5.6.x to 6.6.24.Final
   * Upgrade BIRT from 4.4.2 to 4.20.0
-  
+
   Many of your reports will likely have rendering changes or may even be broken due to numerous emitter improvements/changes in BIRT.
 
   `IPDFRenderOption.PDF_HYPHENATION` is renamed to `IPDFRenderOption.PDF_WORDBREAK`, but enabled by default.
@@ -18,7 +18,7 @@ description: |
   Also, the XML parser in BIRT has become more strict. Most notably, in your `fontsConfig.xml`,
   you need to omit the DOCTYPE declaration `<!DOCTYPE font>` to avoid validation against a non-existent DTD.
   Otherwise, your font configuration file will fail validation and will be ignored.
-  
+
   * Upgrade Apache Tomcat from 9.0.x to 10.1.44
   * Upgrade Junit5 from 5.11.4 to 5.13.4
   * Upgrade Ldaptive from 2.3.2 to 2.4.2
@@ -52,4 +52,5 @@ description: |
   * Upgrade to Jakarta XML Binding 4.0
   * Upgrade to Jakarta WebSocket 2.0
   * Upgrade to Jakarta Mail 2.1 and Jakarta Activation 2.1
+  * Upgrade Hibernate Validator from 6.2.5.Final to 8.0.3.Final
   * Upgrade Infinispan from 13.0.22 to 15.2.5.Final
