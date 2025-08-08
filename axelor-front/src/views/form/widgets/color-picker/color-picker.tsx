@@ -108,36 +108,34 @@ export function ColorPicker(props: FieldProps<string>) {
           </Button>
         )}
       </Box>
-      {showColorPicker && (
-        <Popper
-          open
-          shadow
-          rounded
-          target={element as HTMLElement}
-          placement={lite ? "bottom" : "bottom-start"}
-        >
-          <ClickAwayListener onClickAway={handleCloseColorPicker}>
-            <Box>
-              {lite ? (
-                <Block
-                  colors={colorPalette}
-                  color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
-                  onChange={handleOnChange}
-                />
-              ) : (
-                <Chrome
-                  inputType={"hexa" as any}
-                  showAlpha={colorPickerShowAlpha}
-                  showEyeDropper={false}
-                  showColorPreview={false}
-                  color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
-                  onChange={handleOnChange}
-                />
-              )}
-            </Box>
-          </ClickAwayListener>
-        </Popper>
-      )}
+      <Popper
+        open={showColorPicker}
+        shadow
+        rounded
+        target={element as HTMLElement}
+        placement={lite ? "bottom" : "bottom-start"}
+      >
+        <ClickAwayListener onClickAway={handleCloseColorPicker}>
+          <Box>
+            {lite ? (
+              <Block
+                colors={colorPalette}
+                color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
+                onChange={handleOnChange}
+              />
+            ) : (
+              <Chrome
+                inputType={"hexa" as any}
+                showAlpha={colorPickerShowAlpha}
+                showEyeDropper={false}
+                showColorPreview={false}
+                color={color?.hsva ?? (isValueHex ? value : DEFAULT_COLOR)}
+                onChange={handleOnChange}
+              />
+            )}
+          </Box>
+        </ClickAwayListener>
+      </Popper>
     </FieldControl>
   );
 }

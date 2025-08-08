@@ -54,7 +54,7 @@ const cssPropertyExamples: Record<string, string> = {
   "box-shadow": "ex: 0 0.5rem 1rem rgba(0, 0, 0, 0.15)",
   "row-gap": "ex: 1rem, 16px",
   "column-gap": "ex: 1rem, 16px",
-  "border": "ex: 1px solid #eee",
+  border: "ex: 1px solid #eee",
   "border-width": "ex: 1px, 0.625rem",
   "border-style": "ex: solid, dashed, dotted",
   "border-radius": "ex: 6px, 0.375rem, 15%",
@@ -349,32 +349,30 @@ function ColorInput({
         }
         onChange={onChange}
       />
-      {show && (
-        <Popper
-          open
-          shadow
-          rounded
-          target={target as HTMLElement}
-          placement={"bottom-start"}
-        >
-          <ClickAwayListener onClickAway={handleClose}>
-            <Box>
-              <Chrome
-                inputType={"hexa" as any}
-                showAlpha={true}
-                showEyeDropper={false}
-                showColorPreview={false}
-                color={color}
-                onChange={(e) =>
-                  onChange({
-                    target: { value: e.hex },
-                  } as ChangeEvent<HTMLInputElement>)
-                }
-              />
-            </Box>
-          </ClickAwayListener>
-        </Popper>
-      )}
+      <Popper
+        open={show}
+        shadow
+        rounded
+        target={target as HTMLElement}
+        placement={"bottom-start"}
+      >
+        <ClickAwayListener onClickAway={handleClose}>
+          <Box>
+            <Chrome
+              inputType={"hexa" as any}
+              showAlpha={true}
+              showEyeDropper={false}
+              showColorPreview={false}
+              color={color}
+              onChange={(e) =>
+                onChange({
+                  target: { value: e.hex },
+                } as ChangeEvent<HTMLInputElement>)
+              }
+            />
+          </Box>
+        </ClickAwayListener>
+      </Popper>
     </>
   );
 }
