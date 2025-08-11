@@ -1,0 +1,12 @@
+---
+title: Add checkDuplicateClasses gradle task
+type: feature
+description: |
+  Added a new `checkDuplicateClasses` gradle task to detect conflicting dependencies in application projects.
+  
+  The task analyzes runtime classpath dependencies and identifies duplicate classes between different
+  jar files, helping to prevent classpath conflicts that can cause runtime issues.
+
+  Key features:
+  - Automatically excludes Axelor modules (which can have duplicate domain classes by design)
+  - Supports exclude patterns for specific libraries

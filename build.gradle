@@ -60,6 +60,7 @@ configure(subprojects - project(':axelor-front')) {
   apply plugin: com.axelor.gradle.support.EclipseSupport
   apply plugin: com.axelor.gradle.support.LicenseSupport
   apply plugin: com.axelor.gradle.support.PublishSupport
+  apply plugin: com.axelor.gradle.support.DuplicatedClassSupport
   apply plugin: 'com.adarshr.test-logger'
   apply plugin: 'signing'
 

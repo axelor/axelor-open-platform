@@ -247,6 +247,37 @@ To generate the `CHANGELOG.md` with unreleased entries, run the following Gradle
 
 NOTE: `--preview` argument can also be used to preview the generated changelog without deleting/updating files.
 
+=== Check duplicate classes plugin
+
+Duplicate classes in classpath can cause unexpected behavior at runtime. Generally, they come from transitive
+dependencies, and most of the time we want to exclude them. The plugin checks whether different artifacts in a
+configuration provide the same classes.
+
+The plugin is automatically applied by the `AxelorPlugin`. If the module isn't an Axelor module, plugin can be
+manually applied : `apply plugin: com.axelor.gradle.support.ChangelogSupport`
+
+Plugin can be configured with the following properties :
+
+[source,gradle]
+----
+checkDuplicateClasses {
+  ignoreFailures = false
+  excludes = ["jakarta-action-api.*"]
+  classpathToScan = configurations.runtimeClasspath
+}
+----
+
+[cols="2,6,2"]
+|===
+| Property | Description | Default
+
+| `ignoreFailures` | Fails the build if any duplicate classes are found or not | false
+| `excludes` | List of excluded jar name (regex) | []
+| `classpathToScan` | The classpath to scan |  runtimeClasspath
+|===
+
+The check is performed by the task `checkForDuplicateClasses`. In output, it will print all libraries in conflicts.
+
 == Module
 
 The application project generally doesn't provide any implementation logic.
