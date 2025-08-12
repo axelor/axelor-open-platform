@@ -85,7 +85,7 @@ libs.graal_js = [
 libs.jakarta_jaxb = "jakarta.xml.bind:jakarta.xml.bind-api:4.0.2"
 libs.jakarta_servlet = "jakarta.servlet:jakarta.servlet-api:6.0.0"
 libs.jakarta_mail = [
-    "org.eclipse.angus:jakarta.mail:2.0.3",
+    "org.eclipse.angus:jakarta.mail:2.0.4",
     "org.eclipse.angus:angus-activation:2.0.2"
 ]
 libs.greenmail = "com.icegreen:greenmail-junit5:2.1.5"
@@ -172,6 +172,7 @@ def resteasy_module = { name ->
         exclude module: "jackson-module-jakarta-xmlbind-annotations"
         exclude module: "jackson-jakarta-rs-json-provider"
         exclude module: "mail", group: "javax.mail"
+        exclude module: "angus-mail"
         exclude module: "angus-activation"
         exclude module: "jandex", group: "org.jboss"
     }
