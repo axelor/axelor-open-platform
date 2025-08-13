@@ -225,6 +225,37 @@ SELECT e FROM MyEntity e WHERE e.id = 123
 SELECT e FROM MyEntity e WHERE e.id = :entityId
 ----
 
+==== Stricter parameter type binding
+
+A consequence of strict type binding is that the query parser will not assign different parameter types to the same named parameter.
+For example, using a single named parameter for both `IS NULL` check and an `IN` clause causes a type mismatch and falls back to column type:
+
+.Before
+[source,jpql]
+----
+SELECT e FROM MyEntity e WHERE :names IS NULL OR e.name IN :names
+----
+[source,java]
+----
+var names = List.of("a", "b");
+// IllegalArgumentException since Hibernate 6
+// Trying to coerce names to String instead of Collection<String>
+query.setParameter("names", ObjectUtils.isEmpty(names) ? null : names);
+----
+
+.After
+[source,jpql]
+----
+SELECT e FROM MyEntity e WHERE :isNamesEmpty = TRUE OR e.name IN :names
+----
+[source,java]
+----
+var names = List.of("a", "b");
+// Use separate parameters
+query.setParameter("isNamesEmpty", ObjectUtils.isEmpty(names));
+query.setParameter("names", names);
+----
+
 === Other Notable Changes
 
 ==== Hibernate 6 supports automatic coercion of single-value parameters

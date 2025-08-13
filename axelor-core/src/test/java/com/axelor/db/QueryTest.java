@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptTest;
@@ -328,6 +329,41 @@ public class QueryTest extends ScriptTest {
     // Hibernate 5 doesn't fail because of null in collection.
     // Hibernate 6 throws AssertionError because of null in collection when caching is enabled.
     assertThrows(AssertionError.class, query::getResultList);
+  }
+
+  /** Hibernate 6's stricter parser assigns a single parameter type per parameter. */
+  @Test
+  void testQueryAmbiguousParameter() {
+    // firstNames is parsed as String instead of Collection<String>
+    var qlString =
+        """
+        SELECT self FROM Contact self
+        WHERE :firstNames IS NULL OR self.firstName IN :firstNames
+        """;
+    var query = JPA.em().createQuery(qlString, Contact.class);
+    var firstNames = List.of("Jane", "John");
+    var firstNamesParam = ObjectUtils.isEmpty(firstNames) ? null : firstNames;
+
+    assertThrows(
+        IllegalArgumentException.class, () -> query.setParameter("firstNames", firstNamesParam));
+  }
+
+  @Test
+  void testQueryNonAmbiguousParameter() {
+    var qlString =
+        """
+        SELECT self FROM Contact self
+        WHERE :isFirstNamesEmpty = TRUE OR self.firstName IN :firstNames
+        """;
+    var query = JPA.em().createQuery(qlString, Contact.class);
+    var firstNames = List.of("Jane", "John");
+    var isFirstNamesEmpty = ObjectUtils.isEmpty(firstNames);
+
+    query.setParameter("isFirstNamesEmpty", isFirstNamesEmpty);
+    query.setParameter("firstNames", firstNames);
+
+    var results = query.getResultList();
+    assertEquals(1, results.size());
   }
 
   @Test
