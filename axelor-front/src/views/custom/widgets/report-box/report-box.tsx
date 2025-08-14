@@ -1,4 +1,4 @@
-import React, { LegacyRef, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Icon } from "@/components/icon";
 import { legacyClassNames } from "@/styles/legacy";
 import { i18n } from "@/services/client/i18n";
@@ -20,7 +20,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
   const tagCssProp = props["tag-css"];
   const { icon, label } = props;
   const context = useTemplateContext();
-  const ref = React.useRef<HTMLDivElement>();
+  const ref = React.useRef<HTMLDivElement>(null);
 
   const { value, percent, tag, tagCss, up } = useMemo(
     () => ({
@@ -61,7 +61,7 @@ export const ReportBox = React.forwardRef(function ReportBox(
 
   return (
     <div
-      ref={ref as LegacyRef<HTMLDivElement>}
+      ref={ref}
       className={legacyClassNames("report-data", "hidden")}
     >
       {icon && (

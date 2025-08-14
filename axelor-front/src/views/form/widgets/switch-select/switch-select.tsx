@@ -23,7 +23,7 @@ export function SwitchSelect(
   const { schema, readonly, widgetAtom } = props;
   const { labels = true, direction = "horizontal" } = schema;
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [highlightStyles, setHighlightStyles] =
     useState<HighlightStyle | null>();
 

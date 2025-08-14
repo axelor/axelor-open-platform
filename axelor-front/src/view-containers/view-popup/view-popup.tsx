@@ -336,7 +336,7 @@ function useClose(
     [handler.readyAtom],
   );
   const ready = useAtomValue(readyAtom);
-  const originalRef = useRef<DataRecord>();
+  const originalRef = useRef<DataRecord>(null);
   const getHandlerState = handler.getState;
 
   useEffect(() => {
@@ -346,7 +346,7 @@ function useClose(
     }
   }, [getHandlerState, ready]);
 
-  const parentId = useRef<string | null>(null);
+  const parentId = useRef<string>(null);
 
   useEffect(() => {
     if (!parentId.current) {

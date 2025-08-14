@@ -20,7 +20,7 @@ import { useMessagePopup } from "./message-form";
 import styles from "./message-input.module.scss";
 
 function TextareaAutoSizeInput(props: any) {
-  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const { value } = props;
 
   useLayoutEffect(() => {

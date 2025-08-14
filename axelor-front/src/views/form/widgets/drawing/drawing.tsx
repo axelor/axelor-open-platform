@@ -24,7 +24,7 @@ export function Drawing(
   const { schema, readonly, formAtom, widgetAtom, valueAtom, invalid } = props;
   const { type, widgetAttrs, serverType, $json } = schema;
   const isBinary = (serverType || type || "").toLowerCase() === "binary";
-  const signaturePadRef = useRef<SignaturePad | null>(null);
+  const signaturePadRef = useRef<SignaturePad>(null);
   const [value, setValue] = useAtom(valueAtom);
   const {
     attrs: { title, required },

@@ -63,7 +63,7 @@ export function Tags(props: FieldProps<any>) {
   );
 
   const selectRef = useRef<SelectRefHandler>(null);
-  const valueRef = useRef<DataRecord[]>();
+  const valueRef = useRef<DataRecord[]>([]);
   const { attrs } = useAtomValue(widgetAtom);
   const { title, focus, required, domain } = attrs;
 

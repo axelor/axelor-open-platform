@@ -105,7 +105,7 @@ const getLabels: () => Record<GridLabel, string> = () =>
   });
 
 export type GridHandler = {
-  form?: RefObject<GridFormHandler>;
+  form?: RefObject<GridFormHandler | null>;
   onAdd?: () => void;
   onSave?: () => void;
   commit?: () => void;

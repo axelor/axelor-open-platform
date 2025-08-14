@@ -254,7 +254,7 @@ export function ManyToOne(
 
   const onRefSelectRefresh = useCallback(() => {
     if (["ref-select", "ref-link"].includes(toKebabCase(schema.widget))) {
-      valueRef.current = undefined;
+      valueRef.current = null;
       ensureRelatedValues(undefined, true);
     }
   }, [schema.widget, valueRef, ensureRelatedValues]);

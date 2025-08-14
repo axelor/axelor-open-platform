@@ -101,7 +101,7 @@ export function useEnsureRelated({
 }) {
   const { name = "" } = field;
 
-  const valueRef = useRef<DataRecord>();
+  const valueRef = useRef<DataRecord>(null);
   const mountRef = useRef(false);
 
   useEffect(() => {

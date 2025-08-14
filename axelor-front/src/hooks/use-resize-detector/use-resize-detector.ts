@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export function useResizeDetector() {
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ height: number; width: number }>();
 
   useEffect(() => {

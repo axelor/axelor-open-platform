@@ -64,9 +64,9 @@ export function DateComponent({
 }) {
   const { focus } = attrs || {};
   const { uid, placeholder } = schema;
-  const pickerRef = useRef<any>();
+  const pickerRef = useRef<any>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const valueRef = useRef<string | null>();
+  const valueRef = useRef<string | null>(undefined);
   const classNames = useClassNames();
   const [open, setOpen] = useState(false);
   const [changed, setChanged] = useState(false);

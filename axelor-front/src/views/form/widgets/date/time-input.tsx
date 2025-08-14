@@ -35,7 +35,7 @@ function TimeSelect({
   const [popperContent, setPopperContent] = useState<HTMLDivElement | null>(
     null,
   );
-  const boxRef = useRef<HTMLDivElement | null>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
 
   const options = useMemo(
     () =>

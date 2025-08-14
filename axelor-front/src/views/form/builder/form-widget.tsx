@@ -313,8 +313,8 @@ function useExpressions({
   );
 
   const modeRef = useRef({ readonly, required });
-  const recordRef = useRef<DataRecord>();
-  const contextRef = useRef<DataContext>();
+  const recordRef = useRef<DataRecord>(null);
+  const contextRef = useRef<DataContext>({});
 
   const createContext = useCallback(
     (record: DataRecord) => {

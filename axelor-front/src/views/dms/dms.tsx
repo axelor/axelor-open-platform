@@ -126,8 +126,8 @@ export function Dms(props: ViewProps<GridView>) {
   const [detailsId, setDetailsId] = useState<TreeRecord["id"]>(null);
   const [showDetails, setDetailsPopup] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // tree state
   const [treeRecords, setTreeRecords] = useState<TreeRecord[]>([root]);

@@ -1,6 +1,7 @@
 import {
   ForwardedRef,
   forwardRef,
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -43,10 +44,10 @@ export interface SelectProps<Type, Multiple extends boolean>
 
 const EMPTY: any[] = [];
 
-export const Select = forwardRef(function Select<
-  Type,
-  Multiple extends boolean,
->(props: SelectProps<Type, Multiple>, ref: ForwardedRef<HTMLDivElement>) {
+function SelectInner<Type, Multiple extends boolean>(
+  props: SelectProps<Type, Multiple>,
+  ref: ForwardedRef<HTMLDivElement>,
+): ReactElement | null {
   const {
     autoFocus,
     readOnly,
@@ -71,7 +72,7 @@ export const Select = forwardRef(function Select<
 
   const [ready, setReady] = useState(!fetchOptions);
   const selectRef = useRefs(ref);
-  const loadTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const loadTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const loadOptions = useCallback(
     (inputValue: string) => {
@@ -242,7 +243,11 @@ export const Select = forwardRef(function Select<
       })}
     />
   );
-}) as unknown as <Type, Multiple extends boolean>(
-  props: SelectProps<Type, Multiple>,
-  ref: ForwardedRef<HTMLDivElement>,
-) => React.ReactNode;
+}
+
+export const Select = forwardRef(SelectInner) as <
+  Type,
+  Multiple extends boolean = false,
+>(
+  props: SelectProps<Type, Multiple> & { ref?: ForwardedRef<HTMLDivElement> },
+) => ReactElement | null;

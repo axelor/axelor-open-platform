@@ -729,7 +729,7 @@ function KanbanCard({
   const { template: templateString } = view;
   const divRef = useRef<any>(null);
   const className = useCardClassName(view, record as DataRecord);
-  const timer = useRef<any>();
+  const timer = useRef<NodeJS.Timeout>(null);
   const [popover, setPopover] = useState(false);
   const [popoverData, setPopoverData] = useState<{ title: ""; body: "" }>({
     title: "",
@@ -760,7 +760,9 @@ function KanbanCard({
 
   const hidePopover = useCallback(function hidePopover() {
     setPopover(false);
-    clearTimeout(timer.current);
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
   }, []);
 
   const hasPopover = (templateString || "").includes("popover");

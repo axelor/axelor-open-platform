@@ -37,7 +37,7 @@ export function PanelTabs(props: WidgetProps) {
   >({});
 
   const shouldRefocus = useRef<boolean | null>(true);
-  const lastActiveTab = useRef<string | null>(null);
+  const lastActiveTab = useRef<string>(null);
 
   const hidden = useAtomValue(widgetAtom).attrs?.hidden;
   const parentId = useAtomValue(

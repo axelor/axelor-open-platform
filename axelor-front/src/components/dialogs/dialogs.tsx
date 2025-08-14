@@ -312,7 +312,7 @@ export function ModalDialog(props: DialogOptions) {
     }));
   }, [close, setHandler]);
 
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const initialFocus = useCallback(() => contentRef.current!, []);
 

@@ -164,7 +164,7 @@ function RefItemInner(
     [_schema, related, targetName],
   );
 
-  const valRef = useRef<DataRecord | null>();
+  const valRef = useRef<DataRecord>(null);
 
   const refAtom: ValueAtom<DataRecord> = useMemo(() => {
     return atom(
@@ -178,7 +178,7 @@ function RefItemInner(
       },
       (get, set, value, fireOnChange, markDirty) => {
         const id = value && value.id && value.id > 0 ? value.id : null;
-        valRef.current = value;
+        valRef.current = value ?? null;
         set(relatedValueAtom, null);
         set(relatedValueAtom, id);
         // // trigger onchange

@@ -28,7 +28,7 @@ export default function DrawingCanvas(props: SignaturePadProps) {
 
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const signaturePadRef = useRef<SignaturePad | null>(null);
+  const signaturePadRef = useRef<SignaturePad>(null);
 
   const handleClear = useCallback(() => {
     signaturePadRef.current?.clear();

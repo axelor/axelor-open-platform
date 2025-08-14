@@ -12,7 +12,7 @@ import { FieldProps } from "../../builder";
 export function Tag(props: FieldProps<DataRecord>) {
   const { schema, valueAtom } = props;
   const [value, setValue] = useAtom(valueAtom);
-  const selectRef = useRef<HTMLDivElement>();
+  const selectRef = useRef<HTMLDivElement>(null);
 
   const optionMatch = useCallback(() => true, []);
 

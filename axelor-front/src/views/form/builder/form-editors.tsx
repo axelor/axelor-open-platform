@@ -976,7 +976,7 @@ const RecordEditor = memo(function RecordEditor({
   );
 
   const [loaded, setLoaded] = useState<DataRecord>({});
-  const checkInvalidRef = useRef<() => void>();
+  const checkInvalidRef = useRef<() => void>(null);
 
   const editorAtom = useMemo(() => {
     const getRecord = (_value: DataRecord) => {
@@ -1102,7 +1102,7 @@ const RecordEditor = memo(function RecordEditor({
 
   useAsyncEffect(async () => load(), [load]);
 
-  const mountRef = useRef<boolean>();
+  const mountRef = useRef<boolean>(false);
 
   useEffect(() => {
     mountRef.current = true;
@@ -1142,7 +1142,7 @@ const RecordEditor = memo(function RecordEditor({
 
   checkInvalidRef.current = checkInvalid;
 
-  const idRef = useRef<number>();
+  const idRef = useRef<number>(null);
   const id = useAtomValue(
     useMemo(() => selectAtom(valueAtom, (x) => x.id ?? 0), [valueAtom]),
   );
@@ -1293,7 +1293,7 @@ function JsonEditorInner({
   const jsonModel = schema.jsonModel;
   const jsonFields: Record<string, JsonField> = schema.jsonFields ?? {};
   const jsonNameField = Object.values(jsonFields).find((x) => x.nameColumn);
-  const jsonValueRef = useRef<DataRecord>();
+  const jsonValueRef = useRef<DataRecord>(null);
 
   const jsonAtom = useMemo(() => {
     return atom(

@@ -284,7 +284,7 @@ export const Form = forwardRef<GridFormHandler, GridFormRendererProps>(
     const record = useMemo(() => processGridRecord(_record), [_record]);
     const containerRef = useRef<HTMLDivElement>(null);
     const recordRef = useRef<DataRecord>({});
-    const parentRef = useRef<Element>();
+    const parentRef = useRef<Element>(null);
     const meta = useMemo(
       () => ({
         view,

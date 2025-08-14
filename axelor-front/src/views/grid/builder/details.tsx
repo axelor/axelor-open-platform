@@ -72,8 +72,8 @@ export function Details({
     recordHandler,
   });
 
-  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
-  const resetStatesByName = useRef<FormState["statesByName"] | null>(null);
+  const widgetHandler = useRef<FormWidgetsHandler>(null);
+  const resetStatesByName = useRef<FormState["statesByName"]>(null);
   const isSaveOnLoad = useRef(false);
   const dirtyAtom = useViewDirtyAtom();
 

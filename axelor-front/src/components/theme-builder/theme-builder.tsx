@@ -41,7 +41,7 @@ function ThemeBuilderInner(
   const [themeDiv, setThemeDiv] = useState<HTMLDivElement | null>(null);
   const [invalidProps, setInvalidProps] = useState<Record<string, boolean>>({});
   const [theme, setTheme] = useState<ThemeOptions>(props.theme);
-  const styleRef = useRef<CSSStyleDeclaration>();
+  const styleRef = useRef<CSSStyleDeclaration>(undefined);
 
   const getCssVar = useCallback(
     (name: string) => {

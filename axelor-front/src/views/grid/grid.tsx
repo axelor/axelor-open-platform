@@ -147,7 +147,7 @@ function GridInner(props: ViewProps<GridView>) {
   const pageSetRef = useRef(false);
   const gridRef = useRef<GridHandler>(null);
   const selectedIdsRef = useRef<number[]>([]);
-  const saveIdRef = useRef<number | null>();
+  const saveIdRef = useRef<number>(null);
   const saveGridStateRef = useRef(0);
   const initDetailsRef = useRef(false);
   const reorderRef = useRef(false);
@@ -609,7 +609,7 @@ function GridInner(props: ViewProps<GridView>) {
       if (saved) {
         fetchAndSetDetailsRecord(saved, options?.select, restoreDummyValues);
         if ((record.id ?? 0) < 0) {
-          saveIdRef.current = saved.id;
+          saveIdRef.current = saved.id ?? null;
         }
       }
     },

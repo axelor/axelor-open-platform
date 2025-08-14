@@ -341,7 +341,7 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const { Card } = components;
 
-  const scrollTopsRef = useRef<Record<string, number>>();
+  const scrollTopsRef = useRef<Record<string, number>>({});
 
   const $columns = useMemo(
     () =>

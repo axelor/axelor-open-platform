@@ -810,9 +810,9 @@ export function useAfterActions<Type, Args extends Array<unknown>>(
 ) {
   const { actionExecutor } = useFormScope();
 
-  const waitRef = useRef<Promise<Type>>();
-  const argsRef = useRef<Args>();
-  const funcRef = useRef<(...args: Args) => Promise<Type>>();
+  const waitRef = useRef<Promise<Type>>(undefined);
+  const argsRef = useRef<Args>(undefined);
+  const funcRef = useRef<(...args: Args) => Promise<Type>>(undefined);
 
   const reset = useCallback(() => {
     const func = funcRef.current!;
@@ -865,7 +865,7 @@ export function FormRecordUpdates({
   formAtom: FormAtom;
   recordHandler: RecordHandler;
 }) {
-  const recordRef = useRef<DataRecord | undefined | null>();
+  const recordRef = useRef<DataRecord>(null);
   const { formAtom: treeFormAtom } = useCollectionTree();
   const treeFormRecord = useAtomValue(
     useMemo(

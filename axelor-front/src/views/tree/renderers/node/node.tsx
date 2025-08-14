@@ -8,7 +8,7 @@ import { getNodeOfTreeRecord } from "../../utils";
 export interface NodeProps {
   data: TreeRecord;
   view: TreeView;
-  children: ReactElement;
+  children: ReactElement<any>;
   actionExecutor: ActionExecutor;
 }
 
@@ -25,7 +25,7 @@ export function Node({ data, view, actionExecutor, children }: NodeProps) {
         });
       }
     },
-    [actionExecutor, data.data, node]
+    [actionExecutor, data.data, node],
   );
   return node?.onClick ? cloneElement(children, { onDoubleClick }) : children;
 }

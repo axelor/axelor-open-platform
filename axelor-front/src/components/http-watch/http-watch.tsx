@@ -26,7 +26,7 @@ export function HttpWatch() {
 function HttpIndicator({ count }: { count: number }) {
   const [show, setShow] = useState(false);
 
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number>(undefined);
   const mountRef = useRef(false);
   const countRef = useRef(count);
 

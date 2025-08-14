@@ -309,7 +309,7 @@ export function useManyEditor(action: ActionView, dashlet?: boolean) {
     ),
   );
 
-  const parentId = useRef<string | null>(null);
+  const parentId = useRef<string>(null);
 
   useEffect(() => {
     if (!parentId.current) {

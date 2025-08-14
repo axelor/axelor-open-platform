@@ -113,11 +113,11 @@ export function ExpandableFormView({
     onSave: onSaveAction,
   } = schema;
 
-  const fetchedRef = useRef<DataRecord>();
+  const fetchedRef = useRef<DataRecord>(null);
   const closeRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const widgetHandler = useRef<FormWidgetsHandler | null>(null);
+  const widgetHandler = useRef<FormWidgetsHandler>(null);
 
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState(false);

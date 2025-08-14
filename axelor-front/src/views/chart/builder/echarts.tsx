@@ -27,7 +27,7 @@ export function ECharts({
   lazyUpdate: boolean;
 }) {
   const divRef = useRef<HTMLDivElement>(null);
-  const chart = useRef<echarts.ECharts | null>(null);
+  const chart = useRef<echarts.ECharts>(null);
   const theme = useAppTheme();
   const isRTL = useTheme().dir === "rtl";
 

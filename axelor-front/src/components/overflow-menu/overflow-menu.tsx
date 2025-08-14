@@ -39,7 +39,7 @@ export function OverflowMenu<T>({
     useOverflowMenu<HTMLDivElement>();
 
   const [show, setShow] = useState(false);
-  const targetRef = useRef<HTMLDivElement | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
 
   const iconRef = useRefs(ref, targetRef);
 

@@ -99,8 +99,8 @@ export function usePrepareWidgetContext(
 
 export function usePrepareContext(formAtom: FormAtom, options?: DataContext) {
   const actionView = useViewAction();
-  const recordRef = useRef<DataRecord>();
-  const contextRef = useRef<DataContext>();
+  const recordRef = useRef<DataRecord>(null);
+  const contextRef = useRef<DataContext>({});
   const statesByNameRef = useRef<Record<string, WidgetState>>({});
 
   return useAtomCallback(

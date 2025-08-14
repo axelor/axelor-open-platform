@@ -33,7 +33,7 @@ export function Slider(props: FieldProps<string | number>) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ left: 0, top: 0 });
 
-  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   function extractScale(number: number | null | undefined) {
     if (!number || isNaN(number)) return 0;

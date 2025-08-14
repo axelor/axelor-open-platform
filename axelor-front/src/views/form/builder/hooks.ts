@@ -14,7 +14,7 @@ import { ValueAtom } from "./types";
 import * as WIDGETS from "../widgets";
 
 export function useWidget(schema: Schema) {
-  const compRef = useRef<React.ElementType>();
+  const compRef = useRef<React.ElementType>(null);
   if (compRef.current) {
     return compRef.current;
   }
@@ -101,7 +101,7 @@ export function useInput<T>(
   const [changed, setChanged] = useState(false);
   const [text, setText] = useState(valueText);
 
-  const dirtyRef = useRef<boolean>();
+  const dirtyRef = useRef<boolean>(undefined);
 
   const update = useCallback(
     (text: string, fireOnChange: boolean) => {

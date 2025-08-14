@@ -42,7 +42,7 @@ export function Decimal(props: FieldProps<string | number>) {
   );
 
   const [inputElement, setInputElement] = useDisableWheelScroll();
-  const timerRef = useRef<number>();
+  const timerRef = useRef<number>(undefined);
 
   const parse = useCallback(
     (value?: string | number | null) =>

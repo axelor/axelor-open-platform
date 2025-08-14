@@ -323,7 +323,7 @@ function OneToManyInner({
     syncServerSelectionPending: false,
   });
 
-  const panelRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<GridHandler>(null);
 
   const eventsAtom = useMemo(() => atom<GridExpandableEvents>({}), []);

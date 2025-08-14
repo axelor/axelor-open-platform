@@ -5,7 +5,7 @@ import { Box, Popper, ClickAwayListener, usePopperTrigger } from "@axelor/ui";
 import styles from "./tooltip.module.scss";
 
 export type TooltipProps = {
-  children: React.ReactElement;
+  children: React.ReactElement<any>;
   title?: string;
   content: () => JSX.Element | null;
   disableContentClick?: boolean;
@@ -37,6 +37,7 @@ export function Tooltip({
       {cloneElement(children, {
         ref: setTargetEl,
       })}
+
       <Popper
         className={styles.tooltip}
         open={open}

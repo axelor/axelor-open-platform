@@ -16,7 +16,7 @@ export function useBeforeSelect(
   const { onSelect: onSelectAction } = schema;
   const { actionExecutor } = useFormScope();
 
-  const beforeSelectRef = useRef<string | null>(null);
+  const beforeSelectRef = useRef<string>(null);
   const handleBeforeSelect = useCallback(
     async (currentDomain?: string, force = false) => {
       if ((force || beforeSelectRef.current === null) && onSelectAction) {

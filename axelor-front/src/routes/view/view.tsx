@@ -44,9 +44,9 @@ export function View() {
   const { redirect, location } = useRoute();
   const [searchParams] = useSearchParams();
 
-  const pathRef = useRef<string | null>(null);
-  const tabPathRef = useRef<string | null>(null);
-  const actionRef = useRef<string>();
+  const pathRef = useRef<string>(null);
+  const tabPathRef = useRef<string>(null);
+  const actionRef = useRef<string>('');
   const qsRef = useRef<Record<string, Record<string, string>>>({});
   const homeAction = session.info?.user?.action;
 
