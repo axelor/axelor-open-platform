@@ -16,7 +16,7 @@ versions.jackson = "2.19.2"
 versions.shiro = "2.0.5"
 versions.buji_pac4j = "9.1.0"
 versions.jakartaee_pac4j = "8.0.1"
-versions.pac4j = "6.2.0"
+versions.pac4j = "6.2.1"
 versions.ldaptive = "2.4.2"
 
 versions.junit5 = "5.13.4"
