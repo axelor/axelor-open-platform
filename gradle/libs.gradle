@@ -73,7 +73,7 @@ libs.asm = [
 ]
 
 // Byte Buddy
-libs.byte_buddy = "net.bytebuddy:byte-buddy:1.17.6"
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.17.7"
 
 // Graal JS
 libs.graal_js = [
