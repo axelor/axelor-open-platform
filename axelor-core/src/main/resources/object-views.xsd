@@ -4266,6 +4266,11 @@
             <xsd:documentation>Whether to download the exported file on client.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="attachment" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Whether to attach the exported file to current record</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

@@ -242,6 +242,13 @@ export class DefaultActionExecutor implements ActionExecutor {
     }
 
     if (data.exportFile) {
+      if (data.attached) {
+        const context = this.#handler.getContext();
+        const attachments =
+          context["$attachments"] ?? context["attachments"] ?? 0;
+        this.#handler.setValue("$attachments", attachments + 1);
+      }
+
       const link = "ws/files/data-export";
       await download(link, data.exportFile);
     }

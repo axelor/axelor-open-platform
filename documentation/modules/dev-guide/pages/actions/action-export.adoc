@@ -24,6 +24,7 @@ The `<action-export>` can be used to export records.
 | *name* | name of the action
 | output | override the default output path
 | download | whether to download the exported files
+| attachment | whether to attach the exported file to current record
 |===
 
 The export action requires one or more `<export>` tasks:

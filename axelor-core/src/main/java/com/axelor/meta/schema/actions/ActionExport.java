@@ -23,11 +23,17 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
+import com.axelor.db.Model;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.file.store.FileStoreFactory;
 import com.axelor.file.store.Store;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.axelor.text.GroovyTemplates;
@@ -45,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -70,6 +77,8 @@ public class ActionExport extends Action {
   @XmlAttribute(name = "download")
   private Boolean download;
 
+  @XmlAttribute private Boolean attachment;
+
   @XmlElement(name = "export")
   private List<Export> exports;
 
@@ -79,6 +88,10 @@ public class ActionExport extends Action {
 
   public Boolean getDownload() {
     return download;
+  }
+
+  public Boolean getAttachment() {
+    return attachment;
   }
 
   public List<Export> getExports() {
@@ -155,6 +168,20 @@ public class ActionExport extends Action {
   }
 
   @Override
+  protected void checkPermission(ActionHandler handler) {
+    super.checkPermission(handler);
+
+    if (Boolean.TRUE.equals(getAttachment())) {
+      var id = (Long) handler.getContext().get("id");
+
+      if (id != null) {
+        var klass = handler.getContext().getContextClass().asSubclass(Model.class);
+        handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);
+      }
+    }
+  }
+
+  @Override
   public Object evaluate(ActionHandler handler) {
     log.info("action-export: {}", getName());
 
@@ -176,6 +203,16 @@ public class ActionExport extends Action {
         if (Boolean.TRUE.equals(getDownload())) {
           result.put("exportFile", file);
         }
+        if (Boolean.TRUE.equals(getAttachment())) {
+          Long id = (Long) handler.getContext().get("id");
+          if (id != null) {
+            Class<? extends Model> modelClass =
+                handler.getContext().getContextClass().asSubclass(Model.class);
+            Model model = JPA.em().find(modelClass, id);
+            MetaFile attachedMetaFile = createAttachment(model, file);
+            result.put("attached", attachedMetaFile);
+          }
+        }
         ActionValidateBuilder validateBuilder =
             new ActionValidateBuilder(ValidatorType.NOTIFY)
                 .setMessage(I18n.get("Export complete."));
@@ -190,6 +227,18 @@ public class ActionExport extends Action {
       }
     }
     return null;
+  }
+
+  private MetaFile createAttachment(Model model, String pathName) {
+    var path = getExportPath().toPath().resolve(pathName);
+
+    try (var is = java.nio.file.Files.newInputStream(path)) {
+      var fileName = path.getFileName().toString();
+      var dmsFile = Beans.get(MetaFiles.class).attach(is, fileName, model);
+      return dmsFile.getMetaFile();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   @XmlType

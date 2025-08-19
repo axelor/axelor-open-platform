@@ -1,0 +1,5 @@
+---
+title: Rework axelor-export storage
+type: feature
+description: |
+  Add `attachment="true|false"` attribute to attach the exported file to current object.
