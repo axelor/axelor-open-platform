@@ -197,18 +197,27 @@ public class RedissonProvider {
   }
 
   /** Shuts down all Redisson clients. */
-  public static void shutdown() {
+  public static synchronized void shutdown() {
     if (redissonClients.isEmpty()) {
       return;
     }
 
-    log.info("Shutting down Redisson...");
-    for (var redisson : redissonClients.values()) {
-      try {
-        redisson.shutdown();
-      } catch (Exception e) {
-        log.error("Error shutting down {}: {}", redisson, e);
+    log.info("Shutting down {} Redisson clients...", redissonClients.size());
+
+    try {
+      for (var redisson : redissonClients.values()) {
+        try {
+          redisson.shutdown();
+        } catch (Exception e) {
+          log.error("Error shutting down Redisson client {}: {}", redisson.getId(), e);
+        }
       }
+    } finally {
+      redissonClients.clear();
     }
+  }
+
+  public static boolean isActive() {
+    return !redissonClients.isEmpty();
   }
 }

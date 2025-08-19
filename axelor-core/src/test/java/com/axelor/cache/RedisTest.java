@@ -20,6 +20,7 @@ package com.axelor.cache;
 
 import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
+import com.axelor.cache.redisson.RedissonProvider;
 import com.axelor.test.GuiceModules;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class RedisTest extends AbstractBaseCache {
       return;
     }
 
-    if (redisServer != null) {
+    if (redisServer != null && !RedissonProvider.isActive()) {
       redisServer.stop();
     }
   }
