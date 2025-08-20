@@ -190,7 +190,6 @@ export function processContextValues(
   meta?: FormState["meta"],
 ) {
   const IGNORE = [
-    "$attachments",
     "$processInstanceId",
     "_dirty",
     "_fetched",
@@ -292,7 +291,7 @@ export function processContextValues(
 }
 
 export function processSaveValues(record: DataRecord, meta: FormState["meta"]) {
-  return processContextValues(record, meta);
+  return { ...processContextValues(record, meta), $attachments: undefined };
 }
 
 export function compactJson(
@@ -583,7 +582,7 @@ export function createContextParams(
     const _view = _views?.find((x) => x.type === _viewType);
     const _viewName = _view ? (_view.name ?? name) : name;
 
-      // ignore special context names
+    // ignore special context names
     const IGNORE = ["_showRecord", "_showSingle", "__check_version"];
 
     return {
