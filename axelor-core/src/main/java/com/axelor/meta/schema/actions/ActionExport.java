@@ -60,6 +60,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @XmlType
 public class ActionExport extends Action {
@@ -129,6 +130,14 @@ public class ActionExport extends Action {
       }
 
       String name = export.getName();
+
+      if (StringUtils.isBlank(name)
+          || ".".equals(name)
+          || "..".equals(name)
+          || !Objects.equals(name, Path.of(name).getFileName().toString())) {
+        throw new IllegalArgumentException("Invalid file name: " + name);
+      }
+
       if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
         name = handler.evaluate(toExpression(name, true)).toString();
       }
