@@ -4251,16 +4251,6 @@
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
-        <xsd:attribute name="output" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Override the default output directory structure.
-              Special keywords
-              ${name}, ${date}, ${datetime} can
-              be used to organize the output directory.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="download" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Whether to download the exported file on client.</xsd:documentation>

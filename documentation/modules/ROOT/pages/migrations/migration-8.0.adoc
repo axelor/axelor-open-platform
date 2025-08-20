@@ -503,6 +503,12 @@ ALTER TABLE meta_filter DROP COLUMN name;
 CREATE INDEX IF NOT EXISTS meta_filter_filter_view_idx ON meta_filter(filter_view);
 ----
 
+== `action-export` storage changes
+
+`output` attribute on `action-export` action has been removed.
+
+Refer to xref:dev-guide:actions/action-export.adoc[action-export documentation] for details.
+
 == `TagSelect` widget deprecated in favor of `Tags`
 
 `TagSelect` widget is deprecated in favor of `Tags`. It has the same behavior, it's just a renaming of the widget name

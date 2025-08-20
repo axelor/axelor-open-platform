@@ -71,9 +71,6 @@ public class ActionExport extends Action {
   private static final String TEMPLATE_DIR =
       AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
 
-  @XmlAttribute(name = "output")
-  private String output;
-
   @XmlAttribute(name = "download")
   private Boolean download;
 
@@ -81,10 +78,6 @@ public class ActionExport extends Action {
 
   @XmlElement(name = "export")
   private List<Export> exports;
-
-  public String getOutput() {
-    return output;
-  }
 
   public Boolean getDownload() {
     return download;
@@ -185,7 +178,7 @@ public class ActionExport extends Action {
   public Object evaluate(ActionHandler handler) {
     log.info("action-export: {}", getName());
 
-    String dir = output == null ? DEFAULT_DIR : output;
+    String dir = DEFAULT_DIR;
 
     dir =
         dir.replace("${name}", getName())

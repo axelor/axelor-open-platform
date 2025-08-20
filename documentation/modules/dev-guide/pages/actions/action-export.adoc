@@ -6,7 +6,7 @@ The `<action-export>` can be used to export records.
 
 [source,xml]
 -----
-<action-export name="export.sale.order" output="${name}/${date}${time}">
+<action-export name="export.sale.order">
   <export name="${name}.xml"
     template="data/ws-test/export-sale-order.tmpl"
     engine="groovy"/>
@@ -22,7 +22,6 @@ The `<action-export>` can be used to export records.
 | Name | Description
 
 | *name* | name of the action
-| output | override the default output path
 | download | whether to download the exported files
 | attachment | whether to attach the exported file to current record
 |===
