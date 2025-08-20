@@ -247,10 +247,22 @@ export class DefaultActionExecutor implements ActionExecutor {
         const attachments =
           context["$attachments"] ?? context["attachments"] ?? 0;
         this.#handler.setValue("$attachments", attachments + 1);
-      }
 
-      const link = "ws/files/data-export";
-      await download(link, data.exportFile);
+        const confirmed = await dialogs.confirm({
+          title: i18n.get("Download"),
+          content: i18n.get(
+            "Export attached to current object. Would you like to download?",
+          ),
+        });
+
+        if (confirmed) {
+          const url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
+          await download(url, data.attached.fileName);
+        }
+      } else {
+        const link = "ws/files/data-export";
+        await download(link, data.exportFile);
+      }
     }
 
     if (data.signal === "refresh-app") {

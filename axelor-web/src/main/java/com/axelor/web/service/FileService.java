@@ -25,7 +25,6 @@ import com.axelor.common.http.ContentDisposition;
 import com.axelor.file.temp.TempFiles;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
-import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.google.inject.persist.Transactional;
@@ -71,14 +70,20 @@ public class FileService extends AbstractService {
     if (StringUtils.isBlank(name)) {
       return jakarta.ws.rs.core.Response.status(Status.BAD_REQUEST).build();
     }
-    final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
-    if (!file.isFile()) {
+
+    var file = TempFiles.findTempFile(name).normalize();
+
+    if (!file.startsWith(TempFiles.getTempPath()) || !java.nio.file.Files.isRegularFile(file)) {
       return jakarta.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
-    return jakarta.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+
+    return jakarta.ws.rs.core.Response.ok(file.toFile(), MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header(
             "Content-Disposition",
-            ContentDisposition.attachment().filename(file.getName()).build().toString())
+            ContentDisposition.attachment()
+                .filename(file.getFileName().toString())
+                .build()
+                .toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }

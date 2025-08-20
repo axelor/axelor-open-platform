@@ -22,14 +22,12 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
-import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
-import com.axelor.db.tenants.TenantResolver;
 import com.axelor.file.store.FileStoreFactory;
 import com.axelor.file.store.Store;
-import com.axelor.i18n.I18n;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaFiles;
@@ -54,19 +52,12 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @XmlType
 public class ActionExport extends Action {
-
-  private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
-  private static final String DEFAULT_DIR = "${date}/${name}";
 
   private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
   private static final String TEMPLATE_DIR =
@@ -92,17 +83,7 @@ public class ActionExport extends Action {
     return exports;
   }
 
-  public static File getExportPath() {
-    final Path exportPath =
-        Path.of(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR));
-    final String tenantId = TenantResolver.currentTenantIdentifier();
-    if (StringUtils.isBlank(tenantId)) {
-      return exportPath.toFile();
-    }
-    return exportPath.resolve(tenantId).toFile();
-  }
-
-  protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
+  protected String doExport(Export export, ActionHandler handler) throws IOException {
     Store store = FileStoreFactory.getStore();
     String templatePath = handler.evaluate(export.template).toString();
     File template;
@@ -131,13 +112,6 @@ public class ActionExport extends Action {
 
       String name = export.getName();
 
-      if (StringUtils.isBlank(name)
-          || ".".equals(name)
-          || "..".equals(name)
-          || !Objects.equals(name, Path.of(name).getFileName().toString())) {
-        throw new IllegalArgumentException("Invalid file name: " + name);
-      }
-
       if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
         name = handler.evaluate(toExpression(name, true)).toString();
       }
@@ -149,19 +123,23 @@ public class ActionExport extends Action {
         engine = new GroovyTemplates();
       }
 
-      File output = getExportPath();
-      output = FileUtils.getFile(output, dir, name);
+      name = FileUtils.safeFileName(name);
+      Path tempDir = TempFiles.createTempDir("export-");
+      Path output = tempDir.resolve(name).normalize();
+
+      if (!output.startsWith(tempDir)) {
+        throw new IllegalArgumentException("Invalid file name: " + name);
+      }
 
       String contents = null;
 
       contents = handler.template(engine, reader);
 
-      Files.createParentDirs(output);
-      Files.asCharSink(output, StandardCharsets.UTF_8).write(contents);
+      Files.asCharSink(output.toFile(), StandardCharsets.UTF_8).write(contents);
 
       log.info("file saved: {}", output);
 
-      return FileUtils.getFile(dir, name).toString();
+      return TempFiles.getTempPath().relativize(output).toString();
     } finally {
       if (reader != null) {
         reader.close();
@@ -187,25 +165,17 @@ public class ActionExport extends Action {
   public Object evaluate(ActionHandler handler) {
     log.info("action-export: {}", getName());
 
-    String dir = DEFAULT_DIR;
-
-    dir =
-        dir.replace("${name}", getName())
-            .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
-            .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
-    dir = handler.evaluate(dir).toString();
-
     for (Export export : exports) {
       if (!export.test(handler)) {
         continue;
       }
       final Map<String, Object> result = new HashMap<>();
       try {
-        String file = doExport(dir, export, handler);
-        if (Boolean.TRUE.equals(getDownload())) {
-          result.put("exportFile", file);
-        }
-        if (Boolean.TRUE.equals(getAttachment())) {
+        String file = doExport(export, handler);
+        result.put("exportFile", file);
+
+        // Force either attachment or download
+        if (Boolean.TRUE.equals(getAttachment()) || Boolean.FALSE.equals(getDownload())) {
           Long id = (Long) handler.getContext().get("id");
           if (id != null) {
             Class<? extends Model> modelClass =
@@ -215,10 +185,7 @@ public class ActionExport extends Action {
             result.put("attached", attachedMetaFile);
           }
         }
-        ActionValidateBuilder validateBuilder =
-            new ActionValidateBuilder(ValidatorType.NOTIFY)
-                .setMessage(I18n.get("Export complete."));
-        result.putAll(validateBuilder.build());
+
         return result;
       } catch (Exception e) {
         log.error("error while exporting: ", e);
@@ -231,12 +198,15 @@ public class ActionExport extends Action {
     return null;
   }
 
-  private MetaFile createAttachment(Model model, String pathName) {
-    var path = getExportPath().toPath().resolve(pathName);
+  private MetaFile createAttachment(Model model, String tempName) {
+    var tempFile = TempFiles.findTempFile(tempName);
 
-    try (var is = java.nio.file.Files.newInputStream(path)) {
-      var fileName = path.getFileName().toString();
-      var dmsFile = Beans.get(MetaFiles.class).attach(is, fileName, model);
+    if (!java.nio.file.Files.isRegularFile(tempFile)) {
+      throw new IllegalArgumentException("Export file not found: " + tempFile);
+    }
+
+    try (var is = java.nio.file.Files.newInputStream(tempFile)) {
+      var dmsFile = Beans.get(MetaFiles.class).attach(is, tempFile.getFileName().toString(), model);
       return dmsFile.getMetaFile();
     } catch (IOException e) {
       throw new UncheckedIOException(e);

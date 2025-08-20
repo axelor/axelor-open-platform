@@ -26,6 +26,10 @@ The `<action-export>` can be used to export records.
 | attachment | whether to attach the exported file to current record
 |===
 
+NOTE: Export file will be directly downloaded by default.
+If `attachment` is set to `true`, the export file will first be attached to the current record,
+then the user will be prompted if they wish to download the attachement.
+
 The export action requires one or more `<export>` tasks:
 
 * `<export>` - specify an export task

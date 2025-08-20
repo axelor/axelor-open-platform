@@ -2,5 +2,9 @@
 title: Rework axelor-export storage
 type: feature
 description: |
+  Exported files are now created as a temporary files instead of being saved to `data.export.dir` directory.
+  It used to be possible to disable downloading and have exported files only accessible in `data.export.dir` directory.
+  This is no longer the case: the export files have to be either downloaded or attached to current record.
+
   - Add `attachment="true|false"` attribute to attach the exported file to current object.
   - Remove `output` attribute.

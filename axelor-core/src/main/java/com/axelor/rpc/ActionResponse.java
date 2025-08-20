@@ -24,6 +24,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.file.temp.TempFiles;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.validate.validator.Alert;
 import com.axelor.meta.schema.actions.validate.validator.Error;
@@ -32,6 +33,7 @@ import com.axelor.meta.schema.actions.validate.validator.Notify;
 import jakarta.annotation.Nullable;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -274,10 +276,25 @@ public class ActionResponse extends Response {
    *
    * <p>The client will initiate downloading the exported file.
    *
-   * @param path the relative path to the exported file
+   * <p>Make sure the specified path is relative to the data upload temporary directory.
+   *
+   * @param path the relative path string to the exported file
    */
   public void setExportFile(String path) {
     set("exportFile", path);
+  }
+
+  /**
+   * Set the file path relative to the data upload temporary directory.
+   *
+   * <p>The client will initiate downloading the exported file.
+   *
+   * <p>This ensures that the path is relative to the data upload temporary directory.
+   *
+   * @param path the path to the exported file
+   */
+  public void setExportFile(Path path) {
+    setExportFile(TempFiles.getTempPath().relativize(path).toString());
   }
 
   /**
