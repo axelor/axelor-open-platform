@@ -31,7 +31,7 @@ description: |
   * Update Swagger from 2.2.28 to 2.2.36
   * Upgrade snakeyaml from 2.3 to 2.4
   * Upgrade Shiro from 1.13.0 to 2.0.5
-  * Upgrade Redisson from 3.38.1 to 3.50.0
+  * Upgrade Redisson from 3.38.1 to 3.51.0
   * Upgrade Jackson from 2.18.x to 2.19.2
   * Upgrade HikariCP from 6.3.0 to 7.0.2
   * Upgrade hazelcast from 5.3.7 to 5.5.0
